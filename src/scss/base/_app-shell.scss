@@ -1,8 +1,32 @@
 @use "../abstracts/variables" as v;
 
-html, body { height: 100%; }
+/* =========================================================
+   App shell background
+   Cel:
+   - gradient nie może się kończyć po 100vh
+   - zawsze jeden, bez powtarzania
+   - fallback na color-bg
+   ========================================================= */
+
+html,
+body {
+  height: auto;
+  min-height: 100%;
+}
 
 body {
-  background: var(--mg-bg-gradient, v.$color-bg);
+  margin: 0;
+  min-height: 100dvh;
+
   color: v.$color-text;
+
+  background-color: v.$color-bg;
+
+  background-image: var(--mg-bg-gradient, none);
+  background-repeat: no-repeat;
+  background-position: top center;
+
+  background-size: 100% 100%;
+
+  background-attachment: scroll;
 }

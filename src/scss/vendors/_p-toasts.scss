@@ -1,0 +1,122 @@
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG — Toast (MG semantic colors)
+   ========================================================= */
+
+/* Base toast */
+.p-toast-message.mg-toast {
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-border;
+  box-shadow: v.$shadow-soft;
+
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+/* Layout tweaks */
+.p-toast-message.mg-toast .p-toast-message-content {
+  align-items: flex-start;
+}
+
+.p-toast-message.mg-toast .p-toast-summary {
+  font-family: v.$font-family-display;
+}
+
+.p-toast-message.mg-toast .p-toast-detail {
+  color: v.$color-text-muted;
+}
+
+/* =========================================================
+   Close button / icon (X)
+   SVG ma fill="currentColor" => sterujemy `color`
+   Cel:
+   - zawsze czytelny (szczególnie w light, gdzie tło jest prawie białe)
+   ========================================================= */
+
+.p-toast-message.mg-toast .p-toast-close-button {
+  color: v.$color-text; 
+  opacity: 0.9;
+  border-radius: v.$radius-sm;
+  transition: opacity v.$transition-fast, background-color v.$transition-fast,
+    color v.$transition-fast, box-shadow v.$transition-fast;
+}
+
+.p-toast-message.mg-toast .p-toast-close-button:hover {
+  opacity: 1;
+  background: color-mix(in srgb, v.$color-border 30%, transparent);
+}
+
+.p-toast-message.mg-toast .p-toast-close-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, v.$color-secondary 35%, transparent);
+}
+
+/* Dodatkowo łapiemy ikonę, gdy Prime nadaje jej własną klasę */
+.p-toast-message.mg-toast .p-toast-close-icon,
+.p-toast-message.mg-toast .p-toast-close-button .p-icon {
+  color: inherit;
+}
+
+/* =========================================================
+   Semantic variants
+   Rule:
+   - dark (default): wash = mix(surface, semantic)
+   - light: wash = mix(white, semantic) -> nie miesza się z papierem
+   ========================================================= */
+
+/* ---------- DARK (default) ---------- */
+
+/* INFO */
+.p-toast-message.mg-toast--info {
+  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-info);
+  border-color: color-mix(in srgb, v.$color-info 55%, v.$color-border);
+}
+.p-toast-message.mg-toast--info .p-toast-summary {
+  color: v.$color-info;
+}
+
+/* SUCCESS */
+.p-toast-message.mg-toast--success {
+  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-success);
+  border-color: color-mix(in srgb, v.$color-success 55%, v.$color-border);
+}
+.p-toast-message.mg-toast--success .p-toast-summary {
+  color: v.$color-success;
+}
+
+/* DANGER */
+.p-toast-message.mg-toast--danger {
+  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-danger);
+  border-color: color-mix(in srgb, v.$color-danger 55%, v.$color-border);
+}
+.p-toast-message.mg-toast--danger .p-toast-summary {
+  color: v.$color-danger;
+}
+
+/* ARCANE */
+.p-toast-message.mg-toast--arcane {
+  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-arcane);
+  border-color: color-mix(in srgb, v.$color-arcane 55%, v.$color-border);
+}
+.p-toast-message.mg-toast--arcane .p-toast-summary {
+  color: v.$color-arcane;
+}
+
+/* ---------- LIGHT overrides ---------- */
+
+html[data-theme="light"] .p-toast-message.mg-toast--info {
+  background: color-mix(in srgb, white 88%, v.$color-info);
+}
+
+html[data-theme="light"] .p-toast-message.mg-toast--success {
+  background: color-mix(in srgb, white 88%, v.$color-success);
+}
+
+html[data-theme="light"] .p-toast-message.mg-toast--danger {
+  background: color-mix(in srgb, white 88%, v.$color-danger);
+}
+
+html[data-theme="light"] .p-toast-message.mg-toast--arcane {
+  background: color-mix(in srgb, white 88%, v.$color-arcane);
+}

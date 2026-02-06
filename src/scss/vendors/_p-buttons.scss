@@ -1,0 +1,99 @@
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG — Buttons (MG semantic mapping)
+   Cel:
+   - Prime używa var(--p-button-*-*)
+   - mapujemy je na --mg-* (jedno źródło prawdy)
+   - RULE: warn = arcane
+   - nie ruszamy hover/active dopóki nie ustalimy estetyki na realnych tokenach
+   ========================================================= */
+
+/* Opcjonalne: drobne dopasowanie typografii/radius (zostawiam minimalnie) */
+.p-button {
+  border-radius: v.$radius-md;
+  font-family: v.$font-family-body;
+  font-weight: 700;
+  transition: background-color v.$transition-fast, border-color v.$transition-fast,
+    color v.$transition-fast, box-shadow v.$transition-fast;
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 2px color-mix(in srgb, v.$color-secondary 35%, transparent);
+  }
+}
+
+/* =========================================================
+   Sedno: mapowanie runtime CSS vars Prime -> MG tokens
+   Uwaga: to muszą być realne vars, które Prime faktycznie czyta.
+   Ty już potwierdziłeś: --p-button-success-background / border-color / color
+   ========================================================= */
+
+:root {
+  /* SUCCESS */
+  --p-button-success-background: #{v.$color-success};
+  --p-button-success-border-color: #{v.$color-success};
+  --p-button-success-color: #{v.$color-white};
+
+  /* INFO */
+  --p-button-info-background: #{v.$color-info};
+  --p-button-info-border-color: #{v.$color-info};
+  --p-button-info-color: #{v.$color-white};
+
+  /* DANGER */
+  --p-button-danger-background: #{v.$color-danger};
+  --p-button-danger-border-color: #{v.$color-danger};
+  --p-button-danger-color: #{v.$color-white};
+
+  /* WARN => ARCANE (project rule) */
+  --p-button-warn-background: #{v.$color-arcane};
+  --p-button-warn-border-color: #{v.$color-arcane};
+  --p-button-warn-color: #{v.$color-white};
+}
+
+/* =========================================================
+   Outlined/Text — ustawiamy tylko kolory (bez hover),
+   żeby nie robić "brzydkich" mieszanek na ślepo.
+   Jeśli Twoja wersja Prime nie używa tych varów, nic się nie stanie.
+   ========================================================= */
+
+:root {
+  /* Outlined */
+  --p-button-outlined-success-border-color: #{v.$color-success};
+  --p-button-outlined-success-color: #{v.$color-success};
+
+  --p-button-outlined-info-border-color: #{v.$color-info};
+  --p-button-outlined-info-color: #{v.$color-info};
+
+  --p-button-outlined-danger-border-color: #{v.$color-danger};
+  --p-button-outlined-danger-color: #{v.$color-danger};
+
+  --p-button-outlined-warn-border-color: #{v.$color-arcane};
+  --p-button-outlined-warn-color: #{v.$color-arcane};
+
+  /* Text */
+  --p-button-text-success-color: #{v.$color-success};
+  --p-button-text-info-color: #{v.$color-info};
+  --p-button-text-danger-color: #{v.$color-danger};
+  --p-button-text-warn-color: #{v.$color-arcane};
+}
+
+/* =========================================================
+   (Opcjonalnie) MG-style hover/active — ZAKOMENTOWANE.
+   Włączymy dopiero po tym jak wspólnie obejrzymy, jak to wygląda na Twoich tokenach.
+   Prime ma różne nazwy varów zależnie od wersji, więc wolę nie zgadywać.
+   ========================================================= */
+
+:root {
+  --p-button-success-hover-background: color-mix(in srgb, #{v.$color-success} 88%, black);
+  --p-button-success-active-background: color-mix(in srgb, #{v.$color-success} 78%, black);
+
+  --p-button-info-hover-background: color-mix(in srgb, #{v.$color-info} 88%, black);
+  --p-button-info-active-background: color-mix(in srgb, #{v.$color-info} 78%, black);
+
+  --p-button-danger-hover-background: color-mix(in srgb, #{v.$color-danger} 88%, black);
+  --p-button-danger-active-background: color-mix(in srgb, #{v.$color-danger} 78%, black);
+
+  --p-button-warn-hover-background: color-mix(in srgb, #{v.$color-arcane} 88%, black);
+  --p-button-warn-active-background: color-mix(in srgb, #{v.$color-arcane} 78%, black);
+}

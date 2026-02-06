@@ -1,0 +1,58 @@
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   Scrollbars — MG (docelowo prosto)
+   Zasady:
+   - LIGHT: thumb = primary (crimson)
+   - DARK: thumb = golden-ish (bez gradientu; przeglądarki nie wspierają tego stabilnie)
+   - track zawsze = bg
+   - hover = lekki shift (bez procentologii od procentów, 1 mieszanka max)
+   ========================================================= */
+
+/* Złote “solid” wyciągnięte z legacy gradientu (stałe, świadome wyjątki) */
+$gold-500: rgb(232, 188, 90);
+$gold-700: rgb(158, 113, 48);
+
+/* ---------- DEFAULT (dark) ---------- */
+:root {
+  --mg-scrollbar-track: #{v.$color-bg};
+
+  /* golden-ish thumb */
+  --mg-scrollbar-thumb: #{$gold-700};
+  --mg-scrollbar-thumb-hover: #{$gold-500};
+}
+
+/* ---------- LIGHT ---------- */
+html[data-theme="light"] {
+  --mg-scrollbar-track: #{v.$color-bg};
+
+  /* brand thumb */
+  --mg-scrollbar-thumb: #{v.$color-primary};
+  --mg-scrollbar-thumb-hover: color-mix(in srgb, #{v.$color-primary} 85%, black);
+}
+
+/* ---------- Firefox ---------- */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mg-scrollbar-thumb) var(--mg-scrollbar-track);
+}
+
+/* ---------- WebKit ---------- */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mg-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mg-scrollbar-thumb);
+  border-radius: 999px;
+  border: 3px solid var(--mg-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mg-scrollbar-thumb-hover);
+}

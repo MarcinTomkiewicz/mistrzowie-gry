@@ -1,5 +1,8 @@
 <section class="mg-section mg-section--full">
   <div class="mg-container">
+    <!-- PrimeNG toast host -->
+    <p-toast position="top-right"></p-toast>
+
     <header class="mg-card hero">
       <div class="brand">
         <div class="logo-wrap" aria-hidden="true">
@@ -21,20 +24,15 @@
 
           <!-- switch theme -->
           <div class="row flex-row-start theme-switch">
-            <button
-              type="button"
-              class="tag-badge tag-badge--muted"
-              (click)="setTheme('dark')"
-            >
-              Dark
-            </button>
-            <button
-              type="button"
-              class="tag-badge tag-badge--muted"
-              (click)="setTheme('light')"
-            >
-              Light
-            </button>
+            <span class="tag-badge tag-badge--muted">Dark</span>
+
+            <p-toggleswitch
+              [(ngModel)]="isLightTheme"
+              (onChange)="onThemeToggle()"
+              ariaLabel="Przełącz motyw jasny/ciemny"
+            ></p-toggleswitch>
+
+            <span class="tag-badge tag-badge--muted">Light</span>
           </div>
         </div>
       </div>
@@ -57,11 +55,9 @@
     </header>
 
     <div class="mg-section">
-      <!-- <div class="mg-container"> -->
-        <div class="mg-card">
-          <div class="mg-section__title">Hello</div>
-        </div>
-      <!-- </div> -->
+      <div class="mg-card">
+        <div class="mg-section__title">Hello</div>
+      </div>
     </div>
 
     <main class="grid">
@@ -116,6 +112,20 @@
           <a href="#">przykładowy link</a>
           &nbsp;— a tu tekst normalny i <strong>pogrubiony</strong>.
         </p>
+
+        <div class="mg-section__title">PrimeNG</div>
+
+        <div class="row flex-row-start" style="gap: 0.75rem; flex-wrap: wrap">
+          <p-button label="Toast: Info" (onClick)="toastInfo()"></p-button>
+          <p-button
+            label="Toast: Success"
+            (onClick)="toastSuccess()"
+          ></p-button>
+          <p-button label="Toast: Danger" (onClick)="toastDanger()"></p-button>
+          <p-button label="Toast: Arcane" (onClick)="toastArcane()"></p-button>
+
+          <p-button label="Otwórz modal" (onClick)="openDialog()"></p-button>
+        </div>
       </section>
 
       <section class="mg-card">
@@ -147,4 +157,50 @@
       <div class="muted">Tokens + mixins only</div>
     </footer>
   </div>
+  <router-outlet></router-outlet>
+
+  <!-- PrimeNG Dialog (modal) -->
+  <p-dialog
+    header="Arcane dialog"
+    [modal]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [closeOnEscape]="true"
+    [style]="{ width: 'min(92vw, 560px)' }"
+    [visible]="isDialogOpen()"
+    (onHide)="closeDialog()"
+    styleClass="mg-dialog mg-dialog--success"
+  >
+    <p class="muted">
+      To jest przykładowy modal (PrimeNG <code>p-dialog</code>) wystylowany
+      przez <code>vendors/_p-dialogs.scss</code> na bazie tokenów
+      <code>--mg-*</code>.
+    </p>
+
+    <p>
+      Treść może być dowolna: formularze, potwierdzenia, edycje. Zależy nam na
+      tym, żeby defaultowy dialog był spójny z MG.
+    </p>
+
+    <ng-template pTemplate="footer">
+      <div
+        class="row flex-row-start"
+        style="gap: 0.75rem; justify-content: flex-end; width: 100%"
+      >
+        <p-button
+          label="Anuluj"
+          severity="danger"
+          outlined
+          (onClick)="closeDialog()"
+        ></p-button>
+        <p-button
+          label="Potwierdź"
+          severity="success"
+          (onClick)="confirmDialog()"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </section>

@@ -1,0 +1,146 @@
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG — Dialog (MG)
+   - header semantyczny = pełny kolor (bez wash)
+   - close button (X) ma SVG fill="currentColor" -> sterujemy `color`
+   - hover: odwrócenie (jasne tło przycisku + ciemna ikona)
+   ========================================================= */
+
+/* Base dialog container */
+.p-dialog.mg-dialog {
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$color-border;
+  box-shadow: v.$shadow-soft;
+
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+/* Header (neutral) */
+.p-dialog.mg-dialog .p-dialog-header {
+  border-bottom: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+
+  border-top-left-radius: v.$radius-lg;
+  border-top-right-radius: v.$radius-lg;
+}
+
+.p-dialog.mg-dialog .p-dialog-title {
+  font-family: v.$font-family-display;
+}
+
+/* Close button base (neutral header) — delikatne, bez narzucania palety */
+.p-dialog.mg-dialog .p-dialog-header .p-dialog-close-button {
+  /* zostawiamy Prime'owe paddingi/rozmiary, pilnujemy tylko czytelności i focus */
+  color: inherit; /* SVG korzysta z currentColor */
+  opacity: 0.85;
+  transition: opacity v.$transition-fast, background-color v.$transition-fast,
+    color v.$transition-fast;
+}
+
+.p-dialog.mg-dialog .p-dialog-header .p-dialog-close-button:hover {
+  opacity: 1;
+}
+
+/* Focus ring na close button — spójny z MG */
+.p-dialog.mg-dialog .p-dialog-header .p-dialog-close-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, v.$color-secondary 35%, transparent);
+}
+
+/* Content */
+.p-dialog.mg-dialog .p-dialog-content {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+/* Footer */
+.p-dialog.mg-dialog .p-dialog-footer {
+  border-top: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+
+  border-bottom-left-radius: v.$radius-lg;
+  border-bottom-right-radius: v.$radius-lg;
+}
+
+/* Mask */
+.p-dialog-mask {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* =========================================================
+   Semantic variants — SOLID header
+   ========================================================= */
+
+.p-dialog.mg-dialog--info .p-dialog-header {
+  background: v.$color-info;
+  color: v.$color-white;
+  border-bottom-color: color-mix(in srgb, v.$color-info 55%, v.$color-border);
+}
+
+.p-dialog.mg-dialog--success .p-dialog-header {
+  background: v.$color-success;
+  color: v.$color-white;
+  border-bottom-color: color-mix(in srgb, v.$color-success 55%, v.$color-border);
+}
+
+.p-dialog.mg-dialog--danger .p-dialog-header {
+  background: v.$color-danger;
+  color: v.$color-white;
+  border-bottom-color: color-mix(in srgb, v.$color-danger 55%, v.$color-border);
+}
+
+.p-dialog.mg-dialog--arcane .p-dialog-header {
+  background: v.$color-arcane;
+  color: v.$color-white;
+  border-bottom-color: color-mix(in srgb, v.$color-arcane 55%, v.$color-border);
+}
+
+/* =========================================================
+   Close button (X) inside semantic header
+   - normal: white icon on transparent background
+   - hover: invert -> light background + dark icon (ink)
+   - nie używamy filter, bo SVG ma currentColor
+   ========================================================= */
+
+/* Normal state in semantic headers */
+.p-dialog.mg-dialog--info .p-dialog-header .p-dialog-close-button,
+.p-dialog.mg-dialog--success .p-dialog-header .p-dialog-close-button,
+.p-dialog.mg-dialog--danger .p-dialog-header .p-dialog-close-button,
+.p-dialog.mg-dialog--arcane .p-dialog-header .p-dialog-close-button {
+  color: v.$color-white;
+  opacity: 0.9;
+  background: transparent;
+}
+
+/* Hover "invert" */
+.p-dialog.mg-dialog--info .p-dialog-header .p-dialog-close-button:hover,
+.p-dialog.mg-dialog--success .p-dialog-header .p-dialog-close-button:hover,
+.p-dialog.mg-dialog--danger .p-dialog-header .p-dialog-close-button:hover,
+.p-dialog.mg-dialog--arcane .p-dialog-header .p-dialog-close-button:hover {
+  opacity: 1;
+
+  /* odwrócenie: jasne tło + ciemna ikona */
+  background: color-mix(in srgb, white 78%, transparent);
+  color: v.$color-ink;
+}
+
+/* Active: trochę mocniej */
+.p-dialog.mg-dialog--info .p-dialog-header .p-dialog-close-button:active,
+.p-dialog.mg-dialog--success .p-dialog-header .p-dialog-close-button:active,
+.p-dialog.mg-dialog--danger .p-dialog-header .p-dialog-close-button:active,
+.p-dialog.mg-dialog--arcane .p-dialog-header .p-dialog-close-button:active {
+  background: color-mix(in srgb, white 70%, transparent);
+  color: v.$color-ink;
+}
+
+/* Focus-visible w semantic headerze (ring + zachowany kontrast) */
+.p-dialog.mg-dialog--info .p-dialog-header .p-dialog-close-button:focus-visible,
+.p-dialog.mg-dialog--success .p-dialog-header .p-dialog-close-button:focus-visible,
+.p-dialog.mg-dialog--danger .p-dialog-header .p-dialog-close-button:focus-visible,
+.p-dialog.mg-dialog--arcane .p-dialog-header .p-dialog-close-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, white 55%, transparent);
+}

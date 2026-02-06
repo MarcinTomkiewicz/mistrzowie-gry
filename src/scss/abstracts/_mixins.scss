@@ -8,6 +8,7 @@
     @content;
   }
 }
+
 @mixin down($bp) {
   @media (max-width: map.get(v.$breakpoints, $bp)) {
     @content;
@@ -20,10 +21,17 @@
   flex-direction: $direction;
   justify-content: $justify;
   align-items: $align;
-  @if $gap != null { gap: $gap; }
+  @if $gap != null {
+    gap: $gap;
+  }
 }
+
 @mixin center($inline: false) {
-  display: if($inline, inline-flex, flex);
+  @if $inline {
+    display: inline-flex;
+  } @else {
+    display: flex;
+  }
   justify-content: center;
   align-items: center;
 }
