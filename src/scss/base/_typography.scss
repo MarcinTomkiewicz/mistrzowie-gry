@@ -1,0 +1,111 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   TYPOGRAPHY – base defaults
+   ========================================================= */
+
+body {
+  font-family: v.$font-family-body;
+  line-height: v.$line-height-base;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 map.get(v.$spacings, "sm");
+  font-family: v.$font-family-display;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+h1 { font-size: map.get(v.$font-sizes, "hero"); }
+h2 { font-size: map.get(v.$font-sizes, "xxl"); }
+h3 { font-size: map.get(v.$font-sizes, "xl"); }
+h4 { font-size: map.get(v.$font-sizes, "lg"); }
+h5 { font-size: map.get(v.$font-sizes, "md"); }
+h6 { font-size: map.get(v.$font-sizes, "sm"); }
+
+p {
+  margin: 0 0 map.get(v.$spacings, "md");
+}
+
+small {
+  font-size: map.get(v.$font-sizes, "sm");
+  color: v.$color-text-muted;
+}
+
+strong {
+  font-weight: 700;
+}
+
+a {
+  color: v.$color-link;
+  text-decoration: none;
+
+  &:hover {
+    color: v.$color-link-hover;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+code,
+kbd,
+samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+}
+
+code {
+  padding: 0.12rem 0.35rem;
+  border-radius: v.$radius-sm;
+  border: 1px solid v.$color-border;
+
+  /* zamiast color.scale(bg) */
+  background: v.$color-bg-surface;
+}
+
+pre {
+  margin: 0 0 map.get(v.$spacings, "md");
+  padding: map.get(v.$spacings, "md");
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-border;
+
+  /* zamiast color.scale(bg) */
+  background: v.$color-bg-surface;
+
+  overflow: auto;
+
+  code {
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, v.$color-secondary 75%, transparent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, v.$color-secondary 35%, transparent);
+  color: v.$color-text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

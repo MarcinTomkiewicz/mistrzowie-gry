@@ -1,0 +1,11 @@
+@use "sass:map";
+@use "./theme.engine" as engine;
+@use "./theme.common" as common;
+@use "./theme.dark" as dark;
+@use "./theme.light" as light;
+
+/* domyślnie: dark */
+@include engine.apply-theme(":root", map.merge(common.$common, dark.$dark));
+
+/* przełącznik: <html data-theme="light"> */
+@include engine.apply-theme(':root[data-theme="light"]', map.merge(common.$common, light.$light));

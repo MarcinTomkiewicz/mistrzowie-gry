@@ -1,0 +1,9 @@
+@use "../abstracts/variables" as v;
+
+.mg-card {
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+  box-shadow: v.$shadow-soft;
+  padding: 1rem;
+}

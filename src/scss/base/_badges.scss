@@ -1,0 +1,130 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
+/* =========================================================
+   BADGES – BASE
+   ========================================================= */
+
+.tag-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag-badge {
+  border: 1px solid v.$color-border;
+  font-size: map.get(v.$font-sizes, "xs");
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   CANONICAL VARIANTS (NOWE API)
+   ========================================================= */
+
+.tag-badge--success { @include m.badge-variant(v.$color-success, 0.14, 8%); }
+.tag-badge--danger  { @include m.badge-variant(v.$color-danger, 0.10, 6%); }
+.tag-badge--info    { @include m.badge-variant(v.$color-info,   0.10, 8%); }
+.tag-badge--arcane  { @include m.badge-variant(v.$color-arcane, 0.12, 10%); }
+
+.tag-badge--muted {
+  color: v.$color-text-muted;
+  background: v.$color-bg-surface;
+  border-color: v.$color-border;
+}
+
+.tag-badge--golden { @include m.badge-golden; }
+
+/* alias “golden” (utilities) też ma działać */
+.tag-badge.golden { @include m.badge-golden; }
+
+/* =========================================================
+   LEGACY / ALIASES (STARE KLASY – BEZ @extend)
+   ========================================================= */
+
+/* join == success */
+.tag-badge.join { @include m.badge-variant(v.$color-success, 0.14, 8%); }
+
+/* gm == arcane (Slaanesh vibe) */
+.tag-badge.gm { @include m.badge-variant(v.$color-arcane, 0.12, 10%); }
+
+/* reception == success (Nurgle) */
+.tag-badge.reception { @include m.badge-variant(v.$color-success, 0.14, 8%); }
+
+/* owner -> PRIMARY (crimson z theme) */
+.tag-badge.owner {
+  @include m.badge-variant(v.$color-primary, 0.10, 10%);
+}
+
+/* coowner -> SECONDARY (bronze z theme) */
+.tag-badge.coowner {
+  @include m.badge-variant(v.$color-secondary, 0.14, 12%);
+}
+
+/* member -> SECONDARY (bardziej “pełne”) */
+.tag-badge.member {
+  @include m.badge-variant(v.$color-secondary, 0.15, 12%);
+}
+
+/* club -> tylko kolor, bez “glow”/tła */
+.tag-badge.club {
+  color: v.$color-primary;
+  border-color: v.$color-border;
+}
+
+/* muted (legacy) */
+.tag-badge.muted {
+  color: v.$color-text-muted;
+  background: v.$color-bg-surface;
+  border-color: v.$color-border;
+}
+
+/* mine (legacy, tylko kolor tekstu) */
+.tag-badge.mine {
+  color: v.$color-text-muted;
+  border-color: v.$color-border;
+}
+
+/* =========================================================
+   NOTIFICATION BADGE
+   ========================================================= */
+
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  left: -11px;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: map.get(v.$font-sizes, "xs");
+  line-height: 18px;
+  text-align: center;
+  border: 2px solid v.$color-bg;
+
+  /* zamiast rgba(0,0,0,0.25) – zostawiamy stałą, bo to “cień”, nie token */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+
+  pointer-events: none;
+  user-select: none;
+
+  background: v.$color-primary;
+  color: v.$color-white;
+
+  &.wider { left: -18px; }
+  &.widest { left: -25px; }
+
+  &.inline-badge {
+    position: static;
+    margin-left: 0.4rem;
+    border-color: v.$color-primary;
+
+    &:hover {
+      border-color: v.$color-bg;
+    }
+  }
+}

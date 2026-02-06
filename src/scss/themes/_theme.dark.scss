@@ -1,0 +1,32 @@
+@use "sass:map";
+@use "sass:color";
+@use "./theme.common" as common;
+
+$c: common.$common;
+
+$dark: (
+  "color-primary": map.get($c, "color-crimson"),
+  "color-secondary": map.get($c, "color-bronze"),
+  "color-bg": map.get($c, "color-ink"),
+  "color-bg-surface": map.get($c, "color-graphite"),
+  "color-border": color.scale(map.get($c, "color-graphite"), $lightness: 12%),
+  "color-text": map.get($c, "color-white"),
+  "color-text-muted": color.scale(map.get($c, "color-white"), $alpha: -35%),
+  "color-link": map.get($c, "color-bronze"),
+  "color-link-hover": color.scale(map.get($c, "color-bronze"), $lightness: 10%),
+
+  "color-paper-bg": linear-gradient(
+      180deg,
+      #f0e2c4 0%,
+      #e4d2ae 35%,
+      #d8c29a 100%
+    ),
+  "color-paper-overlay-1": rgba(255, 255, 255, 0.08),
+  "color-paper-overlay-2": rgba(255, 255, 255, 0.06),
+  "color-paper-text": map.get($c, "color-ink"),
+  "color-paper-muted": rgba(map.get($c, "color-ink"), 0.75),
+  "color-paper-border": rgba(map.get($c, "color-ink"), 0.25),
+
+    "heading-color": map.get($c, "color-secondary"),
+  "heading-mode": gold
+);

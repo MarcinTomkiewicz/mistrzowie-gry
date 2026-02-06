@@ -1,0 +1,38 @@
+@use "sass:map";
+@use "sass:color";
+@use "./theme.common" as common;
+
+$c: common.$common;
+
+$paper-1: map.get($c, "color-paper-1");
+$paper-2: map.get($c, "color-paper-2");
+$paper-3: map.get($c, "color-paper-3");
+
+$paper-gradient: linear-gradient(
+  180deg,
+  $paper-1 0%,
+  $paper-2 42%,
+  $paper-3 100%
+);
+
+$light: (
+  "color-primary": map.get($c, "color-crimson"),
+  "color-secondary": map.get($c, "color-bronze"),
+  "color-bg": $paper-2,
+  "color-bg-surface": color.scale($paper-2, $lightness: 6%),
+  "color-border": color.scale(map.get($c, "color-ink"), $alpha: -70%),
+  "color-text": map.get($c, "color-ink"),
+  "color-text-muted": color.scale(map.get($c, "color-ink"), $alpha: -35%),
+  "color-link": map.get($c, "color-crimson"),
+  "color-link-hover": color.scale(map.get($c, "color-crimson"), $lightness: -8%),
+  "color-paper-bg": $paper-2,
+  "color-paper-overlay-1": rgba(255, 255, 255, 0),
+  "color-paper-overlay-2": rgba(255, 255, 255, 0),
+  "color-paper-text": map.get($c, "color-ink"),
+  "color-paper-muted": color.scale(map.get($c, "color-ink"), $alpha: -35%),
+  "color-paper-border": color.scale(map.get($c, "color-ink"), $alpha: -70%),
+  "bg-gradient": $paper-gradient,
+
+  "heading-color": map.get($c, "color-crimson"),
+  "heading-mode": solid,
+);

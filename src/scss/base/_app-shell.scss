@@ -1,0 +1,8 @@
+@use "../abstracts/variables" as v;
+
+html, body { height: 100%; }
+
+body {
+  background: var(--mg-bg-gradient, v.$color-bg);
+  color: v.$color-text;
+}

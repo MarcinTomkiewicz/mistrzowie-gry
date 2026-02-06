@@ -1,0 +1,29 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+/* alias (stara nazwa) -> typ stylu */
+$tag-badge-aliases: (
+  "violet": "arcane",
+  "green": "success",
+  "blue": "info",
+  "golden": "golden",
+  "gray": "muted"
+) !default;
+
+@each $alias, $variant in $tag-badge-aliases {
+  .tag-badge.#{$alias} {
+    @if $variant == "arcane" {
+      @include m.badge-variant(v.$color-arcane, 0.12, 10%);
+    } @else if $variant == "success" {
+      @include m.badge-variant(v.$color-success, 0.14, 8%);
+    } @else if $variant == "info" {
+      @include m.badge-variant(v.$color-info, 0.10, 8%);
+    } @else if $variant == "golden" {
+      @include m.badge-golden;
+    } @else if $variant == "muted" {
+      color: v.$color-text-muted;
+      background: v.$color-bg-surface;
+    }
+  }
+}

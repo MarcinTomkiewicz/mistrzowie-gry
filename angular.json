@@ -26,9 +26,10 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/scss"]
+            },
+            "styles": ["src/scss/main.scss"],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -85,9 +86,10 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/scss"]
+            },
+            "styles": ["src/scss/main.scss"]
           }
         }
       }

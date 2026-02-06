@@ -1,0 +1,91 @@
+@use "sass:map";
+@use "sass:list";
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
+/* =========================================================
+   FLEX UTILITIES (legacy-style, but generated)
+   - bazowe klasy flex do używania w HTML
+   ========================================================= */
+
+/* mapa: suffix -> (justify, align) */
+$flex-presets: (
+  "regular": (space-between, center),
+  "between": (space-between, center),
+  "center": (center, center),
+  "start": (flex-start, center),
+  "end": (flex-end, center),
+  "around": (space-around, center),
+  "evenly": (space-evenly, center),
+
+  "align-start": (space-between, flex-start),
+  "align-end": (space-between, flex-end),
+  "align-stretch": (space-between, stretch),
+  "align-baseline": (space-between, baseline),
+
+  "all-start": (flex-start, flex-start)
+);
+
+/* generator dla jednego kierunku */
+@mixin _gen-flex-classes($dir, $prefix) {
+  @each $name, $pair in $flex-presets {
+    $justify: list.nth($pair, 1);
+    $align: list.nth($pair, 2);
+
+    .#{$prefix}-#{$name} {
+      @include m.flex($dir, $justify, $align);
+    }
+  }
+}
+
+/* ROW */
+@include _gen-flex-classes(row, "flex-row");
+
+/* COLUMN */
+@include _gen-flex-classes(column, "flex-col");
+
+/* =========================================================
+   RESPONSIVE HELPERS (najczęstsze z Twojego legacy)
+   ========================================================= */
+
+/* -sm */
+@include m.down("sm") {
+  .flex-col-sm {
+    @include m.flex(column, flex-start, flex-start);
+  }
+
+  .flex-col-center-sm {
+    @include m.flex(column, center, center);
+  }
+
+  .flex-col-around-sm {
+    @include m.flex(column, space-around, center);
+  }
+
+  .flex-col-evenly-sm {
+    @include m.flex(column, space-evenly, center);
+  }
+
+  .flex-col-end-sm {
+    @include m.flex(column, flex-end, flex-start);
+  }
+
+  .flex-col-start-center-sm {
+    @include m.flex(column, flex-start, center);
+  }
+}
+
+/* -xs */
+@include m.down("xs") {
+  .flex-col-around-xs {
+    @include m.flex(column, space-around, center);
+  }
+
+  .flex-col-between-center-xs {
+    @include m.flex(column, space-between, center);
+  }
+
+  .flex-col-between-start-xs {
+    @include m.flex(column, space-between, flex-start);
+  }
+}

@@ -1,0 +1,85 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
+/* =========================================================
+   LAYOUT PRIMITIVES / SHELL
+   - section + container + section header
+   - bez stylowania “komponentów” typu button/form
+   ========================================================= */
+
+/* Container */
+.mg-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: v.$container-padding;
+  padding-right: v.$container-padding;
+}
+
+/* Section wrapper */
+.mg-section {
+  color: v.$color-text;
+  padding: map.get(v.$spacings, "xxl") 0;
+
+  @include m.down("md") {
+    padding: map.get(v.$spacings, "xl") 0;
+  }
+}
+
+/* Full-height variant */
+.mg-section--full {
+  min-height: 100vh;
+  display: grid;
+  align-items: center;
+}
+
+/* Centered content helper (częsty przypadek) */
+.mg-section--center {
+  text-align: center;
+}
+
+/* Section header block */
+.mg-section__header {
+  text-align: center;
+  margin-bottom: map.get(v.$spacings, "xl");
+}
+
+/* Title / subtitle (layout-level, semantyczne) */
+.mg-section__title {
+  margin: 0 0 map.get(v.$spacings, "sm");
+  font-family: v.$font-family-display;
+  font-size: map.get(v.$font-sizes, "xxl");
+  line-height: 1.1;
+  font-weight: 700;
+
+  /* default (działa zawsze) */
+  color: v.$heading-color;
+}
+
+/* DARK (domyślny) – gold */
+:root .mg-section__title {
+  @include m.gold-gradient-text;
+}
+
+/* LIGHT – wyłącz gradient i użyj solid */
+:root[data-theme="light"] .mg-section__title {
+  background: none;
+  background-clip: initial;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: currentColor;
+  color: v.$heading-color;
+}
+
+// /* Golden variant (legacy gradient) */
+// .mg-section__title--golden {
+//   @include m.gold-gradient-text;
+// }
+
+.mg-section__subtitle {
+  margin: 0 auto;
+  max-width: 70ch;
+  font-size: map.get(v.$font-sizes, "md");
+  line-height: 1.6;
+  color: v.$color-text-muted;
+}

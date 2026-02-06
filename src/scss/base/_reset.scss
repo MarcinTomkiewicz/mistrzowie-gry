@@ -1,0 +1,23 @@
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   RESET (minimal + bez agresywnego normalize)
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: v.$color-bg;
+  color: v.$color-text;
+}

@@ -1,0 +1,109 @@
+@use "sass:map";
+
+/* =========================================================
+   TYPOGRAPHY (Brand Board)
+   ========================================================= */
+$font-family-body: "Times New Roman", Times, serif;
+$font-family-display: "HORIZON", "Times New Roman", Times, serif;
+
+$line-height-base: 1.2;
+
+$font-sizes: (
+  "xs": 0.75rem,
+  "sm": 0.875rem,
+  "md": 1rem,
+  "lg": 1.25rem,
+  "xl": 1.5rem,
+  "xxl": 2rem,
+  "hero": 3rem,
+);
+
+/* =========================================================
+   BREAKPOINTS / SPACING
+   ========================================================= */
+$breakpoints: (
+  "xs": 479px,
+  "sm": 767px,
+  "md": 1023px,
+  "lg": 1270px,
+  "xl": 1440px,
+);
+
+$spacings: (
+  "xs": 0.25rem,
+  "sm": 0.5rem,
+  "md": 1rem,
+  "lg": 1.5rem,
+  "xl": 2rem,
+  "xxl": 3rem,
+);
+
+$navbar-height: 60px;
+$container-padding: 1.5rem;
+
+/* =========================================================
+   RADII / SHADOWS / TRANSITIONS
+   ========================================================= */
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
+$transition-fast: 0.2s ease-in-out;
+$transition-slow: 0.5s ease;
+
+/* =========================================================
+   COLOR TOKENS (CSS Variables)
+   - UWAGA: to są "wartości runtime"
+   - Realne liczby siedzą w src/scss/themes/*
+   ========================================================= */
+
+/* brand (opcjonalnie — czasem przydaje się w CSS) */
+$color-ink: var(--mg-color-ink);
+$color-crimson: var(--mg-color-crimson);
+$color-graphite: var(--mg-color-graphite);
+$color-bronze: var(--mg-color-bronze);
+$color-white: var(--mg-color-white);
+$color-black: var(--mg-color-black);
+
+/* theme tokens (UI) */
+$color-primary: var(--mg-color-primary);
+$color-secondary: var(--mg-color-secondary);
+
+$color-bg: var(--mg-color-bg);
+$color-bg-surface: var(--mg-color-bg-surface);
+$color-border: var(--mg-color-border);
+
+$heading-color: var(--mg-heading-color);
+$heading-style: var(--mg-heading-style);
+
+$color-text: var(--mg-color-text);
+$color-text-muted: var(--mg-color-text-muted);
+
+$color-link: var(--mg-color-link);
+$color-link-hover: var(--mg-color-link-hover);
+
+/* paper tokens (alt/demo) */
+$color-paper-bg: var(--mg-color-paper-bg);
+$color-paper-overlay-1: var(--mg-color-paper-overlay-1);
+$color-paper-overlay-2: var(--mg-color-paper-overlay-2);
+$color-paper-text: var(--mg-color-paper-text);
+$color-paper-muted: var(--mg-color-paper-muted);
+$color-paper-border: var(--mg-color-paper-border);
+
+/* =========================================================
+   SEMANTIC COLORS (Warhammer Chaos) — wspólne
+   - trzymamy jako CSS vars (bo je ustawiamy w theme-common)
+   - plus mapka dla ewentualnych generatorów
+   ========================================================= */
+$color-info: var(--mg-color-info);
+$color-danger: var(--mg-color-danger);
+$color-success: var(--mg-color-success);
+$color-arcane: var(--mg-color-arcane);
+
+$semantic-colors: (
+  "info": $color-info,
+  "danger": $color-danger,
+  "success": $color-success,
+  "arcane": $color-arcane,
+);

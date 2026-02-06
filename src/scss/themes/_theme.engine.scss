@@ -1,0 +1,9 @@
+@use "sass:map";
+
+@mixin apply-theme($selector, $tokens) {
+  #{$selector} {
+    @each $name, $value in $tokens {
+      --mg-#{$name}: #{$value};
+    }
+  }
+}
