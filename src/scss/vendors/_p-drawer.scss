@@ -1,0 +1,31 @@
+@use "abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG — Drawer (MG)
+   ========================================================= */
+
+.p-drawer {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+  border-left: 1px solid v.$color-border;
+  box-shadow: v.$shadow-soft;
+}
+
+.p-drawer-header[data-pc-section="header"] {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+  border-bottom: 1px solid v.$color-border;
+}
+
+.p-drawer-content[data-pc-section="content"] {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+.p-drawer-close-button .p-button {
+  color: v.$color-text;
+}
+
+.p-drawer-close-button .p-icon {
+  color: v.$color-text;
+}

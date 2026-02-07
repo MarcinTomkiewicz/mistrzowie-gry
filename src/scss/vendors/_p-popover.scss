@@ -1,0 +1,68 @@
+@use "abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG — Popover (MG)
+   ========================================================= */
+
+.p-popover {
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-border;
+  box-shadow: v.$shadow-soft;
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+.p-popover-content[data-pc-section="content"] {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+/* Arrow */
+.p-popover .p-popover-arrow {
+  background: v.$color-bg-surface;
+}
+.p-popover .p-popover-arrow::before {
+  border-color: v.$color-border;
+}
+
+/* =========================================================
+   Submenu items hover (MG)
+   Dlaczego tu? Bo popover to overlay Prime – vendor ma wygrywać kolejnością.
+   ========================================================= */
+
+/* DARK/default: delikatny wash primary na surface */
+.p-popover-content[data-pc-section="content"] .mg-popover-menu__link {
+  display: block;
+  padding: 0.55rem 0.7rem;
+  border-radius: v.$radius-sm;
+  text-decoration: none;
+  color: v.$color-text;
+  transition: background-color v.$transition-fast, color v.$transition-fast;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: color-mix(in srgb, v.$color-bg-surface 85%, v.$color-primary);
+    }
+  }
+
+  &:focus-visible {
+    outline: 0;
+    background-color: color-mix(in srgb, v.$color-bg-surface 78%, v.$color-primary);
+  }
+}
+
+/* LIGHT: papier → hover musi iść w ink, inaczej ginie */
+html[data-theme="light"]
+  .p-popover-content[data-pc-section="content"]
+  .mg-popover-menu__link {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: color-mix(in srgb, v.$color-paper-bg 82%, v.$color-ink);
+    }
+  }
+
+  &:focus-visible {
+    background-color: color-mix(in srgb, v.$color-paper-bg 74%, v.$color-ink);
+    color: v.$color-ink;
+  }
+}

@@ -1,0 +1,110 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.hero {
+  margin-bottom: map.get(v.$spacings, "lg");
+}
+
+.brand {
+  @include m.grid(84px 1fr, map.get(v.$spacings, "md"), center);
+  margin-bottom: map.get(v.$spacings, "md");
+}
+
+.logo-wrap {
+  @include m.center();
+}
+
+.logo-placeholder {
+  width: 84px;
+  height: 84px;
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-border;
+
+  /* zamiast color.scale(var()) -> color-mix */
+  background: color-mix(in srgb, v.$color-bg 94%, white);
+
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  @include m.center();
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.grid {
+  @include m.mg-grid(2);
+}
+
+.row {
+  gap: map.get(v.$spacings, "sm");
+  margin-top: map.get(v.$spacings, "md");
+  flex-wrap: wrap;
+}
+
+.theme-switch {
+  margin-top: map.get(v.$spacings, "sm");
+}
+
+.swatches {
+  display: grid;
+  gap: map.get(v.$spacings, "sm");
+  margin: map.get(v.$spacings, "md") 0 map.get(v.$spacings, "lg");
+
+  @include m.up("sm") {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.swatch {
+  padding: map.get(v.$spacings, "md");
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-border;
+  background: color-mix(in srgb, v.$color-bg 96%, white);
+  gap: map.get(v.$spacings, "md");
+}
+
+.chip {
+  width: 42px;
+  height: 42px;
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-border;
+  flex: 0 0 auto;
+}
+
+.chip-bg { background: v.$color-bg; }
+.chip-surface { background: v.$color-bg-surface; }
+.chip-border { background: v.$color-border; }
+.chip-primary { background: v.$color-primary; }
+.chip-secondary { background: v.$color-secondary; }
+
+.bronze { @include m.bronze-gradient-text; }
+.golden { @include m.gold-gradient-text; }
+
+/* paper zostaje jak masz tokeny, ale bez sassowych operacji */
+.paper {
+  background:
+    radial-gradient(1200px 500px at 10% 0%, v.$color-paper-overlay-1, transparent 60%),
+    radial-gradient(900px 420px at 90% 10%, v.$color-paper-overlay-2, transparent 55%),
+    v.$color-paper-bg;
+
+  color: v.$color-paper-text;
+  border-color: v.$color-paper-border;
+}
+
+.footer {
+  margin-top: map.get(v.$spacings, "xl");
+  padding: map.get(v.$spacings, "md") 0;
+  border-top: 1px solid v.$color-border;
+  gap: map.get(v.$spacings, "md");
+}

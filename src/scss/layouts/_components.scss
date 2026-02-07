@@ -57,6 +57,13 @@
   color: v.$heading-color;
 }
 
+.mg-section__title--sm {
+  font-size: map.get(v.$font-sizes, "lg");
+}
+.mg-section__title--xs {
+  font-size: map.get(v.$font-sizes, "md");
+}
+
 /* DARK (domyślny) – gold */
 :root .mg-section__title {
   @include m.gold-gradient-text;

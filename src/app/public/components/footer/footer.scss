@@ -1,0 +1,116 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+$sm: map.get(v.$spacings, "sm");
+$md: map.get(v.$spacings, "md");
+$lg: map.get(v.$spacings, "lg");
+$xl: map.get(v.$spacings, "xl");
+$xxl: map.get(v.$spacings, "xxl");
+
+.mg-footer {
+  margin-top: $xxl;
+  padding: $xl 0;
+  background: v.$color-bg;
+  color: v.$color-text;
+  border-top: 1px solid v.$color-border;
+
+  p { margin: 0; }
+  ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; }
+  li { opacity: 0.88; }
+
+  a {
+    color: v.$color-text;
+    text-decoration: none;
+    border-radius: v.$radius-sm;
+    transition: background-color v.$transition-fast, color v.$transition-fast, opacity v.$transition-fast;
+
+    &:focus-visible {
+      outline: 0;
+      background: v.$color-text;
+      color: v.$color-bg;
+    }
+
+    &.is-disabled { opacity: 0.45; pointer-events: none; }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a:hover { opacity: 1; color: v.$color-link-hover; }
+  }
+}
+
+/* grid tylko layoutowo */
+.mg-footer__grid {
+  @include m.grid(1.2fr 1fr 1fr, $xl, start);
+
+  @include m.down("md") {
+    grid-template-columns: 1fr;
+    gap: $lg;
+    text-align: center;
+
+    ul { justify-items: center; }
+    .mg-footer__social { justify-content: center; }
+  }
+}
+
+/* logo + opis */
+.mg-footer__logo {
+  width: 84px;
+  height: auto;
+  border-radius: v.$radius-sm;
+  box-shadow: v.$shadow-soft;
+  margin-bottom: $md;
+}
+
+.mg-footer__desc {
+  max-width: 48ch;
+  opacity: 0.85;
+  line-height: 1.5;
+  margin-bottom: $md;
+
+  @include m.down("md") { margin-inline: auto; }
+}
+
+/* tytuł z primitives — tylko “skalowanie w dół” */
+.mg-footer__title {
+  font-size: map.get(v.$font-sizes, "lg");
+  margin-bottom: $md;
+
+  /* Primitive ma line-height 1.1, tu może być OK; jak chcesz ciaśniej: */
+  line-height: 1.05;
+}
+
+/* social tylko jako “pigułki” */
+.mg-footer__social { gap: $sm; flex-wrap: wrap; }
+
+.mg-social-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: v.$color-secondary;
+      background: color-mix(in srgb, v.$color-bg-surface 85%, v.$color-secondary);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/* bottom bar */
+.mg-footer__bottom {
+  margin-top: $xl;
+  padding-top: $lg;
+  border-top: 1px solid v.$color-border;
+  gap: $md;
+
+  @include m.down("sm") { text-align: center; }
+}
+
+.mg-footer__copy { opacity: 0.75; }
+.mg-footer__legal { gap: $md; flex-wrap: wrap; }

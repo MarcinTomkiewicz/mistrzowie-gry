@@ -1,0 +1,66 @@
+<footer class="mg-footer">
+  <div class="mg-container">
+    <div class="mg-footer__grid">
+      <section>
+        <img src="/logo/fav-icon.png" alt="Mistrzowie Gry" class="mg-footer__logo" />
+
+        <p class="mg-footer__desc">
+          Centrum gier fabularnych w sercu Poznania. Miejsce, gdzie historie
+          tworzy się przy stole, a legendy pisze się kostkami.
+        </p>
+
+        <nav class="flex-row-start mg-footer__social" aria-label="Social media">
+          @for (s of nav.social(); track s.label) {
+            <a
+              class="mg-social-btn"
+              [href]="s.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              [attr.aria-label]="s.label"
+              (click)="track(s.label)"
+            >
+              <i class="{{ s.icon }}" aria-hidden="true"></i>
+            </a>
+          }
+        </nav>
+      </section>
+
+      <section>
+        <h3 class="mg-section__title mg-section__title--sm">Na skróty</h3>
+        <ul class="mg-footer__list">
+          @for (l of nav.footer(); track l.label) {
+            <li>
+              <a
+                [routerLink]="l.path"
+                [class.is-disabled]="l.disabled"
+                (click)="l.disabled && $event.preventDefault(); track(l.label)"
+              >
+                {{ l.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section>
+        <h3 class="mg-section__title mg-section__title--sm">Kontakt</h3>
+        <ul class="mg-footer__list">
+          <li><strong>Telefon:</strong> +48 000 000 000</li>
+          <li><strong>Email:</strong> kontakt&#64;twoja-domena.pl</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="mg-footer__bottom flex-row-between flex-col-sm">
+      <div class="mg-footer__copy">
+        © {{ year() }} Mistrzowie Gry. Wszystkie prawa zastrzeżone.
+      </div>
+
+      <nav class="mg-footer__legal flex-row-start" aria-label="Legal">
+        @for (l of nav.legal(); track l.label) {
+          <a [routerLink]="l.path">{{ l.label }}</a>
+        }
+      </nav>
+    </div>
+  </div>
+</footer>

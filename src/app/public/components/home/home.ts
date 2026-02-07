@@ -7,28 +7,33 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
-
-import { Platform } from './core/services/platform/platform';
-import { Seo } from './core/services/seo/seo';
-import { AppShell } from './public/components/app-shell/app-shell';
+import { Platform } from '../../../core/services/platform/platform';
+import { Seo } from '../../../core/services/seo/seo';
+import { SeoRichText } from './seo-rich-text/seo-rich-text';
+import { Programs } from './programs/programs';
+import { Problems } from './problems/problems';
+import { HeroCarousel } from './hero-carousel/hero-carousel';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
+    HeroCarousel,
+    Problems,
+    Programs,
+    SeoRichText,
     FormsModule,
     ButtonModule,
     ToggleSwitchModule,
     ToastModule,
     DialogModule,
-    AppShell
-],
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  ],
+  templateUrl: './home.html',
+  styleUrl: './home.scss',
   providers: [MessageService],
 })
-export class App {
+export class Home {
   private readonly platform = inject(Platform);
   private readonly seo = inject(Seo);
   private readonly messages = inject(MessageService);

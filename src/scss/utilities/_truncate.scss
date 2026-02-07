@@ -1,0 +1,19 @@
+@use "abstracts/mixins" as m;
+
+/* =========================================================
+   TRUNCATE UTILITIES
+   - używaj jako klasy pomocnicze w HTML
+   - bez duplikacji logiki w komponentach
+   ========================================================= */
+
+.truncate-1 {
+  @include m.truncate(1);
+}
+
+.truncate-2 {
+  @include m.truncate(2);
+}
+
+.truncate-3 {
+  @include m.truncate(3);
+}

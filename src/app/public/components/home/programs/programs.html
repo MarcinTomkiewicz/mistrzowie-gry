@@ -1,0 +1,27 @@
+<section class="mg-section" aria-label="Programy">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title mg-section__title--sm">Programy</h2>
+      <p class="mg-section__subtitle">
+        Dwa formaty, które rozwiązują najczęstsze bariery wejścia i pomagają zbudować ciągłość grania.
+      </p>
+    </header>
+
+    <div class="mg-programs__grid">
+      @for (p of programs; track p.title) {
+        <article class="mg-card mg-programs__card">
+          <h3 class="mg-programs__title">{{ p.title }}</h3>
+          <p class="mg-programs__intro">{{ p.intro }}</p>
+
+          <ul class="mg-programs__list">
+            @for (b of p.bullets; track b) {
+              <li>{{ b }}</li>
+            }
+          </ul>
+
+          <a class="mg-programs__link" [routerLink]="p.ctaPath">{{ p.ctaLabel }}</a>
+        </article>
+      }
+    </div>
+  </div>
+</section>

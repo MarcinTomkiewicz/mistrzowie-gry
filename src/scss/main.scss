@@ -1,3 +1,5 @@
+
+
 /* ===========================
    THEMES
    =========================== */
@@ -16,7 +18,7 @@
 /* ===========================
    UTILITIES
    =========================== */
-@use "utilities/tag-badge-aliases";
+@use "utilities/utilities";
 
 /* ===========================
    COMPONENTS (globalne, jeśli będą)
@@ -29,3 +31,11 @@
    VENDORS OVERRIDES
    =========================== */
 @use "vendors/primeng";
+/* vendors */
+@import "primeicons/primeicons.css";
+
+/* =========================================================
+   GOOGLE FONTS
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');

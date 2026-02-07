@@ -1,0 +1,169 @@
+<nav class="mg-navbar">
+  <div class="mg-navbar__inner flex-row-between">
+    <!-- BRAND -->
+    <a routerLink="/" class="mg-navbar__brand" aria-label="Strona główna">
+      <img
+        [src]="brandLogoSrc()"
+        alt="Mistrzowie Gry"
+        class="mg-navbar__logo"
+      />
+    </a>
+
+
+    <!-- DESKTOP MENU -->
+    <ul class="mg-navbar__menu">
+      @for (item of menu(); track item.label) {
+        <li class="mg-navbar__item">
+          @if (!item.children?.length) {
+            <a class="mg-navbar__link" [routerLink]="item.path">
+              {{ item.label }}
+            </a>
+          } @else {
+            <button
+              type="button"
+              class="mg-navbar__link mg-navbar__link--button"
+              (click)="openDropdown($event, item)"
+              aria-haspopup="true"
+              [attr.aria-expanded]="activeDropdown()?.label === item.label"
+            >
+              <span class="mg-navbar__link-label">{{ item.label }}</span>
+              <span class="mg-navbar__caret" aria-hidden="true">▾</span>
+            </button>
+          }
+        </li>
+      }
+    </ul>
+
+    <!-- ACTIONS -->
+    <div class="mg-navbar__actions flex-row-start">
+      <!-- Theme switch (desktop) -->
+      <div class="mg-navbar__theme flex-row-start">
+        <span class="tag-badge tag-badge--muted">Dark</span>
+
+        <p-toggleswitch
+          [(ngModel)]="isLight"
+          (onChange)="toggleTheme()"
+          ariaLabel="Przełącz motyw jasny/ciemny"
+        ></p-toggleswitch>
+
+        <span class="tag-badge tag-badge--muted">Light</span>
+      </div>
+
+      <!-- Placeholders: profil / koszyk -->
+      <div class="mg-navbar__slots flex-row-start">
+        <button
+          type="button"
+          class="mg-icon-btn"
+          aria-label="Profil (placeholder)"
+        >
+          <i class="pi pi-user"></i>
+        </button>
+
+        <button
+          type="button"
+          class="mg-icon-btn"
+          aria-label="Koszyk (placeholder)"
+        >
+          <i class="pi pi-shopping-cart"></i>
+        </button>
+      </div>
+
+      <!-- Mobile trigger -->
+      <button
+        type="button"
+        class="mg-icon-btn mg-navbar__burger"
+        (click)="openMobile()"
+        aria-label="Otwórz menu"
+      >
+        <i class="pi pi-bars"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- DESKTOP DROPDOWN: Popover -->
+<p-popover #navPopover styleClass="mg-popover" (onHide)="closeDropdown()">
+  <ul class="mg-popover-menu">
+    @for (child of activeChildren(); track child.label) {
+      <li class="mg-popover-menu__item">
+        <a
+          class="mg-popover-menu__link"
+          [routerLink]="child.path"
+          (click)="closeDropdown()"
+          [target]="child.target"
+          [rel]="child.target === '_blank' ? 'noopener noreferrer' : null"
+        >
+          {{ child.label }}
+        </a>
+      </li>
+    }
+  </ul>
+</p-popover>
+
+<!-- MOBILE MENU: Drawer -->
+<p-drawer
+  [(visible)]="mobileOpen"
+  position="right"
+  styleClass="mg-drawer"
+  (onHide)="closeMobile()"
+>
+  <div class="mg-mobile-drawer">
+    <div class="mg-mobile-drawer__head flex-row-between">
+      <div class="mg-mobile-drawer__title">Menu</div>
+
+      <!-- Theme switch (mobile) -->
+      <div class="mg-mobile-theme-switch flex-row-start">
+        <span class="tag-badge tag-badge--muted">Dark</span>
+
+        <p-toggleswitch
+          [(ngModel)]="isLight"
+          (onChange)="toggleTheme()"
+          ariaLabel="Przełącz motyw jasny/ciemny"
+        ></p-toggleswitch>
+
+        <span class="tag-badge tag-badge--muted">Light</span>
+      </div>
+
+      <button
+        type="button"
+        class="mg-icon-btn mg-icon-btn--flat"
+        (click)="closeMobile()"
+        aria-label="Zamknij"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <ul class="mg-mobile-menu">
+      @for (item of menu(); track item.label) {
+        <li class="mg-mobile-menu__item">
+          @if (!item.children?.length) {
+            <a
+              class="mg-mobile-menu__link"
+              [routerLink]="item.path"
+              (click)="onMobileNavigate()"
+            >
+              {{ item.label }}
+            </a>
+          } @else {
+            <div class="mg-mobile-menu__group">{{ item.label }}</div>
+
+            <ul class="mg-mobile-menu__sub">
+              @for (child of item.children; track child.label) {
+                <li class="mg-mobile-menu__sub-item">
+                  <a
+                    class="mg-mobile-menu__link"
+                    [routerLink]="child.path"
+                    (click)="onMobileNavigate()"
+                  >
+                    {{ child.label }}
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+</p-drawer>

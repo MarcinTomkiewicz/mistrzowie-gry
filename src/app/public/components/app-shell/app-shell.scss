@@ -1,0 +1,7 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+.app-shell__content {
+margin-top: map.get(v.$spacings, "xl");
+}

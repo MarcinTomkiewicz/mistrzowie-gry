@@ -1,0 +1,275 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+.mg-navbar {
+  position: fixed;
+  top: 0;
+  z-index: 1100;
+  width: 100%;
+  height: v.$navbar-height;
+
+  background: v.$color-bg;
+  color: v.$color-text;
+  border-bottom: 1px solid v.$color-border;
+  box-shadow: v.$shadow-soft;
+}
+
+.mg-navbar__inner {
+  height: 100%;
+  padding: 0 v.$container-padding;
+}
+
+.mg-navbar__logo {
+  width: auto;
+  height: 50px;
+  margin-left: 0.5rem;
+}
+
+.mg-navbar__brand {
+  font-family: v.$font-family-display;
+  font-size: map.get(v.$font-sizes, "lg");
+  text-decoration: none;
+
+  @include m.gold-gradient-text;
+}
+
+/* ============ DESKTOP MENU ============ */
+
+.mg-navbar__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @include m.flex(row, center, center, map.get(v.$spacings, "lg"));
+
+  @include m.down("md") {
+    display: none;
+  }
+}
+
+.mg-navbar__item {
+  display: flex;
+  align-items: center;
+}
+
+/**
+ * Ujednolicamy <a> i <button>.
+ * Klucz: NIE używamy "font: inherit" na wariancie button,
+ * bo to resetuje font-size do 16px (UA default / body).
+ */
+.mg-navbar__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  font-family: v.$font-family-body;
+  font-size: map.get(v.$font-sizes, "xs");
+  font-weight: 600;
+  line-height: 1;
+
+  height: 36px;
+  padding: 0 0.6rem;
+
+  color: v.$color-text;
+  text-decoration: none;
+
+  background: transparent;
+  border: 0;
+  border-radius: v.$radius-sm;
+
+  cursor: pointer;
+  transition: background-color v.$transition-fast, color v.$transition-fast;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.mg-navbar__link:focus-visible {
+  background-color: v.$color-text;
+  color: v.$color-bg;
+  outline: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mg-navbar__link:hover,
+  .mg-navbar__link:focus {
+    background-color: v.$color-text;
+    color: v.$color-bg;
+    outline: 0;
+  }
+}
+
+.mg-navbar__link-label {
+  display: inline-block;
+}
+
+.mg-navbar__caret {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transform: translateY(1px);
+  opacity: 0.9;
+}
+
+/* ============ ACTIONS ============ */
+
+.mg-navbar__actions {
+  gap: map.get(v.$spacings, "md");
+}
+
+.mg-navbar__theme {
+  gap: map.get(v.$spacings, "sm");
+
+  @include m.down("sm") {
+    display: none;
+  }
+}
+
+.mg-navbar__slots {
+  gap: map.get(v.$spacings, "xs");
+
+  @include m.down("sm") {
+    display: none;
+  }
+}
+
+.mg-icon-btn {
+  border: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+  border-radius: 999px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+
+  @include m.center();
+
+  transition: transform v.$transition-fast, background-color v.$transition-fast;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mg-icon-btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.mg-icon-btn--flat {
+  background: transparent;
+  border-color: transparent;
+}
+
+.mg-navbar__burger {
+  display: none;
+
+  @include m.down("md") {
+    display: inline-flex;
+  }
+}
+
+/* ============ POPOVER MENU CONTENT ============ */
+/* UWAGA: hover przeniesiony do vendors/_p-popover.scss, bo to overlay Prime. */
+
+.mg-popover-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+  min-width: 14rem;
+
+  @include m.flex(column, flex-start, stretch, 0.25rem);
+}
+
+.mg-popover-menu__item {
+  display: block;
+}
+
+.mg-popover-menu__link {
+  display: block;
+  padding: 0.55rem 0.7rem;
+  border-radius: v.$radius-sm;
+  text-decoration: none;
+  color: v.$color-text;
+  transition: background-color v.$transition-fast, color v.$transition-fast;
+
+  &:focus-visible {
+    outline: 0;
+  }
+}
+
+/* ============ DRAWER CONTENT ============ */
+
+.mg-mobile-drawer__head {
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid v.$color-border;
+
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mg-mobile-drawer__title {
+  font-family: v.$font-family-display;
+  font-size: map.get(v.$font-sizes, "lg");
+}
+
+.mg-mobile-theme-switch {
+  gap: 0.5rem;
+  align-items: center;
+
+  .tag-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+}
+
+.mg-mobile-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @include m.flex(column, flex-start, stretch, 0.75rem);
+}
+
+.mg-mobile-menu__item {
+  display: block;
+}
+
+.mg-mobile-menu__link {
+  display: block;
+  padding: 0.55rem 0;
+  text-decoration: none;
+  color: v.$color-text;
+  border-radius: v.$radius-sm;
+
+  transition: background-color v.$transition-fast, color v.$transition-fast;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: v.$color-bg;
+    }
+  }
+
+  &:focus-visible {
+    outline: 0;
+    background-color: v.$color-text;
+    color: v.$color-bg;
+  }
+}
+
+.mg-mobile-menu__group {
+  font-weight: 800;
+  padding: 0.25rem 0;
+  color: v.$color-text;
+}
+
+.mg-mobile-menu__sub {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding-left: 1rem;
+
+  @include m.flex(column, flex-start, stretch, 0.35rem);
+}
+
+.mg-mobile-menu__sub-item {
+  display: block;
+}

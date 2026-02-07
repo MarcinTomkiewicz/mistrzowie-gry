@@ -1,0 +1,5 @@
+export interface ISocialLink {
+  label: string;
+  href: string;
+  icon: string;
+}
