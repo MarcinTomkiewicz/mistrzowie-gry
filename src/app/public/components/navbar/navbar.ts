@@ -6,8 +6,9 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
-import { Platform } from '../../../core/services/platform/platform';
+
 import { Navigation } from '../../../core/services/navigation/navigation';
+import { Theme } from '../../../core/services/theme/theme';
 import { IMenu } from '../../../core/interfaces/i-menu';
 
 @Component({
@@ -16,8 +17,6 @@ import { IMenu } from '../../../core/interfaces/i-menu';
   imports: [
     RouterModule,
     FormsModule,
-
-    // PrimeNG
     ToggleSwitchModule,
     PopoverModule,
     DrawerModule,
@@ -27,90 +26,32 @@ import { IMenu } from '../../../core/interfaces/i-menu';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
-  private readonly platform = inject(Platform);
   private readonly nav = inject(Navigation);
+  readonly theme = inject(Theme);
 
-  /**
-   * Menu pochodzi z Navigation (single source of truth).
-   * Nie trzymamy MENU_CONFIG w komponencie.
-   */
   readonly menu = this.nav.navbar;
 
-  /** true => light, false => dark (default) */
-  readonly isLight = signal(false);
-
-  /** mobile drawer */
   readonly mobileOpen = signal(false);
-
-  /** dropdown state (dla popovera) */
   readonly activeDropdown = signal<IMenu | null>(null);
 
-  /** dzieci aktywnego dropdownu (wygoda dla template) */
   readonly activeChildren = computed<IMenu[]>(() => {
     const a = this.activeDropdown();
     return a?.children ?? [];
   });
 
-  readonly brandLogoSrc = computed(() =>
-    this.isLight() ? 'theme/light/brand.png' : 'theme/dark/brand.png',
-  );
+  readonly brandLogoSrc = this.theme.brandLogoSrc;
 
   @ViewChild('navPopover') private readonly navPopover?: Popover;
 
-  constructor() {
-    // SSR-safe: tylko w przeglądarce czytamy DOM
-    if (!this.platform.isBrowser) return;
-
-    const doc = this.platform.document;
-    if (!doc) return;
-
-    this.isLight.set(
-      doc.documentElement.getAttribute('data-theme') === 'light',
-    );
+  // ===== THEME =====
+  onThemeToggle(nextLight: boolean): void {
+    this.theme.set(nextLight ? 'light' : 'dark');
   }
 
-  log(data: any): void {
-    console.log(data);
-  }
-  
-
-  // ======================
-  // THEME
-  // ======================
-
-  /**
-   * Handler dla (onChange) z p-toggleswitch.
-   * Źródło prawdy: signal isLight().
-   */
-  toggleTheme(): void {
-    if (!this.platform.isBrowser) return;
-
-    const doc = this.platform.document;
-    if (!doc) return;
-
-    const root = doc.documentElement;
-
-    if (this.isLight()) {
-      root.setAttribute('data-theme', 'light');
-      this.isLight.set(true);
-    }
-    else {
-      root.removeAttribute('data-theme')
-      this.isLight.set(false);
-    };
-  }
-
-  // ======================
-  // DESKTOP DROPDOWN (POPOVER)
-  // ======================
-
-  /**
-   * Prime Popover: toggle(event) potrzebuje eventu, żeby ustawić anchor.
-   */
+  // ===== DROPDOWN / MOBILE =====
   openDropdown(event: Event, item: IMenu): void {
     if (!item.children?.length) return;
 
-    // jeśli klikniesz ten sam dropdown -> zamknij
     if (this.activeDropdown()?.label === item.label) {
       this.closeDropdown();
       return;
@@ -125,13 +66,8 @@ export class Navbar {
     this.activeDropdown.set(null);
   }
 
-  // ======================
-  // MOBILE DRAWER
-  // ======================
-
   openMobile(): void {
     this.mobileOpen.set(true);
-    // na mobile zamykamy popover jeśli był otwarty
     this.closeDropdown();
   }
 
@@ -139,17 +75,9 @@ export class Navbar {
     this.mobileOpen.set(false);
   }
 
-  /**
-   * Gdy klikniesz link w drawerze – zamykamy drawer.
-   * (zoneless: sygnał wystarczy, brak CD magic)
-   */
   onMobileNavigate(): void {
     this.closeMobile();
   }
-
-  // ======================
-  // HELPERS
-  // ======================
 
   trackByLabel = (_: number, item: IMenu) => item.label;
 }

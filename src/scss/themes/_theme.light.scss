@@ -23,7 +23,7 @@ $light: (
   "color-border": color.scale(map.get($c, "color-ink"), $alpha: -70%),
   "color-text": map.get($c, "color-ink"),
   "color-text-muted": color.scale(map.get($c, "color-ink"), $alpha: -35%),
-  "color-link": map.get($c, "color-crimson"),
+  "color-link": map.get($c, "color-ink"),
   "color-link-hover": color.scale(map.get($c, "color-crimson"), $lightness: -8%),
   "color-paper-bg": $paper-2,
   "color-paper-overlay-1": rgba(255, 255, 255, 0),

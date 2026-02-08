@@ -12,7 +12,7 @@ $dark: (
   "color-border": color.scale(map.get($c, "color-graphite"), $lightness: 12%),
   "color-text": map.get($c, "color-white"),
   "color-text-muted": color.scale(map.get($c, "color-white"), $alpha: -35%),
-  "color-link": map.get($c, "color-bronze"),
+  "color-link": map.get($c, "color-white"),
   "color-link-hover": color.scale(map.get($c, "color-bronze"), $lightness: 10%),
 
   "color-paper-bg": linear-gradient(

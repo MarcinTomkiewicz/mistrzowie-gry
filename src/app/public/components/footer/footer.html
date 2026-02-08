@@ -1,10 +1,16 @@
-<footer class="mg-footer">
+<footer class="mg-section mg-footer">
   <div class="mg-container">
     <div class="mg-footer__grid">
-      <section>
-        <img src="/logo/fav-icon.png" alt="Mistrzowie Gry" class="mg-footer__logo" />
+      <section class="flex-col-center">
+        <img
+          class="mg-footer__logo"
+          [src]="footerImgSrc()"
+          alt="Mistrzowie Gry"
+          loading="lazy"
+          decoding="async"
+        />
 
-        <p class="mg-footer__desc">
+        <p class="mg-section__text">
           Centrum gier fabularnych w sercu Poznania. Miejsce, gdzie historie
           tworzy się przy stole, a legendy pisze się kostkami.
         </p>

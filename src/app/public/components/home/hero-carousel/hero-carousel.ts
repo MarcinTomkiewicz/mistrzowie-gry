@@ -1,8 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+
 import { Platform } from '../../../../core/services/platform/platform';
 import { IHeroSlide } from '../../../../core/interfaces/home/i-hero-slide';
+
 import { ButtonModule } from 'primeng/button';
 
 @Component({
@@ -14,6 +23,7 @@ import { ButtonModule } from 'primeng/button';
 })
 export class HeroCarousel implements OnInit, OnDestroy {
   private readonly platform = inject(Platform);
+  private readonly router = inject(Router);
 
   readonly slides = signal<IHeroSlide[]>([
     {
@@ -21,7 +31,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: 'Projektujemy i prowadzimy doświadczenia RPG — dla ludzi, grup i organizacji.',
       ctaLabel: 'Zobacz ofertę',
       ctaPath: '/offer/individual',
-      imageSrc: 'assets/hero/hero-1.jpg',
+      imageSrc: 'hero/hero-1.png',
       imageAlt: 'Sesja RPG prowadzona przy stole',
     },
     {
@@ -29,7 +39,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: 'Cotygodniowe wydarzenie — losujemy stoły, ekipy i systemy. Wpadasz i grasz.',
       ctaLabel: 'Sprawdź szczegóły',
       ctaPath: '/chaotic-thursdays',
-      imageSrc: 'assets/hero/hero-2.jpg',
+      imageSrc: 'hero/hero-2.png',
       imageAlt: 'Kostki RPG i notatki na stole',
     },
     {
@@ -37,7 +47,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: 'Program dla tych, którzy chcą znaleźć ekipę i wejść w regularne granie.',
       ctaLabel: 'Zobacz program',
       ctaPath: '/join',
-      imageSrc: 'assets/hero/hero-3.jpg',
+      imageSrc: 'hero/hero-3.png',
       imageAlt: 'Grupa osób grających w RPG',
     },
     {
@@ -45,7 +55,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: 'RPG jako narzędzie integracji i rozwoju — projektujemy scenariusze pod cele grupy.',
       ctaLabel: 'Poznaj ofertę',
       ctaPath: '/offer/business',
-      imageSrc: 'assets/hero/hero-4.jpg',
+      imageSrc: 'hero/hero-4.png',
       imageAlt: 'Spotkanie zespołu przy stole',
     },
   ]);
@@ -58,7 +68,6 @@ export class HeroCarousel implements OnInit, OnDestroy {
     return list[Math.max(0, Math.min(idx, list.length - 1))];
   });
 
-  /** Autoplay kontrolowany i “uprzejmy”. */
   private intervalId: number | null = null;
   private userPaused = false;
 
@@ -80,11 +89,10 @@ export class HeroCarousel implements OnInit, OnDestroy {
     const win = this.platform.window;
     if (!win) return;
 
-    // Respect user motion preferences
-    const prefersReducedMotion = win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+    const prefersReducedMotion =
+      win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
     if (prefersReducedMotion) return;
 
-    // Jeśli jest tylko 1 slajd, autoplay nie ma sensu
     if (this.slides().length <= 1) return;
 
     this.intervalId = win.setInterval(() => {
@@ -128,24 +136,43 @@ export class HeroCarousel implements OnInit, OnDestroy {
     this.userPaused = true;
     const len = this.slides().length;
     if (!len) return;
-    const nextIndex = (this.activeIndex() - 1 + len) % len;
-    this.activeIndex.set(nextIndex);
+    this.activeIndex.set((this.activeIndex() - 1 + len) % len);
   }
 
   next(): void {
     const len = this.slides().length;
     if (!len) return;
-    const nextIndex = (this.activeIndex() + 1) % len;
-    this.activeIndex.set(nextIndex);
+    this.activeIndex.set((this.activeIndex() + 1) % len);
   }
 
   goTo(index: number): void {
     this.userPaused = true;
     const len = this.slides().length;
     if (!len) return;
-    const clamped = Math.max(0, Math.min(index, len - 1));
-    this.activeIndex.set(clamped);
+    this.activeIndex.set(Math.max(0, Math.min(index, len - 1)));
+  }
+
+  // ======================
+  // CTA CARDS (clickable divs)
+  // ======================
+
+  onCtaNavigate(path: string): void {
+    this.router.navigateByUrl(path);
+  }
+
+  onCtaKeydown(event: KeyboardEvent, path: string): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.onCtaNavigate(path);
+      return;
+    }
+
+    if (event.key === ' ' || event.code === 'Space') {
+      event.preventDefault();
+      this.onCtaNavigate(path);
+    }
   }
 
   trackByIndex = (i: number) => i;
+  trackByCtaPath = (_: number, item: IHeroSlide) => item.ctaPath;
 }

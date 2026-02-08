@@ -89,3 +89,16 @@ $flex-presets: (
     @include m.flex(column, space-between, flex-start);
   }
 }
+
+.gap-sm {
+  gap: map.get(v.$spacings, "sm");
+}
+.gap-md {
+  gap: map.get(v.$spacings, "md");
+}
+.gap-lg {
+  gap: map.get(v.$spacings, "lg");
+}
+.gap-xs {
+  gap: map.get(v.$spacings, "xs");
+}

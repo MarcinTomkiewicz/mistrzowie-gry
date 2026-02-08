@@ -63,6 +63,9 @@
 .mg-section__title--xs {
   font-size: map.get(v.$font-sizes, "md");
 }
+.mg-section__title--no-margin {
+  margin-bottom: 0;
+}
 
 /* DARK (domyślny) – gold */
 :root .mg-section__title {

@@ -18,7 +18,6 @@ import { HeroCarousel } from './hero-carousel/hero-carousel';
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
     HeroCarousel,
     Problems,
     Programs,

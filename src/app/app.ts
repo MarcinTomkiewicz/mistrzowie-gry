@@ -16,7 +16,6 @@ import { AppShell } from './public/components/app-shell/app-shell';
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
     FormsModule,
     ButtonModule,
     ToggleSwitchModule,

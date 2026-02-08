@@ -1,4 +1,4 @@
-<section class="mg-section mg-hero" aria-label="Sekcja startowa">
+<section class="mg-section" aria-label="Sekcja startowa">
   <div class="mg-container">
     <div
       class="mg-hero__wrap"
@@ -8,12 +8,7 @@
       (focusout)="onFocusOut()"
     >
       <div class="mg-hero__media mg-card">
-        <!-- Cały obraz jako link + caption na obrazie -->
-        <a
-          class="mg-hero__link"
-          [routerLink]="active().ctaPath"
-          [attr.aria-label]="active().ctaLabel + ': ' + active().heading"
-        >
+        <div class="mg-hero__stage">
           <img
             class="mg-hero__img"
             [src]="active().imageSrc"
@@ -22,20 +17,28 @@
             decoding="async"
           />
 
+          <a
+            class="mg-hero__stretched-link"
+            [routerLink]="active().ctaPath"
+            [attr.aria-label]="active().ctaLabel + ': ' + active().heading"
+          ></a>
+
           <div class="mg-hero__overlay" aria-hidden="true"></div>
 
           <div class="mg-hero__caption">
-            <div class="mg-hero__caption-row flex-row-between">
-              <div class="mg-section__title mg-section__title--sm truncate-2">
+            <div class="flex-row-between flex-col-sm">
+              <div class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2">
                 {{ active().heading }}
               </div>
 
               <p-button
+                class="mg-hero__caption-btn"
                 [label]="active().ctaLabel"
                 icon="pi pi-arrow-right"
                 iconPos="right"
                 severity="primary"
                 size="small"
+                [routerLink]="active().ctaPath"
               />
             </div>
 
@@ -43,85 +46,72 @@
               {{ active().text }}
             </p>
           </div>
-        </a>
 
-        <div class="mg-hero__controls flex-row-between">
-          <button
-            type="button"
-            class="mg-hero__btn"
-            (click)="prev()"
-            aria-label="Poprzedni slajd"
-          >
-            ‹
-          </button>
+          <div class="mg-hero__controls flex-row-between">
+            <p-button
+              type="button"
+              icon="pi pi-chevron-left"
+              severity="secondary"
+              size="small"
+              [text]="true"
+              (onClick)="prev()"
+              ariaLabel="Poprzedni slajd"
+            />
 
-          <div class="mg-hero__dots" role="tablist" aria-label="Wybór slajdu">
-            @for (s of slides(); track trackByIndex($index)) {
-              <button
-                type="button"
-                class="mg-hero__dot"
-                [class.is-active]="$index === activeIndex()"
-                (click)="goTo($index)"
-                [attr.aria-label]="'Przejdź do slajdu ' + ($index + 1)"
-                [attr.aria-current]="$index === activeIndex() ? 'true' : null"
-              ></button>
-            }
+            <div class="flex-row-center" role="tablist" aria-label="Wybór slajdu">
+              @for (s of slides(); track trackByIndex($index)) {
+                <button
+                  type="button"
+                  class="mg-hero__dot"
+                  [class.is-active]="$index === activeIndex()"
+                  (click)="goTo($index)"
+                  [attr.aria-label]="'Przejdź do slajdu ' + ($index + 1)"
+                  [attr.aria-current]="$index === activeIndex() ? 'true' : null"
+                ></button>
+              }
+            </div>
+
+            <p-button
+              type="button"
+              icon="pi pi-chevron-right"
+              severity="secondary"
+              size="small"
+              [text]="true"
+              (onClick)="next()"
+              ariaLabel="Następny slajd"
+            />
           </div>
-
-          <button
-            type="button"
-            class="mg-hero__btn"
-            (click)="next()"
-            aria-label="Następny slajd"
-          >
-            ›
-          </button>
         </div>
       </div>
 
       <div class="mg-hero__content">
-        <header class="mg-section__header mg-hero__header">
-          <h1 class="mg-section__title">Mistrzowie Gry</h1>
+        <header class="mg-section__header">
+          <h1 class="mg-section__title">{{ active().heading }}</h1>
 
           <p class="mg-section__subtitle mg-hero__subtitle truncate-2">
             {{ active().text }}
           </p>
         </header>
 
-        <div class="mg-hero__cta-grid">
-          <a class="mg-card mg-hero__cta" routerLink="/offer/individual">
-            <div class="mg-section__title mg-section__title--xs">
-              Oferta indywidualna
-            </div>
-            <p class="mg-hero__cta-text truncate-2">
-              Dla osób i grup prywatnych — sesje dopasowane do oczekiwań.
-            </p>
-          </a>
+         <div class="mg-hero__cta-grid">
+          @for (s of slides(); track trackByCtaPath($index, s)) {
+            <div
+              class="mg-card mg-hero__cta"
+              role="link"
+              tabindex="0"
+              (click)="onCtaNavigate(s.ctaPath)"
+              (keydown)="onCtaKeydown($event, s.ctaPath)"
+              [attr.aria-label]="s.heading"
+            >
+              <div class="mg-section__title mg-section__title--xs mg-section__title--no-margin">
+                {{ s.heading }}
+              </div>
 
-          <a class="mg-card mg-hero__cta" routerLink="/chaotic-thursdays">
-            <div class="mg-section__title mg-section__title--xs">
-              Chaotyczne Czwartki
+              <p class="truncate-3">
+                {{ s.text }}
+              </p>
             </div>
-            <p class="mg-hero__cta-text truncate-2">
-              Otwarte granie — wpadasz, losujesz ekipę i grasz.
-            </p>
-          </a>
-
-          <a class="mg-card mg-hero__cta" routerLink="/join">
-            <div class="mg-section__title mg-section__title--xs">
-              Dołącz do Drużyny
-            </div>
-            <p class="mg-hero__cta-text truncate-2">
-              Program, który pomaga wejść w regularne granie.
-            </p>
-          </a>
-
-          <a class="mg-card mg-hero__cta" routerLink="/contact">
-            <div class="mg-section__title mg-section__title--xs">Kontakt</div>
-            <p class="mg-hero__cta-text truncate-2">
-              Napisz — dobierzemy rozwiązanie do Twojej sytuacji.
-            </p>
-          </a>
+          }
         </div>
       </div>
     </div>

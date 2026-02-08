@@ -1,0 +1,176 @@
+<section class="mg-section mg-chaotic-hero" aria-label="Chaotyczne Czwartki">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <div class="mg-chaotic-hero__badge">Czwartki • RPG • Losowanie</div>
+
+      <h1 class="mg-section__title">Chaotyczne Czwartki</h1>
+
+      <p class="mg-section__subtitle">
+        Wpadasz. Poznajesz ludzi. Los decyduje. Ty grasz.
+        <br />
+        Format zrobiony tak, żebyś wyszedł z myślą:
+        <strong>„chcę więcej”</strong>.
+      </p>
+
+      <div class="mg-chaotic-hero__spark" aria-hidden="true">
+        <span class="mg-chaotic-hero__dice">🎲</span>
+        <span class="mg-chaotic-hero__dice">🎲</span>
+        <span class="mg-chaotic-hero__dice">🎲</span>
+      </div>
+
+      <div class="flex-row-center flex-col-sm mt-md gap-md">
+        <p-button
+          label="Sprawdź najbliższy termin"
+          icon="pi pi-calendar"
+          severity="primary"
+          size="small"
+          routerLink="/contact"
+        />
+        <p-button
+          label="Chcę stałą ekipę"
+          icon="pi pi-users"
+          severity="secondary"
+          size="small"
+          routerLink="/join"
+          [outlined]="true"
+        />
+      </div>
+    </header>
+
+  </div>
+</section>
+
+<section class="mg-section" aria-label="O co w tym chodzi">
+  <div class="mg-container">
+    <div class="mg-card">
+      <h2 class="mg-section__title mg-section__title--sm">O co w tym chodzi</h2>
+      <p>
+        Chaotyczne Czwartki to cykliczne wydarzenie RPG, które działa jak
+        “pierwszy kontakt”: jedno wejście, zero deklaracji, maksimum
+        doświadczenia. Losowanie to celowy element formatu — buduje emocje i
+        nieprzewidywalność.
+      </p>
+
+      <!-- 2 kolumny wracają -->
+      <div class="mg-chaotic-grid">
+        @for (h of highlights; track h.title) {
+          <div class="mg-card">
+            <div class="mg-chaotic-item-head">
+              <i class="{{ h.icon }}" aria-hidden="true"></i>
+              <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+                {{ h.title }}
+              </h3>
+            </div>
+            <p>{{ h.text }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mg-section" aria-label="Jak to działa">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">Jak to działa</h2>
+      <p class="mg-section__subtitle">
+        Struktura jest prosta i powtarzalna: wspólny start, integracja,
+        losowanie jako show, a potem sesje równolegle.
+      </p>
+    </header>
+
+    <div class="mg-card">
+      <!-- KISS: tabela bez żadnych custom wrapperów -->
+      <p-table [value]="steps">
+        <ng-template pTemplate="body" let-s>
+          <tr>
+            <td>{{ s.time }}</td>
+            <td>{{ s.title }}</td>
+            <td>{{ s.text }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</section>
+
+<section class="mg-section" aria-label="Standard prowadzenia">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">Standard prowadzenia</h2>
+      <p class="mg-section__subtitle">
+        Chaotyczne mają spójne ramy: wejście dla początkujących, tempo i domknięcie historii,
+        zasady wprowadzane w trakcie, kultura komunikacji.
+      </p>
+    </header>
+
+    <!-- 2 kolumny wracają -->
+    <div class="mg-chaotic-grid">
+      @for (st of standards; track st.title) {
+        <div class="mg-card">
+          <div class="mg-chaotic-item-head">
+            <i class="{{ st.icon }}" aria-hidden="true"></i>
+            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              {{ st.title }}
+            </h3>
+          </div>
+          <p>{{ st.text }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- odstęp od grida -->
+    <div class="mg-card mg-chaotic-expectations">
+      <h3 class="mg-section__title mg-section__title--sm">
+        Ważne, żeby ustawić oczekiwania
+      </h3>
+      <ul>
+        <li>Nie ma gwarancji konkretnego systemu ani klimatu — to element formatu.</li>
+        <li>To format jednorazowy, bez obietnicy kampanii.</li>
+        <li>Organizacja i standard są po naszej stronie.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="mg-section" aria-label="FAQ">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">FAQ</h2>
+      <p class="mg-section__subtitle">
+        Szybkie odpowiedzi, zanim zapytasz w wiadomości.
+      </p>
+    </header>
+
+    <div class="mg-card">
+      <p-accordion [multiple]="true">
+        @for (f of faqs; let i=$index; track f.q) {
+          <p-accordion-panel [value]="i">
+            <p-accordion-header>{{ f.q }}</p-accordion-header>
+            <p-accordion-content>
+              <p>{{ f.a }}</p>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    </div>
+
+    <div class="flex-row-center flex-col-sm mt-md gap-md">
+      <p-button
+        label="Dołącz do Drużyny"
+        icon="pi pi-users"
+        severity="primary"
+        size="small"
+        routerLink="/join"
+      />
+      <p-button
+        label="Oferta indywidualna"
+        icon="pi pi-star"
+        severity="secondary"
+        size="small"
+        [outlined]="true"
+        routerLink="/offer/individual"
+      />
+    </div>
+  </div>
+</section>

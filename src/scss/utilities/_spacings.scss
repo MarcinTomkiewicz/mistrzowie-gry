@@ -1,0 +1,26 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   SPACING UTILITIES (generowane na podstawie $spacings)
+   - .m{t|b|l|r|x|y}-{size}
+   ========================================================= */
+
+@each $name, $value in v.$spacings {
+  /* single sides */
+  .mt-#{$name} { margin-top: $value !important; }
+  .mb-#{$name} { margin-bottom: $value !important; }
+  .ml-#{$name} { margin-left: $value !important; }
+  .mr-#{$name} { margin-right: $value !important; }
+
+  /* axis */
+  .mx-#{$name} {
+    margin-left: $value !important;
+    margin-right: $value !important;
+  }
+
+  .my-#{$name} {
+    margin-top: $value !important;
+    margin-bottom: $value !important;
+  }
+}

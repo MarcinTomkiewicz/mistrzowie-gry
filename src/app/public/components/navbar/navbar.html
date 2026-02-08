@@ -9,7 +9,6 @@
       />
     </a>
 
-
     <!-- DESKTOP MENU -->
     <ul class="mg-navbar__menu">
       @for (item of menu(); track item.label) {
@@ -38,15 +37,15 @@
     <div class="mg-navbar__actions flex-row-start">
       <!-- Theme switch (desktop) -->
       <div class="mg-navbar__theme flex-row-start">
-        <span class="tag-badge tag-badge--muted">Dark</span>
+        <span class="tag-badge tag-badge--muted"><i class="pi pi-moon"></i></span>
 
         <p-toggleswitch
-          [(ngModel)]="isLight"
-          (onChange)="toggleTheme()"
+          [ngModel]="theme.isLight()"
+          (onChange)="onThemeToggle($event.checked)"
           ariaLabel="Przełącz motyw jasny/ciemny"
         ></p-toggleswitch>
 
-        <span class="tag-badge tag-badge--muted">Light</span>
+        <span class="tag-badge tag-badge--golden"><i class="pi pi-sun"></i></span>
       </div>
 
       <!-- Placeholders: profil / koszyk -->
@@ -113,15 +112,15 @@
 
       <!-- Theme switch (mobile) -->
       <div class="mg-mobile-theme-switch flex-row-start">
-        <span class="tag-badge tag-badge--muted">Dark</span>
+        <span class="tag-badge tag-badge--muted"><i class="pi pi-moon"></i></span>
 
         <p-toggleswitch
-          [(ngModel)]="isLight"
-          (onChange)="toggleTheme()"
+          [ngModel]="theme.isLight()"
+          (onChange)="onThemeToggle($event.checked)"
           ariaLabel="Przełącz motyw jasny/ciemny"
         ></p-toggleswitch>
 
-        <span class="tag-badge tag-badge--muted">Light</span>
+        <span class="tag-badge tag-badge--golden"><i class="pi pi-sun"></i></span>
       </div>
 
       <button

@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Navigation } from '../../../core/services/navigation/navigation';
-
+import { Theme } from '../../../core/services/theme/theme';
 
 @Component({
   selector: 'app-footer',
@@ -12,12 +12,14 @@ import { Navigation } from '../../../core/services/navigation/navigation';
 })
 export class Footer {
   readonly nav = inject(Navigation);
+  readonly theme = inject(Theme);
 
   readonly year = computed(() => new Date().getFullYear());
 
-  /**
-   * Placeholder na przyszłość: np. tracking kliknięć w footer.
-   * Na razie nie robimy tu nic (public site).
-   */
+  // theme-aware asset
+  readonly footerImgSrc = computed(() =>
+    this.theme.isLight() ? 'theme/light/footer.png' : 'theme/dark/footer.png',
+  );
+
   track(_label: string): void {}
 }

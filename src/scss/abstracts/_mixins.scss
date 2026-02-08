@@ -159,7 +159,7 @@
 /* Badge: golden – bez sassowych operacji na var() */
 @mixin badge-golden {
   @include gold-gradient-text;
-  border-color: color-mix(in srgb, v.$color-primary 80%, white);
+  border-color: color-mix(in srgb, v.$color-bronze 80%, white);
   box-shadow: 0 0 8px color-mix(in srgb, v.$color-secondary 35%, transparent);
 }
 

@@ -1,38 +1,33 @@
 import { Routes } from '@angular/router';
 
-/**
- * Lazy loader dla Home (SSR-safe).
- *
- * Uwaga: zakładamy strukturę:
- * src/app/public/home/home.ts  -> export class Home
- *
- * Jeśli u Ciebie jest inaczej, trzeba skorygować ścieżkę lub nazwę eksportu.
- */
-const loadHome = () => import('./public/components/home/home').then((m) => m.Home);
+const loaders = {
+  home: () => import('./public/components/home/home').then((m) => m.Home),
+  about: () => import('./public/components/about/about').then((m) => m.About),
 
-/**
- * Routing publiczny bazujący na MENU_CONFIG.
- *
- * Na ten moment wszystkie ścieżki (z menu) prowadzą do Home,
- * bo inne komponenty stron jeszcze nie istnieją.
- *
- * Dzięki temu:
- * - menu działa od razu,
- * - URL-e są docelowe (SEO-friendly),
- * - podmiana na prawdziwe strony później jest minimalna (wymieniasz tylko loadComponent).
- */
+  // na dziś mogą wskazywać na home (placeholders) – ale zostawiam jawnie,
+  // żeby później podmiana była 1-liniowa i bez szukania po pliku.
+  offerIndividual: () => import('./public/components/home/home').then((m) => m.Home),
+  offerBusiness: () => import('./public/components/home/home').then((m) => m.Home),
+  offerInstitutions: () => import('./public/components/home/home').then((m) => m.Home),
+  offerEvents: () => import('./public/components/home/home').then((m) => m.Home),
+
+  chaoticThursdays: () => import('./public/components/chaotic-thursdays/chaotic-thursdays').then((m) => m.ChaoticThursdays),
+  join: () => import('./public/components/home/home').then((m) => m.Home),
+  contact: () => import('./public/components/home/home').then((m) => m.Home),
+} as const;
+
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
     title: 'Mistrzowie Gry',
-    loadComponent: loadHome,
+    loadComponent: loaders.home,
   },
 
   {
     path: 'about',
     title: 'O nas • Mistrzowie Gry',
-    loadComponent: loadHome,
+    loadComponent: loaders.about,
   },
 
   {
@@ -41,24 +36,23 @@ export const routes: Routes = [
       {
         path: 'individual',
         title: 'Oferta indywidualna • Mistrzowie Gry',
-        loadComponent: loadHome,
+        loadComponent: loaders.offerIndividual,
       },
       {
         path: 'business',
         title: 'Oferta dla firm • Mistrzowie Gry',
-        loadComponent: loadHome,
+        loadComponent: loaders.offerBusiness,
       },
       {
         path: 'institutions',
         title: 'Oferta dla instytucji • Mistrzowie Gry',
-        loadComponent: loadHome,
+        loadComponent: loaders.offerInstitutions,
       },
       {
         path: 'events',
         title: 'Oferta imprezowa • Mistrzowie Gry',
-        loadComponent: loadHome,
+        loadComponent: loaders.offerEvents,
       },
-      // opcjonalnie: wejście /offer bez childa (na przyszłość)
       {
         path: '',
         pathMatch: 'full',
@@ -70,35 +64,25 @@ export const routes: Routes = [
   {
     path: 'chaotic-thursdays',
     title: 'Chaotyczne Czwartki • Mistrzowie Gry',
-    loadComponent: loadHome,
+    loadComponent: loaders.chaoticThursdays,
   },
 
   {
     path: 'join',
     title: 'Dołącz do Drużyny • Mistrzowie Gry',
-    loadComponent: loadHome,
+    loadComponent: loaders.join,
   },
 
   {
     path: 'contact',
     title: 'Kontakt • Mistrzowie Gry',
-    loadComponent: loadHome,
+    loadComponent: loaders.contact,
   },
 
-  /**
-   * Fallback:
-   * - na publicznym MVP bez osobnego 404 lepiej nie serwować "pustej" strony
-   * - później można podmienić na dedykowane NotFoundPage (lazy)
-   */
   {
     path: '**',
     redirectTo: '',
   },
 ];
 
-/**
- * Back-compat alias:
- * jeśli gdzieś w app.config.ts importujesz np. APP_ROUTES,
- * to nie rozwalisz sobie importów.
- */
 export const APP_ROUTES = routes;

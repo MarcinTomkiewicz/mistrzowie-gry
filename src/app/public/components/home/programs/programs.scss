@@ -2,32 +2,27 @@
 @use "abstracts/variables" as v;
 @use "abstracts/mixins" as m;
 
-:host {
-  display: block;
-}
-
 .mg-programs__grid {
   @include m.mg-grid(2, map.get(v.$spacings, "lg"), map.get(v.$spacings, "md"), true, 2, 1);
 }
 
-.mg-programs__title {
-  margin: 0 0 0.5rem;
-  font-weight: 700;
-}
-
-.mg-programs__intro {
-  margin: 0 0 0.75rem;
-  color: v.$color-text-muted;
-}
-
 .mg-programs__list {
-  margin: 0 0 1rem;
-  padding-left: 1.1rem;
-}
+  list-style: none;
+  padding-left: 0;
 
-.mg-programs__link {
-  text-decoration: none;
-  color: v.$color-text;
-  border-bottom: 1px solid v.$color-border;
-  padding-bottom: 0.15rem;
+  li {
+    position: relative;
+    padding-left: 1.5rem;
+    line-height: 1.9;
+
+    &::before {
+      content: "\ea0f";
+      font-family: 'primeicons';
+      position: absolute;
+      left: 0;
+      top: 0.15em;
+      color: v.$heading-color;
+      font-size: 0.9em;
+    }
+  }
 }

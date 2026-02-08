@@ -1,0 +1,69 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+.mg-chaotic-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.mg-chaotic-hero__badge {
+  display: inline-flex;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+  font-size: map.get(v.$font-sizes, "xs");
+  font-weight: 700;
+  margin-bottom: map.get(v.$spacings, "xl");
+}
+
+.mg-chaotic-hero__spark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  opacity: 0.35;
+}
+
+.mg-chaotic-hero__dice {
+  position: absolute;
+  font-size: 3rem;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+
+  &:nth-child(1) {
+    transform: translate(-35%, -10%) rotate(-12deg);
+  }
+  &:nth-child(2) {
+    transform: translate(20%, -25%) rotate(10deg);
+  }
+  &:nth-child(3) {
+    transform: translate(30%, 20%) rotate(-6deg);
+  }
+}
+
+/* 2 kolumny dla highlights/standards */
+.mg-chaotic-grid {
+  margin-top: map.get(v.$spacings, "md");
+  @include m.mg-grid(
+    2,
+    map.get(v.$spacings, "md"),
+    map.get(v.$spacings, "md"),
+    true,
+    2,
+    1
+  );
+}
+
+/* gap ikona <-> tytuł, niezależnie od globalnych flex utili */
+.mg-chaotic-item-head {
+  display: inline-flex;
+  align-items: center;
+  gap: map.get(v.$spacings, "sm");
+}
+
+/* oddzielamy expectations od grida (żeby nie było “przyklejone”) */
+.mg-chaotic-expectations {
+  margin-top: map.get(v.$spacings, "md");
+}

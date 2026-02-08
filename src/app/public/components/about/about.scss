@@ -1,0 +1,20 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+.mg-about__stack {
+  display: grid;
+  gap: map.get(v.$spacings, "lg");
+}
+
+.mg-about__grid {
+  @include m.mg-grid(2, map.get(v.$spacings, "md"), 0, true, 2, 1);
+
+  p {
+    margin: 0;
+  }
+}
+
+.mg-about__actions {
+  gap: map.get(v.$spacings, "sm");
+}

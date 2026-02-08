@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 import { IProgramCard } from '../../../../core/interfaces/home/i-program-card';
 
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ButtonModule],
   templateUrl: './programs.html',
   styleUrl: './programs.scss',
 })

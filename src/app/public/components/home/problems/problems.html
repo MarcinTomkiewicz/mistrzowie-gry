@@ -3,16 +3,30 @@
     <header class="mg-section__header">
       <h2 class="mg-section__title">Na jakie problemy odpowiadamy</h2>
       <p class="mg-section__subtitle">
-        RPG bywa trudne do “wejścia” — my projektujemy formy, które zdejmują tarcie i prowadzą do regularnego grania.
+        RPG bywa trudne do “wejścia” — my projektujemy formy, które zdejmują
+        tarcie i prowadzą do regularnego grania.
       </p>
     </header>
 
     <div class="mg-problems__grid">
       @for (p of items; track p.title) {
-        <div class="mg-card mg-problems__card">
-          <h3 class="mg-section__title mg-section__title--sm">{{ p.title }}</h3>
-          <p class="mg-problems__text">{{ p.text }}</p>
-          <a class="mg-problems__link" [routerLink]="p.ctaPath">{{ p.ctaLabel }}</a>
+        <div class="mg-card">
+          <h3 class="mg-section__title mg-section__title--sm">
+            {{ p.title }}
+          </h3>
+
+          <p>{{ p.text }}</p>
+
+          <div class="flex-row-end">
+            <p-button
+              [label]="p.ctaLabel"
+              severity="info"
+              [icon]="p.icon"
+              iconPos="right"
+              size="small"
+              [routerLink]="p.ctaPath"
+            />
+          </div>
         </div>
       }
     </div>

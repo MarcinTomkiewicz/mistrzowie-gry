@@ -9,20 +9,3 @@
 .mg-problems__grid {
   @include m.mg-grid(2, map.get(v.$spacings, "lg"), map.get(v.$spacings, "md"), true, 2, 1);
 }
-
-.mg-problems__title {
-  margin: 0 0 0.5rem;
-  font-weight: 700;
-}
-
-.mg-problems__text {
-  margin: 0 0 0.75rem;
-  color: v.$color-text-muted;
-}
-
-.mg-problems__link {
-  text-decoration: none;
-  color: v.$color-text;
-  border-bottom: 1px solid v.$color-border;
-  padding-bottom: 0.15rem;
-}

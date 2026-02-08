@@ -1,0 +1,21 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   GAP UTILITIES (generowane na podstawie $spacings)
+   - .gap-{size} / .row-gap-{size} / .col-gap-{size}
+   ========================================================= */
+
+@each $name, $value in v.$spacings {
+  .gap-#{$name} {
+    gap: $value !important;
+  }
+
+  .row-gap-#{$name} {
+    row-gap: $value !important;
+  }
+
+  .col-gap-#{$name} {
+    column-gap: $value !important;
+  }
+}
