@@ -36,7 +36,6 @@
         />
       </div>
     </header>
-
   </div>
 </section>
 
@@ -55,9 +54,11 @@
       <div class="mg-chaotic-grid">
         @for (h of highlights; track h.title) {
           <div class="mg-card">
-            <div class="mg-chaotic-item-head">
+            <div class="flex-row-start gap-sm mb-sm">
               <i class="{{ h.icon }}" aria-hidden="true"></i>
-              <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              <h3
+                class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+              >
                 {{ h.title }}
               </h3>
             </div>
@@ -80,12 +81,11 @@
     </header>
 
     <div class="mg-card">
-      <!-- KISS: tabela bez żadnych custom wrapperów -->
       <p-table [value]="steps">
         <ng-template pTemplate="body" let-s>
           <tr>
             <td>{{ s.time }}</td>
-            <td>{{ s.title }}</td>
+            <td class="mg-section__title mg-section__title--sm">{{ s.title }}</td>
             <td>{{ s.text }}</td>
           </tr>
         </ng-template>
@@ -99,8 +99,8 @@
     <header class="mg-section__header">
       <h2 class="mg-section__title">Standard prowadzenia</h2>
       <p class="mg-section__subtitle">
-        Chaotyczne mają spójne ramy: wejście dla początkujących, tempo i domknięcie historii,
-        zasady wprowadzane w trakcie, kultura komunikacji.
+        Chaotyczne mają spójne ramy: wejście dla początkujących, tempo i
+        domknięcie historii, zasady wprowadzane w trakcie, kultura komunikacji.
       </p>
     </header>
 
@@ -108,9 +108,11 @@
     <div class="mg-chaotic-grid">
       @for (st of standards; track st.title) {
         <div class="mg-card">
-          <div class="mg-chaotic-item-head">
+          <div class="flex-row-start gap-sm mb-sm">
             <i class="{{ st.icon }}" aria-hidden="true"></i>
-            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
               {{ st.title }}
             </h3>
           </div>
@@ -125,7 +127,9 @@
         Ważne, żeby ustawić oczekiwania
       </h3>
       <ul>
-        <li>Nie ma gwarancji konkretnego systemu ani klimatu — to element formatu.</li>
+        <li>
+          Nie ma gwarancji konkretnego systemu ani klimatu — to element formatu.
+        </li>
         <li>To format jednorazowy, bez obietnicy kampanii.</li>
         <li>Organizacja i standard są po naszej stronie.</li>
       </ul>
@@ -144,9 +148,9 @@
 
     <div class="mg-card">
       <p-accordion [multiple]="true">
-        @for (f of faqs; let i=$index; track f.q) {
+        @for (f of faqs; let i = $index; track f.q) {
           <p-accordion-panel [value]="i">
-            <p-accordion-header>{{ f.q }}</p-accordion-header>
+            <p-accordion-header class="mg-section__title mg-section__title--xs">{{ f.q }}</p-accordion-header>
             <p-accordion-content>
               <p>{{ f.a }}</p>
             </p-accordion-content>

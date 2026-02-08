@@ -43,7 +43,6 @@
   }
 }
 
-/* 2 kolumny dla highlights/standards */
 .mg-chaotic-grid {
   margin-top: map.get(v.$spacings, "md");
   @include m.mg-grid(
@@ -56,7 +55,6 @@
   );
 }
 
-/* gap ikona <-> tytuł, niezależnie od globalnych flex utili */
 .mg-chaotic-item-head {
   display: inline-flex;
   align-items: center;

@@ -6,7 +6,7 @@ $c: common.$common;
 
 $dark: (
   "color-primary": map.get($c, "color-crimson"),
-  "color-secondary": map.get($c, "color-bronze"),
+  "color-secondary": map.get($c, "color-arcane"),
   "color-bg": map.get($c, "color-ink"),
   "color-bg-surface": map.get($c, "color-graphite"),
   "color-border": color.scale(map.get($c, "color-graphite"), $lightness: 12%),
@@ -14,7 +14,6 @@ $dark: (
   "color-text-muted": color.scale(map.get($c, "color-white"), $alpha: -35%),
   "color-link": map.get($c, "color-white"),
   "color-link-hover": color.scale(map.get($c, "color-bronze"), $lightness: 10%),
-
   "color-paper-bg": linear-gradient(
       180deg,
       #f0e2c4 0%,
@@ -26,7 +25,6 @@ $dark: (
   "color-paper-text": map.get($c, "color-ink"),
   "color-paper-muted": rgba(map.get($c, "color-ink"), 0.75),
   "color-paper-border": rgba(map.get($c, "color-ink"), 0.25),
-
-    "heading-color": map.get($c, "color-secondary"),
-  "heading-mode": gold
+  "heading-color": map.get($c, "color-secondary"),
+  "heading-mode": gold,
 );

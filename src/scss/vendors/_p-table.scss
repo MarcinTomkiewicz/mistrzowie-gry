@@ -1,0 +1,15 @@
+@use "../abstracts/variables" as v;
+
+.p-datatable {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+}
+
+.p-datatable td {
+  border-color: v.$color-border;
+}
+
+.p-datatable tr {
+  background: transparent;
+  color: v.$color-text;
+}

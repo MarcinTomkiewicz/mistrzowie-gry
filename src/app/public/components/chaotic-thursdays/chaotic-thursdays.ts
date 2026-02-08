@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { AccordionModule } from 'primeng/accordion';
 import { TableModule } from 'primeng/table';
+import { ScrollerModule } from 'primeng/scroller';
 
 @Component({
   selector: 'app-chaotic-thursdays',
   standalone: true,
-  imports: [RouterModule, ButtonModule, AccordionModule, TableModule],
+  imports: [RouterModule, ButtonModule, AccordionModule, TableModule, ScrollerModule],
   templateUrl: './chaotic-thursdays.html',
   styleUrl: './chaotic-thursdays.scss',
 })
@@ -20,7 +21,7 @@ export class ChaoticThursdays {
       text: 'Wpadasz bez zobowiązań. Bez kampanii, bez deklaracji.',
     },
     {
-      icon: 'pi pi-random',
+      icon: 'pi pi-question-circle',
       title: 'Losowanie',
       text: 'Stoły, MG i składy drużyn są losowane na miejscu.',
     },
@@ -53,7 +54,7 @@ export class ChaoticThursdays {
       text: 'Krótkie wprowadzenie i ruszamy z grą. Zasady podawane w trakcie.',
     },
     {
-      time: '21:15',
+      time: '22:15',
       title: 'Zamknięcie historii',
       text: 'Sesja ma wyraźne zakończenie — domykamy wątki i kończymy w punkt.',
     },
