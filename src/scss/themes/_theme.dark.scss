@@ -6,7 +6,7 @@ $c: common.$common;
 
 $dark: (
   "color-primary": map.get($c, "color-crimson"),
-  "color-secondary": map.get($c, "color-arcane"),
+  "color-secondary": map.get($c, "color-antique"),
   "color-bg": map.get($c, "color-ink"),
   "color-bg-surface": map.get($c, "color-graphite"),
   "color-border": color.scale(map.get($c, "color-graphite"), $lightness: 12%),

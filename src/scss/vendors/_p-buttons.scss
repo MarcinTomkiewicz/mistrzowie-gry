@@ -78,6 +78,11 @@
 
   --p-button-outlined-secondary-border-color: #{v.$color-secondary};
   --p-button-outlined-secondary-color: #{v.$color-secondary};
+  --p-button-outlined-secondary-hover-background: color-mix(
+    in srgb,
+    #{v.$color-bg-surface} 88%,
+    black
+  );
 }
 
 /* =========================================================
@@ -133,7 +138,6 @@
     black
   );
 
-  /* WARN / ARCANE */
   --p-button-warn-hover-background: color-mix(
     in srgb,
     #{v.$color-arcane} 88%,
@@ -145,7 +149,6 @@
     black
   );
 
-  /* SECONDARY */
   --p-button-secondary-hover-background: color-mix(
     in srgb,
     #{v.$color-secondary} 88%,
