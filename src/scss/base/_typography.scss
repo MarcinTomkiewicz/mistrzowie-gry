@@ -32,7 +32,6 @@ p {
 
 small {
   font-size: map.get(v.$font-sizes, "sm");
-  color: v.$color-text-muted;
 }
 
 strong {

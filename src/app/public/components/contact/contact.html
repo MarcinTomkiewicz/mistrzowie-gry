@@ -1,0 +1,182 @@
+<!-- path: src/app/public/components/contact/contact.html -->
+<section class="mg-section" [attr.aria-label]="hero().title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">{{ hero().title }}</h1>
+      <p class="mg-section__subtitle">{{ hero().subtitle }}</p>
+    </header>
+
+    <div class="mg-contact-grid">
+      <div class="mg-card flex-col-center gap-md">
+        <h2 class="mg-section__title mg-section__title--sm align-self-start">
+          {{ formText().title }}
+        </h2>
+        <p class="mg-section__subtitle align-self-start mb-md">{{ formText().hint }}</p>
+
+        <form
+          class="flex-col-center gap-sm w-80"
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+        >
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              inputId="topic"
+              [options]="topics()"
+              optionLabel="label"
+              optionValue="value"
+              formControlName="topic"
+            />
+            <label for="topic">{{ formText().topicLabel }}</label>
+          </p-iftalabel>
+
+          @if (isOtherTopicSelected()) {
+            <p-iftalabel class="w-100">
+              <input
+                class="w-100"
+                pInputText
+                id="topicCustom"
+                type="text"
+                formControlName="topicCustom"
+                [attr.aria-invalid]="showRequiredError('topicCustom')"
+              />
+              <label for="topicCustom">{{ formText().topicCustomLabel }}</label>
+            </p-iftalabel>
+
+            @if (showRequiredError("topicCustom")) {
+              <small class="error-text">{{ errors().required }}</small>
+            }
+          }
+
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              [attr.aria-invalid]="showRequiredError('firstName')"
+            />
+            <label for="firstName">{{ formText().firstNameLabel }}</label>
+          </p-iftalabel>
+
+          @if (showRequiredError("firstName")) {
+            <small class="mg-contact-error">{{ errors().required }}</small>
+          }
+
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              [attr.aria-invalid]="showRequiredError('lastName')"
+            />
+            <label for="lastName">{{ formText().lastNameLabel }}</label>
+          </p-iftalabel>
+
+          @if (showRequiredError("lastName")) {
+            <small class="mg-contact-error">{{ errors().required }}</small>
+          }
+
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="company"
+              type="text"
+              formControlName="company"
+            />
+            <label for="company">{{ formText().companyLabel }}</label>
+          </p-iftalabel>
+
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="phone"
+              type="tel"
+              formControlName="phone"
+            />
+            <label for="phone">{{ formText().phoneLabel }}</label>
+          </p-iftalabel>
+
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              [attr.aria-invalid]="showEmailError()"
+            />
+            <label for="email">{{ formText().emailLabel }}</label>
+          </p-iftalabel>
+
+          @if (showEmailError()) {
+            <small class="mg-contact-error">
+              @if (form.controls.email.errors?.["email"]) {
+                {{ errors().email }}
+              } @else {
+                {{ errors().required }}
+              }
+            </small>
+          }
+
+          <p-iftalabel class="w-100">
+            <textarea
+              class="w-100"
+              pTextarea
+              id="message"
+              formControlName="message"
+              [rows]="6"
+              [autoResize]="true"
+              [placeholder]="formText().messagePlaceholder"
+              [attr.aria-invalid]="
+                showRequiredError('message') || showMinMessageError()
+              "
+            ></textarea>
+            <label for="message">{{ formText().messageLabel }}</label>
+          </p-iftalabel>
+
+          @if (showRequiredError("message")) {
+            <small class="mg-contact-error">{{ errors().required }}</small>
+          } @else if (showMinMessageError()) {
+            <small class="mg-contact-error">{{ errors().minMessage }}</small>
+          }
+
+          <div class="flex-row-end flex-col-sm gap-sm">
+            <p-button
+              type="submit"
+              [label]="cta().sendMessage"
+              icon="pi pi-send"
+              severity="success"
+            />
+          </div>
+        </form>
+      </div>
+
+      <div class="mg-card">
+        <h2 class="mg-section__title mg-section__title--sm">
+          contact.info.title
+        </h2>
+        <p class="mg-section__subtitle">
+          [PH] contact.info.subtitle — Nie mamy lokalu ani adresu do odwiedzin.
+          Najszybciej odpowiadamy przez formularz lub mail.
+        </p>
+
+        <div class="gap-sm mt-md">
+          <div class="flex-row-start gap-sm">
+            <i class="pi pi-envelope" aria-hidden="true"></i>
+            <span>contact.info.emailLabel</span>
+          </div>
+          <div class="flex-row-start gap-sm">
+            <i class="pi pi-phone" aria-hidden="true"></i>
+            <span>contact.info.phoneLabel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

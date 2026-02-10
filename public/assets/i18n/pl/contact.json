@@ -1,0 +1,43 @@
+{
+  "seo": {
+    "title": "contact.seo.title",
+    "description": "[PH] contact.seo.description — Skontaktuj się z nami w sprawie usług RPG: oferta biznesowa, instytucje, imprezy okolicznościowe i inne tematy. Wybierz temat i wyślij wiadomość."
+  },
+
+  "hero": {
+    "title": "contact.hero.title",
+    "subtitle": "[PH] contact.hero.subtitle — Wybierz temat, napisz wiadomość i zostaw kontakt. Odpowiemy najszybciej jak to możliwe."
+  },
+
+  "form": {
+    "title": "contact.form.title",
+    "hint": "[PH] contact.form.hint — Im więcej kontekstu podasz, tym szybciej dobierzemy właściwą odpowiedź (format, termin, budżet, liczba osób).",
+
+    "topicLabel": "contact.form.topicLabel",
+    "topicCustomLabel": "contact.form.topicCustomLabel",
+
+    "firstNameLabel": "contact.form.firstNameLabel",
+    "lastNameLabel": "contact.form.lastNameLabel",
+    "companyLabel": "contact.form.companyLabel",
+    "emailLabel": "contact.form.emailLabel",
+    "phoneLabel": "contact.form.phoneLabel",
+    "messageLabel": "contact.form.messageLabel",
+    "messagePlaceholder": "[PH] contact.form.messagePlaceholder — Napisz: czego potrzebujesz, dla ilu osób, jaki termin/okres i co jest dla Ciebie najważniejsze."
+  },
+
+  "errors": {
+    "required": "contact.errors.required",
+    "email": "contact.errors.email",
+    "minMessage": "contact.errors.minMessage"
+  },
+
+  "topics": {
+    "topic-1": { "id": 1, "value": "business", "label": "contact.topics.business" },
+    "topic-2": { "id": 2, "value": "institution", "label": "contact.topics.institution" },
+    "topic-3": { "id": 3, "value": "party", "label": "contact.topics.party" },
+    "topic-4": { "id": 4, "value": "individual", "label": "contact.topics.individual" },
+    "topic-5": { "id": 5, "value": "join", "label": "contact.topics.join" },
+    "topic-6": { "id": 6, "value": "pricing", "label": "contact.topics.pricing" },
+    "topic-7": { "id": 7, "value": "other", "label": "contact.topics.other" }
+  }
+}

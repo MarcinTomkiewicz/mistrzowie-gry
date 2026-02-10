@@ -90,15 +90,6 @@ $flex-presets: (
   }
 }
 
-.gap-sm {
-  gap: map.get(v.$spacings, "sm");
-}
-.gap-md {
-  gap: map.get(v.$spacings, "md");
-}
-.gap-lg {
-  gap: map.get(v.$spacings, "lg");
-}
-.gap-xs {
-  gap: map.get(v.$spacings, "xs");
+.align-self-start {
+  align-self: flex-start;
 }

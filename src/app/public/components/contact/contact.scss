@@ -1,0 +1,19 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+.mg-contact-grid {
+  @include m.mg-grid(
+    2,
+    map.get(v.$spacings, "lg"),
+    map.get(v.$spacings, "lg"),
+    true,
+    1,
+    1
+  );
+}
+
+.mg-contact-error {
+  color: v.$color-danger;
+  font-size: map.get(v.$font-sizes, "xs");
+}

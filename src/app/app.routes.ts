@@ -4,8 +4,6 @@ const loaders = {
   home: () => import('./public/components/home/home').then((m) => m.Home),
   about: () => import('./public/components/about/about').then((m) => m.About),
 
-  // na dziś mogą wskazywać na home (placeholders) – ale zostawiam jawnie,
-  // żeby później podmiana była 1-liniowa i bez szukania po pliku.
   offerIndividual: () => import('./public/components/home/home').then((m) => m.Home),
   offerBusiness: () => import('./public/components/home/home').then((m) => m.Home),
   offerInstitutions: () => import('./public/components/home/home').then((m) => m.Home),
@@ -13,7 +11,7 @@ const loaders = {
 
   chaoticThursdays: () => import('./public/components/chaotic-thursdays/chaotic-thursdays').then((m) => m.ChaoticThursdays),
   joinTheParty: () => import('./public/components/join-the-party/join-the-party').then((m) => m.JoinTheParty),
-  contact: () => import('./public/components/home/home').then((m) => m.Home),
+  contact: () => import('./public/components/contact/contact').then((m) => m.Contact),
 } as const;
 
 export const routes: Routes = [

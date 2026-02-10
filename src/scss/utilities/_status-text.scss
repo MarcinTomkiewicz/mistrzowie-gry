@@ -1,0 +1,15 @@
+@use "../abstracts/variables" as v;
+
+$status-text: (
+  "error": v.$color-danger,
+  "success": v.$color-success,
+  "info": v.$color-info,
+  "muted": v.$color-text-muted,
+  "arcane": v.$color-arcane
+);
+
+@each $name, $color in $status-text {
+  .#{$name}-text {
+    color: $color;
+  }
+}

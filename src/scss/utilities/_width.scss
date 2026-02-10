@@ -1,0 +1,10 @@
+$widths: (10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100);
+
+@each $w in $widths {
+  .w-#{$w} {
+    width: $w * 1% !important;
+  }
+}
+
+
+.w-auto { width: auto !important; }
