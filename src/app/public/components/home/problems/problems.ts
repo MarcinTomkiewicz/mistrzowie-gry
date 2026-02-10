@@ -42,7 +42,7 @@ type UiProblemCard = IProblemCard & { id: number };
 export class Problems {
   // developer-owned (routing/icons + which common CTA label to use)
   private readonly tech: ProblemCardTech[] = [
-    { id: 1, ctaPath: '/join', icon: 'pi pi-users', ctaKey: 'joinProgram' },
+    { id: 1, ctaPath: '/join-the-party', icon: 'pi pi-users', ctaKey: 'joinProgram' },
     {
       id: 2,
       ctaPath: '/offer/individual',

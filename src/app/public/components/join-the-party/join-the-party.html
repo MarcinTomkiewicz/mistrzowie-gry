@@ -1,0 +1,145 @@
+<section class="mg-section mg-join-hero" [attr.aria-label]="hero().title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <div class="mg-join-hero__badge">{{ hero().badge }}</div>
+
+      <h1 class="mg-section__title">{{ hero().title }}</h1>
+
+      <p class="mg-section__subtitle">
+        {{ hero().subtitle }}
+      </p>
+
+      <div class="flex-row-center flex-col-sm mt-md gap-md">
+        <p-button
+          [label]="cta().contactUs"
+          icon="pi pi-envelope"
+          severity="primary"
+          size="small"
+          routerLink="/contact"
+        />
+        <p-button
+          [label]="cta().joinProgram"
+          icon="pi pi-users"
+          severity="secondary"
+          size="small"
+          [outlined]="true"
+          routerLink="/join-the-party"
+        />
+      </div>
+    </header>
+  </div>
+</section>
+
+<section class="mg-section" [attr.aria-label]="intro().title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">{{ intro().title }}</h2>
+      <p class="mg-section__subtitle">{{ intro().subtitle }}</p>
+    </header>
+
+    <div class="mg-join-grid">
+      @for (b of benefits(); track trackByIndex($index)) {
+        <div class="mg-card">
+          <div class="flex-row-start gap-sm mb-sm">
+            <i class="{{ b.icon }}" aria-hidden="true"></i>
+            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              {{ b.title }}
+            </h3>
+          </div>
+          <p>{{ b.text }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="mg-section" [attr.aria-label]="structure().title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">{{ structure().title }}</h2>
+      <p class="mg-section__subtitle">{{ structure().subtitle }}</p>
+    </header>
+
+    <div class="mg-join-grid">
+      @for (s of steps(); track trackByIndex($index)) {
+        <div class="mg-card">
+          <div class="flex-row-start gap-sm mb-sm">
+            <i class="{{ s.icon }}" aria-hidden="true"></i>
+            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              {{ s.title }}
+            </h3>
+          </div>
+          <p>{{ s.text }}</p>
+        </div>
+      }
+    </div>
+
+    <p-divider></p-divider>
+
+    <div class="mg-card">
+      <h3 class="mg-section__title mg-section__title--sm">joinTheParty.structure.rules.title</h3>
+
+      <ul class="mg-join-list">
+        @for (x of rules(); track trackByIndex($index)) {
+          <li>{{ x }}</li>
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="mg-section" [attr.aria-label]="continuation().title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">{{ continuation().title }}</h2>
+      <p class="mg-section__subtitle">{{ continuation().subtitle }}</p>
+    </header>
+
+    <div class="mg-card">
+      <h3 class="mg-section__title mg-section__title--sm">joinTheParty.continuation.bullets.title</h3>
+
+      <ul class="mg-join-list">
+        @for (x of continuationBullets(); track trackByIndex($index)) {
+          <li>{{ x }}</li>
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="mg-section" [attr.aria-label]="orgMeeting().title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h2 class="mg-section__title">{{ orgMeeting().title }}</h2>
+      <p class="mg-section__subtitle">{{ orgMeeting().subtitle }}</p>
+    </header>
+
+    <div class="mg-card">
+      <h3 class="mg-section__title mg-section__title--sm">joinTheParty.orgMeeting.bullets.title</h3>
+
+      <ul class="mg-join-list">
+        @for (x of orgMeetingBullets(); track trackByIndex($index)) {
+          <li>{{ x }}</li>
+        }
+      </ul>
+
+      <div class="flex-row-end flex-col-sm mt-md gap-sm">
+        <p-button
+          [label]="cta().contactUs"
+          icon="pi pi-envelope"
+          severity="primary"
+          size="small"
+          routerLink="/contact"
+        />
+        <p-button
+          [label]="cta().joinProgram"
+          icon="pi pi-users"
+          severity="secondary"
+          size="small"
+          [outlined]="true"
+          routerLink="/join-the-party"
+        />
+      </div>
+    </div>
+  </div>
+</section>

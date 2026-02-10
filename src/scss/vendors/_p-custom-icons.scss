@@ -1,0 +1,48 @@
+/* path: src/styles/vendors/_custom-icons.scss */
+
+.pi {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: -0.125em;
+}
+
+.pi--svg {
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.tag-badge--golden .pi--svg,
+.tag-badge.golden .pi--svg {
+  background: linear-gradient(
+    90deg,
+    rgba(232, 188, 90, 1) 0%,
+    rgba(123, 79, 34, 1) 64%,
+    rgba(158, 113, 48, 1) 100%
+  );
+  background-color: unset;
+}
+
+/* nazwa klasy -> plik w /assets/icons */
+$custom-icons: (
+  "overlord": "overlord-helm.svg",
+  "shop-bag": "shop.svg",
+  "cash": "cash.svg",
+  "d20": "d20.svg",
+  "moon-bats": "moon-bats.svg",
+  "sun-eclipse": "eclipse-flare.svg",
+);
+
+@each $name, $file in $custom-icons {
+  .pi.pi-#{$name} {
+    @extend .pi--svg;
+    -webkit-mask-image: url("/icons/#{$file}");
+    mask-image: url("/icons/#{$file}");
+  }
+}

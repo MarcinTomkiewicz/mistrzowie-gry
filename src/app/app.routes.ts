@@ -12,7 +12,7 @@ const loaders = {
   offerEvents: () => import('./public/components/home/home').then((m) => m.Home),
 
   chaoticThursdays: () => import('./public/components/chaotic-thursdays/chaotic-thursdays').then((m) => m.ChaoticThursdays),
-  join: () => import('./public/components/home/home').then((m) => m.Home),
+  joinTheParty: () => import('./public/components/join-the-party/join-the-party').then((m) => m.JoinTheParty),
   contact: () => import('./public/components/home/home').then((m) => m.Home),
 } as const;
 
@@ -68,9 +68,9 @@ export const routes: Routes = [
   },
 
   {
-    path: 'join',
+    path: 'join-the-party',
     title: 'Dołącz do Drużyny • Mistrzowie Gry',
-    loadComponent: loaders.join,
+    loadComponent: loaders.joinTheParty,
   },
 
   {

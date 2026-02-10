@@ -14,6 +14,6 @@ export const MENU_CONFIG: IMenu[] = [
   },
 
   { label: 'Chaotyczne Czwartki', path: '/chaotic-thursdays', footer: true },
-  { label: 'Dołącz do Drużyny', path: '/join', footer: true },
+  { label: 'Dołącz do Drużyny', path: '/join-the-party', footer: true },
   { label: 'Kontakt', path: '/contact', footer: true },
 ];

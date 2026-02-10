@@ -66,7 +66,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       heading: '',
       text: '',
       ctaLabel: '',
-      ctaPath: '/join',
+      ctaPath: '/join-the-party',
       imageSrc: 'hero/hero-3.png',
       imageAlt: 'Grupa osób grających w RPG',
     },

@@ -1,0 +1,94 @@
+{
+  "seo": {
+    "title": "joinTheParty.seo.title",
+    "description": "[PH] joinTheParty.seo.description — Dołącz do Drużyny: program wejścia w regularne granie w stałej grupie. Etap wprowadzający obejmuje 5 sesji po 4 godziny i prowadzi do kontynuacji w ramach struktur projektu."
+  },
+
+  "hero": {
+    "badge": "joinTheParty.hero.badge",
+    "title": "joinTheParty.hero.title",
+    "subtitle": "[PH] joinTheParty.hero.subtitle — Program, który zamienia “chcę zagrać” w realną, regularną drużynę. My bierzemy na siebie organizację, a Ty po prostu wchodzisz w grę."
+  },
+
+  "intro": {
+    "title": "joinTheParty.intro.title",
+    "subtitle": "[PH] joinTheParty.intro.subtitle — To program dla osób, które chcą grać, ale nie chcą (albo nie mogą) samodzielnie składać ekipy, szukać MG i dogrywać wszystkiego od zera.",
+    "benefits": {
+      "item-1": {
+        "id": 1,
+        "title": "joinTheParty.intro.benefits.1.title",
+        "text": "[PH] joinTheParty.intro.benefits.1.text — Organizacja drużyny po naszej stronie: dobór osób, ramy współpracy i start bez chaosu."
+      },
+      "item-2": {
+        "id": 2,
+        "title": "joinTheParty.intro.benefits.2.title",
+        "text": "[PH] joinTheParty.intro.benefits.2.text — Regularność bez narzuconego grafiku: ustalacie terminy z MG przy wsparciu narzędzi projektu."
+      },
+      "item-3": {
+        "id": 3,
+        "title": "joinTheParty.intro.benefits.3.title",
+        "text": "[PH] joinTheParty.intro.benefits.3.text — Pełne doświadczenie startowe: etap wprowadzający jako zamknięty pakiet, bez wymogu przygotowania."
+      },
+      "item-4": {
+        "id": 4,
+        "title": "joinTheParty.intro.benefits.4.title",
+        "text": "[PH] joinTheParty.intro.benefits.4.text — Spójny standard prowadzenia i bezpieczna kultura stołu jako część usługi, nie opcja."
+      }
+    }
+  },
+
+  "structure": {
+    "title": "joinTheParty.structure.title",
+    "subtitle": "[PH] joinTheParty.structure.subtitle — Etap wprowadzający to 5 sesji (gwarantowane 4 godziny każda) i jasne ramy startu: celem jest doprowadzić drużynę do świadomej decyzji o dalszym, regularnym graniu.",
+    "steps": {
+      "item-1": {
+        "id": 1,
+        "title": "joinTheParty.structure.steps.1.title",
+        "text": "[PH] joinTheParty.structure.steps.1.text — Kontakt i wejście: zbieramy podstawowe informacje, odpowiadamy na pytania i ustawiamy oczekiwania."
+      },
+      "item-2": {
+        "id": 2,
+        "title": "joinTheParty.structure.steps.2.title",
+        "text": "[PH] joinTheParty.structure.steps.2.text — Tworzenie drużyny: dopasowanie dostępności i preferencji tak, żeby zwiększyć szanse na stabilność grupy."
+      },
+      "item-3": {
+        "id": 3,
+        "title": "joinTheParty.structure.steps.3.title",
+        "text": "[PH] joinTheParty.structure.steps.3.text — Etap wprowadzający (5 sesji): start bez presji “znajomości zasad”, z prowadzeniem nastawionym na komfort i tempo."
+      },
+      "item-4": {
+        "id": 4,
+        "title": "joinTheParty.structure.steps.4.title",
+        "text": "[PH] joinTheParty.structure.steps.4.text — Decyzja i kontynuacja: po etapie wprowadzającym przechodzicie płynnie do regularnego grania w ramach projektu."
+      }
+    },
+    "rules": {
+      "title": "joinTheParty.structure.rules.title",
+      "1": "[PH] joinTheParty.structure.rules.1 — Etap wprowadzający ma określony początek i zakres: to pakiet, nie “luźne zapisy”.",
+      "2": "[PH] joinTheParty.structure.rules.2 — Terminy ustalane są z MG, ale zakładamy regularność: brak grafiku ≠ dowolność.",
+      "3": "[PH] joinTheParty.structure.rules.3 — Korzystacie z narzędzi projektu do koordynacji terminów i komunikacji."
+    }
+  },
+
+  "continuation": {
+    "title": "joinTheParty.continuation.title",
+    "subtitle": "[PH] joinTheParty.continuation.subtitle — Domyślnym scenariuszem jest dalsze granie w ramach struktur projektu (abonament / pakiety) na preferencyjnych warunkach przez określony czas.",
+    "bullets": {
+      "title": "joinTheParty.continuation.bullets.title",
+      "1": "[PH] joinTheParty.continuation.bullets.1 — Kontynuacja to kolejny etap programu, a nie przeskok do “nowej usługi”.",
+      "2": "[PH] joinTheParty.continuation.bullets.2 — Zachowujecie spójność organizacyjną i komunikacyjną, a akcent przesuwa się z wprowadzenia na pogłębianie gry.",
+      "3": "[PH] joinTheParty.continuation.bullets.3 — Drużyna zostaje w strukturach projektu tak długo, jak korzysta z wypracowanych warunków."
+    }
+  },
+
+  "orgMeeting": {
+    "title": "joinTheParty.orgMeeting.title",
+    "subtitle": "[PH] joinTheParty.orgMeeting.subtitle — Przed dołączeniem odbywa się bezpłatne spotkanie organizacyjne: informacyjne, nie sprzedażowe. To pierwszy punkt kontaktu i miejsce na doprecyzowanie zasad programu.",
+    "bullets": {
+      "title": "joinTheParty.orgMeeting.bullets.title",
+      "1": "[PH] joinTheParty.orgMeeting.bullets.1 — Wyjaśniamy jak działa program i co jest po stronie uczestników, a co po stronie projektu.",
+      "2": "[PH] joinTheParty.orgMeeting.bullets.2 — Odpowiadamy na pytania i pomagamy podjąć świadomą decyzję.",
+      "3": "[PH] joinTheParty.orgMeeting.bullets.3 — Ustalamy kolejne kroki: zebranie informacji i start procesu tworzenia drużyny."
+    }
+  }
+}

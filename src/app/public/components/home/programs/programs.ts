@@ -42,7 +42,7 @@ export class Programs {
   // developer-owned (routing + which common CTA label to use)
   private readonly tech: ProgramsCardTech[] = [
     { id: 1, ctaPath: '/chaotic-thursdays', ctaKey: 'checkDetails' },
-    { id: 2, ctaPath: '/join', ctaKey: 'seeProgram' },
+    { id: 2, ctaPath: '/join-the-party', ctaKey: 'seeProgram' },
   ];
 
   // copywriter-owned (home.json)
