@@ -1,0 +1,104 @@
+{
+  "cta": {
+    "contactUs": "Kontakt",
+    "joinProgram": "Dołącz do Drużyny",
+    "offerIndividual": "Oferta indywidualna",
+    "offerBusiness": "Oferta dla firm",
+    "chaoticThursdays": "Chaotyczne Czwartki",
+    "checkDetails": "Sprawdź szczegóły",
+    "seeProgram": "Zobacz program",
+    "learnMore": "Dowiedz się więcej",
+    "seeOffer": "Zobacz ofertę",
+    "seePricing": "Zobacz cennik",
+    "bookSession": "Umów sesję",
+    "signUp": "Zapisz się",
+    "sendMessage": "Wyślij wiadomość",
+    "goBack": "Wróć",
+    "goHome": "Strona główna",
+    "viewAll": "Zobacz wszystko"
+  },
+
+  "actions": {
+    "close": "Zamknij",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "save": "Zapisz",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "copy": "Kopiuj",
+    "refresh": "Odśwież",
+    "retry": "Spróbuj ponownie",
+    "add": "Dodaj",
+    "remove": "Usuń",
+    "next": "Dalej",
+    "previous": "Wstecz",
+    "submit": "Wyślij"
+  },
+
+  "nav": {
+    "home": "Start",
+    "about": "O nas",
+    "offer": "Oferta",
+    "individualOffer": "Oferta indywidualna",
+    "businessOffer": "Oferta dla firm",
+    "programs": "Programy",
+    "join": "Dołącz do Drużyny",
+    "chaoticThursdays": "Chaotyczne Czwartki",
+    "contact": "Kontakt",
+    "faq": "FAQ",
+    "pricing": "Cennik",
+    "blog": "Blog"
+  },
+
+  "status": {
+    "loading": "Ładowanie…",
+    "saving": "Zapisywanie…",
+    "sending": "Wysyłanie…",
+    "success": "Gotowe.",
+    "done": "Zrobione."
+  },
+
+  "form": {
+    "required": "To pole jest wymagane.",
+    "invalidEmail": "Podaj poprawny adres e-mail.",
+    "minLength": "Wpisz co najmniej {{min}} znaków.",
+    "maxLength": "Wpisz maksymalnie {{max}} znaków.",
+    "invalid": "Sprawdź poprawność pól formularza.",
+    "consent": {
+      "label": "Wyrażam zgodę na kontakt w sprawie zapytania.",
+      "required": "Zgoda jest wymagana."
+    }
+  },
+
+  "empty": {
+    "title": "Brak danych",
+    "description": "Nie ma tu jeszcze nic do wyświetlenia."
+  },
+
+  "errors": {
+    "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+    "network": "Błąd połączenia. Sprawdź internet i spróbuj ponownie.",
+    "notFound": "Nie znaleziono.",
+    "forbidden": "Brak dostępu.",
+    "unauthorized": "Wymagane logowanie.",
+    "timeout": "Przekroczono czas oczekiwania. Spróbuj ponownie.",
+    "server": "Błąd serwera. Spróbuj później."
+  },
+
+  "seo": {
+    "defaultTitle": "Mistrz Gry — sesje RPG",
+    "defaultDescription": "Prowadzimy sesje RPG: one-shoty, kampanie i formaty dla grup oraz firm."
+  },
+
+  "legal": {
+    "privacyPolicy": "Polityka prywatności",
+    "terms": "Regulamin",
+    "cookies": "Cookies"
+  },
+
+  "accessibility": {
+    "openMenu": "Otwórz menu",
+    "closeMenu": "Zamknij menu",
+    "skipToContent": "Przejdź do treści"
+  }
+}

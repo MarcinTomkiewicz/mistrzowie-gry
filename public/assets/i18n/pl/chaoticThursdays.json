@@ -1,0 +1,125 @@
+{
+  "seo": {
+    "title": "[PH] chaoticThursdays.seo.title - Chaotyczne Czwartki",
+    "description": "[PH] chaoticThursdays.seo.description — Chaotyczne Czwartki: cykliczne wydarzenie RPG z losowaniem stołów i one-shotami. Wpadasz bez zobowiązań, poznajesz ludzi i grasz w spójnym standardzie prowadzenia."
+  },
+  "hero": {
+    "badge": "chaoticThursdays.hero.badge",
+    "title": "chaoticThursdays.hero.title",
+    "subtitleLead": "[PH] chaoticThursdays.hero.subtitleLead — Wpadasz. Poznajesz ludzi. Los decyduje. Ty grasz.",
+    "subtitleStrong": "chaoticThursdays.hero.subtitleStrong"
+  },
+  "cta": {
+    "primaryLabel": "chaoticThursdays.cta.primaryLabel",
+    "secondaryLabel": "chaoticThursdays.cta.secondaryLabel"
+  },
+  "about": {
+    "title": "chaoticThursdays.about.title",
+    "text": "[PH] chaoticThursdays.about.text — Chaotyczne Czwartki to cykliczne wydarzenie RPG, które działa jak “pierwszy kontakt”: jedno wejście, zero deklaracji, maksimum doświadczenia. Losowanie to celowy element formatu — buduje emocje i nieprzewidywalność.",
+    "highlights": {
+      "item-1": {
+        "id": 1,
+        "title": "chaoticThursdays.about.highlights.1.title",
+        "text": "[PH] chaoticThursdays.about.highlights.1.text — Wpadasz bez zobowiązań. Bez kampanii, bez deklaracji."
+      },
+      "item-2": {
+        "id": 2,
+        "title": "chaoticThursdays.about.highlights.2.title",
+        "text": "[PH] chaoticThursdays.about.highlights.2.text — Stoły, MG i składy drużyn są losowane na miejscu."
+      },
+      "item-3": {
+        "id": 3,
+        "title": "chaoticThursdays.about.highlights.3.title",
+        "text": "[PH] chaoticThursdays.about.highlights.3.text — Format zaprojektowany pod poznawanie graczy."
+      },
+      "item-4": {
+        "id": 4,
+        "title": "chaoticThursdays.about.highlights.4.title",
+        "text": "[PH] chaoticThursdays.about.highlights.4.text — To jest sesja RPG, nie „demo” — tempo i domknięcie historii są częścią standardu."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "chaoticThursdays.howItWorks.title",
+    "subtitle": "[PH] chaoticThursdays.howItWorks.subtitle — Struktura jest prosta i powtarzalna: wspólny start, integracja, losowanie jako show, a potem sesje równolegle.",
+    "steps": {
+      "step-1": {
+        "id": 1,
+        "time": "17:00",
+        "title": "chaoticThursdays.howItWorks.steps.1.title",
+        "text": "[PH] chaoticThursdays.howItWorks.steps.1.text — Zbieramy uczestników, odpowiadamy na pytania, integrujemy grupę."
+      },
+      "step-2": {
+        "id": 2,
+        "time": "18:00",
+        "title": "chaoticThursdays.howItWorks.steps.2.title",
+        "text": "[PH] chaoticThursdays.howItWorks.steps.2.text — Losujemy MG, stoły i drużyny. Element napięcia i „show”."
+      },
+      "step-3": {
+        "id": 3,
+        "time": "18:15",
+        "title": "chaoticThursdays.howItWorks.steps.3.title",
+        "text": "[PH] chaoticThursdays.howItWorks.steps.3.text — Krótkie wprowadzenie i ruszamy z grą. Zasady podawane w trakcie."
+      },
+      "step-4": {
+        "id": 4,
+        "time": "22:15",
+        "title": "chaoticThursdays.howItWorks.steps.4.title",
+        "text": "[PH] chaoticThursdays.howItWorks.steps.4.text — Sesja ma wyraźne zakończenie — domykamy wątki i kończymy w punkt."
+      }
+    }
+  },
+  "standards": {
+    "title": "chaoticThursdays.standards.title",
+    "subtitle": "[PH] chaoticThursdays.standards.subtitle — Chaotyczne mają spójne ramy: wejście dla początkujących, tempo i domknięcie historii, zasady wprowadzane w trakcie, kultura komunikacji.",
+    "cards": {
+      "item-1": {
+        "id": 1,
+        "title": "chaoticThursdays.standards.cards.1.title",
+        "text": "[PH] chaoticThursdays.standards.cards.1.text — Dbamy o komfort i granice — komunikacja i kultura stołu są elementem standardu."
+      },
+      "item-2": {
+        "id": 2,
+        "title": "chaoticThursdays.standards.cards.2.title",
+        "text": "[PH] chaoticThursdays.standards.cards.2.text — Wydarzenie ma ramy, a sesja ma domknięcie — bez „urwanych” historii."
+      },
+      "item-3": {
+        "id": 3,
+        "title": "chaoticThursdays.standards.cards.3.title",
+        "text": "[PH] chaoticThursdays.standards.cards.3.text — Jeśli nie znasz systemu — nic nie szkodzi. Tłumaczymy w trakcie i prowadzimy za rękę."
+      },
+      "item-4": {
+        "id": 4,
+        "title": "chaoticThursdays.standards.cards.4.title",
+        "text": "[PH] chaoticThursdays.standards.cards.4.text — Prowadzący działają w ramach wspólnych wytycznych, nie „jak komu wygodnie”."
+      }
+    },
+    "expectationsTitle": "chaoticThursdays.standards.expectationsTitle",
+    "expectations": {
+      "1": "[PH] chaoticThursdays.standards.expectations.1 — Nie ma gwarancji konkretnego systemu ani klimatu — to element formatu.",
+      "2": "[PH] chaoticThursdays.standards.expectations.2 — To format jednorazowy, bez obietnicy kampanii.",
+      "3": "[PH] chaoticThursdays.standards.expectations.3 — Organizacja i standard są po naszej stronie."
+    }
+  },
+  "faq": {
+    "title": "chaoticThursdays.faq.title",
+    "subtitle": "[PH] chaoticThursdays.faq.subtitle — Szybkie odpowiedzi, zanim zapytasz w wiadomości.",
+    "items": {
+      "item-1": {
+        "id": 1,
+        "q": "chaoticThursdays.faq.items.1.q",
+        "a": "[PH] chaoticThursdays.faq.items.1.a — Nie. To format przygotowany również dla początkujących."
+      },
+      "item-2": {
+        "id": 2,
+        "q": "chaoticThursdays.faq.items.2.q",
+        "a": "[PH] chaoticThursdays.faq.items.2.a — Nie. Każda sesja jest zamkniętym one-shotem."
+      },
+      "item-3": {
+        "id": 3,
+        "q": "chaoticThursdays.faq.items.3.q",
+        "a": "[PH] chaoticThursdays.faq.items.3.a — Tak. To częsty scenariusz — właśnie po to jest losowanie."
+      }
+    }
+  }
+}

@@ -1,21 +1,18 @@
-<section class="mg-section" aria-label="Programy">
+<section class="mg-section" [attr.aria-label]="header().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">Programy</h2>
-      <p class="mg-section__subtitle">
-        Dwa formaty, które rozwiązują najczęstsze bariery wejścia i pomagają
-        zbudować ciągłość grania.
-      </p>
+      <h2 class="mg-section__title">{{ header().title }}</h2>
+      <p class="mg-section__subtitle">{{ header().subtitle }}</p>
     </header>
 
     <div class="mg-programs__grid">
-      @for (p of programs; track p.title) {
+      @for (p of programs(); track trackById($index, p)) {
         <article class="mg-card">
           <h3 class="mg-section__title mg-section__title--sm">{{ p.title }}</h3>
           <p>{{ p.intro }}</p>
 
           <ul class="mg-programs__list">
-            @for (b of p.bullets; track b) {
+            @for (b of p.bullets; track trackByBullet($index, b)) {
               <li>{{ b }}</li>
             }
           </ul>

@@ -1,4 +1,10 @@
-<section class="mg-section" aria-label="Sekcja startowa">
+@let copyList = slidesCopy();
+@let copyActive = activeCopy();
+
+<section
+  class="mg-section"
+  [attr.aria-label]="ariaSectionLabel() || 'Sekcja startowa'"
+>
   <div class="mg-container">
     <div
       class="mg-hero__wrap"
@@ -20,20 +26,22 @@
           <a
             class="mg-hero__stretched-link"
             [routerLink]="active().ctaPath"
-            [attr.aria-label]="active().ctaLabel + ': ' + active().heading"
+            [attr.aria-label]="(copyActive?.ctaLabel || '') + ': ' + (copyActive?.heading || '')"
           ></a>
 
           <div class="mg-hero__overlay" aria-hidden="true"></div>
 
           <div class="mg-hero__caption">
             <div class="flex-row-between flex-col-sm">
-              <div class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2">
-                {{ active().heading }}
+              <div
+                class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
+              >
+                {{ copyActive?.heading }}
               </div>
 
               <p-button
                 class="mg-hero__caption-btn"
-                [label]="active().ctaLabel"
+                [label]="copyActive?.ctaLabel"
                 icon="pi pi-arrow-right"
                 iconPos="right"
                 severity="primary"
@@ -43,7 +51,7 @@
             </div>
 
             <p class="mg-hero__caption-text truncate-2">
-              {{ active().text }}
+              {{ copyActive?.text }}
             </p>
           </div>
 
@@ -55,17 +63,21 @@
               size="small"
               [text]="true"
               (onClick)="prev()"
-              ariaLabel="Poprzedni slajd"
+              [ariaLabel]="ariaPrev() || 'Poprzedni slajd'"
             />
 
-            <div class="flex-row-center" role="tablist" aria-label="Wybór slajdu">
+            <div
+              class="flex-row-center"
+              role="tablist"
+              [attr.aria-label]="ariaDots() || 'Wybór slajdu'"
+            >
               @for (s of slides(); track trackByIndex($index)) {
                 <button
                   type="button"
                   class="mg-hero__dot"
                   [class.is-active]="$index === activeIndex()"
                   (click)="goTo($index)"
-                  [attr.aria-label]="'Przejdź do slajdu ' + ($index + 1)"
+                  [attr.aria-label]="dotAriaLabel(ariaGoToPrefix() || 'Przejdź do slajdu', $index)"
                   [attr.aria-current]="$index === activeIndex() ? 'true' : null"
                 ></button>
               }
@@ -78,7 +90,7 @@
               size="small"
               [text]="true"
               (onClick)="next()"
-              ariaLabel="Następny slajd"
+              [ariaLabel]="ariaNext() || 'Następny slajd'"
             />
           </div>
         </div>
@@ -86,29 +98,31 @@
 
       <div class="mg-hero__content">
         <header class="mg-section__header">
-          <h1 class="mg-section__title">{{ active().heading }}</h1>
+          <h1 class="mg-section__title">{{ copyActive?.heading }}</h1>
 
           <p class="mg-section__subtitle mg-hero__subtitle truncate-2">
-            {{ active().text }}
+            {{ copyActive?.text }}
           </p>
         </header>
 
-         <div class="mg-hero__cta-grid">
+        <div class="mg-hero__cta-grid">
           @for (s of slides(); track trackByCtaPath($index, s)) {
+            @let copy = (copyList?.[$index] ?? null);
+
             <div
               class="mg-card mg-hero__cta"
               role="link"
               tabindex="0"
               (click)="onCtaNavigate(s.ctaPath)"
               (keydown)="onCtaKeydown($event, s.ctaPath)"
-              [attr.aria-label]="s.heading"
+              [attr.aria-label]="copy?.heading"
             >
               <div class="mg-section__title mg-section__title--xs mg-section__title--no-margin">
-                {{ s.heading }}
+                {{ copy?.heading }}
               </div>
 
               <p class="truncate-3">
-                {{ s.text }}
+                {{ copy?.text }}
               </p>
             </div>
           }

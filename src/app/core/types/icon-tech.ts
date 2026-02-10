@@ -1,0 +1,1 @@
+export type IconTech = { id: number; icon: string };

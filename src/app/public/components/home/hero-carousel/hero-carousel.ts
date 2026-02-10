@@ -9,10 +9,28 @@ import {
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
+import { ButtonModule } from 'primeng/button';
+
+import {
+  provideTranslocoScope,
+  TranslocoService,
+  translateObjectSignal,
+  translateSignal,
+} from '@jsverse/transloco';
+
 import { Platform } from '../../../../core/services/platform/platform';
 import { IHeroSlide } from '../../../../core/interfaces/home/i-hero-slide';
+import {
+  dictToSortedArray,
+  numberedDictToStringArray,
+} from '../../../../core/utils/dict-to-sorted-array';
 
-import { ButtonModule } from 'primeng/button';
+type HeroSlideCopy = {
+  id: number;
+  heading: string;
+  text: string;     // (string), ale zostawiamy furtkę na paragraphs gdybyś chciał
+  ctaLabel: string;
+};
 
 @Component({
   selector: 'app-hero-carousel',
@@ -20,40 +38,42 @@ import { ButtonModule } from 'primeng/button';
   imports: [CommonModule, RouterModule, ButtonModule],
   templateUrl: './hero-carousel.html',
   styleUrl: './hero-carousel.scss',
+  providers: [provideTranslocoScope('home')],
 })
 export class HeroCarousel implements OnInit, OnDestroy {
   private readonly platform = inject(Platform);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   readonly slides = signal<IHeroSlide[]>([
     {
-      heading: 'Poznaj Mistrzów Gry',
-      text: 'Projektujemy i prowadzimy doświadczenia RPG — dla ludzi, grup i organizacji.',
-      ctaLabel: 'Zobacz ofertę',
+      heading: '',
+      text: '',
+      ctaLabel: '',
       ctaPath: '/offer/individual',
       imageSrc: 'hero/hero-1.png',
       imageAlt: 'Sesja RPG prowadzona przy stole',
     },
     {
-      heading: 'Chaotyczne Czwartki',
-      text: 'Cotygodniowe wydarzenie — losujemy stoły, ekipy i systemy. Wpadasz i grasz.',
-      ctaLabel: 'Sprawdź szczegóły',
+      heading: '',
+      text: '',
+      ctaLabel: '',
       ctaPath: '/chaotic-thursdays',
       imageSrc: 'hero/hero-2.png',
       imageAlt: 'Kostki RPG i notatki na stole',
     },
     {
-      heading: 'Dołącz do Drużyny',
-      text: 'Program dla tych, którzy chcą znaleźć ekipę i wejść w regularne granie.',
-      ctaLabel: 'Zobacz program',
+      heading: '',
+      text: '',
+      ctaLabel: '',
       ctaPath: '/join',
       imageSrc: 'hero/hero-3.png',
       imageAlt: 'Grupa osób grających w RPG',
     },
     {
-      heading: 'Oferta dla firm i instytucji',
-      text: 'RPG jako narzędzie integracji i rozwoju — projektujemy scenariusze pod cele grupy.',
-      ctaLabel: 'Poznaj ofertę',
+      heading: '',
+      text: '',
+      ctaLabel: '',
       ctaPath: '/offer/business',
       imageSrc: 'hero/hero-4.png',
       imageAlt: 'Spotkanie zespołu przy stole',
@@ -72,12 +92,45 @@ export class HeroCarousel implements OnInit, OnDestroy {
   private userPaused = false;
 
   ngOnInit(): void {
+    // MVP: jeśli globalnie ustawiasz język gdzie indziej, usuń to stąd
+    this.transloco.setActiveLang('pl');
     this.tryStartAutoplay();
   }
 
   ngOnDestroy(): void {
     this.stopAutoplay();
   }
+
+  // ======================
+  // i18n (signals)
+  // ======================
+
+  readonly ariaSectionLabel = translateSignal('heroCarousel.aria.sectionLabel', {}, { scope: 'home' });
+  readonly ariaPrev = translateSignal('heroCarousel.aria.prev', {}, { scope: 'home' });
+  readonly ariaNext = translateSignal('heroCarousel.aria.next', {}, { scope: 'home' });
+  readonly ariaDots = translateSignal('heroCarousel.aria.dots', {}, { scope: 'home' });
+  readonly ariaGoToPrefix = translateSignal('heroCarousel.aria.goToSlidePrefix', {}, { scope: 'home' });
+
+  readonly slidesCopyDict = translateObjectSignal('heroCarousel.slides', {}, { scope: 'home' });
+
+  readonly slidesCopy = computed(() => {
+    const dict = this.slidesCopyDict();
+    return dictToSortedArray<HeroSlideCopy>(dict, (item) => Number(item?.id ?? 0)).map((x) => ({
+      id: Number((x as any)?.id ?? 0),
+      heading: String((x as any)?.heading ?? ''),
+      // jeśli kiedyś zrobisz text jako paragraphs: { "1": "...", "2": "..." }
+      // to tu możesz zrobić join:
+      // text: numberedDictToStringArray((x as any)?.text).join(' ')
+      text: String((x as any)?.text ?? ''),
+      ctaLabel: String((x as any)?.ctaLabel ?? ''),
+    }));
+  });
+
+  readonly activeCopy = computed(() => {
+    const list = this.slidesCopy();
+    const idx = this.activeIndex();
+    return list[Math.max(0, Math.min(idx, list.length - 1))] ?? null;
+  });
 
   // ======================
   // AUTOPLAY
@@ -153,7 +206,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
   }
 
   // ======================
-  // CTA CARDS (clickable divs)
+  // CTA CARDS
   // ======================
 
   onCtaNavigate(path: string): void {
@@ -175,4 +228,8 @@ export class HeroCarousel implements OnInit, OnDestroy {
 
   trackByIndex = (i: number) => i;
   trackByCtaPath = (_: number, item: IHeroSlide) => item.ctaPath;
+
+  dotAriaLabel(goToSlidePrefix: string, index: number): string {
+    return `${goToSlidePrefix} ${index + 1}`;
+  }
 }

@@ -1,8 +1,35 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { IProblemCard } from '../../../../core/interfaces/home/i-problem-card';
+
 import { ButtonModule } from 'primeng/button';
+
+import { provideTranslocoScope, translateObjectSignal } from '@jsverse/transloco';
+
+import { IProblemCard } from '../../../../core/interfaces/home/i-problem-card';
+import { dictToSortedArray } from '../../../../core/utils/dict-to-sorted-array';
+import { pickTranslations } from '../../../../core/utils/pick-translation';
+
+type ProblemCardCopy = {
+  id: number;
+  title: string;
+  text: string;
+};
+
+type CtaKey =
+  | 'joinProgram'
+  | 'offerIndividual'
+  | 'chaoticThursdays'
+  | 'offerBusiness';
+
+type ProblemCardTech = {
+  id: number;
+  ctaPath: string;
+  icon: string;
+  ctaKey: CtaKey;
+};
+
+type UiProblemCard = IProblemCard & { id: number };
 
 @Component({
   selector: 'app-problems',
@@ -10,36 +37,87 @@ import { ButtonModule } from 'primeng/button';
   imports: [CommonModule, RouterModule, ButtonModule],
   templateUrl: './problems.html',
   styleUrl: './problems.scss',
+  providers: [provideTranslocoScope('home'), provideTranslocoScope('common')],
 })
 export class Problems {
-  readonly items: IProblemCard[] = [
+  // developer-owned (routing/icons + which common CTA label to use)
+  private readonly tech: ProblemCardTech[] = [
+    { id: 1, ctaPath: '/join', icon: 'pi pi-users', ctaKey: 'joinProgram' },
     {
-      title: 'Nie masz ekipy / nie wiesz od czego zacząć',
-      text: 'Pomagamy wejść w RPG — dobieramy formę, ludzi i prowadzenie.',
-      ctaLabel: 'Dołącz do Drużyny',
-      ctaPath: '/join',
-      icon: 'pi pi-users',
-    },
-    {
-      title: 'Chcesz zagrać, ale brakuje prowadzącego',
-      text: 'Zapewniamy standard prowadzenia i spójne doświadczenie sesji.',
-      ctaLabel: 'Oferta indywidualna',
+      id: 2,
       ctaPath: '/offer/individual',
       icon: 'pi pi-user-edit',
+      ctaKey: 'offerIndividual',
     },
     {
-      title: 'Szukasz regularnego grania bez układania wszystkiego od zera',
-      text: 'Wydarzenia otwarte i formaty, które upraszczają start i dają ciągłość.',
-      ctaLabel: 'Chaotyczne Czwartki',
+      id: 3,
       ctaPath: '/chaotic-thursdays',
       icon: 'pi pi-calendar',
+      ctaKey: 'chaoticThursdays',
     },
     {
-      title: 'Potrzebujesz rozwiązania dla grupy / organizacji',
-      text: 'Projektujemy scenariusze i formaty RPG pod cele zespołu.',
-      ctaLabel: 'Oferta dla firm',
+      id: 4,
       ctaPath: '/offer/business',
       icon: 'pi pi-building',
+      ctaKey: 'offerBusiness',
     },
   ];
+
+  // copywriter-owned (home.json)
+  private readonly headerDict = translateObjectSignal(
+    'problems.header',
+    {},
+    { scope: 'home' },
+  );
+  private readonly cardsDict = translateObjectSignal(
+    'problems.cards',
+    {},
+    { scope: 'home' },
+  );
+
+  // common CTA labels
+  private readonly ctaDict = translateObjectSignal('cta', {}, { scope: 'common' });
+  private readonly cta = pickTranslations(this.ctaDict, [
+    'joinProgram',
+    'offerIndividual',
+    'chaoticThursdays',
+    'offerBusiness',
+  ] as const);
+
+  readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
+
+  readonly items = computed<UiProblemCard[]>(() => {
+    const dict = this.cardsDict();
+    const copyList = dictToSortedArray<ProblemCardCopy>(dict as any, (item) =>
+      Number((item as any)?.id ?? 0),
+    ).map((x) => ({
+      id: Number((x as any)?.id ?? 0),
+      title: String((x as any)?.title ?? ''),
+      text: String((x as any)?.text ?? ''),
+    }));
+
+    const techById = new Map<number, ProblemCardTech>(
+      this.tech.map((t) => [t.id, t]),
+    );
+
+    const cta = this.cta();
+
+    return copyList
+      .map((c) => {
+        const t = techById.get(c.id);
+        if (!t) return null;
+
+        return {
+          id: c.id,
+          title: c.title,
+          text: c.text,
+          ctaLabel: cta[t.ctaKey] ?? '',
+          ctaPath: t.ctaPath,
+          icon: t.icon,
+        } satisfies UiProblemCard;
+      })
+      .filter((x): x is UiProblemCard => !!x);
+  });
+
+  trackById = (_: number, item: UiProblemCard) => item.id;
 }

@@ -1,0 +1,56 @@
+{
+  "seo": {
+    "title": "[PH] about.seo.title — O nas",
+    "description": "[PH] about.seo.description — Mistrzowie Gry to zespół, który projektuje i prowadzi doświadczenia RPG."
+  },
+  "hero": {
+    "title": "about.hero.title",
+    "subtitle": "[PH] about.hero.subtitle — Mistrzowie Gry to projekt usługowy w obszarze RPG. Nie sprzedajemy “godzin MG” — projektujemy i realizujemy doświadczenia: dla osób, grup i organizacji."
+  },
+  "sections": {
+    "section-1": {
+      "id": 1,
+      "title": "about.sections.1.title",
+      "paragraphs": {
+        "1": "[PH] about.sections.1.p1 — Pomagamy ludziom wejść w RPG i grać regularnie — bez chaosu organizacyjnego, bez polowania na prowadzącego i bez poczucia, że “trzeba wszystko umieć na start”. Dobieramy formę sesji, styl prowadzenia i poziom złożoności do konkretnej grupy."
+      }
+    },
+    "section-2": {
+      "id": 2,
+      "title": "about.sections.2.title",
+      "paragraphs": {
+        "1": "[PH] about.sections.2.p1 — Fundamentem projektu są standardy: przygotowanie prowadzącego, jasne zasady stołu, komunikacja z grupą oraz dbałość o tempo, czytelność i komfort grania. To jest obszar, który docelowo będziesz mógł przeczytać i zweryfikować — nie “marketingowe zapewnienie”, tylko konkretne reguły pracy."
+      }
+    }
+  },
+  "cards": {
+    "card-1": {
+      "id": 1,
+      "title": "about.cards.1.title",
+      "paragraphs": {
+        "1": "[PH] about.cards.1.p1 — Pracujemy z prowadzącymi, których znamy i weryfikujemy. Standard dotyczy zarówno warsztatu (prowadzenie scen, praca z grupą), jak i organizacji (terminy, przygotowanie, komunikacja)."
+      }
+    },
+    "card-2": {
+      "id": 2,
+      "title": "about.cards.2.title",
+      "paragraphs": {
+        "1": "[PH] about.cards.2.p1 — Jeśli zapraszasz prowadzącego do domu lub organizujesz sesję dla grupy, chcesz wiedzieć, z kim pracujesz. Jesteśmy podmiotem, który bierze odpowiedzialność za współpracę i jej standard — nie “losową osobą z internetu”."
+      }
+    },
+    "card-3": {
+      "id": 3,
+      "title": "about.cards.3.title",
+      "paragraphs": {
+        "1": "[PH] about.cards.3.p1 — Inaczej wygląda sesja dla nowej grupy, inaczej wydarzenie otwarte, inaczej realizacja dla firmy. Projektujemy format pod cele, ograniczenia i doświadczenie uczestników."
+      }
+    },
+    "card-4": {
+      "id": 4,
+      "title": "about.cards.4.title",
+      "paragraphs": {
+        "1": "[PH] about.cards.4.p1 — Naszym celem jest budowanie stałych grup i długofalowych relacji. To wpływa na ofertę, komunikację i na to, jak prowadzimy sesje."
+      }
+    }
+  }
+}

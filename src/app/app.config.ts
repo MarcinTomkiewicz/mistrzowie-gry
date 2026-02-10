@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  isDevMode,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
@@ -13,6 +14,9 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideTransloco } from '@jsverse/transloco';
+import { TranslocoHttpLoader } from './core/loaders/transloco.loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +24,16 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+    provideHttpClient(withFetch()),
+     provideTransloco({
+      config: {
+        availableLangs: ['pl'],
+        defaultLang: 'pl',
+        reRenderOnLangChange: false,
+        prodMode: !isDevMode(),
+      },
+      loader: TranslocoHttpLoader,
+    }),
     providePrimeNG({
       theme: {
         preset: MgPrimePreset,
