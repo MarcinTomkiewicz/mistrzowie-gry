@@ -17,6 +17,8 @@ import {
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideTransloco } from '@jsverse/transloco';
 import { TranslocoHttpLoader } from './core/loaders/transloco.loader';
+import { SUPABASE_CONFIG } from './core/configs/supabase.config';
+import { environment } from '../env/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch()),
-     provideTransloco({
+    provideTransloco({
       config: {
         availableLangs: ['pl'],
         defaultLang: 'pl',
@@ -46,5 +48,9 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    {
+      provide: SUPABASE_CONFIG,
+      useValue: environment.supabase,
+    },
   ],
 };
