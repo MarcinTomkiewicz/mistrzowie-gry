@@ -1,0 +1,15 @@
+{
+  "labels": {
+    "loading": "[PH] offers.labels.loading — Ładowanie…"
+  },
+  "cta": {
+    "contactUs": "common.cta.contactUs"
+  },
+  "pricingTable": {
+    "headers": {
+      "variant": "offers.pricingTable.headers.variant",
+      "price": "offers.pricingTable.headers.price",
+      "description": "offers.pricingTable.headers.description"
+    }
+  }
+}

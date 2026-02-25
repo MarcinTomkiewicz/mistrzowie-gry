@@ -1,0 +1,124 @@
+<section class="mg-section">
+  <div class="mg-container">
+    @if (vm(); as data) {
+      <header class="mg-section__header">
+        <h1 class="mg-section__title">{{ data.page.title }}</h1>
+        <p class="mg-section__subtitle">{{ data.page.subtitle }}</p>
+      </header>
+
+      <!-- HERO -->
+      @if (heroSection(); as s) {
+        <div class="mg-card mb-lg">
+          @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
+          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+
+          <div class="flex-row-start gap-sm mt-md">
+            <p-button
+              [label]="commonCta().contactUs"
+              icon="pi pi-envelope"
+              severity="primary"
+              routerLink="/contact"
+            />
+          </div>
+        </div>
+      }
+
+      <!-- PRICING TABLE -->
+      @if (pricingSection(); as s) {
+        <div class="mg-card mb-lg">
+          @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
+          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+
+          <p-table [value]="s.items" [stripedRows]="true" [tableStyle]="{ 'width': '100%' }">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ pricingHeaders().variant }}</th>
+                <th>{{ pricingHeaders().price }}</th>
+                <th>{{ pricingHeaders().description }}</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-it>
+              <tr>
+                <td>{{ it.title }}</td>
+                <td>
+                  [PH] {{ it.pricing | json }}
+                </td>
+                <td>{{ it.lead }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      }
+
+      @if (addonSection(); as s) {
+        <div class="mb-lg">
+          @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
+          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+
+          <div class="mg-offer-cards">
+            @for (it of s.items; track it.id) {
+              <div class="mg-card">
+                <div class="mg-section__title mg-section__title--sm">{{ it.title }}</div>
+                <p class="mg-section__subtitle">{{ it.lead }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (materialSection(); as s) {
+        <div class="mb-lg">
+          @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
+          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+
+          <div class="mg-offer-cards">
+            @for (it of s.items; track it.id) {
+              <div class="mg-card">
+                <div class="mg-section__title mg-section__title--sm">{{ it.title }}</div>
+                <p class="mg-section__subtitle">{{ it.lead }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (faqSection(); as s) {
+        <div class="mg-card mb-lg">
+          @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
+          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+
+          <p-accordion>
+            @for (x of (s.display['items']); let i = $index; track i) {
+              <p-accordion-panel [value]="i">
+                <p-accordion-header class="mg-section__title mg-section__title--xs">{{ x.h }}</p-accordion-header>
+                <p-accordion-content>{{ x.a }}</p-accordion-content>
+              </p-accordion-panel>
+            }
+          </p-accordion>
+        </div>
+      }
+
+      <!-- CTA -->
+      @if (ctaSection(); as s) {
+        <div class="mg-card">
+          @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
+          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+
+          <div class="flex-row-start gap-sm mt-md">
+            <p-button
+              [label]="commonCta().contactUs"
+              icon="pi pi-envelope"
+              severity="success"
+              routerLink="/contact"
+            />
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="mg-card">
+        <p>{{ labels().loading }}</p>
+      </div>
+    }
+  </div>
+</section>

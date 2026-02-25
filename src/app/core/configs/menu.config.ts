@@ -6,7 +6,7 @@ export const MENU_CONFIG: IMenu[] = [
   {
     label: 'Oferta',
     children: [
-      { label: 'Oferta indywidualna', path: '/offer/individual', footer: true },
+      { label: 'Oferta indywidualna', path: '/offer/oferta-indywidualna', footer: true },
       { label: 'Oferta dla firm', path: '/offer/business', footer: true },
       { label: 'Oferta dla instytucji', path: '/offer/institutions', footer: true },
       { label: 'Oferta imprezowa', path: '/offer/events', footer: true },
