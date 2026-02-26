@@ -1,7 +1,4 @@
 {
-  "labels": {
-    "loading": "[PH] offers.labels.loading — Ładowanie…"
-  },
   "cta": {
     "contactUs": "common.cta.contactUs"
   },

@@ -1,16 +1,17 @@
+<!-- path: src/app/features/offers/offers.html -->
 <section class="mg-section">
   <div class="mg-container">
-    @if (vm(); as data) {
+    @if (pageVm(); as data) {
       <header class="mg-section__header">
         <h1 class="mg-section__title">{{ data.page.title }}</h1>
         <p class="mg-section__subtitle">{{ data.page.subtitle }}</p>
       </header>
 
       <!-- HERO -->
-      @if (heroSection(); as s) {
+      @if (data.hero; as s) {
         <div class="mg-card mb-lg">
           @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
-          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+          @if (s.subtitle) { <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ s.subtitle }}</p> }
 
           <div class="flex-row-start gap-sm mt-md">
             <p-button
@@ -24,10 +25,10 @@
       }
 
       <!-- PRICING TABLE -->
-      @if (pricingSection(); as s) {
+      @if (data.pricing; as s) {
         <div class="mg-card mb-lg">
           @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
-          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+          @if (s.subtitle) { <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ s.subtitle }}</p> }
 
           <p-table [value]="s.items" [stripedRows]="true" [tableStyle]="{ 'width': '100%' }">
             <ng-template pTemplate="header">
@@ -41,9 +42,7 @@
             <ng-template pTemplate="body" let-it>
               <tr>
                 <td>{{ it.title }}</td>
-                <td>
-                  [PH] {{ it.pricing | json }}
-                </td>
+                <td>{{ formatPricing(it.pricing) }}</td>
                 <td>{{ it.lead }}</td>
               </tr>
             </ng-template>
@@ -51,59 +50,87 @@
         </div>
       }
 
-      @if (addonSection(); as s) {
+      <!-- ADDONS -->
+      @if (data.addon; as s) {
         <div class="mb-lg">
           @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
-          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+          @if (s.subtitle) { <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ s.subtitle }}</p> }
 
           <div class="mg-offer-cards">
             @for (it of s.items; track it.id) {
               <div class="mg-card">
                 <div class="mg-section__title mg-section__title--sm">{{ it.title }}</div>
-                <p class="mg-section__subtitle">{{ it.lead }}</p>
+
+                @if (formatAddonPricing(it.pricing); as p) {
+                  <div class="mg-section__title mg-section__title--xs">{{ p.value }}</div>
+                  @if (p.note) {
+                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ p.note }}</p>
+                  }
+                }
+
+                <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ it.lead }}</p>
               </div>
             }
           </div>
         </div>
       }
 
-      @if (materialSection(); as s) {
+      <!-- MATERIALS -->
+      @if (data.material; as s) {
         <div class="mb-lg">
           @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
-          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+          @if (s.subtitle) { <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ s.subtitle }}</p> }
 
           <div class="mg-offer-cards">
             @for (it of s.items; track it.id) {
               <div class="mg-card">
                 <div class="mg-section__title mg-section__title--sm">{{ it.title }}</div>
-                <p class="mg-section__subtitle">{{ it.lead }}</p>
+
+                @if (formatPricingDetailed(it.pricing); as p) {
+                  <div class="mg-section__title mg-section__title--xs">{{ p.value }}</div>
+                  @if (p.note) {
+                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ p.note }}</p>
+                  }
+                }
+
+                <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ it.lead }}</p>
               </div>
             }
           </div>
         </div>
       }
 
-      @if (faqSection(); as s) {
+      <!-- FAQ -->
+      @if (data.faq.section; as s) {
         <div class="mg-card mb-lg">
           @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
-          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+          @if (s.subtitle) { <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ s.subtitle }}</p> }
 
-          <p-accordion>
-            @for (x of (s.display['items']); let i = $index; track i) {
-              <p-accordion-panel [value]="i">
-                <p-accordion-header class="mg-section__title mg-section__title--xs">{{ x.h }}</p-accordion-header>
-                <p-accordion-content>{{ x.a }}</p-accordion-content>
-              </p-accordion-panel>
-            }
-          </p-accordion>
+          @if (data.faq.items.length) {
+            <p-accordion>
+              @for (x of data.faq.items; let i = $index; track i) {
+                <p-accordion-panel [value]="i">
+                  <p-accordion-header class="mg-section__title mg-section__title--xs">
+                    {{ x.h }}
+                  </p-accordion-header>
+                  <p-accordion-content>{{ x.a }}</p-accordion-content>
+                </p-accordion-panel>
+              }
+            </p-accordion>
+          } @else {
+            <div class="mg-card">
+              <div class="mg-section__title mg-section__title--sm">{{ commonEmpty().title }}</div>
+              <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ commonEmpty().description }}</p>
+            </div>
+          }
         </div>
       }
 
       <!-- CTA -->
-      @if (ctaSection(); as s) {
+      @if (data.cta; as s) {
         <div class="mg-card">
           @if (s.title) { <h2 class="mg-section__title mg-section__title--sm">{{ s.title }}</h2> }
-          @if (s.subtitle) { <p class="mg-section__subtitle">{{ s.subtitle }}</p> }
+          @if (s.subtitle) { <p class="mg-section__subtitle mg-section__subtitle--no-margin">{{ s.subtitle }}</p> }
 
           <div class="flex-row-start gap-sm mt-md">
             <p-button
@@ -117,7 +144,7 @@
       }
     } @else {
       <div class="mg-card">
-        <p>{{ labels().loading }}</p>
+        <p>{{ commonStatus().loading }}</p>
       </div>
     }
   </div>

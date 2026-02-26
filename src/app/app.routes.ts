@@ -40,28 +40,6 @@ export const routes: Routes = [
     loadComponent: loaders.offerPage,
   },
 
-  { path: 'offer', pathMatch: 'full', redirectTo: 'offer/oferta-indywidualna' },
-  {
-    path: 'offer/oferta-indywidualna',
-    pathMatch: 'full',
-    redirectTo: 'offer/oferta-indywidualna',
-  },
-  {
-    path: 'offer/business',
-    pathMatch: 'full',
-    redirectTo: 'offer/oferta-dla-firm',
-  },
-  {
-    path: 'offer/institutions',
-    pathMatch: 'full',
-    redirectTo: 'offer/oferta-dla-instytucji',
-  },
-  {
-    path: 'offer/events',
-    pathMatch: 'full',
-    redirectTo: 'offer/oferta-imprezowa',
-  },
-
   {
     path: 'chaotic-thursdays',
     title: 'Chaotyczne Czwartki • Mistrzowie Gry',
