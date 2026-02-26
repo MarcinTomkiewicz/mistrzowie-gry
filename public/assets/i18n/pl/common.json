@@ -100,5 +100,10 @@
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
     "skipToContent": "Przejdź do treści"
+  },
+
+  "footnotes": {
+    "net": "Podane ceny są cenami netto. Należy doliczyć do nich podatek VAT 23%.",
+    "gross": "Podane ceny są cenami brutto i zawierają podatek VAT w wysokości 23%."
   }
 }

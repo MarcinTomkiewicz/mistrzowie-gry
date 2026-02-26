@@ -1,6 +1,8 @@
-export type OfferPageType = 'individual' | 'business' | 'institution' | 'event';
-export type OfferSectionType = 'hero' | 'highlights' | 'cards' | 'pricing_table' | 'timeline' | 'faq' | 'seo_text' | 'cta';
-export type OfferItemKind = 'core' | 'addon' | 'material' | 'other';
+import { OfferItemKindEnum, OfferPageTypeEnum, OfferSectionTypeEnum } from "../enums/offers";
+
+export type OfferPageType = `${OfferPageTypeEnum}`;
+export type OfferSectionType = `${OfferSectionTypeEnum}`;
+export type OfferItemKind = `${OfferItemKindEnum}`;
 
 export type OfferPage = {
   id: string;

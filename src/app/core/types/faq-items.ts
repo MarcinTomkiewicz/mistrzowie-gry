@@ -1,0 +1,1 @@
+export type DisplayFaqItem = { h: string; a: string };
