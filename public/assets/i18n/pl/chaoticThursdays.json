@@ -107,17 +107,17 @@
     "items": {
       "item-1": {
         "id": 1,
-        "q": "chaoticThursdays.faq.items.1.q",
+        "h": "chaoticThursdays.faq.items.1.h",
         "a": "[PH] chaoticThursdays.faq.items.1.a — Nie. To format przygotowany również dla początkujących."
       },
       "item-2": {
         "id": 2,
-        "q": "chaoticThursdays.faq.items.2.q",
+        "h": "chaoticThursdays.faq.items.2.h",
         "a": "[PH] chaoticThursdays.faq.items.2.a — Nie. Każda sesja jest zamkniętym one-shotem."
       },
       "item-3": {
         "id": 3,
-        "q": "chaoticThursdays.faq.items.3.q",
+        "h": "chaoticThursdays.faq.items.3.h",
         "a": "[PH] chaoticThursdays.faq.items.3.a — Tak. To częsty scenariusz — właśnie po to jest losowanie."
       }
     }

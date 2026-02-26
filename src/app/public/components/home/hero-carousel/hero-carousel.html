@@ -1,10 +1,4 @@
-@let copyList = slidesCopy();
-@let copyActive = activeCopy();
-
-<section
-  class="mg-section"
-  [attr.aria-label]="ariaSectionLabel() || 'Sekcja startowa'"
->
+<section class="mg-section" [attr.aria-label]="vm().aria.sectionLabel">
   <div class="mg-container">
     <div
       class="mg-hero__wrap"
@@ -17,41 +11,39 @@
         <div class="mg-hero__stage">
           <img
             class="mg-hero__img"
-            [src]="active().imageSrc"
-            [alt]="active().imageAlt"
+            [src]="vm().active.imageSrc"
+            [alt]="vm().active.imageAlt"
             loading="eager"
             decoding="async"
           />
 
           <a
             class="mg-hero__stretched-link"
-            [routerLink]="active().ctaPath"
-            [attr.aria-label]="(copyActive?.ctaLabel || '') + ': ' + (copyActive?.heading || '')"
+            [routerLink]="vm().active.ctaPath"
+            [attr.aria-label]="(vm().activeCopy.ctaLabel || '') + ': ' + (vm().activeCopy.heading || '')"
           ></a>
 
           <div class="mg-hero__overlay" aria-hidden="true"></div>
 
           <div class="mg-hero__caption">
             <div class="flex-row-between flex-col-sm">
-              <div
-                class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
-              >
-                {{ copyActive?.heading }}
+              <div class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2">
+                {{ vm().activeCopy.heading }}
               </div>
 
               <p-button
                 class="mg-hero__caption-btn"
-                [label]="copyActive?.ctaLabel"
+                [label]="vm().activeCopy.ctaLabel"
                 icon="pi pi-arrow-right"
                 iconPos="right"
                 severity="primary"
                 size="small"
-                [routerLink]="active().ctaPath"
+                [routerLink]="vm().active.ctaPath"
               />
             </div>
 
             <p class="mg-hero__caption-text truncate-2">
-              {{ copyActive?.text }}
+              {{ vm().activeCopy.text }}
             </p>
           </div>
 
@@ -63,22 +55,18 @@
               size="small"
               [text]="true"
               (onClick)="prev()"
-              [ariaLabel]="ariaPrev() || 'Poprzedni slajd'"
+              [ariaLabel]="vm().aria.prev"
             />
 
-            <div
-              class="flex-row-center"
-              role="tablist"
-              [attr.aria-label]="ariaDots() || 'Wybór slajdu'"
-            >
-              @for (s of slides(); track trackByIndex($index)) {
+            <div class="flex-row-center" role="tablist" [attr.aria-label]="vm().aria.dots">
+              @for (s of vm().slides; track trackByIndex($index)) {
                 <button
                   type="button"
                   class="mg-hero__dot"
-                  [class.is-active]="$index === activeIndex()"
+                  [class.is-active]="$index === vm().activeIndex"
                   (click)="goTo($index)"
-                  [attr.aria-label]="dotAriaLabel(ariaGoToPrefix() || 'Przejdź do slajdu', $index)"
-                  [attr.aria-current]="$index === activeIndex() ? 'true' : null"
+                  [attr.aria-label]="dotAriaLabel(vm().aria.goToPrefix, $index)"
+                  [attr.aria-current]="$index === vm().activeIndex ? 'true' : null"
                 ></button>
               }
             </div>
@@ -90,7 +78,7 @@
               size="small"
               [text]="true"
               (onClick)="next()"
-              [ariaLabel]="ariaNext() || 'Następny slajd'"
+              [ariaLabel]="vm().aria.next"
             />
           </div>
         </div>
@@ -98,16 +86,16 @@
 
       <div class="mg-hero__content">
         <header class="mg-section__header">
-          <h1 class="mg-section__title">{{ copyActive?.heading }}</h1>
+          <h1 class="mg-section__title">{{ vm().activeCopy.heading }}</h1>
 
           <p class="mg-section__subtitle mg-hero__subtitle truncate-2">
-            {{ copyActive?.text }}
+            {{ vm().activeCopy.text }}
           </p>
         </header>
 
         <div class="mg-hero__cta-grid">
-          @for (s of slides(); track trackByCtaPath($index, s)) {
-            @let copy = (copyList?.[$index] ?? null);
+          @for (s of vm().slides; track trackByCtaPath($index, s)) {
+            @let copy = (vm().copyList[$index]);
 
             <div
               class="mg-card mg-hero__cta"

@@ -1,52 +1,53 @@
-<section class="mg-section" aria-label="O nas">
+<section class="mg-section" [attr.aria-label]="vm().hero.title">
   <div class="mg-container">
     <header class="mg-section__header">
       <h1 class="mg-section__title">
-        {{ heroData().title }}
+        {{ vm().hero.title }}
       </h1>
 
       <p class="mg-section__subtitle">
-        {{ heroData().subtitle }}
+        {{ vm().hero.subtitle }}
       </p>
     </header>
 
     <div class="mg-card mg-about__stack">
-      @for (section of sections(); track section.id) {
+      @for (section of vm().sections; track section.id) {
         <h2 class="mg-section__title mg-section__title--sm">
           {{ section.title }}
         </h2>
 
-        @for (p of section.paragraphs; track $index) {
+        @for (p of section.paragraphs; track trackByIndex($index)) {
           <p>{{ p }}</p>
         }
       }
 
       <div class="mg-about__grid">
-        @for (card of cards(); track card.id) {
+        @for (card of vm().cards; track card.id) {
           <div class="mg-card">
             <h3 class="mg-section__title mg-section__title--xs">
               {{ card.title }}
             </h3>
 
-            @for (p of card.paragraphs; track $index) {
+            @for (p of card.paragraphs; track trackByIndex($index)) {
               <p>{{ p }}</p>
             }
           </div>
         }
       </div>
+
       <div class="mg-about__actions flex-row-end flex-col-sm">
         <p-button
-          [label]="aboutCommon().contactUs"
+          [label]="vm().commonCta.contactUs"
           icon="pi pi-envelope"
           severity="primary"
-          [routerLink]="'/contact'"
+          routerLink="/contact"
         />
         <p-button
-          [label]="aboutCommon().joinProgram"
+          [label]="vm().commonCta.joinProgram"
           icon="pi pi-users"
           severity="secondary"
           [text]="true"
-          [routerLink]="'/join-the-party'"
+          routerLink="/join-the-party"
         />
       </div>
     </div>

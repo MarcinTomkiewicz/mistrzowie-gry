@@ -1,15 +1,15 @@
-<section class="mg-section" [attr.aria-label]="header().title">
+<section class="mg-section" [attr.aria-label]="vm().header.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ header().title }}</h2>
+      <h2 class="mg-section__title">{{ vm().header.title }}</h2>
       <p class="mg-section__subtitle">
-        {{ header().subtitle }}
+        {{ vm().header.subtitle }}
       </p>
     </header>
 
     <div class="mg-card mg-seo-text">
       <div class="flex-row-all-start flex-col-sm mg-seo-text__cols">
-        @for (col of columns(); track trackByColId($index, col)) {
+        @for (col of vm().columns; track trackByColId($index, col)) {
           <div class="mg-seo-text__col">
             @for (section of col.sections; track trackBySectionId($index, section)) {
               <h3 class="mg-section__title mg-section__title--sm">

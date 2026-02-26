@@ -9,6 +9,15 @@
     "subtitle": "[PH] contact.hero.subtitle — Wybierz temat, napisz wiadomość i zostaw kontakt. Odpowiemy najszybciej jak to możliwe."
   },
 
+    "info": {
+    "title": "contact.info.title",
+    "subtitle": "[PH] contact.info.subtitle — Nie mamy lokalu ani adresu do odwiedzin. Najszybciej odpowiadamy przez formularz lub mail.",
+    "emailLabel": "contact.info.emailLabel",
+    "phoneLabel": "contact.info.phoneLabel",
+    "emailValue": "[PH] kontakt@mistrzgry.pl",
+    "phoneValue": "[PH] +48 000 000 000"
+  },
+
   "form": {
     "title": "contact.form.title",
     "hint": "[PH] contact.form.hint — Im więcej kontekstu podasz, tym szybciej dobierzemy właściwą odpowiedź (format, termin, budżet, liczba osób).",

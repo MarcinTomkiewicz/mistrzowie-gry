@@ -103,7 +103,6 @@ export class Offers {
     };
   });
 
-  // expose utils for template
   readonly formatPricing = formatPricing;
   readonly formatPricingDetailed = formatPricingDetailed;
   readonly formatAddonPricing = formatAddonPricing;

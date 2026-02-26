@@ -18,6 +18,10 @@ import {
 } from '../../../core/utils/dict-to-sorted-array';
 import { pickTranslations } from '../../../core/utils/pick-translation';
 
+function toSortedById<T>(dict: unknown): T[] {
+  return dictToSortedArray<T>(dict as any, (x) => Number((x as any)?.id ?? 0));
+}
+
 @Component({
   selector: 'app-about',
   standalone: true,
@@ -30,28 +34,15 @@ export class About {
   private readonly seo = inject(Seo);
   private readonly transloco = inject(TranslocoService);
 
-  readonly ctaDict = translateObjectSignal('cta', {}, { scope: 'common' });
-  readonly heroDict = translateObjectSignal('hero', {}, { scope: 'about' });
-
-  readonly aboutCommon = pickTranslations(this.ctaDict, [
-    'contactUs',
-    'joinProgram',
-  ] as const);
-  readonly heroData = pickTranslations(this.heroDict, ['title', 'subtitle'] as const);
-
   constructor() {
     this.transloco.setActiveLang('pl');
   }
 
   // ===============
-  // SEO (stringi) – scope: about
+  // SEO (scope: about)
   // ===============
   readonly seoTitle = translateSignal('seo.title', {}, { scope: 'about' });
-  readonly seoDescription = translateSignal(
-    'seo.description',
-    {},
-    { scope: 'about' },
-  );
+  readonly seoDescription = translateSignal('seo.description', {}, { scope: 'about' });
 
   private readonly _applySeo = effect(() => {
     this.seo.apply({
@@ -60,42 +51,52 @@ export class About {
     });
   });
 
-  // ==========================
-  // STRUKTURY (obiekty z JSON)
-  // ==========================
-  readonly sectionsDict = translateObjectSignal(
-    'sections',
-    {},
-    { scope: 'about' },
-  );
-  readonly cardsDict = translateObjectSignal('cards', {}, { scope: 'about' });
+  // ===============
+  // i18n dicts
+  // ===============
+  private readonly commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
+  private readonly heroDict = translateObjectSignal('hero', {}, { scope: 'about' });
+  private readonly sectionsDict = translateObjectSignal('sections', {}, { scope: 'about' });
+  private readonly cardsDict = translateObjectSignal('cards', {}, { scope: 'about' });
 
-  // ==========================
-  // VIEW MODEL (computed) – minimalny, bez subscribów i bez ręcznego mapowania translacji
-  // ==========================
-  readonly sections = computed(() => {
-    const dict = this.sectionsDict();
-    return dictToSortedArray<{
-      id: number;
-      title: string;
-      paragraphs: string[];
-    }>(dict, (item) => Number(item?.id ?? 0)).map((x) => ({
-      id: Number(x?.id ?? 0),
+  // ===============
+  // picked (flat)
+  // ===============
+  private readonly commonCta = pickTranslations(this.commonCtaDict, [
+    'contactUs',
+    'joinProgram',
+  ] as const);
+
+  private readonly hero = pickTranslations(this.heroDict, ['title', 'subtitle'] as const);
+
+  // ===============
+  // lists
+  // ===============
+  private readonly sections = computed(() => {
+    return toSortedById<{ id: number; title: string; paragraphs: unknown }>(this.sectionsDict()).map((x) => ({
+      id: Number((x as any)?.id ?? 0),
       title: String((x as any)?.title ?? ''),
       paragraphs: numberedDictToStringArray((x as any)?.paragraphs),
     }));
   });
 
-  readonly cards = computed(() => {
-    const dict = this.cardsDict();
-    return dictToSortedArray<{
-      id: number;
-      title: string;
-      paragraphs: string[];
-    }>(dict, (item) => Number(item?.id ?? 0)).map((x) => ({
-      id: Number(x?.id ?? 0),
+  private readonly cards = computed(() => {
+    return toSortedById<{ id: number; title: string; paragraphs: unknown }>(this.cardsDict()).map((x) => ({
+      id: Number((x as any)?.id ?? 0),
       title: String((x as any)?.title ?? ''),
       paragraphs: numberedDictToStringArray((x as any)?.paragraphs),
     }));
   });
+
+  // ===============
+  // View model
+  // ===============
+  readonly vm = computed(() => ({
+    hero: this.hero(),
+    sections: this.sections(),
+    cards: this.cards(),
+    commonCta: this.commonCta(),
+  }));
+
+  trackByIndex = (i: number) => i;
 }

@@ -1,8 +1,10 @@
-// path: src/app/features/home/components/seo-text/seo-text.ts
 import { CommonModule } from '@angular/common';
 import { Component, computed } from '@angular/core';
 
-import { provideTranslocoScope, translateObjectSignal } from '@jsverse/transloco';
+import {
+  provideTranslocoScope,
+  translateObjectSignal,
+} from '@jsverse/transloco';
 
 import {
   dictToSortedArray,
@@ -21,6 +23,17 @@ type SeoTextColumnCopy = {
   sections: Record<string, SeoTextSectionCopy>;
 };
 
+type UiSeoTextSection = {
+  id: number;
+  title: string;
+  paragraphs: string[];
+};
+
+type UiSeoTextColumn = {
+  id: number;
+  sections: UiSeoTextSection[];
+};
+
 @Component({
   selector: 'app-seo-rich-text',
   standalone: true,
@@ -30,24 +43,15 @@ type SeoTextColumnCopy = {
   providers: [provideTranslocoScope('home')],
 })
 export class SeoRichText {
-  private readonly headerDict = translateObjectSignal(
-    'seoText.header',
-    {},
-    { scope: 'home' },
-  );
-  private readonly columnsDict = translateObjectSignal(
-    'seoText.columns',
-    {},
-    { scope: 'home' },
-  );
+  private readonly headerDict = translateObjectSignal('seoText.header', {}, { scope: 'home' });
+  private readonly columnsDict = translateObjectSignal('seoText.columns', {}, { scope: 'home' });
 
-  readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
+  private readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
 
-  readonly columns = computed(() => {
-    const colsDict = this.columnsDict();
-
-    const cols = dictToSortedArray<SeoTextColumnCopy>(colsDict as any, (col) =>
-      Number((col as any)?.id ?? 0),
+  private readonly columns = computed<UiSeoTextColumn[]>(() => {
+    const cols = dictToSortedArray<SeoTextColumnCopy>(
+      this.columnsDict() as any,
+      (col) => Number((col as any)?.id ?? 0),
     ).map((col) => {
       const sectionsDict = ((col as any)?.sections ?? {}) as Record<string, any>;
 
@@ -68,6 +72,11 @@ export class SeoRichText {
 
     return cols;
   });
+
+  readonly vm = computed(() => ({
+    header: this.header(),
+    columns: this.columns(),
+  }));
 
   trackByColId = (_: number, col: { id: number }) => col.id;
   trackBySectionId = (_: number, section: { id: number }) => section.id;

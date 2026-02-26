@@ -1,12 +1,12 @@
-<section class="mg-section" [attr.aria-label]="header().title">
+<section class="mg-section" [attr.aria-label]="vm().header.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ header().title }}</h2>
-      <p class="mg-section__subtitle">{{ header().subtitle }}</p>
+      <h2 class="mg-section__title">{{ vm().header.title }}</h2>
+      <p class="mg-section__subtitle">{{ vm().header.subtitle }}</p>
     </header>
 
     <div class="mg-problems__grid">
-      @for (p of items(); track trackById($index, p)) {
+      @for (p of vm().items; track trackById($index, p)) {
         <div class="mg-card">
           <h3 class="mg-section__title mg-section__title--sm">
             {{ p.title }}

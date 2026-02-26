@@ -1,3 +1,4 @@
+// path: src/app/features/special-offers/chaotic-thursdays/chaotic-thursdays.ts
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -39,7 +40,7 @@ export class ChaoticThursdays {
   private readonly transloco = inject(TranslocoService);
 
   // ============
-  // SEO (scope: chaoticThursdays)
+  // SEO
   // ============
   readonly seoTitle = translateSignal('seo.title', {}, { scope: 'chaoticThursdays' });
   readonly seoDescription = translateSignal('seo.description', {}, { scope: 'chaoticThursdays' });
@@ -67,36 +68,36 @@ export class ChaoticThursdays {
 
   private readonly commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
 
-  readonly hero = pickTranslations(this.heroDict, [
+  private readonly hero = pickTranslations(this.heroDict, [
     'badge',
     'title',
     'subtitleLead',
     'subtitleStrong',
   ] as const);
 
-  readonly heroCta = pickTranslations(this.pageCtaDict, [
+  private readonly heroCta = pickTranslations(this.pageCtaDict, [
     'primaryLabel',
     'secondaryLabel',
   ] as const);
 
-  readonly about = pickTranslations(this.aboutDict, ['title', 'text'] as const);
-  readonly howItWorks = pickTranslations(this.howDict, ['title', 'subtitle'] as const);
+  private readonly about = pickTranslations(this.aboutDict, ['title', 'text'] as const);
+  private readonly howItWorks = pickTranslations(this.howDict, ['title', 'subtitle'] as const);
 
-  readonly standards = pickTranslations(this.standardsDict, [
+  private readonly standards = pickTranslations(this.standardsDict, [
     'title',
     'subtitle',
     'expectationsTitle',
   ] as const);
 
-  readonly faq = pickTranslations(this.faqDict, ['title', 'subtitle'] as const);
+  private readonly faq = pickTranslations(this.faqDict, ['title', 'subtitle'] as const);
 
-  readonly commonCta = pickTranslations(this.commonCtaDict, [
+  private readonly commonCta = pickTranslations(this.commonCtaDict, [
     'joinProgram',
     'offerIndividual',
   ] as const);
 
   // ============
-  // lists (dict -> array)
+  // lists
   // ============
   private readonly highlightsDict = translateObjectSignal('about.highlights', {}, { scope: 'chaoticThursdays' });
   private readonly stepsDict = translateObjectSignal('howItWorks.steps', {}, { scope: 'chaoticThursdays' });
@@ -104,7 +105,6 @@ export class ChaoticThursdays {
   private readonly expectationsDict = translateObjectSignal('standards.expectations', {}, { scope: 'chaoticThursdays' });
   private readonly faqItemsDict = translateObjectSignal('faq.items', {}, { scope: 'chaoticThursdays' });
 
-  // developer-owned icons
   private readonly highlightIcons: IconTech[] = [
     { id: 1, icon: 'pi pi-bolt' },
     { id: 2, icon: 'pi pi-question-circle' },
@@ -119,27 +119,53 @@ export class ChaoticThursdays {
     { id: 4, icon: 'pi pi-check' },
   ];
 
-  readonly highlights = computed(() => {
+  private readonly highlights = computed(() => {
     const list = toSortedById<{ id: number; title: string; text: string }>(this.highlightsDict());
     return withIcons(list, this.highlightIcons);
   });
 
-  readonly steps = computed(() => {
+  private readonly steps = computed(() => {
     return toSortedById<{ id: number; time: string; title: string; text: string }>(this.stepsDict()).map(
       ({ time, title, text }) => ({ time, title, text }),
     );
   });
 
-  readonly standardsCards = computed(() => {
+  private readonly standardsCards = computed(() => {
     const list = toSortedById<{ id: number; title: string; text: string }>(this.standardsCardsDict());
     return withIcons(list, this.standardsIcons);
   });
 
-  readonly expectations = computed(() => numberedDictToStringArray(this.expectationsDict() as any));
+  private readonly expectations = computed(() =>
+    numberedDictToStringArray(this.expectationsDict() as any),
+  );
 
-  readonly faqs = computed(() => {
-    return toSortedById<{ id: number; q: string; a: string }>(this.faqItemsDict()).map(({ q, a }) => ({ q, a }));
+  // ✅ FAQ bez mapowania q -> h (JSON już ma h/a)
+  private readonly faqs = computed(() => {
+    return toSortedById<{ id: number; h: string; a: string }>(this.faqItemsDict());
   });
+
+  // ============
+  // View model
+  // ============
+  readonly vm = computed(() => ({
+    hero: this.hero(),
+    heroCta: this.heroCta(),
+
+    about: this.about(),
+    highlights: this.highlights(),
+
+    howItWorks: this.howItWorks(),
+    steps: this.steps(),
+
+    standards: this.standards(),
+    standardsCards: this.standardsCards(),
+    expectations: this.expectations(),
+
+    faq: this.faq(),
+    faqs: this.faqs(),
+
+    commonCta: this.commonCta(),
+  }));
 
   trackByIndex = (i: number) => i;
 }

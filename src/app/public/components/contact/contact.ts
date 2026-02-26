@@ -1,4 +1,3 @@
-// path: src/app/public/components/contact/contact.ts
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -58,11 +57,7 @@ export class Contact {
   // SEO (scope: contact)
   // ============
   readonly seoTitle = translateSignal('seo.title', {}, { scope: 'contact' });
-  readonly seoDescription = translateSignal(
-    'seo.description',
-    {},
-    { scope: 'contact' },
-  );
+  readonly seoDescription = translateSignal('seo.description', {}, { scope: 'contact' });
 
   private readonly _applySeo = effect(() => {
     this.seo.apply({
@@ -78,48 +73,31 @@ export class Contact {
     topic: this.fb.nonNullable.control(''),
     topicCustom: this.fb.nonNullable.control(''),
 
-    firstName: this.fb.nonNullable.control('', {
-      validators: [Validators.required],
-    }),
-    lastName: this.fb.nonNullable.control('', {
-      validators: [Validators.required],
-    }),
+    firstName: this.fb.nonNullable.control('', { validators: [Validators.required] }),
+    lastName: this.fb.nonNullable.control('', { validators: [Validators.required] }),
 
     company: this.fb.nonNullable.control(''),
 
-    email: this.fb.nonNullable.control('', {
-      validators: [Validators.required, Validators.email],
-    }),
-
+    email: this.fb.nonNullable.control('', { validators: [Validators.required, Validators.email] }),
     phone: this.fb.nonNullable.control(''),
 
-    message: this.fb.nonNullable.control('', {
-      validators: [Validators.required, Validators.minLength(20)],
-    }),
+    message: this.fb.nonNullable.control('', { validators: [Validators.required, Validators.minLength(20)] }),
   });
 
   // ============
   // i18n
   // ============
-  private readonly heroDict = translateObjectSignal('hero', {}, {
-    scope: 'contact',
-  });
-  private readonly formDict = translateObjectSignal('form', {}, {
-    scope: 'contact',
-  });
-  private readonly errorsDict = translateObjectSignal('errors', {}, {
-    scope: 'contact',
-  });
-  private readonly topicsDict = translateObjectSignal('topics', {}, {
-    scope: 'contact',
-  });
-  private readonly commonCtaDict = translateObjectSignal('cta', {}, {
-    scope: 'common',
-  });
+  private readonly heroDict = translateObjectSignal('hero', {}, { scope: 'contact' });
+  private readonly formDict = translateObjectSignal('form', {}, { scope: 'contact' });
+  private readonly errorsDict = translateObjectSignal('errors', {}, { scope: 'contact' });
+  private readonly topicsDict = translateObjectSignal('topics', {}, { scope: 'contact' });
+  private readonly infoDict = translateObjectSignal('info', {}, { scope: 'contact' });
 
-  readonly hero = pickTranslations(this.heroDict, ['title', 'subtitle'] as const);
+  private readonly commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
 
-  readonly formText = pickTranslations(this.formDict, [
+  private readonly hero = pickTranslations(this.heroDict, ['title', 'subtitle'] as const);
+
+  private readonly formText = pickTranslations(this.formDict, [
     'title',
     'hint',
     'topicLabel',
@@ -133,18 +111,27 @@ export class Contact {
     'messagePlaceholder',
   ] as const);
 
-  readonly errors = pickTranslations(this.errorsDict, [
+  private readonly errors = pickTranslations(this.errorsDict, [
     'required',
     'email',
     'minMessage',
   ] as const);
 
-  readonly cta = pickTranslations(this.commonCtaDict, ['sendMessage'] as const);
+  private readonly cta = pickTranslations(this.commonCtaDict, ['sendMessage'] as const);
+
+  private readonly info = pickTranslations(this.infoDict, [
+    'title',
+    'subtitle',
+    'emailLabel',
+    'phoneLabel',
+    'emailValue',
+    'phoneValue',
+  ] as const);
 
   // ============
   // topics
   // ============
-  readonly topics = computed<ContactTopicOption[]>(() => {
+  private readonly topics = computed<ContactTopicOption[]>(() => {
     const list = toSortedById<ContactTopicOption>(this.topicsDict());
     return list.map((x) => ({
       id: Number((x as any)?.id ?? 0),
@@ -157,7 +144,7 @@ export class Contact {
     initialValue: this.form.controls.topic.value,
   });
 
-  readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
+  private readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
 
   private readonly _initDefaultTopic = effect(() => {
     const options = this.topics();
@@ -181,6 +168,19 @@ export class Contact {
 
     ctrl.updateValueAndValidity({ emitEvent: false });
   });
+
+  // ============
+  // VM
+  // ============
+  readonly vm = computed(() => ({
+    hero: this.hero(),
+    formText: this.formText(),
+    errors: this.errors(),
+    cta: this.cta(),
+    topics: this.topics(),
+    isOtherTopicSelected: this.isOtherTopicSelected(),
+    info: this.info(),
+  }));
 
   // ============
   // submit (mock)
@@ -223,4 +223,6 @@ export class Contact {
     const c = this.form.controls.message;
     return c.touched && !!c.errors?.['minlength'];
   }
+
+  trackByIndex = (i: number) => i;
 }

@@ -1,36 +1,31 @@
-<!-- path: src/app/public/components/contact/contact.html -->
-<section class="mg-section" [attr.aria-label]="hero().title">
+<section class="mg-section" [attr.aria-label]="vm().hero.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h1 class="mg-section__title">{{ hero().title }}</h1>
-      <p class="mg-section__subtitle">{{ hero().subtitle }}</p>
+      <h1 class="mg-section__title">{{ vm().hero.title }}</h1>
+      <p class="mg-section__subtitle">{{ vm().hero.subtitle }}</p>
     </header>
 
     <div class="mg-contact-grid">
       <div class="mg-card flex-col-center gap-md">
         <h2 class="mg-section__title mg-section__title--sm align-self-start">
-          {{ formText().title }}
+          {{ vm().formText.title }}
         </h2>
-        <p class="mg-section__subtitle align-self-start mb-md">{{ formText().hint }}</p>
+        <p class="mg-section__subtitle align-self-start mb-md">{{ vm().formText.hint }}</p>
 
-        <form
-          class="flex-col-center gap-sm w-80"
-          [formGroup]="form"
-          (ngSubmit)="onSubmit()"
-        >
+        <form class="flex-col-center gap-sm w-80" [formGroup]="form" (ngSubmit)="onSubmit()">
           <p-iftalabel class="w-100">
             <p-select
               class="w-100"
               inputId="topic"
-              [options]="topics()"
+              [options]="vm().topics"
               optionLabel="label"
               optionValue="value"
               formControlName="topic"
             />
-            <label for="topic">{{ formText().topicLabel }}</label>
+            <label for="topic">{{ vm().formText.topicLabel }}</label>
           </p-iftalabel>
 
-          @if (isOtherTopicSelected()) {
+          @if (vm().isOtherTopicSelected) {
             <p-iftalabel class="w-100">
               <input
                 class="w-100"
@@ -40,11 +35,11 @@
                 formControlName="topicCustom"
                 [attr.aria-invalid]="showRequiredError('topicCustom')"
               />
-              <label for="topicCustom">{{ formText().topicCustomLabel }}</label>
+              <label for="topicCustom">{{ vm().formText.topicCustomLabel }}</label>
             </p-iftalabel>
 
             @if (showRequiredError("topicCustom")) {
-              <small class="error-text">{{ errors().required }}</small>
+              <small class="mg-contact-error">{{ vm().errors.required }}</small>
             }
           }
 
@@ -57,11 +52,11 @@
               formControlName="firstName"
               [attr.aria-invalid]="showRequiredError('firstName')"
             />
-            <label for="firstName">{{ formText().firstNameLabel }}</label>
+            <label for="firstName">{{ vm().formText.firstNameLabel }}</label>
           </p-iftalabel>
 
           @if (showRequiredError("firstName")) {
-            <small class="mg-contact-error">{{ errors().required }}</small>
+            <small class="mg-contact-error">{{ vm().errors.required }}</small>
           }
 
           <p-iftalabel class="w-100">
@@ -73,33 +68,21 @@
               formControlName="lastName"
               [attr.aria-invalid]="showRequiredError('lastName')"
             />
-            <label for="lastName">{{ formText().lastNameLabel }}</label>
+            <label for="lastName">{{ vm().formText.lastNameLabel }}</label>
           </p-iftalabel>
 
           @if (showRequiredError("lastName")) {
-            <small class="mg-contact-error">{{ errors().required }}</small>
+            <small class="mg-contact-error">{{ vm().errors.required }}</small>
           }
 
           <p-iftalabel class="w-100">
-            <input
-              class="w-100"
-              pInputText
-              id="company"
-              type="text"
-              formControlName="company"
-            />
-            <label for="company">{{ formText().companyLabel }}</label>
+            <input class="w-100" pInputText id="company" type="text" formControlName="company" />
+            <label for="company">{{ vm().formText.companyLabel }}</label>
           </p-iftalabel>
 
           <p-iftalabel class="w-100">
-            <input
-              class="w-100"
-              pInputText
-              id="phone"
-              type="tel"
-              formControlName="phone"
-            />
-            <label for="phone">{{ formText().phoneLabel }}</label>
+            <input class="w-100" pInputText id="phone" type="tel" formControlName="phone" />
+            <label for="phone">{{ vm().formText.phoneLabel }}</label>
           </p-iftalabel>
 
           <p-iftalabel class="w-100">
@@ -111,15 +94,15 @@
               formControlName="email"
               [attr.aria-invalid]="showEmailError()"
             />
-            <label for="email">{{ formText().emailLabel }}</label>
+            <label for="email">{{ vm().formText.emailLabel }}</label>
           </p-iftalabel>
 
           @if (showEmailError()) {
             <small class="mg-contact-error">
               @if (form.controls.email.errors?.["email"]) {
-                {{ errors().email }}
+                {{ vm().errors.email }}
               } @else {
-                {{ errors().required }}
+                {{ vm().errors.required }}
               }
             </small>
           }
@@ -132,24 +115,22 @@
               formControlName="message"
               [rows]="6"
               [autoResize]="true"
-              [placeholder]="formText().messagePlaceholder"
-              [attr.aria-invalid]="
-                showRequiredError('message') || showMinMessageError()
-              "
+              [placeholder]="vm().formText.messagePlaceholder"
+              [attr.aria-invalid]="showRequiredError('message') || showMinMessageError()"
             ></textarea>
-            <label for="message">{{ formText().messageLabel }}</label>
+            <label for="message">{{ vm().formText.messageLabel }}</label>
           </p-iftalabel>
 
           @if (showRequiredError("message")) {
-            <small class="mg-contact-error">{{ errors().required }}</small>
+            <small class="mg-contact-error">{{ vm().errors.required }}</small>
           } @else if (showMinMessageError()) {
-            <small class="mg-contact-error">{{ errors().minMessage }}</small>
+            <small class="mg-contact-error">{{ vm().errors.minMessage }}</small>
           }
 
           <div class="flex-row-end flex-col-sm gap-sm">
             <p-button
               type="submit"
-              [label]="cta().sendMessage"
+              [label]="vm().cta.sendMessage"
               icon="pi pi-send"
               severity="success"
             />
@@ -159,21 +140,27 @@
 
       <div class="mg-card">
         <h2 class="mg-section__title mg-section__title--sm">
-          contact.info.title
+          {{ vm().info.title }}
         </h2>
         <p class="mg-section__subtitle">
-          [PH] contact.info.subtitle — Nie mamy lokalu ani adresu do odwiedzin.
-          Najszybciej odpowiadamy przez formularz lub mail.
+          {{ vm().info.subtitle }}
         </p>
 
         <div class="gap-sm mt-md">
           <div class="flex-row-start gap-sm">
             <i class="pi pi-envelope" aria-hidden="true"></i>
-            <span>contact.info.emailLabel</span>
+            <span>
+              {{ vm().info.emailLabel }}
+              @if (vm().info.emailValue) { <span>{{ vm().info.emailValue }}</span> }
+            </span>
           </div>
+
           <div class="flex-row-start gap-sm">
             <i class="pi pi-phone" aria-hidden="true"></i>
-            <span>contact.info.phoneLabel</span>
+            <span>
+              {{ vm().info.phoneLabel }}
+              @if (vm().info.phoneValue) { <span>{{ vm().info.phoneValue }}</span> }
+            </span>
           </div>
         </div>
       </div>

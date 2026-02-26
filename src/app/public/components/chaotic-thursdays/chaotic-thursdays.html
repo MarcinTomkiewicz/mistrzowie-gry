@@ -1,15 +1,14 @@
-<!-- path: src/app/features/special-offers/chaotic-thursdays/chaotic-thursdays.html -->
-<section class="mg-section mg-chaotic-hero" [attr.aria-label]="hero().title">
+<section class="mg-section mg-chaotic-hero" [attr.aria-label]="vm().hero.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <div class="mg-chaotic-hero__badge">{{ hero().badge }}</div>
+      <div class="mg-chaotic-hero__badge">{{ vm().hero.badge }}</div>
 
-      <h1 class="mg-section__title">{{ hero().title }}</h1>
+      <h1 class="mg-section__title">{{ vm().hero.title }}</h1>
 
       <p class="mg-section__subtitle">
-        {{ hero().subtitleLead }}
+        {{ vm().hero.subtitleLead }}
         <br />
-        {{ hero().subtitleStrong }}
+        {{ vm().hero.subtitleStrong }}
       </p>
 
       <div class="mg-chaotic-hero__spark" aria-hidden="true">
@@ -20,14 +19,14 @@
 
       <div class="flex-row-center flex-col-sm mt-md gap-md">
         <p-button
-          [label]="heroCta().primaryLabel"
+          [label]="vm().heroCta.primaryLabel"
           icon="pi pi-calendar"
           severity="primary"
           size="small"
           routerLink="/contact"
         />
         <p-button
-          [label]="heroCta().secondaryLabel"
+          [label]="vm().heroCta.secondaryLabel"
           icon="pi pi-users"
           severity="secondary"
           size="small"
@@ -39,14 +38,14 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="about().title">
+<section class="mg-section" [attr.aria-label]="vm().about.title">
   <div class="mg-container">
     <div class="mg-card">
-      <h2 class="mg-section__title mg-section__title--sm">{{ about().title }}</h2>
-      <p>{{ about().text }}</p>
+      <h2 class="mg-section__title mg-section__title--sm">{{ vm().about.title }}</h2>
+      <p>{{ vm().about.text }}</p>
 
       <div class="mg-chaotic-grid">
-        @for (h of highlights(); track trackByIndex($index)) {
+        @for (h of vm().highlights; track trackByIndex($index)) {
           <div class="mg-card">
             <div class="flex-row-start gap-sm mb-sm">
               <i class="{{ h.icon }}" aria-hidden="true"></i>
@@ -62,15 +61,15 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="howItWorks().title">
+<section class="mg-section" [attr.aria-label]="vm().howItWorks.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ howItWorks().title }}</h2>
-      <p class="mg-section__subtitle">{{ howItWorks().subtitle }}</p>
+      <h2 class="mg-section__title">{{ vm().howItWorks.title }}</h2>
+      <p class="mg-section__subtitle">{{ vm().howItWorks.subtitle }}</p>
     </header>
 
     <div class="mg-card">
-      <p-table [value]="steps()">
+      <p-table [value]="vm().steps">
         <ng-template pTemplate="body" let-s>
           <tr>
             <td>{{ s.time }}</td>
@@ -83,15 +82,15 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="standards().title">
+<section class="mg-section" [attr.aria-label]="vm().standards.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ standards().title }}</h2>
-      <p class="mg-section__subtitle">{{ standards().subtitle }}</p>
+      <h2 class="mg-section__title">{{ vm().standards.title }}</h2>
+      <p class="mg-section__subtitle">{{ vm().standards.subtitle }}</p>
     </header>
 
     <div class="mg-chaotic-grid">
-      @for (st of standardsCards(); track trackByIndex($index)) {
+      @for (st of vm().standardsCards; track trackByIndex($index)) {
         <div class="mg-card">
           <div class="flex-row-start gap-sm mb-sm">
             <i class="{{ st.icon }}" aria-hidden="true"></i>
@@ -106,10 +105,10 @@
 
     <div class="mg-card mg-chaotic-expectations">
       <h3 class="mg-section__title mg-section__title--sm">
-        {{ standards().expectationsTitle }}
+        {{ vm().standards.expectationsTitle }}
       </h3>
       <ul>
-        @for (x of expectations(); track trackByIndex($index)) {
+        @for (x of vm().expectations; track trackByIndex($index)) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -117,19 +116,19 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="faq().title">
+<section class="mg-section" [attr.aria-label]="vm().faq.title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ faq().title }}</h2>
-      <p class="mg-section__subtitle">{{ faq().subtitle }}</p>
+      <h2 class="mg-section__title">{{ vm().faq.title }}</h2>
+      <p class="mg-section__subtitle">{{ vm().faq.subtitle }}</p>
     </header>
 
     <div class="mg-card">
       <p-accordion [multiple]="true">
-        @for (f of faqs(); let i = $index; track trackByIndex($index)) {
+        @for (f of vm().faqs; let i = $index; track trackByIndex($index)) {
           <p-accordion-panel [value]="i">
             <p-accordion-header class="mg-section__title mg-section__title--xs">
-              {{ f.q }}
+              {{ f.h }}
             </p-accordion-header>
             <p-accordion-content>
               <p>{{ f.a }}</p>
@@ -138,16 +137,17 @@
         }
       </p-accordion>
     </div>
+
     <div class="flex-row-center flex-col-sm mt-md gap-md">
       <p-button
-        [label]="commonCta().joinProgram"
+        [label]="vm().commonCta.joinProgram"
         icon="pi pi-users"
         severity="primary"
         size="small"
         routerLink="/join-the-party"
       />
       <p-button
-        [label]="commonCta().offerIndividual"
+        [label]="vm().commonCta.offerIndividual"
         icon="pi pi-star"
         severity="secondary"
         size="small"

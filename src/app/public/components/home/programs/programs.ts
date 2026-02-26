@@ -4,7 +4,10 @@ import { RouterModule } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 
-import { provideTranslocoScope, translateObjectSignal } from '@jsverse/transloco';
+import {
+  provideTranslocoScope,
+  translateObjectSignal,
+} from '@jsverse/transloco';
 
 import { IProgramCard } from '../../../../core/interfaces/home/i-program-card';
 import {
@@ -46,28 +49,19 @@ export class Programs {
   ];
 
   // copywriter-owned (home.json)
-  private readonly headerDict = translateObjectSignal(
-    'programs.header',
-    {},
-    { scope: 'home' },
-  );
-  private readonly cardsDict = translateObjectSignal(
-    'programs.cards',
-    {},
-    { scope: 'home' },
-  );
+  private readonly headerDict = translateObjectSignal('programs.header', {}, { scope: 'home' });
+  private readonly cardsDict = translateObjectSignal('programs.cards', {}, { scope: 'home' });
 
   // common CTA labels
   private readonly ctaDict = translateObjectSignal('cta', {}, { scope: 'common' });
   private readonly cta = pickTranslations(this.ctaDict, ['checkDetails', 'seeProgram'] as const);
 
-  readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
+  private readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
 
-  readonly programs = computed<UiProgramCard[]>(() => {
-    const dict = this.cardsDict();
-
-    const copyList = dictToSortedArray<ProgramsCardCopy>(dict as any, (item) =>
-      Number((item as any)?.id ?? 0),
+  private readonly programs = computed<UiProgramCard[]>(() => {
+    const copyList = dictToSortedArray<ProgramsCardCopy>(
+      this.cardsDict() as any,
+      (item) => Number((item as any)?.id ?? 0),
     ).map((x) => ({
       id: Number((x as any)?.id ?? 0),
       title: String((x as any)?.title ?? ''),
@@ -75,10 +69,7 @@ export class Programs {
       bullets: ((x as any)?.bullets ?? {}) as Record<string, string>,
     }));
 
-    const techById = new Map<number, ProgramsCardTech>(
-      this.tech.map((t) => [t.id, t]),
-    );
-
+    const techById = new Map<number, ProgramsCardTech>(this.tech.map((t) => [t.id, t]));
     const cta = this.cta();
 
     return copyList
@@ -97,6 +88,11 @@ export class Programs {
       })
       .filter((x): x is UiProgramCard => !!x);
   });
+
+  readonly vm = computed(() => ({
+    header: this.header(),
+    programs: this.programs(),
+  }));
 
   trackById = (_: number, item: UiProgramCard) => item.id;
   trackByBullet = (_: number, bullet: string) => bullet;

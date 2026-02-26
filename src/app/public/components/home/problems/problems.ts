@@ -4,7 +4,10 @@ import { RouterModule } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 
-import { provideTranslocoScope, translateObjectSignal } from '@jsverse/transloco';
+import {
+  provideTranslocoScope,
+  translateObjectSignal,
+} from '@jsverse/transloco';
 
 import { IProblemCard } from '../../../../core/interfaces/home/i-problem-card';
 import { dictToSortedArray } from '../../../../core/utils/dict-to-sorted-array';
@@ -43,37 +46,14 @@ export class Problems {
   // developer-owned (routing/icons + which common CTA label to use)
   private readonly tech: ProblemCardTech[] = [
     { id: 1, ctaPath: '/join-the-party', icon: 'pi pi-users', ctaKey: 'joinProgram' },
-    {
-      id: 2,
-      ctaPath: '/offer/individual',
-      icon: 'pi pi-user-edit',
-      ctaKey: 'offerIndividual',
-    },
-    {
-      id: 3,
-      ctaPath: '/chaotic-thursdays',
-      icon: 'pi pi-calendar',
-      ctaKey: 'chaoticThursdays',
-    },
-    {
-      id: 4,
-      ctaPath: '/offer/business',
-      icon: 'pi pi-building',
-      ctaKey: 'offerBusiness',
-    },
+    { id: 2, ctaPath: '/offer/individual', icon: 'pi pi-user-edit', ctaKey: 'offerIndividual' },
+    { id: 3, ctaPath: '/chaotic-thursdays', icon: 'pi pi-calendar', ctaKey: 'chaoticThursdays' },
+    { id: 4, ctaPath: '/offer/business', icon: 'pi pi-building', ctaKey: 'offerBusiness' },
   ];
 
   // copywriter-owned (home.json)
-  private readonly headerDict = translateObjectSignal(
-    'problems.header',
-    {},
-    { scope: 'home' },
-  );
-  private readonly cardsDict = translateObjectSignal(
-    'problems.cards',
-    {},
-    { scope: 'home' },
-  );
+  private readonly headerDict = translateObjectSignal('problems.header', {}, { scope: 'home' });
+  private readonly cardsDict = translateObjectSignal('problems.cards', {}, { scope: 'home' });
 
   // common CTA labels
   private readonly ctaDict = translateObjectSignal('cta', {}, { scope: 'common' });
@@ -84,22 +64,19 @@ export class Problems {
     'offerBusiness',
   ] as const);
 
-  readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
+  private readonly header = pickTranslations(this.headerDict, ['title', 'subtitle'] as const);
 
-  readonly items = computed<UiProblemCard[]>(() => {
-    const dict = this.cardsDict();
-    const copyList = dictToSortedArray<ProblemCardCopy>(dict as any, (item) =>
-      Number((item as any)?.id ?? 0),
+  private readonly items = computed<UiProblemCard[]>(() => {
+    const copyList = dictToSortedArray<ProblemCardCopy>(
+      this.cardsDict() as any,
+      (item) => Number((item as any)?.id ?? 0),
     ).map((x) => ({
       id: Number((x as any)?.id ?? 0),
       title: String((x as any)?.title ?? ''),
       text: String((x as any)?.text ?? ''),
     }));
 
-    const techById = new Map<number, ProblemCardTech>(
-      this.tech.map((t) => [t.id, t]),
-    );
-
+    const techById = new Map<number, ProblemCardTech>(this.tech.map((t) => [t.id, t]));
     const cta = this.cta();
 
     return copyList
@@ -118,6 +95,11 @@ export class Problems {
       })
       .filter((x): x is UiProblemCard => !!x);
   });
+
+  readonly vm = computed(() => ({
+    header: this.header(),
+    items: this.items(),
+  }));
 
   trackById = (_: number, item: UiProblemCard) => item.id;
 }

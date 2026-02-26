@@ -20,17 +20,18 @@ import {
 
 import { Platform } from '../../../../core/services/platform/platform';
 import { IHeroSlide } from '../../../../core/interfaces/home/i-hero-slide';
-import {
-  dictToSortedArray,
-  numberedDictToStringArray,
-} from '../../../../core/utils/dict-to-sorted-array';
+import { dictToSortedArray } from '../../../../core/utils/dict-to-sorted-array';
 
 type HeroSlideCopy = {
   id: number;
   heading: string;
-  text: string;     // (string), ale zostawiamy furtkę na paragraphs gdybyś chciał
+  text: string;
   ctaLabel: string;
 };
+
+function toSortedById<T>(dict: unknown): T[] {
+  return dictToSortedArray<T>(dict as any, (x) => Number((x as any)?.id ?? 0));
+}
 
 @Component({
   selector: 'app-hero-carousel',
@@ -45,7 +46,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly transloco = inject(TranslocoService);
 
-  readonly slides = signal<IHeroSlide[]>([
+  private readonly slides = signal<IHeroSlide[]>([
     {
       heading: '',
       text: '',
@@ -80,9 +81,9 @@ export class HeroCarousel implements OnInit, OnDestroy {
     },
   ]);
 
-  readonly activeIndex = signal(0);
+  private readonly activeIndex = signal(0);
 
-  readonly active = computed(() => {
+  private readonly active = computed(() => {
     const list = this.slides();
     const idx = this.activeIndex();
     return list[Math.max(0, Math.min(idx, list.length - 1))];
@@ -92,7 +93,6 @@ export class HeroCarousel implements OnInit, OnDestroy {
   private userPaused = false;
 
   ngOnInit(): void {
-    // MVP: jeśli globalnie ustawiasz język gdzie indziej, usuń to stąd
     this.transloco.setActiveLang('pl');
     this.tryStartAutoplay();
   }
@@ -105,31 +105,54 @@ export class HeroCarousel implements OnInit, OnDestroy {
   // i18n (signals)
   // ======================
 
-  readonly ariaSectionLabel = translateSignal('heroCarousel.aria.sectionLabel', {}, { scope: 'home' });
-  readonly ariaPrev = translateSignal('heroCarousel.aria.prev', {}, { scope: 'home' });
-  readonly ariaNext = translateSignal('heroCarousel.aria.next', {}, { scope: 'home' });
-  readonly ariaDots = translateSignal('heroCarousel.aria.dots', {}, { scope: 'home' });
-  readonly ariaGoToPrefix = translateSignal('heroCarousel.aria.goToSlidePrefix', {}, { scope: 'home' });
+  private readonly ariaSectionLabel = translateSignal('heroCarousel.aria.sectionLabel', {}, { scope: 'home' });
+  private readonly ariaPrev = translateSignal('heroCarousel.aria.prev', {}, { scope: 'home' });
+  private readonly ariaNext = translateSignal('heroCarousel.aria.next', {}, { scope: 'home' });
+  private readonly ariaDots = translateSignal('heroCarousel.aria.dots', {}, { scope: 'home' });
+  private readonly ariaGoToPrefix = translateSignal('heroCarousel.aria.goToSlidePrefix', {}, { scope: 'home' });
 
-  readonly slidesCopyDict = translateObjectSignal('heroCarousel.slides', {}, { scope: 'home' });
+  private readonly slidesCopyDict = translateObjectSignal('heroCarousel.slides', {}, { scope: 'home' });
 
-  readonly slidesCopy = computed(() => {
-    const dict = this.slidesCopyDict();
-    return dictToSortedArray<HeroSlideCopy>(dict, (item) => Number(item?.id ?? 0)).map((x) => ({
+  private readonly slidesCopy = computed(() => {
+    return toSortedById<HeroSlideCopy>(this.slidesCopyDict()).map((x) => ({
       id: Number((x as any)?.id ?? 0),
       heading: String((x as any)?.heading ?? ''),
-      // jeśli kiedyś zrobisz text jako paragraphs: { "1": "...", "2": "..." }
-      // to tu możesz zrobić join:
-      // text: numberedDictToStringArray((x as any)?.text).join(' ')
       text: String((x as any)?.text ?? ''),
       ctaLabel: String((x as any)?.ctaLabel ?? ''),
     }));
   });
 
-  readonly activeCopy = computed(() => {
+  private readonly activeCopy = computed(() => {
     const list = this.slidesCopy();
     const idx = this.activeIndex();
     return list[Math.max(0, Math.min(idx, list.length - 1))] ?? null;
+  });
+
+  // ======================
+  // VM (single access point)
+  // ======================
+  readonly vm = computed(() => {
+    const slides = this.slides();
+    const copyList = this.slidesCopy();
+    const active = this.active();
+    const activeCopy = this.activeCopy();
+
+    return {
+      slides,
+      copyList,
+      active,
+      activeCopy,
+
+      aria: {
+        sectionLabel: this.ariaSectionLabel() || 'Sekcja startowa',
+        prev: this.ariaPrev() || 'Poprzedni slajd',
+        next: this.ariaNext() || 'Następny slajd',
+        dots: this.ariaDots() || 'Wybór slajdu',
+        goToPrefix: this.ariaGoToPrefix() || 'Przejdź do slajdu',
+      },
+
+      activeIndex: this.activeIndex(),
+    };
   });
 
   // ======================
