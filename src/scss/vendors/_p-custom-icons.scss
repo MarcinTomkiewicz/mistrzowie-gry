@@ -37,6 +37,7 @@ $custom-icons: (
   "d20": "d20.svg",
   "moon-bats": "moon-bats.svg",
   "sun-eclipse": "eclipse-flare.svg",
+  "direction-sign": "direction-sign.svg",
 );
 
 @each $name, $file in $custom-icons {

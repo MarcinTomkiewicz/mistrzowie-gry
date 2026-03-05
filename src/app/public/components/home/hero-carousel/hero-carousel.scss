@@ -63,7 +63,7 @@
   padding: map.get(v.$spacings, "sm") map.get(v.$spacings, "md");
   border-radius: v.$radius-md;
 
-  background: color-mix(in srgb, v.$color-border 100%, transparent);
+  background: color-mix(in srgb, v.$color-bg 50%, transparent);
 
   @include m.down("sm") {
     left: map.get(v.$spacings, "sm");
@@ -89,10 +89,6 @@
   position: relative;
   z-index: 3;
   padding: map.get(v.$spacings, "sm");
-
-  > .flex-row-center {
-    gap: 0.5rem;
-  }
 }
 
 .mg-hero__dot {

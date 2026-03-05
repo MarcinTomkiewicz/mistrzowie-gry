@@ -12,14 +12,14 @@ const loaders = {
 } as const;
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', title: 'Mistrzowie Gry', loadComponent: loaders.home },
-  { path: 'about', title: 'O nas • Mistrzowie Gry', loadComponent: loaders.about },
+  { path: '', pathMatch: 'full', loadComponent: loaders.home },
+  { path: 'about', loadComponent: loaders.about },
 
-  { path: 'offer/:slug', title: 'Oferta • Mistrzowie Gry', loadComponent: loaders.offerPage },
+  { path: 'offer/:slug', loadComponent: loaders.offerPage },
 
-  { path: 'chaotic-thursdays', title: 'Chaotyczne Czwartki • Mistrzowie Gry', loadComponent: loaders.chaoticThursdays },
-  { path: 'join-the-party', title: 'Dołącz do Drużyny • Mistrzowie Gry', loadComponent: loaders.joinTheParty },
-  { path: 'contact', title: 'Kontakt • Mistrzowie Gry', loadComponent: loaders.contact },
+  { path: 'chaotic-thursdays', loadComponent: loaders.chaoticThursdays },
+  { path: 'join-the-party', loadComponent: loaders.joinTheParty },
+  { path: 'contact', loadComponent: loaders.contact },
 
   { path: '**', redirectTo: '' },
 ];

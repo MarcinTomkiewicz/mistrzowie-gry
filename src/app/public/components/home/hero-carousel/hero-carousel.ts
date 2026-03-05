@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
   Component,
   OnDestroy,
@@ -36,7 +36,7 @@ function toSortedById<T>(dict: unknown): T[] {
 @Component({
   selector: 'app-hero-carousel',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule],
+  imports: [CommonModule, RouterModule, ButtonModule, NgOptimizedImage],
   templateUrl: './hero-carousel.html',
   styleUrl: './hero-carousel.scss',
   providers: [provideTranslocoScope('home')],
@@ -52,7 +52,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: '',
       ctaLabel: '',
       ctaPath: '/offer/oferta-indywidualna',
-      imageSrc: 'hero/hero-1.png',
+      imageSrc: 'hero/hero-1.avif',
       imageAlt: '',
     },
     {
@@ -60,7 +60,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: '',
       ctaLabel: '',
       ctaPath: '/chaotic-thursdays',
-      imageSrc: 'hero/hero-2.png',
+      imageSrc: 'hero/hero-2.avif',
       imageAlt: '',
     },
     {
@@ -76,7 +76,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       text: '',
       ctaLabel: '',
       ctaPath: '/offer/oferta-biznesowa',
-      imageSrc: 'hero/hero-4.png',
+      imageSrc: 'hero/hero-4.avif',
       imageAlt: '',
     },
   ]);
@@ -207,6 +207,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       },
 
       activeIndex: this.activeIndex(),
+      isFirstSlide: this.activeIndex() === 0,
     };
   });
 

@@ -11,30 +11,34 @@
         <div class="mg-hero__stage">
           <img
             class="mg-hero__img"
-            [src]="vm().active.imageSrc"
+            [ngSrc]="vm().active.imageSrc"
             [alt]="vm().active.imageAlt"
-            loading="eager"
+            width="597"
+            height="373"
+            
             decoding="async"
           />
 
           <a
             class="mg-hero__stretched-link"
             [routerLink]="vm().active.ctaPath"
-            [attr.aria-label]="(vm().activeCopy.heading)"
-            ></a>
+            [attr.aria-label]="vm().activeCopy.heading"
+          ></a>
 
           <div class="mg-hero__overlay" aria-hidden="true"></div>
 
           <div class="mg-hero__caption">
             <div class="flex-row-between flex-col-sm">
-              <div class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2">
+              <div
+                class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
+              >
                 {{ vm().activeCopy.heading }}
               </div>
 
               <p-button
                 class="mg-hero__caption-btn"
                 [label]="vm().activeCopy.ctaLabel"
-                icon="pi pi-arrow-right"
+                icon="pi pi-direction-sign"
                 iconPos="right"
                 severity="primary"
                 size="small"
@@ -58,7 +62,11 @@
               [ariaLabel]="vm().aria.prev"
             />
 
-            <div class="flex-row-center" role="tablist" [attr.aria-label]="vm().aria.dots">
+            <div
+              class="flex-row-center gap-sm"
+              role="tablist"
+              [attr.aria-label]="vm().aria.dots"
+            >
               @for (s of vm().slides; track trackByIndex($index)) {
                 <button
                   type="button"
@@ -66,7 +74,9 @@
                   [class.is-active]="$index === vm().activeIndex"
                   (click)="goTo($index)"
                   [attr.aria-label]="dotAriaLabel(vm().aria.goToPrefix, $index)"
-                  [attr.aria-current]="$index === vm().activeIndex ? 'true' : null"
+                  [attr.aria-current]="
+                    $index === vm().activeIndex ? 'true' : null
+                  "
                 ></button>
               }
             </div>
@@ -85,7 +95,7 @@
       </div>
 
       <div class="flex-col-align-start h-100">
-        <header class="mg-section__header">
+        <header class="mg-section__header w-100">
           <h1 class="mg-section__title">{{ vm().activeCopy.heading }}</h1>
 
           <p class="mg-section__subtitle mg-hero__subtitle truncate-3">
@@ -95,7 +105,7 @@
 
         <div class="mg-hero__cta-grid">
           @for (s of vm().slides; track trackByCtaPath($index, s)) {
-            @let copy = (vm().copyList[$index]);
+            @let copy = vm().copyList[$index];
 
             <div
               class="mg-card mg-hero__cta"
@@ -105,7 +115,9 @@
               (keydown)="onCtaKeydown($event, s.ctaPath)"
               [attr.aria-label]="copy?.heading"
             >
-              <div class="mg-section__title mg-section__title--xs mg-section__title--no-margin">
+              <div
+                class="mg-section__title mg-section__title--xs mg-section__title--no-margin"
+              >
                 {{ copy?.heading }}
               </div>
 

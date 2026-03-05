@@ -3,9 +3,12 @@
     <!-- BRAND -->
     <a routerLink="/" class="mg-navbar__brand" aria-label="Strona główna">
       <img
-        [src]="brandLogoSrc()"
+        [ngSrc]="brandLogoSrc()"
+        width="135"
+        height="50"
         alt="Mistrzowie Gry"
         class="mg-navbar__logo"
+        priority
       />
     </a>
 
@@ -37,7 +40,9 @@
     <div class="mg-navbar__actions flex-row-start">
       <!-- Theme switch (desktop) -->
       <div class="mg-navbar__theme flex-row-start">
-        <span class="tag-badge tag-badge--muted"><i class="pi pi-moon-bats"></i></span>
+        <span class="tag-badge tag-badge--muted"
+          ><i class="pi pi-moon-bats"></i
+        ></span>
 
         <p-toggleswitch
           [ngModel]="theme.isLight()"
@@ -45,7 +50,9 @@
           ariaLabel="Przełącz motyw jasny/ciemny"
         ></p-toggleswitch>
 
-        <span class="tag-badge tag-badge--golden"><i class="pi pi-sun-eclipse"></i></span>
+        <span class="tag-badge tag-badge--golden"
+          ><i class="pi pi-sun-eclipse"></i
+        ></span>
       </div>
 
       <!-- Placeholders: profil / koszyk -->
@@ -112,7 +119,9 @@
 
       <!-- Theme switch (mobile) -->
       <div class="mg-mobile-theme-switch flex-row-start">
-        <span class="tag-badge tag-badge--muted"><i class="pi pi-moon"></i></span>
+        <span class="tag-badge tag-badge--muted"
+          ><i class="pi pi-moon"></i
+        ></span>
 
         <p-toggleswitch
           [ngModel]="theme.isLight()"
@@ -120,7 +129,9 @@
           ariaLabel="Przełącz motyw jasny/ciemny"
         ></p-toggleswitch>
 
-        <span class="tag-badge tag-badge--golden"><i class="pi pi-sun"></i></span>
+        <span class="tag-badge tag-badge--golden"
+          ><i class="pi pi-sun"></i
+        ></span>
       </div>
 
       <button

@@ -10,6 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { IMenu } from '../../../core/interfaces/i-menu';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +22,7 @@ import { IMenu } from '../../../core/interfaces/i-menu';
     PopoverModule,
     DrawerModule,
     ButtonModule,
+    NgOptimizedImage
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
