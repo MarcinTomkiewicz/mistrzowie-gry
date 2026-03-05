@@ -1,11 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { ToastModule } from 'primeng/toast';
-import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 
 import { Platform } from './core/services/platform/platform';
@@ -16,11 +10,6 @@ import { AppShell } from './public/components/app-shell/app-shell';
   selector: 'app-root',
   standalone: true,
   imports: [
-    FormsModule,
-    ButtonModule,
-    ToggleSwitchModule,
-    ToastModule,
-    DialogModule,
     AppShell
 ],
   templateUrl: './app.html',

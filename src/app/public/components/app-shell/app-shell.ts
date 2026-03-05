@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
-import { Navbar } from '../navbar/navbar';
 import { Footer } from '../footer/footer';
+import { Navbar } from '../navbar/navbar';
 
 @Component({
   selector: 'app-app-shell',

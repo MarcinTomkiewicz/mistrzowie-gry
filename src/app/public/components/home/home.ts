@@ -1,18 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { ToastModule } from 'primeng/toast';
-import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { Platform } from '../../../core/services/platform/platform';
 import { Seo } from '../../../core/services/seo/seo';
-import { SeoRichText } from './seo-rich-text/seo-rich-text';
-import { Programs } from './programs/programs';
-import { Problems } from './problems/problems';
 import { HeroCarousel } from './hero-carousel/hero-carousel';
+import { Problems } from './problems/problems';
+import { Programs } from './programs/programs';
+import { SeoRichText } from './seo-rich-text/seo-rich-text';
 
 @Component({
   selector: 'app-root',
@@ -22,15 +16,10 @@ import { HeroCarousel } from './hero-carousel/hero-carousel';
     Problems,
     Programs,
     SeoRichText,
-    FormsModule,
-    ButtonModule,
-    ToggleSwitchModule,
-    ToastModule,
-    DialogModule,
+    
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
-  providers: [MessageService],
 })
 export class Home {
   private readonly platform = inject(Platform);

@@ -1,16 +1,15 @@
-import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NgOptimizedImage } from '@angular/common';
 
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { DrawerModule } from 'primeng/drawer';
-import { ButtonModule } from 'primeng/button';
 
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { IMenu } from '../../../core/interfaces/i-menu';
-import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
@@ -21,8 +20,7 @@ import { NgOptimizedImage } from '@angular/common';
     ToggleSwitchModule,
     PopoverModule,
     DrawerModule,
-    ButtonModule,
-    NgOptimizedImage
+    NgOptimizedImage,
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
@@ -36,21 +34,15 @@ export class Navbar {
   readonly mobileOpen = signal(false);
   readonly activeDropdown = signal<IMenu | null>(null);
 
-  readonly activeChildren = computed<IMenu[]>(() => {
-    const a = this.activeDropdown();
-    return a?.children ?? [];
-  });
-
+  readonly activeChildren = computed(() => this.activeDropdown()?.children ?? []);
   readonly brandLogoSrc = this.theme.brandLogoSrc;
 
-  @ViewChild('navPopover') private readonly navPopover?: Popover;
+  private readonly navPopover = viewChild<Popover>('navPopover');
 
-  // ===== THEME =====
   onThemeToggle(nextLight: boolean): void {
     this.theme.set(nextLight ? 'light' : 'dark');
   }
 
-  // ===== DROPDOWN / MOBILE =====
   openDropdown(event: Event, item: IMenu): void {
     if (!item.children?.length) return;
 
@@ -60,11 +52,11 @@ export class Navbar {
     }
 
     this.activeDropdown.set(item);
-    this.navPopover?.show(event);
+    this.navPopover()?.show(event);
   }
 
   closeDropdown(): void {
-    this.navPopover?.hide();
+    this.navPopover()?.hide();
     this.activeDropdown.set(null);
   }
 
