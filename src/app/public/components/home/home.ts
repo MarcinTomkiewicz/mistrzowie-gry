@@ -43,15 +43,13 @@ export class Home {
    */
   readonly isLightTheme = signal(false);
 
-  /** Demo modal */
   readonly isDialogOpen = signal(false);
 
   constructor() {
-    // Global SEO fallback (App-level). Strony docelowo nadpisują to własnymi danymi.
     this.seo.apply({
-      title: 'Mistrzowie Gry',
+      title: 'Gry fabularne na wyciągnięcie ręki - Mistrzowie Gry',
       description:
-        'Mistrzowie Gry — centrum RPG, oferta, wydarzenia i społeczność.',
+        'Nie przejmuj się brakiem Mistrza Gry ani czytaniem podręczników. Organizujemy sesje RPG dla początkujących, prowadzimy gry fabularne, pomagamy zacząć grać i znaleźć drużynę.',
       og: {
         type: 'website',
       },
@@ -60,7 +58,6 @@ export class Home {
       },
     });
 
-    // SSR-safe theme init
     if (!this.platform.isBrowser) return;
 
     const doc = this.platform.document;

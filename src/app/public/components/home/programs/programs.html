@@ -7,17 +7,20 @@
 
     <div class="mg-programs__grid">
       @for (p of vm().programs; track trackById($index, p)) {
-        <article class="mg-card">
-          <h3 class="mg-section__title mg-section__title--sm">{{ p.title }}</h3>
-          <p>{{ p.intro }}</p>
-
+        <article class="mg-card flex-col-between-start h-100">
+          <div>
+            <h3 class="mg-section__title mg-section__title--sm">
+              {{ p.title }}
+            </h3>
+            <div class="mg-section__subtitle">{{ p.intro }}</div>
+          </div>
           <ul class="mg-programs__list">
             @for (b of p.bullets; track trackByBullet($index, b)) {
               <li>{{ b }}</li>
             }
           </ul>
 
-          <div class="flex-row-end">
+          <div class="align-self-end">
             <p-button
               [label]="p.ctaLabel"
               severity="warn"

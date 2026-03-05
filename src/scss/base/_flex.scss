@@ -4,7 +4,7 @@
 @use "../abstracts/mixins" as m;
 
 /* =========================================================
-   FLEX UTILITIES (legacy-style, but generated)
+   FLEX UTILITIES
    - bazowe klasy flex do używania w HTML
    ========================================================= */
 
@@ -17,13 +17,16 @@ $flex-presets: (
   "end": (flex-end, center),
   "around": (space-around, center),
   "evenly": (space-evenly, center),
+  "between-start": (space-between, flex-start),
+  "between-end": (space-between, flex-end),
 
   "align-start": (space-between, flex-start),
   "align-end": (space-between, flex-end),
   "align-stretch": (space-between, stretch),
   "align-baseline": (space-between, baseline),
 
-  "all-start": (flex-start, flex-start)
+  "all-start": (flex-start, flex-start),
+  "all-end": (flex-end, flex-end),
 );
 
 /* generator dla jednego kierunku */
@@ -45,7 +48,7 @@ $flex-presets: (
 @include _gen-flex-classes(column, "flex-col");
 
 /* =========================================================
-   RESPONSIVE HELPERS (najczęstsze z Twojego legacy)
+   RESPONSIVE HELPERS 
    ========================================================= */
 
 /* -sm */
@@ -92,4 +95,8 @@ $flex-presets: (
 
 .align-self-start {
   align-self: flex-start;
+}
+
+.align-self-end {
+  align-self: flex-end;
 }

@@ -51,9 +51,9 @@ export class HeroCarousel implements OnInit, OnDestroy {
       heading: '',
       text: '',
       ctaLabel: '',
-      ctaPath: '/offer/individual',
+      ctaPath: '/offer/oferta-indywidualna',
       imageSrc: 'hero/hero-1.png',
-      imageAlt: 'Sesja RPG prowadzona przy stole',
+      imageAlt: '',
     },
     {
       heading: '',
@@ -61,7 +61,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       ctaLabel: '',
       ctaPath: '/chaotic-thursdays',
       imageSrc: 'hero/hero-2.png',
-      imageAlt: 'Kostki RPG i notatki na stole',
+      imageAlt: '',
     },
     {
       heading: '',
@@ -69,15 +69,15 @@ export class HeroCarousel implements OnInit, OnDestroy {
       ctaLabel: '',
       ctaPath: '/join-the-party',
       imageSrc: 'hero/hero-3.png',
-      imageAlt: 'Grupa osób grających w RPG',
+      imageAlt: '',
     },
     {
       heading: '',
       text: '',
       ctaLabel: '',
-      ctaPath: '/offer/business',
+      ctaPath: '/offer/oferta-biznesowa',
       imageSrc: 'hero/hero-4.png',
-      imageAlt: 'Spotkanie zespołu przy stole',
+      imageAlt: '',
     },
   ]);
 
@@ -86,7 +86,28 @@ export class HeroCarousel implements OnInit, OnDestroy {
   private readonly active = computed(() => {
     const list = this.slides();
     const idx = this.activeIndex();
-    return list[Math.max(0, Math.min(idx, list.length - 1))];
+
+    if (!list.length) {
+      return {
+        heading: '',
+        text: '',
+        ctaLabel: '',
+        ctaPath: '',
+        imageSrc: '',
+        imageAlt: '',
+      };
+    }
+
+    return (
+      list[Math.max(0, Math.min(idx, list.length - 1))] ?? {
+        heading: '',
+        text: '',
+        ctaLabel: '',
+        ctaPath: '',
+        imageSrc: '',
+        imageAlt: '',
+      }
+    );
   });
 
   private intervalId: number | null = null;
@@ -105,21 +126,55 @@ export class HeroCarousel implements OnInit, OnDestroy {
   // i18n (signals)
   // ======================
 
-  private readonly ariaSectionLabel = translateSignal('heroCarousel.aria.sectionLabel', {}, { scope: 'home' });
-  private readonly ariaPrev = translateSignal('heroCarousel.aria.prev', {}, { scope: 'home' });
-  private readonly ariaNext = translateSignal('heroCarousel.aria.next', {}, { scope: 'home' });
-  private readonly ariaDots = translateSignal('heroCarousel.aria.dots', {}, { scope: 'home' });
-  private readonly ariaGoToPrefix = translateSignal('heroCarousel.aria.goToSlidePrefix', {}, { scope: 'home' });
+  private readonly ariaSectionLabel = translateSignal(
+    'heroCarousel.aria.sectionLabel',
+    {},
+    { scope: 'home' },
+  );
+  private readonly ariaPrev = translateSignal(
+    'heroCarousel.aria.prev',
+    {},
+    { scope: 'home' },
+  );
+  private readonly ariaNext = translateSignal(
+    'heroCarousel.aria.next',
+    {},
+    { scope: 'home' },
+  );
+  private readonly ariaDots = translateSignal(
+    'heroCarousel.aria.dots',
+    {},
+    { scope: 'home' },
+  );
+  private readonly ariaGoToPrefix = translateSignal(
+    'heroCarousel.aria.goToSlidePrefix',
+    {},
+    { scope: 'home' },
+  );
 
-  private readonly slidesCopyDict = translateObjectSignal('heroCarousel.slides', {}, { scope: 'home' });
+  private readonly slidesCopyDict = translateObjectSignal(
+    'heroCarousel.slides',
+    {},
+    { scope: 'home' },
+  );
 
-  private readonly slidesCopy = computed(() => {
-    return toSortedById<HeroSlideCopy>(this.slidesCopyDict()).map((x) => ({
-      id: Number((x as any)?.id ?? 0),
-      heading: String((x as any)?.heading ?? ''),
-      text: String((x as any)?.text ?? ''),
-      ctaLabel: String((x as any)?.ctaLabel ?? ''),
-    }));
+  private readonly slidesCopy = computed<HeroSlideCopy[]>(() => {
+    const dictList = toSortedById<HeroSlideCopy>(this.slidesCopyDict());
+    const byId = new Map<number, HeroSlideCopy>(
+      dictList.map((x: any) => [Number(x?.id ?? 0), x as any]),
+    );
+
+    return this.slides().map((_, i) => {
+      const id = i + 1;
+      const t = byId.get(id);
+
+      return {
+        id,
+        heading: String((t as any)?.heading ?? ''),
+        text: String((t as any)?.text ?? ''),
+        ctaLabel: String((t as any)?.ctaLabel ?? ''),
+      };
+    });
   });
 
   private readonly activeCopy = computed(() => {
@@ -144,7 +199,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
       activeCopy,
 
       aria: {
-        sectionLabel: this.ariaSectionLabel() || 'Sekcja startowa',
+        sectionLabel: this.ariaSectionLabel() || 'Wprowadzenie do usług RPG',
         prev: this.ariaPrev() || 'Poprzedni slajd',
         next: this.ariaNext() || 'Następny slajd',
         dots: this.ariaDots() || 'Wybór slajdu',

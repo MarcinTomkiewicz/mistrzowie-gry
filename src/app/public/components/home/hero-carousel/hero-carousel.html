@@ -20,8 +20,8 @@
           <a
             class="mg-hero__stretched-link"
             [routerLink]="vm().active.ctaPath"
-            [attr.aria-label]="(vm().activeCopy.ctaLabel || '') + ': ' + (vm().activeCopy.heading || '')"
-          ></a>
+            [attr.aria-label]="(vm().activeCopy.heading)"
+            ></a>
 
           <div class="mg-hero__overlay" aria-hidden="true"></div>
 
@@ -84,11 +84,11 @@
         </div>
       </div>
 
-      <div class="mg-hero__content">
+      <div class="flex-col-align-start h-100">
         <header class="mg-section__header">
           <h1 class="mg-section__title">{{ vm().activeCopy.heading }}</h1>
 
-          <p class="mg-section__subtitle mg-hero__subtitle truncate-2">
+          <p class="mg-section__subtitle mg-hero__subtitle truncate-3">
             {{ vm().activeCopy.text }}
           </p>
         </header>

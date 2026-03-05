@@ -10,50 +10,33 @@ import { Router } from '@angular/router';
 import { Platform } from '../platform/platform';
 import { ISeoConfig } from '../../interfaces/i-seo';
 
-/**
- * SEO service (SSR-friendly).
- *
- * Zasady:
- * - Title/Meta używamy zawsze (działa też w SSR).
- * - Canonical <link> ustawiamy tylko w przeglądarce (SSR i tak go zwykle wyrenderuje statycznie lub nie).
- *   Jeśli chcesz canonical w HTML SSR, trzeba to robić na poziomie renderera/Express. Na razie: DX + brak crashy.
- * - Serwis jest idempotentny: apply() może być wołane wielokrotnie.
- */
 @Injectable({ providedIn: 'root' })
 export class Seo {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
   private readonly router = inject(Router);
   private readonly platform = inject(Platform);
-  private readonly platformId = inject(PLATFORM_ID);
 
-  /** Trzymamy ostatnią konfigurację (pomocne w debug). */
   readonly last = signal<ISeoConfig | null>(null);
 
-  /** Bazowy tytuł serwisu (do suffixu). Ustaw raz w app config lub zostaw default. */
   private readonly siteName = 'Mistrzowie Gry';
 
-  /** Domyślny opis jeśli strona go nie poda. */
   private readonly defaultDescription =
-    'Mistrzowie Gry — centrum RPG, wydarzenia, oferta i społeczność.';
+    'Nie przejmuj się brakiem Mistrza Gry ani czytaniem podręczników. Organizujemy sesje RPG dla początkujących, prowadzimy gry fabularne, pomagamy zacząć grać i znaleźć drużynę.';
 
   apply(config: ISeoConfig): void {
     const normalized = this.normalize(config);
     this.last.set(normalized);
 
-    // --- TITLE (SSR-friendly)
     this.title.setTitle(normalized.title);
 
-    // --- META: description + robots
     this.setMetaName('description', normalized.description ?? this.defaultDescription);
     if (normalized.robots) {
       this.setMetaName('robots', normalized.robots);
     } else {
-      // jeśli nie podano, nie narzucamy nic (możesz dodać default, jeśli chcesz)
       this.removeMetaName('robots');
     }
 
-    // --- OpenGraph
     const og = normalized.og;
     if (og) {
       this.setMetaProperty('og:title', og.title ?? normalized.title);
@@ -69,7 +52,6 @@ export class Seo {
         this.setMetaProperty('og:site_name', og.siteName ?? this.siteName);
       }
 
-      // images: czyścimy stare i ustawiamy od nowa (PrimeNG/SEO lubi duplikaty)
       this.removeMetaProperty('og:image');
       this.removeMetaProperty('og:image:width');
       this.removeMetaProperty('og:image:height');
@@ -77,7 +59,6 @@ export class Seo {
       this.removeMetaProperty('og:image:type');
 
       if (og.images?.length) {
-        // OG spec: multiple og:image tags are allowed
         for (const img of og.images) {
           this.addMetaProperty('og:image', img.url);
           if (img.width) this.addMetaProperty('og:image:width', String(img.width));
@@ -86,12 +67,8 @@ export class Seo {
           if (img.type) this.addMetaProperty('og:image:type', img.type);
         }
       }
-    } else {
-      // jeśli nie podano OG, nie usuwamy globalnych (możesz chcieć mieć stałe OG na całej stronie)
-      // ale description/title i tak ustawione.
     }
 
-    // --- Twitter
     const tw = normalized.twitter;
     if (tw) {
       this.setMetaName('twitter:card', tw.card ?? 'summary');
@@ -104,27 +81,20 @@ export class Seo {
       } else {
         this.removeMetaName('twitter:image');
       }
-    } else {
-      // jw. — nie usuwamy na siłę
     }
 
-    // --- Canonical (browser only)
-    // Jeśli potrzebujesz canonical w SSR HTML, zrobimy to później w Express/renderer.
     const canonical = normalized.canonicalUrl ?? this.buildAbsoluteUrl();
     if (canonical) {
       this.setCanonical(canonical);
     }
   }
 
-  /** Minimalne czyszczenie gdy wychodzisz na stronę typu "noindex". */
   clear(): void {
     this.last.set(null);
     this.title.setTitle(this.siteName);
     this.removeMetaName('description');
     this.removeMetaName('robots');
   }
-
-  // ----------------- helpers -----------------
 
   private normalize(config: ISeoConfig): ISeoConfig {
     const title = config.title.includes(this.siteName)
@@ -173,11 +143,6 @@ export class Seo {
     link.setAttribute('href', url);
   }
 
-  /**
-   * Buduje absolute URL bez hardcodowania domeny.
-   * W przeglądarce używa window.location.origin.
-   * W SSR zwraca null (nie mamy request context).
-   */
   private buildAbsoluteUrl(): string | null {
     if (!this.platform.isBrowser) return null;
 
@@ -185,7 +150,6 @@ export class Seo {
     if (!loc) return null;
 
     const origin = loc.origin;
-    // router.url jest bez origin
     const path = this.router.url || '/';
     return `${origin}${path}`;
   }
