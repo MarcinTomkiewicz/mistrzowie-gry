@@ -1,37 +1,29 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  AfterRenderRef,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 
-import { MessageService } from 'primeng/api';
-
-import { Platform } from './core/services/platform/platform';
 import { Seo } from './core/services/seo/seo';
 import { AppShell } from './public/components/app-shell/app-shell';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    AppShell
-],
+  imports: [AppShell],
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  providers: [MessageService],
 })
 export class App {
-  private readonly platform = inject(Platform);
   private readonly seo = inject(Seo);
-  private readonly messages = inject(MessageService);
 
-  /**
-   * true => light (html[data-theme="light"])
-   * false => dark (domyślny, bez atrybutu)
-   */
+  private readonly afterRenderRef: AfterRenderRef;
+
   readonly isLightTheme = signal(false);
 
-  /** Demo modal */
-  readonly isDialogOpen = signal(false);
-
   constructor() {
-    // Global SEO fallback (App-level). Strony docelowo nadpisują to własnymi danymi.
     this.seo.apply({
       title: 'Gry fabularne na wyciągnięcie ręki - Mistrzowie Gry',
       description:
@@ -44,94 +36,34 @@ export class App {
       },
     });
 
-    // SSR-safe theme init
-    if (!this.platform.isBrowser) return;
+    this.afterRenderRef = afterNextRender(() => {
+      this.syncThemeFromDom();
+    });
+  }
 
-    const doc = this.platform.document;
-    if (!doc) return;
-
-    const root = doc.documentElement;
-    this.isLightTheme.set(root.getAttribute('data-theme') === 'light');
+  ngOnDestroy(): void {
+    this.afterRenderRef.destroy();
   }
 
   onThemeToggle(): void {
     this.applyTheme(this.isLightTheme() ? 'light' : 'dark');
   }
 
+  private syncThemeFromDom(): void {
+    const root = document.documentElement;
+    this.isLightTheme.set(root.getAttribute('data-theme') === 'light');
+  }
+
   private applyTheme(theme: 'dark' | 'light'): void {
-    if (!this.platform.isBrowser) return;
+    const root = document.documentElement;
 
-    const doc = this.platform.document;
-    if (!doc) return;
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      this.isLightTheme.set(true);
+      return;
+    }
 
-    const root = doc.documentElement;
-
-    if (theme === 'light') root.setAttribute('data-theme', 'light');
-    else root.removeAttribute('data-theme');
-  }
-
-  // === Toast triggers (MG semantics) ===
-
-  toastInfo(): void {
-    this.messages.add({
-      severity: 'info',
-      summary: 'Info',
-      detail: 'To jest toast info (mg-color-info).',
-      life: 3500,
-      styleClass: 'mg-toast mg-toast--info',
-    });
-  }
-
-  toastSuccess(): void {
-    this.messages.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'To jest toast success (mg-color-success).',
-      life: 3500,
-      styleClass: 'mg-toast mg-toast--success',
-    });
-  }
-
-  toastDanger(): void {
-    this.messages.add({
-      severity: 'error',
-      summary: 'Danger',
-      detail: 'To jest toast danger (mg-color-danger).',
-      life: 3500,
-      styleClass: 'mg-toast mg-toast--danger',
-    });
-  }
-
-  toastArcane(): void {
-    // RULE: warn = arcane (Twoja decyzja)
-    this.messages.add({
-      severity: 'warn',
-      summary: 'Arcane',
-      detail: 'To jest toast arcane (mg-color-arcane).',
-      life: 3500,
-      styleClass: 'mg-toast mg-toast--arcane',
-    });
-  }
-
-  // === Dialog demo ===
-
-  openDialog(): void {
-    this.isDialogOpen.set(true);
-  }
-
-  closeDialog(): void {
-    this.isDialogOpen.set(false);
-  }
-
-  confirmDialog(): void {
-    this.messages.add({
-      severity: 'success',
-      summary: 'Zatwierdzone',
-      detail: 'Kliknięto „Potwierdź” w modalu.',
-      life: 2500,
-      styleClass: 'mg-toast mg-toast--success',
-    });
-
-    this.closeDialog();
+    root.removeAttribute('data-theme');
+    this.isLightTheme.set(false);
   }
 }

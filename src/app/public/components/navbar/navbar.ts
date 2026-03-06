@@ -10,16 +10,16 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { IMenu } from '../../../core/interfaces/i-menu';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
+import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
     RouterModule,
-    FormsModule,
-    ToggleSwitchModule,
     PopoverModule,
     DrawerModule,
+    ThemeSwitch,
     NgOptimizedImage,
   ],
   templateUrl: './navbar.html',

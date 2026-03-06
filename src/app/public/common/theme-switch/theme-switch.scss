@@ -1,0 +1,25 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+:host {
+  display: inline-flex;
+}
+
+.mg-theme-switch {
+  gap: map.get(v.$spacings, "sm");
+  align-items: center;
+}
+
+:host(.mg-navbar__theme) {
+  @include m.down("sm") {
+    display: none;
+  }
+}
+
+:host(.mg-mobile-theme-switch) {
+  .tag-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+}

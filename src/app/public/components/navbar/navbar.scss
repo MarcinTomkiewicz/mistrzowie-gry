@@ -118,14 +118,6 @@
   gap: map.get(v.$spacings, "md");
 }
 
-.mg-navbar__theme {
-  gap: map.get(v.$spacings, "sm");
-
-  @include m.down("sm") {
-    display: none;
-  }
-}
-
 .mg-navbar__slots {
   gap: map.get(v.$spacings, "xs");
 
@@ -162,13 +154,12 @@
 .mg-navbar__burger {
   display: none;
 
-  @include m.down("md") {
+  @include m.down("sm") {
     display: inline-flex;
   }
 }
 
 /* ============ POPOVER MENU CONTENT ============ */
-/* UWAGA: hover przeniesiony do vendors/_p-popover.scss, bo to overlay Prime. */
 
 .mg-popover-menu {
   list-style: none;
@@ -181,19 +172,6 @@
 
 .mg-popover-menu__item {
   display: block;
-}
-
-.mg-popover-menu__link {
-  display: block;
-  padding: 0.55rem 0.7rem;
-  border-radius: v.$radius-sm;
-  text-decoration: none;
-  color: v.$color-text;
-  transition: background-color v.$transition-fast, color v.$transition-fast;
-
-  &:focus-visible {
-    outline: 0;
-  }
 }
 
 /* ============ DRAWER CONTENT ============ */
@@ -210,16 +188,6 @@
 .mg-mobile-drawer__title {
   font-family: v.$font-family-display;
   font-size: map.get(v.$font-sizes, "lg");
-}
-
-.mg-mobile-theme-switch {
-  gap: 0.5rem;
-  align-items: center;
-
-  .tag-badge {
-    font-size: 0.7rem;
-    padding: 0.15rem 0.4rem;
-  }
 }
 
 .mg-mobile-menu {

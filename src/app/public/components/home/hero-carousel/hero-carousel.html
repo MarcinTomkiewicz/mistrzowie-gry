@@ -22,7 +22,7 @@
           <a
             class="mg-hero__stretched-link"
             [routerLink]="vm().active.ctaPath"
-            [attr.aria-label]="vm().activeCopy.heading"
+            [attr.aria-label]="vm().activeCopy.heading || null"
           ></a>
 
           <div class="mg-hero__overlay" aria-hidden="true"></div>
@@ -37,7 +37,7 @@
 
               <p-button
                 class="mg-hero__caption-btn"
-                [label]="vm().activeCopy.ctaLabel"
+                [label]="vm().activeCopy.ctaLabel || ''"
                 icon="pi pi-direction-sign"
                 iconPos="right"
                 severity="primary"
@@ -113,7 +113,7 @@
               tabindex="0"
               (click)="onCtaNavigate(s.ctaPath)"
               (keydown)="onCtaKeydown($event, s.ctaPath)"
-              [attr.aria-label]="copy?.heading"
+              [attr.aria-label]="copy?.heading || null"
             >
               <div
                 class="mg-section__title mg-section__title--xs mg-section__title--no-margin"

@@ -1,0 +1,15 @@
+<div class="mg-theme-switch flex-row-start">
+  <span class="tag-badge tag-badge--muted">
+    <i class="pi pi-moon-bats"></i>
+  </span>
+
+  <p-toggleswitch
+    [ngModel]="theme.isLight()"
+    (onChange)="onToggle($event.checked)"
+    ariaLabel="Przełącz motyw jasny/ciemny"
+  ></p-toggleswitch>
+
+  <span class="tag-badge tag-badge--golden">
+    <i class="pi pi-sun-eclipse"></i>
+  </span>
+</div>

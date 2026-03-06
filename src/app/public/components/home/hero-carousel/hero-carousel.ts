@@ -1,24 +1,24 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
+  AfterRenderRef,
   Component,
   OnDestroy,
-  OnInit,
   computed,
   inject,
   signal,
+  afterNextRender,
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 
 import {
-  provideTranslocoScope,
   TranslocoService,
+  provideTranslocoScope,
   translateObjectSignal,
   translateSignal,
 } from '@jsverse/transloco';
 
-import { Platform } from '../../../../core/services/platform/platform';
 import { IHeroSlide } from '../../../../core/interfaces/home/i-hero-slide';
 import { dictToSortedArray } from '../../../../core/utils/dict-to-sorted-array';
 
@@ -30,7 +30,9 @@ type HeroSlideCopy = {
 };
 
 function toSortedById<T>(dict: unknown): T[] {
-  return dictToSortedArray<T>(dict as any, (x) => Number((x as any)?.id ?? 0));
+  return dictToSortedArray<T>(dict as never, (x) =>
+    Number((x as { id?: number })?.id ?? 0),
+  );
 }
 
 @Component({
@@ -41,8 +43,7 @@ function toSortedById<T>(dict: unknown): T[] {
   styleUrl: './hero-carousel.scss',
   providers: [provideTranslocoScope('home')],
 })
-export class HeroCarousel implements OnInit, OnDestroy {
-  private readonly platform = inject(Platform);
+export class HeroCarousel implements OnDestroy {
   private readonly router = inject(Router);
   private readonly transloco = inject(TranslocoService);
 
@@ -112,13 +113,18 @@ export class HeroCarousel implements OnInit, OnDestroy {
 
   private intervalId: number | null = null;
   private userPaused = false;
+  private readonly afterRenderRef: AfterRenderRef;
 
-  ngOnInit(): void {
+  constructor() {
     this.transloco.setActiveLang('pl');
-    this.tryStartAutoplay();
+
+    this.afterRenderRef = afterNextRender(() => {
+      this.tryStartAutoplay();
+    });
   }
 
   ngOnDestroy(): void {
+    this.afterRenderRef.destroy();
     this.stopAutoplay();
   }
 
@@ -131,21 +137,25 @@ export class HeroCarousel implements OnInit, OnDestroy {
     {},
     { scope: 'home' },
   );
+
   private readonly ariaPrev = translateSignal(
     'heroCarousel.aria.prev',
     {},
     { scope: 'home' },
   );
+
   private readonly ariaNext = translateSignal(
     'heroCarousel.aria.next',
     {},
     { scope: 'home' },
   );
+
   private readonly ariaDots = translateSignal(
     'heroCarousel.aria.dots',
     {},
     { scope: 'home' },
   );
+
   private readonly ariaGoToPrefix = translateSignal(
     'heroCarousel.aria.goToSlidePrefix',
     {},
@@ -161,7 +171,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
   private readonly slidesCopy = computed<HeroSlideCopy[]>(() => {
     const dictList = toSortedById<HeroSlideCopy>(this.slidesCopyDict());
     const byId = new Map<number, HeroSlideCopy>(
-      dictList.map((x: any) => [Number(x?.id ?? 0), x as any]),
+      dictList.map((x) => [Number(x.id ?? 0), x]),
     );
 
     return this.slides().map((_, i) => {
@@ -170,9 +180,9 @@ export class HeroCarousel implements OnInit, OnDestroy {
 
       return {
         id,
-        heading: String((t as any)?.heading ?? ''),
-        text: String((t as any)?.text ?? ''),
-        ctaLabel: String((t as any)?.ctaLabel ?? ''),
+        heading: String(t?.heading ?? ''),
+        text: String(t?.text ?? ''),
+        ctaLabel: String(t?.ctaLabel ?? ''),
       };
     });
   });
@@ -180,24 +190,26 @@ export class HeroCarousel implements OnInit, OnDestroy {
   private readonly activeCopy = computed(() => {
     const list = this.slidesCopy();
     const idx = this.activeIndex();
+
     return list[Math.max(0, Math.min(idx, list.length - 1))] ?? null;
   });
 
   // ======================
   // VM (single access point)
   // ======================
+
   readonly vm = computed(() => {
     const slides = this.slides();
     const copyList = this.slidesCopy();
     const active = this.active();
     const activeCopy = this.activeCopy();
+    const activeIndex = this.activeIndex();
 
     return {
       slides,
       copyList,
       active,
       activeCopy,
-
       aria: {
         sectionLabel: this.ariaSectionLabel() || 'Wprowadzenie do usług RPG',
         prev: this.ariaPrev() || 'Poprzedni slajd',
@@ -205,9 +217,8 @@ export class HeroCarousel implements OnInit, OnDestroy {
         dots: this.ariaDots() || 'Wybór slajdu',
         goToPrefix: this.ariaGoToPrefix() || 'Przejdź do slajdu',
       },
-
-      activeIndex: this.activeIndex(),
-      isFirstSlide: this.activeIndex() === 0,
+      activeIndex,
+      isFirstSlide: activeIndex === 0,
     };
   });
 
@@ -216,32 +227,24 @@ export class HeroCarousel implements OnInit, OnDestroy {
   // ======================
 
   private tryStartAutoplay(): void {
-    if (!this.platform.isBrowser) return;
-
-    const win = this.platform.window;
-    if (!win) return;
-
     const prefersReducedMotion =
-      win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+
     if (prefersReducedMotion) return;
-
     if (this.slides().length <= 1) return;
+    if (this.intervalId !== null) return;
 
-    this.intervalId = win.setInterval(() => {
+    this.intervalId = window.setInterval(() => {
       if (this.userPaused) return;
       this.next();
     }, 10_000);
   }
 
   private stopAutoplay(): void {
-    if (!this.platform.isBrowser) return;
-    const win = this.platform.window;
-    if (!win) return;
+    if (this.intervalId === null) return;
 
-    if (this.intervalId !== null) {
-      win.clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
+    window.clearInterval(this.intervalId);
+    this.intervalId = null;
   }
 
   onMouseEnter(): void {
@@ -266,21 +269,26 @@ export class HeroCarousel implements OnInit, OnDestroy {
 
   prev(): void {
     this.userPaused = true;
+
     const len = this.slides().length;
     if (!len) return;
+
     this.activeIndex.set((this.activeIndex() - 1 + len) % len);
   }
 
   next(): void {
     const len = this.slides().length;
     if (!len) return;
+
     this.activeIndex.set((this.activeIndex() + 1) % len);
   }
 
   goTo(index: number): void {
     this.userPaused = true;
+
     const len = this.slides().length;
     if (!len) return;
+
     this.activeIndex.set(Math.max(0, Math.min(index, len - 1)));
   }
 
@@ -289,7 +297,7 @@ export class HeroCarousel implements OnInit, OnDestroy {
   // ======================
 
   onCtaNavigate(path: string): void {
-    this.router.navigateByUrl(path);
+    void this.router.navigateByUrl(path);
   }
 
   onCtaKeydown(event: KeyboardEvent, path: string): void {
@@ -305,8 +313,9 @@ export class HeroCarousel implements OnInit, OnDestroy {
     }
   }
 
-  trackByIndex = (i: number) => i;
-  trackByCtaPath = (_: number, item: IHeroSlide) => item.ctaPath;
+  trackByIndex = (i: number): number => i;
+
+  trackByCtaPath = (_: number, item: IHeroSlide): string => item.ctaPath;
 
   dotAriaLabel(goToSlidePrefix: string, index: number): string {
     return `${goToSlidePrefix} ${index + 1}`;
