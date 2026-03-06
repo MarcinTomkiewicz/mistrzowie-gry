@@ -38,6 +38,10 @@ $custom-icons: (
   "moon-bats": "moon-bats.svg",
   "sun-eclipse": "eclipse-flare.svg",
   "direction-sign": "direction-sign.svg",
+  "teacher": "teacher.svg",
+  "read": "read.svg",
+  "uprising": "uprising.svg",
+  "evil-book": "evil-book.svg",
 );
 
 @each $name, $file in $custom-icons {

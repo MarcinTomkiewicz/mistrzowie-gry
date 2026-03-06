@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -37,7 +36,7 @@ type UiProblemCard = IProblemCard & { id: number };
 @Component({
   selector: 'app-problems',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule],
+  imports: [RouterModule, ButtonModule],
   templateUrl: './problems.html',
   styleUrl: './problems.scss',
   providers: [provideTranslocoScope('home'), provideTranslocoScope('common')],
@@ -45,10 +44,10 @@ type UiProblemCard = IProblemCard & { id: number };
 export class Problems {
   // developer-owned (routing/icons + which common CTA label to use)
   private readonly tech: ProblemCardTech[] = [
-    { id: 1, ctaPath: '/join-the-party', icon: 'pi pi-users', ctaKey: 'joinProgram' },
-    { id: 2, ctaPath: '/offer/individual', icon: 'pi pi-user-edit', ctaKey: 'offerIndividual' },
-    { id: 3, ctaPath: '/chaotic-thursdays', icon: 'pi pi-calendar', ctaKey: 'chaoticThursdays' },
-    { id: 4, ctaPath: '/offer/business', icon: 'pi pi-building', ctaKey: 'offerBusiness' },
+    { id: 1, ctaPath: '/join-the-party', icon: 'pi pi-uprising', ctaKey: 'joinProgram' },
+    { id: 2, ctaPath: '/offer/oferta-indywidualna', icon: 'pi pi-read', ctaKey: 'offerIndividual' },
+    { id: 3, ctaPath: '/chaotic-thursdays', icon: 'pi pi-evil-book', ctaKey: 'chaoticThursdays' },
+    { id: 4, ctaPath: '/offer/oferta-biznesowa', icon: 'pi pi-teacher', ctaKey: 'offerBusiness' },
   ];
 
   // copywriter-owned (home.json)

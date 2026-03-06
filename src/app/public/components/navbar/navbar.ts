@@ -1,15 +1,15 @@
-import { Component, ViewChild, computed, inject, signal, viewChild } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { NgOptimizedImage } from '@angular/common';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { Popover, PopoverModule } from 'primeng/popover';
 import { DrawerModule } from 'primeng/drawer';
+import { Popover, PopoverModule } from 'primeng/popover';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
+import { IMenu } from '../../../core/interfaces/i-menu';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
-import { IMenu } from '../../../core/interfaces/i-menu';
 
 @Component({
   selector: 'app-navbar',

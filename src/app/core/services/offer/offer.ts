@@ -1,9 +1,9 @@
-import { Injectable, inject } from '@angular/core';
-import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable, of, switchMap } from 'rxjs';
 
-import { Backend } from '../backend/backend';
-import { OfferItem, OfferPage, OfferPageSection, OfferPageVm, OfferSectionItem } from '../../types/offers';
 import { FilterOperator } from '../../enums/filter-operators';
+import { OfferItem, OfferPage, OfferPageSection, OfferPageVm, OfferSectionItem } from '../../types/offers';
+import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
 export class Offer {

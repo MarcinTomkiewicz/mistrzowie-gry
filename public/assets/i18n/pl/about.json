@@ -1,55 +1,55 @@
 {
   "seo": {
-    "title": "[PH] about.seo.title — O nas",
-    "description": "[PH] about.seo.description — Mistrzowie Gry to zespół, który projektuje i prowadzi doświadczenia RPG."
+    "title": "O nas - Mistrzowie Gry",
+    "description": "Jesteśmy Mistrzami Gry. Projektujemy doświadczenia gier fabularnych dla grup prywatnych, firm i instytucji. Poprzez realizację sesji RPG, organizujemy i dostarczamy kompletne rozwiązania."
   },
   "hero": {
-    "title": "about.hero.title",
-    "subtitle": "[PH] about.hero.subtitle — Mistrzowie Gry to projekt usługowy w obszarze RPG. Nie sprzedajemy “godzin MG” — projektujemy i realizujemy doświadczenia: dla osób, grup i organizacji."
+    "title": "Poznajmy się lepiej",
+    "subtitle": "Jesteśmy Mistrzami Gry. Tak jak w grach fabularnych, chcemy zaprojektować i prowadzić dla Ciebie pełne doświadczenie RPG. Nie jesteśmy \"Mistrzami Gry do wynajęcia\". Kim więc jesteśmy?"
   },
   "sections": {
     "section-1": {
       "id": 1,
-      "title": "about.sections.1.title",
+      "title": "Wsparcie dla graczy",
       "paragraphs": {
-        "1": "[PH] about.sections.1.p1 — Pomagamy ludziom wejść w RPG i grać regularnie — bez chaosu organizacyjnego, bez polowania na prowadzącego i bez poczucia, że “trzeba wszystko umieć na start”. Dobieramy formę sesji, styl prowadzenia i poziom złożoności do konkretnej grupy."
+        "1": "Naszym celem jest ułatwienie wejścia i wprowadzenie graczy do świata gier fabularnych. Zależy nam także na osobach, które od dawna grają w RPG - wspieramy te osoby w dostępie do prowadzących, pomagamy planować kampanie i uprawiać hobby w sposób ciągły i przewidywalny. Dla firm i organizacji przygotowujemy programy, które stanowią naturalne rozszerzenie oferty integracyjnej, rozwijającej umiejętności społeczne, kreatywność członków zespołu albo grup wychowawczych. Z kolei nasze propozycje imprezowe stanowią atrakcyjną odmianę dla innych, tradycyjnie wybieranych form aktywności."
       }
     },
     "section-2": {
       "id": 2,
-      "title": "about.sections.2.title",
+      "title": "Standardy, bezpieczeństwo, odpowiedzialność",
       "paragraphs": {
-        "1": "[PH] about.sections.2.p1 — Fundamentem projektu są standardy: przygotowanie prowadzącego, jasne zasady stołu, komunikacja z grupą oraz dbałość o tempo, czytelność i komfort grania. To jest obszar, który docelowo będziesz mógł przeczytać i zweryfikować — nie “marketingowe zapewnienie”, tylko konkretne reguły pracy."
+        "1": "W naszych działaniach opieramy się na trzech filarach. Każdy z naszych prowadzących jest zobowiązany do przestrzegania standardów prowadzenia sesji RPG jako pełnego doświadczenia. Zarazem bardzo dużą wagę przykładamy do bezpieczeństwa uczestników rozgrywki - zarówno organizacyjnego jak i emocjonalnego. Bierzemy też pełną odpowiedzialność za współpracę. Obejmuje to nie tylko samo przygotowanie Twojego doświadczenia, ale jego realizację oraz reakcję na problemy i zdarzenia w trakcie."
       }
     }
   },
   "cards": {
     "card-1": {
       "id": 1,
-      "title": "about.cards.1.title",
+      "title": "Mistrzowie Gry, których znasz i którym ufasz",
       "paragraphs": {
-        "1": "[PH] about.cards.1.p1 — Pracujemy z prowadzącymi, których znamy i weryfikujemy. Standard dotyczy zarówno warsztatu (prowadzenie scen, praca z grupą), jak i organizacji (terminy, przygotowanie, komunikacja)."
+        "1": "Pracujemy z doświadczonymi osobami prowadzącymi, które weryfikujemy pod kątem doświadczenia, umiejętności i zdolności pracy z grupą przed rozpoczęciem współpracy. Każda Mistrzyni Gry i każdy Mistrz Gry są zobowiązani do przestrzegania standardów, dbania o komfort uczestników rozgrywki i odpowiedzialności za prawidłowy jej przebieg."
       }
     },
     "card-2": {
       "id": 2,
-      "title": "about.cards.2.title",
+      "title": "Bezpieczeństwo w Twoim domu",
       "paragraphs": {
-        "1": "[PH] about.cards.2.p1 — Jeśli zapraszasz prowadzącego do domu lub organizujesz sesję dla grupy, chcesz wiedzieć, z kim pracujesz. Jesteśmy podmiotem, który bierze odpowiedzialność za współpracę i jej standard — nie “losową osobą z internetu”."
+        "1": "Jeśli decydujesz się na sesję w domu, w miejscu prywatnym, w firmie czy szkole, masz pewność, że zapraszasz do siebie osobę sprawdzoną, zweryfikowaną oraz odpowiedzialną. Każda z osób prowadzących posiada odpowiednie umiejętności i doświadczenie, aby realizować usługę o określonym standardzie. Prowadzimy Twoje doświadczenie w sposób profesjonalny i planowany, ale nie ograniczamy kreatywności naszych prowadzących."
       }
     },
     "card-3": {
       "id": 3,
-      "title": "about.cards.3.title",
+      "title": "Reagujemy na potrzeby i problemy",
       "paragraphs": {
-        "1": "[PH] about.cards.3.p1 — Inaczej wygląda sesja dla nowej grupy, inaczej wydarzenie otwarte, inaczej realizacja dla firmy. Projektujemy format pod cele, ograniczenia i doświadczenie uczestników."
+        "1": "Każda grupa jest wyjątkowa i jej potrzeby się różnią od innych drużyn. Dlatego do każdej ekipy podchodzimy indywidualnie, a nasze rozwiązania dostosowujemy do potrzeb i oczekiwań. Reagujemy na problemy, które mogą się pojawić w trakcie rozgrywki, a jeśli nie jesteśmy w stanie ich rozwiązać na bieżąco, bierzemy pełną odpowiedzialność za łagodzenie ich skutków. Nie jesteśmy w stanie zapobiec wszystkiemu, ale dokładamy starań, żeby problemy były jak najmniej odczuwalne."
       }
     },
     "card-4": {
       "id": 4,
-      "title": "about.cards.4.title",
+      "title": "Przygoda, która staje się kampanią",
       "paragraphs": {
-        "1": "[PH] about.cards.4.p1 — Naszym celem jest budowanie stałych grup i długofalowych relacji. To wpływa na ofertę, komunikację i na to, jak prowadzimy sesje."
+        "1": "Chcemy budować dla Ciebie doświadczenie, które nie zakończy się na jednym spotkaniu. Każde spotkanie z nami może być zamkniętą całością, ale jednocześnie zostawiamy Ci możliwość kontynuowania doświadczenia. Nasza oferta składa się nie tylko z pojedynczych doświadczeń, ale też z pakietów spotkań oraz abonamentów na regularne spotkania. Także nasza oferta dla firm i instytucji zakłada organizowanie regularnych spotkań tak, aby gry fabularne nie były tylko jednorazowym doświadczeniem."
       }
     }
   }

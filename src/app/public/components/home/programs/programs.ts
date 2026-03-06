@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -36,7 +35,7 @@ type UiProgramCard = IProgramCard & { id: number };
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule],
+  imports: [RouterModule, ButtonModule],
   templateUrl: './programs.html',
   styleUrl: './programs.scss',
   providers: [provideTranslocoScope('home'), provideTranslocoScope('common')],

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed } from '@angular/core';
 
 import {
@@ -37,7 +36,7 @@ type UiSeoTextColumn = {
 @Component({
   selector: 'app-seo-rich-text',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './seo-rich-text.html',
   styleUrl: './seo-rich-text.scss',
   providers: [provideTranslocoScope('home')],

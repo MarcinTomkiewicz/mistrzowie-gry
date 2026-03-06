@@ -23,4 +23,7 @@
     margin-top: $value !important;
     margin-bottom: $value !important;
   }
+  .m-#{$name} {
+    margin: $value !important;
+  }
 }

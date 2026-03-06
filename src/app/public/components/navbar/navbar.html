@@ -112,68 +112,69 @@
   position="right"
   styleClass="mg-drawer"
   (onHide)="closeMobile()"
->
-  <div class="mg-mobile-drawer">
-    <div class="mg-mobile-drawer__head flex-row-between">
-      <div class="mg-mobile-drawer__title">Menu</div>
+  [closable]="false"
+  ><ng-template #headless>
+    <div class="mg-mobile-drawer m-sm">
+      <div class="mg-mobile-drawer__head flex-row-between">
+        <div class="mg-mobile-drawer__title">Menu</div>
 
-      <!-- Theme switch (mobile) -->
-      <div class="mg-mobile-theme-switch flex-row-start">
-        <span class="tag-badge tag-badge--muted"
-          ><i class="pi pi-moon"></i
-        ></span>
+        <div class="mg-mobile-theme-switch flex-row-start">
+          <span class="tag-badge tag-badge--muted"
+            ><i class="pi pi-moon"></i
+          ></span>
 
-        <p-toggleswitch
-          [ngModel]="theme.isLight()"
-          (onChange)="onThemeToggle($event.checked)"
-          ariaLabel="Przełącz motyw jasny/ciemny"
-        ></p-toggleswitch>
+          <p-toggleswitch
+            [ngModel]="theme.isLight()"
+            (onChange)="onThemeToggle($event.checked)"
+            ariaLabel="Przełącz motyw jasny/ciemny"
+          ></p-toggleswitch>
 
-        <span class="tag-badge tag-badge--golden"
-          ><i class="pi pi-sun"></i
-        ></span>
+          <span class="tag-badge tag-badge--golden"
+            ><i class="pi pi-sun"></i
+          ></span>
+        </div>
+
+        <button
+          type="button"
+          class="mg-icon-btn mg-icon-btn--flat"
+          (click)="closeMobile()"
+          aria-label="Zamknij"
+        >
+          <i class="pi pi-times"></i>
+        </button>
       </div>
 
-      <button
-        type="button"
-        class="mg-icon-btn mg-icon-btn--flat"
-        (click)="closeMobile()"
-        aria-label="Zamknij"
-      >
-        <i class="pi pi-times"></i>
-      </button>
+      <ul class="mg-mobile-menu">
+        @for (item of menu(); track item.label) {
+          <li class="mg-mobile-menu__item">
+            @if (!item.children?.length) {
+              <a
+                class="mg-mobile-menu__link"
+                [routerLink]="item.path"
+                (click)="onMobileNavigate()"
+              >
+                {{ item.label }}
+              </a>
+            } @else {
+              <div class="mg-mobile-menu__group">{{ item.label }}</div>
+
+              <ul class="mg-mobile-menu__sub">
+                @for (child of item.children; track child.label) {
+                  <li class="mg-mobile-menu__sub-item">
+                    <a
+                      class="mg-mobile-menu__link"
+                      [routerLink]="child.path"
+                      (click)="onMobileNavigate()"
+                    >
+                      {{ child.label }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
     </div>
-
-    <ul class="mg-mobile-menu">
-      @for (item of menu(); track item.label) {
-        <li class="mg-mobile-menu__item">
-          @if (!item.children?.length) {
-            <a
-              class="mg-mobile-menu__link"
-              [routerLink]="item.path"
-              (click)="onMobileNavigate()"
-            >
-              {{ item.label }}
-            </a>
-          } @else {
-            <div class="mg-mobile-menu__group">{{ item.label }}</div>
-
-            <ul class="mg-mobile-menu__sub">
-              @for (child of item.children; track child.label) {
-                <li class="mg-mobile-menu__sub-item">
-                  <a
-                    class="mg-mobile-menu__link"
-                    [routerLink]="child.path"
-                    (click)="onMobileNavigate()"
-                  >
-                    {{ child.label }}
-                  </a>
-                </li>
-              }
-            </ul>
-          }
-        </li>
-      }
-    </ul>
-  </div>
+  </ng-template>
 </p-drawer>

@@ -1,14 +1,12 @@
-import { isPlatformServer } from '@angular/common';
 import {
   Injectable,
-  PLATFORM_ID,
   inject,
-  signal,
+  signal
 } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { Platform } from '../platform/platform';
 import { ISeoConfig } from '../../interfaces/i-seo';
+import { Platform } from '../platform/platform';
 
 @Injectable({ providedIn: 'root' })
 export class Seo {
