@@ -1,0 +1,17 @@
+{
+  "footer": {
+    "brandAlt": "Mistrzowie Gry",
+    "description": "Centrum gier fabularnych w sercu Poznania. Miejsce, gdzie historie tworzy się przy stole, a legendy pisze się kostkami.",
+    "shortcutTitle": "Na skróty",
+    "contactTitle": "Kontakt",
+    "socialAriaLabel": "Social media",
+    "legalAriaLabel": "Informacje prawne",
+    "phoneLabel": "Telefon",
+    "phoneValue": "+48 000 000 000",
+    "phoneHref": "tel:+48000000000",
+    "emailLabel": "Email",
+    "emailValue": "kontakt@twoja-domena.pl",
+    "emailHref": "mailto:kontakt@twoja-domena.pl",
+    "copyrightSuffix": "Wszystkie prawa zastrzeżone."
+  }
+}

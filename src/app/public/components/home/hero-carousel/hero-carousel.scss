@@ -124,4 +124,8 @@
     outline: 2px solid color-mix(in srgb, v.$color-secondary 75%, transparent);
     outline-offset: 2px;
   }
+
+  & p {
+    min-height: 4.5rem;
+  }
 }

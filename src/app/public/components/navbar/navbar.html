@@ -1,5 +1,5 @@
 <nav class="mg-navbar">
-  <div class="mg-navbar__inner flex-row-between">
+  <div class="mg-navbar__inner flex-row-between-center">
     <a routerLink="/" class="mg-navbar__brand" aria-label="Strona główna">
       <img
         [ngSrc]="brandLogoSrc()"
@@ -34,10 +34,10 @@
       }
     </ul>
 
-    <div class="mg-navbar__actions flex-row-start">
+    <div class="mg-navbar__actions flex-row-start-center">
       <app-theme-switch class="mg-navbar__theme"></app-theme-switch>
 
-      <div class="mg-navbar__slots flex-row-start">
+      <div class="mg-navbar__slots flex-row-start-center">
         <button
           type="button"
           class="mg-icon-btn"
@@ -94,7 +94,7 @@
 >
   <ng-template #headless>
     <div class="mg-mobile-drawer m-sm">
-      <div class="mg-mobile-drawer__head flex-row-between">
+      <div class="mg-mobile-drawer__head flex-row-between-center">
         <div class="mg-mobile-drawer__title">Menu</div>
 
         <app-theme-switch class="mg-mobile-theme-switch"></app-theme-switch>

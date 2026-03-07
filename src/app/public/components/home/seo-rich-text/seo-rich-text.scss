@@ -1,12 +1,16 @@
-@use "sass:map";
 @use "abstracts/variables" as v;
 @use "abstracts/mixins" as m;
-
-.mg-seo-text__cols {
-  gap: map.get(v.$spacings, "xl");
-}
 
 .mg-seo-text__col {
   flex: 1 1 0;
   min-width: 240px;
+}
+
+.mg-seo-text__col p {
+  text-align: justify;
+  hyphens: auto;
+
+  @include m.down("xs") {
+    text-align: left;
+  }
 }

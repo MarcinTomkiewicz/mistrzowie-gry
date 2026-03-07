@@ -2,18 +2,35 @@
 @use "../abstracts/variables" as v;
 
 /* =========================================================
-   SPACING UTILITIES (generowane na podstawie $spacings)
-   - .m{t|b|l|r|x|y}-{size}
+   SPACING UTILITIES
+   - margin:  .m{t|b|l|r|x|y}-{size}
+   - padding: .p{t|b|l|r|x|y}-{size}
+   - size:
+   -   margin  => 0 | auto | values from $spacings
+   -   padding => 0 | values from $spacings
    ========================================================= */
 
-@each $name, $value in v.$spacings {
-  /* single sides */
+$margin-values: map.merge(
+  (
+    0: 0,
+    auto: auto,
+  ),
+  v.$spacings
+);
+
+$padding-values: map.merge(
+  (
+    0: 0,
+  ),
+  v.$spacings
+);
+
+@each $name, $value in $margin-values {
   .mt-#{$name} { margin-top: $value !important; }
   .mb-#{$name} { margin-bottom: $value !important; }
   .ml-#{$name} { margin-left: $value !important; }
   .mr-#{$name} { margin-right: $value !important; }
 
-  /* axis */
   .mx-#{$name} {
     margin-left: $value !important;
     margin-right: $value !important;
@@ -23,7 +40,29 @@
     margin-top: $value !important;
     margin-bottom: $value !important;
   }
+
   .m-#{$name} {
     margin: $value !important;
+  }
+}
+
+@each $name, $value in $padding-values {
+  .pt-#{$name} { padding-top: $value !important; }
+  .pb-#{$name} { padding-bottom: $value !important; }
+  .pl-#{$name} { padding-left: $value !important; }
+  .pr-#{$name} { padding-right: $value !important; }
+
+  .px-#{$name} {
+    padding-left: $value !important;
+    padding-right: $value !important;
+  }
+
+  .py-#{$name} {
+    padding-top: $value !important;
+    padding-bottom: $value !important;
+  }
+
+  .p-#{$name} {
+    padding: $value !important;
   }
 }

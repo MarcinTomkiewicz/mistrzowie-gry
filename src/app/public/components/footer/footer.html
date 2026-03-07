@@ -1,21 +1,25 @@
-<footer class="mg-section mg-footer">
+<footer class="mg-section mg-footer mt-xxl">
   <div class="mg-container">
     <div class="mg-footer__grid">
-      <section class="flex-col-center">
+      <section class="flex-col-center-center">
         <img
-          class="mg-footer__logo"
-          [src]="footerImgSrc()"
-          alt="Mistrzowie Gry"
+          class="mg-footer__logo mb-md"
+          [ngSrc]="footerImgSrc()"
+          width="100"
+          height="100"
+          [alt]="i18n.brand().brandAlt"
           loading="lazy"
           decoding="async"
         />
 
-        <p class="mg-section__text">
-          Centrum gier fabularnych w sercu Poznania. Miejsce, gdzie historie
-          tworzy się przy stole, a legendy pisze się kostkami.
+        <p class="mg-footer__desc m-0 mb-md">
+          {{ i18n.brand().description }}
         </p>
 
-        <nav class="flex-row-start mg-footer__social" aria-label="Social media">
+        <nav
+          class="flex-row-start-center gap-sm mg-footer__social"
+          [attr.aria-label]="i18n.sections().socialAriaLabel"
+        >
           @for (s of nav.social(); track s.label) {
             <a
               class="mg-social-btn"
@@ -32,8 +36,11 @@
       </section>
 
       <section>
-        <h3 class="mg-section__title mg-section__title--sm">Na skróty</h3>
-        <ul class="mg-footer__list">
+        <h3 class="mg-section__title mg-section__title--sm">
+          {{ i18n.sections().shortcutTitle }}
+        </h3>
+
+        <ul class="mg-footer__list m-0 p-0">
           @for (l of nav.footer(); track l.label) {
             <li>
               <a
@@ -49,20 +56,39 @@
       </section>
 
       <section>
-        <h3 class="mg-section__title mg-section__title--sm">Kontakt</h3>
-        <ul class="mg-footer__list">
-          <li><strong>Telefon:</strong> +48 000 000 000</li>
-          <li><strong>Email:</strong> kontakt&#64;twoja-domena.pl</li>
+        <h3 class="mg-section__title mg-section__title--sm">
+          {{ i18n.sections().contactTitle }}
+        </h3>
+
+        <ul class="mg-footer__list m-0 p-0">
+          <li>
+            <strong>{{ i18n.contact().phoneLabel }}:</strong>
+            <a [href]="i18n.contact().phoneHref">
+              {{ i18n.contact().phoneValue }}
+            </a>
+          </li>
+
+          <li>
+            <strong>{{ i18n.contact().emailLabel }}:</strong>
+            <a [href]="i18n.contact().emailHref">
+              {{ i18n.contact().emailValue }}
+            </a>
+          </li>
         </ul>
       </section>
     </div>
 
-    <div class="mg-footer__bottom flex-row-between flex-col-sm">
+    <div
+      class="mg-footer__bottom flex-row-between-center flex-col-sm mt-xl pt-lg gap-md"
+    >
       <div class="mg-footer__copy">
-        © {{ year() }} Mistrzowie Gry. Wszystkie prawa zastrzeżone.
+        © {{ year() }} Mistrzowie Gry. {{ i18n.sections().copyrightSuffix }}
       </div>
 
-      <nav class="mg-footer__legal flex-row-start" aria-label="Legal">
+      <nav
+        class="mg-footer__legal flex-row-start-center gap-md"
+        [attr.aria-label]="i18n.sections().legalAriaLabel"
+      >
         @for (l of nav.legal(); track l.label) {
           <a [routerLink]="l.path">{{ l.label }}</a>
         }

@@ -1,17 +1,17 @@
-<section class="mg-section" [attr.aria-label]="vm().hero.title">
+<section class="mg-section" [attr.aria-label]="hero().title">
   <div class="mg-container">
     <header class="mg-section__header">
       <h1 class="mg-section__title">
-        {{ vm().hero.title }}
+        {{ hero().title }}
       </h1>
 
       <p class="mg-section__subtitle">
-        {{ vm().hero.subtitle }}
+        {{ hero().subtitle }}
       </p>
     </header>
 
     <div class="mg-card mg-about__stack">
-      @for (section of vm().sections; track section.id) {
+      @for (section of sections(); track section.id) {
         <h2 class="mg-section__title mg-section__title--sm">
           {{ section.title }}
         </h2>
@@ -22,7 +22,7 @@
       }
 
       <div class="mg-about__grid">
-        @for (card of vm().cards; track card.id) {
+        @for (card of cards(); track card.id) {
           <div class="mg-card">
             <h3 class="mg-section__title mg-section__title--xs">
               {{ card.title }}
@@ -35,15 +35,15 @@
         }
       </div>
 
-      <div class="mg-about__actions flex-row-end flex-col-sm">
+      <div class="flex-row-end-center flex-col-center-center-xs gap-sm">
         <p-button
-          [label]="vm().commonCta.contactUs"
+          [label]="commonCta().contactUs"
           icon="pi pi-envelope"
           severity="primary"
           routerLink="/contact"
         />
         <p-button
-          [label]="vm().commonCta.joinProgram"
+          [label]="commonCta().joinProgram"
           icon="pi pi-users"
           severity="secondary"
           [text]="true"

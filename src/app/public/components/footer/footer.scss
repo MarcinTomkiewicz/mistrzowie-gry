@@ -3,7 +3,6 @@
 @use "abstracts/mixins" as m;
 
 .mg-footer {
-  margin-top: map.get(v.$spacings, "xxl");
   padding: map.get(v.$spacings, "xl") 0;
   border-top: 1px solid v.$color-border;
   background: v.$color-bg;
@@ -17,8 +16,13 @@
     gap: map.get(v.$spacings, "lg");
     text-align: center;
 
-    .mg-footer__social { justify-content: center; }
-    .mg-footer__list { justify-items: center; }
+    .mg-footer__social {
+      justify-content: center;
+    }
+
+    .mg-footer__list {
+      justify-items: center;
+    }
   }
 }
 
@@ -26,29 +30,29 @@
   width: 100px;
   height: auto;
   border-radius: v.$radius-sm;
-  margin-bottom: map.get(v.$spacings, "md");
 }
 
 .mg-footer__desc {
   max-width: 48ch;
   line-height: 1.5;
-  margin: 0 0 map.get(v.$spacings, "md");
 
-  @include m.down("md") { margin-inline: auto; }
+  @include m.down("md") {
+    margin-inline: auto;
+  }
 }
 
 .mg-footer__list {
-  margin: 0;
-  padding: 0;
   list-style: none;
   display: grid;
   gap: 0.4rem;
 
-  .is-disabled { opacity: 0.45; pointer-events: none; }
+  .is-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
 }
 
 .mg-footer__social {
-  gap: map.get(v.$spacings, "sm");
   flex-wrap: wrap;
 }
 
@@ -64,18 +68,24 @@
   transition: transform v.$transition-fast;
 
   @media (hover: hover) and (pointer: fine) {
-    &:hover { transform: translateY(-1px); }
+    &:hover {
+      transform: translateY(-1px);
+    }
   }
 }
 
 .mg-footer__bottom {
-  margin-top: map.get(v.$spacings, "xl");
-  padding-top: map.get(v.$spacings, "lg");
   border-top: 1px solid v.$color-border;
-  gap: map.get(v.$spacings, "md");
 
-  @include m.down("sm") { text-align: center; }
+  @include m.down("sm") {
+    text-align: center;
+  }
 }
 
-.mg-footer__copy { opacity: 0.75; }
-.mg-footer__legal { gap: map.get(v.$spacings, "md"); flex-wrap: wrap; }
+.mg-footer__copy {
+  opacity: 0.75;
+}
+
+.mg-footer__legal {
+  flex-wrap: wrap;
+}
