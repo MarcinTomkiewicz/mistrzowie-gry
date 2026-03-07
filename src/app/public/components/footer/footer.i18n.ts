@@ -1,41 +1,74 @@
 import { computed } from '@angular/core';
 import { translateObjectSignal } from '@jsverse/transloco';
-import { pickTranslations } from '../../../core/utils/pick-translation';
+
+import { IMenu } from '../../../core/interfaces/i-menu';
+import { ISocialLink } from '../../../core/interfaces/i-socials';
+import {
+  CommonFooterTranslations,
+  CommonLegalTranslations,
+  CommonNavTranslations,
+  CommonSocialTranslations,
+} from '../../../core/types/common-i18n';
+import { ILegalLink } from '../../../core/interfaces/i-legal';
+
+export type UIFooterMenu = IMenu & { label: string };
+export type UISocialLink = ISocialLink & { label: string };
+export type UILegalLink = ILegalLink & { label: string };
 
 export function createFooterI18n() {
-  const dict = translateObjectSignal('footer', {}, { scope: 'footer' });
+  const navDict = translateObjectSignal('nav', {}, { scope: 'common' });
+  const socialDict = translateObjectSignal('social', {}, { scope: 'common' });
+  const legalDict = translateObjectSignal('legal', {}, { scope: 'common' });
+  const footerDict = translateObjectSignal('footer', {}, { scope: 'footer' });
 
-  const brand = computed(() =>
-    pickTranslations(dict, [
-      'brandAlt',
-      'description',
-    ] as const)(),
-  );
+  const nav = computed(() => navDict() as CommonNavTranslations);
+  const social = computed(() => socialDict() as CommonSocialTranslations);
+  const legal = computed(() => legalDict() as CommonLegalTranslations);
+  const footer = computed(() => footerDict() as CommonFooterTranslations);
 
-  const sections = computed(() =>
-    pickTranslations(dict, [
-      'shortcutTitle',
-      'contactTitle',
-      'socialAriaLabel',
-      'legalAriaLabel',
-      'copyrightSuffix',
-    ] as const)(),
-  );
+  const resolveNavLabel = (labelKey: string): string => {
+    const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
+    return nav()[key] ?? labelKey;
+  };
 
-  const contact = computed(() =>
-    pickTranslations(dict, [
-      'phoneLabel',
-      'phoneValue',
-      'phoneHref',
-      'emailLabel',
-      'emailValue',
-      'emailHref',
-    ] as const)(),
-  );
+  const resolveSocialLabel = (labelKey: string): string => {
+    const key = labelKey.replace(
+      /^social\./,
+      '',
+    ) as keyof CommonSocialTranslations;
+    return social()[key] ?? labelKey;
+  };
+
+  const resolveLegalLabel = (labelKey: string): string => {
+    const key = labelKey.replace(
+      /^legal\./,
+      '',
+    ) as keyof CommonLegalTranslations;
+    return legal()[key] ?? labelKey;
+  };
+
+  const resolveFooterMenu = (items: IMenu[]): UIFooterMenu[] =>
+    items.map((item) => ({
+      ...item,
+      label: resolveNavLabel(item.labelKey),
+    }));
+
+  const resolveSocialLinks = (items: ISocialLink[]): UISocialLink[] =>
+    items.map((item) => ({
+      ...item,
+      label: resolveSocialLabel(item.labelKey),
+    }));
+
+  const resolveLegalLinks = (items: ILegalLink[]): UILegalLink[] =>
+    items.map((item) => ({
+      ...item,
+      label: resolveLegalLabel(item.labelKey),
+    }));
 
   return {
-    brand,
-    sections,
-    contact,
+    footer,
+    resolveFooterMenu,
+    resolveSocialLinks,
+    resolveLegalLinks,
   };
 }

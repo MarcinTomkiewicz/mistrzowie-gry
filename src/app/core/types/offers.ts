@@ -1,8 +1,14 @@
-import { OfferItemKindEnum, OfferPageTypeEnum, OfferSectionTypeEnum } from "../enums/offers";
+import {
+  OfferItemKindEnum,
+  OfferPageTypeEnum,
+  OfferSectionTypeEnum,
+} from '../enums/offers';
 
 export type OfferPageType = `${OfferPageTypeEnum}`;
 export type OfferSectionType = `${OfferSectionTypeEnum}`;
 export type OfferItemKind = `${OfferItemKindEnum}`;
+
+export type JsonObject = Record<string, unknown>;
 
 export type OfferPage = {
   id: string;
@@ -11,10 +17,12 @@ export type OfferPage = {
   subtitle: string | null;
   position: number | null;
   type: OfferPageType;
-  seo: Record<string, any>;
+  seo: JsonObject;
   isActive: boolean;
   isTest: boolean;
 };
+
+export type OfferPageSectionDisplay = JsonObject;
 
 export type OfferPageSection = {
   id: string;
@@ -23,11 +31,14 @@ export type OfferPageSection = {
   title: string | null;
   subtitle: string | null;
   itemKind: OfferItemKind | null;
-  display: Record<string, any>;
+  display: OfferPageSectionDisplay;
   position: number;
   isActive: boolean;
   isTest: boolean;
 };
+
+export type OfferItemMeta = JsonObject;
+export type OfferItemPricing = JsonObject;
 
 export type OfferItem = {
   id: number;
@@ -36,8 +47,8 @@ export type OfferItem = {
   kind: OfferItemKind;
   lead: string | null;
   body: string | null;
-  meta: Record<string, any>;
-  pricing: Record<string, any>;
+  meta: OfferItemMeta;
+  pricing: OfferItemPricing;
   position: number;
   isActive: boolean;
   isTest: boolean;
@@ -50,7 +61,11 @@ export type OfferSectionItem = {
   position: number;
 };
 
+export type OfferVmSection = OfferPageSection & {
+  items: OfferItem[];
+};
+
 export type OfferPageVm = {
   page: OfferPage;
-  sections: Array<OfferPageSection & { items: OfferItem[] }>;
+  sections: OfferVmSection[];
 };

@@ -1,19 +1,51 @@
 import { IMenu } from '../interfaces/i-menu';
 
 export const MENU_CONFIG: IMenu[] = [
-  { label: 'O nas', path: '/about', footer: true },
+  {
+    labelKey: 'nav.about',
+    path: '/about',
+    footer: true,
+  },
 
   {
-    label: 'Oferta',
+    labelKey: 'nav.offer',
     children: [
-      { label: 'Oferta indywidualna', path: '/offer/oferta-indywidualna', footer: true },
-      { label: 'Oferta dla firm', path: '/offer/oferta-biznesowa', footer: true },
-      { label: 'Oferta dla instytucji', path: '/offer/oferta-dla-instytucji', footer: true },
-      { label: 'Oferta imprezowa', path: '/offer/oferta-imprezowa', footer: true },
+      {
+        labelKey: 'nav.individualOffer',
+        path: '/offer/oferta-indywidualna',
+        footer: true,
+      },
+      {
+        labelKey: 'nav.businessOffer',
+        path: '/offer/oferta-biznesowa',
+        footer: true,
+      },
+      {
+        labelKey: 'nav.institutionOffer',
+        path: '/offer/oferta-dla-instytucji',
+        footer: true,
+      },
+      {
+        labelKey: 'nav.eventOffer',
+        path: '/offer/oferta-imprezowa',
+        footer: true,
+      },
     ],
   },
 
-  { label: 'Chaotyczne Czwartki', path: '/chaotic-thursdays', footer: true },
-  { label: 'Dołącz do Drużyny', path: '/join-the-party', footer: true },
-  { label: 'Kontakt', path: '/contact', footer: true },
+  {
+    labelKey: 'nav.chaoticThursdays',
+    path: '/chaotic-thursdays',
+    footer: true,
+  },
+  {
+    labelKey: 'nav.join',
+    path: '/join-the-party',
+    footer: true,
+  },
+  {
+    labelKey: 'nav.contact',
+    path: '/contact',
+    footer: true,
+  },
 ];

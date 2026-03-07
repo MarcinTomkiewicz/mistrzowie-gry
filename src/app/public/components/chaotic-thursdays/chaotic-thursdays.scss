@@ -15,7 +15,6 @@
   background: v.$color-bg-surface;
   font-size: map.get(v.$font-sizes, "xs");
   font-weight: 700;
-  margin-bottom: map.get(v.$spacings, "xl");
 }
 
 .mg-chaotic-hero__spark {
@@ -35,33 +34,29 @@
   &:nth-child(1) {
     transform: translate(-35%, -10%) rotate(-12deg);
   }
+
   &:nth-child(2) {
     transform: translate(20%, -25%) rotate(10deg);
   }
+
   &:nth-child(3) {
     transform: translate(30%, 20%) rotate(-6deg);
   }
 }
 
 .mg-chaotic-grid {
-  margin-top: map.get(v.$spacings, "md");
-  @include m.mg-grid(
-    2,
-    map.get(v.$spacings, "md"),
-    map.get(v.$spacings, "md"),
-    true,
-    2,
-    1
-  );
+  @include m.mg-grid(2, map.get(v.$spacings, "md"), 0, true, 2, 1);
 }
 
-.mg-chaotic-item-head {
-  display: inline-flex;
-  align-items: center;
-  gap: map.get(v.$spacings, "sm");
-}
+.mg-chaotic-list {
+  padding-left: 1.25rem;
 
-/* oddzielamy expectations od grida (żeby nie było “przyklejone”) */
-.mg-chaotic-expectations {
-  margin-top: map.get(v.$spacings, "md");
+  li {
+    margin-bottom: map.get(v.$spacings, "xs");
+    color: v.$color-text;
+  }
+
+  li:last-child {
+    margin-bottom: 0;
+  }
 }

@@ -14,7 +14,7 @@ import { createFooterI18n } from './footer.i18n';
   imports: [RouterModule, NgOptimizedImage],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
-  providers: [provideTranslocoScope('footer')],
+  providers: [provideTranslocoScope('common')],
 })
 export class Footer {
   readonly nav = inject(Navigation);
@@ -22,6 +22,18 @@ export class Footer {
   readonly i18n = createFooterI18n();
 
   readonly year = computed(() => new Date().getFullYear());
+
+  readonly footerLinks = computed(() =>
+    this.i18n.resolveFooterMenu(this.nav.footer()),
+  );
+
+  readonly socialLinks = computed(() =>
+    this.i18n.resolveSocialLinks(this.nav.social()),
+  );
+
+  readonly legalLinks = computed(() =>
+    this.i18n.resolveLegalLinks(this.nav.legal()),
+  );
 
   readonly footerImgSrc = computed(() =>
     this.theme.isLight() ? 'theme/light/footer.avif' : 'theme/dark/footer.avif',

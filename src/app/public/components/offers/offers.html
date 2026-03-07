@@ -6,7 +6,6 @@
         <p class="mg-section__subtitle">{{ data.page.subtitle }}</p>
       </header>
 
-      <!-- HERO -->
       @if (data.hero; as s) {
         <div class="mg-card mb-lg">
           @if (s.title) {
@@ -14,15 +13,16 @@
               {{ s.title }}
             </h2>
           }
+
           @if (s.subtitle) {
             <p class="mg-section__subtitle mg-section__subtitle--no-margin">
               {{ s.subtitle }}
             </p>
           }
 
-          <div class="flex-row-start gap-sm mt-md">
+          <div class="flex-row-start-center gap-sm mt-md">
             <p-button
-              [label]="commonCta().contactUs"
+              [label]="i18n.commonCta().contactUs"
               icon="pi pi-envelope"
               severity="primary"
               routerLink="/contact"
@@ -31,7 +31,6 @@
         </div>
       }
 
-      <!-- PRICING TABLE -->
       @if (data.pricing; as s) {
         <div class="mg-card mb-lg">
           @if (s.title) {
@@ -39,8 +38,9 @@
               {{ s.title }}
             </h2>
           }
+
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin mb-md">
               {{ s.subtitle }}
             </p>
           }
@@ -52,9 +52,9 @@
           >
             <ng-template pTemplate="header">
               <tr>
-                <th>{{ pricingHeaders().variant }}</th>
-                <th>{{ pricingHeaders().price }}</th>
-                <th>{{ pricingHeaders().description }}</th>
+                <th>{{ i18n.pricingHeaders().variant }}</th>
+                <th>{{ i18n.pricingHeaders().price }}</th>
+                <th>{{ i18n.pricingHeaders().description }}</th>
               </tr>
             </ng-template>
 
@@ -68,16 +68,13 @@
           </p-table>
 
           @if (data.pricingFootnote) {
-            <p
-              class="mg-section__subtitle mt-md mg-section__subtitle--no-margin"
-            >
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">
               {{ data.pricingFootnote }}
             </p>
           }
         </div>
       }
 
-      <!-- ADDONS -->
       @if (data.addon; as s) {
         <div class="mb-lg">
           @if (s.title) {
@@ -85,6 +82,7 @@
               {{ s.title }}
             </h2>
           }
+
           @if (s.subtitle) {
             <p class="mg-section__subtitle mg-section__subtitle--no-margin">
               {{ s.subtitle }}
@@ -102,10 +100,9 @@
                   <div class="mg-section__title mg-section__title--xs">
                     {{ p.value }}
                   </div>
+
                   @if (p.note) {
-                    <p
-                      class="mg-section__subtitle mg-section__subtitle--no-margin"
-                    >
+                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">
                       {{ p.note }}
                     </p>
                   }
@@ -117,17 +114,15 @@
               </div>
             }
           </div>
+
           @if (data.pricingFootnote) {
-            <p
-              class="mg-section__subtitle mt-md mg-section__subtitle--no-margin"
-            >
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">
               {{ data.pricingFootnote }}
             </p>
           }
         </div>
       }
 
-      <!-- MATERIALS -->
       @if (data.material; as s) {
         <div class="mb-lg">
           @if (s.title) {
@@ -135,6 +130,7 @@
               {{ s.title }}
             </h2>
           }
+
           @if (s.subtitle) {
             <p class="mg-section__subtitle mg-section__subtitle--no-margin">
               {{ s.subtitle }}
@@ -152,10 +148,9 @@
                   <div class="mg-section__title mg-section__title--xs">
                     {{ p.value }}
                   </div>
+
                   @if (p.note) {
-                    <p
-                      class="mg-section__subtitle mg-section__subtitle--no-margin"
-                    >
+                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">
                       {{ p.note }}
                     </p>
                   }
@@ -170,7 +165,6 @@
         </div>
       }
 
-      <!-- FAQ -->
       @if (data.faq.section; as s) {
         <div class="mg-card mb-lg">
           @if (s.title) {
@@ -178,6 +172,7 @@
               {{ s.title }}
             </h2>
           }
+
           @if (s.subtitle) {
             <p class="mg-section__subtitle mg-section__subtitle--no-margin">
               {{ s.subtitle }}
@@ -188,29 +183,30 @@
             <p-accordion>
               @for (x of data.faq.items; let i = $index; track i) {
                 <p-accordion-panel [value]="i">
-                  <p-accordion-header
-                    class="mg-section__title mg-section__title--xs"
-                  >
+                  <p-accordion-header class="mg-section__title mg-section__title--xs">
                     {{ x.h }}
                   </p-accordion-header>
-                  <p-accordion-content>{{ x.a }}</p-accordion-content>
+                  <p-accordion-content>
+                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+                      {{ x.a }}
+                    </p>
+                  </p-accordion-content>
                 </p-accordion-panel>
               }
             </p-accordion>
           } @else {
             <div class="mg-card">
               <div class="mg-section__title mg-section__title--sm">
-                {{ commonEmpty().title }}
+                {{ i18n.commonEmpty().title }}
               </div>
               <p class="mg-section__subtitle mg-section__subtitle--no-margin">
-                {{ commonEmpty().description }}
+                {{ i18n.commonEmpty().description }}
               </p>
             </div>
           }
         </div>
       }
 
-      <!-- CTA -->
       @if (data.cta; as s) {
         <div class="mg-card">
           @if (s.title) {
@@ -218,15 +214,16 @@
               {{ s.title }}
             </h2>
           }
+
           @if (s.subtitle) {
             <p class="mg-section__subtitle mg-section__subtitle--no-margin">
               {{ s.subtitle }}
             </p>
           }
 
-          <div class="flex-row-start gap-sm mt-md">
+          <div class="flex-row-start-center gap-sm mt-md">
             <p-button
-              [label]="commonCta().contactUs"
+              [label]="i18n.commonCta().contactUs"
               icon="pi pi-envelope"
               severity="success"
               routerLink="/contact"
@@ -236,7 +233,7 @@
       }
     } @else {
       <div class="mg-card">
-        <p>{{ commonStatus().loading }}</p>
+        <p>{{ i18n.commonStatus().loading }}</p>
       </div>
     }
   </div>

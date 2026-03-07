@@ -10,10 +10,17 @@
         <h2 class="mg-section__title mg-section__title--sm align-self-start">
           {{ vm().formText.title }}
         </h2>
-        <p class="mg-section__subtitle align-self-start mb-md">{{ vm().formText.hint }}</p>
 
-        <form class="flex-col-center gap-sm w-80" [formGroup]="form" (ngSubmit)="onSubmit()">
-          <p-iftalabel class="w-100">
+        <p class="mg-section__subtitle align-self-start mb-md">
+          {{ vm().formText.hint }}
+        </p>
+
+        <form
+          class="flex-col-center-center gap-sm w-100"
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+        >
+          <p-iftalabel class="w-80">
             <p-select
               class="w-100"
               inputId="topic"
@@ -26,7 +33,7 @@
           </p-iftalabel>
 
           @if (vm().isOtherTopicSelected) {
-            <p-iftalabel class="w-100">
+            <p-iftalabel class="w-80">
               <input
                 class="w-100"
                 pInputText
@@ -35,7 +42,9 @@
                 formControlName="topicCustom"
                 [attr.aria-invalid]="showRequiredError('topicCustom')"
               />
-              <label for="topicCustom">{{ vm().formText.topicCustomLabel }}</label>
+              <label for="topicCustom">
+                {{ vm().formText.topicCustomLabel }}
+              </label>
             </p-iftalabel>
 
             @if (showRequiredError("topicCustom")) {
@@ -43,7 +52,7 @@
             }
           }
 
-          <p-iftalabel class="w-100">
+          <p-iftalabel class="w-80">
             <input
               class="w-100"
               pInputText
@@ -59,7 +68,7 @@
             <small class="mg-contact-error">{{ vm().errors.required }}</small>
           }
 
-          <p-iftalabel class="w-100">
+          <p-iftalabel class="w-80">
             <input
               class="w-100"
               pInputText
@@ -75,17 +84,29 @@
             <small class="mg-contact-error">{{ vm().errors.required }}</small>
           }
 
-          <p-iftalabel class="w-100">
-            <input class="w-100" pInputText id="company" type="text" formControlName="company" />
+          <p-iftalabel class="w-80">
+            <input
+              class="w-100"
+              pInputText
+              id="company"
+              type="text"
+              formControlName="company"
+            />
             <label for="company">{{ vm().formText.companyLabel }}</label>
           </p-iftalabel>
 
-          <p-iftalabel class="w-100">
-            <input class="w-100" pInputText id="phone" type="tel" formControlName="phone" />
+          <p-iftalabel class="w-80">
+            <input
+              class="w-100"
+              pInputText
+              id="phone"
+              type="tel"
+              formControlName="phone"
+            />
             <label for="phone">{{ vm().formText.phoneLabel }}</label>
           </p-iftalabel>
 
-          <p-iftalabel class="w-100">
+          <p-iftalabel class="w-80">
             <input
               class="w-100"
               pInputText
@@ -107,7 +128,7 @@
             </small>
           }
 
-          <p-iftalabel class="w-100">
+          <p-iftalabel class="w-80">
             <textarea
               class="w-100"
               pTextarea
@@ -116,7 +137,9 @@
               [rows]="6"
               [autoResize]="true"
               [placeholder]="vm().formText.messagePlaceholder"
-              [attr.aria-invalid]="showRequiredError('message') || showMinMessageError()"
+              [attr.aria-invalid]="
+                showRequiredError('message') || showMinMessageError()
+              "
             ></textarea>
             <label for="message">{{ vm().formText.messageLabel }}</label>
           </p-iftalabel>
@@ -127,7 +150,7 @@
             <small class="mg-contact-error">{{ vm().errors.minMessage }}</small>
           }
 
-          <div class="flex-row-end flex-col-sm gap-sm">
+          <div class="flex-row-end-center flex-col-sm gap-sm">
             <p-button
               type="submit"
               [label]="vm().cta.sendMessage"
@@ -142,24 +165,29 @@
         <h2 class="mg-section__title mg-section__title--sm">
           {{ vm().info.title }}
         </h2>
+
         <p class="mg-section__subtitle">
           {{ vm().info.subtitle }}
         </p>
 
-        <div class="gap-sm mt-md">
-          <div class="flex-row-start gap-sm">
+        <div class="flex-col-start gap-sm mt-md">
+          <div class="flex-row-start-center gap-sm">
             <i class="pi pi-envelope" aria-hidden="true"></i>
             <span>
               {{ vm().info.emailLabel }}
-              @if (vm().info.emailValue) { <span>{{ vm().info.emailValue }}</span> }
+              @if (vm().info.emailValue) {
+                <span>{{ vm().info.emailValue }}</span>
+              }
             </span>
           </div>
 
-          <div class="flex-row-start gap-sm">
+          <div class="flex-row-start-center gap-sm">
             <i class="pi pi-phone" aria-hidden="true"></i>
             <span>
               {{ vm().info.phoneLabel }}
-              @if (vm().info.phoneValue) { <span>{{ vm().info.phoneValue }}</span> }
+              @if (vm().info.phoneValue) {
+                <span>{{ vm().info.phoneValue }}</span>
+              }
             </span>
           </div>
         </div>

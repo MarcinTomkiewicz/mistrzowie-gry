@@ -12,7 +12,7 @@
     </a>
 
     <ul class="mg-navbar__menu">
-      @for (item of menu(); track item.label) {
+      @for (item of menu(); track trackByLabelKey($index, item)) {
         <li class="mg-navbar__item">
           @if (!item.children?.length) {
             <a class="mg-navbar__link" [routerLink]="item.path">
@@ -24,7 +24,7 @@
               class="mg-navbar__link mg-navbar__link--button"
               (click)="openDropdown($event, item)"
               aria-haspopup="true"
-              [attr.aria-expanded]="activeDropdown()?.label === item.label"
+              [attr.aria-expanded]="activeDropdown()?.labelKey === item.labelKey"
             >
               <span class="mg-navbar__link-label">{{ item.label }}</span>
               <span class="mg-navbar__caret" aria-hidden="true">▾</span>
@@ -59,7 +59,7 @@
         type="button"
         class="mg-icon-btn mg-navbar__burger"
         (click)="openMobile()"
-        aria-label="Otwórz menu"
+        [attr.aria-label]="i18n.accessibility().openMenu"
       >
         <i class="pi pi-d20"></i>
       </button>
@@ -69,7 +69,7 @@
 
 <p-popover #navPopover styleClass="mg-popover" (onHide)="closeDropdown()">
   <ul class="mg-popover-menu">
-    @for (child of activeChildren(); track child.label) {
+    @for (child of activeChildren(); track trackByLabelKey($index, child)) {
       <li class="mg-popover-menu__item">
         <a
           class="mg-popover-menu__link"
@@ -103,14 +103,14 @@
           type="button"
           class="mg-icon-btn mg-icon-btn--flat"
           (click)="closeMobile()"
-          aria-label="Zamknij"
+          [attr.aria-label]="i18n.accessibility().closeMenu"
         >
           <i class="pi pi-times"></i>
         </button>
       </div>
 
       <ul class="mg-mobile-menu">
-        @for (item of menu(); track item.label) {
+        @for (item of menu(); track trackByLabelKey($index, item)) {
           <li class="mg-mobile-menu__item">
             @if (!item.children?.length) {
               <a
@@ -124,7 +124,7 @@
               <div class="mg-mobile-menu__group">{{ item.label }}</div>
 
               <ul class="mg-mobile-menu__sub">
-                @for (child of item.children; track child.label) {
+                @for (child of item.children; track trackByLabelKey($index, child)) {
                   <li class="mg-mobile-menu__sub-item">
                     <a
                       class="mg-mobile-menu__link"

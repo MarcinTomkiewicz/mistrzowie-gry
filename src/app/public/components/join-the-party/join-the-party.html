@@ -1,24 +1,24 @@
-<section class="mg-section mg-join-hero" [attr.aria-label]="hero().title">
+<section class="mg-section mg-join-hero" [attr.aria-label]="i18n.hero().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <div class="mg-join-hero__badge">{{ hero().badge }}</div>
+      <div class="mg-join-hero__badge mb-sm">{{ i18n.hero().badge }}</div>
 
-      <h1 class="mg-section__title">{{ hero().title }}</h1>
+      <h1 class="mg-section__title">{{ i18n.hero().title }}</h1>
 
       <p class="mg-section__subtitle">
-        {{ hero().subtitle }}
+        {{ i18n.hero().subtitle }}
       </p>
 
-      <div class="flex-row-center flex-col-sm mt-md gap-md">
+      <div class="flex-row-center-center flex-col-sm mt-md gap-md">
         <p-button
-          [label]="cta().contactUs"
+          [label]="i18n.cta().contactUs"
           icon="pi pi-envelope"
           severity="primary"
           size="small"
           routerLink="/contact"
         />
         <p-button
-          [label]="cta().joinProgram"
+          [label]="i18n.cta().joinProgram"
           icon="pi pi-users"
           severity="secondary"
           size="small"
@@ -30,46 +30,52 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="intro().title">
+<section class="mg-section" [attr.aria-label]="i18n.intro().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ intro().title }}</h2>
-      <p class="mg-section__subtitle">{{ intro().subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.intro().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.intro().subtitle }}</p>
     </header>
 
     <div class="mg-join-grid">
-      @for (b of benefits(); track trackByIndex($index)) {
+      @for (b of i18n.benefits(); track trackByIndex($index)) {
         <div class="mg-card">
-          <div class="flex-row-start gap-sm mb-sm">
+          <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ b.icon }}" aria-hidden="true"></i>
             <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
               {{ b.title }}
             </h3>
           </div>
-          <p>{{ b.text }}</p>
+
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ b.text }}
+          </p>
         </div>
       }
     </div>
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="structure().title">
+<section class="mg-section" [attr.aria-label]="i18n.structure().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ structure().title }}</h2>
-      <p class="mg-section__subtitle">{{ structure().subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.structure().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.structure().subtitle }}</p>
     </header>
 
     <div class="mg-join-grid">
-      @for (s of steps(); track trackByIndex($index)) {
+      @for (s of i18n.steps(); track trackByIndex($index)) {
         <div class="mg-card">
-          <div class="flex-row-start gap-sm mb-sm">
+          <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ s.icon }}" aria-hidden="true"></i>
             <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
               {{ s.title }}
             </h3>
           </div>
-          <p>{{ s.text }}</p>
+
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ s.text }}
+          </p>
         </div>
       }
     </div>
@@ -77,10 +83,12 @@
     <p-divider></p-divider>
 
     <div class="mg-card">
-      <h3 class="mg-section__title mg-section__title--sm">joinTheParty.structure.rules.title</h3>
+      <h3 class="mg-section__title mg-section__title--sm">
+        {{ i18n.rulesTitle().title }}
+      </h3>
 
-      <ul class="mg-join-list">
-        @for (x of rules(); track trackByIndex($index)) {
+      <ul class="mg-join-list m-0">
+        @for (x of i18n.rules(); track trackByIndex($index)) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -88,18 +96,20 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="continuation().title">
+<section class="mg-section" [attr.aria-label]="i18n.continuation().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ continuation().title }}</h2>
-      <p class="mg-section__subtitle">{{ continuation().subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.continuation().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.continuation().subtitle }}</p>
     </header>
 
     <div class="mg-card">
-      <h3 class="mg-section__title mg-section__title--sm">joinTheParty.continuation.bullets.title</h3>
+      <h3 class="mg-section__title mg-section__title--sm">
+        {{ i18n.continuationBulletsTitle().title }}
+      </h3>
 
-      <ul class="mg-join-list">
-        @for (x of continuationBullets(); track trackByIndex($index)) {
+      <ul class="mg-join-list m-0">
+        @for (x of i18n.continuationBullets(); track trackByIndex($index)) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -107,32 +117,34 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="orgMeeting().title">
+<section class="mg-section" [attr.aria-label]="i18n.orgMeeting().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ orgMeeting().title }}</h2>
-      <p class="mg-section__subtitle">{{ orgMeeting().subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.orgMeeting().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.orgMeeting().subtitle }}</p>
     </header>
 
     <div class="mg-card">
-      <h3 class="mg-section__title mg-section__title--sm">joinTheParty.orgMeeting.bullets.title</h3>
+      <h3 class="mg-section__title mg-section__title--sm">
+        {{ i18n.orgMeetingBulletsTitle().title }}
+      </h3>
 
-      <ul class="mg-join-list">
-        @for (x of orgMeetingBullets(); track trackByIndex($index)) {
+      <ul class="mg-join-list m-0">
+        @for (x of i18n.orgMeetingBullets(); track trackByIndex($index)) {
           <li>{{ x }}</li>
         }
       </ul>
 
-      <div class="flex-row-end flex-col-sm mt-md gap-sm">
+      <div class="flex-row-end-center flex-col-sm mt-md gap-sm">
         <p-button
-          [label]="cta().contactUs"
+          [label]="i18n.cta().contactUs"
           icon="pi pi-envelope"
           severity="primary"
           size="small"
           routerLink="/contact"
         />
         <p-button
-          [label]="cta().joinProgram"
+          [label]="i18n.cta().joinProgram"
           icon="pi pi-users"
           severity="secondary"
           size="small"

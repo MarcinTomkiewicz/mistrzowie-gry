@@ -41,6 +41,8 @@
     "offer": "Oferta",
     "individualOffer": "Oferta indywidualna",
     "businessOffer": "Oferta dla firm",
+    "institutionOffer": "Oferta dla instytucji",
+    "eventOffer": "Oferta imprezowa",
     "programs": "Programy",
     "join": "Dołącz do Drużyny",
     "chaoticThursdays": "Chaotyczne Czwartki",
@@ -48,6 +50,11 @@
     "faq": "FAQ",
     "pricing": "Cennik",
     "blog": "Blog"
+  },
+  "social": {
+    "facebook": "Odwiedź nas na Facebooku",
+    "instagram": "Odwiedź nas na Instagramie",
+    "discord": "Dołącz do nas na Discordzie"
   },
 
   "status": {

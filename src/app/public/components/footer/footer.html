@@ -7,20 +7,20 @@
           [ngSrc]="footerImgSrc()"
           width="100"
           height="100"
-          [alt]="i18n.brand().brandAlt"
+          [alt]="i18n.footer().brandAlt"
           loading="lazy"
           decoding="async"
         />
 
         <p class="mg-footer__desc m-0 mb-md">
-          {{ i18n.brand().description }}
+          {{ i18n.footer().description }}
         </p>
 
         <nav
           class="flex-row-start-center gap-sm mg-footer__social"
-          [attr.aria-label]="i18n.sections().socialAriaLabel"
+          [attr.aria-label]="i18n.footer().socialAriaLabel"
         >
-          @for (s of nav.social(); track s.label) {
+          @for (s of socialLinks(); track $index) {
             <a
               class="mg-social-btn"
               [href]="s.href"
@@ -37,11 +37,11 @@
 
       <section>
         <h3 class="mg-section__title mg-section__title--sm">
-          {{ i18n.sections().shortcutTitle }}
+          {{ i18n.footer().shortcutTitle }}
         </h3>
 
         <ul class="mg-footer__list m-0 p-0">
-          @for (l of nav.footer(); track l.label) {
+          @for (l of footerLinks(); track $index) {
             <li>
               <a
                 [routerLink]="l.path"
@@ -57,21 +57,21 @@
 
       <section>
         <h3 class="mg-section__title mg-section__title--sm">
-          {{ i18n.sections().contactTitle }}
+          {{ i18n.footer().contactTitle }}
         </h3>
 
         <ul class="mg-footer__list m-0 p-0">
           <li>
-            <strong>{{ i18n.contact().phoneLabel }}:</strong>
-            <a [href]="i18n.contact().phoneHref">
-              {{ i18n.contact().phoneValue }}
+            <strong>{{ i18n.footer().phoneLabel }}:</strong>
+            <a [href]="i18n.footer().phoneHref">
+              {{ i18n.footer().phoneValue }}
             </a>
           </li>
 
           <li>
-            <strong>{{ i18n.contact().emailLabel }}:</strong>
-            <a [href]="i18n.contact().emailHref">
-              {{ i18n.contact().emailValue }}
+            <strong>{{ i18n.footer().emailLabel }}:</strong>
+            <a [href]="i18n.footer().emailHref">
+              {{ i18n.footer().emailValue }}
             </a>
           </li>
         </ul>
@@ -82,14 +82,14 @@
       class="mg-footer__bottom flex-row-between-center flex-col-sm mt-xl pt-lg gap-md"
     >
       <div class="mg-footer__copy">
-        © {{ year() }} Mistrzowie Gry. {{ i18n.sections().copyrightSuffix }}
+        © {{ year() }} Mistrzowie Gry. {{ i18n.footer().copyrightSuffix }}
       </div>
 
       <nav
         class="mg-footer__legal flex-row-start-center gap-md"
-        [attr.aria-label]="i18n.sections().legalAriaLabel"
+        [attr.aria-label]="i18n.footer().legalAriaLabel"
       >
-        @for (l of nav.legal(); track l.label) {
+        @for (l of legalLinks(); track $index) {
           <a [routerLink]="l.path">{{ l.label }}</a>
         }
       </nav>

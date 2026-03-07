@@ -1,15 +1,20 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { IMenu } from '../../interfaces/i-menu';
+
 import { MENU_CONFIG } from '../../configs/menu.config';
 import { SOCIAL_LINKS } from '../../configs/social.config';
 import { LEGAL_LINKS } from '../../configs/legal.config';
 
+import { IMenu } from '../../interfaces/i-menu';
+import { ISocialLink } from '../../interfaces/i-socials';
+import { ILegalLink } from '../../interfaces/i-legal';
 
 @Injectable({ providedIn: 'root' })
 export class Navigation {
   /* ========= BASE DATA ========= */
 
   private readonly menuSource = signal<IMenu[]>(MENU_CONFIG);
+  private readonly socialSource = signal<ISocialLink[]>(SOCIAL_LINKS);
+  private readonly legalSource = signal<ILegalLink[]>(LEGAL_LINKS);
 
   /* ========= PUBLIC SIGNALS ========= */
 
@@ -21,12 +26,13 @@ export class Navigation {
     const out: IMenu[] = [];
 
     const walk = (items: IMenu[]) => {
-      for (const i of items) {
-        if (i.footer && i.path && !i.disabled) {
-          out.push(i);
+      for (const item of items) {
+        if (item.footer && item.path && !item.disabled) {
+          out.push(item);
         }
-        if (i.children?.length) {
-          walk(i.children);
+
+        if (item.children?.length) {
+          walk(item.children);
         }
       }
     };
@@ -36,10 +42,10 @@ export class Navigation {
   });
 
   /** social links */
-  readonly social = signal(SOCIAL_LINKS);
+  readonly social = computed(() => this.socialSource());
 
   /** legal links */
-  readonly legal = signal(LEGAL_LINKS);
+  readonly legal = computed(() => this.legalSource());
 
   /* ========= FUTURE EXTENSIONS ========= */
 

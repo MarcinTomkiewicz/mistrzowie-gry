@@ -7,24 +7,14 @@ import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
 
-import {
-  provideTranslocoScope,
-  TranslocoService,
-  translateObjectSignal,
-  translateSignal,
-} from '@jsverse/transloco';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { Seo } from '../../../core/services/seo/seo';
-import { dictToSortedArray } from '../../../core/utils/dict-to-sorted-array';
-import { pickTranslations } from '../../../core/utils/pick-translation';
-import { ContactPayload, ContactTopicOption } from '../../../core/types/contact';
-
-function toSortedById<T>(dict: unknown): T[] {
-  return dictToSortedArray<T>(dict as any, (x) => Number((x as any)?.id ?? 0));
-}
+import { ContactPayload } from '../../../core/types/contact';
+import { createContactI18n } from './contact.i18n';
 
 @Component({
   selector: 'app-contact',
@@ -33,7 +23,6 @@ function toSortedById<T>(dict: unknown): T[] {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-
     ButtonModule,
     IftaLabelModule,
     SelectModule,
@@ -42,112 +31,54 @@ function toSortedById<T>(dict: unknown): T[] {
   ],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
-  providers: [provideTranslocoScope('contact'), provideTranslocoScope('common')],
+  providers: [provideTranslocoScope('contact', 'common')],
 })
 export class Contact {
   private readonly seo = inject(Seo);
-  private readonly transloco = inject(TranslocoService);
   private readonly fb = inject(FormBuilder);
 
-  constructor() {
-    this.transloco.setActiveLang('pl');
-  }
+  readonly i18n = createContactI18n();
 
-  // ============
-  // SEO (scope: contact)
-  // ============
-  readonly seoTitle = translateSignal('seo.title', {}, { scope: 'contact' });
-  readonly seoDescription = translateSignal('seo.description', {}, { scope: 'contact' });
-
-  private readonly _applySeo = effect(() => {
-    this.seo.apply({
-      title: this.seoTitle() || 'Kontakt',
-      description: this.seoDescription() || '',
-    });
-  });
-
-  // ============
-  // form
-  // ============
   readonly form = this.fb.nonNullable.group({
     topic: this.fb.nonNullable.control(''),
     topicCustom: this.fb.nonNullable.control(''),
 
-    firstName: this.fb.nonNullable.control('', { validators: [Validators.required] }),
-    lastName: this.fb.nonNullable.control('', { validators: [Validators.required] }),
+    firstName: this.fb.nonNullable.control('', {
+      validators: [Validators.required],
+    }),
+    lastName: this.fb.nonNullable.control('', {
+      validators: [Validators.required],
+    }),
 
     company: this.fb.nonNullable.control(''),
 
-    email: this.fb.nonNullable.control('', { validators: [Validators.required, Validators.email] }),
+    email: this.fb.nonNullable.control('', {
+      validators: [Validators.required, Validators.email],
+    }),
     phone: this.fb.nonNullable.control(''),
 
-    message: this.fb.nonNullable.control('', { validators: [Validators.required, Validators.minLength(20)] }),
-  });
-
-  // ============
-  // i18n
-  // ============
-  private readonly heroDict = translateObjectSignal('hero', {}, { scope: 'contact' });
-  private readonly formDict = translateObjectSignal('form', {}, { scope: 'contact' });
-  private readonly errorsDict = translateObjectSignal('errors', {}, { scope: 'contact' });
-  private readonly topicsDict = translateObjectSignal('topics', {}, { scope: 'contact' });
-  private readonly infoDict = translateObjectSignal('info', {}, { scope: 'contact' });
-
-  private readonly commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
-
-  private readonly hero = pickTranslations(this.heroDict, ['title', 'subtitle'] as const);
-
-  private readonly formText = pickTranslations(this.formDict, [
-    'title',
-    'hint',
-    'topicLabel',
-    'topicCustomLabel',
-    'firstNameLabel',
-    'lastNameLabel',
-    'companyLabel',
-    'emailLabel',
-    'phoneLabel',
-    'messageLabel',
-    'messagePlaceholder',
-  ] as const);
-
-  private readonly errors = pickTranslations(this.errorsDict, [
-    'required',
-    'email',
-    'minMessage',
-  ] as const);
-
-  private readonly cta = pickTranslations(this.commonCtaDict, ['sendMessage'] as const);
-
-  private readonly info = pickTranslations(this.infoDict, [
-    'title',
-    'subtitle',
-    'emailLabel',
-    'phoneLabel',
-    'emailValue',
-    'phoneValue',
-  ] as const);
-
-  // ============
-  // topics
-  // ============
-  private readonly topics = computed<ContactTopicOption[]>(() => {
-    const list = toSortedById<ContactTopicOption>(this.topicsDict());
-    return list.map((x) => ({
-      id: Number((x as any)?.id ?? 0),
-      value: String((x as any)?.value ?? ''),
-      label: String((x as any)?.label ?? ''),
-    }));
+    message: this.fb.nonNullable.control('', {
+      validators: [Validators.required, Validators.minLength(20)],
+    }),
   });
 
   private readonly topicValue = toSignal(this.form.controls.topic.valueChanges, {
     initialValue: this.form.controls.topic.value,
   });
 
-  private readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
+  readonly isOtherTopicSelected = computed(
+    () => this.topicValue() === 'other',
+  );
 
-  private readonly _initDefaultTopic = effect(() => {
-    const options = this.topics();
+  private readonly applySeoEffect = effect(() => {
+    this.seo.apply({
+      title: this.i18n.seoTitle() || 'Kontakt',
+      description: this.i18n.seoDescription() || '',
+    });
+  });
+
+  private readonly initDefaultTopicEffect = effect(() => {
+    const options = this.i18n.topics();
     if (!options.length) return;
 
     const current = this.form.controls.topic.value;
@@ -156,73 +87,66 @@ export class Contact {
     this.form.controls.topic.setValue(options[0].value);
   });
 
-  private readonly _syncTopicCustomValidator = effect(() => {
-    const ctrl = this.form.controls.topicCustom;
+  private readonly syncTopicCustomValidatorEffect = effect(() => {
+    const control = this.form.controls.topicCustom;
 
     if (this.isOtherTopicSelected()) {
-      ctrl.addValidators([Validators.required]);
+      control.addValidators([Validators.required]);
     } else {
-      ctrl.clearValidators();
-      ctrl.setValue('');
+      control.clearValidators();
+      control.setValue('');
     }
 
-    ctrl.updateValueAndValidity({ emitEvent: false });
+    control.updateValueAndValidity({ emitEvent: false });
   });
 
-  // ============
-  // VM
-  // ============
   readonly vm = computed(() => ({
-    hero: this.hero(),
-    formText: this.formText(),
-    errors: this.errors(),
-    cta: this.cta(),
-    topics: this.topics(),
+    hero: this.i18n.hero(),
+    formText: this.i18n.formText(),
+    errors: this.i18n.errors(),
+    cta: this.i18n.cta(),
+    topics: this.i18n.topics(),
     isOtherTopicSelected: this.isOtherTopicSelected(),
-    info: this.info(),
+    info: this.i18n.info(),
   }));
 
-  // ============
-  // submit (mock)
-  // ============
   onSubmit(): void {
     if (!this.form.valid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    const v = this.form.getRawValue();
+    const value = this.form.getRawValue();
+
     const payload: ContactPayload = {
-      topic: v.topic,
-      topicCustom: v.topic === 'other' ? v.topicCustom : undefined,
-      firstName: v.firstName,
-      lastName: v.lastName,
-      company: v.company || undefined,
-      email: v.email,
-      phone: v.phone || undefined,
-      message: v.message,
+      topic: value.topic,
+      topicCustom: value.topic === 'other' ? value.topicCustom : undefined,
+      firstName: value.firstName,
+      lastName: value.lastName,
+      company: value.company || undefined,
+      email: value.email,
+      phone: value.phone || undefined,
+      message: value.message,
     };
 
     console.log('[contact] submit payload', payload);
   }
 
-  // ============
-  // template helpers
-  // ============
   showRequiredError(name: keyof Contact['form']['controls']): boolean {
-    const c = this.form.controls[name];
-    return c.touched && !!c.errors?.['required'];
+    const control = this.form.controls[name];
+    return control.touched && !!control.errors?.['required'];
   }
 
   showEmailError(): boolean {
-    const c = this.form.controls.email;
-    return c.touched && (!!c.errors?.['required'] || !!c.errors?.['email']);
+    const control = this.form.controls.email;
+    return (
+      control.touched &&
+      (!!control.errors?.['required'] || !!control.errors?.['email'])
+    );
   }
 
   showMinMessageError(): boolean {
-    const c = this.form.controls.message;
-    return c.touched && !!c.errors?.['minlength'];
+    const control = this.form.controls.message;
+    return control.touched && !!control.errors?.['minlength'];
   }
-
-  trackByIndex = (i: number) => i;
 }

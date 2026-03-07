@@ -1,16 +1,16 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { DrawerModule } from 'primeng/drawer';
 import { Popover, PopoverModule } from 'primeng/popover';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
-import { IMenu } from '../../../core/interfaces/i-menu';
+import { provideTranslocoScope } from '@jsverse/transloco';
+
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
+import { createNavbarI18n, UIMenu } from './navbar.i18n';
 
 @Component({
   selector: 'app-navbar',
@@ -24,29 +24,30 @@ import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
+  providers: [provideTranslocoScope('common')],
 })
 export class Navbar {
   private readonly nav = inject(Navigation);
   readonly theme = inject(Theme);
+  readonly i18n = createNavbarI18n();
 
-  readonly menu = this.nav.navbar;
+  readonly menu = computed(() => this.i18n.resolveMenu(this.nav.navbar()));
 
   readonly mobileOpen = signal(false);
-  readonly activeDropdown = signal<IMenu | null>(null);
+  readonly activeDropdown = signal<UIMenu | null>(null);
 
-  readonly activeChildren = computed(() => this.activeDropdown()?.children ?? []);
+  readonly activeChildren = computed(
+    () => this.activeDropdown()?.children ?? [],
+  );
+
   readonly brandLogoSrc = this.theme.brandLogoSrc;
 
   private readonly navPopover = viewChild<Popover>('navPopover');
 
-  onThemeToggle(nextLight: boolean): void {
-    this.theme.set(nextLight ? 'light' : 'dark');
-  }
-
-  openDropdown(event: Event, item: IMenu): void {
+  openDropdown(event: Event, item: UIMenu): void {
     if (!item.children?.length) return;
 
-    if (this.activeDropdown()?.label === item.label) {
+    if (this.activeDropdown()?.labelKey === item.labelKey) {
       this.closeDropdown();
       return;
     }
@@ -73,5 +74,5 @@ export class Navbar {
     this.closeMobile();
   }
 
-  trackByLabel = (_: number, item: IMenu) => item.label;
+  trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;
 }

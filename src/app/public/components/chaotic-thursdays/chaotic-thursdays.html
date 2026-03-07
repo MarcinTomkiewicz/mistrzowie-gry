@@ -1,32 +1,32 @@
-<section class="mg-section mg-chaotic-hero" [attr.aria-label]="vm().hero.title">
+<section class="mg-section mg-chaotic-hero" [attr.aria-label]="i18n.hero().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <div class="mg-chaotic-hero__badge">{{ vm().hero.badge }}</div>
+      <div class="mg-chaotic-hero__badge mb-xl">{{ i18n.hero().badge }}</div>
 
-      <h1 class="mg-section__title">{{ vm().hero.title }}</h1>
+      <h1 class="mg-section__title">{{ i18n.hero().title }}</h1>
 
       <p class="mg-section__subtitle">
-        {{ vm().hero.subtitleLead }}
+        {{ i18n.hero().subtitleLead }}
         <br />
-        {{ vm().hero.subtitleStrong }}
+        {{ i18n.hero().subtitleStrong }}
       </p>
 
       <div class="mg-chaotic-hero__spark" aria-hidden="true">
-        <span class="mg-chaotic-hero__dice">🎲</span>
-        <span class="mg-chaotic-hero__dice">🎲</span>
-        <span class="mg-chaotic-hero__dice">🎲</span>
+        @for (dice of sparkDice; track trackByIndex($index)) {
+          <span class="mg-chaotic-hero__dice">🎲</span>
+        }
       </div>
 
-      <div class="flex-row-center flex-col-sm mt-md gap-md">
+      <div class="flex-row-center-center flex-col-sm mt-md gap-md">
         <p-button
-          [label]="vm().heroCta.primaryLabel"
+          [label]="i18n.heroCta().primaryLabel"
           icon="pi pi-calendar"
           severity="primary"
           size="small"
           routerLink="/contact"
         />
         <p-button
-          [label]="vm().heroCta.secondaryLabel"
+          [label]="i18n.heroCta().secondaryLabel"
           icon="pi pi-users"
           severity="secondary"
           size="small"
@@ -38,22 +38,30 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="vm().about.title">
+<section class="mg-section" [attr.aria-label]="i18n.about().title">
   <div class="mg-container">
     <div class="mg-card">
-      <h2 class="mg-section__title mg-section__title--sm">{{ vm().about.title }}</h2>
-      <p>{{ vm().about.text }}</p>
+      <h2 class="mg-section__title mg-section__title--sm">
+        {{ i18n.about().title }}
+      </h2>
 
-      <div class="mg-chaotic-grid">
-        @for (h of vm().highlights; track trackByIndex($index)) {
+      <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+        {{ i18n.about().text }}
+      </p>
+
+      <div class="mg-chaotic-grid mt-md">
+        @for (h of i18n.highlights(); track trackByIndex($index)) {
           <div class="mg-card">
-            <div class="flex-row-start gap-sm mb-sm">
+            <div class="flex-row-start-center gap-sm mb-sm">
               <i class="{{ h.icon }}" aria-hidden="true"></i>
               <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
                 {{ h.title }}
               </h3>
             </div>
-            <p>{{ h.text }}</p>
+
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+              {{ h.text }}
+            </p>
           </div>
         }
       </div>
@@ -61,15 +69,15 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="vm().howItWorks.title">
+<section class="mg-section" [attr.aria-label]="i18n.howItWorks().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ vm().howItWorks.title }}</h2>
-      <p class="mg-section__subtitle">{{ vm().howItWorks.subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.howItWorks().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.howItWorks().subtitle }}</p>
     </header>
 
     <div class="mg-card">
-      <p-table [value]="vm().steps">
+      <p-table [value]="i18n.steps()">
         <ng-template pTemplate="body" let-s>
           <tr>
             <td>{{ s.time }}</td>
@@ -82,33 +90,37 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="vm().standards.title">
+<section class="mg-section" [attr.aria-label]="i18n.standards().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ vm().standards.title }}</h2>
-      <p class="mg-section__subtitle">{{ vm().standards.subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.standards().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.standards().subtitle }}</p>
     </header>
 
     <div class="mg-chaotic-grid">
-      @for (st of vm().standardsCards; track trackByIndex($index)) {
+      @for (st of i18n.standardsCards(); track trackByIndex($index)) {
         <div class="mg-card">
-          <div class="flex-row-start gap-sm mb-sm">
+          <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ st.icon }}" aria-hidden="true"></i>
             <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
               {{ st.title }}
             </h3>
           </div>
-          <p>{{ st.text }}</p>
+
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ st.text }}
+          </p>
         </div>
       }
     </div>
 
-    <div class="mg-card mg-chaotic-expectations">
+    <div class="mg-card mt-md">
       <h3 class="mg-section__title mg-section__title--sm">
-        {{ vm().standards.expectationsTitle }}
+        {{ i18n.standards().expectationsTitle }}
       </h3>
-      <ul>
-        @for (x of vm().expectations; track trackByIndex($index)) {
+
+      <ul class="mg-chaotic-list m-0">
+        @for (x of i18n.expectations(); track trackByIndex($index)) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -116,43 +128,45 @@
   </div>
 </section>
 
-<section class="mg-section" [attr.aria-label]="vm().faq.title">
+<section class="mg-section" [attr.aria-label]="i18n.faq().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <h2 class="mg-section__title">{{ vm().faq.title }}</h2>
-      <p class="mg-section__subtitle">{{ vm().faq.subtitle }}</p>
+      <h2 class="mg-section__title">{{ i18n.faq().title }}</h2>
+      <p class="mg-section__subtitle">{{ i18n.faq().subtitle }}</p>
     </header>
 
     <div class="mg-card">
       <p-accordion [multiple]="true">
-        @for (f of vm().faqs; let i = $index; track trackByIndex($index)) {
+        @for (f of i18n.faqs(); let i = $index; track trackByIndex($index)) {
           <p-accordion-panel [value]="i">
             <p-accordion-header class="mg-section__title mg-section__title--xs">
               {{ f.h }}
             </p-accordion-header>
             <p-accordion-content>
-              <p>{{ f.a }}</p>
+              <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+                {{ f.a }}
+              </p>
             </p-accordion-content>
           </p-accordion-panel>
         }
       </p-accordion>
     </div>
 
-    <div class="flex-row-center flex-col-sm mt-md gap-md">
+    <div class="flex-row-center-center flex-col-sm mt-md gap-md">
       <p-button
-        [label]="vm().commonCta.joinProgram"
+        [label]="i18n.commonCta().joinProgram"
         icon="pi pi-users"
         severity="primary"
         size="small"
         routerLink="/join-the-party"
       />
       <p-button
-        [label]="vm().commonCta.offerIndividual"
+        [label]="i18n.commonCta().offerIndividual"
         icon="pi pi-star"
         severity="secondary"
         size="small"
         [outlined]="true"
-        routerLink="/offer/individual"
+        routerLink="/offer/oferta-indywidualna"
       />
     </div>
   </div>
