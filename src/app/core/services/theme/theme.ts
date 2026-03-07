@@ -23,7 +23,7 @@ export class Theme {
   readonly current = computed(() => this.mode());
 
   readonly brandLogoSrc = computed(() =>
-    this.isLight() ? 'theme/light/brand.png' : 'theme/dark/brand.png',
+    this.isLight() ? 'theme/light/brand.avif' : 'theme/dark/brand.avif',
   );
 
   constructor() {

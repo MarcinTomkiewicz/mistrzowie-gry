@@ -25,10 +25,6 @@
   display: block;
   aspect-ratio: 16 / 10;
   object-fit: cover;
-
-  @include m.down("md") {
-    aspect-ratio: 16 / 11;
-  }
 }
 
 .mg-hero__stretched-link {
@@ -64,6 +60,7 @@
   border-radius: v.$radius-md;
 
   background: color-mix(in srgb, v.$color-bg 50%, transparent);
+  margin-bottom: 30px;
 
   @include m.down("sm") {
     left: map.get(v.$spacings, "sm");
@@ -110,7 +107,14 @@
 }
 
 .mg-hero__cta-grid {
-  @include m.mg-grid(2, map.get(v.$spacings, "md"), map.get(v.$spacings, "md"), true, 2, 1);
+  @include m.mg-grid(
+    2,
+    map.get(v.$spacings, "md"),
+    map.get(v.$spacings, "md"),
+    true,
+    2,
+    1
+  );
 }
 
 .mg-hero__cta {
@@ -119,10 +123,5 @@
   &:focus-visible {
     outline: 2px solid color-mix(in srgb, v.$color-secondary 75%, transparent);
     outline-offset: 2px;
-  }
-
-  p {
-    margin: 0;
-    color: v.$color-text-muted;
   }
 }

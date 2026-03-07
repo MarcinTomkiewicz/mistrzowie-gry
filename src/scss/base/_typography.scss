@@ -28,10 +28,11 @@ h6 { font-size: map.get(v.$font-sizes, "sm"); }
 
 p {
   margin: 0 0 map.get(v.$spacings, "md");
+  font-size: map.get(v.$font-sizes, "sm");
 }
 
 small {
-  font-size: map.get(v.$font-sizes, "sm");
+  font-size: map.get(v.$font-sizes, "xs");
 }
 
 strong {

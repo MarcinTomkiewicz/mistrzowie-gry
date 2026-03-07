@@ -18,7 +18,7 @@ export class Footer {
 
   // theme-aware asset
   readonly footerImgSrc = computed(() =>
-    this.theme.isLight() ? 'theme/light/footer.png' : 'theme/dark/footer.png',
+    this.theme.isLight() ? 'theme/light/footer.avif' : 'theme/dark/footer.avif',
   );
 
   track(_label: string): void {}
