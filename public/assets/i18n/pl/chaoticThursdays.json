@@ -1,124 +1,132 @@
 {
   "seo": {
-    "title": "[PH] chaoticThursdays.seo.title - Chaotyczne Czwartki",
-    "description": "[PH] chaoticThursdays.seo.description — Chaotyczne Czwartki: cykliczne wydarzenie RPG z losowaniem stołów i one-shotami. Wpadasz bez zobowiązań, poznajesz ludzi i grasz w spójnym standardzie prowadzenia."
+    "title": "Wieczór gier fabularnych, którym rządzi Chaos!",
+    "description": "Chaotyczne Czwartki są dla tych, którzy chcą spróbować. Zacząć grać w RPG albo wrócić do hobby po latach. Dla tych, którzy zastanawiają się jak znaleźć drużynę do gier fabularnych."
   },
   "hero": {
-    "badge": "chaoticThursdays.hero.badge",
-    "title": "chaoticThursdays.hero.title",
-    "subtitleLead": "[PH] chaoticThursdays.hero.subtitleLead — Wpadasz. Poznajesz ludzi. Los decyduje. Ty grasz.",
-    "subtitleStrong": "chaoticThursdays.hero.subtitleStrong"
+    "badge": "Dla każdego",
+    "title": "Chaotyczne Czwartki",
+    "subtitleLead": "Wyobraź sobie, że przychodzisz na wydarzenie gier fabularnych i nie tylko akceptujesz rzut kością, ale nawet to, że los za Ciebie wybierze, w co zagrasz.",
+    "subtitleStrong": "Sprawdź wieczór gier fabularnych, którym rządzi Chaos."
   },
+
+    "heroInfo": {
+    "title": "W skrócie",
+    "chaoticPrice": "Koszt spotkania: 40 zł od osoby",
+    "chaoticSchedule": "Kiedy: W każdy czwartek od 17:00",
+    "chaoticPlace": "Gdzie: Pub Pod Dwoma Miotłami, Wroniecka 21 w Poznaniu"
+  },
+
   "cta": {
-    "primaryLabel": "chaoticThursdays.cta.primaryLabel",
-    "secondaryLabel": "chaoticThursdays.cta.secondaryLabel"
+    "primaryLabel": "Zadaj pytanie",
+    "secondaryLabel": "Następne wydarzenie"
   },
   "about": {
-    "title": "chaoticThursdays.about.title",
-    "text": "[PH] chaoticThursdays.about.text — Chaotyczne Czwartki to cykliczne wydarzenie RPG, które działa jak “pierwszy kontakt”: jedno wejście, zero deklaracji, maksimum doświadczenia. Losowanie to celowy element formatu — buduje emocje i nieprzewidywalność.",
+    "title": "Czym są Chaotyczne Czwartki",
+    "text": "Podczas Chaotycznych Czwartków weźmiesz udział w niespotykanych na innych wydarzeniach atrakcjach. Wszystko zaczyna się od spotkania przed rozgrywką, na którym poznajesz innych graczy i Mistrzów Gry. A potem do gry wchodzi chaos.",
     "highlights": {
       "item-1": {
         "id": 1,
-        "title": "chaoticThursdays.about.highlights.1.title",
-        "text": "[PH] chaoticThursdays.about.highlights.1.text — Wpadasz bez zobowiązań. Bez kampanii, bez deklaracji."
+        "title": "Emocje bez zobowiązań",
+        "text": "Podczas Chaotycznego Czwartku weźmiesz udział w tzw. jednostrzale. Zamkniętej sesji, w której poznasz styl i sposób prowadzenia Mistrza Gry - oraz będziesz mieć okazję poznać system, w który, być może, do tej pory nie dane Ci było zagrać."
       },
       "item-2": {
         "id": 2,
-        "title": "chaoticThursdays.about.highlights.2.title",
-        "text": "[PH] chaoticThursdays.about.highlights.2.text — Stoły, MG i składy drużyn są losowane na miejscu."
+        "title": "Tu rządzi los...",
+        "text": "Centralnym punktem Chaotycznych Czwartków jest losowanie. Podczas niego losujesz sesję, w którą zagrasz. Dzięki temu masz szansę poznać innych naszych Mistrzów Gry, systemy, które prowadzą i różne style rozgrywki. Tak jak akceptujesz rzut kością w grze fabularnej, tak akceptujesz sesję, którą wskazał los"
       },
       "item-3": {
         "id": 3,
-        "title": "chaoticThursdays.about.highlights.3.title",
-        "text": "[PH] chaoticThursdays.about.highlights.3.text — Format zaprojektowany pod poznawanie graczy."
+        "title": "...ale nie przypadek",
+        "text": "Wszystkie sesje prowadzone są według ściśle określonych standardów. Kreatywność Mistrzów Gry nie jest niczym ograniczona, ale każda sesja spełnia minimum organizacyjne, którego oczekujemy. Dbamy o to, żeby Twoje doświadczenie było pełne i kompletne."
       },
       "item-4": {
         "id": 4,
-        "title": "chaoticThursdays.about.highlights.4.title",
-        "text": "[PH] chaoticThursdays.about.highlights.4.text — To jest sesja RPG, nie „demo” — tempo i domknięcie historii są częścią standardu."
+        "title": "Przyjdź raz i zostań na dłużej",
+        "text": "To Ty decydujesz czym będzie to spotkanie - jednorazową przygodą, okazją do poznania naszych Mistrzów Gry, testem przed skorzystaniem z naszych propozycji organizowania doświadczenia RPG. A może po prostu świetną zabawą dostępną dla osób, które nie mają stałej drużyny."
       }
     }
   },
   "howItWorks": {
-    "title": "chaoticThursdays.howItWorks.title",
-    "subtitle": "[PH] chaoticThursdays.howItWorks.subtitle — Struktura jest prosta i powtarzalna: wspólny start, integracja, losowanie jako show, a potem sesje równolegle.",
+    "title": "Jak to działa w praktyce?",
+    "subtitle": "Staramy się zachować prostą strukturę wydarzenia, tak, aby mimo całego Chaosu, Twoje doświadczenie było uporządkowane i kompletne.",
     "steps": {
       "step-1": {
         "id": 1,
         "time": "17:00",
-        "title": "chaoticThursdays.howItWorks.steps.1.title",
-        "text": "[PH] chaoticThursdays.howItWorks.steps.1.text — Zbieramy uczestników, odpowiadamy na pytania, integrujemy grupę."
+        "title": "Zbiórka",
+        "text": "To jest czas na to, żebyśmy mogli się lepiej poznać. Możesz porozmawiać z Mistrzami Gry i innymi uczestnikami, bo nigdy nie wiesz, z którymi z nich połączy Cię los."
       },
       "step-2": {
         "id": 2,
         "time": "18:00",
-        "title": "chaoticThursdays.howItWorks.steps.2.title",
-        "text": "[PH] chaoticThursdays.howItWorks.steps.2.text — Losujemy MG, stoły i drużyny. Element napięcia i „show”."
+        "title": "Losowanie",
+        "text": "Nasze specjalnie podgrzewane kulki są gotowe do tego, by wskazać Ci Twój stół i Twojego Mistrza Gry. Potem od razu udajecie się do stolika i gracie."
       },
       "step-3": {
         "id": 3,
         "time": "18:15",
-        "title": "chaoticThursdays.howItWorks.steps.3.title",
-        "text": "[PH] chaoticThursdays.howItWorks.steps.3.text — Krótkie wprowadzenie i ruszamy z grą. Zasady podawane w trakcie."
+        "title": "Sesja RPG",
+        "text": "Czyli to, na co wszyscy czekają. Nie przejmuj się, że los wskazał Ci system, którego nie znasz - w naszym standardzie Mistrz Gry poświęca pierwsze kilka minut na wprowadzenie Cię w świat i fabułę oraz na bieżąco tłumaczy niejasności."
       },
       "step-4": {
         "id": 4,
         "time": "22:15",
-        "title": "chaoticThursdays.howItWorks.steps.4.title",
-        "text": "[PH] chaoticThursdays.howItWorks.steps.4.text — Sesja ma wyraźne zakończenie — domykamy wątki i kończymy w punkt."
+        "title": "Zakończenie",
+        "text": "To orientacyjna godzina końca. Wszystkie sesje planowane są na około 4 godziny, ale to od graczy zależy czy potrwa to nieco krócej czy dłużej. Mistrz Gry pilnuje czasu, ale nie urywa w połowie zdania tylko dokańcza przygodę tak, żeby mieć poczucie zakończonej historii."
       }
     }
   },
   "standards": {
-    "title": "chaoticThursdays.standards.title",
-    "subtitle": "[PH] chaoticThursdays.standards.subtitle — Chaotyczne mają spójne ramy: wejście dla początkujących, tempo i domknięcie historii, zasady wprowadzane w trakcie, kultura komunikacji.",
+    "title": "Standardy Chaotycznych Czwartków",
+    "subtitle": "W trakcie każdego wydarzenia pilnujemy standardów, tego, żeby Twoje doświadczenie było zawsze spójne oraz na jak najwyższym poziomie - niezależnie od Mistrza Gry, do którego przydzieli Cię los.",
     "cards": {
       "item-1": {
         "id": 1,
-        "title": "chaoticThursdays.standards.cards.1.title",
-        "text": "[PH] chaoticThursdays.standards.cards.1.text — Dbamy o komfort i granice — komunikacja i kultura stołu są elementem standardu."
+        "title": "Komfort i bezpieczeństwo",
+        "text": "Najważniejszy jest dla nas Twój komfort i bezpieczeństwo, dlatego każdy z Mistrzów Gry przedstawi na początku spotkania zasady bezpieczeństwa obowiązujące przy stole oraz styl rozgrywki."
       },
       "item-2": {
         "id": 2,
-        "title": "chaoticThursdays.standards.cards.2.title",
-        "text": "[PH] chaoticThursdays.standards.cards.2.text — Wydarzenie ma ramy, a sesja ma domknięcie — bez „urwanych” historii."
+        "title": "Kompletna opowieść",
+        "text": "Nie urywamy naszych historii w trakcie, nie zostawiamy nierozwiązanych wątków. Dbamy o to, żeby sesje były zamkniętą całością, a Mistrzowie Gry pilnują, by zakończyć spotkania bez otwartych kwestii i wątków."
       },
       "item-3": {
         "id": 3,
-        "title": "chaoticThursdays.standards.cards.3.title",
-        "text": "[PH] chaoticThursdays.standards.cards.3.text — Jeśli nie znasz systemu — nic nie szkodzi. Tłumaczymy w trakcie i prowadzimy za rękę."
+        "title": "Tłumaczymy zasady",
+        "text": "Nawet jeśli nie znasz systemu, nasi Mistrzowie Gry wprowadzą Cię w zasady na początku spotkania, a później będą uzupełniać Twoją wiedzę na bieżąco, w miarę potrzeb i bez zaburzania rytmu sesji."
       },
       "item-4": {
         "id": 4,
-        "title": "chaoticThursdays.standards.cards.4.title",
-        "text": "[PH] chaoticThursdays.standards.cards.4.text — Prowadzący działają w ramach wspólnych wytycznych, nie „jak komu wygodnie”."
+        "title": "Jeden standard dla wszystkich",
+        "text": "Nasze standardy obowiązują wszystkich naszych Mistrzów Gry, dlatego nie ma znaczenia, na którą sesję trafisz - każda będzie prowadzona w ten sam sposób. Choć treść, przebieg i sposób prowadzenia są indywidualną sprawą Mistrza Gry, standard, który określamy obowiązuje wszystkich."
       }
     },
-    "expectationsTitle": "chaoticThursdays.standards.expectationsTitle",
+    "expectationsTitle": "Czego się możesz spodziewać?",
     "expectations": {
-      "1": "[PH] chaoticThursdays.standards.expectations.1 — Nie ma gwarancji konkretnego systemu ani klimatu — to element formatu.",
-      "2": "[PH] chaoticThursdays.standards.expectations.2 — To format jednorazowy, bez obietnicy kampanii.",
-      "3": "[PH] chaoticThursdays.standards.expectations.3 — Organizacja i standard są po naszej stronie."
+      "1": "Gwarantujemy dobrą zabawę i emocje - ale nie gwarantujemy Ci, że zagrasz w to, co chcesz.",
+      "2": "Spotkania są jednorazowymi sesjami i nie stanowią części większej całości.",
+      "3": "Bierzemy na siebie odpowiedzialność za zorganizowanie i przebieg wydarzenia."
     }
   },
   "faq": {
-    "title": "chaoticThursdays.faq.title",
-    "subtitle": "[PH] chaoticThursdays.faq.subtitle — Szybkie odpowiedzi, zanim zapytasz w wiadomości.",
+    "title": "Najczęstsze pytania",
+    "subtitle": "Zanim wyślesz do nas wiadomość, sprawdź odpowiedzi na najczęściej pojawiające się pytania.",
     "items": {
       "item-1": {
         "id": 1,
-        "h": "chaoticThursdays.faq.items.1.h",
-        "a": "[PH] chaoticThursdays.faq.items.1.a — Nie. To format przygotowany również dla początkujących."
+        "h": "Czy muszę znać RPG?",
+        "a": "Nie. To wydarzenie adresowane do wszystkich, zarówno początkujących, jak i zaawansowanych. Na początku każdej sesji tłumaczymy i wyjaśniamy zasady gry i systemu."
       },
       "item-2": {
         "id": 2,
-        "h": "chaoticThursdays.faq.items.2.h",
-        "a": "[PH] chaoticThursdays.faq.items.2.a — Nie. Każda sesja jest zamkniętym one-shotem."
+        "h": "Czy to jest wstęp do kampanii?",
+        "a": "Nie. Każda sesja jest zamkniętą, jednorazową przygodą (tzw. jednostrzałem) a kontynuacja jest możliwa poza wydarzeniem, w ramach naszej oferty indywidualnej."
       },
       "item-3": {
         "id": 3,
-        "h": "chaoticThursdays.faq.items.3.h",
-        "a": "[PH] chaoticThursdays.faq.items.3.a — Tak. To częsty scenariusz — właśnie po to jest losowanie."
+        "h": "Czy będę grać z nieznajomymi?",
+        "a": "Tak. To jest element, który sprawia, że Chaotyczne Czwartki są wyjątkowym spotkaniem. Losowanie sesji i zarazem współgraczy to nasza propozycja dobierania uczestników w drużyny, zamiast tradycyjnych zapisów na sesje."
       }
     }
   }

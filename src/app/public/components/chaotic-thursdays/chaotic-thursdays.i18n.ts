@@ -30,6 +30,7 @@ export function createChaoticThursdaysI18n(
   );
 
   const heroDict = translateObjectSignal('hero', {}, { scope: 'chaoticThursdays' });
+  const heroInfoDict = translateObjectSignal('heroInfo', {}, { scope: 'chaoticThursdays' });
   const pageCtaDict = translateObjectSignal('cta', {}, { scope: 'chaoticThursdays' });
   const aboutDict = translateObjectSignal('about', {}, { scope: 'chaoticThursdays' });
   const howDict = translateObjectSignal(
@@ -77,6 +78,14 @@ export function createChaoticThursdaysI18n(
     'subtitleLead',
     'subtitleStrong',
   ] as const);
+
+    const heroInfo = pickTranslations(heroInfoDict, [
+      'title',
+    'chaoticPlace',
+    'chaoticSchedule',
+    'chaoticPrice',
+  ] as const);
+
 
   const heroCta = pickTranslations(pageCtaDict, [
     'primaryLabel',
@@ -135,6 +144,7 @@ export function createChaoticThursdaysI18n(
     seoTitle,
     seoDescription,
     hero,
+    heroInfo,
     heroCta,
     about,
     howItWorks,

@@ -17,10 +17,20 @@
         }
       </div>
 
+      <div class="mg-card mt-md mx-auto flex-col-center-start">
+        <p class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs">{{ i18n.heroInfo().title }}</p>
+        <ul class="flex-col m-0 px-md">
+          <li>{{ i18n.heroInfo().chaoticPlace }}</li>
+          <li>{{ i18n.heroInfo().chaoticSchedule }}</li>
+          <li>{{ i18n.heroInfo().chaoticPrice }}</li>
+          
+        </ul>
+      </div>
+
       <div class="flex-row-center-center flex-col-sm mt-md gap-md">
         <p-button
           [label]="i18n.heroCta().primaryLabel"
-          icon="pi pi-calendar"
+          icon="pi pi-message-away"
           severity="primary"
           size="small"
           routerLink="/contact"
@@ -155,14 +165,14 @@
     <div class="flex-row-center-center flex-col-sm mt-md gap-md">
       <p-button
         [label]="i18n.commonCta().joinProgram"
-        icon="pi pi-users"
+        icon="pi pi-uprising"
         severity="primary"
         size="small"
         routerLink="/join-the-party"
       />
       <p-button
         [label]="i18n.commonCta().offerIndividual"
-        icon="pi pi-star"
+        icon="pi pi-read"
         severity="secondary"
         size="small"
         [outlined]="true"
