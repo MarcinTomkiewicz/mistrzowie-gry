@@ -1,0 +1,64 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-select {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-text);
+    border: 1px solid var(--mg-form-border);
+  }
+
+  .p-select:not(.p-disabled):hover {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-select.p-focus {
+    outline: none;
+    background: var(--mg-form-bg-focus);
+    border-color: var(--mg-form-border-focus);
+    box-shadow: 0 0 0 3px var(--mg-form-ring);
+  }
+
+  .p-select .p-select-label {
+    color: var(--mg-form-text);
+  }
+
+  .p-select .p-select-dropdown {
+    color: var(--mg-form-label);
+  }
+
+  .p-select.p-invalid,
+  .p-select.ng-invalid.ng-dirty,
+  .p-select.ng-invalid.ng-touched {
+    border-color: var(--mg-form-error);
+  }
+
+  .p-select.p-invalid.p-focus {
+    box-shadow: 0 0 0 3px var(--mg-form-error-ring);
+  }
+
+  .p-select.p-disabled {
+    background: var(--mg-form-disabled-bg);
+    color: var(--mg-form-disabled-text);
+    border-color: var(--mg-form-border);
+  }
+}
+
+.p-select-overlay,
+.p-select-panel {
+  background: var(--mg-form-bg);
+  color: var(--mg-form-text);
+  border: 1px solid var(--mg-form-border);
+}
+
+.p-select-option {
+  color: var(--mg-form-text);
+}
+
+.p-select-option:hover,
+.p-select-option.p-focus {
+  background: var(--mg-form-select-option-hover-bg);
+}
+
+.p-select-option.p-select-option-selected {
+  background: var(--mg-form-select-option-selected-bg);
+  color: var(--mg-form-text);
+}

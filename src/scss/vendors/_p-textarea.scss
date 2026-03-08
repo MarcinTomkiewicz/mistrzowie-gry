@@ -1,0 +1,43 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-textarea {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-text);
+    border: 1px solid var(--mg-form-border);
+  }
+
+  .p-textarea::placeholder {
+    color: var(--mg-form-placeholder);
+    opacity: 1;
+  }
+
+  .p-textarea:hover {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-textarea:focus,
+  .p-textarea:focus-visible {
+    outline: none;
+    background: var(--mg-form-bg-focus);
+    border-color: var(--mg-form-border-focus);
+    box-shadow: 0 0 0 3px var(--mg-form-ring);
+  }
+
+  .p-textarea.p-invalid,
+  .p-textarea.ng-invalid.ng-dirty,
+  .p-textarea.ng-invalid.ng-touched {
+    border-color: var(--mg-form-error);
+  }
+
+  .p-textarea.p-invalid:focus,
+  .p-textarea.p-invalid:focus-visible {
+    box-shadow: 0 0 0 3px var(--mg-form-error-ring);
+  }
+
+  .p-textarea:disabled,
+  .p-textarea.p-disabled {
+    background: var(--mg-form-disabled-bg) !important;
+    color: var(--mg-form-disabled-text) !important;
+    border-color: var(--mg-form-border) !important;
+  }
+}

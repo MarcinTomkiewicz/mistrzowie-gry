@@ -90,6 +90,7 @@ $color-paper-overlay-2: var(--mg-color-paper-overlay-2);
 $color-paper-text: var(--mg-color-paper-text);
 $color-paper-muted: var(--mg-color-paper-muted);
 $color-paper-border: var(--mg-color-paper-border);
+$color-antique: var(--mg-color-antique);
 
 /* =========================================================
    SEMANTIC COLORS (Warhammer Chaos) — wspólne
@@ -107,3 +108,26 @@ $semantic-colors: (
   "success": $color-success,
   "arcane": $color-arcane,
 );
+
+/* forms */
+$color-form-bg: var(--mg-form-bg);
+$color-form-bg-hover: var(--mg-form-bg-hover);
+$color-form-bg-focus: var(--mg-form-bg-focus);
+
+$color-form-text: var(--mg-form-text);
+$color-form-placeholder: var(--mg-form-placeholder);
+$color-form-label: var(--mg-form-label);
+
+$color-form-border: var(--mg-form-border);
+$color-form-border-hover: var(--mg-form-border-hover);
+$color-form-border-focus: var(--mg-form-border-focus);
+$color-form-ring: var(--mg-form-ring);
+
+$color-form-error: var(--mg-form-error);
+$color-form-success: var(--mg-form-success);
+
+$color-form-disabled-bg: var(--mg-form-disabled-bg);
+$color-form-disabled-text: var(--mg-form-disabled-text);
+
+$color-form-autofill-bg: var(--mg-form-autofill-bg);
+$color-form-autofill-text: var(--mg-form-autofill-text);

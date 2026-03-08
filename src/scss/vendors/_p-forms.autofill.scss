@@ -1,0 +1,24 @@
+:where(.mg-form, form, .mg-card form) {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--mg-form-autofill-text) !important;
+    caret-color: var(--mg-form-autofill-text);
+    border: 1px solid var(--mg-form-border-focus) !important;
+    box-shadow:
+      0 0 0 1000px var(--mg-form-autofill-bg) inset,
+      0 0 0 3px var(--mg-form-ring) !important;
+    transition: background-color 99999s ease-in-out 0s;
+  }
+
+  input:-webkit-autofill::first-line,
+  textarea:-webkit-autofill::first-line {
+    color: var(--mg-form-autofill-text) !important;
+  }
+}

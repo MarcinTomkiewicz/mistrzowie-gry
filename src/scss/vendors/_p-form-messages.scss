@@ -1,0 +1,10 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+:where(.mg-form, form, .mg-card form) {
+  .mg-contact-error {
+    color: var(--mg-form-error);
+    font-size: map.get(v.$font-sizes, "sm");
+    line-height: 1.35;
+  }
+}

@@ -1,0 +1,43 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-inputtext {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-text);
+    border: 1px solid var(--mg-form-border);
+  }
+
+  .p-inputtext::placeholder {
+    color: var(--mg-form-placeholder);
+    opacity: 1;
+  }
+
+  .p-inputtext:hover {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-inputtext:focus,
+  .p-inputtext:focus-visible {
+    outline: none;
+    background: var(--mg-form-bg-focus);
+    border-color: var(--mg-form-border-focus);
+    box-shadow: 0 0 0 3px var(--mg-form-ring);
+  }
+
+  .p-inputtext.p-invalid,
+  .p-inputtext.ng-invalid.ng-dirty,
+  .p-inputtext.ng-invalid.ng-touched {
+    border-color: var(--mg-form-error);
+  }
+
+  .p-inputtext.p-invalid:focus,
+  .p-inputtext.p-invalid:focus-visible {
+    box-shadow: 0 0 0 3px var(--mg-form-error-ring);
+  }
+
+  .p-inputtext:disabled,
+  .p-inputtext.p-disabled {
+    background: var(--mg-form-disabled-bg) !important;
+    color: var(--mg-form-disabled-text) !important;
+    border-color: var(--mg-form-border) !important;
+  }
+}
