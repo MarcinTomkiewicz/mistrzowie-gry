@@ -19,10 +19,6 @@
     .mg-footer__social {
       justify-content: center;
     }
-
-    .mg-footer__list {
-      justify-items: center;
-    }
   }
 }
 
@@ -38,17 +34,6 @@
 
   @include m.down("md") {
     margin-inline: auto;
-  }
-}
-
-.mg-footer__list {
-  list-style: none;
-  display: grid;
-  gap: 0.4rem;
-
-  .is-disabled {
-    opacity: 0.45;
-    pointer-events: none;
   }
 }
 

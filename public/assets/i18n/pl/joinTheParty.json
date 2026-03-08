@@ -16,7 +16,7 @@
     "orgMeetingPrice": "Koszt spotkania: Za darmo!",
     "orgMeetingSchedule": "Kiedy: W każdą środę o 18:00",
     "orgMeetingPlace": "Gdzie: Pub Pod Dwoma Miotłami, Wroniecka 21 w Poznaniu",
-    "sessionPrice": "Udział w programie: 40 zł od osoby"
+    "sessionPrice": "Udział w programie: 40 zł od osoby za spotkanie w programie"
   },
 
   "intro": {
@@ -73,7 +73,7 @@
     },
     "rules": {
       "title": "Zasady programu",
-      "1": "Pierwsze 5 sesji to umowa pakietowa na realizację konkretnego pakietu. To krótkoterminowe zobowiązanie, które pozwoli Ci podjąć decyzję o dalszej grze.",
+      "1": "Pierwsze 5 sesji jest realizacją konkretnego pakietu sesji RPG. To krótkoterminowe zobowiązanie, które pozwoli Ci podjąć decyzję o dalszej grze.",
       "2": "Terminy ustalane są wewnątrz drużyny w porozumieniu z Mistrzem Gry. Nie narzucamy terminów odgórnie, ale stawiamy na regularną grę.",
       "3": "Rezerwacje terminów i płatności odbywają się poprzez narzędzia dostarczane przez nas."
     }

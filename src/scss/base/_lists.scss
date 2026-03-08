@@ -3,6 +3,7 @@
 
 ul {
     padding: 0;
+    text-align: start;
 }
 
 li {
@@ -27,8 +28,8 @@ li {
     mask-size: contain;
 
     /* default bullet = d20 */
-    -webkit-mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd20')}");
-    mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd20')}");
+    -webkit-mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd10')}");
+    mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd10')}");
   }
 }
 

@@ -8,8 +8,8 @@ export const JOIN_THE_PARTY_BENEFIT_ICONS: readonly IconTech[] = [
 ] as const;
 
 export const JOIN_THE_PARTY_STEP_ICONS: readonly IconTech[] = [
-  { id: 1, icon: 'pi pi-comments' },
-  { id: 2, icon: 'pi pi-sitemap' },
-  { id: 3, icon: 'pi pi-play' },
-  { id: 4, icon: 'pi pi-compass' },
+  { id: 1, icon: 'pi pi-stairs-goal' },
+  { id: 2, icon: 'pi pi-stairs-goal' },
+  { id: 3, icon: 'pi pi-stairs-goal' },
+  { id: 4, icon: 'pi pi-stairs-goal' },
 ] as const;

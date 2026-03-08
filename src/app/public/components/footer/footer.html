@@ -40,9 +40,9 @@
           {{ i18n.footer().shortcutTitle }}
         </h3>
 
-        <ul class="mg-footer__list m-0 p-0">
+        <ul class="flex-col-center-center-md m-0 p-0">
           @for (l of footerLinks(); track $index) {
-            <li>
+            <li class="w-30-md w-50-sm w-70-xs">
               <a
                 [routerLink]="l.path"
                 [class.is-disabled]="l.disabled"
@@ -60,15 +60,15 @@
           {{ i18n.footer().contactTitle }}
         </h3>
 
-        <ul class="mg-footer__list m-0 p-0">
-          <li>
+        <ul class="flex-col-center-center-md m-0 p-0">
+          <li class="w-30-md w-50-sm w-70-xs">
             <strong>{{ i18n.footer().phoneLabel }}:</strong>
             <a [href]="i18n.footer().phoneHref">
               {{ i18n.footer().phoneValue }}
             </a>
           </li>
 
-          <li>
+          <li class="w-30-md w-50-sm w-70-xs">
             <strong>{{ i18n.footer().emailLabel }}:</strong>
             <a [href]="i18n.footer().emailHref">
               {{ i18n.footer().emailValue }}
