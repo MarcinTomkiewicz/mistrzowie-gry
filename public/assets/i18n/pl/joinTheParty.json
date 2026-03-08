@@ -1,94 +1,103 @@
 {
   "seo": {
-    "title": "joinTheParty.seo.title",
-    "description": "[PH] joinTheParty.seo.description — Dołącz do Drużyny: program wejścia w regularne granie w stałej grupie. Etap wprowadzający obejmuje 5 sesji po 4 godziny i prowadzi do kontynuacji w ramach struktur projektu."
+    "title": "Dołącz do Drużyny! Zacznij grać w RPG!",
+    "description": "Dołącz do Drużyny to program przede wszystkim dla początkujących graczy. Jeśli nie wiesz jak zacząć grać w RPG, znajdziemy Ci drużynę i zorganizujemy Twoją pierwszą sesję RPG."
   },
 
   "hero": {
-    "badge": "joinTheParty.hero.badge",
-    "title": "joinTheParty.hero.title",
-    "subtitle": "[PH] joinTheParty.hero.subtitle — Program, który zamienia “chcę zagrać” w realną, regularną drużynę. My bierzemy na siebie organizację, a Ty po prostu wchodzisz w grę."
+    "badge": "Dla początkujących",
+    "title": "Dołącz do Drużyny",
+    "subtitle": "Witaj w naszym autorskim programie. To tutaj postawisz swoje pierwsze kroki w grach fabularnych, poznasz Mistrzów Gry i zasady. Nie będziesz czytać setek stron podręczników i zasad. Nasza formuła \"RPG z napisami\" pozwoli Ci poznać gry fabularne w Twoim tempie, poprzez praktykę i regularną grę. Na teorię przyjdzie czas! "
+  },
+
+  "heroInfo": {
+    "title": "W skrócie",
+    "orgMeetingFree": "Przyjdź na nasze bezpłatne spotkanie organizacyjne i poznaj szczegóły",
+    "orgMeetingPrice": "Koszt spotkania: Za darmo!",
+    "orgMeetingSchedule": "Kiedy: W każdą środę o 18:00",
+    "orgMeetingPlace": "Gdzie: Pub Pod Dwoma Miotłami, Wroniecka 21 w Poznaniu",
+    "sessionPrice": "Udział w programie: 40 zł od osoby"
   },
 
   "intro": {
-    "title": "joinTheParty.intro.title",
-    "subtitle": "[PH] joinTheParty.intro.subtitle — To program dla osób, które chcą grać, ale nie chcą (albo nie mogą) samodzielnie składać ekipy, szukać MG i dogrywać wszystkiego od zera.",
+    "title": "Program dla początkujących",
+    "subtitle": "Dołącz do Drużyny to program skierowany przede wszystkim do nowych, początkujących graczy. Dzięki uczestnictwu w programie nie musisz szukać drużyny, graczy, chętnego Mistrza Gry. Nie musisz też znać zasad, czytać podręczników, dodatków i poradników. Zapoznaj się ze szczegółami poniżej i zagraj z nami!",
     "benefits": {
       "item-1": {
         "id": 1,
-        "title": "joinTheParty.intro.benefits.1.title",
-        "text": "[PH] joinTheParty.intro.benefits.1.text — Organizacja drużyny po naszej stronie: dobór osób, ramy współpracy i start bez chaosu."
+        "title": "Jak zacząć grać w RPG?",
+        "text": "Jako organizacja zajmujemy się kompleksową obsługą Twojego pierwszego doświadczenia RPG. Na spotkaniach organizacyjnych poznajemy Twoje preferencje co do stylu, klimatu, który Cię interesuje, przekazujemy szczegółowe informacje o funkcjonowaniu i organizacji Twojej gry."
       },
       "item-2": {
         "id": 2,
-        "title": "joinTheParty.intro.benefits.2.title",
-        "text": "[PH] joinTheParty.intro.benefits.2.text — Regularność bez narzuconego grafiku: ustalacie terminy z MG przy wsparciu narzędzi projektu."
+        "title": "Z nami grasz regularnie",
+        "text": "Wspieramy regularne granie, ale nie narzucamy Ci sztywnego grafiku. To Ty, w porozumieniu z Mistrzem Gry i resztą drużyny, ustalasz kiedy i jak często grasz. Dzięki temu masz pewność regularnej gry, ale też swobodę i elastyczność."
       },
       "item-3": {
         "id": 3,
-        "title": "joinTheParty.intro.benefits.3.title",
-        "text": "[PH] joinTheParty.intro.benefits.3.text — Pełne doświadczenie startowe: etap wprowadzający jako zamknięty pakiet, bez wymogu przygotowania."
+        "title": "Dajemy Ci kompletne doświadczenie",
+        "text": "W Dołącz do Drużyny proponujemy Ci pełne doświadczenie RPG - od tworzenia postaci po Twoją pierwszą kampanię. Pierwsze 5 spotkań programu pozwala Ci lepiej poznać drużynę, Mistrza Gry, system, który wybierzecie i podjąć świadomą decyzję o tym, czy to hobby jest dla Ciebie."
       },
       "item-4": {
         "id": 4,
-        "title": "joinTheParty.intro.benefits.4.title",
-        "text": "[PH] joinTheParty.intro.benefits.4.text — Spójny standard prowadzenia i bezpieczna kultura stołu jako część usługi, nie opcja."
+        "title": "Standard, bezpieczeństwo i kontynuacja",
+        "text": "Każdy z naszych Mistrzów Gry realizuje program w oparciu o te same standardy prowadzenia. Dzięki temu każda drużyna otrzymuje to samo pełne wsparcie i pomoc w nauce gry. A nasze opcje po zakończeniu programu - specjalne zniżki i pakiety dla uczestników Dołącz do Drużyny, pozwalają kontynuować przygodę w tej samej grupie."
       }
     }
   },
 
   "structure": {
-    "title": "joinTheParty.structure.title",
-    "subtitle": "[PH] joinTheParty.structure.subtitle — Etap wprowadzający to 5 sesji (gwarantowane 4 godziny każda) i jasne ramy startu: celem jest doprowadzić drużynę do świadomej decyzji o dalszym, regularnym graniu.",
+    "title": "Jak to działa?",
+    "subtitle": "Poniżej przedstawiamy etapy, z których składa się nasza propozycja. Wierzymy, że tak ukształtowany schemat programu pozwala poznać hobby w wystarczającym stopniu, żeby umożliwić Ci świadomą decyzję o tym co dalej.",
     "steps": {
       "item-1": {
         "id": 1,
-        "title": "joinTheParty.structure.steps.1.title",
-        "text": "[PH] joinTheParty.structure.steps.1.text — Kontakt i wejście: zbieramy podstawowe informacje, odpowiadamy na pytania i ustawiamy oczekiwania."
+        "title": "Krok 1",
+        "text": "Na spotkaniu organizacyjnym poznajemy Twoje preferencje, oczekiwany styl gry, a Ty decydujesz czy chcesz grać z nami. Nie przejmuj się, jeśli nie znasz odpowiedzi na pytania o preferencje. Nie wymagamy znajomości nazw systemów - wystarczy informacja czy wolisz fantasy czy horror, \"Wiedźmina\" czy \"Gwiezdne Wojny\"."
       },
       "item-2": {
         "id": 2,
-        "title": "joinTheParty.structure.steps.2.title",
-        "text": "[PH] joinTheParty.structure.steps.2.text — Tworzenie drużyny: dopasowanie dostępności i preferencji tak, żeby zwiększyć szanse na stabilność grupy."
+        "title": "Krok 2",
+        "text": "Na podstawie zebranych informacji o preferencjach Twoich i innych uczestników programu, tworzymy drużyny i przydzielamy Mistrza Gry. Czasami formowanie drużyny może chwilę potrwać, nie zawsze uda nam się stworzyć drużynę od razu na spotkaniu. Ale na pewno zaczniesz grać w gry fabularne."
       },
       "item-3": {
         "id": 3,
-        "title": "joinTheParty.structure.steps.3.title",
-        "text": "[PH] joinTheParty.structure.steps.3.text — Etap wprowadzający (5 sesji): start bez presji “znajomości zasad”, z prowadzeniem nastawionym na komfort i tempo."
+        "title": "Krok 3",
+        "text": "Pierwsze 5 sesji, z których składa się program to czas na to, żeby spokojnie zacząć grać. \"RPG z napisami\" pozwala Mistrzowi Gry zrobić \"stopklatkę\", przerwę w grze, przekazać kluczową informację mechaniczną albo fabularną i kontynuować grę. A Ty dowiadujesz się tylko tyle, ile jest na dany moment potrzebne."
       },
       "item-4": {
         "id": 4,
-        "title": "joinTheParty.structure.steps.4.title",
-        "text": "[PH] joinTheParty.structure.steps.4.text — Decyzja i kontynuacja: po etapie wprowadzającym przechodzicie płynnie do regularnego grania w ramach projektu."
+        "title": "Krok 4",
+        "text": "Po pierwszych 5 sesjach przychodzi moment decyzji. Znacie się już z drużyną dość dobrze, poznaliście też Mistrza Gry i wiecie na czym polega gra. Teraz decydujecie czy chcecie grać dalej. Jeśli tak - skorzystacie ze zniżek na sesje pakietowe i abonamentowe u nas, albo wypuszczamy was \"w świat\" niczym wiedźminów z Kaer Morhen."
       }
     },
     "rules": {
-      "title": "joinTheParty.structure.rules.title",
-      "1": "[PH] joinTheParty.structure.rules.1 — Etap wprowadzający ma określony początek i zakres: to pakiet, nie “luźne zapisy”.",
-      "2": "[PH] joinTheParty.structure.rules.2 — Terminy ustalane są z MG, ale zakładamy regularność: brak grafiku ≠ dowolność.",
-      "3": "[PH] joinTheParty.structure.rules.3 — Korzystacie z narzędzi projektu do koordynacji terminów i komunikacji."
+      "title": "Zasady programu",
+      "1": "Pierwsze 5 sesji to umowa pakietowa na realizację konkretnego pakietu. To krótkoterminowe zobowiązanie, które pozwoli Ci podjąć decyzję o dalszej grze.",
+      "2": "Terminy ustalane są wewnątrz drużyny w porozumieniu z Mistrzem Gry. Nie narzucamy terminów odgórnie, ale stawiamy na regularną grę.",
+      "3": "Rezerwacje terminów i płatności odbywają się poprzez narzędzia dostarczane przez nas."
     }
   },
 
   "continuation": {
-    "title": "joinTheParty.continuation.title",
-    "subtitle": "[PH] joinTheParty.continuation.subtitle — Domyślnym scenariuszem jest dalsze granie w ramach struktur projektu (abonament / pakiety) na preferencyjnych warunkach przez określony czas.",
+    "title": "Przygoda, która staje się kampanią",
+    "subtitle": "Zależy nam na tym, żeby drużyny, które powstaną w wyniku działania programu, kontynuowały swoje doświadczenie RPG. Dlatego dla uczestników programu Dołącz do Drużyny przygotowaliśmy specjalne pakiety i promocje, które ułatwią Ci dalszą grę w naszych strukturach.",
     "bullets": {
-      "title": "joinTheParty.continuation.bullets.title",
-      "1": "[PH] joinTheParty.continuation.bullets.1 — Kontynuacja to kolejny etap programu, a nie przeskok do “nowej usługi”.",
-      "2": "[PH] joinTheParty.continuation.bullets.2 — Zachowujecie spójność organizacyjną i komunikacyjną, a akcent przesuwa się z wprowadzenia na pogłębianie gry.",
-      "3": "[PH] joinTheParty.continuation.bullets.3 — Drużyna zostaje w strukturach projektu tak długo, jak korzysta z wypracowanych warunków."
+      "title": "Życie po programie",
+      "1": "Kontynuacja gry w ramach inicjatywy \"Mistrzowie Gry\" to kolejny etap i naturalne przejście od nauki podstaw do regularnej gry - to nie nowa usługa tylko ciąg dalszy przygody.",
+      "2": "Ciągłość gry pozwala Ci zachować spójność z dotychczasowym doświadczeniem, stylem i wypracowaną dynamiką grupy. Dzięki dalszej grze akcenty przesuwają się z nauki podstaw na pogłębianie Twojego doświadczenia i szczegółowych zasad.",
+      "3": "Twoja drużyna pozostaje w strukturze, dzięki czemu masz dostęp do wsparcia, rozwiązywania problemów i dbałości o to, żeby na każdym etapie Twoje doświadczenie było kompletne."
     }
   },
 
   "orgMeeting": {
-    "title": "joinTheParty.orgMeeting.title",
-    "subtitle": "[PH] joinTheParty.orgMeeting.subtitle — Przed dołączeniem odbywa się bezpłatne spotkanie organizacyjne: informacyjne, nie sprzedażowe. To pierwszy punkt kontaktu i miejsce na doprecyzowanie zasad programu.",
+    "title": "Spotkanie organizacyjne",
+    "subtitle": "Zanim dołączysz do drużyny, weź udział w spotkaniu organizacyjnym. Dowiesz się na nim wszystkiego, co jest potrzebne do rozpoczęcia gry - od spraw organizacyjnych po korzyści z uczestnictwa.",
     "bullets": {
-      "title": "joinTheParty.orgMeeting.bullets.title",
-      "1": "[PH] joinTheParty.orgMeeting.bullets.1 — Wyjaśniamy jak działa program i co jest po stronie uczestników, a co po stronie projektu.",
-      "2": "[PH] joinTheParty.orgMeeting.bullets.2 — Odpowiadamy na pytania i pomagamy podjąć świadomą decyzję.",
-      "3": "[PH] joinTheParty.orgMeeting.bullets.3 — Ustalamy kolejne kroki: zebranie informacji i start procesu tworzenia drużyny."
+      "title": "Dołącz do Drużyny - spotkanie organizacyjne",
+      "1": "Podczas spotkania wyjaśnimy Ci, jak działa program, co znajduje się po stronie naszej odpowiedzialności, czego oczekujemy od Ciebie.",
+      "2": "Odpowiemy na pytania i pomożemy Ci podjąć świadomą decyzję o uczestnictwie w programie, przedstawimy warunki i szczegóły.",
+      "3": "W zależności od liczby osób na spotkaniu oraz na liście oczekujących, poinformujemy Cię o dalszych krokach, zadecydujemy o wpisaniu Cię na listę oczekujących lub przydzielimy do drużyny."
     }
   }
 }

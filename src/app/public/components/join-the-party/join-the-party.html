@@ -1,7 +1,7 @@
 <section class="mg-section mg-join-hero" [attr.aria-label]="i18n.hero().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <div class="mg-join-hero__badge mb-sm">{{ i18n.hero().badge }}</div>
+      <div class="mg-join-hero__badge mb-md">{{ i18n.hero().badge }}</div>
 
       <h1 class="mg-section__title">{{ i18n.hero().title }}</h1>
 
@@ -9,21 +9,24 @@
         {{ i18n.hero().subtitle }}
       </p>
 
+      <div class="mg-card mt-md mx-auto flex-col-center-start">
+        <p class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs">{{ i18n.heroInfo().title }}</p>
+        <ul class="flex-col m-0 px-xl">
+          <li>{{ i18n.heroInfo().orgMeetingFree }}</li>
+          <li>{{ i18n.heroInfo().orgMeetingPrice }}</li>
+          <li>{{ i18n.heroInfo().orgMeetingSchedule }}</li>
+          <li>{{ i18n.heroInfo().orgMeetingPlace }}</li>
+          <li>{{ i18n.heroInfo().sessionPrice }}</li>
+        </ul>
+      </div>
+
       <div class="flex-row-center-center flex-col-sm mt-md gap-md">
         <p-button
           [label]="i18n.cta().contactUs"
-          icon="pi pi-envelope"
+          icon="pi pi-message-away"
           severity="primary"
           size="small"
           routerLink="/contact"
-        />
-        <p-button
-          [label]="i18n.cta().joinProgram"
-          icon="pi pi-users"
-          severity="secondary"
-          size="small"
-          [outlined]="true"
-          routerLink="/join-the-party"
         />
       </div>
     </header>
@@ -138,18 +141,10 @@
       <div class="flex-row-end-center flex-col-sm mt-md gap-sm">
         <p-button
           [label]="i18n.cta().contactUs"
-          icon="pi pi-envelope"
+          icon="pi pi-message-away"
           severity="primary"
           size="small"
           routerLink="/contact"
-        />
-        <p-button
-          [label]="i18n.cta().joinProgram"
-          icon="pi pi-users"
-          severity="secondary"
-          size="small"
-          [outlined]="true"
-          routerLink="/join-the-party"
         />
       </div>
     </div>

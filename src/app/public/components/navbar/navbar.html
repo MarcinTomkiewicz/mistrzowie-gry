@@ -13,7 +13,7 @@
 
     <ul class="mg-navbar__menu">
       @for (item of menu(); track trackByLabelKey($index, item)) {
-        <li class="mg-navbar__item">
+        <li class="mg-navbar__item li--unset">
           @if (!item.children?.length) {
             <a class="mg-navbar__link" [routerLink]="item.path">
               {{ item.label }}

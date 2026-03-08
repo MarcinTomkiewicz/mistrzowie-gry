@@ -18,9 +18,9 @@
             </p>
           </div>
 
-          <ul class="mg-programs__list">
+          <ul>
             @for (b of p.bullets; track trackByBullet($index, b)) {
-              <li>{{ b }}</li>
+              <li class="li--bullet-overlord">{{ b }}</li>
             }
           </ul>
 

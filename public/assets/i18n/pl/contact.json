@@ -1,52 +1,53 @@
 {
   "seo": {
-    "title": "contact.seo.title",
-    "description": "[PH] contact.seo.description — Skontaktuj się z nami w sprawie usług RPG: oferta biznesowa, instytucje, imprezy okolicznościowe i inne tematy. Wybierz temat i wyślij wiadomość."
+    "title": "Kontakt",
+    "description": "Nawiąż kontakt z Mistrzami Gry. Dowiedz się więcej o sesjach RPG dla początkujących graczy. Poznaj szczegóły oferty dla firm i instytucji."
   },
 
   "hero": {
-    "title": "contact.hero.title",
-    "subtitle": "[PH] contact.hero.subtitle — Wybierz temat, napisz wiadomość i zostaw kontakt. Odpowiemy najszybciej jak to możliwe."
+    "title": "Skontaktuj się z nami",
+    "subtitle": "Jeśli potrzebujesz więcej informacji na temat naszej propozycji albo chcesz zorganizować swoje doświadczenie RPG, użyj formularza poniżej, a my odpowiemy tak szybko jak to możliwe."
   },
 
     "info": {
-    "title": "contact.info.title",
-    "subtitle": "[PH] contact.info.subtitle — Nie mamy lokalu ani adresu do odwiedzin. Najszybciej odpowiadamy przez formularz lub mail.",
-    "emailLabel": "contact.info.emailLabel",
-    "phoneLabel": "contact.info.phoneLabel",
-    "emailValue": "[PH] kontakt@mistrzgry.pl",
+    "title": "Dane kontaktowe",
+    "subtitle": "Mistrzowie Gry są usługą działającą mobilnie, wirtualnie i w chmurze. Nie mamy swojej siedziby ani adresu, pod którym możesz nas odwiedzić. Dlatego zachęcamy do kontaktu przez e-mail albo telefonicznie.",
+    "emailLabel": "Adres e-mail:",
+    "phoneLabel": "Nr telefonu:",
+    "emailValue": "kontakt@mistrzowie-gry.pl",
     "phoneValue": "[PH] +48 000 000 000"
   },
 
   "form": {
-    "title": "contact.form.title",
-    "hint": "[PH] contact.form.hint — Im więcej kontekstu podasz, tym szybciej dobierzemy właściwą odpowiedź (format, termin, budżet, liczba osób).",
+    "title": "Napisz bezpośrednio",
+    "hint": "Podaj nam swoje oczekiwania, liczbę uczestników Twojego doświadczenia RPG, datę i jak najwięcej szczegółów. Przygotujemy wtedy dla Ciebie najlepsze rozwiązanie i dobierzemy najlepszych prowadzących.",
 
-    "topicLabel": "contact.form.topicLabel",
-    "topicCustomLabel": "contact.form.topicCustomLabel",
+    "topicLabel": "Wybierz temat",
+    "topicCustomLabel": "Twój temat wiadomości",
 
-    "firstNameLabel": "contact.form.firstNameLabel",
-    "lastNameLabel": "contact.form.lastNameLabel",
-    "companyLabel": "contact.form.companyLabel",
-    "emailLabel": "contact.form.emailLabel",
-    "phoneLabel": "contact.form.phoneLabel",
-    "messageLabel": "contact.form.messageLabel",
-    "messagePlaceholder": "[PH] contact.form.messagePlaceholder — Napisz: czego potrzebujesz, dla ilu osób, jaki termin/okres i co jest dla Ciebie najważniejsze."
+    "firstNameLabel": "Imię*",
+    "lastNameLabel": "Nazwisko*",
+    "companyLabel": "Nazwa firmy",
+    "emailLabel": "Adres e-mail*",
+    "phoneLabel": "Nr telefonu",
+    "messageLabel": "Treść wiadomości*",
+    "messagePlaceholder": "Podaj jak najwięcej szczegółów Twojego zapytania. Pozwoli nam to precyzyjnie odpowiedzieć na Twoje pytania i przygotować najlepsze rozwiązanie."
   },
 
   "errors": {
-    "required": "contact.errors.required",
-    "email": "contact.errors.email",
-    "minMessage": "contact.errors.minMessage"
+    "required": "Pole wymagane!",
+    "email": "Błędny adres e-mail!",
+    "minMessage": "Wiadomość jest za krótka!"
   },
 
   "topics": {
-    "topic-1": { "id": 1, "value": "business", "label": "contact.topics.business" },
-    "topic-2": { "id": 2, "value": "institution", "label": "contact.topics.institution" },
-    "topic-3": { "id": 3, "value": "party", "label": "contact.topics.party" },
-    "topic-4": { "id": 4, "value": "individual", "label": "contact.topics.individual" },
-    "topic-5": { "id": 5, "value": "join", "label": "contact.topics.join" },
-    "topic-6": { "id": 6, "value": "pricing", "label": "contact.topics.pricing" },
-    "topic-7": { "id": 7, "value": "other", "label": "contact.topics.other" }
+    "topic-1": { "id": 1, "value": "business", "label": "Zapytanie biznesowe" },
+    "topic-2": { "id": 2, "value": "institution", "label": "W imieniu instytucji" },
+    "topic-3": { "id": 3, "value": "party", "label": "Chcę zorganizować imprezę" },
+    "topic-4": { "id": 4, "value": "individual", "label": "Grupa prywatna" },
+    "topic-5": { "id": 5, "value": "join", "label": "Dołącz do Drużyny" },
+    "topic-6": { "id": 6, "value": "chaotic", "label": "Chaotyczne Czwartki" },
+    "topic-7": { "id": 7, "value": "pricing", "label": "Ceny i oferta" },
+    "topic-8": { "id": 8, "value": "other", "label": "Inny temat (wpisz ręcznie)" }
   }
 }

@@ -1,4 +1,4 @@
-/* path: src/styles/vendors/_custom-icons.scss */
+@use "../abstracts/custom-icons" as ci;
 
 .pi {
   display: inline-block;
@@ -29,22 +29,7 @@
   background-color: unset;
 }
 
-/* nazwa klasy -> plik w /assets/icons */
-$custom-icons: (
-  "overlord": "overlord-helm.svg",
-  "shop-bag": "shop.svg",
-  "cash": "cash.svg",
-  "d20": "d20.svg",
-  "moon-bats": "moon-bats.svg",
-  "sun-eclipse": "eclipse-flare.svg",
-  "direction-sign": "direction-sign.svg",
-  "teacher": "teacher.svg",
-  "read": "read.svg",
-  "uprising": "uprising.svg",
-  "evil-book": "evil-book.svg",
-);
-
-@each $name, $file in $custom-icons {
+@each $name, $file in ci.$custom-icons {
   .pi.pi-#{$name} {
     @extend .pi--svg;
     -webkit-mask-image: url("/icons/#{$file}");

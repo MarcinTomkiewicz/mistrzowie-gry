@@ -13,6 +13,14 @@ import { pickTranslations } from '../../../core/utils/pick-translation';
 import { IconTech } from '../../../core/types/icon-tech';
 
 const TITLE_SUBTITLE = ['title', 'subtitle'] as const;
+const HERO_INFO_KEYS = [
+  'title',
+  'orgMeetingFree',
+  'orgMeetingPrice',
+  'orgMeetingSchedule',
+  'orgMeetingPlace',
+  'sessionPrice',
+] as const;
 
 function toSortedById<T>(dict: unknown): T[] {
   return dictToSortedArray<T>(dict as never, (x) =>
@@ -35,6 +43,12 @@ export function createJoinThePartyI18n(
   const seoDescription = translateSignal('seo.description', {}, { scope: 'joinTheParty' });
 
   const heroDict = translateObjectSignal('hero', {}, { scope: 'joinTheParty' });
+  const heroInfoDict = translateObjectSignal(
+    'heroInfo',
+    {},
+    { scope: 'joinTheParty' },
+  );
+
   const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
 
   const rulesTitleDict = translateObjectSignal(
@@ -86,6 +100,8 @@ export function createJoinThePartyI18n(
   );
 
   const hero = pickTranslations(heroDict, ['badge', 'title', 'subtitle'] as const);
+  const heroInfo = pickTranslations(heroInfoDict, HERO_INFO_KEYS);
+
   const cta = pickTranslations(commonCtaDict, ['contactUs', 'joinProgram'] as const);
 
   const intro = createSectionTitleSubtitle('intro');
@@ -129,6 +145,7 @@ export function createJoinThePartyI18n(
     seoTitle,
     seoDescription,
     hero,
+    heroInfo,
     cta,
     intro,
     structure,

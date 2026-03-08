@@ -1,0 +1,50 @@
+@use "sass:map";
+@use "../abstracts/custom-icons" as ci;
+
+ul {
+    padding: 0;
+}
+
+li {
+  position: relative;
+  padding-left: 1.5rem;
+  line-height: 1.9;
+  list-style: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.35em;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+
+    /* default bullet = d20 */
+    -webkit-mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd20')}");
+    mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd20')}");
+  }
+}
+
+.li--unset {
+  all: unset;
+
+  &::before {
+    all: unset;
+  }
+}
+
+@each $name, $file in ci.$custom-icons {
+  .li--bullet-#{$name}::before {
+    content: "";
+    font-family: unset;
+    -webkit-mask-image: url("/icons/#{$file}");
+    mask-image: url("/icons/#{$file}");
+  }
+}

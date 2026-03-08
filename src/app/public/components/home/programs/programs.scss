@@ -5,24 +5,3 @@
 .mg-programs__grid {
   @include m.mg-grid(2, map.get(v.$spacings, "lg"), map.get(v.$spacings, "md"), true, 2, 1);
 }
-
-.mg-programs__list {
-  list-style: none;
-  padding-left: 0;
-
-  li {
-    position: relative;
-    padding-left: 1.5rem;
-    line-height: 1.9;
-
-    &::before {
-      content: "\ea0f";
-      font-family: 'primeicons';
-      position: absolute;
-      left: 0;
-      top: 0.15em;
-      color: v.$heading-color;
-      font-size: 0.9em;
-    }
-  }
-}
