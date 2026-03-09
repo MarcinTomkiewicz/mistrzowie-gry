@@ -1,12 +1,18 @@
 {
   "cta": {
-    "contactUs": "common.cta.contactUs"
+    "contactUs": "Zapytaj o ofertę"
   },
+
+  "seo": {
+    "title": "Nasza oferta",
+    "description": ""
+  },
+
   "pricingTable": {
     "headers": {
-      "variant": "offers.pricingTable.headers.variant",
-      "price": "offers.pricingTable.headers.price",
-      "description": "offers.pricingTable.headers.description"
+      "variant": "Twoje doświadczenie RPG",
+      "price": "Cena",
+      "description": "Opis"
     }
   }
 }

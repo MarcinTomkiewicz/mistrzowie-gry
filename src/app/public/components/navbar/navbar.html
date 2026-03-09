@@ -70,7 +70,7 @@
 <p-popover #navPopover styleClass="mg-popover" (onHide)="closeDropdown()">
   <ul class="mg-popover-menu">
     @for (child of activeChildren(); track trackByLabelKey($index, child)) {
-      <li class="mg-popover-menu__item">
+      <li class="mg-popover-menu__item li--unset">
         <a
           class="mg-popover-menu__link"
           [routerLink]="child.path"
@@ -111,7 +111,7 @@
 
       <ul class="mg-mobile-menu">
         @for (item of menu(); track trackByLabelKey($index, item)) {
-          <li class="mg-mobile-menu__item">
+          <li class="mg-mobile-menu__item li--unset">
             @if (!item.children?.length) {
               <a
                 class="mg-mobile-menu__link"
@@ -125,7 +125,7 @@
 
               <ul class="mg-mobile-menu__sub">
                 @for (child of item.children; track trackByLabelKey($index, child)) {
-                  <li class="mg-mobile-menu__sub-item">
+                  <li class="mg-mobile-menu__sub-item li--unset">
                     <a
                       class="mg-mobile-menu__link"
                       [routerLink]="child.path"

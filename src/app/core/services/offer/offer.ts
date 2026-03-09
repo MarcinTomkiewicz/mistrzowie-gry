@@ -1,85 +1,73 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, switchMap } from 'rxjs';
-
-import { FilterOperator } from '../../enums/filter-operators';
-import { OfferItem, OfferPage, OfferPageSection, OfferPageVm, OfferSectionItem } from '../../types/offers';
-import { Backend } from '../backend/backend';
+import { from, map, Observable } from 'rxjs';
+import { Supabase } from '../supabase/supabase';
+import { toCamelCase } from '../../utils/type-mappings';
+import type {
+  OfferItem,
+  OfferPage,
+  OfferPageDbRow,
+  OfferPageSection,
+  OfferPageVm,
+  OfferSectionItem,
+  OfferSectionWithItems,
+} from '../../types/offers';
 
 @Injectable({ providedIn: 'root' })
 export class Offer {
-  private readonly backend = inject(Backend);
+  private readonly supabase = inject(Supabase).client();
 
   getOfferPageVmBySlug(slug: string): Observable<OfferPageVm | null> {
-    return this.backend.getBySlug<OfferPage>('offer_pages', slug).pipe(
-      switchMap((page) => {
-        if (!page) return of(null);
-       
-        return this.backend.getAll<OfferPageSection>({
-          table: 'offer_page_sections',
-          sortBy: 'position',
-          sortOrder: 'asc',
-          pagination: {
-            filters: {
-              offerPageId: { operator: FilterOperator.EQ, value: page.id },
-              isActive: { operator: FilterOperator.EQ, value: true },
-            },
-          },
-        }).pipe(
-          switchMap((sections) => {
-            if (!sections.length) return of({ page, sections: [] });
+    const query = this.supabase
+      .from('offer_pages')
+      .select(
+        `
+        *,
+        offer_page_sections (
+          *,
+          offer_page_section_items (
+            *,
+            offer_items (*)
+          )
+        )
+      `,
+      )
+      .eq('slug', slug)
+      .maybeSingle();
 
-            const sectionIds = sections.map((s) => s.id);
+    return from(query).pipe(
+      map((res) => {
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
 
-            return this.backend.getAll<OfferSectionItem>({
-              table: 'offer_page_section_items',
-              sortBy: 'position',
-              sortOrder: 'asc',
-              pagination: {
-                filters: {
-                  sectionId: { operator: FilterOperator.IN, value: sectionIds },
-                },
-              },
-            }).pipe(
-              switchMap((links) => {
-                const itemIds = [...new Set(links.map((l) => l.offerItemId))];
-                if (!itemIds.length) {
-                  return of({
-                    page,
-                    sections: sections.map((s) => ({ ...s, items: [] })),
-                  });
-                }
+        if (!res.data) {
+          return null;
+        }
 
-                // 3) pobierz itemy
-                return this.backend.getByIds<OfferItem>('offer_items', itemIds).pipe(
-                  map((items) => {
-                    const itemsById = new Map(items.map((it) => [it.id, it]));
+        const raw = toCamelCase<OfferPageDbRow>(res.data);
 
-                    const linksBySection = new Map<string, OfferSectionItem[]>();
-                    for (const l of links) {
-                      const arr = linksBySection.get(l.sectionId) ?? [];
-                      arr.push(l);
-                      linksBySection.set(l.sectionId, arr);
-                    }
+        const sections: OfferSectionWithItems[] = (raw.offerPageSections ?? [])
+          .filter((section) => section.isActive)
+          .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+          .map((section) => {
+            const items = (section.offerPageSectionItems ?? [])
+              .slice()
+              .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+              .map((link) => link.offerItems)
+              .filter(Boolean) as OfferItem[];
 
-                    const sectionsVm = sections
-                      .slice()
-                      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-                      .map((s) => {
-                        const ls = (linksBySection.get(s.id) ?? []).slice().sort((a, b) => a.position - b.position);
-                        const sectionItems = ls
-                          .map((x) => itemsById.get(x.offerItemId))
-                          .filter(Boolean) as OfferItem[];
+            return {
+              ...section,
+              items,
+            };
+          });
 
-                        return { ...s, items: sectionItems };
-                      });
+        const { offerPageSections, ...page } = raw;
 
-                    return { page, sections: sectionsVm };
-                  }),
-                );
-              }),
-            );
-          }),
-        );
+        return {
+          page,
+          sections,
+        };
       }),
     );
   }

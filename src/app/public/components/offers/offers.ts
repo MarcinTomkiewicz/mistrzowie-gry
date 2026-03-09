@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
@@ -11,20 +11,22 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 
-import { OfferPageTypeEnum } from '../../../core/enums/offers';
+import {
+  OfferItemKindEnum,
+  OfferPageTypeEnum,
+  OfferSectionTypeEnum,
+} from '../../../core/enums/offers';
 import { Offer } from '../../../core/services/offer/offer';
+import { Seo } from '../../../core/services/seo/seo';
+import type { OfferItem, OfferPageSection } from '../../../core/types/offers';
 import { normalizeFaqItems } from '../../../core/utils/display-items';
 import {
   formatAddonPricing,
   formatPricing,
   formatPricingDetailed,
 } from '../../../core/utils/pricing';
-import {
-  findCardsSectionByKind,
-  findSectionByType,
-} from './offers.utils';
 import { createOffersI18n } from './offers.i18n';
-import type { OfferItem, OfferPageSection } from '../../../core/types/offers';
+import { findCardsSectionByKind, findSectionByType } from './offers.utils';
 
 type OfferVmSection = OfferPageSection & { items: OfferItem[] };
 
@@ -45,6 +47,7 @@ type OfferVmSection = OfferPageSection & { items: OfferItem[] };
 export class Offers {
   private readonly route = inject(ActivatedRoute);
   private readonly offer = inject(Offer);
+  private readonly seo = inject(Seo);
 
   readonly i18n = createOffersI18n();
 
@@ -54,11 +57,38 @@ export class Offers {
   );
 
   readonly vm = toSignal(
-    this.slug$.pipe(
-      switchMap((slug) => this.offer.getOfferPageVmBySlug(slug)),
-    ),
+    this.slug$.pipe(switchMap((slug) => this.offer.getOfferPageVmBySlug(slug))),
     { initialValue: null },
   );
+
+  private readonly applySeoEffect = effect(() => {
+    const vm = this.vm();
+
+    if (!vm) {
+      this.seo.apply({
+        title: this.i18n.seo().title || 'Chaotyczne Czwartki',
+        description: this.i18n.seo().description || '',
+      });
+      return;
+    }
+
+    this.seo.apply({
+      title: vm.page.seo.title?.trim() || vm.page.title,
+      description: vm.page.seo.description?.trim() || vm.page.subtitle || '',
+      canonicalUrl: vm.page.seo.canonicalUrl?.trim() || undefined,
+      og: {
+        title:
+          vm.page.seo.ogTitle?.trim() ||
+          vm.page.seo.title?.trim() ||
+          vm.page.title,
+        description:
+          vm.page.seo.ogDescription?.trim() ||
+          vm.page.seo.description?.trim() ||
+          vm.page.subtitle ||
+          '',
+      },
+    });
+  });
 
   readonly pageVm = computed(() => {
     const vm = this.vm();
@@ -66,18 +96,22 @@ export class Offers {
 
     const sections = vm.sections as OfferVmSection[];
 
-    const hero = findSectionByType(sections, 'hero');
-    const pricing =
-      findSectionByType(sections, 'pricingTable') ??
-      findSectionByType(sections, 'pricing_table');
+    const hero = findSectionByType(sections, OfferSectionTypeEnum.Hero);
+    const pricing = findSectionByType(
+      sections,
+      OfferSectionTypeEnum.PricingTable,
+    );
 
-    const addon = findCardsSectionByKind(sections, 'addon');
-    const material = findCardsSectionByKind(sections, 'material');
+    const addon = findCardsSectionByKind(sections, OfferItemKindEnum.Addon);
+    const material = findCardsSectionByKind(
+      sections,
+      OfferItemKindEnum.Material,
+    );
 
-    const faqSection = findSectionByType(sections, 'faq');
+    const faqSection = findSectionByType(sections, OfferSectionTypeEnum.Faq);
     const faqItems = normalizeFaqItems(faqSection?.display['items']);
 
-    const cta = findSectionByType(sections, 'cta');
+    const cta = findSectionByType(sections, OfferSectionTypeEnum.Cta);
 
     const pageType = vm.page?.type;
     const isNet =

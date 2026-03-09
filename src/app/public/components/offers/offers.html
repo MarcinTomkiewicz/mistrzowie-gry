@@ -23,7 +23,7 @@
           <div class="flex-row-start-center gap-sm mt-md">
             <p-button
               [label]="i18n.commonCta().contactUs"
-              icon="pi pi-envelope"
+              icon="pi pi-message-away"
               severity="primary"
               routerLink="/contact"
             />
@@ -40,16 +40,14 @@
           }
 
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mb-md">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mb-md"
+            >
               {{ s.subtitle }}
             </p>
           }
 
-          <p-table
-            [value]="s.items"
-            [stripedRows]="true"
-            [tableStyle]="{ width: '100%' }"
-          >
+          <p-table [value]="s.items" [stripedRows]="true" class="w-100">
             <ng-template pTemplate="header">
               <tr>
                 <th>{{ i18n.pricingHeaders().variant }}</th>
@@ -68,7 +66,9 @@
           </p-table>
 
           @if (data.pricingFootnote) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mt-md"
+            >
               {{ data.pricingFootnote }}
             </p>
           }
@@ -102,7 +102,9 @@
                   </div>
 
                   @if (p.note) {
-                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+                    <p
+                      class="mg-section__subtitle mg-section__subtitle--no-margin"
+                    >
                       {{ p.note }}
                     </p>
                   }
@@ -116,7 +118,9 @@
           </div>
 
           @if (data.pricingFootnote) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mt-md"
+            >
               {{ data.pricingFootnote }}
             </p>
           }
@@ -150,7 +154,9 @@
                   </div>
 
                   @if (p.note) {
-                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+                    <p
+                      class="mg-section__subtitle mg-section__subtitle--no-margin"
+                    >
                       {{ p.note }}
                     </p>
                   }
@@ -183,11 +189,15 @@
             <p-accordion>
               @for (x of data.faq.items; let i = $index; track i) {
                 <p-accordion-panel [value]="i">
-                  <p-accordion-header class="mg-section__title mg-section__title--xs">
+                  <p-accordion-header
+                    class="mg-section__title mg-section__title--xs"
+                  >
                     {{ x.h }}
                   </p-accordion-header>
                   <p-accordion-content>
-                    <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+                    <p
+                      class="mg-section__subtitle mg-section__subtitle--no-margin"
+                    >
                       {{ x.a }}
                     </p>
                   </p-accordion-content>
@@ -224,7 +234,7 @@
           <div class="flex-row-start-center gap-sm mt-md">
             <p-button
               [label]="i18n.commonCta().contactUs"
-              icon="pi pi-envelope"
+              icon="pi pi-message-away"
               severity="success"
               routerLink="/contact"
             />

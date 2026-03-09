@@ -10,6 +10,14 @@ export type OfferItemKind = `${OfferItemKindEnum}`;
 
 export type JsonObject = Record<string, unknown>;
 
+export type OfferPageSeo = {
+  title?: string | null;
+  description?: string | null;
+  canonicalUrl?: string | null;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+};
+
 export type OfferPage = {
   id: string;
   slug: string;
@@ -17,7 +25,7 @@ export type OfferPage = {
   subtitle: string | null;
   position: number | null;
   type: OfferPageType;
-  seo: JsonObject;
+  seo: OfferPageSeo;
   isActive: boolean;
   isTest: boolean;
 };
@@ -68,4 +76,20 @@ export type OfferVmSection = OfferPageSection & {
 export type OfferPageVm = {
   page: OfferPage;
   sections: OfferVmSection[];
+};
+
+export type OfferSectionWithItems = OfferPageSection & {
+  items: OfferItem[];
+};
+
+export type OfferPageDbRow = OfferPage & {
+  offerPageSections?: Array<
+    OfferPageSection & {
+      offerPageSectionItems?: Array<
+        OfferSectionItem & {
+          offerItems?: OfferItem | null;
+        }
+      >;
+    }
+  >;
 };
