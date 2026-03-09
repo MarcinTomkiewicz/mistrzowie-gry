@@ -24,7 +24,9 @@
               class="mg-navbar__link mg-navbar__link--button"
               (click)="openDropdown($event, item)"
               aria-haspopup="true"
-              [attr.aria-expanded]="activeDropdown()?.labelKey === item.labelKey"
+              [attr.aria-expanded]="
+                activeDropdown()?.labelKey === item.labelKey
+              "
             >
               <span class="mg-navbar__link-label">{{ item.label }}</span>
               <span class="mg-navbar__caret" aria-hidden="true">▾</span>
@@ -124,7 +126,10 @@
               <div class="mg-mobile-menu__group">{{ item.label }}</div>
 
               <ul class="mg-mobile-menu__sub">
-                @for (child of item.children; track trackByLabelKey($index, child)) {
+                @for (
+                  child of item.children;
+                  track trackByLabelKey($index, child)
+                ) {
                   <li class="mg-mobile-menu__sub-item li--unset">
                     <a
                       class="mg-mobile-menu__link"
