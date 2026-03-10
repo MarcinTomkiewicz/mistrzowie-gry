@@ -61,12 +61,10 @@
   margin-bottom: 0;
 }
 
-/* DARK (domyślny) – gold */
 :root .mg-section__title {
   @include m.gold-gradient-text;
 }
 
-/* LIGHT – wyłącz gradient i użyj solid */
 :root[data-theme="light"] .mg-section__title {
   background: none;
   background-clip: initial;

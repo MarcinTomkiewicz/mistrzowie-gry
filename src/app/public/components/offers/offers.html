@@ -15,7 +15,9 @@
           }
 
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+            >
               {{ s.subtitle }}
             </p>
           }
@@ -47,10 +49,10 @@
             </p>
           }
 
-          <p-table [value]="s.items" [stripedRows]="true" class="w-100">
+          <p-table [value]="s.items">
             <ng-template pTemplate="header">
               <tr>
-                <th>{{ i18n.pricingHeaders().variant }}</th>
+                <th pFrozenColumn class="w-20">{{ i18n.pricingHeaders().variant }}</th>
                 <th>{{ i18n.pricingHeaders().price }}</th>
                 <th>{{ i18n.pricingHeaders().description }}</th>
               </tr>
@@ -84,7 +86,9 @@
           }
 
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+            >
               {{ s.subtitle }}
             </p>
           }
@@ -99,18 +103,15 @@
                 @if (formatAddonPricing(it.pricing); as p) {
                   <div class="mg-section__title mg-section__title--xs">
                     {{ p.value }}
+                    @if (p.note) {
+                      -&nbsp;{{ p.note }}
+                    }
                   </div>
-
-                  @if (p.note) {
-                    <p
-                      class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
-                    >
-                      {{ p.note }}
-                    </p>
-                  }
                 }
 
-                <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+                <p
+                  class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+                >
                   {{ it.lead }}
                 </p>
               </div>
@@ -136,7 +137,9 @@
           }
 
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+            >
               {{ s.subtitle }}
             </p>
           }
@@ -180,7 +183,9 @@
           }
 
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mb-md">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mb-md"
+            >
               {{ s.subtitle }}
             </p>
           }
@@ -196,7 +201,7 @@
                   </p-accordion-header>
                   <p-accordion-content>
                     <p
-                      class="mg-section__subtitle mg-section__subtitle--no-margin"
+                      class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
                     >
                       {{ x.a }}
                     </p>
@@ -226,7 +231,9 @@
           }
 
           @if (s.subtitle) {
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+            <p
+              class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+            >
               {{ s.subtitle }}
             </p>
           }

@@ -1,8 +1,22 @@
+@use "sass:map";
 @use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
 
 .p-datatable {
   background: v.$color-bg-surface;
   color: v.$color-text;
+}
+
+:root .p-datatable-thead th {
+  @include m.gold-gradient-text;
+}
+
+:root[data-theme="light"] .p-datatable-thead th {
+  background: none;
+  background-clip: initial;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: currentColor;
+  color: v.$heading-color;
 }
 
 .p-datatable td {
