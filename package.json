@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:mistrzowie-gry": "node dist/mistrzowie-gry/server/server.mjs"
+    "serve:ssr:mistrzowie-gry": "node dist/mistrzowie-gry/server/server.mjs",
+    "build:ssr": "node scripts/build-ssr.mjs"
   },
   "prettier": {
     "overrides": [

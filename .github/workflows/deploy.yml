@@ -1,0 +1,78 @@
+name: Deploy Mistrzowie Gry
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_BASE_HREF: /mistrzowie-gry/
+      PUBLIC_BASE_URL: https://moj-adres-vpsa.ovh.com/mistrzowie-gry
+      INDEXABLE: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (SSR)
+        run: npm run build:ssr
+
+      - name: Fetch dynamic routes
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/fetch-dynamic.mjs
+
+      - name: Generate SEO files
+        run: node scripts/gen_seo.mjs
+
+      - name: Validate generated files
+        run: |
+          test -f dist/mistrzowie-gry/browser/robots.txt
+          test -f dist/mistrzowie-gry/browser/sitemap.xml
+          test -f dist/mistrzowie-gry/server/server.mjs
+
+      - name: Pack dist
+        run: |
+          TAR_PATH="/tmp/mistrzowie-gry-dist.tgz"
+          tar -czf "$TAR_PATH" -C dist/mistrzowie-gry browser server
+          echo "TAR_PATH=$TAR_PATH" >> "$GITHUB_ENV"
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload dist archive
+        run: |
+          scp -P "${{ secrets.SSH_PORT }}" \
+            "$TAR_PATH" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/mistrzowie-gry-dist.tgz"
+
+      - name: Upload deploy script
+        run: |
+          scp -P "${{ secrets.SSH_PORT }}" \
+            scripts/deploy_dist.sh \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/mistrzowie-gry-deploy.sh"
+
+      - name: Run remote deploy
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "chmod +x /tmp/mistrzowie-gry-deploy.sh && /tmp/mistrzowie-gry-deploy.sh /tmp/mistrzowie-gry-dist.tgz"

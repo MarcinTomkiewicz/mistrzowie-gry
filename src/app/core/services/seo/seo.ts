@@ -8,6 +8,8 @@ export class Seo {
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
   private readonly request = inject(REQUEST, { optional: true });
+  private readonly publicBaseUrl =
+    process.env['PUBLIC_BASE_URL']?.replace(/\/$/, '') || null;
 
   readonly last = signal<ISeoConfig | null>(null);
 
@@ -71,10 +73,7 @@ export class Seo {
     this.removeCanonical();
   }
 
-  private applyOpenGraph(
-    config: ISeoConfig,
-    absoluteUrl?: string,
-  ): void {
+  private applyOpenGraph(config: ISeoConfig, absoluteUrl?: string): void {
     const og = config.og;
 
     if (!og) {
@@ -214,12 +213,22 @@ export class Seo {
   }
 
   private buildAbsoluteUrl(): string | null {
-    const requestUrl = this.request?.url;
-    if (requestUrl) {
-      return requestUrl;
+    const requestUrl =
+      this.request?.url ?? this.document.location?.href ?? null;
+
+    if (!requestUrl) {
+      return this.publicBaseUrl;
     }
 
-    const href = this.document.location?.href;
-    return href || null;
+    if (this.publicBaseUrl) {
+      try {
+        const url = new URL(requestUrl, this.publicBaseUrl);
+        return `${this.publicBaseUrl}${url.pathname}${url.search}${url.hash}`;
+      } catch {
+        return this.publicBaseUrl;
+      }
+    }
+
+    return requestUrl;
   }
 }
