@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Build (SSR)
-        run: npm run build:ssr
+        run: APP_BASE_HREF=/mistrzowie-gry/ npm run build:ssr
 
       - name: Fetch dynamic routes
         env:

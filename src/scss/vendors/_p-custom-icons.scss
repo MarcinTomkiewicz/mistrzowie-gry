@@ -32,7 +32,7 @@
 @each $name, $file in ci.$custom-icons {
   .pi.pi-#{$name} {
     @extend .pi--svg;
-    -webkit-mask-image: url("icons/#{$file}");
-    mask-image: url("icons/#{$file}");
+    -webkit-mask-image: url("/icons/#{$file}");
+    mask-image: url("/icons/#{$file}");
   }
 }
