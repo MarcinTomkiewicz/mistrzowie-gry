@@ -28,8 +28,8 @@ li {
     mask-size: contain;
 
     /* default bullet = d20 */
-    -webkit-mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd10')}");
-    mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd10')}");
+    -webkit-mask-image: url("icons/#{map.get(ci.$custom-icons, 'd10')}");
+    mask-image: url("icons/#{map.get(ci.$custom-icons, 'd10')}");
   }
 }
 
@@ -45,7 +45,7 @@ li {
   .li--bullet-#{$name}::before {
     content: "";
     font-family: unset;
-    -webkit-mask-image: url("/icons/#{$file}");
-    mask-image: url("/icons/#{$file}");
+    -webkit-mask-image: url("icons/#{$file}");
+    mask-image: url("icons/#{$file}");
   }
 }

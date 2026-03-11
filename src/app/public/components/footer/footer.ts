@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { APP_BASE_HREF, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -20,6 +20,11 @@ export class Footer {
   readonly nav = inject(Navigation);
   readonly theme = inject(Theme);
   readonly i18n = createFooterI18n();
+  private readonly appBaseHref = inject(APP_BASE_HREF, { optional: true }) ?? '/';
+  
+  private readonly baseHref = this.appBaseHref.endsWith('/')
+  ? this.appBaseHref
+  : `${this.appBaseHref}/`;
 
   readonly year = computed(() => new Date().getFullYear());
 
@@ -35,9 +40,11 @@ export class Footer {
     this.i18n.resolveLegalLinks(this.nav.legal()),
   );
 
-  readonly footerImgSrc = computed(() =>
-    this.theme.isLight() ? 'theme/light/footer.avif' : 'theme/dark/footer.avif',
-  );
+readonly footerImgSrc = computed(() =>
+  this.theme.isLight()
+    ? `${this.baseHref}theme/light/footer.avif`
+    : `${this.baseHref}theme/dark/footer.avif`,
+);
 
   track(_label: string): void {}
 }

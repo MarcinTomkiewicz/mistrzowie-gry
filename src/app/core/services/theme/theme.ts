@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
 import {
   Injectable,
   afterNextRender,
@@ -16,6 +16,12 @@ const STORAGE_KEY = 'mg-theme';
 export class Theme {
   private readonly platform = inject(Platform);
   private readonly document = inject(DOCUMENT);
+  private readonly appBaseHref =
+    inject(APP_BASE_HREF, { optional: true }) ?? '/';
+
+  private readonly baseHref = this.appBaseHref.endsWith('/')
+    ? this.appBaseHref
+    : `${this.appBaseHref}/`;
 
   private readonly mode = signal<IThemeMode>('dark');
 
@@ -23,7 +29,9 @@ export class Theme {
   readonly current = computed(() => this.mode());
 
   readonly brandLogoSrc = computed(() =>
-    this.isLight() ? 'theme/light/brand.avif' : 'theme/dark/brand.avif',
+    this.isLight()
+      ? `${this.baseHref}theme/light/brand.avif`
+      : `${this.baseHref}theme/dark/brand.avif`,
   );
 
   constructor() {
@@ -36,7 +44,10 @@ export class Theme {
     this.set(this.isLight() ? 'dark' : 'light');
   }
 
-  set(next: IThemeMode, opts?: { persist?: boolean; writeDom?: boolean }): void {
+  set(
+    next: IThemeMode,
+    opts?: { persist?: boolean; writeDom?: boolean },
+  ): void {
     const persist = opts?.persist ?? true;
     const writeDom = opts?.writeDom ?? true;
 
