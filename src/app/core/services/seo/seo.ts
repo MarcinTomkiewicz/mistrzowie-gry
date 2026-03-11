@@ -8,8 +8,6 @@ export class Seo {
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
   private readonly request = inject(REQUEST, { optional: true });
-  private readonly publicBaseUrl =
-    process.env['PUBLIC_BASE_URL']?.replace(/\/$/, '') || null;
 
   readonly last = signal<ISeoConfig | null>(null);
 
@@ -20,8 +18,12 @@ export class Seo {
 
   apply(config: ISeoConfig): void {
     const normalized = this.normalize(config);
-    const absoluteUrl =
+    const rawAbsoluteUrl =
       normalized.canonicalUrl ?? this.buildAbsoluteUrl() ?? undefined;
+
+    const absoluteUrl = rawAbsoluteUrl && this.shouldExposeSeoUrl(rawAbsoluteUrl)
+      ? rawAbsoluteUrl
+      : undefined;
 
     this.last.set(normalized);
     this.title.setTitle(normalized.title);
@@ -213,22 +215,21 @@ export class Seo {
   }
 
   private buildAbsoluteUrl(): string | null {
-    const requestUrl =
-      this.request?.url ?? this.document.location?.href ?? null;
-
-    if (!requestUrl) {
-      return this.publicBaseUrl;
+    const requestUrl = this.request?.url;
+    if (requestUrl) {
+      return requestUrl;
     }
 
-    if (this.publicBaseUrl) {
-      try {
-        const url = new URL(requestUrl, this.publicBaseUrl);
-        return `${this.publicBaseUrl}${url.pathname}${url.search}${url.hash}`;
-      } catch {
-        return this.publicBaseUrl;
-      }
-    }
+    const href = this.document.location?.href;
+    return href || null;
+  }
 
-    return requestUrl;
+  private shouldExposeSeoUrl(url: string): boolean {
+    try {
+      const hostname = new URL(url).hostname;
+      return hostname === 'mistrzowiegry.pl' || hostname === 'www.mistrzowiegry.pl';
+    } catch {
+      return false;
+    }
   }
 }
