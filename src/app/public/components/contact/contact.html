@@ -88,12 +88,23 @@
             <input
               class="w-100"
               pInputText
-              id="company"
+              id="companyName"
               type="text"
-              formControlName="company"
+              formControlName="companyName"
             />
-            <label for="company">{{ vm().formText.companyLabel }}</label>
+            <label for="companyName">{{ vm().formText.companyLabel }}</label>
           </p-iftalabel>
+
+          <div class="mg-honeypot" aria-hidden="true">
+            <label for="website">Website</label>
+            <input
+              id="website"
+              type="text"
+              formControlName="website"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
 
           <p-iftalabel class="w-80">
             <input
@@ -153,9 +164,12 @@
           <div class="flex-row-end-center flex-col-sm gap-sm">
             <p-button
               type="submit"
-              [label]="vm().cta.sendMessage"
+              [label]="
+                vm().isSubmitting ? vm().status.sending : vm().cta.sendMessage
+              "
               icon="pi pi-send"
               severity="success"
+              [disabled]="vm().isSubmitting"
             />
           </div>
         </form>

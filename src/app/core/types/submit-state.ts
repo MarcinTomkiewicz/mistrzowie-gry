@@ -1,0 +1,1 @@
+type SubmitState = 'idle' | 'submitting' | 'success' | 'error';

@@ -1,8 +1,5 @@
 import { computed } from '@angular/core';
-import {
-  translateObjectSignal,
-  translateSignal,
-} from '@jsverse/transloco';
+import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
 
 import { ContactTopicOption } from '../../../core/types/contact';
 import { dictToSortedArray } from '../../../core/utils/dict-to-sorted-array';
@@ -27,7 +24,11 @@ export function createContactI18n() {
   const errorsDict = translateObjectSignal('errors', {}, { scope: 'contact' });
   const topicsDict = translateObjectSignal('topics', {}, { scope: 'contact' });
   const infoDict = translateObjectSignal('info', {}, { scope: 'contact' });
-
+  const statusDict = translateObjectSignal(
+    'status',
+    {},
+    { scope: 'common' },
+  );
   const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
 
   const hero = pickTranslations(heroDict, ['title', 'subtitle'] as const);
@@ -53,6 +54,7 @@ export function createContactI18n() {
   ] as const);
 
   const cta = pickTranslations(commonCtaDict, ['sendMessage'] as const);
+  const status = pickTranslations(statusDict, ['sending'] as const)
 
   const info = pickTranslations(infoDict, [
     'title',
@@ -77,6 +79,7 @@ export function createContactI18n() {
     hero,
     formText,
     errors,
+    status,
     cta,
     info,
     topics,

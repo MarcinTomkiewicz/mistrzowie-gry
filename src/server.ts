@@ -15,10 +15,15 @@ dotenv.config({
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 type ContactPayload = {
-  name?: string;
+  topic?: string;
+  topicCustom?: string;
+  firstName?: string;
+  lastName?: string;
+  companyName?: string;
   email?: string;
+  phone?: string;
   message?: string;
-  company?: string; // honeypot
+  website?: string; // honeypot
 };
 
 function isValidEmail(value: string): boolean {
@@ -78,16 +83,28 @@ export function app(): express.Express {
   app.post('/api/contact', async (req, res) => {
     const body = (req.body ?? {}) as ContactPayload;
 
-    const name = body.name?.trim() || '';
+    const topic = body.topic?.trim() || '';
+    const topicCustom = body.topicCustom?.trim() || '';
+    const firstName = body.firstName?.trim() || '';
+    const lastName = body.lastName?.trim() || '';
+    const companyName = body.companyName?.trim() || '';
     const email = body.email?.trim() || '';
+    const phone = body.phone?.trim() || '';
     const message = body.message?.trim() || '';
-    const company = body.company?.trim() || ''; // honeypot
+    const website = body.website?.trim() || ''; // honeypot
 
-    if (company) {
+    if (website) {
       return res.status(200).json({ ok: true });
     }
 
-    if (!name || !email || !message) {
+    if (!firstName || !lastName || !email || !message) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Brak wymaganych pól.',
+      });
+    }
+
+    if (topic === 'other' && !topicCustom) {
       return res.status(400).json({
         ok: false,
         error: 'Brak wymaganych pól.',
@@ -101,7 +118,16 @@ export function app(): express.Express {
       });
     }
 
-    if (name.length > 120 || email.length > 320 || message.length > 5000) {
+    if (
+      firstName.length > 120 ||
+      lastName.length > 120 ||
+      companyName.length > 200 ||
+      email.length > 320 ||
+      phone.length > 50 ||
+      topic.length > 100 ||
+      topicCustom.length > 200 ||
+      message.length > 5000
+    ) {
       return res.status(400).json({
         ok: false,
         error: 'Jedno z pól ma niepoprawną długość.',
@@ -117,6 +143,10 @@ export function app(): express.Express {
         process.env['MAIL_FROM']?.trim() || 'kontakt@mistrzowie-gry.pl';
       const siteName = process.env['MAIL_FROM_NAME']?.trim() || 'Mistrzowie Gry';
 
+      const fullName = `${firstName} ${lastName}`.trim();
+      const resolvedTopic =
+        topic === 'other' ? `Inny: ${topicCustom || '-'}` : topic || '-';
+
       await transporter.sendMail({
         from: `"${siteName}" <${from}>`,
         to,
@@ -125,16 +155,22 @@ export function app(): express.Express {
         text: [
           'Nowa wiadomość z formularza kontaktowego',
           '',
-          `Imię: ${name}`,
+          `Temat: ${resolvedTopic}`,
+          `Imię i nazwisko: ${fullName}`,
           `Email: ${email}`,
+          `Telefon: ${phone || '-'}`,
+          `Firma: ${companyName || '-'}`,
           '',
           'Treść:',
           message,
         ].join('\n'),
         html: `
           <h2>Nowa wiadomość z formularza kontaktowego</h2>
-          <p><strong>Imię:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Temat:</strong> ${escapeHtml(resolvedTopic)}</p>
+          <p><strong>Imię i nazwisko:</strong> ${escapeHtml(fullName)}</p>
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Telefon:</strong> ${escapeHtml(phone || '-')}</p>
+          <p><strong>Firma:</strong> ${escapeHtml(companyName || '-')}</p>
           <p><strong>Treść:</strong></p>
           <p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>
         `,

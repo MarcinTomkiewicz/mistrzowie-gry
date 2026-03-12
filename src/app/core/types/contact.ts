@@ -9,8 +9,9 @@ export type ContactPayload = {
   topicCustom?: string;
   firstName: string;
   lastName: string;
-  company?: string;
+  companyName?: string;
   email: string;
   phone?: string;
   message: string;
+  website?: string;
 };
