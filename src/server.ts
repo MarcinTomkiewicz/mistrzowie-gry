@@ -8,28 +8,13 @@ import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
-function normalizeBaseHref(value: string): string {
-  if (!value || value === '/') return '/';
-
-  let normalized = value.trim();
-
-  if (!normalized.startsWith('/')) {
-    normalized = `/${normalized}`;
-  }
-
-  normalized = normalized.replace(/\/+$/, '');
-
-  return normalized || '/';
-}
-
 export function app(): express.Express {
   const app = express();
   const angularApp = new AngularNodeAppEngine();
-  const appBaseHref = normalizeBaseHref(process.env['APP_BASE_HREF'] || '/');
 
   /**
-   * Serve static files from /browser without prefix
-   * e.g. /icons/read.svg
+   * Serve static files from /browser
+   * e.g. /icons/read.svg, /theme/dark/brand.avif
    */
   app.use(
     express.static(browserDistFolder, {
@@ -38,21 +23,6 @@ export function app(): express.Express {
       redirect: false,
     }),
   );
-
-  /**
-   * Serve static files also under APP_BASE_HREF
-   * e.g. /mistrzowie-gry/icons/read.svg
-   */
-  if (appBaseHref !== '/') {
-    app.use(
-      appBaseHref,
-      express.static(browserDistFolder, {
-        maxAge: '1y',
-        index: false,
-        redirect: false,
-      }),
-    );
-  }
 
   /**
    * Handle all other requests by rendering the Angular application.
@@ -85,11 +55,11 @@ export function app(): express.Express {
 }
 
 function run(): void {
-  const port = Number(process.env['PORT'] || 4000);
+  const port = Number(process.env['PORT'] || 4100);
   const server = app();
 
-  server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  server.listen(port, '127.0.0.1', () => {
+    console.log(`Node Express server listening on http://127.0.0.1:${port}`);
   });
 }
 

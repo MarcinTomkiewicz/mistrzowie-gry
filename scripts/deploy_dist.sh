@@ -27,9 +27,9 @@ tar xzf "$ARCHIVE_PATH" -C "$DEPLOY_ROOT"
 
 echo "[deploy] ensuring pm2 process is running"
 if /usr/bin/pm2 describe mistrzowie-gry-ssr >/dev/null 2>&1; then
-  APP_BASE_HREF=/mistrzowie-gry/ PORT=4100 /usr/bin/pm2 restart mistrzowie-gry-ssr --update-env
+  APP_BASE_HREF=/ PORT=4100 /usr/bin/pm2 restart mistrzowie-gry-ssr --update-env
 else
-  APP_BASE_HREF=/mistrzowie-gry/ PORT=4100 /usr/bin/pm2 start "$DEPLOY_ROOT/server/server.mjs" --name mistrzowie-gry-ssr
+  APP_BASE_HREF=/ PORT=4100 /usr/bin/pm2 start "$DEPLOY_ROOT/server/server.mjs" --name mistrzowie-gry-ssr --cwd "$DEPLOY_ROOT"
 fi
 
 /usr/bin/pm2 save
