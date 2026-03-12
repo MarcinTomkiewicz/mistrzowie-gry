@@ -5,8 +5,12 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import nodemailer from 'nodemailer';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { join } from 'node:path';
+
+dotenv.config({
+  path: join(import.meta.dirname, '../.env'),
+});
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
