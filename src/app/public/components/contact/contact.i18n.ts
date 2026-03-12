@@ -21,15 +21,24 @@ export function createContactI18n() {
 
   const heroDict = translateObjectSignal('hero', {}, { scope: 'contact' });
   const formDict = translateObjectSignal('form', {}, { scope: 'contact' });
-  const errorsDict = translateObjectSignal('errors', {}, { scope: 'contact' });
+  const formErrorsDict = translateObjectSignal(
+    'errors',
+    {},
+    { scope: 'contact' },
+  );
+  const successDict = translateObjectSignal('success', {}, { scope: 'contact' });
+  const toastDict = translateObjectSignal('toast', {}, { scope: 'contact' });
   const topicsDict = translateObjectSignal('topics', {}, { scope: 'contact' });
   const infoDict = translateObjectSignal('info', {}, { scope: 'contact' });
-  const statusDict = translateObjectSignal(
-    'status',
+
+  const statusDict = translateObjectSignal('status', {}, { scope: 'common' });
+  const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
+  const commonErrorsDict = translateObjectSignal(
+    'errors',
     {},
     { scope: 'common' },
   );
-  const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
+  const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
 
   const hero = pickTranslations(heroDict, ['title', 'subtitle'] as const);
 
@@ -47,14 +56,34 @@ export function createContactI18n() {
     'messagePlaceholder',
   ] as const);
 
-  const errors = pickTranslations(errorsDict, [
+  const formErrors = pickTranslations(formErrorsDict, [
     'required',
     'email',
     'minMessage',
   ] as const);
 
+  const success = pickTranslations(successDict, ['mailSent'] as const);
+
+  const toast = pickTranslations(toastDict, [
+    'invalidFormSummary',
+    'mailSentSummary',
+    'sendFailedSummary',
+  ] as const);
+
+  const commonForm = pickTranslations(commonFormDict, ['invalid'] as const);
+
+  const commonErrors = pickTranslations(commonErrorsDict, [
+    'generic',
+    'network',
+    'notFound',
+    'forbidden',
+    'unauthorized',
+    'timeout',
+    'server',
+  ] as const);
+
   const cta = pickTranslations(commonCtaDict, ['sendMessage'] as const);
-  const status = pickTranslations(statusDict, ['sending'] as const)
+  const status = pickTranslations(statusDict, ['sending'] as const);
 
   const info = pickTranslations(infoDict, [
     'title',
@@ -78,7 +107,11 @@ export function createContactI18n() {
     seoDescription,
     hero,
     formText,
-    errors,
+    formErrors,
+    success,
+    toast,
+    commonForm,
+    commonErrors,
     status,
     cta,
     info,

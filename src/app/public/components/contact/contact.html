@@ -48,7 +48,9 @@
             </p-iftalabel>
 
             @if (showRequiredError("topicCustom")) {
-              <small class="mg-contact-error">{{ vm().errors.required }}</small>
+              <small class="mg-contact-error">
+                {{ vm().formErrors.required }}
+              </small>
             }
           }
 
@@ -65,7 +67,9 @@
           </p-iftalabel>
 
           @if (showRequiredError("firstName")) {
-            <small class="mg-contact-error">{{ vm().errors.required }}</small>
+            <small class="mg-contact-error">
+              {{ vm().formErrors.required }}
+            </small>
           }
 
           <p-iftalabel class="w-80">
@@ -81,7 +85,9 @@
           </p-iftalabel>
 
           @if (showRequiredError("lastName")) {
-            <small class="mg-contact-error">{{ vm().errors.required }}</small>
+            <small class="mg-contact-error">
+              {{ vm().formErrors.required }}
+            </small>
           }
 
           <p-iftalabel class="w-80">
@@ -94,17 +100,6 @@
             />
             <label for="companyName">{{ vm().formText.companyLabel }}</label>
           </p-iftalabel>
-
-          <div class="mg-honeypot" aria-hidden="true">
-            <label for="website">Website</label>
-            <input
-              id="website"
-              type="text"
-              formControlName="website"
-              tabindex="-1"
-              autocomplete="off"
-            />
-          </div>
 
           <p-iftalabel class="w-80">
             <input
@@ -132,9 +127,9 @@
           @if (showEmailError()) {
             <small class="mg-contact-error">
               @if (form.controls.email.errors?.["email"]) {
-                {{ vm().errors.email }}
+                {{ vm().formErrors.email }}
               } @else {
-                {{ vm().errors.required }}
+                {{ vm().formErrors.required }}
               }
             </small>
           }
@@ -156,17 +151,30 @@
           </p-iftalabel>
 
           @if (showRequiredError("message")) {
-            <small class="mg-contact-error">{{ vm().errors.required }}</small>
+            <small class="mg-contact-error">
+              {{ vm().formErrors.required }}
+            </small>
           } @else if (showMinMessageError()) {
-            <small class="mg-contact-error">{{ vm().errors.minMessage }}</small>
+            <small class="mg-contact-error">
+              {{ vm().formErrors.minMessage }}
+            </small>
           }
+
+          <div class="mg-honeypot" aria-hidden="true">
+            <label for="website">Website</label>
+            <input
+              id="website"
+              type="text"
+              formControlName="website"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
 
           <div class="flex-row-end-center flex-col-sm gap-sm">
             <p-button
               type="submit"
-              [label]="
-                vm().isSubmitting ? vm().status.sending : vm().cta.sendMessage
-              "
+              [label]="vm().isSubmitting ? vm().status.sending : vm().cta.sendMessage"
               icon="pi pi-send"
               severity="success"
               [disabled]="vm().isSubmitting"

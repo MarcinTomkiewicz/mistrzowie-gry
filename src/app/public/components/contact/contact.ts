@@ -1,10 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,8 +25,7 @@ import { Seo } from '../../../core/services/seo/seo';
 import { ContactPayload } from '../../../core/types/contact';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
-
-import { SubmitState, SubmitStateEnum} from '../../../core/types/submit-state'
+import { SubmitState, SubmitStateEnum } from '../../../core/types/submit-state';
 
 @Component({
   selector: 'app-contact',
@@ -41,11 +48,12 @@ export class Contact {
   private readonly seo = inject(Seo);
   private readonly fb = inject(FormBuilder);
   private readonly contactApi = inject(ContactApi);
-  private readonly destroyRef = inject(DestroyRef)
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly messageService = inject(MessageService);
 
   readonly i18n = createContactI18n();
 
-  readonly submitState = signal<SubmitState>(SubmitStateEnum.IDLE);
+  readonly submitState = signal<SubmitState>(SubmitStateEnum.Idle);
   readonly submitError = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
@@ -70,21 +78,20 @@ export class Contact {
       validators: [Validators.required, Validators.minLength(20)],
     }),
 
-    website: this.fb.nonNullable.control(''),
+    website: this.fb.nonNullable.control(''), // honeypot
   });
 
-  private readonly topicValue = toSignal(
-    this.form.controls.topic.valueChanges,
-    {
-      initialValue: this.form.controls.topic.value,
-    },
+  private readonly topicValue = toSignal(this.form.controls.topic.valueChanges, {
+    initialValue: this.form.controls.topic.value,
+  });
+
+  readonly isOtherTopicSelected = computed(
+    () => this.topicValue() === 'other',
   );
 
-  readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
-
-  readonly isSubmitting = computed(() => this.submitState() === SubmitStateEnum.SUBMITTING);
-  readonly isSuccess = computed(() => this.submitState() === SubmitStateEnum.SUCCESS);
-  readonly isError = computed(() => this.submitState() === SubmitStateEnum.ERROR);
+  readonly isSubmitting = computed(
+    () => this.submitState() === SubmitStateEnum.Submitting,
+  );
 
   private readonly applySeoEffect = effect(() => {
     this.seo.apply({
@@ -119,31 +126,39 @@ export class Contact {
   readonly vm = computed(() => ({
     hero: this.i18n.hero(),
     formText: this.i18n.formText(),
-    errors: this.i18n.errors(),
+    formErrors: this.i18n.formErrors(),
+    toast: this.i18n.toast(),
+    success: this.i18n.success(),
     status: this.i18n.status(),
+    commonForm: this.i18n.commonForm(),
+    commonErrors: this.i18n.commonErrors(),
     cta: this.i18n.cta(),
     topics: this.i18n.topics(),
     isOtherTopicSelected: this.isOtherTopicSelected(),
     info: this.i18n.info(),
     isSubmitting: this.isSubmitting(),
-    isSuccess: this.isSuccess(),
-    isError: this.isError(),
-    submitError: this.submitError(),
   }));
 
   onSubmit(): void {
     if (this.isSubmitting()) return;
 
     if (this.form.invalid) {
-      this.submitState.set(SubmitStateEnum.IDLE);
+      this.submitState.set(SubmitStateEnum.Idle);
       this.submitError.set(null);
       this.form.markAllAsTouched();
+
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.vm().toast.invalidFormSummary,
+        detail: this.vm().commonForm.invalid,
+      });
+
       return;
     }
 
     const payload = this.buildPayload();
 
-    this.submitState.set(SubmitStateEnum.SUBMITTING);
+    this.submitState.set(SubmitStateEnum.Submitting);
     this.submitError.set(null);
 
     this.contactApi
@@ -151,22 +166,39 @@ export class Contact {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          if (this.submitState() === SubmitStateEnum.SUBMITTING) {
-            this.submitState.set(SubmitStateEnum.IDLE);
+          if (this.submitState() === SubmitStateEnum.Submitting) {
+            this.submitState.set(SubmitStateEnum.Idle);
           }
         }),
       )
       .subscribe({
         next: () => {
           this.resetForm();
-          this.submitState.set(SubmitStateEnum.SUCCESS);
+          this.submitState.set(SubmitStateEnum.Success);
+
+          this.messageService.add({
+            severity: 'success',
+            summary: this.vm().toast.mailSentSummary,
+            detail: this.vm().success.mailSent,
+          });
         },
         error: (err) => {
           console.error('[contact] submit error', err);
-          this.submitState.set(SubmitStateEnum.ERROR);
-          this.submitError.set(
-            err?.error?.error || 'Nie udało się wysłać wiadomości.',
-          );
+
+          this.submitState.set(SubmitStateEnum.Error);
+
+          const detail =
+            err?.error?.error ||
+            this.vm().commonErrors.generic ||
+            'Nie udało się wysłać wiadomości.';
+
+          this.submitError.set(detail);
+
+          this.messageService.add({
+            severity: 'error',
+            summary: this.vm().toast.sendFailedSummary,
+            detail,
+          });
         },
       });
   }
@@ -176,7 +208,7 @@ export class Contact {
 
     return {
       topic: value.topic,
-      topicCustom: value.topic === 'other' ? value.topicCustom : undefined,
+      topicCustom: value.topic === 'other' ? value.topicCustom.trim() : undefined,
       firstName: value.firstName.trim(),
       lastName: value.lastName.trim(),
       companyName: value.companyName.trim() || undefined,
