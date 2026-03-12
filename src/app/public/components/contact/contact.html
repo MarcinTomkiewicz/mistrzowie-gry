@@ -24,6 +24,7 @@
             <p-select
               class="w-100"
               inputId="topic"
+              id="topic"
               [options]="vm().topics"
               optionLabel="label"
               optionValue="value"
@@ -108,6 +109,7 @@
               id="phone"
               type="tel"
               formControlName="phone"
+              autocomplete
             />
             <label for="phone">{{ vm().formText.phoneLabel }}</label>
           </p-iftalabel>
@@ -119,6 +121,7 @@
               id="email"
               type="email"
               formControlName="email"
+              autocomplete
               [attr.aria-invalid]="showEmailError()"
             />
             <label for="email">{{ vm().formText.emailLabel }}</label>

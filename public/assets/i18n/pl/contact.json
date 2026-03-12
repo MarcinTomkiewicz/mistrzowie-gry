@@ -34,7 +34,7 @@
     "minMessage": "Wiadomość jest za krótka!"
   },
   "success": {
-    "mailSent": "Wiadomość wysłana poprawnie! Postaramy się odpowiedzieć na nią jak najszybciej"
+    "mailSent": "Wiadomość wysłana poprawnie! Postaramy się odpowiedzieć na nią jak najszybciej."
   },
   "toast": {
     "invalidFormSummary": "Popraw błędy w formularzu!",
