@@ -34,12 +34,12 @@
     "minMessage": "Wiadomość jest za krótka!"
   },
   "success": {
-    "mailSent": "Wiadomość wysłana poprawnie!"
+    "mailSent": "Wiadomość wysłana poprawnie! Postaramy się odpowiedzieć na nią jak najszybciej"
   },
   "toast": {
-    "invalidFormSummary": "Formularz jest niepoprawny",
-    "mailSentSummary": "Wiadomość wysłana",
-    "sendFailedSummary": "Nie udało się wysłać wiadomości"
+    "invalidFormSummary": "Popraw błędy w formularzu!",
+    "mailSentSummary": "Dziękujemy za wysłanie wiadomości",
+    "sendFailedSummary": "Nie udało się wysłać wiadomości!"
   },
   "topics": {
     "topic-1": { "id": 1, "value": "business", "label": "Zapytanie biznesowe" },
@@ -49,6 +49,6 @@
     "topic-5": { "id": 5, "value": "join", "label": "Dołącz do Drużyny" },
     "topic-6": { "id": 6, "value": "chaotic", "label": "Chaotyczne Czwartki" },
     "topic-7": { "id": 7, "value": "pricing", "label": "Ceny i oferta" },
-    "topic-8": { "id": 8, "value": "other", "label": "Inny temat (wpisz ręcznie)" }
+    "topic-8": { "id": 8, "value": "other", "label": "Inny temat (podaj poniżej)" }
   }
 }
