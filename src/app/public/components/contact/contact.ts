@@ -174,6 +174,7 @@ export class Contact {
       .subscribe({
         next: () => {
           this.resetForm();
+          console.log(this.vm().toast.mailSentSummary, this.vm().success.mailSent);
           this.submitState.set(SubmitStateEnum.Success);
 
           this.messageService.add({

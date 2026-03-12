@@ -243,8 +243,8 @@ function buildContactEmailHtml(data: {
   return `
     <div style="margin:0;padding:24px;background:${mailTheme.graphite};font-family:Arial,sans-serif;color:${mailTheme.paperText};">
       <div style="max-width:720px;margin:0 auto;background:linear-gradient(180deg, ${mailTheme.paperBg} 0%, ${mailTheme.paperBgAlt} 100%);border:1px solid ${mailTheme.paperBorder};border-radius:16px;overflow:hidden;">
-        <div style="padding:20px 24px;background:${mailTheme.crimson};color:${mailTheme.white};border-bottom:1px solid ${mailTheme.border};">
-          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:${mailTheme.textMuted};margin-bottom:8px;">
+        <div style="padding:20px 24px;background:${mailTheme.crimson};color:${mailTheme.white};border-bottom:1px solid ${mailTheme.border};border-radius:16px;">
+          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:${mailTheme.textMuted};margin-bottom:8px;border-radius:16px;">
             Mistrzowie Gry
           </div>
           <h1 style="margin:0;font-size:24px;line-height:1.2;color:${mailTheme.white};">
