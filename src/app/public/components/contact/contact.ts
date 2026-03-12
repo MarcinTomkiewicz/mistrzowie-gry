@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -39,10 +39,11 @@ export class Contact {
   private readonly seo = inject(Seo);
   private readonly fb = inject(FormBuilder);
   private readonly contactApi = inject(ContactApi);
+  private readonly destroyRef = inject(DestroyRef)
 
   readonly i18n = createContactI18n();
 
-  readonly submitState = signal<SubmitState>('idle');
+  readonly submitState = signal<SubmitState>(SubmitStateEnum.IDLE);
   readonly submitError = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
@@ -79,9 +80,9 @@ export class Contact {
 
   readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
 
-  readonly isSubmitting = computed(() => this.submitState() === 'submitting');
-  readonly isSuccess = computed(() => this.submitState() === 'success');
-  readonly isError = computed(() => this.submitState() === 'error');
+  readonly isSubmitting = computed(() => this.submitState() === SubmitStateEnum.SUBMITTING);
+  readonly isSuccess = computed(() => this.submitState() === SubmitStateEnum.SUCCESS);
+  readonly isError = computed(() => this.submitState() === SubmitStateEnum.ERROR);
 
   private readonly applySeoEffect = effect(() => {
     this.seo.apply({
@@ -132,7 +133,7 @@ export class Contact {
     if (this.isSubmitting()) return;
 
     if (this.form.invalid) {
-      this.submitState.set('idle');
+      this.submitState.set(SubmitStateEnum.IDLE);
       this.submitError.set(null);
       this.form.markAllAsTouched();
       return;
@@ -140,27 +141,27 @@ export class Contact {
 
     const payload = this.buildPayload();
 
-    this.submitState.set('submitting');
+    this.submitState.set(SubmitStateEnum.SUBMITTING);
     this.submitError.set(null);
 
     this.contactApi
       .send(payload)
       .pipe(
-        takeUntilDestroyed(),
+        takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          if (this.submitState() === 'submitting') {
-            this.submitState.set('idle');
+          if (this.submitState() === SubmitStateEnum.SUBMITTING) {
+            this.submitState.set(SubmitStateEnum.IDLE);
           }
         }),
       )
       .subscribe({
         next: () => {
           this.resetForm();
-          this.submitState.set('success');
+          this.submitState.set(SubmitStateEnum.SUCCESS);
         },
         error: (err) => {
           console.error('[contact] submit error', err);
-          this.submitState.set('error');
+          this.submitState.set(SubmitStateEnum.ERROR);
           this.submitError.set(
             err?.error?.error || 'Nie udało się wysłać wiadomości.',
           );
