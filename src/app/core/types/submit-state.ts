@@ -1,6 +1,6 @@
-type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
+export type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
 
-enum SubmitStateEnum {
+export enum SubmitStateEnum {
     IDLE = 'idle',
     SUBMITTING = 'submitting',
     SUCCESS = 'success',

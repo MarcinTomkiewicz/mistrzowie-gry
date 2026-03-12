@@ -18,6 +18,8 @@ import { ContactPayload } from '../../../core/types/contact';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
 
+import { SubmitState, SubmitStateEnum} from '../../../core/types/submit-state'
+
 @Component({
   selector: 'app-contact',
   standalone: true,
