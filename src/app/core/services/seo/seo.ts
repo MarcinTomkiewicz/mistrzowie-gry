@@ -11,6 +11,8 @@ export class Seo {
 
   readonly last = signal<ISeoConfig | null>(null);
 
+  private readonly publicOrigin = 'https://mistrzowiegry.pl';
+
   private readonly siteName = 'Mistrzowie Gry';
 
   private readonly defaultDescription =
@@ -21,9 +23,10 @@ export class Seo {
     const rawAbsoluteUrl =
       normalized.canonicalUrl ?? this.buildAbsoluteUrl() ?? undefined;
 
-    const absoluteUrl = rawAbsoluteUrl && this.shouldExposeSeoUrl(rawAbsoluteUrl)
-      ? rawAbsoluteUrl
-      : undefined;
+    const absoluteUrl =
+      rawAbsoluteUrl && this.shouldExposeSeoUrl(rawAbsoluteUrl)
+        ? rawAbsoluteUrl
+        : undefined;
 
     this.last.set(normalized);
     this.title.setTitle(normalized.title);
@@ -217,7 +220,11 @@ export class Seo {
   private buildAbsoluteUrl(): string | null {
     const requestUrl = this.request?.url;
     if (requestUrl) {
-      return requestUrl;
+      try {
+        return new URL(requestUrl, this.publicOrigin).toString();
+      } catch {
+        return this.publicOrigin;
+      }
     }
 
     const href = this.document.location?.href;
@@ -227,7 +234,9 @@ export class Seo {
   private shouldExposeSeoUrl(url: string): boolean {
     try {
       const hostname = new URL(url).hostname;
-      return hostname === 'mistrzowiegry.pl' || hostname === 'www.mistrzowiegry.pl';
+      return (
+        hostname === 'mistrzowiegry.pl' || hostname === 'www.mistrzowiegry.pl'
+      );
     } catch {
       return false;
     }

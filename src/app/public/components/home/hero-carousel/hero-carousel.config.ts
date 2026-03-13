@@ -5,25 +5,25 @@ export const HERO_SLIDES_TECH: readonly HeroSlideTech[] = [
     id: 1,
     ctaPath: '/offer/oferta-indywidualna',
     imageSrc: 'hero/hero-1.avif',
-    imageAlt: '',
+    imageAlt: 'Oferta indywidualna',
   },
   {
     id: 2,
     ctaPath: '/chaotic-thursdays',
     imageSrc: 'hero/hero-2.avif',
-    imageAlt: '',
+    imageAlt: 'Chaotyczne Czwartki',
   },
   {
     id: 3,
     ctaPath: '/join-the-party',
     imageSrc: 'hero/hero-3.avif',
-    imageAlt: '',
+    imageAlt: 'Dołącz do Drużyny',
   },
   {
     id: 4,
     ctaPath: '/offer/oferta-biznesowa',
     imageSrc: 'hero/hero-4.avif',
-    imageAlt: '',
+    imageAlt: 'Oferta biznesowa',
   },
 ] as const;
 
