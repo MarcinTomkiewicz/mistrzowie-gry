@@ -57,9 +57,9 @@
           <p-table [value]="s.items">
             <ng-template pTemplate="header">
               <tr>
-                <th class="w-20">{{ pricingHeaders.variant }}</th>
-                <th class="w-20">{{ pricingHeaders.price }}</th>
-                <th>{{ pricingHeaders.description }}</th>
+                <th class="w-20 small-caps">{{ pricingHeaders.variant }}</th>
+                <th class="w-20 small-caps">{{ pricingHeaders.price }}</th>
+                <th class="small-caps">{{ pricingHeaders.description }}</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-it>
@@ -69,7 +69,7 @@
                 <td>
                   <div class="flex-col-start-start">
                     <div
-                      class="mg-pricing-lead"
+                      class="mg-pricing-lead lh-18"
                       [class.mg-pricing-lead--expanded]="
                         isPricingLeadExpanded(it.id)
                       "
@@ -83,6 +83,7 @@
                         iconPos="right"
                         size="small"
                         class="align-self-end"
+                                [outlined]="true"
                         (click)="togglePricingLead(it.id)"
                         [attr.aria-expanded]="isPricingLeadExpanded(it.id)"
                       >

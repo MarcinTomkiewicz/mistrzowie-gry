@@ -65,6 +65,7 @@
               type="text"
               formControlName="firstName"
               [attr.aria-invalid]="showRequiredError('firstName')"
+              autocomplete="given-name"
             />
             <label for="firstName">{{ data.formText.firstNameLabel }}</label>
           </p-iftalabel>
@@ -82,6 +83,7 @@
               id="lastName"
               type="text"
               formControlName="lastName"
+              autocomplete="family-name"
               [attr.aria-invalid]="showRequiredError('lastName')"
             />
             <label for="lastName">{{ data.formText.lastNameLabel }}</label>
@@ -100,6 +102,7 @@
               id="companyName"
               type="text"
               formControlName="companyName"
+              autocomplete="organization"
             />
             <label for="companyName">{{ data.formText.companyLabel }}</label>
           </p-iftalabel>
@@ -111,7 +114,7 @@
               id="phone"
               type="tel"
               formControlName="phone"
-              autocomplete
+              autocomplete="tel"
             />
             <label for="phone">{{ data.formText.phoneLabel }}</label>
           </p-iftalabel>
@@ -123,7 +126,7 @@
               id="email"
               type="email"
               formControlName="email"
-              autocomplete
+              autocomplete="email"
               [attr.aria-invalid]="showEmailError()"
             />
             <label for="email">{{ data.formText.emailLabel }}</label>
