@@ -48,6 +48,7 @@ $dark: (
   "form-border-focus": $secondary,
   "form-ring": rgba($secondary, 0.32),
   "form-error": $danger,
+  "form-error-ring": rgba($danger, 0.28),
   "form-success": $success,
   "form-disabled-bg": color.scale($surface, $lightness: -6%),
   "form-disabled-text": color.scale($text, $alpha: -50%),

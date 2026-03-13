@@ -12,7 +12,7 @@
 
   .p-select.p-focus {
     outline: none;
-    background: var(--mg-form-bg-focus);
+    background: var(--mg-form-bg-hover);
     border-color: var(--mg-form-border-focus);
     box-shadow: 0 0 0 3px var(--mg-form-ring);
   }
@@ -51,14 +51,36 @@
 
 .p-select-option {
   color: var(--mg-form-text);
+
+  &::before {
+    content: "";
+    position: unset;
+    left: unset;
+    top: unset;
+    width: unset;
+    height: unset;
+    background-color: unset;
+    -webkit-mask-repeat: unset;
+    mask-repeat: unset;
+    -webkit-mask-position: unset;
+    mask-position: unset;
+    -webkit-mask-size: unset;
+    mask-size: unset;
+    -webkit-mask-image: unset;
+    mask-image: unset;
+  }
 }
 
-.p-select-option:hover,
-.p-select-option.p-focus {
-  background: var(--mg-form-select-option-hover-bg);
+.p-select-option:hover {
+  background: var(--mg-form-border-hover);
 }
 
 .p-select-option.p-select-option-selected {
-  background: var(--mg-form-select-option-selected-bg);
+  background: var(--mg-form-border-hover);
+  color: var(--mg-form-text);
+}
+
+.p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus {
+  background: var(--mg-form-border-hover);
   color: var(--mg-form-text);
 }
