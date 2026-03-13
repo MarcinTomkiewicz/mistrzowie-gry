@@ -11,7 +11,7 @@ export class Seo {
 
   readonly last = signal<ISeoConfig | null>(null);
 
-  private readonly publicOrigin = 'https://mistrzowiegry.pl';
+  private readonly publicOrigin = 'https://mistrzowie-gry.pl';
 
   private readonly siteName = 'Mistrzowie Gry';
 
@@ -231,16 +231,5 @@ export class Seo {
     const path = `${location?.pathname ?? '/'}${location?.search ?? ''}${location?.hash ?? ''}`;
 
     return new URL(path, this.publicOrigin).toString();
-  }
-
-  private shouldExposeSeoUrl(url: string): boolean {
-    try {
-      const hostname = new URL(url).hostname;
-      return (
-        hostname === 'mistrzowiegry.pl' || hostname === 'www.mistrzowiegry.pl'
-      );
-    } catch {
-      return false;
-    }
   }
 }
