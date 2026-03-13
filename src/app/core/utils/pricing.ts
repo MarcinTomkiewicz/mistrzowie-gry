@@ -1,5 +1,5 @@
-import { AnyDict } from "../types/any-dict";
-import { PricingFormatted } from "../types/pricing";
+import { AnyDict } from '../types/any-dict';
+import { PricingFormatted } from '../types/pricing';
 
 function toNumber(value: unknown): number | null {
   if (typeof value === 'number' && !Number.isNaN(value)) return value;
@@ -21,37 +21,41 @@ export function formatPricing(pricing: unknown): string {
   return formatPricingDetailed(pricing)?.value ?? '';
 }
 
-export function formatPricingDetailed(pricing: unknown): PricingFormatted | null {
+export function formatPricingDetailed(
+  pricing: unknown,
+): PricingFormatted | null {
   if (!pricing || typeof pricing !== 'object') return null;
 
   const p = pricing as AnyDict;
 
   const currency = typeof p['currency'] === 'string' ? p['currency'] : 'PLN';
-  const note = typeof p['pricingNote'] === 'string' ? p['pricingNote'] : undefined;
+  const note =
+    typeof p['pricingNote'] === 'string' ? p['pricingNote'] : undefined;
 
-  const formatRange = (minKey: string, maxKey: string, monthly = false) => {
+  const formatRange = (minKey: string, maxKey: string, suffix?: string) => {
     const minStr = formatMoney(p[minKey], currency);
     const maxStr = formatMoney(p[maxKey], currency);
     if (!minStr || !maxStr) return null;
+
     const base = `${minStr} – ${maxStr}`;
-    return monthly ? `${base} / miesiąc` : base;
+    return suffix ? `${base} ${suffix}` : base;
   };
 
-  // 1) ranges
   const range = formatRange('min', 'max');
   if (range) return { value: range, note };
 
-  const monthlyRange = formatRange('monthlyMin', 'monthlyMax', true);
+  const monthlyRange = formatRange('monthlyMin', 'monthlyMax', '/ miesiąc');
   if (monthlyRange) return { value: monthlyRange, note };
 
-  // 2) totals
+  const hourlyRange = formatRange('hourlyMin', 'hourlyMax', '/ godzina');
+  if (hourlyRange) return { value: hourlyRange, note };
+
   const total = formatMoney(p['total'], currency);
   if (total) return { value: total, note };
 
   const monthly = formatMoney(p['monthly'], currency);
   if (monthly) return { value: `${monthly} / miesiąc`, note };
 
-  // 3) rates
   const perHour = formatMoney(p['perHour'], currency);
   if (perHour) return { value: `${perHour} / h`, note };
 
@@ -61,7 +65,6 @@ export function formatPricingDetailed(pricing: unknown): PricingFormatted | null
     return { value: unitLabel ? `${unit} / ${unitLabel}` : unit, note };
   }
 
-  // 4) minimum / surcharge / percent
   const minTotal = formatMoney(p['minTotal'], currency);
   if (minTotal) return { value: `od ${minTotal}`, note };
 
@@ -70,6 +73,12 @@ export function formatPricingDetailed(pricing: unknown): PricingFormatted | null
 
   const percent = toNumber(p['percentSurcharge']);
   if (percent !== null) return { value: `+${percent}%`, note };
+
+  const percentMin = toNumber(p['percentMin']);
+  const percentMax = toNumber(p['percentMax']);
+  if (percentMin !== null && percentMax !== null) {
+    return { value: `+${percentMin}% – +${percentMax}%`, note };
+  }
 
   try {
     return { value: JSON.stringify(pricing), note };

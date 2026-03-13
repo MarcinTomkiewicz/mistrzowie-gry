@@ -66,7 +66,7 @@ export class Offers {
 
     if (!vm) {
       this.seo.apply({
-        title: this.i18n.seo().title || 'Chaotyczne Czwartki',
+        title: this.i18n.seo().title || 'Oferta',
         description: this.i18n.seo().description || '',
       });
       return;
