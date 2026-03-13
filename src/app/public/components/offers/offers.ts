@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
@@ -138,4 +138,26 @@ export class Offers {
   readonly formatPricing = formatPricing;
   readonly formatPricingDetailed = formatPricingDetailed;
   readonly formatAddonPricing = formatAddonPricing;
+
+  readonly expandedPricingLeadIds = signal<Set<string>>(new Set());
+
+readonly isPricingLeadExpanded = (id: string) =>
+  this.expandedPricingLeadIds().has(id);
+
+readonly togglePricingLead = (id: string) => {
+  this.expandedPricingLeadIds.update((current) => {
+    const next = new Set(current);
+
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+
+    return next;
+  });
+};
+
+readonly shouldShowPricingLeadToggle = (text?: string | null) =>
+  !!text && text.trim().length > 180;
 }

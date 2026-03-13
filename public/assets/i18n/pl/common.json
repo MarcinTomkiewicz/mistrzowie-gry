@@ -15,7 +15,9 @@
     "sendMessage": "Wyślij wiadomość",
     "goBack": "Wróć",
     "goHome": "Strona główna",
-    "viewAll": "Zobacz wszystko"
+    "viewAll": "Zobacz wszystko",
+    "showMore": "Pokaż więcej...",
+    "showLess": "Pokaż mniej"
   },
 
   "actions": {

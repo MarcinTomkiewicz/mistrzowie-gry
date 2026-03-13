@@ -35,7 +35,7 @@ export function createOffersI18n() {
     'description',
   ] as const);
 
-  const commonCta = pickTranslations(commonCtaDict, ['contactUs'] as const);
+  const commonCta = pickTranslations(commonCtaDict, ['contactUs', 'showMore', 'showLess'] as const);
 
   const commonStatus = pickTranslations(commonStatusDict, ['loading'] as const);
 
