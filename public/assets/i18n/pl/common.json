@@ -106,7 +106,9 @@
   "accessibility": {
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
-    "skipToContent": "Przejdź do treści"
+    "skipToContent": "Przejdź do treści",
+    "sendMail": "Wyślij maila do",
+    "callMe": "Zadzwoń na numer"
   },
 
   "footnotes": {

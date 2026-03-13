@@ -177,7 +177,9 @@
           <div class="flex-row-end-center flex-col-sm gap-sm">
             <p-button
               type="submit"
-              [label]="vm().isSubmitting ? vm().status.sending : vm().cta.sendMessage"
+              [label]="
+                vm().isSubmitting ? vm().status.sending : vm().cta.sendMessage
+              "
               icon="pi pi-send"
               severity="success"
               [disabled]="vm().isSubmitting"
@@ -191,28 +193,32 @@
           {{ vm().info.title }}
         </h2>
 
-        <p class="mg-section__subtitle">
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
           {{ vm().info.subtitle }}
         </p>
 
-        <div class="flex-col-start gap-sm mt-md">
+        <div class="flex-col-start-start gap-sm mt-md">
           <div class="flex-row-start-center gap-sm">
-            <i class="pi pi-envelope" aria-hidden="true"></i>
-            <span>
-              {{ vm().info.emailLabel }}
-              @if (vm().info.emailValue) {
-                <span>{{ vm().info.emailValue }}</span>
-              }
-            </span>
+            <i class="pi pi-send-message" aria-hidden="true"></i>
+            {{ vm().info.emailLabel }}
+            <a
+              [href]="'mailto:' + vm().info.emailValue"
+              [attr.aria-label]="vm().accessibility.sendMail + vm().info.emailValue"
+            >
+              {{ vm().info.emailValue }}
+            </a>
           </div>
 
           <div class="flex-row-start-center gap-sm">
-            <i class="pi pi-phone" aria-hidden="true"></i>
+            <i class="pi pi-call-me" aria-hidden="true"></i>
             <span>
               {{ vm().info.phoneLabel }}
-              @if (vm().info.phoneValue) {
-                <span>{{ vm().info.phoneValue }}</span>
-              }
+            <a
+              [href]="'tel:' + vm().info.phoneValue"
+              [attr.aria-label]="vm().accessibility.callMe + vm().info.phoneValue"
+            >
+              {{ vm().info.phoneValue }}
+            </a>
             </span>
           </div>
         </div>

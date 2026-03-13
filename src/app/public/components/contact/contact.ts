@@ -136,6 +136,7 @@ export class Contact {
     topics: this.i18n.topics(),
     isOtherTopicSelected: this.isOtherTopicSelected(),
     info: this.i18n.info(),
+    accessibility: this.i18n.accessibility(),
     isSubmitting: this.isSubmitting(),
   }));
 

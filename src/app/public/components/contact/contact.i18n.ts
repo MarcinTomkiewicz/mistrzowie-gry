@@ -39,6 +39,7 @@ export function createContactI18n() {
     { scope: 'common' },
   );
   const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
+  const accessibilityDict = translateObjectSignal('accessibility', {}, { scope: 'common' });
 
   const hero = pickTranslations(heroDict, ['title', 'subtitle'] as const);
 
@@ -84,6 +85,7 @@ export function createContactI18n() {
 
   const cta = pickTranslations(commonCtaDict, ['sendMessage'] as const);
   const status = pickTranslations(statusDict, ['sending'] as const);
+  const accessibility = pickTranslations(statusDict, ['sendMail', 'callMe'] as const);
 
   const info = pickTranslations(infoDict, [
     'title',
@@ -116,5 +118,6 @@ export function createContactI18n() {
     cta,
     info,
     topics,
+    accessibility
   };
 }
