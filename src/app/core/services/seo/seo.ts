@@ -20,13 +20,9 @@ export class Seo {
 
   apply(config: ISeoConfig): void {
     const normalized = this.normalize(config);
-    const rawAbsoluteUrl =
-      normalized.canonicalUrl ?? this.buildAbsoluteUrl() ?? undefined;
+    const rawAbsoluteUrl = normalized.canonicalUrl ?? this.buildAbsoluteUrl();
 
-    const absoluteUrl =
-      rawAbsoluteUrl && this.shouldExposeSeoUrl(rawAbsoluteUrl)
-        ? rawAbsoluteUrl
-        : undefined;
+    const absoluteUrl = this.normalizeCanonicalUrl(rawAbsoluteUrl);
 
     this.last.set(normalized);
     this.title.setTitle(normalized.title);
@@ -44,12 +40,7 @@ export class Seo {
 
     this.applyOpenGraph(normalized, absoluteUrl);
     this.applyTwitter(normalized);
-
-    if (absoluteUrl) {
-      this.setCanonical(absoluteUrl);
-    } else {
-      this.removeCanonical();
-    }
+    this.setCanonical(absoluteUrl);
   }
 
   clear(): void {
@@ -177,6 +168,19 @@ export class Seo {
     };
   }
 
+  private normalizeCanonicalUrl(url: string): string {
+  const parsed = new URL(url);
+
+  parsed.hash = '';
+  parsed.search = '';
+
+  if (parsed.pathname !== '/' && parsed.pathname.endsWith('/')) {
+    parsed.pathname = parsed.pathname.slice(0, -1);
+  }
+
+  return parsed.toString();
+}
+
   private setMetaName(name: string, content: string): void {
     this.meta.updateTag({ name, content }, `name='${name}'`);
   }
@@ -217,18 +221,16 @@ export class Seo {
       ?.remove();
   }
 
-  private buildAbsoluteUrl(): string | null {
+  private buildAbsoluteUrl(): string {
     const requestUrl = this.request?.url;
     if (requestUrl) {
-      try {
-        return new URL(requestUrl, this.publicOrigin).toString();
-      } catch {
-        return this.publicOrigin;
-      }
+      return new URL(requestUrl, this.publicOrigin).toString();
     }
 
-    const href = this.document.location?.href;
-    return href || null;
+    const location = this.document.location;
+    const path = `${location?.pathname ?? '/'}${location?.search ?? ''}${location?.hash ?? ''}`;
+
+    return new URL(path, this.publicOrigin).toString();
   }
 
   private shouldExposeSeoUrl(url: string): boolean {
