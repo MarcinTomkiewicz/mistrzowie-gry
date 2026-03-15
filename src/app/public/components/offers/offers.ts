@@ -18,7 +18,11 @@ import {
 } from '../../../core/enums/offers';
 import { Offer } from '../../../core/services/offer/offer';
 import { Seo } from '../../../core/services/seo/seo';
-import type { OfferItem, OfferPageSection } from '../../../core/types/offers';
+import type {
+  OfferItem,
+  OfferItemId,
+  OfferPageSection,
+} from '../../../core/types/offers';
 import { normalizeFaqItems } from '../../../core/utils/display-items';
 import {
   formatAddonPricing,
@@ -56,10 +60,19 @@ export class Offers {
     distinctUntilChanged(),
   );
 
+  private readonly slug = toSignal(this.slug$, {
+    initialValue: 'oferta-indywidualna',
+  });
+
   readonly vm = toSignal(
     this.slug$.pipe(switchMap((slug) => this.offer.getOfferPageVmBySlug(slug))),
     { initialValue: null },
   );
+
+  private readonly resetExpandedLeadsEffect = effect(() => {
+    this.slug();
+    this.expandedLeadIds.set(new Set());
+  });
 
   private readonly applySeoEffect = effect(() => {
     const vm = this.vm();
@@ -139,25 +152,25 @@ export class Offers {
   readonly formatPricingDetailed = formatPricingDetailed;
   readonly formatAddonPricing = formatAddonPricing;
 
-  readonly expandedPricingLeadIds = signal<Set<string>>(new Set());
+  readonly expandedLeadIds = signal<Set<OfferItemId>>(new Set());
 
-readonly isPricingLeadExpanded = (id: string) =>
-  this.expandedPricingLeadIds().has(id);
+  readonly isLeadExpanded = (id: OfferItemId) =>
+    this.expandedLeadIds().has(id);
 
-readonly togglePricingLead = (id: string) => {
-  this.expandedPricingLeadIds.update((current) => {
-    const next = new Set(current);
+  readonly toggleLead = (id: OfferItemId) => {
+    this.expandedLeadIds.update((current) => {
+      const next = new Set(current);
 
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
 
-    return next;
-  });
-};
+      return next;
+    });
+  };
 
-readonly shouldShowPricingLeadToggle = (text?: string | null) =>
-  !!text && text.trim().length > 180;
+  readonly shouldShowLeadToggle = (text?: string | null) =>
+    !!text && text.trim().length > 180;
 }

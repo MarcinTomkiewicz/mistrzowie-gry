@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
 
 /* =========================================================
    TYPOGRAPHY – base defaults
@@ -12,19 +13,36 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0 0 map.get(v.$spacings, "sm");
   font-family: v.$font-family-display;
   line-height: 1.1;
   font-weight: 700;
 }
 
-h1 { font-size: map.get(v.$font-sizes, "hero"); }
-h2 { font-size: map.get(v.$font-sizes, "xxl"); }
-h3 { font-size: map.get(v.$font-sizes, "xl"); }
-h4 { font-size: map.get(v.$font-sizes, "lg"); }
-h5 { font-size: map.get(v.$font-sizes, "md"); }
-h6 { font-size: map.get(v.$font-sizes, "sm"); }
+h1 {
+  font-size: map.get(v.$font-sizes, "hero");
+}
+h2 {
+  font-size: map.get(v.$font-sizes, "xxl");
+}
+h3 {
+  font-size: map.get(v.$font-sizes, "xl");
+}
+h4 {
+  font-size: map.get(v.$font-sizes, "lg");
+}
+h5 {
+  font-size: map.get(v.$font-sizes, "md");
+}
+h6 {
+  font-size: map.get(v.$font-sizes, "sm");
+}
 
 p {
   margin: 0 0 map.get(v.$spacings, "md");
@@ -52,8 +70,9 @@ a {
 code,
 kbd,
 samp {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   font-size: 0.95em;
 }
 
@@ -72,7 +91,6 @@ pre {
   border-radius: v.$radius-md;
   border: 1px solid v.$color-border;
 
-  /* zamiast color.scale(bg) */
   background: v.$color-bg-surface;
 
   overflow: auto;
@@ -111,4 +129,16 @@ pre {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+:root .heading-color {
+  @include m.gold-gradient-text;
+}
+
+:root[data-theme="light"] .heading-color {
+  background: none;
+  background-clip: initial;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: currentColor;
+  color: v.$heading-color;
 }

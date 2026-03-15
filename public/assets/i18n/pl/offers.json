@@ -11,6 +11,7 @@
   "pricingTable": {
     "headers": {
       "variant": "Dostępne opcje",
+      "variantLabel": "Usługa",
       "price": "Cena",
       "description": "Opis"
     }

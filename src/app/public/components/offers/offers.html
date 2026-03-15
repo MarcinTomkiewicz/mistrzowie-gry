@@ -54,51 +54,116 @@
             </p>
           }
 
-          <p-table [value]="s.items">
-            <ng-template pTemplate="header">
-              <tr>
-                <th class="w-20 small-caps">{{ pricingHeaders.variant }}</th>
-                <th class="w-20 small-caps">{{ pricingHeaders.price }}</th>
-                <th class="small-caps">{{ pricingHeaders.description }}</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-it>
-              <tr>
-                <td>{{ it.title }}</td>
-                <td>{{ formatPricing(it.pricing) }}</td>
-                <td>
-                  <div class="flex-col-start-start">
-                    <div
-                      class="mg-pricing-lead lh-18"
-                      [class.mg-pricing-lead--expanded]="
-                        isPricingLeadExpanded(it.id)
-                      "
-                    >
-                      {{ it.lead }}
+          <div class="hide-down-md">
+            <p-table [value]="s.items">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="w-20 small-caps">{{ pricingHeaders.variant }}</th>
+                  <th class="w-20 small-caps">{{ pricingHeaders.price }}</th>
+                  <th class="small-caps">{{ pricingHeaders.description }}</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-it>
+                <tr>
+                  <td>{{ it.title }}</td>
+                  <td>{{ formatPricing(it.pricing) }}</td>
+                  <td>
+                    <div class="flex-col-start-start">
+                      <div
+                        class="mg-pricing-lead lh-18"
+                        [class.mg-pricing-lead--expanded]="
+                          isLeadExpanded(it.id)
+                        "
+                      >
+                        {{ it.lead }}
+                      </div>
+
+                      @if (shouldShowLeadToggle(it.lead)) {
+                        <p-button
+                          severity="warn"
+                          iconPos="right"
+                          size="small"
+                          class="align-self-end"
+                          [outlined]="true"
+                          (click)="toggleLead(it.id)"
+                          [attr.aria-expanded]="isLeadExpanded(it.id)"
+                        >
+                          {{
+                            isLeadExpanded(it.id)
+                              ? i18n.commonCta().showLess
+                              : i18n.commonCta().showMore
+                          }}
+                        </p-button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+
+          <div class="show-down-md">
+            <div class="flex-col-start-stretch gap-md">
+              @for (it of s.items; track it.id) {
+                <div class="mg-card">
+                  <div class="flex-col-start-stretch gap-sm">
+                    <div class="flex-row-start-center gap-sm">
+                      <div class="heading-color small-caps flex-fixed-25">
+                        {{ pricingHeaders.variantLabel }}
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        {{ it.title }}
+                      </div>
                     </div>
 
-                    @if (shouldShowPricingLeadToggle(it.lead)) {
-                      <p-button
-                        severity="warn"
-                        iconPos="right"
-                        size="small"
-                        class="align-self-end"
-                                [outlined]="true"
-                        (click)="togglePricingLead(it.id)"
-                        [attr.aria-expanded]="isPricingLeadExpanded(it.id)"
-                      >
-                        {{
-                          isPricingLeadExpanded(it.id)
-                            ? i18n.commonCta().showLess
-                            : i18n.commonCta().showMore
-                        }}
-                      </p-button>
-                    }
+                    <div class="flex-row-start-start gap-sm">
+                      <div class="heading-color small-caps flex-fixed-25">
+                        {{ pricingHeaders.price }}
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        {{ formatPricing(it.pricing) }}
+                      </div>
+                    </div>
+
+                    <div class="flex-col-start-stretch gap-xs">
+                      <div class="heading-color small-caps">
+                        {{ pricingHeaders.description }}
+                      </div>
+
+                      <div class="flex-col-start-start">
+                        <div
+                          class="mg-pricing-lead lh-18"
+                          [class.mg-pricing-lead--expanded]="
+                            isLeadExpanded(it.id)
+                          "
+                        >
+                          {{ it.lead }}
+                        </div>
+
+                        @if (shouldShowLeadToggle(it.lead)) {
+                          <p-button
+                            severity="warn"
+                            iconPos="right"
+                            size="small"
+                            class="align-self-end"
+                            [outlined]="true"
+                            (click)="toggleLead(it.id)"
+                            [attr.aria-expanded]="isLeadExpanded(it.id)"
+                          >
+                            {{
+                              isLeadExpanded(it.id)
+                                ? i18n.commonCta().showLess
+                                : i18n.commonCta().showMore
+                            }}
+                          </p-button>
+                        }
+                      </div>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
+                </div>
+              }
+            </div>
+          </div>
 
           @if (data.pricingFootnote) {
             <p
@@ -142,11 +207,34 @@
                   </div>
                 }
 
-                <p
-                  class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
-                >
-                  {{ it.lead }}
-                </p>
+                <div class="flex-col-start-start">
+                  <p
+                    class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mg-pricing-lead"
+                    [class.mg-pricing-lead--expanded]="isLeadExpanded(it.id)"
+                  >
+                    {{ it.lead }}
+                  </p>
+
+                  @if (shouldShowLeadToggle(it.lead)) {
+                    <div class="show-down-md">
+                      <p-button
+                        severity="warn"
+                        iconPos="right"
+                        size="small"
+                        class="align-self-end"
+                        [outlined]="true"
+                        (click)="toggleLead(it.id)"
+                        [attr.aria-expanded]="isLeadExpanded(it.id)"
+                      >
+                        {{
+                          isLeadExpanded(it.id)
+                            ? i18n.commonCta().showLess
+                            : i18n.commonCta().showMore
+                        }}
+                      </p-button>
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>

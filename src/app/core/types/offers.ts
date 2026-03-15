@@ -69,13 +69,9 @@ export type OfferSectionItem = {
   position: number;
 };
 
-export type OfferVmSection = OfferPageSection & {
-  items: OfferItem[];
-};
-
 export type OfferPageVm = {
   page: OfferPage;
-  sections: OfferVmSection[];
+  sections: OfferSectionWithItems[];
 };
 
 export type OfferSectionWithItems = OfferPageSection & {
@@ -93,3 +89,5 @@ export type OfferPageDbRow = OfferPage & {
     }
   >;
 };
+
+export type OfferItemId = OfferItem['id'];

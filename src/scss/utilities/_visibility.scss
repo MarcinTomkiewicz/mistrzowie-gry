@@ -1,0 +1,41 @@
+@use "../abstracts/mixins" as m;
+
+$visibility-breakpoints: ("xl", "lg", "md", "sm", "xs");
+
+/* =========================================================
+   VISIBILITY UTILITIES
+   - show-down-{bp} => pokaż do breakpointu w dół
+   - hide-down-{bp} => ukryj do breakpointu w dół
+   - show-up-{bp}   => pokaż od breakpointu wzwyż
+   - hide-up-{bp}   => ukryj od breakpointu wzwyż
+   ========================================================= */
+
+@each $bp in $visibility-breakpoints {
+  .show-down-#{$bp} {
+    display: none !important;
+
+    @include m.down($bp) {
+      display: block !important;
+    }
+  }
+
+  .hide-down-#{$bp} {
+    @include m.down($bp) {
+      display: none !important;
+    }
+  }
+
+  .show-up-#{$bp} {
+    display: none !important;
+
+    @include m.up($bp) {
+      display: block !important;
+    }
+  }
+
+  .hide-up-#{$bp} {
+    @include m.up($bp) {
+      display: none !important;
+    }
+  }
+}

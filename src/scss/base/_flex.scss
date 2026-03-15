@@ -25,6 +25,59 @@ $flex-align-map: (
   baseline: baseline
 );
 
+$align-self-map: (
+  start: flex-start,
+  center: center,
+  end: flex-end,
+  stretch: stretch,
+  baseline: baseline,
+  auto: auto
+);
+
+$flex-values: (
+  1: 1 1 auto,
+  auto: 1 1 auto,
+  none: 0 0 auto
+);
+
+$flex-grow-values: (
+  0: 0,
+  1: 1
+);
+
+$flex-shrink-values: (
+  0: 0,
+  1: 1
+);
+
+$flex-basis-values: (
+  0: 0,
+  10: 10%,
+  20: 20%,
+  25: 25%,
+  30: 30%,
+  33: 33.333333%,
+  40: 40%,
+  50: 50%,
+  auto: auto
+);
+
+$min-width-values: (
+  0: 0,
+  full: 100%,
+  auto: auto
+);
+
+$min-height-values: (
+  0: 0,
+  full: 100%,
+  auto: auto
+);
+
+/* =========================================================
+   CONTAINER HELPERS
+   ========================================================= */
+
 @function _default-align($dir) {
   @if $dir == row {
     @return center;
@@ -43,6 +96,10 @@ $flex-align-map: (
   }
 }
 
+/* =========================================================
+   FLEX CONTAINERS
+   ========================================================= */
+
 @include _emit(
   flex-row,
   row,
@@ -56,7 +113,6 @@ $flex-align-map: (
   _default-justify(column),
   _default-align(column)
 );
-
 
 @each $j-name, $j-value in $flex-justify-map {
   @each $a-name, $a-value in $flex-align-map {
@@ -77,11 +133,7 @@ $flex-align-map: (
 }
 
 @each $bp in $flex-breakpoints {
-
   @include m.down($bp) {
-
-    /* shorthand */
-
     @include _emit(
       "flex-row-#{$bp}",
       row,
@@ -98,7 +150,6 @@ $flex-align-map: (
 
     @each $j-name, $j-value in $flex-justify-map {
       @each $a-name, $a-value in $flex-align-map {
-
         @include _emit(
           "flex-row-#{$j-name}-#{$a-name}-#{$bp}",
           row,
@@ -112,21 +163,78 @@ $flex-align-map: (
           $j-value,
           $a-value
         );
-
       }
     }
   }
-
 }
 
-.align-self-start {
-  align-self: flex-start;
+/* =========================================================
+   ITEM HELPERS
+   ========================================================= */
+
+@mixin _emit-prop($class, $property, $value, $important: false) {
+  .#{$class} {
+    @if $important {
+      #{$property}: $value !important;
+    } @else {
+      #{$property}: $value;
+    }
+  }
 }
 
-.align-self-end {
-  align-self: flex-end;
+@mixin _emit-prop-down($bp, $class, $property, $value, $important: false) {
+  @include m.down($bp) {
+    .#{$class}-#{$bp} {
+      @if $important {
+        #{$property}: $value !important;
+      } @else {
+        #{$property}: $value;
+      }
+    }
+  }
 }
 
-.align-self-center {
-  align-self: center;
+@mixin _emit-prop-map($prefix, $values, $property, $important: false) {
+  @each $name, $value in $values {
+    @include _emit-prop("#{$prefix}-#{$name}", $property, $value, $important);
+
+    @each $bp in $flex-breakpoints {
+      @include _emit-prop-down(
+        $bp,
+        "#{$prefix}-#{$name}",
+        $property,
+        $value,
+        $important
+      );
+    }
+  }
 }
+
+@mixin _emit-flex-fixed-map($values) {
+  @each $name, $value in $values {
+    .flex-fixed-#{$name} {
+      flex: 0 0 $value !important;
+    }
+
+    @each $bp in $flex-breakpoints {
+      @include m.down($bp) {
+        .flex-fixed-#{$name}-#{$bp} {
+          flex: 0 0 $value !important;
+        }
+      }
+    }
+  }
+}
+
+/* =========================================================
+   FLEX ITEMS
+   ========================================================= */
+
+@include _emit-prop-map(align-self, $align-self-map, align-self);
+@include _emit-prop-map(flex, $flex-values, flex);
+@include _emit-prop-map(flex-grow, $flex-grow-values, flex-grow);
+@include _emit-prop-map(flex-shrink, $flex-shrink-values, flex-shrink);
+@include _emit-prop-map(min-w, $min-width-values, min-width);
+@include _emit-prop-map(min-h, $min-height-values, min-height);
+@include _emit-prop-map(basis, $flex-basis-values, flex-basis, true);
+@include _emit-flex-fixed-map($flex-basis-values);

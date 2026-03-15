@@ -31,6 +31,7 @@ export function createOffersI18n() {
 
   const pricingHeaders = pickTranslations(pricingHeadersDict, [
     'variant',
+    'variantLabel',
     'price',
     'description',
   ] as const);
