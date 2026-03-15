@@ -31,7 +31,10 @@
               "
             >
               <span>{{ item.label }}</span>
-              <span class="mg-navbar__caret flex-row-start-center ml-xs">
+              <span
+                class="mg-navbar__caret flex-row-start-center ml-xs"
+                aria-hidden="true"
+              >
                 ▾
               </span>
             </button>
@@ -41,13 +44,16 @@
     </ul>
 
     <div class="flex-row-start-center gap-sm">
-      <div class="hide-down-md"><app-theme-switch></app-theme-switch></div>
+      <div class="hide-down-md">
+        <app-theme-switch></app-theme-switch>
+      </div>
 
-      <div class="flex-row-start-center gap-xs ps-sm">
+      <div class="flex-row-start-center gap-xs pl-sm">
         <button
           type="button"
           class="mg-icon-btn"
           aria-label="Profil"
+          (click)="showOutOfOrderPopup($event)"
         >
           <i class="pi pi-overlord"></i>
         </button>
@@ -56,6 +62,7 @@
           type="button"
           class="mg-icon-btn"
           aria-label="Koszyk"
+          (click)="showOutOfOrderPopup($event)"
         >
           <i class="pi pi-cash"></i>
         </button>
@@ -72,7 +79,6 @@
     </div>
   </div>
 </nav>
-
 
 <p-popover #navPopover styleClass="mg-popover" (onHide)="closeDropdown()">
   <ul class="m-0 p-sm flex-col-start-stretch gap-xs">
@@ -92,7 +98,6 @@
   </ul>
 </p-popover>
 
-
 <p-drawer
   [(visible)]="mobileOpen"
   position="right"
@@ -102,11 +107,10 @@
 >
   <ng-template #headless>
     <div class="m-sm">
-
-      <div class="flex-row-between-center row-gap-sm col-gap-sm pb-sm mb-sm mg-mobile-drawer__head">
-        <div class="mg-mobile-drawer__title">
-          Menu
-        </div>
+      <div
+        class="flex-row-between-center row-gap-sm col-gap-sm pb-sm mb-sm mg-mobile-drawer__head"
+      >
+        <div class="mg-mobile-drawer__title">Menu</div>
 
         <app-theme-switch></app-theme-switch>
 
@@ -122,11 +126,8 @@
 
       <ul class="m-0 p-0 flex-col-start-stretch gap-md">
         @for (item of menu(); track trackByLabelKey($index, item)) {
-
           <li class="li--unset">
-
             @if (!item.children?.length) {
-
               <a
                 class="mg-mobile-menu__link py-sm"
                 [routerLink]="item.path"
@@ -134,17 +135,16 @@
               >
                 {{ item.label }}
               </a>
-
             } @else {
-
               <div class="mg-mobile-menu__group py-xs">
                 {{ item.label }}
               </div>
 
               <ul class="m-0 mt-xs pl-md flex-col-start-stretch gap-xs">
-
-                @for (child of item.children; track trackByLabelKey($index, child)) {
-
+                @for (
+                  child of item.children;
+                  track trackByLabelKey($index, child)
+                ) {
                   <li class="li--unset">
                     <a
                       class="mg-mobile-menu__link py-sm"
@@ -154,18 +154,12 @@
                       {{ child.label }}
                     </a>
                   </li>
-
                 }
-
               </ul>
-
             }
-
           </li>
-
         }
       </ul>
-
     </div>
   </ng-template>
 </p-drawer>

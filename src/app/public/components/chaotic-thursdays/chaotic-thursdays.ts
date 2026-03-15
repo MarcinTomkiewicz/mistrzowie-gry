@@ -15,6 +15,7 @@ import {
   CHAOTIC_STANDARDS_ICONS,
 } from './chaotic-thursdays.config';
 import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-chaotic-thursdays',
@@ -32,6 +33,8 @@ export class ChaoticThursdays {
     CHAOTIC_STANDARDS_ICONS,
   );
 
+  private readonly confirmationService = inject(ConfirmationService);
+
   readonly sparkDice = CHAOTIC_SPARK_DICE;
 
   private readonly applySeoEffect = effect(() => {
@@ -42,4 +45,19 @@ export class ChaoticThursdays {
   });
 
   trackByIndex = (i: number) => i;
+
+    showOutOfOrderPopup(event: Event): void {
+    this.confirmationService.confirm({
+      target: event.currentTarget as HTMLElement,
+      message: this.i18n.info().outOfOrder,
+      icon: 'pi pi-tied-scroll',
+      acceptLabel: this.i18n.actions().ok,
+      rejectVisible: false,
+      accept: () => {},
+      acceptButtonProps: {
+        label: this.i18n.actions().ok,
+        severity: 'info',
+      },
+    });
+  }
 }

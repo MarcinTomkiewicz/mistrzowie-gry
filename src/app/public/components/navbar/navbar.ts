@@ -2,6 +2,8 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { DrawerModule } from 'primeng/drawer';
 import { Popover, PopoverModule } from 'primeng/popover';
 
@@ -19,6 +21,7 @@ import { createNavbarI18n, UIMenu } from './navbar.i18n';
     RouterModule,
     PopoverModule,
     DrawerModule,
+    ConfirmPopupModule,
     ThemeSwitch,
     NgOptimizedImage,
   ],
@@ -28,6 +31,8 @@ import { createNavbarI18n, UIMenu } from './navbar.i18n';
 })
 export class Navbar {
   private readonly nav = inject(Navigation);
+  private readonly confirmationService = inject(ConfirmationService);
+
   readonly theme = inject(Theme);
   readonly i18n = createNavbarI18n();
 
@@ -72,6 +77,21 @@ export class Navbar {
 
   onMobileNavigate(): void {
     this.closeMobile();
+  }
+
+  showOutOfOrderPopup(event: Event): void {
+    this.confirmationService.confirm({
+      target: event.currentTarget as HTMLElement,
+      message: this.i18n.info().outOfOrder,
+      icon: 'pi pi-tied-scroll',
+      acceptLabel: this.i18n.actions().ok,
+      rejectVisible: false,
+      accept: () => {},
+      acceptButtonProps: {
+        label: this.i18n.actions().ok,
+        severity: 'info',
+      },
+    });
   }
 
   trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;

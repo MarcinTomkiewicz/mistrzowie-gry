@@ -1,3 +1,42 @@
+export type CommonCtaTranslations = {
+  contactUs: string;
+  joinProgram: string;
+  offerIndividual: string;
+  offerBusiness: string;
+  chaoticThursdays: string;
+  checkDetails: string;
+  seeProgram: string;
+  learnMore: string;
+  seeOffer: string;
+  seePricing: string;
+  bookSession: string;
+  signUp: string;
+  sendMessage: string;
+  goBack: string;
+  goHome: string;
+  viewAll: string;
+  showMore: string;
+  showLess: string;
+};
+
+export type CommonActionsTranslations = {
+  close: string;
+  cancel: string;
+  confirm: string;
+  save: string;
+  edit: string;
+  delete: string;
+  copy: string;
+  refresh: string;
+  retry: string;
+  add: string;
+  remove: string;
+  next: string;
+  previous: string;
+  submit: string;
+  ok: string;
+};
+
 export type CommonNavTranslations = {
   home: string;
   about: string;
@@ -31,6 +70,8 @@ export type CommonAccessibilityTranslations = {
   openMenu: string;
   closeMenu: string;
   skipToContent: string;
+  sendMail: string;
+  callMe: string;
 };
 
 export type CommonFooterTranslations = {
@@ -47,4 +88,55 @@ export type CommonFooterTranslations = {
   emailLabel: string;
   emailValue: string;
   emailHref: string;
+};
+
+export type CommonStatusTranslations = {
+  loading: string;
+  saving: string;
+  sending: string;
+  success: string;
+  done: string;
+};
+
+export type CommonEmptyTranslations = {
+  title: string;
+  description: string;
+};
+
+export type CommonInfoTranslations = {
+  outOfOrder: string;
+};
+
+export type CommonErrorsTranslations = {
+  generic: string;
+  network: string;
+  notFound: string;
+  forbidden: string;
+  unauthorized: string;
+  timeout: string;
+  server: string;
+};
+
+export type CommonSeoTranslations = {
+  defaultTitle: string;
+  defaultDescription: string;
+};
+
+export type CommonFootnotesTranslations = {
+  net: string;
+  gross: string;
+};
+
+export type CommonFormConsentTranslations = {
+  label: string;
+  required: string;
+};
+
+export type CommonFormTranslations = {
+  required: string;
+  invalidEmail: string;
+  minLength: string;
+  maxLength: string;
+  invalid: string;
+  consent: CommonFormConsentTranslations;
 };

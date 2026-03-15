@@ -1,0 +1,43 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG ConfirmPopup
+   - PrimeNG 20/21 styled mode uses p-confirmpopup classes
+   - and --p-confirmpopup-* tokens
+   ========================================================= */
+
+:root {
+  --p-confirmpopup-background: #{v.$color-bg-surface};
+  --p-confirmpopup-border-color: #{v.$color-border};
+  --p-confirmpopup-color: #{v.$color-text};
+  --p-confirmpopup-border-radius: #{v.$radius-md};
+  --p-confirmpopup-shadow: #{v.$shadow-soft};
+
+  --p-confirmpopup-content-padding: #{map.get(v.$spacings, "sm")};
+  --p-confirmpopup-content-gap: #{map.get(v.$spacings, "xs")};
+
+  --p-confirmpopup-icon-color: #{v.$color-text};
+
+  --p-confirmpopup-footer-gap: #{map.get(v.$spacings, "xs")};
+  --p-confirmpopup-footer-padding: 0 #{map.get(v.$spacings, "sm")} #{map.get(v.$spacings, "sm")};
+}
+
+/* opcjonalne dopięcie rzeczy, których tokenami nie ustawisz tak wygodnie */
+
+.p-confirmpopup {
+  max-width: 18rem;
+}
+
+.p-confirmpopup-message {
+  color: v.$color-text;
+}
+
+.p-confirmpopup-footer {
+  justify-content: flex-end;
+}
+
+/* jeśli chcesz dopiąć jeszcze pewność dla przycisku accept */
+.p-confirmpopup-accept-button.p-button {
+  border-radius: v.$radius-sm;
+}

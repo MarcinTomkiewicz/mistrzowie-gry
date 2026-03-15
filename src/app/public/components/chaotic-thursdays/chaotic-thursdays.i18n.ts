@@ -11,6 +11,7 @@ import {
   withIcons,
 } from '../../../core/utils/dict-to-sorted-array';
 import { pickTranslations } from '../../../core/utils/pick-translation';
+import { CommonActionsTranslations, CommonInfoTranslations } from '../../../core/types/common-i18n';
 
 function toSortedById<T>(dict: unknown): T[] {
   return dictToSortedArray<T>(dict as never, (x) =>
@@ -45,6 +46,12 @@ export function createChaoticThursdaysI18n(
   );
   const faqDict = translateObjectSignal('faq', {}, { scope: 'chaoticThursdays' });
   const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
+
+  const actionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
+const infoDict = translateObjectSignal('info', {}, { scope: 'common' });
+
+const actions = computed(() => actionsDict() as CommonActionsTranslations);
+const info = computed(() => infoDict() as CommonInfoTranslations);
 
   const highlightsDict = translateObjectSignal(
     'about.highlights',
@@ -143,6 +150,8 @@ export function createChaoticThursdaysI18n(
   return {
     seoTitle,
     seoDescription,
+    actions,
+    info,
     hero,
     heroInfo,
     heroCta,

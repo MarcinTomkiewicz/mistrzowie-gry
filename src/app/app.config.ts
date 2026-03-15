@@ -19,7 +19,7 @@ import { provideTransloco } from '@jsverse/transloco';
 import { TranslocoHttpLoader } from './core/loaders/transloco.loader';
 import { SUPABASE_CONFIG } from './core/configs/supabase.config';
 import { environment } from '../env/environment';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -53,6 +53,7 @@ export const appConfig: ApplicationConfig = {
       provide: SUPABASE_CONFIG,
       useValue: environment.supabase,
     },
-    MessageService
+    MessageService,
+    ConfirmationService
   ],
 };

@@ -2,8 +2,10 @@ import { computed } from '@angular/core';
 import { translateObjectSignal } from '@jsverse/transloco';
 
 import { IMenu } from '../../../core/interfaces/i-menu';
-import {
+import type {
   CommonAccessibilityTranslations,
+  CommonActionsTranslations,
+  CommonInfoTranslations,
   CommonNavTranslations,
 } from '../../../core/types/common-i18n';
 
@@ -19,13 +21,15 @@ export function createNavbarI18n() {
     {},
     { scope: 'common' },
   );
-  const actionsDict = translateObjectSignal('actions', {}, { scope: 'common' })
-  const info = translateObjectSignal('info', {}, {scope: 'common'})
+  const actionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
+  const infoDict = translateObjectSignal('info', {}, { scope: 'common' });
 
   const nav = computed(() => navDict() as CommonNavTranslations);
   const accessibility = computed(
     () => accessibilityDict() as CommonAccessibilityTranslations,
   );
+  const actions = computed(() => actionsDict() as CommonActionsTranslations);
+  const info = computed(() => infoDict() as CommonInfoTranslations);
 
   const resolveLabel = (labelKey: string): string => {
     const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
@@ -40,7 +44,10 @@ export function createNavbarI18n() {
     }));
 
   return {
+    nav,
     accessibility,
+    actions,
+    info,
     resolveLabel,
     resolveMenu,
   };
