@@ -1,48 +1,53 @@
-<nav class="mg-navbar">
-  <div class="mg-navbar__inner flex-row-between-center">
-    <a routerLink="/" class="mg-navbar__brand" aria-label="Strona główna">
+<nav class="mg-navbar w-100">
+  <div class="h-100 flex-row-between-center px-md">
+    <a routerLink="/" aria-label="Strona główna">
       <img
         [ngSrc]="brandLogoSrc()"
         width="135"
         height="50"
         alt="Mistrzowie Gry"
-        class="mg-navbar__logo"
+        class="mg-navbar__logo ml-sm"
       />
     </a>
 
-    <ul class="mg-navbar__menu">
+    <ul class="m-0 p-0 flex-row-center-center gap-xs hide-down-md">
       @for (item of menu(); track trackByLabelKey($index, item)) {
-        <li class="mg-navbar__item li--unset">
+        <li class="li--unset flex-row-start-center">
           @if (!item.children?.length) {
-            <a class="mg-navbar__link" [routerLink]="item.path">
+            <a
+              class="mg-navbar__link flex-row-start-center px-sm"
+              [routerLink]="item.path"
+            >
               {{ item.label }}
             </a>
           } @else {
             <button
               type="button"
-              class="mg-navbar__link mg-navbar__link--button"
+              class="mg-navbar__link flex-row-start-center px-sm"
               (click)="openDropdown($event, item)"
               aria-haspopup="true"
               [attr.aria-expanded]="
                 activeDropdown()?.labelKey === item.labelKey
               "
             >
-              <span class="mg-navbar__link-label">{{ item.label }}</span>
-              <span class="mg-navbar__caret" aria-hidden="true">▾</span>
+              <span>{{ item.label }}</span>
+              <span class="mg-navbar__caret flex-row-start-center ml-xs">
+                ▾
+              </span>
             </button>
           }
         </li>
       }
     </ul>
 
-    <div class="mg-navbar__actions flex-row-start-center">
-      <app-theme-switch class="mg-navbar__theme"></app-theme-switch>
+    <div class="flex-row-start-center gap-sm">
+      <div class="hide-down-md"><app-theme-switch></app-theme-switch></div>
 
-      <div class="mg-navbar__slots flex-row-start-center">
+      <div class="flex-row-start-center gap-xs ps-sm">
         <button
           type="button"
           class="mg-icon-btn"
-          aria-label="Profil (placeholder)"
+          aria-label="Profil"
         >
           <i class="pi pi-overlord"></i>
         </button>
@@ -50,7 +55,7 @@
         <button
           type="button"
           class="mg-icon-btn"
-          aria-label="Koszyk (placeholder)"
+          aria-label="Koszyk"
         >
           <i class="pi pi-cash"></i>
         </button>
@@ -58,7 +63,7 @@
 
       <button
         type="button"
-        class="mg-icon-btn mg-navbar__burger"
+        class="mg-icon-btn show-down-md"
         (click)="openMobile()"
         [attr.aria-label]="i18n.accessibility().openMenu"
       >
@@ -68,12 +73,13 @@
   </div>
 </nav>
 
+
 <p-popover #navPopover styleClass="mg-popover" (onHide)="closeDropdown()">
-  <ul class="mg-popover-menu">
+  <ul class="m-0 p-sm flex-col-start-stretch gap-xs">
     @for (child of activeChildren(); track trackByLabelKey($index, child)) {
-      <li class="mg-popover-menu__item li--unset">
+      <li class="li--unset">
         <a
-          class="mg-popover-menu__link"
+          class="mg-popover-menu__link py-xs"
           [routerLink]="child.path"
           (click)="closeDropdown()"
           [target]="child.target"
@@ -86,6 +92,7 @@
   </ul>
 </p-popover>
 
+
 <p-drawer
   [(visible)]="mobileOpen"
   position="right"
@@ -94,11 +101,14 @@
   [closable]="false"
 >
   <ng-template #headless>
-    <div class="mg-mobile-drawer m-sm">
-      <div class="mg-mobile-drawer__head flex-row-between-center">
-        <div class="mg-mobile-drawer__title">Menu</div>
+    <div class="m-sm">
 
-        <app-theme-switch class="mg-mobile-theme-switch"></app-theme-switch>
+      <div class="flex-row-between-center row-gap-sm col-gap-sm pb-sm mb-sm mg-mobile-drawer__head">
+        <div class="mg-mobile-drawer__title">
+          Menu
+        </div>
+
+        <app-theme-switch></app-theme-switch>
 
         <button
           type="button"
@@ -110,40 +120,52 @@
         </button>
       </div>
 
-      <ul class="mg-mobile-menu">
+      <ul class="m-0 p-0 flex-col-start-stretch gap-md">
         @for (item of menu(); track trackByLabelKey($index, item)) {
-          <li class="mg-mobile-menu__item li--unset">
+
+          <li class="li--unset">
+
             @if (!item.children?.length) {
+
               <a
-                class="mg-mobile-menu__link"
+                class="mg-mobile-menu__link py-sm"
                 [routerLink]="item.path"
                 (click)="onMobileNavigate()"
               >
                 {{ item.label }}
               </a>
-            } @else {
-              <div class="mg-mobile-menu__group">{{ item.label }}</div>
 
-              <ul class="mg-mobile-menu__sub">
-                @for (
-                  child of item.children;
-                  track trackByLabelKey($index, child)
-                ) {
-                  <li class="mg-mobile-menu__sub-item li--unset">
+            } @else {
+
+              <div class="mg-mobile-menu__group py-xs">
+                {{ item.label }}
+              </div>
+
+              <ul class="m-0 mt-xs pl-md flex-col-start-stretch gap-xs">
+
+                @for (child of item.children; track trackByLabelKey($index, child)) {
+
+                  <li class="li--unset">
                     <a
-                      class="mg-mobile-menu__link"
+                      class="mg-mobile-menu__link py-sm"
                       [routerLink]="child.path"
                       (click)="onMobileNavigate()"
                     >
                       {{ child.label }}
                     </a>
                   </li>
+
                 }
+
               </ul>
+
             }
+
           </li>
+
         }
       </ul>
+
     </div>
   </ng-template>
 </p-drawer>

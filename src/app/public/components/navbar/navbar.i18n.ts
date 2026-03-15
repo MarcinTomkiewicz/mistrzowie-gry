@@ -19,6 +19,8 @@ export function createNavbarI18n() {
     {},
     { scope: 'common' },
   );
+  const actionsDict = translateObjectSignal('actions', {}, { scope: 'common' })
+  const info = translateObjectSignal('info', {}, {scope: 'common'})
 
   const nav = computed(() => navDict() as CommonNavTranslations);
   const accessibility = computed(

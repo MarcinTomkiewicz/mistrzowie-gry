@@ -34,7 +34,8 @@
     "remove": "Usuń",
     "next": "Dalej",
     "previous": "Wstecz",
-    "submit": "Wyślij"
+    "submit": "Wyślij",
+    "ok": "OK"
   },
 
   "nav": {
@@ -103,6 +104,10 @@
     "privacyPolicy": "Polityka prywatności",
     "terms": "Regulamin",
     "cookies": "Cookies"
+  },
+
+  "info": {
+    "outOfOrder": "Ta funkcja w tej chwili nie działa."
   },
 
   "accessibility": {
