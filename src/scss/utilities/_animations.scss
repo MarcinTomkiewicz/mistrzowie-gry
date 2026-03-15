@@ -1,0 +1,14 @@
+.mg-spin-cw {
+  display: inline-block;
+  animation: mg-spin-cw 1s linear infinite;
+}
+
+@keyframes mg-spin-cw {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

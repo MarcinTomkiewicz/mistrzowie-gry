@@ -5,6 +5,11 @@
 
 <section class="mg-section">
   <div class="mg-container">
+      <app-loading-overlay
+        [visible]="!pageVm()"
+        [label]="status.loading"
+      />
+
     @if (pageVm(); as data) {
       <header class="mg-section__header">
         <h1 class="mg-section__title">{{ data.page.title }}</h1>
@@ -369,10 +374,6 @@
           </div>
         </div>
       }
-    } @else {
-      <div class="mg-card">
-        <p>{{ status.loading }}</p>
-      </div>
     }
   </div>
 </section>

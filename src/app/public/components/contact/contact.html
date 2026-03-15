@@ -185,7 +185,9 @@
               [label]="
                 data.isSubmitting ? data.status.sending : data.cta.sendMessage
               "
-              icon="pi pi-message-away"
+              [icon]="'pi pi-message-away'"
+              [loading]="data.isSubmitting"
+              loadingIcon="pi pi-d20"
               severity="success"
               [disabled]="data.isSubmitting"
             />

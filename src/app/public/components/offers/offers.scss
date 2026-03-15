@@ -2,6 +2,11 @@
 @use "abstracts/variables" as v;
 @use "abstracts/mixins" as m;
 
+.mg-offers-loading-host {
+  position: relative;
+  min-height: 20rem;
+}
+
 .mg-offer-cards {
   @include m.mg-grid(2, map.get(v.$spacings, "lg"), map.get(v.$spacings, "md"), true, 2, 1);
 }

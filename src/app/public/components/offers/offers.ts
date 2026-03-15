@@ -31,6 +31,7 @@ import {
 } from '../../../core/utils/pricing';
 import { createOffersI18n } from './offers.i18n';
 import { findCardsSectionByKind, findSectionByType } from './offers.utils';
+import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
 
 type OfferVmSection = OfferPageSection & { items: OfferItem[] };
 
@@ -43,6 +44,7 @@ type OfferVmSection = OfferPageSection & { items: OfferItem[] };
     AccordionModule,
     ButtonModule,
     TableModule,
+    LoadingOverlay
   ],
   templateUrl: './offers.html',
   styleUrl: './offers.scss',

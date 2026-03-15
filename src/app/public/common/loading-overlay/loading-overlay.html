@@ -1,0 +1,21 @@
+@if (visible()) {
+  <div
+    class="mg-loading-overlay flex-col-center-center gap-sm"
+    role="status"
+    aria-live="polite"
+    [attr.aria-label]="label()"
+  >
+    <img
+      [ngSrc]="logoSrc"
+      width="320"
+      height="320"
+      alt=""
+      aria-hidden="true"
+      class="mg-loading-overlay__logo"
+    />
+
+    <p class="mg-loading-overlay__label m-0">
+      {{ label() }}
+    </p>
+  </div>
+}
