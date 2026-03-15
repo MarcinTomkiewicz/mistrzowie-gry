@@ -26,6 +26,7 @@ import { ContactPayload } from '../../../core/types/contact';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
 import { SubmitState, SubmitStateEnum } from '../../../core/types/submit-state';
+import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 
 @Component({
   selector: 'app-contact',
@@ -49,7 +50,7 @@ export class Contact {
   private readonly fb = inject(FormBuilder);
   private readonly contactApi = inject(ContactApi);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly messageService = inject(MessageService);
+  private readonly toast = inject(UiToast);
 
   readonly i18n = createContactI18n();
 
@@ -81,13 +82,14 @@ export class Contact {
     website: this.fb.nonNullable.control(''), // honeypot
   });
 
-  private readonly topicValue = toSignal(this.form.controls.topic.valueChanges, {
-    initialValue: this.form.controls.topic.value,
-  });
-
-  readonly isOtherTopicSelected = computed(
-    () => this.topicValue() === 'other',
+  private readonly topicValue = toSignal(
+    this.form.controls.topic.valueChanges,
+    {
+      initialValue: this.form.controls.topic.value,
+    },
   );
+
+  readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
 
   readonly isSubmitting = computed(
     () => this.submitState() === SubmitStateEnum.Submitting,
@@ -148,8 +150,7 @@ export class Contact {
       this.submitError.set(null);
       this.form.markAllAsTouched();
 
-      this.messageService.add({
-        severity: 'warn',
+      this.toast.warn({
         summary: this.vm().toast.invalidFormSummary,
         detail: this.vm().commonForm.invalid,
       });
@@ -177,8 +178,7 @@ export class Contact {
           this.resetForm();
           this.submitState.set(SubmitStateEnum.Success);
 
-          this.messageService.add({
-            severity: 'success',
+          this.toast.success({
             summary: this.vm().toast.mailSentSummary,
             detail: this.vm().success.mailSent,
           });
@@ -195,8 +195,7 @@ export class Contact {
 
           this.submitError.set(detail);
 
-          this.messageService.add({
-            severity: 'error',
+          this.toast.danger({
             summary: this.vm().toast.sendFailedSummary,
             detail,
           });
@@ -209,7 +208,8 @@ export class Contact {
 
     return {
       topic: value.topic,
-      topicCustom: value.topic === 'other' ? value.topicCustom.trim() : undefined,
+      topicCustom:
+        value.topic === 'other' ? value.topicCustom.trim() : undefined,
       firstName: value.firstName.trim(),
       lastName: value.lastName.trim(),
       companyName: value.companyName.trim() || undefined,

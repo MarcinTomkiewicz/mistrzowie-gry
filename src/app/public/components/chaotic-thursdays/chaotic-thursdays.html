@@ -1,4 +1,7 @@
-<section class="mg-section mg-chaotic-hero" [attr.aria-label]="i18n.hero().title">
+<section
+  class="mg-section mg-chaotic-hero"
+  [attr.aria-label]="i18n.hero().title"
+>
   <div class="mg-container">
     <header class="mg-section__header">
       <div class="mg-chaotic-hero__badge mb-xl">{{ i18n.hero().badge }}</div>
@@ -18,12 +21,15 @@
       </div>
 
       <div class="mg-card mt-md mx-auto flex-col-center-start">
-        <p class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs">{{ i18n.heroInfo().title }}</p>
+        <p
+          class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs"
+        >
+          {{ i18n.heroInfo().title }}
+        </p>
         <ul class="flex-col m-0 px-md">
           <li>{{ i18n.heroInfo().chaoticPlace }}</li>
           <li>{{ i18n.heroInfo().chaoticSchedule }}</li>
           <li>{{ i18n.heroInfo().chaoticPrice }}</li>
-          
         </ul>
       </div>
 
@@ -44,6 +50,24 @@
           [outlined]="true"
         />
       </div>
+      <div class="mt-md">
+        <p-button
+          label="UWAGA! Będzie ostro"
+          icon="pi pi-danger-orc"
+          severity="danger"
+          size="large"
+          routerLink="/contact"
+          [outlined]="true"
+        />
+        <p-button
+          label="OSTROŻNIE!"
+          icon="pi pi-biohazard"
+          severity="warn"
+          size="large"
+          routerLink="/contact"
+          class="pl-md"
+        />
+      </div>
     </header>
   </div>
 </section>
@@ -55,7 +79,9 @@
         {{ i18n.about().title }}
       </h2>
 
-      <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+      <p
+        class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+      >
         {{ i18n.about().text }}
       </p>
 
@@ -64,7 +90,9 @@
           <div class="mg-card">
             <div class="flex-row-start-center gap-sm mb-sm">
               <i class="{{ h.icon }}" aria-hidden="true"></i>
-              <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              <h3
+                class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+              >
                 {{ h.title }}
               </h3>
             </div>
@@ -91,7 +119,9 @@
         <ng-template pTemplate="body" let-s>
           <tr>
             <td>{{ s.time }}</td>
-            <td class="mg-section__title mg-section__title--sm">{{ s.title }}</td>
+            <td class="mg-section__title mg-section__title--sm">
+              {{ s.title }}
+            </td>
             <td>{{ s.text }}</td>
           </tr>
         </ng-template>
@@ -112,7 +142,9 @@
         <div class="mg-card">
           <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ st.icon }}" aria-hidden="true"></i>
-            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
               {{ st.title }}
             </h3>
           </div>

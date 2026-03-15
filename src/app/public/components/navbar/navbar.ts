@@ -13,6 +13,7 @@ import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
 import { createNavbarI18n, UIMenu } from './navbar.i18n';
+import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 
 @Component({
   selector: 'app-navbar',
@@ -31,7 +32,7 @@ import { createNavbarI18n, UIMenu } from './navbar.i18n';
 })
 export class Navbar {
   private readonly nav = inject(Navigation);
-  private readonly confirmationService = inject(ConfirmationService);
+  private readonly uiConfirm = inject(UiConfirm);
 
   readonly theme = inject(Theme);
   readonly i18n = createNavbarI18n();
@@ -80,17 +81,9 @@ export class Navbar {
   }
 
   showOutOfOrderPopup(event: Event): void {
-    this.confirmationService.confirm({
-      target: event.currentTarget as HTMLElement,
+    this.uiConfirm.info(event, {
       message: this.i18n.info().outOfOrder,
-      icon: 'pi pi-tied-scroll',
       acceptLabel: this.i18n.actions().ok,
-      rejectVisible: false,
-      accept: () => {},
-      acceptButtonProps: {
-        label: this.i18n.actions().ok,
-        severity: 'info',
-      },
     });
   }
 

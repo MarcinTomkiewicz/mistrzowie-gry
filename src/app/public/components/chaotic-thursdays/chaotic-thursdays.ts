@@ -16,11 +16,18 @@ import {
 } from './chaotic-thursdays.config';
 import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 import { ConfirmationService } from 'primeng/api';
+import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 
 @Component({
   selector: 'app-chaotic-thursdays',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, AccordionModule, TableModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ButtonModule,
+    AccordionModule,
+    TableModule,
+  ],
   templateUrl: './chaotic-thursdays.html',
   styleUrl: './chaotic-thursdays.scss',
   providers: [provideTranslocoScope('chaoticThursdays', 'common')],
@@ -33,7 +40,7 @@ export class ChaoticThursdays {
     CHAOTIC_STANDARDS_ICONS,
   );
 
-  private readonly confirmationService = inject(ConfirmationService);
+  private readonly uiConfirm = inject(UiConfirm);
 
   readonly sparkDice = CHAOTIC_SPARK_DICE;
 
@@ -46,18 +53,10 @@ export class ChaoticThursdays {
 
   trackByIndex = (i: number) => i;
 
-    showOutOfOrderPopup(event: Event): void {
-    this.confirmationService.confirm({
-      target: event.currentTarget as HTMLElement,
+  showOutOfOrderPopup(event: Event): void {
+    this.uiConfirm.info(event, {
       message: this.i18n.info().outOfOrder,
-      icon: 'pi pi-tied-scroll',
       acceptLabel: this.i18n.actions().ok,
-      rejectVisible: false,
-      accept: () => {},
-      acceptButtonProps: {
-        label: this.i18n.actions().ok,
-        severity: 'info',
-      },
     });
   }
 }
