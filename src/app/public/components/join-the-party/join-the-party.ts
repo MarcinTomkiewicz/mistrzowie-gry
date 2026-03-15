@@ -13,11 +13,12 @@ import {
   JOIN_THE_PARTY_STEP_ICONS,
 } from './join-the-party.config';
 import { createJoinThePartyI18n } from './join-the-party.i18n';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-join-the-party',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, DividerModule],
+  imports: [CommonModule, RouterModule, ButtonModule, DividerModule, AnimateOnScrollModule],
   templateUrl: './join-the-party.html',
   styleUrl: './join-the-party.scss',
   providers: [provideTranslocoScope('joinTheParty', 'common')],

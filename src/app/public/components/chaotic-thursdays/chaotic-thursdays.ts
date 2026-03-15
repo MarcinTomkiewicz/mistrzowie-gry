@@ -17,6 +17,7 @@ import {
 import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 import { ConfirmationService } from 'primeng/api';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-chaotic-thursdays',
@@ -27,6 +28,7 @@ import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
     ButtonModule,
     AccordionModule,
     TableModule,
+    AnimateOnScrollModule
   ],
   templateUrl: './chaotic-thursdays.html',
   styleUrl: './chaotic-thursdays.scss',

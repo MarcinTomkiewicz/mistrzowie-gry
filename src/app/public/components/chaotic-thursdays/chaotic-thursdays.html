@@ -50,24 +50,6 @@
           [outlined]="true"
         />
       </div>
-      <div class="mt-md">
-        <p-button
-          label="UWAGA! Będzie ostro"
-          icon="pi pi-danger-orc"
-          severity="danger"
-          size="large"
-          routerLink="/contact"
-          [outlined]="true"
-        />
-        <p-button
-          label="OSTROŻNIE!"
-          icon="pi pi-biohazard"
-          severity="warn"
-          size="large"
-          routerLink="/contact"
-          class="pl-md"
-        />
-      </div>
     </header>
   </div>
 </section>
@@ -87,7 +69,11 @@
 
       <div class="mg-chaotic-grid mt-md">
         @for (h of i18n.highlights(); track trackByIndex($index)) {
-          <div class="mg-card">
+          <div
+            pAnimateOnScroll
+            enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+            class="mg-card"
+          >
             <div class="flex-row-start-center gap-sm mb-sm">
               <i class="{{ h.icon }}" aria-hidden="true"></i>
               <h3
@@ -114,7 +100,11 @@
       <p class="mg-section__subtitle">{{ i18n.howItWorks().subtitle }}</p>
     </header>
 
-    <div class="mg-card">
+    <div
+      pAnimateOnScroll
+      enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+      class="mg-card"
+    >
       <p-table [value]="i18n.steps()">
         <ng-template pTemplate="body" let-s>
           <tr>
@@ -139,7 +129,11 @@
 
     <div class="mg-chaotic-grid">
       @for (st of i18n.standardsCards(); track trackByIndex($index)) {
-        <div class="mg-card">
+        <div
+          pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+          class="mg-card"
+        >
           <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ st.icon }}" aria-hidden="true"></i>
             <h3
@@ -156,7 +150,8 @@
       }
     </div>
 
-    <div class="mg-card mt-md">
+    <div pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card mt-md">
       <h3 class="mg-section__title mg-section__title--sm">
         {{ i18n.standards().expectationsTitle }}
       </h3>

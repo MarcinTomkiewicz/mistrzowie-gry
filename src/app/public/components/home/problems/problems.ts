@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { IProblemCard } from '../../../../core/interfaces/home/i-problem-card';
 import { PROBLEMS_TECH_BY_ID } from './problems.config';
 import { createProblemsI18n } from './problems.i18n';
@@ -14,7 +15,7 @@ type UiProblemCard = IProblemCard & { id: number };
 @Component({
   selector: 'app-problems',
   standalone: true,
-  imports: [RouterModule, ButtonModule],
+  imports: [RouterModule, ButtonModule, AnimateOnScrollModule],
   templateUrl: './problems.html',
   styleUrl: './problems.scss',
   providers: [provideTranslocoScope('home', 'common')],

@@ -8,13 +8,14 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { IProgramCard } from '../../../../core/interfaces/home/i-program-card';
 import { PROGRAMS_TECH_BY_ID } from './programs.config';
 import { createProgramsI18n } from './programs.i18n';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 type UiProgramCard = IProgramCard & { id: number };
 
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [RouterModule, ButtonModule],
+  imports: [RouterModule, ButtonModule, AnimateOnScrollModule],
   templateUrl: './programs.html',
   styleUrl: './programs.scss',
   providers: [provideTranslocoScope('home', 'common')],

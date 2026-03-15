@@ -43,7 +43,8 @@
 
     <div class="mg-join-grid">
       @for (b of i18n.benefits(); track trackByIndex($index)) {
-        <div class="mg-card">
+        <div pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
           <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ b.icon }}" aria-hidden="true"></i>
             <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
@@ -69,7 +70,8 @@
 
     <div class="mg-join-grid">
       @for (s of i18n.steps(); track trackByIndex($index)) {
-        <div class="mg-card">
+        <div pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
           <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ s.icon }}" aria-hidden="true"></i>
             <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
@@ -107,7 +109,8 @@
       <p class="mg-section__subtitle">{{ i18n.continuation().subtitle }}</p>
     </header>
 
-    <div class="mg-card">
+    <div pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
       <h3 class="mg-section__title mg-section__title--sm">
         {{ i18n.continuationBulletsTitle().title }}
       </h3>
@@ -128,7 +131,8 @@
       <p class="mg-section__subtitle">{{ i18n.orgMeeting().subtitle }}</p>
     </header>
 
-    <div class="mg-card">
+    <div pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
       <h3 class="mg-section__title mg-section__title--sm">
         {{ i18n.orgMeetingBulletsTitle().title }}
       </h3>
