@@ -30,9 +30,19 @@ export class App {
         'Nie przejmuj się brakiem Mistrza Gry ani czytaniem podręczników. Organizujemy sesje RPG dla początkujących, prowadzimy gry fabularne, pomagamy zacząć grać i znaleźć drużynę.',
       og: {
         type: 'website',
+        images: [
+          {
+            url: 'https://mistrzowie-gry.pl/logo/logoMG.png',
+            width: 1200,
+            height: 1200,
+            alt: 'Mistrzowie Gry',
+            type: 'image/png',
+          },
+        ],
       },
       twitter: {
         card: 'summary_large_image',
+        image: 'https://mistrzowie-gry.pl/logo/logoMG.png',
       },
     });
 
