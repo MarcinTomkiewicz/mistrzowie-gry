@@ -16,7 +16,12 @@
 }
 
 /* Flex helpers */
-@mixin flex($direction: row, $justify: space-between, $align: center, $gap: null) {
+@mixin flex(
+  $direction: row,
+  $justify: space-between,
+  $align: center,
+  $gap: null
+) {
   display: flex;
   flex-direction: $direction;
   justify-content: $justify;
@@ -148,12 +153,21 @@
 @mixin gold-gradient-text {
   background: linear-gradient(
     90deg,
-    rgba(232, 188, 90, 1) 0%,
-    rgba(123, 79, 34, 1) 64%,
-    rgba(158, 113, 48, 1) 100%
+    #f6e27a 0%,
+    #e8bc5a 18%,
+    #c9982f 32%,
+    #7b4f22 45%,
+    #c9982f 60%,
+    #e8bc5a 75%,
+    #f6e27a 100%
   );
+
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+
+  text-shadow:
+    // 0 0.25px 0.25px rgba(0,0,0,0.25),
+    0 0 5px rgba(232,188,90,0.15);
 }
 
 /* Badge: golden – bez sassowych operacji na var() */

@@ -1,0 +1,183 @@
+@let cta = i18n.commonCta();
+@let data = vm();
+@let empty = i18n.commonEmpty();
+
+@if (data.intro.title || data.intro.subtitle) {
+  <div class="mg-card mb-lg">
+    @if (data.intro.title) {
+      <h2 class="mg-section__title mg-section__title--sm">
+        {{ data.intro.title }}
+      </h2>
+    }
+
+    @if (data.intro.subtitle) {
+      <p
+        class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+      >
+        {{ data.intro.subtitle }}
+      </p>
+    }
+  </div>
+}
+
+@if (data.standard.title || data.standard.items.length) {
+  <div class="mb-lg">
+    <div class="mg-section__header">
+      @if (data.standard.title) {
+        <h2 class="mg-section__title">
+          {{ data.standard.title }}
+        </h2>
+      }
+
+      @if (data.standard.subtitle) {
+        <p class="mg-section__subtitle">
+          {{ data.standard.subtitle }}
+        </p>
+      }
+    </div>
+
+    <div class="mg-offer-cards">
+      @for (it of data.standard.items; track it.title) {
+        <div class="mg-card">
+          <div class="mg-section__title mg-section__title--sm">
+            {{ it.title }}
+          </div>
+
+          <p
+            class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+          >
+            {{ it.lead }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (data.logistics.title || data.logistics.items.length) {
+  <div class="mb-lg">
+    <div class="mg-section__header">
+      @if (data.logistics.title) {
+        <h2 class="mg-section__title">
+          {{ data.logistics.title }}
+        </h2>
+      }
+
+      @if (data.logistics.subtitle) {
+        <div class="mg-section__subtitle">
+          {{ data.logistics.subtitle }}
+        </div>
+      }
+    </div>
+
+    @if (data.logistics.items.length) {
+      <div class="mg-offer-cards">
+        @for (it of data.logistics.items; track it.id) {
+          <div class="mg-card">
+            <div class="mg-section__title mg-section__title--sm">
+              {{ it.title }}
+            </div>
+
+            @if (formatPricingDetailed(it.pricing); as p) {
+              <div class="mg-section__title mg-section__title--xs">
+                {{ p.value }}
+                @if (p.note) {
+                  -&nbsp;{{ p.note }}
+                }
+              </div>
+            }
+
+            <div class="flex-col-start-start">
+              <p
+                class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mg-pricing-lead lh-18"
+                [class.mg-pricing-lead--expanded]="isLeadExpanded(it.id)"
+              >
+                {{ it.lead }}
+              </p>
+
+              @if (shouldShowLeadToggle(it.lead)) {
+                <p-button
+                  severity="warn"
+                  iconPos="right"
+                  size="small"
+                  class="align-self-end"
+                  [outlined]="true"
+                  (click)="toggleLead(it.id)"
+                  [attr.aria-expanded]="isLeadExpanded(it.id)"
+                >
+                  {{ isLeadExpanded(it.id) ? cta.showLess : cta.showMore }}
+                </p-button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="mg-card">
+        <div class="mg-section__title mg-section__title--sm">
+          {{ empty.title }}
+        </div>
+
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ empty.description }}
+        </p>
+      </div>
+    }
+
+    @if (pricingFootnote()) {
+      <p
+        class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mt-md"
+      >
+        {{ pricingFootnote() }}
+      </p>
+    }
+  </div>
+}
+
+@if (data.faq.title || data.faq.items.length) {
+  <div class="mg-card mb-lg">
+    @if (data.faq.title) {
+      <h2 class="mg-section__title mg-section__title--sm">
+        {{ data.faq.title }}
+      </h2>
+    }
+
+    @if (data.faq.subtitle) {
+      <p
+        class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mb-md"
+      >
+        {{ data.faq.subtitle }}
+      </p>
+    }
+
+    @if (data.faq.items.length) {
+      <p-accordion>
+        @for (x of data.faq.items; track x.h) {
+          <p-accordion-panel [value]="x.h">
+            <p-accordion-header class="mg-section__title mg-section__title--xs">
+              {{ x.h }}
+            </p-accordion-header>
+
+            <p-accordion-content>
+              <p
+                class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+              >
+                {{ x.a }}
+              </p>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    } @else {
+      <div class="mg-card">
+        <div class="mg-section__title mg-section__title--sm">
+          {{ empty.title }}
+        </div>
+
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ empty.description }}
+        </p>
+      </div>
+    }
+  </div>
+}

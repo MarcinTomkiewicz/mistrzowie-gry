@@ -2,18 +2,74 @@
   "cta": {
     "contactUs": "Zapytaj o ofertę"
   },
-
   "seo": {
     "title": "Nasza oferta",
     "description": "Przygotowaliśmy dla Ciebie rozwiązania, które pozwolą Ci zacząć grać w RPG. Sesje, kampanie, pakiety a dla firm i instytucji specjalne wydarzenia, które rozszerzą ofertę integracyjną i edukacyjną."
   },
-
   "pricingTable": {
     "headers": {
       "variant": "Dostępne opcje",
       "variantLabel": "Usługa",
       "price": "Cena",
       "description": "Opis"
+    }
+  },
+  "standardsAndLogistics": {
+    "intro": {
+      "title": "Standard, bezpieczeństwo, odpowiedzialność",
+      "subtitle": "Bierzemy pełną odpowiedzialność za przygotowanie Twojego wydarzenia, dlatego realizujemy je zawsze w oparciu o elementy, które wyznaczają nasz standard sesji. Dzięki temu masz pewność, że usługa, niezależnie od osoby prowadzącej, będzie realizowana w sposób rzetelny, a wrażenia i odczucia, choć uwzględniające indywidualne podejście Mistrza Gry, będą zawsze na podobnym, wysokim poziomie."
+    },
+    "standard": {
+      "title": "Poznaj nasze standardy",
+      "subtitle": "To stałe punkty oferty, które dostarczamy niezależnie od usługi, na którą się decydujesz. Dbamy o to, żeby poniższe składniki były zawsze obecne, choć warto pamiętać, że nie każde doświadczenie wymaga, by wszystkie z nich były jednocześnie obecne.",
+      "items": [
+        {
+          "title": "Czas trwania sesji",
+          "lead": "Twoja sesja RPG w podstawowym wariancie zawsze trwa około 4 godzin. W ramach standardu masz też przysłowiowe 15 minut, na dokończenie wątków, zakończenie scenariusza, wyjaśnienie ewentualnych niezakończonych wątków. Jeśli Twoja drużyna potrzebuje dłuższego spotkania, na etapie ustalania szczegółów przygotujemy dla Ciebie specjalną ofertę."
+        },
+        {
+          "title": "Równe standardy dla wszystkich",
+          "lead": "Nasze doświadczenie zawsze projektujemy w oparciu o standardy prowadzenia sesji. To oznacza, że niezależnie od Mistrza Gry, kreatywności osoby prowadzącej, systemu czy scenariusza, otrzymujesz niezmiennie tę samą jakość doświadczenia. I choć Mistrzowie Gry różnią się między sobą, dokładamy starań, aby Twoje wrażenia były zawsze niezmienne."
+        },
+        {
+          "title": "Przygotowanie i odpowiedzialność",
+          "lead": "Już od pierwszego kontaktu bierzemy pełną odpowiedzialność za Twoje doświadczenie. Dokładamy starań, żeby nasi Mistrzowie Gry byli przygotowani do prowadzenia sesji RPG i prezentowali odpowiedni poziom. Dbamy o to, żeby każdy uczestnik przygody mógł brać czynny udział w zabawie a czas poświęcony każdej osobie odpowiadał jej osobistym preferencjom i chęci zaangażowania się w przygodę."
+        },
+        {
+          "title": "Dojazd na terenie Poznania - gratis",
+          "lead": "Niezależnie czy korzystasz z naszych usług prywatnie czy w imieniu firmy bądź instytucji - w granicach administracyjnych Poznania dojeżdżamy do Ciebie w ramach opłaty za usługę."
+        },
+        {
+          "title": "Komunikacja i rozwiązywanie problemów",
+          "lead": "Realizujemy nasze usługi w oparciu o jasne zasady komunikacji, obsługi i prowadzenia. Zależy nam na tym, żeby reagować na potencjalne problemy w sposób zdecydowany, tak aby każdy z graczy miał poczucie bezpieczeństwa przy stole. Zgodnie z naszymi zasadami bezpieczeństwa każda osoba grająca powinna czuć się wysłuchana i mieć szansę na wykazanie się."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Najczęściej zadawane pytania",
+      "subtitle": "A jeśli nie znajdziesz odpowiedzi na pytanie, skontaktuj się z nami. Postaramy się odpowiedzieć jak najszybciej.",
+      "items": [
+        {
+          "h": "Ile czasu trwa jedna sesja?",
+          "a": "Zgodnie z naszymi standardami pojedyncza sesja trwa około 4 godziny. Uważamy, że jest to długość, która z jednej strony pozwala na rozegranie pełnej przygody bądź kolejnego fragmentu kampanii, a z drugiej nie jest nużąca nawet dla początkujących graczy."
+        },
+        {
+          "h": "Kiedy muszę dopłacać za logistykę?",
+          "a": "Każde zapytanie, które wykracza poza standardowy zakres spotkania opisanego w standardach oraz w opisie usługi jest dodatkowo płatne. Dotyczy to także wyjazdów poza Poznań czy wydarzeń wielodniowych z naszym udziałem."
+        },
+        {
+          "h": "Co muszę zapewnić ze swojej strony?",
+          "a": "Przede wszystkim oczekujemy od Ciebie zapewnienia miejsca do spokojnego i bezpiecznego przeprowadzenia spotkania. Powinno to być miejsce, w którym każdy, włącznie z osobą prowadzącą będzie mógł czuć się bezpiecznie i komfortowo. Jeśli nie masz takich możliwości organizacyjnych to nic straconego - mamy kilka miejsc, z którymi współpracujemy, w których może się odbyć Twoja sesja."
+        },
+        {
+          "h": "Co jeśli zostaną naruszone zasady bezpieczeństwa?",
+          "a": "W uzasadnionych przypadkach, w sytuacji zagrożenia, Mistrz Gry ma prawo do natychmiastowego przerwania spotkania i zgłoszenia incydentu. Jeśli zagrożenie i przerwanie sesji nastąpiło z Twojej winy, nie będziesz mieć prawa do zwrotu środków."
+        },
+        {
+          "h": "W jaki sposób mogę się z wami skontaktować?",
+          "a": "W razie pytań cały czas dostępne są nasze kanały komunikacyjne - email, telefon oraz formularz kontaktowy na stronie."
+        }
+      ]
     }
   }
 }

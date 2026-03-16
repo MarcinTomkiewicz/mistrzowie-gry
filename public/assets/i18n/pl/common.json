@@ -52,7 +52,8 @@
     "contact": "Kontakt",
     "faq": "FAQ",
     "pricing": "Cennik",
-    "blog": "Blog"
+    "blog": "Blog",
+    "standardsAndLogistics": "Standardy i logistyka"
   },
   "social": {
     "facebook": "Odwiedź nas na Facebooku",
@@ -120,6 +121,7 @@
 
   "footnotes": {
     "net": "Podane ceny są cenami netto. Należy doliczyć do nich podatek VAT 23%.",
-    "gross": "Podane ceny są cenami brutto i zawierają podatek VAT w wysokości 23%."
+    "gross": "Podane ceny są cenami brutto i zawierają podatek VAT w wysokości 23%.",
+    "both": "Podane ceny dla klienta indywidualnego zawierają podatek VAT w wysokości 23%. Dla klienta biznesowego i instytucjonalnego są cenami netto i należy doliczyć do nich 23% VAT."
   }
 }

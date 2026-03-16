@@ -18,22 +18,19 @@ import {
 } from '../../../core/enums/offers';
 import { Offer } from '../../../core/services/offer/offer';
 import { Seo } from '../../../core/services/seo/seo';
-import type {
-  OfferItem,
-  OfferItemId,
-  OfferPageSection,
-} from '../../../core/types/offers';
+import type { OfferItemId } from '../../../core/types/offers';
 import { normalizeFaqItems } from '../../../core/utils/display-items';
 import {
   formatAddonPricing,
   formatPricing,
   formatPricingDetailed,
 } from '../../../core/utils/pricing';
-import { createOffersI18n } from './offers.i18n';
-import { findCardsSectionByKind, findSectionByType } from './offers.utils';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
+import { createOffersI18n } from './offers.i18n';
+import { StandardsAndLogistics } from './standards-and-logistics/standards-and-logistics';
+import { findCardsSectionByKind, findSectionByType } from './offers.utils';
 
-type OfferVmSection = OfferPageSection & { items: OfferItem[] };
+const STANDARDS_AND_LOGISTICS_SLUG = 'standardy-i-logistyka';
 
 @Component({
   selector: 'app-offers',
@@ -44,7 +41,8 @@ type OfferVmSection = OfferPageSection & { items: OfferItem[] };
     AccordionModule,
     ButtonModule,
     TableModule,
-    LoadingOverlay
+    LoadingOverlay,
+    StandardsAndLogistics,
   ],
   templateUrl: './offers.html',
   styleUrl: './offers.scss',
@@ -109,7 +107,9 @@ export class Offers {
     const vm = this.vm();
     if (!vm) return null;
 
-    const sections = vm.sections as OfferVmSection[];
+    const sections = vm.sections;
+    const isStandardsAndLogisticsPage =
+      vm.page.slug === STANDARDS_AND_LOGISTICS_SLUG;
 
     const hero = findSectionByType(sections, OfferSectionTypeEnum.Hero);
     const pricing = findSectionByType(
@@ -122,6 +122,10 @@ export class Offers {
       sections,
       OfferItemKindEnum.Material,
     );
+    const logistics = findCardsSectionByKind(
+      sections,
+      OfferItemKindEnum.Logistics,
+    );
 
     const faqSection = findSectionByType(sections, OfferSectionTypeEnum.Faq);
     const faqItems = normalizeFaqItems(faqSection?.display['items']);
@@ -129,24 +133,32 @@ export class Offers {
     const cta = findSectionByType(sections, OfferSectionTypeEnum.Cta);
 
     const pageType = vm.page?.type;
-    const isNet =
-      pageType === OfferPageTypeEnum.Business ||
-      pageType === OfferPageTypeEnum.Institution;
+
+    const footnotes = this.i18n.commonFootnotes();
+
+    const FOOTNOTE_BY_PAGE_TYPE: Partial<Record<OfferPageTypeEnum, string>> = {
+      [OfferPageTypeEnum.Business]: footnotes.net,
+      [OfferPageTypeEnum.Institution]: footnotes.net,
+      [OfferPageTypeEnum.StandardsAndLogistics]: footnotes.both,
+    };
+
+    const pricingFootnote =
+      FOOTNOTE_BY_PAGE_TYPE[pageType as OfferPageTypeEnum] ?? footnotes.gross;
 
     return {
       page: vm.page,
+      isStandardsAndLogisticsPage,
       hero,
       pricing,
       addon,
       material,
+      logistics,
       faq: {
         section: faqSection,
         items: faqItems,
       },
       cta,
-      pricingFootnote: isNet
-        ? this.i18n.commonFootnotes().net
-        : this.i18n.commonFootnotes().gross,
+      pricingFootnote,
     };
   });
 
@@ -156,8 +168,7 @@ export class Offers {
 
   readonly expandedLeadIds = signal<Set<OfferItemId>>(new Set());
 
-  readonly isLeadExpanded = (id: OfferItemId) =>
-    this.expandedLeadIds().has(id);
+  readonly isLeadExpanded = (id: OfferItemId) => this.expandedLeadIds().has(id);
 
   readonly toggleLead = (id: OfferItemId) => {
     this.expandedLeadIds.update((current) => {

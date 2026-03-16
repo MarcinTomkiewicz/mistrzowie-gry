@@ -30,6 +30,11 @@ export const MENU_CONFIG: IMenu[] = [
         path: '/offer/oferta-imprezowa',
         footer: true,
       },
+      {
+        labelKey: 'nav.standardsAndLogistics',
+        path: '/offer/standardy-i-logistyka',
+        footer: true,
+      },
     ],
   },
 

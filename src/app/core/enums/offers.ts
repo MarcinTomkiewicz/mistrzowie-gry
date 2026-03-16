@@ -3,6 +3,7 @@ export enum OfferPageTypeEnum {
   Business = 'business',
   Institution = 'institution',
   Event = 'event',
+  StandardsAndLogistics = 'standards_and_logistics',
 }
 
 export enum OfferSectionTypeEnum {
@@ -20,5 +21,6 @@ export enum OfferItemKindEnum {
   Core = 'core',
   Addon = 'addon',
   Material = 'material',
+  Logistics = 'logistics',
   Other = 'other',
 }
