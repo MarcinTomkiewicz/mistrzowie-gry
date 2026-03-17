@@ -4,12 +4,7 @@
   <main class="app-shell__content">
     <router-outlet></router-outlet>
   </main>
-
-  @defer (on viewport) {
-    <app-footer></app-footer>
-  } @placeholder {
-    <footer aria-hidden="true"></footer>
-  }
+  <app-footer></app-footer>
 
   <p-confirmpopup />
 
