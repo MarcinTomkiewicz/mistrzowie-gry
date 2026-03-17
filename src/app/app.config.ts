@@ -20,6 +20,7 @@ import { TranslocoHttpLoader } from './core/loaders/transloco.loader';
 import { SUPABASE_CONFIG } from './core/configs/supabase.config';
 import { environment } from '../env/environment';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { provideImageKitLoader } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -53,7 +54,8 @@ export const appConfig: ApplicationConfig = {
       provide: SUPABASE_CONFIG,
       useValue: environment.supabase,
     },
+    ...provideImageKitLoader('https://ik.imagekit.io/ialsnkfw5g'),
     MessageService,
-    ConfirmationService
+    ConfirmationService,
   ],
 };
