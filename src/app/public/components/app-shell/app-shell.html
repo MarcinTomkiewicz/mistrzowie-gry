@@ -5,8 +5,15 @@
     <router-outlet></router-outlet>
   </main>
 
-  <app-footer></app-footer>
+  @defer (on viewport) {
+    <app-footer></app-footer>
+  } @placeholder {
+    <footer aria-hidden="true"></footer>
+  }
 
-  <p-toast></p-toast>
   <p-confirmpopup />
+
+  @if (toastEnabled()) {
+    <p-toast></p-toast>
+  }
 </div>

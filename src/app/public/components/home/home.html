@@ -1,4 +1,28 @@
-<app-hero-carousel></app-hero-carousel>
-<app-problems></app-problems>
-<app-programs></app-programs>
-<app-seo-rich-text></app-seo-rich-text>
+<app-hero-carousel />
+<app-problems />
+
+@defer (on viewport; prefetch on idle) {
+  <app-programs />
+} @placeholder {
+  <section class="mg-section" aria-hidden="true">
+    <div class="mg-container">
+      <header class="mg-section__header">
+        <div class="mg-section__title">&nbsp;</div>
+        <p class="mg-section__subtitle">&nbsp;</p>
+      </header>
+    </div>
+  </section>
+}
+
+@defer (on viewport; prefetch on idle) {
+  <app-seo-rich-text />
+} @placeholder {
+  <section class="mg-section" aria-hidden="true">
+    <div class="mg-container">
+      <header class="mg-section__header">
+        <div class="mg-section__title">&nbsp;</div>
+        <p class="mg-section__subtitle">&nbsp;</p>
+      </header>
+    </div>
+  </section>
+}

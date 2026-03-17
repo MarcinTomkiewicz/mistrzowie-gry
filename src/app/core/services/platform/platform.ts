@@ -1,6 +1,14 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 
+type IdleCapableWindow = Window & {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number;
+  cancelIdleCallback?: (id: number) => void;
+};
+
 @Injectable({ providedIn: 'root' })
 export class Platform {
   private readonly platformId = inject(PLATFORM_ID);
@@ -22,6 +30,29 @@ export class Platform {
       window.removeEventListener(type, fn, options);
     };
   }
+
+
+onIdle(callback: () => void, timeout = 300): () => void {
+  if (!this.isBrowser) return () => {};
+
+  const win = window as IdleCapableWindow;
+
+  if (typeof win.requestIdleCallback === 'function') {
+    const id = win.requestIdleCallback(() => callback());
+
+    return () => {
+      if (typeof win.cancelIdleCallback === 'function') {
+        win.cancelIdleCallback(id);
+      }
+    };
+  }
+
+  const id = win.setTimeout(callback, timeout);
+
+  return () => {
+    win.clearTimeout(id);
+  };
+}
 
   preloadImage(url: string): void {
     if (!this.isBrowser || !url) return;

@@ -17,7 +17,8 @@
               width="597"
               height="373"
               decoding="async"
-              priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+              [priority]="activeIndex() === 0"
             />
 
             <a
@@ -74,7 +75,9 @@
                     class="mg-hero__dot"
                     [class.is-active]="$index === activeIndex()"
                     (click)="goTo($index)"
-                    [attr.aria-label]="dotAriaLabel(i18n.aria().goToPrefix, $index)"
+                    [attr.aria-label]="
+                      dotAriaLabel(i18n.aria().goToPrefix, $index)
+                    "
                     [attr.aria-current]="
                       $index === activeIndex() ? 'true' : null
                     "
@@ -120,7 +123,9 @@
                   {{ slide.heading }}
                 </div>
 
-                <p class="mg-section__subtitle mg-section__subtitle--no-margin truncate-3">
+                <p
+                  class="mg-section__subtitle mg-section__subtitle--no-margin truncate-3"
+                >
                   {{ slide.text }}
                 </p>
               </div>
