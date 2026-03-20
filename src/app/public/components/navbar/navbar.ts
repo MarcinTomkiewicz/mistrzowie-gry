@@ -1,8 +1,6 @@
-import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { ConfirmationService } from 'primeng/api';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { DrawerModule } from 'primeng/drawer';
 import { Popover, PopoverModule } from 'primeng/popover';
@@ -11,9 +9,9 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
+import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
 import { createNavbarI18n, UIMenu } from './navbar.i18n';
-import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 
 @Component({
   selector: 'app-navbar',
@@ -24,7 +22,6 @@ import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
     DrawerModule,
     ConfirmPopupModule,
     ThemeSwitch,
-    NgOptimizedImage,
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',

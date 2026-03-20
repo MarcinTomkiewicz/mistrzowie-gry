@@ -10,10 +10,17 @@ import {
   CommonSocialTranslations,
 } from '../../../core/types/common-i18n';
 import { ILegalLink } from '../../../core/interfaces/i-legal';
+import { RichContent } from '../../../core/types/rich-content';
 
 export type UIFooterMenu = IMenu & { label: string };
 export type UISocialLink = ISocialLink & { label: string };
 export type UILegalLink = ILegalLink & { label: string };
+
+export interface LegalDialogContent {
+  title: string;
+  subtitle?: string;
+  content: RichContent;
+}
 
 export function createFooterI18n() {
   const navDict = translateObjectSignal('nav', {}, { scope: 'common' });
@@ -21,10 +28,23 @@ export function createFooterI18n() {
   const legalDict = translateObjectSignal('legal', {}, { scope: 'common' });
   const footerDict = translateObjectSignal('footer', {}, { scope: 'footer' });
 
+  const termsDialogDict = translateObjectSignal('termsDialog', {}, { scope: 'legal' });
+  const privacyPolicyDialogDict = translateObjectSignal('privacyPolicyDialog', {}, {
+    scope: 'legal',
+  });
+
   const nav = computed(() => navDict() as CommonNavTranslations);
   const social = computed(() => socialDict() as CommonSocialTranslations);
   const legal = computed(() => legalDict() as CommonLegalTranslations);
   const footer = computed(() => footerDict() as CommonFooterTranslations);
+
+  const termsDialog = computed(
+    () => termsDialogDict() as LegalDialogContent,
+  );
+
+  const privacyPolicyDialog = computed(
+    () => privacyPolicyDialogDict() as LegalDialogContent,
+  );
 
   const resolveNavLabel = (labelKey: string): string => {
     const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
@@ -67,6 +87,8 @@ export function createFooterI18n() {
 
   return {
     footer,
+    termsDialog,
+    privacyPolicyDialog,
     resolveFooterMenu,
     resolveSocialLinks,
     resolveLegalLinks,

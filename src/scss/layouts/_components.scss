@@ -45,17 +45,25 @@
   margin: 0 0 map.get(v.$spacings, "sm");
   font-family: v.$font-family-display;
   font-size: map.get(v.$font-sizes, "xxl");
-  line-height: 1.1;
   font-weight: 700;
-
   color: v.$heading-color;
+
+  @include m.down('md') {
+    font-size: map.get(v.$font-sizes, "xl");
+  }
 }
 
 .mg-section__title--sm {
   font-size: map.get(v.$font-sizes, "lg");
+    @include m.down('md') {
+    font-size: map.get(v.$font-sizes, "md");
+  }
 }
 .mg-section__title--xs {
   font-size: map.get(v.$font-sizes, "md");
+    @include m.down('md') {
+    font-size: map.get(v.$font-sizes, "sm");
+  }
 }
 .mg-section__title--no-margin {
   margin-bottom: 0;

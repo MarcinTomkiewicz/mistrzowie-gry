@@ -90,9 +90,23 @@
         [attr.aria-label]="i18n.footer().legalAriaLabel"
       >
         @for (l of legalLinks(); track $index) {
-          <a [routerLink]="l.path">{{ l.label }}</a>
+          <a [routerLink]="l.path" (click)="onLegalClick(l, $event)">
+            {{ l.label }}
+          </a>
         }
       </nav>
     </div>
   </div>
 </footer>
+
+@if (isLegalDialogVisible()) {
+  <app-info-dialog
+    [visible]="isLegalDialogVisible()"
+    [title]="legalDialogTitle()"
+    [subtitle]="legalDialogSubtitle()"
+    [content]="legalDialogContent()"
+    [maximizable]="true"
+    size="lg"
+    (visibleChange)="onLegalDialogVisibleChange($event)"
+  />
+}

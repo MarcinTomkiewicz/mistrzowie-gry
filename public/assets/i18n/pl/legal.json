@@ -1,0 +1,1505 @@
+{
+  "termsDialog": {
+    "title": "Regulamin świadczenia usług",
+    "content": {
+      "sections": [
+        {
+          "title": "§ 1. Postanowienia ogólne",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Niniejszy Regulamin określa zasady korzystania z usług organizowanych pod marką Mistrzowie Gry, w szczególności zasady zamawiania, realizacji, zmiany, odwoływania i reklamowania usług związanych z prowadzeniem sesji RPG oraz wydarzeń opartych na grach fabularnych."
+                },
+                {
+                  "text": "Organizatorem usług świadczonych pod marką Mistrzowie Gry jest:",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "FBE Solutions Marcin Tomkiewicz\nos. Polan 22/8\n61-253 Poznań\nNIP: 9721147318\nREGON: 301716748\ne-mail: kontakt@mistrzowie-gry.pl\ntel.: +48 533 616 491"
+                    }
+                  ]
+                },
+                {
+                  "text": "Projekt Mistrzowie Gry organizuje i koordynuje realizację usług RPG we współpracy z Mistrzami Gry działającymi w ramach przyjętych standardów organizacyjnych, jakościowych i bezpieczeństwa."
+                },
+                {
+                  "text": "Mistrzowie Gry realizują usługi w ramach projektu, ale nie działają wobec Klientów jako niezależni sprzedawcy usług objętych niniejszym Regulaminem. Klient zawiera umowę z Organizatorem, a nie z pojedynczym Mistrzem Gry."
+                },
+                {
+                  "text": "Regulamin stanowi integralną część umowy zawieranej z Klientem, o ile strony nie ustalą indywidualnie odmiennych warunków w formie pisemnej, dokumentowej lub mailowej."
+                },
+                {
+                  "text": "Regulamin stosuje się do usług świadczonych na rzecz:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "konsumentów,"
+                        },
+                        {
+                          "text": "przedsiębiorców,"
+                        },
+                        {
+                          "text": "instytucji publicznych i niepublicznych,"
+                        },
+                        {
+                          "text": "innych podmiotów zamawiających usługi w ramach działalności prywatnej, społecznej, edukacyjnej, kulturalnej lub biznesowej."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "W zakresie, w jakim bezwzględnie obowiązujące przepisy prawa przyznają konsumentowi albo przedsiębiorcy na prawach konsumenta dalej idące uprawnienia niż wynikające z Regulaminu, pierwszeństwo mają te przepisy."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 2. Definicje",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator – FBE Solutions Marcin Tomkiewicz, prowadzący projekt Mistrzowie Gry i odpowiedzialny za organizację, koordynację oraz obsługę usług objętych Regulaminem."
+                },
+                {
+                  "text": "Klient – osoba fizyczna, osoba prawna lub jednostka organizacyjna zamawiająca usługę od Organizatora."
+                },
+                {
+                  "text": "Konsument – Klient będący osobą fizyczną dokonującą czynności prawnej niezwiązanej bezpośrednio z jej działalnością gospodarczą lub zawodową."
+                },
+                {
+                  "text": "Mistrz Gry lub MG – osoba prowadząca sesję RPG lub wydarzenie w ramach współpracy z Organizatorem."
+                },
+                {
+                  "text": "Usługa – organizowana przez Organizatora usługa obejmująca w szczególności sesję RPG, pakiet sesji, abonament miesięczny, program wprowadzający, wydarzenie firmowe, wydarzenie instytucjonalne, wydarzenie imprezowe, warsztaty lub inne doświadczenie oparte na grach fabularnych."
+                },
+                {
+                  "text": "Sesja standardowa – pojedyncze spotkanie RPG realizowane w podstawowym modelu usługi, trwające co do zasady około 4 godzin, chyba że opis danej oferty, umowa albo indywidualne ustalenia przewidują inny czas trwania."
+                },
+                {
+                  "text": "Usługa dodatkowa – każde świadczenie wykraczające poza podstawowy zakres wybranej oferty, w szczególności dodatkowa personalizacja, wydłużenie czasu trwania, przygotowanie materiałów lub postaci, rozszerzona obsługa organizacyjna, dodatkowy dojazd, obsługa hybrydowa, prowadzenie w języku obcym, koordynacja wielostanowiskowa lub inne elementy wyceniane odrębnie."
+                },
+                {
+                  "text": "Umowa – umowa o świadczenie usług zawierana między Klientem a Organizatorem."
+                },
+                {
+                  "text": "Oferta – informacja handlowa, cennik, opis usługi, indywidualna wycena albo propozycja współpracy przedstawiona Klientowi przez Organizatora."
+                },
+                {
+                  "text": "Pakiet – usługa obejmująca określoną liczbę sesji oferowanych za łączną cenę."
+                },
+                {
+                  "text": "Abonament miesięczny – usługa obejmująca określoną liczbę sesji przypadających na konkretny miesiąc kalendarzowy, za który została wniesiona opłata."
+                },
+                {
+                  "text": "Dni robocze – dni od poniedziałku do piątku, z wyłączeniem dni ustawowo wolnych od pracy."
+                },
+                {
+                  "text": "Strona internetowa – serwis internetowy prowadzony przez Organizatora pod adresem związanym z marką Mistrzowie Gry."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 3. Charakter i zakres usług",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator świadczy usługi polegające na organizacji i realizacji doświadczeń RPG oraz wydarzeń pokrewnych dla klientów indywidualnych, grup prywatnych, firm, instytucji i organizatorów wydarzeń."
+                },
+                {
+                  "text": "Usługi Organizatora obejmują w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "ofertę indywidualną,"
+                        },
+                        {
+                          "text": "ofertę firmową,"
+                        },
+                        {
+                          "text": "ofertę instytucjonalną,"
+                        },
+                        {
+                          "text": "ofertę imprezową,"
+                        },
+                        {
+                          "text": "programy i formaty specjalne,"
+                        },
+                        {
+                          "text": "usługi dodatkowe i rozszerzenia."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Klient zamawia usługę organizowaną i koordynowaną przez Organizatora, a nie wyłącznie czas pracy konkretnego Mistrza Gry. Organizator odpowiada za dobór osoby prowadzącej, przygotowanie organizacyjne usługi oraz zachowanie standardów właściwych dla wybranej oferty."
+                },
+                {
+                  "text": "O ile strony nie ustalą inaczej, podstawową jednostką usługi jest sesja RPG trwająca około 4 godzin. Dopuszczalne jest niewielkie wydłużenie spotkania potrzebne do domknięcia bieżących wątków albo organizacyjnego zakończenia sesji."
+                },
+                {
+                  "text": "Zakres podstawowy usługi zależy od rodzaju wybranej oferty. W szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "w ofercie indywidualnej podstawowy zakres obejmuje organizację około 4-godzinnej sesji RPG realizowanej zgodnie ze standardami projektu,"
+                        },
+                        {
+                          "text": "w ofercie firmowej podstawowy zakres może obejmować dodatkowo organizację większej liczby równoległych stołów, wspólną strukturę wydarzenia, element wprowadzający i podsumowujący, a w wybranych wariantach także koordynację wydarzenia,"
+                        },
+                        {
+                          "text": "w ofercie instytucjonalnej podstawowy zakres może obejmować zarówno sesje około 4-godzinne, jak i spotkania warsztatowe około 2-godzinne, zależnie od rodzaju współpracy,"
+                        },
+                        {
+                          "text": "w ofercie imprezowej podstawowy zakres obejmuje organizację jednorazowego doświadczenia dopasowanego do skali wydarzenia i liczby uczestników."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Sposób przygotowania scenariusza lub treści wydarzenia zależy od rodzaju oferty:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "w części ofert podstawą realizacji są wcześniej przygotowane scenariusze lub formaty sesji,"
+                        },
+                        {
+                          "text": "w części ofert indywidualne dostosowanie scenariusza, kampanii lub oprawy wydarzenia może stanowić usługę dodatkową,"
+                        },
+                        {
+                          "text": "w części ofert, zwłaszcza firmowych, instytucjonalnych lub imprezowych, określony stopień dostosowania scenariusza do potrzeb Klienta może być elementem podstawowego zakresu usługi."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Szczegółowy zakres usługi, w tym liczba uczestników, liczba prowadzących, czas trwania, miejsce, forma realizacji, język prowadzenia, cena i zakres usług dodatkowych, wynika każdorazowo z opisu oferty, indywidualnej wyceny, potwierdzenia zamówienia lub odrębnych ustaleń stron."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 4. Zawarcie umowy",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Do zawarcia umowy dochodzi w szczególności poprzez:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "zaakceptowanie oferty przedstawionej przez Organizatora,"
+                        },
+                        {
+                          "text": "potwierdzenie zamówienia złożonego przez Klienta,"
+                        },
+                        {
+                          "text": "dokonanie płatności za usługę, jeżeli z okoliczności jednoznacznie wynika, jakiej usługi dotyczy,"
+                        },
+                        {
+                          "text": "inną jednoznaczną formę potwierdzenia uzgodnionych warunków."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Przed zawarciem umowy Organizator przekazuje Klientowi informacje o istotnych warunkach usługi, w szczególności o jej zakresie, cenie, terminie, sposobie realizacji oraz innych elementach niezbędnych do świadomego podjęcia decyzji."
+                },
+                {
+                  "text": "Zamówienia standardowych usług przyjmowane są co do zasady z co najmniej 3-dniowym wyprzedzeniem roboczym przed planowanym terminem realizacji."
+                },
+                {
+                  "text": "Organizator może przyjąć zamówienie w krótszym terminie, jeżeli pozwalają na to możliwości organizacyjne."
+                },
+                {
+                  "text": "Organizator zastrzega sobie prawo odmowy zawarcia umowy, jeżeli:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "realizacja usługi w żądanym terminie jest niemożliwa,"
+                        },
+                        {
+                          "text": "warunki realizacji byłyby sprzeczne z prawem, bezpieczeństwem uczestników lub standardami projektu,"
+                        },
+                        {
+                          "text": "Klient odmawia podania danych koniecznych do realizacji usługi lub rozliczenia,"
+                        },
+                        {
+                          "text": "wcześniejsza współpraca z danym Klientem wskazuje na istotne ryzyko organizacyjne, bezpieczeństwa lub naruszeń zasad współpracy."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Jeżeli charakter usługi tego wymaga, Organizator może uzależnić zawarcie umowy od wpłaty zaliczki, całości wynagrodzenia albo od podpisania odrębnej umowy."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 5. Ceny i płatności",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Ceny usług są ustalane indywidualnie albo publikowane w ramach oferty, cennika, formularza zamówienia lub innych materiałów Organizatora."
+                },
+                {
+                  "text": "Cena podawana w ofercie zawiera informację, czy jest ceną brutto czy netto."
+                },
+                {
+                  "text": "Cena obejmuje wyłącznie te elementy, które zostały wyraźnie wskazane w opisie danej oferty albo w indywidualnych ustaleniach. W zależności od rodzaju oferty cena może obejmować w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "realizację określonej liczby sesji,"
+                        },
+                        {
+                          "text": "udział jednego lub większej liczby Mistrzów Gry,"
+                        },
+                        {
+                          "text": "przygotowanie scenariusza lub formatu wydarzenia w zakresie przewidzianym dla danej oferty,"
+                        },
+                        {
+                          "text": "element wprowadzający, zakończenie lub opiekę organizacyjną,"
+                        },
+                        {
+                          "text": "dojazd w granicach administracyjnych Poznania, o ile oferta lub ustalenia nie stanowią inaczej."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Dodatkowo płatne mogą być w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "wydłużenie spotkania,"
+                        },
+                        {
+                          "text": "sesja online lub obsługa hybrydowa,"
+                        },
+                        {
+                          "text": "przygotowanie kart postaci,"
+                        },
+                        {
+                          "text": "sesja 0,"
+                        },
+                        {
+                          "text": "personalizacja scenariusza lub przygotowanie nowej kampanii,"
+                        },
+                        {
+                          "text": "koordynator wydarzenia,"
+                        },
+                        {
+                          "text": "dodatkowy stół lub dodatkowy Mistrz Gry,"
+                        },
+                        {
+                          "text": "prowadzenie w języku obcym,"
+                        },
+                        {
+                          "text": "rekwizyty tematyczne,"
+                        },
+                        {
+                          "text": "opłaty formalne lub organizacyjne związane ze szczególnym charakterem wydarzenia,"
+                        },
+                        {
+                          "text": "inne elementy wyraźnie oznaczone jako usługi dodatkowe."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "O ile strony nie ustaliły inaczej:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "dojazd na terenie administracyjnym Poznania jest wliczony w cenę usługi,"
+                        },
+                        {
+                          "text": "dojazd poza ten obszar może stanowić usługę dodatkową i być wyceniany osobno."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "O ile strony nie ustaliły inaczej, płatność za usługę następuje przelewem na rachunek bankowy wskazany przez Organizatora."
+                },
+                {
+                  "text": "W przypadku usług dla klientów indywidualnych oraz usług imprezowych Organizator może wymagać pełnej płatności z góry jako warunku rezerwacji terminu."
+                },
+                {
+                  "text": "Rezerwacja terminu następuje po zaksięgowaniu płatności albo po otrzymaniu potwierdzenia przelewu, jeżeli Organizator wyraźnie dopuści taką możliwość."
+                },
+                {
+                  "text": "Jeżeli Klient nie dokona płatności w terminie wskazanym przez Organizatora, Organizator może anulować rezerwację bez ponoszenia odpowiedzialności za brak realizacji usługi."
+                },
+                {
+                  "text": "W przypadku usług dla firm i instytucji Organizator może stosować zaliczki, płatności etapowe albo rozliczenie na podstawie faktury, zgodnie z indywidualnymi ustaleniami."
+                },
+                {
+                  "text": "O ile strony nie ustaliły inaczej, termin płatności dla faktur wystawianych firmom i instytucjom wynosi 14 dni od dnia wystawienia faktury."
+                },
+                {
+                  "text": "W przypadku usług wymagających większego nakładu przygotowań, personalizacji albo rezerwacji większej liczby prowadzących Organizator może uzależnić rozpoczęcie przygotowań od wpłaty zaliczki."
+                },
+                {
+                  "text": "Za dzień zapłaty uważa się dzień uznania rachunku bankowego Organizatora, chyba że Organizator postanowi inaczej."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 6. Realizacja usług",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator odpowiada za organizację usługi, komunikację z Klientem, dobór Mistrza Gry oraz zapewnienie realizacji zgodnej z obowiązującymi standardami jakości i bezpieczeństwa."
+                },
+                {
+                  "text": "Mistrz Gry realizuje usługę w ramach zasad przyjętych przez Organizatora i nie prowadzi samodzielnych negocjacji handlowych z Klientem dotyczących usługi objętej projektem, chyba że Organizator wyraźnie dopuści to w konkretnym zakresie."
+                },
+                {
+                  "text": "Organizator zastrzega sobie prawo do zmiany osoby prowadzącej usługę, jeżeli jest to uzasadnione przyczynami organizacyjnymi, jakościowymi, zdrowotnymi, losowymi lub związanymi z bezpieczeństwem, pod warunkiem zachowania spójności standardu realizacji. Zmiana osoby prowadzącej nie stanowi zmiany istotnych warunków umowy, o ile zachowany zostaje standard realizacji usługi."
+                },
+                {
+                  "text": "Klient zobowiązuje się zapewnić warunki umożliwiające prawidłową realizację usługi, odpowiednie do jej rodzaju, w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "dostępność miejsca lub środowiska online,"
+                        },
+                        {
+                          "text": "możliwość punktualnego rozpoczęcia,"
+                        },
+                        {
+                          "text": "obecność uczestników w uzgodnionym czasie,"
+                        },
+                        {
+                          "text": "warunki pozwalające zachować podstawowe bezpieczeństwo i kulturę uczestnictwa."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "W przypadku pakietów, abonamentów i usług cyklicznych terminy poszczególnych spotkań mogą być ustalane sukcesywnie, zgodnie z charakterem danej oferty i dostępnością Organizatora oraz Mistrza Gry."
+                },
+                {
+                  "text": "W przypadku pakietów, abonamentów lub usług cyklicznych Organizator może dopuścić zmianę osoby prowadzącej między spotkaniami, jeżeli nie narusza to charakteru usługi i zachowania standardów projektu."
+                },
+                {
+                  "text": "W przypadku usług realizowanych dla firm lub instytucji szczegółowy podział odpowiedzialności za przestrzeń, uczestników i ramy formalne może zostać określony odrębnie."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 7. Standard realizacji",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator realizuje usługi w oparciu o standardy projektu obejmujące w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "przygotowanie sesji lub wydarzenia,"
+                        },
+                        {
+                          "text": "kulturę prowadzenia i komunikacji,"
+                        },
+                        {
+                          "text": "organizację i punktualność,"
+                        },
+                        {
+                          "text": "bezpieczeństwo uczestników,"
+                        },
+                        {
+                          "text": "czytelność założeń i ram sesji,"
+                        },
+                        {
+                          "text": "reakcję na sytuacje problemowe."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Standard realizacji nie oznacza identycznego stylu prowadzenia przez wszystkich Mistrzów Gry. Oznacza minimalny, powtarzalny poziom jakości, odpowiedzialności, przygotowania i bezpieczeństwa niezależnie od osoby prowadzącej."
+                },
+                {
+                  "text": "W ramach standardu realizacji Klient może oczekiwać, że:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "usługa zostanie przygotowana i poprowadzona przez osobę współpracującą z Organizatorem,"
+                        },
+                        {
+                          "text": "osoba prowadząca będzie przygotowana merytorycznie i technicznie do realizacji wybranej usługi,"
+                        },
+                        {
+                          "text": "przebieg spotkania będzie zgodny z charakterem wybranej oferty oraz uzgodnionym zakresem,"
+                        },
+                        {
+                          "text": "Organizator i Mistrz Gry będą dążyć do zapewnienia komfortu uczestników, czytelnej komunikacji i możliwości aktywnego udziału każdej osoby w zakresie adekwatnym do charakteru spotkania,"
+                        },
+                        {
+                          "text": "na sytuacje problemowe Organizator albo osoba prowadząca zareagują zgodnie z przyjętymi zasadami bezpieczeństwa i organizacji."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Szczegółowy opis standardów może być publikowany oddzielnie na stronie internetowej lub przekazywany Klientowi jako dokument uzupełniający."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 8. Bezpieczeństwo i zasady uczestnictwa",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator przywiązuje istotną wagę do bezpieczeństwa psychicznego, fizycznego i organizacyjnego uczestników."
+                },
+                {
+                  "text": "Każdy uczestnik powinien zachowywać się wobec innych osób z poszanowaniem ich granic, godności i prawa do bezpiecznego udziału w wydarzeniu."
+                },
+                {
+                  "text": "Niedopuszczalne są w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "zachowania agresywne, przemocowe, napastliwe lub uporczywie naruszające komfort innych uczestników,"
+                        },
+                        {
+                          "text": "świadome sabotowanie przebiegu usługi,"
+                        },
+                        {
+                          "text": "stwarzanie zagrożenia dla bezpieczeństwa fizycznego lub psychicznego innych osób,"
+                        },
+                        {
+                          "text": "uporczywe ignorowanie poleceń organizacyjnych związanych z bezpieczeństwem lub przebiegiem wydarzenia,"
+                        },
+                        {
+                          "text": "działania sprzeczne z prawem albo dobrymi obyczajami."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "W przypadku naruszenia zasad bezpieczeństwa lub poważnego zakłócenia realizacji usługi Organizator lub Mistrz Gry mogą:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "zwrócić uwagę uczestnikowi,"
+                        },
+                        {
+                          "text": "zmienić sposób prowadzenia sesji lub wydarzenia,"
+                        },
+                        {
+                          "text": "przerwać wątek lub scenę,"
+                        },
+                        {
+                          "text": "czasowo wstrzymać usługę,"
+                        },
+                        {
+                          "text": "zakończyć udział danej osoby w sesji,"
+                        },
+                        {
+                          "text": "w skrajnych przypadkach przerwać realizację całej usługi."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Jeżeli przerwanie lub ograniczenie usługi nastąpiło z przyczyn leżących po stronie Klienta lub uczestników przez niego zgłoszonych, Organizator może uwzględnić częściowy zwrot, zmianę terminu albo inne rozwiązanie, biorąc pod uwagę okoliczności sytuacji. Klientowi nie przysługuje jednak automatycznie roszczenie o zwrot pełnej ceny."
+                },
+                {
+                  "text": "W przypadku usług z udziałem osób niepełnoletnich Organizator może wymagać dodatkowych informacji organizacyjnych, zgód opiekunów lub określonych warunków realizacji."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 9. Zmiana terminu, odwołanie i rezygnacja",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Klient może wystąpić o zmianę terminu lub odwołanie usługi."
+                },
+                {
+                  "text": "O ile strony nie ustaliły inaczej:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "zmiana terminu lub odwołanie zgłoszone nie później niż 7 dni kalendarzowych przed planowaną realizacją uprawnia do przeniesienia usługi na inny termin, zależnie od dostępności Organizatora,"
+                        },
+                        {
+                          "text": "zmiana terminu lub odwołanie zgłoszone później niż 7 dni kalendarzowych, ale nie później niż 72 godziny przed terminem może skutkować potrąceniem uzasadnionych kosztów organizacyjnych i przygotowawczych,"
+                        },
+                        {
+                          "text": "zmiana terminu lub odwołanie zgłoszone później niż 72 godziny przed terminem nie rodzi automatycznie prawa do zwrotu wpłaconych środków,"
+                        },
+                        {
+                          "text": "w przypadku odwołania zgłoszonego później niż 24 godziny przed terminem lub niestawienia się uczestników w uzgodnionym czasie Organizator może uznać usługę za niewykorzystaną z przyczyn leżących po stronie Klienta."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "W przypadku usług wymagających indywidualnego przygotowania, personalizacji, rezerwacji większej liczby prowadzących albo poniesienia dodatkowych kosztów, Organizator może potrącić uzasadnione koszty przygotowawcze niezależnie od terminu zgłoszenia anulacji."
+                },
+                {
+                  "text": "W przypadku firm, instytucji, wydarzeń wielostanowiskowych lub usług niestandardowych strony mogą ustalić odrębne zasady anulacji i zmiany terminu."
+                },
+                {
+                  "text": "Jeżeli Organizator odwoła usługę z przyczyn leżących po swojej stronie, Klientowi przysługuje wybór pomiędzy:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "wyznaczeniem nowego terminu,"
+                        },
+                        {
+                          "text": "skorzystaniem z usługi zastępczej o porównywalnym standardzie,"
+                        },
+                        {
+                          "text": "zwrotem wpłaconych środków w odpowiednim zakresie."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Jeżeli realizacja usługi okaże się niemożliwa z przyczyn niezależnych od stron, w szczególności z powodu siły wyższej, nagłego zdarzenia losowego, awarii, ograniczeń organizacyjnych lub niedostępności miejsca, strony w pierwszej kolejności dążą do uzgodnienia nowego terminu lub zmienionej formy realizacji."
+                },
+                {
+                  "text": "Organizator może uwzględnić częściowy zwrot, pełne przeniesienie terminu albo inne rozwiązanie polubowne, biorąc pod uwagę okoliczności konkretnej sytuacji."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 10. Pakiety, abonamenty i usługi cykliczne",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Jeżeli oferta obejmuje pakiet sesji, abonament miesięczny albo inną usługę realizowaną cyklicznie, szczegółowe warunki korzystania z niej wynikają z opisu oferty, indywidualnych ustaleń albo odrębnej umowy."
+                },
+                {
+                  "text": "O ile oferta nie stanowi inaczej, pakiety i abonamenty są opłacane z góry."
+                },
+                {
+                  "text": "Terminy spotkań w ramach pakietu lub abonamentu ustalane są sukcesywnie, zależnie od dostępności Organizatora i osób prowadzących."
+                },
+                {
+                  "text": "Pakiety zachowują ważność bezterminowo, chyba że strony wyraźnie ustalą inaczej."
+                },
+                {
+                  "text": "Pakiety nie podlegają zwrotowi ani wymianie na środki pieniężne, w całości ani w części, chyba że bezwzględnie obowiązujące przepisy prawa stanowią inaczej."
+                },
+                {
+                  "text": "Niewykorzystanie części pakietu z przyczyn leżących po stronie Klienta nie powoduje automatycznie prawa do zwrotu środków."
+                },
+                {
+                  "text": "Abonament miesięczny obejmuje określoną liczbę sesji przypadających na konkretny miesiąc kalendarzowy, za który została wniesiona opłata."
+                },
+                {
+                  "text": "W ramach abonamentu miesięcznego Klient może wykorzystać wyłącznie tę liczbę sesji, która wynika z wybranego wariantu abonamentu w danym miesiącu kalendarzowym."
+                },
+                {
+                  "text": "Niewykorzystane sesje abonamentowe nie przechodzą automatycznie na kolejny miesiąc i nie podlegają zwrotowi ani wymianie na środki pieniężne, chyba że bezwzględnie obowiązujące przepisy prawa stanowią inaczej."
+                },
+                {
+                  "text": "Jeżeli Klient wykupi abonament w trakcie trwania miesiąca kalendarzowego, abonament obejmuje pozostałą część tego miesiąca i nie ulega automatycznemu przedłużeniu ani proporcjonalnemu wydłużeniu na kolejny miesiąc."
+                },
+                {
+                  "text": "Kontynuacja abonamentu na kolejny miesiąc wymaga dokonania kolejnej płatności albo odrębnego potwierdzenia, o ile oferta nie stanowi inaczej."
+                },
+                {
+                  "text": "Jeżeli dana oferta przewiduje dodatkowe świadczenia, takie jak sesja 0, przygotowanie kart postaci albo inne elementy organizacyjne, ich zakres i sposób realizacji określa opis oferty lub indywidualne ustalenia."
+                },
+                {
+                  "text": "Zmiana terminu sesji realizowanej w ramach pakietu albo abonamentu podlega zasadom określonym w § 9 Regulaminu."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 11. Prawo odstąpienia od umowy przez konsumenta",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Jeżeli Klient jest Konsumentem i zawarł umowę na odległość albo poza lokalem przedsiębiorstwa, ma prawo odstąpić od umowy w terminie 14 dni od dnia jej zawarcia, bez podawania przyczyny, z zastrzeżeniem wyjątków przewidzianych przez przepisy prawa."
+                },
+                {
+                  "text": "Jeżeli Konsument chce, aby Organizator rozpoczął wykonywanie usługi przed upływem terminu do odstąpienia, powinien złożyć wyraźne żądanie rozpoczęcia świadczenia przed upływem tego terminu."
+                },
+                {
+                  "text": "W przypadku rozpoczęcia świadczenia przed upływem terminu do odstąpienia Konsument, który następnie skorzysta z prawa odstąpienia, jest zobowiązany do zapłaty za świadczenia spełnione do chwili odstąpienia, proporcjonalnie do zakresu wykonanej usługi."
+                },
+                {
+                  "text": "Jeżeli usługa została w pełni wykonana za wyraźną zgodą Konsumenta przed upływem terminu do odstąpienia, a Konsument został poinformowany o utracie prawa odstąpienia po pełnym wykonaniu usługi, prawo odstąpienia nie przysługuje."
+                },
+                {
+                  "text": "Oświadczenie o odstąpieniu może zostać złożone mailowo albo pisemnie na dane kontaktowe Organizatora wskazane w Regulaminie."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 12. Reklamacje",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Klient ma prawo złożyć reklamację, jeżeli uzna, że usługa została wykonana niezgodnie z umową, ofertą albo uzgodnionym zakresem."
+                },
+                {
+                  "text": "Reklamację można złożyć:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "mailowo na adres: kontakt@mistrzowie-gry.pl,"
+                        },
+                        {
+                          "text": "pisemnie na adres Organizatora wskazany w Regulaminie."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Reklamacja powinna zawierać:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "dane Klienta pozwalające na jego identyfikację,"
+                        },
+                        {
+                          "text": "wskazanie usługi, której dotyczy,"
+                        },
+                        {
+                          "text": "opis zastrzeżeń,"
+                        },
+                        {
+                          "text": "w miarę możliwości oczekiwany sposób rozwiązania sprawy."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Organizator rozpatruje reklamację w terminie 14 dni od dnia otrzymania kompletnego zgłoszenia. Jeżeli do rozpatrzenia reklamacji potrzebne będą dodatkowe informacje, Organizator może zwrócić się do Klienta o ich uzupełnienie."
+                },
+                {
+                  "text": "Odpowiedź na reklamację jest udzielana na trwałym nośniku albo w inny uzgodniony sposób."
+                },
+                {
+                  "text": "Sposób rozpatrzenia reklamacji zależy od charakteru sprawy i może obejmować w szczególności:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "wyjaśnienie okoliczności,"
+                        },
+                        {
+                          "text": "częściowy zwrot ceny,"
+                        },
+                        {
+                          "text": "ponowną realizację usługi w całości lub części,"
+                        },
+                        {
+                          "text": "przyznanie rabatu lub innej formy rekompensaty,"
+                        },
+                        {
+                          "text": "odmowę uznania reklamacji wraz z uzasadnieniem."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 13. Kontakt i komunikacja",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator komunikuje się z Klientem za pośrednictwem danych kontaktowych podanych przy składaniu zapytania, zamówienia lub w toku dalszych ustaleń."
+                },
+                {
+                  "text": "Klient zobowiązuje się przekazywać prawdziwe i aktualne dane niezbędne do kontaktu i realizacji usługi."
+                },
+                {
+                  "text": "W sprawach związanych z usługą wiążące są ustalenia przekazane przez Organizatora lub osoby działające w jego imieniu w ramach obsługi projektu."
+                },
+                {
+                  "text": "Bezpośrednie ustalenia między Klientem a Mistrzem Gry nie zmieniają zakresu usługi, ceny ani innych istotnych warunków i nie są wiążące dla Organizatora, chyba że zostały wyraźnie zaakceptowane przez Organizatora."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 14. Odpowiedzialność",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Organizator odpowiada za dochowanie należytej staranności właściwej dla organizacji i realizacji usług objętych Regulaminem."
+                },
+                {
+                  "text": "Organizator nie ponosi odpowiedzialności za:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "niepowodzenie usługi wynikające z podania nieprawdziwych informacji przez Klienta,"
+                        },
+                        {
+                          "text": "brak możliwości realizacji usługi z przyczyn leżących po stronie Klienta, uczestników lub miejsca realizacji,"
+                        },
+                        {
+                          "text": "oczekiwania Klienta wykraczające poza uzgodniony zakres usługi,"
+                        },
+                        {
+                          "text": "zakłócenia wynikające z działania siły wyższej lub zdarzeń niezależnych od Organizatora."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "W relacjach z podmiotami niebędącymi konsumentami odpowiedzialność Organizatora może zostać ograniczona do wysokości wynagrodzenia otrzymanego za daną usługę, chyba że szkoda została wyrządzona umyślnie."
+                },
+                {
+                  "text": "Organizator odpowiada za organizację usługi i dochowanie standardu realizacji, ale nie gwarantuje osiągnięcia przez Klienta określonych rezultatów subiektywnych, biznesowych, integracyjnych, edukacyjnych, wychowawczych lub rozwojowych, chyba że strony wyraźnie ustalą inaczej."
+                },
+                {
+                  "text": "Żadne postanowienie Regulaminu nie ogranicza odpowiedzialności wobec konsumenta w zakresie, w jakim byłoby to niedopuszczalne na mocy bezwzględnie obowiązujących przepisów prawa."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 15. Własność intelektualna i materiały",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Scenariusze, opisy, materiały organizacyjne, treści publikowane na stronie internetowej oraz inne materiały przygotowane przez Organizatora lub Mistrzów Gry mogą stanowić utwory chronione prawem autorskim."
+                },
+                {
+                  "text": "O ile strony nie ustalą inaczej, Klient otrzymuje prawo korzystania z usługi zgodnie z jej przeznaczeniem, bez nabywania praw do materiałów wykorzystywanych przy jej realizacji."
+                },
+                {
+                  "text": "Utrwalanie, publikowanie lub dalsze komercyjne wykorzystywanie materiałów, nagrań lub elementów usługi może wymagać uprzedniej zgody Organizatora."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 16. Dane osobowe",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Zasady przetwarzania danych osobowych przez Organizatora określa odrębna Polityka Prywatności."
+                },
+                {
+                  "text": "W zakresie niezbędnym do realizacji usługi Klient przyjmuje do wiadomości, że Organizator może przetwarzać dane kontaktowe, organizacyjne i rozliczeniowe niezbędne do zawarcia i wykonania umowy."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "§ 17. Postanowienia końcowe",
+          "blocks": [
+            {
+              "type": "ordered-list",
+              "items": [
+                {
+                  "text": "Regulamin wchodzi w życie z dniem [do uzupełnienia]."
+                },
+                {
+                  "text": "Organizator może zmienić Regulamin z ważnych przyczyn, w szczególności z powodu:",
+                  "blocks": [
+                    {
+                      "type": "unordered-list",
+                      "items": [
+                        {
+                          "text": "zmiany przepisów prawa,"
+                        },
+                        {
+                          "text": "zmiany modelu usług lub sposobu ich realizacji,"
+                        },
+                        {
+                          "text": "konieczności doprecyzowania zasad bezpieczeństwa lub organizacji,"
+                        },
+                        {
+                          "text": "zmian technicznych lub operacyjnych wpływających na sposób zawierania i realizacji umów."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "text": "Do umów zawartych przed zmianą Regulaminu stosuje się co do zasady Regulamin obowiązujący w chwili zawarcia umowy, chyba że przepisy prawa stanowią inaczej albo strony zgodnie ustalą inaczej."
+                },
+                {
+                  "text": "W sprawach nieuregulowanych Regulaminem zastosowanie mają właściwe przepisy prawa polskiego."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "privacyPolicyDialog": {
+    "title": "Polityka Prywatności",
+    "content": {
+      "sections": [
+        {
+          "title": "1. Kto jest administratorem danych osobowych",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Administratorem Twoich danych osobowych jest:"
+            },
+            {
+              "type": "paragraph",
+              "text": "FBE Solutions Marcin Tomkiewicz\nos. Polan 22/8\n61-253 Poznań\nNIP: 9721147318\nREGON: 301716748\ne-mail: kontakt@mistrzowie-gry.pl\ntel.: +48 533 616 491"
+            },
+            {
+              "type": "paragraph",
+              "text": "W sprawach związanych z przetwarzaniem danych osobowych możesz skontaktować się z Administratorem pod adresem e-mail: kontakt@mistrzowie-gry.pl."
+            }
+          ]
+        },
+        {
+          "title": "2. Czego dotyczy ta Polityka Prywatności",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Niniejsza Polityka Prywatności opisuje zasady przetwarzania danych osobowych w związku z:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "korzystaniem ze strony internetowej Mistrzowie Gry,"
+                },
+                {
+                  "text": "kontaktem z Administratorem,"
+                },
+                {
+                  "text": "składaniem zapytań o ofertę,"
+                },
+                {
+                  "text": "zawieraniem i realizacją umów,"
+                },
+                {
+                  "text": "obsługą reklamacji i innych zgłoszeń,"
+                },
+                {
+                  "text": "ewentualnym korzystaniem z usług elektronicznych dostępnych na stronie,"
+                },
+                {
+                  "text": "przyszłymi funkcjami logowania i kont użytkowników, jeśli zostaną uruchomione."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "3. Kim jest projekt Mistrzowie Gry z perspektywy danych osobowych",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Mistrzowie Gry to projekt organizacyjny oferujący prowadzone sesje RPG jako usługę. Projekt nie działa jako marketplace ani tablica ogłoszeń dla niezależnych Mistrzów Gry, lecz jako organizator usługi, który odpowiada za jej ramy organizacyjne, standard, bezpieczeństwo i realizację. Oznacza to, że w zakresie niezbędnym do organizacji i wykonania usługi Administrator przetwarza dane klientów, uczestników i współpracowników w ramach własnej odpowiedzialności organizacyjnej. Projekt buduje relacje długoterminowe, powtarzalne doświadczenie i bierze odpowiedzialność za przebieg usług."
+            }
+          ]
+        },
+        {
+          "title": "4. Jakie dane możemy przetwarzać",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "W zależności od sytuacji możemy przetwarzać w szczególności:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "imię i nazwisko,"
+                },
+                {
+                  "text": "adres e-mail,"
+                },
+                {
+                  "text": "numer telefonu,"
+                },
+                {
+                  "text": "dane podane w treści wiadomości lub formularza,"
+                },
+                {
+                  "text": "dane niezbędne do przygotowania oferty i organizacji usługi,"
+                },
+                {
+                  "text": "dane rozliczeniowe i fakturowe,"
+                },
+                {
+                  "text": "dane dotyczące ustaleń organizacyjnych związanych z usługą,"
+                },
+                {
+                  "text": "dane techniczne związane z korzystaniem ze strony, jeśli są zbierane przez narzędzia techniczne lub systemy bezpieczeństwa."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Co do zasady nie prosimy o podawanie szczególnych kategorii danych osobowych, chyba że jest to wyjątkowo niezbędne i ma wyraźną podstawę organizacyjną lub prawną."
+            }
+          ]
+        },
+        {
+          "title": "5. W jakich celach przetwarzamy dane i na jakiej podstawie prawnej",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Twoje dane osobowe możemy przetwarzać w następujących celach:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "udzielenie odpowiedzi na wiadomość, zapytanie lub formularz kontaktowy",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b RODO – podjęcie działań przed zawarciem umowy, lub art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na obsłudze kontaktu i komunikacji."
+                    }
+                  ]
+                },
+                {
+                  "text": "przygotowanie oferty, ustalenie warunków współpracy i organizacja usługi",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b RODO – niezbędność do zawarcia i wykonania umowy."
+                    }
+                  ]
+                },
+                {
+                  "text": "wykonanie zawartej umowy, w tym koordynacja realizacji sesji, wydarzenia lub programu",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b RODO – wykonanie umowy."
+                    }
+                  ]
+                },
+                {
+                  "text": "rozliczenia, księgowość i realizacja obowiązków podatkowych",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. c RODO – obowiązek prawny ciążący na Administratorze."
+                    }
+                  ]
+                },
+                {
+                  "text": "dochodzenie roszczeń, obrona przed roszczeniami oraz ochrona bezpieczeństwa organizacyjnego",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na ochronie swoich praw, zapewnieniu bezpieczeństwa i dokumentowaniu przebiegu współpracy."
+                    }
+                  ]
+                },
+                {
+                  "text": "rozpatrywanie reklamacji, uwag, incydentów i innych zgłoszeń",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b, c lub f RODO – zależnie od charakteru zgłoszenia."
+                    }
+                  ]
+                },
+                {
+                  "text": "zapewnienie bezpieczeństwa strony internetowej i jej działania technicznego",
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "text": "Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na zapewnieniu bezpieczeństwa, stabilności i ochronie przed nadużyciami."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "6. Czy podanie danych jest obowiązkowe",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Podanie danych jest dobrowolne, ale w wielu przypadkach niezbędne do:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "uzyskania odpowiedzi na wiadomość,"
+                },
+                {
+                  "text": "przygotowania oferty,"
+                },
+                {
+                  "text": "zawarcia umowy,"
+                },
+                {
+                  "text": "realizacji usługi,"
+                },
+                {
+                  "text": "wystawienia faktury,"
+                },
+                {
+                  "text": "rozpatrzenia reklamacji lub zgłoszenia."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Brak podania danych może uniemożliwić kontakt, przygotowanie oferty lub realizację usługi."
+            }
+          ]
+        },
+        {
+          "title": "7. Skąd mamy dane",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Co do zasady dane otrzymujemy bezpośrednio od Ciebie, na przykład:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "przez formularz kontaktowy,"
+                },
+                {
+                  "text": "przez e-mail,"
+                },
+                {
+                  "text": "telefonicznie,"
+                },
+                {
+                  "text": "w toku ustaleń dotyczących usługi,"
+                },
+                {
+                  "text": "podczas współpracy organizacyjnej."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "W niektórych przypadkach dane mogą zostać przekazane przez podmiot zamawiający usługę dla grupy, firmy lub instytucji, jeśli jest to niezbędne do organizacji wydarzenia."
+            },
+            {
+              "type": "paragraph",
+              "text": "W zakresie wymaganym przez przepisy prawa informacja o przetwarzaniu danych może być przekazywana również osobom, których dane zostały przekazane Administratorowi przez podmiot zamawiający usługę."
+            }
+          ]
+        },
+        {
+          "title": "8. Komu możemy ujawniać dane",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Dane mogą być przekazywane podmiotom, które wspierają Administratora w prowadzeniu działalności, wyłącznie w zakresie niezbędnym do danego celu, w szczególności:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "dostawcy hostingu,"
+                },
+                {
+                  "text": "dostawcy poczty elektronicznej,"
+                },
+                {
+                  "text": "biuru rachunkowemu lub podmiotom księgowym,"
+                },
+                {
+                  "text": "dostawcom narzędzi IT i wsparcia technicznego,"
+                },
+                {
+                  "text": "operatorom płatności – jeśli zostaną wdrożeni,"
+                },
+                {
+                  "text": "podmiotom świadczącym usługi prawne lub doradcze,"
+                },
+                {
+                  "text": "Mistrzom Gry współpracującym z projektem – wyłącznie w zakresie niezbędnym do przygotowania, organizacji i realizacji konkretnej usługi."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Ponieważ projekt działa jako organizator usługi, a nie jedynie pośrednik, część danych organizacyjnych może być przekazywana osobie prowadzącej sesję tylko wtedy, gdy jest to konieczne do wykonania konkretnej usługi, zachowania standardu i bezpieczeństwa realizacji."
+            }
+          ]
+        },
+        {
+          "title": "9. Czy przekazujemy dane poza Europejski Obszar Gospodarczy",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Co do zasady dane nie są przekazywane poza Europejski Obszar Gospodarczy, chyba że korzystanie z konkretnych narzędzi technologicznych będzie to powodowało. Jeśli takie przekazanie będzie miało miejsce, odbędzie się zgodnie z obowiązującymi przepisami prawa, w szczególności przy zastosowaniu odpowiednich zabezpieczeń wymaganych przez RODO."
+            }
+          ]
+        },
+        {
+          "title": "10. Jak długo przechowujemy dane",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Dane przechowujemy przez okres nie dłuższy niż jest to potrzebne do celu, w jakim zostały zebrane, a następnie przez okres wymagany przepisami prawa albo potrzebny do ochrony przed roszczeniami."
+            },
+            {
+              "type": "paragraph",
+              "text": "W praktyce oznacza to, że:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "dane z korespondencji i formularzy kontaktowych przechowujemy przez okres potrzebny do obsługi zapytania oraz dalszego kontaktu, a następnie przez okres uzasadniony archiwizacyjnie lub związany z obroną przed roszczeniami,"
+                },
+                {
+                  "text": "dane związane z umową i realizacją usługi przechowujemy przez czas jej wykonywania, a następnie przez okres wymagany przepisami księgowymi, podatkowymi oraz związany z przedawnieniem roszczeń,"
+                },
+                {
+                  "text": "dane z reklamacji i zgłoszeń przechowujemy przez czas potrzebny do ich obsługi oraz ewentualnej obrony przed roszczeniami,"
+                },
+                {
+                  "text": "dane techniczne – przez okres niezbędny do zapewnienia bezpieczeństwa i prawidłowego działania strony."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "11. Jakie prawa Ci przysługują",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Masz prawo do:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "dostępu do swoich danych,"
+                },
+                {
+                  "text": "sprostowania danych,"
+                },
+                {
+                  "text": "usunięcia danych, w przypadkach przewidzianych prawem,"
+                },
+                {
+                  "text": "ograniczenia przetwarzania,"
+                },
+                {
+                  "text": "przenoszenia danych, jeśli podstawą przetwarzania jest umowa lub zgoda i przetwarzanie odbywa się w sposób zautomatyzowany,"
+                },
+                {
+                  "text": "wniesienia sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie Administratora,"
+                },
+                {
+                  "text": "cofnięcia zgody w dowolnym momencie, jeśli przetwarzanie odbywa się na podstawie zgody; cofnięcie zgody nie wpływa na zgodność z prawem przetwarzania dokonanego wcześniej,"
+                },
+                {
+                  "text": "wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "W celu skorzystania z tych praw możesz napisać na adres: kontakt@mistrzowie-gry.pl."
+            }
+          ]
+        },
+        {
+          "title": "12. Czy podejmujemy zautomatyzowane decyzje lub profilujemy",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Na moment publikacji niniejszej Polityki Prywatności Administrator nie podejmuje wobec użytkowników zautomatyzowanych decyzji wywołujących wobec nich skutki prawne ani nie stosuje profilowania w rozumieniu RODO."
+            },
+            {
+              "type": "paragraph",
+              "text": "Jeżeli w przyszłości wdrożone zostaną rozwiązania, które tego wymagają, Polityka Prywatności zostanie odpowiednio zaktualizowana."
+            }
+          ]
+        },
+        {
+          "title": "13. Formularz kontaktowy",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Jeżeli korzystasz z formularza kontaktowego na stronie, przetwarzamy dane podane w formularzu w celu:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "odpowiedzi na wiadomość,"
+                },
+                {
+                  "text": "obsługi zapytania,"
+                },
+                {
+                  "text": "przygotowania oferty albo ustalenia, czy i w jaki sposób możemy zrealizować usługę."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Samo wysłanie formularza kontaktowego nie powoduje automatycznie zawarcia umowy ani rezerwacji terminu."
+            }
+          ]
+        },
+        {
+          "title": "14. Logowanie i konta użytkowników",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Na moment publikacji niniejszej Polityki Prywatności logowanie użytkowników może być niewdrożone albo ograniczone do określonych funkcji wewnętrznych projektu."
+            },
+            {
+              "type": "paragraph",
+              "text": "Jeżeli zostanie uruchomione logowanie, w szczególności dla Mistrzów Gry lub innych współpracowników, Polityka Prywatności zostanie rozszerzona o informacje dotyczące:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "zakresu danych konta,"
+                },
+                {
+                  "text": "celu przetwarzania danych logowania,"
+                },
+                {
+                  "text": "okresów przechowywania,"
+                },
+                {
+                  "text": "bezpieczeństwa dostępu,"
+                },
+                {
+                  "text": "ewentualnych logów systemowych."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "15. Cookies i technologie podobne",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Strona może korzystać z plików cookies oraz podobnych technologii w celu:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "zapewnienia prawidłowego działania strony,"
+                },
+                {
+                  "text": "utrzymania bezpieczeństwa,"
+                },
+                {
+                  "text": "zapamiętywania preferencji użytkownika,"
+                },
+                {
+                  "text": "obsługi przyszłych funkcji logowania."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Na moment publikacji niniejszej Polityki Prywatności Administrator nie korzysta z analityki ani newslettera. Jeżeli w przyszłości zostaną wdrożone dodatkowe narzędzia, w szczególności analityczne, marketingowe lub związane z komunikacją, Polityka Prywatności zostanie odpowiednio zaktualizowana."
+            }
+          ]
+        },
+        {
+          "title": "16. Bezpieczeństwo danych",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Administrator stosuje środki organizacyjne i techniczne odpowiednie do charakteru przetwarzanych danych oraz ryzyk związanych z ich przetwarzaniem."
+            },
+            {
+              "type": "paragraph",
+              "text": "Podejście projektu do bezpieczeństwa ma charakter systemowy i obejmuje nie tylko kwestie techniczne, ale również organizacyjne: identyfikowalność stron, reagowanie na incydenty, ograniczanie ryzyka i wyraźny podział odpowiedzialności."
+            }
+          ]
+        },
+        {
+          "title": "17. Dane dzieci i osób niepełnoletnich",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Usługi projektu mogą w określonych przypadkach być realizowane z udziałem osób niepełnoletnich, w szczególności w kontekście oferty instytucjonalnej albo innych zorganizowanych form udziału."
+            },
+            {
+              "type": "paragraph",
+              "text": "W takich przypadkach dane osobowe są przetwarzane wyłącznie w zakresie niezbędnym do organizacji i bezpiecznej realizacji usługi, a projekt może wymagać dodatkowych zgód opiekunów albo innych warunków organizacyjnych wynikających z charakteru wydarzenia."
+            }
+          ]
+        },
+        {
+          "title": "18. Zmiany Polityki Prywatności",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Polityka Prywatności może być aktualizowana w szczególności w przypadku:"
+            },
+            {
+              "type": "unordered-list",
+              "items": [
+                {
+                  "text": "zmiany przepisów prawa,"
+                },
+                {
+                  "text": "zmiany sposobu działania strony internetowej,"
+                },
+                {
+                  "text": "wdrożenia nowych narzędzi technologicznych,"
+                },
+                {
+                  "text": "uruchomienia nowych funkcji, takich jak logowanie lub sprzedaż online,"
+                },
+                {
+                  "text": "zmian organizacyjnych w projekcie."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "Aktualna wersja Polityki Prywatności jest publikowana na stronie internetowej."
+            }
+          ]
+        },
+        {
+          "title": "19. Data obowiązywania",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Niniejsza Polityka Prywatności obowiązuje od dnia: 20.03.2026."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,4 @@
 export const LEGAL_LINKS = [
-  { labelKey: 'Polityka prywatności', path: '/legal/privacy' },
-  { labelKey: 'Regulamin', path: '/legal/terms' },
+  { labelKey: 'legal.privacyPolicy', path: '/legal/privacy-policy' },
+  { labelKey: 'legal.terms', path: '/legal/terms' },
 ];

@@ -1,0 +1,154 @@
+@if (hasSections()) {
+  <div>
+    @for (section of sections(); track trackByIndex($index)) {
+      <section class="mt-lg">
+        @if (hasSectionTitle(section)) {
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ section.title }}
+          </h3>
+        }
+
+        <div [class.mt-sm]="hasSectionTitle(section)">
+          @for (block of section.blocks; track trackByIndex($index)) {
+            <div [class.mt-sm]="!!$index">
+              <ng-container
+                [ngTemplateOutlet]="renderBlock"
+                [ngTemplateOutletContext]="{ $implicit: block }"
+              />
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}
+
+<ng-template #renderBlock let-block>
+  @switch (block.type) {
+    @case ('paragraph') {
+      <p class="m-0 lh-18">
+        @if (hasInlineContent(block)) {
+          <ng-container
+            [ngTemplateOutlet]="renderInlineNodes"
+            [ngTemplateOutletContext]="{ $implicit: block.content ?? [] }"
+          />
+        } @else {
+          @for (line of splitLines(block.text); track trackByIndex($index)) {
+            @if ($index) {
+              <br />
+            }
+            {{ line }}
+          }
+        }
+      </p>
+    }
+
+    @case ('ordered-list') {
+      <ol class="m-0 lh-18">
+        @for (item of block.items; track trackByIndex($index)) {
+          <li [class.mt-xs]="!!$index">
+            @if (item.text) {
+              @for (line of splitLines(item.text); track trackByIndex($index)) {
+                @if ($index) {
+                  <br />
+                }
+                {{ line }}
+              }
+            }
+
+            @if (hasInlineContent(item)) {
+              <ng-container
+                [ngTemplateOutlet]="renderInlineNodes"
+                [ngTemplateOutletContext]="{ $implicit: item.content ?? [] }"
+              />
+            }
+
+            @if (hasNestedBlocks(item)) {
+              <div class="mt-sm">
+                @for (nestedBlock of item.blocks ?? []; track trackByIndex($index)) {
+                  <div [class.mt-sm]="!!$index">
+                    <ng-container
+                      [ngTemplateOutlet]="renderBlock"
+                      [ngTemplateOutletContext]="{ $implicit: nestedBlock }"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ol>
+    }
+
+    @case ('unordered-list') {
+      <ul class="m-0 lh-16">
+        @for (item of block.items; track trackByIndex($index)) {
+          <li [class.mt-xs]="!!$index">
+            @if (item.text) {
+              @for (line of splitLines(item.text); track trackByIndex($index)) {
+                @if ($index) {
+                  <br />
+                }
+                {{ line }}
+              }
+            }
+
+            @if (hasInlineContent(item)) {
+              <ng-container
+                [ngTemplateOutlet]="renderInlineNodes"
+                [ngTemplateOutletContext]="{ $implicit: item.content ?? [] }"
+              />
+            }
+
+            @if (hasNestedBlocks(item)) {
+              <div class="mt-sm">
+                @for (nestedBlock of item.blocks ?? []; track trackByIndex($index)) {
+                  <div [class.mt-sm]="!!$index">
+                    <ng-container
+                      [ngTemplateOutlet]="renderBlock"
+                      [ngTemplateOutletContext]="{ $implicit: nestedBlock }"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  }
+</ng-template>
+
+<ng-template #renderInlineNodes let-nodes>
+  @for (node of nodes; track trackByIndex($index)) {
+    @switch (node.type) {
+      @case ('text') {
+        @for (line of splitLines(node.text); track trackByIndex($index)) {
+          @if ($index) {
+            <br />
+          }
+          <span>{{ line }}</span>
+        }
+      }
+
+      @case ('strong') {
+        @for (line of splitLines(node.text); track trackByIndex($index)) {
+          @if ($index) {
+            <br />
+          }
+          <strong>{{ line }}</strong>
+        }
+      }
+
+      @case ('link') {
+        <a
+          [href]="node.href"
+          [target]="isExternalLink(node) ? '_blank' : null"
+          [rel]="isExternalLink(node) ? 'noopener noreferrer' : null"
+        >
+          {{ node.text }}
+        </a>
+      }
+    }
+  }
+</ng-template>

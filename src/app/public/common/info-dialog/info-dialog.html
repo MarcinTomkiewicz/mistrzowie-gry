@@ -1,49 +1,36 @@
 <p-dialog
-  [visible]="visible"
+  [visible]="visible()"
   (visibleChange)="onVisibleChange($event)"
-  [modal]="modal"
-  [dismissableMask]="dismissableMask"
-  [closable]="closable"
-  [draggable]="false"
-  [resizable]="false"
-  [styleClass]="styleClass"
-  [style]="{ width: width, maxWidth: '95vw' }"
-  [breakpoints]="breakpoints"
+  [modal]="true"
+  [styleClass]="dialogStyleClass()"
+  [maximizable]="maximizable()"
+  maximizeIcon="pi pi-expand"
+  minimizeIcon="pi pi-contract"
 >
   <ng-template pTemplate="header">
-    <div class="mg-info-dialog__header">
-      <div class="mg-info-dialog__title">
-        {{ title }}
-      </div>
-
-      @if (subtitle) {
-        <div class="mg-info-dialog__subtitle">
-          {{ subtitle }}
-        </div>
+      @if (title()) {
+        <h2 class="mg-section__title m-0">
+          {{ title() }}
+        </h2>
       }
-    </div>
+
+      @if (subtitle()) {
+        <p class="m-0 mt-sm">
+          {{ subtitle() }}
+        </p>
+      }
   </ng-template>
 
-  <div class="mg-info-dialog__content">
-    @if (body) {
-      <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
-        {{ body }}
-      </p>
-    }
+  <app-rich-content [content]="resolvedContent()" />
 
-    <ng-content />
-  </div>
-
-  @if (showFooter) {
-    <ng-template pTemplate="footer">
-      <div class="mg-info-dialog__footer">
-        <p-button
-          [label]="closeLabel"
-          severity="secondary"
-          [outlined]="true"
-          (click)="close()"
-        />
-      </div>
-    </ng-template>
-  }
+  <ng-template pTemplate="footer">
+    <div class="mt-md">
+      <p-button
+        [label]="resolvedCloseLabel()"
+        severity="secondary"
+        [outlined]="true"
+        (click)="close()"
+      />
+    </div>
+  </ng-template>
 </p-dialog>
