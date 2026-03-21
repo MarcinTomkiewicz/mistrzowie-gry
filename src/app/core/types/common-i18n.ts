@@ -15,6 +15,7 @@ export type CommonCtaTranslations = {
   goBack: string;
   goHome: string;
   viewAll: string;
+  viewLess: string;
   showMore: string;
   showLess: string;
 };

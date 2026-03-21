@@ -1,0 +1,1 @@
+export type ProfileFormMode = 'register' | 'edit';

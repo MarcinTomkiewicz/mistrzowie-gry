@@ -21,5 +21,10 @@ export const routes: Routes = [
   { path: 'join-the-party', loadComponent: loaders.joinTheParty },
   { path: 'contact', loadComponent: loaders.contact },
 
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth-routes').then((m) => m.authRoutes),
+  },
+
   { path: '**', redirectTo: '' },
 ];

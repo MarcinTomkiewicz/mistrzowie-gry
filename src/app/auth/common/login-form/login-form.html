@@ -1,0 +1,66 @@
+<header class="mg-section__header w-100 m-sm">
+  <h2 class="mg-section__title mg-section__title--md">
+    {{ i18n.title().main }}
+  </h2>
+</header>
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  novalidate
+  class="flex-col-start-center w-100 gap-sm"
+>
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="login-email"
+        formControlName="email"
+        autocomplete="email"
+      />
+      <label for="login-email">{{ i18n.form().emailLabel }}</label>
+    </p-iftalabel>
+
+    @if (showEmailError()) {
+      <small>{{ i18n.commonForm().invalidEmail }}</small>
+    }
+  </div>
+
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <p-password
+        styleClass="w-100"
+        inputStyleClass="w-100"
+        inputId="login-password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        autocomplete="current-password"
+      >
+        <ng-template #showicon>
+          <i class="pi pi-horus p-password-toggle-mask-icon"></i>
+        </ng-template>
+
+        <ng-template #hideicon>
+          <i class="pi pi-closed-eye p-password-toggle-mask-icon"></i>
+        </ng-template>
+      </p-password>
+
+      <label for="login-password">{{ i18n.form().passwordLabel }}</label>
+    </p-iftalabel>
+
+    @if (showPasswordError()) {
+      <small>{{ i18n.commonForm().minLength.replace('{{min}}', '8') }}</small>
+    }
+  </div>
+
+  <div class="w-100 flex-row-center-center">
+    <p-button
+      severity="success"
+      [label]="i18n.actions().submitLabel"
+      (onClick)="onSubmit()"
+      loadingIcon="pi pi-d20"
+      [icon]="'pi pi-teleport'"
+    />
+  </div>
+</form>

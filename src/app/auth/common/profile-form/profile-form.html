@@ -1,0 +1,287 @@
+<header class="mg-section__header w-100 m-sm">
+  <h2 class="mg-section__title mg-section__title--md">
+    {{ isRegisterMode() ? i18n.title().register : i18n.title().edit }}
+  </h2>
+</header>
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  novalidate
+  class="flex-col-start-center w-100 gap-sm"
+>
+  @if (isRegisterMode()) {
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="email"
+          formControlName="email"
+          autocomplete="email"
+        />
+        <label for="email">{{ i18n.form().emailLabel }}</label>
+      </p-iftalabel>
+
+      @if (showEmailError()) {
+        <small>{{ i18n.commonForm().invalidEmail }}</small>
+      }
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <p-password
+          styleClass="w-100"
+          inputStyleClass="w-100"
+          inputId="login-password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          autocomplete="current-password"
+        >
+          <ng-template #showicon>
+            <i class="pi pi-horus p-password-toggle-mask-icon"></i>
+          </ng-template>
+
+          <ng-template #hideicon>
+            <i class="pi pi-closed-eye p-password-toggle-mask-icon"></i>
+          </ng-template>
+        </p-password>
+
+        <label for="login-password">{{ i18n.form().passwordLabel }}</label>
+      </p-iftalabel>
+
+      @if (showPasswordError()) {
+        <small>{{ i18n.commonForm().minLength.replace('{{min}}', '8') }}</small>
+      }
+    </div>
+  }
+
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="firstName"
+        formControlName="firstName"
+        autocomplete="given-name"
+      />
+      <label for="firstName">{{ i18n.form().firstNameLabel }}</label>
+    </p-iftalabel>
+  </div>
+
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="nickname"
+        formControlName="nickname"
+        autocomplete="nickname"
+      />
+      <label for="nickname">{{ i18n.form().nicknameLabel }}</label>
+    </p-iftalabel>
+  </div>
+
+  <div class="w-80 flex-row-start-center">
+    <p-toggleswitch
+      inputId="useNickname"
+      formControlName="useNickname"
+      class="mr-sm"
+    />
+    <label for="useNickname">{{ i18n.form().useNicknameLabel }}</label>
+  </div>
+
+  @if (showDisplayNameRequiredError()) {
+    <div class="mt-xs w-80">
+      <small>{{ i18n.errors().displayNameRequired }}</small>
+    </div>
+  }
+
+  @if (showDisplayPreferenceError()) {
+    <div class="mt-xs w-80">
+      <small>{{ i18n.errors().displayPreference }}</small>
+    </div>
+  }
+
+  @if (showExtendedFields()) {
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          autocomplete="tel"
+        />
+        <label for="phoneNumber">{{ i18n.form().phoneNumberLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="city"
+          formControlName="city"
+          autocomplete="address-level2"
+        />
+        <label for="city">{{ i18n.form().cityLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="street"
+          formControlName="street"
+          autocomplete="address-line1"
+        />
+        <label for="street">{{ i18n.form().streetLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="houseNumber"
+          formControlName="houseNumber"
+          autocomplete="address-line2"
+        />
+        <label for="houseNumber">{{ i18n.form().houseNumberLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="apartmentNumber"
+          formControlName="apartmentNumber"
+        />
+        <label for="apartmentNumber">
+          {{ i18n.form().apartmentNumberLabel }}
+        </label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="postalCode"
+          formControlName="postalCode"
+          autocomplete="postal-code"
+        />
+        <label for="postalCode">{{ i18n.form().postalCodeLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          class="w-100"
+          inputId="age"
+          formControlName="age"
+          [min]="0"
+          [max]="120"
+        />
+        <label for="age">{{ i18n.form().ageLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="shortDescription"
+          formControlName="shortDescription"
+          rows="3"
+        ></textarea>
+        <label for="shortDescription">
+          {{ i18n.form().shortDescriptionLabel }}
+        </label>
+      </p-iftalabel>
+
+      @if (showShortDescriptionError()) {
+        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '150') }}</small>
+      }
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="longDescription"
+          formControlName="longDescription"
+          rows="4"
+        ></textarea>
+        <label for="longDescription">
+          {{ i18n.form().longDescriptionLabel }}
+        </label>
+      </p-iftalabel>
+
+      @if (showLongDescriptionError()) {
+        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small>
+      }
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="extendedDescription"
+          formControlName="extendedDescription"
+          rows="6"
+        ></textarea>
+        <label for="extendedDescription">
+          {{ i18n.form().extendedDescriptionLabel }}
+        </label>
+      </p-iftalabel>
+    </div>
+  }
+
+  @if (isRegisterMode()) {
+    <div class="w-100 flex-row-around-center gap-sm">
+      <p-button
+        severity="success"
+        [label]="i18n.actions().registerLabel"
+        type="submit"
+        loadingIcon="pi pi-d20"
+        [icon]="'pi pi-scroll-quill'"
+      />
+
+      <p-button
+        severity="warn"
+        type="button"
+        [label]="
+          isExpanded()
+            ? i18n.commonCta().viewLess
+            : i18n.commonCta().viewAll
+        "
+        [icon]="isExpanded() ? 'pi pi-angle-up' : 'pi pi-angle-down'"
+        (onClick)="toggleExpanded()"
+      />
+    </div>
+  } @else {
+    <div class="w-100 flex-row-center-center">
+      <p-button
+        severity="success"
+        [label]="i18n.actions().updateLabel"
+        type="submit"
+        loadingIcon="pi pi-d20"
+        [icon]="'pi pi-scroll-quill'"
+      />
+    </div>
+  }
+</form>
