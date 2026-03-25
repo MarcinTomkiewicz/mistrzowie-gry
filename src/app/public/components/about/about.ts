@@ -7,11 +7,12 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { Seo } from '../../../core/services/seo/seo';
 import { createAboutI18n } from './about.i18n';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [RouterModule, ButtonModule],
+  imports: [RouterModule, ButtonModule, AnimateOnScrollModule],
   templateUrl: './about.html',
   styleUrl: './about.scss',
   providers: [provideTranslocoScope('common', 'about')],

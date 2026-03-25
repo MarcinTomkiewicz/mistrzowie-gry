@@ -1,6 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { ConfirmationService, Confirmation } from 'primeng/api';
-import { BasePopupOptions, DecisionPopupOptions, PopupTargetEvent } from '../../types/popup';
+import { ConfirmationService } from 'primeng/api';
+import {
+  BasePopupOptions,
+  DecisionPopupOptions,
+  PopupTargetEvent,
+} from '../../types/popup';
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +19,8 @@ export class UiConfirm {
       icon: options.icon ?? 'pi pi-tied-scroll',
       rejectVisible: false,
       accept: options.accept ?? (() => {}),
+      acceptLabel: options.acceptLabel,
       acceptButtonProps: {
-        label: options.acceptLabel,
         severity: 'info',
       },
     });
@@ -29,8 +33,8 @@ export class UiConfirm {
       icon: options.icon ?? 'pi pi-exclamation-triangle',
       rejectVisible: false,
       accept: options.accept ?? (() => {}),
+      acceptLabel: options.acceptLabel,
       acceptButtonProps: {
-        label: options.acceptLabel,
         severity: 'warn',
       },
     });
@@ -43,8 +47,8 @@ export class UiConfirm {
       icon: options.icon ?? 'pi pi-times-circle',
       rejectVisible: false,
       accept: options.accept ?? (() => {}),
+      acceptLabel: options.acceptLabel,
       acceptButtonProps: {
-        label: options.acceptLabel,
         severity: 'danger',
       },
     });
@@ -57,12 +61,12 @@ export class UiConfirm {
       icon: options.icon ?? 'pi pi-question-circle',
       accept: options.accept ?? (() => {}),
       reject: options.reject ?? (() => {}),
+      acceptLabel: options.acceptLabel,
+      rejectLabel: options.rejectLabel,
       acceptButtonProps: {
-        label: options.acceptLabel,
         severity: 'info',
       },
       rejectButtonProps: {
-        label: options.rejectLabel,
         severity: 'secondary',
         outlined: true,
       },

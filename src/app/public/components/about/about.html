@@ -23,7 +23,11 @@
 
       <div class="mg-about__grid">
         @for (card of cards(); track card.id) {
-          <div class="mg-card">
+          <div
+            class="mg-card"
+            pAnimateOnScroll
+            enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+          >
             <h3 class="mg-section__title mg-section__title--xs">
               {{ card.title }}
             </h3>

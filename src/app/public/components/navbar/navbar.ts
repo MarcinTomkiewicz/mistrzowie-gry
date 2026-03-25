@@ -82,6 +82,9 @@ export class Navbar {
       message: this.i18n.info().outOfOrder,
       acceptLabel: this.i18n.actions().ok,
     });
+
+    console.log(this.i18n.actions().ok);
+    
   }
 
   trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;

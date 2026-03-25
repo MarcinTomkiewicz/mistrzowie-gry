@@ -7,11 +7,12 @@ import {
   UiSeoTextColumn,
   UiSeoTextSection,
 } from './seo-rich-text.i18n';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-seo-rich-text',
   standalone: true,
-  imports: [],
+  imports: [AnimateOnScrollModule],
   templateUrl: './seo-rich-text.html',
   styleUrl: './seo-rich-text.scss',
   providers: [provideTranslocoScope('home')],

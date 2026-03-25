@@ -1,8 +1,16 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import {
+  computed,
+  DestroyRef,
+  inject,
+  Injectable,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import {
   catchError,
+  finalize,
   from,
   map,
   Observable,
@@ -28,15 +36,20 @@ import { mapAuthError } from '../../utils/auth-error';
 @Injectable({ providedIn: 'root' })
 export class Auth {
   private readonly backend = inject(Backend);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly platform = inject(Platform);
   private readonly router = inject(Router);
   private readonly supabase = inject(Supabase).client();
 
   private readonly _user = signal<IUser | null>(null);
+  private readonly _isReady = signal(false);
 
   readonly user = computed(() => this._user());
+  readonly isReady = computed(() => this._isReady());
   readonly isAuthenticated = computed(() => !!this._user());
-  readonly appRole = computed<AppRole | null>(() => this._user()?.appRole ?? null);
+  readonly appRole = computed<AppRole | null>(
+    () => this._user()?.appRole ?? null,
+  );
   readonly userId = computed(() => this._user()?.id ?? null);
 
   readonly displayName = computed(() => {
@@ -54,27 +67,19 @@ export class Auth {
   });
 
   constructor() {
-    if (!this.platform.isBrowser) {
-      return;
-    }
-
-    void this.loadUser().subscribe();
-
-    this.supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, _session: Session | null) => {
-        void this.loadUser().subscribe();
-      },
-    );
+    this.initializeAuth();
   }
 
   loadUser(): Observable<IUser | null> {
-    return from(this.supabase.auth.getSession()).pipe(
+    this._isReady.set(false);
+
+    return from(this.supabase.auth.getUser()).pipe(
       switchMap(({ data, error }) => {
         if (error) {
           throw mapAuthError(error);
         }
 
-        const id = data.session?.user?.id;
+        const id = data.user?.id;
 
         if (!id) {
           this._user.set(null);
@@ -86,6 +91,9 @@ export class Auth {
       catchError(() => {
         this._user.set(null);
         return of(null);
+      }),
+      finalize(() => {
+        this._isReady.set(true);
       }),
     );
   }
@@ -108,7 +116,9 @@ export class Auth {
           throw new AppAuthError('user_not_found');
         }
 
-        return this.loadProfileRequired(id);
+        return this.loadProfileRequired(id).pipe(
+          tap(() => this._isReady.set(true)),
+        );
       }),
       catchError((error) => this.toErrorObservable(error)),
     );
@@ -158,10 +168,12 @@ export class Auth {
           map((user) => {
             if (data.session?.user?.id) {
               this._user.set(user);
+              this._isReady.set(true);
               return user;
             }
 
             this._user.set(null);
+            this._isReady.set(true);
             return null;
           }),
         );
@@ -178,7 +190,10 @@ export class Auth {
     }
 
     return this.backend.update<IUser>('users', user.id, payload).pipe(
-      tap((nextUser) => this._user.set(nextUser)),
+      tap((nextUser) => {
+        this._user.set(nextUser);
+        this._isReady.set(true);
+      }),
       catchError((error) => this.toErrorObservable(error)),
     );
   }
@@ -191,6 +206,7 @@ export class Auth {
         }
 
         this._user.set(null);
+        this._isReady.set(true);
 
         return from(this.router.navigateByUrl(redirectTo)).pipe(
           map(() => void 0),
@@ -204,9 +220,25 @@ export class Auth {
     return this._user()?.appRole === role;
   }
 
+  private initializeAuth(): void {
+    this.loadUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+
+    if (!this.platform.isBrowser) {
+      return;
+    }
+
+    this.supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, _session: Session | null) => {
+        this.loadUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+      },
+    );
+  }
+
   private loadProfile(id: string): Observable<IUser | null> {
     return this.backend.getById<IUser>('users', id).pipe(
-      tap((user) => this._user.set(user)),
+      tap((user) => {
+        this._user.set(user);
+      }),
       catchError(() => {
         this._user.set(null);
         return of(null);

@@ -8,7 +8,11 @@
     </header>
 
     <div class="mg-card mg-seo-text">
-      <div class="flex-row-start-start flex-col-sm gap-xl">
+      <div
+        class="flex-row-start-start flex-col-sm gap-xl"
+        pAnimateOnScroll
+        enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+      >
         @for (col of columns(); track trackByColId($index, col)) {
           <div class="mg-seo-text__col">
             @for (

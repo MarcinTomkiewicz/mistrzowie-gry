@@ -1,0 +1,29 @@
+<section class="mg-section">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">
+        {{ i18n.title() }}
+      </h1>
+
+      <p class="mg-section__subtitle">
+        {{ i18n.subtitle() }}
+      </p>
+    </header>
+
+    <p-tabs value="profile" [lazy]="true">
+      <p-tablist>
+        @for (tab of tabs; track tab.id) {
+          <p-tab [value]="tab.id">
+            {{ resolveTabLabel(tab.id) }}
+          </p-tab>
+        }
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="profile">
+          <app-profile-form mode="edit" />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</section>

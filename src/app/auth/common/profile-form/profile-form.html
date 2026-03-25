@@ -17,8 +17,12 @@
           pInputText
           class="w-100"
           id="email"
+          name="email"
           formControlName="email"
+          type="email"
           autocomplete="email"
+          autocapitalize="none"
+          spellcheck="false"
         />
         <label for="email">{{ i18n.form().emailLabel }}</label>
       </p-iftalabel>
@@ -37,7 +41,8 @@
           formControlName="password"
           [feedback]="false"
           [toggleMask]="true"
-          autocomplete="current-password"
+          autocomplete="new-password"
+          inputStyleClass="w-100"
         >
           <ng-template #showicon>
             <i class="pi pi-horus p-password-toggle-mask-icon"></i>
@@ -63,6 +68,7 @@
         pInputText
         class="w-100"
         id="firstName"
+        name="given-name"
         formControlName="firstName"
         autocomplete="given-name"
       />
@@ -76,6 +82,7 @@
         pInputText
         class="w-100"
         id="nickname"
+        name="nickname"
         formControlName="nickname"
         autocomplete="nickname"
       />
@@ -111,7 +118,9 @@
           pInputText
           class="w-100"
           id="phoneNumber"
+          name="tel"
           formControlName="phoneNumber"
+          type="tel"
           autocomplete="tel"
         />
         <label for="phoneNumber">{{ i18n.form().phoneNumberLabel }}</label>
@@ -124,6 +133,7 @@
           pInputText
           class="w-100"
           id="city"
+          name="address-level2"
           formControlName="city"
           autocomplete="address-level2"
         />
@@ -137,6 +147,7 @@
           pInputText
           class="w-100"
           id="street"
+          name="address-line1"
           formControlName="street"
           autocomplete="address-line1"
         />
@@ -150,6 +161,7 @@
           pInputText
           class="w-100"
           id="houseNumber"
+          name="address-line2"
           formControlName="houseNumber"
           autocomplete="address-line2"
         />
@@ -163,7 +175,9 @@
           pInputText
           class="w-100"
           id="apartmentNumber"
+          name="address-line3"
           formControlName="apartmentNumber"
+          autocomplete="address-line3"
         />
         <label for="apartmentNumber">
           {{ i18n.form().apartmentNumberLabel }}
@@ -177,6 +191,7 @@
           pInputText
           class="w-100"
           id="postalCode"
+          name="postal-code"
           formControlName="postalCode"
           autocomplete="postal-code"
         />
@@ -203,8 +218,10 @@
           pTextarea
           class="w-100"
           id="shortDescription"
+          name="shortDescription"
           formControlName="shortDescription"
           rows="3"
+          autocomplete="off"
         ></textarea>
         <label for="shortDescription">
           {{ i18n.form().shortDescriptionLabel }}
@@ -222,8 +239,10 @@
           pTextarea
           class="w-100"
           id="longDescription"
+          name="longDescription"
           formControlName="longDescription"
           rows="4"
+          autocomplete="off"
         ></textarea>
         <label for="longDescription">
           {{ i18n.form().longDescriptionLabel }}
@@ -241,8 +260,10 @@
           pTextarea
           class="w-100"
           id="extendedDescription"
+          name="extendedDescription"
           formControlName="extendedDescription"
           rows="6"
+          autocomplete="off"
         ></textarea>
         <label for="extendedDescription">
           {{ i18n.form().extendedDescriptionLabel }}

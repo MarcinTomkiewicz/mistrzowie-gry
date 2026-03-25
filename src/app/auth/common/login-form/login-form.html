@@ -3,6 +3,7 @@
     {{ i18n.title().main }}
   </h2>
 </header>
+
 <form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
@@ -15,8 +16,12 @@
         pInputText
         class="w-100"
         id="login-email"
+        name="username"
         formControlName="email"
-        autocomplete="email"
+        type="email"
+        autocomplete="username"
+        autocapitalize="none"
+        spellcheck="false"
       />
       <label for="login-email">{{ i18n.form().emailLabel }}</label>
     </p-iftalabel>
@@ -58,7 +63,7 @@
     <p-button
       severity="success"
       [label]="i18n.actions().submitLabel"
-      (onClick)="onSubmit()"
+      type="submit"
       loadingIcon="pi pi-d20"
       [icon]="'pi pi-teleport'"
     />
