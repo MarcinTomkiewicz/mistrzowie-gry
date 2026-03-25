@@ -10,11 +10,14 @@
       </p>
     </header>
 
-    <p-tabs value="profile" [lazy]="true">
+    <p-tabs value="profile" lazy>
       <p-tablist>
-        @for (tab of tabs; track tab.id) {
+        @for (tab of tabs(); track trackTab($index, tab)) {
           <p-tab [value]="tab.id">
-            {{ resolveTabLabel(tab.id) }}
+            <span class="flex-row-center-center gap-xs">
+              <i [class]="tab.icon"></i>
+              <span>{{ resolveTabLabel(tab.id) }}</span>
+            </span>
           </p-tab>
         }
       </p-tablist>
@@ -23,6 +26,12 @@
         <p-tabpanel value="profile">
           <app-profile-form mode="edit" />
         </p-tabpanel>
+
+        @if (canSeeGmProfileTab()) {
+          <p-tabpanel value="gm-profile">
+            <app-gm-profile />
+          </p-tabpanel>
+        }
       </p-tabpanels>
     </p-tabs>
   </div>

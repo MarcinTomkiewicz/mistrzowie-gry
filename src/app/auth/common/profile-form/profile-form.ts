@@ -22,8 +22,14 @@ import { PasswordModule } from 'primeng/password';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { createUserForm, mapUserFormToProfilePayload } from '../../../core/factories/user-form.factory';
-import { IRegisterPayload } from '../../../core/interfaces/i-auth-payloads';
+import {
+  createUserForm,
+  mapUserFormToProfilePayload,
+} from '../../../core/factories/user-form.factory';
+import {
+  IRegisterPayload,
+} from '../../../core/interfaces/i-auth-payloads';
+import { IUser } from '../../../core/interfaces/i-user';
 import { Auth } from '../../../core/services/auth/auth';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { AppAuthError, AuthErrorCode } from '../../../core/types/auth-error';
@@ -54,6 +60,8 @@ export class ProfileForm {
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(UiToast);
 
+  private readonly hydratedUserId = signal<string | null>(null);
+
   readonly mode = input<ProfileFormMode>('register');
 
   readonly i18n = createProfileFormI18n();
@@ -67,7 +75,10 @@ export class ProfileForm {
   readonly isExpanded = signal(false);
 
   readonly isRegisterMode = computed(() => this.mode() === 'register');
+  readonly isEditMode = computed(() => this.mode() === 'edit');
   readonly isSubmitting = computed(() => false);
+  readonly currentUser = computed(() => this.auth.user());
+  readonly displayEmail = computed(() => this.currentUser()?.email ?? '');
   readonly showExtendedFields = computed(
     () => !this.isRegisterMode() || this.isExpanded(),
   );
@@ -82,19 +93,42 @@ export class ProfileForm {
       passwordControl.setValidators([Validators.required, Validators.minLength(8)]);
       emailControl.enable({ emitEvent: false });
       passwordControl.enable({ emitEvent: false });
+      emailControl.updateValueAndValidity({ emitEvent: false });
+      passwordControl.updateValueAndValidity({ emitEvent: false });
       return;
     }
 
     emailControl.clearValidators();
     passwordControl.clearValidators();
-    emailControl.setValue(null, { emitEvent: false });
-    passwordControl.setValue(null, { emitEvent: false });
+
     emailControl.disable({ emitEvent: false });
     passwordControl.disable({ emitEvent: false });
+
+    passwordControl.setValue(null, { emitEvent: false });
     this.isExpanded.set(false);
 
     emailControl.updateValueAndValidity({ emitEvent: false });
     passwordControl.updateValueAndValidity({ emitEvent: false });
+  });
+
+  private readonly hydrateEditFormEffect = effect(() => {
+    if (!this.isEditMode()) {
+      this.hydratedUserId.set(null);
+      return;
+    }
+
+    const user = this.currentUser();
+
+    if (!user) {
+      return;
+    }
+
+    if (this.hydratedUserId() === user.id) {
+      return;
+    }
+
+    this.patchFormFromUser(user);
+    this.hydratedUserId.set(user.id);
   });
 
   onSubmit(): void {
@@ -227,6 +261,9 @@ export class ProfileForm {
       )
       .subscribe({
         next: () => {
+          this.form.markAsPristine();
+          this.form.markAsUntouched();
+
           this.toast.success({
             summary: this.i18n.toast().updateSuccessSummary,
             detail: this.i18n.success().updated,
@@ -244,6 +281,32 @@ export class ProfileForm {
           });
         },
       });
+  }
+
+  private patchFormFromUser(user: IUser): void {
+    this.form.patchValue(
+      {
+        email: user.email,
+        password: null,
+        firstName: user.firstName,
+        nickname: user.nickname,
+        useNickname: !!user.useNickname,
+        phoneNumber: user.phoneNumber,
+        city: user.city,
+        street: user.street,
+        houseNumber: user.houseNumber,
+        apartmentNumber: user.apartmentNumber,
+        postalCode: user.postalCode,
+        age: user.age,
+        shortDescription: user.shortDescription,
+        longDescription: user.longDescription,
+        extendedDescription: user.extendedDescription,
+      },
+      { emitEvent: false },
+    );
+
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   private resetForm(): void {

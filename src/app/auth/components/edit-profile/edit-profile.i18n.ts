@@ -21,11 +21,18 @@ export function createEditProfileI18n() {
     { scope: 'auth' },
   );
 
+  const gmProfileTabLabel = translateSignal(
+    'editProfile.tabs.gmProfile',
+    {},
+    { scope: 'auth' },
+  );
+
   return {
     seoTitle,
     seoDescription,
     title,
     subtitle,
     profileTabLabel,
+    gmProfileTabLabel,
   };
 }

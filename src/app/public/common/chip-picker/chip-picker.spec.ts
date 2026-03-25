@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditGm } from './edit-gm';
+import { ChipPicker } from './chip-picker';
 
-describe('EditGm', () => {
-  let component: EditGm;
-  let fixture: ComponentFixture<EditGm>;
+describe('ChipPicker', () => {
+  let component: ChipPicker;
+  let fixture: ComponentFixture<ChipPicker>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditGm]
+      imports: [ChipPicker]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EditGm);
+    fixture = TestBed.createComponent(ChipPicker);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

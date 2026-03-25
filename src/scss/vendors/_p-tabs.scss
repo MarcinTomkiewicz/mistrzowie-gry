@@ -1,0 +1,32 @@
+:where(.p-tabs) {
+  .p-tablist {
+    background: var(--mg-form-bg);
+    border-color: var(--mg-form-border);
+  }
+
+  .p-tab {
+    color: var(--mg-form-label);
+  }
+
+  .p-tab:hover {
+    color: var(--mg-form-text);
+    background: var(--mg-form-bg-hover);
+  }
+
+  .p-tab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--mg-form-ring);
+  }
+
+  .p-tab[aria-selected="true"] {
+    color: var(--mg-form-text);
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-focus);
+  }
+
+  .p-tabpanels {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-text);
+    border-color: var(--mg-form-border);
+  }
+}

@@ -1,44 +1,14 @@
 import {
   AbstractControlOptions,
   FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
+  Validators
 } from '@angular/forms';
 
 import { IUserProfileFormData } from '../interfaces/i-auth-payloads';
+import { IUserFormFactoryOptions, UserFormGroup } from '../interfaces/i-user-form';
 import { normalizeText } from '../utils/normalize-text';
-import { profileIdentityValidator } from '../validators/profile-identity.validator';
 import { displayPreferenceValidator } from '../validators/display-preference.validator';
-
-
-export interface IUserFormFactoryOptions {
-  includeEmail?: boolean;
-  includePassword?: boolean;
-  includeProfile?: boolean;
-  initial?: Partial<IUserProfileFormData> & {
-    email?: string | null;
-    password?: string | null;
-  };
-}
-
-export type UserFormGroup = FormGroup<{
-  email: FormControl<string | null>;
-  password: FormControl<string | null>;
-  firstName: FormControl<string | null>;
-  nickname: FormControl<string | null>;
-  useNickname: FormControl<boolean>;
-  phoneNumber: FormControl<string | null>;
-  city: FormControl<string | null>;
-  street: FormControl<string | null>;
-  houseNumber: FormControl<string | null>;
-  apartmentNumber: FormControl<string | null>;
-  postalCode: FormControl<string | null>;
-  age: FormControl<number | null>;
-  shortDescription: FormControl<string | null>;
-  longDescription: FormControl<string | null>;
-  extendedDescription: FormControl<string | null>;
-}>;
+import { profileIdentityValidator } from '../validators/profile-identity.validator';
 
 export function createUserForm(
   fb: FormBuilder,

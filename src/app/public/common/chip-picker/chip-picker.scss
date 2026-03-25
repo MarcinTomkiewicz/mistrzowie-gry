@@ -1,0 +1,26 @@
+.chip-picker__chip--disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+button.tag-badge {
+  cursor: pointer;
+  appearance: none;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+button.tag-badge:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button.tag-badge:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--mg-form-ring);
+}
+
+button.tag-badge:disabled {
+  pointer-events: none;
+}

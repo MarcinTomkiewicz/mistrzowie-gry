@@ -1,0 +1,93 @@
+<header class="mg-section__header w-100 m-sm">
+  <h2 class="mg-section__title mg-section__title--md">
+    <span>{{ i18n.title() }}</span>
+  </h2>
+</header>
+
+@if (isLoading()) {
+  <div class="w-100 flex-row-center-center">
+    <i class="pi pi-spin pi-spinner"></i>
+  </div>
+} @else {
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    class="mg-form flex-col-start-center w-100 gap-sm"
+  >
+    <div class="w-80 flex-col-start-stretch gap-xs">
+      <app-file-upload
+        [currentUrl]="storedImageUrl()"
+        [chooseLabel]="i18n.imageChooseLabel()"
+        [clearLabel]="i18n.imageClearLabel()"
+        [dropLabel]="i18n.imageDropLabel()"
+        [formatsLabel]="i18n.imageFormatsLabel()"
+        [previewAlt]="i18n.imagePreviewAlt()"
+        [disabled]="isSubmitting()"
+        (valueChange)="onImageValueChange($event)"
+        (removeStored)="onRemoveStoredImage()"
+      />
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="gm-experience"
+          name="gm-experience"
+          formControlName="experience"
+          rows="5"
+          autocomplete="off"
+        ></textarea>
+        <label for="gm-experience">{{ i18n.experienceLabel() }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="gm-quote"
+          name="gm-quote"
+          formControlName="quote"
+          rows="3"
+          autocomplete="off"
+        ></textarea>
+        <label for="gm-quote">{{ i18n.quoteLabel() }}</label>
+      </p-iftalabel>
+
+      @if (showQuoteError()) {
+        <small>{{ i18n.quoteMaxLengthLabel() }}</small>
+      }
+    </div>
+
+    <div class="w-80 flex-col-start-stretch gap-xs">
+      <label for="gm-style-ids">{{ i18n.stylesLabel() }}</label>
+
+      <app-chip-picker
+        [options]="styleOptions()"
+        [selected]="form.controls.gmStyleIds.getRawValue()"
+        [maxSelected]="5"
+        [searchable]="false"
+        (selectedChange)="onStylesChange($event)"
+      />
+
+      @if (showStyleCountError()) {
+        <small>{{ i18n.invalidStyleCount() }}</small>
+      }
+    </div>
+
+    <div class="w-100 flex-row-center-center">
+      <p-button
+        severity="success"
+        [label]="i18n.saveLabel()"
+        type="submit"
+        loadingIcon="pi pi-d20"
+        [icon]="'pi pi-scroll-quill'"
+        [loading]="isSubmitting()"
+      />
+    </div>
+  </form>
+}

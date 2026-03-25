@@ -1,0 +1,80 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-fileupload {
+    color: var(--mg-form-text);
+
+    &.p-fileupload-advanced {
+      background: var(--mg-form-bg);
+      border: 1px solid var(--mg-form-border);
+    }
+
+    &.p-fileupload-advanced:hover {
+      background: var(--mg-form-bg-hover);
+      border-color: var(--mg-form-border-hover);
+    }
+
+    .p-fileupload-header {
+      background: var(--mg-form-bg);
+      color: var(--mg-form-text);
+      border: 1px solid var(--mg-form-border);
+    }
+
+    .p-fileupload-content {
+      background: var(--mg-form-bg);
+      color: var(--mg-form-text);
+      border: 1px solid var(--mg-form-border);
+      border-top: 0;
+    }
+
+    &:has(.p-fileupload-content:hover) .p-fileupload-header,
+    .p-fileupload-content:hover {
+      background: var(--mg-form-bg-hover);
+      border-color: var(--mg-form-border-hover);
+    }
+
+    .p-fileupload-file {
+      color: var(--mg-form-text);
+      border-color: var(--mg-form-border);
+    }
+
+    .p-fileupload-file-name,
+    .p-fileupload-file-size,
+    .p-fileupload-file-badge,
+    .p-fileupload-empty,
+    .p-fileupload-basic {
+      color: var(--mg-form-text);
+    }
+
+    .p-fileupload-empty {
+      color: var(--mg-form-label);
+    }
+
+    .p-progressbar {
+      background: var(--mg-form-disabled-bg);
+      border: 1px solid var(--mg-form-border);
+    }
+
+    .p-progressbar .p-progressbar-value {
+      background: var(--mg-form-border-focus);
+    }
+
+    &.p-disabled,
+    &:has(.p-disabled) {
+      color: var(--mg-form-disabled-text);
+    }
+
+    &.p-disabled.p-fileupload-advanced,
+    &:has(.p-disabled).p-fileupload-advanced {
+      background: var(--mg-form-disabled-bg);
+      border-color: var(--mg-form-border);
+    }
+
+    &.p-disabled .p-fileupload-header,
+    &.p-disabled .p-fileupload-content,
+    &:has(.p-disabled) .p-fileupload-header,
+    &:has(.p-disabled) .p-fileupload-content {
+      background: var(--mg-form-disabled-bg);
+      color: var(--mg-form-disabled-text);
+      border-color: var(--mg-form-border);
+    }
+  }
+}

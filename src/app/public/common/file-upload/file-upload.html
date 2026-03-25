@@ -1,0 +1,107 @@
+<div class="flex-col-start-stretch gap-sm w-100">
+  @if (hasPreview()) {
+    <div class="flex-col-center-center gap-sm w-100">
+      <div class="image__preview">
+        <p-image
+          [src]="previewUrl()!"
+          [alt]="previewAlt()"
+          imageClass="image__preview-image"
+          [preview]="true"
+        />
+      </div>
+    </div>
+  }
+
+  <div class="flex-col-start-stretch gap-xs">
+    <label>{{ label() }}</label>
+
+    <p-fileupload
+      name="file-upload"
+      mode="advanced"
+      [customUpload]="true"
+      [auto]="false"
+      [multiple]="false"
+      [showUploadButton]="false"
+      [showCancelButton]="false"
+      [fileLimit]="1"
+      [maxFileSize]="maxFileSize()"
+      [accept]="accept()"
+      [disabled]="disabled()"
+      (onSelect)="onSelect($event)"
+      (onRemove)="onRemove($event)"
+      (onClear)="onClear()"
+    >
+      <ng-template
+        #header
+        let-files
+        let-chooseCallback="chooseCallback"
+        let-clearCallback="clearCallback"
+      >
+        <div class="flex-row-center-center gap-sm w-100">
+          <div class="flex-row-center-center gap-sm">
+            <p-button
+              type="button"
+              severity="secondary"
+              [label]="chooseLabel()"
+              icon="pi pi-mona-lisa"
+              [outlined]="true"
+              [disabled]="disabled()"
+              (onClick)="chooseCallback()"
+            />
+
+            @if (files?.length) {
+              <p-button
+                type="button"
+                severity="warn"
+                [label]="clearLabel()"
+                icon="pi pi-vacuum-cleaner"
+                [outlined]="true"
+                [disabled]="disabled()"
+                (onClick)="clearCallback()"
+              />
+            }
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #content let-files let-removeFileCallback="removeFileCallback">
+        @if (files?.length) {
+          <div class="flex-col-start-stretch gap-sm pt-sm">
+            @for (
+              file of files;
+              track file.name + "-" + file.size;
+              let index = $index
+            ) {
+              <div class="flex-row-between-center gap-sm w-100">
+                <div class="flex-row-start-center gap-sm min-w-0">
+                  <span class="tag-badge tag-badge--muted">
+                    {{ file.name }}
+                  </span>
+                </div>
+
+                <p-button
+                  type="button"
+                  severity="danger"
+                  icon="pi pi-times"
+                  [rounded]="true"
+                  [text]="true"
+                  (onClick)="removeFileCallback($event, index)"
+                />
+              </div>
+            }
+          </div>
+        }
+      </ng-template>
+
+      <ng-template #file></ng-template>
+
+      <ng-template #empty>
+        <div class="flex-col-center-center gap-xs py-md">
+          <i class="pi pi-soul text-4xl"></i>
+          <span>{{ dropLabel() }}</span>
+          <small>{{ formatsLabel() }}</small>
+        </div>
+      </ng-template>
+    </p-fileupload>
+  </div>
+</div>

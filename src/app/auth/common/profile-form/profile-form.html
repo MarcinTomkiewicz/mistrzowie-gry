@@ -42,7 +42,6 @@
           [feedback]="false"
           [toggleMask]="true"
           autocomplete="new-password"
-          inputStyleClass="w-100"
         >
           <ng-template #showicon>
             <i class="pi pi-horus p-password-toggle-mask-icon"></i>
@@ -59,6 +58,13 @@
       @if (showPasswordError()) {
         <small>{{ i18n.commonForm().minLength.replace('{{min}}', '8') }}</small>
       }
+    </div>
+  } @else {
+    <div class="w-80 px-sm">
+      <div>{{ i18n.form().emailLabel }}</div>
+      <div class="w-100 flex-row-start-center">
+        {{ displayEmail() }}
+      </div>
     </div>
   }
 
@@ -90,13 +96,12 @@
     </p-iftalabel>
   </div>
 
-  <div class="w-80 flex-row-start-center">
+  <div class="w-80 flex-row-start-center gap-md">
     <p-toggleswitch
       inputId="useNickname"
       formControlName="useNickname"
-      class="mr-sm"
     />
-    <label for="useNickname">{{ i18n.form().useNicknameLabel }}</label>
+    <label for="useNickname" class="w-70">{{ i18n.form().useNicknameLabel }}</label>
   </div>
 
   @if (showDisplayNameRequiredError()) {
@@ -229,7 +234,9 @@
       </p-iftalabel>
 
       @if (showShortDescriptionError()) {
-        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '150') }}</small>
+        <small
+          >{{ i18n.commonForm().maxLength.replace('{{max}}', '150') }}</small
+        >
       }
     </div>
 
@@ -250,7 +257,9 @@
       </p-iftalabel>
 
       @if (showLongDescriptionError()) {
-        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small>
+        <small
+          >{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small
+        >
       }
     </div>
 
@@ -286,9 +295,7 @@
         severity="warn"
         type="button"
         [label]="
-          isExpanded()
-            ? i18n.commonCta().viewLess
-            : i18n.commonCta().viewAll
+          isExpanded() ? i18n.commonCta().viewLess : i18n.commonCta().viewAll
         "
         [icon]="isExpanded() ? 'pi pi-angle-up' : 'pi pi-angle-down'"
         (onClick)="toggleExpanded()"

@@ -1,0 +1,30 @@
+@if (searchable()) {
+  <div class="w-100 mb-sm">
+    <input
+      pInputText
+      type="text"
+      class="w-100"
+      [placeholder]="searchPlaceholder()"
+      [disabled]="disabled()"
+      (input)="onSearch($event)"
+    />
+  </div>
+}
+
+@if (filteredOptions().length) {
+  <div class="tag-badges w-100">
+    @for (option of filteredOptions(); track option.id) {
+      <button
+        type="button"
+        [class]="resolveClassNames(option).join(' ')"
+        [disabled]="isOptionDisabled(option.id)"
+        [attr.aria-pressed]="isSelected(option.id)"
+        (click)="toggle(option.id)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+} @else if (emptyLabel()) {
+  <small>{{ emptyLabel() }}</small>
+}

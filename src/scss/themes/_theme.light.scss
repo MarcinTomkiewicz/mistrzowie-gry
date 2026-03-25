@@ -45,7 +45,7 @@ $light: (
   "heading-mode": solid,
 
   "form-bg": $surface,
-  "form-bg-hover": color.scale($surface, $lightness: 4%),
+  "form-bg-hover": color.scale($surface, $lightness: 25%),
   "form-bg-focus": color.scale($surface, $lightness: 8%),
   "form-text": $text,
   "form-placeholder": $text-muted,
