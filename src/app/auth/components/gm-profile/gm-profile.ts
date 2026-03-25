@@ -1,10 +1,6 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   finalize,
@@ -19,6 +15,8 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { SliderModule } from 'primeng/slider';
 import { TextareaModule } from 'primeng/textarea';
 
 import {
@@ -27,7 +25,6 @@ import {
 } from '../../../core/factories/gm-profile-form.factory';
 import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
 import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
-import { IGmProfileFormData } from '../../../core/interfaces/i-gm-profile';
 import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
 import { Auth } from '../../../core/services/auth/auth';
 import { GmProfileFacade } from '../../../core/services/gm-profile/gm-profile';
@@ -48,6 +45,8 @@ import { createGmProfileI18n } from './gm-profile.i18n';
     ChipPicker,
     FileUpload,
     IftaLabelModule,
+    InputTextModule,
+    SliderModule,
     TextareaModule,
   ],
   templateUrl: './gm-profile.html',
@@ -70,6 +69,26 @@ export class GmProfile {
   readonly styleOptions = signal<IChipPickerOption[]>([]);
   readonly selectedImageFile = signal<File | null>(null);
 
+  private readonly quoteValue = toSignal(this.form.controls.quote.valueChanges, {
+    initialValue: this.form.controls.quote.getRawValue(),
+  });
+
+  private readonly experienceValue = toSignal(
+    this.form.controls.experience.valueChanges,
+    {
+      initialValue: this.form.controls.experience.getRawValue(),
+    },
+  );
+
+  private readonly gmStyleIdsValue = toSignal(
+    this.form.controls.gmStyleIds.valueChanges,
+    {
+      initialValue: this.form.controls.gmStyleIds.getRawValue(),
+    },
+  );
+
+  readonly displayName = computed(() => this.auth.displayName());
+
   readonly storedImageUrl = computed(() => {
     const imagePath = normalizeText(this.form.controls.image.getRawValue());
 
@@ -81,10 +100,20 @@ export class GmProfile {
   });
 
   readonly hasValidStyleCount = computed(() => {
-    const count = this.form.controls.gmStyleIds.getRawValue().length;
+    const gmStyleIds = this.gmStyleIdsValue() ?? [];
+    const count = gmStyleIds.length;
 
     return count === 0 || (count >= 3 && count <= 5);
   });
+
+  readonly quoteRemaining = computed(() => {
+    const value = this.quoteValue() ?? '';
+    return Math.max(0, 255 - value.length);
+  });
+
+  readonly isQuoteLimitReached = computed(() => this.quoteRemaining() === 0);
+
+  readonly experienceDisplay = computed(() => this.experienceValue() ?? 0);
 
   constructor() {
     this.loadData();
@@ -110,34 +139,38 @@ export class GmProfile {
       this.form.markAllAsTouched();
 
       this.toast.warn({
-        summary: this.i18n.invalidFormSummary(),
+        summary: this.i18n.commonForm().invalidSummary,
         detail: !this.hasValidStyleCount()
-          ? this.i18n.invalidStyleCount()
-          : this.i18n.invalidFormDetail(),
+          ? this.i18n.errors().invalidStyleCount
+          : this.i18n.toast().invalidFormDetail,
       });
 
       return;
     }
 
-    const payload = mapGmProfileFormToPayload(this.form);
-
     this.isSubmitting.set(true);
 
     this.uploadSelectedImageIfNeeded()
       .pipe(
-        switchMap(() => this.gmProfileFacade.upsertMyGmProfile(payload)),
+        switchMap(() => {
+          const payload = mapGmProfileFormToPayload(this.form);
+          return this.gmProfileFacade.upsertMyGmProfile(payload);
+        }),
         finalize(() => this.isSubmitting.set(false)),
       )
       .subscribe({
         next: (profile) => {
+          const styleIds = profile.styles?.map((style) => style.id) ?? [];
+
           this.selectedImageFile.set(null);
 
           this.form.patchValue(
             {
               experience: profile.experience,
+              description: profile.description,
               image: profile.image,
               quote: profile.quote,
-              gmStyleIds: profile.styles.map((style) => style.id),
+              gmStyleIds: styleIds,
             },
             { emitEvent: false },
           );
@@ -146,14 +179,16 @@ export class GmProfile {
           this.form.markAsUntouched();
 
           this.toast.success({
-            summary: this.i18n.saveSuccessSummary(),
-            detail: this.i18n.saveSuccessDetail(),
+            summary: this.i18n.toast().saveSuccessSummary,
+            detail: this.i18n.toast().saveSuccessDetail,
           });
         },
-        error: () => {
+        error: (error) => {
+          console.error('[GM PROFILE SAVE ERROR]', error);
+
           this.toast.danger({
-            summary: this.i18n.saveFailedSummary(),
-            detail: this.i18n.saveFailedDetail(),
+            summary: this.i18n.toast().saveFailedSummary,
+            detail: this.i18n.toast().saveFailedDetail,
           });
         },
       });
@@ -167,8 +202,16 @@ export class GmProfile {
 
   showQuoteError(): boolean {
     const control = this.form.controls.quote;
-
     return control.touched && !!control.errors?.['maxlength'];
+  }
+
+  showExperienceError(): boolean {
+    const control = this.form.controls.experience;
+
+    return (
+      control.touched &&
+      (!!control.errors?.['min'] || !!control.errors?.['max'])
+    );
   }
 
   showStyleCountError(): boolean {
@@ -202,9 +245,10 @@ export class GmProfile {
           this.form.patchValue(
             {
               experience: profile.experience,
+              description: profile.description,
               image: profile.image,
               quote: profile.quote,
-              gmStyleIds: profile.styles.map((style) => style.id),
+              gmStyleIds: profile.styles?.map((style) => style.id) ?? [],
             },
             { emitEvent: false },
           );
@@ -212,10 +256,12 @@ export class GmProfile {
           this.form.markAsPristine();
           this.form.markAsUntouched();
         },
-        error: () => {
+        error: (error) => {
+          console.error('[GM PROFILE LOAD ERROR]', error);
+
           this.toast.danger({
-            summary: this.i18n.loadFailedSummary(),
-            detail: this.i18n.loadFailedDetail(),
+            summary: this.i18n.toast().loadFailedSummary,
+            detail: this.i18n.toast().loadFailedDetail,
           });
         },
       });
@@ -234,20 +280,22 @@ export class GmProfile {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.storage.uploadImage(file, {
-      folder: 'profilePhotos',
-      ownerId: userId,
-      currentPath: this.form.controls.image.getRawValue(),
-      removePrevious: true,
-      usePublicUrl: false,
-    }).pipe(
-      switchMap((result) => {
-        this.form.controls.image.setValue(result.path);
-        this.form.controls.image.markAsDirty();
-        this.form.controls.image.markAsTouched();
+    return this.storage
+      .uploadImage(file, {
+        folder: 'profilePhotos',
+        ownerId: userId,
+        currentPath: this.form.controls.image.getRawValue(),
+        removePrevious: true,
+        usePublicUrl: false,
+      })
+      .pipe(
+        switchMap((result) => {
+          this.form.controls.image.setValue(result.path);
+          this.form.controls.image.markAsDirty();
+          this.form.controls.image.markAsTouched();
 
-        return of(result);
-      }),
-    );
+          return of(result);
+        }),
+      );
   }
 }

@@ -54,9 +54,7 @@ export class GmProfileFacade {
     });
   }
 
-  upsertMyGmProfile(
-    payload: IGmProfileFormData,
-  ): Observable<IGmProfileWithRelations> {
+  upsertMyGmProfile(payload: IGmProfileFormData): Observable<IGmProfileWithRelations> {
     const userId = this.auth.userId();
 
     if (!userId) {
@@ -64,15 +62,15 @@ export class GmProfileFacade {
     }
 
     return this.backend
-      .upsert<Pick<IGmProfile, 'id' | 'experience' | 'image' | 'quote'>>(
-        'gm_profiles',
-        {
-          id: userId,
-          experience: payload.experience,
-          image: payload.image,
-          quote: payload.quote,
-        },
-      )
+      .upsert<
+        Pick<IGmProfile, 'id' | 'experience' | 'description' | 'image' | 'quote'>
+      >('gm_profiles', {
+        id: userId,
+        experience: payload.experience,
+        description: payload.description,
+        image: payload.image,
+        quote: payload.quote,
+      })
       .pipe(
         switchMap(() => this.replaceMyGmStyles(payload.gmStyleIds)),
         switchMap(() => this.getMyGmProfileRequired()),
@@ -114,9 +112,7 @@ export class GmProfileFacade {
       );
   }
 
-  private getGmProfileById(
-    gmProfileId: string,
-  ): Observable<IGmProfileWithRelations | null> {
+  private getGmProfileById(gmProfileId: string): Observable<IGmProfileWithRelations | null> {
     return this.backend.getById<IGmProfile>('gm_profiles', gmProfileId).pipe(
       switchMap((profile) => {
         if (!profile) {
@@ -150,21 +146,15 @@ export class GmProfileFacade {
       })
       .pipe(
         switchMap((rows) => {
-          const gmStyleIds = [
-            ...new Set(rows.map((row) => row.gmStyleId).filter(Boolean)),
-          ];
+          const gmStyleIds = [...new Set(rows.map((row) => row.gmStyleId).filter(Boolean))];
 
           if (!gmStyleIds.length) {
             return of([]);
           }
 
-          return this.backend
-            .getByIds<IGmStyle>('gm_styles', gmStyleIds)
-            .pipe(
-              map((styles) =>
-                [...styles].sort((a, b) => a.sortOrder - b.sortOrder),
-              ),
-            );
+          return this.backend.getByIds<IGmStyle>('gm_styles', gmStyleIds).pipe(
+            map((styles) => [...styles].sort((a, b) => a.sortOrder - b.sortOrder)),
+          );
         }),
       );
   }

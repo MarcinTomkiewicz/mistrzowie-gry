@@ -33,10 +33,12 @@
     "retry": "Spróbuj ponownie",
     "add": "Dodaj",
     "remove": "Usuń",
+    "clear": "Wyczyść",
     "next": "Dalej",
     "previous": "Wstecz",
     "submit": "Wyślij",
-    "ok": "OK"
+    "ok": "OK",
+    "logout": "Wyloguj się"
   },
 
   "nav": {
@@ -56,6 +58,7 @@
     "blog": "Blog",
     "standardsAndLogistics": "Standardy i logistyka"
   },
+
   "social": {
     "facebook": "Odwiedź nas na Facebooku",
     "instagram": "Odwiedź nas na Instagramie",
@@ -72,10 +75,17 @@
 
   "form": {
     "required": "To pole jest wymagane.",
+    "invalidSummary": "Nieprawidłowy formularz",
     "invalidEmail": "Podaj poprawny adres e-mail.",
     "minLength": "Wpisz co najmniej {{min}} znaków.",
     "maxLength": "Wpisz maksymalnie {{max}} znaków.",
     "invalid": "Sprawdź poprawność pól formularza.",
+    "fileUpload": {
+      "chooseImage": "Wybierz obrazek",
+      "dropImage": "Przeciągnij obrazek tutaj albo wybierz plik",
+      "imageFormats": "PNG, JPG, WEBP lub AVIF do 5 MB",
+      "imagePreviewAlt": "Podgląd wybranego obrazka"
+    },
     "consent": {
       "label": "Wyrażam zgodę na kontakt w sprawie zapytania.",
       "required": "Zgoda jest wymagana."

@@ -7,7 +7,8 @@ export interface IGmProfileFormFactoryOptions {
 }
 
 export type GmProfileFormGroup = FormGroup<{
-  experience: FormControl<string | null>;
+  experience: FormControl<number | null>;
+  description: FormControl<string | null>;
   image: FormControl<string | null>;
   quote: FormControl<string | null>;
   gmStyleIds: FormControl<string[]>;

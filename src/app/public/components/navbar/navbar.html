@@ -49,14 +49,26 @@
       </div>
 
       <div class="flex-row-start-center gap-xs pl-sm">
-        <button
-          type="button"
-          class="mg-icon-btn"
-          aria-label="Profil"
-          (click)="showOutOfOrderPopup($event)"
-        >
-          <i class="pi pi-overlord"></i>
-        </button>
+        @if (isAuthenticated()) {
+          <button
+            type="button"
+            class="mg-icon-btn"
+            aria-label="Profil"
+            (click)="openUserMenu($event)"
+            aria-haspopup="true"
+          >
+            <i class="pi pi-overlord"></i>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="mg-icon-btn"
+            aria-label="Profil"
+            (click)="showOutOfOrderPopup($event)"
+          >
+            <i class="pi pi-overlord"></i>
+          </button>
+        }
 
         <button
           type="button"
@@ -96,6 +108,10 @@
       </li>
     }
   </ul>
+</p-popover>
+
+<p-popover #userPopover styleClass="mg-popover" (onHide)="closeUserMenu()">
+  <app-user-menu-panel (closed)="closeUserMenu()" />
 </p-popover>
 
 <p-drawer

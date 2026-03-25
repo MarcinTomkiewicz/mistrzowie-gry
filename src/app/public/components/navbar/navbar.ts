@@ -7,11 +7,13 @@ import { Popover, PopoverModule } from 'primeng/popover';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { Auth } from '../../../core/services/auth/auth';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
 import { createNavbarI18n, UIMenu } from './navbar.i18n';
+import { UserMenuPanel } from '../../../auth/components/user-menu-panel/user-menu-panel';
 
 @Component({
   selector: 'app-navbar',
@@ -22,12 +24,14 @@ import { createNavbarI18n, UIMenu } from './navbar.i18n';
     DrawerModule,
     ConfirmPopupModule,
     ThemeSwitch,
+    UserMenuPanel,
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
   providers: [provideTranslocoScope('common')],
 })
 export class Navbar {
+  private readonly auth = inject(Auth);
   private readonly nav = inject(Navigation);
   private readonly uiConfirm = inject(UiConfirm);
 
@@ -35,6 +39,7 @@ export class Navbar {
   readonly i18n = createNavbarI18n();
 
   readonly menu = computed(() => this.i18n.resolveMenu(this.nav.navbar()));
+  readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
 
   readonly mobileOpen = signal(false);
   readonly activeDropdown = signal<UIMenu | null>(null);
@@ -46,6 +51,7 @@ export class Navbar {
   readonly brandLogoSrc = this.theme.brandLogoSrc;
 
   private readonly navPopover = viewChild<Popover>('navPopover');
+  private readonly userPopover = viewChild<Popover>('userPopover');
 
   openDropdown(event: Event, item: UIMenu): void {
     if (!item.children?.length) return;
@@ -55,6 +61,7 @@ export class Navbar {
       return;
     }
 
+    this.closeUserMenu();
     this.activeDropdown.set(item);
     this.navPopover()?.show(event);
   }
@@ -64,9 +71,19 @@ export class Navbar {
     this.activeDropdown.set(null);
   }
 
+  openUserMenu(event: Event): void {
+    this.closeDropdown();
+    this.userPopover()?.toggle(event);
+  }
+
+  closeUserMenu(): void {
+    this.userPopover()?.hide();
+  }
+
   openMobile(): void {
     this.mobileOpen.set(true);
     this.closeDropdown();
+    this.closeUserMenu();
   }
 
   closeMobile(): void {
@@ -82,9 +99,6 @@ export class Navbar {
       message: this.i18n.info().outOfOrder,
       acceptLabel: this.i18n.actions().ok,
     });
-
-    console.log(this.i18n.actions().ok);
-    
   }
 
   trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;

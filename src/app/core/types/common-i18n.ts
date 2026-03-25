@@ -32,10 +32,12 @@ export type CommonActionsTranslations = {
   retry: string;
   add: string;
   remove: string;
+  clear: string;
   next: string;
   previous: string;
   submit: string;
   ok: string;
+  logout: string;
 };
 
 export type CommonNavTranslations = {
@@ -53,6 +55,7 @@ export type CommonNavTranslations = {
   faq: string;
   pricing: string;
   blog: string;
+  standardsAndLogistics: string;
 };
 
 export type CommonSocialTranslations = {
@@ -126,11 +129,19 @@ export type CommonSeoTranslations = {
 export type CommonFootnotesTranslations = {
   net: string;
   gross: string;
+  both: string;
 };
 
 export type CommonFormConsentTranslations = {
   label: string;
   required: string;
+};
+
+export type CommonFormFileUploadTranslations = {
+  chooseImage: string;
+  dropImage: string;
+  imageFormats: string;
+  imagePreviewAlt: string;
 };
 
 export type CommonFormTranslations = {
@@ -139,5 +150,38 @@ export type CommonFormTranslations = {
   minLength: string;
   maxLength: string;
   invalid: string;
+  invalidSummary: string;
   consent: CommonFormConsentTranslations;
+  fileUpload: CommonFormFileUploadTranslations;
 };
+
+export interface GmProfileFormTranslations {
+  displayNameLabel: string;
+  experienceLabel: string;
+  experienceRangeLabel: string;
+  descriptionLabel: string;
+  quoteLabel: string;
+  stylesLabel: string;
+}
+
+export interface GmProfileErrorsTranslations {
+  invalidStyleCount: string;
+}
+
+export interface GmProfileActionsTranslations {
+  saveLabel: string;
+}
+
+export interface GmProfileToastTranslations {
+  invalidFormDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+}
+
+export interface GmProfileTranslations {
+  title: string;
+}

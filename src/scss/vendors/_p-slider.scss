@@ -1,0 +1,47 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-slider {
+    background: var(--mg-form-disabled-bg);
+    border: 1px solid var(--mg-form-border);
+  }
+
+  .p-slider:not(.p-disabled):hover {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-slider .p-slider-range {
+    background: var(--mg-form-border-focus);
+  }
+
+  .p-slider .p-slider-handle {
+    background: var(--mg-form-bg);
+    border: 1px solid var(--mg-form-border-focus);
+    box-shadow: none;
+  }
+
+  .p-slider .p-slider-handle:focus,
+  .p-slider .p-slider-handle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--mg-form-ring);
+  }
+
+  .p-slider:not(.p-disabled) .p-slider-handle:hover {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-slider.p-disabled {
+    background: var(--mg-form-disabled-bg);
+    border-color: var(--mg-form-border);
+    opacity: 1;
+  }
+
+  .p-slider.p-disabled .p-slider-range {
+    background: var(--mg-form-border);
+  }
+
+  .p-slider.p-disabled .p-slider-handle {
+    background: var(--mg-form-disabled-bg);
+    border-color: var(--mg-form-border);
+  }
+}

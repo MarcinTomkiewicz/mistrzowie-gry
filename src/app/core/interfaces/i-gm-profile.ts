@@ -2,7 +2,8 @@ import { IGmStyle } from './i-gm-style';
 
 export interface IGmProfile {
   id: string;
-  experience: string | null;
+  experience: number | null;
+  description: string | null;
   image: string | null;
   quote: string | null;
   createdAt: string | null;
@@ -10,7 +11,8 @@ export interface IGmProfile {
 }
 
 export interface IGmProfileFormData {
-  experience: string | null;
+  experience: number | null;
+  description: string | null;
   image: string | null;
   quote: string | null;
   gmStyleIds: string[];

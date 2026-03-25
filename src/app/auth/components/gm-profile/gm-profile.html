@@ -1,6 +1,6 @@
 <header class="mg-section__header w-100 m-sm">
   <h2 class="mg-section__title mg-section__title--md">
-    <span>{{ i18n.title() }}</span>
+    <span>{{ i18n.gmProfile().title }}</span>
   </h2>
 </header>
 
@@ -15,56 +15,89 @@
     novalidate
     class="mg-form flex-col-start-center w-100 gap-sm"
   >
-    <div class="w-80 flex-col-start-stretch gap-xs">
+    <div class="w-80 flex-col-start-stretch gap-xs my-md">
+      <div>{{ i18n.form().displayNameLabel }}: {{ displayName() }}</div>
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="gm-quote"
+          name="gm-quote"
+          formControlName="quote"
+          autocomplete="off"
+          maxlength="255"
+        />
+        <label for="gm-quote" [class.p-error]="isQuoteLimitReached()">
+          {{ i18n.form().quoteLabel }}
+        </label>
+      </p-iftalabel>
+
+      <div class="flex-row-between-center gap-sm">
+        @if (showQuoteError()) {
+          <small
+            >{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small
+          >
+        } @else {
+          <span></span>
+        }
+
+        <small [class.p-error]="isQuoteLimitReached()">
+          {{ quoteRemaining() }}/255
+        </small>
+      </div>
+    </div>
+
+    <div class="w-80 flex-col-start-stretch gap-sm mb-sm">
+      <label for="gm-experience">
+        {{ i18n.form().experienceLabel }}: {{ experienceDisplay() }}
+      </label>
+
+      <div class="flex-row-between-center gap-sm">
+        <small>0</small>
+        <small>40</small>
+      </div>
+
+      <p-slider formControlName="experience" [min]="0" [max]="40" [step]="1" />
+
+      @if (showExperienceError()) {
+        <small>{{ i18n.form().experienceRangeLabel }}</small>
+      }
+    </div>
+
+    <div class="w-80">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="gm-description"
+          name="gm-description"
+          formControlName="description"
+          rows="6"
+          autocomplete="off"
+        ></textarea>
+        <label for="gm-description">{{ i18n.form().descriptionLabel }}</label>
+      </p-iftalabel>
+    </div>
+
+    <div class="w-80">
       <app-file-upload
         [currentUrl]="storedImageUrl()"
-        [chooseLabel]="i18n.imageChooseLabel()"
-        [clearLabel]="i18n.imageClearLabel()"
-        [dropLabel]="i18n.imageDropLabel()"
-        [formatsLabel]="i18n.imageFormatsLabel()"
-        [previewAlt]="i18n.imagePreviewAlt()"
+        [chooseLabel]="i18n.commonForm().fileUpload.chooseImage"
+        [clearLabel]="i18n.commonActions().clear"
+        [dropLabel]="i18n.commonForm().fileUpload.dropImage"
+        [formatsLabel]="i18n.commonForm().fileUpload.imageFormats"
+        [previewAlt]="i18n.commonForm().fileUpload.imagePreviewAlt"
         [disabled]="isSubmitting()"
         (valueChange)="onImageValueChange($event)"
         (removeStored)="onRemoveStoredImage()"
       />
     </div>
 
-    <div class="w-80">
-      <p-iftalabel class="w-100">
-        <textarea
-          pTextarea
-          class="w-100"
-          id="gm-experience"
-          name="gm-experience"
-          formControlName="experience"
-          rows="5"
-          autocomplete="off"
-        ></textarea>
-        <label for="gm-experience">{{ i18n.experienceLabel() }}</label>
-      </p-iftalabel>
-    </div>
-
-    <div class="w-80">
-      <p-iftalabel class="w-100">
-        <textarea
-          pTextarea
-          class="w-100"
-          id="gm-quote"
-          name="gm-quote"
-          formControlName="quote"
-          rows="3"
-          autocomplete="off"
-        ></textarea>
-        <label for="gm-quote">{{ i18n.quoteLabel() }}</label>
-      </p-iftalabel>
-
-      @if (showQuoteError()) {
-        <small>{{ i18n.quoteMaxLengthLabel() }}</small>
-      }
-    </div>
-
     <div class="w-80 flex-col-start-stretch gap-xs">
-      <label for="gm-style-ids">{{ i18n.stylesLabel() }}</label>
+      <label for="gm-style-ids">{{ i18n.form().stylesLabel }}</label>
 
       <app-chip-picker
         [options]="styleOptions()"
@@ -75,14 +108,14 @@
       />
 
       @if (showStyleCountError()) {
-        <small>{{ i18n.invalidStyleCount() }}</small>
+        <small>{{ i18n.errors().invalidStyleCount }}</small>
       }
     </div>
 
     <div class="w-100 flex-row-center-center">
       <p-button
         severity="success"
-        [label]="i18n.saveLabel()"
+        [label]="i18n.actions().saveLabel"
         type="submit"
         loadingIcon="pi pi-d20"
         [icon]="'pi pi-scroll-quill'"

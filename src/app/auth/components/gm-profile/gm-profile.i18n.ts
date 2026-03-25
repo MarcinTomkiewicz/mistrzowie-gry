@@ -1,198 +1,46 @@
-import { translateSignal } from '@jsverse/transloco';
+import { computed } from '@angular/core';
+import { translateObjectSignal } from '@jsverse/transloco';
+
+import {
+  CommonActionsTranslations,
+  CommonErrorsTranslations,
+  CommonFormTranslations,
+  GmProfileActionsTranslations,
+  GmProfileErrorsTranslations,
+  GmProfileFormTranslations,
+  GmProfileToastTranslations,
+  GmProfileTranslations,
+} from '../../../core/types/common-i18n';
 
 export function createGmProfileI18n() {
-  const title = translateSignal('gmProfile.title', {}, { scope: 'auth' });
+  const gmProfileDict = translateObjectSignal('gmProfile', {}, { scope: 'auth' });
+  const gmProfileFormDict = translateObjectSignal('gmProfile.form', {}, { scope: 'auth' });
+  const gmProfileErrorsDict = translateObjectSignal('gmProfile.errors', {}, { scope: 'auth' });
+  const gmProfileActionsDict = translateObjectSignal('gmProfile.actions', {}, { scope: 'auth' });
+  const gmProfileToastDict = translateObjectSignal('gmProfile.toast', {}, { scope: 'auth' });
 
-  const experienceLabel = translateSignal(
-    'gmProfile.form.experienceLabel',
-    {},
-    { scope: 'auth' },
-  );
+  const commonActionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
+  const commonErrorsDict = translateObjectSignal('errors', {}, { scope: 'common' });
+  const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
 
-  const imageLabel = translateSignal(
-    'gmProfile.form.imageLabel',
-    {},
-    { scope: 'auth' },
-  );
+  const gmProfile = computed(() => gmProfileDict() as GmProfileTranslations);
+  const form = computed(() => gmProfileFormDict() as GmProfileFormTranslations);
+  const errors = computed(() => gmProfileErrorsDict() as GmProfileErrorsTranslations);
+  const actions = computed(() => gmProfileActionsDict() as GmProfileActionsTranslations);
+  const toast = computed(() => gmProfileToastDict() as GmProfileToastTranslations);
 
-  const imageChooseLabel = translateSignal(
-    'gmProfile.form.imageChooseLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageCancelLabel = translateSignal(
-    'gmProfile.form.imageCancelLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageUploadLabel = translateSignal(
-    'gmProfile.form.imageUploadLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageDropLabel = translateSignal(
-    'gmProfile.form.imageDropLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageFormatsLabel = translateSignal(
-    'gmProfile.form.imageFormatsLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageUploadingLabel = translateSignal(
-    'gmProfile.form.imageUploadingLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const quoteLabel = translateSignal(
-    'gmProfile.form.quoteLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const stylesLabel = translateSignal(
-    'gmProfile.form.stylesLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imagePreviewAlt = translateSignal(
-    'gmProfile.form.imagePreviewAlt',
-    {},
-    { scope: 'auth' },
-  );
-
-  const quoteMaxLengthLabel = translateSignal(
-    'gmProfile.form.quoteMaxLengthLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const invalidStyleCount = translateSignal(
-    'gmProfile.errors.invalidStyleCount',
-    {},
-    { scope: 'auth' },
-  );
-
-  const saveLabel = translateSignal(
-    'gmProfile.actions.saveLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const invalidFormSummary = translateSignal(
-    'gmProfile.toast.invalidFormSummary',
-    {},
-    { scope: 'auth' },
-  );
-
-  const invalidFormDetail = translateSignal(
-    'gmProfile.toast.invalidFormDetail',
-    {},
-    { scope: 'auth' },
-  );
-
-  const saveSuccessSummary = translateSignal(
-    'gmProfile.toast.saveSuccessSummary',
-    {},
-    { scope: 'auth' },
-  );
-
-  const saveSuccessDetail = translateSignal(
-    'gmProfile.toast.saveSuccessDetail',
-    {},
-    { scope: 'auth' },
-  );
-
-  const saveFailedSummary = translateSignal(
-    'gmProfile.toast.saveFailedSummary',
-    {},
-    { scope: 'auth' },
-  );
-
-  const saveFailedDetail = translateSignal(
-    'gmProfile.toast.saveFailedDetail',
-    {},
-    { scope: 'auth' },
-  );
-
-  const loadFailedSummary = translateSignal(
-    'gmProfile.toast.loadFailedSummary',
-    {},
-    { scope: 'auth' },
-  );
-
-  const loadFailedDetail = translateSignal(
-    'gmProfile.toast.loadFailedDetail',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageUploadSuccessSummary = translateSignal(
-    'gmProfile.toast.imageUploadSuccessSummary',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageUploadSuccessDetail = translateSignal(
-    'gmProfile.toast.imageUploadSuccessDetail',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageUploadFailedSummary = translateSignal(
-    'gmProfile.toast.imageUploadFailedSummary',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageUploadFailedDetail = translateSignal(
-    'gmProfile.toast.imageUploadFailedDetail',
-    {},
-    { scope: 'auth' },
-  );
-
-  const imageClearLabel = translateSignal(
-  'gmProfile.form.imageClearLabel',
-  {},
-  { scope: 'auth' },
-);
+  const commonActions = computed(() => commonActionsDict() as CommonActionsTranslations);
+  const commonErrors = computed(() => commonErrorsDict() as CommonErrorsTranslations);
+  const commonForm = computed(() => commonFormDict() as CommonFormTranslations);
 
   return {
-    title,
-    experienceLabel,
-    imageLabel,
-    imageChooseLabel,
-    imageCancelLabel,
-    imageUploadLabel,
-    imageDropLabel,
-    imageFormatsLabel,
-    imageUploadingLabel,
-    quoteLabel,
-    stylesLabel,
-    imagePreviewAlt,
-    quoteMaxLengthLabel,
-    invalidStyleCount,
-    saveLabel,
-    invalidFormSummary,
-    invalidFormDetail,
-    saveSuccessSummary,
-    saveSuccessDetail,
-    saveFailedSummary,
-    saveFailedDetail,
-    loadFailedSummary,
-    loadFailedDetail,
-    imageUploadSuccessSummary,
-    imageUploadSuccessDetail,
-    imageUploadFailedSummary,
-    imageUploadFailedDetail,
-    imageClearLabel,
+    gmProfile,
+    form,
+    errors,
+    actions,
+    toast,
+    commonActions,
+    commonErrors,
+    commonForm,
   };
 }

@@ -25,11 +25,6 @@
   border-color: v.$color-border;
 }
 
-/* =========================================================
-   Submenu items hover (MG)
-   Dlaczego tu? Bo popover to overlay Prime – vendor ma wygrywać kolejnością.
-   ========================================================= */
-
 /* DARK/default: delikatny wash primary na surface */
 .p-popover-content[data-pc-section="content"] .mg-popover-menu__link {
   display: block;
