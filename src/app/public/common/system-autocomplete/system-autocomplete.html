@@ -1,0 +1,21 @@
+<p-autocomplete
+  [inputId]="inputId()"
+  [formControl]="systemSearchControl"
+  [suggestions]="systemSuggestions()"
+  [forceSelection]="true"
+  [dropdown]="true"
+  dropdownMode="blank"
+  [showClear]="true"
+  [delay]="0"
+  optionLabel="name"
+  [appendTo]="appendTo()"
+  class="w-100"
+  (completeMethod)="onComplete($event)"
+  (onDropdownClick)="onDropdownClick()"
+  (onSelect)="onSelect($event)"
+  (onClear)="onClear()"
+>
+  <ng-template #loadingicon>
+    <i class="pi pi-d20 pi-spin"></i>
+  </ng-template>
+</p-autocomplete>

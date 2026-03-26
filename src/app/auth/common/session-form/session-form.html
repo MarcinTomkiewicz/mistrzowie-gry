@@ -24,14 +24,13 @@
 
   <div class="w-80">
     <p-iftalabel class="w-100">
-      <p-select
+      <app-system-autocomplete
+        [control]="form.controls.systemId"
+        [systems]="systems()"
         inputId="session-system-id"
-        formControlName="systemId"
-        optionLabel="name"
-        optionValue="id"
-        [options]="systemOptions()"
         appendTo="body"
-        class="w-100"
+        (systemSelected)="onSystemSelect($event)"
+        (systemCleared)="onSystemClear()"
       />
       <label for="session-system-id">{{ i18n.systemLabel() }}</label>
     </p-iftalabel>
@@ -41,108 +40,93 @@
     }
   </div>
 
-  <div class="w-80">
-    <p-iftalabel class="w-100">
-      <p-select
-        inputId="session-difficulty-level"
-        formControlName="difficultyLevel"
-        optionLabel="label"
-        optionValue="value"
-        [options]="difficultyOptions()"
-        appendTo="body"
-        class="w-100"
-      />
-      <label for="session-difficulty-level">{{ i18n.difficultyLabel() }}</label>
-    </p-iftalabel>
-
-    @if (showRequiredError('difficultyLevel')) {
-      <small>{{ i18n.commonForm().required }}</small>
-    }
-  </div>
-
-  <div class="w-80 flex-row-between-start gap-sm">
-    <div class="w-100">
+  <div
+    class="w-80 flex-row-between-center flex-col-start-stretch-xs gap-sm"
+  >
+    <div class="w-70 w-50-md w-100-xs">
       <p-iftalabel class="w-100">
-        <p-inputnumber
-          inputId="session-min-players"
-          formControlName="minPlayers"
-          [min]="1"
-          [max]="5"
-          [useGrouping]="false"
-          styleClass="w-100"
-          inputStyleClass="w-100"
+        <p-select
+          inputId="session-difficulty-level"
+          formControlName="difficultyLevel"
+          optionLabel="label"
+          optionValue="value"
+          [options]="difficultyOptions()"
+          appendTo="body"
+          class="w-100"
         />
-        <label for="session-min-players">{{ i18n.minPlayersLabel() }}</label>
+        <label for="session-difficulty-level">{{
+          i18n.difficultyLabel()
+        }}</label>
       </p-iftalabel>
+
+      @if (showRequiredError("difficultyLevel")) {
+        <small>{{ i18n.commonForm().required }}</small>
+      }
+    </div>
+
+    <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
+      <label for="session-min-players">{{ i18n.minPlayersLabel() }}</label>
+
+      <p-inputnumber
+        class="w-100"
+        inputId="session-min-players"
+        formControlName="minPlayers"
+        [min]="1"
+        [max]="5"
+        [useGrouping]="false"
+        styleClass="w-100"
+        inputStyleClass="w-100"
+      />
 
       @if (showMinPlayersError()) {
         <small>{{ i18n.playersRangeLabel() }}</small>
       }
     </div>
 
-    <div class="w-100">
-      <p-iftalabel class="w-100">
-        <p-inputnumber
-          inputId="session-max-players"
-          formControlName="maxPlayers"
-          [min]="1"
-          [max]="5"
-          [useGrouping]="false"
-          styleClass="w-100"
-          inputStyleClass="w-100"
-        />
-        <label for="session-max-players">{{ i18n.maxPlayersLabel() }}</label>
-      </p-iftalabel>
+    <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
+      <label for="session-max-players">{{ i18n.maxPlayersLabel() }}</label>
+
+      <p-inputnumber
+        class="w-100"
+        inputId="session-max-players"
+        formControlName="maxPlayers"
+        [min]="1"
+        [max]="5"
+        [useGrouping]="false"
+        styleClass="w-100"
+        inputStyleClass="w-100"
+      />
 
       @if (showMaxPlayersError()) {
         <small>{{ i18n.playersRangeLabel() }}</small>
       }
     </div>
+
+    <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
+      <label for="session-min-age">{{ i18n.minAgeLabel() }}</label>
+
+      <p-inputnumber
+        class="w-100"
+        inputId="session-min-age"
+        formControlName="minAge"
+        [min]="0"
+        [useGrouping]="false"
+        styleClass="w-100"
+        inputStyleClass="w-100"
+      />
+
+      @if (showMinAgeError()) {
+        <small>{{ i18n.minAgeRangeLabel() }}</small>
+      }
+    </div>
   </div>
+
 
   @if (showPlayersRangeError()) {
     <div class="w-80">
       <small>{{ i18n.invalidPlayersRangeError() }}</small>
     </div>
   }
-
-  <div class="w-80 flex-row-between-start gap-sm">
-    <div class="w-100">
-      <p-iftalabel class="w-100">
-        <p-inputnumber
-          inputId="session-min-age"
-          formControlName="minAge"
-          [min]="0"
-          [useGrouping]="false"
-          styleClass="w-100"
-          inputStyleClass="w-100"
-        />
-        <label for="session-min-age">{{ i18n.minAgeLabel() }}</label>
-      </p-iftalabel>
-
-      @if (showMinAgeError()) {
-        <small>{{ i18n.minAgeRangeLabel() }}</small>
-      }
-    </div>
-
-    <div class="w-100">
-      <p-iftalabel class="w-100">
-        <p-inputnumber
-          inputId="session-sort-order"
-          formControlName="sortOrder"
-          [min]="0"
-          [useGrouping]="false"
-          styleClass="w-100"
-          inputStyleClass="w-100"
-        />
-        <label for="session-sort-order">{{ i18n.sortOrderLabel() }}</label>
-      </p-iftalabel>
-
-      @if (showSortOrderError()) {
-        <small>{{ i18n.sortOrderRangeLabel() }}</small>
-      }
-    </div>
-  </div>
 
   <div class="w-80">
     <p-iftalabel class="w-100">
@@ -219,7 +203,7 @@
       [label]="cancelLabel()"
       [outlined]="true"
       [disabled]="isSubmitting()"
-      [icon]="'pi pi-times'"
+      [icon]="'pi pi-interdiction'"
       (onClick)="onCancel()"
     />
   </div>

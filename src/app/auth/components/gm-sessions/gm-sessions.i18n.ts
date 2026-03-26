@@ -1,10 +1,14 @@
 import { computed } from '@angular/core';
 import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
 
-import { CommonActionsTranslations } from '../../../core/types/common-i18n';
+import {
+  CommonActionsTranslations,
+  CommonStatusTranslations,
+} from '../../../core/types/common-i18n';
 
 export function createGmSessionsI18n() {
   const commonActionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
+  const commonStatusDict = translateObjectSignal('status', {}, { scope: 'common' });
 
   const title = translateSignal('gmSessions.title', {}, { scope: 'auth' });
   const subtitle = translateSignal('gmSessions.subtitle', {}, { scope: 'auth' });
@@ -28,8 +32,13 @@ export function createGmSessionsI18n() {
     { scope: 'auth' },
   );
 
-  const stylesLabel = translateSignal('sessionForm.form.stylesLabel', {}, { scope: 'auth' });
-  const triggersLabel = translateSignal('sessionForm.form.triggersLabel', {}, { scope: 'auth' });
+  const systemLabel = translateSignal('sessionForm.form.systemLabel', {}, { scope: 'auth' });
+  const titleLabel = translateSignal('sessionForm.form.titleLabel', {}, { scope: 'auth' });
+  const difficultyLabel = translateSignal(
+    'sessionForm.form.difficultyLabel',
+    {},
+    { scope: 'auth' },
+  );
 
   const beginnerDifficultyLabel = translateSignal(
     'sessionForm.difficulty.beginner',
@@ -102,6 +111,10 @@ export function createGmSessionsI18n() {
     () => commonActionsDict() as CommonActionsTranslations,
   );
 
+  const commonStatus = computed(
+    () => commonStatusDict() as CommonStatusTranslations,
+  );
+
   return {
     title,
     subtitle,
@@ -110,8 +123,9 @@ export function createGmSessionsI18n() {
     actionsUpdateLabel,
     emptyTitle,
     emptyDescription,
-    stylesLabel,
-    triggersLabel,
+    systemLabel,
+    titleLabel,
+    difficultyLabel,
     beginnerDifficultyLabel,
     intermediateDifficultyLabel,
     advancedDifficultyLabel,
@@ -126,8 +140,11 @@ export function createGmSessionsI18n() {
     toastDeleteFailedSummary,
     toastDeleteFailedDetail,
     commonActions,
+    commonStatus,
+    playersHeaderLabel: () => 'Gracze',
+    minAgeHeaderLabel: () => 'Wiek',
     playersLabel: (minPlayers: number, maxPlayers: number) =>
-      `${minPlayers}-${maxPlayers} graczy`,
-    minAgeLabel: (minAge: number) => `Wiek ${minAge}+`,
+      `${minPlayers}-${maxPlayers}`,
+    minAgeLabel: (minAge: number) => `${minAge}+`,
   };
 }

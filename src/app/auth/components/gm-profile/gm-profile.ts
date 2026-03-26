@@ -33,6 +33,7 @@ import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
+import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { createGmProfileI18n } from './gm-profile.i18n';
 
 @Component({
@@ -46,6 +47,7 @@ import { createGmProfileI18n } from './gm-profile.i18n';
     FileUpload,
     IftaLabelModule,
     InputTextModule,
+    LoadingOverlay,
     SliderModule,
     TextareaModule,
   ],

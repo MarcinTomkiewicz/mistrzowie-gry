@@ -23,7 +23,11 @@
   border-color: v.$color-border;
 }
 
-.p-datatable tr {
+.p-datatable .p-datatable-tbody > tr {
   background: transparent;
   color: v.$color-text;
+
+  &:hover {
+    background: v.$color-form-bg-hover;
+  }
 }

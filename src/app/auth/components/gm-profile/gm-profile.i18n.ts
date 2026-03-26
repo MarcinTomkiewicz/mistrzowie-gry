@@ -5,6 +5,7 @@ import {
   CommonActionsTranslations,
   CommonErrorsTranslations,
   CommonFormTranslations,
+  CommonStatusTranslations,
   GmProfileActionsTranslations,
   GmProfileErrorsTranslations,
   GmProfileFormTranslations,
@@ -22,6 +23,7 @@ export function createGmProfileI18n() {
   const commonActionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
   const commonErrorsDict = translateObjectSignal('errors', {}, { scope: 'common' });
   const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
+  const commonStatusDict = translateObjectSignal('status', {}, { scope: 'common' });
 
   const gmProfile = computed(() => gmProfileDict() as GmProfileTranslations);
   const form = computed(() => gmProfileFormDict() as GmProfileFormTranslations);
@@ -32,6 +34,7 @@ export function createGmProfileI18n() {
   const commonActions = computed(() => commonActionsDict() as CommonActionsTranslations);
   const commonErrors = computed(() => commonErrorsDict() as CommonErrorsTranslations);
   const commonForm = computed(() => commonFormDict() as CommonFormTranslations);
+  const commonStatus = computed(() => commonStatusDict() as CommonStatusTranslations);
 
   return {
     gmProfile,
@@ -42,5 +45,6 @@ export function createGmProfileI18n() {
     commonActions,
     commonErrors,
     commonForm,
+    commonStatus,
   };
 }

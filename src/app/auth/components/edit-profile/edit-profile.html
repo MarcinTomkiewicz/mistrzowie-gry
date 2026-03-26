@@ -10,10 +10,10 @@
       </p>
     </header>
 
-    <p-tabs value="profile" lazy>
+    <p-tabs [value]="activeTab()" lazy>
       <p-tablist>
         @for (tab of tabs(); track trackTab($index, tab)) {
-          <p-tab [value]="tab.id">
+          <p-tab [value]="tab.id" (click)="onTabChange(tab.id)">
             <span class="flex-row-center-center gap-xs">
               <i [class]="tab.icon"></i>
               <span>{{ resolveTabLabel(tab.id) }}</span>

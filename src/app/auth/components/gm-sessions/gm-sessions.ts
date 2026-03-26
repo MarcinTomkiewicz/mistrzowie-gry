@@ -5,6 +5,7 @@ import { finalize, forkJoin } from 'rxjs';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 
 import {
   ICreateSessionPayload,
@@ -19,12 +20,21 @@ import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { SessionForm } from '../../common/session-form/session-form';
+import { SessionDetails } from '../../common/session-details/session-details';
 import { createGmSessionsI18n } from './gm-sessions.i18n';
+import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 
 @Component({
   selector: 'app-gm-sessions',
   standalone: true,
-  imports: [CommonModule, ButtonModule, SessionForm],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    TableModule,
+    SessionForm,
+    SessionDetails,
+    LoadingOverlay,
+  ],
   templateUrl: './gm-sessions.html',
   styleUrl: './gm-sessions.scss',
   providers: [provideTranslocoScope('auth', 'common')],
@@ -45,6 +55,8 @@ export class GmSessions {
 
   readonly editedSessionId = signal<string | null>(null);
   readonly isCreateMode = signal(false);
+
+  readonly rowsPerPageOptions = [10, 20, 50];
 
   readonly editedSession = computed(() =>
     this.sessions().find((session) => session.id === this.editedSessionId()) ?? null,
@@ -75,8 +87,18 @@ export class GmSessions {
     };
   });
 
-  readonly sortedSessions = computed(() =>
-    [...this.sessions()].sort((a, b) => a.sortOrder - b.sortOrder),
+  readonly tableSessions = computed(() =>
+    [...this.sessions()].sort((a, b) => {
+      const systemA = a.system?.name ?? '';
+      const systemB = b.system?.name ?? '';
+      const systemCompare = systemA.localeCompare(systemB, 'pl');
+
+      if (systemCompare !== 0) {
+        return systemCompare;
+      }
+
+      return a.title.localeCompare(b.title, 'pl');
+    }),
   );
 
   constructor() {
@@ -178,10 +200,6 @@ export class GmSessions {
       case SessionDifficultyLevel.Advanced:
         return this.i18n.advancedDifficultyLabel();
     }
-  }
-
-  trackSession(_: number, session: ISessionWithRelations): string {
-    return session.id;
   }
 
   private loadData(): void {

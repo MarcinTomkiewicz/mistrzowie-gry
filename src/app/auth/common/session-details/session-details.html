@@ -1,0 +1,55 @@
+<div class="flex-col-start-stretch w-100 gap-sm">
+  <div class="flex-col-start-stretch gap-xs">
+    <div class="session-details__description">
+      @if (imageUrl()) {
+        <div class="image__preview session-details__image">
+          <img
+            class="image__preview-image"
+            [src]="imageUrl()!"
+            [alt]="session().title"
+            loading="lazy"
+          />
+        </div>
+      }
+      <small class="status-text status-text--muted">
+        {{ i18n.descriptionLabel() }}
+      </small>
+
+      <p class="m-0 lh-md">
+        {{ session().description }}
+      </p>
+    </div>
+  </div>
+
+  @if (session().styles.length) {
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.stylesLabel() }}
+      </small>
+
+      <div class="flex-row-start-center gap-xs flex-wrap">
+        @for (style of session().styles; track style.id) {
+          <span class="tag-badge tag-badge--arcane">
+            {{ style.label }}
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  @if (session().triggers.length) {
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.triggersLabel() }}
+      </small>
+
+      <div class="flex-row-start-center gap-xs flex-wrap">
+        @for (trigger of session().triggers; track trigger.id) {
+          <span class="tag-badge tag-badge--muted">
+            {{ trigger.label }}
+          </span>
+        }
+      </div>
+    </div>
+  }
+</div>

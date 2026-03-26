@@ -36,7 +36,6 @@ export interface ISessionFormData {
   minAge: number | null;
   triggerIds: string[];
   gmStyleIds: string[];
-  sortOrder: number | null;
 }
 
 export interface ICreateSessionPayload {

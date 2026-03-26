@@ -57,6 +57,7 @@ $flex-basis-values: (
   25: 25%,
   30: 30%,
   33: 33.333333%,
+  35: 35%,
   40: 40%,
   50: 50%,
   auto: auto
@@ -233,10 +234,41 @@ $min-height-values: (
   }
 }
 
+@mixin _emit-flex-wrap-utilities() {
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .flex-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  .flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+
+  @each $bp in $flex-breakpoints {
+    @include m.down($bp) {
+      .flex-wrap-#{$bp} {
+        flex-wrap: wrap;
+      }
+
+      .flex-nowrap-#{$bp} {
+        flex-wrap: nowrap;
+      }
+
+      .flex-wrap-reverse-#{$bp} {
+        flex-wrap: wrap-reverse;
+      }
+    }
+  }
+}
+
 /* =========================================================
    FLEX ITEMS
    ========================================================= */
 
+@include _emit-flex-wrap-utilities();
 @include _emit-prop-map(align-self, $align-self-map, align-self);
 @include _emit-prop-map(flex, $flex-values, flex);
 @include _emit-prop-map(flex-grow, $flex-grow-values, flex-grow);

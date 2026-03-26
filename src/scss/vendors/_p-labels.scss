@@ -1,18 +1,22 @@
 :where(.mg-form, form, .mg-card form) {
-  .p-iftalabel label,
-  .p-floatlabel label {
-    color: var(--mg-form-label);
+  .p-iftalabel,
+  .p-floatlabel {
+    label {
+      color: var(--mg-form-label);
+    }
+
+    &:focus-within label {
+      color: var(--mg-form-border-focus);
+    }
+
+    &:has(.p-invalid) label,
+    &:has([aria-invalid="true"]) label {
+      color: var(--mg-form-error);
+    }
   }
 
-  .p-iftalabel:focus-within label,
-  .p-floatlabel:focus-within label {
-    color: var(--mg-form-border-focus);
-  }
-
-  .p-iftalabel:has(.p-invalid) label,
-  .p-floatlabel:has(.p-invalid) label,
-  .p-iftalabel:has([aria-invalid="true"]) label,
-  .p-floatlabel:has([aria-invalid="true"]) label {
-    color: var(--mg-form-error);
+  .p-floatlabel[variant="on"] label,
+  .p-floatlabel.p-floatlabel-on label {
+    background: var(--mg-form-bg);
   }
 }

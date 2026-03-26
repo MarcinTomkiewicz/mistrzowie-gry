@@ -5,110 +5,89 @@ import {
   ISessionFormData,
   IUpdateSessionPayload,
 } from '../interfaces/i-session';
-import {
-  ISessionFormFactoryOptions,
-  SessionFormGroup,
-} from '../interfaces/i-session-form';
-import { SessionDifficultyLevel } from '../types/sessions';
-import { normalizeText } from '../utils/normalize-text';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 import { sessionPlayersRangeValidator } from '../validators/session-players-range.validator';
 
-type SessionFormSource = Partial<{
-  systemId: string | null;
-  title: string | null;
-  description: string | null;
-  image: string | null;
-  difficultyLevel: SessionDifficultyLevel | null;
-  minPlayers: number | null;
-  maxPlayers: number | null;
-  minAge: number | null;
-  triggerIds: string[];
-  gmStyleIds: string[];
-  sortOrder: number | null;
-}>;
-
-export function createSessionForm(
-  fb: FormBuilder,
-  options?: ISessionFormFactoryOptions,
-): SessionFormGroup {
-  const initial = options?.initial;
-
+export function createSessionForm(fb: FormBuilder) {
   return fb.group(
     {
-      systemId: fb.control<string | null>(initial?.systemId ?? null, {
+      systemId: fb.control<string | null>(null, {
         validators: [Validators.required],
+        nonNullable: false,
       }),
-      title: fb.control<string | null>(initial?.title ?? null, {
+      title: fb.control<string | null>(null, {
+        validators: [Validators.required, requiredTrimmedValidator(), Validators.maxLength(120)],
+        nonNullable: false,
+      }),
+      description: fb.control<string | null>(null, {
         validators: [Validators.required, requiredTrimmedValidator()],
+        nonNullable: false,
       }),
-      description: fb.control<string | null>(initial?.description ?? null, {
+      image: fb.control<string | null>(null, {
         validators: [Validators.required, requiredTrimmedValidator()],
+        nonNullable: false,
       }),
-      image: fb.control<string | null>(initial?.image ?? null, {
-        validators: [Validators.required, requiredTrimmedValidator()],
+      difficultyLevel: fb.control<ISessionFormData['difficultyLevel']>(null, {
+        validators: [Validators.required],
+        nonNullable: false,
       }),
-      difficultyLevel: fb.control<SessionDifficultyLevel | null>(
-        initial?.difficultyLevel ?? SessionDifficultyLevel.Beginner,
-        {
-          validators: [Validators.required],
-        },
-      ),
-      minPlayers: fb.control<number | null>(initial?.minPlayers ?? 1, {
+      minPlayers: fb.control<number | null>(1, {
         validators: [Validators.required, Validators.min(1), Validators.max(5)],
+        nonNullable: false,
       }),
-      maxPlayers: fb.control<number | null>(initial?.maxPlayers ?? 5, {
+      maxPlayers: fb.control<number | null>(5, {
         validators: [Validators.required, Validators.min(1), Validators.max(5)],
+        nonNullable: false,
       }),
-      minAge: fb.control<number | null>(initial?.minAge ?? 0, {
+      minAge: fb.control<number | null>(0, {
         validators: [Validators.required, Validators.min(0)],
+        nonNullable: false,
       }),
-      triggerIds: fb.nonNullable.control<string[]>(initial?.triggerIds ?? []),
-      gmStyleIds: fb.nonNullable.control<string[]>(initial?.gmStyleIds ?? []),
-      sortOrder: fb.control<number | null>(initial?.sortOrder ?? 0, {
-        validators: [Validators.required, Validators.min(0)],
+      triggerIds: fb.control<string[]>([], {
+        nonNullable: true,
+      }),
+      gmStyleIds: fb.control<string[]>([], {
+        nonNullable: true,
       }),
     },
     {
       validators: [sessionPlayersRangeValidator()],
     },
-  ) as SessionFormGroup;
-}
-
-export function mapSessionFormToPayload(
-  form: SessionFormGroup,
-): ICreateSessionPayload | IUpdateSessionPayload {
-  const value = form.getRawValue();
-
-  return {
-    systemId: value.systemId ?? '',
-    title: normalizeText(value.title) ?? '',
-    description: normalizeText(value.description) ?? '',
-    image: normalizeText(value.image) ?? '',
-    difficultyLevel: value.difficultyLevel ?? SessionDifficultyLevel.Beginner,
-    minPlayers: value.minPlayers ?? 1,
-    maxPlayers: value.maxPlayers ?? 5,
-    minAge: value.minAge ?? 0,
-    triggerIds: [...new Set((value.triggerIds ?? []).filter(Boolean))],
-    gmStyleIds: [...new Set((value.gmStyleIds ?? []).filter(Boolean))],
-    sortOrder: value.sortOrder ?? 0,
-  };
+  );
 }
 
 export function mapSessionToFormData(
-  session: SessionFormSource,
+  value: Partial<ISessionFormData> | null | undefined,
 ): ISessionFormData {
   return {
-    systemId: session.systemId ?? null,
-    title: session.title ?? null,
-    description: session.description ?? null,
-    image: session.image ?? null,
-    difficultyLevel: session.difficultyLevel ?? SessionDifficultyLevel.Beginner,
-    minPlayers: session.minPlayers ?? 1,
-    maxPlayers: session.maxPlayers ?? 5,
-    minAge: session.minAge ?? 0,
-    triggerIds: [...new Set((session.triggerIds ?? []).filter(Boolean))],
-    gmStyleIds: [...new Set((session.gmStyleIds ?? []).filter(Boolean))],
-    sortOrder: session.sortOrder ?? 0,
+    systemId: value?.systemId ?? null,
+    title: value?.title ?? null,
+    description: value?.description ?? null,
+    image: value?.image ?? null,
+    difficultyLevel: value?.difficultyLevel ?? null,
+    minPlayers: value?.minPlayers ?? 1,
+    maxPlayers: value?.maxPlayers ?? 5,
+    minAge: value?.minAge ?? 0,
+    triggerIds: value?.triggerIds ?? [],
+    gmStyleIds: value?.gmStyleIds ?? [],
+  };
+}
+
+export function mapSessionFormToPayload(
+  form: ReturnType<typeof createSessionForm>,
+): ICreateSessionPayload | IUpdateSessionPayload {
+  const raw = form.getRawValue();
+
+  return {
+    systemId: raw.systemId!,
+    title: raw.title!,
+    description: raw.description!,
+    image: raw.image!,
+    difficultyLevel: raw.difficultyLevel!,
+    minPlayers: raw.minPlayers!,
+    maxPlayers: raw.maxPlayers!,
+    minAge: raw.minAge!,
+    triggerIds: raw.triggerIds,
+    gmStyleIds: raw.gmStyleIds,
   };
 }

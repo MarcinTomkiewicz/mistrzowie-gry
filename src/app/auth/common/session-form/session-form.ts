@@ -19,21 +19,32 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+
+import {
+  createSessionForm,
+  mapSessionFormToPayload,
+  mapSessionToFormData,
+} from '../../../core/factories/session-form.factory';
+import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
+import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
+import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
+import { IGmStyle } from '../../../core/interfaces/i-gm-style';
+import {
+  ISessionFormData,
+  IUpdateSessionPayload,
+} from '../../../core/interfaces/i-session';
+import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
+import { ISystem } from '../../../core/interfaces/i-system';
+import { Auth } from '../../../core/services/auth/auth';
+import { Storage } from '../../../core/services/storage/storage';
+import {
+  SESSION_DIFFICULTY_LEVEL_OPTIONS
+} from '../../../core/types/sessions';
+import { normalizeText } from '../../../core/utils/normalize-text';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
-import { Auth } from '../../../core/services/auth/auth';
-import { ISessionFormData, IUpdateSessionPayload } from '../../../core/interfaces/i-session';
-import { ISystem } from '../../../core/interfaces/i-system';
-import { IGmStyle } from '../../../core/interfaces/i-gm-style';
-import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
+import { SystemAutocomplete } from '../../../public/common/system-autocomplete/system-autocomplete';
 import { createSessionFormI18n } from './session-form.i18n';
-import { createSessionForm, mapSessionFormToPayload, mapSessionToFormData } from '../../../core/factories/session-form.factory';
-import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
-import { SESSION_DIFFICULTY_LEVEL_OPTIONS, SessionDifficultyLevel } from '../../../core/types/sessions';
-import { normalizeText } from '../../../core/utils/normalize-text';
-import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
-import { Storage } from '../../../core/services/storage/storage';
-import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
 
 @Component({
   selector: 'app-session-form',
@@ -48,6 +59,7 @@ import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
     InputNumberModule,
     InputTextModule,
     SelectModule,
+    SystemAutocomplete,
     TextareaModule,
   ],
   templateUrl: './session-form.html',
@@ -79,8 +91,6 @@ export class SessionForm {
 
   readonly isSubmitting = computed(() => this.busy() || this.isUploadingImage());
 
-  readonly systemOptions = computed<ISystem[]>(() => [...this.systems()]);
-
   readonly styleOptions = computed<IChipPickerOption[]>(() =>
     this.styles().map((style) => ({
       id: style.id,
@@ -101,12 +111,12 @@ export class SessionForm {
     })),
   );
 
-  readonly difficultyOptions = computed(() =>
-    SESSION_DIFFICULTY_LEVEL_OPTIONS.map((value) => ({
-      value,
-      label: this.resolveDifficultyLabel(value),
-    })),
-  );
+readonly difficultyOptions = computed(() =>
+  SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => ({
+    value: option.value,
+    label: this.i18n[option.i18nKey](),
+  })),
+);
 
   readonly storedImageUrl = computed(() => {
     if (this.selectedImageFile()) {
@@ -131,8 +141,18 @@ export class SessionForm {
       this.form.markAsPristine();
       this.form.markAsUntouched();
     });
+  }
 
-    this.auth.debugSessionClaims()
+  onSystemSelect(system: ISystem | null): void {
+    this.form.controls.systemId.setValue(system?.id ?? null);
+    this.form.controls.systemId.markAsDirty();
+    this.form.controls.systemId.markAsTouched();
+  }
+
+  onSystemClear(): void {
+    this.form.controls.systemId.setValue(null);
+    this.form.controls.systemId.markAsDirty();
+    this.form.controls.systemId.markAsTouched();
   }
 
   onStylesChange(gmStyleIds: string[]): void {
@@ -226,15 +246,6 @@ export class SessionForm {
     );
   }
 
-  showSortOrderError(): boolean {
-    const control = this.form.controls.sortOrder;
-
-    return (
-      control.touched &&
-      (!!control.errors?.['required'] || !!control.errors?.['min'])
-    );
-  }
-
   showPlayersRangeError(): boolean {
     const minPlayers = this.form.controls.minPlayers;
     const maxPlayers = this.form.controls.maxPlayers;
@@ -278,14 +289,14 @@ export class SessionForm {
       );
   }
 
-  private resolveDifficultyLabel(value: SessionDifficultyLevel): string {
-    switch (value) {
-      case SessionDifficultyLevel.Beginner:
-        return this.i18n.beginnerDifficultyLabel();
-      case SessionDifficultyLevel.Intermediate:
-        return this.i18n.intermediateDifficultyLabel();
-      case SessionDifficultyLevel.Advanced:
-        return this.i18n.advancedDifficultyLabel();
-    }
-  }
+  // private resolveDifficultyLabel(value: SessionDifficultyLevel): string {
+  //   switch (value) {
+  //     case SessionDifficultyLevel.Beginner:
+  //       return this.i18n.beginnerDifficultyLabel();
+  //     case SessionDifficultyLevel.Intermediate:
+  //       return this.i18n.intermediateDifficultyLabel();
+  //     case SessionDifficultyLevel.Advanced:
+  //       return this.i18n.advancedDifficultyLabel();
+  //   }
+  // }
 }

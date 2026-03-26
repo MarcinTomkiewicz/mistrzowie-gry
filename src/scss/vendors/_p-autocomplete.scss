@@ -1,0 +1,114 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-autocomplete {
+    width: 100%;
+  }
+
+  .p-autocomplete .p-inputtext {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-text);
+    border: 1px solid var(--mg-form-border);
+  }
+
+  .p-autocomplete:not(.p-disabled):hover .p-inputtext {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-autocomplete.p-focus .p-inputtext,
+  .p-autocomplete .p-inputtext:focus {
+    outline: none;
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-focus);
+    box-shadow: 0 0 0 3px var(--mg-form-ring);
+  }
+
+  .p-autocomplete .p-inputtext::placeholder {
+    color: var(--mg-form-label);
+  }
+
+  .p-autocomplete-dropdown {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-label);
+    border: 1px solid var(--mg-form-border);
+    border-left: 0;
+  }
+
+  .p-autocomplete:not(.p-disabled):hover .p-autocomplete-dropdown {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+    border-left: 0;
+  }
+
+  .p-autocomplete.p-focus .p-autocomplete-dropdown {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-focus);
+    border-left: 0;
+  }
+
+  .p-autocomplete.p-invalid .p-inputtext,
+  .p-autocomplete.ng-invalid.ng-dirty .p-inputtext,
+  .p-autocomplete.ng-invalid.ng-touched .p-inputtext {
+    border-color: var(--mg-form-error);
+  }
+
+  .p-autocomplete.p-invalid.p-focus .p-inputtext,
+  .p-autocomplete.ng-invalid.ng-dirty.p-focus .p-inputtext,
+  .p-autocomplete.ng-invalid.ng-touched.p-focus .p-inputtext {
+    box-shadow: 0 0 0 3px var(--mg-form-error-ring);
+  }
+
+  .p-autocomplete.p-disabled .p-inputtext,
+  .p-autocomplete.p-disabled .p-autocomplete-dropdown {
+    background: var(--mg-form-disabled-bg);
+    color: var(--mg-form-disabled-text);
+    border-color: var(--mg-form-border);
+  }
+}
+
+.p-autocomplete-overlay,
+.p-autocomplete-panel {
+  background: var(--mg-form-bg);
+  color: var(--mg-form-text);
+  border: 1px solid var(--mg-form-border);
+}
+
+.p-autocomplete-option {
+  color: var(--mg-form-text);
+  &::before {
+    content: "";
+    position: unset;
+    left: unset;
+    top: unset;
+    width: unset;
+    height: unset;
+    background-color: unset;
+    -webkit-mask-repeat: unset;
+    mask-repeat: unset;
+    -webkit-mask-position: unset;
+    mask-position: unset;
+    -webkit-mask-size: unset;
+    mask-size: unset;
+    -webkit-mask-image: unset;
+    mask-image: unset;
+  }
+}
+
+.p-autocomplete-option:hover {
+  background: var(--mg-form-border-hover);
+}
+
+.p-autocomplete-option.p-autocomplete-option-selected {
+  background: var(--mg-form-border-hover);
+  color: var(--mg-form-text);
+}
+
+.p-autocomplete-option:not(.p-autocomplete-option-selected):not(
+    .p-disabled
+  ).p-focus {
+  background: var(--mg-form-border-hover);
+  color: var(--mg-form-text);
+}
+
+.p-autocomplete-empty-message {
+  color: var(--mg-form-label);
+}

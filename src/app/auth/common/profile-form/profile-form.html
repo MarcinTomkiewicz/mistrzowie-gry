@@ -11,7 +11,7 @@
   class="flex-col-start-center w-100 gap-sm"
 >
   @if (isRegisterMode()) {
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -32,7 +32,7 @@
       }
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <p-password
           styleClass="w-100"
@@ -60,7 +60,7 @@
       }
     </div>
   } @else {
-    <div class="w-80 px-sm">
+    <div class="w-80 w-100-xs px-sm">
       <div>{{ i18n.form().emailLabel }}</div>
       <div class="w-100 flex-row-start-center">
         {{ displayEmail() }}
@@ -68,7 +68,7 @@
     </div>
   }
 
-  <div class="w-80">
+  <div class="w-80 w-100-xs">
     <p-iftalabel class="w-100">
       <input
         pInputText
@@ -82,7 +82,7 @@
     </p-iftalabel>
   </div>
 
-  <div class="w-80">
+  <div class="w-80 w-100-xs">
     <p-iftalabel class="w-100">
       <input
         pInputText
@@ -96,28 +96,30 @@
     </p-iftalabel>
   </div>
 
-  <div class="w-80 flex-row-start-center gap-md">
+  <div class="w-80 w-100-xs flex-row-start-center gap-md">
     <p-toggleswitch
       inputId="useNickname"
       formControlName="useNickname"
     />
-    <label for="useNickname" class="w-70">{{ i18n.form().useNicknameLabel }}</label>
+    <label for="useNickname" class="w-70">
+      {{ i18n.form().useNicknameLabel }}
+    </label>
   </div>
 
   @if (showDisplayNameRequiredError()) {
-    <div class="mt-xs w-80">
+    <div class="mt-xs w-80 w-100-xs">
       <small>{{ i18n.errors().displayNameRequired }}</small>
     </div>
   }
 
   @if (showDisplayPreferenceError()) {
-    <div class="mt-xs w-80">
+    <div class="mt-xs w-80 w-100-xs">
       <small>{{ i18n.errors().displayPreference }}</small>
     </div>
   }
 
   @if (showExtendedFields()) {
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -132,7 +134,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -146,7 +148,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -160,7 +162,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -174,7 +176,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -190,7 +192,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -204,7 +206,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <p-inputnumber
           class="w-100"
@@ -217,7 +219,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <textarea
           pTextarea
@@ -234,13 +236,11 @@
       </p-iftalabel>
 
       @if (showShortDescriptionError()) {
-        <small
-          >{{ i18n.commonForm().maxLength.replace('{{max}}', '150') }}</small
-        >
+        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '150') }}</small>
       }
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <textarea
           pTextarea
@@ -257,13 +257,11 @@
       </p-iftalabel>
 
       @if (showLongDescriptionError()) {
-        <small
-          >{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small
-        >
+        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small>
       }
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <textarea
           pTextarea
@@ -282,7 +280,7 @@
   }
 
   @if (isRegisterMode()) {
-    <div class="w-100 flex-row-around-center gap-sm">
+    <div class="w-100 flex-row-around-center flex-col-center-center-sm gap-sm">
       <p-button
         severity="success"
         [label]="i18n.actions().registerLabel"

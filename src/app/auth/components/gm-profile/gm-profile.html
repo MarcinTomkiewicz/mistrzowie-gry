@@ -4,22 +4,23 @@
   </h2>
 </header>
 
-@if (isLoading()) {
-  <div class="w-100 flex-row-center-center">
-    <i class="pi pi-spin pi-spinner"></i>
-  </div>
-} @else {
+<app-loading-overlay
+  [visible]="isLoading()"
+  [label]="i18n.commonStatus().loading"
+/>
+
+@if (!isLoading()) {
   <form
     [formGroup]="form"
     (ngSubmit)="onSubmit()"
     novalidate
     class="mg-form flex-col-start-center w-100 gap-sm"
   >
-    <div class="w-80 flex-col-start-stretch gap-xs my-md">
+    <div class="w-80 w-100-xs flex-col-start-stretch gap-xs my-md">
       <div>{{ i18n.form().displayNameLabel }}: {{ displayName() }}</div>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <input
           pInputText
@@ -35,11 +36,11 @@
         </label>
       </p-iftalabel>
 
-      <div class="flex-row-between-center gap-sm">
+      <div class="flex-row-between-center flex-col-end-end-xs gap-sm">
         @if (showQuoteError()) {
-          <small
-            >{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small
-          >
+          <small>
+            {{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}
+          </small>
         } @else {
           <span></span>
         }
@@ -50,7 +51,7 @@
       </div>
     </div>
 
-    <div class="w-80 flex-col-start-stretch gap-sm mb-sm">
+    <div class="w-80 w-100-xs flex-col-start-stretch gap-sm mb-sm">
       <label for="gm-experience">
         {{ i18n.form().experienceLabel }}: {{ experienceDisplay() }}
       </label>
@@ -67,7 +68,7 @@
       }
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <p-iftalabel class="w-100">
         <textarea
           pTextarea
@@ -82,7 +83,7 @@
       </p-iftalabel>
     </div>
 
-    <div class="w-80">
+    <div class="w-80 w-100-xs">
       <app-file-upload
         [currentUrl]="storedImageUrl()"
         [chooseLabel]="i18n.commonForm().fileUpload.chooseImage"
@@ -96,7 +97,7 @@
       />
     </div>
 
-    <div class="w-80 flex-col-start-stretch gap-xs">
+    <div class="w-80 w-100-xs flex-col-start-stretch gap-xs">
       <label for="gm-style-ids">{{ i18n.form().stylesLabel }}</label>
 
       <app-chip-picker

@@ -1,0 +1,96 @@
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG — Paginator
+   tylko kolory + rozmiar
+   ========================================================= */
+
+:root {
+  --p-paginator-background: #{v.$color-bg-surface};
+  --p-paginator-color: #{v.$color-text};
+  --p-paginator-border-color: #{v.$color-border};
+  --p-paginator-border-radius: #{v.$radius-md};
+
+  --p-paginator-padding: 0.75rem 0.75rem;
+
+  --p-paginator-nav-button-background: transparent;
+  --p-paginator-nav-button-color: #{v.$color-secondary};
+  --p-paginator-nav-button-border-color: transparent;
+
+  --p-paginator-nav-button-hover-background: color-mix(
+    in srgb,
+    #{v.$color-secondary} 12%,
+    transparent
+  );
+  --p-paginator-nav-button-hover-color: #{v.$color-secondary};
+  --p-paginator-nav-button-selected-background: #{v.$color-secondary};
+  --p-paginator-nav-button-selected-color: #{v.$color-white};
+  --p-paginator-nav-button-selected-border-color: #{v.$color-secondary};
+
+  --p-paginator-current-page-report-color: #{v.$color-text-muted};
+  --p-paginator-nav-button-focus-ring-color: color-mix(
+    in srgb,
+    #{v.$color-secondary} 35%,
+    transparent
+  );
+}
+
+/* =========================================================
+   Rozmiar paginatora
+   ========================================================= */
+
+.p-paginator {
+  font-size: 0.875rem;
+  gap: 0.25rem;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+  min-width: 2rem;
+  height: 2rem;
+}
+
+.p-paginator .p-paginator-current {
+  font-size: 0.875rem;
+}
+
+/* =========================================================
+   Rows per page select — lokalnie dla paginatora
+   ========================================================= */
+
+.p-paginator .p-select {
+  min-height: 2rem;
+  background: var(--mg-form-bg);
+  color: var(--mg-form-text);
+  border: 1px solid var(--mg-form-border);
+}
+
+.p-paginator .p-select:not(.p-disabled):hover {
+  background: var(--mg-form-bg-hover);
+  border-color: var(--mg-form-border-hover);
+}
+
+.p-paginator .p-select.p-focus {
+  outline: none;
+  background: var(--mg-form-bg-hover);
+  border-color: var(--mg-form-border-focus);
+  box-shadow: 0 0 0 3px var(--mg-form-ring);
+}
+
+.p-paginator .p-select .p-select-label {
+  color: var(--mg-form-text);
+  font-size: 0.875rem;
+}
+
+.p-paginator .p-select .p-select-dropdown {
+  color: var(--mg-form-label);
+}
+
+.p-paginator .p-select.p-disabled {
+  background: var(--mg-form-disabled-bg);
+  color: var(--mg-form-disabled-text);
+  border-color: var(--mg-form-border);
+}

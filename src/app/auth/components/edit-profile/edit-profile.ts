@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -27,6 +28,8 @@ import { GmSessions } from '../gm-sessions/gm-sessions';
 })
 export class EditProfile {
   private readonly auth = inject(Auth);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly i18n = createEditProfileI18n();
 
@@ -39,6 +42,8 @@ export class EditProfile {
       .filter((tab) => this.isTabVisible(tab.id))
       .sort((a, b) => a.order - b.order),
   );
+
+  readonly activeTab = signal<EditProfileTabId>(this.resolveInitialTab());
 
   resolveTabLabel(tabId: EditProfileTabId): string {
     switch (tabId) {
@@ -53,6 +58,39 @@ export class EditProfile {
 
   trackTab(_: number, tab: EditProfileTabDefinition): EditProfileTabId {
     return tab.id;
+  }
+
+  onTabChange(tabId: EditProfileTabId): void {
+    if (!this.isTabVisible(tabId)) {
+      return;
+    }
+
+    this.activeTab.set(tabId);
+
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: tabId },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  private resolveInitialTab(): EditProfileTabId {
+    const tabFromQuery = this.route.snapshot.queryParamMap.get('tab');
+
+    if (!this.isEditProfileTabId(tabFromQuery)) {
+      return 'profile';
+    }
+
+    if (!this.isTabVisible(tabFromQuery)) {
+      return 'profile';
+    }
+
+    return tabFromQuery;
+  }
+
+  private isEditProfileTabId(value: string | null): value is EditProfileTabId {
+    return EDIT_PROFILE_TABS.some((tab) => tab.id === value);
   }
 
   private isTabVisible(tabId: EditProfileTabId): boolean {
