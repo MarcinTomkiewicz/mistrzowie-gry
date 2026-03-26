@@ -174,7 +174,7 @@ export class GmProfile {
               quote: profile.quote,
               gmStyleIds: styleIds,
             },
-            { emitEvent: false },
+            { emitEvent: true },
           );
 
           this.form.markAsPristine();
@@ -252,7 +252,7 @@ export class GmProfile {
               quote: profile.quote,
               gmStyleIds: profile.styles?.map((style) => style.id) ?? [],
             },
-            { emitEvent: false },
+            { emitEvent: true },
           );
 
           this.form.markAsPristine();
