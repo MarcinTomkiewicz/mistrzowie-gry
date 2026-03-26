@@ -27,6 +27,12 @@ export function createEditProfileI18n() {
     { scope: 'auth' },
   );
 
+  const gmSessionsTabLabel = translateSignal(
+    'editProfile.tabs.gmSessions',
+    {},
+    { scope: 'auth' },
+  );
+
   return {
     seoTitle,
     seoDescription,
@@ -34,5 +40,6 @@ export function createEditProfileI18n() {
     subtitle,
     profileTabLabel,
     gmProfileTabLabel,
+    gmSessionsTabLabel,
   };
 }

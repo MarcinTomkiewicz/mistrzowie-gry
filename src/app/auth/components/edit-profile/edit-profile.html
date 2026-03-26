@@ -27,9 +27,13 @@
           <app-profile-form mode="edit" />
         </p-tabpanel>
 
-        @if (canSeeGmProfileTab()) {
+        @if (canSeeGmTabs()) {
           <p-tabpanel value="gm-profile">
             <app-gm-profile />
+          </p-tabpanel>
+
+          <p-tabpanel value="gm-sessions">
+            <app-gm-sessions />
           </p-tabpanel>
         }
       </p-tabpanels>

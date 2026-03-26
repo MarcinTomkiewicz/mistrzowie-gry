@@ -1,3 +1,4 @@
+import { SessionDifficultyLevel } from '../types/sessions';
 import { IContentTrigger } from './i-content-trigger';
 import { IGmStyle } from './i-gm-style';
 import { ISystem } from './i-system';
@@ -10,6 +11,10 @@ export interface ISession {
   description: string;
   image: string;
   sortOrder: number;
+  difficultyLevel: SessionDifficultyLevel;
+  minPlayers: number;
+  maxPlayers: number;
+  minAge: number;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -25,6 +30,10 @@ export interface ISessionFormData {
   title: string | null;
   description: string | null;
   image: string | null;
+  difficultyLevel: SessionDifficultyLevel | null;
+  minPlayers: number | null;
+  maxPlayers: number | null;
+  minAge: number | null;
   triggerIds: string[];
   gmStyleIds: string[];
   sortOrder: number | null;
@@ -35,6 +44,10 @@ export interface ICreateSessionPayload {
   title: string;
   description: string;
   image: string;
+  difficultyLevel: SessionDifficultyLevel;
+  minPlayers: number;
+  maxPlayers: number;
+  minAge: number;
   triggerIds: string[];
   gmStyleIds: string[];
   sortOrder?: number;
@@ -45,6 +58,10 @@ export interface IUpdateSessionPayload {
   title: string;
   description: string;
   image: string;
+  difficultyLevel: SessionDifficultyLevel;
+  minPlayers: number;
+  maxPlayers: number;
+  minAge: number;
   triggerIds: string[];
   gmStyleIds: string[];
   sortOrder?: number;

@@ -15,7 +15,7 @@ export interface IGmProfileStyle {
 }
 
 export interface ISessionStyle {
-  gmStandardSessionId: string;
+  gmSessionTemplateId: string;
   gmStyleId: string;
   createdAt: string | null;
 }

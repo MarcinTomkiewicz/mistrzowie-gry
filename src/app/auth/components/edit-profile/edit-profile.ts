@@ -11,15 +11,16 @@ import {
   EditProfileTabId,
 } from '../../../core/types/profile';
 import { Auth } from '../../../core/services/auth/auth';
-import { ProfileForm } from '../../common/profile-form/profile-form';
-import { createEditProfileI18n } from './edit-profile.i18n';
-import { GmProfile } from '../gm-profile/gm-profile';
 import { hasMinimumRole } from '../../../core/utils/roles';
+import { ProfileForm } from '../../common/profile-form/profile-form';
+import { GmProfile } from '../gm-profile/gm-profile';
+import { createEditProfileI18n } from './edit-profile.i18n';
+import { GmSessions } from '../gm-sessions/gm-sessions';
 
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
-  imports: [CommonModule, TabsModule, ProfileForm, GmProfile],
+  imports: [CommonModule, TabsModule, ProfileForm, GmProfile, GmSessions],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.scss',
   providers: [provideTranslocoScope('auth', 'common')],
@@ -29,7 +30,7 @@ export class EditProfile {
 
   readonly i18n = createEditProfileI18n();
 
-  readonly canSeeGmProfileTab = computed(() =>
+  readonly canSeeGmTabs = computed(() =>
     hasMinimumRole(this.auth.user(), 'gm'),
   );
 
@@ -45,6 +46,8 @@ export class EditProfile {
         return this.i18n.profileTabLabel();
       case 'gm-profile':
         return this.i18n.gmProfileTabLabel();
+      case 'gm-sessions':
+        return this.i18n.gmSessionsTabLabel();
     }
   }
 
@@ -57,7 +60,8 @@ export class EditProfile {
       case 'profile':
         return true;
       case 'gm-profile':
-        return this.canSeeGmProfileTab();
+      case 'gm-sessions':
+        return this.canSeeGmTabs();
     }
   }
 }

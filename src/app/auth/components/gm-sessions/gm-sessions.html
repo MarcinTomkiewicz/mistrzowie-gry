@@ -1,0 +1,124 @@
+<header class="mg-section__header w-100 m-sm">
+  <h2 class="mg-section__title mg-section__title--md">
+    <span>{{ i18n.title() }}</span>
+  </h2>
+
+  <p class="mg-section__subtitle">
+    {{ i18n.subtitle() }}
+  </p>
+</header>
+
+@if (isLoading()) {
+  <div class="w-100 flex-row-center-center">
+    <i class="pi pi-spin pi-spinner"></i>
+  </div>
+} @else {
+  <div class="flex-col-start-center w-100 gap-md">
+    @if (isFormVisible()) {
+      <app-session-form
+        [initial]="initialFormData()"
+        [systems]="systems()"
+        [styles]="styles()"
+        [triggers]="triggers()"
+        [busy]="isSubmitting()"
+        [submitLabel]="isEditing() ? i18n.actionsUpdateLabel() : i18n.actionsCreateLabel()"
+        [cancelLabel]="i18n.commonActions().cancel"
+        (save)="saveSession($event)"
+        (cancel)="cancelEdition()"
+      />
+    } @else {
+      <div class="w-100 flex-row-center-center">
+        <p-button
+          severity="success"
+          [label]="i18n.actionsAddLabel()"
+          [icon]="'pi pi-plus'"
+          (onClick)="startCreate()"
+        />
+      </div>
+    }
+
+    @if (sortedSessions().length) {
+      <div class="w-100 flex-col-start-center gap-sm">
+        @for (session of sortedSessions(); track trackSession($index, session)) {
+          <article class="mg-card w-80 p-md flex-col-start-stretch gap-sm">
+            <div class="flex-row-between-start gap-sm">
+              <div class="flex-col-start-stretch gap-xs">
+                <h3 class="mg-section__title mg-section__title--sm m-0">
+                  {{ session.title }}
+                </h3>
+
+                @if (session.system) {
+                  <small>{{ session.system.name }}</small>
+                }
+              </div>
+
+              <div class="flex-row-end-center gap-xs">
+                <p-button
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="i18n.commonActions().edit"
+                  [icon]="'pi pi-pencil'"
+                  [disabled]="isSubmitting()"
+                  (onClick)="startEdit(session.id)"
+                />
+
+                <p-button
+                  severity="danger"
+                  [outlined]="true"
+                  [label]="i18n.commonActions().delete"
+                  [icon]="'pi pi-trash'"
+                  [disabled]="isSubmitting()"
+                  (onClick)="deleteSession(session.id)"
+                />
+              </div>
+            </div>
+
+            <div class="flex-row-start-center gap-xs flex-wrap">
+              <small>{{ resolveDifficultyLabel(session.difficultyLevel) }}</small> - 
+              <small>{{ i18n.playersLabel(session.minPlayers, session.maxPlayers) }}</small> - 
+              <small>{{ i18n.minAgeLabel(session.minAge) }}</small>
+            </div>
+
+            <p class="m-0">
+              {{ session.description }}
+            </p>
+
+            @if (session.styles.length) {
+              <div class="flex-col-start-stretch gap-xs">
+                <small>{{ i18n.stylesLabel() }}</small>
+
+                <div class="flex-row-start-center gap-xs flex-wrap">
+                  @for (style of session.styles; track style.id) {
+                    <span class="tag-badge tag-badge--arcane">{{ style.label }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (session.triggers.length) {
+              <div class="flex-col-start-stretch gap-xs">
+                <small>{{ i18n.triggersLabel() }}</small>
+
+                <div class="flex-row-start-center gap-xs flex-wrap">
+                  @for (trigger of session.triggers; track trigger.id) {
+                    <span class="tag-badge tag-badge--muted">{{ trigger.label }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    } @else if (!isFormVisible()) {
+      <div class="mg-card w-80 p-md flex-col-start-stretch gap-xs">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.emptyTitle() }}
+        </h3>
+
+        <p class="m-0">
+          {{ i18n.emptyDescription() }}
+        </p>
+      </div>
+    }
+  </div>
+}

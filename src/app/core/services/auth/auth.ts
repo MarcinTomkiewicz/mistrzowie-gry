@@ -234,6 +234,24 @@ export class Auth {
     );
   }
 
+  debugSessionClaims(): void {
+  from(this.supabase.auth.getSession()).subscribe({
+    next: ({ data }) => {
+      const token = data.session?.access_token ?? null;
+      const payload = token
+        ? JSON.parse(atob(token.split('.')[1]))
+        : null;
+
+      console.log('SESSION USER', data.session?.user);
+      console.log('APP METADATA', data.session?.user?.app_metadata);
+      console.log('JWT PAYLOAD', payload);
+    },
+    error: (error) => {
+      console.error('[AUTH DEBUG SESSION CLAIMS ERROR]', error);
+    },
+  });
+}
+
   private loadProfile(id: string): Observable<IUser | null> {
     return this.backend.getById<IUser>('users', id).pipe(
       tap((user) => {

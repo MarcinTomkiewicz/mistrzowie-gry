@@ -1,0 +1,226 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  novalidate
+  class="mg-form flex-col-start-center w-100 gap-sm"
+>
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="session-title"
+        name="session-title"
+        formControlName="title"
+        autocomplete="off"
+      />
+      <label for="session-title">{{ i18n.titleLabel() }}</label>
+    </p-iftalabel>
+
+    @if (showRequiredError('title')) {
+      <small>{{ i18n.commonForm().required }}</small>
+    }
+  </div>
+
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <p-select
+        inputId="session-system-id"
+        formControlName="systemId"
+        optionLabel="name"
+        optionValue="id"
+        [options]="systemOptions()"
+        appendTo="body"
+        class="w-100"
+      />
+      <label for="session-system-id">{{ i18n.systemLabel() }}</label>
+    </p-iftalabel>
+
+    @if (showRequiredError('systemId')) {
+      <small>{{ i18n.commonForm().required }}</small>
+    }
+  </div>
+
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <p-select
+        inputId="session-difficulty-level"
+        formControlName="difficultyLevel"
+        optionLabel="label"
+        optionValue="value"
+        [options]="difficultyOptions()"
+        appendTo="body"
+        class="w-100"
+      />
+      <label for="session-difficulty-level">{{ i18n.difficultyLabel() }}</label>
+    </p-iftalabel>
+
+    @if (showRequiredError('difficultyLevel')) {
+      <small>{{ i18n.commonForm().required }}</small>
+    }
+  </div>
+
+  <div class="w-80 flex-row-between-start gap-sm">
+    <div class="w-100">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          inputId="session-min-players"
+          formControlName="minPlayers"
+          [min]="1"
+          [max]="5"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+        <label for="session-min-players">{{ i18n.minPlayersLabel() }}</label>
+      </p-iftalabel>
+
+      @if (showMinPlayersError()) {
+        <small>{{ i18n.playersRangeLabel() }}</small>
+      }
+    </div>
+
+    <div class="w-100">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          inputId="session-max-players"
+          formControlName="maxPlayers"
+          [min]="1"
+          [max]="5"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+        <label for="session-max-players">{{ i18n.maxPlayersLabel() }}</label>
+      </p-iftalabel>
+
+      @if (showMaxPlayersError()) {
+        <small>{{ i18n.playersRangeLabel() }}</small>
+      }
+    </div>
+  </div>
+
+  @if (showPlayersRangeError()) {
+    <div class="w-80">
+      <small>{{ i18n.invalidPlayersRangeError() }}</small>
+    </div>
+  }
+
+  <div class="w-80 flex-row-between-start gap-sm">
+    <div class="w-100">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          inputId="session-min-age"
+          formControlName="minAge"
+          [min]="0"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+        <label for="session-min-age">{{ i18n.minAgeLabel() }}</label>
+      </p-iftalabel>
+
+      @if (showMinAgeError()) {
+        <small>{{ i18n.minAgeRangeLabel() }}</small>
+      }
+    </div>
+
+    <div class="w-100">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          inputId="session-sort-order"
+          formControlName="sortOrder"
+          [min]="0"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+        <label for="session-sort-order">{{ i18n.sortOrderLabel() }}</label>
+      </p-iftalabel>
+
+      @if (showSortOrderError()) {
+        <small>{{ i18n.sortOrderRangeLabel() }}</small>
+      }
+    </div>
+  </div>
+
+  <div class="w-80">
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        class="w-100"
+        id="session-description"
+        name="session-description"
+        formControlName="description"
+        rows="6"
+        autocomplete="off"
+      ></textarea>
+      <label for="session-description">{{ i18n.descriptionLabel() }}</label>
+    </p-iftalabel>
+
+    @if (showRequiredError('description')) {
+      <small>{{ i18n.commonForm().required }}</small>
+    }
+  </div>
+
+  <div class="w-80">
+    <app-file-upload
+      [currentUrl]="storedImageUrl()"
+      [chooseLabel]="i18n.commonForm().fileUpload.chooseImage"
+      [clearLabel]="i18n.commonActions().clear"
+      [dropLabel]="i18n.commonForm().fileUpload.dropImage"
+      [formatsLabel]="i18n.commonForm().fileUpload.imageFormats"
+      [previewAlt]="i18n.commonForm().fileUpload.imagePreviewAlt"
+      [disabled]="isSubmitting()"
+      (valueChange)="onImageValueChange($event)"
+      (removeStored)="onRemoveStoredImage()"
+    />
+
+    @if (showRequiredError('image')) {
+      <small>{{ i18n.commonForm().required }}</small>
+    }
+  </div>
+
+  <div class="w-80 flex-col-start-stretch gap-xs">
+    <label for="session-style-ids">{{ i18n.stylesLabel() }}</label>
+
+    <app-chip-picker
+      [options]="styleOptions()"
+      [selected]="form.controls.gmStyleIds.getRawValue()"
+      [searchable]="false"
+      (selectedChange)="onStylesChange($event)"
+    />
+  </div>
+
+  <div class="w-80 flex-col-start-stretch gap-xs">
+    <label for="session-trigger-ids">{{ i18n.triggersLabel() }}</label>
+
+    <app-chip-picker
+      [options]="triggerOptions()"
+      [selected]="form.controls.triggerIds.getRawValue()"
+      [searchable]="true"
+      (selectedChange)="onTriggersChange($event)"
+    />
+  </div>
+
+  <div class="w-100 flex-row-center-center gap-sm">
+    <p-button
+      severity="success"
+      [label]="submitLabel()"
+      type="submit"
+      loadingIcon="pi pi-d20"
+      [icon]="'pi pi-scroll-quill'"
+      [loading]="isSubmitting()"
+    />
+
+    <p-button
+      severity="secondary"
+      type="button"
+      [label]="cancelLabel()"
+      [outlined]="true"
+      [disabled]="isSubmitting()"
+      [icon]="'pi pi-times'"
+      (onClick)="onCancel()"
+    />
+  </div>
+</form>
