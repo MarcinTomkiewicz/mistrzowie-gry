@@ -6,14 +6,13 @@ import { finalize, forkJoin } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
 
 import {
   ICreateSessionPayload,
   ISessionFormData,
+  ISessionListLabels,
   ISessionWithRelations,
   IUpdateSessionPayload,
 } from '../../../core/interfaces/i-session';
@@ -27,9 +26,9 @@ import {
 import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { SessionForm } from '../../common/session-form/session-form';
-import { SessionDetails } from '../../common/session-details/session-details';
 import { createGmSessionsI18n } from './gm-sessions.i18n';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { SessionList } from '../../../public/common/session-list/session-list';
 
 interface ISessionSystemOption {
   id: string | null;
@@ -42,13 +41,11 @@ interface ISessionSystemOption {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    AccordionModule,
     ButtonModule,
     SelectModule,
-    TableModule,
     SessionForm,
-    SessionDetails,
     LoadingOverlay,
+    SessionList,
   ],
   templateUrl: './gm-sessions.html',
   styleUrl: './gm-sessions.scss',
@@ -162,6 +159,16 @@ export class GmSessions {
       ) as Record<SessionDifficultyLevel, string>;
     },
   );
+
+  readonly sessionListLabels = computed<ISessionListLabels>(() => ({
+    systemLabel: this.i18n.sessionForm().systemLabel,
+    titleLabel: this.i18n.sessionForm().titleLabel,
+    difficultyLabel: this.i18n.sessionForm().difficultyLabel,
+    playersLabel: this.i18n.form().playersHeaderLabel,
+    minAgeLabel: this.i18n.form().minAgeHeaderLabel,
+    editLabel: this.i18n.commonActions().edit,
+    deleteLabel: this.i18n.commonActions().delete,
+  }));
 
   constructor() {
     this.loadData();

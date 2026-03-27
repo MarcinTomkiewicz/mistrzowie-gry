@@ -71,3 +71,13 @@ export interface ISessionWithRelations extends ISession {
   triggers: IContentTrigger[];
   styles: IGmStyle[];
 }
+
+export interface ISessionListLabels {
+  systemLabel: string;
+  titleLabel: string;
+  difficultyLabel: string;
+  playersLabel: string;
+  minAgeLabel: string;
+  editLabel: string;
+  deleteLabel: string;
+}

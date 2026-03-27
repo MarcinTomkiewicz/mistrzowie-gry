@@ -1,0 +1,174 @@
+<div class="w-100 hide-down-sm">
+  <p-table
+    [value]="sortedSessions()"
+    dataKey="id"
+    [paginator]="true"
+    [rows]="rows()"
+    [rowsPerPageOptions]="rowsPerPageOptions()"
+    class="w-100"
+  >
+    <ng-template #header>
+      <tr>
+        <th></th>
+        <th class="small-caps">{{ labels().systemLabel }}</th>
+        <th class="small-caps">{{ labels().titleLabel }}</th>
+        <th class="small-caps">{{ labels().difficultyLabel }}</th>
+        <th class="small-caps">{{ labels().playersLabel }}</th>
+        <th class="small-caps">{{ labels().minAgeLabel }}</th>
+        @if (hasActions()) {
+          <th class="w-10"></th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-session let-expanded="expanded">
+      <tr>
+        <td>
+          <p-button
+            type="button"
+            severity="secondary"
+            [pRowToggler]="session"
+            [text]="true"
+            [rounded]="true"
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+          />
+        </td>
+
+        <td>{{ session.system?.name ?? "—" }}</td>
+        <td>{{ session.title }}</td>
+        <td>{{ resolveDifficultyLabel()(session.difficultyLevel) }}</td>
+        <td>{{ playersLabel()(session.minPlayers, session.maxPlayers) }}</td>
+        <td>{{ minAgeLabel()(session.minAge) }}</td>
+
+        @if (hasActions()) {
+          <td>
+            <div class="flex-row-end-center flex-col-center-center-md gap-xs">
+              <p-button
+                severity="secondary"
+                [outlined]="true"
+                [label]="labels().editLabel"
+                [icon]="'pi pi-quill'"
+                [disabled]="busy()"
+                size="small"
+                (onClick)="onEdit(session.id)"
+              />
+
+              <p-button
+                severity="danger"
+                [outlined]="true"
+                [label]="labels().deleteLabel"
+                [icon]="'pi pi-demolish'"
+                [disabled]="busy()"
+                size="small"
+                (onClick)="onDelete(session.id)"
+              />
+            </div>
+          </td>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #expandedrow let-session>
+      <tr>
+        <td [attr.colspan]="colspan()">
+          <app-session-details [session]="session" />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td [attr.colspan]="colspan()">
+          <div class="flex-col-start-stretch gap-xs p-md">
+            <h3 class="mg-section__title mg-section__title--sm m-0">
+              {{ emptyTitle() }}
+            </h3>
+
+            <p class="m-0 lh-md">
+              {{ emptyDescription() }}
+            </p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<div class="w-100 show-down-sm">
+  @if (sortedSessions().length) {
+    <p-accordion>
+      @for (session of sortedSessions(); track session.id) {
+        <p-accordion-panel [value]="session.id">
+          <p-accordion-header class="mg-section__title mg-section__title--md">
+            <div
+              class="flex-row-start-stretch flex-col-start-center-xs w-100 gap-xs pr-sm"
+            >
+              <strong class="small-caps">{{ session.title }}</strong>
+              <span class="hide-down-xs">-</span>
+              <span class="small-caps">{{ session.system?.name }}</span>
+            </div>
+          </p-accordion-header>
+
+          <p-accordion-content>
+            <div class="flex-col-start-stretch gap-sm">
+              <div class="flex-col-start-stretch gap-xs">
+                <div>
+                  <strong>{{ labels().difficultyLabel }}:</strong>
+                  {{ resolveDifficultyLabel()(session.difficultyLevel) }}
+                </div>
+
+                <div>
+                  <strong>{{ labels().playersLabel }}:</strong>
+                  {{ playersLabel()(session.minPlayers, session.maxPlayers) }}
+                </div>
+
+                <div>
+                  <strong>{{ labels().minAgeLabel }}:</strong>
+                  {{ minAgeLabel()(session.minAge) }}
+                </div>
+              </div>
+
+              @if (hasActions()) {
+                <div
+                  class="flex-row-center-center flex-row-center-stretch-xs gap-xs"
+                >
+                  <p-button
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="labels().editLabel"
+                    [icon]="'pi pi-quill'"
+                    [disabled]="busy()"
+                    size="small"
+                    (onClick)="onEdit(session.id)"
+                  />
+
+                  <p-button
+                    severity="danger"
+                    [outlined]="true"
+                    [label]="labels().deleteLabel"
+                    [icon]="'pi pi-demolish'"
+                    [disabled]="busy()"
+                    size="small"
+                    (onClick)="onDelete(session.id)"
+                  />
+                </div>
+              }
+
+              <app-session-details [session]="session" />
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+      }
+    </p-accordion>
+  } @else {
+    <div class="flex-col-start-stretch gap-xs p-md">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ emptyTitle() }}
+      </h3>
+
+      <p class="m-0 lh-md">
+        {{ emptyDescription() }}
+      </p>
+    </div>
+  }
+</div>

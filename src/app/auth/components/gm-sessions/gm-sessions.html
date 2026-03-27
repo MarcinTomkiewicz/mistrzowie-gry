@@ -54,167 +54,20 @@
     </div>
   }
 
-  <div class="w-100 hide-down-sm">
-    <p-table
-      [value]="filteredSessions()"
-      dataKey="id"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="rowsPerPageOptions"
-    >
-      <ng-template #header>
-        <tr>
-          <th></th>
-          <th class="small-caps">{{ i18n.sessionForm().systemLabel }}</th>
-          <th class="small-caps">{{ i18n.sessionForm().titleLabel }}</th>
-          <th class="small-caps">{{ i18n.sessionForm().difficultyLabel }}</th>
-          <th class="small-caps">{{ i18n.form().playersHeaderLabel }}</th>
-          <th class="small-caps">{{ i18n.form().minAgeHeaderLabel }}</th>
-          <th class="w-10"></th>
-        </tr>
-      </ng-template>
-
-      <ng-template #body let-session let-expanded="expanded">
-        <tr>
-          <td>
-            <p-button
-              type="button"
-              severity="secondary"
-              [pRowToggler]="session"
-              [text]="true"
-              [rounded]="true"
-              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-            />
-          </td>
-
-          <td>{{ session.system?.name ?? "—" }}</td>
-          <td>{{ session.title }}</td>
-          <td>{{ resolveDifficultyLabel(session.difficultyLevel) }}</td>
-          <td>
-            {{ i18n.playersLabel(session.minPlayers, session.maxPlayers) }}
-          </td>
-          <td>{{ i18n.minAgeLabel(session.minAge) }}</td>
-          <td>
-            <div class="flex-row-end-center flex-col-center-center-md gap-xs">
-              <p-button
-                severity="secondary"
-                [outlined]="true"
-                [label]="i18n.commonActions().edit"
-                [icon]="'pi pi-quill'"
-                [disabled]="isSubmitting()"
-                size="small"
-                (onClick)="startEdit(session.id)"
-              />
-
-              <p-button
-                severity="danger"
-                [outlined]="true"
-                [label]="i18n.commonActions().delete"
-                [icon]="'pi pi-demolish'"
-                [disabled]="isSubmitting()"
-                size="small"
-                (onClick)="deleteSession(session.id)"
-              />
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template #expandedrow let-session>
-        <tr>
-          <td colspan="7">
-            <app-session-details [session]="session" />
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="7">
-            <div class="flex-col-start-stretch gap-xs p-md">
-              <h3 class="mg-section__title mg-section__title--sm m-0">
-                {{ i18n.empty().title }}
-              </h3>
-
-              <p class="m-0 lh-md">
-                {{ i18n.empty().description }}
-              </p>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-
-  <div class="w-100 show-down-sm">
-    @if (filteredSessions().length) {
-      <p-accordion>
-        @for (session of filteredSessions(); track session.id) {
-          <p-accordion-panel [value]="session.id">
-            <p-accordion-header class="mg-section__title mg-section__title--md">
-              <div class="flex-row-start-stretch flex-col-start-center-xs w-100 gap-xs pr-sm">
-                <strong class="small-caps">{{ session.title }}</strong> <span class="hide-down-xs">-</span>
-                <span class="small-caps">{{ session.system?.name }}</span>
-              </div>
-            </p-accordion-header>
-
-            <p-accordion-content>
-              <div class="flex-col-start-stretch gap-sm">
-                <div class="flex-col-start-stretch gap-xs">
-                  <div>
-                    <strong>{{ i18n.sessionForm().difficultyLabel }}:</strong>
-                    {{ resolveDifficultyLabel(session.difficultyLevel) }}
-                  </div>
-
-                  <div>
-                    <strong>{{ i18n.form().playersHeaderLabel }}:</strong>
-                    {{ i18n.playersLabel(session.minPlayers, session.maxPlayers) }}
-                  </div>
-
-                  <div>
-                    <strong>{{ i18n.form().minAgeHeaderLabel }}:</strong>
-                    {{ i18n.minAgeLabel(session.minAge) }}
-                  </div>
-                </div>
-
-                <div class="flex-row-center-center flex-row-center-stretch-xs gap-xs">
-                  <p-button
-                    severity="secondary"
-                    [outlined]="true"
-                    [label]="i18n.commonActions().edit"
-                    [icon]="'pi pi-quill'"
-                    [disabled]="isSubmitting()"
-                    size="small"
-                    (onClick)="startEdit(session.id)"
-                  />
-
-                  <p-button
-                    severity="danger"
-                    [outlined]="true"
-                    [label]="i18n.commonActions().delete"
-                    [icon]="'pi pi-demolish'"
-                    [disabled]="isSubmitting()"
-                    size="small"
-                    (onClick)="deleteSession(session.id)"
-                  />
-                </div>
-
-                <app-session-details [session]="session" />
-              </div>
-            </p-accordion-content>
-          </p-accordion-panel>
-        }
-      </p-accordion>
-    } @else {
-      <div class="flex-col-start-stretch gap-xs p-md">
-        <h3 class="mg-section__title mg-section__title--sm m-0">
-          {{ i18n.empty().title }}
-        </h3>
-
-        <p class="m-0 lh-md">
-          {{ i18n.empty().description }}
-        </p>
-      </div>
-    }
-  </div>
+  <app-session-list
+    class="w-100"
+    [sessions]="filteredSessions()"
+    [labels]="sessionListLabels()"
+    [emptyTitle]="i18n.empty().title"
+    [emptyDescription]="i18n.empty().description"
+    [rows]="10"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [showActions]="true"
+    [busy]="isSubmitting()"
+    [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
+    [playersLabel]="i18n.playersLabel"
+    [minAgeLabel]="i18n.minAgeLabel"
+    (edit)="startEdit($event)"
+    (delete)="deleteSession($event)"
+  />
 </div>
