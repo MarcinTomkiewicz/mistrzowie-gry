@@ -5,9 +5,21 @@
   },
   "seo": {
     "title": "Poznaj naszych Mistrzów Gry",
-    "description": "Mistrzowie Gry organizują Twoje doświadczenie. To do nich należy przygotowanie sesji RPG i odpowiedź na pytanie jak zacząć grać. Tworzą scenariusze do sesji i postacie."
+    "description": "Do naszych Mistrzów Gry należy przygotowanie sesji RPG i odpowiedź na pytanie jak zacząć grać. Tworzą scenariusze do sesji, postacie i dbają o Twój komfort."
   },
   "card": {
     "imageAltPrefix": "Zdjęcie profilowe:"
+  },
+  "dialog": {
+    "profileTabLabel": "Profil",
+    "sessionsTabLabel": "Sesje standardowe",
+    "experienceLabel": "Doświadczenie",
+    "quoteLabel": "Motto",
+    "descriptionLabel": "Opis",
+    "systemsLabel": "Prowadzone systemy",
+    "stylesLabel": "Style prowadzenia",
+    "languagesLabel": "Języki",
+    "yearsSuffix": "lat",
+    "noData": "Nie podano"
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -11,12 +11,13 @@ import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
+import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createOurTeamI18n } from './our-team.i18n';
 
 @Component({
   selector: 'app-our-team',
   standalone: true,
-  imports: [CommonModule, LoadingOverlay],
+  imports: [CommonModule, LoadingOverlay, GmProfileDialog],
   templateUrl: './our-team.html',
   styleUrl: './our-team.scss',
   providers: [provideTranslocoScope('ourTeam', 'common')],
@@ -28,6 +29,9 @@ export class OurTeam {
 
   readonly i18n = createOurTeamI18n();
   readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
+
+  readonly isDialogVisible = signal(false);
+  readonly selectedProfile = signal<IGmPublicProfile | null>(null);
 
   readonly profiles = toSignal(
     this.gmRead.getPublicProfiles().pipe(
@@ -80,6 +84,19 @@ export class OurTeam {
       },
     });
   });
+
+  openProfileDialog(profile: IGmPublicProfile): void {
+    this.selectedProfile.set(profile);
+    this.isDialogVisible.set(true);
+  }
+
+  onDialogVisibleChange(visible: boolean): void {
+    this.isDialogVisible.set(visible);
+
+    if (!visible) {
+      this.selectedProfile.set(null);
+    }
+  }
 
   private getImageUrl(profile: IGmPublicProfile): string | null {
     const imagePath = normalizeText(profile.profile.image);

@@ -1,4 +1,6 @@
+@use "sass:map";
 @use "../abstracts/variables" as v;
+@use "abstracts/mixins" as m;
 
 /* =========================================================
    PrimeNG — Dialog (MG)
@@ -92,7 +94,8 @@
     .p-dialog-maximize-button:focus-visible,
     .p-dialog-minimize-button:focus-visible {
       outline: 0;
-      box-shadow: 0 0 0 2px color-mix(in srgb, v.$color-secondary 35%, transparent);
+      box-shadow: 0 0 0 2px
+        color-mix(in srgb, v.$color-secondary 35%, transparent);
     }
   }
 
@@ -103,6 +106,10 @@
   .p-dialog-content {
     background: v.$color-bg-surface;
     color: v.$color-text;
+
+    @include m.down("xs") {
+      padding: map.get(v.$spacings, "sm");
+    }
   }
 
   .p-dialog-footer {

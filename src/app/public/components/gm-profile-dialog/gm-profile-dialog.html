@@ -1,0 +1,210 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [styleClass]="'mg-dialog mg-dialog--xl'"
+  [maximizable]="true"
+  maximizeIcon="pi pi-expand"
+  minimizeIcon="pi pi-contract"
+>
+  <ng-template pTemplate="header">
+    <h2 class="mg-section__title m-0">
+      {{ displayName() }}
+    </h2>
+  </ng-template>
+
+  @if (profile(); as gm) {
+    <p-tabs [value]="activeTab()" lazy class="w-100">
+      <div class="hide-down-xs">
+        <p-tablist>
+          @for (tab of tabs(); track trackTab($index, tab)) {
+            <p-tab [value]="tab.id" (click)="onTabChange(tab.id)">
+              <span class="flex-row-center-center gap-xs">
+                <i [class]="tab.icon"></i>
+                <span>{{ resolveTabLabel(tab.id) }}</span>
+              </span>
+            </p-tab>
+          }
+        </p-tablist>
+      </div>
+
+      <div class="show-down-xs mb-md">
+        <p-select
+          [options]="tabOptions()"
+          [formControl]="mobileTabControl"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          class="w-100"
+          (onChange)="onMobileTabChange($event.value)"
+        >
+          <ng-template #selectedItem let-option>
+            @if (option) {
+              <span class="flex-row-start-center gap-xs">
+                <i [class]="option.icon"></i>
+                <span>{{ option.label }}</span>
+              </span>
+            }
+          </ng-template>
+
+          <ng-template #item let-option>
+            <span class="flex-row-start-center gap-xs">
+              <i [class]="option.icon"></i>
+              <span>{{ option.label }}</span>
+            </span>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <p-tabpanels>
+        <p-tabpanel value="profile">
+          <div class="flex-col-start-stretch gap-md">
+            <div
+              class="flex-row-start-stretch flex-col-start-center-sm gap-lg w-100"
+            >
+              <div class="mg-card flex-row-center-center w-100-sm">
+                <div
+                  class="gm-profile-dialog__avatar-wrap"
+                >
+                  <img
+                    class="gm-profile-dialog__avatar"
+                    [src]="imageUrl() || placeholderImageSrc"
+                    [alt]="displayName()"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+
+              <div class="mg-card flex-1 min-w-0 flex-col-start-stretch gap-md w-100-sm">
+                <div class="flex-row-start-center flex-wrap gap-sm">
+                  <h3 class="mg-section__title mg-section__title--sm m-0">
+                    {{ displayName() }}
+                  </h3>
+
+                  @if (profileLanguageFlags().length) {
+                    <div class="flex-row-start-center flex-wrap gap-xs">
+                      @for (
+                        language of profileLanguageFlags();
+                        track language.id
+                      ) {
+                        @if (language.className) {
+                          <span
+                            [class]="language.className"
+                            [attr.aria-label]="language.label"
+                            [attr.title]="language.label"
+                          ></span>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div>
+                  <strong>{{ i18n.dialog().experienceLabel }}:</strong>
+                  @if (gm.profile.experience != null) {
+                    {{ i18n.yearsLabel(gm.profile.experience) }}
+                  } @else {
+                    {{ i18n.dialog().noData }}
+                  }
+                </div>
+
+                <div>
+                  <strong>{{ i18n.dialog().quoteLabel }}:</strong>
+                  @if (gm.profile.quote?.trim()) {
+                    <em>{{ gm.profile.quote }}</em>
+                  } @else {
+                    {{ i18n.dialog().noData }}
+                  }
+                </div>
+
+                <div class="flex-col-start-stretch gap-xs">
+                  <div class="mg-section__title mg-section__title--xs">
+                    {{ i18n.dialog().systemsLabel }}
+                  </div>
+
+                  @if (systems().length) {
+                    <div class="flex-row-start-center flex-wrap gap-xs">
+                      @for (system of systems(); track system) {
+                        <span class="tag-badge tag-badge--muted">
+                          {{ system }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <p
+                      class="mg-section__subtitle mg-section__subtitle--no-margin"
+                    >
+                      {{ i18n.dialog().noData }}
+                    </p>
+                  }
+                </div>
+
+                <div class="flex-col-start-stretch gap-xs">
+                  <div class="mg-section__title mg-section__title--xs">
+                    {{ i18n.dialog().stylesLabel }}
+                  </div>
+
+                  @if (gm.profile.styles.length) {
+                    <div class="flex-row-start-center flex-wrap gap-xs">
+                      @for (style of gm.profile.styles; track style.id) {
+                        <span class="tag-badge tag-badge--arcane">
+                          {{ style.label }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <p
+                      class="mg-section__subtitle mg-section__subtitle--no-margin"
+                    >
+                      {{ i18n.dialog().noData }}
+                    </p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="mg-card">
+              <div class="mg-section__title mg-section__title--xs">
+                {{ i18n.dialog().descriptionLabel }}
+              </div>
+
+              <p
+                class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mt-sm"
+              >
+                {{ gm.profile.description || i18n.dialog().noData }}
+              </p>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="sessions">
+          <app-session-list
+            [sessions]="gm.sessions"
+            [labels]="sessionListLabels()"
+            [emptyTitle]="i18n.commonEmpty().title"
+            [emptyDescription]="i18n.commonEmpty().description"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            [showActions]="false"
+            [busy]="false"
+            [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
+            [playersLabel]="i18n.playersLabel"
+            [minAgeLabel]="i18n.minAgeLabel"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="mt-md">
+      <p-button
+        [label]="i18n.commonActions().close"
+        severity="secondary"
+        [outlined]="true"
+        (click)="close()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

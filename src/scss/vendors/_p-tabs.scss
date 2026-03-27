@@ -1,3 +1,7 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
 :where(.p-tabs) {
   .p-tablist {
     background: var(--mg-form-bg);
@@ -28,5 +32,8 @@
     background: var(--mg-form-bg);
     color: var(--mg-form-text);
     border-color: var(--mg-form-border);
+    @include m.down("xs") {
+      padding: map.get(v.$spacings, "sm");
+    }
   }
 }
