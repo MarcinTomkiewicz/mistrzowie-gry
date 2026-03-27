@@ -21,7 +21,14 @@
         [attr.aria-pressed]="isSelected(option.id)"
         (click)="toggle(option.id)"
       >
-        {{ option.label }}
+        @if (option.iconClassName) {
+          <span
+            [class]="`${resolveIconClassNames(option).join(' ')} mr-xs`"
+            aria-hidden="true"
+          ></span>
+        }
+
+        <span class="chip-picker__label">{{ option.label }}</span>
       </button>
     }
   </div>

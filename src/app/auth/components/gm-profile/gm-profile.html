@@ -98,6 +98,17 @@
     </div>
 
     <div class="w-80 w-100-xs flex-col-start-stretch gap-xs">
+      <label for="gm-language-ids">{{ i18n.form().languagesLabel }}</label>
+
+      <app-chip-picker
+        [options]="languageOptions()"
+        [selected]="form.controls.languageIds.getRawValue()"
+        [searchable]="false"
+        (selectedChange)="onLanguagesChange($event)"
+      />
+    </div>
+
+    <div class="w-80 w-100-xs flex-col-start-stretch gap-xs">
       <label for="gm-style-ids">{{ i18n.form().stylesLabel }}</label>
 
       <app-chip-picker

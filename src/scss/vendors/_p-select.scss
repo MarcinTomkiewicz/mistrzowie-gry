@@ -1,4 +1,4 @@
-:where(.mg-form, form, .mg-card form) {
+:where(.mg-form, form, .mg-card form, div) {
   .p-select {
     background: var(--mg-form-bg);
     color: var(--mg-form-text);

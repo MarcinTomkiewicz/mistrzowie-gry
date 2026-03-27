@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
+import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 
 import {
@@ -16,7 +20,10 @@ import {
 import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
 import { IGmStyle } from '../../../core/interfaces/i-gm-style';
 import { ISystem } from '../../../core/interfaces/i-system';
-import { SessionDifficultyLevel } from '../../../core/types/sessions';
+import {
+  SESSION_DIFFICULTY_LEVEL_OPTIONS,
+  SessionDifficultyLevel,
+} from '../../../core/types/sessions';
 import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { SessionForm } from '../../common/session-form/session-form';
@@ -24,12 +31,20 @@ import { SessionDetails } from '../../common/session-details/session-details';
 import { createGmSessionsI18n } from './gm-sessions.i18n';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 
+interface ISessionSystemOption {
+  id: string | null;
+  name: string;
+}
+
 @Component({
   selector: 'app-gm-sessions',
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
+    AccordionModule,
     ButtonModule,
+    SelectModule,
     TableModule,
     SessionForm,
     SessionDetails,
@@ -50,20 +65,31 @@ export class GmSessions {
 
   readonly sessions = signal<ISessionWithRelations[]>([]);
   readonly systems = signal<ISystem[]>([]);
+  readonly mySessionSystems = signal<ISystem[]>([]);
   readonly styles = signal<IGmStyle[]>([]);
   readonly triggers = signal<IContentTrigger[]>([]);
+
+  readonly systemFilterControl = new FormControl<string | null>(null);
+  private readonly selectedSystemId = toSignal(this.systemFilterControl.valueChanges, {
+    initialValue: this.systemFilterControl.getRawValue(),
+  });
 
   readonly editedSessionId = signal<string | null>(null);
   readonly isCreateMode = signal(false);
 
   readonly rowsPerPageOptions = [10, 20, 50];
 
-  readonly editedSession = computed(() =>
-    this.sessions().find((session) => session.id === this.editedSessionId()) ?? null,
+  readonly editedSession = computed(
+    () =>
+      this.sessions().find(
+        (session) => session.id === this.editedSessionId(),
+      ) ?? null,
   );
 
   readonly isEditing = computed(() => !!this.editedSessionId());
-  readonly isFormVisible = computed(() => this.isCreateMode() || this.isEditing());
+  readonly isFormVisible = computed(
+    () => this.isCreateMode() || this.isEditing(),
+  );
 
   readonly initialFormData = computed<Partial<ISessionFormData> | null>(() => {
     const session = this.editedSession();
@@ -101,6 +127,42 @@ export class GmSessions {
     }),
   );
 
+  readonly filteredSessions = computed(() => {
+    const selectedSystemId = this.selectedSystemId();
+
+    if (!selectedSystemId) {
+      return this.tableSessions();
+    }
+
+    return this.tableSessions().filter(
+      (session) => session.systemId === selectedSystemId,
+    );
+  });
+
+  readonly systemFilterOptions = computed<ISessionSystemOption[]>(() => [
+    {
+      id: null,
+      name: this.i18n.form().systemFilterAllLabel,
+    },
+    ...this.mySessionSystems().map((system) => ({
+      id: system.id,
+      name: system.name,
+    })),
+  ]);
+
+  readonly difficultyLabels = computed<Record<SessionDifficultyLevel, string>>(
+    () => {
+      const difficulty = this.i18n.difficulty();
+
+      return Object.fromEntries(
+        SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => [
+          option.value,
+          difficulty[option.i18nKey],
+        ]),
+      ) as Record<SessionDifficultyLevel, string>;
+    },
+  );
+
   constructor() {
     this.loadData();
   }
@@ -123,40 +185,45 @@ export class GmSessions {
   saveSession(payload: ICreateSessionPayload | IUpdateSessionPayload): void {
     this.isSubmitting.set(true);
 
-    const request$ = this.isEditing() && this.editedSessionId()
-      ? this.gmSessionsFacade.updateMySessionTemplate(this.editedSessionId()!, payload)
-      : this.gmSessionsFacade.createMySessionTemplate(payload);
+    const request$ =
+      this.isEditing() && this.editedSessionId()
+        ? this.gmSessionsFacade.updateMySessionTemplate(
+            this.editedSessionId()!,
+            payload,
+          )
+        : this.gmSessionsFacade.createMySessionTemplate(payload);
 
-    request$
-      .pipe(finalize(() => this.isSubmitting.set(false)))
-      .subscribe({
-        next: (session) => {
-          this.sessions.update((sessions) => {
-            const hasExisting = sessions.some((item) => item.id === session.id);
+    request$.pipe(finalize(() => this.isSubmitting.set(false))).subscribe({
+      next: (session) => {
+        this.sessions.update((sessions) => {
+          const hasExisting = sessions.some((item) => item.id === session.id);
 
-            if (!hasExisting) {
-              return [...sessions, session];
-            }
+          if (!hasExisting) {
+            return [...sessions, session];
+          }
 
-            return sessions.map((item) => (item.id === session.id ? session : item));
-          });
+          return sessions.map((item) =>
+            item.id === session.id ? session : item,
+          );
+        });
 
-          this.cancelEdition();
+        this.refreshMySessionSystems();
+        this.cancelEdition();
 
-          this.toast.success({
-            summary: this.i18n.toastSaveSuccessSummary(),
-            detail: this.i18n.toastSaveSuccessDetail(),
-          });
-        },
-        error: (error) => {
-          console.error('[GM SESSIONS SAVE ERROR]', error);
+        this.toast.success({
+          summary: this.i18n.toast().saveSuccessSummary,
+          detail: this.i18n.toast().saveSuccessDetail,
+        });
+      },
+      error: (error) => {
+        console.error('[GM SESSIONS SAVE ERROR]', error);
 
-          this.toast.danger({
-            summary: this.i18n.toastSaveFailedSummary(),
-            detail: this.i18n.toastSaveFailedDetail(),
-          });
-        },
-      });
+        this.toast.danger({
+          summary: this.i18n.toast().saveFailedSummary,
+          detail: this.i18n.toast().saveFailedDetail,
+        });
+      },
+    });
   }
 
   deleteSession(sessionId: string): void {
@@ -175,31 +242,26 @@ export class GmSessions {
             this.cancelEdition();
           }
 
+          this.refreshMySessionSystems();
+
           this.toast.success({
-            summary: this.i18n.toastDeleteSuccessSummary(),
-            detail: this.i18n.toastDeleteSuccessDetail(),
+            summary: this.i18n.toast().deleteSuccessSummary,
+            detail: this.i18n.toast().deleteSuccessDetail,
           });
         },
         error: (error) => {
           console.error('[GM SESSIONS DELETE ERROR]', error);
 
           this.toast.danger({
-            summary: this.i18n.toastDeleteFailedSummary(),
-            detail: this.i18n.toastDeleteFailedDetail(),
+            summary: this.i18n.toast().deleteFailedSummary,
+            detail: this.i18n.toast().deleteFailedDetail,
           });
         },
       });
   }
 
   resolveDifficultyLabel(value: SessionDifficultyLevel): string {
-    switch (value) {
-      case SessionDifficultyLevel.Beginner:
-        return this.i18n.beginnerDifficultyLabel();
-      case SessionDifficultyLevel.Intermediate:
-        return this.i18n.intermediateDifficultyLabel();
-      case SessionDifficultyLevel.Advanced:
-        return this.i18n.advancedDifficultyLabel();
-    }
+    return this.difficultyLabels()[value];
   }
 
   private loadData(): void {
@@ -208,25 +270,57 @@ export class GmSessions {
     forkJoin({
       sessions: this.gmSessionsFacade.getMySessionTemplates(),
       systems: this.gmSessionsFacade.getAvailableSystems(),
+      mySessionSystems: this.gmSessionsFacade.getMySessionSystems(),
       styles: this.gmSessionsFacade.getAvailableStyles(),
       triggers: this.gmSessionsFacade.getAvailableTriggers(),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: ({ sessions, systems, styles, triggers }) => {
+        next: ({ sessions, systems, mySessionSystems, styles, triggers }) => {
           this.sessions.set(sessions);
           this.systems.set(systems);
+          this.mySessionSystems.set(mySessionSystems);
           this.styles.set(styles);
           this.triggers.set(triggers);
+
+          this.ensureSelectedSystemStillExists();
         },
         error: (error) => {
           console.error('[GM SESSIONS LOAD ERROR]', error);
 
           this.toast.danger({
-            summary: this.i18n.toastLoadFailedSummary(),
-            detail: this.i18n.toastLoadFailedDetail(),
+            summary: this.i18n.toast().loadFailedSummary,
+            detail: this.i18n.toast().loadFailedDetail,
           });
         },
       });
+  }
+
+  private refreshMySessionSystems(): void {
+    this.gmSessionsFacade.getMySessionSystems().subscribe({
+      next: (systems) => {
+        this.mySessionSystems.set(systems);
+        this.ensureSelectedSystemStillExists();
+      },
+      error: (error) => {
+        console.error('[GM SESSION SYSTEMS LOAD ERROR]', error);
+      },
+    });
+  }
+
+  private ensureSelectedSystemStillExists(): void {
+    const selectedSystemId = this.selectedSystemId();
+
+    if (!selectedSystemId) {
+      return;
+    }
+
+    const exists = this.mySessionSystems().some(
+      (system) => system.id === selectedSystemId,
+    );
+
+    if (!exists) {
+      this.systemFilterControl.setValue(null, { emitEvent: false });
+    }
   }
 }

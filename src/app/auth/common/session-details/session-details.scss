@@ -1,3 +1,5 @@
+@use "abstracts/mixins" as m;
+
 .image__preview {
   width: 12rem;
   aspect-ratio: 1;
@@ -20,10 +22,12 @@
   margin-bottom: 0.75rem;
 }
 
-@media (max-width: 640px) {
+@include m.down(sm) {
   .session-details__image {
     float: none;
-    margin-right: 0;
+    display: block;
+    margin-right: auto;
     margin-bottom: 0.75rem;
+    margin-left: auto;
   }
 }

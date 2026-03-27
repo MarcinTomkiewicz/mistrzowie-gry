@@ -38,7 +38,8 @@ import { ISystem } from '../../../core/interfaces/i-system';
 import { Auth } from '../../../core/services/auth/auth';
 import { Storage } from '../../../core/services/storage/storage';
 import {
-  SESSION_DIFFICULTY_LEVEL_OPTIONS
+  SESSION_DIFFICULTY_LEVEL_OPTIONS,
+  SessionDifficultyLevel,
 } from '../../../core/types/sessions';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
@@ -111,12 +112,25 @@ export class SessionForm {
     })),
   );
 
-readonly difficultyOptions = computed(() =>
-  SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => ({
-    value: option.value,
-    label: this.i18n[option.i18nKey](),
-  })),
-);
+  readonly difficultyLabels = computed<Record<SessionDifficultyLevel, string>>(
+    () => {
+      const difficulty = this.i18n.difficulty();
+
+      return Object.fromEntries(
+        SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => [
+          option.value,
+          difficulty[option.i18nKey],
+        ]),
+      ) as Record<SessionDifficultyLevel, string>;
+    },
+  );
+
+  readonly difficultyOptions = computed(() =>
+    SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => ({
+      value: option.value,
+      label: this.difficultyLabels()[option.value],
+    })),
+  );
 
   readonly storedImageUrl = computed(() => {
     if (this.selectedImageFile()) {
@@ -288,15 +302,4 @@ readonly difficultyOptions = computed(() =>
         }),
       );
   }
-
-  // private resolveDifficultyLabel(value: SessionDifficultyLevel): string {
-  //   switch (value) {
-  //     case SessionDifficultyLevel.Beginner:
-  //       return this.i18n.beginnerDifficultyLabel();
-  //     case SessionDifficultyLevel.Intermediate:
-  //       return this.i18n.intermediateDifficultyLabel();
-  //     case SessionDifficultyLevel.Advanced:
-  //       return this.i18n.advancedDifficultyLabel();
-  //   }
-  // }
 }

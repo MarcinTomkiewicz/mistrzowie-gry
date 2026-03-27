@@ -11,16 +11,46 @@
     </header>
 
     <p-tabs [value]="activeTab()" lazy>
-      <p-tablist>
-        @for (tab of tabs(); track trackTab($index, tab)) {
-          <p-tab [value]="tab.id" (click)="onTabChange(tab.id)">
-            <span class="flex-row-center-center gap-xs">
-              <i [class]="tab.icon"></i>
-              <span>{{ resolveTabLabel(tab.id) }}</span>
+      <div class="hide-down-xs">
+        <p-tablist>
+          @for (tab of tabs(); track trackTab($index, tab)) {
+            <p-tab [value]="tab.id" (click)="onTabChange(tab.id)">
+              <span class="flex-row-center-center gap-xs">
+                <i [class]="tab.icon"></i>
+                <span>{{ resolveTabLabel(tab.id) }}</span>
+              </span>
+            </p-tab>
+          }
+        </p-tablist>
+      </div>
+
+      <div class="show-down-xs mb-md">
+        <p-select
+          [options]="tabOptions()"
+          [formControl]="mobileTabControl"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          class="w-100"
+          (onChange)="onMobileTabChange($event.value)"
+        >
+          <ng-template #selectedItem let-option>
+            @if (option) {
+              <span class="flex-row-start-center gap-xs">
+                <i [class]="option.icon"></i>
+                <span>{{ option.label }}</span>
+              </span>
+            }
+          </ng-template>
+
+          <ng-template #item let-option>
+            <span class="flex-row-start-center gap-xs">
+              <i [class]="option.icon"></i>
+              <span>{{ option.label }}</span>
             </span>
-          </p-tab>
-        }
-      </p-tablist>
+          </ng-template>
+        </p-select>
+      </div>
 
       <p-tabpanels>
         <p-tabpanel value="profile">

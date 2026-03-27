@@ -162,6 +162,7 @@ export interface GmProfileFormTranslations {
   descriptionLabel: string;
   quoteLabel: string;
   stylesLabel: string;
+  languagesLabel: string;
 }
 
 export interface GmProfileErrorsTranslations {
@@ -184,4 +185,79 @@ export interface GmProfileToastTranslations {
 
 export interface GmProfileTranslations {
   title: string;
+}
+export interface GmSessionsTranslations {
+  title: string;
+  subtitle: string;
+}
+
+export interface GmSessionsActionsTranslations {
+  addLabel: string;
+  createLabel: string;
+  updateLabel: string;
+}
+
+export interface GmSessionsFormTranslations {
+  systemFilterAllLabel: string;
+  systemFilterLabel: string;
+  playersHeaderLabel: string;
+  minAgeHeaderLabel: string;
+}
+
+export interface GmSessionsEmptyTranslations {
+  title: string;
+  description: string;
+}
+
+export interface GmSessionsToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+  deleteSuccessSummary: string;
+  deleteSuccessDetail: string;
+  deleteFailedSummary: string;
+  deleteFailedDetail: string;
+}
+
+export interface SessionFormTranslations {
+  titleLabel: string;
+  systemLabel: string;
+  descriptionLabel: string;
+  difficultyLabel: string;
+  minPlayersLabel: string;
+  maxPlayersLabel: string;
+  minAgeLabel: string;
+  sortOrderLabel: string;
+  stylesLabel: string;
+  triggersLabel: string;
+  playersRangeLabel: string;
+  minAgeRangeLabel: string;
+  sortOrderRangeLabel: string;
+}
+
+export interface SessionDifficultyTranslations {
+  beginner: string;
+  intermediate: string;
+  advanced: string;
+}
+
+export interface SessionErrorsTranslations {
+  invalidPlayersRange: string;
+}
+
+export interface OurTeamPageTranslations {
+  title: string;
+  subtitle: string;
+}
+
+export interface OurTeamSeoTranslations {
+  title: string;
+  description: string;
+}
+
+export interface OurTeamCardTranslations {
+  imageAltPrefix: string;
 }

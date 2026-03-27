@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 const loaders = {
   home: () => import('./public/components/home/home').then((m) => m.Home),
   about: () => import('./public/components/about/about').then((m) => m.About),
+  ourTeam: () => import('./public/components/our-team/our-team').then((m) => m.OurTeam),
   offerPage: () => import('./public/components/offers/offers').then((m) => m.Offers),
   chaoticThursdays: () =>
     import('./public/components/chaotic-thursdays/chaotic-thursdays').then((m) => m.ChaoticThursdays),
@@ -14,6 +15,7 @@ const loaders = {
 export const routes: Routes = [
   { path: '', pathMatch: 'full', loadComponent: loaders.home },
   { path: 'about', loadComponent: loaders.about },
+  { path: 'our-team', loadComponent: loaders.ourTeam },
 
   { path: 'offer/:slug', loadComponent: loaders.offerPage },
 

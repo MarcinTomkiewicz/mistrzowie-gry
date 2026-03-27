@@ -53,12 +53,20 @@
   }
 }
 
+.mg-section__title--md {
+  font-size: map.get(v.$font-sizes, "xl");
+    @include m.down('md') {
+    font-size: map.get(v.$font-sizes, "lg");
+  }
+}
+
 .mg-section__title--sm {
   font-size: map.get(v.$font-sizes, "lg");
     @include m.down('md') {
     font-size: map.get(v.$font-sizes, "md");
   }
 }
+
 .mg-section__title--xs {
   font-size: map.get(v.$font-sizes, "md");
     @include m.down('md') {

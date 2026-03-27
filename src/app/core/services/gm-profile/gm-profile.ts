@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, switchMap, throwError } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
 
 import { FilterOperator } from '../../enums/filter-operators';
 import {
@@ -10,11 +10,14 @@ import {
 import { IGmProfileStyle, IGmStyle } from '../../interfaces/i-gm-style';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
+import { GmRead } from '../gm-read/gm-read';
+import { IGmProfileLanguage, ILanguage } from '../../interfaces/i-languages';
 
 @Injectable({ providedIn: 'root' })
 export class GmProfileFacade {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
+  private readonly gmRead = inject(GmRead);
 
   getMyGmProfile(): Observable<IGmProfileWithRelations | null> {
     const userId = this.auth.userId();
@@ -23,7 +26,7 @@ export class GmProfileFacade {
       return of(null);
     }
 
-    return this.getGmProfileById(userId);
+    return this.gmRead.getGmProfileWithRelationsById(userId);
   }
 
   getMyGmProfileRequired(): Observable<IGmProfileWithRelations> {
@@ -54,7 +57,13 @@ export class GmProfileFacade {
     });
   }
 
-  upsertMyGmProfile(payload: IGmProfileFormData): Observable<IGmProfileWithRelations> {
+  getAvailableLanguages(): Observable<ILanguage[]> {
+    return this.gmRead.getAvailableLanguages();
+  }
+
+  upsertMyGmProfile(
+    payload: IGmProfileFormData,
+  ): Observable<IGmProfileWithRelations> {
     const userId = this.auth.userId();
 
     if (!userId) {
@@ -63,7 +72,10 @@ export class GmProfileFacade {
 
     return this.backend
       .upsert<
-        Pick<IGmProfile, 'id' | 'experience' | 'description' | 'image' | 'quote'>
+        Pick<
+          IGmProfile,
+          'id' | 'experience' | 'description' | 'image' | 'quote'
+        >
       >('gm_profiles', {
         id: userId,
         experience: payload.experience,
@@ -72,7 +84,12 @@ export class GmProfileFacade {
         quote: payload.quote,
       })
       .pipe(
-        switchMap(() => this.replaceMyGmStyles(payload.gmStyleIds)),
+        switchMap(() =>
+          forkJoin([
+            this.replaceMyGmStyles(payload.gmStyleIds),
+            this.replaceMyGmLanguages(payload.languageIds),
+          ]),
+        ),
         switchMap(() => this.getMyGmProfileRequired()),
       );
   }
@@ -112,49 +129,39 @@ export class GmProfileFacade {
       );
   }
 
-  private getGmProfileById(gmProfileId: string): Observable<IGmProfileWithRelations | null> {
-    return this.backend.getById<IGmProfile>('gm_profiles', gmProfileId).pipe(
-      switchMap((profile) => {
-        if (!profile) {
-          return of(null);
-        }
+  replaceMyGmLanguages(languageIds: string[]): Observable<void> {
+    const userId = this.auth.userId();
 
-        return this.getGmProfileStyles(gmProfileId).pipe(
-          map((styles) => ({
-            ...profile,
-            styles,
-          })),
-        );
-      }),
-    );
-  }
+    if (!userId) {
+      return throwError(() => new Error('Unauthorized.'));
+    }
 
-  private getGmProfileStyles(gmProfileId: string): Observable<IGmStyle[]> {
+    const uniqueLanguageIds = [...new Set(languageIds.filter(Boolean))];
+
     return this.backend
-      .getAll<IGmProfileStyle>({
-        table: 'gm_profile_styles',
-        sortBy: 'createdAt',
-        sortOrder: 'asc',
-        pagination: {
-          filters: {
-            gmProfileId: {
-              operator: FilterOperator.EQ,
-              value: gmProfileId,
-            },
-          },
+      .delete('gm_profile_languages', {
+        gmProfileId: {
+          operator: FilterOperator.EQ,
+          value: userId,
         },
       })
       .pipe(
-        switchMap((rows) => {
-          const gmStyleIds = [...new Set(rows.map((row) => row.gmStyleId).filter(Boolean))];
-
-          if (!gmStyleIds.length) {
-            return of([]);
+        switchMap(() => {
+          if (!uniqueLanguageIds.length) {
+            return of(void 0);
           }
 
-          return this.backend.getByIds<IGmStyle>('gm_styles', gmStyleIds).pipe(
-            map((styles) => [...styles].sort((a, b) => a.sortOrder - b.sortOrder)),
-          );
+          return this.backend
+            .createMany<
+              Pick<IGmProfileLanguage, 'gmProfileId' | 'languageId'>
+            >(
+              'gm_profile_languages',
+              uniqueLanguageIds.map((languageId) => ({
+                gmProfileId: userId,
+                languageId,
+              })),
+            )
+            .pipe(map(() => void 0));
         }),
       );
   }

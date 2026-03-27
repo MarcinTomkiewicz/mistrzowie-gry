@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { map, Observable, of, switchMap, throwError } from 'rxjs';
 
 import { FilterOperator } from '../../enums/filter-operators';
 import {
@@ -13,6 +13,7 @@ import { IGmStyle } from '../../interfaces/i-gm-style';
 import { ISystem } from '../../interfaces/i-system';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
+import { GmRead } from '../gm-read/gm-read';
 
 interface IGmSessionTemplateRecord
   extends Pick<
@@ -49,6 +50,7 @@ interface IGmSessionTemplateTriggerRow {
 export class GmSessionsFacade {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
+  private readonly gmRead = inject(GmRead);
 
   getMySessionTemplates(): Observable<ISessionWithRelations[]> {
     const userId = this.auth.userId();
@@ -57,17 +59,19 @@ export class GmSessionsFacade {
       return of([]);
     }
 
-    return this.getSessionTemplatesByGmProfileId(userId);
+    return this.gmRead.getSessionTemplatesByGmProfileId(userId);
   }
 
-  getMySessionTemplateRequired(sessionId: string): Observable<ISessionWithRelations> {
+  getMySessionTemplateRequired(
+    sessionId: string,
+  ): Observable<ISessionWithRelations> {
     const userId = this.auth.userId();
 
     if (!userId) {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.getSessionTemplateById(sessionId, userId).pipe(
+    return this.gmRead.getSessionTemplateById(sessionId, userId).pipe(
       switchMap((session) => {
         if (!session) {
           return throwError(() => new Error('Session template not found.'));
@@ -84,6 +88,48 @@ export class GmSessionsFacade {
       sortBy: 'name',
       sortOrder: 'asc',
     });
+  }
+
+  getMySessionSystems(): Observable<ISystem[]> {
+    const userId = this.auth.userId();
+
+    if (!userId) {
+      return of([]);
+    }
+
+    return this.getSessionSystemsByGmProfileId(userId);
+  }
+
+  getSessionSystemsByGmProfileId(gmProfileId: string): Observable<ISystem[]> {
+    return this.backend
+      .getAll<Pick<ISession, 'systemId'>>({
+        table: 'gm_session_templates',
+        pagination: {
+          filters: {
+            gmProfileId: {
+              operator: FilterOperator.EQ,
+              value: gmProfileId,
+            },
+          },
+        },
+      })
+      .pipe(
+        switchMap((sessions) => {
+          const systemIds = [
+            ...new Set(sessions.map((session) => session.systemId).filter(Boolean)),
+          ];
+
+          if (!systemIds.length) {
+            return of([]);
+          }
+
+          return this.backend.getByIds<ISystem>('systems', systemIds).pipe(
+            map((systems) =>
+              [...systems].sort((a, b) => a.name.localeCompare(b.name, 'pl')),
+            ),
+          );
+        }),
+      );
   }
 
   getAvailableStyles(): Observable<IGmStyle[]> {
@@ -143,13 +189,17 @@ export class GmSessionsFacade {
       .pipe(
         switchMap((session) => {
           if (!session.id) {
-            return throwError(() => new Error('Session template id was not returned.'));
+            return throwError(
+              () => new Error('Session template id was not returned.'),
+            );
           }
 
-          return forkJoin([
-            this.replaceSessionTemplateStyles(session.id, payload.gmStyleIds),
-            this.replaceSessionTemplateTriggers(session.id, payload.triggerIds),
-          ]).pipe(map(() => session.id as string));
+          return this.replaceSessionTemplateStyles(session.id, payload.gmStyleIds).pipe(
+            switchMap(() =>
+              this.replaceSessionTemplateTriggers(session.id as string, payload.triggerIds),
+            ),
+            map(() => session.id as string),
+          );
         }),
         switchMap((sessionId) => this.getMySessionTemplateRequired(sessionId)),
       );
@@ -165,29 +215,34 @@ export class GmSessionsFacade {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.getSessionTemplateById(sessionId, userId).pipe(
+    return this.gmRead.getSessionTemplateById(sessionId, userId).pipe(
       switchMap((session) => {
         if (!session) {
           return throwError(() => new Error('Session template not found.'));
         }
 
-        return this.backend.update<IGmSessionTemplateRecord>('gm_session_templates', sessionId, {
-          systemId: payload.systemId,
-          title: payload.title,
-          description: payload.description,
-          image: payload.image,
-          difficultyLevel: payload.difficultyLevel,
-          minPlayers: payload.minPlayers,
-          maxPlayers: payload.maxPlayers,
-          minAge: payload.minAge,
-          sortOrder: payload.sortOrder ?? session.sortOrder,
-        });
+        return this.backend.update<IGmSessionTemplateRecord>(
+          'gm_session_templates',
+          sessionId,
+          {
+            systemId: payload.systemId,
+            title: payload.title,
+            description: payload.description,
+            image: payload.image,
+            difficultyLevel: payload.difficultyLevel,
+            minPlayers: payload.minPlayers,
+            maxPlayers: payload.maxPlayers,
+            minAge: payload.minAge,
+            sortOrder: payload.sortOrder ?? session.sortOrder,
+          },
+        );
       }),
       switchMap(() =>
-        forkJoin([
-          this.replaceSessionTemplateStyles(sessionId, payload.gmStyleIds),
-          this.replaceSessionTemplateTriggers(sessionId, payload.triggerIds),
-        ]),
+        this.replaceSessionTemplateStyles(sessionId, payload.gmStyleIds).pipe(
+          switchMap(() =>
+            this.replaceSessionTemplateTriggers(sessionId, payload.triggerIds),
+          ),
+        ),
       ),
       switchMap(() => this.getMySessionTemplateRequired(sessionId)),
     );
@@ -232,7 +287,9 @@ export class GmSessionsFacade {
           }
 
           return this.backend
-            .createMany<Pick<IGmSessionTemplateStyleRow, 'gmSessionTemplateId' | 'gmStyleId'>>(
+            .createMany<
+              Pick<IGmSessionTemplateStyleRow, 'gmSessionTemplateId' | 'gmStyleId'>
+            >(
               'gm_session_template_styles',
               uniqueStyleIds.map((gmStyleId) => ({
                 gmSessionTemplateId: sessionId,
@@ -265,7 +322,10 @@ export class GmSessionsFacade {
 
           return this.backend
             .createMany<
-              Pick<IGmSessionTemplateTriggerRow, 'gmSessionTemplateId' | 'contentTriggerId'>
+              Pick<
+                IGmSessionTemplateTriggerRow,
+                'gmSessionTemplateId' | 'contentTriggerId'
+              >
             >(
               'gm_session_template_triggers',
               uniqueTriggerIds.map((contentTriggerId) => ({
@@ -274,140 +334,6 @@ export class GmSessionsFacade {
               })),
             )
             .pipe(map(() => void 0));
-        }),
-      );
-  }
-
-  private getSessionTemplatesByGmProfileId(
-    gmProfileId: string,
-  ): Observable<ISessionWithRelations[]> {
-    return this.backend
-      .getAll<ISession>({
-        table: 'gm_session_templates',
-        sortBy: 'sortOrder',
-        sortOrder: 'asc',
-        pagination: {
-          filters: {
-            gmProfileId: {
-              operator: FilterOperator.EQ,
-              value: gmProfileId,
-            },
-          },
-        },
-      })
-      .pipe(
-        switchMap((sessions) => {
-          if (!sessions.length) {
-            return of([]);
-          }
-
-          return forkJoin(
-            sessions.map((session) => this.hydrateSessionTemplate(session)),
-          );
-        }),
-        map((sessions) =>
-          [...sessions].sort((a, b) => a.sortOrder - b.sortOrder),
-        ),
-      );
-  }
-
-  private getSessionTemplateById(
-    sessionId: string,
-    gmProfileId: string,
-  ): Observable<ISessionWithRelations | null> {
-    return this.backend
-      .getOneByFields<ISession>('gm_session_templates', {
-        id: sessionId,
-        gmProfileId,
-      })
-      .pipe(
-        switchMap((session) => {
-          if (!session) {
-            return of(null);
-          }
-
-          return this.hydrateSessionTemplate(session);
-        }),
-      );
-  }
-
-  private hydrateSessionTemplate(session: ISession): Observable<ISessionWithRelations> {
-    return forkJoin({
-      system: this.backend.getById<ISystem>('systems', session.systemId),
-      styles: this.getSessionTemplateStyles(session.id),
-      triggers: this.getSessionTemplateTriggers(session.id),
-    }).pipe(
-      map(({ system, styles, triggers }) => ({
-        ...session,
-        system,
-        styles,
-        triggers,
-      })),
-    );
-  }
-
-  private getSessionTemplateStyles(sessionId: string): Observable<IGmStyle[]> {
-    return this.backend
-      .getAll<IGmSessionTemplateStyleRow>({
-        table: 'gm_session_template_styles',
-        sortBy: 'createdAt',
-        sortOrder: 'asc',
-        pagination: {
-          filters: {
-            gmSessionTemplateId: {
-              operator: FilterOperator.EQ,
-              value: sessionId,
-            },
-          },
-        },
-      })
-      .pipe(
-        switchMap((rows) => {
-          const gmStyleIds = [...new Set(rows.map((row) => row.gmStyleId).filter(Boolean))];
-
-          if (!gmStyleIds.length) {
-            return of([]);
-          }
-
-          return this.backend.getByIds<IGmStyle>('gm_styles', gmStyleIds).pipe(
-            map((styles) => [...styles].sort((a, b) => a.sortOrder - b.sortOrder)),
-          );
-        }),
-      );
-  }
-
-  private getSessionTemplateTriggers(sessionId: string): Observable<IContentTrigger[]> {
-    return this.backend
-      .getAll<IGmSessionTemplateTriggerRow>({
-        table: 'gm_session_template_triggers',
-        sortBy: 'createdAt',
-        sortOrder: 'asc',
-        pagination: {
-          filters: {
-            gmSessionTemplateId: {
-              operator: FilterOperator.EQ,
-              value: sessionId,
-            },
-          },
-        },
-      })
-      .pipe(
-        switchMap((rows) => {
-          const triggerIds = [
-            ...new Set(rows.map((row) => row.contentTriggerId).filter(Boolean)),
-          ];
-
-          if (!triggerIds.length) {
-            return of([]);
-          }
-
-          return this.backend
-            .getByIds<IContentTrigger>('content_triggers', triggerIds)
-            .pipe(
-              map((triggers) =>
-                [...triggers].sort((a, b) => a.label.localeCompare(b.label, 'pl')),
-              ),
-            );
         }),
       );
   }

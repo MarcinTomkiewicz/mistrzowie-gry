@@ -14,7 +14,7 @@
         formControlName="title"
         autocomplete="off"
       />
-      <label for="session-title">{{ i18n.titleLabel() }}</label>
+      <label for="session-title">{{ i18n.form().titleLabel }}</label>
     </p-iftalabel>
 
     @if (showRequiredError('title')) {
@@ -32,7 +32,7 @@
         (systemSelected)="onSystemSelect($event)"
         (systemCleared)="onSystemClear()"
       />
-      <label for="session-system-id">{{ i18n.systemLabel() }}</label>
+      <label for="session-system-id">{{ i18n.form().systemLabel }}</label>
     </p-iftalabel>
 
     @if (showRequiredError('systemId')) {
@@ -40,9 +40,7 @@
     }
   </div>
 
-  <div
-    class="w-80 flex-row-between-center flex-col-start-stretch-xs gap-sm"
-  >
+  <div class="w-80 flex-row-between-center flex-col-start-stretch-xs gap-sm">
     <div class="w-70 w-50-md w-100-xs">
       <p-iftalabel class="w-100">
         <p-select
@@ -54,18 +52,18 @@
           appendTo="body"
           class="w-100"
         />
-        <label for="session-difficulty-level">{{
-          i18n.difficultyLabel()
-        }}</label>
+        <label for="session-difficulty-level">
+          {{ i18n.form().difficultyLabel }}
+        </label>
       </p-iftalabel>
 
-      @if (showRequiredError("difficultyLevel")) {
+      @if (showRequiredError('difficultyLevel')) {
         <small>{{ i18n.commonForm().required }}</small>
       }
     </div>
 
     <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
-      <label for="session-min-players">{{ i18n.minPlayersLabel() }}</label>
+      <label for="session-min-players">{{ i18n.form().minPlayersLabel }}</label>
 
       <p-inputnumber
         class="w-100"
@@ -79,12 +77,12 @@
       />
 
       @if (showMinPlayersError()) {
-        <small>{{ i18n.playersRangeLabel() }}</small>
+        <small>{{ i18n.form().playersRangeLabel }}</small>
       }
     </div>
 
     <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
-      <label for="session-max-players">{{ i18n.maxPlayersLabel() }}</label>
+      <label for="session-max-players">{{ i18n.form().maxPlayersLabel }}</label>
 
       <p-inputnumber
         class="w-100"
@@ -98,12 +96,12 @@
       />
 
       @if (showMaxPlayersError()) {
-        <small>{{ i18n.playersRangeLabel() }}</small>
+        <small>{{ i18n.form().playersRangeLabel }}</small>
       }
     </div>
 
     <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
-      <label for="session-min-age">{{ i18n.minAgeLabel() }}</label>
+      <label for="session-min-age">{{ i18n.form().minAgeLabel }}</label>
 
       <p-inputnumber
         class="w-100"
@@ -116,15 +114,14 @@
       />
 
       @if (showMinAgeError()) {
-        <small>{{ i18n.minAgeRangeLabel() }}</small>
+        <small>{{ i18n.form().minAgeRangeLabel }}</small>
       }
     </div>
   </div>
 
-
   @if (showPlayersRangeError()) {
     <div class="w-80">
-      <small>{{ i18n.invalidPlayersRangeError() }}</small>
+      <small>{{ i18n.errors().invalidPlayersRange }}</small>
     </div>
   }
 
@@ -139,7 +136,7 @@
         rows="6"
         autocomplete="off"
       ></textarea>
-      <label for="session-description">{{ i18n.descriptionLabel() }}</label>
+      <label for="session-description">{{ i18n.form().descriptionLabel }}</label>
     </p-iftalabel>
 
     @if (showRequiredError('description')) {
@@ -166,7 +163,7 @@
   </div>
 
   <div class="w-80 flex-col-start-stretch gap-xs">
-    <label for="session-style-ids">{{ i18n.stylesLabel() }}</label>
+    <label for="session-style-ids">{{ i18n.form().stylesLabel }}</label>
 
     <app-chip-picker
       [options]="styleOptions()"
@@ -177,7 +174,7 @@
   </div>
 
   <div class="w-80 flex-col-start-stretch gap-xs">
-    <label for="session-trigger-ids">{{ i18n.triggersLabel() }}</label>
+    <label for="session-trigger-ids">{{ i18n.form().triggersLabel }}</label>
 
     <app-chip-picker
       [options]="triggerOptions()"

@@ -7,14 +7,14 @@ export enum SessionDifficultyLevel {
 export const SESSION_DIFFICULTY_LEVEL_OPTIONS = [
   {
     value: SessionDifficultyLevel.Beginner,
-    i18nKey: 'beginnerDifficultyLabel',
+    i18nKey: 'beginner',
   },
   {
     value: SessionDifficultyLevel.Intermediate,
-    i18nKey: 'intermediateDifficultyLabel',
+    i18nKey: 'intermediate',
   },
   {
     value: SessionDifficultyLevel.Advanced,
-    i18nKey: 'advancedDifficultyLabel',
+    i18nKey: 'advanced',
   },
 ] as const;

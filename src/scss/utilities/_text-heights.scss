@@ -1,0 +1,50 @@
+@use "../abstracts/mixins" as m;
+
+$flex-breakpoints: ("xs", "sm", "md", "lg", "xl");
+
+$min-height-lines-values: (
+  1: 1lh,
+  2: 2lh,
+  3: 3lh,
+  4: 4lh
+);
+
+@mixin _emit-prop($class, $property, $value, $important: false) {
+  .#{$class} {
+    @if $important {
+      #{$property}: $value !important;
+    } @else {
+      #{$property}: $value;
+    }
+  }
+}
+
+@mixin _emit-prop-down($bp, $class, $property, $value, $important: false) {
+  @include m.down($bp) {
+    .#{$class}-#{$bp} {
+      @if $important {
+        #{$property}: $value !important;
+      } @else {
+        #{$property}: $value;
+      }
+    }
+  }
+}
+
+@mixin _emit-prop-map($prefix, $values, $property, $important: false) {
+  @each $name, $value in $values {
+    @include _emit-prop("#{$prefix}-#{$name}", $property, $value, $important);
+
+    @each $bp in $flex-breakpoints {
+      @include _emit-prop-down(
+        $bp,
+        "#{$prefix}-#{$name}",
+        $property,
+        $value,
+        $important
+      );
+    }
+  }
+}
+
+@include _emit-prop-map(min-h-lines, $min-height-lines-values, min-height);

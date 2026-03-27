@@ -69,11 +69,15 @@ export class GmProfile {
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
   readonly styleOptions = signal<IChipPickerOption[]>([]);
+  readonly languageOptions = signal<IChipPickerOption[]>([]);
   readonly selectedImageFile = signal<File | null>(null);
 
-  private readonly quoteValue = toSignal(this.form.controls.quote.valueChanges, {
-    initialValue: this.form.controls.quote.getRawValue(),
-  });
+  private readonly quoteValue = toSignal(
+    this.form.controls.quote.valueChanges,
+    {
+      initialValue: this.form.controls.quote.getRawValue(),
+    },
+  );
 
   private readonly experienceValue = toSignal(
     this.form.controls.experience.valueChanges,
@@ -163,6 +167,8 @@ export class GmProfile {
       .subscribe({
         next: (profile) => {
           const styleIds = profile.styles?.map((style) => style.id) ?? [];
+          const languageIds =
+            profile.languages?.map((language) => language.id) ?? [];
 
           this.selectedImageFile.set(null);
 
@@ -173,6 +179,7 @@ export class GmProfile {
               image: profile.image,
               quote: profile.quote,
               gmStyleIds: styleIds,
+              languageIds,
             },
             { emitEvent: true },
           );
@@ -202,6 +209,12 @@ export class GmProfile {
     this.form.controls.gmStyleIds.markAsTouched();
   }
 
+  onLanguagesChange(languageIds: string[]): void {
+    this.form.controls.languageIds.setValue(languageIds);
+    this.form.controls.languageIds.markAsDirty();
+    this.form.controls.languageIds.markAsTouched();
+  }
+
   showQuoteError(): boolean {
     const control = this.form.controls.quote;
     return control.touched && !!control.errors?.['maxlength'];
@@ -226,10 +239,11 @@ export class GmProfile {
     forkJoin({
       profile: this.gmProfileFacade.getMyGmProfile(),
       styles: this.gmProfileFacade.getAvailableStyles(),
+      languages: this.gmProfileFacade.getAvailableLanguages(),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: ({ profile, styles }) => {
+        next: ({ profile, styles, languages }) => {
           this.styleOptions.set(
             styles.map((style) => ({
               id: style.id,
@@ -238,6 +252,19 @@ export class GmProfile {
               selectedClassName: 'tag-badge--arcane',
               unselectedClassName: 'tag-badge--muted',
             })),
+          );
+
+          this.languageOptions.set(
+            [...languages]
+              .sort((a, b) => a.sortOrder - b.sortOrder)
+              .map((language) => ({
+                id: language.id,
+                label: language.label,
+                searchText: `${language.code} ${language.label} ${language.flagCode}`,
+                iconClassName: `fi fi-${language.flagCode.toLowerCase()}`,
+                selectedClassName: 'tag-badge--arcane',
+                unselectedClassName: 'tag-badge--muted',
+              })),
           );
 
           if (!profile) {
@@ -251,6 +278,8 @@ export class GmProfile {
               image: profile.image,
               quote: profile.quote,
               gmStyleIds: profile.styles?.map((style) => style.id) ?? [],
+              languageIds:
+                profile.languages?.map((language) => language.id) ?? [],
             },
             { emitEvent: true },
           );
@@ -298,6 +327,19 @@ export class GmProfile {
 
           return of(result);
         }),
+      );
+  }
+
+  private toFlagEmoji(flagCode: string | null | undefined): string {
+    if (!flagCode?.trim()) {
+      return '';
+    }
+
+    return flagCode
+      .trim()
+      .toUpperCase()
+      .replace(/./g, (char) =>
+        String.fromCodePoint(127397 + char.charCodeAt(0)),
       );
   }
 }

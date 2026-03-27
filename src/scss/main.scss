@@ -28,8 +28,9 @@
 // @use "components/nav";
 
 /* ===========================
-   VENDORS OVERRIDES
-   =========================== */
+VENDORS OVERRIDES
+=========================== */
 @use "vendors/primeng";
 /* vendors */
+@import "flag-icons/css/flag-icons.min.css";
 @import "primeicons/primeicons.css";

@@ -12,4 +12,5 @@ export type GmProfileFormGroup = FormGroup<{
   image: FormControl<string | null>;
   quote: FormControl<string | null>;
   gmStyleIds: FormControl<string[]>;
+  languageIds: FormControl<string[]>;
 }>;

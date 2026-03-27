@@ -6,6 +6,11 @@ export const MENU_CONFIG: IMenu[] = [
     path: '/about',
     footer: true,
   },
+  {
+    labelKey: 'nav.ourTeam',
+    path: '/our-team',
+    footer: true,
+  },
 
   {
     labelKey: 'nav.offer',

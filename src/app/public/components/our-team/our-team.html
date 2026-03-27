@@ -1,0 +1,71 @@
+@let data = pageVm();
+@let empty = i18n.commonEmpty();
+@let status = i18n.commonStatus();
+
+<section class="mg-section">
+  <div class="mg-container">
+    <app-loading-overlay [visible]="isLoading()" [label]="status.loading" />
+
+    @if (data; as vm) {
+      <header class="mg-section__header">
+        <h1 class="mg-section__title">{{ vm.page.title }}</h1>
+        <p class="mg-section__subtitle">{{ vm.page.subtitle }}</p>
+      </header>
+
+      @if (!vm.items.length) {
+        <div class="mg-card">
+          <div class="mg-section__title mg-section__title--sm">
+            {{ empty.title }}
+          </div>
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ empty.description }}
+          </p>
+        </div>
+      } @else {
+        <div class="our-team-grid">
+          @for (item of vm.items; track item.profile.user.id) {
+            <article class="mg-card">
+              <div class="our-team-card__image-wrap">
+                <img
+                  class="our-team-card__image"
+                  [src]="item.imageUrl || placeholderImageSrc"
+                  [alt]="i18n.imageAltLabel(item.displayName)"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <div class="flex-col-start-stretch gap-sm">
+                <div class="flex-row-between-center gap-sm">
+                  <h2 class="mg-section__title mg-section__title--sm m-0">
+                    {{ item.displayName }}
+                  </h2>
+                  @if (item.languageFlags.length) {
+                    <div class="flex-row-start-center gap-xs">
+                      @for (language of item.languageFlags; track language.id) {
+                        @if (language.className) {
+                          <span
+                            
+                            [class]="language.className"
+                            [attr.aria-label]="language.label"
+                            [attr.title]="language.label"
+                          ></span>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+
+                <p
+                  class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full truncate-2 min-h-lines-2"
+                >
+                  {{ item.profile.profile.quote || "" }}
+                </p>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

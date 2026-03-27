@@ -26,15 +26,13 @@ export class ChipPicker {
 
   readonly filteredOptions = computed(() => {
     const normalizedTerm = this.term().trim().toLowerCase();
-    const sorted = [...this.options()].sort((a, b) =>
-      a.label.localeCompare(b.label, 'pl'),
-    );
+    const options = this.options();
 
     if (!this.searchable() || !normalizedTerm) {
-      return sorted;
+      return options;
     }
 
-    return sorted.filter((option) => {
+    return options.filter((option) => {
       const haystack = [option.label, option.searchText ?? '']
         .join(' ')
         .toLowerCase();
@@ -86,11 +84,16 @@ export class ChipPicker {
 
     return [
       'tag-badge',
+      'chip-picker__chip',
       isSelected
         ? (option.selectedClassName ?? 'tag-badge--arcane')
         : (option.unselectedClassName ?? 'tag-badge--muted'),
       this.isOptionDisabled(option.id) ? 'chip-picker__chip--disabled' : '',
       isSelected ? 'chip-picker__chip--selected' : '',
     ].filter(Boolean);
+  }
+
+  resolveIconClassNames(option: IChipPickerOption): string[] {
+    return ['chip-picker__icon', option.iconClassName ?? ''].filter(Boolean);
   }
 }

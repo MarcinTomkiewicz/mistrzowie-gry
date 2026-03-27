@@ -1,0 +1,43 @@
+@use "/abstracts/mixins" as m;
+@use "/abstracts/variables" as v;
+@use "sass:map";
+
+.our-team-grid {
+  @include m.mg-grid(
+    4,
+    map.get(v.$spacings, "lg"),
+    map.get(v.$spacings, "lg"),
+    true,
+    2,
+    1
+  );
+  justify-items: center;
+}
+
+.mg-card {
+  max-width: 270px;
+}
+
+.our-team-card__image-wrap {
+  width: min(100%, 18rem);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 100%;
+  margin-bottom: map.get(v.$spacings, "md");
+  margin-inline: auto;
+  border: 1px solid v.$color-border;
+  background: v.$color-bg;
+}
+
+.our-team-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@include m.down("sm") {
+  .our-team-card__image-wrap {
+    width: min(100%, 14rem);
+  }
+}

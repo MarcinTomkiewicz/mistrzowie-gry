@@ -23,6 +23,7 @@ export function createGmProfileForm(
       validators: [Validators.maxLength(255)],
     }),
     gmStyleIds: fb.nonNullable.control<string[]>(initial?.gmStyleIds ?? []),
+    languageIds: fb.nonNullable.control<string[]>(initial?.languageIds ?? []),
   });
 }
 
@@ -37,5 +38,6 @@ export function mapGmProfileFormToPayload(
     image: normalizeText(value.image),
     quote: normalizeText(value.quote),
     gmStyleIds: [...new Set((value.gmStyleIds ?? []).filter(Boolean))],
+    languageIds: [...new Set((value.languageIds ?? []).filter(Boolean))],
   };
 }

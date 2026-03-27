@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
 import {
@@ -15,13 +17,27 @@ import { Auth } from '../../../core/services/auth/auth';
 import { hasMinimumRole } from '../../../core/utils/roles';
 import { ProfileForm } from '../../common/profile-form/profile-form';
 import { GmProfile } from '../gm-profile/gm-profile';
-import { createEditProfileI18n } from './edit-profile.i18n';
 import { GmSessions } from '../gm-sessions/gm-sessions';
+import { createEditProfileI18n } from './edit-profile.i18n';
+
+interface IEditProfileTabOption {
+  value: EditProfileTabId;
+  label: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
-  imports: [CommonModule, TabsModule, ProfileForm, GmProfile, GmSessions],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TabsModule,
+    SelectModule,
+    ProfileForm,
+    GmProfile,
+    GmSessions,
+  ],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.scss',
   providers: [provideTranslocoScope('auth', 'common')],
@@ -43,7 +59,30 @@ export class EditProfile {
       .sort((a, b) => a.order - b.order),
   );
 
+  readonly tabOptions = computed<IEditProfileTabOption[]>(() =>
+    this.tabs().map((tab) => ({
+      value: tab.id,
+      label: this.resolveTabLabel(tab.id),
+      icon: tab.icon,
+    })),
+  );
+
   readonly activeTab = signal<EditProfileTabId>(this.resolveInitialTab());
+
+  readonly mobileTabControl = new FormControl<EditProfileTabId>(
+    this.activeTab(),
+    { nonNullable: true },
+  );
+
+  constructor() {
+    effect(() => {
+      const activeTab = this.activeTab();
+
+      if (this.mobileTabControl.value !== activeTab) {
+        this.mobileTabControl.setValue(activeTab, { emitEvent: false });
+      }
+    });
+  }
 
   resolveTabLabel(tabId: EditProfileTabId): string {
     switch (tabId) {
@@ -73,6 +112,14 @@ export class EditProfile {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  onMobileTabChange(tabId: EditProfileTabId | null): void {
+    if (!tabId) {
+      return;
+    }
+
+    this.onTabChange(tabId);
   }
 
   private resolveInitialTab(): EditProfileTabId {
