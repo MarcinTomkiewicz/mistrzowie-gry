@@ -16,7 +16,9 @@
 
       <div class="mg-chaotic-hero__spark" aria-hidden="true">
         @for (dice of sparkDice; track trackByIndex($index)) {
-          <span class="mg-chaotic-hero__dice">🎲</span>
+          <span class="mg-chaotic-hero__dice">
+            <i class="pi pi-d20 mg-chaotic-hero__dice-icon"></i>
+          </span>
         }
       </div>
 
@@ -41,18 +43,39 @@
           size="small"
           routerLink="/contact"
         />
-        <p-button
-          [label]="i18n.heroCta().secondaryLabel"
-          icon="pi pi-users"
-          severity="secondary"
-          size="small"
-          (click)="showOutOfOrderPopup($event)"
-          [outlined]="true"
-        />
       </div>
     </header>
   </div>
 </section>
+
+<div class="mg-container">
+  <app-occurrence-switcher
+    [options]="occurrenceOptions()"
+    [selectedIndex]="safeSelectedOccurrenceIndex()"
+    [disabled]="isLoading()"
+    (selectedIndexChange)="onOccurrenceSelect($event)"
+  />
+
+  <app-event-slots
+    [items]="slotCards()"
+    [slotCount]="slotCount()"
+    [isLoading]="isLoading()"
+    (slotSelect)="onSlotSelect($event)"
+    (gmSelect)="onGmSelect($event)"
+  />
+</div>
+
+<app-gm-profile-dialog
+  [visible]="isGmDialogVisible()"
+  [profile]="selectedProfile()"
+  (visibleChange)="onGmDialogVisibleChange($event)"
+/>
+
+<app-session-dialog
+  [visible]="isSessionDialogVisible()"
+  [session]="selectedSession()"
+  (visibleChange)="onSessionDialogVisibleChange($event)"
+/>
 
 <section class="mg-section" [attr.aria-label]="i18n.about().title">
   <div class="mg-container">
@@ -150,8 +173,11 @@
       }
     </div>
 
-    <div pAnimateOnScroll
-          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card mt-md">
+    <div
+      pAnimateOnScroll
+      enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+      class="mg-card mt-md"
+    >
       <h3 class="mg-section__title mg-section__title--sm">
         {{ i18n.standards().expectationsTitle }}
       </h3>

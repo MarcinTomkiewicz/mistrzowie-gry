@@ -2,20 +2,22 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, switchMap, throwError } from 'rxjs';
 
 import { FilterOperator } from '../../enums/filter-operators';
+import { IContentTrigger } from '../../interfaces/i-content-trigger';
+import { IGmStyle } from '../../interfaces/i-gm-style';
 import {
   ICreateSessionPayload,
   ISession,
   ISessionWithRelations,
   IUpdateSessionPayload,
 } from '../../interfaces/i-session';
-import { IContentTrigger } from '../../interfaces/i-content-trigger';
-import { IGmStyle } from '../../interfaces/i-gm-style';
 import { ISystem } from '../../interfaces/i-system';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
-import { GmRead } from '../gm-read/gm-read';
+import { SessionRead } from '../session-read/session-read';
 
-interface IGmSessionTemplateRecord
+type SessionSourceKind = 'template' | 'custom';
+
+interface ISessionRecord
   extends Pick<
     ISession,
     | 'gmProfileId'
@@ -34,36 +36,64 @@ interface IGmSessionTemplateRecord
   updatedAt?: string | null;
 }
 
-interface IGmSessionTemplateStyleRow {
-  gmSessionTemplateId: string;
+interface ISessionStyleRow {
+  sessionId: string;
   gmStyleId: string;
   createdAt: string | null;
 }
 
-interface IGmSessionTemplateTriggerRow {
-  gmSessionTemplateId: string;
+interface ISessionTriggerRow {
+  sessionId: string;
   contentTriggerId: string;
   createdAt: string | null;
 }
+
+const SESSION_SOURCE_CONFIG: Record<
+  SessionSourceKind,
+  {
+    sessionsTable: string;
+    stylesTable: string;
+    triggersTable: string;
+    sessionIdKey: 'gmSessionTemplateId' | 'customSessionId';
+  }
+> = {
+  template: {
+    sessionsTable: 'gm_session_templates',
+    stylesTable: 'gm_session_template_styles',
+    triggersTable: 'gm_session_template_triggers',
+    sessionIdKey: 'gmSessionTemplateId',
+  },
+  custom: {
+    sessionsTable: 'custom_sessions',
+    stylesTable: 'custom_session_styles',
+    triggersTable: 'custom_session_triggers',
+    sessionIdKey: 'customSessionId',
+  },
+};
 
 @Injectable({ providedIn: 'root' })
 export class GmSessionsFacade {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
-  private readonly gmRead = inject(GmRead);
+  private readonly sessionRead = inject(SessionRead);
 
-  getMySessionTemplates(): Observable<ISessionWithRelations[]> {
+  getMySessions(
+    source: SessionSourceKind = 'template',
+  ): Observable<ISessionWithRelations[]> {
     const userId = this.auth.userId();
 
     if (!userId) {
       return of([]);
     }
 
-    return this.gmRead.getSessionTemplatesByGmProfileId(userId);
+    return source === 'template'
+      ? this.sessionRead.getSessionTemplatesByGmProfileId(userId)
+      : this.sessionRead.getCustomSessionsByGmProfileId(userId);
   }
 
-  getMySessionTemplateRequired(
+  getMySessionRequired(
     sessionId: string,
+    source: SessionSourceKind = 'template',
   ): Observable<ISessionWithRelations> {
     const userId = this.auth.userId();
 
@@ -71,10 +101,15 @@ export class GmSessionsFacade {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.gmRead.getSessionTemplateById(sessionId, userId).pipe(
+    const read$ =
+      source === 'template'
+        ? this.sessionRead.getSessionTemplateById(sessionId, userId)
+        : this.sessionRead.getCustomSessionById(sessionId, userId);
+
+    return read$.pipe(
       switchMap((session) => {
         if (!session) {
-          return throwError(() => new Error('Session template not found.'));
+          return throwError(() => new Error('Session not found.'));
         }
 
         return of(session);
@@ -90,20 +125,27 @@ export class GmSessionsFacade {
     });
   }
 
-  getMySessionSystems(): Observable<ISystem[]> {
+  getMySessionSystems(
+    source: SessionSourceKind = 'template',
+  ): Observable<ISystem[]> {
     const userId = this.auth.userId();
 
     if (!userId) {
       return of([]);
     }
 
-    return this.getSessionSystemsByGmProfileId(userId);
+    return this.getSessionSystemsByGmProfileId(userId, source);
   }
 
-  getSessionSystemsByGmProfileId(gmProfileId: string): Observable<ISystem[]> {
+  getSessionSystemsByGmProfileId(
+    gmProfileId: string,
+    source: SessionSourceKind = 'template',
+  ): Observable<ISystem[]> {
+    const config = SESSION_SOURCE_CONFIG[source];
+
     return this.backend
       .getAll<Pick<ISession, 'systemId'>>({
-        table: 'gm_session_templates',
+        table: config.sessionsTable,
         pagination: {
           filters: {
             gmProfileId: {
@@ -164,17 +206,19 @@ export class GmSessionsFacade {
     });
   }
 
-  createMySessionTemplate(
+  createMySession(
     payload: ICreateSessionPayload,
+    source: SessionSourceKind = 'template',
   ): Observable<ISessionWithRelations> {
     const userId = this.auth.userId();
+    const config = SESSION_SOURCE_CONFIG[source];
 
     if (!userId) {
       return throwError(() => new Error('Unauthorized.'));
     }
 
     return this.backend
-      .create<IGmSessionTemplateRecord>('gm_session_templates', {
+      .create<ISessionRecord>(config.sessionsTable, {
         gmProfileId: userId,
         systemId: payload.systemId,
         title: payload.title,
@@ -189,40 +233,44 @@ export class GmSessionsFacade {
       .pipe(
         switchMap((session) => {
           if (!session.id) {
-            return throwError(
-              () => new Error('Session template id was not returned.'),
-            );
+            return throwError(() => new Error('Session id was not returned.'));
           }
 
-          return this.replaceSessionTemplateStyles(session.id, payload.gmStyleIds).pipe(
+          return this.replaceSessionStyles(
+            session.id,
+            payload.gmStyleIds,
+            source,
+          ).pipe(
             switchMap(() =>
-              this.replaceSessionTemplateTriggers(session.id as string, payload.triggerIds),
+              this.replaceSessionTriggers(
+                session.id as string,
+                payload.triggerIds,
+                source,
+              ),
             ),
             map(() => session.id as string),
           );
         }),
-        switchMap((sessionId) => this.getMySessionTemplateRequired(sessionId)),
+        switchMap((sessionId) => this.getMySessionRequired(sessionId, source)),
       );
   }
 
-  updateMySessionTemplate(
+  updateMySession(
     sessionId: string,
     payload: IUpdateSessionPayload,
+    source: SessionSourceKind = 'template',
   ): Observable<ISessionWithRelations> {
     const userId = this.auth.userId();
+    const config = SESSION_SOURCE_CONFIG[source];
 
     if (!userId) {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.gmRead.getSessionTemplateById(sessionId, userId).pipe(
-      switchMap((session) => {
-        if (!session) {
-          return throwError(() => new Error('Session template not found.'));
-        }
-
-        return this.backend.update<IGmSessionTemplateRecord>(
-          'gm_session_templates',
+    return this.getMySessionRequired(sessionId, source).pipe(
+      switchMap((session) =>
+        this.backend.update<ISessionRecord>(
+          config.sessionsTable,
           sessionId,
           {
             systemId: payload.systemId,
@@ -235,27 +283,31 @@ export class GmSessionsFacade {
             minAge: payload.minAge,
             sortOrder: payload.sortOrder ?? session.sortOrder,
           },
-        );
-      }),
+        ),
+      ),
       switchMap(() =>
-        this.replaceSessionTemplateStyles(sessionId, payload.gmStyleIds).pipe(
+        this.replaceSessionStyles(sessionId, payload.gmStyleIds, source).pipe(
           switchMap(() =>
-            this.replaceSessionTemplateTriggers(sessionId, payload.triggerIds),
+            this.replaceSessionTriggers(sessionId, payload.triggerIds, source),
           ),
         ),
       ),
-      switchMap(() => this.getMySessionTemplateRequired(sessionId)),
+      switchMap(() => this.getMySessionRequired(sessionId, source)),
     );
   }
 
-  deleteMySessionTemplate(sessionId: string): Observable<void> {
+  deleteMySession(
+    sessionId: string,
+    source: SessionSourceKind = 'template',
+  ): Observable<void> {
     const userId = this.auth.userId();
+    const config = SESSION_SOURCE_CONFIG[source];
 
     if (!userId) {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.backend.delete('gm_session_templates', {
+    return this.backend.delete(config.sessionsTable, {
       id: {
         operator: FilterOperator.EQ,
         value: sessionId,
@@ -267,15 +319,17 @@ export class GmSessionsFacade {
     });
   }
 
-  replaceSessionTemplateStyles(
+  replaceSessionStyles(
     sessionId: string,
     gmStyleIds: string[],
+    source: SessionSourceKind = 'template',
   ): Observable<void> {
     const uniqueStyleIds = [...new Set(gmStyleIds.filter(Boolean))];
+    const config = SESSION_SOURCE_CONFIG[source];
 
     return this.backend
-      .delete('gm_session_template_styles', {
-        gmSessionTemplateId: {
+      .delete(config.stylesTable, {
+        [config.sessionIdKey]: {
           operator: FilterOperator.EQ,
           value: sessionId,
         },
@@ -288,28 +342,32 @@ export class GmSessionsFacade {
 
           return this.backend
             .createMany<
-              Pick<IGmSessionTemplateStyleRow, 'gmSessionTemplateId' | 'gmStyleId'>
+              Pick<ISessionStyleRow, 'sessionId' | 'gmStyleId'>
             >(
-              'gm_session_template_styles',
+              config.stylesTable,
               uniqueStyleIds.map((gmStyleId) => ({
-                gmSessionTemplateId: sessionId,
+                [config.sessionIdKey]: sessionId,
                 gmStyleId,
-              })),
+              })) as Array<
+                Pick<ISessionStyleRow, 'sessionId' | 'gmStyleId'>
+              >,
             )
             .pipe(map(() => void 0));
         }),
       );
   }
 
-  replaceSessionTemplateTriggers(
+  replaceSessionTriggers(
     sessionId: string,
     triggerIds: string[],
+    source: SessionSourceKind = 'template',
   ): Observable<void> {
     const uniqueTriggerIds = [...new Set(triggerIds.filter(Boolean))];
+    const config = SESSION_SOURCE_CONFIG[source];
 
     return this.backend
-      .delete('gm_session_template_triggers', {
-        gmSessionTemplateId: {
+      .delete(config.triggersTable, {
+        [config.sessionIdKey]: {
           operator: FilterOperator.EQ,
           value: sessionId,
         },
@@ -322,16 +380,15 @@ export class GmSessionsFacade {
 
           return this.backend
             .createMany<
-              Pick<
-                IGmSessionTemplateTriggerRow,
-                'gmSessionTemplateId' | 'contentTriggerId'
-              >
+              Pick<ISessionTriggerRow, 'sessionId' | 'contentTriggerId'>
             >(
-              'gm_session_template_triggers',
+              config.triggersTable,
               uniqueTriggerIds.map((contentTriggerId) => ({
-                gmSessionTemplateId: sessionId,
+                [config.sessionIdKey]: sessionId,
                 contentTriggerId,
-              })),
+              })) as Array<
+                Pick<ISessionTriggerRow, 'sessionId' | 'contentTriggerId'>
+              >,
             )
             .pipe(map(() => void 0));
         }),

@@ -1,0 +1,135 @@
+<section class="mg-section">
+  <div class="mg-container flex-col-start-stretch gap-md">
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    @if (selectedEventVm(); as selectedEventVm) {
+      <header class="mg-section__header w-100">
+        <h1 class="mg-section__title">
+          {{ i18n.page().title }}
+        </h1>
+
+        <p class="mg-section__subtitle">
+          {{ i18n.page().subtitle }}
+        </p>
+      </header>
+
+      <form [formGroup]="form" class="mg-card flex-col-start-stretch gap-md">
+        <div class="hide-down-sm">
+          <p-tabs
+            [value]="form.controls.eventId.value || selectedEventVm.event.id"
+          >
+            <p-tablist>
+              @for (
+                item of eventsVm() ?? [];
+                track trackByEventId($index, item)
+              ) {
+                <p-tab
+                  [value]="item.event.id"
+                  (click)="onEventChange(item.event.id)"
+                >
+                  {{ item.event.name }}
+                </p-tab>
+              }
+            </p-tablist>
+          </p-tabs>
+        </div>
+
+        <div class="show-down-sm">
+          <p-select
+            class="w-100"
+            [options]="eventOptions()"
+            optionLabel="label"
+            optionValue="value"
+            formControlName="eventId"
+            appendTo="body"
+          />
+        </div>
+
+        <div class="flex-col-start-stretch gap-sm">
+          <header class="mg-section__header w-100">
+            <h2 class="mg-section__title mg-section__title--md">
+              {{ selectedEventVm.event.name }}
+            </h2>
+
+            @if (selectedEventVm.event.shortDescription) {
+              <p class="mg-section__subtitle mg-section__subtitle">
+                {{ selectedEventVm.event.shortDescription }}
+              </p>
+            }
+          </header>
+
+          <div class="flex-col-start-stretch gap-xs">
+            <div>
+              <strong>{{ i18n.details().timeLabel }}:</strong>
+              {{ selectedEventTimeLabel() }}
+            </div>
+
+            <div>
+              <strong>{{ i18n.details().beginnersLabel }}:</strong>
+              {{
+                selectedEventVm.event.isForBeginners
+                  ? i18n.details().beginnersYes
+                  : i18n.details().beginnersNo
+              }}
+            </div>
+
+            @if (selectedEventVm.event.longDescription) {
+              <p class="m-0 lh-md">
+                {{ selectedEventVm.event.longDescription }}
+              </p>
+            }
+          </div>
+        </div>
+
+        <div class="flex-col-start-stretch gap-xs">
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.occurrences().title }}
+          </h3>
+
+          <p
+            class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+          >
+            {{ i18n.occurrences().subtitle }}
+          </p>
+        </div>
+
+        @if (!selectedEventVm.occurrences.length) {
+          <div class="flex-col-start-stretch gap-xs">
+            <h2 class="mg-section__title mg-section__title--sm m-0">
+              {{ i18n.empty().title }}
+            </h2>
+
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+              {{ i18n.empty().description }}
+            </p>
+          </div>
+        } @else {
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            @for (
+              item of selectedEventVm.occurrences;
+              track trackByOccurrenceId($index, item)
+            ) {
+              <p-button
+                [label]="item.label"
+                severity="secondary"
+                size="small"
+                [outlined]="!item.mySignup"
+                [disabled]="!item.canOpen"
+                (onClick)="
+                  openOccurrence(
+                    selectedEventVm.event.slug,
+                    item.occurrence.occurrenceDate,
+                    item.canOpen
+                  )
+                "
+              />
+            }
+          </div>
+        }
+      </form>
+    }
+  </div>
+</section>

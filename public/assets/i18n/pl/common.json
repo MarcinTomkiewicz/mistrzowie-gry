@@ -38,7 +38,15 @@
     "previous": "Wstecz",
     "submit": "Wyślij",
     "ok": "OK",
-    "logout": "Wyloguj się"
+    "logout": "Wyloguj się",
+    "yes": "Tak",
+    "no": "Nie"
+  },
+
+  "questions": {
+    "contact": "Masz pytania? Skontaktuj się z nami!",
+    "sure": "Na pewno?",
+    "deleteSession": "Czy na pewno usunąć sesję?"
   },
 
   "nav": {
@@ -121,6 +129,15 @@
 
   "info": {
     "outOfOrder": "Ta funkcja w tej chwili nie działa."
+  },
+
+  "fallbacks": {
+    "none": "Brak",
+    "nonePlural": "Brak",
+    "noStyles": "Brak stylów",
+    "noTriggers": "Brak triggerów",
+    "missingData": "Brak danych",
+    "emptySession": "Brak sesji"
   },
 
   "accessibility": {

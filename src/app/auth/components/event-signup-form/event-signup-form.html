@@ -1,0 +1,201 @@
+@let res = resources();
+
+<section class="mg-section">
+  <div class="mg-container flex-col-start-stretch gap-md">
+    <app-loading-overlay
+      [visible]="isBusy()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    <p-confirmdialog
+      key="event-signup-withdraw"
+      styleClass="mg-dialog mg-dialog--sm mg-confirmdialog"
+    />
+
+    @if (page(); as vm) {
+      @if (!vm.event || !vm.occurrence) {
+        <div class="mg-card flex-col-start-stretch gap-sm">
+          <h1 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.states().notFoundTitle }}
+          </h1>
+
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ i18n.states().notFoundDescription }}
+          </p>
+
+          <div class="flex-row-start-center gap-sm">
+            <p-button
+              [label]="i18n.actions().backToSelectionLabel"
+              severity="secondary"
+              [outlined]="true"
+              routerLink="/auth/event-signup"
+            />
+          </div>
+        </div>
+      } @else if (!vm.canAccess) {
+        <div class="mg-card flex-col-start-stretch gap-sm">
+          <h1 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.states().fullTitle }}
+          </h1>
+
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ i18n.states().fullDescription }}
+          </p>
+
+          <div class="flex-row-start-center gap-sm">
+            <p-button
+              [label]="i18n.actions().backToSelectionLabel"
+              severity="secondary"
+              [outlined]="true"
+              routerLink="/auth/event-signup"
+            />
+          </div>
+        </div>
+      } @else {
+        <header class="mg-section__header w-100">
+          <h1 class="mg-section__title">
+            {{ i18n.sections().pageTitlePrefix }}: {{ vm.event.name }}
+          </h1>
+
+          <h2 class="mg-section__title mg-section__title--sm">
+            {{ formatDateLabel(vm.occurrence.occurrenceDate, "pl-PL", true) }}
+          </h2>
+
+          <p class="mg-section__subtitle">
+            {{ i18n.sections().pageSubtitle }}
+          </p>
+        </header>
+
+        <p-breadcrumb class="w-100" [model]="breadcrumbs()" />
+
+        <app-occurrence-switcher
+          [options]="occurrenceOptions()"
+          [selectedIndex]="selectedOccurrenceIndex()"
+          [disabled]="isBusy()"
+          (selectedIndexChange)="onOccurrenceSelect($event)"
+          marginBottomClass="mb-xs"
+        />
+
+        @if (hasSubmittedSession()) {
+          <div class="mg-card flex-col-start-stretch gap-md">
+            <header class="mg-section__header w-100">
+              <h2 class="mg-section__title mg-section__title--md">
+                {{ i18n.sections().submittedSessionTitle }}
+              </h2>
+            </header>
+
+            <app-session-list
+              [sessions]="signupSessions()"
+              [labels]="sessionListLabels()"
+              [emptyTitle]="i18n.template().emptyTitle"
+              [emptyDescription]="i18n.template().emptyDescription"
+              [showActions]="false"
+              [busy]="isBusy()"
+              [actionLabel]="i18n.actions().withdrawLabel"
+              [actionSeverity]="'danger'"
+              [actionOutlined]="true"
+              [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
+              [playersLabel]="i18n.playersLabel"
+              [minAgeLabel]="i18n.minAgeLabel"
+              (action)="onWithdrawCurrentSession($event)"
+            />
+          </div>
+        } @else {
+          <div class="mg-card flex-col-start-stretch gap-md">
+            <div class="hide-down-sm">
+              <p-tabs [value]="mode()">
+                <p-tablist>
+                  <p-tab value="template" (click)="setMode('template')">
+                    {{ i18n.mode().templateLabel }}
+                  </p-tab>
+                  <p-tab value="custom" (click)="setMode('custom')">
+                    {{ i18n.mode().customLabel }}
+                  </p-tab>
+                </p-tablist>
+              </p-tabs>
+            </div>
+
+            <div class="show-down-sm w-100" [formGroup]="form">
+              <p-iftalabel class="w-100">
+                <p-select
+                  class="w-100"
+                  [options]="modeOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  formControlName="mode"
+                  appendTo="body"
+                />
+                <label>{{ i18n.form().modeLabel }}</label>
+              </p-iftalabel>
+            </div>
+          </div>
+
+          @if (isTemplateMode()) {
+            <div class="mg-card flex-col-start-stretch gap-md">
+              <app-session-list
+                [sessions]="templateSessions()"
+                [labels]="sessionListLabels()"
+                [emptyTitle]="i18n.template().emptyTitle"
+                [emptyDescription]="i18n.template().emptyDescription"
+                [showActions]="false"
+                [busy]="isBusy()"
+                [selectable]="true"
+                [selectedSessionId]="selectedTemplateId()"
+                [selectLabel]="i18n.actions().selectLabel"
+                [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
+                [playersLabel]="i18n.playersLabel"
+                [minAgeLabel]="i18n.minAgeLabel"
+                (select)="onTemplateSelect($event)"
+              />
+
+              <div class="flex-row-center-center gap-sm">
+                <p-button
+                  [label]="i18n.actions().submitLabel"
+                  severity="success"
+                  [disabled]="!canSubmitTemplate() || isBusy()"
+                  [loading]="isSubmitting()"
+                  loadingIcon="pi pi-d20"
+                  (onClick)="onSubmitTemplate()"
+                />
+              </div>
+            </div>
+          }
+
+          @if (isCustomMode()) {
+            <div class="mg-card flex-col-start-stretch gap-md">
+              <div class="w-100" [formGroup]="form">
+                @if (customSessionOptions().length) {
+                  <div class="w-80 w-100-sm">
+                    <p-iftalabel class="w-100">
+                      <p-select
+                        class="w-100"
+                        [options]="customSessionOptions()"
+                        optionLabel="label"
+                        optionValue="value"
+                        formControlName="customSessionId"
+                        appendTo="body"
+                      />
+                      <label>{{ i18n.custom().previousSessionsLabel }}</label>
+                    </p-iftalabel>
+                  </div>
+                }
+              </div>
+
+              <app-session-form
+                [initial]="selectedCustomSession()"
+                [systems]="res.systems"
+                [styles]="res.styles"
+                [triggers]="res.triggers"
+                [submitLabel]="i18n.actions().submitLabel"
+                [cancelLabel]="i18n.actions().resetLabel"
+                [busy]="isBusy()"
+                (save)="onSubmitCustom($event)"
+                (cancel)="onResetCustomSession()"
+              />
+            </div>
+          }
+        }
+      }
+    }
+  </div>
+</section>

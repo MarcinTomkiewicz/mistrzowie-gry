@@ -1,0 +1,51 @@
+<div class="flex-row-center-center gap-sm" [ngClass]="marginBottomClass()">
+  <p-button
+    icon="pi pi-chevron-left"
+    severity="secondary"
+    size="small"
+    [outlined]="true"
+    [disabled]="!canGoPrev()"
+    (onClick)="goToPrevious()"
+  />
+
+  <p-button
+    [label]="selectedOptionLabel()"
+    severity="secondary"
+    size="small"
+    [outlined]="true"
+    icon="pi pi-calendar"
+    iconPos="left"
+    [disabled]="disabled() || !options().length"
+    (onClick)="togglePopover($event)"
+  />
+
+  <p-button
+    icon="pi pi-chevron-right"
+    severity="secondary"
+    size="small"
+    [outlined]="true"
+    [disabled]="!canGoNext()"
+    (onClick)="goToNext()"
+  />
+</div>
+
+<p-popover #occurrencePopover styleClass="mg-popover">
+  <ul class="flex-col-start-stretch gap-xs min-w-200" role="listbox">
+    @for (option of options(); track trackByIndex($index)) {
+      <li class="li--unset" role="presentation">
+        <p-button
+          [label]="option.label"
+          [styleClass]="
+            isSelected($index)
+              ? 'mg-button-link-like is-active'
+              : 'mg-button-link-like'
+          "
+          size="small"
+          [text]="true"
+          (onClick)="selectOccurrence($index)"
+          [attr.aria-current]="isSelected($index) ? 'true' : null"
+        />
+      </li>
+    }
+  </ul>
+</p-popover>

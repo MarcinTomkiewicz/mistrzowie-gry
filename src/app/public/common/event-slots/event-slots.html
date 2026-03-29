@@ -1,0 +1,145 @@
+<section class="event-slots">
+  @if (isLoading()) {
+    <div class="mg-grid-3 grid-content-center">
+      @for (item of skeletonItems(); track item) {
+        <article class="mg-card flex-col-start-stretch gap-sm h-100 w-px-363">
+          <header class="min-h-lines-2">
+            <p-skeleton width="78%" height="2.5rem" borderRadius="6px" />
+          </header>
+
+          <div class="event-slot-card__image-wrap">
+            <p-skeleton width="100%" height="100%" borderRadius="10px" />
+          </div>
+
+          <div class="flex-col-start-stretch gap-sm mt-md">
+            <div
+              class="flex-row-between-center gap-sm flex-col-start-stretch-sm"
+            >
+              <div class="flex-col-start-stretch gap-xs flex-1">
+                <p-skeleton width="6rem" height="1rem" />
+                <p-skeleton width="8rem" height="2rem" borderRadius="10px" />
+              </div>
+
+              <p-skeleton
+                width="5.25rem"
+                height="1.5rem"
+                borderRadius="999px"
+              />
+            </div>
+
+            <div class="tag-badges">
+              <p-skeleton width="5rem" height="1.5rem" borderRadius="999px" />
+              <p-skeleton width="6rem" height="1.5rem" borderRadius="999px" />
+            </div>
+
+            <div class="tag-badges">
+              <p-skeleton width="5.5rem" height="1.5rem" borderRadius="999px" />
+              <p-skeleton width="6.5rem" height="1.5rem" borderRadius="999px" />
+              <p-skeleton width="4.5rem" height="1.5rem" borderRadius="999px" />
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="mg-grid-3 grid-content-center">
+      @for (item of displayItems(); track trackBySlot($index, item)) {
+        <article
+          class="mg-card flex-col-start-stretch gap-sm h-100 max-w-363"
+          [class.cursor-pointer]="item.canOpenDetails"
+          [attr.role]="item.canOpenDetails ? 'button' : null"
+          [attr.tabindex]="item.canOpenDetails ? 0 : null"
+          (click)="onSlotClick(item)"
+          (keydown)="onSlotKeydown($event, item)"
+        >
+          <header class="min-h-lines-2">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
+            >
+              {{ item.title }}
+            </h3>
+          </header>
+
+          <div class="event-slot-card__image-wrap">
+            <img
+              class="event-slot-card__image"
+              [src]="resolveImageSrc(item)"
+              [alt]="item.title"
+              width="640"
+              height="360"
+            />
+          </div>
+
+          <div class="flex-col-start-stretch gap-sm mt-md">
+            <div
+              class="flex-row-between-center gap-sm flex-row-between-center-sm"
+            >
+              <div class="flex-col-start-stretch gap-xs flex-1">
+                <span
+                  class="mg-section__subtitle mg-section__subtitle--no-margin"
+                >
+                  {{ i18n.labels().gm }}
+                </span>
+
+                @if (item.canOpenGmProfile && item.gmDisplayName) {
+                  <p-button
+                    [label]="item.gmDisplayName"
+                    severity="warn"
+                    size="small"
+                    [outlined]="true"
+                    (onClick)="onGmClick($event, item)"
+                  />
+                } @else {
+                  <span
+                    class="mg-section__title mg-section__title--xs mg-section__title--no-margin"
+                  >
+                    {{ item.gmDisplayName || i18n.commonFallbacks().none }}
+                  </span>
+                }
+              </div>
+
+              <div
+                class="tag-badge"
+                [class]="difficultyBadgeClass(item.difficultyLevel)"
+              >
+                {{ difficultyLabel(item.difficultyLevel) }}
+              </div>
+            </div>
+
+            @if (item.styles.length) {
+              <div class="tag-badges">
+                @for (style of item.styles; track style.id) {
+                  <span class="tag-badge tag-badge--golden">
+                    {{ style.label }}
+                  </span>
+                }
+              </div>
+            } @else {
+              <div class="tag-badges">
+                <span class="tag-badge tag-badge--muted">
+                  {{ i18n.commonFallbacks().noStyles }}
+                </span>
+              </div>
+            }
+
+            @if (item.triggers.length) {
+              <div class="tag-badges">
+                @for (trigger of item.triggers; track trigger.id) {
+                  <span class="tag-badge tag-badge--arcane">
+                    {{ trigger.label }}
+                  </span>
+                }
+              </div>
+            } @else {
+              <div class="tag-badges">
+                <span class="tag-badge tag-badge--muted">
+                  {{ i18n.commonFallbacks().noTriggers }}
+                </span>
+              </div>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

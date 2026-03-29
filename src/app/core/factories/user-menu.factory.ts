@@ -3,6 +3,7 @@ import { IUserMenuSection } from "../types/user-menu";
 export interface BuildUserMenuArgs {
   accountTitle: string;
   editProfileLabel: string;
+  eventSignupLabel: string;
 }
 
 export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
@@ -16,6 +17,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           label: args.editProfileLabel,
           path: '/auth/edit-profile',
         },
+        {
+          id: 'event-signup',
+          label: args.eventSignupLabel,
+          path: '/auth/event-signup'
+        }
       ],
     },
   ];

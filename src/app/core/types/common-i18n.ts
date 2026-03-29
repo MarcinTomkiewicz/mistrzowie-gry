@@ -1,3 +1,5 @@
+import { Signal } from '@angular/core';
+
 export type CommonCtaTranslations = {
   contactUs: string;
   joinProgram: string;
@@ -38,6 +40,8 @@ export type CommonActionsTranslations = {
   submit: string;
   ok: string;
   logout: string;
+  yes: string;
+  no: string;
 };
 
 export type CommonNavTranslations = {
@@ -288,3 +292,99 @@ export interface OurTeamDialogTranslations {
   yearsSuffix: string;
   noData: string;
 }
+
+export type EventSignupFormTranslations = {
+  modeLabel: string;
+  playersHeaderLabel: string;
+  minAgeHeaderLabel: string;
+};
+
+export type EventSignupFormActionsTranslations = {
+  submitLabel: string;
+  withdrawLabel: string;
+  backToSelectionLabel: string;
+  resetLabel: string;
+  selectLabel: string;
+};
+
+export type EventSignupFormStatesTranslations = {
+  notFoundTitle: string;
+  notFoundDescription: string;
+  fullTitle: string;
+  fullDescription: string;
+};
+
+export type EventSignupFormModeTranslations = {
+  templateLabel: string;
+  customLabel: string;
+};
+
+export type EventSignupFormTemplateTranslations = {
+  emptyTitle: string;
+  emptyDescription: string;
+};
+
+export type EventSignupFormCustomTranslations = {
+  previousSessionsLabel: string;
+};
+
+export type EventSignupFormSectionsTranslations = {
+  pageTitlePrefix: string;
+  pageSubtitle: string;
+  submittedSessionTitle: string;
+};
+
+export type EventSignupFormToastTranslations = {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+  withdrawSuccessSummary: string;
+  withdrawSuccessDetail: string;
+  withdrawFailedSummary: string;
+  withdrawFailedDetail: string;
+};
+
+export type EventSignupFormBreadcrumbTranslations = {
+  eventSignupLabel: string;
+};
+
+export type EventSignupFormNavigationTranslations = {
+  previousLabel: string;
+  nextLabel: string;
+};
+
+export type EventSlotsDifficultyTranslations = {
+  beginner: string;
+  intermediate: string;
+  advanced: string;
+};
+
+export type EventSlotsCommonFallbacksTranslations = {
+  none: string;
+  nonePlural: string;
+  noStyles: string;
+  noTriggers: string;
+  missingData: string;
+  emptySession: string;
+};
+
+export type EventSlotsLabelsTranslations = {
+  gm: string;
+};
+
+export type SessionDialogI18n = {
+  actions: Signal<CommonActionsTranslations>;
+};
+
+export type EventSignupFormConfirmationTranslations = {
+  withdrawMessage: string;
+};
+
+export type CommonQuestionsTranslations = {
+  contact: string;
+  sure: string;
+  deleteSession: string;
+};

@@ -7,6 +7,7 @@ export interface UserMenuTranslations {
   greeting: string;
   accountSectionTitle: string;
   editProfileLabel: string;
+  eventSignupLabel: string;
 }
 
 export function createUserMenuPanelI18n() {

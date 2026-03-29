@@ -1,0 +1,140 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
+$grid-breakpoints: ("xs", "sm", "md", "lg", "xl");
+
+$grid-columns-values: (
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4
+);
+
+/* =========================================================
+   BASE GRID HELPERS
+   ========================================================= */
+
+.mg-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: map.get(v.$spacings, "xl");
+  align-items: stretch;
+}
+
+.mg-grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: map.get(v.$spacings, "xl");
+  align-items: stretch;
+}
+
+.mg-grid-auto-fill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: map.get(v.$spacings, "xl");
+  align-items: stretch;
+}
+
+/* =========================================================
+   READY-TO-USE LAYOUTS
+   ========================================================= */
+
+.mg-grid-2 {
+  @include m.mg-grid(2, map.get(v.$spacings, "xl"), 0, true, 2, 1, 1);
+}
+
+.mg-grid-3 {
+  @include m.mg-grid(3, map.get(v.$spacings, "xl"), 0, true, 2, 1, 1);
+}
+
+.mg-grid-4 {
+  @include m.mg-grid(4, map.get(v.$spacings, "xl"), 0, true, 2, 1, 1);
+}
+
+/* trochę łagodniejsze schodzenie dla 4 kolumn */
+.mg-grid-4-soft {
+  @include m.mg-grid(4, map.get(v.$spacings, "xl"), 0, true, 3, 2, 1);
+}
+
+/* =========================================================
+   COLUMN COUNT UTILITIES
+   ========================================================= */
+
+@each $name, $value in $grid-columns-values {
+  .grid-cols-#{$name} {
+    grid-template-columns: repeat($value, minmax(0, 1fr));
+  }
+
+  @each $bp in $grid-breakpoints {
+    @include m.down($bp) {
+      .grid-cols-#{$name}-#{$bp} {
+        grid-template-columns: repeat($value, minmax(0, 1fr));
+      }
+    }
+  }
+}
+
+/* =========================================================
+   ALIGNMENT
+   ========================================================= */
+
+.grid-items-start {
+  align-items: start;
+}
+
+.grid-items-center {
+  align-items: center;
+}
+
+.grid-items-end {
+  align-items: end;
+}
+
+.grid-items-stretch {
+  align-items: stretch;
+}
+
+.grid-content-start {
+  justify-items: start;
+}
+
+.grid-content-center {
+  justify-items: center;
+}
+
+.grid-content-end {
+  justify-items: end;
+}
+
+.grid-content-stretch {
+  justify-items: stretch;
+}
+
+/* =========================================================
+   COMMON PATTERNS
+   ========================================================= */
+
+.grid-2-1 {
+  @include m.grid(minmax(0, 2fr) minmax(0, 1fr), map.get(v.$spacings, "xl"), stretch);
+
+  @include m.down("md") {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-1-2 {
+  @include m.grid(minmax(0, 1fr) minmax(0, 2fr), map.get(v.$spacings, "xl"), stretch);
+
+  @include m.down("md") {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-1-1 {
+  @include m.grid(repeat(2, minmax(0, 1fr)), map.get(v.$spacings, "xl"), stretch);
+
+  @include m.down("sm") {
+    grid-template-columns: 1fr;
+  }
+}

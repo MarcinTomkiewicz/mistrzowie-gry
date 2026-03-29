@@ -26,6 +26,7 @@
   flex-direction: $direction;
   justify-content: $justify;
   align-items: $align;
+
   @if $gap != null {
     gap: $gap;
   }
@@ -37,6 +38,7 @@
   } @else {
     display: flex;
   }
+
   justify-content: center;
   align-items: center;
 }
@@ -52,22 +54,39 @@
 @mixin mg-grid(
   $columns: 3,
   $gap: map.get(v.$spacings, "xl"),
-  $mt: map.get(v.$spacings, "xl"),
+  $mt: 0,
   $responsive: true,
   $md-columns: 2,
-  $sm-columns: 1
+  $sm-columns: 1,
+  $xs-columns: null,
+  $align: stretch
 ) {
   display: grid;
-  grid-template-columns: repeat($columns, 1fr);
+  grid-template-columns: repeat($columns, minmax(0, 1fr));
   gap: $gap;
-  margin-top: $mt;
+  align-items: $align;
+
+  @if $mt != null and $mt != 0 {
+    margin-top: $mt;
+  }
 
   @if $responsive == true {
-    @include down("md") {
-      grid-template-columns: repeat($md-columns, 1fr);
+    @if $md-columns != null {
+      @include down("md") {
+        grid-template-columns: repeat($md-columns, minmax(0, 1fr));
+      }
     }
-    @include down("sm") {
-      grid-template-columns: repeat($sm-columns, 1fr);
+
+    @if $sm-columns != null {
+      @include down("sm") {
+        grid-template-columns: repeat($sm-columns, minmax(0, 1fr));
+      }
+    }
+
+    @if $xs-columns != null {
+      @include down("xs") {
+        grid-template-columns: repeat($xs-columns, minmax(0, 1fr));
+      }
     }
   }
 }
@@ -165,9 +184,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  text-shadow:
-    // 0 0.25px 0.25px rgba(0,0,0,0.25),
-    0 0 5px rgba(232,188,90,0.15);
+  text-shadow: 0 0 5px rgba(232, 188, 90, 0.15);
 }
 
 /* Badge: golden – bez sassowych operacji na var() */
@@ -216,11 +233,7 @@
 
 /* Badge variant helper – bez color.scale */
 @mixin badge-variant($c, $bg-alpha: 0.12, $border-lightness: 10%) {
-  /* tekst lekko “podbić” – zamiast scale: miks z bielą */
   color: color-mix(in srgb, $c 85%, white);
-
-  /* jeśli chcesz wrócić do tła: działa z var() */
-  /* background: color-mix(in srgb, $c #{math.percentage($bg-alpha * 100)}, transparent); */
   border-color: color-mix(in srgb, $c 75%, white);
   box-shadow: 0 0 6px color-mix(in srgb, $c 25%, transparent);
 }

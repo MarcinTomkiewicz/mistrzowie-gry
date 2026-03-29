@@ -194,11 +194,12 @@ export class GmSessions {
 
     const request$ =
       this.isEditing() && this.editedSessionId()
-        ? this.gmSessionsFacade.updateMySessionTemplate(
+        ? this.gmSessionsFacade.updateMySession(
             this.editedSessionId()!,
             payload,
+            'template'
           )
-        : this.gmSessionsFacade.createMySessionTemplate(payload);
+        : this.gmSessionsFacade.createMySession(payload);
 
     request$.pipe(finalize(() => this.isSubmitting.set(false))).subscribe({
       next: (session) => {
@@ -237,7 +238,7 @@ export class GmSessions {
     this.isSubmitting.set(true);
 
     this.gmSessionsFacade
-      .deleteMySessionTemplate(sessionId)
+      .deleteMySession(sessionId)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {
@@ -275,7 +276,7 @@ export class GmSessions {
     this.isLoading.set(true);
 
     forkJoin({
-      sessions: this.gmSessionsFacade.getMySessionTemplates(),
+      sessions: this.gmSessionsFacade.getMySessions(),
       systems: this.gmSessionsFacade.getAvailableSystems(),
       mySessionSystems: this.gmSessionsFacade.getMySessionSystems(),
       styles: this.gmSessionsFacade.getAvailableStyles(),

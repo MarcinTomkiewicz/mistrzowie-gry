@@ -1,0 +1,53 @@
+@use "../abstracts/variables" as v;
+
+.p-confirmdialog.p-dialog.mg-confirmdialog {
+  .p-dialog-header {
+    background: v.$color-danger;
+    color: v.$color-white;
+    border-bottom-color: color-mix(in srgb, v.$color-danger 55%, v.$color-border);
+    padding: 0.5rem 1rem;
+
+    .p-dialog-title {
+      color: inherit;
+    }
+
+    .p-dialog-close-button {
+      color: v.$color-white;
+      opacity: 0.9;
+      background: transparent;
+
+      &:hover {
+        opacity: 1;
+        background: color-mix(in srgb, white 78%, transparent);
+        color: v.$color-ink;
+      }
+
+      &:active {
+        background: color-mix(in srgb, white 70%, transparent);
+        color: v.$color-ink;
+      }
+
+      &:focus-visible {
+        outline: 0;
+        box-shadow: 0 0 0 2px color-mix(in srgb, white 55%, transparent);
+      }
+    }
+  }
+
+  .p-dialog-content {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .p-confirmdialog-message {
+    color: v.$color-text;
+    line-height: 1.5;
+  }
+
+  .p-dialog-footer {
+    padding: 0.5rem;
+    .p-button {
+      min-width: 2rem;
+    }
+  }
+}

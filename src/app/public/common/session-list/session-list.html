@@ -1,3 +1,8 @@
+<p-confirmdialog
+  [key]="deleteConfirmKey"
+  styleClass="mg-dialog mg-dialog--sm mg-confirmdialog"
+/>
+
 <div class="w-100 hide-down-sm">
   <p-table
     [value]="sortedSessions()"
@@ -15,6 +20,15 @@
         <th class="small-caps">{{ labels().difficultyLabel }}</th>
         <th class="small-caps">{{ labels().playersLabel }}</th>
         <th class="small-caps">{{ labels().minAgeLabel }}</th>
+
+        @if (hasSelection()) {
+          <th class="w-10"></th>
+        }
+
+        @if (hasAction()) {
+          <th class="w-10"></th>
+        }
+
         @if (hasActions()) {
           <th class="w-10"></th>
         }
@@ -39,6 +53,37 @@
         <td>{{ resolveDifficultyLabel()(session.difficultyLevel) }}</td>
         <td>{{ playersLabel()(session.minPlayers, session.maxPlayers) }}</td>
         <td>{{ minAgeLabel()(session.minAge) }}</td>
+
+        @if (hasSelection()) {
+          <td>
+            <div class="flex-row-end-center">
+              <p-button
+                severity="success"
+                [outlined]="!isSelected(session.id)"
+                [label]="selectLabel()"
+                [disabled]="busy()"
+                size="small"
+                (onClick)="onSelect(session.id)"
+              />
+            </div>
+          </td>
+        }
+
+        @if (hasAction()) {
+          <td>
+            <div class="flex-row-end-center">
+              <p-button
+                [severity]="actionSeverity()"
+                [outlined]="actionOutlined()"
+                [label]="actionLabel()"
+                [disabled]="busy()"
+                size="small"
+                (onClick)="onAction(session.id)"
+                icon="pi pi-demolish"
+              />
+            </div>
+          </td>
+        }
 
         @if (hasActions()) {
           <td>
@@ -127,6 +172,37 @@
                   {{ minAgeLabel()(session.minAge) }}
                 </div>
               </div>
+
+              @if (hasSelection()) {
+                <div
+                  class="flex-row-center-center flex-row-center-stretch-xs gap-xs"
+                >
+                  <p-button
+                    severity="success"
+                    [outlined]="!isSelected(session.id)"
+                    [label]="selectLabel()"
+                    [disabled]="busy()"
+                    size="small"
+                    (onClick)="onSelect(session.id)"
+                  />
+                </div>
+              }
+
+              @if (hasAction()) {
+                <div
+                  class="flex-row-center-center flex-row-center-stretch-xs gap-xs"
+                >
+                  <p-button
+                    [severity]="actionSeverity()"
+                    [outlined]="actionOutlined()"
+                    [label]="actionLabel()"
+                    [disabled]="busy()"
+                    size="small"
+                    (onClick)="onAction(session.id)"
+                    icon="pi pi-demolish"
+                  />
+                </div>
+              }
 
               @if (hasActions()) {
                 <div

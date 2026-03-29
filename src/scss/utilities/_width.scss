@@ -3,7 +3,12 @@
 $widths: (10, 20, 25, 30, 35, 40, 50, 60, 70, 75, 80, 90, 100);
 $width-breakpoints: ("xl", "lg", "md", "sm", "xs");
 
-/* bazowe */
+$fixed-width-values: 0, 50, 100, 150, 200, 250, 300, 350, 363, 400, 450, 500;
+
+/* =========================================================
+   WIDTH (%)
+   ========================================================= */
+
 @each $w in $widths {
   .w-#{$w} {
     width: $w * 1% !important;
@@ -14,7 +19,6 @@ $width-breakpoints: ("xl", "lg", "md", "sm", "xs");
   width: auto !important;
 }
 
-/* responsive: down(xl|lg|md|sm|xs) */
 @each $bp in $width-breakpoints {
   @include m.down($bp) {
     @each $w in $widths {
@@ -25,6 +29,94 @@ $width-breakpoints: ("xl", "lg", "md", "sm", "xs");
 
     .w-auto-#{$bp} {
       width: auto !important;
+    }
+  }
+}
+
+/* =========================================================
+   WIDTH (px)
+   ========================================================= */
+
+@each $value in $fixed-width-values {
+  .w-px-#{$value} {
+    width: #{$value}px !important;
+  }
+}
+
+.w-px-auto {
+  width: auto !important;
+}
+
+@each $bp in $width-breakpoints {
+  @include m.down($bp) {
+    @each $value in $fixed-width-values {
+      .w-px-#{$value}-#{$bp} {
+        width: #{$value}px !important;
+      }
+    }
+
+    .w-px-auto-#{$bp} {
+      width: auto !important;
+    }
+  }
+}
+
+/* =========================================================
+   MIN / MAX WIDTH (px)
+   ========================================================= */
+
+@each $value in $fixed-width-values {
+  .min-w-#{$value} {
+    min-width: #{$value}px !important;
+  }
+
+  .max-w-#{$value} {
+    max-width: #{$value}px !important;
+  }
+}
+
+.min-w-auto {
+  min-width: auto !important;
+}
+
+.min-w-full {
+  min-width: 100% !important;
+}
+
+.max-w-none {
+  max-width: none !important;
+}
+
+.max-w-full {
+  max-width: 100% !important;
+}
+
+@each $bp in $width-breakpoints {
+  @include m.down($bp) {
+    @each $value in $fixed-width-values {
+      .min-w-#{$value}-#{$bp} {
+        min-width: #{$value}px !important;
+      }
+
+      .max-w-#{$value}-#{$bp} {
+        max-width: #{$value}px !important;
+      }
+    }
+
+    .min-w-auto-#{$bp} {
+      min-width: auto !important;
+    }
+
+    .min-w-full-#{$bp} {
+      min-width: 100% !important;
+    }
+
+    .max-w-none-#{$bp} {
+      max-width: none !important;
+    }
+
+    .max-w-full-#{$bp} {
+      max-width: 100% !important;
     }
   }
 }

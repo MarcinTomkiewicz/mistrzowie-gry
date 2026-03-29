@@ -106,6 +106,10 @@ pre {
   font-variant-caps: small-caps;
 }
 
+.pre-line {
+  white-space: pre-line;
+}
+
 :focus {
   outline: none;
 }

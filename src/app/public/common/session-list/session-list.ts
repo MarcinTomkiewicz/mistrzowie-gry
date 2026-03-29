@@ -1,13 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
 
-import { ISessionListLabels, ISessionWithRelations } from '../../../core/interfaces/i-session';
+import {
+  ISessionListLabels,
+  ISessionWithRelations,
+} from '../../../core/interfaces/i-session';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { SessionDetails } from '../session-details/session-details';
+import { createSessionListI18n } from './session-list.i18n';
 
 @Component({
   selector: 'app-session-list',
@@ -16,6 +22,7 @@ import { SessionDetails } from '../session-details/session-details';
     CommonModule,
     AccordionModule,
     ButtonModule,
+    ConfirmDialogModule,
     TableModule,
     SessionDetails,
   ],
@@ -23,6 +30,10 @@ import { SessionDetails } from '../session-details/session-details';
   styleUrl: './session-list.scss',
 })
 export class SessionList {
+  private static nextConfirmId = 0;
+
+  private readonly confirmation = inject(ConfirmationService);
+
   readonly sessions = input.required<ISessionWithRelations[]>();
 
   readonly labels = input.required<ISessionListLabels>();
@@ -35,6 +46,16 @@ export class SessionList {
   readonly showActions = input<boolean>(false);
   readonly busy = input<boolean>(false);
 
+  readonly selectable = input<boolean>(false);
+  readonly selectedSessionId = input<string | null>(null);
+  readonly selectLabel = input<string>('');
+
+  readonly actionLabel = input<string>('');
+  readonly actionSeverity = input<'secondary' | 'success' | 'danger'>(
+    'secondary',
+  );
+  readonly actionOutlined = input<boolean>(true);
+
   readonly resolveDifficultyLabel =
     input.required<(value: SessionDifficultyLevel) => string>();
 
@@ -45,9 +66,33 @@ export class SessionList {
 
   readonly edit = output<string>();
   readonly delete = output<string>();
+  readonly select = output<string>();
+  readonly action = output<string>();
+
+  readonly i18n = createSessionListI18n();
+  readonly deleteConfirmKey = `session-list-delete-${SessionList.nextConfirmId++}`;
 
   readonly hasActions = computed(() => this.showActions());
-  readonly colspan = computed(() => (this.hasActions() ? 7 : 6));
+  readonly hasSelection = computed(() => this.selectable());
+  readonly hasAction = computed(() => !!this.actionLabel().trim());
+
+  readonly colspan = computed(() => {
+    let columns = 6;
+
+    if (this.hasSelection()) {
+      columns += 1;
+    }
+
+    if (this.hasAction()) {
+      columns += 1;
+    }
+
+    if (this.hasActions()) {
+      columns += 1;
+    }
+
+    return columns;
+  });
 
   readonly sortedSessions = computed(() =>
     [...this.sessions()].sort((a, b) => {
@@ -63,6 +108,26 @@ export class SessionList {
     }),
   );
 
+  isSelected(sessionId: string): boolean {
+    return this.selectedSessionId() === sessionId;
+  }
+
+  onSelect(sessionId: string): void {
+    if (!this.hasSelection()) {
+      return;
+    }
+
+    this.select.emit(sessionId);
+  }
+
+  onAction(sessionId: string): void {
+    if (!this.hasAction()) {
+      return;
+    }
+
+    this.action.emit(sessionId);
+  }
+
   onEdit(sessionId: string): void {
     if (!this.hasActions()) {
       return;
@@ -72,10 +137,30 @@ export class SessionList {
   }
 
   onDelete(sessionId: string): void {
-    if (!this.hasActions()) {
+    if (!this.hasActions() || this.busy()) {
       return;
     }
 
-    this.delete.emit(sessionId);
+    this.confirmation.confirm({
+      key: this.deleteConfirmKey,
+      header: this.i18n.questions().sure,
+      message: this.i18n.questions().deleteSession,
+      closable: true,
+      closeOnEscape: true,
+      dismissableMask: true,
+      rejectVisible: true,
+      acceptLabel: this.i18n.actions().yes,
+      rejectLabel: this.i18n.actions().no,
+      accept: () => {
+        this.delete.emit(sessionId);
+      },
+      acceptButtonProps: {
+        severity: 'danger',
+      },
+      rejectButtonProps: {
+        severity: 'secondary',
+        outlined: true,
+      },
+    });
   }
 }

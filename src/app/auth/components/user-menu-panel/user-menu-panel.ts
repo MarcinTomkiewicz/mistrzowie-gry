@@ -33,6 +33,7 @@ readonly menuSections = computed(() =>
   buildUserMenu({
     accountTitle: this.i18n.userMenu().accountSectionTitle,
     editProfileLabel: this.i18n.userMenu().editProfileLabel,
+    eventSignupLabel: this.i18n.userMenu().eventSignupLabel
   }),
 );
 

@@ -1,0 +1,30 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [styleClass]="'mg-dialog mg-dialog--xl'"
+  (visibleChange)="onVisibleChange($event)"
+>
+  @if (session(); as currentSession) {
+    <app-session-details [session]="currentSession" />
+  }
+  <ng-template pTemplate="header">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ header() }}
+    </h2>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="flex-row-end-center">
+      <p-button
+        [label]="i18n.actions().close"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()"
+        class="mt-md"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

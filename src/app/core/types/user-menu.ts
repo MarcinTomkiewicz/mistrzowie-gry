@@ -1,5 +1,6 @@
 export type UserMenuItemId =
   | 'edit-profile'
+  | 'event-signup'
 
 export type UserMenuSectionId =
   | 'account';

@@ -22,26 +22,38 @@
   inset: 0;
   pointer-events: none;
   display: grid;
-  place-items: center;
-  opacity: 0.35;
+  place-items: start center;
+  padding-top: 5rem;
+  opacity: 0.2;
+  top: 30%
 }
 
 .mg-chaotic-hero__dice {
   position: absolute;
-  font-size: 3rem;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  color: v.$color-secondary;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
 
   &:nth-child(1) {
-    transform: translate(-35%, -10%) rotate(-12deg);
+    transform: translate(-95%, 4%) rotate(-10deg) scale(1.02);
   }
 
   &:nth-child(2) {
-    transform: translate(20%, -25%) rotate(10deg);
+    transform: translate(0%, -18%) rotate(8deg) scale(0.94);
   }
 
   &:nth-child(3) {
-    transform: translate(30%, 20%) rotate(-6deg);
+    transform: translate(92%, 18%) rotate(-5deg) scale(0.9);
   }
+}
+
+.mg-chaotic-hero__dice-icon {
+  font-size: 2.35rem;
+  line-height: 1;
 }
 
 .mg-chaotic-grid {

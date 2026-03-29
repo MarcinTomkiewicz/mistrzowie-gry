@@ -63,7 +63,7 @@ $flex-basis-values: (
   auto: auto
 );
 
-$min-width-values: (
+$width-values: (
   0: 0,
   120: 120px,
   160: 160px,
@@ -71,6 +71,7 @@ $min-width-values: (
   240: 240px,
   250: 250px,
   300: 300px,
+  363: 363px,
   400: 400px,
   full: 100%,
   auto: auto
@@ -273,7 +274,8 @@ $min-height-values: (
 @include _emit-prop-map(flex, $flex-values, flex);
 @include _emit-prop-map(flex-grow, $flex-grow-values, flex-grow);
 @include _emit-prop-map(flex-shrink, $flex-shrink-values, flex-shrink);
-@include _emit-prop-map(min-w, $min-width-values, min-width);
+@include _emit-prop-map(min-w, $width-values, min-width);
+@include _emit-prop-map(max-w, $width-values, max-width);
 @include _emit-prop-map(min-h, $min-height-values, min-height);
 @include _emit-prop-map(basis, $flex-basis-values, flex-basis, true);
 @include _emit-flex-fixed-map($flex-basis-values);
