@@ -282,7 +282,7 @@ export class EventSignup {
   ): Observable<IEventProgramItem> {
     return this.backend.create<IEventProgramItem>('event_program_items', {
       ...payload,
-      status: EventProgramItemStatus.Submitted,
+      status: EventProgramItemStatus.Published,
       displayOrder: null,
     } as IEventProgramItem);
   }

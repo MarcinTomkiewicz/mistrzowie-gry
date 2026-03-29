@@ -26,6 +26,7 @@
    CANONICAL VARIANTS (NOWE API)
    ========================================================= */
 
+.tag-badge--primary { @include m.badge-variant(v.$color-primary, 0.10, 10%); }
 .tag-badge--success { @include m.badge-variant(v.$color-success, 0.14, 8%); }
 .tag-badge--danger  { @include m.badge-variant(v.$color-danger, 0.10, 6%); }
 .tag-badge--info    { @include m.badge-variant(v.$color-info,   0.10, 8%); }
@@ -106,7 +107,6 @@
   text-align: center;
   border: 2px solid v.$color-bg;
 
-  /* zamiast rgba(0,0,0,0.25) – zostawiamy stałą, bo to “cień”, nie token */
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
 
   pointer-events: none;

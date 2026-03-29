@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
+import { Theme } from '../../../core/services/theme/theme';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { createEventSlotsI18n } from './event-slots.i18n';
 
@@ -16,6 +17,8 @@ import { createEventSlotsI18n } from './event-slots.i18n';
   styleUrl: './event-slots.scss',
 })
 export class EventSlots {
+  private readonly theme = inject(Theme);
+
   readonly items = input<IEventSlotCardVm[]>([]);
   readonly slotCount = input<number>(0);
   readonly isLoading = input<boolean>(false);
@@ -25,6 +28,10 @@ export class EventSlots {
 
   readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
   readonly i18n = createEventSlotsI18n();
+
+  readonly styleBadgeClass = computed(() =>
+    this.theme.isLight() ? 'tag-badge--primary' : 'tag-badge--golden',
+  );
 
   readonly displayItems = computed<IEventSlotCardVm[]>(() => {
     const items = this.items() ?? [];
@@ -102,7 +109,6 @@ export class EventSlots {
   difficultyLabel(
     difficulty: SessionDifficultyLevel | null | undefined,
   ): string {
-    
     if (!difficulty) {
       return this.i18n.commonFallbacks().missingData;
     }

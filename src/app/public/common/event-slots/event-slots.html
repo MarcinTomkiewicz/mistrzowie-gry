@@ -109,7 +109,7 @@
             @if (item.styles.length) {
               <div class="tag-badges">
                 @for (style of item.styles; track style.id) {
-                  <span class="tag-badge tag-badge--golden">
+                  <span class="tag-badge" [class]="styleBadgeClass()">
                     {{ style.label }}
                   </span>
                 }
