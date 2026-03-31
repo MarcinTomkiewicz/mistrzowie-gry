@@ -5,11 +5,16 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { catchError, of } from 'rxjs';
 
+import { buildSiteUrl } from '../../../core/config/site';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import {
+  createOrganizationRef,
+  createPageStructuredData,
+} from '../../../core/utils/structured-data';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createOurTeamI18n } from './our-team.i18n';
@@ -26,6 +31,7 @@ export class OurTeam {
   private readonly gmRead = inject(GmRead);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
+  private readonly pageUrl = buildSiteUrl('/our-team');
 
   readonly i18n = createOurTeamI18n();
   readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
@@ -78,10 +84,12 @@ export class OurTeam {
     this.seo.apply({
       title,
       description,
+      canonicalUrl: this.pageUrl,
       og: {
         title,
         description,
       },
+      structuredData: this.buildStructuredData(title, description),
     });
   });
 
@@ -116,5 +124,52 @@ export class OurTeam {
     }
 
     return `fi fi-${code}`;
+  }
+
+  private buildStructuredData(title: string, description: string) {
+    const profiles = this.profiles() ?? [];
+
+    const people = profiles.map((profile) => {
+      const profileId = normalizeText(profile.profile.id) ?? profile.user.id;
+      const image = this.getImageUrl(profile);
+      const profileDescription =
+        normalizeText(profile.profile.description) ??
+        normalizeText(profile.user.shortDescription) ??
+        normalizeText(profile.user.longDescription) ??
+        undefined;
+
+      return {
+        '@type': 'Person',
+        '@id': `${this.pageUrl}#person-${profileId}`,
+        name: this.gmRead.getDisplayName(profile) || 'Mistrz Gry',
+        description: profileDescription,
+        image: image ?? undefined,
+        jobTitle: 'Mistrz Gry',
+        worksFor: createOrganizationRef(),
+        knowsLanguage:
+          profile.profile.languages.map((language) => language.label).filter(Boolean),
+      };
+    });
+
+    return [
+      createPageStructuredData({
+        type: 'AboutPage',
+        id: `${this.pageUrl}#webpage`,
+        url: this.pageUrl,
+        name: title,
+        description,
+        mainEntity: {
+          '@type': 'ItemList',
+          itemListElement: people.map((person, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+              '@id': person['@id'],
+            },
+          })),
+        },
+      }),
+      ...people,
+    ];
   }
 }

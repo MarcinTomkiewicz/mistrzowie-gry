@@ -1,11 +1,10 @@
-import {
-  afterNextRender,
-  AfterRenderRef,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject } from '@angular/core';
 
+import {
+  createOrganizationStructuredData,
+  createWebsiteStructuredData,
+  SOCIAL_SHARE_IMAGE,
+} from './core/config/site';
 import { Seo } from './core/services/seo/seo';
 import { AppShell } from './public/components/app-shell/app-shell';
 
@@ -18,10 +17,7 @@ import { AppShell } from './public/components/app-shell/app-shell';
 })
 export class App {
   private readonly seo = inject(Seo);
-
-  private readonly afterRenderRef: AfterRenderRef;
-
-  readonly isLightTheme = signal(false);
+  private readonly socialShareImage = SOCIAL_SHARE_IMAGE;
 
   constructor() {
     this.seo.apply({
@@ -32,7 +28,7 @@ export class App {
         type: 'website',
         images: [
           {
-            url: 'https://ik.imagekit.io/ialsnkfw5g/logo/logoMG.png?tr=w-1200,q-75,f-jpg',
+            url: this.socialShareImage,
             width: 1200,
             height: 1200,
             alt: 'Mistrzowie Gry',
@@ -42,39 +38,12 @@ export class App {
       },
       twitter: {
         card: 'summary_large_image',
-        image:
-          'https://ik.imagekit.io/ialsnkfw5g/logo/logoMG.png?tr=w-1200,q-75,f-jpg',
+        image: this.socialShareImage,
       },
+      structuredData: [
+        createOrganizationStructuredData(),
+        createWebsiteStructuredData(),
+      ],
     });
-
-    this.afterRenderRef = afterNextRender(() => {
-      this.syncThemeFromDom();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.afterRenderRef.destroy();
-  }
-
-  onThemeToggle(): void {
-    this.applyTheme(this.isLightTheme() ? 'light' : 'dark');
-  }
-
-  private syncThemeFromDom(): void {
-    const root = document.documentElement;
-    this.isLightTheme.set(root.getAttribute('data-theme') === 'light');
-  }
-
-  private applyTheme(theme: 'dark' | 'light'): void {
-    const root = document.documentElement;
-
-    if (theme === 'light') {
-      root.setAttribute('data-theme', 'light');
-      this.isLightTheme.set(true);
-      return;
-    }
-
-    root.removeAttribute('data-theme');
-    this.isLightTheme.set(false);
   }
 }

@@ -16,10 +16,12 @@ import {
   OfferPageTypeEnum,
   OfferSectionTypeEnum,
 } from '../../../core/enums/offers';
+import { SITE_URL } from '../../../core/config/site';
 import { Offer } from '../../../core/services/offer/offer';
 import { Seo } from '../../../core/services/seo/seo';
-import type { OfferItemId } from '../../../core/types/offers';
+import type { OfferItemId, OfferPageVm } from '../../../core/types/offers';
 import { normalizeFaqItems } from '../../../core/utils/display-items';
+import { createPageStructuredData } from '../../../core/utils/structured-data';
 import {
   formatAddonPricing,
   formatPricing,
@@ -52,6 +54,7 @@ export class Offers {
   private readonly route = inject(ActivatedRoute);
   private readonly offer = inject(Offer);
   private readonly seo = inject(Seo);
+  private readonly siteUrl = SITE_URL;
 
   readonly i18n = createOffersI18n();
 
@@ -81,6 +84,7 @@ export class Offers {
       this.seo.apply({
         title: this.i18n.seo().title || 'Oferta',
         description: this.i18n.seo().description || '',
+        canonicalUrl: `${this.siteUrl}/offer/${this.slug()}`,
       });
       return;
     }
@@ -88,7 +92,9 @@ export class Offers {
     this.seo.apply({
       title: vm.page.seo.title?.trim() || vm.page.title,
       description: vm.page.seo.description?.trim() || vm.page.subtitle || '',
-      canonicalUrl: vm.page.seo.canonicalUrl?.trim() || undefined,
+      canonicalUrl:
+        vm.page.seo.canonicalUrl?.trim() ||
+        `${this.siteUrl}/offer/${vm.page.slug}`,
       og: {
         title:
           vm.page.seo.ogTitle?.trim() ||
@@ -100,6 +106,7 @@ export class Offers {
           vm.page.subtitle ||
           '',
       },
+      structuredData: this.buildCollectionStructuredData(vm),
     });
   });
 
@@ -186,4 +193,42 @@ export class Offers {
 
   readonly shouldShowLeadToggle = (text?: string | null) =>
     !!text && text.trim().length > 180;
+
+  private buildCollectionStructuredData(vm: OfferPageVm) {
+    const canonicalUrl =
+      vm.page.seo.canonicalUrl?.trim() || `${this.siteUrl}/offer/${vm.page.slug}`;
+
+    const uniqueItems = new Map<number, { title: string; lead: string | null }>();
+
+    for (const section of vm.sections) {
+      for (const item of section.items) {
+        if (!uniqueItems.has(item.id)) {
+          uniqueItems.set(item.id, {
+            title: item.title,
+            lead: item.lead,
+          });
+        }
+      }
+    }
+
+    return createPageStructuredData({
+      type: 'CollectionPage',
+      id: `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: vm.page.seo.title?.trim() || vm.page.title,
+      description: vm.page.seo.description?.trim() || vm.page.subtitle || '',
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: Array.from(uniqueItems.entries()).map(
+          ([id, item], index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            url: `${canonicalUrl}#offer-item-${id}`,
+            name: item.title,
+            description: item.lead ?? undefined,
+          }),
+        ),
+      },
+    });
+  }
 }

@@ -1,6 +1,10 @@
 import { DOCUMENT, Injectable, REQUEST, inject, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { ISeoConfig } from '../../interfaces/i-seo';
+import {
+  ISeoConfig,
+  ISeoStructuredDataNode,
+} from '../../interfaces/i-seo';
+import { SITE_NAME, SITE_URL } from '../../config/site';
 
 @Injectable({ providedIn: 'root' })
 export class Seo {
@@ -11,9 +15,10 @@ export class Seo {
 
   readonly last = signal<ISeoConfig | null>(null);
 
-  private readonly publicOrigin = 'https://mistrzowie-gry.pl';
+  private readonly publicOrigin = SITE_URL;
+  private readonly structuredDataSelector = 'script[data-mg-json-ld="true"]';
 
-  private readonly siteName = 'Mistrzowie Gry';
+  private readonly siteName = SITE_NAME;
 
   private readonly defaultDescription =
     'Nie przejmuj się brakiem Mistrza Gry ani czytaniem podręczników. Organizujemy sesje RPG dla początkujących, prowadzimy gry fabularne, pomagamy zacząć grać i znaleźć drużynę.';
@@ -41,6 +46,7 @@ export class Seo {
     this.applyOpenGraph(normalized, absoluteUrl);
     this.applyTwitter(normalized);
     this.setCanonical(absoluteUrl);
+    this.applyStructuredData(normalized.structuredData);
   }
 
   clear(): void {
@@ -67,6 +73,7 @@ export class Seo {
     this.removeMetaName('twitter:image');
 
     this.removeCanonical();
+    this.clearStructuredData();
   }
 
   private applyOpenGraph(config: ISeoConfig, absoluteUrl?: string): void {
@@ -168,18 +175,40 @@ export class Seo {
     };
   }
 
-  private normalizeCanonicalUrl(url: string): string {
-  const parsed = new URL(url);
+  private applyStructuredData(
+    structuredData?: ISeoStructuredDataNode | ISeoStructuredDataNode[],
+  ): void {
+    this.clearStructuredData();
 
-  parsed.hash = '';
-  parsed.search = '';
+    if (!structuredData) {
+      return;
+    }
 
-  if (parsed.pathname !== '/' && parsed.pathname.endsWith('/')) {
-    parsed.pathname = parsed.pathname.slice(0, -1);
+    const nodes = Array.isArray(structuredData)
+      ? structuredData
+      : [structuredData];
+
+    for (const node of nodes) {
+      const script = this.document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-mg-json-ld', 'true');
+      script.textContent = this.serializeStructuredData(node);
+      this.document.head.appendChild(script);
+    }
   }
 
-  return parsed.toString();
-}
+  private normalizeCanonicalUrl(url: string): string {
+    const parsed = new URL(url);
+
+    parsed.hash = '';
+    parsed.search = '';
+
+    if (parsed.pathname !== '/' && parsed.pathname.endsWith('/')) {
+      parsed.pathname = parsed.pathname.slice(0, -1);
+    }
+
+    return parsed.toString();
+  }
 
   private setMetaName(name: string, content: string): void {
     this.meta.updateTag({ name, content }, `name='${name}'`);
@@ -219,6 +248,23 @@ export class Seo {
     this.document.head
       .querySelector<HTMLLinkElement>('link[rel="canonical"]')
       ?.remove();
+  }
+
+  private clearStructuredData(): void {
+    this.document.head
+      .querySelectorAll<HTMLScriptElement>(this.structuredDataSelector)
+      .forEach((node) => node.remove());
+  }
+
+  private serializeStructuredData(node: ISeoStructuredDataNode): string {
+    const normalizedNode = node['@context']
+      ? node
+      : {
+          '@context': 'https://schema.org',
+          ...node,
+        };
+
+    return JSON.stringify(normalizedNode).replace(/</g, '\\u003C');
   }
 
   private buildAbsoluteUrl(): string {

@@ -21,6 +21,7 @@ import {
   EventOccurrenceStatus,
   EventProgramItemStatus,
 } from '../../../core/enums/event';
+import { buildSiteUrl } from '../../../core/config/site';
 import { IEvent } from '../../../core/interfaces/i-event';
 import { IEventOccurrence } from '../../../core/interfaces/i-event-occurence';
 import { IEventProgramItemWithDetails } from '../../../core/interfaces/i-event-program-item';
@@ -39,6 +40,10 @@ import {
   getTodayIso,
 } from '../../../core/utils/date';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import {
+  createEventStructuredData,
+  createOfferStructuredData,
+} from '../../../core/utils/structured-data';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { OccurrenceSwitcher } from '../../common/occurrence-switcher/occurrence-switcher';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
@@ -82,6 +87,7 @@ export class ChaoticThursdays implements OnInit {
   private readonly eventRead = inject(EventRead);
   private readonly gmRead = inject(GmRead);
   private readonly storage = inject(Storage);
+  private readonly pageUrl = buildSiteUrl('/chaotic-thursdays');
 
   readonly i18n = createChaoticThursdaysI18n(
     CHAOTIC_HIGHLIGHT_ICONS,
@@ -177,9 +183,13 @@ export class ChaoticThursdays implements OnInit {
   });
 
   private readonly applySeoEffect = effect(() => {
+    const pageVm = this.pageVm();
+
     this.seo.apply({
       title: this.i18n.seoTitle() || 'Chaotyczne Czwartki',
       description: this.i18n.seoDescription() || '',
+      canonicalUrl: this.pageUrl,
+      structuredData: this.buildStructuredData(pageVm),
     });
   });
 
@@ -290,5 +300,54 @@ export class ChaoticThursdays implements OnInit {
     }
 
     return this.storage.getPublicUrl(normalized);
+  }
+
+  private buildStructuredData(pageVm: EventProgramPageVm | null) {
+    const title = pageVm?.event.name || this.i18n.hero().title;
+    const description =
+      pageVm?.event.longDescription ||
+      pageVm?.event.shortDescription ||
+      this.i18n.seoDescription() ||
+      '';
+
+    const image = this.getImageUrl(pageVm?.event.coverImagePath);
+    const eventStartTime = pageVm?.event.startTime ?? '17:00';
+    const eventEndTime = pageVm?.event.endTime ?? '22:15';
+    const offers = createOfferStructuredData({
+      price: '40',
+      url: this.pageUrl,
+    });
+    const subEvents = (pageVm?.occurrences ?? []).slice(0, 8).map((occurrence) =>
+      createEventStructuredData({
+        id: `${this.pageUrl}#occurrence-${occurrence.id}`,
+        url: this.pageUrl,
+        name: title,
+        startDate: `${occurrence.occurrenceDate}T${eventStartTime}:00`,
+        endDate: `${occurrence.occurrenceDate}T${eventEndTime}:00`,
+        offers,
+      }),
+    );
+
+    const firstOccurrence = subEvents[0];
+    const firstOccurrenceStartDate =
+      firstOccurrence && typeof firstOccurrence['startDate'] === 'string'
+        ? firstOccurrence['startDate']
+        : undefined;
+    const firstOccurrenceEndDate =
+      firstOccurrence && typeof firstOccurrence['endDate'] === 'string'
+        ? firstOccurrence['endDate']
+        : undefined;
+
+    return createEventStructuredData({
+      id: `${this.pageUrl}#event`,
+      url: this.pageUrl,
+      name: title,
+      description,
+      image: image ?? undefined,
+      startDate: firstOccurrenceStartDate,
+      endDate: firstOccurrenceEndDate,
+      offers,
+      subEvent: subEvents,
+    });
   }
 }

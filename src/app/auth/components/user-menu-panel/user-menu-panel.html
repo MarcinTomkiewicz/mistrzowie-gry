@@ -1,6 +1,14 @@
 <header class="flex-col-start-center min-w-200">
   <div class="mg-section__title mg-section__title--sm m-0">
-    {{ i18n.userMenu().greeting }} {{ usernameDisplay() }}
+    {{ i18n.userMenu().greeting }}
+    @if (hasUsername()) {
+      <span>{{ usernameDisplay() }}</span>
+    } @else {
+      <span
+        class="mg-user-menu__name-placeholder"
+        aria-hidden="true"
+      ></span>
+    }
   </div>
   <p-divider />
 

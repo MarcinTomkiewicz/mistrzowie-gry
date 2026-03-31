@@ -1,3 +1,19 @@
 .p-popover-content[data-pc-section=content] {
     min-width: 250px;
 }
+
+.mg-user-menu__name-placeholder {
+  display: inline-block;
+  width: 6.5rem;
+  height: 0.95em;
+  margin-left: 0.35rem;
+  vertical-align: -0.08em;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--mg-color-text-muted) 22%, transparent) 0%,
+      color-mix(in srgb, var(--mg-color-text-muted) 38%, transparent) 50%,
+      color-mix(in srgb, var(--mg-color-text-muted) 22%, transparent) 100%
+    );
+}

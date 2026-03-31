@@ -1,0 +1,46 @@
+@use "sass:map";
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as m;
+
+.mg-legal-dialog__backdrop {
+  z-index: 1290;
+}
+
+.mg-legal-dialog {
+  position: fixed;
+  inset: 5vh auto auto 50%;
+  z-index: 1300;
+  max-height: 90vh;
+  transform: translateX(-50%);
+}
+
+.mg-legal-dialog__header-copy {
+  color: v.$heading-color;
+}
+
+.mg-legal-dialog__header-copy .p-dialog-title {
+  color: v.$heading-color;
+}
+
+.mg-legal-dialog__subtitle {
+  max-width: 64ch;
+  color: v.$heading-color;
+}
+
+.mg-legal-dialog__body {
+  overflow: auto;
+  max-height: calc(90vh - 9.5rem);
+  padding-right: map.get(v.$spacings, "xs");
+}
+
+@include m.down("sm") {
+  .mg-legal-dialog {
+    inset: 2vh auto auto 50%;
+    max-height: 96vh;
+  }
+
+  .mg-legal-dialog__body {
+    max-height: calc(96vh - 9.5rem);
+    padding-right: 0;
+  }
+}

@@ -26,6 +26,10 @@
             [class]="`${resolveIconClassNames(option).join(' ')} mr-xs`"
             aria-hidden="true"
           ></span>
+        } @else if (option.iconText) {
+          <span class="chip-picker__icon mr-xs" aria-hidden="true">
+            {{ option.iconText }}
+          </span>
         }
 
         <span class="chip-picker__label">{{ option.label }}</span>

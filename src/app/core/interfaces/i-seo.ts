@@ -8,6 +8,8 @@ export interface ISeoOpenGraphImage {
   type?: string; // e.g. image/png
 }
 
+export type ISeoStructuredDataNode = Record<string, unknown>;
+
 export interface ISeoConfig {
   /** <title> */
   title: string;
@@ -38,4 +40,7 @@ export interface ISeoConfig {
     description?: string;
     image?: string;
   };
+
+  /** JSON-LD / Schema.org structured data */
+  structuredData?: ISeoStructuredDataNode | ISeoStructuredDataNode[];
 }

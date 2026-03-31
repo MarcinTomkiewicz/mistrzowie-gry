@@ -1,19 +1,25 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  Type,
+  ViewContainerRef,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { DrawerModule } from 'primeng/drawer';
 import { Popover, PopoverModule } from 'primeng/popover';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { Auth } from '../../../core/services/auth/auth';
+import { AuthSession } from '../../../core/services/auth-session/auth-session';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
 import { createNavbarI18n, UIMenu } from './navbar.i18n';
-import { UserMenuPanel } from '../../../auth/components/user-menu-panel/user-menu-panel';
 
 @Component({
   selector: 'app-navbar',
@@ -22,16 +28,14 @@ import { UserMenuPanel } from '../../../auth/components/user-menu-panel/user-men
     RouterModule,
     PopoverModule,
     DrawerModule,
-    ConfirmPopupModule,
     ThemeSwitch,
-    UserMenuPanel,
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
   providers: [provideTranslocoScope('common')],
 })
 export class Navbar {
-  private readonly auth = inject(Auth);
+  private readonly authSession = inject(AuthSession);
   private readonly nav = inject(Navigation);
   private readonly uiConfirm = inject(UiConfirm);
 
@@ -39,10 +43,14 @@ export class Navbar {
   readonly i18n = createNavbarI18n();
 
   readonly menu = computed(() => this.i18n.resolveMenu(this.nav.navbar()));
-  readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
+  readonly isAuthenticated = computed(() =>
+    this.authSession.isAuthenticated(),
+  );
 
   readonly mobileOpen = signal(false);
   readonly activeDropdown = signal<UIMenu | null>(null);
+  readonly isUserMenuLoading = signal(false);
+  readonly isUserMenuLoaded = signal(false);
 
   readonly activeChildren = computed(
     () => this.activeDropdown()?.children ?? [],
@@ -52,6 +60,9 @@ export class Navbar {
 
   private readonly navPopover = viewChild<Popover>('navPopover');
   private readonly userPopover = viewChild<Popover>('userPopover');
+  private readonly userMenuHost = viewChild('userMenuHost', {
+    read: ViewContainerRef,
+  });
 
   openDropdown(event: Event, item: UIMenu): void {
     if (!item.children?.length) return;
@@ -71,8 +82,9 @@ export class Navbar {
     this.activeDropdown.set(null);
   }
 
-  openUserMenu(event: Event): void {
+  async openUserMenu(event: Event): Promise<void> {
     this.closeDropdown();
+    await this.ensureUserMenuLoaded();
     this.userPopover()?.toggle(event);
   }
 
@@ -99,6 +111,43 @@ export class Navbar {
       message: this.i18n.info().outOfOrder,
       acceptLabel: this.i18n.actions().ok,
     });
+  }
+
+  private async ensureUserMenuLoaded(): Promise<void> {
+    if (this.isUserMenuLoaded()) {
+      return;
+    }
+
+    const host = this.userMenuHost();
+    if (!host) {
+      return;
+    }
+
+    this.isUserMenuLoading.set(true);
+
+    try {
+      const { UserMenuPanel } = await import(
+        '../../../auth/components/user-menu-panel/user-menu-panel'
+      );
+
+      host.clear();
+
+      const componentRef = host.createComponent(
+        UserMenuPanel as Type<unknown>,
+      );
+
+      const instance = componentRef.instance as {
+        closed?: { subscribe: (cb: () => void) => { unsubscribe(): void } };
+      };
+
+      instance.closed?.subscribe(() => {
+        this.closeUserMenu();
+      });
+
+      this.isUserMenuLoaded.set(true);
+    } finally {
+      this.isUserMenuLoading.set(false);
+    }
   }
 
   trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;

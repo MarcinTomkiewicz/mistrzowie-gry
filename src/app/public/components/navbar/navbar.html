@@ -1,6 +1,6 @@
 <nav class="mg-navbar w-100">
   <div class="h-100 flex-row-between-center px-md">
-    <a routerLink="/" aria-label="Strona główna">
+    <a routerLink="/" aria-label="Strona glowna">
       <img
         [src]="brandLogoSrc()"
         width="135"
@@ -35,7 +35,7 @@
                 class="mg-navbar__caret flex-row-start-center ml-xs"
                 aria-hidden="true"
               >
-                ▾
+                ▼
               </span>
             </button>
           }
@@ -111,7 +111,11 @@
 </p-popover>
 
 <p-popover #userPopover styleClass="mg-popover" (onHide)="closeUserMenu()">
-  <app-user-menu-panel (closed)="closeUserMenu()" />
+  @if (isUserMenuLoading()) {
+    <div class="p-sm">{{ i18n.status().loading }}</div>
+  }
+
+  <ng-container #userMenuHost />
 </p-popover>
 
 <p-drawer
@@ -124,7 +128,7 @@
   <ng-template #headless>
     <div class="m-sm">
       <div
-        class="flex-row-between-center row-gap-sm col-gap-sm pb-sm mb-sm mg-mobile-drawer__head"
+        class="flex-row-between-center row-gap-sm col-gap-sm flex-wrap pb-sm mb-sm mg-mobile-drawer__head"
       >
         <div class="mg-mobile-drawer__title">Menu</div>
 
@@ -132,7 +136,7 @@
 
         <button
           type="button"
-          class="mg-icon-btn mg-icon-btn--flat"
+          class="mg-icon-btn mg-icon-btn--flat flex-row-center-center"
           (click)="closeMobile()"
           [attr.aria-label]="i18n.accessibility().closeMenu"
         >
@@ -157,10 +161,7 @@
               </div>
 
               <ul class="m-0 mt-xs pl-md flex-col-start-stretch gap-xs">
-                @for (
-                  child of item.children;
-                  track trackByLabelKey($index, child)
-                ) {
+                @for (child of item.children; track trackByLabelKey($index, child)) {
                   <li class="li--unset">
                     <a
                       class="mg-mobile-menu__link py-sm"

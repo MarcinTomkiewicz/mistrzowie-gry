@@ -28,6 +28,7 @@ export class UserMenuPanel {
   readonly i18n = createUserMenuPanelI18n();
 
   readonly usernameDisplay = computed(() => this.auth.displayName());
+  readonly hasUsername = computed(() => !!this.usernameDisplay().trim());
 
 readonly menuSections = computed(() =>
   buildUserMenu({

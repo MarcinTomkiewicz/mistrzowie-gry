@@ -7,6 +7,7 @@ import type {
   CommonActionsTranslations,
   CommonInfoTranslations,
   CommonNavTranslations,
+  CommonStatusTranslations,
 } from '../../../core/types/common-i18n';
 
 export type UIMenu = IMenu & {
@@ -23,6 +24,7 @@ export function createNavbarI18n() {
   );
   const actionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
   const infoDict = translateObjectSignal('info', {}, { scope: 'common' });
+  const statusDict = translateObjectSignal('status', {}, { scope: 'common' });
 
   const nav = computed(() => navDict() as CommonNavTranslations);
   const accessibility = computed(
@@ -30,6 +32,7 @@ export function createNavbarI18n() {
   );
   const actions = computed(() => actionsDict() as CommonActionsTranslations);
   const info = computed(() => infoDict() as CommonInfoTranslations);
+  const status = computed(() => statusDict() as CommonStatusTranslations);
 
   const resolveLabel = (labelKey: string): string => {
     const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
@@ -48,6 +51,7 @@ export function createNavbarI18n() {
     accessibility,
     actions,
     info,
+    status,
     resolveLabel,
     resolveMenu,
   };

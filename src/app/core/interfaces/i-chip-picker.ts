@@ -3,6 +3,7 @@ export interface IChipPickerOption {
   label: string;
   searchText?: string;
   iconClassName?: string;
+  iconText?: string;
   selectedClassName?: string;
   unselectedClassName?: string;
 }

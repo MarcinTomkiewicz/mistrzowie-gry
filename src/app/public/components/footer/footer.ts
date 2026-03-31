@@ -4,11 +4,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
-import { InfoDialog } from '../../common/info-dialog/info-dialog';
+import { LegalDialog } from '../../common/legal-dialog/legal-dialog';
 import {
   LegalDialogContent,
   UILegalLink,
@@ -20,7 +21,7 @@ type ActiveLegalDialog = 'terms' | 'privacy-policy' | null;
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, InfoDialog],
+  imports: [RouterModule, ButtonModule, LegalDialog],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
   providers: [provideTranslocoScope('common'), provideTranslocoScope('footer')],
@@ -66,16 +67,18 @@ export class Footer {
   readonly isLegalDialogVisible = computed(
     () =>
       this.activeLegalDialog() !== null &&
-      (this.isLegalDialogLoading() || !!this.activeLegalDialogContent() || !!this.legalDialogError()),
+      (this.isLegalDialogLoading() ||
+        !!this.activeLegalDialogContent() ||
+        !!this.legalDialogError()),
   );
 
   readonly legalDialogTitle = computed(
     () =>
       this.activeLegalDialogContent()?.title ??
       (this.isLegalDialogLoading()
-        ? 'Ładowanie…'
+        ? 'Ladowanie...'
         : this.legalDialogError()
-          ? 'Nie udało się załadować treści'
+          ? 'Nie udalo sie zaladowac tresci'
           : ''),
   );
 
@@ -83,22 +86,20 @@ export class Footer {
     () => this.activeLegalDialogContent()?.subtitle ?? '',
   );
 
-  readonly legalDialogContent = computed(
-    () => {
-      const content = this.activeLegalDialogContent()?.content;
-      if (content) return content;
+  readonly legalDialogContent = computed(() => {
+    const content = this.activeLegalDialogContent()?.content;
+    if (content) return content;
 
-      if (this.isLegalDialogLoading()) {
-        return 'Ładowanie treści dokumentu…';
-      }
+    if (this.isLegalDialogLoading()) {
+      return 'Ladowanie tresci dokumentu...';
+    }
 
-      if (this.legalDialogError()) {
-        return this.legalDialogError();
-      }
+    if (this.legalDialogError()) {
+      return this.legalDialogError();
+    }
 
-      return null;
-    },
-  );
+    return null;
+  });
 
   track(_label: string): void {}
 
@@ -123,11 +124,11 @@ export class Footer {
       this.activeLegalDialogContent.set(dialogs[targetDialog] ?? null);
 
       if (!dialogs[targetDialog]) {
-        this.legalDialogError.set('Nie znaleziono treści dokumentu.');
+        this.legalDialogError.set('Nie znaleziono tresci dokumentu.');
       }
     } catch {
       this.legalDialogError.set(
-        'Nie udało się załadować treści dokumentu. Spróbuj ponownie za chwilę.',
+        'Nie udalo sie zaladowac tresci dokumentu. Sprobuj ponownie za chwile.',
       );
     } finally {
       this.isLegalDialogLoading.set(false);
@@ -180,7 +181,7 @@ export class Footer {
 
     if (!this.legalDialogsPromise) {
       this.legalDialogsPromise = firstValueFrom(
-        this.http.get<LegalJsonPayload>('/assets/i18n/pl/legal.json'),
+        this.http.get<LegalJsonPayload>(`${this.baseHref}assets/i18n/pl/legal.json`),
       )
         .then((payload) => {
           const dialogs = {
@@ -206,4 +207,7 @@ type LegalJsonPayload = {
   privacyPolicyDialog?: LegalDialogContent;
 };
 
-type LegalDialogsPayload = Record<Exclude<ActiveLegalDialog, null>, LegalDialogContent | null>;
+type LegalDialogsPayload = Record<
+  Exclude<ActiveLegalDialog, null>,
+  LegalDialogContent | null
+>;

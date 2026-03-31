@@ -7,8 +7,11 @@
 
     <div class="mg-problems__grid">
       @for (p of items(); track trackById($index, p)) {
-        <div pAnimateOnScroll
-          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card flex-col-between-start h-100">
+        <div
+          pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+          class="mg-card flex-col-between-start h-100"
+        >
           <div>
             <h3 class="mg-section__title mg-section__title--sm">
               {{ p.title }}

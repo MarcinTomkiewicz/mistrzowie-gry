@@ -330,16 +330,4 @@ export class GmProfile {
       );
   }
 
-  private toFlagEmoji(flagCode: string | null | undefined): string {
-    if (!flagCode?.trim()) {
-      return '';
-    }
-
-    return flagCode
-      .trim()
-      .toUpperCase()
-      .replace(/./g, (char) =>
-        String.fromCodePoint(127397 + char.charCodeAt(0)),
-      );
-  }
 }

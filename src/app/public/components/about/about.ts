@@ -5,7 +5,9 @@ import { ButtonModule } from 'primeng/button';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { buildSiteUrl } from '../../../core/config/site';
 import { Seo } from '../../../core/services/seo/seo';
+import { createPageStructuredData } from '../../../core/utils/structured-data';
 import { createAboutI18n } from './about.i18n';
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
@@ -19,6 +21,8 @@ import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 })
 export class About {
   private readonly seo = inject(Seo);
+  private readonly pageUrl = buildSiteUrl('/about');
+
   readonly i18n = createAboutI18n();
 
   constructor() {
@@ -28,6 +32,14 @@ export class About {
       this.seo.apply({
         title: seo.title,
         description: seo.description,
+        canonicalUrl: this.pageUrl,
+        structuredData: createPageStructuredData({
+          type: 'AboutPage',
+          id: `${this.pageUrl}#webpage`,
+          url: this.pageUrl,
+          name: seo.title,
+          description: seo.description,
+        }),
       });
     });
   }

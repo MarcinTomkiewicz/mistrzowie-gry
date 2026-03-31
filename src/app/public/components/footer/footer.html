@@ -17,12 +17,12 @@
         </p>
 
         <nav
-          class="flex-row-start-center gap-sm mg-footer__social"
+          class="flex-row-start-center gap-sm flex-wrap mg-footer__social"
           [attr.aria-label]="i18n.footer().socialAriaLabel"
         >
           @for (s of socialLinks(); track $index) {
             <a
-              class="mg-social-btn"
+              class="mg-social-btn flex-row-center-center"
               [href]="s.href"
               target="_blank"
               rel="noopener noreferrer"
@@ -82,11 +82,11 @@
       class="mg-footer__bottom flex-row-between-center flex-col-sm mt-xl pt-lg gap-md"
     >
       <div class="mg-footer__copy">
-        © {{ year() }} Mistrzowie Gry. {{ i18n.footer().copyrightSuffix }}
+        &copy; {{ year() }} Mistrzowie Gry. {{ i18n.footer().copyrightSuffix }}
       </div>
 
       <nav
-        class="mg-footer__legal flex-row-start-center gap-md"
+        class="mg-footer__legal flex-row-start-center gap-md flex-wrap"
         [attr.aria-label]="i18n.footer().legalAriaLabel"
       >
         @for (l of legalLinks(); track $index) {
@@ -99,14 +99,10 @@
   </div>
 </footer>
 
-@if (isLegalDialogVisible()) {
-  <app-info-dialog
-    [visible]="isLegalDialogVisible()"
-    [title]="legalDialogTitle()"
-    [subtitle]="legalDialogSubtitle()"
-    [content]="legalDialogContent()"
-    [maximizable]="true"
-    size="lg"
-    (visibleChange)="onLegalDialogVisibleChange($event)"
-  />
-}
+<app-legal-dialog
+  [visible]="isLegalDialogVisible()"
+  [dialogTitle]="legalDialogTitle()"
+  [dialogSubtitle]="legalDialogSubtitle()"
+  [dialogContent]="legalDialogContent()"
+  (visibleChange)="onLegalDialogVisibleChange($event)"
+/>

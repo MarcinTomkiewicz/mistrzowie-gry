@@ -26,6 +26,7 @@ import {
   IUpdateUserProfilePayload,
 } from '../../interfaces/i-auth-payloads';
 import { IUser } from '../../interfaces/i-user';
+import { AuthSession } from '../auth-session/auth-session';
 import { Backend } from '../backend/backend';
 import { Platform } from '../platform/platform';
 import { Supabase } from '../supabase/supabase';
@@ -35,6 +36,7 @@ import { mapAuthError } from '../../utils/auth-error';
 
 @Injectable({ providedIn: 'root' })
 export class Auth {
+  private readonly authSession = inject(AuthSession);
   private readonly backend = inject(Backend);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platform = inject(Platform);
@@ -83,6 +85,7 @@ export class Auth {
 
         if (!id) {
           this._user.set(null);
+          this.authSession.setAuthenticated(false);
           return of(null);
         }
 
@@ -90,6 +93,7 @@ export class Auth {
       }),
       catchError(() => {
         this._user.set(null);
+        this.authSession.setAuthenticated(false);
         return of(null);
       }),
       finalize(() => {
@@ -117,7 +121,10 @@ export class Auth {
         }
 
         return this.loadProfileRequired(id).pipe(
-          tap(() => this._isReady.set(true)),
+          tap(() => {
+            this.authSession.setAuthenticated(true);
+            this._isReady.set(true);
+          }),
         );
       }),
       catchError((error) => this.toErrorObservable(error)),
@@ -168,11 +175,13 @@ export class Auth {
           map((user) => {
             if (data.session?.user?.id) {
               this._user.set(user);
+              this.authSession.setAuthenticated(true);
               this._isReady.set(true);
               return user;
             }
 
             this._user.set(null);
+            this.authSession.setAuthenticated(false);
             this._isReady.set(true);
             return null;
           }),
@@ -206,6 +215,7 @@ export class Auth {
         }
 
         this._user.set(null);
+        this.authSession.setAuthenticated(false);
         this._isReady.set(true);
 
         return from(this.router.navigateByUrl(redirectTo)).pipe(
@@ -238,9 +248,11 @@ export class Auth {
     return this.backend.getById<IUser>('users', id).pipe(
       tap((user) => {
         this._user.set(user);
+        this.authSession.setAuthenticated(!!user);
       }),
       catchError(() => {
         this._user.set(null);
+        this.authSession.setAuthenticated(false);
         return of(null);
       }),
     );

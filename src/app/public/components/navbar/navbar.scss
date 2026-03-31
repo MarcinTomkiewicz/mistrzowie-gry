@@ -1,6 +1,5 @@
 @use "sass:map";
 @use "abstracts/variables" as v;
-@use "abstracts/mixins" as m;
 
 .mg-navbar {
   position: fixed;
@@ -22,9 +21,7 @@
   font-family: v.$font-family-body;
   font-size: map.get(v.$font-sizes, "xs");
   font-weight: 600;
-  // line-height: 1;
   color: v.$color-text;
-  // text-decoration: none;
 
   height: 36px;
   border: 0;
@@ -66,8 +63,6 @@
   background: v.$color-bg-surface;
   cursor: pointer;
 
-  @include m.center();
-
   transition: transform v.$transition-fast, background-color v.$transition-fast;
 }
 
@@ -91,7 +86,6 @@
 
 .mg-mobile-drawer__head {
   border-bottom: 1px solid v.$color-border;
-  flex-wrap: wrap;
 }
 
 .mg-mobile-drawer__title {

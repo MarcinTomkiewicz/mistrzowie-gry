@@ -1,0 +1,54 @@
+@if (visible()) {
+  <div
+    class="p-dialog-mask mg-legal-dialog__backdrop"
+    aria-hidden="true"
+    (click)="close()"
+  ></div>
+
+  <section
+    class="p-dialog mg-dialog mg-dialog--lg mg-legal-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="legal-dialog-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div
+      class="p-dialog-header flex-row-between-start flex-col-start-stretch-xs gap-md"
+    >
+      <div class="mg-legal-dialog__header-copy flex-col-start-stretch gap-xs p-md">
+        @if (dialogTitle()) {
+          <h2 id="legal-dialog-title" class="p-dialog-title m-0">
+            {{ dialogTitle() }}
+          </h2>
+        }
+
+        @if (dialogSubtitle()) {
+          <p class="mg-legal-dialog__subtitle m-0 mt-sm">
+            {{ dialogSubtitle() }}
+          </p>
+        }
+      </div>
+
+      <p-button
+        icon="pi pi-times"
+        [rounded]="true"
+        [text]="true"
+        styleClass="p-dialog-close-button m-sm"
+        ariaLabel="Zamknij"
+        (onClick)="close()"
+      />
+    </div>
+
+    <div class="p-dialog-content mg-legal-dialog__body p-md">
+      <app-rich-content [content]="dialogContent()" />
+    </div>
+
+    <div class="p-dialog-footer flex-row-end-center p-md">
+      <p-button
+        [label]="closeLabel()"
+        severity="secondary"
+        (onClick)="close()"
+      />
+    </div>
+  </section>
+}

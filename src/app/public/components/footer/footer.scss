@@ -37,18 +37,12 @@
   }
 }
 
-.mg-footer__social {
-  flex-wrap: wrap;
-}
-
 .mg-social-btn {
   width: 40px;
   height: 40px;
   border-radius: 999px;
   border: 1px solid v.$color-border;
   background: v.$color-bg-surface;
-
-  @include m.center();
 
   transition: transform v.$transition-fast;
 
@@ -69,8 +63,4 @@
 
 .mg-footer__copy {
   opacity: 0.75;
-}
-
-.mg-footer__legal {
-  flex-wrap: wrap;
 }

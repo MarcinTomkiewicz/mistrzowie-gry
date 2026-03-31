@@ -21,8 +21,10 @@ import { TextareaModule } from 'primeng/textarea';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { buildSiteUrl } from '../../../core/config/site';
 import { Seo } from '../../../core/services/seo/seo';
 import { ContactPayload } from '../../../core/types/contact';
+import { createPageStructuredData } from '../../../core/utils/structured-data';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
 import { SubmitState, SubmitStateEnum } from '../../../core/types/submit-state';
@@ -51,6 +53,7 @@ export class Contact {
   private readonly contactApi = inject(ContactApi);
   private readonly destroyRef = inject(DestroyRef);
   private readonly toast = inject(UiToast);
+  private readonly pageUrl = buildSiteUrl('/contact');
 
   readonly i18n = createContactI18n();
 
@@ -99,6 +102,14 @@ export class Contact {
     this.seo.apply({
       title: this.i18n.seoTitle() || 'Kontakt',
       description: this.i18n.seoDescription() || '',
+      canonicalUrl: this.pageUrl,
+      structuredData: createPageStructuredData({
+        type: 'ContactPage',
+        id: `${this.pageUrl}#webpage`,
+        url: this.pageUrl,
+        name: this.i18n.seoTitle() || 'Kontakt',
+        description: this.i18n.seoDescription() || '',
+      }),
     });
   });
 
