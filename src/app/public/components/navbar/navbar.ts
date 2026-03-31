@@ -93,9 +93,9 @@ export class Navbar {
   }
 
   openMobile(): void {
-    this.mobileOpen.set(true);
     this.closeDropdown();
     this.closeUserMenu();
+    this.mobileOpen.set(true);
   }
 
   closeMobile(): void {
