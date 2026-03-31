@@ -28,23 +28,10 @@ export function createFooterI18n() {
   const legalDict = translateObjectSignal('legal', {}, { scope: 'common' });
   const footerDict = translateObjectSignal('footer', {}, { scope: 'footer' });
 
-  const termsDialogDict = translateObjectSignal('termsDialog', {}, { scope: 'legal' });
-  const privacyPolicyDialogDict = translateObjectSignal('privacyPolicyDialog', {}, {
-    scope: 'legal',
-  });
-
   const nav = computed(() => navDict() as CommonNavTranslations);
   const social = computed(() => socialDict() as CommonSocialTranslations);
   const legal = computed(() => legalDict() as CommonLegalTranslations);
   const footer = computed(() => footerDict() as CommonFooterTranslations);
-
-  const termsDialog = computed(
-    () => termsDialogDict() as LegalDialogContent,
-  );
-
-  const privacyPolicyDialog = computed(
-    () => privacyPolicyDialogDict() as LegalDialogContent,
-  );
 
   const resolveNavLabel = (labelKey: string): string => {
     const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
@@ -87,8 +74,6 @@ export function createFooterI18n() {
 
   return {
     footer,
-    termsDialog,
-    privacyPolicyDialog,
     resolveFooterMenu,
     resolveSocialLinks,
     resolveLegalLinks,

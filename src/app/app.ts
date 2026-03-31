@@ -32,17 +32,18 @@ export class App {
         type: 'website',
         images: [
           {
-            url: 'https://mistrzowie-gry.pl/logo/logoMG.png',
+            url: 'https://ik.imagekit.io/ialsnkfw5g/logo/logoMG.png?tr=w-1200,q-75,f-jpg',
             width: 1200,
             height: 1200,
             alt: 'Mistrzowie Gry',
-            type: 'image/png',
+            type: 'image/jpeg',
           },
         ],
       },
       twitter: {
         card: 'summary_large_image',
-        image: 'https://mistrzowie-gry.pl/logo/logoMG.png',
+        image:
+          'https://ik.imagekit.io/ialsnkfw5g/logo/logoMG.png?tr=w-1200,q-75,f-jpg',
       },
     });
 
