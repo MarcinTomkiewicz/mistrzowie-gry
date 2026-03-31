@@ -1,6 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
-  afterNextRender,
   Component,
   computed,
   DestroyRef,
@@ -13,6 +12,7 @@ import { ButtonModule } from 'primeng/button';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { Platform } from '../../../../core/services/platform/platform';
 import { createHeroCarouselI18n, UiHeroSlide } from './hero-carousel.i18n';
 import { HERO_SLIDES_TECH_BY_ID } from './hero-carousel.config';
 
@@ -25,6 +25,7 @@ import { HERO_SLIDES_TECH_BY_ID } from './hero-carousel.config';
   providers: [provideTranslocoScope('home')],
 })
 export class HeroCarousel {
+  private readonly platform = inject(Platform);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   readonly i18n = createHeroCarouselI18n();
@@ -35,9 +36,9 @@ export class HeroCarousel {
   private intervalId: number | null = null;
 
   constructor() {
-    afterNextRender(() => {
+    this.platform.onIdle(() => {
       this.tryStartAutoplay();
-    });
+    }, 1_500);
 
     this.destroyRef.onDestroy(() => this.stopAutoplay());
   }

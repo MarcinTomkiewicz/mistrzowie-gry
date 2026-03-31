@@ -1,11 +1,5 @@
 import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
-import {
-  Injectable,
-  afterNextRender,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 
 import type { IThemeMode } from '../../interfaces/i-theme';
 import { Platform } from '../platform/platform';
@@ -35,9 +29,7 @@ export class Theme {
   );
 
   constructor() {
-    afterNextRender(() => {
-      this.initBrowserTheme();
-    });
+    this.initBrowserTheme();
   }
 
   toggle(): void {

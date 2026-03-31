@@ -18,6 +18,28 @@
 
     <meta name="theme-color" content="#0b0b0b" />
 
+    <script>
+      (() => {
+        try {
+          const key = 'mg-theme';
+          const root = document.documentElement;
+          const stored = localStorage.getItem(key);
+          const systemLight =
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: light)').matches;
+          const next =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : systemLight
+                ? 'light'
+                : 'dark';
+
+          if (next === 'light') root.setAttribute('data-theme', 'light');
+          else root.removeAttribute('data-theme');
+        } catch {}
+      })();
+    </script>
+
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,6 +60,13 @@
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
       />
     </noscript>
+
+    <link
+      rel="preload"
+      as="image"
+      href="/hero/hero-1.avif"
+      fetchpriority="high"
+    />
   </head>
 
   <body>
