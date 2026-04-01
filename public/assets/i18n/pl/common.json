@@ -155,7 +155,7 @@
   },
   "statusPages": {
     "notFound": {
-      "seoTitle": "Strona nie znaleziona (404)",
+      "seoTitle": "(404) - To miejsce nie istnieje",
       "seoDescription": "Zgubiłeś się w labiryncie Mistrzów Gry. Wróć na stronę główną i odnajdź właściwy szlak.",
       "badge": "Błąd 404",
       "title": "404 - Zgubiłeś się, Wędrowcze!",
@@ -164,7 +164,7 @@
       "imageAlt": "Smok pilnujący pustki"
     },
     "notAuthorized": {
-      "seoTitle": "Brak dostępu (403)",
+      "seoTitle": "(403) - Nie przejdziesz!",
       "seoDescription": "Nie masz uprawnień do wyświetlenia tej strony. Wróć na stronę główną albo zaloguj się na właściwe konto.",
       "badge": "Błąd 403",
       "title": "403 - Te wrota pozostają zamknięte!",

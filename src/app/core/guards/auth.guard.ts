@@ -7,9 +7,10 @@ import { Auth } from '../services/auth/auth';
 export const authGuard: CanActivateFn = () => {
   const auth = inject(Auth);
   const router = inject(Router);
+  const unauthorizedUrl = router.parseUrl('/not-authorized');
 
   if (auth.isReady()) {
-    return auth.isAuthenticated() ? true : router.parseUrl('/');
+    return auth.isAuthenticated() ? true : unauthorizedUrl;
   }
 
   return auth.loadUser().pipe(
@@ -18,8 +19,8 @@ export const authGuard: CanActivateFn = () => {
         return true;
       }
 
-      return router.parseUrl('/');
+      return unauthorizedUrl;
     }),
-    catchError(() => of<UrlTree>(router.parseUrl('/'))),
+    catchError(() => of<UrlTree>(unauthorizedUrl)),
   );
 };
