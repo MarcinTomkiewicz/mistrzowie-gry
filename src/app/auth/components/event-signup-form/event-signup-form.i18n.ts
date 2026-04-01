@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
+import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
 
 import {
   CommonActionsTranslations,
@@ -21,6 +21,12 @@ import {
 } from '../../../core/types/common-i18n';
 
 export function createEventSignupFormI18n() {
+  const seoTitle = translateSignal('eventSignupForm.seo.title', {}, { scope: 'auth' });
+  const seoDescription = translateSignal(
+    'eventSignupForm.seo.description',
+    {},
+    { scope: 'auth' },
+  );
   const formDict = translateObjectSignal(
     'eventSignupForm.form',
     {},
@@ -150,6 +156,8 @@ export function createEventSignupFormI18n() {
   );
 
   return {
+    seoTitle,
+    seoDescription,
     form,
     actions,
     confirmation,

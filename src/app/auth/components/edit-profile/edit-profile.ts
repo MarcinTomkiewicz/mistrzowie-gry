@@ -8,12 +8,14 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
+import { buildSiteUrl } from '../../../core/config/site';
 import {
   EDIT_PROFILE_TABS,
   EditProfileTabDefinition,
   EditProfileTabId,
 } from '../../../core/types/profile';
 import { Auth } from '../../../core/services/auth/auth';
+import { Seo } from '../../../core/services/seo/seo';
 import { hasMinimumRole } from '../../../core/utils/roles';
 import { ProfileForm } from '../../common/profile-form/profile-form';
 import { GmProfile } from '../gm-profile/gm-profile';
@@ -46,6 +48,8 @@ export class EditProfile {
   private readonly auth = inject(Auth);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly seo = inject(Seo);
+  private readonly pageUrl = buildSiteUrl('/auth/edit-profile');
 
   readonly i18n = createEditProfileI18n();
 
@@ -75,6 +79,15 @@ export class EditProfile {
   );
 
   constructor() {
+    effect(() => {
+      this.seo.apply({
+        title: this.i18n.seoTitle(),
+        description: this.i18n.seoDescription(),
+        canonicalUrl: this.pageUrl,
+        robots: 'noindex,nofollow',
+      });
+    });
+
     effect(() => {
       const activeTab = this.activeTab();
 

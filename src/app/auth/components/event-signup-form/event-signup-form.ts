@@ -15,6 +15,7 @@ import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
 import { EventOccurrenceStatus } from '../../../core/enums/event';
+import { buildSiteUrl } from '../../../core/config/site';
 import {
   IEventSignupLoadData,
   IEventSignupSavePayload,
@@ -28,6 +29,7 @@ import {
 import { Auth } from '../../../core/services/auth/auth';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
+import { Seo } from '../../../core/services/seo/seo';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {
   SESSION_DIFFICULTY_LEVEL_OPTIONS,
@@ -84,6 +86,7 @@ export class EventSignupFormComponent {
   private readonly auth = inject(Auth);
   private readonly eventRead = inject(EventRead);
   private readonly eventSignup = inject(EventSignup);
+  private readonly seo = inject(Seo);
   private readonly toast = inject(UiToast);
   private readonly confirmation = inject(ConfirmationService);
 
@@ -282,6 +285,25 @@ export class EventSignupFormComponent {
 
     effect(() => {
       this.syncFormWithSignup();
+    });
+
+    effect(() => {
+      const params = this.routeParams();
+      const eventSlug = params.get('eventSlug');
+      const occurrenceDate = params.get('occurrenceDate');
+      const pageUrl =
+        eventSlug && occurrenceDate
+          ? buildSiteUrl(
+              `/auth/event-signup/${eventSlug}/${occurrenceDate}/signup`,
+            )
+          : buildSiteUrl('/auth/event-signup');
+
+      this.seo.apply({
+        title: this.i18n.seoTitle(),
+        description: this.i18n.seoDescription(),
+        canonicalUrl: pageUrl,
+        robots: 'noindex,nofollow',
+      });
     });
   }
 

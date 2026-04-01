@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -11,6 +11,7 @@ import { TabsModule } from 'primeng/tabs';
 
 import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 
+import { buildSiteUrl } from '../../../core/config/site';
 import { EventOccurrenceStatus } from '../../../core/enums/event';
 import { IEvent } from '../../../core/interfaces/i-event';
 import { IEventOccurrence } from '../../../core/interfaces/i-event-occurence';
@@ -20,6 +21,7 @@ import { Auth } from '../../../core/services/auth/auth';
 import { Backend } from '../../../core/services/backend/backend';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
+import { Seo } from '../../../core/services/seo/seo';
 import {
   formatDateLabel,
   getEndOfNextMonthIso,
@@ -69,6 +71,8 @@ export class EventSignupComponent {
   private readonly eventSignup = inject(EventSignup);
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
+  private readonly seo = inject(Seo);
+  private readonly pageUrl = buildSiteUrl('/auth/event-signup');
 
   private readonly rangeStartIso = getStartOfCurrentMonthIso();
   private readonly rangeEndIso = getEndOfNextMonthIso();
@@ -131,6 +135,15 @@ export class EventSignupComponent {
     }
 
     return formatTimeRangeLabel(event.startTime, event.endTime);
+  });
+
+  private readonly applySeoEffect = effect(() => {
+    this.seo.apply({
+      title: this.i18n.seoTitle(),
+      description: this.i18n.seoDescription(),
+      canonicalUrl: this.pageUrl,
+      robots: 'noindex,nofollow',
+    });
   });
 
   onEventChange(eventId: string): void {

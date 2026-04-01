@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
+import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
 
 import {
   CommonStatusTranslations,
@@ -28,6 +28,12 @@ type EventSignupEmptyTranslations = {
 };
 
 export function createEventSignupI18n() {
+  const seoTitle = translateSignal('eventSignup.seo.title', {}, { scope: 'auth' });
+  const seoDescription = translateSignal(
+    'eventSignup.seo.description',
+    {},
+    { scope: 'auth' },
+  );
   const pageDict = translateObjectSignal('eventSignup.page', {}, { scope: 'auth' });
   const detailsDict = translateObjectSignal('eventSignup.details', {}, { scope: 'auth' });
   const occurrencesDict = translateObjectSignal('eventSignup.occurrences', {}, { scope: 'auth' });
@@ -41,6 +47,8 @@ export function createEventSignupI18n() {
   const commonStatus = computed(() => commonStatusDict() as CommonStatusTranslations);
 
   return {
+    seoTitle,
+    seoDescription,
     page,
     details,
     occurrences,
