@@ -1,5 +1,6 @@
 import {
   Component,
+  OutputEmitterRef,
   Type,
   ViewContainerRef,
   computed,
@@ -8,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { DrawerModule } from 'primeng/drawer';
 import { Popover, PopoverModule } from 'primeng/popover';
@@ -15,11 +17,16 @@ import { Popover, PopoverModule } from 'primeng/popover';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { AuthSession } from '../../../core/services/auth-session/auth-session';
+import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
 import { createNavbarI18n, UIMenu } from './navbar.i18n';
+
+interface CloseableOverlayComponent {
+  closed: OutputEmitterRef<void>;
+}
 
 @Component({
   selector: 'app-navbar',
@@ -36,6 +43,7 @@ import { createNavbarI18n, UIMenu } from './navbar.i18n';
 })
 export class Navbar {
   private readonly authSession = inject(AuthSession);
+  private readonly lazyComponentLoader = inject(LazyComponentLoader);
   private readonly nav = inject(Navigation);
   private readonly uiConfirm = inject(UiConfirm);
 
@@ -63,6 +71,10 @@ export class Navbar {
   private readonly userMenuHost = viewChild('userMenuHost', {
     read: ViewContainerRef,
   });
+  private readonly loadUserMenuPanel = () =>
+    import('../../../auth/components/user-menu-panel/user-menu-panel').then(
+      ({ UserMenuPanel }) => UserMenuPanel as Type<CloseableOverlayComponent>,
+    );
 
   openDropdown(event: Event, item: UIMenu): void {
     if (!item.children?.length) return;
@@ -82,10 +94,19 @@ export class Navbar {
     this.activeDropdown.set(null);
   }
 
-  async openUserMenu(event: Event): Promise<void> {
+  openUserMenu(event: Event): void {
     this.closeDropdown();
-    await this.ensureUserMenuLoaded();
-    this.userPopover()?.toggle(event);
+
+    if (this.isUserMenuLoaded()) {
+      this.userPopover()?.toggle(event);
+      return;
+    }
+
+    if (this.isUserMenuLoading()) {
+      return;
+    }
+
+    this.mountUserMenu(event);
   }
 
   closeUserMenu(): void {
@@ -113,11 +134,7 @@ export class Navbar {
     });
   }
 
-  private async ensureUserMenuLoaded(): Promise<void> {
-    if (this.isUserMenuLoaded()) {
-      return;
-    }
-
+  private mountUserMenu(event: Event): void {
     const host = this.userMenuHost();
     if (!host) {
       return;
@@ -125,29 +142,27 @@ export class Navbar {
 
     this.isUserMenuLoading.set(true);
 
-    try {
-      const { UserMenuPanel } = await import(
-        '../../../auth/components/user-menu-panel/user-menu-panel'
-      );
-
-      host.clear();
-
-      const componentRef = host.createComponent(
-        UserMenuPanel as Type<unknown>,
-      );
-
-      const instance = componentRef.instance as {
-        closed?: { subscribe: (cb: () => void) => { unsubscribe(): void } };
-      };
-
-      instance.closed?.subscribe(() => {
-        this.closeUserMenu();
+    this.lazyComponentLoader
+      .mount({
+        host,
+        load: this.loadUserMenuPanel,
+        onMount: (componentRef) => {
+          componentRef.instance.closed.subscribe(() => {
+            this.closeUserMenu();
+          });
+        },
+      })
+      .pipe(
+        finalize(() => {
+          this.isUserMenuLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.isUserMenuLoaded.set(true);
+          this.userPopover()?.toggle(event);
+        },
       });
-
-      this.isUserMenuLoaded.set(true);
-    } finally {
-      this.isUserMenuLoading.set(false);
-    }
   }
 
   trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;

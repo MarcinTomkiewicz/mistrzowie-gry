@@ -1,15 +1,26 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  ComponentRef,
+  OutputEmitterRef,
+  Type,
+  ViewContainerRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 
+import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
-import { LegalDialog } from '../../common/legal-dialog/legal-dialog';
 import {
   LegalDialogContent,
   UILegalLink,
@@ -18,15 +29,25 @@ import {
 
 type ActiveLegalDialog = 'terms' | 'privacy-policy' | null;
 
+interface LazyLegalDialogComponent {
+  visible: unknown;
+  dialogTitle: unknown;
+  dialogSubtitle: unknown;
+  dialogContent: unknown;
+  closeLabel: unknown;
+  visibleChange: OutputEmitterRef<boolean>;
+}
+
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, ButtonModule, LegalDialog],
+  imports: [RouterModule, ButtonModule],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
   providers: [provideTranslocoScope('common'), provideTranslocoScope('footer')],
 })
 export class Footer {
+  private readonly lazyComponentLoader = inject(LazyComponentLoader);
   readonly nav = inject(Navigation);
   readonly theme = inject(Theme);
   readonly i18n = createFooterI18n();
@@ -41,6 +62,15 @@ export class Footer {
   readonly activeLegalDialogContent = signal<LegalDialogContent | null>(null);
   readonly isLegalDialogLoading = signal(false);
   readonly legalDialogError = signal('');
+  private readonly legalDialogHost = viewChild('legalDialogHost', {
+    read: ViewContainerRef,
+  });
+  private readonly loadLegalDialog = () =>
+    import('../../common/legal-dialog/legal-dialog').then(
+      ({ LegalDialog }) => LegalDialog as Type<LazyLegalDialogComponent>,
+    );
+  private readonly legalDialogRef =
+    signal<ComponentRef<LazyLegalDialogComponent> | null>(null);
   private legalDialogsCache: LegalDialogsPayload | null = null;
   private legalDialogsPromise: Promise<LegalDialogsPayload> | null = null;
 
@@ -101,6 +131,18 @@ export class Footer {
     return null;
   });
 
+  private readonly syncLegalDialogInputs = effect(() => {
+    const dialogRef = this.legalDialogRef();
+    if (!dialogRef) {
+      return;
+    }
+
+    dialogRef.setInput('visible', this.isLegalDialogVisible());
+    dialogRef.setInput('dialogTitle', this.legalDialogTitle());
+    dialogRef.setInput('dialogSubtitle', this.legalDialogSubtitle());
+    dialogRef.setInput('dialogContent', this.legalDialogContent());
+  });
+
   track(_label: string): void {}
 
   async onLegalClick(link: UILegalLink, event: MouseEvent): Promise<void> {
@@ -113,6 +155,7 @@ export class Footer {
 
     event.preventDefault();
     this.track(link.label);
+    this.ensureLegalDialogMounted();
     this.activeLegalDialog.set(targetDialog);
 
     this.legalDialogError.set('');
@@ -133,6 +176,30 @@ export class Footer {
     } finally {
       this.isLegalDialogLoading.set(false);
     }
+  }
+
+  private ensureLegalDialogMounted(): void {
+    if (this.legalDialogRef()) {
+      return;
+    }
+
+    const host = this.legalDialogHost();
+    if (!host) {
+      return;
+    }
+
+    this.lazyComponentLoader
+      .mount({
+        host,
+        load: this.loadLegalDialog,
+        onMount: (componentRef) => {
+          this.legalDialogRef.set(componentRef);
+          componentRef.instance.visibleChange.subscribe((visible) => {
+            this.onLegalDialogVisibleChange(visible);
+          });
+        },
+      })
+      .subscribe();
   }
 
   onLegalDialogVisibleChange(visible: boolean): void {

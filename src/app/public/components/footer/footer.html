@@ -99,10 +99,4 @@
   </div>
 </footer>
 
-<app-legal-dialog
-  [visible]="isLegalDialogVisible()"
-  [dialogTitle]="legalDialogTitle()"
-  [dialogSubtitle]="legalDialogSubtitle()"
-  [dialogContent]="legalDialogContent()"
-  (visibleChange)="onLegalDialogVisibleChange($event)"
-/>
+<ng-container #legalDialogHost />
