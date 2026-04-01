@@ -388,3 +388,18 @@ export type CommonQuestionsTranslations = {
   sure: string;
   deleteSession: string;
 };
+
+export type CommonStatusPageTranslations = {
+  seoTitle: string;
+  seoDescription: string;
+  badge: string;
+  title: string;
+  description: string;
+  hint: string;
+  imageAlt: string;
+};
+
+export type CommonStatusPagesTranslations = {
+  notFound: CommonStatusPageTranslations;
+  notAuthorized: CommonStatusPageTranslations;
+};

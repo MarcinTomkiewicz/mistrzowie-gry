@@ -163,7 +163,7 @@ export class Seo {
   }
 
   private normalize(config: ISeoConfig): ISeoConfig {
-    const rawTitle = config.title.trim();
+    const rawTitle = config.title?.trim() || this.siteName;
 
     return {
       ...config,

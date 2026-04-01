@@ -1,0 +1,41 @@
+<section class="mg-section">
+  <div class="mg-container">
+    <div class="mg-card flex-col-center-center gap-md text-center">
+      <header class="mg-section__header">
+        <h1 class="mg-section__title">
+          {{ i18n.page().title }}
+        </h1>
+
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ i18n.page().description }}
+        </p>
+
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ i18n.page().hint }}
+        </p>
+      </header>
+
+      <div
+        class="flex-row-center-center animate-enter-fade-up-soft animate-duration-1000 animate-ease-out animate-fill-both"
+      >
+        <img
+          class="floating-dragon w-px-300 max-w-full"
+          ngSrc="/dragon.avif"
+          [alt]="i18n.page().imageAlt"
+          width="294"
+          height="210"
+        />
+      </div>
+
+      <div class="flex-row-center-center">
+        <p-button
+          [label]="i18n.cta().goHome"
+          icon="pi pi-compass"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/"
+        />
+      </div>
+    </div>
+  </div>
+</section>

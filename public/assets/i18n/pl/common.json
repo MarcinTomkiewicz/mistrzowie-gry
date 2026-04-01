@@ -152,5 +152,25 @@
     "net": "Podane ceny są cenami netto. Należy doliczyć do nich podatek VAT 23%.",
     "gross": "Podane ceny są cenami brutto i zawierają podatek VAT w wysokości 23%.",
     "both": "Podane ceny dla klienta indywidualnego zawierają podatek VAT w wysokości 23%. Dla klienta biznesowego i instytucjonalnego są cenami netto i należy doliczyć do nich 23% VAT."
+  },
+  "statusPages": {
+    "notFound": {
+      "seoTitle": "Strona nie znaleziona (404)",
+      "seoDescription": "Zgubiłeś się w labiryncie Mistrzów Gry. Wróć na stronę główną i odnajdź właściwy szlak.",
+      "badge": "Błąd 404",
+      "title": "404 - Zgubiłeś się, Wędrowcze!",
+      "description": "Przekroczyłeś granice znanych światów i trafiłeś do pustki.",
+      "hint": "Wróć bezpiecznie na znany szlak, zanim trafisz na smoka.",
+      "imageAlt": "Smok pilnujący pustki"
+    },
+    "notAuthorized": {
+      "seoTitle": "Brak dostępu (403)",
+      "seoDescription": "Nie masz uprawnień do wyświetlenia tej strony. Wróć na stronę główną albo zaloguj się na właściwe konto.",
+      "badge": "Błąd 403",
+      "title": "403 - Te wrota pozostają zamknięte!",
+      "description": "Smok strzeże tego miejsca i wpuszcza jedynie wybranych.",
+      "hint": "Jeśli to pomyłka, wróć na stronę główną i spróbuj skorzystać z innej ścieżki.",
+      "imageAlt": "Symbol zamkniętego dostępu"
+    }
   }
 }

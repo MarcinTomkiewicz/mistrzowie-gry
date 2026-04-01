@@ -5,6 +5,10 @@ const loaders = {
   about: () => import('./public/components/about/about').then((m) => m.About),
   ourTeam: () => import('./public/components/our-team/our-team').then((m) => m.OurTeam),
   offerPage: () => import('./public/components/offers/offers').then((m) => m.Offers),
+  notFound: () =>
+    import('./public/common/not-found/not-found').then((m) => m.NotFound),
+  notAuthorized: () =>
+    import('./public/common/not-authorized/not-authorized').then((m) => m.NotAuthorized),
   chaoticThursdays: () =>
     import('./public/components/chaotic-thursdays/chaotic-thursdays').then((m) => m.ChaoticThursdays),
   joinTheParty: () =>
@@ -22,11 +26,13 @@ export const routes: Routes = [
   { path: 'chaotic-thursdays', loadComponent: loaders.chaoticThursdays },
   { path: 'join-the-party', loadComponent: loaders.joinTheParty },
   { path: 'contact', loadComponent: loaders.contact },
+  { path: 'not-found', loadComponent: loaders.notFound },
+  { path: 'not-authorized', loadComponent: loaders.notAuthorized },
 
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth-routes').then((m) => m.authRoutes),
   },
 
-  { path: '**', redirectTo: '' },
+  { path: '**', loadComponent: loaders.notFound },
 ];
