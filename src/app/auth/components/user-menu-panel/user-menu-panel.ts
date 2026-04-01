@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -15,7 +14,7 @@ import { DividerModule } from 'primeng/divider';
 @Component({
   selector: 'app-user-menu-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule, DividerModule],
+  imports: [RouterLink, ButtonModule, DividerModule],
   templateUrl: './user-menu-panel.html',
   styleUrl: './user-menu-panel.scss',
   providers: [provideTranslocoScope('auth', 'common')],

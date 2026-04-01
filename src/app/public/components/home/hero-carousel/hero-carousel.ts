@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import {
   Component,
   computed,
@@ -19,7 +19,7 @@ import { HERO_SLIDES_TECH_BY_ID } from './hero-carousel.config';
 @Component({
   selector: 'app-hero-carousel',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, NgOptimizedImage],
+  imports: [RouterModule, ButtonModule, NgOptimizedImage],
   templateUrl: './hero-carousel.html',
   styleUrl: './hero-carousel.scss',
   providers: [provideTranslocoScope('home')],

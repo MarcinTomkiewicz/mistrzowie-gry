@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -11,7 +10,7 @@ import { createSessionDetailsI18n } from './session-details.i18n';
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
   providers: [provideTranslocoScope('auth', 'common')],

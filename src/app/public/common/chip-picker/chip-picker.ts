@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, input, output, signal } from '@angular/core';
 
 import { InputTextModule } from 'primeng/inputtext';
@@ -7,7 +6,7 @@ import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
 @Component({
   selector: 'app-chip-picker',
   standalone: true,
-  imports: [CommonModule, InputTextModule],
+  imports: [InputTextModule],
   templateUrl: './chip-picker.html',
   styleUrl: './chip-picker.scss',
 })

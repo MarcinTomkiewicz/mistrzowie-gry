@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
@@ -9,7 +8,7 @@ import { RichContent } from '../rich-content/rich-content';
 @Component({
   selector: 'app-legal-dialog',
   standalone: true,
-  imports: [CommonModule, ButtonModule, RichContent],
+  imports: [ButtonModule, RichContent],
   templateUrl: './legal-dialog.html',
   styleUrl: './legal-dialog.scss',
 })

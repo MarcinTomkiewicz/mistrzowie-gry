@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
@@ -17,7 +16,7 @@ import { createInfoDialogI18n } from './info-dialog.i18n';
 @Component({
   selector: 'app-info-dialog',
   standalone: true,
-  imports: [CommonModule, DialogModule, ButtonModule, RichContent],
+  imports: [DialogModule, ButtonModule, RichContent],
   templateUrl: './info-dialog.html',
   styleUrl: './info-dialog.scss',
 })

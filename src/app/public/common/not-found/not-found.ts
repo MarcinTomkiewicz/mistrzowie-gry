@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -12,7 +12,7 @@ import { createStatusPageI18n } from '../../../core/translations/status-page.i18
 @Component({
   selector: 'app-not-found',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, NgOptimizedImage],
+  imports: [RouterModule, ButtonModule, NgOptimizedImage],
   templateUrl: './not-found.html',
   styleUrl: './not-found.scss',
   providers: [provideTranslocoScope('common')],

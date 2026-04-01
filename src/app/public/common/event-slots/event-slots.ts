@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
@@ -12,7 +11,7 @@ import { createEventSlotsI18n } from './event-slots.i18n';
 @Component({
   selector: 'app-event-slots',
   standalone: true,
-  imports: [CommonModule, ButtonModule, SkeletonModule],
+  imports: [ButtonModule, SkeletonModule],
   templateUrl: './event-slots.html',
   styleUrl: './event-slots.scss',
 })
