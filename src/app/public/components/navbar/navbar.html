@@ -2,10 +2,11 @@
   <div class="h-100 flex-row-between-center px-md">
     <a routerLink="/" aria-label="Strona glowna">
       <img
-        [src]="brandLogoSrc()"
+        [ngSrc]="brandLogoSrc()"
         width="135"
         height="50"
         alt="Mistrzowie Gry"
+        decoding="async"
         class="mg-navbar__logo ml-sm"
       />
     </a>

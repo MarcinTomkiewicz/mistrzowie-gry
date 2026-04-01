@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import {
   Component,
   OutputEmitterRef,
@@ -32,6 +33,7 @@ interface CloseableOverlayComponent {
   selector: 'app-navbar',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     RouterModule,
     PopoverModule,
     DrawerModule,

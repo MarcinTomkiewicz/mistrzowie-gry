@@ -1,4 +1,4 @@
-import { APP_BASE_HREF } from '@angular/common';
+import { APP_BASE_HREF, NgOptimizedImage } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import {
   Component,
@@ -41,7 +41,7 @@ interface LazyLegalDialogComponent {
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, ButtonModule],
+  imports: [RouterModule, ButtonModule, NgOptimizedImage],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
   providers: [provideTranslocoScope('common'), provideTranslocoScope('footer')],
@@ -88,11 +88,7 @@ export class Footer {
     this.i18n.resolveLegalLinks(this.nav.legal()),
   );
 
-  readonly footerImgSrc = computed(() =>
-    this.theme.isLight()
-      ? `${this.baseHref}theme/light/footer.avif`
-      : `${this.baseHref}theme/dark/footer.avif`,
-  );
+  readonly footerImgSrc = this.theme.footerImageSrc;
 
   readonly isLegalDialogVisible = computed(
     () =>

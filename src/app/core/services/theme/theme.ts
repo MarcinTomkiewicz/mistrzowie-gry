@@ -1,7 +1,13 @@
-import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { Injectable, computed, inject, signal } from '@angular/core';
 
 import type { IThemeMode } from '../../interfaces/i-theme';
+import {
+  THEME_DARK_BRAND_IMAGE,
+  THEME_DARK_FOOTER_IMAGE,
+  THEME_LIGHT_BRAND_IMAGE,
+  THEME_LIGHT_FOOTER_IMAGE,
+} from '../../config/site';
 import { Platform } from '../platform/platform';
 
 const STORAGE_KEY = 'mg-theme';
@@ -10,12 +16,6 @@ const STORAGE_KEY = 'mg-theme';
 export class Theme {
   private readonly platform = inject(Platform);
   private readonly document = inject(DOCUMENT);
-  private readonly appBaseHref =
-    inject(APP_BASE_HREF, { optional: true }) ?? '/';
-
-  private readonly baseHref = this.appBaseHref.endsWith('/')
-    ? this.appBaseHref
-    : `${this.appBaseHref}/`;
 
   private readonly mode = signal<IThemeMode>('dark');
 
@@ -24,8 +24,14 @@ export class Theme {
 
   readonly brandLogoSrc = computed(() =>
     this.isLight()
-      ? `${this.baseHref}theme/light/brand.avif`
-      : `${this.baseHref}theme/dark/brand.avif`,
+      ? THEME_LIGHT_BRAND_IMAGE
+      : THEME_DARK_BRAND_IMAGE,
+  );
+
+  readonly footerImageSrc = computed(() =>
+    this.isLight()
+      ? THEME_LIGHT_FOOTER_IMAGE
+      : THEME_DARK_FOOTER_IMAGE,
   );
 
   constructor() {
