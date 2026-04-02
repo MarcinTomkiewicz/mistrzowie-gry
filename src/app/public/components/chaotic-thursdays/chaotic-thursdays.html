@@ -205,14 +205,15 @@
     </header>
 
     <div class="mg-card">
-      <p-accordion [multiple]="true">
-        @for (f of i18n.faqs(); let i = $index; track trackByIndex($index)) {
-          <p-accordion-panel [value]="i">
+      <p-accordion>
+        @for (f of i18n.faqs(); track f.id) {
+          <p-accordion-panel [value]="f.id">
             <p-accordion-header class="mg-section__title mg-section__title--xs">
               {{ f.h }}
             </p-accordion-header>
             <p-accordion-content>
-              <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+              <p class="mg-section__subtitle mg-section__subtitle--full w-100
+              ">
                 {{ f.a }}
               </p>
             </p-accordion-content>
