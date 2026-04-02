@@ -1,5 +1,67 @@
-<div class="flex-col-start-stretch w-100 gap-sm mt-sm">
-  <div class="flex-col-start-stretch gap-xs">
+<div class="flex-col-start-stretch w-100 gap-md mt-md">
+  <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
+    <small class="card-legend status-text status-text--muted">
+      {{ i18n.primaryInfoLabel() }}
+    </small>
+
+    <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
+      <span class="status-text status-text--muted align-self-start">
+        {{ i18n.sessionForm().systemLabel }}
+      </span>
+
+      <div class="w-50 text-right"><strong>{{ systemName() }}</strong></div>
+    </div>
+
+    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
+      <div class="status-text status-text--muted">
+        {{ i18n.sessionForm().difficultyLabel }}
+      </div>
+
+      <span [class]="'tag-badge ' + difficultyBadgeClass()">
+        {{ difficultyLabel() }}
+      </span>
+    </div>
+
+    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
+      <span class="status-text status-text--muted">
+        {{ i18n.eventSlotsLabels().gm }}
+      </span>
+
+      @if (canOpenGmProfile()) {
+        <p-button
+          [label]="resolvedGmDisplayName()"
+          severity="warn"
+          size="small"
+          [outlined]="true"
+          (onClick)="onGmProfileSelect()"
+        />
+      } @else {
+        <strong>{{ resolvedGmDisplayName() }}</strong>
+      }
+    </div>
+
+    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
+      <span class="status-text status-text--muted">
+        {{ i18n.gmSessionsForm().playersHeaderLabel }}
+      </span>
+
+      <strong>{{ playersLabel() }}</strong>
+    </div>
+
+    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
+      <span class="status-text status-text--muted">
+        {{ i18n.gmSessionsForm().minAgeHeaderLabel }}
+      </span>
+
+      <strong>{{ minAgeLabel() }}</strong>
+    </div>
+  </div>
+
+  <div class="mg-card mg-card--legend flex-col-start-stretch gap-xs">
+    <small class="card-legend status-text status-text--muted">
+      {{ i18n.descriptionLabel() }}
+    </small>
+
     <div class="session-details__description">
       @if (imageUrl()) {
         <div class="image__preview session-details__image">
@@ -11,9 +73,6 @@
           />
         </div>
       }
-      <small class="status-text status-text--muted">
-        {{ i18n.descriptionLabel() }}
-      </small>
 
       <p class="m-0 lh-md pre-line">
         {{ session().description }}
@@ -21,35 +80,49 @@
     </div>
   </div>
 
-  @if (session().styles.length) {
-    <div class="flex-col-start-stretch gap-xs">
-      <small class="status-text status-text--muted">
-        {{ i18n.stylesLabel() }}
+  @if (session().styles.length || session().triggers.length) {
+    <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
+      <small class="card-legend status-text status-text--muted">
+        {{ i18n.additionalInfoLabel() }}
       </small>
 
-      <div class="flex-row-start-center gap-xs flex-wrap">
-        @for (style of session().styles; track style.id) {
-          <span class="tag-badge tag-badge--arcane">
-            {{ style.label }}
-          </span>
-        }
-      </div>
+      @if (session().styles.length) {
+        <div class="flex-col-start-stretch gap-xs">
+          <div class="flex-row-start-center gap-xs flex-wrap">
+            @for (style of session().styles; track style.id) {
+              <span class="tag-badge tag-badge--arcane">
+                {{ style.label }}
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (session().triggers.length) {
+        <div class="flex-col-start-stretch gap-xs">
+          <small class="status-text status-text--muted">
+            {{ i18n.triggersLabel() }}
+          </small>
+
+          <div class="flex-row-start-center gap-xs flex-wrap">
+            @for (trigger of session().triggers; track trigger.id) {
+              <span class="tag-badge tag-badge--muted">
+                {{ trigger.label }}
+              </span>
+            }
+          </div>
+        </div>
+      }
     </div>
-  }
-
-  @if (session().triggers.length) {
-    <div class="flex-col-start-stretch gap-xs">
-      <small class="status-text status-text--muted">
-        {{ i18n.triggersLabel() }}
+  } @else {
+    <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
+      <small class="card-legend status-text status-text--muted">
+        {{ i18n.additionalInfoLabel() }}
       </small>
 
-      <div class="flex-row-start-center gap-xs flex-wrap">
-        @for (trigger of session().triggers; track trigger.id) {
-          <span class="tag-badge tag-badge--muted">
-            {{ trigger.label }}
-          </span>
-        }
-      </div>
+      <span class="tag-badge tag-badge--muted">
+        {{ i18n.commonFallbacks().noStyles }}
+      </span>
     </div>
   }
 </div>

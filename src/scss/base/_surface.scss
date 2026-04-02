@@ -7,3 +7,18 @@
   box-shadow: v.$shadow-soft;
   padding: 1rem;
 }
+
+.mg-card--legend {
+  position: relative;
+  padding-top: 1.35rem;
+}
+
+.card-legend {
+  position: absolute;
+  top: 0;
+  left: 0.9rem;
+  transform: translateY(-50%);
+  padding: 0 0.45rem;
+  background: v.$color-bg-surface;
+  line-height: 1;
+}

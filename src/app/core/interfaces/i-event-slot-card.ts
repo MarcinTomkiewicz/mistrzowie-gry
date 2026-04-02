@@ -8,6 +8,7 @@ export interface IEventSlotCardVm {
   title: string;
   imageUrl: string | null;
   gmDisplayName: string | null;
+  systemName: string;
   difficultyLevel: SessionDifficultyLevel | null;
   styles: IGmStyleOption[];
   triggers: IContentTrigger[];

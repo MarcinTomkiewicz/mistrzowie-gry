@@ -1,0 +1,47 @@
+@use "abstracts/mixins" as m;
+
+$text-align-breakpoints: ("xl", "lg", "md", "sm", "xs");
+
+$text-align-values: (
+  left: left,
+  center: center,
+  right: right,
+  justify: justify,
+  start: start,
+  end: end
+);
+
+$vertical-align-values: (
+  top: top,
+  middle: middle,
+  bottom: bottom,
+  baseline: baseline
+);
+
+@each $name, $value in $text-align-values {
+  .text-#{$name} {
+    text-align: $value;
+  }
+
+  @each $bp in $text-align-breakpoints {
+    @include m.down($bp) {
+      .text-#{$name}-#{$bp} {
+        text-align: $value;
+      }
+    }
+  }
+}
+
+@each $name, $value in $vertical-align-values {
+  .align-#{$name} {
+    vertical-align: $value;
+  }
+
+  @each $bp in $text-align-breakpoints {
+    @include m.down($bp) {
+      .align-#{$name}-#{$bp} {
+        vertical-align: $value;
+      }
+    }
+  }
+}

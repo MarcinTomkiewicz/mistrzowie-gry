@@ -6,6 +6,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { Theme } from '../../../core/services/theme/theme';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
+import { resolveAltDifficultyLevel } from '../../../core/utils/alt-difficulty-level';
 import { createEventSlotsI18n } from './event-slots.i18n';
 
 @Component({
@@ -93,29 +94,21 @@ export class EventSlots {
   difficultyBadgeClass(
     difficulty: SessionDifficultyLevel | null | undefined,
   ): string {
-    switch (difficulty) {
-      case SessionDifficultyLevel.Beginner:
-        return 'tag-badge--success';
-      case SessionDifficultyLevel.Intermediate:
-        return 'tag-badge--arcane';
-      case SessionDifficultyLevel.Advanced:
-        return 'tag-badge--danger';
-      default:
-        return 'tag-badge--muted';
-    }
+    return resolveAltDifficultyLevel(
+      difficulty,
+      this.i18n.difficulty(),
+      this.i18n.commonFallbacks().missingData,
+    ).badgeClass;
   }
 
   difficultyLabel(
     difficulty: SessionDifficultyLevel | null | undefined,
   ): string {
-    if (!difficulty) {
-      return this.i18n.commonFallbacks().missingData;
-    }
-
-    return (
-      this.i18n.difficulty()[difficulty] ??
-      this.i18n.commonFallbacks().missingData
-    );
+    return resolveAltDifficultyLevel(
+      difficulty,
+      this.i18n.difficulty(),
+      this.i18n.commonFallbacks().missingData,
+    ).label;
   }
 
   trackBySlot(index: number, item: IEventSlotCardVm): string {
@@ -132,6 +125,7 @@ export class EventSlots {
       imageUrl: null,
       gmDisplayName: fallback.none,
       difficultyLevel: null,
+      systemName: '',
       styles: [],
       triggers: [],
       minAge: null,

@@ -49,6 +49,7 @@
 </section>
 
 <div class="mg-container">
+  <h3   class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">{{ i18n.heroInfo().title }}</h3>
   <app-occurrence-switcher
     [options]="occurrenceOptions()"
     [selectedIndex]="safeSelectedOccurrenceIndex()"
@@ -74,6 +75,7 @@
 <app-session-dialog
   [visible]="isSessionDialogVisible()"
   [session]="selectedSession()"
+  [gmProfile]="selectedSessionProgramItem()?.host ?? null"
   (visibleChange)="onSessionDialogVisibleChange($event)"
 />
 

@@ -5,11 +5,18 @@
   [draggable]="false"
   [resizable]="false"
   [closable]="true"
+  appendTo="body"
   [styleClass]="'mg-dialog mg-dialog--xl'"
   (visibleChange)="onVisibleChange($event)"
 >
   @if (session(); as currentSession) {
-    <app-session-details [session]="currentSession" />
+    <app-session-details
+      [session]="currentSession"
+      [gmDisplayName]="resolvedGmDisplayName()"
+      [canOpenGmProfile]="canOpenGmProfile()"
+      [isGmProfileLoading]="isGmProfileLoading()"
+      (gmProfileSelect)="openGmProfile()"
+    />
   }
   <ng-template pTemplate="header">
     <h2 class="mg-section__title mg-section__title--md m-0">
@@ -28,3 +35,9 @@
     </div>
   </ng-template>
 </p-dialog>
+
+<app-gm-profile-dialog
+  [visible]="isGmDialogVisible()"
+  [profile]="selectedProfile()"
+  (visibleChange)="onGmDialogVisibleChange($event)"
+/>

@@ -103,6 +103,9 @@ export class ChaoticThursdays implements OnInit {
   readonly isGmDialogVisible = signal(false);
 
   readonly selectedSession = signal<ISessionWithRelations | null>(null);
+  readonly selectedSessionProgramItem = signal<IEventProgramItemWithDetails | null>(
+    null,
+  );
   readonly isSessionDialogVisible = signal(false);
 
   readonly selectedFutureOccurrenceIndex = signal(0);
@@ -154,21 +157,24 @@ export class ChaoticThursdays implements OnInit {
   });
 
   readonly slotCards = computed<IEventSlotCardVm[]>(() =>
-    this.slotItems().map((item) => ({
-      id: item.id,
-      gmProfileId: item.host.profile.id ?? null,
-      title: item.session.title,
-      imageUrl: this.getImageUrl(item.session.image),
-      gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
-      difficultyLevel: item.session.difficultyLevel,
-      styles: item.session.styles,
-      triggers: item.session.triggers,
-      minAge: item.session.minAge,
-      description: item.session.description,
-      isEmpty: false,
-      canOpenDetails: true,
-      canOpenGmProfile: !!item.host.profile.id,
-    })),
+    this.slotItems().map((item) => {
+      return {
+        id: item.id,
+        gmProfileId: item.host.profile.id ?? null,
+        title: item.session.title,
+        imageUrl: this.getImageUrl(item.session.image),
+        gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
+        difficultyLevel: item.session.difficultyLevel,
+        systemName: item.session.system?.name || '',
+        styles: item.session.styles,
+        triggers: item.session.triggers,
+        minAge: item.session.minAge,
+        description: item.session.description,
+        isEmpty: false,
+        canOpenDetails: true,
+        canOpenGmProfile: !!item.host.profile.id,
+      };
+    }),
   );
 
   readonly slotCount = computed(() => {
@@ -204,12 +210,14 @@ export class ChaoticThursdays implements OnInit {
   }
 
   onSlotSelect(slot: IEventSlotCardVm): void {
-    const session = this.findSessionByProgramItemId(slot.id);
+    const programItem = this.findProgramItemById(slot.id);
+    const session = programItem?.session ?? null;
 
     if (!session) {
       return;
     }
 
+    this.selectedSessionProgramItem.set(programItem);
     this.selectedSession.set(session);
     this.isSessionDialogVisible.set(true);
   }
@@ -247,6 +255,7 @@ export class ChaoticThursdays implements OnInit {
 
     if (!visible) {
       this.selectedSession.set(null);
+      this.selectedSessionProgramItem.set(null);
     }
   }
 
@@ -274,18 +283,16 @@ export class ChaoticThursdays implements OnInit {
       });
   }
 
-  private findSessionByProgramItemId(
+  private findProgramItemById(
     programItemId: string | null | undefined,
-  ): ISessionWithRelations | null {
+  ): IEventProgramItemWithDetails | null {
     const normalizedId = normalizeText(programItemId);
 
     if (!normalizedId) {
       return null;
     }
 
-    const match = this.slotItems().find((item) => item.id === normalizedId);
-
-    return match?.session ?? null;
+    return this.slotItems().find((item) => item.id === normalizedId) ?? null;
   }
 
   private getImageUrl(imagePath: string | null | undefined): string | null {
@@ -317,16 +324,18 @@ export class ChaoticThursdays implements OnInit {
       price: '40',
       url: this.pageUrl,
     });
-    const subEvents = (pageVm?.occurrences ?? []).slice(0, 8).map((occurrence) =>
-      createEventStructuredData({
-        id: `${this.pageUrl}#occurrence-${occurrence.id}`,
-        url: this.pageUrl,
-        name: title,
-        startDate: `${occurrence.occurrenceDate}T${eventStartTime}:00`,
-        endDate: `${occurrence.occurrenceDate}T${eventEndTime}:00`,
-        offers,
-      }),
-    );
+    const subEvents = (pageVm?.occurrences ?? [])
+      .slice(0, 8)
+      .map((occurrence) =>
+        createEventStructuredData({
+          id: `${this.pageUrl}#occurrence-${occurrence.id}`,
+          url: this.pageUrl,
+          name: title,
+          startDate: `${occurrence.occurrenceDate}T${eventStartTime}:00`,
+          endDate: `${occurrence.occurrenceDate}T${eventEndTime}:00`,
+          offers,
+        }),
+      );
 
     const firstOccurrence = subEvents[0];
     const firstOccurrenceStartDate =

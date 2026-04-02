@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
+import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { SessionDialog } from './session-dialog';
 
 describe('SessionDialog', () => {
@@ -8,7 +10,16 @@ describe('SessionDialog', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SessionDialog]
+      imports: [SessionDialog],
+      providers: [
+        {
+          provide: GmRead,
+          useValue: {
+            getPublicProfileById: () => of(null),
+            getDisplayName: () => '',
+          },
+        },
+      ],
     })
     .compileComponents();
 

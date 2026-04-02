@@ -1,0 +1,59 @@
+@use "abstracts/mixins" as m;
+
+$text-wrap-breakpoints: ("xl", "lg", "md", "sm", "xs");
+
+@mixin _emit-text-wrap($class, $white-space, $text-wrap: null) {
+  .#{$class} {
+    white-space: $white-space;
+
+    @if $text-wrap != null {
+      text-wrap: $text-wrap;
+    }
+  }
+
+  @each $bp in $text-wrap-breakpoints {
+    @include m.down($bp) {
+      .#{$class}-#{$bp} {
+        white-space: $white-space;
+
+        @if $text-wrap != null {
+          text-wrap: $text-wrap;
+        }
+      }
+    }
+  }
+}
+
+@mixin _emit-overflow-wrap($class, $overflow-wrap, $word-break: null) {
+  .#{$class} {
+    white-space: normal;
+    overflow-wrap: $overflow-wrap;
+
+    @if $word-break != null {
+      word-break: $word-break;
+    }
+  }
+
+  @each $bp in $text-wrap-breakpoints {
+    @include m.down($bp) {
+      .#{$class}-#{$bp} {
+        white-space: normal;
+        overflow-wrap: $overflow-wrap;
+
+        @if $word-break != null {
+          word-break: $word-break;
+        }
+      }
+    }
+  }
+}
+
+@include _emit-text-wrap("text-wrap", normal, wrap);
+@include _emit-text-wrap("text-wrap-auto", normal, wrap);
+@include _emit-text-wrap("text-nowrap", nowrap, nowrap);
+@include _emit-text-wrap("text-wrap-balance", normal, balance);
+@include _emit-text-wrap("text-wrap-pretty", normal, pretty);
+@include _emit-text-wrap("text-wrap-stable", normal, stable);
+
+@include _emit-overflow-wrap("text-wrap-break-word", break-word);
+@include _emit-overflow-wrap("text-wrap-anywhere", anywhere, break-word);

@@ -52,12 +52,18 @@
           (click)="onSlotClick(item)"
           (keydown)="onSlotKeydown($event, item)"
         >
-          <header class="min-h-lines-2">
+          <header class="min-h-lines-2 flex-row-between-center">
             <h3
               class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
             >
               {{ item.title }}
             </h3>
+            <div
+              class="tag-badge"
+              [class]="difficultyBadgeClass(item.difficultyLevel)"
+            >
+              {{ difficultyLabel(item.difficultyLevel) }}
+            </div>
           </header>
 
           <div class="event-slot-card__image-wrap">
@@ -72,9 +78,9 @@
 
           <div class="flex-col-start-stretch gap-sm mt-md">
             <div
-              class="flex-row-between-center gap-sm flex-row-between-center-sm"
+              class="flex-row-between-center gap-sm"
             >
-              <div class="flex-col-start-stretch gap-xs flex-1">
+              <div class="flex-col-start-stretch gap-xs">
                 <span
                   class="mg-section__subtitle mg-section__subtitle--no-margin"
                 >
@@ -97,12 +103,10 @@
                   </span>
                 }
               </div>
-
               <div
-                class="tag-badge"
-                [class]="difficultyBadgeClass(item.difficultyLevel)"
+                class="tag-badge text-center max-w-none max-w-150-xs text-wrap-auto-xs"
               >
-                {{ difficultyLabel(item.difficultyLevel) }}
+                {{ item.systemName || i18n.commonFallbacks().none }}
               </div>
             </div>
 
