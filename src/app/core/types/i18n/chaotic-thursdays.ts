@@ -8,6 +8,7 @@ export type ChaoticThursdaysHeroTranslations = {
   title: string;
   subtitleLead: string;
   subtitleStrong: string;
+  upcomingSessions: string;
 };
 
 export type ChaoticThursdaysHeroInfoTranslations = {

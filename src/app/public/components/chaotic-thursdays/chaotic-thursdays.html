@@ -1,5 +1,5 @@
 <section
-  class="mg-section mg-chaotic-hero"
+  class="mg-section mg-chaotic-hero pb-sm"
   [attr.aria-label]="i18n.hero().title"
 >
   <div class="mg-container">
@@ -49,7 +49,11 @@
 </section>
 
 <div class="mg-container">
-  <h3   class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">{{ i18n.heroInfo().title }}</h3>
+  <div class="mg-section__header">
+    <h3 class="mg-section__title mg-section__title--md tex mb-md">
+      {{ i18n.hero().upcomingSessions }}
+    </h3>
+  </div>
   <app-occurrence-switcher
     [options]="occurrenceOptions()"
     [selectedIndex]="safeSelectedOccurrenceIndex()"
