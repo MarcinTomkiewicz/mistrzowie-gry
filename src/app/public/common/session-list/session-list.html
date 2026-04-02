@@ -116,7 +116,10 @@
     <ng-template #expandedrow let-session>
       <tr>
         <td [attr.colspan]="colspan()">
-          <app-session-details [session]="session" />
+          <app-session-details
+            [session]="session"
+            [gmDisplayName]="gmDisplayName()"
+          />
         </td>
       </tr>
     </ng-template>
@@ -230,7 +233,10 @@
                 </div>
               }
 
-              <app-session-details [session]="session" />
+              <app-session-details
+                [session]="session"
+                [gmDisplayName]="gmDisplayName()"
+              />
             </div>
           </p-accordion-content>
         </p-accordion-panel>

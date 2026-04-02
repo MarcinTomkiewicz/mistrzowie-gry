@@ -182,6 +182,7 @@
         <p-tabpanel value="sessions">
           <app-session-list
             [sessions]="gm.sessions"
+            [gmDisplayName]="displayName()"
             [labels]="sessionListLabels()"
             [emptyTitle]="i18n.commonEmpty().title"
             [emptyDescription]="i18n.commonEmpty().description"

@@ -23,8 +23,10 @@ import {
   SESSION_DIFFICULTY_LEVEL_OPTIONS,
   SessionDifficultyLevel,
 } from '../../../core/types/sessions';
+import { Auth } from '../../../core/services/auth/auth';
 import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+import { normalizeText } from '../../../core/utils/normalize-text';
 import { SessionForm } from '../../common/session-form/session-form';
 import { createGmSessionsI18n } from './gm-sessions.i18n';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
@@ -52,6 +54,7 @@ interface ISessionSystemOption {
   providers: [provideTranslocoScope('auth', 'common', 'sessions')],
 })
 export class GmSessions {
+  private readonly auth = inject(Auth);
   private readonly gmSessionsFacade = inject(GmSessionsFacade);
   private readonly toast = inject(UiToast);
 
@@ -169,6 +172,10 @@ export class GmSessions {
     editLabel: this.i18n.commonActions().edit,
     deleteLabel: this.i18n.commonActions().delete,
   }));
+
+  readonly gmDisplayName = computed(
+    () => normalizeText(this.auth.displayName()) ?? null,
+  );
 
   constructor() {
     this.loadData();

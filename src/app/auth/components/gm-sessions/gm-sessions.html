@@ -57,6 +57,7 @@
   <app-session-list
     class="w-100"
     [sessions]="filteredSessions()"
+    [gmDisplayName]="gmDisplayName()"
     [labels]="sessionListLabels()"
     [emptyTitle]="i18n.empty().title"
     [emptyDescription]="i18n.empty().description"

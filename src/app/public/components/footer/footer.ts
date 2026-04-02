@@ -175,6 +175,14 @@ export class Footer {
     }
   }
 
+  resolveLegalLinkPath(link: UILegalLink): string | null {
+    if (this.resolveLegalDialog(link)) {
+      return null;
+    }
+
+    return link.path;
+  }
+
   private ensureLegalDialogMounted(): void {
     if (this.legalDialogRef()) {
       return;

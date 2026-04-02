@@ -86,11 +86,15 @@
       </div>
 
       <nav
-        class="mg-footer__legal flex-row-start-center gap-md flex-wrap"
+        class="mg-footer__legal flex-row-start-center gap-md flex-wrap cursor-pointer"
         [attr.aria-label]="i18n.footer().legalAriaLabel"
       >
         @for (l of legalLinks(); track $index) {
-          <a [routerLink]="l.path" (click)="onLegalClick(l, $event)">
+          <a
+            [routerLink]="resolveLegalLinkPath(l)"
+            [attr.href]="resolveLegalLinkPath(l)"
+            (click)="onLegalClick(l, $event)"
+          >
             {{ l.label }}
           </a>
         }

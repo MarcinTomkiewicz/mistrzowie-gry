@@ -51,6 +51,7 @@ export class SessionList {
   readonly selectable = input<boolean>(false);
   readonly selectedSessionId = input<string | null>(null);
   readonly selectLabel = input<string>('');
+  readonly gmDisplayName = input<string | null>(null);
 
   readonly actionLabel = input<string>('');
   readonly actionSeverity = input<'secondary' | 'success' | 'danger'>(
