@@ -87,6 +87,14 @@ export function app(): express.Express {
       maxAge: '1y',
       index: false,
       redirect: false,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.json')) {
+          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+          return;
+        }
+
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      },
     }),
   );
 

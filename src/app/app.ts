@@ -5,6 +5,7 @@ import {
   createWebsiteStructuredData,
   SOCIAL_SHARE_IMAGE,
 } from './core/config/site';
+import { DeployUpdate } from './core/services/deploy-update/deploy-update';
 import { Seo } from './core/services/seo/seo';
 import { AppShell } from './public/components/app-shell/app-shell';
 
@@ -16,6 +17,7 @@ import { AppShell } from './public/components/app-shell/app-shell';
   styleUrl: './app.scss',
 })
 export class App {
+  private readonly deployUpdate = inject(DeployUpdate);
   private readonly seo = inject(Seo);
   private readonly socialShareImage = SOCIAL_SHARE_IMAGE;
 

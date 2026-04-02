@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { Translation, TranslocoLoader } from '@jsverse/transloco';
 import { Observable } from 'rxjs';
 
+const TRANSLATION_CACHE_BUSTER = Date.now().toString(36);
+
 /**
  * Struktura plików:
  *   /assets/i18n/<lang>/<namespace>.json
@@ -22,9 +24,8 @@ import { Observable } from 'rxjs';
 export class TranslocoHttpLoader implements TranslocoLoader {
   private readonly http = inject(HttpClient);
 
-
   getTranslation(langOrScopeLang: string): Observable<Translation> {
-    const url = this.resolveUrl(langOrScopeLang);
+    const url = this.withCacheBuster(this.resolveUrl(langOrScopeLang));
 
     return this.http.get<Translation>(url);
   }
@@ -33,7 +34,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     // scope/lang: bierzemy ostatni segment jako lang, reszta jako namespace
     if (langOrScopeLang.includes('/')) {
       const parts = langOrScopeLang.split('/').filter(Boolean);
-      const lang = parts.at(-1) ?? 'pl';
+      const lang = parts[parts.length - 1] ?? 'pl';
       const namespace = parts.slice(0, -1).join('/');
 
       // minimalna obrona: jeśli namespace pusty, traktujemy jak common
@@ -44,5 +45,11 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     // root lang
     const lang = langOrScopeLang || 'pl';
     return `/assets/i18n/${lang}/common.json`;
+  }
+
+  private withCacheBuster(url: string): string {
+    const separator = url.includes('?') ? '&' : '?';
+
+    return `${url}${separator}v=${TRANSLATION_CACHE_BUSTER}`;
   }
 }
