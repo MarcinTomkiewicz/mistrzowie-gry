@@ -104,3 +104,40 @@
 .mg-section__subtitle--full {
   max-width: unset;
 }
+
+.image__preview {
+  display: block;
+  overflow: hidden;
+  border: 1px solid v.$color-border;
+  background: v.$color-bg-surface;
+}
+
+.image__preview-image,
+.image__preview > img,
+.image__preview > .p-image,
+.image__preview > .p-image .p-image-original {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image__preview--circle {
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.image__preview--circle .image__preview-image,
+.image__preview-image--circle {
+  border-radius: 50%;
+}
+
+.image__preview--square {
+  aspect-ratio: 1;
+  border-radius: v.$radius-md;
+}
+
+.image__preview--landscape {
+  aspect-ratio: 16 / 9;
+  border-radius: v.$radius-md;
+}

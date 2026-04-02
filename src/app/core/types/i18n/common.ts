@@ -125,6 +125,16 @@ export type CommonFormFileUploadTranslations = {
   dropImage: string;
   imageFormats: string;
   imagePreviewAlt: string;
+  cropTitle: string;
+  cropConfirm: string;
+  cropFrameAriaLabel: string;
+  zoomLabel: string;
+  cropPreviewLabel: string;
+  cropPreviewLandscapeLabel: string;
+  cropPreviewCircleLabel: string;
+  cropPreviewSquareLabel: string;
+  gmCropHint: string;
+  sessionCropHint: string;
 };
 
 export type CommonFormTranslations = {

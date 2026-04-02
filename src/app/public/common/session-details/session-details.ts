@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
+import { ImageModule } from 'primeng/image';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -19,7 +20,7 @@ import { createSessionDetailsI18n } from './session-details.i18n';
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [ButtonModule],
+  imports: [ButtonModule, ImageModule],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
   providers: [provideTranslocoScope('sessions')],

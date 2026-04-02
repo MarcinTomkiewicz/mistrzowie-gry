@@ -1,11 +1,21 @@
 <div class="flex-col-start-stretch gap-sm w-100">
-  @if (hasPreview()) {
+  @if (previewUrl(); as previewUrl) {
     <div class="flex-col-center-center gap-sm w-100">
-      <div class="image__preview">
+      <div
+        [class]="
+          'image__preview image__preview--' +
+          resolvedOptions().previewShape +
+          ' w-100 max-w-300'
+        "
+      >
         <p-image
-          [src]="previewUrl()!"
-          [alt]="previewAlt()"
-          imageClass="image__preview-image"
+          [src]="previewUrl"
+          [alt]="resolvedTexts().previewAlt"
+          [imageClass]="
+            resolvedOptions().previewShape === 'circle'
+              ? 'image__preview-image image__preview-image--circle'
+              : 'image__preview-image'
+          "
           [preview]="true"
         />
       </div>
@@ -13,20 +23,20 @@
   }
 
   <div class="flex-col-start-stretch gap-xs">
-    <label>{{ label() }}</label>
-
     <p-fileupload
+      #uploader
       name="file-upload"
       mode="advanced"
+      [files]="selected().displayedFiles"
       [customUpload]="true"
       [auto]="false"
       [multiple]="false"
       [showUploadButton]="false"
       [showCancelButton]="false"
       [fileLimit]="1"
-      [maxFileSize]="maxFileSize()"
-      [accept]="accept()"
-      [disabled]="disabled()"
+      [maxFileSize]="resolvedOptions().maxFileSize"
+      [accept]="resolvedOptions().accept"
+      [disabled]="resolvedOptions().disabled"
       (onSelect)="onSelect($event)"
       (onRemove)="onRemove($event)"
       (onClear)="onClear()"
@@ -42,10 +52,10 @@
             <p-button
               type="button"
               severity="secondary"
-              [label]="chooseLabel()"
+              [label]="resolvedTexts().chooseLabel"
               icon="pi pi-mona-lisa"
               [outlined]="true"
-              [disabled]="disabled()"
+              [disabled]="resolvedOptions().disabled"
               (onClick)="chooseCallback()"
             />
 
@@ -53,10 +63,10 @@
               <p-button
                 type="button"
                 severity="warn"
-                [label]="clearLabel()"
+                [label]="resolvedTexts().clearLabel"
                 icon="pi pi-vacuum-cleaner"
                 [outlined]="true"
-                [disabled]="disabled()"
+                [disabled]="resolvedOptions().disabled"
                 (onClick)="clearCallback()"
               />
             }
@@ -64,7 +74,11 @@
         </div>
       </ng-template>
 
-      <ng-template #content let-files let-removeFileCallback="removeFileCallback">
+      <ng-template
+        #content
+        let-files
+        let-removeFileCallback="removeFileCallback"
+      >
         @if (files?.length) {
           <div class="flex-col-start-stretch gap-sm pt-sm">
             @for (
@@ -98,10 +112,20 @@
       <ng-template #empty>
         <div class="flex-col-center-center gap-xs py-md">
           <i class="pi pi-soul text-4xl"></i>
-          <span>{{ dropLabel() }}</span>
-          <small>{{ formatsLabel() }}</small>
+          <span>{{ resolvedTexts().dropLabel }}</span>
+          <small>{{ resolvedTexts().formatsLabel }}</small>
         </div>
       </ng-template>
     </p-fileupload>
   </div>
 </div>
+
+<app-crop-image-dialog
+  [visible]="cropVisible()"
+  [sourceFile]="pendingFile()"
+  [texts]="resolvedTexts()"
+  [cropConfig]="resolvedCropConfig()"
+  [previewShape]="resolvedOptions().previewShape"
+  (cancel)="onCropCancel()"
+  (confirm)="onCropConfirm($event)"
+/>

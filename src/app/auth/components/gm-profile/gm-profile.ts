@@ -24,15 +24,19 @@ import {
   mapGmProfileFormToPayload,
 } from '../../../core/factories/gm-profile-form.factory';
 import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
-import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
 import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
 import { Auth } from '../../../core/services/auth/auth';
 import { GmProfileFacade } from '../../../core/services/gm-profile/gm-profile';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+import {
+  FileUploadCropConfig,
+  FileUploadOptions,
+  FileUploadTexts,
+} from '../../../core/types/file-upload';
 import { normalizeText } from '../../../core/utils/normalize-text';
-import { FileUpload } from '../../../public/common/file-upload/file-upload';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
+import { FileUpload } from '../../../public/common/file-upload/file-upload';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { createGmProfileI18n } from './gm-profile.i18n';
 
@@ -71,6 +75,7 @@ export class GmProfile {
   readonly styleOptions = signal<IChipPickerOption[]>([]);
   readonly languageOptions = signal<IChipPickerOption[]>([]);
   readonly selectedImageFile = signal<File | null>(null);
+  readonly storedImagePath = signal<string | null>(null);
 
   private readonly quoteValue = toSignal(
     this.form.controls.quote.valueChanges,
@@ -96,7 +101,7 @@ export class GmProfile {
   readonly displayName = computed(() => this.auth.displayName());
 
   readonly storedImageUrl = computed(() => {
-    const imagePath = normalizeText(this.form.controls.image.getRawValue());
+    const imagePath = this.storedImagePath();
 
     if (!imagePath) {
       return null;
@@ -104,6 +109,40 @@ export class GmProfile {
 
     return this.storage.getPublicUrl(imagePath);
   });
+  readonly imageUploadTexts = computed<FileUploadTexts>(() => ({
+    chooseLabel: this.i18n.commonForm().fileUpload.chooseImage,
+    clearLabel: this.i18n.commonActions().clear,
+    dropLabel: this.i18n.commonForm().fileUpload.dropImage,
+    formatsLabel: this.i18n.commonForm().fileUpload.imageFormats,
+    previewAlt: this.i18n.commonForm().fileUpload.imagePreviewAlt,
+    cropTitle: this.i18n.commonForm().fileUpload.cropTitle,
+    cropHint: this.i18n.commonForm().fileUpload.gmCropHint,
+    cropFrameAriaLabel: this.i18n.commonForm().fileUpload.cropFrameAriaLabel,
+    cropConfirmLabel: this.i18n.commonForm().fileUpload.cropConfirm,
+    cropCancelLabel: this.i18n.commonActions().cancel,
+    zoomLabel: this.i18n.commonForm().fileUpload.zoomLabel,
+    cropPreviewLabel: this.i18n.commonForm().fileUpload.cropPreviewLabel,
+    cropPreviewLandscapeLabel:
+      this.i18n.commonForm().fileUpload.cropPreviewLandscapeLabel,
+    cropPreviewCircleLabel:
+      this.i18n.commonForm().fileUpload.cropPreviewCircleLabel,
+    cropPreviewSquareLabel:
+      this.i18n.commonForm().fileUpload.cropPreviewSquareLabel,
+  }));
+  readonly imageUploadOptions = computed<FileUploadOptions>(() => ({
+    currentUrl: this.storedImageUrl(),
+    disabled: this.isSubmitting(),
+    previewShape: 'circle',
+    accept: 'image/png,image/jpeg,image/webp,image/avif',
+    maxFileSize: 5_000_000,
+  }));
+  readonly imageCropConfig = computed<FileUploadCropConfig>(() => ({
+    aspectRatio: 1,
+    roundCropper: true,
+    resizeToWidth: 800,
+    resizeToHeight: 800,
+    previewShapes: ['circle'],
+  }));
 
   readonly hasValidStyleCount = computed(() => {
     const gmStyleIds = this.gmStyleIdsValue() ?? [];
@@ -125,19 +164,12 @@ export class GmProfile {
     this.loadData();
   }
 
-  onImageValueChange(value: IFileUploadValue): void {
-    this.selectedImageFile.set(value.file);
+  onImageValueChange(file: File | null): void {
+    this.selectedImageFile.set(file);
 
-    if (value.file) {
+    if (file) {
       this.form.markAsDirty();
     }
-  }
-
-  onRemoveStoredImage(): void {
-    this.selectedImageFile.set(null);
-    this.form.controls.image.setValue(null);
-    this.form.controls.image.markAsDirty();
-    this.form.controls.image.markAsTouched();
   }
 
   onSubmit(): void {
@@ -183,6 +215,7 @@ export class GmProfile {
             },
             { emitEvent: true },
           );
+          this.storedImagePath.set(normalizeText(profile.image));
 
           this.form.markAsPristine();
           this.form.markAsUntouched();
@@ -283,6 +316,7 @@ export class GmProfile {
             },
             { emitEvent: true },
           );
+          this.storedImagePath.set(normalizeText(profile.image));
 
           this.form.markAsPristine();
           this.form.markAsUntouched();
@@ -315,12 +349,13 @@ export class GmProfile {
       .uploadImage(file, {
         folder: 'profilePhotos',
         ownerId: userId,
-        currentPath: this.form.controls.image.getRawValue(),
+        currentPath: this.storedImagePath(),
         removePrevious: true,
         usePublicUrl: false,
       })
       .pipe(
         switchMap((result) => {
+          this.storedImagePath.set(result.path);
           this.form.controls.image.setValue(result.path);
           this.form.controls.image.markAsDirty();
           this.form.controls.image.markAsTouched();
@@ -329,5 +364,4 @@ export class GmProfile {
         }),
       );
   }
-
 }

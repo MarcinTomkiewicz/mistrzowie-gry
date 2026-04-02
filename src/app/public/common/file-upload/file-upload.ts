@@ -1,106 +1,209 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import {
   FileRemoveEvent,
   FileSelectEvent,
+  FileUpload as PrimeFileUpload,
   FileUploadModule,
 } from 'primeng/fileupload';
 import { ImageModule } from 'primeng/image';
 
-import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
+import { CropImageDialog } from '../crop-image-dialog/crop-image-dialog';
+import {
+  FileUploadCropConfig,
+  FileUploadOptions,
+  FileUploadTexts,
+} from '../../../core/types/file-upload';
+
+export type {
+  FileUploadCropConfig,
+  FileUploadOptions,
+  FileUploadPreviewShape,
+  FileUploadTexts,
+} from '../../../core/types/file-upload';
+
+interface SelectedImageState {
+  file: File | null;
+  objectUrl: string | null;
+  displayedFiles: File[];
+}
+
+const DEFAULT_TEXTS: FileUploadTexts = {
+  chooseLabel: '',
+  clearLabel: '',
+  dropLabel: '',
+  formatsLabel: '',
+  previewAlt: '',
+  cropTitle: '',
+  cropHint: '',
+  cropFrameAriaLabel: 'Crop photo',
+  cropConfirmLabel: '',
+  cropCancelLabel: '',
+  zoomLabel: '',
+  cropPreviewLabel: '',
+  cropPreviewLandscapeLabel: '',
+  cropPreviewCircleLabel: '',
+  cropPreviewSquareLabel: '',
+};
+
+const DEFAULT_OPTIONS: FileUploadOptions = {
+  accept: 'image/png,image/jpeg,image/webp,image/avif',
+  maxFileSize: 5_000_000,
+  currentUrl: null,
+  disabled: false,
+  previewShape: 'circle',
+};
+
+const DEFAULT_CROP_CONFIG: FileUploadCropConfig = {
+  aspectRatio: 1,
+  roundCropper: false,
+  resizeToWidth: 0,
+  resizeToHeight: 0,
+  previewShapes: [],
+};
+
+const createInitialSelectedState = (): SelectedImageState => ({
+  file: null,
+  objectUrl: null,
+  displayedFiles: [],
+});
 
 @Component({
   selector: 'app-file-upload',
   standalone: true,
-  imports: [CommonModule, ButtonModule, FileUploadModule, ImageModule],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    CropImageDialog,
+    FileUploadModule,
+    ImageModule,
+  ],
   templateUrl: './file-upload.html',
-  styleUrl: './file-upload.scss',
 })
 export class FileUpload {
-  readonly label = input<string>('');
-  readonly chooseLabel = input<string>('');
-  readonly clearLabel = input<string>('');
-  readonly dropLabel = input<string>('');
-  readonly formatsLabel = input<string>('');
-  readonly previewAlt = input<string>('');
-  readonly accept = input<string>('image/png,image/jpeg,image/webp,image/avif');
-  readonly maxFileSize = input<number>(5_000_000);
-  readonly currentUrl = input<string | null>(null);
-  readonly disabled = input<boolean>(false);
+  private readonly uploader = viewChild<PrimeFileUpload>('uploader');
+  private isResettingUploader = false;
 
-  readonly valueChange = output<IFileUploadValue>();
-  readonly removeStored = output<void>();
+  readonly texts = input<Partial<FileUploadTexts>>({});
+  readonly options = input<Partial<FileUploadOptions>>({});
+  readonly cropConfig = input<Partial<FileUploadCropConfig>>({});
 
-  readonly selectedFile = signal<File | null>(null);
-  readonly selectedObjectUrl = signal<string | null>(null);
+  readonly valueChange = output<File | null>();
 
+  readonly selected = signal(createInitialSelectedState());
+  readonly pendingFile = signal<File | undefined>(undefined);
+
+  readonly resolvedTexts = computed<FileUploadTexts>(() => ({
+    ...DEFAULT_TEXTS,
+    ...this.texts(),
+  }));
+  readonly resolvedOptions = computed<FileUploadOptions>(() => ({
+    ...DEFAULT_OPTIONS,
+    ...this.options(),
+  }));
+  readonly resolvedCropConfig = computed<FileUploadCropConfig>(() => ({
+    ...DEFAULT_CROP_CONFIG,
+    ...this.cropConfig(),
+  }));
   readonly previewUrl = computed(
-    () => this.selectedObjectUrl() ?? this.currentUrl(),
+    () => this.selected().objectUrl ?? this.resolvedOptions().currentUrl,
   );
+  readonly cropVisible = computed(() => !!this.pendingFile());
 
-  readonly hasPreview = computed(() => !!this.previewUrl());
-  readonly hasSelectedFile = computed(() => !!this.selectedFile());
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      this.revokeObjectUrl();
+    });
+  }
 
   onSelect(event: FileSelectEvent): void {
     const file = event.files?.[0] ?? null;
 
-    this.setFile(file);
+    if (!file) {
+      return;
+    }
+
+    this.pendingFile.set(file);
   }
 
   onRemove(event: FileRemoveEvent): void {
-    if (event.file === this.selectedFile()) {
+    if (event.file === this.selected().file) {
       this.clearSelectedFile();
     }
   }
 
   onClear(): void {
+    if (this.isResettingUploader) {
+      return;
+    }
+
     this.clearSelectedFile();
   }
 
-  onRemoveStored(): void {
-    this.removeStored.emit();
+  onCropCancel(): void {
+    this.pendingFile.set(undefined);
+    this.resetPendingUploaderSelection();
+  }
+
+  onCropConfirm(file: File): void {
+    this.setFile(file);
+    this.pendingFile.set(undefined);
+    this.uploader()?.clearInputElement();
   }
 
   private setFile(file: File | null): void {
     this.revokeObjectUrl();
 
     if (!file) {
-      this.selectedFile.set(null);
-      this.selectedObjectUrl.set(null);
-      this.valueChange.emit({
-        file: null,
-        objectUrl: null,
-      });
+      this.selected.set(createInitialSelectedState());
+      this.valueChange.emit(null);
       return;
     }
 
-    const objectUrl = URL.createObjectURL(file);
-
-    this.selectedFile.set(file);
-    this.selectedObjectUrl.set(objectUrl);
-    this.valueChange.emit({
+    this.selected.set({
       file,
-      objectUrl,
+      objectUrl: URL.createObjectURL(file),
+      displayedFiles: [file],
     });
+    this.valueChange.emit(file);
   }
 
   private clearSelectedFile(): void {
     this.revokeObjectUrl();
-    this.selectedFile.set(null);
-    this.selectedObjectUrl.set(null);
-    this.valueChange.emit({
-      file: null,
-      objectUrl: null,
-    });
+    this.selected.set(createInitialSelectedState());
+    this.valueChange.emit(null);
   }
 
   private revokeObjectUrl(): void {
-    const current = this.selectedObjectUrl();
+    const current = this.selected().objectUrl;
 
     if (current) {
       URL.revokeObjectURL(current);
     }
+  }
+
+  private resetPendingUploaderSelection(): void {
+    const uploader = this.uploader();
+    const files = this.selected().displayedFiles;
+
+    if (!uploader) {
+      return;
+    }
+
+    this.isResettingUploader = true;
+    uploader.clear();
+    uploader.files = [...files];
+    this.isResettingUploader = false;
   }
 }

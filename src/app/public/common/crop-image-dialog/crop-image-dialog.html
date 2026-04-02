@@ -1,0 +1,162 @@
+<p-dialog
+  [visible]="visible()"
+  (onHide)="onDialogHide()"
+  (onMaximize)="onDialogMaximize($event)"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [maximizable]="true"
+  maximizeIcon="pi pi-expand"
+  minimizeIcon="pi pi-contract"
+  [styleClass]="
+    maximized()
+      ? 'mg-dialog mg-dialog--md image-crop-dialog image-crop-dialog--maximized'
+      : 'mg-dialog mg-dialog--md image-crop-dialog'
+  "
+>
+  <ng-template pTemplate="header">
+    <div class="flex-col-start-stretch gap-xs min-w-0">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ texts().cropTitle }}
+      </h3>
+
+      @if (texts().cropHint) {
+        <p class="m-0">
+          {{ texts().cropHint }}
+        </p>
+      }
+    </div>
+  </ng-template>
+
+  <div
+    [class]="
+      maximized()
+        ? 'grid-2-1 grid-items-start w-100 max-w-full gap-lg'
+        : 'flex-col-start-stretch gap-md w-100 max-w-500 mx-auto'
+    "
+  >
+    <div
+      [class]="
+        maximized()
+          ? 'flex-col-start-stretch gap-md w-100 min-w-0'
+          : 'flex-col-start-stretch gap-md w-100'
+      "
+    >
+      @if (sourceFile()) {
+        <div
+          #cropSurface
+          [class]="
+            maximized()
+              ? 'image-crop-dialog__surface w-100 max-w-full'
+              : 'image-crop-dialog__surface w-100 max-w-500 mx-auto'
+          "
+        >
+          <image-cropper
+            [imageFile]="sourceFile()"
+            [maintainAspectRatio]="true"
+            [aspectRatio]="cropConfig().aspectRatio"
+            [roundCropper]="cropConfig().roundCropper"
+            [resizeToWidth]="cropConfig().resizeToWidth"
+            [resizeToHeight]="cropConfig().resizeToHeight"
+            [onlyScaleDown]="true"
+            [allowMoveImage]="true"
+            [transform]="transform()"
+            [format]="cropOutputFormat()"
+            output="blob"
+            [imageQuality]="92"
+            [cropperFrameAriaLabel]="texts().cropFrameAriaLabel"
+            (cropperReady)="onCropperReady()"
+            (imageCropped)="onImageCropped($event)"
+            (transformChange)="onTransformChange($event)"
+            (loadImageFailed)="onLoadFailed()"
+          />
+        </div>
+      }
+    </div>
+
+    <div
+      [class]="
+        maximized()
+          ? 'flex-col-start-stretch gap-md w-100 max-w-300 mx-auto min-w-0'
+          : 'flex-col-start-stretch gap-md w-100'
+      "
+    >
+      @if (cropResultObjectUrl(); as cropPreviewUrl) {
+        <div class="flex-col-start-stretch gap-sm pt-xs">
+          <div class="status-text status-text--muted">
+            {{ texts().cropPreviewLabel }}
+          </div>
+
+          <div
+            [class]="
+              maximized()
+                ? 'flex-col-start-stretch gap-md w-100'
+                : 'flex-row-start-stretch flex-wrap gap-md w-100 max-w-500 mx-auto'
+            "
+          >
+            @for (shape of previewShapes(); track shape) {
+              <div
+                [class]="
+                  maximized()
+                    ? 'flex-col-start-stretch gap-xs w-100'
+                    : 'flex-col-start-stretch gap-xs flex-1 min-w-150 max-w-250'
+                "
+              >
+                <small class="status-text status-text--muted">
+                  {{ resolvePreviewLabel(shape) }}
+                </small>
+
+                <div [class]="'image__preview image__preview--' + shape + ' w-100'">
+                  <img
+                    [src]="cropPreviewUrl"
+                    [alt]="texts().previewAlt"
+                    class="image__preview-image"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="flex-col-start-stretch gap-xs">
+        <label for="file-upload-crop-zoom">{{ texts().zoomLabel }}</label>
+
+        <div class="flex-row-center-center gap-sm">
+          <span class="text-sm">0.5x</span>
+          <p-slider
+            inputId="file-upload-crop-zoom"
+            class="w-100"
+            [min]="0.5"
+            [max]="3"
+            [step]="0.05"
+            [formControl]="zoomControl"
+          />
+          <span class="text-sm">{{ scale().toFixed(2) }}x</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex-row-end-center gap-sm mt-md">
+      <p-button
+        type="button"
+        severity="secondary"
+        [label]="texts().cropCancelLabel"
+        [outlined]="true"
+        (onClick)="onCancel()"
+      />
+
+      <p-button
+        type="button"
+        severity="success"
+        [label]="texts().cropConfirmLabel"
+        [disabled]="!cropResultBlob()"
+        (onClick)="onConfirm()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

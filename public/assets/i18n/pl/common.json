@@ -92,7 +92,17 @@
       "chooseImage": "Wybierz obrazek",
       "dropImage": "Przeciągnij obrazek tutaj albo wybierz plik",
       "imageFormats": "PNG, JPG, WEBP lub AVIF do 5 MB",
-      "imagePreviewAlt": "Podgląd wybranego obrazka"
+      "imagePreviewAlt": "Podgląd wybranego obrazka",
+      "cropTitle": "Dopasuj obrazek",
+      "cropConfirm": "Użyj obrazka",
+      "cropFrameAriaLabel": "Ramka kadrowania obrazka",
+      "zoomLabel": "Powiększenie",
+      "cropPreviewLabel": "Podgląd wyniku",
+      "cropPreviewLandscapeLabel": "Kadr poziomy",
+      "cropPreviewCircleLabel": "W kółku",
+      "cropPreviewSquareLabel": "W kwadracie",
+      "gmCropHint": "Ustaw kadr pod okrągły podgląd profilu.",
+      "sessionCropHint": "Ustaw kadr pod główny obrazek sesji w układzie poziomym."
     },
     "consent": {
       "label": "Wyrażam zgodę na kontakt w sprawie zapytania.",

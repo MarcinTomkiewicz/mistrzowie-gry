@@ -1,0 +1,51 @@
+@use "abstracts/mixins" as m;
+
+.image-crop-dialog__surface {
+  overflow: visible;
+  padding: 0.75rem;
+  border-radius: var(--mg-radius-md, 0.75rem);
+  border: 1px solid var(--mg-form-border);
+  background: rgba(15, 23, 42, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+
+image-cropper {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 0.875rem;
+  box-sizing: border-box;
+  border-radius: calc(var(--mg-radius-md, 0.75rem) - 0.25rem);
+  background: rgba(255, 255, 255, 0.72);
+  --cropper-outline-color: rgba(17, 24, 39, 0.72);
+  --cropper-overlay-color: rgba(255, 255, 255, 0.08);
+  --cropper-color: var(--mg-primary, #c87b2a);
+  --cropper-border: 1px solid rgba(255, 255, 255, 0.7);
+  --cropper-hover-border: 1px solid rgba(255, 255, 255, 0.92);
+  --cropper-focus-border: 2px solid var(--mg-primary, #c87b2a);
+  --cropper-resize-square-bg: var(--mg-primary, #c87b2a);
+  --cropper-resize-square-border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.image-crop-dialog--maximized image-cropper {
+  height: 72vh;
+  min-height: 28rem;
+}
+
+@include m.down("md") {
+  .image-crop-dialog--maximized image-cropper {
+    height: 64vh;
+    min-height: 24rem;
+  }
+}
+
+@include m.down("sm") {
+  image-cropper {
+    height: auto;
+  }
+
+  .image-crop-dialog--maximized image-cropper {
+    height: 54vh;
+    min-height: 20rem;
+  }
+}

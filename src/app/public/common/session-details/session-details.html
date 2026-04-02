@@ -64,12 +64,13 @@
 
     <div class="session-details__description">
       @if (imageUrl()) {
-        <div class="image__preview session-details__image">
-          <img
-            class="image__preview-image"
+        <div class="image__preview image__preview--circle session-details__image">
+          <p-image
             [src]="imageUrl()!"
             [alt]="session().title"
+            imageClass="image__preview-image"
             loading="lazy"
+            [preview]="true"
           />
         </div>
       }

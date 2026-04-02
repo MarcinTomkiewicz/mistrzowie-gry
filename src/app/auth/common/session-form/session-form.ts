@@ -27,7 +27,6 @@ import {
 } from '../../../core/factories/session-form.factory';
 import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
 import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
-import { IFileUploadValue } from '../../../core/interfaces/i-file-upload';
 import { IGmStyle } from '../../../core/interfaces/i-gm-style';
 import {
   ISessionFormData,
@@ -42,6 +41,11 @@ import {
   SessionDifficultyLevel,
 } from '../../../core/types/sessions';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import {
+  FileUploadCropConfig,
+  FileUploadOptions,
+  FileUploadTexts,
+} from '../../../core/types/file-upload';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
 import { SystemAutocomplete } from '../../../public/common/system-autocomplete/system-autocomplete';
@@ -89,6 +93,7 @@ export class SessionForm {
 
   readonly isUploadingImage = signal(false);
   readonly selectedImageFile = signal<File | null>(null);
+  readonly storedImagePath = signal<string | null>(null);
 
   readonly isSubmitting = computed(() => this.busy() || this.isUploadingImage());
 
@@ -137,7 +142,7 @@ export class SessionForm {
       return null;
     }
 
-    const imagePath = normalizeText(this.form.controls.image.getRawValue());
+    const imagePath = this.storedImagePath();
 
     if (!imagePath) {
       return null;
@@ -145,12 +150,48 @@ export class SessionForm {
 
     return this.storage.getPublicUrl(imagePath);
   });
+  readonly imageUploadTexts = computed<FileUploadTexts>(() => ({
+    chooseLabel: this.i18n.commonForm().fileUpload.chooseImage,
+    clearLabel: this.i18n.commonActions().clear,
+    dropLabel: this.i18n.commonForm().fileUpload.dropImage,
+    formatsLabel: this.i18n.commonForm().fileUpload.imageFormats,
+    previewAlt: this.i18n.commonForm().fileUpload.imagePreviewAlt,
+    cropTitle: this.i18n.commonForm().fileUpload.cropTitle,
+    cropHint: this.i18n.commonForm().fileUpload.sessionCropHint,
+    cropFrameAriaLabel: this.i18n.commonForm().fileUpload.cropFrameAriaLabel,
+    cropConfirmLabel: this.i18n.commonForm().fileUpload.cropConfirm,
+    cropCancelLabel: this.i18n.commonActions().cancel,
+    zoomLabel: this.i18n.commonForm().fileUpload.zoomLabel,
+    cropPreviewLabel: this.i18n.commonForm().fileUpload.cropPreviewLabel,
+    cropPreviewLandscapeLabel:
+      this.i18n.commonForm().fileUpload.cropPreviewLandscapeLabel,
+    cropPreviewCircleLabel:
+      this.i18n.commonForm().fileUpload.cropPreviewCircleLabel,
+    cropPreviewSquareLabel:
+      this.i18n.commonForm().fileUpload.cropPreviewSquareLabel,
+  }));
+  readonly imageUploadOptions = computed<FileUploadOptions>(() => ({
+    currentUrl: this.storedImageUrl(),
+    disabled: this.isSubmitting(),
+    previewShape: 'landscape',
+    accept: 'image/png,image/jpeg,image/webp,image/avif',
+    maxFileSize: 5_000_000,
+  }));
+  readonly imageCropConfig = computed<FileUploadCropConfig>(() => ({
+    aspectRatio: 16 / 9,
+    roundCropper: false,
+    resizeToWidth: 1280,
+    resizeToHeight: 720,
+    previewShapes: ['landscape', 'circle'],
+  }));
 
   constructor() {
     effect(() => {
       const initial = this.initial();
+      const imagePath = normalizeText(initial?.image);
 
       this.selectedImageFile.set(null);
+      this.storedImagePath.set(imagePath);
       this.form.reset(mapSessionToFormData(initial ?? {}));
       this.form.markAsPristine();
       this.form.markAsUntouched();
@@ -181,21 +222,16 @@ export class SessionForm {
     this.form.controls.triggerIds.markAsTouched();
   }
 
-  onImageValueChange(value: IFileUploadValue): void {
-    this.selectedImageFile.set(value.file);
+  onImageValueChange(file: File | null): void {
+    this.selectedImageFile.set(file);
 
-    if (!value.file) {
+    if (!file) {
+      this.form.controls.image.setValue(this.storedImagePath());
+      this.form.controls.image.markAsTouched();
       return;
     }
 
-    this.form.controls.image.setValue(value.file.name);
-    this.form.controls.image.markAsDirty();
-    this.form.controls.image.markAsTouched();
-  }
-
-  onRemoveStoredImage(): void {
-    this.selectedImageFile.set(null);
-    this.form.controls.image.setValue(null);
+    this.form.controls.image.setValue(file.name);
     this.form.controls.image.markAsDirty();
     this.form.controls.image.markAsTouched();
   }
@@ -288,12 +324,13 @@ export class SessionForm {
       .uploadImage(file, {
         folder: 'sessionTemplates',
         ownerId: userId,
-        currentPath: this.form.controls.image.getRawValue(),
+        currentPath: this.storedImagePath(),
         removePrevious: true,
         usePublicUrl: false,
       })
       .pipe(
         switchMap((result) => {
+          this.storedImagePath.set(result.path);
           this.form.controls.image.setValue(result.path);
           this.form.controls.image.markAsDirty();
           this.form.controls.image.markAsTouched();
