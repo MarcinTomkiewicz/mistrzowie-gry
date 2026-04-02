@@ -49,7 +49,7 @@ interface ISessionSystemOption {
   ],
   templateUrl: './gm-sessions.html',
   styleUrl: './gm-sessions.scss',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope('auth', 'common', 'sessions')],
 })
 export class GmSessions {
   private readonly gmSessionsFacade = inject(GmSessionsFacade);
@@ -164,8 +164,8 @@ export class GmSessions {
     systemLabel: this.i18n.sessionForm().systemLabel,
     titleLabel: this.i18n.sessionForm().titleLabel,
     difficultyLabel: this.i18n.sessionForm().difficultyLabel,
-    playersLabel: this.i18n.form().playersHeaderLabel,
-    minAgeLabel: this.i18n.form().minAgeHeaderLabel,
+    playersLabel: this.i18n.list().playersHeaderLabel,
+    minAgeLabel: this.i18n.list().minAgeHeaderLabel,
     editLabel: this.i18n.commonActions().edit,
     deleteLabel: this.i18n.commonActions().delete,
   }));

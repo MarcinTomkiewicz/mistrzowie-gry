@@ -45,8 +45,7 @@
 
   "questions": {
     "contact": "Masz pytania? Skontaktuj się z nami!",
-    "sure": "Na pewno?",
-    "deleteSession": "Czy na pewno usunąć sesję?"
+    "sure": "Na pewno?"
   },
 
   "nav": {
@@ -131,27 +130,12 @@
     "outOfOrder": "Ta funkcja w tej chwili nie działa."
   },
 
-  "fallbacks": {
-    "none": "Brak",
-    "nonePlural": "Brak",
-    "noStyles": "Brak stylów",
-    "noTriggers": "Brak triggerów",
-    "missingData": "Brak danych",
-    "emptySession": "Brak sesji"
-  },
-
   "accessibility": {
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
     "skipToContent": "Przejdź do treści",
     "sendMail": "Wyślij maila do",
     "callMe": "Zadzwoń na numer"
-  },
-
-  "footnotes": {
-    "net": "Podane ceny są cenami netto. Należy doliczyć do nich podatek VAT 23%.",
-    "gross": "Podane ceny są cenami brutto i zawierają podatek VAT w wysokości 23%.",
-    "both": "Podane ceny dla klienta indywidualnego zawierają podatek VAT w wysokości 23%. Dla klienta biznesowego i instytucjonalnego są cenami netto i należy doliczyć do nich 23% VAT."
   },
   "statusPages": {
     "notFound": {

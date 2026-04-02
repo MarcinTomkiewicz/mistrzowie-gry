@@ -81,8 +81,8 @@ export class EditProfile {
   constructor() {
     effect(() => {
       this.seo.apply({
-        title: this.i18n.seoTitle(),
-        description: this.i18n.seoDescription(),
+        title: this.i18n.seo().title,
+        description: this.i18n.seo().description,
         canonicalUrl: this.pageUrl,
         robots: 'noindex,nofollow',
       });
@@ -98,13 +98,15 @@ export class EditProfile {
   }
 
   resolveTabLabel(tabId: EditProfileTabId): string {
+    const tabs = this.i18n.tabs();
+
     switch (tabId) {
       case 'profile':
-        return this.i18n.profileTabLabel();
+        return tabs.profile;
       case 'gm-profile':
-        return this.i18n.gmProfileTabLabel();
+        return tabs.gmProfile;
       case 'gm-sessions':
-        return this.i18n.gmSessionsTabLabel();
+        return tabs.gmSessions;
     }
   }
 

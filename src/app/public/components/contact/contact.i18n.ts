@@ -1,9 +1,24 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
 
+import {
+  createCommonAccessibilityI18n,
+  createCommonCtaI18n,
+  createCommonErrorsI18n,
+  createCommonFormI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import { ContactTopicOption } from '../../../core/types/contact';
+import {
+  ContactFormErrorsTranslations,
+  ContactFormTranslations,
+  ContactHeroTranslations,
+  ContactInfoTranslations,
+  ContactSeoTranslations,
+  ContactSuccessTranslations,
+  ContactToastTranslations,
+} from '../../../core/types/i18n/contact';
 import { dictToSortedArray } from '../../../core/utils/dict-to-sorted-array';
-import { pickTranslations } from '../../../core/utils/pick-translation';
 
 function toSortedById<T>(dict: unknown): T[] {
   return dictToSortedArray<T>(dict as never, (x) =>
@@ -12,89 +27,32 @@ function toSortedById<T>(dict: unknown): T[] {
 }
 
 export function createContactI18n() {
-  const seoTitle = translateSignal('seo.title', {}, { scope: 'contact' });
-  const seoDescription = translateSignal(
-    'seo.description',
-    {},
-    { scope: 'contact' },
-  );
+  const { seo, hero, formText, formErrors, success, toast, topicsDict, info } =
+    createScopedSectionsI18n<{
+      seo: ContactSeoTranslations;
+      hero: ContactHeroTranslations;
+      formText: ContactFormTranslations;
+      formErrors: ContactFormErrorsTranslations;
+      success: ContactSuccessTranslations;
+      toast: ContactToastTranslations;
+      topicsDict: Record<string, ContactTopicOption>;
+      info: ContactInfoTranslations;
+    }>('contact', {
+      seo: 'seo',
+      hero: 'hero',
+      formText: 'form',
+      formErrors: 'errors',
+      success: 'success',
+      toast: 'toast',
+      topicsDict: 'topics',
+      info: 'info',
+    });
 
-  const heroDict = translateObjectSignal('hero', {}, { scope: 'contact' });
-  const formDict = translateObjectSignal('form', {}, { scope: 'contact' });
-  const formErrorsDict = translateObjectSignal(
-    'errors',
-    {},
-    { scope: 'contact' },
-  );
-  const successDict = translateObjectSignal('success', {}, { scope: 'contact' });
-  const toastDict = translateObjectSignal('toast', {}, { scope: 'contact' });
-  const topicsDict = translateObjectSignal('topics', {}, { scope: 'contact' });
-  const infoDict = translateObjectSignal('info', {}, { scope: 'contact' });
-
-  const statusDict = translateObjectSignal('status', {}, { scope: 'common' });
-  const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
-  const commonErrorsDict = translateObjectSignal(
-    'errors',
-    {},
-    { scope: 'common' },
-  );
-  const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
-  const accessibilityDict = translateObjectSignal('accessibility', {}, { scope: 'common' });
-
-  const hero = pickTranslations(heroDict, ['title', 'subtitle'] as const);
-
-  const formText = pickTranslations(formDict, [
-    'title',
-    'hint',
-    'topicLabel',
-    'topicCustomLabel',
-    'firstNameLabel',
-    'lastNameLabel',
-    'companyLabel',
-    'emailLabel',
-    'phoneLabel',
-    'messageLabel',
-    'messagePlaceholder',
-  ] as const);
-
-  const formErrors = pickTranslations(formErrorsDict, [
-    'required',
-    'email',
-    'minMessage',
-  ] as const);
-
-  const success = pickTranslations(successDict, ['mailSent'] as const);
-
-  const toast = pickTranslations(toastDict, [
-    'invalidFormSummary',
-    'mailSentSummary',
-    'sendFailedSummary',
-  ] as const);
-
-  const commonForm = pickTranslations(commonFormDict, ['invalid'] as const);
-
-  const commonErrors = pickTranslations(commonErrorsDict, [
-    'generic',
-    'network',
-    'notFound',
-    'forbidden',
-    'unauthorized',
-    'timeout',
-    'server',
-  ] as const);
-
-  const cta = pickTranslations(commonCtaDict, ['sendMessage'] as const);
-  const status = pickTranslations(statusDict, ['sending'] as const);
-  const accessibility = pickTranslations(statusDict, ['sendMail', 'callMe'] as const);
-
-  const info = pickTranslations(infoDict, [
-    'title',
-    'subtitle',
-    'emailLabel',
-    'phoneLabel',
-    'emailValue',
-    'phoneValue',
-  ] as const);
+  const status = createCommonStatusI18n();
+  const cta = createCommonCtaI18n();
+  const commonErrors = createCommonErrorsI18n();
+  const commonForm = createCommonFormI18n();
+  const accessibility = createCommonAccessibilityI18n();
 
   const topics = computed<ContactTopicOption[]>(() =>
     toSortedById<ContactTopicOption>(topicsDict()).map((item) => ({
@@ -105,8 +63,7 @@ export function createContactI18n() {
   );
 
   return {
-    seoTitle,
-    seoDescription,
+    seo,
     hero,
     formText,
     formErrors,
@@ -118,6 +75,6 @@ export function createContactI18n() {
     cta,
     info,
     topics,
-    accessibility
+    accessibility,
   };
 }

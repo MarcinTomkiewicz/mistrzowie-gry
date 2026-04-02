@@ -1,40 +1,37 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
-
 import {
-  CommonActionsTranslations,
-  CommonErrorsTranslations,
-  CommonFormTranslations,
-  CommonStatusTranslations,
+  createCommonActionsI18n,
+  createCommonErrorsI18n,
+  createCommonFormI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
   GmProfileActionsTranslations,
   GmProfileErrorsTranslations,
   GmProfileFormTranslations,
   GmProfileToastTranslations,
   GmProfileTranslations,
-} from '../../../core/types/common-i18n';
+} from '../../../core/types/i18n/auth';
 
 export function createGmProfileI18n() {
-  const gmProfileDict = translateObjectSignal('gmProfile', {}, { scope: 'auth' });
-  const gmProfileFormDict = translateObjectSignal('gmProfile.form', {}, { scope: 'auth' });
-  const gmProfileErrorsDict = translateObjectSignal('gmProfile.errors', {}, { scope: 'auth' });
-  const gmProfileActionsDict = translateObjectSignal('gmProfile.actions', {}, { scope: 'auth' });
-  const gmProfileToastDict = translateObjectSignal('gmProfile.toast', {}, { scope: 'auth' });
-
-  const commonActionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
-  const commonErrorsDict = translateObjectSignal('errors', {}, { scope: 'common' });
-  const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
-  const commonStatusDict = translateObjectSignal('status', {}, { scope: 'common' });
-
-  const gmProfile = computed(() => gmProfileDict() as GmProfileTranslations);
-  const form = computed(() => gmProfileFormDict() as GmProfileFormTranslations);
-  const errors = computed(() => gmProfileErrorsDict() as GmProfileErrorsTranslations);
-  const actions = computed(() => gmProfileActionsDict() as GmProfileActionsTranslations);
-  const toast = computed(() => gmProfileToastDict() as GmProfileToastTranslations);
-
-  const commonActions = computed(() => commonActionsDict() as CommonActionsTranslations);
-  const commonErrors = computed(() => commonErrorsDict() as CommonErrorsTranslations);
-  const commonForm = computed(() => commonFormDict() as CommonFormTranslations);
-  const commonStatus = computed(() => commonStatusDict() as CommonStatusTranslations);
+  const { gmProfile, form, errors, actions, toast } =
+    createScopedSectionsI18n<{
+      gmProfile: GmProfileTranslations;
+      form: GmProfileFormTranslations;
+      errors: GmProfileErrorsTranslations;
+      actions: GmProfileActionsTranslations;
+      toast: GmProfileToastTranslations;
+    }>('auth', {
+      gmProfile: 'gmProfile',
+      form: 'gmProfile.form',
+      errors: 'gmProfile.errors',
+      actions: 'gmProfile.actions',
+      toast: 'gmProfile.toast',
+    });
+  const commonActions = createCommonActionsI18n();
+  const commonErrors = createCommonErrorsI18n();
+  const commonForm = createCommonFormI18n();
+  const commonStatus = createCommonStatusI18n();
 
   return {
     gmProfile,

@@ -1,26 +1,21 @@
-import { Signal, computed } from '@angular/core';
-import {
-  translateObjectSignal,
-  translateSignal,
-} from '@jsverse/transloco';
+import { computed } from '@angular/core';
 
 import {
   dictToSortedArray,
   numberedDictToStringArray,
   withIcons,
 } from '../../../core/utils/dict-to-sorted-array';
-import { pickTranslations } from '../../../core/utils/pick-translation';
+import { createCommonCtaI18n } from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
+  JoinThePartyBulletGroupTranslations,
+  JoinThePartyCardItem,
+  JoinThePartyHeroInfoTranslations,
+  JoinThePartyHeroTranslations,
+  JoinThePartySectionTranslations,
+  JoinThePartySeoTranslations,
+} from '../../../core/types/i18n/join-the-party';
 import { IconTech } from '../../../core/types/icon-tech';
-
-const TITLE_SUBTITLE = ['title', 'subtitle'] as const;
-const HERO_INFO_KEYS = [
-  'title',
-  'orgMeetingFree',
-  'orgMeetingPrice',
-  'orgMeetingSchedule',
-  'orgMeetingPlace',
-  'sessionPrice',
-] as const;
 
 function toSortedById<T>(dict: unknown): T[] {
   return dictToSortedArray<T>(dict as never, (x) =>
@@ -28,122 +23,80 @@ function toSortedById<T>(dict: unknown): T[] {
   );
 }
 
-function createSectionTitleSubtitle(
-  key: string,
-): Signal<{ title: string; subtitle: string }> {
-  const dict = translateObjectSignal(key, {}, { scope: 'joinTheParty' });
-  return pickTranslations(dict, TITLE_SUBTITLE);
-}
-
 export function createJoinThePartyI18n(
   benefitIcons: readonly IconTech[],
   stepIcons: readonly IconTech[],
 ) {
-  const seoTitle = translateSignal('seo.title', {}, { scope: 'joinTheParty' });
-  const seoDescription = translateSignal('seo.description', {}, { scope: 'joinTheParty' });
+  const {
+    seo,
+    hero,
+    heroInfo,
+    intro,
+    structure,
+    continuation,
+    orgMeeting,
+    benefitsDict,
+    stepsDict,
+    rulesBlock,
+    continuationBulletsBlock,
+    orgMeetingBulletsBlock,
+  } = createScopedSectionsI18n<{
+    seo: JoinThePartySeoTranslations;
+    hero: JoinThePartyHeroTranslations;
+    heroInfo: JoinThePartyHeroInfoTranslations;
+    intro: JoinThePartySectionTranslations;
+    structure: JoinThePartySectionTranslations;
+    continuation: JoinThePartySectionTranslations;
+    orgMeeting: JoinThePartySectionTranslations;
+    benefitsDict: Record<string, JoinThePartyCardItem>;
+    stepsDict: Record<string, JoinThePartyCardItem>;
+    rulesBlock: JoinThePartyBulletGroupTranslations;
+    continuationBulletsBlock: JoinThePartyBulletGroupTranslations;
+    orgMeetingBulletsBlock: JoinThePartyBulletGroupTranslations;
+  }>('joinTheParty', {
+    seo: 'seo',
+    hero: 'hero',
+    heroInfo: 'heroInfo',
+    intro: 'intro',
+    structure: 'structure',
+    continuation: 'continuation',
+    orgMeeting: 'orgMeeting',
+    benefitsDict: 'intro.benefits',
+    stepsDict: 'structure.steps',
+    rulesBlock: 'structure.rules',
+    continuationBulletsBlock: 'continuation.bullets',
+    orgMeetingBulletsBlock: 'orgMeeting.bullets',
+  });
+  const cta = createCommonCtaI18n();
 
-  const heroDict = translateObjectSignal('hero', {}, { scope: 'joinTheParty' });
-  const heroInfoDict = translateObjectSignal(
-    'heroInfo',
-    {},
-    { scope: 'joinTheParty' },
+  const rulesTitle = computed(() => rulesBlock().title);
+  const continuationBulletsTitle = computed(
+    () => continuationBulletsBlock().title,
   );
-
-  const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
-
-  const rulesTitleDict = translateObjectSignal(
-    'structure.rules',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const continuationBulletsTitleDict = translateObjectSignal(
-    'continuation.bullets',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const orgMeetingBulletsTitleDict = translateObjectSignal(
-    'orgMeeting.bullets',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const benefitsDict = translateObjectSignal(
-    'intro.benefits',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const stepsDict = translateObjectSignal(
-    'structure.steps',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const rulesDict = translateObjectSignal(
-    'structure.rules',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const continuationBulletsDict = translateObjectSignal(
-    'continuation.bullets',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const orgMeetingBulletsDict = translateObjectSignal(
-    'orgMeeting.bullets',
-    {},
-    { scope: 'joinTheParty' },
-  );
-
-  const hero = pickTranslations(heroDict, ['badge', 'title', 'subtitle'] as const);
-  const heroInfo = pickTranslations(heroInfoDict, HERO_INFO_KEYS);
-
-  const cta = pickTranslations(commonCtaDict, ['contactUs', 'joinProgram'] as const);
-
-  const intro = createSectionTitleSubtitle('intro');
-  const structure = createSectionTitleSubtitle('structure');
-  const continuation = createSectionTitleSubtitle('continuation');
-  const orgMeeting = createSectionTitleSubtitle('orgMeeting');
-
-  const rulesTitle = pickTranslations(rulesTitleDict, ['title'] as const);
-  const continuationBulletsTitle = pickTranslations(
-    continuationBulletsTitleDict,
-    ['title'] as const,
-  );
-  const orgMeetingBulletsTitle = pickTranslations(
-    orgMeetingBulletsTitleDict,
-    ['title'] as const,
+  const orgMeetingBulletsTitle = computed(
+    () => orgMeetingBulletsBlock().title,
   );
 
   const benefits = computed(() => {
-    const list = toSortedById<{ id: number; title: string; text: string }>(
-      benefitsDict(),
-    );
+    const list = toSortedById<JoinThePartyCardItem>(benefitsDict());
     return withIcons(list, benefitIcons);
   });
 
   const steps = computed(() => {
-    const list = toSortedById<{ id: number; title: string; text: string }>(
-      stepsDict(),
-    );
+    const list = toSortedById<JoinThePartyCardItem>(stepsDict());
     return withIcons(list, stepIcons);
   });
 
-  const rules = computed(() => numberedDictToStringArray(rulesDict() as never));
+  const rules = computed(() => numberedDictToStringArray(rulesBlock() as never));
   const continuationBullets = computed(() =>
-    numberedDictToStringArray(continuationBulletsDict() as never),
+    numberedDictToStringArray(continuationBulletsBlock() as never),
   );
   const orgMeetingBullets = computed(() =>
-    numberedDictToStringArray(orgMeetingBulletsDict() as never),
+    numberedDictToStringArray(orgMeetingBulletsBlock() as never),
   );
 
   return {
-    seoTitle,
-    seoDescription,
+    seo,
     hero,
     heroInfo,
     cta,

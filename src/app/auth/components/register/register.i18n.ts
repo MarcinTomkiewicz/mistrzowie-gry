@@ -1,22 +1,27 @@
-import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
+import { computed } from '@angular/core';
 
-import { pickTranslations } from '../../../core/utils/pick-translation';
+import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
+import {
+  RegisterHeroTranslations,
+  RegisterRootTranslations,
+  RegisterSeoTranslations,
+} from '../../../core/types/i18n/auth';
 
 export function createRegisterI18n() {
-  const seoTitle = translateSignal('register.seoTitle', {}, { scope: 'auth' });
-  const seoDescription = translateSignal('register.seoDescription', {}, {
-    scope: 'auth',
-  });
+  const register = createScopedObjectI18n<RegisterRootTranslations>(
+    'auth',
+    'register',
+  );
 
-  const heroDict = translateObjectSignal('register.hero', {}, {
-    scope: 'auth',
-  });
+  const seo = computed<RegisterSeoTranslations>(() => ({
+    title: register().seoTitle,
+    description: register().seoDescription,
+  }));
 
-  const hero = pickTranslations(heroDict, ['title', 'subtitle'] as const);
+  const hero = computed<RegisterHeroTranslations>(() => register().hero);
 
   return {
-    seoTitle,
-    seoDescription,
+    seo,
     hero,
   };
 }

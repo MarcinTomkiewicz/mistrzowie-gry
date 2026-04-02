@@ -1,0 +1,271 @@
+export interface LoginFormTitleTranslations {
+  main: string;
+}
+
+export interface LoginFormTranslations {
+  emailLabel: string;
+  passwordLabel: string;
+}
+
+export interface LoginFormActionsTranslations {
+  submitLabel: string;
+}
+
+export interface LoginFormErrorsTranslations {
+  invalidCredentials: string;
+}
+
+export interface ProfileFormTitleTranslations {
+  register: string;
+  edit: string;
+}
+
+export interface ProfileFormTranslations {
+  emailLabel: string;
+  passwordLabel: string;
+  firstNameLabel: string;
+  nicknameLabel: string;
+  useNicknameLabel: string;
+  phoneNumberLabel: string;
+  cityLabel: string;
+  streetLabel: string;
+  houseNumberLabel: string;
+  apartmentNumberLabel: string;
+  postalCodeLabel: string;
+  ageLabel: string;
+  shortDescriptionLabel: string;
+  longDescriptionLabel: string;
+  extendedDescriptionLabel: string;
+}
+
+export interface ProfileFormErrorsTranslations {
+  displayNameRequired: string;
+  displayPreference: string;
+  emailAlreadyRegistered: string;
+  emailNotConfirmed: string;
+  weakPassword: string;
+  profileNotFound: string;
+  invalidCredentials: string;
+}
+
+export interface ProfileFormToastTranslations {
+  invalidFormSummary: string;
+  registerFailedSummary: string;
+  registerSuccessSummary: string;
+  updateFailedSummary: string;
+  updateSuccessSummary: string;
+  confirmationRequiredSummary: string;
+}
+
+export interface ProfileFormSuccessTranslations {
+  registered: string;
+  confirmationRequired: string;
+  updated: string;
+}
+
+export interface ProfileFormActionsTranslations {
+  registerLabel: string;
+  updateLabel: string;
+}
+
+export interface RegisterSeoTranslations {
+  title: string;
+  description: string;
+}
+
+export interface RegisterRootTranslations {
+  seoTitle: string;
+  seoDescription: string;
+  hero: RegisterHeroTranslations;
+}
+
+export interface RegisterHeroTranslations {
+  title: string;
+  subtitle: string;
+}
+
+export interface EditProfileSeoTranslations {
+  title: string;
+  description: string;
+}
+
+export interface EditProfileHeroTranslations {
+  title: string;
+  subtitle: string;
+}
+
+export interface EditProfileTabsTranslations {
+  profile: string;
+  gmProfile: string;
+  gmSessions: string;
+}
+
+export interface GmProfileFormTranslations {
+  displayNameLabel: string;
+  experienceLabel: string;
+  experienceRangeLabel: string;
+  descriptionLabel: string;
+  quoteLabel: string;
+  stylesLabel: string;
+  languagesLabel: string;
+}
+
+export interface GmProfileErrorsTranslations {
+  invalidStyleCount: string;
+}
+
+export interface GmProfileActionsTranslations {
+  saveLabel: string;
+}
+
+export interface GmProfileToastTranslations {
+  invalidFormDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+}
+
+export interface GmProfileTranslations {
+  title: string;
+}
+
+export interface GmSessionsTranslations {
+  title: string;
+  subtitle: string;
+}
+
+export interface GmSessionsActionsTranslations {
+  addLabel: string;
+  createLabel: string;
+  updateLabel: string;
+}
+
+export interface GmSessionsFormTranslations {
+  systemFilterAllLabel: string;
+  systemFilterLabel: string;
+}
+
+export interface GmSessionsEmptyTranslations {
+  title: string;
+  description: string;
+}
+
+export interface GmSessionsToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+  deleteSuccessSummary: string;
+  deleteSuccessDetail: string;
+  deleteFailedSummary: string;
+  deleteFailedDetail: string;
+}
+
+export type EventSignupFormTranslations = {
+  modeLabel: string;
+};
+
+export type EventSignupFormActionsTranslations = {
+  submitLabel: string;
+  withdrawLabel: string;
+  backToSelectionLabel: string;
+  resetLabel: string;
+  selectLabel: string;
+};
+
+export type EventSignupFormStatesTranslations = {
+  notFoundTitle: string;
+  notFoundDescription: string;
+  fullTitle: string;
+  fullDescription: string;
+};
+
+export type EventSignupFormModeTranslations = {
+  templateLabel: string;
+  customLabel: string;
+};
+
+export type EventSignupFormTemplateTranslations = {
+  emptyTitle: string;
+  emptyDescription: string;
+};
+
+export type EventSignupFormCustomTranslations = {
+  previousSessionsLabel: string;
+};
+
+export type EventSignupFormSectionsTranslations = {
+  pageTitlePrefix: string;
+  pageSubtitle: string;
+  submittedSessionTitle: string;
+};
+
+export type EventSignupFormToastTranslations = {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+  withdrawSuccessSummary: string;
+  withdrawSuccessDetail: string;
+  withdrawFailedSummary: string;
+  withdrawFailedDetail: string;
+};
+
+export type EventSignupFormBreadcrumbTranslations = {
+  eventSignupLabel: string;
+};
+
+export type EventSignupFormNavigationTranslations = {
+  previousLabel: string;
+  nextLabel: string;
+};
+
+export type EventSignupFormConfirmationTranslations = {
+  withdrawMessage: string;
+};
+
+export type EventSignupSeoTranslations = {
+  title: string;
+  description: string;
+};
+
+export type EventSignupPageTranslations = {
+  title: string;
+  subtitle: string;
+};
+
+export type EventSignupDetailsTranslations = {
+  timeLabel: string;
+  beginnersLabel: string;
+  beginnersYes: string;
+  beginnersNo: string;
+};
+
+export type EventSignupOccurrencesTranslations = {
+  title: string;
+  subtitle: string;
+};
+
+export type EventSignupEmptyTranslations = {
+  title: string;
+  description: string;
+};
+
+export type EventSignupFormSeoTranslations = {
+  title: string;
+  description: string;
+};
+
+export interface UserMenuTranslations {
+  greeting: string;
+  accountSectionTitle: string;
+  editProfileLabel: string;
+  eventSignupLabel: string;
+}

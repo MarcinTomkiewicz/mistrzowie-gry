@@ -29,15 +29,15 @@ export class UserMenuPanel {
   readonly usernameDisplay = computed(() => this.auth.displayName());
   readonly hasUsername = computed(() => !!this.usernameDisplay().trim());
 
-readonly menuSections = computed(() =>
-  buildUserMenu({
-    accountTitle: this.i18n.userMenu().accountSectionTitle,
-    editProfileLabel: this.i18n.userMenu().editProfileLabel,
-    eventSignupLabel: this.i18n.userMenu().eventSignupLabel
-  }),
-);
+  readonly menuSections = computed(() =>
+    buildUserMenu({
+      accountTitle: this.i18n.userMenu().accountSectionTitle,
+      editProfileLabel: this.i18n.userMenu().editProfileLabel,
+      eventSignupLabel: this.i18n.userMenu().eventSignupLabel,
+    }),
+  );
 
-readonly logoutLabel = computed(() => this.i18n.commonActions().logout);
+  readonly logoutLabel = computed(() => this.i18n.commonActions().logout);
 
   onNavigate(): void {
     this.closed.emit();

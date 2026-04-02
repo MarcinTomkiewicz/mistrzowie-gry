@@ -13,6 +13,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import {
@@ -49,6 +50,7 @@ interface IGmProfileDialogTabOption {
   ],
   templateUrl: './gm-profile-dialog.html',
   styleUrl: './gm-profile-dialog.scss',
+  providers: [provideTranslocoScope('ourTeam', 'common', 'sessions')],
 })
 export class GmProfileDialog {
   private readonly gmRead = inject(GmRead);
@@ -127,8 +129,8 @@ export class GmProfileDialog {
     systemLabel: this.i18n.sessionForm().systemLabel,
     titleLabel: this.i18n.sessionForm().titleLabel,
     difficultyLabel: this.i18n.sessionForm().difficultyLabel,
-    playersLabel: this.i18n.gmSessionsForm().playersHeaderLabel,
-    minAgeLabel: this.i18n.gmSessionsForm().minAgeHeaderLabel,
+    playersLabel: this.i18n.list().playersHeaderLabel,
+    minAgeLabel: this.i18n.list().minAgeHeaderLabel,
     editLabel: '',
     deleteLabel: '',
   }));

@@ -1,59 +1,24 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
 
+import {
+  SeoTextColumnCopy,
+  SeoTextHeader,
+  SeoTextSectionCopy,
+  UiSeoTextColumn,
+} from '../../../../core/types/i18n/home';
+import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
   dictToSortedArray,
   numberedDictToStringArray,
 } from '../../../../core/utils/dict-to-sorted-array';
-import { pickTranslations } from '../../../../core/utils/pick-translation';
-
-export type SeoTextSectionCopy = {
-  id: number;
-  title: string;
-  paragraphs: Record<string, string>;
-};
-
-export type SeoTextColumnCopy = {
-  id: number;
-  sections: Record<string, SeoTextSectionCopy>;
-};
-
-export type UiSeoTextSection = {
-  id: number;
-  title: string;
-  paragraphs: string[];
-};
-
-export type UiSeoTextColumn = {
-  id: number;
-  sections: UiSeoTextSection[];
-};
-
-export type SeoTextHeader = {
-  title: string;
-  subtitle: string;
-};
 
 export function createSeoRichTextI18n() {
-  const headerDict = translateObjectSignal(
-    'seoText.header',
-    {},
-    { scope: 'home' },
-  );
-
-  const columnsDict = translateObjectSignal(
-    'seoText.columns',
-    {},
-    { scope: 'home' },
-  );
-
-  const header = computed<SeoTextHeader>(() => {
-    const picked = pickTranslations(headerDict, ['title', 'subtitle'] as const)();
-
-    return {
-      title: picked.title || '',
-      subtitle: picked.subtitle || '',
-    };
+  const { header, columnsDict } = createScopedSectionsI18n<{
+    header: SeoTextHeader;
+    columnsDict: Record<string, SeoTextColumnCopy>;
+  }>('home', {
+    header: 'seoText.header',
+    columnsDict: 'seoText.columns',
   });
 
   const columns = computed<UiSeoTextColumn[]>(() =>

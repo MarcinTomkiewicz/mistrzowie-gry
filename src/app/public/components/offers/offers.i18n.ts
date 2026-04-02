@@ -1,119 +1,38 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
 
+import {
+  createCommonCtaI18n,
+  createCommonEmptyI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
+  OfferFootnotesTranslations,
+  OfferPricingHeadersTranslations,
+  StandardsAndLogisticsDict,
+} from '../../../core/types/i18n/offers';
 import { OfferPageSeo } from '../../../core/types/offers';
-import { pickTranslations } from '../../../core/utils/pick-translation';
-
-type StandardsAndLogisticsFaqItem = {
-  h: string;
-  a: string;
-};
-
-type StandardsAndLogisticsCardItem = {
-  title: string;
-  lead: string;
-};
-
-type StandardsAndLogisticsPricingItem = {
-  title: string;
-  value?: string;
-  note?: string;
-};
-
-type StandardsAndLogisticsDict = {
-  intro?: {
-    title?: string;
-    subtitle?: string;
-  };
-  standard?: {
-    title?: string;
-    subtitle?: string;
-    items?: StandardsAndLogisticsCardItem[];
-  };
-  logistics?: {
-    title?: string;
-    subtitle?: string;
-    items?: StandardsAndLogisticsPricingItem[];
-  };
-  faq?: {
-    title?: string;
-    subtitle?: string;
-    items?: StandardsAndLogisticsFaqItem[];
-  };
-};
 
 export function createOffersI18n() {
-  const pricingHeadersDict = translateObjectSignal(
-    'pricingTable.headers',
-    {},
-    { scope: 'offers' },
-  );
+  const { pricingHeaders, seo, standardsAndLogisticsDict, commonFootnotes } =
+    createScopedSectionsI18n<{
+      pricingHeaders: OfferPricingHeadersTranslations;
+      seo: OfferPageSeo;
+      standardsAndLogisticsDict: StandardsAndLogisticsDict;
+      commonFootnotes: OfferFootnotesTranslations;
+    }>('offers', {
+      pricingHeaders: 'pricingTable.headers',
+      seo: 'seo',
+      standardsAndLogisticsDict: 'standardsAndLogistics',
+      commonFootnotes: 'footnotes',
+    });
 
-  const seoDict = translateObjectSignal('seo', {}, { scope: 'offers' });
-
-  const standardsAndLogisticsDict = translateObjectSignal(
-    'standardsAndLogistics',
-    {},
-    { scope: 'offers' },
-  );
-
-  const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
-  const commonStatusDict = translateObjectSignal(
-    'status',
-    {},
-    { scope: 'common' },
-  );
-  const commonEmptyDict = translateObjectSignal(
-    'empty',
-    {},
-    { scope: 'common' },
-  );
-  const commonFootnotesDict = translateObjectSignal(
-    'footnotes',
-    {},
-    { scope: 'common' },
-  );
-
-  const pricingHeaders = pickTranslations(pricingHeadersDict, [
-    'variant',
-    'variantLabel',
-    'price',
-    'description',
-  ] as const);
-
-  const commonCta = pickTranslations(commonCtaDict, [
-    'contactUs',
-    'showMore',
-    'showLess',
-  ] as const);
-
-  const commonStatus = pickTranslations(commonStatusDict, ['loading'] as const);
-
-  const commonEmpty = pickTranslations(commonEmptyDict, [
-    'title',
-    'description',
-  ] as const);
-
-  const seo = computed<OfferPageSeo>(() => {
-    const picked = pickTranslations(seoDict, [
-      'title',
-      'description',
-    ] as const)();
-
-    return {
-      title: picked.title || 'O nas',
-      description: picked.description || '',
-    };
-  });
-
-  const commonFootnotes = pickTranslations(commonFootnotesDict, [
-    'net',
-    'gross',
-    'both'
-  ] as const);
+  const commonCta = createCommonCtaI18n();
+  const commonStatus = createCommonStatusI18n();
+  const commonEmpty = createCommonEmptyI18n();
 
   const standardsAndLogistics = computed<StandardsAndLogisticsDict>(() => {
-    const dict = standardsAndLogisticsDict() as StandardsAndLogisticsDict;
+    const dict = standardsAndLogisticsDict();
 
     return {
       intro: {

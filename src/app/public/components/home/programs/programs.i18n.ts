@@ -1,60 +1,29 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
 
+import { createCommonCtaI18n } from '../../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import {
+  ProgramsCardCopy,
+  ProgramsCardCopyRaw,
+  ProgramsHeader,
+} from '../../../../core/types/i18n/home';
 import {
   dictToSortedArray,
   numberedDictToStringArray,
 } from '../../../../core/utils/dict-to-sorted-array';
-import { pickTranslations } from '../../../../core/utils/pick-translation';
-
-export type ProgramsCardCopy = {
-  id: number;
-  title: string;
-  intro: string;
-  bullets: Record<string, string>;
-};
-
-export type CtaKey = 'checkDetails' | 'seeProgram';
-
-export type ProgramsHeader = {
-  title: string;
-  subtitle: string;
-};
 
 export function createProgramsI18n() {
-  const headerDict = translateObjectSignal(
-    'programs.header',
-    {},
-    { scope: 'home' },
-  );
-
-  const cardsDict = translateObjectSignal(
-    'programs.cards',
-    {},
-    { scope: 'home' },
-  );
-
-  const ctaDict = translateObjectSignal(
-    'cta',
-    {},
-    { scope: 'common' },
-  );
-
-  const header = computed<ProgramsHeader>(() => {
-    const picked = pickTranslations(headerDict, ['title', 'subtitle'] as const)();
-
-    return {
-      title: picked.title || '',
-      subtitle: picked.subtitle || '',
-    };
+  const { header, cardsDict } = createScopedSectionsI18n<{
+    header: ProgramsHeader;
+    cardsDict: Record<string, ProgramsCardCopyRaw>;
+  }>('home', {
+    header: 'programs.header',
+    cardsDict: 'programs.cards',
   });
+  const cta = createCommonCtaI18n();
 
-  const cta = computed(() =>
-    pickTranslations(ctaDict, ['checkDetails', 'seeProgram'] as const)(),
-  );
-
-  const cardsCopy = computed(() =>
-    dictToSortedArray<ProgramsCardCopy>(
+  const cardsCopy = computed<ProgramsCardCopy[]>(() =>
+    dictToSortedArray<ProgramsCardCopyRaw>(
       cardsDict() as never,
       (item) => Number((item as { id?: number })?.id ?? 0),
     ).map((item) => ({

@@ -99,16 +99,18 @@ export class Contact {
   );
 
   private readonly applySeoEffect = effect(() => {
+    const seo = this.i18n.seo();
+
     this.seo.apply({
-      title: this.i18n.seoTitle() || 'Kontakt',
-      description: this.i18n.seoDescription() || '',
+      title: seo.title || 'Kontakt',
+      description: seo.description || '',
       canonicalUrl: this.pageUrl,
       structuredData: createPageStructuredData({
         type: 'ContactPage',
         id: `${this.pageUrl}#webpage`,
         url: this.pageUrl,
-        name: this.i18n.seoTitle() || 'Kontakt',
-        description: this.i18n.seoDescription() || '',
+        name: seo.title || 'Kontakt',
+        description: seo.description || '',
       }),
     });
   });

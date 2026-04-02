@@ -1,45 +1,24 @@
-import { translateSignal } from '@jsverse/transloco';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
+  EditProfileHeroTranslations,
+  EditProfileSeoTranslations,
+  EditProfileTabsTranslations,
+} from '../../../core/types/i18n/auth';
 
 export function createEditProfileI18n() {
-  const seoTitle = translateSignal('editProfile.seo.title', {}, { scope: 'auth' });
-  const seoDescription = translateSignal(
-    'editProfile.seo.description',
-    {},
-    { scope: 'auth' },
-  );
-
-  const title = translateSignal('editProfile.hero.title', {}, { scope: 'auth' });
-  const subtitle = translateSignal(
-    'editProfile.hero.subtitle',
-    {},
-    { scope: 'auth' },
-  );
-
-  const profileTabLabel = translateSignal(
-    'editProfile.tabs.profile',
-    {},
-    { scope: 'auth' },
-  );
-
-  const gmProfileTabLabel = translateSignal(
-    'editProfile.tabs.gmProfile',
-    {},
-    { scope: 'auth' },
-  );
-
-  const gmSessionsTabLabel = translateSignal(
-    'editProfile.tabs.gmSessions',
-    {},
-    { scope: 'auth' },
-  );
+  const { seo, hero, tabs } = createScopedSectionsI18n<{
+    seo: EditProfileSeoTranslations;
+    hero: EditProfileHeroTranslations;
+    tabs: EditProfileTabsTranslations;
+  }>('auth', {
+    seo: 'editProfile.seo',
+    hero: 'editProfile.hero',
+    tabs: 'editProfile.tabs',
+  });
 
   return {
-    seoTitle,
-    seoDescription,
-    title,
-    subtitle,
-    profileTabLabel,
-    gmProfileTabLabel,
-    gmSessionsTabLabel,
+    seo,
+    hero,
+    tabs,
   };
 }

@@ -1,0 +1,56 @@
+{
+  "form": {
+    "titleLabel": "Tytuł sesji",
+    "systemLabel": "System RPG",
+    "descriptionLabel": "Opis sesji",
+    "difficultyLabel": "Poziom trudności",
+    "minPlayersLabel": "Min. graczy",
+    "maxPlayersLabel": "Max. graczy",
+    "minAgeLabel": "Min. wiek",
+    "sortOrderLabel": "Kolejność",
+    "stylesLabel": "Style sesji",
+    "triggersLabel": "Triggery",
+    "playersRangeLabel": "Podaj wartość od 1 do 5.",
+    "minAgeRangeLabel": "Podaj wartość od 0 wzwyż.",
+    "sortOrderRangeLabel": "Podaj wartość od 0 wzwyż."
+  },
+  "difficulty": {
+    "beginner": "Dla początkujących",
+    "intermediate": "Dla średniozaawansowanych",
+    "advanced": "Dla doświadczonych"
+  },
+  "errors": {
+    "invalidPlayersRange": "Minimalna liczba graczy nie może być większa niż maksymalna."
+  },
+  "list": {
+    "playersHeaderLabel": "Gracze",
+    "minAgeHeaderLabel": "Wiek"
+  },
+  "details": {
+    "labels": {
+      "primaryInfo": "Informacje podstawowe",
+      "additionalInfo": "Informacje dodatkowe"
+    }
+  },
+  "slots": {
+    "labels": {
+      "gm": "Mistrz Gry"
+    },
+    "difficulty": {
+      "beginner": "Łatwa",
+      "intermediate": "Średnia",
+      "advanced": "Trudna"
+    },
+    "fallbacks": {
+      "none": "Brak",
+      "nonePlural": "Brak",
+      "noStyles": "Brak stylów",
+      "noTriggers": "Brak triggerów",
+      "missingData": "Brak danych",
+      "emptySession": "Brak sesji"
+    }
+  },
+  "confirmation": {
+    "deleteSession": "Czy na pewno usunąć sesję?"
+  }
+}

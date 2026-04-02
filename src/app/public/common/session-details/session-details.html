@@ -1,7 +1,7 @@
 <div class="flex-col-start-stretch w-100 gap-md mt-md">
   <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
     <small class="card-legend status-text status-text--muted">
-      {{ i18n.primaryInfoLabel() }}
+      {{ i18n.detailsLabels().primaryInfo }}
     </small>
 
     <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
@@ -42,7 +42,7 @@
 
     <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
       <span class="status-text status-text--muted">
-        {{ i18n.gmSessionsForm().playersHeaderLabel }}
+        {{ i18n.list().playersHeaderLabel }}
       </span>
 
       <strong>{{ playersLabel() }}</strong>
@@ -50,7 +50,7 @@
 
     <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
       <span class="status-text status-text--muted">
-        {{ i18n.gmSessionsForm().minAgeHeaderLabel }}
+        {{ i18n.list().minAgeHeaderLabel }}
       </span>
 
       <strong>{{ minAgeLabel() }}</strong>
@@ -59,7 +59,7 @@
 
   <div class="mg-card mg-card--legend flex-col-start-stretch gap-xs">
     <small class="card-legend status-text status-text--muted">
-      {{ i18n.descriptionLabel() }}
+      {{ i18n.sessionForm().descriptionLabel }}
     </small>
 
     <div class="session-details__description">
@@ -83,7 +83,7 @@
   @if (session().styles.length || session().triggers.length) {
     <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
       <small class="card-legend status-text status-text--muted">
-        {{ i18n.additionalInfoLabel() }}
+        {{ i18n.detailsLabels().additionalInfo }}
       </small>
 
       @if (session().styles.length) {
@@ -101,7 +101,7 @@
       @if (session().triggers.length) {
         <div class="flex-col-start-stretch gap-xs">
           <small class="status-text status-text--muted">
-            {{ i18n.triggersLabel() }}
+            {{ i18n.sessionForm().triggersLabel }}
           </small>
 
           <div class="flex-row-start-center gap-xs flex-wrap">
@@ -117,7 +117,7 @@
   } @else {
     <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
       <small class="card-legend status-text status-text--muted">
-        {{ i18n.additionalInfoLabel() }}
+        {{ i18n.detailsLabels().additionalInfo }}
       </small>
 
       <span class="tag-badge tag-badge--muted">

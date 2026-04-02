@@ -1,4 +1,4 @@
-import { HeroSlideTech } from './hero-carousel.i18n';
+import { HeroSlideTech } from '../../../../core/types/i18n/home';
 
 export const HERO_SLIDES_TECH: readonly HeroSlideTech[] = [
   {

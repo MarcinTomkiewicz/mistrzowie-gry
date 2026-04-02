@@ -1,92 +1,40 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
-
 import {
-  CommonActionsTranslations,
-  CommonCtaTranslations,
-  CommonErrorsTranslations,
-  CommonFormTranslations,
-} from '../../../core/types/common-i18n';
-import { pickTranslations } from '../../../core/utils/pick-translation';
+  createCommonActionsI18n,
+  createCommonCtaI18n,
+  createCommonErrorsI18n,
+  createCommonFormI18n,
+} from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
+  ProfileFormActionsTranslations,
+  ProfileFormErrorsTranslations,
+  ProfileFormSuccessTranslations,
+  ProfileFormTitleTranslations,
+  ProfileFormToastTranslations,
+  ProfileFormTranslations,
+} from '../../../core/types/i18n/auth';
 
 export function createProfileFormI18n() {
-  const titleDict = translateObjectSignal('profileForm.title', {}, { scope: 'auth' });
-  const formDict = translateObjectSignal('profileForm.form', {}, { scope: 'auth' });
-  const errorsDict = translateObjectSignal('profileForm.errors', {}, { scope: 'auth' });
-  const toastDict = translateObjectSignal('profileForm.toast', {}, { scope: 'auth' });
-  const successDict = translateObjectSignal('profileForm.success', {}, { scope: 'auth' });
-  const actionsDict = translateObjectSignal('profileForm.actions', {}, { scope: 'auth' });
-
-  const commonActionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
-  const commonCtaDict = translateObjectSignal('cta', {}, { scope: 'common' });
-  const commonErrorsDict = translateObjectSignal('errors', {}, { scope: 'common' });
-  const commonFormDict = translateObjectSignal('form', {}, { scope: 'common' });
-
-  const commonActions = computed(
-    () => commonActionsDict() as CommonActionsTranslations,
-  );
-  const commonCta = computed(
-    () => commonCtaDict() as CommonCtaTranslations,
-  );
-  const commonErrors = computed(
-    () => commonErrorsDict() as CommonErrorsTranslations,
-  );
-  const commonForm = computed(
-    () => commonFormDict() as CommonFormTranslations,
-  );
-
-  const title = pickTranslations(titleDict, [
-    'register',
-    'edit',
-  ] as const);
-
-  const form = pickTranslations(formDict, [
-    'emailLabel',
-    'passwordLabel',
-    'firstNameLabel',
-    'nicknameLabel',
-    'useNicknameLabel',
-    'phoneNumberLabel',
-    'cityLabel',
-    'streetLabel',
-    'houseNumberLabel',
-    'apartmentNumberLabel',
-    'postalCodeLabel',
-    'ageLabel',
-    'shortDescriptionLabel',
-    'longDescriptionLabel',
-    'extendedDescriptionLabel',
-  ] as const);
-
-  const errors = pickTranslations(errorsDict, [
-    'displayNameRequired',
-    'displayPreference',
-    'emailAlreadyRegistered',
-    'emailNotConfirmed',
-    'weakPassword',
-    'profileNotFound',
-    'invalidCredentials',
-  ] as const);
-
-  const toast = pickTranslations(toastDict, [
-    'invalidFormSummary',
-    'registerFailedSummary',
-    'registerSuccessSummary',
-    'updateFailedSummary',
-    'updateSuccessSummary',
-    'confirmationRequiredSummary',
-  ] as const);
-
-  const success = pickTranslations(successDict, [
-    'registered',
-    'confirmationRequired',
-    'updated',
-  ] as const);
-
-  const actions = pickTranslations(actionsDict, [
-    'registerLabel',
-    'updateLabel',
-  ] as const);
+  const { title, form, errors, toast, success, actions } =
+    createScopedSectionsI18n<{
+      title: ProfileFormTitleTranslations;
+      form: ProfileFormTranslations;
+      errors: ProfileFormErrorsTranslations;
+      toast: ProfileFormToastTranslations;
+      success: ProfileFormSuccessTranslations;
+      actions: ProfileFormActionsTranslations;
+    }>('auth', {
+      title: 'profileForm.title',
+      form: 'profileForm.form',
+      errors: 'profileForm.errors',
+      toast: 'profileForm.toast',
+      success: 'profileForm.success',
+      actions: 'profileForm.actions',
+    });
+  const commonActions = createCommonActionsI18n();
+  const commonCta = createCommonCtaI18n();
+  const commonErrors = createCommonErrorsI18n();
+  const commonForm = createCommonFormI18n();
 
   return {
     title,

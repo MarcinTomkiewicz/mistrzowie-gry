@@ -75,7 +75,7 @@
                     class="mg-hero__dot"
                     [class.is-active]="$index === activeIndex()"
                     (click)="goTo($index)"
-                    [attr.aria-label]="dotAriaLabel(i18n.aria().goToPrefix, $index)"
+                    [attr.aria-label]="dotAriaLabel(i18n.aria().goToSlidePrefix, $index)"
                     [attr.aria-current]="$index === activeIndex() ? 'true' : null"
                   ></button>
                 }

@@ -1,92 +1,36 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
 
+import { createCommonCtaI18n } from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
+  AboutCard,
+  AboutCardRaw,
+  AboutHero,
+  AboutSection,
+  AboutSectionRaw,
+  AboutSeo,
+} from '../../../core/types/i18n/about';
 import {
   dictToSortedArray,
   numberedDictToStringArray,
 } from '../../../core/utils/dict-to-sorted-array';
-import { pickTranslations } from '../../../core/utils/pick-translation';
-
-export type AboutSection = {
-  id: number;
-  title: string;
-  paragraphs: string[];
-};
-
-export type AboutCard = {
-  id: number;
-  title: string;
-  paragraphs: string[];
-};
-
-export type AboutSeo = {
-  title: string;
-  description: string;
-};
-
-export type AboutHero = {
-  title: string;
-  subtitle: string;
-};
 
 export function createAboutI18n() {
-  const commonCtaDict = translateObjectSignal(
-    'cta',
-    {},
-    { scope: 'common' },
-  );
-
-  const heroDict = translateObjectSignal(
-    'hero',
-    {},
-    { scope: 'about' },
-  );
-
-  const seoDict = translateObjectSignal(
-    'seo',
-    {},
-    { scope: 'about' },
-  );
-
-  const sectionsDict = translateObjectSignal(
-    'sections',
-    {},
-    { scope: 'about' },
-  );
-
-  const cardsDict = translateObjectSignal(
-    'cards',
-    {},
-    { scope: 'about' },
-  );
-
-  const commonCta = computed(() =>
-    pickTranslations(commonCtaDict, [
-      'contactUs',
-      'joinProgram',
-    ] as const)(),
-  );
-
-  const hero = computed<AboutHero>(() => {
-    const picked = pickTranslations(heroDict, ['title', 'subtitle'] as const)();
-
-    return {
-      title: picked.title || '',
-      subtitle: picked.subtitle || '',
-    };
-  });
-
-  const seo = computed<AboutSeo>(() => {
-    const picked = pickTranslations(seoDict, ['title', 'description'] as const)();
-
-    return {
-      title: picked.title || 'O nas',
-      description: picked.description || '',
-    };
+  const commonCta = createCommonCtaI18n();
+  const { hero, seo, sectionsDict, cardsDict } = createScopedSectionsI18n<{
+    hero: AboutHero;
+    seo: AboutSeo;
+    sectionsDict: Record<string, AboutSectionRaw>;
+    cardsDict: Record<string, AboutCardRaw>;
+  }>('about', {
+    hero: 'hero',
+    seo: 'seo',
+    sectionsDict: 'sections',
+    cardsDict: 'cards',
   });
 
   const sections = computed<AboutSection[]>(() =>
-    dictToSortedArray<{ id: number; title: string; paragraphs: unknown }>(
+    dictToSortedArray<AboutSectionRaw>(
       sectionsDict() as never,
       (item) => Number((item as { id?: number })?.id ?? 0),
     ).map((item) => ({
@@ -99,7 +43,7 @@ export function createAboutI18n() {
   );
 
   const cards = computed<AboutCard[]>(() =>
-    dictToSortedArray<{ id: number; title: string; paragraphs: unknown }>(
+    dictToSortedArray<AboutCardRaw>(
       cardsDict() as never,
       (item) => Number((item as { id?: number })?.id ?? 0),
     ).map((item) => ({

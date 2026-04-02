@@ -22,7 +22,7 @@ import { createSessionDetailsI18n } from './session-details.i18n';
   imports: [ButtonModule],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope('sessions')],
 })
 export class SessionDetails {
   private readonly storage = inject(Storage);

@@ -2,6 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { Theme } from '../../../core/services/theme/theme';
@@ -15,6 +16,7 @@ import { createEventSlotsI18n } from './event-slots.i18n';
   imports: [ButtonModule, SkeletonModule],
   templateUrl: './event-slots.html',
   styleUrl: './event-slots.scss',
+  providers: [provideTranslocoScope('sessions')],
 })
 export class EventSlots {
   private readonly theme = inject(Theme);

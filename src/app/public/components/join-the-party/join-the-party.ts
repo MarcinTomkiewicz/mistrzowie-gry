@@ -44,15 +44,17 @@ export class JoinTheParty {
   );
 
   private readonly applySeoEffect = effect(() => {
+    const seo = this.i18n.seo();
+
     this.seo.apply({
-      title: this.i18n.seoTitle() || 'Dolacz do Druzyny',
-      description: this.i18n.seoDescription() || '',
+      title: seo.title || 'Dolacz do Druzyny',
+      description: seo.description || '',
       canonicalUrl: this.pageUrl,
       structuredData: createEventStructuredData({
         id: `${this.pageUrl}#event`,
         url: this.pageUrl,
         name: this.i18n.hero().title,
-        description: this.i18n.seoDescription() || this.i18n.hero().subtitle,
+        description: seo.description || this.i18n.hero().subtitle,
         eventSchedule: {
           '@type': 'Schedule',
           repeatFrequency: 'P1W',

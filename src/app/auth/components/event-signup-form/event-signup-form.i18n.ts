@@ -1,163 +1,86 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
-
 import {
-  CommonActionsTranslations,
-  CommonQuestionsTranslations,
-  CommonStatusTranslations,
   EventSignupFormActionsTranslations,
   EventSignupFormBreadcrumbTranslations,
   EventSignupFormConfirmationTranslations,
   EventSignupFormCustomTranslations,
   EventSignupFormModeTranslations,
   EventSignupFormNavigationTranslations,
+  EventSignupFormSeoTranslations,
   EventSignupFormSectionsTranslations,
   EventSignupFormStatesTranslations,
   EventSignupFormTemplateTranslations,
   EventSignupFormToastTranslations,
   EventSignupFormTranslations,
+} from '../../../core/types/i18n/auth';
+import {
+  createCommonActionsI18n,
+  createCommonQuestionsI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
   SessionDifficultyTranslations,
   SessionFormTranslations,
-} from '../../../core/types/common-i18n';
+  SessionListLabelsTranslations,
+} from '../../../core/types/i18n/sessions';
 
 export function createEventSignupFormI18n() {
-  const seoTitle = translateSignal('eventSignupForm.seo.title', {}, { scope: 'auth' });
-  const seoDescription = translateSignal(
-    'eventSignupForm.seo.description',
-    {},
-    { scope: 'auth' },
-  );
-  const formDict = translateObjectSignal(
-    'eventSignupForm.form',
-    {},
-    { scope: 'auth' },
-  );
-  const actionsDict = translateObjectSignal(
-    'eventSignupForm.actions',
-    {},
-    { scope: 'auth' },
-  );
-  const confirmationDict = translateObjectSignal(
-    'eventSignupForm.confirmation',
-    {},
-    { scope: 'auth' },
-  );
-  const statesDict = translateObjectSignal(
-    'eventSignupForm.states',
-    {},
-    { scope: 'auth' },
-  );
-  const modeDict = translateObjectSignal(
-    'eventSignupForm.mode',
-    {},
-    { scope: 'auth' },
-  );
-  const templateDict = translateObjectSignal(
-    'eventSignupForm.template',
-    {},
-    { scope: 'auth' },
-  );
-  const customDict = translateObjectSignal(
-    'eventSignupForm.custom',
-    {},
-    { scope: 'auth' },
-  );
-  const sectionsDict = translateObjectSignal(
-    'eventSignupForm.sections',
-    {},
-    { scope: 'auth' },
-  );
-  const breadcrumbsDict = translateObjectSignal(
-    'eventSignupForm.breadcrumbs',
-    {},
-    { scope: 'auth' },
-  );
-  const navigationDict = translateObjectSignal(
-    'eventSignupForm.navigation',
-    {},
-    { scope: 'auth' },
-  );
-  const toastDict = translateObjectSignal(
-    'eventSignupForm.toast',
-    {},
-    { scope: 'auth' },
-  );
+  const {
+    seo,
+    form,
+    actions,
+    confirmation,
+    states,
+    mode,
+    template,
+    custom,
+    sections,
+    breadcrumbs,
+    navigation,
+    toast,
+  } = createScopedSectionsI18n<{
+    seo: EventSignupFormSeoTranslations;
+    form: EventSignupFormTranslations;
+    actions: EventSignupFormActionsTranslations;
+    confirmation: EventSignupFormConfirmationTranslations;
+    states: EventSignupFormStatesTranslations;
+    mode: EventSignupFormModeTranslations;
+    template: EventSignupFormTemplateTranslations;
+    custom: EventSignupFormCustomTranslations;
+    sections: EventSignupFormSectionsTranslations;
+    breadcrumbs: EventSignupFormBreadcrumbTranslations;
+    navigation: EventSignupFormNavigationTranslations;
+    toast: EventSignupFormToastTranslations;
+  }>('auth', {
+    seo: 'eventSignupForm.seo',
+    form: 'eventSignupForm.form',
+    actions: 'eventSignupForm.actions',
+    confirmation: 'eventSignupForm.confirmation',
+    states: 'eventSignupForm.states',
+    mode: 'eventSignupForm.mode',
+    template: 'eventSignupForm.template',
+    custom: 'eventSignupForm.custom',
+    sections: 'eventSignupForm.sections',
+    breadcrumbs: 'eventSignupForm.breadcrumbs',
+    navigation: 'eventSignupForm.navigation',
+    toast: 'eventSignupForm.toast',
+  });
 
-  const sessionFormDict = translateObjectSignal(
-    'sessionForm.form',
-    {},
-    { scope: 'auth' },
-  );
-  const sessionDifficultyDict = translateObjectSignal(
-    'sessionForm.difficulty',
-    {},
-    { scope: 'auth' },
-  );
-
-  const commonActionsDict = translateObjectSignal(
-    'actions',
-    {},
-    { scope: 'common' },
-  );
-  const commonQuestionsDict = translateObjectSignal(
-    'questions',
-    {},
-    { scope: 'common' },
-  );
-  const commonStatusDict = translateObjectSignal(
-    'status',
-    {},
-    { scope: 'common' },
-  );
-
-  const form = computed(() => formDict() as EventSignupFormTranslations);
-  const actions = computed(
-    () => actionsDict() as EventSignupFormActionsTranslations,
-  );
-  const confirmation = computed(
-    () => confirmationDict() as EventSignupFormConfirmationTranslations,
-  );
-  const states = computed(
-    () => statesDict() as EventSignupFormStatesTranslations,
-  );
-  const mode = computed(() => modeDict() as EventSignupFormModeTranslations);
-  const template = computed(
-    () => templateDict() as EventSignupFormTemplateTranslations,
-  );
-  const custom = computed(
-    () => customDict() as EventSignupFormCustomTranslations,
-  );
-  const sections = computed(
-    () => sectionsDict() as EventSignupFormSectionsTranslations,
-  );
-  const breadcrumbs = computed(
-    () => breadcrumbsDict() as EventSignupFormBreadcrumbTranslations,
-  );
-  const navigation = computed(
-    () => navigationDict() as EventSignupFormNavigationTranslations,
-  );
-  const toast = computed(() => toastDict() as EventSignupFormToastTranslations);
-
-  const sessionForm = computed(
-    () => sessionFormDict() as SessionFormTranslations,
-  );
-  const difficulty = computed(
-    () => sessionDifficultyDict() as SessionDifficultyTranslations,
-  );
-
-  const commonActions = computed(
-    () => commonActionsDict() as CommonActionsTranslations,
-  );
-  const commonQuestions = computed(
-    () => commonQuestionsDict() as CommonQuestionsTranslations,
-  );
-  const commonStatus = computed(
-    () => commonStatusDict() as CommonStatusTranslations,
-  );
+  const { sessionForm, difficulty, list } = createScopedSectionsI18n<{
+    sessionForm: SessionFormTranslations;
+    difficulty: SessionDifficultyTranslations;
+    list: SessionListLabelsTranslations;
+  }>('sessions', {
+    sessionForm: 'form',
+    difficulty: 'difficulty',
+    list: 'list',
+  });
+  const commonActions = createCommonActionsI18n();
+  const commonQuestions = createCommonQuestionsI18n();
+  const commonStatus = createCommonStatusI18n();
 
   return {
-    seoTitle,
-    seoDescription,
+    seo,
     form,
     actions,
     confirmation,
@@ -171,6 +94,7 @@ export function createEventSignupFormI18n() {
     toast,
     sessionForm,
     difficulty,
+    list,
     commonActions,
     commonQuestions,
     commonStatus,

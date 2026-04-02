@@ -1,32 +1,25 @@
 import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
-
 import {
-  CommonActionsTranslations,
-  CommonQuestionsTranslations,
-} from '../../../core/types/common-i18n';
+  createCommonActionsI18n,
+  createCommonQuestionsI18n,
+} from '../../../core/translations/common.i18n';
+import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
+import { SessionConfirmationTranslations } from '../../../core/types/i18n/sessions';
 
 export function createSessionListI18n() {
-  const commonActionsDict = translateObjectSignal(
-    'actions',
-    {},
-    { scope: 'common' },
+  const actions = createCommonActionsI18n();
+  const commonQuestions = createCommonQuestionsI18n();
+  const confirmation = createScopedObjectI18n<SessionConfirmationTranslations>(
+    'sessions',
+    'confirmation',
   );
-  const commonQuestionsDict = translateObjectSignal(
-    'questions',
-    {},
-    { scope: 'common' },
-  );
-
-  const actions = computed(
-    () => commonActionsDict() as CommonActionsTranslations,
-  );
-  const questions = computed(
-    () => commonQuestionsDict() as CommonQuestionsTranslations,
-  );
+  const dialog = computed(() => ({
+    sure: commonQuestions().sure,
+    deleteSession: confirmation().deleteSession,
+  }));
 
   return {
     actions,
-    questions,
+    dialog,
   };
 }

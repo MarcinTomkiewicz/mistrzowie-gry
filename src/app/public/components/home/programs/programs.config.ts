@@ -1,9 +1,9 @@
-import { CtaKey } from './programs.i18n';
+import { ProgramsCtaKey } from '../../../../core/types/i18n/home';
 
 export type ProgramsCardTech = {
   id: number;
   ctaPath: string;
-  ctaKey: CtaKey;
+  ctaKey: ProgramsCtaKey;
 };
 
 const PROGRAMS_TECH: readonly ProgramsCardTech[] = [

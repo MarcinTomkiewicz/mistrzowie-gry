@@ -139,8 +139,8 @@ export class EventSignupComponent {
 
   private readonly applySeoEffect = effect(() => {
     this.seo.apply({
-      title: this.i18n.seoTitle(),
-      description: this.i18n.seoDescription(),
+      title: this.i18n.seo().title,
+      description: this.i18n.seo().description,
       canonicalUrl: this.pageUrl,
       robots: 'noindex,nofollow',
     });

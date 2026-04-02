@@ -1,33 +1,17 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
-
 import {
-  CommonCtaTranslations,
   CommonStatusPageTranslations,
-} from '../types/common-i18n';
+} from '../types/i18n/common';
+import { createCommonCtaI18n } from './common.i18n';
+import { createScopedObjectI18n } from './scoped.i18n';
 
 export function createStatusPageI18n(
   pageKey: 'notFound' | 'notAuthorized',
 ) {
-  const pageDict = translateObjectSignal(
+  const page = createScopedObjectI18n<CommonStatusPageTranslations>(
+    'common',
     `statusPages.${pageKey}`,
-    {},
-    { scope: 'common' },
   );
-
-  const ctaDict = translateObjectSignal(
-    'cta',
-    {},
-    { scope: 'common' },
-  );
-
-  const page = computed(
-    () => pageDict() as CommonStatusPageTranslations,
-  );
-
-  const cta = computed(
-    () => ctaDict() as CommonCtaTranslations,
-  );
+  const cta = createCommonCtaI18n();
 
   return {
     page,

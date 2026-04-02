@@ -190,10 +190,11 @@ export class ChaoticThursdays implements OnInit {
 
   private readonly applySeoEffect = effect(() => {
     const pageVm = this.pageVm();
+    const seo = this.i18n.seo();
 
     this.seo.apply({
-      title: this.i18n.seoTitle() || 'Chaotyczne Czwartki',
-      description: this.i18n.seoDescription() || '',
+      title: seo.title || 'Chaotyczne Czwartki',
+      description: seo.description || '',
       canonicalUrl: this.pageUrl,
       structuredData: this.buildStructuredData(pageVm),
     });
@@ -314,7 +315,7 @@ export class ChaoticThursdays implements OnInit {
     const description =
       pageVm?.event.longDescription ||
       pageVm?.event.shortDescription ||
-      this.i18n.seoDescription() ||
+      this.i18n.seo().description ||
       '';
 
     const image = this.getImageUrl(pageVm?.event.coverImagePath);

@@ -1,54 +1,32 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
-
+import { createCommonStatusI18n } from '../../../core/translations/common.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
-  CommonStatusTranslations,
-} from '../../../core/types/common-i18n';
-
-type EventSignupPageTranslations = {
-  title: string;
-  subtitle: string;
-};
-
-type EventSignupDetailsTranslations = {
-  timeLabel: string;
-  beginnersLabel: string;
-  beginnersYes: string;
-  beginnersNo: string;
-};
-
-type EventSignupOccurrencesTranslations = {
-  title: string;
-  subtitle: string;
-};
-
-type EventSignupEmptyTranslations = {
-  title: string;
-  description: string;
-};
+  EventSignupDetailsTranslations,
+  EventSignupEmptyTranslations,
+  EventSignupOccurrencesTranslations,
+  EventSignupPageTranslations,
+  EventSignupSeoTranslations,
+} from '../../../core/types/i18n/auth';
 
 export function createEventSignupI18n() {
-  const seoTitle = translateSignal('eventSignup.seo.title', {}, { scope: 'auth' });
-  const seoDescription = translateSignal(
-    'eventSignup.seo.description',
-    {},
-    { scope: 'auth' },
-  );
-  const pageDict = translateObjectSignal('eventSignup.page', {}, { scope: 'auth' });
-  const detailsDict = translateObjectSignal('eventSignup.details', {}, { scope: 'auth' });
-  const occurrencesDict = translateObjectSignal('eventSignup.occurrences', {}, { scope: 'auth' });
-  const emptyDict = translateObjectSignal('eventSignup.empty', {}, { scope: 'auth' });
-  const commonStatusDict = translateObjectSignal('status', {}, { scope: 'common' });
-
-  const page = computed(() => pageDict() as EventSignupPageTranslations);
-  const details = computed(() => detailsDict() as EventSignupDetailsTranslations);
-  const occurrences = computed(() => occurrencesDict() as EventSignupOccurrencesTranslations);
-  const empty = computed(() => emptyDict() as EventSignupEmptyTranslations);
-  const commonStatus = computed(() => commonStatusDict() as CommonStatusTranslations);
+  const { seo, page, details, occurrences, empty } =
+    createScopedSectionsI18n<{
+      seo: EventSignupSeoTranslations;
+      page: EventSignupPageTranslations;
+      details: EventSignupDetailsTranslations;
+      occurrences: EventSignupOccurrencesTranslations;
+      empty: EventSignupEmptyTranslations;
+    }>('auth', {
+      seo: 'eventSignup.seo',
+      page: 'eventSignup.page',
+      details: 'eventSignup.details',
+      occurrences: 'eventSignup.occurrences',
+      empty: 'eventSignup.empty',
+    });
+  const commonStatus = createCommonStatusI18n();
 
   return {
-    seoTitle,
-    seoDescription,
+    seo,
     page,
     details,
     occurrences,

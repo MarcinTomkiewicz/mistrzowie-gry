@@ -1,21 +1,13 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal } from '@jsverse/transloco';
-
-import { CommonActionsTranslations } from '../../../core/types/common-i18n';
-
-export interface UserMenuTranslations {
-  greeting: string;
-  accountSectionTitle: string;
-  editProfileLabel: string;
-  eventSignupLabel: string;
-}
+import { createCommonActionsI18n } from '../../../core/translations/common.i18n';
+import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
+import { UserMenuTranslations } from '../../../core/types/i18n/auth';
 
 export function createUserMenuPanelI18n() {
-  const userMenuDict = translateObjectSignal('userMenu', {}, { scope: 'auth' });
-  const commonActionsDict = translateObjectSignal('actions', {}, { scope: 'common' });
-
-  const userMenu = computed(() => userMenuDict() as UserMenuTranslations);
-  const commonActions = computed(() => commonActionsDict() as CommonActionsTranslations);
+  const userMenu = createScopedObjectI18n<UserMenuTranslations>(
+    'auth',
+    'userMenu',
+  );
+  const commonActions = createCommonActionsI18n();
 
   return {
     userMenu,

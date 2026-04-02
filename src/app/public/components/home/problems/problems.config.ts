@@ -1,10 +1,10 @@
-import { CtaKey } from './problems.i18n';
+import { ProblemsCtaKey } from '../../../../core/types/i18n/home';
 
 export type ProblemCardTech = {
   id: number;
   ctaPath: string;
   icon: string;
-  ctaKey: CtaKey;
+  ctaKey: ProblemsCtaKey;
 };
 
 const PROBLEMS_TECH: readonly ProblemCardTech[] = [

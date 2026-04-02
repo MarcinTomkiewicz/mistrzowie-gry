@@ -13,7 +13,8 @@ import { ButtonModule } from 'primeng/button';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { Platform } from '../../../../core/services/platform/platform';
-import { createHeroCarouselI18n, UiHeroSlide } from './hero-carousel.i18n';
+import { UiHeroSlide } from '../../../../core/types/i18n/home';
+import { createHeroCarouselI18n } from './hero-carousel.i18n';
 import { HERO_SLIDES_TECH_BY_ID } from './hero-carousel.config';
 
 @Component({

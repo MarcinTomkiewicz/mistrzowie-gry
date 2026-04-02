@@ -3,10 +3,10 @@ import { Component } from '@angular/core';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import {
-  createSeoRichTextI18n,
   UiSeoTextColumn,
   UiSeoTextSection,
-} from './seo-rich-text.i18n';
+} from '../../../../core/types/i18n/home';
+import { createSeoRichTextI18n } from './seo-rich-text.i18n';
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({

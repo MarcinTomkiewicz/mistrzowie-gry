@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 import {
   ISessionListLabels,
@@ -28,6 +29,7 @@ import { createSessionListI18n } from './session-list.i18n';
   ],
   templateUrl: './session-list.html',
   styleUrl: './session-list.scss',
+  providers: [provideTranslocoScope('common', 'sessions')],
 })
 export class SessionList {
   private static nextConfirmId = 0;
@@ -143,8 +145,8 @@ export class SessionList {
 
     this.confirmation.confirm({
       key: this.deleteConfirmKey,
-      header: this.i18n.questions().sure,
-      message: this.i18n.questions().deleteSession,
+      header: this.i18n.dialog().sure,
+      message: this.i18n.dialog().deleteSession,
       closable: true,
       closeOnEscape: true,
       dismissableMask: true,

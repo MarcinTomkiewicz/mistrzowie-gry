@@ -65,7 +65,7 @@ import { createSessionFormI18n } from './session-form.i18n';
   ],
   templateUrl: './session-form.html',
   styleUrl: './session-form.scss',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope('sessions', 'common')],
 })
 export class SessionForm {
   private readonly auth = inject(Auth);

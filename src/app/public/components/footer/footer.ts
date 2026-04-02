@@ -22,12 +22,13 @@ import { LazyComponentLoader } from '../../../core/services/lazy-component-loade
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import {
+  ActiveLegalDialog,
   LegalDialogContent,
-  UILegalLink,
-  createFooterI18n,
-} from './footer.i18n';
-
-type ActiveLegalDialog = 'terms' | 'privacy-policy' | null;
+  LegalDialogsPayload,
+  LegalJsonPayload,
+} from '../../../core/types/i18n/legal';
+import { UILegalLink } from '../../../core/types/i18n/footer';
+import { createFooterI18n } from './footer.i18n';
 
 interface LazyLegalDialogComponent {
   visible: unknown;
@@ -264,13 +265,3 @@ export class Footer {
     return this.legalDialogsPromise;
   }
 }
-
-type LegalJsonPayload = {
-  termsDialog?: LegalDialogContent;
-  privacyPolicyDialog?: LegalDialogContent;
-};
-
-type LegalDialogsPayload = Record<
-  Exclude<ActiveLegalDialog, null>,
-  LegalDialogContent | null
->;

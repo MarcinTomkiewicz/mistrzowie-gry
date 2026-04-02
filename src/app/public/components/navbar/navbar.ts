@@ -22,8 +22,9 @@ import { LazyComponentLoader } from '../../../core/services/lazy-component-loade
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
+import { CommonNavMenuItem } from '../../../core/types/i18n/common';
 import { ThemeSwitch } from '../../common/theme-switch/theme-switch';
-import { createNavbarI18n, UIMenu } from './navbar.i18n';
+import { createNavbarI18n } from './navbar.i18n';
 
 interface CloseableOverlayComponent {
   closed: OutputEmitterRef<void>;
@@ -58,7 +59,7 @@ export class Navbar {
   );
 
   readonly mobileOpen = signal(false);
-  readonly activeDropdown = signal<UIMenu | null>(null);
+  readonly activeDropdown = signal<CommonNavMenuItem | null>(null);
   readonly isUserMenuLoading = signal(false);
   readonly isUserMenuLoaded = signal(false);
 
@@ -78,7 +79,7 @@ export class Navbar {
       ({ UserMenuPanel }) => UserMenuPanel as Type<CloseableOverlayComponent>,
     );
 
-  openDropdown(event: Event, item: UIMenu): void {
+  openDropdown(event: Event, item: CommonNavMenuItem): void {
     if (!item.children?.length) return;
 
     if (this.activeDropdown()?.labelKey === item.labelKey) {
@@ -167,5 +168,5 @@ export class Navbar {
       });
   }
 
-  trackByLabelKey = (_: number, item: UIMenu) => item.labelKey;
+  trackByLabelKey = (_: number, item: CommonNavMenuItem) => item.labelKey;
 }

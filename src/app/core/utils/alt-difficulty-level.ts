@@ -1,4 +1,4 @@
-import { EventSlotsDifficultyTranslations } from '../types/common-i18n';
+import { SessionSlotDifficultyTranslations } from '../types/i18n/sessions';
 import { SessionDifficultyLevel } from '../types/sessions';
 
 export interface IAltDifficultyLevelVm {
@@ -8,7 +8,7 @@ export interface IAltDifficultyLevelVm {
 
 export function resolveAltDifficultyLevel(
   difficulty: SessionDifficultyLevel | null | undefined,
-  labels: EventSlotsDifficultyTranslations,
+  labels: SessionSlotDifficultyTranslations,
   fallbackLabel: string,
 ): IAltDifficultyLevelVm {
   switch (difficulty) {

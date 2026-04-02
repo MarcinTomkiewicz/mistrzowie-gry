@@ -78,7 +78,7 @@ type EventSignupFormGroup = FormGroup<{
   ],
   templateUrl: './event-signup-form.html',
   styleUrl: './event-signup-form.scss',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope('auth', 'common', 'sessions')],
 })
 export class EventSignupFormComponent {
   private readonly route = inject(ActivatedRoute);
@@ -261,8 +261,8 @@ export class EventSignupFormComponent {
     systemLabel: this.i18n.sessionForm().systemLabel,
     titleLabel: this.i18n.sessionForm().titleLabel,
     difficultyLabel: this.i18n.sessionForm().difficultyLabel,
-    playersLabel: this.i18n.form().playersHeaderLabel,
-    minAgeLabel: this.i18n.form().minAgeHeaderLabel,
+    playersLabel: this.i18n.list().playersHeaderLabel,
+    minAgeLabel: this.i18n.list().minAgeHeaderLabel,
     editLabel: this.i18n.commonActions().edit,
     deleteLabel: this.i18n.commonActions().delete,
   }));
@@ -299,8 +299,8 @@ export class EventSignupFormComponent {
           : buildSiteUrl('/auth/event-signup');
 
       this.seo.apply({
-        title: this.i18n.seoTitle(),
-        description: this.i18n.seoDescription(),
+        title: this.i18n.seo().title,
+        description: this.i18n.seo().description,
         canonicalUrl: pageUrl,
         robots: 'noindex,nofollow',
       });

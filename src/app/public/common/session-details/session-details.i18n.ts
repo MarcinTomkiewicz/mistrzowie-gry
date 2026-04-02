@@ -1,98 +1,42 @@
-import { computed } from '@angular/core';
-import { translateObjectSignal, translateSignal } from '@jsverse/transloco';
-
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
-  EventSlotsCommonFallbacksTranslations,
-  EventSlotsDifficultyTranslations,
-  EventSlotsLabelsTranslations,
-  GmSessionsFormTranslations,
+  SessionDetailsLabelsTranslations,
   SessionFormTranslations,
-} from '../../../core/types/common-i18n';
+  SessionListLabelsTranslations,
+  SessionSlotDifficultyTranslations,
+  SessionSlotFallbacksTranslations,
+  SessionSlotLabelsTranslations,
+} from '../../../core/types/i18n/sessions';
 
 export function createSessionDetailsI18n() {
-  const sessionFormDict = translateObjectSignal(
-    'sessionForm.form',
-    {},
-    { scope: 'auth' },
-  );
-
-  const difficultyDict = translateObjectSignal(
-    'eventSlots.difficulty',
-    {},
-    { scope: 'auth' },
-  );
-
-  const gmSessionsFormDict = translateObjectSignal(
-    'gmSessions.form',
-    {},
-    { scope: 'auth' },
-  );
-
-  const eventSlotsLabelsDict = translateObjectSignal(
-    'eventSlots.labels',
-    {},
-    { scope: 'auth' },
-  );
-
-  const commonFallbacksDict = translateObjectSignal(
-    'fallbacks',
-    {},
-    { scope: 'common' },
-  );
-
-  const descriptionLabel = translateSignal(
-    'sessionForm.form.descriptionLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const primaryInfoLabel = translateSignal(
-    'sessionDetails.labels.primaryInfo',
-    {},
-    { scope: 'auth' },
-  );
-
-  const additionalInfoLabel = translateSignal(
-    'sessionDetails.labels.additionalInfo',
-    {},
-    { scope: 'auth' },
-  );
-
-  const stylesLabel = translateSignal(
-    'sessionForm.form.stylesLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const triggersLabel = translateSignal(
-    'sessionForm.form.triggersLabel',
-    {},
-    { scope: 'auth' },
-  );
-
-  const sessionForm = computed(() => sessionFormDict() as SessionFormTranslations);
-  const difficulty = computed(
-    () => difficultyDict() as EventSlotsDifficultyTranslations,
-  );
-  const gmSessionsForm = computed(
-    () => gmSessionsFormDict() as GmSessionsFormTranslations,
-  );
-  const eventSlotsLabels = computed(
-    () => eventSlotsLabelsDict() as EventSlotsLabelsTranslations,
-  );
-  const commonFallbacks = computed(
-    () => commonFallbacksDict() as EventSlotsCommonFallbacksTranslations,
-  );
-
-  return {
-    descriptionLabel,
-    primaryInfoLabel,
-    additionalInfoLabel,
-    stylesLabel,
-    triggersLabel,
+  const {
     sessionForm,
     difficulty,
-    gmSessionsForm,
+    list,
+    eventSlotsLabels,
+    commonFallbacks,
+    detailsLabels,
+  } = createScopedSectionsI18n<{
+    sessionForm: SessionFormTranslations;
+    difficulty: SessionSlotDifficultyTranslations;
+    list: SessionListLabelsTranslations;
+    eventSlotsLabels: SessionSlotLabelsTranslations;
+    commonFallbacks: SessionSlotFallbacksTranslations;
+    detailsLabels: SessionDetailsLabelsTranslations;
+  }>('sessions', {
+    sessionForm: 'form',
+    difficulty: 'slots.difficulty',
+    list: 'list',
+    eventSlotsLabels: 'slots.labels',
+    commonFallbacks: 'slots.fallbacks',
+    detailsLabels: 'details.labels',
+  });
+
+  return {
+    detailsLabels,
+    sessionForm,
+    difficulty,
+    list,
     eventSlotsLabels,
     commonFallbacks,
   };
