@@ -120,6 +120,7 @@ export class GmProfile {
     cropFrameAriaLabel: this.i18n.commonForm().fileUpload.cropFrameAriaLabel,
     cropConfirmLabel: this.i18n.commonForm().fileUpload.cropConfirm,
     cropCancelLabel: this.i18n.commonActions().cancel,
+    cropProcessingLabel: this.i18n.commonForm().fileUpload.cropProcessingLabel,
     zoomLabel: this.i18n.commonForm().fileUpload.zoomLabel,
     cropPreviewLabel: this.i18n.commonForm().fileUpload.cropPreviewLabel,
     cropPreviewLandscapeLabel:

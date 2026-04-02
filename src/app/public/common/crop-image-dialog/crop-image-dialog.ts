@@ -4,6 +4,7 @@ import {
   DestroyRef,
   ElementRef,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -15,6 +16,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { SliderModule } from 'primeng/slider';
 
 import {
@@ -44,6 +46,7 @@ const createInitialTransform = (): ImageTransform => ({
     ButtonModule,
     DialogModule,
     ImageCropperComponent,
+    ProgressBarModule,
     ReactiveFormsModule,
     SliderModule,
   ],
@@ -57,6 +60,8 @@ export class CropImageDialog {
   private readonly imageCropper = viewChild(ImageCropperComponent);
   private cropSurfaceResizeObserver: ResizeObserver | null = null;
   private cropDialogCloseReason: CropDialogCloseReason = null;
+  private currentPreparedSourceFile: File | undefined;
+  private preparationHideFrameId: number | null = null;
 
   readonly visible = input(false);
   readonly sourceFile = input<File | undefined>(undefined);
@@ -73,6 +78,8 @@ export class CropImageDialog {
   readonly scale = signal(1);
   readonly transform = signal<ImageTransform>(createInitialTransform());
   readonly zoomControl = new FormControl(1, { nonNullable: true });
+  readonly preparationProgress = signal(0);
+  readonly isPreparing = signal(false);
 
   readonly cropOutputFormat = computed(() =>
     this.resolveOutputFormat(this.sourceFile()),
@@ -86,11 +93,28 @@ export class CropImageDialog {
   });
 
   constructor() {
+    effect(() => {
+      const isVisible = this.visible();
+      const sourceFile = this.sourceFile();
+
+      if (
+        !isVisible ||
+        !sourceFile ||
+        sourceFile === this.currentPreparedSourceFile
+      ) {
+        return;
+      }
+
+      this.currentPreparedSourceFile = sourceFile;
+      this.startPreparation();
+    });
+
     this.zoomControl.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => this.applyZoom(value));
 
     this.destroyRef.onDestroy(() => {
+      this.cancelPreparationHide();
       this.disconnectCropSurfaceResizeObserver();
       this.revokeCropObjectUrl();
     });
@@ -130,6 +154,7 @@ export class CropImageDialog {
   }
 
   onCropperReady(): void {
+    this.updatePreparationProgress(55);
     this.observeCropSurface();
     this.scheduleCropperRefresh(this.maximized());
   }
@@ -138,6 +163,11 @@ export class CropImageDialog {
     this.revokeCropObjectUrl();
     this.cropResultBlob.set(event.blob ?? null);
     this.cropResultObjectUrl.set(event.objectUrl ?? null);
+
+    if (this.isPreparing()) {
+      this.updatePreparationProgress(100);
+      this.schedulePreparationHide();
+    }
   }
 
   onTransformChange(transform: ImageTransform): void {
@@ -170,11 +200,15 @@ export class CropImageDialog {
   }
 
   private resetState(): void {
+    this.cancelPreparationHide();
     this.disconnectCropSurfaceResizeObserver();
     this.revokeCropObjectUrl();
+    this.currentPreparedSourceFile = undefined;
     this.cropResultBlob.set(null);
     this.cropResultObjectUrl.set(null);
     this.maximized.set(false);
+    this.isPreparing.set(false);
+    this.preparationProgress.set(0);
     this.scale.set(1);
     this.zoomControl.setValue(1, { emitEvent: false });
     this.transform.set(createInitialTransform());
@@ -188,6 +222,35 @@ export class CropImageDialog {
       ...current,
       scale,
     }));
+  }
+
+  private startPreparation(): void {
+    this.cancelPreparationHide();
+    this.isPreparing.set(true);
+    this.preparationProgress.set(12);
+  }
+
+  private updatePreparationProgress(value: number): void {
+    if (value <= this.preparationProgress()) {
+      return;
+    }
+
+    this.preparationProgress.set(value);
+  }
+
+  private schedulePreparationHide(): void {
+    this.cancelPreparationHide();
+    this.preparationHideFrameId = requestAnimationFrame(() => {
+      this.isPreparing.set(false);
+      this.preparationHideFrameId = null;
+    });
+  }
+
+  private cancelPreparationHide(): void {
+    if (this.preparationHideFrameId != null) {
+      cancelAnimationFrame(this.preparationHideFrameId);
+      this.preparationHideFrameId = null;
+    }
   }
 
   private revokeCropObjectUrl(): void {

@@ -129,6 +129,7 @@ export type CommonFormFileUploadTranslations = {
   cropConfirm: string;
   cropFrameAriaLabel: string;
   zoomLabel: string;
+  cropProcessingLabel: string;
   cropPreviewLabel: string;
   cropPreviewLandscapeLabel: string;
   cropPreviewCircleLabel: string;

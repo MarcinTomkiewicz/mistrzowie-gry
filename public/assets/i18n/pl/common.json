@@ -96,6 +96,7 @@
       "cropTitle": "Dopasuj obrazek",
       "cropConfirm": "Użyj obrazka",
       "cropFrameAriaLabel": "Ramka kadrowania obrazka",
+      "cropProcessingLabel": "Przygotowywanie obrazka",
       "zoomLabel": "Powiększenie",
       "cropPreviewLabel": "Podgląd wyniku",
       "cropPreviewLandscapeLabel": "Kadr poziomy",

@@ -1,12 +1,40 @@
 @use "abstracts/mixins" as m;
 
 .image-crop-dialog__surface {
+  position: relative;
   overflow: visible;
   padding: 0.75rem;
   border-radius: var(--mg-radius-md, 0.75rem);
   border: 1px solid var(--mg-form-border);
   background: rgba(15, 23, 42, 0.04);
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+
+.image-crop-dialog__progress-overlay {
+  position: absolute;
+  inset: 0.75rem;
+  z-index: 2;
+  padding: 1rem;
+  border-radius: calc(var(--mg-radius-md, 0.75rem) - 0.25rem);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(4px);
+}
+
+.image-crop-dialog__progress-card {
+  width: min(100%, 22rem);
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mg-radius-md, 0.75rem);
+  border: 1px solid var(--mg-form-border);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0.75rem 2rem rgba(15, 23, 42, 0.12);
+}
+
+.image-crop-dialog__progress-bar {
+  height: 0.55rem;
+}
+
+.image-crop-dialog__progress-bar .p-progressbar-value {
+  transition: width 220ms ease;
 }
 
 image-cropper {

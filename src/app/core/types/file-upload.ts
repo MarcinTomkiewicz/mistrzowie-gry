@@ -11,6 +11,7 @@ export interface FileUploadTexts {
   cropFrameAriaLabel: string;
   cropConfirmLabel: string;
   cropCancelLabel: string;
+  cropProcessingLabel: string;
   zoomLabel: string;
   cropPreviewLabel: string;
   cropPreviewLandscapeLabel: string;
