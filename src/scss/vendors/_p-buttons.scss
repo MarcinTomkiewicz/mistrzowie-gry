@@ -64,6 +64,50 @@
   }
 }
 
+@mixin _button-semantic-class($name, $color) {
+  .p-button.#{$name} {
+    background: $color;
+    border-color: $color;
+    color: v.$color-white;
+
+    &:hover {
+      background: color-mix(in srgb, $color 88%, black);
+      border-color: color-mix(in srgb, $color 88%, black);
+    }
+
+    &:active {
+      background: color-mix(in srgb, $color 78%, black);
+      border-color: color-mix(in srgb, $color 78%, black);
+    }
+  }
+
+  .p-button.p-button-outlined.#{$name} {
+    background: transparent;
+    border-color: $color;
+    color: $color;
+
+    &:hover,
+    &:active {
+      background: color-mix(in srgb, v.$color-bg-surface 88%, $color);
+      border-color: $color;
+      color: $color;
+    }
+  }
+
+  .p-button.p-button-text.#{$name} {
+    background: transparent;
+    border-color: transparent;
+    color: $color;
+
+    &:hover,
+    &:active {
+      background: color-mix(in srgb, v.$color-bg-surface 88%, $color);
+      border-color: transparent;
+      color: $color;
+    }
+  }
+}
+
 /* =========================================================
    BASE COLORS
    ========================================================= */
@@ -84,10 +128,15 @@
   --p-button-danger-border-color: #{v.$color-danger};
   --p-button-danger-color: #{v.$color-white};
 
-  /* WARN => ARCANE */
-  --p-button-warn-background: #{v.$color-arcane};
-  --p-button-warn-border-color: #{v.$color-arcane};
+  /* WARN */
+  --p-button-warn-background: #{v.$color-warn};
+  --p-button-warn-border-color: #{v.$color-warn};
   --p-button-warn-color: #{v.$color-white};
+
+  /* HELP => ARCANE */
+  --p-button-help-background: #{v.$color-arcane};
+  --p-button-help-border-color: #{v.$color-arcane};
+  --p-button-help-color: #{v.$color-white};
 
   /* SECONDARY */
   --p-button-secondary-background: #{v.$color-secondary};
@@ -109,8 +158,11 @@
   --p-button-outlined-danger-border-color: #{v.$color-danger};
   --p-button-outlined-danger-color: #{v.$color-danger};
 
-  --p-button-outlined-warn-border-color: #{v.$color-arcane};
-  --p-button-outlined-warn-color: #{v.$color-arcane};
+  --p-button-outlined-warn-border-color: #{v.$color-warn};
+  --p-button-outlined-warn-color: #{v.$color-warn};
+
+  --p-button-outlined-help-border-color: #{v.$color-arcane};
+  --p-button-outlined-help-color: #{v.$color-arcane};
 
   --p-button-outlined-secondary-border-color: #{v.$color-secondary};
   --p-button-outlined-secondary-color: #{v.$color-secondary};
@@ -129,7 +181,8 @@
   --p-button-text-success-color: #{v.$color-success};
   --p-button-text-info-color: #{v.$color-info};
   --p-button-text-danger-color: #{v.$color-danger};
-  --p-button-text-warn-color: #{v.$color-arcane};
+  --p-button-text-warn-color: #{v.$color-warn};
+  --p-button-text-help-color: #{v.$color-arcane};
   --p-button-text-secondary-color: #{v.$color-secondary};
 }
 
@@ -176,10 +229,21 @@
 
   --p-button-warn-hover-background: color-mix(
     in srgb,
-    #{v.$color-arcane} 88%,
+    #{v.$color-warn} 88%,
     black
   );
   --p-button-warn-active-background: color-mix(
+    in srgb,
+    #{v.$color-warn} 78%,
+    black
+  );
+
+  --p-button-help-hover-background: color-mix(
+    in srgb,
+    #{v.$color-arcane} 88%,
+    black
+  );
+  --p-button-help-active-background: color-mix(
     in srgb,
     #{v.$color-arcane} 78%,
     black
@@ -212,3 +276,5 @@
   font: inherit;
   cursor: pointer;
 }
+
+@include _button-semantic-class(arcane, v.$color-arcane);

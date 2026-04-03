@@ -90,7 +90,7 @@
                 @if (item.canOpenGmProfile && item.gmDisplayName) {
                   <p-button
                     [label]="item.gmDisplayName"
-                    severity="warn"
+                    styleClass="arcane"
                     size="small"
                     [outlined]="true"
                     (onClick)="onGmClick($event, item)"

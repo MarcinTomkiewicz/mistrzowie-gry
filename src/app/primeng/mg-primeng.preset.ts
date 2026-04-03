@@ -26,6 +26,7 @@ const mg = {
   info: 'var(--mg-color-info)',
   success: 'var(--mg-color-success)',
   danger: 'var(--mg-color-danger)',
+  warn: 'var(--mg-color-warn)',
   arcane: 'var(--mg-color-arcane)',
 };
 
@@ -141,7 +142,7 @@ export const MgPrimePreset = definePreset(Aura, {
           info: { color: mg.info },
           success: { color: mg.success },
           danger: { color: mg.danger },
-          warn: { color: mg.arcane },
+          warn: { color: mg.warn },
           help: { color: mg.arcane },
         },
       },
@@ -174,7 +175,7 @@ export const MgPrimePreset = definePreset(Aura, {
           info: { color: mg.info },
           success: { color: mg.success },
           danger: { color: mg.danger },
-          warn: { color: mg.arcane },
+          warn: { color: mg.warn },
           help: { color: mg.arcane },
         },
       },
@@ -185,7 +186,7 @@ export const MgPrimePreset = definePreset(Aura, {
     info: { color: mg.info },
     success: { color: mg.success },
     danger: { color: mg.danger },
-    warn: { color: mg.arcane },
+    warn: { color: mg.warn },
     help: { color: mg.arcane },
   },
 

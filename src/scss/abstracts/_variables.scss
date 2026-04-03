@@ -100,12 +100,14 @@ $color-antique: var(--mg-color-antique);
 $color-info: var(--mg-color-info);
 $color-danger: var(--mg-color-danger);
 $color-success: var(--mg-color-success);
+$color-warn: var(--mg-color-warn);
 $color-arcane: var(--mg-color-arcane);
 
 $semantic-colors: (
   "info": $color-info,
   "danger": $color-danger,
   "success": $color-success,
+  "warn": $color-warn,
   "arcane": $color-arcane,
 );
 

@@ -5,6 +5,7 @@ export const UI_SEMANTIC_VARIANTS = [
   'base',
   'info',
   'success',
+  'warn',
   'danger',
   'arcane',
 ] as const;
