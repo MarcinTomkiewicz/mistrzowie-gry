@@ -13,11 +13,13 @@
             <img
               class="mg-hero__img"
               [ngSrc]="active.imageSrc"
+              ngSrcset="320w, 480w, 680w, 960w"
               [alt]="active.imageAlt"
               width="597"
               height="373"
               decoding="async"
-              sizes="(max-width: 1023px) 92vw, 46vw"
+              sizes="(max-width: 1023px) calc(100vw - 3rem), 600px"
+              [loaderParams]="heroImageLoaderParams"
               [priority]="activeIndex() === 0"
             />
 
@@ -40,7 +42,7 @@
                 <p-button
                   class="mg-hero__caption-btn"
                   [label]="active.ctaLabel || ''"
-                  icon="pi pi-direction-sign"
+                  icon="pi pi-trail"
                   iconPos="right"
                   severity="primary"
                   size="small"

@@ -14,7 +14,6 @@ import {
 import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 
 import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
@@ -42,7 +41,7 @@ interface LazyLegalDialogComponent {
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, ButtonModule, NgOptimizedImage, LazyMountHost],
+  imports: [RouterModule, NgOptimizedImage, LazyMountHost],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
   providers: [provideTranslocoScope('common'), provideTranslocoScope('footer')],

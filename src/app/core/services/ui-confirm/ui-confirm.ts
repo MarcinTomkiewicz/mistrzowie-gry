@@ -11,10 +11,21 @@ import {
 })
 export class UiConfirm {
   private readonly confirmation = inject(ConfirmationService);
+  private hostLoader: (() => Promise<void>) | null = null;
+  private hostReady = false;
+  private hostPromise: Promise<void> | null = null;
+
+  registerHostLoader(loader: () => Promise<void>): void {
+    this.hostLoader = loader;
+  }
+
+  markHostReady(): void {
+    this.hostReady = true;
+    this.hostPromise = Promise.resolve();
+  }
 
   info(event: PopupTargetEvent, options: BasePopupOptions): void {
-    this.confirmation.confirm({
-      target: event.currentTarget as HTMLElement,
+    void this.confirm(event, {
       message: options.message,
       icon: options.icon ?? 'pi pi-tied-scroll',
       rejectVisible: false,
@@ -27,8 +38,7 @@ export class UiConfirm {
   }
 
   warn(event: PopupTargetEvent, options: BasePopupOptions): void {
-    this.confirmation.confirm({
-      target: event.currentTarget as HTMLElement,
+    void this.confirm(event, {
       message: options.message,
       icon: options.icon ?? 'pi pi-exclamation-triangle',
       rejectVisible: false,
@@ -41,8 +51,7 @@ export class UiConfirm {
   }
 
   danger(event: PopupTargetEvent, options: BasePopupOptions): void {
-    this.confirmation.confirm({
-      target: event.currentTarget as HTMLElement,
+    void this.confirm(event, {
       message: options.message,
       icon: options.icon ?? 'pi pi-times-circle',
       rejectVisible: false,
@@ -55,8 +64,7 @@ export class UiConfirm {
   }
 
   decision(event: PopupTargetEvent, options: DecisionPopupOptions): void {
-    this.confirmation.confirm({
-      target: event.currentTarget as HTMLElement,
+    void this.confirm(event, {
       message: options.message,
       icon: options.icon ?? 'pi pi-question-circle',
       accept: options.accept ?? (() => {}),
@@ -71,5 +79,42 @@ export class UiConfirm {
         outlined: true,
       },
     });
+  }
+
+  private async confirm(
+    event: PopupTargetEvent,
+    config: Record<string, unknown>,
+  ): Promise<void> {
+    const target = event.currentTarget as HTMLElement | null;
+
+    await this.ensureHost();
+
+    if (!target) {
+      return;
+    }
+
+    this.confirmation.confirm({
+      ...config,
+      target,
+    });
+  }
+
+  private async ensureHost(): Promise<void> {
+    if (this.hostReady) {
+      return;
+    }
+
+    if (!this.hostLoader) {
+      return;
+    }
+
+    if (!this.hostPromise) {
+      this.hostPromise = this.hostLoader().catch((error) => {
+        this.hostPromise = null;
+        throw error;
+      });
+    }
+
+    await this.hostPromise;
   }
 }

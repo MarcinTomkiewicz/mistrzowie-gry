@@ -197,15 +197,18 @@
   );
 }
 
-.p-button.link-like {
+.link-like {
   @include _button-link-like(100%);
 }
 
-.p-button.link-like.is-active {
+.link-like.is-active {
   background-color: color-mix(in srgb, v.$color-bg-surface 72%, v.$color-primary);
   border-color: v.$color-secondary;
 }
 
-.p-button.link-like-inline {
+.link-like-inline {
   @include _button-link-like(auto, false);
+  border: 0;
+  font: inherit;
+  cursor: pointer;
 }

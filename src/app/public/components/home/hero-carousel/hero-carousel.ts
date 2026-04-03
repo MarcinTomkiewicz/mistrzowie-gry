@@ -15,7 +15,10 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiHeroSlide } from '../../../../core/types/i18n/home';
 import { createHeroCarouselI18n } from './hero-carousel.i18n';
-import { HERO_SLIDES_TECH_BY_ID } from './hero-carousel.config';
+import {
+  HERO_IMAGE_LOADER_PARAMS,
+  HERO_SLIDES_TECH_BY_ID,
+} from './hero-carousel.config';
 
 @Component({
   selector: 'app-hero-carousel',
@@ -33,6 +36,7 @@ export class HeroCarousel {
 
   readonly activeIndex = signal(0);
   readonly userPaused = signal(false);
+  readonly heroImageLoaderParams = HERO_IMAGE_LOADER_PARAMS;
 
   private intervalId: number | null = null;
 

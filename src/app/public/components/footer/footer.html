@@ -91,13 +91,13 @@
       >
         @for (l of legalLinks(); track $index) {
           @if (isLegalDialogLink(l)) {
-            <p-button
-              [label]="l.label"
-              styleClass="link-like-inline"
-              size="small"
-              [text]="true"
-              (onClick)="onLegalClick(l)"
-            />
+            <button
+              type="button"
+              class="link-like-inline"
+              (click)="onLegalClick(l)"
+            >
+              {{ l.label }}
+            </button>
           } @else {
             <a
               [routerLink]="resolveLegalLinkPath(l)"

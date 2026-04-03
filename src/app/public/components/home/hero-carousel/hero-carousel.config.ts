@@ -27,6 +27,12 @@ export const HERO_SLIDES_TECH: readonly HeroSlideTech[] = [
   },
 ] as const;
 
+export const HERO_IMAGE_LOADER_PARAMS = {
+  transform: {
+    q: 70,
+  },
+} as const;
+
 export const HERO_SLIDES_TECH_BY_ID = new Map<number, HeroSlideTech>(
   HERO_SLIDES_TECH.map((slide) => [slide.id, slide]),
 );
