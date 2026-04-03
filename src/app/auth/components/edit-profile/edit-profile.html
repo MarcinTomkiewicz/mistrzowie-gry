@@ -11,7 +11,7 @@
     </header>
 
     <p-tabs [value]="activeTab()" lazy>
-      <div class="hide-down-xs">
+      <div class="hide-down-sm">
         <p-tablist>
           @for (tab of tabs(); track trackTab($index, tab)) {
             <p-tab [value]="tab.id" (click)="onTabChange(tab.id)">
@@ -24,7 +24,7 @@
         </p-tablist>
       </div>
 
-      <div class="show-down-xs mb-md">
+      <div class="show-down-sm mb-md">
         <p-select
           [options]="tabOptions()"
           [formControl]="mobileTabControl"
@@ -64,6 +64,10 @@
 
           <p-tabpanel value="gm-sessions">
             <app-gm-sessions />
+          </p-tabpanel>
+
+          <p-tabpanel value="gm-availability">
+            <app-gm-availability />
           </p-tabpanel>
         }
       </p-tabpanels>

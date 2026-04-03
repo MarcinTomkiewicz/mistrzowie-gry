@@ -163,3 +163,31 @@ export function getWeekdayLabels(
 export function toIsoDates(dates: readonly Date[]): string[] {
   return dates.map((date) => toIsoDate(date));
 }
+
+export function toLocalDayStartIso(
+  dateIso: string,
+  fallbackDate: Date = new Date(),
+): string {
+  const date = parseIsoDate(dateIso) ?? fallbackDate;
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  ).toISOString();
+}
+
+export function toLocalDateTime(
+  dateIso: string,
+  hourOffset: number,
+  fallbackDate: Date = new Date(),
+): Date {
+  const date = parseIsoDate(dateIso) ?? fallbackDate;
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    hourOffset,
+  );
+}

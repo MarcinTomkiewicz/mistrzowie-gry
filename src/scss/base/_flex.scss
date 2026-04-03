@@ -34,6 +34,14 @@ $align-self-map: (
   auto: auto
 );
 
+$justify-self-map: (
+  start: start,
+  center: center,
+  end: end,
+  stretch: stretch,
+  auto: auto
+);
+
 $flex-values: (
   1: 1 1 auto,
   auto: 1 1 auto,
@@ -271,6 +279,7 @@ $min-height-values: (
 
 @include _emit-flex-wrap-utilities();
 @include _emit-prop-map(align-self, $align-self-map, align-self);
+@include _emit-prop-map(justify-self, $justify-self-map, justify-self);
 @include _emit-prop-map(flex, $flex-values, flex);
 @include _emit-prop-map(flex-grow, $flex-grow-values, flex-grow);
 @include _emit-prop-map(flex-shrink, $flex-shrink-values, flex-shrink);

@@ -39,3 +39,30 @@ export function formatTimeRangeLabel(
 
   return `${start} - ${end}`;
 }
+
+export function formatHourOffsetLabel(
+  offset: number,
+  totalHours: number = 24,
+): string {
+  const normalizedHour = ((offset % totalHours) + totalHours) % totalHours;
+  const dayOffset = Math.floor(offset / totalHours);
+  const label = `${String(normalizedHour).padStart(2, '0')}:00`;
+
+  return dayOffset > 0 ? `${label} (+${dayOffset})` : label;
+}
+
+export function hasOverlappingIntervals(
+  intervals: readonly { start: number; end: number }[],
+): boolean {
+  const sortedIntervals = [...intervals].sort(
+    (left, right) => left.start - right.start,
+  );
+
+  for (let index = 1; index < sortedIntervals.length; index += 1) {
+    if (sortedIntervals[index].start < sortedIntervals[index - 1].end) {
+      return true;
+    }
+  }
+
+  return false;
+}

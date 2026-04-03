@@ -98,6 +98,7 @@ export interface EditProfileTabsTranslations {
   profile: string;
   gmProfile: string;
   gmSessions: string;
+  gmAvailability: string;
 }
 
 export interface GmProfileFormTranslations {
@@ -164,6 +165,48 @@ export interface GmSessionsToastTranslations {
   deleteSuccessDetail: string;
   deleteFailedSummary: string;
   deleteFailedDetail: string;
+}
+
+export interface GmAvailabilityTranslations {
+  title: string;
+  subtitle: string;
+  editorTitle: string;
+  hint: string;
+}
+
+export interface GmAvailabilityActionsTranslations {
+  addRangeLabel: string;
+  removeRangeLabel: string;
+  clearDayLabel: string;
+  previousDayLabel: string;
+  nextDayLabel: string;
+  saveLabel: string;
+}
+
+export interface GmAvailabilityFormTranslations {
+  fromLabel: string;
+  toLabel: string;
+  rangeSummaryLabel: string;
+  emptyTitle: string;
+  emptyDescription: string;
+}
+
+export interface GmAvailabilityDialogTranslations {
+  invalidDurationTitle: string;
+  invalidDurationBody: string;
+  overlapTitle: string;
+  overlapBody: string;
+  noSpaceTitle: string;
+  noSpaceBody: string;
+}
+
+export interface GmAvailabilityToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
 }
 
 export type EventSignupFormTranslations = {

@@ -1,4 +1,8 @@
-export type EditProfileTabId = 'profile' | 'gm-profile' | 'gm-sessions';
+export type EditProfileTabId =
+  | 'profile'
+  | 'gm-profile'
+  | 'gm-sessions'
+  | 'gm-availability';
 
 export type EditProfileTabDefinition = {
   id: EditProfileTabId;
@@ -21,5 +25,10 @@ export const EDIT_PROFILE_TABS: readonly EditProfileTabDefinition[] = [
     id: 'gm-sessions',
     order: 3,
     icon: 'pi pi-evil-book',
+  },
+  {
+    id: 'gm-availability',
+    order: 4,
+    icon: 'pi pi-horus',
   },
 ] as const;

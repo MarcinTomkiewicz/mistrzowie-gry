@@ -1,0 +1,216 @@
+<header class="mg-section__header w-100 m-sm">
+  <h2 class="mg-section__title mg-section__title--md">
+    <span>{{ i18n.gmAvailability().title }}</span>
+  </h2>
+
+  <p class="mg-section__subtitle">
+    {{ i18n.gmAvailability().subtitle }}
+  </p>
+</header>
+
+<app-loading-overlay
+  [visible]="isLoading()"
+  [label]="i18n.commonStatus().loading"
+/>
+
+<div class="flex-col-start-stretch gap-md w-100">
+  <app-universal-calendar
+    class="w-100"
+    [days]="calendarDays()"
+    [selectedDate]="selectedDate()"
+    mode="availability"
+    [minDate]="minDate"
+    [maxDate]="maxDate"
+    (dateSelected)="onDateSelected($event)"
+  />
+
+  @if (selectedDate()) {
+    <section
+      #editorPanel
+      class="mg-card flex-col-start-stretch gap-md p-md w-100"
+    >
+      <div class="hide-down-sm">
+        <div class="flex-row-between-center gap-sm">
+          <div class="flex-col-start-stretch gap-xs">
+            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              {{ i18n.gmAvailability().editorTitle }}
+            </h3>
+
+            <p class="mg-section__subtitle m-0">
+              {{ formatDateLabel(selectedDate()!, 'pl-PL', true) }}
+            </p>
+          </div>
+
+          <div class="flex-row-end-center flex-wrap gap-xs">
+            <p-button
+              severity="secondary"
+              [outlined]="true"
+              [label]="i18n.actions().previousDayLabel"
+              [disabled]="!canMoveSelectedDate(-1)"
+              (onClick)="moveSelectedDate(-1)"
+            />
+
+            <p-button
+              severity="secondary"
+              [outlined]="true"
+              [label]="i18n.actions().nextDayLabel"
+              [disabled]="!canMoveSelectedDate(1)"
+              (onClick)="moveSelectedDate(1)"
+            />
+
+            <p-button
+              severity="danger"
+              [outlined]="true"
+              icon="pi pi-demolish"
+              [label]="i18n.actions().clearDayLabel"
+              (onClick)="clearSelectedDate()"
+            />
+
+            <p-button
+              severity="success"
+              [label]="i18n.commonActions().confirm"
+              [disabled]="!editorForm.dirty"
+              (onClick)="confirmSelectedDate()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="show-down-sm">
+        <div class="flex-row-between-center gap-xs">
+          <p-button
+            label="<"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            [disabled]="!canMoveSelectedDate(-1)"
+            (onClick)="moveSelectedDate(-1)"
+          />
+
+          <div class="flex-1 text-center px-xs">
+            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+              {{ i18n.gmAvailability().editorTitle }}
+            </h3>
+
+            <p class="mg-section__subtitle m-0">
+              {{ formatDateLabel(selectedDate()!, 'pl-PL', true) }}
+            </p>
+          </div>
+
+          <p-button
+            label=">"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            [disabled]="!canMoveSelectedDate(1)"
+            (onClick)="moveSelectedDate(1)"
+          />
+        </div>
+      </div>
+
+      <div class="show-down-sm">
+        <div class="flex-row-between-center gap-xs flex-wrap">
+          <p-button
+            severity="danger"
+            size="small"
+            [outlined]="true"
+            icon="pi pi-demolish"
+            [label]="i18n.actions().clearDayLabel"
+            (onClick)="clearSelectedDate()"
+          />
+
+          <p-button
+            severity="success"
+            size="small"
+            [label]="i18n.commonActions().confirm"
+            [disabled]="!editorForm.dirty"
+            (onClick)="confirmSelectedDate()"
+          />
+        </div>
+      </div>
+
+      @if (rangeGroups().length) {
+        <div class="flex-col-start-stretch gap-sm">
+          @for (rangeGroup of rangeGroups(); track trackRange($index, rangeGroup); let index = $index) {
+            <div
+              class="mg-grid grid-3-cols grid-1-cols-sm gap-sm grid-items-end"
+            >
+              <div class="flex-col-start-stretch gap-xs">
+                <label>{{ i18n.form().fromLabel }}</label>
+                <p-select
+                  [options]="startHourOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                  class="w-100"
+                  [formControl]="rangeGroup.controls.startOffset"
+                  (onChange)="syncRangeEndOffset(rangeGroup)"
+                />
+              </div>
+
+              <div class="flex-col-start-stretch gap-xs">
+                <label>{{ i18n.form().toLabel }}</label>
+                <p-select
+                  [options]="getEndHourOptions(rangeGroup)"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                  class="w-100"
+                  [formControl]="rangeGroup.controls.endOffset"
+                />
+              </div>
+
+              <div class="flex-row-end-center">
+                <p-button
+                  severity="danger"
+                  [outlined]="true"
+                  icon="pi pi-demolish"
+                  [label]="i18n.actions().removeRangeLabel"
+                  (onClick)="removeRange(index)"
+                />
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ i18n.form().emptyTitle }}</strong>
+          <p class="m-0">{{ i18n.form().emptyDescription }}</p>
+        </div>
+      }
+
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+        <p class="m-0">
+          {{ i18n.gmAvailability().hint }}
+        </p>
+
+        <div class="flex-row-end-center">
+          <p-button
+            severity="success"
+            icon="pi pi-plus"
+            [label]="i18n.actions().addRangeLabel"
+            (onClick)="addRange()"
+          />
+        </div>
+      </div>
+    </section>
+  }
+
+  <div class="flex-row-end-center">
+    <p-button
+      severity="success"
+      [label]="i18n.actions().saveLabel"
+      [disabled]="(!hasChanges() && !editorForm.dirty) || isSaving()"
+      [loading]="isSaving()"
+      (onClick)="saveAvailability()"
+    />
+  </div>
+</div>
+
+<app-info-dialog
+  [visible]="infoDialogVisible()"
+  [title]="infoDialogContent()?.title ?? ''"
+  [body]="infoDialogContent()?.body ?? ''"
+  variant="info"
+  (visibleChange)="infoDialogVisible.set(false)"
+/>
