@@ -5,9 +5,6 @@
     <router-outlet></router-outlet>
   </main>
   <app-footer></app-footer>
-  <ng-template mgLazyMountHost></ng-template>
-
-  @defer (on idle) {
-    <app-toast-host />
-  }
+  <ng-template #confirmPopupHost mgLazyMountHost></ng-template>
+  <ng-template #toastHost mgLazyMountHost></ng-template>
 </div>

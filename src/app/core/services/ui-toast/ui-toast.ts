@@ -7,6 +7,9 @@ import { PrimeToastSeverity, ToastKind, ToastOptions } from '../../types/toast';
 })
 export class UiToast {
   private readonly messages = inject(MessageService);
+  private hostLoader: (() => Promise<void>) | null = null;
+  private hostReady = false;
+  private hostPromise: Promise<void> | null = null;
 
   private readonly defaultLife = 3500;
 
@@ -34,7 +37,25 @@ export class UiToast {
     arcane: 'pi pi-biohazard',
   };
 
+  registerHostLoader(loader: () => Promise<void>): void {
+    this.hostLoader = loader;
+  }
+
+  markHostReady(): void {
+    this.hostReady = true;
+    this.hostPromise = Promise.resolve();
+  }
+
   show(kind: ToastKind, options: ToastOptions): void {
+    void this.showAsync(kind, options);
+  }
+
+  private async showAsync(
+    kind: ToastKind,
+    options: ToastOptions,
+  ): Promise<void> {
+    await this.ensureHost();
+
     this.messages.add({
       severity: this.severityMap[kind],
       summary: options.summary,
@@ -43,6 +64,25 @@ export class UiToast {
       styleClass: this.styleClassMap[kind],
       icon: options.icon ?? this.iconMap[kind],
     });
+  }
+
+  private async ensureHost(): Promise<void> {
+    if (this.hostReady) {
+      return;
+    }
+
+    if (!this.hostLoader) {
+      return;
+    }
+
+    if (!this.hostPromise) {
+      this.hostPromise = this.hostLoader().catch((error) => {
+        this.hostPromise = null;
+        throw error;
+      });
+    }
+
+    await this.hostPromise;
   }
 
   info(options: ToastOptions): void {

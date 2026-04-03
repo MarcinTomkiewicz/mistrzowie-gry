@@ -1,8 +1,14 @@
 // path: src/app/core/loaders/transloco.loader.ts
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {
+  makeStateKey,
+  TransferState,
+} from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Translation, TranslocoLoader } from '@jsverse/transloco';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 const TRANSLATION_CACHE_BUSTER = Date.now().toString(36);
 
@@ -23,11 +29,33 @@ const TRANSLATION_CACHE_BUSTER = Date.now().toString(36);
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {
   private readonly http = inject(HttpClient);
+  private readonly transferState = inject(TransferState);
+  private readonly platformId = inject(PLATFORM_ID);
 
   getTranslation(langOrScopeLang: string): Observable<Translation> {
-    const url = this.withCacheBuster(this.resolveUrl(langOrScopeLang));
+    const resolvedUrl = this.resolveUrl(langOrScopeLang);
+    const stateKey = makeStateKey<Translation>(
+      `transloco:${resolvedUrl}`,
+    );
 
-    return this.http.get<Translation>(url);
+    if (
+      isPlatformBrowser(this.platformId) &&
+      this.transferState.hasKey(stateKey)
+    ) {
+      const translation = this.transferState.get(stateKey, {});
+      this.transferState.remove(stateKey);
+      return of(translation);
+    }
+
+    const url = this.withCacheBuster(resolvedUrl);
+
+    return this.http.get<Translation>(url).pipe(
+      tap((translation) => {
+        if (isPlatformServer(this.platformId)) {
+          this.transferState.set(stateKey, translation);
+        }
+      }),
+    );
   }
 
   private resolveUrl(langOrScopeLang: string): string {
