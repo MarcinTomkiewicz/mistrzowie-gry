@@ -1,0 +1,85 @@
+@use "abstracts/mixins" as m;
+
+.calendar-viewport {
+  width: 100%;
+}
+
+.calendar-month {
+  min-width: 100%;
+}
+
+.calendar-day__hint {
+  color: var(--mg-heading-color);
+  line-height: 1;
+}
+
+.calendar-day {
+  min-height: 5.5rem;
+  border: 1px solid var(--mg-color-border);
+  border-radius: 10px;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.calendar-day--selected {
+  border-color: var(--mg-heading-color);
+  background: color-mix(in srgb, var(--mg-heading-color) 16%, var(--mg-color-bg-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mg-heading-color) 28%, transparent);
+}
+
+.calendar-day--outside,
+.calendar-day--disabled {
+  opacity: 0.5;
+}
+
+.calendar-day.cursor-pointer:hover {
+  border-color: color-mix(in srgb, var(--mg-heading-color) 50%, var(--mg-color-border));
+  background: color-mix(in srgb, var(--mg-heading-color) 10%, var(--mg-color-bg-surface));
+}
+
+.calendar-day:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mg-heading-color) 60%, white);
+  outline-offset: 2px;
+}
+
+.calendar-hour {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 1px;
+  background: var(--mg-color-danger);
+}
+
+.calendar-hour--active {
+  background: var(--mg-color-success);
+}
+
+.calendar-hour--popover {
+  width: 0.625rem;
+}
+
+.calendar-weekday {
+  color: var(--mg-color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@include m.down("sm") {
+  .calendar-day {
+    min-height: 5rem;
+  }
+
+  .calendar-month {
+    min-width: 100%;
+  }
+
+  .calendar-day {
+    min-height: 3.75rem;
+  }
+
+  .calendar-weekday {
+    letter-spacing: 0.02em;
+  }
+}

@@ -18,11 +18,20 @@
 }
 
 /* Arrow */
-.p-popover .p-popover-arrow {
-  background: v.$color-bg-surface;
+.p-popover:after {
+  border-bottom-color: v.$color-bg-surface;
 }
-.p-popover .p-popover-arrow::before {
-  border-color: v.$color-border;
+
+.p-popover:before {
+  border-bottom-color: v.$color-border;
+}
+
+.p-popover.p-popover-flipped:after {
+  border-top-color: v.$color-bg-surface;
+}
+
+.p-popover.p-popover-flipped:before {
+  border-top-color: v.$color-border;
 }
 
 /* DARK/default: delikatny wash primary na surface */

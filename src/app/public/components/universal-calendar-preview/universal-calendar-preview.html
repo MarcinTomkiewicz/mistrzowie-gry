@@ -1,0 +1,54 @@
+<section class="mg-section">
+  <div class="mg-container flex-col-start-stretch gap-xl">
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">Podgląd kalendarza</h1>
+      <p class="mg-section__subtitle">
+        Tymczasowy route do oceny wizualnej komponentu w trybie dyspozycyjności i rezerwacji.
+      </p>
+    </header>
+
+    <div class="flex-col-start-stretch gap-xl">
+      <section class="mg-card flex-col-start-stretch gap-md w-100">
+        <div class="flex-col gap-xs">
+          <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            Dyspozycyjność MG
+          </h2>
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            Zielone kwadraty oznaczają zaznaczoną dostępność.
+          </p>
+        </div>
+
+        <app-universal-calendar
+          class="w-100"
+          [days]="availabilityDays"
+          [selectedDate]="availabilitySelectedDate()"
+          mode="availability"
+          minDate="2026-04-01"
+          maxDate="2026-05-31"
+          (dateSelected)="onAvailabilityDateSelected($event)"
+        />
+      </section>
+
+      <section class="mg-card flex-col-start-stretch gap-md w-100">
+        <div class="flex-col gap-xs">
+          <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            Rezerwacje / podgląd
+          </h2>
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            Czerwone kwadraty oznaczają zajęte sloty, a pełny dzień jest wygaszony.
+          </p>
+        </div>
+
+        <app-universal-calendar
+          class="w-100"
+          [days]="reservationDays"
+          [selectedDate]="reservationSelectedDate()"
+          mode="reservation"
+          minDate="2026-04-01"
+          maxDate="2026-05-31"
+          (dateSelected)="onReservationDateSelected($event)"
+        />
+      </section>
+    </div>
+  </div>
+</section>

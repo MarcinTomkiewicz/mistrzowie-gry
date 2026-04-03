@@ -5,6 +5,10 @@ const loaders = {
   about: () => import('./public/components/about/about').then((m) => m.About),
   ourTeam: () => import('./public/components/our-team/our-team').then((m) => m.OurTeam),
   offerPage: () => import('./public/components/offers/offers').then((m) => m.Offers),
+  universalCalendarPreview: () =>
+    import('./public/components/universal-calendar-preview/universal-calendar-preview').then(
+      (m) => m.UniversalCalendarPreview,
+    ),
   notFound: () =>
     import('./public/common/not-found/not-found').then((m) => m.NotFound),
   notAuthorized: () =>
@@ -20,6 +24,7 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', loadComponent: loaders.home },
   { path: 'about', loadComponent: loaders.about },
   { path: 'our-team', loadComponent: loaders.ourTeam },
+  { path: 'preview/universal-calendar', loadComponent: loaders.universalCalendarPreview },
 
   { path: 'offer/:slug', loadComponent: loaders.offerPage },
 

@@ -1,0 +1,40 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+/* =========================================================
+   PrimeNG Tooltip
+   ========================================================= */
+
+:root {
+  --p-tooltip-background: #{v.$color-bg-surface};
+  --p-tooltip-color: #{v.$color-text};
+  --p-tooltip-border-radius: #{v.$radius-sm};
+  --p-tooltip-shadow: #{v.$shadow-soft};
+  --p-tooltip-padding: #{map.get(v.$spacings, "xs")} #{map.get(v.$spacings, "sm")};
+  --p-tooltip-max-width: 14rem;
+}
+
+.p-tooltip .p-tooltip-text {
+  border: 1px solid v.$color-border;
+  background: color-mix(in srgb, v.$color-bg-surface 94%, v.$heading-color);
+  color: v.$color-text;
+  font-size: map.get(v.$font-sizes, "xs");
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+}
+
+.p-tooltip.p-tooltip-top .p-tooltip-arrow {
+  border-top-color: color-mix(in srgb, v.$color-bg-surface 94%, v.$heading-color);
+}
+
+.p-tooltip.p-tooltip-bottom .p-tooltip-arrow {
+  border-bottom-color: color-mix(in srgb, v.$color-bg-surface 94%, v.$heading-color);
+}
+
+.p-tooltip.p-tooltip-left .p-tooltip-arrow {
+  border-left-color: color-mix(in srgb, v.$color-bg-surface 94%, v.$heading-color);
+}
+
+.p-tooltip.p-tooltip-right .p-tooltip-arrow {
+  border-right-color: color-mix(in srgb, v.$color-bg-surface 94%, v.$heading-color);
+}

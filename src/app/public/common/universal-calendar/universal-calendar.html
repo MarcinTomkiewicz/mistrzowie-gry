@@ -1,0 +1,120 @@
+<section
+  class="calendar mg-card flex-col-start-stretch gap-sm"
+  [class.calendar--availability]="mode() === 'availability'"
+>
+  <header class="flex-row-between-center gap-xs">
+    <p-button
+      label="<"
+      severity="secondary"
+      size="small"
+      [outlined]="true"
+      [disabled]="!canGoPrev()"
+      [pTooltip]="commonActions().previous"
+      tooltipPosition="top"
+      (onClick)="previousMonth()"
+    />
+
+    <h3
+      class="mg-section__title mg-section__title--sm mg-section__title--no-margin flex-1 text-center"
+    >
+      {{ monthLabel() }}
+    </h3>
+
+    <p-button
+      label=">"
+      severity="secondary"
+      size="small"
+      [outlined]="true"
+      [disabled]="!canGoNext()"
+      [pTooltip]="commonActions().next"
+      tooltipPosition="top"
+      (onClick)="nextMonth()"
+    />
+  </header>
+
+  <div class="calendar-viewport">
+    <div class="calendar-month flex-col-start-stretch gap-xs">
+      <div class="mg-grid grid-cols-7 gap-xs">
+        @for (weekday of weekdayLabels(); track weekday + $index) {
+          <small class="calendar-weekday text-center px-xs py-xs lh-1">
+            {{ weekday }}
+          </small>
+        }
+      </div>
+
+      <div class="mg-grid grid-cols-7 gap-xs">
+        @for (day of calendarDays(); track day.iso) {
+          <div
+            class="calendar-day flex-col-between-stretch gap-xs p-xs"
+            [class.calendar-day--outside]="!day.isCurrentMonth"
+            [class.calendar-day--selected]="day.isSelected"
+            [class.calendar-day--disabled]="day.isDisabled"
+            [class.cursor-pointer]="day.canInspect"
+            [class.cursor-default]="!day.canInspect"
+            [attr.role]="day.canInspect ? 'button' : null"
+            [attr.tabindex]="day.canInspect ? 0 : null"
+            (click)="handleDayClick($event, day)"
+            (keydown)="onDayKeydown($event, day)"
+          >
+            <div class="w-100 text-left">
+              <strong class="lh-1">
+                {{ day.dayNumber }}
+              </strong>
+
+              <div class="show-down-sm mt-xs text-center">
+                <span class="calendar-day__hint" aria-hidden="true">
+                  @if (day.showDetailsHint) {
+                    <i class="pi pi-horus"></i>
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div class="text-center hide-down-sm">
+              <div class="mg-inline-grid grid-max-8-cols grid-max-6-cols-sm gap-xs">
+                @for (hour of day.hours; track hour.index) {
+                  <span
+                    class="calendar-hour w-px-8 w-px-6-xs"
+                    [class.calendar-hour--active]="hour.isActive"
+                    [pTooltip]="hour.label"
+                    tooltipPosition="top"
+                  ></span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <p-popover
+    #dayDetailsPopover
+    styleClass="mg-popover calendar-day-popover"
+    showTransitionOptions=".08s cubic-bezier(0, 0, 0.2, 1)"
+    hideTransitionOptions="0ms"
+    (onHide)="handleDayDetailsHide()"
+  >
+    @if (activeDayDetails(); as activeDay) {
+      <div class="calendar-day-details flex-col-start-stretch gap-sm">
+        <div class="flex-row-between-center gap-sm">
+          <strong>{{ activeDay.label }}</strong>
+          <span class="calendar-day__hint" aria-hidden="true">
+            <i class="pi pi-horus"></i>
+          </span>
+        </div>
+
+        <div class="mg-inline-grid grid-max-6-cols gap-xs align-self-center">
+          @for (hour of activeDay.hours; track hour.index) {
+            <span
+              class="calendar-hour calendar-hour--popover w-px-10"
+              [class.calendar-hour--active]="hour.isActive"
+              [pTooltip]="hour.label"
+              tooltipPosition="top"
+            ></span>
+          }
+        </div>
+      </div>
+    }
+  </p-popover>
+</section>
