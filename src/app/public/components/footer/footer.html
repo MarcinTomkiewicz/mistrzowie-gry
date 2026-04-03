@@ -90,17 +90,27 @@
         [attr.aria-label]="i18n.footer().legalAriaLabel"
       >
         @for (l of legalLinks(); track $index) {
-          <a
-            [routerLink]="resolveLegalLinkPath(l)"
-            [attr.href]="resolveLegalLinkPath(l)"
-            (click)="onLegalClick(l, $event)"
-          >
-            {{ l.label }}
-          </a>
+          @if (isLegalDialogLink(l)) {
+            <p-button
+              [label]="l.label"
+              styleClass="link-like-inline"
+              size="small"
+              [text]="true"
+              (onClick)="onLegalClick(l)"
+            />
+          } @else {
+            <a
+              [routerLink]="resolveLegalLinkPath(l)"
+              [attr.href]="resolveLegalLinkPath(l)"
+              (click)="track(l.label)"
+            >
+              {{ l.label }}
+            </a>
+          }
         }
       </nav>
     </div>
   </div>
 </footer>
 
-<ng-container #legalDialogHost />
+<ng-template mgLazyMountHost></ng-template>

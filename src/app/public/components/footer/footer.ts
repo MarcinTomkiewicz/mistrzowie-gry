@@ -5,7 +5,6 @@ import {
   ComponentRef,
   OutputEmitterRef,
   Type,
-  ViewContainerRef,
   computed,
   effect,
   inject,
@@ -18,6 +17,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 
+import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
 import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
@@ -42,7 +42,7 @@ interface LazyLegalDialogComponent {
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, ButtonModule, NgOptimizedImage],
+  imports: [RouterModule, ButtonModule, NgOptimizedImage, LazyMountHost],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
   providers: [provideTranslocoScope('common'), provideTranslocoScope('footer')],
@@ -63,9 +63,7 @@ export class Footer {
   readonly activeLegalDialogContent = signal<LegalDialogContent | null>(null);
   readonly isLegalDialogLoading = signal(false);
   readonly legalDialogError = signal('');
-  private readonly legalDialogHost = viewChild('legalDialogHost', {
-    read: ViewContainerRef,
-  });
+  private readonly legalDialogHost = viewChild(LazyMountHost);
   private readonly loadLegalDialog = () =>
     import('../../common/legal-dialog/legal-dialog').then(
       ({ LegalDialog }) => LegalDialog as Type<LazyLegalDialogComponent>,
@@ -142,7 +140,11 @@ export class Footer {
 
   track(_label: string): void {}
 
-  async onLegalClick(link: UILegalLink, event: MouseEvent): Promise<void> {
+  protected isLegalDialogLink(link: UILegalLink): boolean {
+    return this.resolveLegalDialog(link) !== null;
+  }
+
+  async onLegalClick(link: UILegalLink): Promise<void> {
     const targetDialog = this.resolveLegalDialog(link);
 
     if (!targetDialog) {
@@ -150,7 +152,6 @@ export class Footer {
       return;
     }
 
-    event.preventDefault();
     this.track(link.label);
     this.ensureLegalDialogMounted();
     this.activeLegalDialog.set(targetDialog);
@@ -188,7 +189,7 @@ export class Footer {
       return;
     }
 
-    const host = this.legalDialogHost();
+    const host = this.legalDialogHost()?.viewContainerRef;
     if (!host) {
       return;
     }

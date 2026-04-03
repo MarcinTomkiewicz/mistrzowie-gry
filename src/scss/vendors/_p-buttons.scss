@@ -28,6 +28,42 @@
   }
 }
 
+@mixin _button-link-like($width, $background-on-hover: true) {
+  border-radius: v.$radius-sm;
+  background: transparent;
+  border-color: transparent;
+  color: v.$color-text;
+  box-shadow: none;
+  width: $width;
+  justify-content: start;
+
+  @if $width == auto {
+    min-width: auto;
+    padding: 0;
+  }
+
+  &:hover {
+    @if $background-on-hover {
+      background-color: color-mix(
+        in srgb,
+        v.$color-bg-surface 85%,
+        v.$color-primary
+      );
+    } @else {
+      background: transparent;
+      color: v.$heading-color;
+    }
+  }
+
+  &:focus-visible {
+    background-color: color-mix(
+      in srgb,
+      v.$color-bg-surface 82%,
+      v.$color-primary
+    );
+  }
+}
+
 /* =========================================================
    BASE COLORS
    ========================================================= */
@@ -161,25 +197,15 @@
   );
 }
 
-.p-button.mg-button-link-like {
-  border-radius: v.$radius-sm;
-  background: transparent;
-  border-color: transparent;
-  color: v.$color-text;
-  box-shadow: none;
-  width: 100%;
-  justify-content: start;
+.p-button.link-like {
+  @include _button-link-like(100%);
 }
 
-.p-button.mg-button-link-like:hover {
-  background-color: color-mix(in srgb, v.$color-bg-surface 85%, v.$color-primary);
-}
-
-.p-button.mg-button-link-like:focus-visible {
-  background-color: color-mix(in srgb, v.$color-bg-surface 78%, v.$color-primary);
-}
-
-.p-button.mg-button-link-like.is-active {
+.p-button.link-like.is-active {
   background-color: color-mix(in srgb, v.$color-bg-surface 72%, v.$color-primary);
   border-color: v.$color-secondary;
+}
+
+.p-button.link-like-inline {
+  @include _button-link-like(auto, false);
 }

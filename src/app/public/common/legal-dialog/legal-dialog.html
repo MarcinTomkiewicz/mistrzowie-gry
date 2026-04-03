@@ -12,18 +12,19 @@
     aria-labelledby="legal-dialog-title"
     (click)="$event.stopPropagation()"
   >
-    <div
-      class="p-dialog-header flex-row-between-start flex-col-start-stretch-xs gap-md"
-    >
-      <div class="mg-legal-dialog__header-copy flex-col-start-stretch gap-xs p-md">
+    <div class="p-dialog-header flex-row-between-center gap-sm">
+      <div class="flex-1 min-w-0 flex-col-start-stretch gap-xs">
         @if (dialogTitle()) {
-          <h2 id="legal-dialog-title" class="p-dialog-title m-0">
+          <h2
+            id="legal-dialog-title"
+            class="mg-section__title mg-section__title--sm m-0"
+          >
             {{ dialogTitle() }}
           </h2>
         }
 
         @if (dialogSubtitle()) {
-          <p class="mg-legal-dialog__subtitle m-0 mt-sm">
+          <p class="m-0 mt-sm">
             {{ dialogSubtitle() }}
           </p>
         }
@@ -33,21 +34,23 @@
         icon="pi pi-times"
         [rounded]="true"
         [text]="true"
-        styleClass="p-dialog-close-button m-sm"
+        styleClass="p-dialog-close-button align-self-start"
+        size="small"
         ariaLabel="Zamknij"
         (onClick)="close()"
       />
     </div>
 
-    <div class="p-dialog-content mg-legal-dialog__body p-md">
+    <div class="p-dialog-content mg-legal-dialog__body">
       <app-rich-content [content]="dialogContent()" />
     </div>
 
-    <div class="p-dialog-footer flex-row-end-center p-md">
+    <div class="p-dialog-footer flex-row-end-center">
       <p-button
         [label]="closeLabel()"
         severity="secondary"
         (onClick)="close()"
+        class="mt-md"
       />
     </div>
   </section>

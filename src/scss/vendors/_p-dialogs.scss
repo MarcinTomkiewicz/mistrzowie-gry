@@ -48,6 +48,7 @@
   box-shadow: v.$shadow-soft;
   background: v.$color-bg-surface;
   color: v.$color-text;
+  
 
   &.mg-dialog--sm {
     width: min(95vw, 32rem);
@@ -71,6 +72,7 @@
     color: v.$color-text;
     border-top-left-radius: v.$radius-lg;
     border-top-right-radius: v.$radius-lg;
+    padding: map.get(v.$spacings, "sm") map.get(v.$spacings, "md");
 
     :is(
       .p-dialog-close-button,
