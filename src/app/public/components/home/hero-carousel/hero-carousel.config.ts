@@ -29,7 +29,8 @@ export const HERO_SLIDES_TECH: readonly HeroSlideTech[] = [
 
 export const HERO_IMAGE_LOADER_PARAMS = {
   transform: {
-    q: 70,
+    f: 'auto',
+    q: 60,
   },
 } as const;
 
