@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
+  effect,
   inject,
   signal,
   viewChild,
@@ -102,9 +103,30 @@ export class GmAvailabilityComponent {
   protected readonly rangeGroups = signal<
     readonly GmAvailabilityRangeFormGroup[]
   >([]);
+  private readonly loadedUserId = signal<string | null>(null);
 
   constructor() {
-    this.loadAvailability();
+    effect(() => {
+      if (!this.auth.isReady()) {
+        return;
+      }
+
+      const userId = this.auth.userId();
+
+      if (!userId) {
+        this.loadedUserId.set(null);
+        this.store.hydrate([]);
+        this.isLoading.set(false);
+        return;
+      }
+
+      if (this.loadedUserId() === userId) {
+        return;
+      }
+
+      this.loadedUserId.set(userId);
+      this.loadAvailability();
+    });
   }
 
   protected onDateSelected(date: string | null): void {
@@ -175,7 +197,7 @@ export class GmAvailabilityComponent {
   }
 
   protected confirmSelectedDate(): void {
-    this.handleMutationError(this.commitEditor());
+    this.handleMutationError(this.commitEditor(true));
   }
 
   protected saveAvailability(): void {
@@ -185,7 +207,7 @@ export class GmAvailabilityComponent {
       return;
     }
 
-    const confirmError = this.commitEditor();
+    const confirmError = this.commitEditor(true);
 
     if (confirmError) {
       this.handleMutationError(confirmError);
@@ -340,10 +362,10 @@ export class GmAvailabilityComponent {
     return true;
   }
 
-  private commitEditor(): GmAvailabilityMutationError | null {
+  private commitEditor(force: boolean = false): GmAvailabilityMutationError | null {
     const selectedDate = this.selectedDate();
 
-    if (!selectedDate || !this.editorForm.dirty) {
+    if (!selectedDate || (!force && !this.editorForm.dirty)) {
       return null;
     }
 

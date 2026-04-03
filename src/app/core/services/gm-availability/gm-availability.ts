@@ -85,7 +85,7 @@ export class GmAvailability {
         return from(
           this.supabase
             .from('gm_availability_slots')
-            .insert(this.toInsertPayload(records))
+            .insert(this.toInsertPayload(records), { defaultToNull: false })
             .select('*')
             .order('starts_at', { ascending: true }),
         ).pipe(
