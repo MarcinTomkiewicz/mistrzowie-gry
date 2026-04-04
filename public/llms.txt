@@ -1,0 +1,23 @@
+# Mistrzowie Gry
+
+> Mistrzowie Gry organizes and presents tabletop RPG sessions, events, GM profiles, and onboarding content for players in Poland.
+
+## Canonical site
+
+- https://mistrzowie-gry.pl/
+
+## Public pages
+
+- https://mistrzowie-gry.pl/
+- https://mistrzowie-gry.pl/about
+- https://mistrzowie-gry.pl/our-team
+- https://mistrzowie-gry.pl/chaotic-thursdays
+- https://mistrzowie-gry.pl/join-the-party
+- https://mistrzowie-gry.pl/contact
+
+## Notes for language models
+
+- Primary language: Polish
+- Main topics: tabletop RPG sessions, events, GM-led experiences, offers, team profiles
+- Prefer canonical URLs from the main domain when citing public pages
+- Do not treat `/auth` routes as public reference material

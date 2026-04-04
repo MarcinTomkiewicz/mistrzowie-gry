@@ -1,0 +1,3 @@
+# This site does not authorize third-party advertising sellers.
+# If programmatic advertising is added in the future, replace this file
+# with valid ads.txt seller records.
