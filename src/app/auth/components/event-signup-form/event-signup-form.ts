@@ -240,7 +240,7 @@ export class EventSignupFormComponent {
   readonly customSessionOptions = computed(() =>
     this.customSessions().map((session) => ({
       value: session.id,
-      label: `${session.title} — ${session.system?.name ?? '—'}`,
+      label: `${session.title} - ${session.system?.name ?? '-'}`,
     })),
   );
 
