@@ -1,5 +1,4 @@
-import { APP_BASE_HREF, NgOptimizedImage } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { NgOptimizedImage } from '@angular/common';
 import {
   Component,
   ComponentRef,
@@ -14,9 +13,9 @@ import {
 import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
 
 import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
+import { LegalDialogs } from '../../../core/services/legal-dialogs/legal-dialogs';
 import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
@@ -24,7 +23,6 @@ import {
   ActiveLegalDialog,
   LegalDialogContent,
   LegalDialogsPayload,
-  LegalJsonPayload,
 } from '../../../core/types/i18n/legal';
 import { UILegalLink } from '../../../core/types/i18n/footer';
 import { createFooterI18n } from './footer.i18n';
@@ -51,12 +49,7 @@ export class Footer {
   readonly nav = inject(Navigation);
   readonly theme = inject(Theme);
   readonly i18n = createFooterI18n();
-  private readonly http = inject(HttpClient);
-  private readonly appBaseHref = inject(APP_BASE_HREF, { optional: true }) ?? '/';
-
-  private readonly baseHref = this.appBaseHref.endsWith('/')
-    ? this.appBaseHref
-    : `${this.appBaseHref}/`;
+  private readonly legalDialogs = inject(LegalDialogs);
 
   readonly activeLegalDialog = signal<ActiveLegalDialog>(null);
   readonly activeLegalDialogContent = signal<LegalDialogContent | null>(null);
@@ -69,8 +62,6 @@ export class Footer {
     );
   private readonly legalDialogRef =
     signal<ComponentRef<LazyLegalDialogComponent> | null>(null);
-  private legalDialogsCache: LegalDialogsPayload | null = null;
-  private legalDialogsPromise: Promise<LegalDialogsPayload> | null = null;
 
   readonly year = computed(() => new Date().getFullYear());
 
@@ -247,29 +238,6 @@ export class Footer {
   }
 
   private async loadLegalDialogs(): Promise<LegalDialogsPayload> {
-    if (this.legalDialogsCache) {
-      return this.legalDialogsCache;
-    }
-
-    if (!this.legalDialogsPromise) {
-      this.legalDialogsPromise = firstValueFrom(
-        this.http.get<LegalJsonPayload>(`${this.baseHref}assets/i18n/pl/legal.json`),
-      )
-        .then((payload) => {
-          const dialogs = {
-            terms: payload.termsDialog ?? null,
-            'privacy-policy': payload.privacyPolicyDialog ?? null,
-          } satisfies LegalDialogsPayload;
-
-          this.legalDialogsCache = dialogs;
-          return dialogs;
-        })
-        .catch((error: unknown) => {
-          this.legalDialogsPromise = null;
-          throw error;
-        });
-    }
-
-    return this.legalDialogsPromise;
+    return this.legalDialogs.loadAll();
   }
 }

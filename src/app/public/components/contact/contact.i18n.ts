@@ -5,6 +5,7 @@ import {
   createCommonCtaI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
+  createCommonLegalNoticeI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -52,6 +53,7 @@ export function createContactI18n() {
   const cta = createCommonCtaI18n();
   const commonErrors = createCommonErrorsI18n();
   const commonForm = createCommonFormI18n();
+  const legalNotice = createCommonLegalNoticeI18n();
   const accessibility = createCommonAccessibilityI18n();
 
   const topics = computed<ContactTopicOption[]>(() =>
@@ -70,6 +72,7 @@ export function createContactI18n() {
     success,
     toast,
     commonForm,
+    legalNotice,
     commonErrors,
     status,
     cta,

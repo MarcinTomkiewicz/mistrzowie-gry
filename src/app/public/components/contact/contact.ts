@@ -1,18 +1,21 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  ComponentRef,
   DestroyRef,
+  OutputEmitterRef,
+  Type,
   computed,
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
@@ -22,13 +25,26 @@ import { TextareaModule } from 'primeng/textarea';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { buildSiteUrl } from '../../../core/config/site';
+import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
+import { LegalDialogs } from '../../../core/services/legal-dialogs/legal-dialogs';
+import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Seo } from '../../../core/services/seo/seo';
 import { ContactPayload } from '../../../core/types/contact';
+import { LegalDialogContent } from '../../../core/types/i18n/legal';
 import { createPageStructuredData } from '../../../core/utils/structured-data';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
 import { SubmitState, SubmitStateEnum } from '../../../core/types/submit-state';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+
+interface LazyLegalDialogComponent {
+  visible: unknown;
+  dialogTitle: unknown;
+  dialogSubtitle: unknown;
+  dialogContent: unknown;
+  closeLabel: unknown;
+  visibleChange: OutputEmitterRef<boolean>;
+}
 
 @Component({
   selector: 'app-contact',
@@ -42,12 +58,15 @@ import { UiToast } from '../../../core/services/ui-toast/ui-toast';
     SelectModule,
     InputTextModule,
     TextareaModule,
+    LazyMountHost,
   ],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
   providers: [provideTranslocoScope('contact', 'common')],
 })
 export class Contact {
+  private readonly lazyComponentLoader = inject(LazyComponentLoader);
+  private readonly legalDialogs = inject(LegalDialogs);
   private readonly seo = inject(Seo);
   private readonly fb = inject(FormBuilder);
   private readonly contactApi = inject(ContactApi);
@@ -59,6 +78,16 @@ export class Contact {
 
   readonly submitState = signal<SubmitState>(SubmitStateEnum.Idle);
   readonly submitError = signal<string | null>(null);
+  readonly activeLegalDialogContent = signal<LegalDialogContent | null>(null);
+  readonly isLegalDialogLoading = signal(false);
+  readonly legalDialogError = signal('');
+  private readonly legalDialogHost = viewChild(LazyMountHost);
+  private readonly loadLegalDialog = () =>
+    import('../../common/legal-dialog/legal-dialog').then(
+      ({ LegalDialog }) => LegalDialog as Type<LazyLegalDialogComponent>,
+    );
+  private readonly legalDialogRef =
+    signal<ComponentRef<LazyLegalDialogComponent> | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     topic: this.fb.nonNullable.control(''),
@@ -98,6 +127,42 @@ export class Contact {
     () => this.submitState() === SubmitStateEnum.Submitting,
   );
 
+  readonly isLegalDialogVisible = computed(
+    () =>
+      this.isLegalDialogLoading() ||
+      !!this.activeLegalDialogContent() ||
+      !!this.legalDialogError(),
+  );
+
+  readonly legalDialogTitle = computed(
+    () =>
+      this.activeLegalDialogContent()?.title ??
+      (this.isLegalDialogLoading()
+        ? 'Ladowanie...'
+        : this.legalDialogError()
+          ? 'Nie udalo sie zaladowac tresci'
+          : ''),
+  );
+
+  readonly legalDialogSubtitle = computed(
+    () => this.activeLegalDialogContent()?.subtitle ?? '',
+  );
+
+  readonly legalDialogContent = computed(() => {
+    const content = this.activeLegalDialogContent()?.content;
+    if (content) return content;
+
+    if (this.isLegalDialogLoading()) {
+      return 'Ladowanie tresci dokumentu...';
+    }
+
+    if (this.legalDialogError()) {
+      return this.legalDialogError();
+    }
+
+    return null;
+  });
+
   private readonly applySeoEffect = effect(() => {
     const seo = this.i18n.seo();
 
@@ -113,6 +178,18 @@ export class Contact {
         description: seo.description || '',
       }),
     });
+  });
+
+  private readonly syncLegalDialogInputs = effect(() => {
+    const dialogRef = this.legalDialogRef();
+    if (!dialogRef) {
+      return;
+    }
+
+    dialogRef.setInput('visible', this.isLegalDialogVisible());
+    dialogRef.setInput('dialogTitle', this.legalDialogTitle());
+    dialogRef.setInput('dialogSubtitle', this.legalDialogSubtitle());
+    dialogRef.setInput('dialogContent', this.legalDialogContent());
   });
 
   private readonly initDefaultTopicEffect = effect(() => {
@@ -146,6 +223,7 @@ export class Contact {
     success: this.i18n.success(),
     status: this.i18n.status(),
     commonForm: this.i18n.commonForm(),
+    legalNotice: this.i18n.legalNotice(),
     commonErrors: this.i18n.commonErrors(),
     cta: this.i18n.cta(),
     topics: this.i18n.topics(),
@@ -216,6 +294,28 @@ export class Contact {
       });
   }
 
+  async openPrivacyPolicyDialog(): Promise<void> {
+    this.ensureLegalDialogMounted();
+    this.legalDialogError.set('');
+    this.activeLegalDialogContent.set(null);
+    this.isLegalDialogLoading.set(true);
+
+    try {
+      const dialog = await this.legalDialogs.load('privacy-policy');
+      this.activeLegalDialogContent.set(dialog ?? null);
+
+      if (!dialog) {
+        this.legalDialogError.set('Nie znaleziono tresci dokumentu.');
+      }
+    } catch {
+      this.legalDialogError.set(
+        'Nie udalo sie zaladowac tresci dokumentu. Sprobuj ponownie za chwile.',
+      );
+    } finally {
+      this.isLegalDialogLoading.set(false);
+    }
+  }
+
   private buildPayload(): ContactPayload {
     const value = this.form.getRawValue();
 
@@ -266,5 +366,37 @@ export class Contact {
   showMinMessageError(): boolean {
     const control = this.form.controls.message;
     return control.touched && !!control.errors?.['minlength'];
+  }
+
+  onLegalDialogVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.activeLegalDialogContent.set(null);
+      this.isLegalDialogLoading.set(false);
+      this.legalDialogError.set('');
+    }
+  }
+
+  private ensureLegalDialogMounted(): void {
+    if (this.legalDialogRef()) {
+      return;
+    }
+
+    const host = this.legalDialogHost()?.viewContainerRef;
+    if (!host) {
+      return;
+    }
+
+    this.lazyComponentLoader
+      .mount({
+        host,
+        load: this.loadLegalDialog,
+        onMount: (componentRef) => {
+          this.legalDialogRef.set(componentRef);
+          componentRef.instance.visibleChange.subscribe((visible) => {
+            this.onLegalDialogVisibleChange(visible);
+          });
+        },
+      })
+      .subscribe();
   }
 }

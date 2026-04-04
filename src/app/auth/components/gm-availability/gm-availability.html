@@ -32,12 +32,14 @@
       <div class="hide-down-sm">
         <div class="flex-row-between-center gap-sm">
           <div class="flex-col-start-stretch gap-xs">
-            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
               {{ i18n.gmAvailability().editorTitle }}
             </h3>
 
             <p class="mg-section__subtitle m-0">
-              {{ formatDateLabel(selectedDate()!, 'pl-PL', true) }}
+              {{ formatDateLabel(selectedDate()!, "pl-PL", true) }}
             </p>
           </div>
 
@@ -70,6 +72,8 @@
               severity="success"
               [label]="i18n.commonActions().confirm"
               (onClick)="confirmSelectedDate()"
+              icon="pi pi-done-it"
+              iconPos="left"
             />
           </div>
         </div>
@@ -87,12 +91,14 @@
           />
 
           <div class="flex-1 text-center px-xs">
-            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
               {{ i18n.gmAvailability().editorTitle }}
             </h3>
 
             <p class="mg-section__subtitle m-0">
-              {{ formatDateLabel(selectedDate()!, 'pl-PL', true) }}
+              {{ formatDateLabel(selectedDate()!, "pl-PL", true) }}
             </p>
           </div>
 
@@ -120,6 +126,8 @@
 
           <p-button
             severity="success"
+            icon="pi pi-done-it"
+            iconPos="left"
             size="small"
             [label]="i18n.commonActions().confirm"
             (onClick)="confirmSelectedDate()"
@@ -129,7 +137,11 @@
 
       @if (rangeGroups().length) {
         <div class="flex-col-start-stretch gap-sm">
-          @for (rangeGroup of rangeGroups(); track trackRange($index, rangeGroup); let index = $index) {
+          @for (
+            rangeGroup of rangeGroups();
+            track trackRange($index, rangeGroup);
+            let index = $index
+          ) {
             <div
               class="mg-grid grid-3-cols grid-1-cols-sm gap-sm grid-items-end"
             >
@@ -185,7 +197,7 @@
         <div class="flex-row-end-center">
           <p-button
             severity="success"
-            icon="pi pi-plus"
+            icon="pi pi-add-plus"
             [label]="i18n.actions().addRangeLabel"
             (onClick)="addRange()"
           />

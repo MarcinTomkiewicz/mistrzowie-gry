@@ -4,11 +4,12 @@
 >
   <header class="flex-row-between-center gap-xs">
     <p-button
-      label="<"
+      icon="pi pi-point-left"
       severity="secondary"
       size="small"
       [outlined]="true"
       [disabled]="!canGoPrev()"
+      [ariaLabel]="commonActions().previous"
       [pTooltip]="commonActions().previous"
       tooltipPosition="top"
       (onClick)="previousMonth()"
@@ -21,11 +22,12 @@
     </h3>
 
     <p-button
-      label=">"
+      icon="pi pi-point-right"
       severity="secondary"
       size="small"
       [outlined]="true"
       [disabled]="!canGoNext()"
+      [ariaLabel]="commonActions().next"
       [pTooltip]="commonActions().next"
       tooltipPosition="top"
       (onClick)="nextMonth()"

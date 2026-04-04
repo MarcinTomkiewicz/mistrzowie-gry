@@ -120,6 +120,10 @@ export type CommonFormConsentTranslations = {
   required: string;
 };
 
+export type CommonLegalNoticeTranslations = {
+  prefix: string;
+  privacyPolicyLabel: string;
+};
 export type CommonFormFileUploadTranslations = {
   chooseImage: string;
   dropImage: string;

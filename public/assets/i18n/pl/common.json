@@ -126,6 +126,11 @@
     "server": "Błąd serwera. Spróbuj później."
   },
 
+  "contactLegalNotice": {
+    "prefix": "Wysy\u0142aj\u0105c wiadomo\u015b\u0107 z formularza potwierdzasz, \u017ce jest Ci znana",
+    "privacyPolicyLabel": "Polityka Prywatno\u015bci"
+  },
+
   "seo": {
     "defaultTitle": "Gry fabularne na wyciągnięcie ręki - Mistrzowie Gry",
     "defaultDescription": "Nie przejmuj się brakiem Mistrza Gry ani czytaniem podręczników. Organizujemy sesje RPG dla początkujących, prowadzimy gry fabularne, pomagamy zacząć grać i znaleźć drużynę."

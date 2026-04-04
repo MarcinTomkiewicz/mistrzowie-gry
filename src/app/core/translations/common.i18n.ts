@@ -5,6 +5,7 @@ import {
   CommonEmptyTranslations,
   CommonErrorsTranslations,
   CommonFormTranslations,
+  CommonLegalNoticeTranslations,
   CommonInfoTranslations,
   CommonLegalTranslations,
   CommonNavTranslations,
@@ -41,6 +42,10 @@ export function createCommonErrorsI18n() {
 
 export function createCommonFormI18n() {
   return createCommonScopeSignal<CommonFormTranslations>('form');
+}
+
+export function createCommonLegalNoticeI18n() {
+  return createCommonScopeSignal<CommonLegalNoticeTranslations>('contactLegalNotice');
 }
 
 export function createCommonInfoI18n() {

@@ -93,19 +93,19 @@
                         @if (shouldShowLeadToggle(it.lead)) {
                           <p-button
                             styleClass="arcane"
+                            [label]="
+                              isLeadExpanded(it.id)
+                                ? i18n.commonCta().showLess
+                                : i18n.commonCta().showMore
+                            "
+                            icon="pi pi-lever"
                             iconPos="right"
                             size="small"
                             class="align-self-end"
                             [outlined]="true"
                             (click)="toggleLead(it.id)"
                             [attr.aria-expanded]="isLeadExpanded(it.id)"
-                          >
-                            {{
-                              isLeadExpanded(it.id)
-                                ? i18n.commonCta().showLess
-                                : i18n.commonCta().showMore
-                            }}
-                          </p-button>
+                          />
                         }
                       </div>
                     </td>
@@ -155,19 +155,19 @@
                           @if (shouldShowLeadToggle(it.lead)) {
                             <p-button
                               styleClass="arcane"
+                              [label]="
+                                isLeadExpanded(it.id)
+                                  ? i18n.commonCta().showLess
+                                  : i18n.commonCta().showMore
+                              "
+                              icon="pi pi-lever"
                               iconPos="right"
                               size="small"
                               class="align-self-end"
                               [outlined]="true"
                               (click)="toggleLead(it.id)"
                               [attr.aria-expanded]="isLeadExpanded(it.id)"
-                            >
-                              {{
-                                isLeadExpanded(it.id)
-                                  ? i18n.commonCta().showLess
-                                  : i18n.commonCta().showMore
-                              }}
-                            </p-button>
+                            />
                           }
                         </div>
                       </div>
@@ -230,19 +230,19 @@
                     @if (it.lead?.trim()) {
                       <p-button
                         styleClass="arcane"
+                        [label]="
+                          isLeadExpanded(it.id)
+                            ? i18n.commonCta().showLess
+                            : i18n.commonCta().showMore
+                        "
+                        icon="pi pi-lever"
                         iconPos="right"
                         size="small"
                         class="align-self-end"
                         [outlined]="true"
                         (click)="toggleLead(it.id)"
                         [attr.aria-expanded]="isLeadExpanded(it.id)"
-                      >
-                        {{
-                          isLeadExpanded(it.id)
-                            ? i18n.commonCta().showLess
-                            : i18n.commonCta().showMore
-                        }}
-                      </p-button>
+                      />
                     }
                   </div>
                 </div>

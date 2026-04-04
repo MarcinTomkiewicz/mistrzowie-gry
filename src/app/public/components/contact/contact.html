@@ -7,7 +7,7 @@
       <p class="mg-section__subtitle">{{ data.hero.subtitle }}</p>
     </header>
 
-    <div class="mg-contact-grid">
+    <div class="mg-grid grid-cols-2 grid-cols-1-md gap-lg">
       <div class="mg-card flex-col-center gap-md">
         <h2 class="mg-section__title mg-section__title--sm align-self-start">
           {{ data.formText.title }}
@@ -179,6 +179,16 @@
             />
           </div>
 
+          <small class="muted-text lh-15 text-center w-100 m-0">
+            {{ data.legalNotice.prefix }}
+            <button
+              type="button"
+              class="link-like-inline"
+              (click)="openPrivacyPolicyDialog()"
+            >
+              {{ data.legalNotice.privacyPolicyLabel }}
+            </button>
+          </small>
           <div class="flex-row-end-center flex-col-sm gap-sm">
             <p-button
               type="submit"
@@ -192,6 +202,7 @@
               [disabled]="data.isSubmitting"
             />
           </div>
+
         </form>
       </div>
 
@@ -237,3 +248,5 @@
     </div>
   </div>
 </section>
+
+<ng-template mgLazyMountHost></ng-template>

@@ -47,6 +47,8 @@ interface IEditProfileTabOption {
   providers: [provideTranslocoScope('auth', 'common')],
 })
 export class EditProfile {
+  private static readonly DEFAULT_TAB: EditProfileTabId = 'profile';
+
   private readonly auth = inject(Auth);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -93,6 +95,11 @@ export class EditProfile {
     effect(() => {
       const activeTab = this.activeTab();
 
+      if (!this.isTabVisible(activeTab)) {
+        this.setActiveTab(EditProfile.DEFAULT_TAB);
+        return;
+      }
+
       if (this.mobileTabControl.value !== activeTab) {
         this.mobileTabControl.setValue(activeTab, { emitEvent: false });
       }
@@ -123,14 +130,7 @@ export class EditProfile {
       return;
     }
 
-    this.activeTab.set(tabId);
-
-    void this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { tab: tabId },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
+    this.setActiveTab(tabId);
   }
 
   onMobileTabChange(tabId: EditProfileTabId | null): void {
@@ -145,14 +145,29 @@ export class EditProfile {
     const tabFromQuery = this.route.snapshot.queryParamMap.get('tab');
 
     if (!this.isEditProfileTabId(tabFromQuery)) {
-      return 'profile';
+      return EditProfile.DEFAULT_TAB;
     }
 
     if (!this.isTabVisible(tabFromQuery)) {
-      return 'profile';
+      return EditProfile.DEFAULT_TAB;
     }
 
     return tabFromQuery;
+  }
+
+  private setActiveTab(tabId: EditProfileTabId): void {
+    if (this.activeTab() === tabId) {
+      return;
+    }
+
+    this.activeTab.set(tabId);
+
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: tabId },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   private isEditProfileTabId(value: string | null): value is EditProfileTabId {
