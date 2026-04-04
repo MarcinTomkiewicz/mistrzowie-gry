@@ -17,7 +17,6 @@ type UiProblemCard = IProblemCard & { id: number };
   standalone: true,
   imports: [RouterModule, ButtonModule, AnimateOnScrollModule],
   templateUrl: './problems.html',
-  styleUrl: './problems.scss',
   providers: [provideTranslocoScope('home', 'common')],
 })
 export class Problems {

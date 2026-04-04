@@ -1,7 +1,0 @@
-@use "sass:map";
-@use "abstracts/variables" as v;
-@use "abstracts/mixins" as m;
-
-.mg-programs__grid {
-  @include m.mg-grid(2, map.get(v.$spacings, "lg"), map.get(v.$spacings, "md"), true, 2, 1);
-}

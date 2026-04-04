@@ -14,7 +14,6 @@ import { AnimateOnScrollModule } from 'primeng/animateonscroll';
   standalone: true,
   imports: [AnimateOnScrollModule],
   templateUrl: './seo-rich-text.html',
-  styleUrl: './seo-rich-text.scss',
   providers: [provideTranslocoScope('home')],
 })
 export class SeoRichText {

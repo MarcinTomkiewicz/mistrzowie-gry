@@ -17,7 +17,6 @@ type UiProgramCard = IProgramCard & { id: number };
   standalone: true,
   imports: [RouterModule, ButtonModule, AnimateOnScrollModule],
   templateUrl: './programs.html',
-  styleUrl: './programs.scss',
   providers: [provideTranslocoScope('home', 'common')],
 })
 export class Programs {

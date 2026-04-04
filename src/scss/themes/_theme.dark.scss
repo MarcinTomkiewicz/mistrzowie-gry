@@ -8,7 +8,7 @@ $bg: map.get($c, "color-ink");
 $surface: map.get($c, "color-graphite");
 $border: color.scale(map.get($c, "color-graphite"), $lightness: 12%);
 $text: map.get($c, "color-white");
-$text-muted: color.scale(map.get($c, "color-white"), $alpha: -35%);
+$text-muted: color.scale(map.get($c, "color-white"), $alpha: -20%);
 $secondary: map.get($c, "color-antique");
 $danger: map.get($c, "color-danger");
 $success: map.get($c, "color-success");

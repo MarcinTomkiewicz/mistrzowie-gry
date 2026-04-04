@@ -71,39 +71,36 @@
 }
 
 .mg-hero__caption-text {
-  margin: 0;
-  min-height: 2.5rem;
   color: v.$color-white;
-}
-
-@include m.down("xs") {
-  .mg-hero__caption-btn {
-    display: none;
-  }
 }
 
 .mg-hero__controls {
   position: relative;
   z-index: 3;
-  padding: map.get(v.$spacings, "sm");
 }
 
 .mg-hero__dot {
   width: 0.75rem;
   height: 0.75rem;
+  padding: 0;
   border-radius: 999px;
   border: 1px solid v.$color-border;
   background: transparent;
   cursor: pointer;
+  transition:
+    background-color v.$transition-fast,
+    border-color v.$transition-fast,
+    box-shadow v.$transition-fast;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, v.$color-secondary 28%, transparent);
+  }
 
   &.is-active {
     background: v.$color-primary;
     border-color: v.$color-primary;
   }
-}
-
-.mg-hero__subtitle {
-  min-height: 4.9em;
 }
 
 .mg-hero__cta-grid {
@@ -118,14 +115,8 @@
 }
 
 .mg-hero__cta {
-  cursor: pointer;
-
   &:focus-visible {
     outline: 2px solid color-mix(in srgb, v.$color-secondary 75%, transparent);
     outline-offset: 2px;
-  }
-
-  & p {
-    min-height: 4.5rem;
   }
 }

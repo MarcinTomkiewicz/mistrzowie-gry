@@ -5,7 +5,7 @@
       <p class="mg-section__subtitle">{{ header().subtitle }}</p>
     </header>
 
-    <div class="mg-programs__grid">
+    <div class="mg-grid mg-grid-2 gap-lg mt-md">
       @for (p of programs(); track trackById($index, p)) {
         <article
           pAnimateOnScroll

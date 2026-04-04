@@ -11,7 +11,7 @@ $paper-3: map.get($c, "color-paper-3");
 $surface: color.scale($paper-2, $lightness: 6%);
 $border: color.scale(map.get($c, "color-ink"), $alpha: -70%);
 $text: map.get($c, "color-ink");
-$text-muted: color.scale(map.get($c, "color-ink"), $alpha: -35%);
+$text-muted: color.scale(map.get($c, "color-ink"), $alpha: -20%);
 $secondary: map.get($c, "color-bronze");
 $danger: map.get($c, "color-danger");
 $success: map.get($c, "color-success");

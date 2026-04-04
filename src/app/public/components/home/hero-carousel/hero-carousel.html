@@ -40,7 +40,7 @@
                 </div>
 
                 <p-button
-                  class="mg-hero__caption-btn"
+                  class="hide-down-xs"
                   [label]="active.ctaLabel || ''"
                   icon="pi pi-trail"
                   iconPos="right"
@@ -50,12 +50,12 @@
                 />
               </div>
 
-              <p class="mg-hero__caption-text truncate-2">
+              <p class="mg-hero__caption-text truncate-2 m-0 min-h-lines-2">
                 {{ active.text }}
               </p>
             </div>
 
-            <div class="mg-hero__controls flex-row-between-center">
+            <div class="mg-hero__controls flex-row-between-center p-sm">
               <p-button
                 type="button"
                 icon="pi pi-chevron-left"
@@ -67,8 +67,8 @@
               />
 
               <div
-                class="flex-row-center-center gap-sm"
-                role="tablist"
+                class="flex-row-center-center gap-sm hide-down-sm"
+                role="group"
                 [attr.aria-label]="i18n.aria().dots"
               >
                 @for (slide of slides(); track trackById($index, slide)) {
@@ -79,6 +79,7 @@
                     (click)="goTo($index)"
                     [attr.aria-label]="dotAriaLabel(i18n.aria().goToSlidePrefix, $index)"
                     [attr.aria-current]="$index === activeIndex() ? 'true' : null"
+                    [attr.aria-pressed]="$index === activeIndex() ? 'true' : 'false'"
                   ></button>
                 }
               </div>
@@ -100,7 +101,7 @@
           <header class="mg-section__header w-100 m-0">
             <h1 class="mg-section__title">{{ active.heading }}</h1>
 
-            <p class="mg-section__subtitle mg-hero__subtitle truncate-3">
+            <p class="mg-section__subtitle truncate-3 min-h-lines-3">
               {{ active.text }}
             </p>
           </header>
@@ -108,7 +109,7 @@
           <div class="mg-hero__cta-grid">
             @for (slide of slides(); track trackByCtaPath($index, slide)) {
               <div
-                class="mg-card mg-hero__cta"
+                class="mg-card mg-hero__cta cursor-pointer"
                 role="link"
                 tabindex="0"
                 (click)="onCtaNavigate(slide.ctaPath)"
@@ -122,7 +123,7 @@
                 </div>
 
                 <p
-                  class="mg-section__subtitle mg-section__subtitle--no-margin truncate-3"
+                  class="mg-section__subtitle mg-section__subtitle--no-margin truncate-3 min-h-lines-3"
                 >
                   {{ slide.text }}
                 </p>
