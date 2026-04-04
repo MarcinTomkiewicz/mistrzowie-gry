@@ -1,6 +1,7 @@
 import {
   Component,
   ComponentRef,
+  OutputEmitterRef,
   Type,
   inject,
   viewChild,
@@ -14,6 +15,10 @@ import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { Footer } from '../footer/footer';
 import { Navbar } from '../navbar/navbar';
+
+interface LazyToastHostComponent {
+  ready: OutputEmitterRef<void>;
+}
 
 @Component({
   selector: 'app-app-shell',
@@ -36,10 +41,12 @@ export class AppShell {
       ({ ConfirmPopupHost }) => ConfirmPopupHost as Type<object>,
     );
   private readonly loadToastHost = () =>
-    import('./toast-host').then(({ ToastHost }) => ToastHost as Type<object>);
+    import('./toast-host').then(
+      ({ ToastHost }) => ToastHost as Type<LazyToastHostComponent>,
+    );
   private confirmPopupRef: ComponentRef<object> | null = null;
   private confirmPopupMountPromise: Promise<void> | null = null;
-  private toastRef: ComponentRef<object> | null = null;
+  private toastRef: ComponentRef<LazyToastHostComponent> | null = null;
   private toastMountPromise: Promise<void> | null = null;
 
   constructor() {
@@ -95,17 +102,28 @@ export class AppShell {
       return Promise.resolve();
     }
 
-    this.toastMountPromise = firstValueFrom(
-      this.lazyComponentLoader.mount({
-        host,
-        load: this.loadToastHost,
-        onMount: (componentRef) => {
-          this.toastRef = componentRef;
-          this.uiToast.markHostReady();
-        },
-      }),
-    )
-      .then(() => undefined)
+    this.toastMountPromise = new Promise<void>((resolve, reject) => {
+      let readyHandled = false;
+
+      firstValueFrom(
+        this.lazyComponentLoader.mount({
+          host,
+          load: this.loadToastHost,
+          onMount: (componentRef) => {
+            this.toastRef = componentRef;
+            componentRef.instance.ready.subscribe(() => {
+              if (readyHandled) {
+                return;
+              }
+
+              readyHandled = true;
+              this.uiToast.markHostReady();
+              resolve();
+            });
+          },
+        }),
+      ).catch(reject);
+    })
       .finally(() => {
         if (!this.toastRef) {
           this.toastMountPromise = null;

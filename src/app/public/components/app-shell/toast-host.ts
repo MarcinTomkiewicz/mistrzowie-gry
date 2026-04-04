@@ -1,4 +1,9 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ViewEncapsulation,
+  afterNextRender,
+  output,
+} from '@angular/core';
 import { ToastModule } from 'primeng/toast';
 
 @Component({
@@ -9,4 +14,12 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './toast-host.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class ToastHost {}
+export class ToastHost {
+  readonly ready = output<void>();
+
+  constructor() {
+    afterNextRender(() => {
+      this.ready.emit();
+    });
+  }
+}
