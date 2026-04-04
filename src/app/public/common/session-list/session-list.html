@@ -25,10 +25,6 @@
           <th class="w-10"></th>
         }
 
-        @if (hasAction()) {
-          <th class="w-10"></th>
-        }
-
         @if (hasActions()) {
           <th class="w-10"></th>
         }
@@ -69,44 +65,20 @@
           </td>
         }
 
-        @if (hasAction()) {
-          <td>
-            <div class="flex-row-end-center">
-              <p-button
-                [severity]="actionSeverity()"
-                [outlined]="actionOutlined()"
-                [label]="actionLabel()"
-                [disabled]="busy()"
-                size="small"
-                (onClick)="onAction(session.id)"
-                icon="pi pi-demolish"
-              />
-            </div>
-          </td>
-        }
-
         @if (hasActions()) {
           <td>
-            <div class="flex-row-end-center flex-col-center-center-md gap-xs">
-              <p-button
-                severity="secondary"
-                [outlined]="true"
-                [label]="labels().editLabel"
-                [icon]="'pi pi-quill'"
-                [disabled]="busy()"
-                size="small"
-                (onClick)="onEdit(session.id)"
-              />
-
-              <p-button
-                severity="danger"
-                [outlined]="true"
-                [label]="labels().deleteLabel"
-                [icon]="'pi pi-demolish'"
-                [disabled]="busy()"
-                size="small"
-                (onClick)="onDelete(session.id)"
-              />
+            <div class="flex-row-end-center flex-col-end-center-md gap-xs">
+              @for (action of actions(); track action.type) {
+                <p-button
+                  [severity]="resolveActionSeverity(action)"
+                  [outlined]="resolveActionOutlined(action)"
+                  [label]="resolveActionLabel(action)"
+                  [disabled]="busy()"
+                  size="small"
+                  (onClick)="onActionClick(action, session.id)"
+                  [icon]="resolveActionIcon(action)"
+                />
+              }
             </div>
           </td>
         }
@@ -191,45 +163,19 @@
                 </div>
               }
 
-              @if (hasAction()) {
-                <div
-                  class="flex-row-center-center flex-row-center-stretch-xs gap-xs"
-                >
-                  <p-button
-                    [severity]="actionSeverity()"
-                    [outlined]="actionOutlined()"
-                    [label]="actionLabel()"
-                    [disabled]="busy()"
-                    size="small"
-                    (onClick)="onAction(session.id)"
-                    icon="pi pi-demolish"
-                  />
-                </div>
-              }
-
               @if (hasActions()) {
-                <div
-                  class="flex-row-center-center flex-row-center-stretch-xs gap-xs"
-                >
-                  <p-button
-                    severity="secondary"
-                    [outlined]="true"
-                    [label]="labels().editLabel"
-                    [icon]="'pi pi-quill'"
-                    [disabled]="busy()"
-                    size="small"
-                    (onClick)="onEdit(session.id)"
-                  />
-
-                  <p-button
-                    severity="danger"
-                    [outlined]="true"
-                    [label]="labels().deleteLabel"
-                    [icon]="'pi pi-demolish'"
-                    [disabled]="busy()"
-                    size="small"
-                    (onClick)="onDelete(session.id)"
-                  />
+                <div class="flex-row-center-center flex-row-center-stretch-xs gap-xs">
+                  @for (action of actions(); track action.type) {
+                    <p-button
+                      [severity]="resolveActionSeverity(action)"
+                      [outlined]="resolveActionOutlined(action)"
+                      [label]="resolveActionLabel(action)"
+                      [disabled]="busy()"
+                      size="small"
+                      (onClick)="onActionClick(action, session.id)"
+                      [icon]="resolveActionIcon(action)"
+                    />
+                  }
                 </div>
               }
 

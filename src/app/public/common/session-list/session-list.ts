@@ -16,6 +16,14 @@ import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { SessionDetails } from '../session-details/session-details';
 import { createSessionListI18n } from './session-list.i18n';
 
+export interface ISessionListAction {
+  type: 'action' | 'edit' | 'delete';
+  label?: string;
+  severity?: 'secondary' | 'success' | 'danger';
+  outlined?: boolean;
+  icon?: string;
+}
+
 @Component({
   selector: 'app-session-list',
   standalone: true,
@@ -45,19 +53,13 @@ export class SessionList {
   readonly rows = input<number>(10);
   readonly rowsPerPageOptions = input<number[]>([10, 20, 50]);
 
-  readonly showActions = input<boolean>(false);
+  readonly actions = input<readonly ISessionListAction[]>([]);
   readonly busy = input<boolean>(false);
 
   readonly selectable = input<boolean>(false);
   readonly selectedSessionId = input<string | null>(null);
   readonly selectLabel = input<string>('');
   readonly gmDisplayName = input<string | null>(null);
-
-  readonly actionLabel = input<string>('');
-  readonly actionSeverity = input<'secondary' | 'success' | 'danger'>(
-    'secondary',
-  );
-  readonly actionOutlined = input<boolean>(true);
 
   readonly resolveDifficultyLabel =
     input.required<(value: SessionDifficultyLevel) => string>();
@@ -75,18 +77,13 @@ export class SessionList {
   readonly i18n = createSessionListI18n();
   readonly deleteConfirmKey = `session-list-delete-${SessionList.nextConfirmId++}`;
 
-  readonly hasActions = computed(() => this.showActions());
   readonly hasSelection = computed(() => this.selectable());
-  readonly hasAction = computed(() => !!this.actionLabel().trim());
+  readonly hasActions = computed(() => this.actions().length > 0);
 
   readonly colspan = computed(() => {
     let columns = 6;
 
     if (this.hasSelection()) {
-      columns += 1;
-    }
-
-    if (this.hasAction()) {
       columns += 1;
     }
 
@@ -124,23 +121,15 @@ export class SessionList {
   }
 
   onAction(sessionId: string): void {
-    if (!this.hasAction()) {
-      return;
-    }
-
     this.action.emit(sessionId);
   }
 
   onEdit(sessionId: string): void {
-    if (!this.hasActions()) {
-      return;
-    }
-
     this.edit.emit(sessionId);
   }
 
   onDelete(sessionId: string): void {
-    if (!this.hasActions() || this.busy()) {
+    if (this.busy()) {
       return;
     }
 
@@ -165,5 +154,66 @@ export class SessionList {
         outlined: true,
       },
     });
+  }
+
+  onActionClick(action: ISessionListAction, sessionId: string): void {
+    switch (action.type) {
+      case 'edit':
+        this.onEdit(sessionId);
+        return;
+      case 'delete':
+        this.onDelete(sessionId);
+        return;
+      default:
+        this.onAction(sessionId);
+    }
+  }
+
+  resolveActionLabel(action: ISessionListAction): string {
+    if (action.label?.trim()) {
+      return action.label;
+    }
+
+    switch (action.type) {
+      case 'edit':
+        return this.labels().editLabel;
+      case 'delete':
+        return this.labels().deleteLabel;
+      default:
+        return '';
+    }
+  }
+
+  resolveActionSeverity(
+    action: ISessionListAction,
+  ): 'secondary' | 'success' | 'danger' {
+    if (action.severity) {
+      return action.severity;
+    }
+
+    switch (action.type) {
+      case 'delete':
+        return 'danger';
+      default:
+        return 'secondary';
+    }
+  }
+
+  resolveActionOutlined(action: ISessionListAction): boolean {
+    return action.outlined ?? true;
+  }
+
+  resolveActionIcon(action: ISessionListAction): string {
+    if (action.icon?.trim()) {
+      return action.icon;
+    }
+
+    switch (action.type) {
+      case 'edit':
+        return 'pi pi-quill';
+      case 'delete':
+      case 'action':
+        return 'pi pi-demolish';
+    }
   }
 }

@@ -59,17 +59,29 @@ export function createSessionForm(fb: FormBuilder) {
 export function mapSessionToFormData(
   value: Partial<ISessionFormData> | null | undefined,
 ): ISessionFormData {
+  const sessionValue = value as Partial<
+    ISessionFormData & {
+      system?: { id: string } | null;
+      triggers?: Array<{ id: string }> | null;
+      styles?: Array<{ id: string }> | null;
+    }
+  >;
+
   return {
-    systemId: value?.systemId ?? null,
-    title: value?.title ?? null,
-    description: value?.description ?? null,
-    image: value?.image ?? null,
-    difficultyLevel: value?.difficultyLevel ?? null,
-    minPlayers: value?.minPlayers ?? 1,
-    maxPlayers: value?.maxPlayers ?? 5,
-    minAge: value?.minAge ?? 0,
-    triggerIds: value?.triggerIds ?? [],
-    gmStyleIds: value?.gmStyleIds ?? [],
+    systemId: sessionValue?.systemId ?? sessionValue?.system?.id ?? null,
+    title: sessionValue?.title ?? null,
+    description: sessionValue?.description ?? null,
+    image: sessionValue?.image ?? null,
+    difficultyLevel: sessionValue?.difficultyLevel ?? null,
+    minPlayers: sessionValue?.minPlayers ?? 1,
+    maxPlayers: sessionValue?.maxPlayers ?? 5,
+    minAge: sessionValue?.minAge ?? 0,
+    triggerIds:
+      sessionValue?.triggerIds ??
+      (sessionValue?.triggers ?? []).map((trigger) => trigger.id),
+    gmStyleIds:
+      sessionValue?.gmStyleIds ??
+      (sessionValue?.styles ?? []).map((style) => style.id),
   };
 }
 

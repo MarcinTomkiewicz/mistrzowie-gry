@@ -30,7 +30,10 @@ import { normalizeText } from '../../../core/utils/normalize-text';
 import { SessionForm } from '../../common/session-form/session-form';
 import { createGmSessionsI18n } from './gm-sessions.i18n';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
-import { SessionList } from '../../../public/common/session-list/session-list';
+import {
+  ISessionListAction,
+  SessionList,
+} from '../../../public/common/session-list/session-list';
 
 interface ISessionSystemOption {
   id: string | null;
@@ -78,6 +81,10 @@ export class GmSessions {
   readonly isCreateMode = signal(false);
 
   readonly rowsPerPageOptions = [10, 20, 50];
+  readonly sessionListActions: readonly ISessionListAction[] = [
+    { type: 'edit' },
+    { type: 'delete' },
+  ];
 
   readonly editedSession = computed(
     () =>

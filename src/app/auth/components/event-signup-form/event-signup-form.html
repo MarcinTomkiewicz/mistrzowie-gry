@@ -76,7 +76,7 @@
           marginBottomClass="mb-xs"
         />
 
-        @if (hasSubmittedSession()) {
+        @if (showSubmittedSessionSummary()) {
           <div class="mg-card flex-col-start-stretch gap-md">
             <header class="mg-section__header w-100">
               <h2 class="mg-section__title mg-section__title--md">
@@ -89,14 +89,12 @@
               [labels]="sessionListLabels()"
               [emptyTitle]="i18n.template().emptyTitle"
               [emptyDescription]="i18n.template().emptyDescription"
-              [showActions]="false"
+              [actions]="submittedSessionActions()"
               [busy]="isBusy()"
-              [actionLabel]="i18n.actions().withdrawLabel"
-              [actionSeverity]="'danger'"
-              [actionOutlined]="true"
               [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
               [playersLabel]="i18n.playersLabel"
               [minAgeLabel]="i18n.minAgeLabel"
+              (edit)="onEditSubmittedCustomSession()"
               (action)="onWithdrawCurrentSession($event)"
             />
           </div>
@@ -137,7 +135,6 @@
                 [labels]="sessionListLabels()"
                 [emptyTitle]="i18n.template().emptyTitle"
                 [emptyDescription]="i18n.template().emptyDescription"
-                [showActions]="false"
                 [busy]="isBusy()"
                 [selectable]="true"
                 [selectedSessionId]="selectedTemplateId()"
@@ -168,12 +165,14 @@
                   <div class="w-80 w-100-sm">
                     <p-iftalabel class="w-100">
                       <p-select
+                        #customSessionSelect
                         class="w-100"
                         [options]="customSessionOptions()"
                         optionLabel="label"
                         optionValue="value"
                         formControlName="customSessionId"
                         appendTo="body"
+                        (onChange)="onCustomSessionOptionChange(customSessionSelect)"
                       />
                       <label>{{ i18n.custom().previousSessionsLabel }}</label>
                     </p-iftalabel>
@@ -182,7 +181,7 @@
               </div>
 
               <app-session-form
-                [initial]="selectedCustomSession()"
+                [initial]="customSessionFormInitial()"
                 [systems]="res.systems"
                 [styles]="res.styles"
                 [triggers]="res.triggers"

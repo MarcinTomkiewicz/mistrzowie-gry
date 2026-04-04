@@ -11,10 +11,13 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { SelectModule } from 'primeng/select';
+import { Select, SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
-import { EventOccurrenceStatus } from '../../../core/enums/event';
+import {
+  EventOccurrenceStatus,
+  EventProgramItemSourceKind,
+} from '../../../core/enums/event';
 import { buildSiteUrl } from '../../../core/config/site';
 import {
   IEventSignupLoadData,
@@ -42,7 +45,10 @@ import {
 } from '../../../core/utils/date';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../public/common/occurrence-switcher/occurrence-switcher';
-import { SessionList } from '../../../public/common/session-list/session-list';
+import {
+  ISessionListAction,
+  SessionList,
+} from '../../../public/common/session-list/session-list';
 import { SessionForm } from '../../common/session-form/session-form';
 import { createEventSignupFormI18n } from './event-signup-form.i18n';
 
@@ -104,6 +110,7 @@ export class EventSignupFormComponent {
 
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
+  readonly isEditingSubmittedCustomSession = signal(false);
 
   readonly data = signal<IEventSignupLoadData>(
     this.eventRead.createEmptyHostSignupLoadData(),
@@ -202,6 +209,20 @@ export class EventSignupFormComponent {
   readonly hasSubmittedSession = computed(
     () => this.signupSessions().length > 0,
   );
+  readonly hasSubmittedCustomSession = computed(
+    () =>
+      this.page().mySignup?.sourceKind === EventProgramItemSourceKind.CustomSession,
+  );
+  readonly showSubmittedSessionSummary = computed(
+    () => this.hasSubmittedSession() && !this.isEditingSubmittedCustomSession(),
+  );
+  readonly customSessionFormInitial = computed(() => {
+    if (this.isEditingSubmittedCustomSession()) {
+      return this.signupSessions()[0] ?? null;
+    }
+
+    return this.selectedCustomSession();
+  });
 
   readonly selectedOccurrenceIndex = computed(() => {
     const occurrenceId = this.page().occurrence?.id;
@@ -276,6 +297,22 @@ export class EventSignupFormComponent {
       !!page.canAccess &&
       !!this.selectedTemplateId()
     );
+  });
+  readonly submittedSessionActions = computed<readonly ISessionListAction[]>(() => {
+    const actions: ISessionListAction[] = [
+      {
+        type: 'action',
+        label: this.i18n.actions().withdrawLabel,
+        severity: 'danger',
+        outlined: true,
+      },
+    ];
+
+    if (this.hasSubmittedCustomSession()) {
+      actions.push({ type: 'edit' });
+    }
+
+    return actions;
   });
 
   constructor() {
@@ -413,7 +450,33 @@ export class EventSignupFormComponent {
   }
 
   onResetCustomSession(): void {
+    if (this.isEditingSubmittedCustomSession()) {
+      this.isEditingSubmittedCustomSession.set(false);
+      this.syncFormWithSignup();
+      return;
+    }
+
     this.form.controls.customSessionId.setValue(null);
+  }
+
+  onCustomSessionOptionChange(select: Select): void {
+    queueMicrotask(() => select.hide(true));
+  }
+
+  onEditSubmittedCustomSession(): void {
+    const signup = this.page().mySignup;
+
+    if (
+      signup?.sourceKind !== EventProgramItemSourceKind.CustomSession ||
+      !signup.customSessionId
+    ) {
+      return;
+    }
+
+    this.form.controls.mode.setValue('custom');
+    this.selectedTemplateIdControl.setValue(null);
+    this.form.controls.customSessionId.setValue(signup.customSessionId);
+    this.isEditingSubmittedCustomSession.set(true);
   }
 
   resolveDifficultyLabel(value: SessionDifficultyLevel): string {
@@ -451,6 +514,7 @@ export class EventSignupFormComponent {
         next: ({ data, occurrenceOptions }) => {
           this.data.set(data);
           this.occurrenceOptions.set(occurrenceOptions);
+          this.isEditingSubmittedCustomSession.set(false);
 
           this.toast.success({
             summary: toastConfig.successSummary,
@@ -541,6 +605,7 @@ export class EventSignupFormComponent {
     const signup = this.page().mySignup;
 
     if (!signup) {
+      this.isEditingSubmittedCustomSession.set(false);
       this.form.controls.mode.setValue('template', { emitEvent: false });
       this.form.controls.customSessionId.setValue(null, { emitEvent: false });
       this.selectedTemplateIdControl.setValue(null, { emitEvent: false });
@@ -548,6 +613,7 @@ export class EventSignupFormComponent {
     }
 
     if (signup.sourceKind === 'gm_session_template') {
+      this.isEditingSubmittedCustomSession.set(false);
       this.form.controls.mode.setValue('template', { emitEvent: false });
       this.form.controls.customSessionId.setValue(null, { emitEvent: false });
       this.selectedTemplateIdControl.setValue(signup.gmSessionTemplateId, {

@@ -8,7 +8,9 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  takeUntilDestroyed,
+} from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Subject, timer } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
@@ -50,17 +52,18 @@ export class SystemAutocomplete {
   readonly systemSuggestions = signal<ISystem[]>([]);
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
+      const control = this.control();
       const systems = this.getAllSystems();
-      const selectedSystemId = this.control().value;
 
       this.systemSuggestions.set(systems);
+      this.syncSelectedSystem(control.getRawValue(), systems);
 
-      const selectedSystem = selectedSystemId
-        ? systems.find((system) => system.id === selectedSystemId) ?? null
-        : null;
+      const subscription = control.valueChanges.subscribe((value) => {
+        this.syncSelectedSystem(value, this.getAllSystems());
+      });
 
-      this.systemSearchControl.setValue(selectedSystem, { emitEvent: false });
+      onCleanup(() => subscription.unsubscribe());
     });
 
     this.query$
@@ -106,6 +109,7 @@ export class SystemAutocomplete {
 
   onSelect(event: AutoCompleteSelectEvent): void {
     const system = event.value as ISystem | null;
+    this.systemSuggestions.set(this.getAllSystems());
     this.systemSelected.emit(system);
   }
 
@@ -116,11 +120,23 @@ export class SystemAutocomplete {
     });
 
     this.systemSearchControl.setValue(null, { emitEvent: false });
+    this.systemSuggestions.set(this.getAllSystems());
     this.systemCleared.emit();
   }
 
   private getAllSystems(): ISystem[] {
     return [...this.systems()];
+  }
+
+  private syncSelectedSystem(
+    systemId: string | null,
+    systems: readonly ISystem[],
+  ): void {
+    const selectedSystem = systemId
+      ? systems.find((system) => system.id === systemId) ?? null
+      : null;
+
+    this.systemSearchControl.setValue(selectedSystem, { emitEvent: false });
   }
 
   private normalize(value: string | null | undefined): string {
