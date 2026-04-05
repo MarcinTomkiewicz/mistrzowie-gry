@@ -77,9 +77,7 @@
           </div>
 
           <div class="flex-col-start-stretch gap-sm mt-md">
-            <div
-              class="flex-row-between-center gap-sm"
-            >
+            <div class="flex-row-between-center gap-sm">
               <div class="flex-col-start-stretch gap-xs">
                 <span
                   class="mg-section__subtitle mg-section__subtitle--no-margin"
@@ -103,11 +101,17 @@
                   </span>
                 }
               </div>
-              <div
-                class="tag-badge text-center max-w-none max-w-150-xs text-wrap-auto-xs"
-              >
-                {{ item.systemName || i18n.commonFallbacks().none }}
-              </div>
+
+              @if (item.system) {
+                <app-system-chip
+                  [system]="item.system"
+                  [badgeClass]="systemBadgeClass()"
+                />
+              } @else {
+                <span class="tag-badge tag-badge--muted">
+                  {{ i18n.commonFallbacks().none }}
+                </span>
+              }
             </div>
 
             @if (item.styles.length) {

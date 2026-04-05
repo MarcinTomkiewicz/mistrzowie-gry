@@ -1,6 +1,7 @@
 import { SessionDifficultyLevel } from '../types/sessions';
 import { IContentTrigger } from './i-content-trigger';
 import { IGmStyleOption } from './i-gm-style';
+import { ISystem } from './i-system';
 
 export interface IEventSlotCardVm {
   id: string | null;
@@ -8,7 +9,7 @@ export interface IEventSlotCardVm {
   title: string;
   imageUrl: string | null;
   gmDisplayName: string | null;
-  systemName: string;
+  system: ISystem | null;
   difficultyLevel: SessionDifficultyLevel | null;
   styles: IGmStyleOption[];
   triggers: IContentTrigger[];

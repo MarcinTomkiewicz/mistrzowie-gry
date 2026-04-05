@@ -7,7 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -28,6 +28,8 @@ import { normalizeText } from '../../../core/utils/normalize-text';
 import { SessionList } from '../../common/session-list/session-list';
 import { createGmProfileDialogI18n } from './gm-profile-dialog.i18n';
 import { ISessionListLabels } from '../../../core/interfaces/i-session';
+import { ISystem } from '../../../core/interfaces/i-system';
+import { SystemChip } from '../../common/system-chip/system-chip';
 
 interface IGmProfileDialogTabOption {
   value: GmProfileDialogTabId;
@@ -40,13 +42,13 @@ interface IGmProfileDialogTabOption {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
     SelectModule,
     TabsModule,
     SessionList,
+    SystemChip,
   ],
   templateUrl: './gm-profile-dialog.html',
   styleUrl: './gm-profile-dialog.scss',
@@ -78,10 +80,9 @@ export class GmProfileDialog {
 
   readonly activeTab = signal<GmProfileDialogTabId>('profile');
 
-  readonly mobileTabControl = new FormControl<GmProfileDialogTabId>(
-    this.activeTab(),
-    { nonNullable: true },
-  );
+  readonly mobileTabControl = new FormControl<GmProfileDialogTabId>('profile', {
+    nonNullable: true,
+  });
 
   readonly displayName = computed(() => {
     const profile = this.profile();
@@ -104,7 +105,7 @@ export class GmProfileDialog {
     return this.storage.getPublicUrl(imagePath);
   });
 
-  readonly systems = computed(() => {
+  readonly systems = computed<ISystem[]>(() => {
     const profile = this.profile();
 
     if (!profile) {
@@ -114,13 +115,16 @@ export class GmProfileDialog {
     const seen = new Set<string>();
 
     return profile.sessions
-      .map((session) => session.system?.name?.trim() ?? '')
-      .filter((name) => {
-        if (!name || seen.has(name)) {
+      .map((session) => session.system)
+      .filter(
+        (system): system is ISystem => !!system && !!normalizeText(system.name),
+      )
+      .filter((system) => {
+        if (seen.has(system.id)) {
           return false;
         }
 
-        seen.add(name);
+        seen.add(system.id);
         return true;
       });
   });
@@ -158,16 +162,6 @@ export class GmProfileDialog {
       })) ?? []
     );
   });
-
-  constructor() {
-    this.mobileTabControl.valueChanges.subscribe((tabId) => {
-      if (!tabId) {
-        return;
-      }
-
-      this.onTabChange(tabId);
-    });
-  }
 
   resolveTabLabel(tabId: GmProfileDialogTabId): string {
     switch (tabId) {

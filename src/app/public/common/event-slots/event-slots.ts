@@ -9,11 +9,12 @@ import { Theme } from '../../../core/services/theme/theme';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { resolveAltDifficultyLevel } from '../../../core/utils/alt-difficulty-level';
 import { createEventSlotsI18n } from './event-slots.i18n';
+import { SystemChip } from '../system-chip/system-chip';
 
 @Component({
   selector: 'app-event-slots',
   standalone: true,
-  imports: [ButtonModule, SkeletonModule],
+  imports: [ButtonModule, SkeletonModule, SystemChip],
   templateUrl: './event-slots.html',
   styleUrl: './event-slots.scss',
   providers: [provideTranslocoScope('sessions')],
@@ -24,6 +25,7 @@ export class EventSlots {
   readonly items = input<IEventSlotCardVm[]>([]);
   readonly slotCount = input<number>(0);
   readonly isLoading = input<boolean>(false);
+  readonly systemBadgeClass = input<string>('');
 
   readonly slotSelect = output<IEventSlotCardVm>();
   readonly gmSelect = output<IEventSlotCardVm>();
@@ -127,7 +129,7 @@ export class EventSlots {
       imageUrl: null,
       gmDisplayName: fallback.none,
       difficultyLevel: null,
-      systemName: '',
+      system: null,
       styles: [],
       triggers: [],
       minAge: null,

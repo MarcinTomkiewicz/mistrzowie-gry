@@ -1,0 +1,36 @@
+@if (hasDescription()) {
+  <span
+    class="hide-down-xs"
+    [class]="hostClass()"
+    [pTooltip]="description()"
+    tooltipPosition="top"
+    showDelay="120"
+    hideDelay="80"
+    tabindex="0"
+  >
+    {{ label() }}
+  </span>
+
+  <div class="show-down-xs">
+    <div
+      class="flex-row-center-center gap-xs w-100"
+      [class]="hostClass()"
+      role="button"
+      tabindex="0"
+      (click)="onMobileInfoClick($event)"
+    >
+      <span>{{ label() }}</span>
+      <span><i class="pi pi-horus" aria-hidden="true"></i></span>
+    </div>
+  </div>
+
+  <p-popover #popover>
+    <div>
+      {{ description() }}
+    </div>
+  </p-popover>
+} @else {
+  <span [class]="hostClass()">
+    {{ label() }}
+  </span>
+}

@@ -64,9 +64,7 @@
               class="flex-row-start-stretch flex-col-start-center-sm gap-lg w-100"
             >
               <div class="mg-card flex-row-center-center w-100-sm">
-                <div
-                  class="gm-profile-dialog__avatar-wrap"
-                >
+                <div class="gm-profile-dialog__avatar-wrap">
                   <img
                     class="gm-profile-dialog__avatar"
                     [src]="imageUrl() || placeholderImageSrc"
@@ -77,7 +75,9 @@
                 </div>
               </div>
 
-              <div class="mg-card flex-1 min-w-0 flex-col-start-stretch gap-md w-100-sm">
+              <div
+                class="mg-card flex-1 min-w-0 flex-col-start-stretch gap-md w-100-sm"
+              >
                 <div class="flex-row-start-center flex-wrap gap-sm">
                   <h3 class="mg-section__title mg-section__title--sm m-0">
                     {{ displayName() }}
@@ -126,10 +126,8 @@
 
                   @if (systems().length) {
                     <div class="flex-row-start-center flex-wrap gap-xs">
-                      @for (system of systems(); track system) {
-                        <span class="tag-badge tag-badge--muted">
-                          {{ system }}
-                        </span>
+                      @for (system of systems(); track system.id) {
+                        <app-system-chip [system]="system" maxWidthClass="max-w-none" />
                       }
                     </div>
                   } @else {

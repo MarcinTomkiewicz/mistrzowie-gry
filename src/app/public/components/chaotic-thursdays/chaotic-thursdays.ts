@@ -157,24 +157,22 @@ export class ChaoticThursdays implements OnInit {
   });
 
   readonly slotCards = computed<IEventSlotCardVm[]>(() =>
-    this.slotItems().map((item) => {
-      return {
-        id: item.id,
-        gmProfileId: item.host.profile.id ?? null,
-        title: item.session.title,
-        imageUrl: this.getImageUrl(item.session.image),
-        gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
-        difficultyLevel: item.session.difficultyLevel,
-        systemName: item.session.system?.name || '',
-        styles: item.session.styles,
-        triggers: item.session.triggers,
-        minAge: item.session.minAge,
-        description: item.session.description,
-        isEmpty: false,
-        canOpenDetails: true,
-        canOpenGmProfile: !!item.host.profile.id,
-      };
-    }),
+    this.slotItems().map((item) => ({
+      id: item.id,
+      gmProfileId: item.host.profile.id ?? null,
+      title: item.session.title,
+      imageUrl: this.getImageUrl(item.session.image),
+      gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
+      system: item.session.system ?? null,
+      difficultyLevel: item.session.difficultyLevel,
+      styles: item.session.styles,
+      triggers: item.session.triggers,
+      minAge: item.session.minAge,
+      description: item.session.description,
+      isEmpty: false,
+      canOpenDetails: true,
+      canOpenGmProfile: !!item.host.profile.id,
+    })),
   );
 
   readonly slotCount = computed(() => {
