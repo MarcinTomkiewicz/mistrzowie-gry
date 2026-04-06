@@ -1,10 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
@@ -16,11 +10,12 @@ import { Storage } from '../../../core/services/storage/storage';
 import { resolveAltDifficultyLevel } from '../../../core/utils/alt-difficulty-level';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { createSessionDetailsI18n } from './session-details.i18n';
+import { SystemChip } from '../system-chip/system-chip';
 
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [ButtonModule, ImageModule],
+  imports: [ButtonModule, ImageModule, SystemChip],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
   providers: [provideTranslocoScope('sessions')],

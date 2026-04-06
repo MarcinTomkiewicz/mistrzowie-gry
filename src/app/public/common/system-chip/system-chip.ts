@@ -25,6 +25,7 @@ export class SystemChip {
   readonly badgeClass = input<string>('');
   readonly maxWidthClass = input<string>('max-w-none max-w-150-xs');
   readonly wrapClass = input<string>('text-wrap-auto-xs');
+  readonly displayType = input<'chip' | 'text'>('chip');
 
   readonly label = computed(() => normalizeText(this.system().name) || '');
 
@@ -36,25 +37,38 @@ export class SystemChip {
   readonly hasDescription = computed(() => !!this.description());
 
   readonly hostClass = computed(() => {
-    const classes = ['tag-badge', 'text-center'];
+    const classes: string[] = [];
 
-    const badgeClass = normalizeText(this.badgeClass());
-    const maxWidthClass = normalizeText(this.maxWidthClass());
+    if (this.displayType() === 'chip') {
+      classes.push('tag-badge', 'text-center');
+
+      const badgeClass = normalizeText(this.badgeClass());
+      const maxWidthClass = normalizeText(this.maxWidthClass());
+
+      if (badgeClass) {
+        classes.push(badgeClass);
+      }
+
+      if (maxWidthClass) {
+        classes.push(maxWidthClass);
+      }
+    }
+
     const wrapClass = normalizeText(this.wrapClass());
-
-    if (badgeClass) {
-      classes.push(badgeClass);
-    }
-
-    if (maxWidthClass) {
-      classes.push(maxWidthClass);
-    }
 
     if (wrapClass) {
       classes.push(wrapClass);
     }
 
     return classes.join(' ');
+  });
+
+  readonly mobileHostClass = computed(() => {
+    if (this.displayType() === 'chip') {
+      return `flex-row-center-center gap-xs w-100 ${this.hostClass()}`.trim();
+    }
+
+    return this.hostClass();
   });
 
   onMobileInfoClick(event: Event): void {

@@ -13,14 +13,20 @@
 
   <div class="show-down-xs">
     <div
-      class="flex-row-center-center gap-xs w-100"
-      [class]="hostClass()"
+      [class]="mobileHostClass()"
       role="button"
       tabindex="0"
       (click)="onMobileInfoClick($event)"
     >
-      <span>{{ label() }}</span>
-      <span><i class="pi pi-horus" aria-hidden="true"></i></span>
+      @if (displayType() === "chip") {
+        <span>{{ label() }}</span>
+        <span><i class="pi pi-horus" aria-hidden="true"></i></span>
+      } @else {
+        <span>
+          {{ label() }}
+          <i class="pi pi-horus ml-xs" aria-hidden="true"></i>
+        </span>
+      }
     </div>
   </div>
 

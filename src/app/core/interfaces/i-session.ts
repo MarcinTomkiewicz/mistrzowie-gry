@@ -67,7 +67,7 @@ export interface IUpdateSessionPayload {
 }
 
 export interface ISessionWithRelations extends ISession {
-  system: ISystem | null;
+  system: ISystem;
   triggers: IContentTrigger[];
   styles: IGmStyle[];
 }
@@ -80,4 +80,29 @@ export interface ISessionListLabels {
   minAgeLabel: string;
   editLabel: string;
   deleteLabel: string;
+}
+
+
+export interface IGmSessionTemplateStyleRow {
+  gmSessionTemplateId: string;
+  gmStyleId: string;
+  createdAt: string | null;
+}
+
+export interface IGmSessionTemplateTriggerRow {
+  gmSessionTemplateId: string;
+  contentTriggerId: string;
+  createdAt: string | null;
+}
+
+export interface ICustomSessionStyleRow {
+  customSessionId: string;
+  gmStyleId: string;
+  createdAt: string | null;
+}
+
+export interface ICustomSessionTriggerRow {
+  customSessionId: string;
+  contentTriggerId: string;
+  createdAt: string | null;
 }

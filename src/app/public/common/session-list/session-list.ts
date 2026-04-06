@@ -15,6 +15,7 @@ import {
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { SessionDetails } from '../session-details/session-details';
 import { createSessionListI18n } from './session-list.i18n';
+import { SystemChip } from '../system-chip/system-chip';
 
 export interface ISessionListAction {
   type: 'action' | 'edit' | 'delete';
@@ -34,6 +35,7 @@ export interface ISessionListAction {
     ConfirmDialogModule,
     TableModule,
     SessionDetails,
+    SystemChip
   ],
   templateUrl: './session-list.html',
   styleUrl: './session-list.scss',

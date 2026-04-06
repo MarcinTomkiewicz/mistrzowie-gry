@@ -20,15 +20,31 @@
   $direction: row,
   $justify: space-between,
   $align: center,
-  $gap: null
+  $gap: null,
+  $inline: false,
+  $self: null,
+  $flex: null
 ) {
-  display: flex;
+  @if $inline {
+    display: inline-flex;
+  } @else {
+    display: flex;
+  }
+
   flex-direction: $direction;
   justify-content: $justify;
   align-items: $align;
 
   @if $gap != null {
     gap: $gap;
+  }
+
+  @if $self != null {
+    align-self: $self;
+  }
+
+  @if $flex != null {
+    flex: $flex;
   }
 }
 

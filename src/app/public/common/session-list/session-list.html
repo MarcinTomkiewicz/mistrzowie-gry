@@ -44,7 +44,7 @@
           />
         </td>
 
-        <td>{{ session.system?.name ?? "—" }}</td>
+        <td><app-system-chip [system]="session.system" displayType="text"></app-system-chip></td>
         <td>{{ session.title }}</td>
         <td>{{ resolveDifficultyLabel()(session.difficultyLevel) }}</td>
         <td>{{ playersLabel()(session.minPlayers, session.maxPlayers) }}</td>
@@ -125,7 +125,7 @@
             >
               <strong class="small-caps">{{ session.title }}</strong>
               <span class="hide-down-xs">-</span>
-              <span class="small-caps">{{ session.system?.name }}</span>
+              <span class="small-caps">{{ session.system.name }}</span>
             </div>
           </p-accordion-header>
 

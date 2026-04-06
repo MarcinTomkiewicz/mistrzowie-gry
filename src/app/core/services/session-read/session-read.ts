@@ -5,32 +5,15 @@ import { Backend } from '../backend/backend';
 import { FilterOperator } from '../../enums/filter-operators';
 import { IContentTrigger } from '../../interfaces/i-content-trigger';
 import { IGmStyle } from '../../interfaces/i-gm-style';
-import { ISession, ISessionWithRelations } from '../../interfaces/i-session';
+import {
+  ICustomSessionStyleRow,
+  ICustomSessionTriggerRow,
+  IGmSessionTemplateStyleRow,
+  IGmSessionTemplateTriggerRow,
+  ISession,
+  ISessionWithRelations,
+} from '../../interfaces/i-session';
 import { ISystem } from '../../interfaces/i-system';
-
-interface IGmSessionTemplateStyleRow {
-  gmSessionTemplateId: string;
-  gmStyleId: string;
-  createdAt: string | null;
-}
-
-interface IGmSessionTemplateTriggerRow {
-  gmSessionTemplateId: string;
-  contentTriggerId: string;
-  createdAt: string | null;
-}
-
-interface ICustomSessionStyleRow {
-  customSessionId: string;
-  gmStyleId: string;
-  createdAt: string | null;
-}
-
-interface ICustomSessionTriggerRow {
-  customSessionId: string;
-  contentTriggerId: string;
-  createdAt: string | null;
-}
 
 @Injectable({ providedIn: 'root' })
 export class SessionRead {
@@ -154,7 +137,7 @@ export class SessionRead {
     }).pipe(
       map(({ system, styles, triggers }) => ({
         ...session,
-        system,
+        system: this.requireSystem(session, system),
         styles,
         triggers,
       })),
@@ -171,7 +154,7 @@ export class SessionRead {
     }).pipe(
       map(({ system, styles, triggers }) => ({
         ...session,
-        system,
+        system: this.requireSystem(session, system),
         styles,
         triggers,
       })),
@@ -203,11 +186,13 @@ export class SessionRead {
             return of([] as IGmStyle[]);
           }
 
-          return this.backend.getByIds<IGmStyle>('gm_styles', gmStyleIds).pipe(
-            map((styles) =>
-              [...styles].sort((a, b) => a.sortOrder - b.sortOrder),
-            ),
-          );
+          return this.backend
+            .getByIds<IGmStyle>('gm_styles', gmStyleIds)
+            .pipe(
+              map((styles) =>
+                [...styles].sort((a, b) => a.sortOrder - b.sortOrder),
+              ),
+            );
         }),
       );
   }
@@ -277,11 +262,13 @@ export class SessionRead {
             return of([] as IGmStyle[]);
           }
 
-          return this.backend.getByIds<IGmStyle>('gm_styles', gmStyleIds).pipe(
-            map((styles) =>
-              [...styles].sort((a, b) => a.sortOrder - b.sortOrder),
-            ),
-          );
+          return this.backend
+            .getByIds<IGmStyle>('gm_styles', gmStyleIds)
+            .pipe(
+              map((styles) =>
+                [...styles].sort((a, b) => a.sortOrder - b.sortOrder),
+              ),
+            );
         }),
       );
   }
@@ -324,5 +311,15 @@ export class SessionRead {
             );
         }),
       );
+  }
+
+  private requireSystem(session: ISession, system: ISystem | null): ISystem {
+    if (system) {
+      return system;
+    }
+
+    throw new Error(
+      `[SESSION_READ] Missing system for session "${session.id}" with systemId "${session.systemId}"`,
+    );
   }
 }

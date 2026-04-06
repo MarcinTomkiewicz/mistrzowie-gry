@@ -4,56 +4,70 @@
       {{ i18n.detailsLabels().primaryInfo }}
     </small>
 
-    <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
-      <span class="status-text status-text--muted align-self-start">
+    <div class="flex-row-between-center flex-row-between-start-sm gap-sm">
+      <span class="status-text status-text--muted basis-50 flex-shrink-0">
         {{ i18n.sessionForm().systemLabel }}
       </span>
 
-      <div class="w-50 text-right"><strong>{{ systemName() }}</strong></div>
-    </div>
-
-    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
-      <div class="status-text status-text--muted">
-        {{ i18n.sessionForm().difficultyLabel }}
+      <div class="flex-1 min-w-0 text-right">
+        <app-system-chip
+          [system]="session().system"
+          maxWidthClass="max-w-none"
+          displayType="text"
+        />
       </div>
-
-      <span [class]="'tag-badge ' + difficultyBadgeClass()">
-        {{ difficultyLabel() }}
-      </span>
     </div>
 
-    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
-      <span class="status-text status-text--muted">
+    <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
+      <span class="status-text status-text--muted basis-50 flex-shrink-0">
+        {{ i18n.sessionForm().difficultyLabel }}
+      </span>
+
+      <div class="flex-1 min-w-0 text-right">
+        <span [class]="'tag-badge ' + difficultyBadgeClass()">
+          {{ difficultyLabel() }}
+        </span>
+      </div>
+    </div>
+
+    <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
+      <span class="status-text status-text--muted basis-50 flex-shrink-0">
         {{ i18n.eventSlotsLabels().gm }}
       </span>
 
-      @if (canOpenGmProfile()) {
-        <p-button
-          [label]="resolvedGmDisplayName()"
-          styleClass="arcane"
-          size="small"
-          [outlined]="true"
-          (onClick)="onGmProfileSelect()"
-        />
-      } @else {
-        <strong>{{ resolvedGmDisplayName() }}</strong>
-      }
+      <div class="flex-1 min-w-0 text-right">
+        @if (canOpenGmProfile()) {
+          <p-button
+            [label]="resolvedGmDisplayName()"
+            styleClass="arcane"
+            size="small"
+            [outlined]="true"
+            (onClick)="onGmProfileSelect()"
+          />
+        } @else {
+          <strong>{{ resolvedGmDisplayName() }}</strong>
+        }
+      </div>
     </div>
 
-    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
-      <span class="status-text status-text--muted">
+    <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
+      <span class="status-text status-text--muted basis-50 flex-shrink-0">
         {{ i18n.list().playersHeaderLabel }}
       </span>
 
-      <strong>{{ playersLabel() }}</strong>
+      <div class="flex-1 min-w-0 text-right">
+        <strong>{{ playersLabel() }}</strong>
+      </div>
     </div>
 
-    <div class="flex-row-between-center flex-row-between-stretch-sm gap-sm">
-      <span class="status-text status-text--muted">
+    <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
+      <span class="status-text status-text--muted basis-50 flex-shrink-0">
         {{ i18n.list().minAgeHeaderLabel }}
       </span>
 
-      <strong>{{ minAgeLabel() }}</strong>
+      <div class="flex-1 min-w-0 text-right">
+        <strong>{{ minAgeLabel() }}</strong>
+      </div>
     </div>
   </div>
 
@@ -64,7 +78,9 @@
 
     <div class="session-details__description">
       @if (imageUrl()) {
-        <div class="image__preview image__preview--circle session-details__image">
+        <div
+          class="image__preview image__preview--circle session-details__image"
+        >
           <p-image
             [src]="imageUrl()!"
             [alt]="session().title"
