@@ -119,13 +119,12 @@
     <p-accordion>
       @for (session of sortedSessions(); track session.id) {
         <p-accordion-panel [value]="session.id">
-          <p-accordion-header class="mg-section__title mg-section__title--md">
+          <p-accordion-header class="">
             <div
-              class="flex-row-start-stretch flex-col-start-center-xs w-100 gap-xs pr-sm"
+              class="flex-col-start-center w-100 gap-xs pr-sm"
             >
-              <strong class="small-caps">{{ session.title }}</strong>
-              <span class="hide-down-xs">-</span>
-              <span class="small-caps">{{ session.system.name }}</span>
+              <strong class="small-caps mg-section__title mg-section__title--md m-0">{{ session.title }}</strong>
+               <span class="text-center"><app-system-chip [system]="session.system" displayType="text"></app-system-chip></span>
             </div>
           </p-accordion-header>
 

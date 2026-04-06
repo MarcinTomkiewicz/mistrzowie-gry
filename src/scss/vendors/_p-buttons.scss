@@ -261,6 +261,11 @@
   );
 }
 
+:root {
+  --p-button-icon-only-width: 40px;
+  --p-button-sm-icon-only-width: 40px
+}
+
 .link-like {
   @include _button-link-like(100%);
 }

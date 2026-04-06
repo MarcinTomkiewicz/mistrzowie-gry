@@ -17,15 +17,6 @@
   border-radius: v.$radius-md;
   background: v.$color-bg-surface;
   overflow: hidden;
-
-//   & + .p-accordion-panel {
-//     margin-top: map.get(v.$spacings, "sm");
-//   }
-}
-
-/* header wrapper */
-.p-accordionheader {
-  margin: 0;
 }
 
 /* prawdziwy clickable element */
@@ -33,14 +24,10 @@
   width: 100%;
   background: transparent;
   border: 0;
+  margin: 0;
 
-//   padding: map.get(v.$spacings, "sm") map.get(v.$spacings, "md");
+  color: v.$color-text;
 
-//   color: v.$heading-color;
-//   font-family: v.$font-family-display;
-//   font-size: map.get(v.$font-sizes, "sm");
-//   font-weight: 800;
-//   line-height: 1.1;
 
   display: flex;
   align-items: center;
@@ -50,14 +37,6 @@
   cursor: pointer;
   transition: background-color v.$transition-fast, color v.$transition-fast;
 }
-
-/* hover */
-// @media (hover: hover) and (pointer: fine) {
-//   .p-accordionheader:hover {
-//     background: color-mix(in srgb, v.$color-bg 60%, transparent);
-//     color: v.$color-white;
-//   }
-// }
 
 /* focus-visible — spójne z resztą UI */
 .p-accordionheader:focus-visible {
