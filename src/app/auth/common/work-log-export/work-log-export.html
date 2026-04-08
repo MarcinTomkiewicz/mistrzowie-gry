@@ -1,0 +1,19 @@
+<div class="flex-row-end-center flex-wrap gap-xs">
+  <p-button
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    [label]="csvLabel()"
+    icon="pi pi-read"
+    (onClick)="exportCsv()"
+  />
+
+  <p-button
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    [label]="xlsLabel()"
+    icon="pi pi-evil-book"
+    (onClick)="exportXls()"
+  />
+</div>

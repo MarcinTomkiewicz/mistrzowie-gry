@@ -1,0 +1,147 @@
+<section class="mg-section">
+  <div class="mg-container flex-col-start-center gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.workLogOverview().title }}</h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.workLogOverview().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    <section class="mg-card flex-col-start-center gap-md p-md w-100">
+      <div class="flex-row-between-center gap-sm w-100">
+        <p-button
+          severity="secondary"
+          [outlined]="monthOffset() !== -1"
+          [label]="isCompactView() ? undefined : i18n.actions().previousMonthLabel"
+          [icon]="isCompactView() ? 'pi pi-point-left' : undefined"
+          [ariaLabel]="i18n.actions().previousMonthLabel"
+          (onClick)="switchMonth(-1)"
+        />
+
+        <strong
+          class="mg-section__title mg-section__title--sm mg-section__title--no-margin flex-1 text-center"
+        >
+          {{ monthScope().label }}
+        </strong>
+
+        <p-button
+          severity="secondary"
+          [outlined]="monthOffset() !== 0"
+          [label]="isCompactView() ? undefined : i18n.actions().currentMonthLabel"
+          [icon]="isCompactView() ? 'pi pi-point-right' : undefined"
+          [ariaLabel]="i18n.actions().currentMonthLabel"
+          (onClick)="switchMonth(0)"
+        />
+      </div>
+
+      <div class="flex-row-end-center flex-wrap gap-sm w-100">
+        <span class="tag-badge tag-badge--success">
+          {{ i18n.workLogOverview().totalHoursLabel }}: {{ totalHours() }} h
+        </span>
+      </div>
+
+      <div class="flex-row-end-center flex-wrap gap-sm w-100">
+        <app-work-log-export
+          [rows]="exportRows()"
+          [fileBaseName]="createExportFileBaseName()"
+          [csvLabel]="i18n.actions().exportCsvLabel"
+          [xlsLabel]="i18n.actions().exportXlsLabel"
+        />
+      </div>
+    </section>
+
+    @if (overview().length) {
+      <div class="w-100">
+        <p-accordion>
+          @for (item of overview(); track item.user.id) {
+            <p-accordion-panel [value]="item.user.id">
+              <p-accordion-header>
+                <div class="flex-row-between-center gap-sm pr-sm w-100">
+                  <strong>{{ displayName(item.user) }}</strong>
+
+                  <span class="tag-badge tag-badge--success">
+                    {{ formatHours(item.totalHours) }} h
+                  </span>
+                </div>
+              </p-accordion-header>
+
+              <p-accordion-content>
+                @if (item.days.length) {
+                  <div class="w-100" style="overflow-x: auto">
+                    <p-table
+                      [value]="[...item.days]"
+                      dataKey="date"
+                      class="w-100 min-w-500"
+                    >
+                    <ng-template #header>
+                      <tr>
+                        <th class="small-caps">{{ i18n.form().dateLabel }}</th>
+                        <th class="small-caps">{{ i18n.form().rangesLabel }}</th>
+                        <th class="small-caps">{{ i18n.form().commentLabel }}</th>
+                        <th class="small-caps text-center">
+                          {{ i18n.form().chaoticThursdayLabel }}
+                        </th>
+                        <th class="small-caps text-right">
+                          {{ i18n.form().totalHoursLabel }}
+                        </th>
+                      </tr>
+                    </ng-template>
+
+                    <ng-template #body let-day>
+                      <tr>
+                        <td>{{ formatDateLabel(day.date, 'pl-PL') }}</td>
+                        <td>
+                          <div class="flex-row-start-center flex-wrap gap-xs">
+                            @for (range of day.ranges; track range.id || $index) {
+                              <span class="tag-badge">
+                                {{ formatRangeLabel(range.startOffset, range.endOffset) }}
+                              </span>
+                            }
+                          </div>
+                        </td>
+                        <td>{{ day.comment || '' }}</td>
+                        <td class="text-center">
+                          {{
+                            day.isChaoticThursday
+                              ? i18n.form().chaoticThursdayYes
+                              : i18n.form().chaoticThursdayNo
+                          }}
+                        </td>
+                        <td class="text-right">
+                          <span class="tag-badge tag-badge--success">
+                            {{ getDayHours(day) }}
+                            h
+                          </span>
+                        </td>
+                      </tr>
+                    </ng-template>
+                    </p-table>
+                  </div>
+                } @else {
+                  <div class="flex-col-start-center gap-xs">
+                    <strong>{{ i18n.workLogOverview().emptyUserTitle }}</strong>
+                    <p class="m-0">{{ i18n.workLogOverview().emptyUserDescription }}</p>
+                  </div>
+                }
+              </p-accordion-content>
+            </p-accordion-panel>
+          }
+        </p-accordion>
+      </div>
+    } @else if (!isLoading()) {
+      <section class="mg-card flex-col-start-center gap-xs p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.workLogOverview().emptyStateTitle }}
+        </h2>
+
+        <p class="m-0">{{ i18n.workLogOverview().emptyStateDescription }}</p>
+      </section>
+    }
+  </div>
+</section>

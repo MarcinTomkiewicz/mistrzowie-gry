@@ -25,7 +25,11 @@ import { Auth } from '../../../core/services/auth/auth';
 import { GmAvailability } from '../../../core/services/gm-availability/gm-availability';
 import { GmAvailabilityStore } from '../../../core/services/gm-availability-store/gm-availability-store';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import { GmAvailabilityMutationError } from '../../../core/types/gm-availability';
+import {
+  GmAvailabilityHourValue,
+  GmAvailabilityMutationError,
+} from '../../../core/types/gm-availability';
+import { HourOffsetValue } from '../../../core/types/hour-offset';
 import {
   addDays,
   compareDatesByDay,
@@ -37,14 +41,16 @@ import {
   toIsoDate,
 } from '../../../core/utils/date';
 import {
+  createEndHourOffsetOptions,
+  createHourOffsetOptions,
+  normalizeEndHourOffset,
+} from '../../../core/utils/time';
+import {
   createGmAvailabilityEditorRanges,
-  createGmAvailabilityEndHourOptions,
-  createGmAvailabilityHourOptions,
   createGmAvailabilityRangeFormGroup,
   createDefaultGmAvailabilityRange,
   getGmAvailabilityMutationError,
   mapGmAvailabilityRangeFormGroupsToRanges,
-  normalizeGmAvailabilityEndOffset,
   replaceGmAvailabilityRangeFormGroups,
 } from '../../../core/utils/gm-availability/gm-availability.util';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
@@ -95,7 +101,10 @@ export class GmAvailabilityComponent {
   });
   protected readonly ranges = this.editorForm.controls.ranges;
 
-  protected readonly startHourOptions = createGmAvailabilityHourOptions(0, 24);
+  protected readonly startHourOptions = createHourOffsetOptions(
+    0,
+    HourOffsetValue.DayTotalHours,
+  ) as IGmAvailabilityHourOption[];
   protected readonly formatDateLabel = formatDateLabel;
   protected readonly selectedDate = this.store.selectedDate;
   protected readonly calendarDays = this.store.calendarDays;
@@ -181,14 +190,17 @@ export class GmAvailabilityComponent {
   protected getEndHourOptions(
     rangeGroup: GmAvailabilityRangeFormGroup,
   ): IGmAvailabilityHourOption[] {
-    return createGmAvailabilityEndHourOptions(
+    return createEndHourOffsetOptions(
       Number(rangeGroup.controls.startOffset.getRawValue()),
-    );
+      GmAvailabilityHourValue.MinDurationHours,
+      HourOffsetValue.DayTotalHours,
+    ) as IGmAvailabilityHourOption[];
   }
 
   protected syncRangeEndOffset(rangeGroup: GmAvailabilityRangeFormGroup): void {
-    const minEndOffset = normalizeGmAvailabilityEndOffset(
+    const minEndOffset = normalizeEndHourOffset(
       Number(rangeGroup.controls.startOffset.getRawValue()),
+      GmAvailabilityHourValue.MinDurationHours,
     );
 
     if (Number(rangeGroup.controls.endOffset.getRawValue()) < minEndOffset) {

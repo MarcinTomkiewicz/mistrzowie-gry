@@ -1,0 +1,335 @@
+<section class="mg-section">
+  <div class="mg-container flex-col-start-center gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.myWorkLog().title }}</h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.myWorkLog().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    <section class="mg-card flex-col-start-center gap-md p-md w-100">
+      <div class="flex-row-between-center gap-sm w-100">
+        <p-button
+          severity="secondary"
+          [outlined]="monthOffset() !== -1"
+          [label]="isCompactView() ? undefined : i18n.actions().previousMonthLabel"
+          [icon]="isCompactView() ? 'pi pi-point-left' : undefined"
+          [ariaLabel]="i18n.actions().previousMonthLabel"
+          (onClick)="switchMonth(-1)"
+        />
+
+        <strong
+          class="mg-section__title mg-section__title--md mg-section__title--no-margin flex-1 text-center"
+        >
+          {{ monthScope().label }}
+        </strong>
+
+        <p-button
+          severity="secondary"
+          [outlined]="monthOffset() !== 0"
+          [label]="isCompactView() ? undefined : i18n.actions().currentMonthLabel"
+          [icon]="isCompactView() ? 'pi pi-point-right' : undefined"
+          [ariaLabel]="i18n.actions().currentMonthLabel"
+          (onClick)="switchMonth(0)"
+        />
+      </div>
+
+      <div class="flex-row-center-center w-100">
+        <div class="flex-col-start-center gap-xs">
+          <span>{{ i18n.myWorkLog().monthHint }}</span>
+        </div>
+      </div>
+
+      <div class="flex-row-end-center flex-wrap gap-sm w-100">
+        <span class="tag-badge tag-badge--success">
+          {{ i18n.myWorkLog().totalHoursLabel }}:
+          {{ formatHours(totalHours()) }} h
+        </span>
+      </div>
+
+      @if (isPreviousMonth() && !monthScope().isEditable) {
+        <div class="mg-card flex-col-start-center gap-xs p-sm w-100">
+          <strong>{{ i18n.myWorkLog().lockedPreviousMonthTitle }}</strong>
+          <p class="m-0">{{ i18n.myWorkLog().lockedPreviousMonthDescription }}</p>
+        </div>
+      }
+    </section>
+
+    <div class="w-100 hide-down-sm">
+      <p-table [value]="rows()" dataKey="date" class="w-100">
+        <ng-template #header>
+          <tr>
+            <th class="small-caps">{{ i18n.form().dateLabel }}</th>
+            <th class="small-caps">{{ i18n.form().rangesLabel }}</th>
+            <th class="small-caps">{{ i18n.form().commentLabel }}</th>
+            <th class="small-caps text-center">
+              {{ i18n.form().chaoticThursdayLabel }}
+            </th>
+            <th class="small-caps text-right">{{ i18n.form().totalHoursLabel }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-row>
+          <tr>
+            <td>
+              <div class="flex-col-start-center gap-xs">
+                <strong>{{ row.weekdayLabel }}</strong>
+                <span>{{ row.dateLabel }}</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="flex-col-start-center gap-sm w-100">
+                @if (row.day?.ranges?.length) {
+                  @for (range of row.day?.ranges ?? []; track range.id) {
+                    <div class="flex-row-start-center flex-wrap gap-xs">
+                      <p-select
+                        [options]="startHourOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        [ngModel]="range.startOffset"
+                        [disabled]="!monthScope().isEditable"
+                        (ngModelChange)="updateRangeStart(row.date, range.id, $event)"
+                      />
+
+                      <span>{{ i18n.form().toLabel }}</span>
+
+                      <p-select
+                        [options]="getEndHourOptions(range)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        [ngModel]="range.endOffset"
+                        [disabled]="!monthScope().isEditable"
+                        (ngModelChange)="updateRangeEnd(row.date, range.id, $event)"
+                      />
+
+                      <p-button
+                        severity="danger"
+                        [outlined]="true"
+                        size="small"
+                        icon="pi pi-demolish"
+                        [disabled]="!monthScope().isEditable"
+                        (onClick)="removeRange(row.date, range.id)"
+                      />
+                    </div>
+                  }
+                } @else {
+                  <span>{{ i18n.form().emptyDayDescription }}</span>
+                }
+
+                <div class="flex-row-start-center flex-wrap gap-xs">
+                  <p-button
+                    severity="warn"
+                    size="small"
+                    [label]="i18n.actions().addRangeLabel"
+                    [disabled]="!monthScope().isEditable"
+                    icon="pi pi-add-plus"
+                    (onClick)="addRange(row.date)"
+                  />
+
+                  <p-button
+                    severity="danger"
+                    [outlined]="true"
+                    size="small"
+                    [label]="i18n.actions().clearDayLabel"
+                    [disabled]="!monthScope().isEditable"
+                    icon="pi pi-demolish"
+                    (onClick)="clearDay(row.date)"
+                  />
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <textarea
+                pTextarea
+                class="w-100"
+                rows="2"
+                [ngModel]="row.day?.comment ?? ''"
+                [disabled]="!monthScope().isEditable"
+                [attr.aria-label]="i18n.form().commentLabel"
+                (ngModelChange)="updateComment(row.date, $event)"
+              ></textarea>
+            </td>
+
+            <td class="text-center">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="row.day?.isChaoticThursday ?? false"
+                [disabled]="!row.isChaoticThursdayDay || !monthScope().isEditable"
+                [pTooltip]="
+                  row.isChaoticThursdayDay
+                    ? i18n.form().chaoticThursdayTooltip
+                    : ''
+                "
+                tooltipPosition="top"
+                (ngModelChange)="updateChaoticThursday(row.date, $event)"
+              />
+            </td>
+
+            <td class="text-right">
+              <span class="tag-badge tag-badge--success">
+                {{ formatHours(row.totalHours) }} h
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="w-100 show-down-sm">
+      <p-accordion>
+        @for (row of rows(); track row.date) {
+          <p-accordion-panel [value]="row.date">
+            <p-accordion-header>
+              <div class="flex-row-between-center gap-sm pr-sm w-100">
+                <strong>{{ row.weekdayLabel }}</strong>
+                <span class="tag-badge tag-badge--success">
+                  {{ formatHours(row.totalHours) }} h
+                </span>
+              </div>
+            </p-accordion-header>
+
+            <p-accordion-content>
+              <div class="flex-col-start-center gap-sm">
+                <div class="flex-row-between-center gap-sm w-100">
+                  <span>{{ row.dateLabel }}</span>
+                </div>
+
+                <div class="flex-row-between-center gap-sm w-100">
+                  <span>{{ i18n.form().chaoticThursdayLabel }}</span>
+
+                  <p-checkbox
+                    [binary]="true"
+                    [ngModel]="row.day?.isChaoticThursday ?? false"
+                    [disabled]="!row.isChaoticThursdayDay || !monthScope().isEditable"
+                    [pTooltip]="
+                      row.isChaoticThursdayDay
+                        ? i18n.form().chaoticThursdayTooltip
+                        : ''
+                    "
+                    tooltipPosition="top"
+                    (ngModelChange)="updateChaoticThursday(row.date, $event)"
+                  />
+                </div>
+
+                @if (row.day?.ranges?.length) {
+                  @for (range of row.day?.ranges ?? []; track range.id) {
+                    <div class="flex-col-start-center gap-xs w-100">
+                      <div class="flex-row-start-center flex-wrap gap-xs">
+                        <p-select
+                          [options]="startHourOptions"
+                          optionLabel="label"
+                          optionValue="value"
+                          appendTo="body"
+                          [ngModel]="range.startOffset"
+                          [disabled]="!monthScope().isEditable"
+                          (ngModelChange)="updateRangeStart(row.date, range.id, $event)"
+                        />
+
+                        <p-select
+                          [options]="getEndHourOptions(range)"
+                          optionLabel="label"
+                          optionValue="value"
+                          appendTo="body"
+                          [ngModel]="range.endOffset"
+                          [disabled]="!monthScope().isEditable"
+                          (ngModelChange)="updateRangeEnd(row.date, range.id, $event)"
+                        />
+                      </div>
+
+                      <div class="flex-row-end-center gap-xs w-100">
+                        <p-button
+                          severity="danger"
+                          [outlined]="true"
+                          size="small"
+                          icon="pi pi-demolish"
+                          [disabled]="!monthScope().isEditable"
+                          (onClick)="removeRange(row.date, range.id)"
+                        />
+                      </div>
+                    </div>
+                  }
+                } @else {
+                  <span>{{ i18n.form().emptyDayDescription }}</span>
+                }
+
+                <div class="flex-col-start-stretch gap-xs w-100">
+                  <label [for]="'work-log-comment-' + row.date">
+                    {{ i18n.form().commentLabel }}
+                  </label>
+
+                  <textarea
+                    pTextarea
+                    class="w-100"
+                    [id]="'work-log-comment-' + row.date"
+                    rows="3"
+                    [ngModel]="row.day?.comment ?? ''"
+                    [disabled]="!monthScope().isEditable"
+                    (ngModelChange)="updateComment(row.date, $event)"
+                  ></textarea>
+                </div>
+
+                <div class="flex-row-start-center flex-wrap gap-xs w-100">
+                  <p-button
+                    severity="warn"
+                    size="small"
+                    [label]="i18n.actions().addRangeLabel"
+                    [disabled]="!monthScope().isEditable"
+                    icon="pi pi-add-plus"
+                    (onClick)="addRange(row.date)"
+                  />
+
+                  <p-button
+                    severity="danger"
+                    [outlined]="true"
+                    size="small"
+                    [label]="i18n.actions().clearDayLabel"
+                    [disabled]="!monthScope().isEditable"
+                    icon="pi pi-demolish"
+                    (onClick)="clearDay(row.date)"
+                  />
+                </div>
+              </div>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    </div>
+
+    <div class="flex-row-end-center flex-wrap gap-xs w-100">
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        [label]="i18n.actions().resetChangesLabel"
+        [disabled]="!hasChanges() || isSaving()"
+        (onClick)="resetChanges()"
+      />
+
+      <p-button
+        severity="success"
+        [label]="i18n.commonActions().save"
+        [disabled]="!hasChanges() || !monthScope().isEditable || isSaving()"
+        [loading]="isSaving()"
+        icon="pi pi-done-it"
+        (onClick)="save()"
+      />
+    </div>
+  </div>
+</section>
+
+<app-info-dialog
+  [visible]="infoDialogVisible()"
+  [title]="infoDialogContent()?.title ?? ''"
+  [body]="infoDialogContent()?.body ?? ''"
+  variant="info"
+  (visibleChange)="infoDialogVisible.set(false)"
+/>

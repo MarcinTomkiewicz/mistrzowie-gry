@@ -228,6 +228,84 @@ export interface GmAvailabilityOverviewToastTranslations {
   loadFailedDetail: string;
 }
 
+export interface MyWorkLogTranslations {
+  title: string;
+  subtitle: string;
+  monthHint: string;
+  totalHoursLabel: string;
+  lockedPreviousMonthTitle: string;
+  lockedPreviousMonthDescription: string;
+}
+
+export interface MyWorkLogActionsTranslations {
+  previousMonthLabel: string;
+  currentMonthLabel: string;
+  addRangeLabel: string;
+  clearDayLabel: string;
+  resetChangesLabel: string;
+}
+
+export interface MyWorkLogFormTranslations {
+  dateLabel: string;
+  rangesLabel: string;
+  commentLabel: string;
+  chaoticThursdayLabel: string;
+  chaoticThursdayTooltip: string;
+  totalHoursLabel: string;
+  toLabel: string;
+  emptyDayDescription: string;
+}
+
+export interface MyWorkLogDialogTranslations {
+  invalidDurationTitle: string;
+  invalidDurationBody: string;
+  overlapTitle: string;
+  overlapBody: string;
+  noSpaceTitle: string;
+  noSpaceBody: string;
+}
+
+export interface MyWorkLogToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+}
+
+export interface WorkLogOverviewTranslations {
+  title: string;
+  subtitle: string;
+  totalHoursLabel: string;
+  emptyStateTitle: string;
+  emptyStateDescription: string;
+  emptyUserTitle: string;
+  emptyUserDescription: string;
+}
+
+export interface WorkLogOverviewActionsTranslations {
+  previousMonthLabel: string;
+  currentMonthLabel: string;
+  exportCsvLabel: string;
+  exportXlsLabel: string;
+}
+
+export interface WorkLogOverviewFormTranslations {
+  dateLabel: string;
+  rangesLabel: string;
+  commentLabel: string;
+  chaoticThursdayLabel: string;
+  chaoticThursdayYes: string;
+  chaoticThursdayNo: string;
+  totalHoursLabel: string;
+}
+
+export interface WorkLogOverviewToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+}
+
 export type EventSignupFormTranslations = {
   modeLabel: string;
 };
@@ -328,8 +406,11 @@ export type EventSignupFormSeoTranslations = {
 export interface UserMenuTranslations {
   greeting: string;
   accountSectionTitle: string;
+  gmZoneSectionTitle: string;
   administrationSectionTitle: string;
   editProfileLabel: string;
   eventSignupLabel: string;
+  myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
+  workLogOverviewLabel: string;
 }

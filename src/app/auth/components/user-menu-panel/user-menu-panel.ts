@@ -33,11 +33,15 @@ export class UserMenuPanel {
   readonly menuSections = computed(() =>
     buildUserMenu({
       accountTitle: this.i18n.userMenu().accountSectionTitle,
+      gmZoneTitle: this.i18n.userMenu().gmZoneSectionTitle,
       administrationTitle: this.i18n.userMenu().administrationSectionTitle,
       editProfileLabel: this.i18n.userMenu().editProfileLabel,
       eventSignupLabel: this.i18n.userMenu().eventSignupLabel,
+      myWorkLogLabel: this.i18n.userMenu().myWorkLogLabel,
       gmAvailabilityOverviewLabel:
         this.i18n.userMenu().gmAvailabilityOverviewLabel,
+      workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
+      canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeAdministration: hasMinimumRole(
         this.auth.user(),
         'customer_manager',
