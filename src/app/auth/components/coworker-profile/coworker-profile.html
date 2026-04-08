@@ -1,0 +1,193 @@
+<section class="mg-section">
+  <div class="mg-container flex-col-start-center gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.coworkerProfile().title }}</h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.coworkerProfile().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    <section class="mg-card flex-col-start-center gap-md p-md w-100">
+      <div class="flex-col-start-center gap-xs w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.coworkerProfile().officialSectionTitle }}
+        </h2>
+        <p class="m-0">{{ i18n.coworkerProfile().officialSectionDescription }}</p>
+      </div>
+
+      <form
+        [formGroup]="form"
+        novalidate
+        class="mg-form flex-col-start-center gap-sm w-100"
+      >
+        <div class="flex-row-start-start flex-col-start-center-sm gap-sm w-100">
+          <div class="flex-1 w-100-sm">
+            <p-iftalabel class="w-100">
+              <input
+                pInputText
+                class="w-100"
+                id="coworker-first-name"
+                formControlName="firstName"
+                autocomplete="given-name"
+              />
+              <label for="coworker-first-name">
+                {{ i18n.form().firstNameLabel }}
+              </label>
+            </p-iftalabel>
+          </div>
+
+          <div class="flex-1 w-100-sm">
+            <p-iftalabel class="w-100">
+              <input
+                pInputText
+                class="w-100"
+                id="coworker-last-name"
+                formControlName="lastName"
+                autocomplete="family-name"
+              />
+              <label for="coworker-last-name">
+                {{ i18n.form().lastNameLabel }}
+              </label>
+            </p-iftalabel>
+          </div>
+        </div>
+
+        <div class="mg-card flex-col-start-center gap-xs p-sm w-100">
+          <div class="flex-row-between-center flex-wrap gap-sm w-100">
+            <strong>{{ i18n.coworkerProfile().protectedSectionTitle }}</strong>
+            <span class="tag-badge">{{ i18n.coworkerProfile().protectedSectionBadge }}</span>
+          </div>
+
+          <p class="m-0">
+            {{ i18n.coworkerProfile().protectedSectionDescription }}
+          </p>
+
+          <div class="flex-row-start-start flex-col-start-center-sm gap-sm w-100">
+            <div class="flex-1 w-100-sm">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-pesel"
+                  formControlName="pesel"
+                  autocomplete="off"
+                />
+                <label for="coworker-pesel">{{ i18n.form().peselLabel }}</label>
+              </p-iftalabel>
+            </div>
+
+            <div class="flex-1 w-100-sm">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-bank-account"
+                  formControlName="bankAccount"
+                  autocomplete="off"
+                />
+                <label for="coworker-bank-account">
+                  {{ i18n.form().bankAccountLabel }}
+                </label>
+              </p-iftalabel>
+            </div>
+          </div>
+
+          <div class="flex-row-start-start flex-col-start-center-sm gap-sm w-100">
+            <div class="flex-1 w-100-sm">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-street"
+                  formControlName="street"
+                  autocomplete="street-address"
+                />
+                <label for="coworker-street">{{ i18n.form().streetLabel }}</label>
+              </p-iftalabel>
+            </div>
+
+            <div class="w-100-sm" style="max-width: 12rem">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-house-number"
+                  formControlName="houseNumber"
+                  autocomplete="address-line2"
+                />
+                <label for="coworker-house-number">
+                  {{ i18n.form().houseNumberLabel }}
+                </label>
+              </p-iftalabel>
+            </div>
+
+            <div class="w-100-sm" style="max-width: 12rem">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-apartment-number"
+                  formControlName="apartmentNumber"
+                  autocomplete="address-line3"
+                />
+                <label for="coworker-apartment-number">
+                  {{ i18n.form().apartmentNumberLabel }}
+                </label>
+              </p-iftalabel>
+            </div>
+          </div>
+
+          <div class="flex-row-start-start flex-col-start-center-sm gap-sm w-100">
+            <div class="w-100-sm" style="max-width: 12rem">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-postal-code"
+                  formControlName="postalCode"
+                  autocomplete="postal-code"
+                />
+                <label for="coworker-postal-code">
+                  {{ i18n.form().postalCodeLabel }}
+                </label>
+              </p-iftalabel>
+            </div>
+
+            <div class="flex-1 w-100-sm">
+              <p-iftalabel class="w-100">
+                <input
+                  pInputText
+                  class="w-100"
+                  id="coworker-city"
+                  formControlName="city"
+                  autocomplete="address-level2"
+                />
+                <label for="coworker-city">{{ i18n.form().cityLabel }}</label>
+              </p-iftalabel>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="flex-row-between-center flex-wrap gap-sm w-100">
+        <p class="m-0">
+          {{ i18n.coworkerProfile().securityNotice }}
+        </p>
+
+        <p-button
+          severity="success"
+          [label]="i18n.actions().saveLabel"
+          [disabled]="isSaveDisabled()"
+          [loading]="isSaving()"
+          (onClick)="save()"
+        />
+      </div>
+    </section>
+  </div>
+</section>

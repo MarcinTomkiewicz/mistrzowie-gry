@@ -6,6 +6,7 @@ export interface BuildUserMenuArgs {
   administrationTitle: string;
   editProfileLabel: string;
   eventSignupLabel: string;
+  coworkerProfileLabel: string;
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
@@ -37,6 +38,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           id: 'event-signup',
           label: args.eventSignupLabel,
           path: '/auth/event-signup',
+        },
+        {
+          id: 'coworker-profile',
+          label: args.coworkerProfileLabel,
+          path: '/auth/gm/coworker-profile',
         },
         {
           id: 'my-work-log',

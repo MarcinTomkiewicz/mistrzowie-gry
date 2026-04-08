@@ -14,16 +14,9 @@ import {
   mapWorkLogDaysToRecords,
   mapWorkLogRecordsToDays,
 } from '../../utils/work-log/work-log.util';
+import { getRolesAtOrAbove } from '../../utils/roles';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
-
-const WORK_LOG_ALLOWED_ROLES = [
-  'gm',
-  'marketing_manager',
-  'customer_manager',
-  'lead_coordinator',
-  'admin',
-] as const satisfies readonly IUser['appRole'][];
 
 @Injectable({ providedIn: 'root' })
 export class WorkLog {
@@ -83,7 +76,7 @@ export class WorkLog {
         filters: {
           appRole: {
             operator: FilterOperator.IN,
-            value: [...WORK_LOG_ALLOWED_ROLES],
+            value: getRolesAtOrAbove('gm'),
           },
         },
       },

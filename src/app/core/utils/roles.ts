@@ -1,4 +1,4 @@
-import { AppRole } from '../types/app-role';
+import { APP_ROLES, AppRole } from '../types/app-role';
 import { IUser } from '../interfaces/i-user';
 
 const ROLE_ACCESS_LEVEL: Record<AppRole, number> = {
@@ -26,4 +26,10 @@ export function hasMinimumRole(
   if (!user) return false;
 
   return ROLE_ACCESS_LEVEL[user.appRole] >= ROLE_ACCESS_LEVEL[requiredRole];
+}
+
+export function getRolesAtOrAbove(requiredRole: AppRole): AppRole[] {
+  return APP_ROLES.filter(
+    (role) => ROLE_ACCESS_LEVEL[role] >= ROLE_ACCESS_LEVEL[requiredRole],
+  );
 }

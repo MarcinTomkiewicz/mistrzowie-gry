@@ -56,6 +56,7 @@ export interface IUserWorkLogOverviewVm {
 export interface IUserWorkLogExportRow {
   userId: string;
   firstName: string;
+  lastName: string;
   totalHours: number;
   chaoticThursdayDatesLabel: string;
 }

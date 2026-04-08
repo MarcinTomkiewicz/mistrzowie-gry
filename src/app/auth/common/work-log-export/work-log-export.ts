@@ -21,12 +21,14 @@ export class WorkLogExportComponent {
     const header = [
       'User ID',
       'Imie MG',
+      'Nazwisko MG',
       'Suma godzin',
       'Daty Chaotycznych Czwartkow',
     ];
     const data = this.rows().map((row) => [
       row.userId,
       row.firstName,
+      row.lastName,
       String(row.totalHours).replace('.', ','),
       row.chaoticThursdayDatesLabel,
     ]);
@@ -45,6 +47,7 @@ export class WorkLogExportComponent {
     const header = [
       'User ID',
       'Imie MG',
+      'Nazwisko MG',
       'Suma godzin',
       'Daty Chaotycznych Czwartkow',
     ];
@@ -54,6 +57,7 @@ export class WorkLogExportComponent {
           <Row>
             <Cell><Data ss:Type="String">${escapeXml(row.userId)}</Data></Cell>
             <Cell><Data ss:Type="String">${escapeXml(row.firstName)}</Data></Cell>
+            <Cell><Data ss:Type="String">${escapeXml(row.lastName)}</Data></Cell>
             <Cell><Data ss:Type="Number">${String(row.totalHours)}</Data></Cell>
             <Cell><Data ss:Type="String">${escapeXml(row.chaoticThursdayDatesLabel)}</Data></Cell>
           </Row>

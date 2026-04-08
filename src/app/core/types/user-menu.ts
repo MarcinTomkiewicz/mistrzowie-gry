@@ -1,6 +1,7 @@
 export type UserMenuItemId =
   | 'edit-profile'
   | 'event-signup'
+  | 'coworker-profile'
   | 'my-work-log'
   | 'gm-availability-overview'
   | 'work-log-overview';

@@ -20,6 +20,10 @@ const loaders = {
     import('./components/my-work-log/my-work-log').then(
       (m) => m.MyWorkLogComponent,
     ),
+  coworkerProfile: () =>
+    import('./components/coworker-profile/coworker-profile').then(
+      (m) => m.CoworkerProfileComponent,
+    ),
   gmAvailabilityOverview: () =>
     import('./components/gm-availability-overview/gm-availability-overview').then(
       (m) => m.GmAvailabilityOverviewComponent,
@@ -47,6 +51,11 @@ export const authRoutes: Routes = [
     path: 'event-signup/:eventSlug/:occurrenceDate/signup',
     loadComponent: loaders.eventSignupForm,
     canActivate: [authGuard],
+  },
+  {
+    path: 'gm/coworker-profile',
+    loadComponent: loaders.coworkerProfile,
+    canActivate: [authGuard, minimumRoleGuard('gm')],
   },
   {
     path: 'gm/work-log',

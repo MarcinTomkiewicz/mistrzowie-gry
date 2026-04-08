@@ -63,7 +63,7 @@
             <p-accordion-panel [value]="item.user.id">
               <p-accordion-header>
                 <div class="flex-row-between-center gap-sm pr-sm w-100">
-                  <strong>{{ displayName(item.user) }}</strong>
+                  <strong>{{ getOverviewUserLabel(item.user) }}</strong>
 
                   <span class="tag-badge tag-badge--success">
                     {{ formatHours(item.totalHours) }} h

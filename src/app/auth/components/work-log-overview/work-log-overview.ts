@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, map, switchMap } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { AccordionModule } from 'primeng/accordion';
@@ -22,7 +22,9 @@ import {
   IUserWorkLogRecord,
   WorkLogMonthOffset,
 } from '../../../core/interfaces/i-work-log';
+import { ICoworkerProfile } from '../../../core/interfaces/i-coworker-profile';
 import { Auth } from '../../../core/services/auth/auth';
+import { CoworkerProfile } from '../../../core/services/coworker-profile/coworker-profile';
 import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { WorkLog } from '../../../core/services/work-log/work-log';
@@ -55,6 +57,7 @@ import { createWorkLogOverviewI18n } from './work-log-overview.i18n';
 })
 export class WorkLogOverviewComponent {
   private readonly auth = inject(Auth);
+  private readonly coworkerProfile = inject(CoworkerProfile);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platform = inject(Platform);
   private readonly toast = inject(UiToast);
@@ -66,8 +69,15 @@ export class WorkLogOverviewComponent {
   protected readonly monthOffset = signal<WorkLogMonthOffset>(0);
 
   private readonly users = signal<readonly IUserWorkLogOverviewVm['user'][]>([]);
+  private readonly coworkerProfiles = signal<readonly ICoworkerProfile[]>([]);
   private readonly records = signal<readonly IUserWorkLogRecord[]>([]);
   private readonly loadedKey = signal<string | null>(null);
+  private readonly coworkerProfileByUserId = computed(
+    () =>
+      new Map(
+        this.coworkerProfiles().map((profile) => [profile.userId, profile] as const),
+      ),
+  );
 
   protected readonly monthScope = computed(() =>
     getWorkLogMonthScope(this.monthOffset()),
@@ -86,8 +96,8 @@ export class WorkLogOverviewComponent {
         };
       })
       .sort((left, right) =>
-        getUserDisplayName(left.user).localeCompare(
-          getUserDisplayName(right.user),
+        this.getOverviewUserLabel(left.user).localeCompare(
+          this.getOverviewUserLabel(right.user),
           'pl',
         ),
       ),
@@ -95,7 +105,8 @@ export class WorkLogOverviewComponent {
   protected readonly exportRows = computed<IUserWorkLogExportRow[]>(() =>
     this.overview().map((item) => ({
       userId: item.user.id,
-      firstName: item.user.firstName?.trim() || '',
+      firstName: this.getExportFirstName(item.user.id, item.user.firstName),
+      lastName: this.getExportLastName(item.user.id),
       totalHours: item.totalHours,
       chaoticThursdayDatesLabel: item.days
         .filter((day) => day.isChaoticThursday)
@@ -111,7 +122,6 @@ export class WorkLogOverviewComponent {
   protected readonly formatHours = formatWorkLogHours;
   protected readonly formatRangeLabel = formatHourOffsetRangeLabel;
   protected readonly formatDateLabel = formatDateLabel;
-  protected readonly displayName = getUserDisplayName;
 
   constructor() {
     const syncViewport = () => {
@@ -169,20 +179,56 @@ export class WorkLogOverviewComponent {
     this.isLoading.set(true);
     this.workLog
       .getOverview(this.monthOffset())
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        switchMap(({ users, records }) =>
+          this.coworkerProfile
+            .getProfilesByUserIds(users.map((user) => user.id))
+            .pipe(
+              map((coworkerProfiles) => ({
+                users,
+                records,
+                coworkerProfiles,
+              })),
+            ),
+        ),
+        finalize(() => this.isLoading.set(false)),
+      )
       .subscribe({
-        next: ({ users, records }) => {
+        next: ({ users, records, coworkerProfiles }) => {
           this.users.set(users);
           this.records.set(records);
+          this.coworkerProfiles.set(coworkerProfiles);
         },
         error: () => {
           this.users.set([]);
           this.records.set([]);
+          this.coworkerProfiles.set([]);
           this.toast.danger({
             summary: this.i18n.toast().loadFailedSummary,
             detail: this.i18n.toast().loadFailedDetail,
           });
         },
       });
+  }
+
+  protected getOverviewUserLabel(user: IUserWorkLogOverviewVm['user']): string {
+    const profile = this.coworkerProfileByUserId().get(user.id);
+    const officialName = [profile?.firstName?.trim(), profile?.lastName?.trim()]
+      .filter(Boolean)
+      .join(' ');
+
+    return officialName || getUserDisplayName(user);
+  }
+
+  private getExportFirstName(userId: string, fallbackFirstName: string | null): string {
+    return (
+      this.coworkerProfileByUserId().get(userId)?.firstName?.trim() ||
+      fallbackFirstName?.trim() ||
+      ''
+    );
+  }
+
+  private getExportLastName(userId: string): string {
+    return this.coworkerProfileByUserId().get(userId)?.lastName?.trim() || '';
   }
 }

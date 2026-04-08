@@ -306,6 +306,42 @@ export interface WorkLogOverviewToastTranslations {
   loadFailedDetail: string;
 }
 
+export interface CoworkerProfileTranslations {
+  title: string;
+  subtitle: string;
+  officialSectionTitle: string;
+  officialSectionDescription: string;
+  protectedSectionTitle: string;
+  protectedSectionBadge: string;
+  protectedSectionDescription: string;
+  securityNotice: string;
+}
+
+export interface CoworkerProfileFormTranslations {
+  firstNameLabel: string;
+  lastNameLabel: string;
+  peselLabel: string;
+  bankAccountLabel: string;
+  streetLabel: string;
+  houseNumberLabel: string;
+  apartmentNumberLabel: string;
+  postalCodeLabel: string;
+  cityLabel: string;
+}
+
+export interface CoworkerProfileActionsTranslations {
+  saveLabel: string;
+}
+
+export interface CoworkerProfileToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  saveFailedDetail: string;
+}
+
 export type EventSignupFormTranslations = {
   modeLabel: string;
 };
@@ -410,6 +446,7 @@ export interface UserMenuTranslations {
   administrationSectionTitle: string;
   editProfileLabel: string;
   eventSignupLabel: string;
+  coworkerProfileLabel: string;
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
