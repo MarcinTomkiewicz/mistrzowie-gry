@@ -12,6 +12,7 @@ import { IUser } from '../../interfaces/i-user';
 import { Backend } from '../backend/backend';
 import { IGmProfileLanguage, ILanguage } from '../../interfaces/i-languages';
 import { SessionRead } from '../session-read/session-read';
+import { getUserDisplayName } from '../../utils/user-display';
 
 @Injectable({ providedIn: 'root' })
 export class GmRead {
@@ -117,21 +118,7 @@ export class GmRead {
   }
 
   getDisplayName(profile: IGmPublicProfile): string {
-    const user = profile.user;
-
-    if (user.useNickname && user.nickname?.trim()) {
-      return user.nickname.trim();
-    }
-
-    if (user.firstName?.trim()) {
-      return user.firstName.trim();
-    }
-
-    if (user.nickname?.trim()) {
-      return user.nickname.trim();
-    }
-
-    return '';
+    return getUserDisplayName(profile.user);
   }
 
   private hydrateProfile(profile: IGmProfile): Observable<IGmPublicProfile> {

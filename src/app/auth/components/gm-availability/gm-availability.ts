@@ -328,7 +328,7 @@ export class GmAvailabilityComponent {
     );
   }
 
-  protected trackRange(
+    protected trackRange(
     index: number,
     rangeGroup: GmAvailabilityRangeFormGroup,
   ): string {

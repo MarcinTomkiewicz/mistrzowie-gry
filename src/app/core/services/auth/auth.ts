@@ -33,6 +33,7 @@ import { Supabase } from '../supabase/supabase';
 import { AppRole } from '../../types/app-role';
 import { AppAuthError } from '../../types/auth-error';
 import { mapAuthError } from '../../utils/auth-error';
+import { getUserDisplayName } from '../../utils/user-display';
 
 @Injectable({ providedIn: 'root' })
 export class Auth {
@@ -55,17 +56,7 @@ export class Auth {
   readonly userId = computed(() => this._user()?.id ?? null);
 
   readonly displayName = computed(() => {
-    const user = this._user();
-
-    if (!user) {
-      return '';
-    }
-
-    if (user.useNickname && user.nickname) {
-      return user.nickname;
-    }
-
-    return user.firstName ?? user.nickname ?? '';
+    return getUserDisplayName(this._user());
   });
 
   constructor() {

@@ -1,0 +1,123 @@
+<section class="mg-section">
+  <div class="mg-container flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">
+        {{ i18n.gmAvailabilityOverview().title }}
+      </h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.gmAvailabilityOverview().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    @if (gmOptions().length) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+          <div class="flex-col-start-stretch gap-xs">
+            <label>{{ i18n.gmAvailabilityOverview().selectLabel }}</label>
+            <p-select
+              class="w-100"
+              [options]="gmOptions()"
+              [showClear]="true"
+              [placeholder]="i18n.gmAvailabilityOverview().selectPlaceholder"
+              [ngModel]="selectedGmId()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              (ngModelChange)="onGmSelected($event)"
+            />
+          </div>
+
+          <div class="flex-col-evenly-stretch gap-xs">
+            <strong>
+              @if (selectedUser(); as selectedUser) {
+                {{ selectedUserLabel() }}
+              } @else {
+                {{ i18n.gmAvailabilityOverview().dayDetailsTitle }}
+              }
+            </strong>
+
+            <p class="m-0 justify-self-center">
+              {{
+                selectedUser()
+                  ? i18n.gmAvailabilityOverview().filteredHint
+                  : i18n.gmAvailabilityOverview().aggregateHint
+              }}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <app-universal-calendar
+        class="w-100"
+        [days]="calendarDays()"
+        [selectedDate]="selectedDate()"
+        mode="availability"
+        [minDate]="minDate"
+        [maxDate]="maxDate"
+        (dateSelected)="onDateSelected($event)"
+      />
+
+      @if (selectedDate()) {
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <div class="flex-col-start-stretch gap-xs">
+            <h2
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
+              {{ i18n.gmAvailabilityOverview().dayDetailsTitle }}
+            </h2>
+
+            <p class="mg-section__subtitle m-0">
+              {{ formatDateLabel(selectedDate()!, "pl-PL", true) }}
+            </p>
+          </div>
+
+          @if (selectedDayEntries().length) {
+            <div class="flex-col-start-stretch gap-sm">
+              @for (entry of selectedDayEntries(); track entry[0]) {
+                <div class="flex-row-start-center gap-sm">
+                  <strong>{{ gmDisplayNameById().get(entry[0]) || entry[0] }}</strong>
+
+                  <div class="flex-row-start-center flex-wrap gap-xs">
+                    @for (range of entry[1].ranges; track range.id || $index) {
+                      <span class="tag-badge tag-badge--success">
+                        {{
+                          formatHourOffsetRangeLabel(
+                            range.startOffset,
+                            range.endOffset
+                          )
+                        }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="flex-col-start-stretch gap-xs">
+              <strong>{{ i18n.gmAvailabilityOverview().emptyDayTitle }}</strong>
+              <p class="m-0">
+                {{ i18n.gmAvailabilityOverview().emptyDayDescription }}
+              </p>
+            </div>
+          }
+        </section>
+      }
+    } @else if (!isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.gmAvailabilityOverview().emptyStateTitle }}
+        </h2>
+
+        <p class="m-0">
+          {{ i18n.gmAvailabilityOverview().emptyStateDescription }}
+        </p>
+      </section>
+    }
+  </div>
+</section>

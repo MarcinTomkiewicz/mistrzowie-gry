@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../core/guards/auth.guard';
+import { minimumRoleGuard } from '../core/guards/minimum-role.guard';
 
 const loaders = {
   // login: () => import('./components/login/login').then((m) => m.Login),
@@ -14,6 +15,10 @@ const loaders = {
   eventSignupForm: () =>
     import('./components/event-signup-form/event-signup-form').then(
       (m) => m.EventSignupFormComponent,
+    ),
+  gmAvailabilityOverview: () =>
+    import('./components/gm-availability-overview/gm-availability-overview').then(
+      (m) => m.GmAvailabilityOverviewComponent,
     ),
 } as const;
 
@@ -34,5 +39,10 @@ export const authRoutes: Routes = [
     path: 'event-signup/:eventSlug/:occurrenceDate/signup',
     loadComponent: loaders.eventSignupForm,
     canActivate: [authGuard],
+  },
+  {
+    path: 'admin/gm-availability',
+    loadComponent: loaders.gmAvailabilityOverview,
+    canActivate: [authGuard, minimumRoleGuard('customer_manager')],
   },
 ];

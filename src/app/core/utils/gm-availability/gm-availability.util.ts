@@ -181,6 +181,60 @@ export function mapGmAvailabilityRecordsToDays(
     .sort((left, right) => left.date.localeCompare(right.date));
 }
 
+export function mapGmAvailabilityRecordsToCoveredDays(
+  records: readonly IGmAvailabilitySlotRecord[],
+): IGmAvailabilityDay[] {
+  const byDate = new Map<string, IGmAvailabilityRange[]>();
+
+  for (const record of records) {
+    const startDate = new Date(record.startsAt);
+    const endDate = new Date(record.endsAt);
+    let segmentStart = new Date(startDate);
+
+    while (segmentStart.getTime() < endDate.getTime()) {
+      const baseDate = new Date(
+        segmentStart.getFullYear(),
+        segmentStart.getMonth(),
+        segmentStart.getDate(),
+      );
+      const nextDayStart = new Date(
+        baseDate.getFullYear(),
+        baseDate.getMonth(),
+        baseDate.getDate() + 1,
+      );
+      const segmentEnd = new Date(
+        Math.min(endDate.getTime(), nextDayStart.getTime()),
+      );
+      const date = toIsoDate(baseDate);
+      const ranges = byDate.get(date) ?? [];
+      const startOffset = Math.round(
+        (segmentStart.getTime() - baseDate.getTime()) / HOUR_IN_MS,
+      );
+      const endOffset = Math.round(
+        (segmentEnd.getTime() - baseDate.getTime()) / HOUR_IN_MS,
+      );
+
+      if (endOffset > startOffset) {
+        ranges.push({
+          id: `${record.id ?? record.gmProfileId}-${date}-${startOffset}-${endOffset}`,
+          startOffset,
+          endOffset,
+        });
+        byDate.set(date, ranges);
+      }
+
+      segmentStart = segmentEnd;
+    }
+  }
+
+  return Array.from(byDate.entries())
+    .map(([date, ranges]) => ({
+      date,
+      ranges: mergeGmAvailabilityRanges(ranges),
+    }))
+    .sort((left, right) => left.date.localeCompare(right.date));
+}
+
 export function mapGmAvailabilityDaysToRecords(
   days: readonly IGmAvailabilityDay[],
   gmProfileId: string,
@@ -288,4 +342,33 @@ export function upsertGmAvailabilityDay(
 
 export function createGmAvailabilityTempId(): string {
   return `draft-${crypto.randomUUID()}`;
+}
+
+function mergeGmAvailabilityRanges(
+  ranges: readonly IGmAvailabilityRange[],
+): IGmAvailabilityRange[] {
+  const sortedRanges = [...ranges].sort(
+    (left, right) => left.startOffset - right.startOffset,
+  );
+  const mergedRanges: IGmAvailabilityRange[] = [];
+
+  for (const range of sortedRanges) {
+    const previousRange = mergedRanges[mergedRanges.length - 1];
+
+    if (previousRange && range.startOffset <= previousRange.endOffset) {
+      previousRange.endOffset = Math.max(
+        previousRange.endOffset,
+        range.endOffset,
+      );
+      continue;
+    }
+
+    mergedRanges.push({
+      id: range.id,
+      startOffset: range.startOffset,
+      endOffset: range.endOffset,
+    });
+  }
+
+  return mergedRanges;
 }

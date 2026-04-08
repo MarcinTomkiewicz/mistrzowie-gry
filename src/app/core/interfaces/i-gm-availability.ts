@@ -1,6 +1,7 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import { IUniversalCalendarDay } from './i-universal-calendar';
+import { ISelectOption } from './i-select-option';
 
 export interface IGmAvailabilitySlotRecord {
   id?: string;
@@ -22,10 +23,7 @@ export interface IGmAvailabilityDay {
   ranges: readonly IGmAvailabilityRange[];
 }
 
-export interface IGmAvailabilityHourOption {
-  value: number;
-  label: string;
-}
+export interface IGmAvailabilityHourOption extends ISelectOption<number> {}
 
 export interface IGmAvailabilityEditorError {
   title: string;

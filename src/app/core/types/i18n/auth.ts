@@ -209,6 +209,25 @@ export interface GmAvailabilityToastTranslations {
   saveFailedDetail: string;
 }
 
+export interface GmAvailabilityOverviewTranslations {
+  title: string;
+  subtitle: string;
+  selectLabel: string;
+  selectPlaceholder: string;
+  dayDetailsTitle: string;
+  filteredHint: string;
+  aggregateHint: string;
+  emptyDayTitle: string;
+  emptyDayDescription: string;
+  emptyStateTitle: string;
+  emptyStateDescription: string;
+}
+
+export interface GmAvailabilityOverviewToastTranslations {
+  loadFailedSummary: string;
+  loadFailedDetail: string;
+}
+
 export type EventSignupFormTranslations = {
   modeLabel: string;
 };
@@ -309,6 +328,8 @@ export type EventSignupFormSeoTranslations = {
 export interface UserMenuTranslations {
   greeting: string;
   accountSectionTitle: string;
+  administrationSectionTitle: string;
   editProfileLabel: string;
   eventSignupLabel: string;
+  gmAvailabilityOverviewLabel: string;
 }

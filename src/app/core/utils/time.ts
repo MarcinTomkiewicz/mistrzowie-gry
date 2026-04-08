@@ -51,6 +51,17 @@ export function formatHourOffsetLabel(
   return dayOffset > 0 ? `${label} (+${dayOffset})` : label;
 }
 
+export function formatHourOffsetRangeLabel(
+  startOffset: number,
+  endOffset: number,
+  totalHours: number = 24,
+): string {
+  return `${formatHourOffsetLabel(
+    startOffset,
+    totalHours,
+  )} - ${formatHourOffsetLabel(endOffset, totalHours)}`;
+}
+
 export function hasOverlappingIntervals(
   intervals: readonly { start: number; end: number }[],
 ): boolean {

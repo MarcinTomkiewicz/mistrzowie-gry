@@ -8,13 +8,13 @@ import { applyFilters } from '../../utils/query';
 import { toCamelCase, toSnakeCase, toSnakeKey } from '../../utils/type-mappings';
 import { Supabase } from '../supabase/supabase';
 
-import { IFilter } from '../../interfaces/i-filter';
+import { FilterDefinition, IFilter } from '../../interfaces/i-filter';
 import { FilterOperator } from '../../enums/filter-operators';
 
 export type Pagination = {
   page?: number;
   pageSize?: number;
-  filters?: Record<string, IFilter>;
+  filters?: Record<string, FilterDefinition>;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -104,7 +104,7 @@ export class Backend {
     );
   }
 
-  getCount(table: string, filters?: Record<string, IFilter>): Observable<number> {
+  getCount(table: string, filters?: Record<string, FilterDefinition>): Observable<number> {
     let query = this.supabase.from(table).select('*', { count: 'exact', head: true });
     query = applyFilters(query, filters);
     return from(query).pipe(
@@ -179,7 +179,7 @@ export class Backend {
     );
   }
 
-  delete(table: string, filters: string | number | Record<string, IFilter>): Observable<void> {
+  delete(table: string, filters: string | number | Record<string, FilterDefinition>): Observable<void> {
     let query = this.supabase.from(table).delete();
     query = typeof filters === 'object'
       ? applyFilters(query, filters)

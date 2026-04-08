@@ -2,12 +2,15 @@ import { IUserMenuSection } from "../types/user-menu";
 
 export interface BuildUserMenuArgs {
   accountTitle: string;
+  administrationTitle: string;
   editProfileLabel: string;
   eventSignupLabel: string;
+  gmAvailabilityOverviewLabel: string;
+  canSeeAdministration: boolean;
 }
 
 export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
-  return [
+  const sections: IUserMenuSection[] = [
     {
       id: 'account',
       title: args.accountTitle,
@@ -25,4 +28,20 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
       ],
     },
   ];
+
+  if (args.canSeeAdministration) {
+    sections.push({
+      id: 'administration',
+      title: args.administrationTitle,
+      items: [
+        {
+          id: 'gm-availability-overview',
+          label: args.gmAvailabilityOverviewLabel,
+          path: '/auth/admin/gm-availability',
+        },
+      ],
+    });
+  }
+
+  return sections;
 }

@@ -1,17 +1,26 @@
 import { FilterOperator } from "../enums/filter-operators";
-import { IFilter } from "../interfaces/i-filter";
+import { FilterDefinition, IFilter } from "../interfaces/i-filter";
 import { toSnakeKey } from "./type-mappings";
 
 export function applyFilters<T>(
   query: any,
-  filters?: { [key: string]: IFilter }
+  filters?: { [key: string]: FilterDefinition }
 ): any {
   if (!filters) return query;
 
-  for (const [key, filter] of Object.entries(filters)) {
-    if (filter.value !== undefined) {
+  for (const [key, filterDefinition] of Object.entries(filters)) {
+    const normalizedFilters = Array.isArray(filterDefinition)
+      ? filterDefinition
+      : [filterDefinition];
+
+    for (const filter of normalizedFilters) {
+      if (filter.value === undefined) {
+        continue;
+      }
+
       const operator = filter.operator || FilterOperator.EQ;
       const snakeKey = toSnakeKey(key);
+
       switch (operator) {
         case FilterOperator.EQ:
           query = query.eq(snakeKey, filter.value);

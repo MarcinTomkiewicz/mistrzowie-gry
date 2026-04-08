@@ -1,20 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { from, Observable, of, switchMap, throwError } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, switchMap, throwError, map } from 'rxjs';
 
-import { PostgrestResponse } from '@supabase/supabase-js';
 import { IGmAvailabilitySlotRecord } from '../../interfaces/i-gm-availability';
 import { IGmProfile } from '../../interfaces/i-gm-profile';
-import { toCamelCase, toSnakeCase } from '../../utils/type-mappings';
+import { IUser } from '../../interfaces/i-user';
+import { FilterOperator } from '../../enums/filter-operators';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
-import { Supabase } from '../supabase/supabase';
 
 @Injectable({ providedIn: 'root' })
 export class GmAvailability {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
-  private readonly supabase = inject(Supabase).client();
 
   getMyAvailability(
     fromIso: string,
@@ -26,22 +23,116 @@ export class GmAvailability {
       return of([]);
     }
 
-    return from(
-      this.supabase
-        .from('gm_availability_slots')
-        .select('*')
-        .eq('gm_profile_id', userId)
-        .gte('starts_at', fromIso)
-        .lt('starts_at', toIsoExclusive)
-        .order('starts_at', { ascending: true }),
-    ).pipe(
-      map((response: PostgrestResponse<unknown>) => {
-        if (response.error) {
-          throw new Error(response.error.message);
+    return this.backend.getAll<IGmAvailabilitySlotRecord>({
+      table: 'gm_availability_slots',
+      sortBy: 'startsAt',
+      sortOrder: 'asc',
+      pagination: {
+        filters: {
+          gmProfileId: {
+            operator: FilterOperator.EQ,
+            value: userId,
+          },
+          startsAt: [
+            {
+              operator: FilterOperator.GTE,
+              value: fromIso,
+            },
+            {
+              operator: FilterOperator.LT,
+              value: toIsoExclusive,
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  getGmUsers(): Observable<IUser[]> {
+    return this.backend
+      .getAll<IGmProfile>({
+        table: 'gm_profiles',
+        sortBy: 'createdAt',
+        sortOrder: 'asc',
+      })
+      .pipe(
+        switchMap((profiles) => {
+          const gmProfileIds = [
+            ...new Set(profiles.map((profile) => profile.id).filter(Boolean)),
+          ];
+
+          if (!gmProfileIds.length) {
+            return of([] as IUser[]);
+          }
+
+          return this.backend.getByIds<IUser>('users', gmProfileIds);
+        }),
+      );
+  }
+
+  getAvailabilityForGms(
+    gmProfileIds: readonly string[],
+    fromIso: string,
+    toIsoExclusive: string,
+  ): Observable<IGmAvailabilitySlotRecord[]> {
+    if (!gmProfileIds.length) {
+      return of([]);
+    }
+
+    return this.backend.getAll<IGmAvailabilitySlotRecord>({
+      table: 'gm_availability_slots',
+      sortBy: 'startsAt',
+      sortOrder: 'asc',
+      pagination: {
+        filters: {
+          gmProfileId: {
+            operator: FilterOperator.IN,
+            value: [...gmProfileIds],
+          },
+          startsAt: [
+            {
+              operator: FilterOperator.GTE,
+              value: fromIso,
+            },
+            {
+              operator: FilterOperator.LT,
+              value: toIsoExclusive,
+            },
+          ],
+        },
+      },
+    }).pipe(
+      map((records) =>
+        [...records].sort((left, right) => left.startsAt.localeCompare(right.startsAt)),
+      ),
+    );
+  }
+
+  getAvailabilityOverview(
+    fromIso: string,
+    toIsoExclusive: string,
+  ): Observable<{
+    gmUsers: IUser[];
+    records: IGmAvailabilitySlotRecord[];
+  }> {
+    return this.getGmUsers().pipe(
+      switchMap((gmUsers) => {
+        if (!gmUsers.length) {
+          return of({
+            gmUsers,
+            records: [] as IGmAvailabilitySlotRecord[],
+          });
         }
 
-        return (response.data ?? []).map((record) =>
-          toCamelCase<IGmAvailabilitySlotRecord>(record),
+        return this.getAvailabilityForGms(
+          gmUsers.map((user) => user.id),
+          fromIso,
+          toIsoExclusive,
+        ).pipe(
+          map((records) => ({
+            gmUsers,
+            records,
+          })),
         );
       }),
     );
@@ -60,45 +151,39 @@ export class GmAvailability {
 
     return this.ensureMyGmProfile().pipe(
       switchMap(() =>
-        from(
-          this.supabase
-            .from('gm_availability_slots')
-            .delete()
-            .eq('gm_profile_id', userId)
-            .gte('starts_at', fromIso)
-            .lt('starts_at', toIsoExclusive),
-        ).pipe(
-          map((response) => {
-            if (response.error) {
-              throw new Error(response.error.message);
-            }
-
-            return void 0;
-          }),
-        ),
+        this.backend.delete('gm_availability_slots', {
+          gmProfileId: {
+            operator: FilterOperator.EQ,
+            value: userId,
+          },
+          startsAt: [
+            {
+              operator: FilterOperator.GTE,
+              value: fromIso,
+            },
+            {
+              operator: FilterOperator.LT,
+              value: toIsoExclusive,
+            },
+          ],
+        }),
       ),
       switchMap(() => {
         if (!records.length) {
           return of([]);
         }
 
-        return from(
-          this.supabase
-            .from('gm_availability_slots')
-            .insert(this.toInsertPayload(records), { defaultToNull: false })
-            .select('*')
-            .order('starts_at', { ascending: true }),
-        ).pipe(
-          map((response: PostgrestResponse<unknown>) => {
-            if (response.error) {
-              throw new Error(response.error.message);
-            }
-
-            return (response.data ?? []).map((record) =>
-              toCamelCase<IGmAvailabilitySlotRecord>(record),
-            );
-          }),
-        );
+        return this.backend
+          .createMany<IGmAvailabilitySlotRecord>('gm_availability_slots', [
+            ...records,
+          ])
+          .pipe(
+            map((savedRecords) =>
+              [...savedRecords].sort((left, right) =>
+                left.startsAt.localeCompare(right.startsAt),
+              ),
+            ),
+          );
       }),
     );
   }
@@ -113,13 +198,5 @@ export class GmAvailability {
     return this.backend.upsert<Pick<IGmProfile, 'id'>>('gm_profiles', {
       id: userId,
     }) as Observable<IGmProfile>;
-  }
-
-  private toInsertPayload(
-    records: readonly IGmAvailabilitySlotRecord[],
-  ): object[] {
-    return records.map(({ id, createdAt, updatedAt, ...record }) =>
-      toSnakeCase(id ? { id, ...record } : record),
-    );
   }
 }

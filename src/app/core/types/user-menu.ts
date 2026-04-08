@@ -1,9 +1,11 @@
 export type UserMenuItemId =
   | 'edit-profile'
   | 'event-signup'
+  | 'gm-availability-overview';
 
 export type UserMenuSectionId =
-  | 'account';
+  | 'account'
+  | 'administration';
 
 export interface IUserMenuItem {
   id: UserMenuItemId;

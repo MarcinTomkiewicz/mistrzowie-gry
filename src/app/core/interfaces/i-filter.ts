@@ -4,7 +4,9 @@ export interface IFilter {
     operator: FilterOperator;
     value: any;
   }
+
+export type FilterDefinition = IFilter | IFilter[];
   
   export interface IFilters {
-    [key: string]: IFilter;
+    [key: string]: FilterDefinition;
   }

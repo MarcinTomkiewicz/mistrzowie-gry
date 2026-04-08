@@ -10,6 +10,7 @@ import { IUserMenuItem } from '../../../core/types/user-menu';
 import { createUserMenuPanelI18n } from './user-menu-panel.i18n';
 import { buildUserMenu } from '../../../core/factories/user-menu.factory';
 import { DividerModule } from 'primeng/divider';
+import { hasMinimumRole } from '../../../core/utils/roles';
 
 @Component({
   selector: 'app-user-menu-panel',
@@ -32,8 +33,15 @@ export class UserMenuPanel {
   readonly menuSections = computed(() =>
     buildUserMenu({
       accountTitle: this.i18n.userMenu().accountSectionTitle,
+      administrationTitle: this.i18n.userMenu().administrationSectionTitle,
       editProfileLabel: this.i18n.userMenu().editProfileLabel,
       eventSignupLabel: this.i18n.userMenu().eventSignupLabel,
+      gmAvailabilityOverviewLabel:
+        this.i18n.userMenu().gmAvailabilityOverviewLabel,
+      canSeeAdministration: hasMinimumRole(
+        this.auth.user(),
+        'customer_manager',
+      ),
     }),
   );
 
