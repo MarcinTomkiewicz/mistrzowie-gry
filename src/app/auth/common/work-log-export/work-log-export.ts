@@ -43,55 +43,41 @@ export class WorkLogExportComponent {
     );
   }
 
-  exportXls(): void {
-    const header = [
-      'User ID',
-      'Imie MG',
-      'Nazwisko MG',
-      'Suma godzin',
-      'Daty Chaotycznych Czwartkow',
+  async exportXls(): Promise<void> {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const XLSX = await import('xlsx');
+    const rows = [
+      [
+        'User ID',
+        'Imie MG',
+        'Nazwisko MG',
+        'Suma godzin',
+        'Daty Chaotycznych Czwartkow',
+      ],
+      ...this.rows().map((row) => [
+        row.userId,
+        row.firstName,
+        row.lastName,
+        row.totalHours,
+        row.chaoticThursdayDatesLabel,
+      ]),
     ];
-    const rows = this.rows()
-      .map(
-        (row) => `
-          <Row>
-            <Cell><Data ss:Type="String">${escapeXml(row.userId)}</Data></Cell>
-            <Cell><Data ss:Type="String">${escapeXml(row.firstName)}</Data></Cell>
-            <Cell><Data ss:Type="String">${escapeXml(row.lastName)}</Data></Cell>
-            <Cell><Data ss:Type="Number">${String(row.totalHours)}</Data></Cell>
-            <Cell><Data ss:Type="String">${escapeXml(row.chaoticThursdayDatesLabel)}</Data></Cell>
-          </Row>
-        `,
-      )
-      .join('');
 
-    const workbook = `<?xml version="1.0" encoding="utf-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook
-  xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
-  xmlns:x="urn:schemas-microsoft-com:office:excel"
-  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:html="http://www.w3.org/TR/REC-html40"
->
-  <Worksheet ss:Name="Ewidencja">
-    <Table>
-      <Row>${header
-        .map(
-          (cell) =>
-            `<Cell><Data ss:Type="String">${escapeXml(cell)}</Data></Cell>`,
-        )
-        .join('')}</Row>
-      ${rows}
-    </Table>
-  </Worksheet>
-</Workbook>`;
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    worksheet['!cols'] = [
+      { wch: 40 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 14 },
+      { wch: 32 },
+    ];
 
-    this.downloadFile(
-      `${this.fileBaseName()}.xls`,
-      'application/vnd.ms-excel;charset=utf-8;',
-      ['\uFEFF', workbook],
-    );
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Ewidencja');
+    XLSX.writeFileXLSX(workbook, `${this.fileBaseName()}.xlsx`);
   }
 
   private downloadFile(
@@ -118,17 +104,4 @@ function csvCell(value: string): string {
   const escaped = value.replace(/"/g, '""');
 
   return /[;"\n]/.test(value) ? `"${escaped}"` : escaped;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function escapeXml(value: string): string {
-  return escapeHtml(value);
 }
