@@ -10,14 +10,14 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
 import {
-  ICreateSessionPayload,
-  ISessionFormData,
+  ISessionFormInitialData,
   ISessionListLabels,
+  ISessionFormSubmitData,
   ISessionWithRelations,
-  IUpdateSessionPayload,
 } from '../../../core/interfaces/i-session';
 import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
 import { IGmStyle } from '../../../core/interfaces/i-gm-style';
+import { ILanguage } from '../../../core/interfaces/i-languages';
 import { ISystem } from '../../../core/interfaces/i-system';
 import {
   SESSION_DIFFICULTY_LEVEL_OPTIONS,
@@ -71,6 +71,7 @@ export class GmSessions {
   readonly mySessionSystems = signal<ISystem[]>([]);
   readonly styles = signal<IGmStyle[]>([]);
   readonly triggers = signal<IContentTrigger[]>([]);
+  readonly languages = signal<ILanguage[]>([]);
 
   readonly systemFilterControl = new FormControl<string | null>(null);
   private readonly selectedSystemId = toSignal(this.systemFilterControl.valueChanges, {
@@ -98,27 +99,9 @@ export class GmSessions {
     () => this.isCreateMode() || this.isEditing(),
   );
 
-  readonly initialFormData = computed<Partial<ISessionFormData> | null>(() => {
-    const session = this.editedSession();
-
-    if (!session) {
-      return null;
-    }
-
-    return {
-      systemId: session.systemId,
-      title: session.title,
-      description: session.description,
-      image: session.image,
-      difficultyLevel: session.difficultyLevel,
-      minPlayers: session.minPlayers,
-      maxPlayers: session.maxPlayers,
-      minAge: session.minAge,
-      triggerIds: session.triggers.map((trigger) => trigger.id),
-      gmStyleIds: session.styles.map((style) => style.id),
-      sortOrder: session.sortOrder,
-    };
-  });
+  readonly initialFormData = computed<ISessionFormInitialData | null>(
+    () => this.editedSession(),
+  );
 
   readonly tableSessions = computed(() =>
     [...this.sessions()].sort((a, b) => {
@@ -203,17 +186,17 @@ export class GmSessions {
     this.editedSessionId.set(null);
   }
 
-  saveSession(payload: ICreateSessionPayload | IUpdateSessionPayload): void {
+  saveSession(submit: ISessionFormSubmitData): void {
     this.isSubmitting.set(true);
 
     const request$ =
       this.isEditing() && this.editedSessionId()
         ? this.gmSessionsFacade.updateMySession(
             this.editedSessionId()!,
-            payload,
+            submit,
             'template'
           )
-        : this.gmSessionsFacade.createMySession(payload);
+        : this.gmSessionsFacade.createMySession(submit);
 
     request$.pipe(finalize(() => this.isSubmitting.set(false))).subscribe({
       next: (session) => {
@@ -295,15 +278,17 @@ export class GmSessions {
       mySessionSystems: this.gmSessionsFacade.getMySessionSystems(),
       styles: this.gmSessionsFacade.getAvailableStyles(),
       triggers: this.gmSessionsFacade.getAvailableTriggers(),
+      languages: this.gmSessionsFacade.getAvailableLanguages(),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: ({ sessions, systems, mySessionSystems, styles, triggers }) => {
+        next: ({ sessions, systems, mySessionSystems, styles, triggers, languages }) => {
           this.sessions.set(sessions);
           this.systems.set(systems);
           this.mySessionSystems.set(mySessionSystems);
           this.styles.set(styles);
           this.triggers.set(triggers);
+          this.languages.set(languages);
 
           this.ensureSelectedSystemStillExists();
         },

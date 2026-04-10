@@ -1,5 +1,5 @@
 <div class="flex-col-start-stretch gap-sm w-100">
-  @if (previewUrl(); as previewUrl) {
+  @if (isImageMode() && previewUrl(); as previewUrl) {
     <div class="flex-col-center-center gap-sm w-100">
       <div
         [class]="
@@ -27,13 +27,13 @@
       #uploader
       name="file-upload"
       mode="advanced"
-      [files]="selected().displayedFiles"
+      [files]="isImageMode() ? selected().displayedFiles : []"
       [customUpload]="true"
       [auto]="false"
-      [multiple]="false"
+      [multiple]="resolvedOptions().multiple ?? false"
       [showUploadButton]="false"
       [showCancelButton]="false"
-      [fileLimit]="1"
+      [fileLimit]="isImageMode() ? 1 : undefined"
       [maxFileSize]="resolvedOptions().maxFileSize"
       [accept]="resolvedOptions().accept"
       [disabled]="resolvedOptions().disabled"
@@ -53,13 +53,13 @@
               type="button"
               severity="secondary"
               [label]="resolvedTexts().chooseLabel"
-              icon="pi pi-mona-lisa"
+              [icon]="resolvedOptions().chooseIcon"
               [outlined]="true"
               [disabled]="resolvedOptions().disabled"
               (onClick)="chooseCallback()"
             />
 
-            @if (files?.length) {
+            @if (isImageMode() && files?.length) {
               <p-button
                 type="button"
                 styleClass="arcane"
@@ -79,7 +79,7 @@
         let-files
         let-removeFileCallback="removeFileCallback"
       >
-        @if (files?.length) {
+        @if (isImageMode() && files?.length) {
           <div class="flex-col-start-stretch gap-sm pt-sm">
             @for (
               file of files;
@@ -111,7 +111,7 @@
 
       <ng-template #empty>
         <div class="flex-col-center-center gap-xs py-md">
-          <i class="pi pi-soul text-4xl"></i>
+          <i [class]="resolvedOptions().emptyIcon + ' text-4xl'"></i>
           <span>{{ resolvedTexts().dropLabel }}</span>
           <small>{{ resolvedTexts().formatsLabel }}</small>
         </div>

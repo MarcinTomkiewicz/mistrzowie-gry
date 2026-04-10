@@ -1,4 +1,6 @@
 export interface SessionFormTranslations {
+  basicInfoTitle: string;
+  additionalInfoTitle: string;
   titleLabel: string;
   systemLabel: string;
   descriptionLabel: string;
@@ -9,6 +11,14 @@ export interface SessionFormTranslations {
   sortOrderLabel: string;
   stylesLabel: string;
   triggersLabel: string;
+  languagesLabel: string;
+  allowsScenarioCustomizationLabel: string;
+  hasReadyCharacterSheetsLabel: string;
+  characterSheetsLabel: string;
+  chooseCharacterSheetsLabel: string;
+  characterSheetsHint: string;
+  characterSheetsRequirementHint: string;
+  removeCharacterSheetsLabel: string;
   playersRangeLabel: string;
   minAgeRangeLabel: string;
   sortOrderRangeLabel: string;
@@ -22,6 +32,7 @@ export interface SessionDifficultyTranslations {
 
 export interface SessionErrorsTranslations {
   invalidPlayersRange: string;
+  invalidCharacterSheetsCount: string;
 }
 
 export interface SessionListLabelsTranslations {
@@ -40,6 +51,8 @@ export type SessionSlotFallbacksTranslations = {
   nonePlural: string;
   noStyles: string;
   noTriggers: string;
+  noLanguages: string;
+  noCharacterSheets: string;
   missingData: string;
   emptySession: string;
 };

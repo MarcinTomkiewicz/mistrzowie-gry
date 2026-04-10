@@ -16,6 +16,10 @@ export type SessionFormGroup = FormGroup<{
   minPlayers: FormControl<number | null>;
   maxPlayers: FormControl<number | null>;
   minAge: FormControl<number | null>;
+  hasReadyCharacterSheets: FormControl<boolean>;
+  allowsScenarioCustomization: FormControl<boolean>;
+  languageIds: FormControl<string[]>;
+  characterSheetsCount: FormControl<number | null>;
   triggerIds: FormControl<string[]>;
   gmStyleIds: FormControl<string[]>;
   sortOrder: FormControl<number | null>;

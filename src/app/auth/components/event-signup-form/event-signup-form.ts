@@ -25,9 +25,9 @@ import {
 } from '../../../core/interfaces/i-event-signup';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
 import {
+  ISessionFormSubmitData,
   ISessionListLabels,
   ISessionWithRelations,
-  IUpdateSessionPayload,
 } from '../../../core/interfaces/i-session';
 import { Auth } from '../../../core/services/auth/auth';
 import { EventRead } from '../../../core/services/event-read/event-read';
@@ -395,7 +395,7 @@ export class EventSignupFormComponent {
     });
   }
 
-  onSubmitCustom(payload: IUpdateSessionPayload): void {
+  onSubmitCustom(payload: ISessionFormSubmitData): void {
     const page = this.page();
 
     if (!page.event || !page.occurrence) {

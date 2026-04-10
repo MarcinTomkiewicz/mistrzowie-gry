@@ -97,49 +97,161 @@
     </div>
   </div>
 
-  @if (session().styles.length || session().triggers.length) {
-    <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
-      <small class="card-legend status-text status-text--muted">
-        {{ i18n.detailsLabels().additionalInfo }}
+  <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
+    <small class="card-legend status-text status-text--muted">
+      {{ i18n.detailsLabels().additionalInfo }}
+    </small>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.sessionForm().allowsScenarioCustomizationLabel }}
+      </small>
+
+      <span
+        [class]="
+          'tag-badge ' +
+          (session().allowsScenarioCustomization ? 'tag-badge--arcane' : 'tag-badge--muted')
+        "
+      >
+        {{ session().allowsScenarioCustomization ? 'Tak' : 'Nie' }}
+      </span>
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.sessionForm().hasReadyCharacterSheetsLabel }}
+      </small>
+
+      <span
+        [class]="
+          'tag-badge ' +
+          (session().hasReadyCharacterSheets ? 'tag-badge--arcane' : 'tag-badge--muted')
+        "
+      >
+        {{ session().hasReadyCharacterSheets ? 'Tak' : 'Nie' }}
+      </span>
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.sessionForm().languagesLabel }}
+      </small>
+
+      @if (session().languages.length) {
+        <div class="flex-row-start-center gap-xs flex-wrap">
+          @for (language of session().languages; track language.id) {
+            <span class="tag-badge tag-badge--arcane">
+              {{ language.label }}
+            </span>
+          }
+        </div>
+      } @else {
+        <span class="tag-badge tag-badge--muted">
+          {{ i18n.commonFallbacks().noLanguages }}
+        </span>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.sessionForm().stylesLabel }}
       </small>
 
       @if (session().styles.length) {
-        <div class="flex-col-start-stretch gap-xs">
-          <div class="flex-row-start-center gap-xs flex-wrap">
-            @for (style of session().styles; track style.id) {
-              <span class="tag-badge tag-badge--arcane">
-                {{ style.label }}
-              </span>
-            }
-          </div>
+        <div class="flex-row-start-center gap-xs flex-wrap">
+          @for (style of session().styles; track style.id) {
+            <span class="tag-badge tag-badge--arcane">
+              {{ style.label }}
+            </span>
+          }
         </div>
-      }
-
-      @if (session().triggers.length) {
-        <div class="flex-col-start-stretch gap-xs">
-          <small class="status-text status-text--muted">
-            {{ i18n.sessionForm().triggersLabel }}
-          </small>
-
-          <div class="flex-row-start-center gap-xs flex-wrap">
-            @for (trigger of session().triggers; track trigger.id) {
-              <span class="tag-badge tag-badge--muted">
-                {{ trigger.label }}
-              </span>
-            }
-          </div>
-        </div>
+      } @else {
+        <span class="tag-badge tag-badge--muted">
+          {{ i18n.commonFallbacks().noStyles }}
+        </span>
       }
     </div>
-  } @else {
-    <div class="mg-card mg-card--legend flex-col-start-stretch gap-sm">
-      <small class="card-legend status-text status-text--muted">
-        {{ i18n.detailsLabels().additionalInfo }}
+
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.sessionForm().triggersLabel }}
       </small>
 
-      <span class="tag-badge tag-badge--muted">
-        {{ i18n.commonFallbacks().noStyles }}
-      </span>
+      @if (session().triggers.length) {
+        <div class="flex-row-start-center gap-xs flex-wrap">
+          @for (trigger of session().triggers; track trigger.id) {
+            <span class="tag-badge tag-badge--muted">
+              {{ trigger.label }}
+            </span>
+          }
+        </div>
+      } @else {
+        <span class="tag-badge tag-badge--muted">
+          {{ i18n.commonFallbacks().noTriggers }}
+        </span>
+      }
     </div>
-  }
+
+    <div class="flex-col-start-stretch gap-xs">
+      <small class="status-text status-text--muted">
+        {{ i18n.sessionForm().characterSheetsLabel }}
+      </small>
+
+      @if (session().characterSheets.length) {
+        <div class="mg-grid grid-cols-5 grid-cols-3-md grid-cols-2-sm grid-cols-1-xs gap-sm">
+          @for (sheet of session().characterSheets; track sheet.id) {
+            @if (resolveCharacterSheetUrl(sheet.storagePath); as sheetUrl) {
+              <div
+                class="mg-card flex-col-start-stretch gap-sm p-sm cursor-pointer"
+                role="button"
+                tabindex="0"
+                (click)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
+                (keyup.enter)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
+              >
+                <object
+                  [data]="resolvePdfPreviewUrl(sheetUrl)"
+                  type="application/pdf"
+                  class="w-100 h-px-200 overflow-hidden pointer-events-none"
+                ></object>
+
+                <span class="tag-badge tag-badge--muted">
+                  {{ sheet.fileName }}
+                </span>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <span class="tag-badge tag-badge--muted">
+          {{ i18n.commonFallbacks().noCharacterSheets }}
+        </span>
+      }
+    </div>
+  </div>
 </div>
+
+<p-dialog
+  [visible]="!!characterSheetPreview()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  appendTo="body"
+  [styleClass]="'mg-dialog mg-dialog--xl'"
+  (visibleChange)="closeCharacterSheetPreview()"
+>
+  @if (characterSheetPreview(); as preview) {
+    <ng-template pTemplate="header">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ preview.title }}
+      </h2>
+    </ng-template>
+
+    <object
+      [data]="resolvePdfPreviewUrl(preview.url)"
+      type="application/pdf"
+      class="w-100 h-px-800 max-h-800"
+    ></object>
+  }
+</p-dialog>

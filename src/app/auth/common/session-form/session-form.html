@@ -1,182 +1,362 @@
+@let commonActions = i18n.commonActions();
+@let commonForm = i18n.commonForm();
+@let fileUpload = commonForm.fileUpload;
+@let formTexts = i18n.form();
+@let errorTexts = i18n.errors();
+
 <form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
   novalidate
-  class="mg-form flex-col-start-center w-100 gap-sm"
+  class="mg-form flex-col-start-center w-100 gap-md"
 >
-  <div class="w-80">
-    <p-iftalabel class="w-100">
-      <input
-        pInputText
-        class="w-100"
-        id="session-title"
-        name="session-title"
-        formControlName="title"
-        autocomplete="off"
-      />
-      <label for="session-title">{{ i18n.form().titleLabel }}</label>
-    </p-iftalabel>
+  <div class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md">
+    <h3 class="mg-section__title mg-section__title--md m-0">
+      {{ formTexts.basicInfoTitle }}
+    </h3>
 
-    @if (showRequiredError('title')) {
-      <small>{{ i18n.commonForm().required }}</small>
-    }
-  </div>
-
-  <div class="w-80">
-    <p-iftalabel class="w-100">
-      <app-system-autocomplete
-        [control]="form.controls.systemId"
-        [systems]="systems()"
-        inputId="session-system-id"
-        appendTo="body"
-        (systemSelected)="onSystemSelect($event)"
-        (systemCleared)="onSystemClear()"
-      />
-      <label for="session-system-id">{{ i18n.form().systemLabel }}</label>
-    </p-iftalabel>
-
-    @if (showRequiredError('systemId')) {
-      <small>{{ i18n.commonForm().required }}</small>
-    }
-  </div>
-
-  <div class="w-80 flex-row-between-center flex-col-start-stretch-xs gap-sm">
-    <div class="w-70 w-50-md w-100-xs">
+    <div class="w-100">
       <p-iftalabel class="w-100">
-        <p-select
-          inputId="session-difficulty-level"
-          formControlName="difficultyLevel"
-          optionLabel="label"
-          optionValue="value"
-          [options]="difficultyOptions()"
-          appendTo="body"
+        <input
+          pInputText
           class="w-100"
+          id="session-title"
+          name="session-title"
+          formControlName="title"
+          autocomplete="off"
         />
-        <label for="session-difficulty-level">
-          {{ i18n.form().difficultyLabel }}
-        </label>
+        <label for="session-title">{{ formTexts.titleLabel }}</label>
       </p-iftalabel>
 
-      @if (showRequiredError('difficultyLevel')) {
-        <small>{{ i18n.commonForm().required }}</small>
+      @if (showControlError('title', ['required', 'requiredTrimmed'])) {
+        <small>{{ commonForm.required }}</small>
       }
     </div>
 
-    <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
-      <label for="session-min-players">{{ i18n.form().minPlayersLabel }}</label>
+    <div class="w-100">
+      <p-iftalabel class="w-100">
+        <app-system-autocomplete
+          [control]="form.controls.systemId"
+          [systems]="systems()"
+          inputId="session-system-id"
+          appendTo="body"
+          (systemSelected)="onSystemSelect($event)"
+          (systemCleared)="onSystemClear()"
+        />
+        <label for="session-system-id">{{ formTexts.systemLabel }}</label>
+      </p-iftalabel>
 
-      <p-inputnumber
-        class="w-100"
-        inputId="session-min-players"
-        formControlName="minPlayers"
-        [min]="1"
-        [max]="5"
-        [useGrouping]="false"
-        styleClass="w-100"
-        inputStyleClass="w-100"
-      />
-
-      @if (showMinPlayersError()) {
-        <small>{{ i18n.form().playersRangeLabel }}</small>
+      @if (showControlError('systemId', ['required'])) {
+        <small>{{ commonForm.required }}</small>
       }
     </div>
 
-    <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
-      <label for="session-max-players">{{ i18n.form().maxPlayersLabel }}</label>
+    <div class="w-100 flex-row-between-center flex-col-start-stretch-sm gap-sm">
+      <div class="w-50 w-100-sm">
+        <p-iftalabel class="w-100">
+          <p-select
+            inputId="session-difficulty-level"
+            formControlName="difficultyLevel"
+            optionLabel="label"
+            optionValue="value"
+            [options]="difficultyOptions()"
+            appendTo="body"
+            class="w-100"
+          />
+          <label for="session-difficulty-level">
+            {{ formTexts.difficultyLabel }}
+          </label>
+        </p-iftalabel>
 
-      <p-inputnumber
-        class="w-100"
-        inputId="session-max-players"
-        formControlName="maxPlayers"
-        [min]="1"
-        [max]="5"
-        [useGrouping]="false"
-        styleClass="w-100"
-        inputStyleClass="w-100"
-      />
+        @if (showControlError('difficultyLevel', ['required'])) {
+          <small>{{ commonForm.required }}</small>
+        }
+      </div>
 
-      @if (showMaxPlayersError()) {
-        <small>{{ i18n.form().playersRangeLabel }}</small>
-      }
+      <div class="w-15 w-100-sm flex-col-start-stretch gap-xs">
+        <label for="session-min-players">{{ formTexts.minPlayersLabel }}</label>
+
+        <p-inputnumber
+          class="w-100"
+          inputId="session-min-players"
+          formControlName="minPlayers"
+          [min]="1"
+          [max]="5"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+
+        @if (showControlError('minPlayers', ['required', 'min', 'max'])) {
+          <small>{{ formTexts.playersRangeLabel }}</small>
+        }
+      </div>
+
+      <div class="w-15 w-100-sm flex-col-start-stretch gap-xs">
+        <label for="session-max-players">{{ formTexts.maxPlayersLabel }}</label>
+
+        <p-inputnumber
+          class="w-100"
+          inputId="session-max-players"
+          formControlName="maxPlayers"
+          [min]="1"
+          [max]="5"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+
+        @if (showControlError('maxPlayers', ['required', 'min', 'max'])) {
+          <small>{{ formTexts.playersRangeLabel }}</small>
+        }
+      </div>
+
+      <div class="w-15 w-100-sm flex-col-start-stretch gap-xs">
+        <label for="session-min-age">{{ formTexts.minAgeLabel }}</label>
+
+        <p-inputnumber
+          class="w-100"
+          inputId="session-min-age"
+          formControlName="minAge"
+          [min]="0"
+          [useGrouping]="false"
+          styleClass="w-100"
+          inputStyleClass="w-100"
+        />
+
+        @if (showControlError('minAge', ['required', 'min'])) {
+          <small>{{ formTexts.minAgeRangeLabel }}</small>
+        }
+      </div>
     </div>
 
-    <div class="w-10 w-20-md w-100-xs flex-col-start-stretch gap-xs">
-      <label for="session-min-age">{{ i18n.form().minAgeLabel }}</label>
-
-      <p-inputnumber
-        class="w-100"
-        inputId="session-min-age"
-        formControlName="minAge"
-        [min]="0"
-        [useGrouping]="false"
-        styleClass="w-100"
-        inputStyleClass="w-100"
-      />
-
-      @if (showMinAgeError()) {
-        <small>{{ i18n.form().minAgeRangeLabel }}</small>
-      }
-    </div>
-  </div>
-
-  @if (showPlayersRangeError()) {
-    <div class="w-80">
-      <small>{{ i18n.errors().invalidPlayersRange }}</small>
-    </div>
-  }
-
-  <div class="w-80">
-    <p-iftalabel class="w-100">
-      <textarea
-        pTextarea
-        class="w-100"
-        id="session-description"
-        name="session-description"
-        formControlName="description"
-        rows="6"
-        autocomplete="off"
-      ></textarea>
-      <label for="session-description">{{ i18n.form().descriptionLabel }}</label>
-    </p-iftalabel>
-
-    @if (showRequiredError('description')) {
-      <small>{{ i18n.commonForm().required }}</small>
+    @if (showPlayersRangeError()) {
+      <small>{{ errorTexts.invalidPlayersRange }}</small>
     }
+
+    <div class="w-100">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          class="w-100"
+          id="session-description"
+          name="session-description"
+          formControlName="description"
+          rows="6"
+          autocomplete="off"
+        ></textarea>
+        <label for="session-description">{{ formTexts.descriptionLabel }}</label>
+      </p-iftalabel>
+
+      @if (showControlError('description', ['required', 'requiredTrimmed'])) {
+        <small>{{ commonForm.required }}</small>
+      }
+    </div>
+
+    <div class="w-100">
+      <app-file-upload
+        [texts]="{
+          chooseLabel: fileUpload.chooseImage,
+          clearLabel: commonActions.clear,
+          dropLabel: fileUpload.dropImage,
+          formatsLabel: fileUpload.imageFormats,
+          previewAlt: fileUpload.imagePreviewAlt,
+          cropTitle: fileUpload.cropTitle,
+          cropHint: fileUpload.sessionCropHint,
+          cropFrameAriaLabel: fileUpload.cropFrameAriaLabel,
+          cropConfirmLabel: fileUpload.cropConfirm,
+          cropCancelLabel: commonActions.cancel,
+          cropProcessingLabel: fileUpload.cropProcessingLabel,
+          zoomLabel: fileUpload.zoomLabel,
+          cropPreviewLabel: fileUpload.cropPreviewLabel,
+          cropPreviewLandscapeLabel: fileUpload.cropPreviewLandscapeLabel,
+          cropPreviewCircleLabel: fileUpload.cropPreviewCircleLabel,
+          cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel
+        }"
+        [options]="{
+          currentUrl: storedImageUrl(),
+          disabled: isSubmitting(),
+          previewShape: 'landscape',
+          accept: 'image/png,image/jpeg,image/webp,image/avif',
+          maxFileSize: 5000000
+        }"
+        [cropConfig]="{
+          aspectRatio: 16 / 9,
+          roundCropper: false,
+          resizeToWidth: 1280,
+          resizeToHeight: 720,
+          previewShapes: ['landscape', 'circle']
+        }"
+        (valueChange)="onImageValueChange($event)"
+      />
+
+      @if (showControlError('image', ['required', 'requiredTrimmed'])) {
+        <small>{{ commonForm.required }}</small>
+      }
+    </div>
   </div>
 
-  <div class="w-80">
-    <app-file-upload
-      [texts]="imageUploadTexts()"
-      [options]="imageUploadOptions()"
-      [cropConfig]="imageCropConfig()"
-      (valueChange)="onImageValueChange($event)"
-    />
+  <div class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md">
+    <h3 class="mg-section__title mg-section__title--md m-0">
+      {{ formTexts.additionalInfoTitle }}
+    </h3>
 
-    @if (showRequiredError('image')) {
-      <small>{{ i18n.commonForm().required }}</small>
+    <div class="flex-col-start-stretch gap-xs">
+      <div class="flex-row-start-center gap-sm">
+        <p-checkbox
+          inputId="session-allows-scenario-customization"
+          formControlName="allowsScenarioCustomization"
+          [binary]="true"
+        />
+        <label for="session-allows-scenario-customization">
+          {{ formTexts.allowsScenarioCustomizationLabel }}
+        </label>
+      </div>
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <div class="flex-row-start-center gap-sm">
+        <p-checkbox
+          inputId="session-has-ready-character-sheets"
+          formControlName="hasReadyCharacterSheets"
+          [binary]="true"
+          (onChange)="onReadyCharacterSheetsChange($event.checked)"
+        />
+        <label for="session-has-ready-character-sheets">
+          {{ formTexts.hasReadyCharacterSheetsLabel }}
+        </label>
+      </div>
+    </div>
+
+    @if (form.controls.hasReadyCharacterSheets.getRawValue()) {
+      <div class="flex-col-start-stretch gap-sm">
+        @if (characterSheetItems().length) {
+          <div class="mg-grid grid-cols-5 grid-cols-3-md grid-cols-2-sm grid-cols-1-xs gap-sm">
+            @for (item of characterSheetItems(); track item.id) {
+              <div class="mg-card flex-col-start-stretch gap-sm p-sm">
+                <div
+                  class="cursor-pointer"
+                  role="button"
+                  tabindex="0"
+                  (click)="openCharacterSheetPreview(item.previewUrl, item.fileName)"
+                  (keyup.enter)="openCharacterSheetPreview(item.previewUrl, item.fileName)"
+                >
+                  @if (resolvePdfPreviewUrl(item.previewUrl); as previewUrl) {
+                    <object
+                      [data]="previewUrl"
+                      type="application/pdf"
+                      class="w-100 h-px-200 overflow-hidden pointer-events-none"
+                    ></object>
+                  } @else {
+                    <div class="w-100 h-px-200 flex-col-center-center gap-xs">
+                      <i class="pi pi-file-pdf text-4xl"></i>
+                      <small>{{ formTexts.characterSheetsLabel }}</small>
+                    </div>
+                  }
+                </div>
+
+                <div class="flex-row-between-start gap-sm">
+                  <span class="tag-badge tag-badge--muted flex-1 min-w-0">
+                    {{ item.fileName }}
+                  </span>
+
+                  <p-button
+                    type="button"
+                    severity="danger"
+                    icon="pi pi-times"
+                    [rounded]="true"
+                    [text]="true"
+                    (onClick)="$event.stopPropagation(); removeCharacterSheet(item)"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="flex-row-start-center">
+            <p-button
+              type="button"
+              severity="danger"
+              [outlined]="true"
+              icon="pi pi-trash"
+              [label]="formTexts.removeCharacterSheetsLabel"
+              (onClick)="clearCharacterSheets()"
+            />
+          </div>
+        }
+
+        <app-file-upload
+          [texts]="{
+            chooseLabel: formTexts.chooseCharacterSheetsLabel,
+            clearLabel: commonActions.clear,
+            dropLabel: formTexts.characterSheetsHint,
+            formatsLabel: formTexts.characterSheetsRequirementHint,
+            previewAlt: fileUpload.imagePreviewAlt,
+            cropTitle: fileUpload.cropTitle,
+            cropHint: fileUpload.sessionCropHint,
+            cropFrameAriaLabel: fileUpload.cropFrameAriaLabel,
+            cropConfirmLabel: fileUpload.cropConfirm,
+            cropCancelLabel: commonActions.cancel,
+            cropProcessingLabel: fileUpload.cropProcessingLabel,
+            zoomLabel: fileUpload.zoomLabel,
+            cropPreviewLabel: fileUpload.cropPreviewLabel,
+            cropPreviewLandscapeLabel: fileUpload.cropPreviewLandscapeLabel,
+            cropPreviewCircleLabel: fileUpload.cropPreviewCircleLabel,
+            cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel
+          }"
+          [options]="{
+            mode: 'files',
+            currentUrl: null,
+            disabled: isSubmitting(),
+            previewShape: 'square',
+            accept: 'application/pdf,.pdf',
+            maxFileSize: 10000000,
+            multiple: true,
+            clearAfterSelect: true,
+            chooseIcon: 'pi pi-file-pdf',
+            emptyIcon: 'pi pi-file-pdf'
+          }"
+          (filesSelected)="onCharacterSheetsSelected($event)"
+        />
+
+        @if (showCharacterSheetsCountError()) {
+          <small>{{ errorTexts.invalidCharacterSheetsCount }}</small>
+        }
+      </div>
     }
-  </div>
 
-  <div class="w-80 flex-col-start-stretch gap-xs">
-    <label for="session-style-ids">{{ i18n.form().stylesLabel }}</label>
+    <div class="flex-col-start-stretch gap-xs">
+      <label for="session-language-ids">{{ formTexts.languagesLabel }}</label>
 
-    <app-chip-picker
-      [options]="styleOptions()"
-      [selected]="form.controls.gmStyleIds.getRawValue()"
-      [searchable]="false"
-      (selectedChange)="onStylesChange($event)"
-    />
-  </div>
+      <app-chip-picker
+        [options]="languageOptions()"
+        [selected]="form.controls.languageIds.getRawValue()"
+        [searchable]="false"
+        (selectedChange)="onLanguagesChange($event)"
+      />
+    </div>
 
-  <div class="w-80 flex-col-start-stretch gap-xs">
-    <label for="session-trigger-ids">{{ i18n.form().triggersLabel }}</label>
+    <div class="flex-col-start-stretch gap-xs">
+      <label for="session-style-ids">{{ formTexts.stylesLabel }}</label>
 
-    <app-chip-picker
-      [options]="triggerOptions()"
-      [selected]="form.controls.triggerIds.getRawValue()"
-      [searchable]="true"
-      (selectedChange)="onTriggersChange($event)"
-    />
+      <app-chip-picker
+        [options]="styleOptions()"
+        [selected]="form.controls.gmStyleIds.getRawValue()"
+        [searchable]="false"
+        (selectedChange)="onStylesChange($event)"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <label for="session-trigger-ids">{{ formTexts.triggersLabel }}</label>
+
+      <app-chip-picker
+        [options]="triggerOptions()"
+        [selected]="form.controls.triggerIds.getRawValue()"
+        [searchable]="true"
+        (selectedChange)="onTriggersChange($event)"
+      />
+    </div>
   </div>
 
   <div class="w-100 flex-row-center-center gap-sm">
@@ -200,3 +380,29 @@
     />
   </div>
 </form>
+
+<p-dialog
+  [visible]="!!characterSheetPreview()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  appendTo="body"
+  [styleClass]="'mg-dialog mg-dialog--xl'"
+  (visibleChange)="closeCharacterSheetPreview()"
+>
+  @if (characterSheetPreview(); as preview) {
+    <ng-template pTemplate="header">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ preview.title }}
+      </h2>
+    </ng-template>
+
+    <object
+      [data]="resolvePdfPreviewUrl(preview.url)"
+      type="application/pdf"
+      class="w-100 h-px-800 max-h-800"
+    ></object>
+  }
+</p-dialog>

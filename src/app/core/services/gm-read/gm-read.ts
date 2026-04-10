@@ -75,22 +75,6 @@ export class GmRead {
     });
   }
 
-  getSessionTemplatesByGmProfileId(gmProfileId: string) {
-    return this.sessionRead.getSessionTemplatesByGmProfileId(gmProfileId);
-  }
-
-  getSessionTemplateById(sessionId: string, gmProfileId?: string) {
-    return this.sessionRead.getSessionTemplateById(sessionId, gmProfileId);
-  }
-
-  getCustomSessionsByGmProfileId(gmProfileId: string) {
-    return this.sessionRead.getCustomSessionsByGmProfileId(gmProfileId);
-  }
-
-  getCustomSessionById(sessionId: string, gmProfileId?: string) {
-    return this.sessionRead.getCustomSessionById(sessionId, gmProfileId);
-  }
-
   getPublicProfiles(): Observable<IGmPublicProfile[]> {
     return this.backend
       .getAll<IGmProfile>({
@@ -125,7 +109,7 @@ export class GmRead {
     return forkJoin({
       user: this.backend.getById<IUser>('users', profile.id),
       profileWithRelations: this.hydrateGmProfile(profile),
-      sessions: this.sessionRead.getSessionTemplatesByGmProfileId(profile.id),
+      sessions: this.sessionRead.getSessionsByGmProfileId(profile.id, 'template'),
     }).pipe(
       map(({ user, profileWithRelations, sessions }) => ({
         user: user as IUser,

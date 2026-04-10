@@ -1,4 +1,5 @@
 export type FileUploadPreviewShape = 'circle' | 'square' | 'landscape';
+export type FileUploadMode = 'image' | 'files';
 
 export interface FileUploadTexts {
   chooseLabel: string;
@@ -20,11 +21,16 @@ export interface FileUploadTexts {
 }
 
 export interface FileUploadOptions {
+  mode?: FileUploadMode;
   accept: string;
   maxFileSize: number;
   currentUrl: string | null;
   disabled: boolean;
   previewShape: FileUploadPreviewShape;
+  multiple?: boolean;
+  clearAfterSelect?: boolean;
+  chooseIcon?: string;
+  emptyIcon?: string;
 }
 
 export interface FileUploadCropConfig {

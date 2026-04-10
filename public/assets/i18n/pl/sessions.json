@@ -1,5 +1,7 @@
 {
   "form": {
+    "basicInfoTitle": "Informacje podstawowe",
+    "additionalInfoTitle": "Informacje dodatkowe",
     "titleLabel": "Tytuł sesji",
     "systemLabel": "System RPG",
     "descriptionLabel": "Opis sesji",
@@ -10,6 +12,14 @@
     "sortOrderLabel": "Kolejność",
     "stylesLabel": "Style sesji",
     "triggersLabel": "Triggery",
+    "languagesLabel": "Języki",
+    "allowsScenarioCustomizationLabel": "Personalizacja scenariusza",
+    "hasReadyCharacterSheetsLabel": "Gotowe karty postaci",
+    "characterSheetsLabel": "Karty postaci",
+    "chooseCharacterSheetsLabel": "Dodaj karty postaci",
+    "characterSheetsHint": "Dodaj pliki PDF z gotowymi kartami postaci.",
+    "characterSheetsRequirementHint": "Liczba kart musi być co najmniej równa maksymalnej liczbie graczy.",
+    "removeCharacterSheetsLabel": "Usuń wszystkie karty",
     "playersRangeLabel": "Podaj wartość od 1 do 5.",
     "minAgeRangeLabel": "Podaj wartość od 0 wzwyż.",
     "sortOrderRangeLabel": "Podaj wartość od 0 wzwyż."
@@ -20,7 +30,8 @@
     "advanced": "Dla doświadczonych"
   },
   "errors": {
-    "invalidPlayersRange": "Minimalna liczba graczy nie może być większa niż maksymalna."
+    "invalidPlayersRange": "Minimalna liczba graczy nie może być większa niż maksymalna.",
+    "invalidCharacterSheetsCount": "Liczba kart postaci musi być co najmniej równa maksymalnej liczbie graczy."
   },
   "list": {
     "playersHeaderLabel": "Gracze",
@@ -46,6 +57,8 @@
       "nonePlural": "Brak",
       "noStyles": "Brak stylów",
       "noTriggers": "Brak triggerów",
+      "noLanguages": "Brak języków",
+      "noCharacterSheets": "Brak kart postaci",
       "missingData": "Brak danych",
       "emptySession": "Brak sesji"
     }

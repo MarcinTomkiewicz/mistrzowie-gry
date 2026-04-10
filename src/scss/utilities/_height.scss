@@ -1,4 +1,5 @@
 $heights: (10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100);
+$fixed-height-values: 0, 50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800;
 
 @each $h in $heights {
   .h-#{$h} {
@@ -8,3 +9,18 @@ $heights: (10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100);
 
 
 .h-auto { height: auto !important; }
+
+@each $value in $fixed-height-values {
+  .h-px-#{$value} {
+    height: #{$value}px !important;
+  }
+}
+
+@each $value in $fixed-height-values {
+  .max-h-#{$value} {
+    max-height: #{$value}px !important;
+  }
+}
+
+.max-h-none { max-height: none !important; }
+.max-h-full { max-height: 100% !important; }

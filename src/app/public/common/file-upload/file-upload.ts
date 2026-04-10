@@ -28,6 +28,7 @@ import {
 
 export type {
   FileUploadCropConfig,
+  FileUploadMode,
   FileUploadOptions,
   FileUploadPreviewShape,
   FileUploadTexts,
@@ -59,11 +60,16 @@ const DEFAULT_TEXTS: FileUploadTexts = {
 };
 
 const DEFAULT_OPTIONS: FileUploadOptions = {
+  mode: 'image',
   accept: 'image/png,image/jpeg,image/webp,image/avif',
   maxFileSize: 5_000_000,
   currentUrl: null,
   disabled: false,
   previewShape: 'circle',
+  multiple: false,
+  clearAfterSelect: false,
+  chooseIcon: 'pi pi-mona-lisa',
+  emptyIcon: 'pi pi-soul',
 };
 
 const DEFAULT_CROP_CONFIG: FileUploadCropConfig = {
@@ -101,6 +107,7 @@ export class FileUpload {
   readonly cropConfig = input<Partial<FileUploadCropConfig>>({});
 
   readonly valueChange = output<File | null>();
+  readonly filesSelected = output<File[]>();
 
   readonly selected = signal(createInitialSelectedState());
   readonly pendingFile = signal<File | undefined>(undefined);
@@ -120,7 +127,10 @@ export class FileUpload {
   readonly previewUrl = computed(
     () => this.selected().objectUrl ?? this.resolvedOptions().currentUrl,
   );
-  readonly cropVisible = computed(() => !!this.pendingFile());
+  readonly cropVisible = computed(
+    () => this.resolvedOptions().mode === 'image' && !!this.pendingFile(),
+  );
+  readonly isImageMode = computed(() => this.resolvedOptions().mode === 'image');
 
   constructor() {
     inject(DestroyRef).onDestroy(() => {
@@ -129,7 +139,23 @@ export class FileUpload {
   }
 
   onSelect(event: FileSelectEvent): void {
-    const file = event.files?.[0] ?? null;
+    const files = Array.from(event.files ?? []);
+
+    if (!files.length) {
+      return;
+    }
+
+    if (!this.isImageMode()) {
+      this.filesSelected.emit(files);
+
+      if (this.resolvedOptions().clearAfterSelect) {
+        this.uploader()?.clear();
+      }
+
+      return;
+    }
+
+    const file = files[0] ?? null;
 
     if (!file) {
       return;
@@ -139,13 +165,17 @@ export class FileUpload {
   }
 
   onRemove(event: FileRemoveEvent): void {
+    if (!this.isImageMode()) {
+      return;
+    }
+
     if (event.file === this.selected().file) {
       this.clearSelectedFile();
     }
   }
 
   onClear(): void {
-    if (this.isResettingUploader) {
+    if (this.isResettingUploader || !this.isImageMode()) {
       return;
     }
 

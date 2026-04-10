@@ -1,17 +1,29 @@
 import { inject, Injectable } from '@angular/core';
-import { from, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { forkJoin, from, map, Observable, of, switchMap, throwError } from 'rxjs';
 
+import { FilterOperator } from '../../enums/filter-operators';
+import {
+  ICustomSessionCharacterSheetRow,
+  IGmSessionTemplateCharacterSheetRow,
+} from '../../interfaces/i-session';
 import {
   IStorageUploadOptions,
   IStorageUploadResult,
 } from '../../interfaces/i-storage';
+import { SessionSourceKind, SESSION_SOURCE_CONFIG } from '../../types/session-source';
+import { Backend } from '../backend/backend';
 import { Supabase } from '../supabase/supabase';
+
+type SessionCharacterSheetRow =
+  | IGmSessionTemplateCharacterSheetRow
+  | ICustomSessionCharacterSheetRow;
 
 @Injectable({ providedIn: 'root' })
 export class Storage {
+  private readonly backend = inject(Backend);
   private readonly supabase = inject(Supabase).client();
 
-  uploadImage(file: File, options: IStorageUploadOptions): Observable<IStorageUploadResult> {
+  uploadFile(file: File, options: IStorageUploadOptions): Observable<IStorageUploadResult> {
     const bucket = options.bucket ?? 'images';
     const removePrevious = options.removePrevious ?? true;
     const path = this.buildStoragePath(file, options);
@@ -38,15 +50,27 @@ export class Storage {
     );
   }
 
-  removeFile(pathOrUrl: string | null | undefined, bucket = 'images'): Observable<void> {
-    const normalizedPath = this.normalizeStoragePath(pathOrUrl, bucket);
+  uploadImage(file: File, options: IStorageUploadOptions): Observable<IStorageUploadResult> {
+    return this.uploadFile(file, options);
+  }
 
-    if (!normalizedPath) {
+  removeFile(pathOrUrl: string | null | undefined, bucket = 'images'): Observable<void> {
+    return this.removeFiles(pathOrUrl ? [pathOrUrl] : [], bucket);
+  }
+
+  removeFiles(pathsOrUrls: readonly (string | null | undefined)[], bucket = 'images'): Observable<void> {
+    const normalizedPaths = [...new Set(
+      pathsOrUrls
+        .map((path) => this.normalizeStoragePath(path, bucket))
+        .filter((path): path is string => !!path),
+    )];
+
+    if (!normalizedPaths.length) {
       return of(void 0);
     }
 
     return from(
-      this.supabase.storage.from(bucket).remove([normalizedPath]),
+      this.supabase.storage.from(bucket).remove(normalizedPaths),
     ).pipe(
       switchMap(({ error }) => {
         if (error) {
@@ -66,7 +90,6 @@ export class Storage {
     }
 
     const { data } = this.supabase.storage.from(bucket).getPublicUrl(normalizedPath);
-
     return data.publicUrl ?? null;
   }
 
@@ -85,6 +108,125 @@ export class Storage {
       .join('/');
   }
 
+  syncSessionCharacterSheets(
+    sessionId: string,
+    source: SessionSourceKind,
+    ownerId: string,
+    newFiles: readonly File[],
+    removedSheetIds: readonly string[],
+  ): Observable<void> {
+    if (!newFiles.length && !removedSheetIds.length) {
+      return of(void 0);
+    }
+
+    return this.getSessionCharacterSheetRows(sessionId, source).pipe(
+      switchMap((rows) => {
+        const rowsToRemove = rows.filter((row) => removedSheetIds.includes(row.id));
+
+        return this.removeSessionCharacterSheetRows(rowsToRemove, source).pipe(
+          switchMap(() =>
+            this.uploadSessionCharacterSheetFiles(sessionId, source, ownerId, newFiles),
+          ),
+        );
+      }),
+    );
+  }
+
+  removeSessionCharacterSheets(
+    sessionId: string,
+    source: SessionSourceKind,
+  ): Observable<void> {
+    return this.getSessionCharacterSheetRows(sessionId, source).pipe(
+      switchMap((rows) => this.removeSessionCharacterSheetRows(rows, source)),
+    );
+  }
+
+  private uploadSessionCharacterSheetFiles(
+    sessionId: string,
+    source: SessionSourceKind,
+    ownerId: string,
+    files: readonly File[],
+  ): Observable<void> {
+    if (!files.length) {
+      return of(void 0);
+    }
+
+    const config = SESSION_SOURCE_CONFIG[source];
+
+    return forkJoin(
+      files.map((file) =>
+        this.uploadFile(file, {
+          bucket: 'docs',
+          folder: 'sessions',
+          ownerId,
+          subfolders: [sessionId, 'characters'],
+          usePublicUrl: false,
+        }).pipe(
+          map((result) => ({
+            [config.sessionIdKey]: sessionId,
+            storagePath: result.path,
+            fileName: file.name,
+          })),
+        ),
+      ),
+    ).pipe(
+      switchMap((rows) =>
+        this.backend.createMany<Record<string, string>>(
+          config.characterSheetsTable,
+          rows,
+        ),
+      ),
+      map(() => void 0),
+    );
+  }
+
+  private removeSessionCharacterSheetRows(
+    rows: readonly SessionCharacterSheetRow[],
+    source: SessionSourceKind,
+  ): Observable<void> {
+    if (!rows.length) {
+      return of(void 0);
+    }
+
+    const config = SESSION_SOURCE_CONFIG[source];
+    const ids = rows.map((row) => row.id);
+
+    return this.removeFiles(
+      rows.map((row) => row.storagePath),
+      'docs',
+    ).pipe(
+      switchMap(() =>
+        this.backend.delete(config.characterSheetsTable, {
+          id: {
+            operator: FilterOperator.IN,
+            value: ids,
+          },
+        }),
+      ),
+    );
+  }
+
+  private getSessionCharacterSheetRows(
+    sessionId: string,
+    source: SessionSourceKind,
+  ): Observable<SessionCharacterSheetRow[]> {
+    const config = SESSION_SOURCE_CONFIG[source];
+
+    return this.backend.getAll<SessionCharacterSheetRow>({
+      table: config.characterSheetsTable,
+      sortBy: 'createdAt',
+      sortOrder: 'asc',
+      pagination: {
+        filters: {
+          [config.sessionIdKey]: {
+            operator: FilterOperator.EQ,
+            value: sessionId,
+          },
+        },
+      },
+    });
+  }
+
   private createUploadResult(
     bucket: string,
     path: string,
@@ -98,7 +240,7 @@ export class Storage {
   }
 
   private createFileName(file: File): string {
-    const baseName = this.stripExtension(file.name).trim() || 'image';
+    const baseName = this.stripExtension(file.name).trim() || 'file';
     const extension = this.resolveExtension(file);
     const timestamp = Date.now();
 
@@ -125,6 +267,8 @@ export class Storage {
         return 'gif';
       case 'image/svg+xml':
         return 'svg';
+      case 'application/pdf':
+        return 'pdf';
       default:
         return 'bin';
     }
@@ -157,7 +301,7 @@ export class Storage {
       .trim()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9-_]+/g, '-')
+      .replace(/[^a-zA-Z0-9-_.]+/g, '-')
       .replace(/-{2,}/g, '-')
       .replace(/^-+|-+$/g, '');
   }

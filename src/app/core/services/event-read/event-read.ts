@@ -304,14 +304,15 @@ export class EventRead {
                 ? this.getMySignupForOccurrence(occurrence.id, userId)
                 : of(null),
               templateSessions: userId
-                ? this.sessionRead.getSessionTemplatesByGmProfileId(userId)
+                ? this.sessionRead.getSessionsByGmProfileId(userId, 'template')
                 : of([] as ISessionWithRelations[]),
               customSessions: userId
-                ? this.sessionRead.getCustomSessionsByGmProfileId(userId)
+                ? this.sessionRead.getSessionsByGmProfileId(userId, 'custom')
                 : of([] as ISessionWithRelations[]),
               systems: this.gmSessions.getAvailableSystems(),
               styles: this.gmSessions.getAvailableStyles(),
               triggers: this.gmSessions.getAvailableTriggers(),
+              languages: this.gmSessions.getAvailableLanguages(),
             }).pipe(
               map(
                 ({
@@ -323,6 +324,7 @@ export class EventRead {
                   systems,
                   styles,
                   triggers,
+                  languages,
                 }) => {
                   const activeSignupCount = signups.filter(
                     (item) =>
@@ -350,6 +352,7 @@ export class EventRead {
                       systems,
                       styles,
                       triggers,
+                      languages,
                     },
                   } satisfies IEventSignupLoadData;
                 },
@@ -378,6 +381,7 @@ export class EventRead {
         systems: [],
         styles: [],
         triggers: [],
+        languages: [],
       },
     };
   }
@@ -448,14 +452,14 @@ export class EventRead {
       item.sourceKind === EventProgramItemSourceKind.GmSessionTemplate &&
       item.gmSessionTemplateId
     ) {
-      return this.sessionRead.getSessionTemplateById(item.gmSessionTemplateId);
+      return this.sessionRead.getSessionById(item.gmSessionTemplateId, 'template');
     }
 
     if (
       item.sourceKind === EventProgramItemSourceKind.CustomSession &&
       item.customSessionId
     ) {
-      return this.sessionRead.getCustomSessionById(item.customSessionId);
+      return this.sessionRead.getSessionById(item.customSessionId, 'custom');
     }
 
     return of(null);

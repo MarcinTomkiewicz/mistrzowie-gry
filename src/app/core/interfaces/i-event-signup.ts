@@ -3,8 +3,12 @@ import { IEvent } from './i-event';
 import { IEventOccurrence } from './i-event-occurence';
 import { IEventProgramItem } from './i-event-program-item';
 import { IGmStyle } from './i-gm-style';
-import { IUpdateSessionPayload, ISessionWithRelations } from './i-session';
+import {
+  ISessionFormSubmitData,
+  ISessionWithRelations,
+} from './i-session';
 import { ISystem } from './i-system';
+import { ILanguage } from './i-languages';
 
 export interface IEventSignupSelection {
   eventId: string;
@@ -26,7 +30,7 @@ export interface IEventCustomSignupSubmitPayload {
   selection: IEventSignupSelection;
   mode: 'custom';
   customSourceSessionId: string | null;
-  customSessionPayload: IUpdateSessionPayload;
+  customSessionPayload: ISessionFormSubmitData;
 }
 
 export type IEventSignupSubmitPayload =
@@ -57,6 +61,7 @@ export interface IEventSignupResourcesData {
   systems: ISystem[];
   styles: IGmStyle[];
   triggers: IContentTrigger[];
+  languages: ILanguage[];
 }
 
 export interface IEventSignupLoadData {

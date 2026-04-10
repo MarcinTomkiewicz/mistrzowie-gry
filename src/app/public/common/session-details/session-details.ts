@@ -1,6 +1,8 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { ImageModule } from 'primeng/image';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -15,12 +17,13 @@ import { SystemChip } from '../system-chip/system-chip';
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [ButtonModule, ImageModule, SystemChip],
+  imports: [ButtonModule, DialogModule, ImageModule, SystemChip],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
   providers: [provideTranslocoScope('sessions')],
 })
 export class SessionDetails {
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly storage = inject(Storage);
 
   readonly session = input.required<ISessionWithRelations>();
@@ -31,6 +34,7 @@ export class SessionDetails {
   readonly gmProfileSelect = output<void>();
 
   readonly i18n = createSessionDetailsI18n();
+  readonly characterSheetPreview = signal<{ title: string; url: string } | null>(null);
 
   readonly imageUrl = computed(() => {
     const imagePath = normalizeText(this.session().image);
@@ -116,5 +120,32 @@ export class SessionDetails {
     }
 
     this.gmProfileSelect.emit();
+  }
+
+  openCharacterSheetPreview(url: string | null, title: string): void {
+    if (!url) {
+      return;
+    }
+
+    this.characterSheetPreview.set({
+      title,
+      url,
+    });
+  }
+
+  closeCharacterSheetPreview(): void {
+    this.characterSheetPreview.set(null);
+  }
+
+  resolveCharacterSheetUrl(path: string): string | null {
+    return this.storage.getPublicUrl(path, 'docs');
+  }
+
+  resolvePdfPreviewUrl(url: string | null): SafeResourceUrl | null {
+    return url
+      ? this.sanitizer.bypassSecurityTrustResourceUrl(
+          `${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`,
+        )
+      : null;
   }
 }

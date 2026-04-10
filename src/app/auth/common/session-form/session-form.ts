@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -9,11 +10,14 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { finalize, Observable, of, switchMap, throwError } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { finalize, map, Observable, of, throwError } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -28,9 +32,11 @@ import {
 import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
 import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
 import { IGmStyle } from '../../../core/interfaces/i-gm-style';
+import { ILanguage } from '../../../core/interfaces/i-languages';
 import {
-  ISessionFormData,
-  IUpdateSessionPayload,
+  ISessionCharacterSheet,
+  ISessionFormInitialData,
+  ISessionFormSubmitData,
 } from '../../../core/interfaces/i-session';
 import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
 import { ISystem } from '../../../core/interfaces/i-system';
@@ -41,15 +47,21 @@ import {
   SessionDifficultyLevel,
 } from '../../../core/types/sessions';
 import { normalizeText } from '../../../core/utils/normalize-text';
-import {
-  FileUploadCropConfig,
-  FileUploadOptions,
-  FileUploadTexts,
-} from '../../../core/types/file-upload';
+import { setControlValue } from '../../../core/utils/form-controls';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
 import { SystemAutocomplete } from '../../../public/common/system-autocomplete/system-autocomplete';
 import { createSessionFormI18n } from './session-form.i18n';
+
+type CharacterSheetCard = {
+  id: string;
+  fileName: string;
+  previewUrl: string | null;
+  kind: 'existing' | 'new';
+  removeToken: string | number;
+};
+
+const PDF_PREVIEW_HASH = '#toolbar=0&navpanes=0&scrollbar=0&view=FitH';
 
 @Component({
   selector: 'app-session-form',
@@ -58,7 +70,9 @@ import { createSessionFormI18n } from './session-form.i18n';
     CommonModule,
     ReactiveFormsModule,
     ButtonModule,
+    CheckboxModule,
     ChipPicker,
+    DialogModule,
     FileUpload,
     IftaLabelModule,
     InputNumberModule,
@@ -68,32 +82,37 @@ import { createSessionFormI18n } from './session-form.i18n';
     TextareaModule,
   ],
   templateUrl: './session-form.html',
-  styleUrl: './session-form.scss',
   providers: [provideTranslocoScope('sessions', 'common')],
 })
 export class SessionForm {
   private readonly auth = inject(Auth);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly storage = inject(Storage);
+  private currentNewCharacterSheetFiles: readonly { file: File; previewUrl: string }[] = [];
 
-  readonly initial = input<Partial<ISessionFormData> | null>(null);
+  readonly initial = input<ISessionFormInitialData | null>(null);
   readonly systems = input<readonly ISystem[]>([]);
   readonly styles = input<readonly IGmStyle[]>([]);
   readonly triggers = input<readonly IContentTrigger[]>([]);
+  readonly languages = input<readonly ILanguage[]>([]);
   readonly submitLabel = input('');
   readonly cancelLabel = input('');
   readonly busy = input(false);
 
-  readonly save = output<IUpdateSessionPayload>();
+  readonly save = output<ISessionFormSubmitData>();
   readonly cancel = output<void>();
 
   readonly i18n = createSessionFormI18n();
-
   readonly form = createSessionForm(this.fb);
 
   readonly isUploadingImage = signal(false);
   readonly selectedImageFile = signal<File | null>(null);
   readonly storedImagePath = signal<string | null>(null);
+  readonly removedCharacterSheetIds = signal<string[]>([]);
+  readonly newCharacterSheetFiles = signal<readonly { file: File; previewUrl: string }[]>([]);
+  readonly characterSheetPreview = signal<{ title: string; url: string } | null>(null);
 
   readonly isSubmitting = computed(() => this.busy() || this.isUploadingImage());
 
@@ -115,6 +134,19 @@ export class SessionForm {
       selectedClassName: 'tag-badge--ember',
       unselectedClassName: 'tag-badge--muted',
     })),
+  );
+
+  readonly languageOptions = computed<IChipPickerOption[]>(() =>
+    [...this.languages()]
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((language) => ({
+        id: language.id,
+        label: language.label,
+        searchText: `${language.code} ${language.label} ${language.flagCode}`,
+        iconClassName: `fi fi-${language.flagCode.toLowerCase()}`,
+        selectedClassName: 'tag-badge--arcane',
+        unselectedClassName: 'tag-badge--muted',
+      })),
   );
 
   readonly difficultyLabels = computed<Record<SessionDifficultyLevel, string>>(
@@ -142,102 +174,154 @@ export class SessionForm {
       return null;
     }
 
-    const imagePath = this.storedImagePath();
-
-    if (!imagePath) {
-      return null;
-    }
-
-    return this.storage.getPublicUrl(imagePath);
+    return this.storage.getPublicUrl(this.storedImagePath());
   });
-  readonly imageUploadTexts = computed<FileUploadTexts>(() => ({
-    chooseLabel: this.i18n.commonForm().fileUpload.chooseImage,
-    clearLabel: this.i18n.commonActions().clear,
-    dropLabel: this.i18n.commonForm().fileUpload.dropImage,
-    formatsLabel: this.i18n.commonForm().fileUpload.imageFormats,
-    previewAlt: this.i18n.commonForm().fileUpload.imagePreviewAlt,
-    cropTitle: this.i18n.commonForm().fileUpload.cropTitle,
-    cropHint: this.i18n.commonForm().fileUpload.sessionCropHint,
-    cropFrameAriaLabel: this.i18n.commonForm().fileUpload.cropFrameAriaLabel,
-    cropConfirmLabel: this.i18n.commonForm().fileUpload.cropConfirm,
-    cropCancelLabel: this.i18n.commonActions().cancel,
-    cropProcessingLabel: this.i18n.commonForm().fileUpload.cropProcessingLabel,
-    zoomLabel: this.i18n.commonForm().fileUpload.zoomLabel,
-    cropPreviewLabel: this.i18n.commonForm().fileUpload.cropPreviewLabel,
-    cropPreviewLandscapeLabel:
-      this.i18n.commonForm().fileUpload.cropPreviewLandscapeLabel,
-    cropPreviewCircleLabel:
-      this.i18n.commonForm().fileUpload.cropPreviewCircleLabel,
-    cropPreviewSquareLabel:
-      this.i18n.commonForm().fileUpload.cropPreviewSquareLabel,
-  }));
-  readonly imageUploadOptions = computed<FileUploadOptions>(() => ({
-    currentUrl: this.storedImageUrl(),
-    disabled: this.isSubmitting(),
-    previewShape: 'landscape',
-    accept: 'image/png,image/jpeg,image/webp,image/avif',
-    maxFileSize: 5_000_000,
-  }));
-  readonly imageCropConfig = computed<FileUploadCropConfig>(() => ({
-    aspectRatio: 16 / 9,
-    roundCropper: false,
-    resizeToWidth: 1280,
-    resizeToHeight: 720,
-    previewShapes: ['landscape', 'circle'],
-  }));
+
+  readonly existingCharacterSheets = computed<readonly ISessionCharacterSheet[]>(() => {
+    const removedIds = new Set(this.removedCharacterSheetIds());
+
+    return (this.initial()?.characterSheets ?? []).filter(
+      (sheet) => !removedIds.has(sheet.id),
+    );
+  });
+
+  readonly characterSheetItems = computed<readonly CharacterSheetCard[]>(() => [
+    ...this.existingCharacterSheets().map((sheet) => ({
+      id: sheet.id,
+      fileName: sheet.fileName,
+      previewUrl: this.storage.getPublicUrl(sheet.storagePath, 'docs'),
+      kind: 'existing' as const,
+      removeToken: sheet.id,
+    })),
+    ...this.newCharacterSheetFiles().map((sheet, index) => ({
+      id: `new-${index}`,
+      fileName: sheet.file.name,
+      previewUrl: sheet.previewUrl,
+      kind: 'new' as const,
+      removeToken: index,
+    })),
+  ]);
 
   constructor() {
     effect(() => {
-      const initial = this.initial();
-      const imagePath = normalizeText(initial?.image);
-
+      this.removedCharacterSheetIds.set([]);
+      this.replaceNewCharacterSheetFiles([]);
       this.selectedImageFile.set(null);
-      this.storedImagePath.set(imagePath);
-      this.form.reset(mapSessionToFormData(initial ?? {}));
+      this.storedImagePath.set(normalizeText(this.initial()?.image));
+      this.characterSheetPreview.set(null);
+      this.form.reset(mapSessionToFormData(this.initial()));
       this.form.markAsPristine();
       this.form.markAsUntouched();
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.replaceNewCharacterSheetFiles([]);
     });
   }
 
   onSystemSelect(system: ISystem | null): void {
-    this.form.controls.systemId.setValue(system?.id ?? null);
-    this.form.controls.systemId.markAsDirty();
-    this.form.controls.systemId.markAsTouched();
+    setControlValue(this.form.controls.systemId, system?.id ?? null);
   }
 
   onSystemClear(): void {
-    this.form.controls.systemId.setValue(null);
-    this.form.controls.systemId.markAsDirty();
-    this.form.controls.systemId.markAsTouched();
+    setControlValue(this.form.controls.systemId, null);
   }
 
   onStylesChange(gmStyleIds: string[]): void {
-    this.form.controls.gmStyleIds.setValue(gmStyleIds);
-    this.form.controls.gmStyleIds.markAsDirty();
-    this.form.controls.gmStyleIds.markAsTouched();
+    setControlValue(this.form.controls.gmStyleIds, gmStyleIds);
   }
 
   onTriggersChange(triggerIds: string[]): void {
-    this.form.controls.triggerIds.setValue(triggerIds);
-    this.form.controls.triggerIds.markAsDirty();
-    this.form.controls.triggerIds.markAsTouched();
+    setControlValue(this.form.controls.triggerIds, triggerIds);
+  }
+
+  onLanguagesChange(languageIds: string[]): void {
+    setControlValue(this.form.controls.languageIds, languageIds);
   }
 
   onImageValueChange(file: File | null): void {
     this.selectedImageFile.set(file);
 
     if (!file) {
-      this.form.controls.image.setValue(this.storedImagePath());
-      this.form.controls.image.markAsTouched();
+      setControlValue(this.form.controls.image, this.storedImagePath(), false);
       return;
     }
 
-    this.form.controls.image.setValue(file.name);
-    this.form.controls.image.markAsDirty();
-    this.form.controls.image.markAsTouched();
+    setControlValue(this.form.controls.image, file.name);
+  }
+
+  onReadyCharacterSheetsChange(checked: boolean): void {
+    if (!checked) {
+      this.clearCharacterSheets();
+      setControlValue(this.form.controls.hasReadyCharacterSheets, false);
+      return;
+    }
+
+    setControlValue(this.form.controls.hasReadyCharacterSheets, true);
+    this.syncCharacterSheetsCount();
+  }
+
+  onCharacterSheetsSelected(files: File[] | FileList | readonly File[]): void {
+    const selectedFiles = Array.from(files).filter((file) => this.isPdfFile(file));
+
+    if (!selectedFiles.length) {
+      return;
+    }
+
+    this.replaceNewCharacterSheetFiles([
+      ...this.newCharacterSheetFiles(),
+      ...selectedFiles.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      })),
+    ]);
+    setControlValue(this.form.controls.hasReadyCharacterSheets, true);
+    this.syncCharacterSheetsCount();
+  }
+
+  removeCharacterSheet(item: CharacterSheetCard): void {
+    if (item.kind === 'existing') {
+      this.removedCharacterSheetIds.update((ids) => [...new Set([...ids, item.removeToken as string])]);
+    } else {
+      this.replaceNewCharacterSheetFiles(
+        this.newCharacterSheetFiles().filter((_, index) => index !== item.removeToken),
+      );
+    }
+
+    this.form.markAsDirty();
+    this.syncCharacterSheetsCount();
+  }
+
+  clearCharacterSheets(): void {
+    const existingIds = this.existingCharacterSheets().map((sheet) => sheet.id);
+
+    if (existingIds.length) {
+      this.removedCharacterSheetIds.update((ids) => [...new Set([...ids, ...existingIds])]);
+    }
+
+    this.replaceNewCharacterSheetFiles([]);
+    this.syncCharacterSheetsCount(0);
+    this.form.markAsDirty();
+  }
+
+  openCharacterSheetPreview(url: string | null, title: string): void {
+    if (!url) {
+      return;
+    }
+
+    this.characterSheetPreview.set({
+      title,
+      url,
+    });
+  }
+
+  closeCharacterSheetPreview(): void {
+    this.characterSheetPreview.set(null);
   }
 
   onSubmit(): void {
+    this.syncCharacterSheetsCount();
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -248,7 +332,12 @@ export class SessionForm {
     this.uploadSelectedImageIfNeeded()
       .pipe(finalize(() => this.isUploadingImage.set(false)))
       .subscribe({
-        next: () => this.save.emit(mapSessionFormToPayload(this.form)),
+        next: () =>
+          this.save.emit({
+            payload: mapSessionFormToPayload(this.form),
+            newCharacterSheetFiles: this.newCharacterSheetFiles().map((sheet) => sheet.file),
+            removedCharacterSheetIds: this.removedCharacterSheetIds(),
+          }),
         error: (error) => console.error('[SESSION FORM IMAGE UPLOAD ERROR]', error),
       });
   }
@@ -257,44 +346,13 @@ export class SessionForm {
     this.cancel.emit();
   }
 
-  showRequiredError(controlName: keyof typeof this.form.controls): boolean {
+  showControlError(
+    controlName: keyof typeof this.form.controls,
+    errorKeys: readonly string[],
+  ): boolean {
     const control = this.form.controls[controlName];
 
-    return (
-      control.touched &&
-      (!!control.errors?.['required'] || !!control.errors?.['requiredTrimmed'])
-    );
-  }
-
-  showMinPlayersError(): boolean {
-    const control = this.form.controls.minPlayers;
-
-    return (
-      control.touched &&
-      (!!control.errors?.['required'] ||
-        !!control.errors?.['min'] ||
-        !!control.errors?.['max'])
-    );
-  }
-
-  showMaxPlayersError(): boolean {
-    const control = this.form.controls.maxPlayers;
-
-    return (
-      control.touched &&
-      (!!control.errors?.['required'] ||
-        !!control.errors?.['min'] ||
-        !!control.errors?.['max'])
-    );
-  }
-
-  showMinAgeError(): boolean {
-    const control = this.form.controls.minAge;
-
-    return (
-      control.touched &&
-      (!!control.errors?.['required'] || !!control.errors?.['min'])
-    );
+    return control.touched && errorKeys.some((key) => !!control.errors?.[key]);
   }
 
   showPlayersRangeError(): boolean {
@@ -305,6 +363,48 @@ export class SessionForm {
       this.form.touched &&
       this.form.hasError('invalidPlayersRange') &&
       (minPlayers.touched || maxPlayers.touched)
+    );
+  }
+
+  showCharacterSheetsCountError(): boolean {
+    return (
+      this.form.controls.hasReadyCharacterSheets.touched &&
+      this.form.hasError('invalidCharacterSheetsCount')
+    );
+  }
+
+  resolvePdfPreviewUrl(url: string | null): SafeResourceUrl | null {
+    return url
+      ? this.sanitizer.bypassSecurityTrustResourceUrl(`${url}${PDF_PREVIEW_HASH}`)
+      : null;
+  }
+
+  private syncCharacterSheetsCount(count = this.characterSheetItems().length): void {
+    this.form.controls.characterSheetsCount.setValue(
+      this.form.controls.hasReadyCharacterSheets.getRawValue() ? count : 0,
+      { emitEvent: false },
+    );
+    this.form.controls.characterSheetsCount.markAsTouched();
+    this.form.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private replaceNewCharacterSheetFiles(
+    nextFiles: readonly { file: File; previewUrl: string }[],
+  ): void {
+    const nextPreviewUrls = new Set(nextFiles.map((file) => file.previewUrl));
+
+    this.currentNewCharacterSheetFiles
+      .filter((file) => !nextPreviewUrls.has(file.previewUrl))
+      .forEach((file) => URL.revokeObjectURL(file.previewUrl));
+
+    this.currentNewCharacterSheetFiles = nextFiles;
+    this.newCharacterSheetFiles.set(nextFiles);
+  }
+
+  private isPdfFile(file: File): boolean {
+    return (
+      file.type === 'application/pdf' ||
+      file.name.toLowerCase().endsWith('.pdf')
     );
   }
 
@@ -322,7 +422,7 @@ export class SessionForm {
     }
 
     return this.storage
-      .uploadImage(file, {
+      .uploadFile(file, {
         folder: 'sessionTemplates',
         ownerId: userId,
         currentPath: this.storedImagePath(),
@@ -330,13 +430,10 @@ export class SessionForm {
         usePublicUrl: false,
       })
       .pipe(
-        switchMap((result) => {
+        map((result) => {
           this.storedImagePath.set(result.path);
-          this.form.controls.image.setValue(result.path);
-          this.form.controls.image.markAsDirty();
-          this.form.controls.image.markAsTouched();
-
-          return of(result);
+          setControlValue(this.form.controls.image, result.path);
+          return result;
         }),
       );
   }

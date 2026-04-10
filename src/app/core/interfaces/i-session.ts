@@ -1,6 +1,7 @@
 import { SessionDifficultyLevel } from '../types/sessions';
 import { IContentTrigger } from './i-content-trigger';
 import { IGmStyle } from './i-gm-style';
+import { ILanguage } from './i-languages';
 import { ISystem } from './i-system';
 
 export interface ISession {
@@ -15,6 +16,8 @@ export interface ISession {
   minPlayers: number;
   maxPlayers: number;
   minAge: number;
+  hasReadyCharacterSheets: boolean;
+  allowsScenarioCustomization: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -34,8 +37,28 @@ export interface ISessionFormData {
   minPlayers: number | null;
   maxPlayers: number | null;
   minAge: number | null;
+  hasReadyCharacterSheets: boolean;
+  allowsScenarioCustomization: boolean;
+  languageIds: string[];
+  characterSheetsCount: number | null;
   triggerIds: string[];
   gmStyleIds: string[];
+  sortOrder: number | null;
+}
+
+export interface ISessionCharacterSheet {
+  id: string;
+  storagePath: string;
+  fileName: string;
+  createdAt: string | null;
+}
+
+export interface ISessionFormInitialData extends Partial<ISessionFormData> {
+  system?: ISystem | null;
+  triggers?: Pick<IContentTrigger, 'id'>[] | null;
+  styles?: Pick<IGmStyle, 'id'>[] | null;
+  languages?: Pick<ILanguage, 'id'>[] | null;
+  characterSheets?: ISessionCharacterSheet[] | null;
 }
 
 export interface ICreateSessionPayload {
@@ -47,6 +70,10 @@ export interface ICreateSessionPayload {
   minPlayers: number;
   maxPlayers: number;
   minAge: number;
+  hasReadyCharacterSheets: boolean;
+  allowsScenarioCustomization: boolean;
+  languageIds: string[];
+  characterSheetsCount: number;
   triggerIds: string[];
   gmStyleIds: string[];
   sortOrder?: number;
@@ -61,15 +88,27 @@ export interface IUpdateSessionPayload {
   minPlayers: number;
   maxPlayers: number;
   minAge: number;
+  hasReadyCharacterSheets: boolean;
+  allowsScenarioCustomization: boolean;
+  languageIds: string[];
+  characterSheetsCount: number;
   triggerIds: string[];
   gmStyleIds: string[];
   sortOrder?: number;
+}
+
+export interface ISessionFormSubmitData {
+  payload: ICreateSessionPayload | IUpdateSessionPayload;
+  newCharacterSheetFiles: File[];
+  removedCharacterSheetIds: string[];
 }
 
 export interface ISessionWithRelations extends ISession {
   system: ISystem;
   triggers: IContentTrigger[];
   styles: IGmStyle[];
+  languages: ILanguage[];
+  characterSheets: ISessionCharacterSheet[];
 }
 
 export interface ISessionListLabels {
@@ -104,5 +143,33 @@ export interface ICustomSessionStyleRow {
 export interface ICustomSessionTriggerRow {
   customSessionId: string;
   contentTriggerId: string;
+  createdAt: string | null;
+}
+
+export interface IGmSessionTemplateLanguageRow {
+  gmSessionTemplateId: string;
+  languageId: string;
+  createdAt: string | null;
+}
+
+export interface ICustomSessionLanguageRow {
+  customSessionId: string;
+  languageId: string;
+  createdAt: string | null;
+}
+
+export interface IGmSessionTemplateCharacterSheetRow {
+  id: string;
+  gmSessionTemplateId: string;
+  storagePath: string;
+  fileName: string;
+  createdAt: string | null;
+}
+
+export interface ICustomSessionCharacterSheetRow {
+  id: string;
+  customSessionId: string;
+  storagePath: string;
+  fileName: string;
   createdAt: string | null;
 }

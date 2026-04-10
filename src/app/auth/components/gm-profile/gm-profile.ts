@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   finalize,
   forkJoin,
+  map,
   Observable,
   of,
   switchMap,
@@ -34,6 +35,7 @@ import {
   FileUploadOptions,
   FileUploadTexts,
 } from '../../../core/types/file-upload';
+import { setControlValue } from '../../../core/utils/form-controls';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
@@ -238,15 +240,11 @@ export class GmProfile {
   }
 
   onStylesChange(gmStyleIds: string[]): void {
-    this.form.controls.gmStyleIds.setValue(gmStyleIds);
-    this.form.controls.gmStyleIds.markAsDirty();
-    this.form.controls.gmStyleIds.markAsTouched();
+    setControlValue(this.form.controls.gmStyleIds, gmStyleIds);
   }
 
   onLanguagesChange(languageIds: string[]): void {
-    this.form.controls.languageIds.setValue(languageIds);
-    this.form.controls.languageIds.markAsDirty();
-    this.form.controls.languageIds.markAsTouched();
+    setControlValue(this.form.controls.languageIds, languageIds);
   }
 
   showQuoteError(): boolean {
@@ -347,7 +345,7 @@ export class GmProfile {
     }
 
     return this.storage
-      .uploadImage(file, {
+      .uploadFile(file, {
         folder: 'profilePhotos',
         ownerId: userId,
         currentPath: this.storedImagePath(),
@@ -355,13 +353,10 @@ export class GmProfile {
         usePublicUrl: false,
       })
       .pipe(
-        switchMap((result) => {
+        map((result) => {
           this.storedImagePath.set(result.path);
-          this.form.controls.image.setValue(result.path);
-          this.form.controls.image.markAsDirty();
-          this.form.controls.image.markAsTouched();
-
-          return of(result);
+          setControlValue(this.form.controls.image, result.path);
+          return result;
         }),
       );
   }
