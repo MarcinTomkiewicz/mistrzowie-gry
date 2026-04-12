@@ -10,6 +10,7 @@ import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
+import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import {
   createOrganizationRef,
@@ -65,7 +66,7 @@ export class OurTeam {
           profile.profile.languages?.map((language) => ({
             id: language.id,
             label: language.label,
-            className: this.getLanguageFlagClass(language.flagCode),
+            className: resolveLanguageFlagClass(language.flagCode) ?? '',
           })) ?? [],
       })),
     };
@@ -115,17 +116,6 @@ export class OurTeam {
 
     return this.storage.getPublicUrl(imagePath);
   }
-
-  private getLanguageFlagClass(flagCode: string | null | undefined): string {
-    const code = normalizeText(flagCode)?.toLowerCase();
-
-    if (!code) {
-      return '';
-    }
-
-    return `fi fi-${code}`;
-  }
-
   private buildStructuredData(title: string, description: string) {
     const profiles = this.profiles() ?? [];
 

@@ -13,7 +13,7 @@
 }
 
 .tag-badge {
-  @include m.flex($justify: center, $align: center, $inline: true, $self: flex-start, $flex: 0 0 auto);
+  @include m.flex($justify: center, $align: center, $inline: true, $flex: 0 0 auto);
 
   border: 1px solid v.$color-border;
   font-size: map.get(v.$font-sizes, "xs");

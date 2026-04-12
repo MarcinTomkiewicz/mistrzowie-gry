@@ -36,6 +36,7 @@ import {
   FileUploadTexts,
 } from '../../../core/types/file-upload';
 import { setControlValue } from '../../../core/utils/form-controls';
+import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
@@ -293,7 +294,7 @@ export class GmProfile {
                 id: language.id,
                 label: language.label,
                 searchText: `${language.code} ${language.label} ${language.flagCode}`,
-                iconClassName: `fi fi-${language.flagCode.toLowerCase()}`,
+                iconClassName: resolveLanguageFlagClass(language.flagCode) ?? '',
                 selectedClassName: 'tag-badge--arcane',
                 unselectedClassName: 'tag-badge--muted',
               })),

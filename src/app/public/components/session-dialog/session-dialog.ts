@@ -18,6 +18,7 @@ import { catchError, finalize, of } from 'rxjs';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
+import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { SessionDetails } from '../../common/session-details/session-details';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
@@ -55,6 +56,15 @@ export class SessionDialog {
   readonly isGmProfileLoading = signal(false);
 
   readonly header = computed(() => this.session()?.title ?? '');
+  readonly languageFlags = computed(() =>
+    (this.session()?.languages ?? [])
+      .map((language) => ({
+        id: language.id,
+        label: language.label,
+        className: resolveLanguageFlagClass(language.flagCode),
+      }))
+      .filter((language) => !!language.className),
+  );
   readonly resolvedGmDisplayName = computed(() => {
     const explicitDisplayName = normalizeText(this.gmDisplayName());
 

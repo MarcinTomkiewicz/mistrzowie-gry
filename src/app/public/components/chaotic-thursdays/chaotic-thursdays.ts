@@ -164,6 +164,7 @@ export class ChaoticThursdays implements OnInit {
       imageUrl: this.getImageUrl(item.session.image),
       gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
       system: item.session.system ?? null,
+      languages: item.session.languages ?? [],
       difficultyLevel: item.session.difficultyLevel,
       styles: item.session.styles,
       triggers: item.session.triggers,

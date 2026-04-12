@@ -13,6 +13,7 @@ import {
   ISessionWithRelations,
 } from '../../../core/interfaces/i-session';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
+import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { SessionDetails } from '../session-details/session-details';
 import { createSessionListI18n } from './session-list.i18n';
 import { SystemChip } from '../system-chip/system-chip';
@@ -232,4 +233,6 @@ export class SessionList {
 
     this.mobileExpandedSessionId.set(value != null ? String(value) : null);
   }
+
+  readonly resolveLanguageFlagClass = resolveLanguageFlagClass;
 }

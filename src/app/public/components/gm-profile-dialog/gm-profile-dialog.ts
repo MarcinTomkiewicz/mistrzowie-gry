@@ -24,6 +24,7 @@ import {
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Storage } from '../../../core/services/storage/storage';
+import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { SessionList } from '../../common/session-list/session-list';
 import { createGmProfileDialogI18n } from './gm-profile-dialog.i18n';
@@ -158,7 +159,7 @@ export class GmProfileDialog {
       profile?.profile.languages?.map((language) => ({
         id: language.id,
         label: language.label,
-        className: this.getLanguageFlagClass(language.flagCode),
+        className: resolveLanguageFlagClass(language.flagCode) ?? '',
       })) ?? []
     );
   });
@@ -212,15 +213,5 @@ export class GmProfileDialog {
   private resetState(): void {
     this.activeTab.set('profile');
     this.mobileTabControl.setValue('profile', { emitEvent: false });
-  }
-
-  private getLanguageFlagClass(flagCode: string | null | undefined): string {
-    const code = normalizeText(flagCode)?.toLowerCase();
-
-    if (!code) {
-      return '';
-    }
-
-    return `fi fi-${code}`;
   }
 }

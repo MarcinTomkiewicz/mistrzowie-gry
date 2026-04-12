@@ -19,9 +19,19 @@
     />
   }
   <ng-template pTemplate="header">
-    <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ header() }}
-    </h2>
+    <div class="flex-row-start-center flex-wrap gap-xs">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ header() }}
+      </h2>
+
+      @for (language of languageFlags(); track language.id) {
+        <i
+          [class]="language.className"
+          [attr.aria-label]="language.label"
+          [title]="language.label"
+        ></i>
+      }
+    </div>
   </ng-template>
   <ng-template pTemplate="footer">
     <div class="flex-row-end-center">

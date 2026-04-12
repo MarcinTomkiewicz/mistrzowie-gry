@@ -102,7 +102,7 @@
       {{ i18n.detailsLabels().additionalInfo }}
     </small>
 
-    <div class="flex-col-start-stretch gap-xs">
+    <div class="flex-col-start-start gap-xs">
       <small class="status-text status-text--muted">
         {{ i18n.sessionForm().allowsScenarioCustomizationLabel }}
       </small>
@@ -117,7 +117,7 @@
       </span>
     </div>
 
-    <div class="flex-col-start-stretch gap-xs">
+    <div class="flex-col-start-start gap-xs">
       <small class="status-text status-text--muted">
         {{ i18n.sessionForm().hasReadyCharacterSheetsLabel }}
       </small>
@@ -130,26 +130,6 @@
       >
         {{ session().hasReadyCharacterSheets ? 'Tak' : 'Nie' }}
       </span>
-    </div>
-
-    <div class="flex-col-start-stretch gap-xs">
-      <small class="status-text status-text--muted">
-        {{ i18n.sessionForm().languagesLabel }}
-      </small>
-
-      @if (session().languages.length) {
-        <div class="flex-row-start-center gap-xs flex-wrap">
-          @for (language of session().languages; track language.id) {
-            <span class="tag-badge tag-badge--arcane">
-              {{ language.label }}
-            </span>
-          }
-        </div>
-      } @else {
-        <span class="tag-badge tag-badge--muted">
-          {{ i18n.commonFallbacks().noLanguages }}
-        </span>
-      }
     </div>
 
     <div class="flex-col-start-stretch gap-xs">

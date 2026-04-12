@@ -45,7 +45,21 @@
         </td>
 
         <td><app-system-chip [system]="session.system" displayType="text"></app-system-chip></td>
-        <td>{{ session.title }}</td>
+        <td>
+          <div class="flex-row-start-center gap-xs flex-wrap">
+            <span>{{ session.title }}</span>
+
+            @for (language of session.languages; track language.id) {
+              @if (resolveLanguageFlagClass(language.flagCode); as flagClass) {
+                <i
+                  [class]="flagClass"
+                  [attr.aria-label]="language.label"
+                  [title]="language.label"
+                ></i>
+              }
+            }
+          </div>
+        </td>
         <td>{{ resolveDifficultyLabel()(session.difficultyLevel) }}</td>
         <td>{{ playersLabel()(session.minPlayers, session.maxPlayers) }}</td>
         <td>{{ minAgeLabel()(session.minAge) }}</td>
@@ -127,8 +141,21 @@
             <div
               class="flex-col-start-center w-100 gap-xs pr-sm"
             >
-              <strong class="small-caps mg-section__title mg-section__title--md m-0">{{ session.title }}</strong>
-               <span class="text-center"><app-system-chip [system]="session.system" displayType="text"></app-system-chip></span>
+              <div class="flex-row-center-center gap-xs flex-wrap">
+                <strong class="small-caps mg-section__title mg-section__title--md m-0">{{ session.title }}</strong>
+
+                @for (language of session.languages; track language.id) {
+                  @if (resolveLanguageFlagClass(language.flagCode); as flagClass) {
+                    <i
+                      [class]="flagClass"
+                      [attr.aria-label]="language.label"
+                      [title]="language.label"
+                    ></i>
+                  }
+                }
+              </div>
+
+              <span class="text-center"><app-system-chip [system]="session.system" displayType="text"></app-system-chip></span>
             </div>
           </p-accordion-header>
 
