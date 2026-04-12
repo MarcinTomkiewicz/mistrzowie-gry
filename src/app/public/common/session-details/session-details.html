@@ -208,10 +208,17 @@
                 (click)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
                 (keyup.enter)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
               >
-                <app-pdf-thumbnail
-                  [src]="sheetUrl"
-                  [title]="sheet.fileName"
-                />
+                @if (enablePdfPreviews()) {
+                  <app-pdf-thumbnail
+                    [src]="sheetUrl"
+                    [title]="sheet.fileName"
+                  />
+                } @else {
+                  <div class="w-100 h-px-200 flex-col-center-center gap-xs">
+                    <i class="pi pi-file-pdf text-4xl"></i>
+                    <small>{{ i18n.sessionForm().characterSheetsLabel }}</small>
+                  </div>
+                }
 
                 <span class="tag-badge tag-badge--muted">
                   {{ sheet.fileName }}
@@ -229,7 +236,9 @@
   </div>
 </div>
 
-<app-pdf-viewer-dialog
-  [preview]="characterSheetPreview()"
-  (closed)="closeCharacterSheetPreview()"
-/>
+@defer (when characterSheetPreview()) {
+  <app-pdf-viewer-dialog
+    [preview]="characterSheetPreview()"
+    (closed)="closeCharacterSheetPreview()"
+  />
+}

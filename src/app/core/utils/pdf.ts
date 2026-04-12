@@ -1,4 +1,4 @@
-import { from, map, Observable, switchMap } from 'rxjs';
+import { from, map, Observable, of, switchMap } from 'rxjs';
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
@@ -18,75 +18,78 @@ export interface IPdfRenderResult {
   pageNumber: number;
 }
 
-export interface IPdfDocumentRenderResult {
+export interface IPdfLoadResult {
+  document: PDFDocumentProxy;
   pageCount: number;
 }
 
-export function renderPdfPageToCanvas(
-  src: string,
-  pageNumber: number,
-  canvas: HTMLCanvasElement,
-  targetWidth: number,
-): Observable<IPdfRenderResult> {
+export function loadPdfDocument(src: string): Observable<IPdfLoadResult> {
   return from(import('pdfjs-dist')).pipe(
     switchMap((pdfjs) => {
       ensurePdfWorker(pdfjs.GlobalWorkerOptions);
 
       return from(pdfjs.getDocument(src).promise).pipe(
-        switchMap((document) =>
-          from(document.getPage(resolvePageNumber(document, pageNumber))).pipe(
-            switchMap((page) => {
-              const baseViewport = page.getViewport({ scale: 1 });
-              const scale = targetWidth > 0 ? targetWidth / baseViewport.width : 1;
-              const viewport = page.getViewport({ scale });
-              const context = canvas.getContext('2d');
-
-              if (!context) {
-                throw new Error('Canvas 2D context unavailable.');
-              }
-
-              canvas.width = Math.ceil(viewport.width);
-              canvas.height = Math.ceil(viewport.height);
-
-              return from(
-                page.render({
-                  canvas,
-                  canvasContext: context,
-                  viewport,
-                }).promise,
-              ).pipe(
-                map(() => ({
-                  pageCount: document.numPages,
-                  pageNumber: resolvePageNumber(document, pageNumber),
-                })),
-              );
-            }),
-          ),
-        ),
+        map((document) => ({
+          document,
+          pageCount: document.numPages,
+        })),
       );
     }),
   );
 }
 
-export function renderPdfDocumentToContainer(
-  src: string,
-  container: HTMLElement,
+export function renderPdfPageToCanvas(
+  srcOrDocument: string | PDFDocumentProxy,
+  pageNumber: number,
+  canvas: HTMLCanvasElement,
   targetWidth: number,
-): Observable<IPdfDocumentRenderResult> {
-  return from(import('pdfjs-dist')).pipe(
-    switchMap((pdfjs) => {
-      ensurePdfWorker(pdfjs.GlobalWorkerOptions);
+  targetHeight?: number,
+  zoom = 1,
+): Observable<IPdfRenderResult> {
+  const document$ =
+    typeof srcOrDocument === 'string'
+      ? loadPdfDocument(srcOrDocument).pipe(map((result) => result.document))
+      : of(srcOrDocument);
 
-      return from(pdfjs.getDocument(src).promise).pipe(
-        switchMap((document) =>
-          from(renderAllPages(document, container, targetWidth)).pipe(
+  return document$.pipe(
+    switchMap((document) =>
+      from(document.getPage(resolvePageNumber(document, pageNumber))).pipe(
+        switchMap((page) => {
+          const baseViewport = page.getViewport({ scale: 1 });
+          const widthScale = targetWidth > 0 ? targetWidth / baseViewport.width : 1;
+          const heightScale =
+            targetHeight && targetHeight > 0
+              ? targetHeight / baseViewport.height
+              : widthScale;
+          const fitScale =
+            targetHeight && targetHeight > 0
+              ? Math.min(widthScale, heightScale)
+              : widthScale;
+          const viewport = page.getViewport({ scale: fitScale * zoom });
+          const context = canvas.getContext('2d');
+
+          if (!context) {
+            throw new Error('Canvas 2D context unavailable.');
+          }
+
+          canvas.width = Math.ceil(viewport.width);
+          canvas.height = Math.ceil(viewport.height);
+
+          return from(
+            page.render({
+              canvas,
+              canvasContext: context,
+              viewport,
+            }).promise,
+          ).pipe(
             map(() => ({
               pageCount: document.numPages,
+              pageNumber: resolvePageNumber(document, pageNumber),
             })),
-          ),
-        ),
-      );
-    }),
+          );
+        }),
+      ),
+    ),
   );
 }
 
@@ -95,36 +98,4 @@ function resolvePageNumber(
   pageNumber: number,
 ): number {
   return Math.min(Math.max(pageNumber, 1), document.numPages);
-}
-
-async function renderAllPages(
-  document: PDFDocumentProxy,
-  container: HTMLElement,
-  targetWidth: number,
-): Promise<void> {
-  container.replaceChildren();
-
-  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
-    const page = await document.getPage(pageNumber);
-    const baseViewport = page.getViewport({ scale: 1 });
-    const scale = targetWidth > 0 ? targetWidth / baseViewport.width : 1;
-    const viewport = page.getViewport({ scale });
-    const canvas = globalThis.document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    if (!context) {
-      throw new Error('Canvas 2D context unavailable.');
-    }
-
-    canvas.className = 'pdf-viewer-dialog__canvas';
-    canvas.width = Math.ceil(viewport.width);
-    canvas.height = Math.ceil(viewport.height);
-    container.append(canvas);
-
-    await page.render({
-      canvas,
-      canvasContext: context,
-      viewport,
-    }).promise;
-  }
 }

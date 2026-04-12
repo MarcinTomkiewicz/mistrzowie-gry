@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
@@ -78,6 +78,7 @@ export class SessionList {
 
   readonly i18n = createSessionListI18n();
   readonly deleteConfirmKey = `session-list-delete-${SessionList.nextConfirmId++}`;
+  readonly mobileExpandedSessionId = signal<string | null>(null);
 
   readonly hasSelection = computed(() => this.selectable());
   readonly hasActions = computed(() => this.actions().length > 0);
@@ -217,5 +218,18 @@ export class SessionList {
       case 'action':
         return 'pi pi-demolish';
     }
+  }
+
+  onMobileAccordionChange(
+    value: string | number | string[] | number[] | null | undefined,
+  ): void {
+    if (Array.isArray(value)) {
+      this.mobileExpandedSessionId.set(
+        value[0] != null ? String(value[0]) : null,
+      );
+      return;
+    }
+
+    this.mobileExpandedSessionId.set(value != null ? String(value) : null);
   }
 }

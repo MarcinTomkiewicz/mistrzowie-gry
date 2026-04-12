@@ -289,7 +289,6 @@
             }
           </div>
 
-          <!-- <div class="flex-row-start-center"> -->
           <p-button
             type="button"
             severity="danger"
@@ -298,7 +297,6 @@
             [label]="formTexts.removeCharacterSheetsLabel"
             (onClick)="clearCharacterSheets()"
           />
-          <!-- </div> -->
         }
 
         <app-file-upload
@@ -397,7 +395,9 @@
   </div>
 </form>
 
-<app-pdf-viewer-dialog
-  [preview]="characterSheetPreview()"
-  (closed)="closeCharacterSheetPreview()"
-/>
+@defer (when characterSheetPreview()) {
+  <app-pdf-viewer-dialog
+    [preview]="characterSheetPreview()"
+    (closed)="closeCharacterSheetPreview()"
+  />
+}

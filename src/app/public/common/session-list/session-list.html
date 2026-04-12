@@ -91,6 +91,7 @@
           <app-session-details
             [session]="session"
             [gmDisplayName]="gmDisplayName()"
+            [enablePdfPreviews]="true"
           />
         </td>
       </tr>
@@ -116,7 +117,10 @@
 
 <div class="w-100 show-down-sm">
   @if (sortedSessions().length) {
-    <p-accordion>
+    <p-accordion
+      [value]="mobileExpandedSessionId()"
+      (valueChange)="onMobileAccordionChange($event)"
+    >
       @for (session of sortedSessions(); track session.id) {
         <p-accordion-panel [value]="session.id">
           <p-accordion-header class="">
@@ -178,10 +182,19 @@
                 </div>
               }
 
-              <app-session-details
-                [session]="session"
-                [gmDisplayName]="gmDisplayName()"
-              />
+              @defer (when mobileExpandedSessionId() === session.id) {
+                <app-session-details
+                  [session]="session"
+                  [gmDisplayName]="gmDisplayName()"
+                  [enablePdfPreviews]="true"
+                />
+              } @placeholder {
+                <app-session-details
+                  [session]="session"
+                  [gmDisplayName]="gmDisplayName()"
+                  [enablePdfPreviews]="false"
+                />
+              }
             </div>
           </p-accordion-content>
         </p-accordion-panel>

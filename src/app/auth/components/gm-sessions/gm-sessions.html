@@ -15,20 +15,22 @@
 
 <div class="flex-col-start-center w-100 gap-md">
   @if (isFormVisible()) {
-    <app-session-form
-      [initial]="initialFormData()"
-      [systems]="systems()"
-      [styles]="styles()"
-      [triggers]="triggers()"
-      [languages]="languages()"
-      [busy]="isSubmitting()"
-      [submitLabel]="
-        isEditing() ? i18n.actions().updateLabel : i18n.actions().createLabel
-      "
-      [cancelLabel]="i18n.commonActions().cancel"
-      (save)="saveSession($event)"
-      (cancel)="cancelEdition()"
-    />
+    <div #formAnchor class="w-100 flex-row-center-center">
+      <app-session-form
+        [initial]="initialFormData()"
+        [systems]="systems()"
+        [styles]="styles()"
+        [triggers]="triggers()"
+        [languages]="languages()"
+        [busy]="isSubmitting()"
+        [submitLabel]="
+          isEditing() ? i18n.actions().updateLabel : i18n.actions().createLabel
+        "
+        [cancelLabel]="i18n.commonActions().cancel"
+        (save)="saveSession($event)"
+        (cancel)="cancelEdition()"
+      />
+    </div>
   } @else {
     <div class="w-100 flex-row-center-center">
       <p-button

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
@@ -27,6 +27,7 @@ import { Auth } from '../../../core/services/auth/auth';
 import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
 import { SessionForm } from '../../common/session-form/session-form';
 import { createGmSessionsI18n } from './gm-sessions.i18n';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
@@ -60,6 +61,7 @@ export class GmSessions {
   private readonly auth = inject(Auth);
   private readonly gmSessionsFacade = inject(GmSessionsFacade);
   private readonly toast = inject(UiToast);
+  private readonly formAnchor = viewChild<ElementRef<HTMLElement>>('formAnchor');
 
   readonly i18n = createGmSessionsI18n();
 
@@ -174,11 +176,13 @@ export class GmSessions {
   startCreate(): void {
     this.isCreateMode.set(true);
     this.editedSessionId.set(null);
+    this.scrollToForm();
   }
 
   startEdit(sessionId: string): void {
     this.isCreateMode.set(false);
     this.editedSessionId.set(sessionId);
+    this.scrollToForm();
   }
 
   cancelEdition(): void {
@@ -329,5 +333,15 @@ export class GmSessions {
     if (!exists) {
       this.systemFilterControl.setValue(null, { emitEvent: false });
     }
+  }
+
+  private scrollToForm(): void {
+    scrollElementIntoViewWhenReady(
+      () => this.formAnchor()?.nativeElement,
+      {
+        behavior: 'smooth',
+        block: 'start',
+      },
+    );
   }
 }

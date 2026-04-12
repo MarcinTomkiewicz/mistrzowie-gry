@@ -4,34 +4,121 @@
   [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
-  [closable]="true"
+  [closable]="false"
   appendTo="body"
   [styleClass]="'mg-dialog mg-dialog--xl'"
   (visibleChange)="close()"
 >
   @if (preview(); as activePreview) {
     <ng-template pTemplate="header">
-      <div class="w-100 flex-row-between-center gap-sm">
-        <h2 class="mg-section__title mg-section__title--md m-0">
-          {{ activePreview.title }}
-        </h2>
+      <div class="w-100 flex-row-between-center flex-col-start-stretch-xs gap-sm">
+        <div class="flex-row-between-center gap-sm w-100 flex-1">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ activePreview.title }}
+          </h2>
 
-        <div class="flex-row-start-center gap-sm" >
-          <span class="tag-badge tag-badge--muted">
-            {{ pageCount() || 1 }}
-          </span>
+          <p-button
+            type="button"
+            severity="secondary"
+            styleClass="small-icon show-down-xs"
+            [rounded]="true"
+            [text]="true"
+            icon="pi pi-times"
+            (onClick)="close()"
+          />
         </div>
+
+        @if (canShowControls()) {
+          <div class="flex-row-end-center flex-row-center-center-xs gap-sm w-100-xs">
+            <p-button
+              type="button"
+              severity="secondary"
+              styleClass="small-icon"
+              [rounded]="true"
+              [text]="true"
+              icon="pi pi-minus"
+              [disabled]="!canZoomOut() || isLoading()"
+              (onClick)="zoomOut()"
+            />
+
+            <div class="flex-row-center-center">
+              <span
+                class="tag-badge tag-badge--muted cursor-pointer py-0"
+                role="button"
+                tabindex="0"
+                (click)="resetZoom()"
+                (keyup.enter)="resetZoom()"
+              >
+                {{ zoomLabel() }}
+              </span>
+            </div>
+
+            <p-button
+              type="button"
+              severity="secondary"
+              styleClass="small-icon"
+              [rounded]="true"
+              [text]="true"
+              icon="pi pi-plus"
+              [disabled]="isLoading()"
+              (onClick)="zoomIn()"
+            />
+
+            <p-button
+              type="button"
+              severity="secondary"
+              styleClass="small-icon"
+              [rounded]="true"
+              [text]="true"
+              icon="pi pi-point-left"
+              [disabled]="!canGoPrevious() || isLoading()"
+              (onClick)="previousPage()"
+            />
+
+            <div class="flex-row-center-center">
+              <span class="tag-badge tag-badge--muted py-0">
+                {{ pageNumber() }} / {{ pageCount() || 1 }}
+              </span>
+            </div>
+
+            <p-button
+              type="button"
+              severity="secondary"
+              styleClass="small-icon"
+              [rounded]="true"
+              [text]="true"
+              icon="pi pi-point-right"
+              [disabled]="!canGoNext() || isLoading()"
+              (onClick)="nextPage()"
+            />
+
+            <p-button
+              type="button"
+              severity="secondary"
+              styleClass="small-icon hide-down-xs"
+              [rounded]="true"
+              [text]="true"
+              icon="pi pi-times"
+              (onClick)="close()"
+            />
+          </div>
+        }
       </div>
     </ng-template>
 
-    <div class="position-relative w-100 max-h-800 overflow-auto">
+    <div class="position-relative w-100">
       @if (hasError()) {
         <div class="w-100 h-px-400 flex-col-center-center gap-sm text-center">
           <i class="pi pi-file-pdf text-5xl"></i>
           <span>{{ activePreview.title }}</span>
         </div>
       } @else {
-        <div #pages class="pdf-viewer-dialog__pages w-100"></div>
+        <div
+          #viewport
+          class="pdf-viewer-dialog__viewport flex-row-center-center w-100 overflow-auto p-md"
+        >
+          <canvas #canvas class="pdf-viewer-dialog__canvas"></canvas>
+        </div>
 
         @if (isLoading()) {
           <div class="pdf-viewer-dialog__overlay position-absolute flex-col-center-center gap-xs">
