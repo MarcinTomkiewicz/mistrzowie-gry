@@ -9,7 +9,7 @@ function ensurePdfWorker(GlobalWorkerOptions: { workerSrc: string }): void {
     return;
   }
 
-  GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+  GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
   workerConfigured = true;
 }
 
