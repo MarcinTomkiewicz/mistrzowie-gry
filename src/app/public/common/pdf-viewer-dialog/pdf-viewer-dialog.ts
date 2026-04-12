@@ -5,7 +5,6 @@ import {
   ElementRef,
   PLATFORM_ID,
   computed,
-  effect,
   inject,
   input,
   output,
@@ -56,34 +55,38 @@ export class PdfViewerDialog {
   readonly canShowControls = computed(
     () => !this.hasError() && (!!this.document() || this.isLoading()),
   );
-  readonly canRender = computed(
-    () =>
-      isPlatformBrowser(this.platformId) &&
-      !!this.document() &&
-      !!this.canvas() &&
-      !!this.viewport(),
-  );
+  readonly renderRequest = computed(() => {
+    const document = this.document();
+    const canvasRef = this.canvas();
+    const viewportRef = this.viewport();
+
+    if (
+      !isPlatformBrowser(this.platformId) ||
+      !document ||
+      !canvasRef ||
+      !viewportRef
+    ) {
+      return null;
+    }
+
+    return {
+      document,
+      canvas: canvasRef.nativeElement,
+      viewport: viewportRef.nativeElement,
+      pageNumber: this.pageNumber(),
+      zoom: this.zoom(),
+    };
+  });
 
   constructor() {
-    effect(() => {
-      if (!this.preview()) {
-        this.document.set(null);
-        this.pageNumber.set(1);
-        this.zoom.set(1);
-        this.pageCount.set(0);
-        return;
-      }
-
-      this.hasError.set(false);
-      this.pageNumber.set(1);
-      this.zoom.set(1);
-    });
-
     toObservable(this.preview)
       .pipe(
         map((preview) => preview?.url ?? null),
         distinctUntilChanged(),
         switchMap((url) => {
+          this.pageNumber.set(1);
+          this.zoom.set(1);
+
           if (!url || !isPlatformBrowser(this.platformId)) {
             this.document.set(null);
             this.pageCount.set(0);
@@ -118,28 +121,36 @@ export class PdfViewerDialog {
         },
       });
 
-    effect((onCleanup) => {
-      if (!this.canRender()) {
-        return;
-      }
+    toObservable(this.renderRequest)
+      .pipe(
+        switchMap((request) => {
+          if (!request) {
+            return of(null);
+          }
 
-      this.isLoading.set(true);
-      this.hasError.set(false);
+          this.isLoading.set(true);
+          this.hasError.set(false);
 
-      const canvas = this.canvas()!.nativeElement;
-      const viewport = this.viewport()!.nativeElement;
-      const targetWidth = viewport.clientWidth - 32 || 1080;
-      const targetHeight = viewport.clientHeight - 32 || undefined;
+          const targetWidth = request.viewport.clientWidth - 32 || 1080;
+          const targetHeight = request.viewport.clientHeight - 32 || undefined;
 
-      const subscription = renderPdfPageToCanvas(
-        this.document()!,
-        this.pageNumber(),
-        canvas,
-        targetWidth,
-        targetHeight,
-        this.zoom(),
-      ).subscribe({
+          return renderPdfPageToCanvas(
+            request.document,
+            request.pageNumber,
+            request.canvas,
+            targetWidth,
+            targetHeight,
+            request.zoom,
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
         next: (result) => {
+          if (!result) {
+            return;
+          }
+
           this.pageCount.set(result.pageCount);
           this.pageNumber.set(result.pageNumber);
           this.isLoading.set(false);
@@ -149,9 +160,6 @@ export class PdfViewerDialog {
           this.isLoading.set(false);
         },
       });
-
-      onCleanup(() => subscription.unsubscribe());
-    });
   }
 
   previousPage(): void {

@@ -9,6 +9,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize, map, Observable, of, throwError } from 'rxjs';
 
@@ -328,7 +329,10 @@ export class SessionForm {
     this.isUploadingImage.set(true);
 
     this.uploadSelectedImageIfNeeded()
-      .pipe(finalize(() => this.isUploadingImage.set(false)))
+      .pipe(
+        finalize(() => this.isUploadingImage.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: () =>
           this.save.emit({

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
 
@@ -59,6 +59,7 @@ interface ISessionSystemOption {
 })
 export class GmSessions {
   private readonly auth = inject(Auth);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly gmSessionsFacade = inject(GmSessionsFacade);
   private readonly toast = inject(UiToast);
   private readonly formAnchor = viewChild<ElementRef<HTMLElement>>('formAnchor');
@@ -202,7 +203,12 @@ export class GmSessions {
           )
         : this.gmSessionsFacade.createMySession(submit);
 
-    request$.pipe(finalize(() => this.isSubmitting.set(false))).subscribe({
+    request$
+      .pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: (session) => {
         this.sessions.update((sessions) => {
           const hasExisting = sessions.some((item) => item.id === session.id);
@@ -232,7 +238,7 @@ export class GmSessions {
           detail: this.i18n.toast().saveFailedDetail,
         });
       },
-    });
+      });
   }
 
   deleteSession(sessionId: string): void {
@@ -240,7 +246,10 @@ export class GmSessions {
 
     this.gmSessionsFacade
       .deleteMySession(sessionId)
-      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: () => {
           this.sessions.update((sessions) =>
@@ -261,11 +270,11 @@ export class GmSessions {
         error: (error) => {
           console.error('[GM SESSIONS DELETE ERROR]', error);
 
-          this.toast.danger({
-            summary: this.i18n.toast().deleteFailedSummary,
-            detail: this.i18n.toast().deleteFailedDetail,
-          });
-        },
+        this.toast.danger({
+          summary: this.i18n.toast().deleteFailedSummary,
+          detail: this.i18n.toast().deleteFailedDetail,
+        });
+      },
       });
   }
 
@@ -284,7 +293,10 @@ export class GmSessions {
       triggers: this.gmSessionsFacade.getAvailableTriggers(),
       languages: this.gmSessionsFacade.getAvailableLanguages(),
     })
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: ({ sessions, systems, mySessionSystems, styles, triggers, languages }) => {
           this.sessions.set(sessions);
@@ -299,24 +311,27 @@ export class GmSessions {
         error: (error) => {
           console.error('[GM SESSIONS LOAD ERROR]', error);
 
-          this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
-            detail: this.i18n.toast().loadFailedDetail,
-          });
-        },
+        this.toast.danger({
+          summary: this.i18n.toast().loadFailedSummary,
+          detail: this.i18n.toast().loadFailedDetail,
+        });
+      },
       });
   }
 
   private refreshMySessionSystems(): void {
-    this.gmSessionsFacade.getMySessionSystems().subscribe({
-      next: (systems) => {
-        this.mySessionSystems.set(systems);
-        this.ensureSelectedSystemStillExists();
-      },
-      error: (error) => {
-        console.error('[GM SESSION SYSTEMS LOAD ERROR]', error);
-      },
-    });
+    this.gmSessionsFacade
+      .getMySessionSystems()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (systems) => {
+          this.mySessionSystems.set(systems);
+          this.ensureSelectedSystemStillExists();
+        },
+        error: (error) => {
+          console.error('[GM SESSION SYSTEMS LOAD ERROR]', error);
+        },
+      });
   }
 
   private ensureSelectedSystemStillExists(): void {
