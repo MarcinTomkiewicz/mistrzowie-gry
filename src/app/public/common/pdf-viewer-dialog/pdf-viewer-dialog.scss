@@ -1,0 +1,16 @@
+.pdf-viewer-dialog__canvas {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.pdf-viewer-dialog__pages {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pdf-viewer-dialog__overlay {
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+}

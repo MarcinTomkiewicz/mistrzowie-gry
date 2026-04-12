@@ -28,6 +28,21 @@
   }
 }
 
+.small-icon.p-button,
+.small-icon .p-button {
+  padding: 0 !important;
+  min-width: auto !important;
+  width: auto !important;
+  height: auto !important;
+  --p-button-icon-only-width: auto;
+  --p-button-sm-icon-only-width: auto;
+}
+
+.small-icon.p-button.p-button-icon-only,
+.small-icon .p-button.p-button-icon-only {
+  padding: 0 !important;
+}
+
 @mixin _button-link-like($width, $background-on-hover: true) {
   border-radius: v.$radius-sm;
   background: transparent;

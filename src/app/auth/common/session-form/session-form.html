@@ -10,7 +10,9 @@
   novalidate
   class="mg-form flex-col-start-center w-100 gap-md"
 >
-  <div class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md">
+  <div
+    class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md"
+  >
     <h3 class="mg-section__title mg-section__title--md m-0">
       {{ formTexts.basicInfoTitle }}
     </h3>
@@ -28,7 +30,7 @@
         <label for="session-title">{{ formTexts.titleLabel }}</label>
       </p-iftalabel>
 
-      @if (showControlError('title', ['required', 'requiredTrimmed'])) {
+      @if (showControlError("title", ["required", "requiredTrimmed"])) {
         <small>{{ commonForm.required }}</small>
       }
     </div>
@@ -46,7 +48,7 @@
         <label for="session-system-id">{{ formTexts.systemLabel }}</label>
       </p-iftalabel>
 
-      @if (showControlError('systemId', ['required'])) {
+      @if (showControlError("systemId", ["required"])) {
         <small>{{ commonForm.required }}</small>
       }
     </div>
@@ -68,7 +70,7 @@
           </label>
         </p-iftalabel>
 
-        @if (showControlError('difficultyLevel', ['required'])) {
+        @if (showControlError("difficultyLevel", ["required"])) {
           <small>{{ commonForm.required }}</small>
         }
       </div>
@@ -87,7 +89,7 @@
           inputStyleClass="w-100"
         />
 
-        @if (showControlError('minPlayers', ['required', 'min', 'max'])) {
+        @if (showControlError("minPlayers", ["required", "min", "max"])) {
           <small>{{ formTexts.playersRangeLabel }}</small>
         }
       </div>
@@ -106,7 +108,7 @@
           inputStyleClass="w-100"
         />
 
-        @if (showControlError('maxPlayers', ['required', 'min', 'max'])) {
+        @if (showControlError("maxPlayers", ["required", "min", "max"])) {
           <small>{{ formTexts.playersRangeLabel }}</small>
         }
       </div>
@@ -124,7 +126,7 @@
           inputStyleClass="w-100"
         />
 
-        @if (showControlError('minAge', ['required', 'min'])) {
+        @if (showControlError("minAge", ["required", "min"])) {
           <small>{{ formTexts.minAgeRangeLabel }}</small>
         }
       </div>
@@ -145,10 +147,12 @@
           rows="6"
           autocomplete="off"
         ></textarea>
-        <label for="session-description">{{ formTexts.descriptionLabel }}</label>
+        <label for="session-description">{{
+          formTexts.descriptionLabel
+        }}</label>
       </p-iftalabel>
 
-      @if (showControlError('description', ['required', 'requiredTrimmed'])) {
+      @if (showControlError("description", ["required", "requiredTrimmed"])) {
         <small>{{ commonForm.required }}</small>
       }
     </div>
@@ -171,32 +175,34 @@
           cropPreviewLabel: fileUpload.cropPreviewLabel,
           cropPreviewLandscapeLabel: fileUpload.cropPreviewLandscapeLabel,
           cropPreviewCircleLabel: fileUpload.cropPreviewCircleLabel,
-          cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel
+          cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel,
         }"
         [options]="{
           currentUrl: storedImageUrl(),
           disabled: isSubmitting(),
           previewShape: 'landscape',
           accept: 'image/png,image/jpeg,image/webp,image/avif',
-          maxFileSize: 5000000
+          maxFileSize: 5000000,
         }"
         [cropConfig]="{
           aspectRatio: 16 / 9,
           roundCropper: false,
           resizeToWidth: 1280,
           resizeToHeight: 720,
-          previewShapes: ['landscape', 'circle']
+          previewShapes: ['landscape', 'circle'],
         }"
         (valueChange)="onImageValueChange($event)"
       />
 
-      @if (showControlError('image', ['required', 'requiredTrimmed'])) {
+      @if (showControlError("image", ["required", "requiredTrimmed"])) {
         <small>{{ commonForm.required }}</small>
       }
     </div>
   </div>
 
-  <div class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md">
+  <div
+    class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md"
+  >
     <h3 class="mg-section__title mg-section__title--md m-0">
       {{ formTexts.additionalInfoTitle }}
     </h3>
@@ -231,22 +237,27 @@
     @if (form.controls.hasReadyCharacterSheets.getRawValue()) {
       <div class="flex-col-start-stretch gap-sm">
         @if (characterSheetItems().length) {
-          <div class="mg-grid grid-cols-5 grid-cols-3-md grid-cols-2-sm grid-cols-1-xs gap-sm">
+          <div
+            class="mg-grid grid-cols-5 grid-cols-3-md grid-cols-2-sm grid-cols-1-xs gap-sm"
+          >
             @for (item of characterSheetItems(); track item.id) {
               <div class="mg-card flex-col-start-stretch gap-sm p-sm">
                 <div
                   class="cursor-pointer"
                   role="button"
                   tabindex="0"
-                  (click)="openCharacterSheetPreview(item.previewUrl, item.fileName)"
-                  (keyup.enter)="openCharacterSheetPreview(item.previewUrl, item.fileName)"
+                  (click)="
+                    openCharacterSheetPreview(item.previewUrl, item.fileName)
+                  "
+                  (keyup.enter)="
+                    openCharacterSheetPreview(item.previewUrl, item.fileName)
+                  "
                 >
-                  @if (resolvePdfPreviewUrl(item.previewUrl); as previewUrl) {
-                    <object
-                      [data]="previewUrl"
-                      type="application/pdf"
-                      class="w-100 h-px-200 overflow-hidden pointer-events-none"
-                    ></object>
+                  @if (item.previewUrl) {
+                    <app-pdf-thumbnail
+                      [src]="item.previewUrl"
+                      [title]="item.fileName"
+                    />
                   } @else {
                     <div class="w-100 h-px-200 flex-col-center-center gap-xs">
                       <i class="pi pi-file-pdf text-4xl"></i>
@@ -255,34 +266,39 @@
                   }
                 </div>
 
-                <div class="flex-row-between-start gap-sm">
-                  <span class="tag-badge tag-badge--muted flex-1 min-w-0">
+                <div class="flex-row-between-end gap-xs">
+                  <div class="tag-badge tag-badge--muted flex-1 min-w-0">
                     {{ item.fileName }}
-                  </span>
+                  </div>
 
                   <p-button
                     type="button"
                     severity="danger"
-                    icon="pi pi-times"
+                    class="small-icon"
+                    outlined="true"
+                    size="small"
+                    icon="pi pi-demolish"
                     [rounded]="true"
                     [text]="true"
-                    (onClick)="$event.stopPropagation(); removeCharacterSheet(item)"
+                    (onClick)="
+                      $event.stopPropagation(); removeCharacterSheet(item)
+                    "
                   />
                 </div>
               </div>
             }
           </div>
 
-          <div class="flex-row-start-center">
-            <p-button
-              type="button"
-              severity="danger"
-              [outlined]="true"
-              icon="pi pi-trash"
-              [label]="formTexts.removeCharacterSheetsLabel"
-              (onClick)="clearCharacterSheets()"
-            />
-          </div>
+          <!-- <div class="flex-row-start-center"> -->
+          <p-button
+            type="button"
+            severity="danger"
+            [outlined]="true"
+            icon="pi pi-demolish"
+            [label]="formTexts.removeCharacterSheetsLabel"
+            (onClick)="clearCharacterSheets()"
+          />
+          <!-- </div> -->
         }
 
         <app-file-upload
@@ -302,7 +318,7 @@
             cropPreviewLabel: fileUpload.cropPreviewLabel,
             cropPreviewLandscapeLabel: fileUpload.cropPreviewLandscapeLabel,
             cropPreviewCircleLabel: fileUpload.cropPreviewCircleLabel,
-            cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel
+            cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel,
           }"
           [options]="{
             mode: 'files',
@@ -314,7 +330,7 @@
             multiple: true,
             clearAfterSelect: true,
             chooseIcon: 'pi pi-file-pdf',
-            emptyIcon: 'pi pi-file-pdf'
+            emptyIcon: 'pi pi-file-pdf',
           }"
           (filesSelected)="onCharacterSheetsSelected($event)"
         />
@@ -381,28 +397,7 @@
   </div>
 </form>
 
-<p-dialog
-  [visible]="!!characterSheetPreview()"
-  [modal]="true"
-  [dismissableMask]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [closable]="true"
-  appendTo="body"
-  [styleClass]="'mg-dialog mg-dialog--xl'"
-  (visibleChange)="closeCharacterSheetPreview()"
->
-  @if (characterSheetPreview(); as preview) {
-    <ng-template pTemplate="header">
-      <h2 class="mg-section__title mg-section__title--md m-0">
-        {{ preview.title }}
-      </h2>
-    </ng-template>
-
-    <object
-      [data]="resolvePdfPreviewUrl(preview.url)"
-      type="application/pdf"
-      class="w-100 h-px-800 max-h-800"
-    ></object>
-  }
-</p-dialog>
+<app-pdf-viewer-dialog
+  [preview]="characterSheetPreview()"
+  (closed)="closeCharacterSheetPreview()"
+/>

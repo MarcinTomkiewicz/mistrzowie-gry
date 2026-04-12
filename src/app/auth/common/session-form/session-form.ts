@@ -10,14 +10,12 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { finalize, map, Observable, of, throwError } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { DialogModule } from 'primeng/dialog';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -50,6 +48,8 @@ import { normalizeText } from '../../../core/utils/normalize-text';
 import { setControlValue } from '../../../core/utils/form-controls';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
+import { PdfThumbnail } from '../../../public/common/pdf-thumbnail/pdf-thumbnail';
+import { PdfViewerDialog } from '../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { SystemAutocomplete } from '../../../public/common/system-autocomplete/system-autocomplete';
 import { createSessionFormI18n } from './session-form.i18n';
 
@@ -61,8 +61,6 @@ type CharacterSheetCard = {
   removeToken: string | number;
 };
 
-const PDF_PREVIEW_HASH = '#toolbar=0&navpanes=0&scrollbar=0&view=FitH';
-
 @Component({
   selector: 'app-session-form',
   standalone: true,
@@ -72,11 +70,12 @@ const PDF_PREVIEW_HASH = '#toolbar=0&navpanes=0&scrollbar=0&view=FitH';
     ButtonModule,
     CheckboxModule,
     ChipPicker,
-    DialogModule,
     FileUpload,
     IftaLabelModule,
     InputNumberModule,
     InputTextModule,
+    PdfThumbnail,
+    PdfViewerDialog,
     SelectModule,
     SystemAutocomplete,
     TextareaModule,
@@ -88,7 +87,6 @@ export class SessionForm {
   private readonly auth = inject(Auth);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly storage = inject(Storage);
   private currentNewCharacterSheetFiles: readonly { file: File; previewUrl: string }[] = [];
 
@@ -371,12 +369,6 @@ export class SessionForm {
       this.form.controls.hasReadyCharacterSheets.touched &&
       this.form.hasError('invalidCharacterSheetsCount')
     );
-  }
-
-  resolvePdfPreviewUrl(url: string | null): SafeResourceUrl | null {
-    return url
-      ? this.sanitizer.bypassSecurityTrustResourceUrl(`${url}${PDF_PREVIEW_HASH}`)
-      : null;
   }
 
   private syncCharacterSheetsCount(count = this.characterSheetItems().length): void {

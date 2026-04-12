@@ -208,11 +208,10 @@
                 (click)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
                 (keyup.enter)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
               >
-                <object
-                  [data]="resolvePdfPreviewUrl(sheetUrl)"
-                  type="application/pdf"
-                  class="w-100 h-px-200 overflow-hidden pointer-events-none"
-                ></object>
+                <app-pdf-thumbnail
+                  [src]="sheetUrl"
+                  [title]="sheet.fileName"
+                />
 
                 <span class="tag-badge tag-badge--muted">
                   {{ sheet.fileName }}
@@ -230,28 +229,7 @@
   </div>
 </div>
 
-<p-dialog
-  [visible]="!!characterSheetPreview()"
-  [modal]="true"
-  [dismissableMask]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [closable]="true"
-  appendTo="body"
-  [styleClass]="'mg-dialog mg-dialog--xl'"
-  (visibleChange)="closeCharacterSheetPreview()"
->
-  @if (characterSheetPreview(); as preview) {
-    <ng-template pTemplate="header">
-      <h2 class="mg-section__title mg-section__title--md m-0">
-        {{ preview.title }}
-      </h2>
-    </ng-template>
-
-    <object
-      [data]="resolvePdfPreviewUrl(preview.url)"
-      type="application/pdf"
-      class="w-100 h-px-800 max-h-800"
-    ></object>
-  }
-</p-dialog>
+<app-pdf-viewer-dialog
+  [preview]="characterSheetPreview()"
+  (closed)="closeCharacterSheetPreview()"
+/>

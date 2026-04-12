@@ -1,0 +1,16 @@
+<div class="position-relative w-100 h-px-200 overflow-hidden">
+  @if (hasError()) {
+    <div class="w-100 h-100 flex-col-center-center gap-xs text-center">
+      <i class="pi pi-file-pdf text-4xl"></i>
+      <small class="truncate w-100 px-sm">{{ title() }}</small>
+    </div>
+  } @else {
+    <canvas #canvas class="pdf-thumbnail__canvas w-100"></canvas>
+
+    @if (isLoading()) {
+      <div class="pdf-thumbnail__overlay position-absolute flex-col-center-center gap-xs">
+        <i class="pi pi-d20 mg-spin-cw"></i>
+      </div>
+    }
+  }
+</div>

@@ -2,7 +2,7 @@
 @use "../abstracts/variables" as v;
 @use "../abstracts/mixins" as m;
 
-$grid-breakpoints: ("xs", "sm", "md", "lg", "xl");
+$grid-breakpoints: ("xl", "lg", "md", "sm", "xs");
 
 $grid-columns-values: (
   1: 1,
