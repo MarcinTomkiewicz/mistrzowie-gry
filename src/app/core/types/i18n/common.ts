@@ -38,6 +38,8 @@ export type CommonActionsTranslations = {
   clear: string;
   next: string;
   previous: string;
+  nextProfile: string;
+  previousProfile: string;
   submit: string;
   ok: string;
   logout: string;
