@@ -8,7 +8,6 @@
   border-radius: v.$radius-md;
   border: 1px solid v.$color-border;
   background: v.$color-bg-surface;
-  box-shadow: v.$shadow-soft;
   color: v.$color-text-muted;
   margin-bottom: map.get(v.$spacings, "sm");
 }

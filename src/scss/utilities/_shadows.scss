@@ -1,0 +1,17 @@
+@use "../abstracts/variables" as v;
+
+.shadow-none {
+  box-shadow: none !important;
+}
+
+.shadow-sm {
+  box-shadow: v.$shadow-sm !important;
+}
+
+.shadow-soft {
+  box-shadow: v.$shadow-soft !important;
+}
+
+.shadow-lg {
+  box-shadow: v.$shadow-lg !important;
+}

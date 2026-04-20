@@ -125,9 +125,7 @@
           (pointerup)="onViewportPointerUp($event)"
           (pointercancel)="onViewportPointerUp($event)"
         >
-          <div class="min-w-full min-h-full flex-row-center-start">
-            <canvas #canvas class="pdf-viewer-dialog__canvas"></canvas>
-          </div>
+          <canvas #canvas class="mx-auto shadow-sm"></canvas>
         </div>
 
         @if (isLoading()) {
