@@ -267,8 +267,10 @@
                 </div>
 
                 <div class="flex-row-between-end gap-xs">
-                  <div class="tag-badge tag-badge--muted flex-1 min-w-0">
-                    {{ item.fileName }}
+                  <div class="tag-badge tag-badge--muted flex-1 min-w-0 max-w-full">
+                    <span class="truncate-1 w-100">
+                      {{ item.fileName }}
+                    </span>
                   </div>
 
                   <p-button

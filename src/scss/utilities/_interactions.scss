@@ -2,8 +2,24 @@
   cursor: pointer;
 }
 
+.cursor-grab {
+  cursor: grab;
+}
+
+.cursor-grabbing {
+  cursor: grabbing;
+}
+
 .cursor-default {
   cursor: default;
+}
+
+.user-select-none {
+  user-select: none;
+}
+
+.touch-action-none {
+  touch-action: none;
 }
 
 .pointer-events-none {

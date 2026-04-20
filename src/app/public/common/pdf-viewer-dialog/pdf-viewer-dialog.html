@@ -115,9 +115,19 @@
       } @else {
         <div
           #viewport
-          class="pdf-viewer-dialog__viewport flex-row-center-center w-100 overflow-auto p-md"
+          class="pdf-viewer-dialog__viewport w-100 overflow-auto p-md"
+          [class.touch-action-none]="canPan()"
+          [class.cursor-grab]="canPan() && !isPanning()"
+          [class.cursor-grabbing]="isPanning()"
+          [class.user-select-none]="isPanning()"
+          (pointerdown)="onViewportPointerDown($event)"
+          (pointermove)="onViewportPointerMove($event)"
+          (pointerup)="onViewportPointerUp($event)"
+          (pointercancel)="onViewportPointerUp($event)"
         >
-          <canvas #canvas class="pdf-viewer-dialog__canvas"></canvas>
+          <div class="min-w-full min-h-full flex-row-center-start">
+            <canvas #canvas class="pdf-viewer-dialog__canvas"></canvas>
+          </div>
         </div>
 
         @if (isLoading()) {
