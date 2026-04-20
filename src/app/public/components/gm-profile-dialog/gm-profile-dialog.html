@@ -197,12 +197,37 @@
   }
 
   <ng-template pTemplate="footer">
-    <div class="mt-md">
+    <div class="mt-md flex-row-between-center flex-col-center-stretch-xs gap-sm w-100">
+      @if (enableProfileNavigation()) {
+        <div class="flex-row-start-center flex-col-center-stretch-xs gap-sm">
+          <p-button
+            [label]="i18n.commonActions().previous"
+            severity="secondary"
+            [outlined]="true"
+            icon="pi pi-point-left"
+            [disabled]="!canGoPreviousProfile()"
+            (onClick)="previousProfile()"
+          />
+
+          <p-button
+            [label]="i18n.commonActions().next"
+            severity="secondary"
+            [outlined]="true"
+            iconPos="right"
+            icon="pi pi-point-right"
+            [disabled]="!canGoNextProfile()"
+            (onClick)="nextProfile()"
+          />
+        </div>
+      } @else {
+        <div></div>
+      }
+
       <p-button
         [label]="i18n.commonActions().close"
         severity="secondary"
         [outlined]="true"
-        (click)="close()"
+        (onClick)="close()"
       />
     </div>
   </ng-template>

@@ -78,7 +78,10 @@
     <app-gm-profile-dialog
       [visible]="isDialogVisible()"
       [profile]="selectedProfile()"
+      [profiles]="profiles() ?? []"
+      [enableProfileNavigation]="true"
       (visibleChange)="onDialogVisibleChange($event)"
+      (profileChange)="onProfileChange($event)"
     />
   </div>
 </section>

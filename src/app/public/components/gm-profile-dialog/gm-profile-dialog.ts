@@ -61,8 +61,11 @@ export class GmProfileDialog {
 
   readonly visible = input(false);
   readonly profile = input<IGmPublicProfile | null>(null);
+  readonly profiles = input<readonly IGmPublicProfile[]>([]);
+  readonly enableProfileNavigation = input(false);
 
   readonly visibleChange = output<boolean>();
+  readonly profileChange = output<IGmPublicProfile>();
 
   readonly i18n = createGmProfileDialogI18n();
   readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
@@ -164,6 +167,32 @@ export class GmProfileDialog {
     );
   });
 
+  readonly currentProfileIndex = computed(() => {
+    const profile = this.profile();
+
+    if (!profile) {
+      return -1;
+    }
+
+    return this.profiles().findIndex(
+      (item) => item.profile.id === profile.profile.id,
+    );
+  });
+
+  readonly canGoPreviousProfile = computed(
+    () => this.enableProfileNavigation() && this.currentProfileIndex() > 0,
+  );
+
+  readonly canGoNextProfile = computed(() => {
+    const currentIndex = this.currentProfileIndex();
+
+    return (
+      this.enableProfileNavigation() &&
+      currentIndex >= 0 &&
+      currentIndex < this.profiles().length - 1
+    );
+  });
+
   resolveTabLabel(tabId: GmProfileDialogTabId): string {
     switch (tabId) {
       case 'profile':
@@ -208,6 +237,34 @@ export class GmProfileDialog {
 
   resolveDifficultyLabel(value: SessionDifficultyLevel): string {
     return this.difficultyLabels()[value];
+  }
+
+  previousProfile(): void {
+    const currentIndex = this.currentProfileIndex();
+
+    if (currentIndex <= 0) {
+      return;
+    }
+
+    const previousProfile = this.profiles()[currentIndex - 1];
+
+    if (previousProfile) {
+      this.profileChange.emit(previousProfile);
+    }
+  }
+
+  nextProfile(): void {
+    const currentIndex = this.currentProfileIndex();
+
+    if (currentIndex < 0 || currentIndex >= this.profiles().length - 1) {
+      return;
+    }
+
+    const nextProfile = this.profiles()[currentIndex + 1];
+
+    if (nextProfile) {
+      this.profileChange.emit(nextProfile);
+    }
   }
 
   private resetState(): void {

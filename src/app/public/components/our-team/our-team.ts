@@ -99,6 +99,10 @@ export class OurTeam {
     this.isDialogVisible.set(true);
   }
 
+  onProfileChange(profile: IGmPublicProfile): void {
+    this.selectedProfile.set(profile);
+  }
+
   onDialogVisibleChange(visible: boolean): void {
     this.isDialogVisible.set(visible);
 
