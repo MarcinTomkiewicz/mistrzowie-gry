@@ -1,0 +1,42 @@
+@use "../abstracts/variables" as v;
+
+$transition-property-values: (
+  none: none,
+  colors: (background-color v.$transition-fast, color v.$transition-fast, border-color v.$transition-fast),
+  opacity: (opacity v.$transition-fast),
+  transform: (transform v.$transition-fast),
+  width: (width 220ms ease),
+  max-height: (max-height 240ms ease),
+);
+
+$transition-duration-values: (
+  fast: v.$transition-fast,
+  slow: v.$transition-slow,
+  220: 220ms,
+  240: 240ms,
+);
+
+$transition-timing-values: (
+  ease: ease,
+  ease-in-out: ease-in-out,
+  ease-out: ease-out,
+  linear: linear,
+);
+
+@each $name, $value in $transition-property-values {
+  .transition-#{$name} {
+    transition: $value !important;
+  }
+}
+
+@each $name, $value in $transition-duration-values {
+  .duration-#{$name} {
+    transition-duration: $value !important;
+  }
+}
+
+@each $name, $value in $transition-timing-values {
+  .ease-#{$name} {
+    transition-timing-function: $value !important;
+  }
+}

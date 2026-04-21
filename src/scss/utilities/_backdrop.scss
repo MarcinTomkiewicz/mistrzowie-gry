@@ -1,0 +1,13 @@
+$backdrop-blur-values: (
+  none: none,
+  sm: blur(2px),
+  md: blur(4px),
+  lg: blur(8px),
+  xl: blur(12px),
+);
+
+@each $name, $value in $backdrop-blur-values {
+  .backdrop-blur-#{$name} {
+    backdrop-filter: $value !important;
+  }
+}

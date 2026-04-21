@@ -11,13 +11,10 @@
 }
 
 .image-crop-dialog__progress-overlay {
-  position: absolute;
   inset: 0.75rem;
-  z-index: 2;
   padding: 1rem;
   border-radius: calc(var(--mg-radius-md, 0.75rem) - 0.25rem);
   background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(4px);
 }
 
 .image-crop-dialog__progress-card {

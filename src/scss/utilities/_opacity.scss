@@ -1,0 +1,16 @@
+$opacity-values: (
+  0: 0,
+  20: 0.2,
+  35: 0.35,
+  50: 0.5,
+  55: 0.55,
+  75: 0.75,
+  90: 0.9,
+  100: 1,
+);
+
+@each $name, $value in $opacity-values {
+  .opacity-#{$name} {
+    opacity: $value !important;
+  }
+}

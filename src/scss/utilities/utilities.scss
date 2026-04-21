@@ -7,12 +7,17 @@
 @use "./text-wrap";
 @use "./width";
 @use "./height";
+@use "./opacity";
+@use "./aspect-ratio";
 @use "./shadows";
+@use "./z-index";
 @use "./overflow";
 @use "./position";
+@use "./backdrop";
 @use "./object-fit";
 @use "./line-heights";
 @use "./visibility";
 @use "./animations";
 @use "./text-heights";
 @use "./interactions";
+@use "./transitions";

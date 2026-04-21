@@ -1,5 +1,47 @@
-.position-static { position: static !important; }
-.position-relative { position: relative !important; }
-.position-absolute { position: absolute !important; }
-.position-fixed { position: fixed !important; }
-.position-sticky { position: sticky !important; }
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+$position-values: (
+  static: static,
+  relative: relative,
+  absolute: absolute,
+  fixed: fixed,
+  sticky: sticky,
+);
+
+$offset-values: map.merge(
+  (
+    auto: auto,
+    0: 0,
+    full: 100%,
+  ),
+  v.$spacings
+);
+
+@each $name, $value in $position-values {
+  .position-#{$name} {
+    position: $value !important;
+  }
+}
+
+@each $name, $value in $offset-values {
+  .inset-#{$name} {
+    inset: $value !important;
+  }
+
+  .top-#{$name} {
+    top: $value !important;
+  }
+
+  .right-#{$name} {
+    right: $value !important;
+  }
+
+  .bottom-#{$name} {
+    bottom: $value !important;
+  }
+
+  .left-#{$name} {
+    left: $value !important;
+  }
+}
