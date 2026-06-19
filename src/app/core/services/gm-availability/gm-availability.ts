@@ -54,6 +54,14 @@ export class GmAvailability {
         table: 'gm_profiles',
         sortBy: 'createdAt',
         sortOrder: 'asc',
+        pagination: {
+          filters: {
+            isArchived: {
+              operator: FilterOperator.EQ,
+              value: false,
+            },
+          },
+        },
       })
       .pipe(
         switchMap((profiles) => {
@@ -188,15 +196,27 @@ export class GmAvailability {
     );
   }
 
-  private ensureMyGmProfile(): Observable<IGmProfile> {
+  private ensureMyGmProfile(): Observable<unknown> {
     const userId = this.auth.userId();
 
     if (!userId) {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.backend.upsert<Pick<IGmProfile, 'id'>>('gm_profiles', {
-      id: userId,
-    }) as Observable<IGmProfile>;
+    return this.backend.getById<IGmProfile>('gm_profiles', userId).pipe(
+      switchMap((profile) => {
+        if (profile) {
+          return of(profile);
+        }
+
+        return this.backend.create<
+          Pick<IGmProfile, 'id' | 'isPublic' | 'isArchived'>
+        >('gm_profiles', {
+          id: userId,
+          isPublic: false,
+          isArchived: false,
+        });
+      }),
+    );
   }
 }

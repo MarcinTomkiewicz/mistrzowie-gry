@@ -1,4 +1,4 @@
-import { IUserMenuSection } from "../types/user-menu";
+import { IUserMenuSection } from '../types/user-menu';
 
 export interface BuildUserMenuArgs {
   accountTitle: string;
@@ -10,6 +10,7 @@ export interface BuildUserMenuArgs {
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
+  adminUsersLabel: string;
   canSeeGmZone: boolean;
   canSeeAdministration: boolean;
 }
@@ -24,7 +25,7 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           id: 'edit-profile',
           label: args.editProfileLabel,
           path: '/auth/edit-profile',
-        }
+        },
       ],
     },
   ];
@@ -67,6 +68,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           id: 'work-log-overview',
           label: args.workLogOverviewLabel,
           path: '/auth/admin/work-log',
+        },
+        {
+          id: 'admin-users',
+          label: args.adminUsersLabel,
+          path: '/auth/admin/users',
         },
       ],
     });

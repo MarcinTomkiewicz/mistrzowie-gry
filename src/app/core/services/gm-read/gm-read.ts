@@ -45,20 +45,6 @@ export class GmRead {
     );
   }
 
-  getPublicProfileById(
-    gmProfileId: string,
-  ): Observable<IGmPublicProfile | null> {
-    return this.getProfileById(gmProfileId).pipe(
-      map((profile) => {
-        if (!profile?.profile.isPublic) {
-          return null;
-        }
-
-        return profile;
-      }),
-    );
-  }
-
   getAvailableLanguages(): Observable<ILanguage[]> {
     return this.backend.getAll<ILanguage>({
       table: 'languages',
@@ -81,6 +67,18 @@ export class GmRead {
         table: 'gm_profiles',
         sortBy: 'createdAt',
         sortOrder: 'asc',
+        pagination: {
+          filters: {
+            isPublic: {
+              operator: FilterOperator.EQ,
+              value: true,
+            },
+            isArchived: {
+              operator: FilterOperator.EQ,
+              value: false,
+            },
+          },
+        },
       })
       .pipe(
         switchMap((profiles) => {
@@ -88,14 +86,14 @@ export class GmRead {
             return of([] as IGmPublicProfile[]);
           }
 
-          const publicProfiles = profiles.filter((profile) => profile.isPublic);
-
-          if (!publicProfiles.length) {
-            return of([] as IGmPublicProfile[]);
-          }
-
           return forkJoin(
-            publicProfiles.map((profile) => this.hydrateProfile(profile)),
+            profiles.map((profile) => this.hydrateProfile(profile)),
+          ).pipe(
+            map((hydratedProfiles) =>
+              hydratedProfiles.filter(
+                (profile): profile is IGmPublicProfile => !!profile,
+              ),
+            ),
           );
         }),
       );
@@ -105,17 +103,25 @@ export class GmRead {
     return getUserDisplayName(profile.user);
   }
 
-  private hydrateProfile(profile: IGmProfile): Observable<IGmPublicProfile> {
+  private hydrateProfile(
+    profile: IGmProfile,
+  ): Observable<IGmPublicProfile | null> {
     return forkJoin({
       user: this.backend.getById<IUser>('users', profile.id),
       profileWithRelations: this.hydrateGmProfile(profile),
       sessions: this.sessionRead.getSessionsByGmProfileId(profile.id, 'template'),
     }).pipe(
-      map(({ user, profileWithRelations, sessions }) => ({
-        user: user as IUser,
-        profile: profileWithRelations,
-        sessions,
-      })),
+      map(({ user, profileWithRelations, sessions }) => {
+        if (!user) {
+          return null;
+        }
+
+        return {
+          user,
+          profile: profileWithRelations,
+          sessions,
+        };
+      }),
     );
   }
 

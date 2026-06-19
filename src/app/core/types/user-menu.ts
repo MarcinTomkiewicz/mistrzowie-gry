@@ -4,7 +4,8 @@ export type UserMenuItemId =
   | 'coworker-profile'
   | 'my-work-log'
   | 'gm-availability-overview'
-  | 'work-log-overview';
+  | 'work-log-overview'
+  | 'admin-users';
 
 export type UserMenuSectionId =
   | 'account'

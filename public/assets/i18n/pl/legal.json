@@ -1,5 +1,5 @@
 {
-  "termsDialog": {
+ "termsDialog": {
     "title": "Regulamin świadczenia usług",
     "content": {
       "sections": [
@@ -17,12 +17,12 @@
                   "blocks": [
                     {
                       "type": "paragraph",
-                      "text": "FBE Solutions Marcin Tomkiewicz\nos. Polan 22/8\n61-253 Poznań\nNIP: 9721147318\nREGON: 301716748\ne-mail: kontakt@mistrzowie-gry.pl\ntel.: +48 533 616 491"
+                      "text": "MISTRZOWIE GRY sp. z o.o.\nul. Augustyna Szamarzewskiego 21/2\n60-514 Poznań\nKRS: 0001246935\nNIP: 7812112460\nREGON: 544979988\nkapitał zakładowy: 13 000 zł\ne-mail: kontakt@mistrzowie-gry.pl\ntel.: +48 533 616 491"
                     }
                   ]
                 },
                 {
-                  "text": "Projekt Mistrzowie Gry organizuje i koordynuje realizację usług RPG we współpracy z Mistrzami Gry działającymi w ramach przyjętych standardów organizacyjnych, jakościowych i bezpieczeństwa."
+                  "text": "MISTRZOWIE GRY sp. z o.o. organizuje i koordynuje realizację usług RPG we współpracy z Mistrzami Gry działającymi w ramach przyjętych standardów organizacyjnych, jakościowych i bezpieczeństwa."
                 },
                 {
                   "text": "Mistrzowie Gry realizują usługi w ramach projektu, ale nie działają wobec Klientów jako niezależni sprzedawcy usług objętych niniejszym Regulaminem. Klient zawiera umowę z Organizatorem, a nie z pojedynczym Mistrzem Gry."
@@ -66,7 +66,7 @@
               "type": "ordered-list",
               "items": [
                 {
-                  "text": "Organizator – FBE Solutions Marcin Tomkiewicz, prowadzący projekt Mistrzowie Gry i odpowiedzialny za organizację, koordynację oraz obsługę usług objętych Regulaminem."
+                  "text": "Organizator – MISTRZOWIE GRY sp. z o.o. z siedzibą w Poznaniu, odpowiedzialna za organizację, koordynację oraz obsługę usług objętych Regulaminem."
                 },
                 {
                   "text": "Klient – osoba fizyczna, osoba prawna lub jednostka organizacyjna zamawiająca usługę od Organizatora."
@@ -913,7 +913,7 @@
               "type": "ordered-list",
               "items": [
                 {
-                  "text": "Regulamin wchodzi w życie z dniem [do uzupełnienia]."
+                  "text": "Regulamin wchodzi w życie z dniem 19.06.2026."
                 },
                 {
                   "text": "Organizator może zmienić Regulamin z ważnych przyczyn, w szczególności z powodu:",
@@ -964,11 +964,11 @@
             },
             {
               "type": "paragraph",
-              "text": "FBE Solutions Marcin Tomkiewicz\nos. Polan 22/8\n61-253 Poznań\nNIP: 9721147318\nREGON: 301716748\ne-mail: kontakt@mistrzowie-gry.pl\ntel.: +48 533 616 491"
+              "text": "MISTRZOWIE GRY sp. z o.o.\nul. Augustyna Szamarzewskiego 21/2\n60-514 Poznań\nKRS: 0001246935\nNIP: 7812112460\nREGON: 544979988\ne-mail: [kontakt@mistrzowie-gry.pl](mailto:kontakt@mistrzowie-gry.pl)\ntel.: +48 533 616 491"
             },
             {
               "type": "paragraph",
-              "text": "W sprawach związanych z przetwarzaniem danych osobowych możesz skontaktować się z Administratorem pod adresem e-mail: kontakt@mistrzowie-gry.pl."
+              "text": "W sprawach związanych z przetwarzaniem danych osobowych możesz skontaktować się z Administratorem pod adresem e-mail: [kontakt@mistrzowie-gry.pl](mailto:kontakt@mistrzowie-gry.pl)."
             }
           ]
         },
@@ -998,6 +998,9 @@
                   "text": "obsługą reklamacji i innych zgłoszeń,"
                 },
                 {
+                  "text": "korzystaniem z formularza kontaktowego,"
+                },
+                {
                   "text": "ewentualnym korzystaniem z usług elektronicznych dostępnych na stronie,"
                 },
                 {
@@ -1012,7 +1015,11 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "Mistrzowie Gry to projekt organizacyjny oferujący prowadzone sesje RPG jako usługę. Projekt nie działa jako marketplace ani tablica ogłoszeń dla niezależnych Mistrzów Gry, lecz jako organizator usługi, który odpowiada za jej ramy organizacyjne, standard, bezpieczeństwo i realizację. Oznacza to, że w zakresie niezbędnym do organizacji i wykonania usługi Administrator przetwarza dane klientów, uczestników i współpracowników w ramach własnej odpowiedzialności organizacyjnej. Projekt buduje relacje długoterminowe, powtarzalne doświadczenie i bierze odpowiedzialność za przebieg usług."
+              "text": "Mistrzowie Gry to projekt organizacyjny oferujący prowadzone sesje RPG jako usługę. Projekt nie działa jako marketplace ani tablica ogłoszeń dla niezależnych Mistrzów Gry, lecz jako organizator usługi, który odpowiada za jej ramy organizacyjne, standard, bezpieczeństwo i realizację."
+            },
+            {
+              "type": "paragraph",
+              "text": "Oznacza to, że w zakresie niezbędnym do organizacji i wykonania usługi Administrator przetwarza dane klientów, uczestników i współpracowników w ramach własnej odpowiedzialności organizacyjnej. Projekt buduje relacje długoterminowe, powtarzalne doświadczenie i bierze odpowiedzialność za przebieg usług."
             }
           ]
         },
@@ -1066,72 +1073,32 @@
               "text": "Twoje dane osobowe możemy przetwarzać w następujących celach:"
             },
             {
-              "type": "unordered-list",
-              "items": [
-                {
-                  "text": "udzielenie odpowiedzi na wiadomość, zapytanie lub formularz kontaktowy",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b RODO – podjęcie działań przed zawarciem umowy, lub art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na obsłudze kontaktu i komunikacji."
-                    }
-                  ]
-                },
-                {
-                  "text": "przygotowanie oferty, ustalenie warunków współpracy i organizacja usługi",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b RODO – niezbędność do zawarcia i wykonania umowy."
-                    }
-                  ]
-                },
-                {
-                  "text": "wykonanie zawartej umowy, w tym koordynacja realizacji sesji, wydarzenia lub programu",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b RODO – wykonanie umowy."
-                    }
-                  ]
-                },
-                {
-                  "text": "rozliczenia, księgowość i realizacja obowiązków podatkowych",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. c RODO – obowiązek prawny ciążący na Administratorze."
-                    }
-                  ]
-                },
-                {
-                  "text": "dochodzenie roszczeń, obrona przed roszczeniami oraz ochrona bezpieczeństwa organizacyjnego",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na ochronie swoich praw, zapewnieniu bezpieczeństwa i dokumentowaniu przebiegu współpracy."
-                    }
-                  ]
-                },
-                {
-                  "text": "rozpatrywanie reklamacji, uwag, incydentów i innych zgłoszeń",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. b, c lub f RODO – zależnie od charakteru zgłoszenia."
-                    }
-                  ]
-                },
-                {
-                  "text": "zapewnienie bezpieczeństwa strony internetowej i jej działania technicznego",
-                  "blocks": [
-                    {
-                      "type": "paragraph",
-                      "text": "Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na zapewnieniu bezpieczeństwa, stabilności i ochronie przed nadużyciami."
-                    }
-                  ]
-                }
-              ]
+              "type": "paragraph",
+              "text": "Udzielenie odpowiedzi na wiadomość, zapytanie lub formularz kontaktowy. Podstawa prawna: art. 6 ust. 1 lit. b RODO – podjęcie działań przed zawarciem umowy, lub art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na obsłudze kontaktu i komunikacji."
+            },
+            {
+              "type": "paragraph",
+              "text": "Przygotowanie oferty, ustalenie warunków współpracy i organizacja usługi. Podstawa prawna: art. 6 ust. 1 lit. b RODO – niezbędność do zawarcia i wykonania umowy."
+            },
+            {
+              "type": "paragraph",
+              "text": "Wykonanie zawartej umowy, w tym koordynacja realizacji sesji, wydarzenia lub programu. Podstawa prawna: art. 6 ust. 1 lit. b RODO – wykonanie umowy."
+            },
+            {
+              "type": "paragraph",
+              "text": "Rozliczenia, księgowość i realizacja obowiązków podatkowych. Podstawa prawna: art. 6 ust. 1 lit. c RODO – obowiązek prawny ciążący na Administratorze."
+            },
+            {
+              "type": "paragraph",
+              "text": "Dochodzenie roszczeń, obrona przed roszczeniami oraz ochrona bezpieczeństwa organizacyjnego. Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na ochronie swoich praw, zapewnieniu bezpieczeństwa i dokumentowaniu przebiegu współpracy."
+            },
+            {
+              "type": "paragraph",
+              "text": "Rozpatrywanie reklamacji, uwag, incydentów i innych zgłoszeń. Podstawa prawna: art. 6 ust. 1 lit. b, c lub f RODO – zależnie od charakteru zgłoszenia."
+            },
+            {
+              "type": "paragraph",
+              "text": "Zapewnienie bezpieczeństwa strony internetowej i jej działania technicznego. Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na zapewnieniu bezpieczeństwa, stabilności i ochronie przed nadużyciami."
             }
           ]
         },
@@ -1324,7 +1291,7 @@
             },
             {
               "type": "paragraph",
-              "text": "W celu skorzystania z tych praw możesz napisać na adres: kontakt@mistrzowie-gry.pl."
+              "text": "W celu skorzystania z tych praw możesz napisać na adres: [kontakt@mistrzowie-gry.pl](mailto:kontakt@mistrzowie-gry.pl)."
             }
           ]
         },
@@ -1495,7 +1462,7 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "Niniejsza Polityka Prywatności obowiązuje od dnia: 20.03.2026."
+              "text": "Niniejsza Polityka Prywatności obowiązuje od dnia: 19.06.2026."
             }
           ]
         }

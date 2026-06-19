@@ -18,17 +18,12 @@ import {
 import { IOccurrenceSwitcherOption } from '../../interfaces/i-occurrence-switcher';
 import { ISessionWithRelations } from '../../interfaces/i-session';
 import { IUser } from '../../interfaces/i-user';
+import { IEventPublicProgramLoadData } from '../../types/event-program';
 import { hasMinimumRole } from '../../utils/roles';
 import { Backend } from '../backend/backend';
 import { GmRead } from '../gm-read/gm-read';
 import { GmSessionsFacade } from '../gm-sessions/gm-sessions';
 import { SessionRead } from '../session-read/session-read';
-
-interface IEventPublicProgramLoadData {
-  event: IEvent;
-  occurrences: IEventOccurrence[];
-  programsByOccurrenceId: Map<string, IEventProgramItemWithDetails[]>;
-}
 
 @Injectable({ providedIn: 'root' })
 export class EventRead {
@@ -285,9 +280,7 @@ export class EventRead {
 
             return forkJoin({
               user: userId
-                ? this.backend
-                    .getById<IUser>('users', userId)
-                    .pipe(switchMap((user) => of(user)))
+                ? this.backend.getById<IUser>('users', userId)
                 : of(null),
               signups: this.backend.getAll<IEventProgramItem>({
                 table: 'event_program_items',

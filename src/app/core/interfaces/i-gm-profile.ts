@@ -8,6 +8,7 @@ export interface IGmProfile {
   image: string | null;
   quote: string | null;
   isPublic: boolean;
+  isArchived: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -20,10 +21,6 @@ export interface IGmProfileFormData {
   gmStyleIds: string[];
   languageIds: string[];
 }
-
-export interface ICreateGmProfilePayload extends IGmProfileFormData {}
-
-export interface IUpdateGmProfilePayload extends IGmProfileFormData {}
 
 export interface IGmProfileWithRelations extends IGmProfile {
   styles: IGmStyle[];

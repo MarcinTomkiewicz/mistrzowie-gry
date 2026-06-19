@@ -42,6 +42,7 @@ export class UserMenuPanel {
       gmAvailabilityOverviewLabel:
         this.i18n.userMenu().gmAvailabilityOverviewLabel,
       workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
+      adminUsersLabel: this.i18n.userMenu().adminUsersLabel,
       canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeAdministration: hasMinimumRole(
         this.auth.user(),

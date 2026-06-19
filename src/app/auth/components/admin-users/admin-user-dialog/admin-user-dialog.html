@@ -1,0 +1,95 @@
+<p-dialog
+  styleClass="mg-dialog mg-dialog--md"
+  [modal]="true"
+  [visible]="visible()"
+  [header]="i18n.dialog().title"
+  (visibleChange)="onVisibleChange($event)"
+>
+  @if (row(); as row) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="flex-col-center-center gap-sm w-100"
+      novalidate
+    >
+      <div class="flex-col-start-stretch gap-xs w-80">
+        <label>{{ i18n.dialog().emailLabel }}</label>
+        <strong>{{ row.user.email }}</strong>
+      </div>
+
+      @if (isAdminRow()) {
+        <div class="flex-col-start-stretch gap-xs w-80">
+          <label>{{ i18n.dialog().appRoleLabel }}</label>
+          <span>{{ getCurrentRoleLabel() }}</span>
+        </div>
+      } @else {
+        @for (field of selectFields; track field.controlName) {
+          <p-iftalabel class="w-80">
+            <p-select
+              class="w-100"
+              [inputId]="field.inputId"
+              [id]="field.inputId"
+              [options]="getSelectOptions(field)"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              [formControlName]="field.controlName"
+            />
+            <label [for]="field.inputId">{{ getSelectLabel(field) }}</label>
+          </p-iftalabel>
+        }
+      }
+
+      @for (field of textFields; track field.controlName) {
+        <p-iftalabel class="w-80">
+          <input
+            class="w-100"
+            pInputText
+            [id]="field.inputId"
+            [type]="field.type"
+            [formControlName]="field.controlName"
+            [autocomplete]="field.autocomplete"
+            [attr.aria-invalid]="hasTextControlError(field)"
+          />
+          <label [for]="field.inputId">
+            {{ getTextLabel(field) }}
+          </label>
+        </p-iftalabel>
+
+        @if (hasTextControlError(field)) {
+          <small class="mg-contact-error">{{ maxLengthMessage(field) }}</small>
+        }
+      }
+
+      @for (field of toggleFields; track field.controlName) {
+        <div class="flex-row-start-center gap-md w-80">
+          <p-toggleswitch
+            [inputId]="field.inputId"
+            [formControlName]="field.controlName"
+          />
+          <label [for]="field.inputId">
+            {{ getToggleLabel(field) }}
+          </label>
+        </div>
+      }
+
+      <div class="p-dialog-footer flex-row-end-center gap-sm w-100 p-md">
+        <p-button
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          icon="pi pi-interdiction"
+          [label]="i18n.commonActions().cancel"
+          (onClick)="onVisibleChange(false)"
+        />
+        <p-button
+          type="submit"
+          severity="success"
+          icon="pi pi-scroll-quill"
+          [label]="i18n.actions().saveUser"
+          [loading]="saving()"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>

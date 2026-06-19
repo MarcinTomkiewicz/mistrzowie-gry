@@ -70,19 +70,31 @@ export class GmProfileFacade {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.backend
-      .upsert<
-        Pick<
-          IGmProfile,
-          'id' | 'experience' | 'description' | 'image' | 'quote'
-        >
-      >('gm_profiles', {
-        id: userId,
-        experience: payload.experience,
-        description: payload.description,
-        image: payload.image,
-        quote: payload.quote,
-      })
+    return this.getMyGmProfile()
+      .pipe(
+        switchMap((existingProfile) =>
+          this.backend.upsert<
+            Pick<
+              IGmProfile,
+              | 'id'
+              | 'experience'
+              | 'description'
+              | 'image'
+              | 'quote'
+              | 'isPublic'
+              | 'isArchived'
+            >
+          >('gm_profiles', {
+            id: userId,
+            experience: payload.experience,
+            description: payload.description,
+            image: payload.image,
+            quote: payload.quote,
+            isPublic: existingProfile?.isPublic ?? false,
+            isArchived: existingProfile?.isArchived ?? false,
+          }),
+        ),
+      )
       .pipe(
         switchMap(() =>
           forkJoin([

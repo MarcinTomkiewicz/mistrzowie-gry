@@ -106,7 +106,7 @@ export class SessionDialog {
       this.isGmProfileLoading.set(true);
 
       const subscription = this.gmRead
-        .getPublicProfileById(gmProfileId)
+        .getProfileById(gmProfileId)
         .pipe(
           catchError(() => of(null as IGmPublicProfile | null)),
           finalize(() => this.isGmProfileLoading.set(false)),

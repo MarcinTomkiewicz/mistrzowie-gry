@@ -22,13 +22,13 @@ import {
   EventProgramItemStatus,
 } from '../../../core/enums/event';
 import { buildSiteUrl } from '../../../core/config/site';
-import { IEvent } from '../../../core/interfaces/i-event';
 import { IEventOccurrence } from '../../../core/interfaces/i-event-occurence';
 import { IEventProgramItemWithDetails } from '../../../core/interfaces/i-event-program-item';
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
+import { EventProgramPageVm } from '../../../core/types/event-program';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Seo } from '../../../core/services/seo/seo';
@@ -56,12 +56,6 @@ import {
 import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 
 const CHAOTIC_THURSDAYS_SLUG = 'chaotyczne-czwartki';
-
-type EventProgramPageVm = {
-  event: IEvent;
-  occurrences: IEventOccurrence[];
-  programsByOccurrenceId: Map<string, IEventProgramItemWithDetails[]>;
-};
 
 @Component({
   selector: 'app-chaotic-thursdays',

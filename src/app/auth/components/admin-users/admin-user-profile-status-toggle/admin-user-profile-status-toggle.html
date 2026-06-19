@@ -1,0 +1,8 @@
+@if (profile()) {
+  <p-toggleswitch
+    [formControl]="control"
+    (onChange)="onChange($event.checked)"
+  />
+} @else {
+  {{ notAvailableLabel() }}
+}

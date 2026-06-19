@@ -38,6 +38,7 @@ testem.log
 /typings
 .env
 .env.*
+/.gitchanges/
 
 # System files
 .DS_Store

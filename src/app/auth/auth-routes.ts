@@ -32,6 +32,10 @@ const loaders = {
     import('./components/work-log-overview/work-log-overview').then(
       (m) => m.WorkLogOverviewComponent,
     ),
+  adminUsers: () =>
+    import('./components/admin-users/admin-users').then(
+      (m) => m.AdminUsersComponent,
+    ),
 } as const;
 
 export const authRoutes: Routes = [
@@ -71,5 +75,10 @@ export const authRoutes: Routes = [
     path: 'admin/work-log',
     loadComponent: loaders.workLogOverview,
     canActivate: [authGuard, minimumRoleGuard('customer_manager')],
+  },
+  {
+    path: 'admin/users',
+    loadComponent: loaders.adminUsers,
+    canActivate: [authGuard, minimumRoleGuard('marketing_manager')],
   },
 ];
