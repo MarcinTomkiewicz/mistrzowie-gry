@@ -181,10 +181,17 @@ export class GmAvailability {
           return of([]);
         }
 
+        const payload = records.map(({ gmProfileId, startsAt, endsAt }) => ({
+          gmProfileId,
+          startsAt,
+          endsAt,
+        }));
+
         return this.backend
-          .createMany<IGmAvailabilitySlotRecord>('gm_availability_slots', [
-            ...records,
-          ])
+          .createMany<IGmAvailabilitySlotRecord>(
+            'gm_availability_slots',
+            payload,
+          )
           .pipe(
             map((savedRecords) =>
               [...savedRecords].sort((left, right) =>
