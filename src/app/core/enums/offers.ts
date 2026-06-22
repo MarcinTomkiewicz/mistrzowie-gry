@@ -24,3 +24,12 @@ export enum OfferItemKindEnum {
   Logistics = 'logistics',
   Other = 'other',
 }
+
+export enum OfferPricingTypeEnum {
+  Session = 'session',
+  Hour = 'hour',
+  Package = 'package',
+  Subscription = 'subscription',
+  Addon = 'addon',
+  Custom = 'custom',
+}

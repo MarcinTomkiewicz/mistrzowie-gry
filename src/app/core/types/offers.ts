@@ -1,12 +1,14 @@
 import {
   OfferItemKindEnum,
   OfferPageTypeEnum,
+  OfferPricingTypeEnum,
   OfferSectionTypeEnum,
 } from '../enums/offers';
 
 export type OfferPageType = `${OfferPageTypeEnum}`;
 export type OfferSectionType = `${OfferSectionTypeEnum}`;
 export type OfferItemKind = `${OfferItemKindEnum}`;
+export type OfferPricingType = `${OfferPricingTypeEnum}`;
 
 export type JsonObject = Record<string, unknown>;
 
