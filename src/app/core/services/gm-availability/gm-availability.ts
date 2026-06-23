@@ -146,6 +146,42 @@ export class GmAvailability {
     );
   }
 
+  getAvailabilityForGmsOverlapping(
+    gmProfileIds: readonly string[],
+    fromIso: string,
+    toIsoExclusive: string,
+  ): Observable<IGmAvailabilitySlotRecord[]> {
+    if (!gmProfileIds.length) {
+      return of([]);
+    }
+
+    return this.backend.getAll<IGmAvailabilitySlotRecord>({
+      table: 'gm_availability_slots',
+      sortBy: 'startsAt',
+      sortOrder: 'asc',
+      pagination: {
+        filters: {
+          gmProfileId: {
+            operator: FilterOperator.IN,
+            value: [...gmProfileIds],
+          },
+          startsAt: {
+            operator: FilterOperator.LT,
+            value: toIsoExclusive,
+          },
+          endsAt: {
+            operator: FilterOperator.GT,
+            value: fromIso,
+          },
+        },
+      },
+    }).pipe(
+      map((records) =>
+        [...records].sort((left, right) => left.startsAt.localeCompare(right.startsAt)),
+      ),
+    );
+  }
+
   replaceMyAvailability(
     records: readonly IGmAvailabilitySlotRecord[],
     fromIso: string,
@@ -181,8 +217,8 @@ export class GmAvailability {
           return of([]);
         }
 
-        const payload = records.map(({ gmProfileId, startsAt, endsAt }) => ({
-          gmProfileId,
+        const payload = records.map(({ startsAt, endsAt }) => ({
+          gmProfileId: userId,
           startsAt,
           endsAt,
         }));
@@ -203,7 +239,7 @@ export class GmAvailability {
     );
   }
 
-  private ensureMyGmProfile(): Observable<unknown> {
+  private ensureMyGmProfile(): Observable<void> {
     const userId = this.auth.userId();
 
     if (!userId) {
@@ -213,7 +249,7 @@ export class GmAvailability {
     return this.backend.getById<IGmProfile>('gm_profiles', userId).pipe(
       switchMap((profile) => {
         if (profile) {
-          return of(profile);
+          return of(void 0);
         }
 
         return this.backend.create<
@@ -222,7 +258,7 @@ export class GmAvailability {
           id: userId,
           isPublic: false,
           isArchived: false,
-        });
+        }).pipe(map(() => void 0));
       }),
     );
   }

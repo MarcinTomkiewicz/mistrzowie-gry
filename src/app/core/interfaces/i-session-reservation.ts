@@ -83,18 +83,28 @@ export interface ISessionReservation extends ISessionReservationContact {
   cancelledAt: string | null;
 }
 
-type SessionReservationCreateBase = Omit<
-  ISessionReservation,
-  | 'id'
-  | 'bookingMode'
-  | 'sourceKind'
-  | 'gmSessionTemplateId'
-  | 'customSessionId'
-  | 'customerEntitlementId'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'cancelledAt'
->;
+export interface ISessionReservationCreateBase
+  extends ISessionReservationContact {
+  userId: string | null;
+  gmProfileId: string;
+  systemId: string;
+  startsAt: string;
+  endsAt: string;
+  durationHours: number;
+  baseProductId: string;
+  playersCount: number | null;
+  message: string | null;
+  createCharactersAtTable: boolean;
+  provideCharacterGuidelines: boolean;
+  characterGuidelines: string | null;
+  extraNotes: string | null;
+  addonsSnapshotJson: ISessionReservationAddonSnapshot[];
+  customServicesRequest: string | null;
+  pricingSnapshotJson: ISessionReservationPricingSnapshot;
+  grossTotalPln: number | null;
+  currency: 'PLN';
+  priceStatus: SessionPriceStatus;
+}
 
 export type SessionReservationSourceSelection =
   | {
@@ -130,6 +140,6 @@ export type SessionReservationBookingSelection =
     };
 
 export type ICreateSessionReservationPayload =
-  SessionReservationCreateBase &
+  ISessionReservationCreateBase &
   SessionReservationSourceSelection &
   SessionReservationBookingSelection;

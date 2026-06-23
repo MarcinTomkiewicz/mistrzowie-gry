@@ -125,12 +125,15 @@ export class Backend {
     );
   }
 
-  create<T extends object>(table: string, data: T): Observable<T> {
+  create<TResult extends object, TPayload extends object = TResult>(
+    table: string,
+    data: TPayload,
+  ): Observable<TResult> {
     const snake = toSnakeCase(data);
     return from(this.supabase.from(table).insert(snake).select('*').single()).pipe(
       map((res: PostgrestSingleResponse<any>) => {
         if (res.error) throw new Error(res.error.message);
-        return toCamelCase<T>(res.data);
+        return toCamelCase<TResult>(res.data);
       }),
     );
   }

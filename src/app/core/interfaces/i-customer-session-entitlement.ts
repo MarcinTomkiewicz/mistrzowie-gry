@@ -44,3 +44,13 @@ export interface ICustomerSessionEntitlementPriceSnapshot {
   validTo?: string | null;
   note?: string | null;
 }
+
+export type ICustomerSessionEntitlementLookup =
+  | {
+      userId: string;
+      customerEmail?: null;
+    }
+  | {
+      userId?: null;
+      customerEmail: string;
+    };

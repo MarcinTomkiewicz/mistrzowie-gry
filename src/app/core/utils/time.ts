@@ -68,6 +68,13 @@ export function formatHourOffsetRangeLabel(
   )} - ${formatHourOffsetLabel(endOffset, totalHours)}`;
 }
 
+export function formatDateTimeAsTimeLabel(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${hours}:${minutes}`;
+}
+
 export function createHourOffsetOptions(
   start: number,
   end: number,
@@ -158,6 +165,40 @@ export function getHourOffsetFromDateTime(
   const date = typeof value === 'string' ? new Date(value) : value;
 
   return (date.getTime() - baseTime) / HOUR_IN_MS;
+}
+
+export function createLocalDateTimeRangeIso(
+  dateIso: string,
+  startTime: string,
+  durationHours: number,
+): { startsAt: string; endsAt: string } {
+  const match = /^(\d{2}):(\d{2})(?::\d{2})?$/.exec(startTime);
+
+  if (!match) {
+    throw new Error(`Invalid start time: ${startTime}`);
+  }
+
+  const [year, month, day] = dateIso.split('-').map(Number);
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const startsAt = new Date(year, month - 1, day, hours, minutes);
+  const endsAt = new Date(startsAt.getTime() + durationHours * HOUR_IN_MS);
+
+  return {
+    startsAt: startsAt.toISOString(),
+    endsAt: endsAt.toISOString(),
+  };
+}
+
+export function ceilToTimeStep(value: number, stepMs: number): number {
+  return Math.ceil(value / stepMs) * stepMs;
+}
+
+export function doTimeRangesOverlap(
+  left: { start: number; end: number },
+  right: { start: number; end: number },
+): boolean {
+  return left.start < right.end && left.end > right.start;
 }
 
 export function hasOverlappingIntervals(
