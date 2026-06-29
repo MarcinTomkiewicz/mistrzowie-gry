@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-import { ISessionReservationI18nSections } from '../../../core/interfaces/i-session-reservation-i18n';
+import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 
 @Component({
   selector: 'app-session-reservation-choice-panel',
@@ -8,6 +8,5 @@ import { ISessionReservationI18nSections } from '../../../core/interfaces/i-sess
   templateUrl: './session-reservation-choice-panel.html',
 })
 export class SessionReservationChoicePanel {
-  readonly sections = input.required<ISessionReservationI18nSections['sections']>();
-  readonly labels = input.required<ISessionReservationI18nSections['labels']>();
+  readonly data = input.required<ISessionReservationViewModel>();
 }

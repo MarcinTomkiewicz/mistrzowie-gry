@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 
-import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
-import { ISessionReservationI18nSections } from '../../../core/interfaces/i-session-reservation-i18n';
+import { ISessionReservationFlowState } from '../../../core/interfaces/i-session-reservation-flow';
+import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
 
 @Component({
@@ -11,10 +11,8 @@ import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
   templateUrl: './session-reservation-gm-panel.html',
 })
 export class SessionReservationGmPanel {
-  readonly sections = input.required<ISessionReservationI18nSections['sections']>();
-  readonly states = input.required<ISessionReservationI18nSections['states']>();
-  readonly selectedGmId = input.required<string | null>();
-  readonly visibleGms = input.required<readonly IGmPublicProfile[]>();
+  readonly data = input.required<ISessionReservationViewModel>();
+  readonly state = input.required<ISessionReservationFlowState>();
 
   readonly gmSelected = output<string>();
 }

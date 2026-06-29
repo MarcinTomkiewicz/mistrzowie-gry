@@ -56,17 +56,11 @@
         <p-step-panels>
           <p-step-panel [value]="wizard.wizardSteps.Offer">
             <ng-template #content>
-              <app-session-reservation-choice-panel
-                [sections]="data.sections"
-                [labels]="data.labels"
-              />
+              <app-session-reservation-choice-panel [data]="data" />
 
               <app-session-reservation-addons-panel
-                [sections]="data.sections"
-                [labels]="data.labels"
-                [states]="data.states"
+                [data]="data"
                 [state]="state"
-                [addonProducts]="data.addonProducts"
                 (addonToggled)="toggleAddon($event)"
                 (addonCustomerDetailsChanged)="setAddonCustomerDetails($event)"
                 (addonQuantityChanged)="setAddonQuantity($event)"
@@ -77,10 +71,8 @@
           <p-step-panel [value]="wizard.wizardSteps.Gm">
             <ng-template #content>
               <app-session-reservation-gm-panel
-                [sections]="data.sections"
-                [states]="data.states"
-                [selectedGmId]="state.selectedGmId"
-                [visibleGms]="data.visibleGms"
+                [data]="data"
+                [state]="state"
                 (gmSelected)="wizard.selectGm($event)"
               />
             </ng-template>
@@ -89,13 +81,8 @@
           <p-step-panel [value]="wizard.wizardSteps.System">
             <ng-template #content>
               <app-session-reservation-system-panel
-                [sections]="data.sections"
-                [states]="data.states"
-                [commonStatus]="data.commonStatus"
-                [selectedGmId]="state.selectedGmId"
-                [selectedSystemId]="state.selectedSystemId"
-                [systemsForSelectedGm]="data.systemsForSelectedGm"
-                [isLoadingSystems]="data.isLoadingSystems"
+                [data]="data"
+                [state]="state"
                 (systemSelected)="wizard.selectSystem($event)"
               />
             </ng-template>
@@ -104,15 +91,8 @@
           <p-step-panel [value]="wizard.wizardSteps.Slot">
             <ng-template #content>
               <app-session-reservation-slot-panel
-                [sections]="data.sections"
-                [states]="data.states"
-                [commonActions]="data.commonActions"
-                [commonStatus]="data.commonStatus"
-                [selectedGmId]="state.selectedGmId"
-                [selectedDate]="state.selectedDate"
-                [selectedStartTime]="state.selectedStartTime"
-                [availableSlots]="data.availableSlots"
-                [isLoadingSlots]="data.isLoadingSlots"
+                [data]="data"
+                [state]="state"
                 (slotsRefresh)="wizard.loadSlots()"
                 (slotSelected)="wizard.selectSlot($event)"
               />
@@ -123,10 +103,7 @@
             <ng-template #content>
               <div class="flex-col-start-stretch gap-lg">
                 <app-session-reservation-details-panel
-                  [sections]="data.sections"
-                  [labels]="data.labels"
-                  [states]="data.states"
-                  [commonActions]="data.commonActions"
+                  [data]="data"
                   [state]="state"
                   [contactForm]="contactForm"
                   [gmExtraForm]="gmExtraForm"
@@ -135,22 +112,15 @@
                   "
                   [playersCountControl]="playersCountControl"
                   [customServicesRequestControl]="customServicesRequestControl"
-                  [customerEntitlements]="data.customerEntitlements"
-                  [requiresManualQuote]="data.requiresManualQuote"
-                  [requiresCustomerEntitlement]="data.requiresCustomerEntitlement"
-                  [isLoadingEntitlements]="data.isLoadingEntitlements"
                   (entitlementsRefresh)="wizard.refreshEntitlements()"
-                  (customerEntitlementSelected)="selectCustomerEntitlement($event)"
+                  (customerEntitlementSelected)="
+                    selectCustomerEntitlement($event)
+                  "
                 />
 
                 <app-session-reservation-summary-card
-                  [sections]="data.sections"
-                  [labels]="data.labels"
-                  [states]="data.states"
+                  [data]="data"
                   [state]="state"
-                  [summary]="data.summary"
-                  [selectedGm]="data.selectedGm"
-                  [selectedSystem]="data.selectedSystem"
                 />
               </div>
             </ng-template>

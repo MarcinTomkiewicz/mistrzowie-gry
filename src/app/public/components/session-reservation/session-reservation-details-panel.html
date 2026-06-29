@@ -1,7 +1,7 @@
 <div class="mg-form flex-col-start-stretch gap-lg">
   <section class="mg-card flex-col-start-stretch gap-md w-100">
     <h2 class="mg-section__title mg-section__title--sm m-0">
-      {{ sections().contact }}
+      {{ data().sections.contact }}
     </h2>
 
     <form
@@ -17,7 +17,7 @@
           formControlName="customerName"
           autocomplete="name"
         />
-        <label for="customerName">{{ labels().customerName }}</label>
+        <label for="customerName">{{ data().labels.customerName }}</label>
       </p-iftalabel>
 
       <p-iftalabel class="w-100">
@@ -29,7 +29,7 @@
           formControlName="customerEmail"
           autocomplete="email"
         />
-        <label for="customerEmail">{{ labels().customerEmail }}</label>
+        <label for="customerEmail">{{ data().labels.customerEmail }}</label>
       </p-iftalabel>
 
       <p-iftalabel class="w-100">
@@ -41,7 +41,7 @@
           formControlName="customerPhone"
           autocomplete="tel"
         />
-        <label for="customerPhone">{{ labels().customerPhone }}</label>
+        <label for="customerPhone">{{ data().labels.customerPhone }}</label>
       </p-iftalabel>
 
       <p-iftalabel class="w-100">
@@ -55,7 +55,7 @@
           [max]="12"
           [showButtons]="true"
         />
-        <label for="playersCount">{{ labels().playersCount }}</label>
+        <label for="playersCount">{{ data().labels.playersCount }}</label>
       </p-iftalabel>
     </form>
 
@@ -69,7 +69,7 @@
           [rows]="3"
           [autoResize]="true"
         ></textarea>
-        <label for="message">{{ labels().message }}</label>
+        <label for="message">{{ data().labels.message }}</label>
       </p-iftalabel>
 
       <div class="flex-row-start-start gap-sm">
@@ -79,7 +79,7 @@
           [binary]="true"
         />
         <label for="createCharactersAtTable">
-          {{ labels().createCharactersAtTable }}
+          {{ data().labels.createCharactersAtTable }}
         </label>
       </div>
 
@@ -90,7 +90,7 @@
           [binary]="true"
         />
         <label for="provideCharacterGuidelines">
-          {{ labels().provideCharacterGuidelines }}
+          {{ data().labels.provideCharacterGuidelines }}
         </label>
       </div>
 
@@ -105,7 +105,7 @@
             [autoResize]="true"
           ></textarea>
           <label for="characterGuidelines">
-            {{ labels().characterGuidelines }}
+            {{ data().labels.characterGuidelines }}
           </label>
         </p-iftalabel>
       }
@@ -119,15 +119,15 @@
           [rows]="3"
           [autoResize]="true"
         ></textarea>
-        <label for="extraNotes">{{ labels().extraNotes }}</label>
+        <label for="extraNotes">{{ data().labels.extraNotes }}</label>
       </p-iftalabel>
     </form>
   </section>
 
-  @if (requiresManualQuote()) {
+  @if (data().requiresManualQuote) {
     <section class="mg-card flex-col-start-stretch gap-md w-100">
       <h2 class="mg-section__title mg-section__title--sm m-0">
-        {{ labels().customServicesRequest }}
+        {{ data().labels.customServicesRequest }}
       </h2>
       <p-iftalabel class="w-100">
         <textarea
@@ -139,35 +139,35 @@
           [autoResize]="true"
         ></textarea>
         <label for="customServicesRequest">
-          {{ labels().customServicesRequest }}
+          {{ data().labels.customServicesRequest }}
         </label>
       </p-iftalabel>
     </section>
   }
 
-  @if (requiresCustomerEntitlement()) {
+  @if (data().requiresCustomerEntitlement) {
     <section class="mg-card flex-col-start-stretch gap-md w-100">
       <div class="flex-row-between-center flex-col-sm gap-sm">
         <h2 class="mg-section__title mg-section__title--sm m-0">
-          {{ labels().entitlement }}
+          {{ data().labels.entitlement }}
         </h2>
         <p-button
           type="button"
           severity="secondary"
           size="small"
           icon="pi pi-refresh"
-          [label]="commonActions().refresh"
-          [loading]="isLoadingEntitlements()"
+          [label]="data().commonActions.refresh"
+          [loading]="data().isLoadingEntitlements"
           (onClick)="entitlementsRefresh.emit()"
         />
       </div>
 
-      @if (!customerEntitlements().length) {
-        <p class="muted-text">{{ states().emptyEntitlements }}</p>
+      @if (!data().customerEntitlements.length) {
+        <p class="muted-text">{{ data().states.emptyEntitlements }}</p>
       }
 
       <div class="flex-col-start-stretch gap-md">
-        @for (entitlement of customerEntitlements(); track entitlement.id) {
+        @for (entitlement of data().customerEntitlements; track entitlement.id) {
           <button
             type="button"
             class="mg-choice-card w-100 text-left"

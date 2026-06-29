@@ -9,6 +9,7 @@ import {
   ISessionReservationAddonCustomerDetailsChange,
   ISessionReservationAddonQuantityChange,
 } from '../../../core/interfaces/i-session-reservation-flow';
+import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { Auth } from '../../../core/services/auth/auth';
 import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
 import { Seo } from '../../../core/services/seo/seo';
@@ -113,8 +114,7 @@ export class SessionReservation implements OnInit {
 
   readonly summaryPreview = computed(() => this.facade.buildSummaryPreview());
 
-  readonly vm = computed(() => ({
-    seo: this.i18n.seo(),
+  readonly vm = computed<ISessionReservationViewModel>(() => ({
     hero: this.i18n.hero(),
     sections: this.i18n.sections(),
     labels: this.i18n.labels(),

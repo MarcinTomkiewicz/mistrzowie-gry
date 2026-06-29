@@ -1,14 +1,14 @@
 <section class="mg-card flex-col-start-stretch gap-md w-100">
   <h2 class="mg-section__title mg-section__title--sm m-0">
-    {{ sections().addons }}
+    {{ data().sections.addons }}
   </h2>
 
-  @if (!addonProducts().length) {
-    <p class="muted-text">{{ states().emptyAddons }}</p>
+  @if (!data().addonProducts.length) {
+    <p class="muted-text">{{ data().states.emptyAddons }}</p>
   }
 
   <div class="flex-col-start-stretch gap-md">
-    @for (addon of addonProducts(); track addon.id) {
+    @for (addon of data().addonProducts; track addon.id) {
       <button
         type="button"
         class="mg-choice-card w-100 text-left"
@@ -17,7 +17,7 @@
       >
         <span class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
           <strong>{{ addon.name }}</strong>
-          <span>{{ productPriceLabel(addon, states()) }}</span>
+          <span>{{ productPriceLabel(addon, data().states) }}</span>
         </span>
         @if (addon.description) {
           <span class="muted-text d-block">
@@ -41,7 +41,10 @@
                 (input)="setAddonCustomerDetails(addon, addonDetailsInput.value)"
               ></textarea>
               <label [for]="'addonDetails-' + addon.slug">
-                {{ addon.metadata.customerDetailsLabel || labels().addonDetails }}
+                {{
+                  addon.metadata.customerDetailsLabel ||
+                    data().labels.addonDetails
+                }}
               </label>
             </p-iftalabel>
           }
@@ -60,7 +63,7 @@
                 (input)="setAddonQuantity(addon, addonQuantityInput.valueAsNumber)"
               />
               <label [for]="'addonQuantity-' + addon.slug">
-                {{ addon.metadata.quantityLabel || labels().addonQuantity }}
+                {{ addon.metadata.quantityLabel || data().labels.addonQuantity }}
               </label>
             </p-iftalabel>
           }

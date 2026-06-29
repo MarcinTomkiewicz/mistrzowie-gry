@@ -11,7 +11,7 @@ import {
   ISessionReservationAddonQuantityChange,
   ISessionReservationFlowState,
 } from '../../../core/interfaces/i-session-reservation-flow';
-import { ISessionReservationI18nSections } from '../../../core/interfaces/i-session-reservation-i18n';
+import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { SessionAddonProductSlug } from '../../../core/types/session-booking-product';
 import { formatSessionBookingProductPriceLabel } from '../../../core/utils/session-pricing';
 
@@ -22,11 +22,8 @@ import { formatSessionBookingProductPriceLabel } from '../../../core/utils/sessi
   templateUrl: './session-reservation-addons-panel.html',
 })
 export class SessionReservationAddonsPanel {
-  readonly sections = input.required<ISessionReservationI18nSections['sections']>();
-  readonly labels = input.required<ISessionReservationI18nSections['labels']>();
-  readonly states = input.required<ISessionReservationI18nSections['states']>();
+  readonly data = input.required<ISessionReservationViewModel>();
   readonly state = input.required<ISessionReservationFlowState>();
-  readonly addonProducts = input.required<readonly ISessionBookingProduct[]>();
 
   readonly addonToggled = output<SessionAddonProductSlug>();
   readonly addonCustomerDetailsChanged =

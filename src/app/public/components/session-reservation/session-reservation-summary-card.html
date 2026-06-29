@@ -1,50 +1,50 @@
 <section class="mg-card flex-col-start-stretch gap-md w-100">
   <h2 class="mg-section__title mg-section__title--sm m-0">
-    {{ sections().summary }}
+    {{ data().sections.summary }}
   </h2>
 
-  @if (summary(); as preview) {
-    @let gm = selectedGm();
+  @if (data().summary; as preview) {
+    @let gm = data().selectedGm;
 
     <dl class="m-0 flex-col-start-stretch gap-sm">
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ sections().offer }}</dt>
-        <dd class="m-0">{{ labels().reservationKind }}</dd>
+        <dt>{{ data().sections.offer }}</dt>
+        <dd class="m-0">{{ data().labels.reservationKind }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ sections().gm }}</dt>
+        <dt>{{ data().sections.gm }}</dt>
         <dd class="m-0">
           {{ gm ? gmName(gm) : "" }}
         </dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ sections().system }}</dt>
-        <dd class="m-0">{{ selectedSystem()?.name }}</dd>
+        <dt>{{ data().sections.system }}</dt>
+        <dd class="m-0">{{ data().selectedSystem?.name }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ labels().selectedSlot }}</dt>
+        <dt>{{ data().labels.selectedSlot }}</dt>
         <dd class="m-0">
           {{ state().selectedDate }} {{ state().selectedStartTime }}
         </dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ labels().manualQuote }}</dt>
+        <dt>{{ data().labels.manualQuote }}</dt>
         <dd class="m-0">
           {{
             preview.requiresManualQuote
-              ? states().manualQuoteRequired
-              : states().fixedPrice
+              ? data().states.manualQuoteRequired
+              : data().states.fixedPrice
           }}
         </dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ labels().grossTotal }}</dt>
+        <dt>{{ data().labels.grossTotal }}</dt>
         <dd class="m-0">
           {{ grossTotalLabel(preview.grossTotalPln) }}
         </dd>
       </div>
     </dl>
   } @else {
-    <p class="muted-text">{{ states().summaryNotReady }}</p>
+    <p class="muted-text">{{ data().states.summaryNotReady }}</p>
   }
 </section>

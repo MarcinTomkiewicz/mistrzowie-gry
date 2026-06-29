@@ -1,15 +1,15 @@
 <section class="mg-card flex-col-start-stretch gap-md w-100">
   <h2 class="mg-section__title mg-section__title--sm m-0">
-    {{ sections().gm }}
+    {{ data().sections.gm }}
   </h2>
 
-  @if (!visibleGms().length) {
-    <p class="muted-text">{{ states().emptyGms }}</p>
+  @if (!data().visibleGms.length) {
+    <p class="muted-text">{{ data().states.emptyGms }}</p>
   }
 
   <app-gm-profiles
-    [profiles]="visibleGms()"
-    [selectedProfileId]="selectedGmId()"
+    [profiles]="data().visibleGms"
+    [selectedProfileId]="state().selectedGmId"
     (profileSelected)="gmSelected.emit($event.profile.id)"
   />
 </section>
