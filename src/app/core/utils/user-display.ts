@@ -1,3 +1,4 @@
+import { IGmPublicProfile } from '../interfaces/i-gm-public-profile';
 import { IUser } from '../interfaces/i-user';
 
 export function getUserDisplayName(
@@ -11,4 +12,8 @@ export function getUserDisplayName(
   const nickname = user.nickname?.trim() || '';
 
   return user.useNickname ? nickname || firstName : firstName || nickname;
+}
+
+export function getGmPublicProfileDisplayName(gm: IGmPublicProfile): string {
+  return getUserDisplayName(gm.user) || gm.user.email;
 }

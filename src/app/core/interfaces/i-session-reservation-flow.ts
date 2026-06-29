@@ -65,3 +65,13 @@ export interface ISessionReservationSummaryPreview {
   requiresManualQuote: boolean;
   grossTotalPln: number | null;
 }
+
+export interface ISessionReservationAddonCustomerDetailsChange {
+  slug: SessionAddonProductSlug;
+  customerDetails: string | null;
+}
+
+export interface ISessionReservationAddonQuantityChange {
+  slug: SessionAddonProductSlug;
+  quantity: number | null;
+}

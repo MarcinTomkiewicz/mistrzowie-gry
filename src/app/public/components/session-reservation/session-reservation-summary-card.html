@@ -1,0 +1,50 @@
+<section class="mg-card w-100">
+  <h2 class="mg-section__title mg-section__title--sm">
+    {{ sections().summary }}
+  </h2>
+
+  @if (summary(); as preview) {
+    @let gm = selectedGm();
+
+    <dl class="m-0 flex-col-start-stretch gap-sm">
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ sections().offer }}</dt>
+        <dd class="m-0">{{ preview.baseProduct.name }}</dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ sections().gm }}</dt>
+        <dd class="m-0">
+          {{ gm ? gmName(gm) : "" }}
+        </dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ sections().system }}</dt>
+        <dd class="m-0">{{ selectedSystem()?.name }}</dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ labels().selectedSlot }}</dt>
+        <dd class="m-0">
+          {{ state().selectedDate }} {{ state().selectedStartTime }}
+        </dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ labels().manualQuote }}</dt>
+        <dd class="m-0">
+          {{
+            preview.requiresManualQuote
+              ? states().manualQuoteRequired
+              : states().fixedPrice
+          }}
+        </dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ labels().grossTotal }}</dt>
+        <dd class="m-0">
+          {{ grossTotalLabel(preview.grossTotalPln) }}
+        </dd>
+      </div>
+    </dl>
+  } @else {
+    <p class="muted-text">{{ states().summaryNotReady }}</p>
+  }
+</section>

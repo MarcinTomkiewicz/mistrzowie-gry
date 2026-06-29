@@ -1,6 +1,26 @@
+import { SESSION_RESERVATION_CONFIG } from '../configs/session-reservation.config';
 import { ISessionBookingProduct } from '../interfaces/i-session-booking-product';
 import { SessionReservationAddonDetailsMap } from '../interfaces/i-session-reservation-flow';
 import { SessionAddonProductSlug } from '../types/session-booking-product';
+import { formatMoney } from './pricing';
+
+export function formatSessionBookingProductPriceLabel(
+  product: ISessionBookingProduct,
+  labels: { manualQuoteRequired: string },
+): string {
+  if (product.requiresManualQuote) {
+    return labels.manualQuoteRequired;
+  }
+
+  if (product.pricePercent !== null) {
+    return `+${product.pricePercent}%`;
+  }
+
+  return (
+    formatMoney(product.grossPricePln, SESSION_RESERVATION_CONFIG.currency) ??
+    labels.manualQuoteRequired
+  );
+}
 
 export function calculateProductsGrossTotal(
   baseProduct: ISessionBookingProduct,

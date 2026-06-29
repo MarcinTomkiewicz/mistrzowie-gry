@@ -1,0 +1,49 @@
+{
+  "seo": {
+    "title": "Rezerwacja sesji RPG | Mistrzowie Gry",
+    "description": "Wybierz Mistrza Gry, system, termin i dodatki do sesji RPG."
+  },
+  "hero": {
+    "title": "Rezerwacja sesji RPG",
+    "subtitle": "Wybierz Mistrza Gry, system i termin. Na tym etapie pokazujemy podgląd rezerwacji bez zapisu."
+  },
+  "sections": {
+    "offer": "Tryb i produkt",
+    "gm": "Mistrz Gry",
+    "system": "System",
+    "slot": "Termin",
+    "contact": "Dane kontaktowe",
+    "addons": "Dodatki",
+    "summary": "Podsumowanie"
+  },
+  "labels": {
+    "customerName": "Imię i nazwisko",
+    "customerEmail": "E-mail",
+    "customerPhone": "Telefon",
+    "playersCount": "Liczba graczy",
+    "message": "Wiadomość dla Mistrza Gry",
+    "createCharactersAtTable": "Chcemy tworzyć postacie przy stole",
+    "provideCharacterGuidelines": "Mamy wytyczne do postaci",
+    "characterGuidelines": "Wytyczne do postaci",
+    "extraNotes": "Dodatkowe informacje",
+    "customServicesRequest": "Opis zapytania do wyceny",
+    "addonDetails": "Szczegóły dodatku",
+    "addonQuantity": "Ilość",
+    "entitlement": "Pakiet lub abonament",
+    "manualQuote": "Wycena",
+    "grossTotal": "Suma brutto",
+    "selectedSlot": "Wybrany termin"
+  },
+  "states": {
+    "emptyGms": "Brak publicznych Mistrzów Gry.",
+    "selectGmFirst": "Wybierz Mistrza Gry, aby zobaczyć prowadzone systemy.",
+    "emptySystemsForGm": "Wybrany Mistrz Gry nie ma obecnie publicznych systemów.",
+    "selectGmForSlots": "Wybierz Mistrza Gry, aby zobaczyć dostępne terminy.",
+    "emptySlotsForGm": "Brak terminów dla wybranego Mistrza Gry w aktualnym zakresie.",
+    "emptyAddons": "Brak dostępnych dodatków.",
+    "emptyEntitlements": "Brak aktywnych pakietów dla podanego e-maila.",
+    "summaryNotReady": "Uzupełnij wymagane dane, aby zobaczyć podsumowanie.",
+    "manualQuoteRequired": "Wymaga wyceny",
+    "fixedPrice": "Cena stała"
+  }
+}

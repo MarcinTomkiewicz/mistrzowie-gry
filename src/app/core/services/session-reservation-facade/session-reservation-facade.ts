@@ -1,7 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, tap } from 'rxjs';
 
-import { SESSION_RESERVATION_CONFIG } from '../../configs/session-reservation.config';
 import {
   ICustomerSessionEntitlement,
   ICustomerSessionEntitlementLookup,
@@ -22,7 +21,10 @@ import {
   SESSION_BOOKING_MODES,
   SessionBookingMode,
 } from '../../types/session-booking-mode';
-import { SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG } from '../../types/session-booking-product';
+import {
+  SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG,
+  SessionReservationBaseProductSlug,
+} from '../../types/session-booking-product';
 import {
   SESSION_RESERVATION_FLOW_MODES,
   SessionReservationFlowMode,
@@ -88,6 +90,11 @@ export class SessionReservationFacade {
     );
   }
 
+  clearCustomerEntitlements(): void {
+    this.customerEntitlements.set([]);
+    this.store.selectCustomerEntitlement(null);
+  }
+
   loadAvailableSlotsForSelectedGm(
     fromIso: string,
     toIsoExclusive: string,
@@ -136,25 +143,9 @@ export class SessionReservationFacade {
     this.nextSlotsForSelectedSystem.set([]);
   }
 
-  selectBookingMode(bookingMode: SessionBookingMode): void {
-    const previousBaseProductSlug = this.store.selectedBaseProductSlug();
-
-    this.store.setBookingMode(bookingMode);
-
-    if (bookingMode === SESSION_BOOKING_MODES.CustomQuote) {
-      this.store.selectBaseProduct(
-        SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG,
-      );
-      return;
-    }
-
-    if (
-      previousBaseProductSlug === SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG
-    ) {
-      this.store.selectBaseProduct(
-        SESSION_RESERVATION_CONFIG.defaultBaseProductSlug,
-      );
-    }
+  selectBaseProduct(product: ISessionBookingProduct): void {
+    this.store.setBookingMode(this.resolveBookingMode(product));
+    this.store.selectBaseProduct(product.slug as SessionReservationBaseProductSlug);
   }
 
   selectCustomerEntitlement(id: string | null): void {
@@ -328,5 +319,21 @@ export class SessionReservationFacade {
             state.addonDetails,
           ),
     };
+  }
+
+  private resolveBookingMode(product: ISessionBookingProduct): SessionBookingMode {
+    if (product.slug === SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG) {
+      return SESSION_BOOKING_MODES.CustomQuote;
+    }
+
+    if (product.monthlySessionsCount !== null) {
+      return SESSION_BOOKING_MODES.SubscriptionCredit;
+    }
+
+    if (product.includedSessionsCount !== null) {
+      return SESSION_BOOKING_MODES.PackageCredit;
+    }
+
+    return SESSION_BOOKING_MODES.SingleSession;
   }
 }

@@ -10,7 +10,7 @@ function toNumber(value: unknown): number | null {
   return null;
 }
 
-function formatMoney(value: unknown, currency: string): string | null {
+export function formatMoney(value: unknown, currency: string): string | null {
   const n = toNumber(value);
   if (n === null) return null;
   const decimals = n % 1 === 0 ? 0 : 2;

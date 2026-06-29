@@ -1,0 +1,77 @@
+@let data = vm();
+@let state = store.state();
+
+<section class="mg-section" [attr.aria-label]="data.hero.title">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">{{ data.hero.title }}</h1>
+      <p class="mg-section__subtitle">{{ data.hero.subtitle }}</p>
+    </header>
+
+    @if (data.loadError) {
+      <p class="status-text status-text--danger">{{ data.loadError }}</p>
+    }
+
+    @if (data.isLoadingInitial) {
+      <p class="muted-text">{{ data.commonStatus.loading }}</p>
+    } @else {
+      <div class="mg-grid grid-cols-2 grid-cols-1-md gap-lg">
+        <app-session-reservation-choice-panel
+          [sections]="data.sections"
+          [states]="data.states"
+          [commonActions]="data.commonActions"
+          [commonStatus]="data.commonStatus"
+          [state]="state"
+          [baseProducts]="data.baseProducts"
+          [visibleGms]="data.visibleGms"
+          [systemsForSelectedGm]="data.systemsForSelectedGm"
+          [availableSlots]="data.availableSlots"
+          [isLoadingSystems]="data.isLoadingSystems"
+          [isLoadingSlots]="data.isLoadingSlots"
+          (baseProductSelected)="selectBaseProduct($event)"
+          (gmSelected)="selectGm($event)"
+          (systemSelected)="selectSystem($event)"
+          (slotsRefresh)="loadSlots()"
+          (slotSelected)="selectSlot($event)"
+        />
+
+        <div class="flex-col-start-start gap-lg">
+          <app-session-reservation-details-panel
+            [sections]="data.sections"
+            [labels]="data.labels"
+            [states]="data.states"
+            [commonActions]="data.commonActions"
+            [state]="state"
+            [contactForm]="contactForm"
+            [gmExtraForm]="gmExtraForm"
+            [provideCharacterGuidelinesControl]="
+              gmExtraForm.controls.provideCharacterGuidelines
+            "
+            [playersCountControl]="playersCountControl"
+            [customServicesRequestControl]="customServicesRequestControl"
+            [addonProducts]="data.addonProducts"
+            [customerEntitlements]="data.customerEntitlements"
+            [requiresManualQuote]="data.requiresManualQuote"
+            [requiresCustomerEntitlement]="data.requiresCustomerEntitlement"
+            [isLoadingEntitlements]="data.isLoadingEntitlements"
+            (entitlementsRefresh)="refreshEntitlements()"
+            (customerEntitlementSelected)="selectCustomerEntitlement($event)"
+            (addonToggled)="toggleAddon($event)"
+            (addonCustomerDetailsChanged)="setAddonCustomerDetails($event)"
+            (addonQuantityChanged)="setAddonQuantity($event)"
+          />
+
+          <app-session-reservation-summary-card
+            [sections]="data.sections"
+            [labels]="data.labels"
+            [states]="data.states"
+            [state]="state"
+            [summary]="data.summary"
+            [selectedGm]="data.selectedGm"
+            [selectedSystem]="data.selectedSystem"
+          />
+        </div>
+      </div>
+    }
+  </div>
+</section>
