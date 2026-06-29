@@ -73,7 +73,6 @@ export class SessionReservationWizardController {
     this.facade.clearSlot();
     this.store.selectSystem(systemId);
     this.loadSlots();
-    this.goToWizardStep(SESSION_RESERVATION_WIZARD_STEPS.Slot);
   }
 
   loadSlots(): void {
@@ -148,6 +147,17 @@ export class SessionReservationWizardController {
     }
 
     this.activeWizardStep.set(step);
+  }
+
+  goToWizardStepFromStepper(step: number | undefined): void {
+    if (
+      this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.System &&
+      step === SESSION_RESERVATION_WIZARD_STEPS.Slot
+    ) {
+      return;
+    }
+
+    this.goToWizardStep(step);
   }
 
   goToPreviousWizardStep(): void {

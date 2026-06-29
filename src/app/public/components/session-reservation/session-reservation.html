@@ -1,7 +1,10 @@
 @let data = vm();
 @let state = store.state();
 
-<section class="mg-section" [attr.aria-label]="data.hero.title">
+<section
+  class="mg-section mg-section--full"
+  [attr.aria-label]="data.hero.title"
+>
   <div class="mg-container">
     <app-loading-overlay
       [visible]="data.isLoadingInitial"
@@ -21,7 +24,7 @@
       <p-stepper
         [value]="wizard.activeWizardStep()"
         [linear]="true"
-        (valueChange)="wizard.goToWizardStep($event)"
+        (valueChange)="wizard.goToWizardStepFromStepper($event)"
       >
         <p-step-list>
           <p-step [value]="wizard.wizardSteps.Offer">
