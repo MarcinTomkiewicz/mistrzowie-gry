@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -10,12 +9,12 @@ import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
-import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import {
   createOrganizationRef,
   createPageStructuredData,
 } from '../../../core/utils/structured-data';
+import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createOurTeamI18n } from './our-team.i18n';
@@ -23,9 +22,8 @@ import { createOurTeamI18n } from './our-team.i18n';
 @Component({
   selector: 'app-our-team',
   standalone: true,
-  imports: [CommonModule, LoadingOverlay, GmProfileDialog],
+  imports: [LoadingOverlay, GmProfiles, GmProfileDialog],
   templateUrl: './our-team.html',
-  styleUrl: './our-team.scss',
   providers: [provideTranslocoScope('ourTeam', 'common')],
 })
 export class OurTeam {
@@ -35,7 +33,6 @@ export class OurTeam {
   private readonly pageUrl = buildSiteUrl('/our-team');
 
   readonly i18n = createOurTeamI18n();
-  readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
 
   readonly isDialogVisible = signal(false);
   readonly selectedProfile = signal<IGmPublicProfile | null>(null);
@@ -58,17 +55,7 @@ export class OurTeam {
 
     return {
       page: this.i18n.page(),
-      items: profiles.map((profile) => ({
-        profile,
-        displayName: this.gmRead.getDisplayName(profile),
-        imageUrl: this.getImageUrl(profile),
-        languageFlags:
-          profile.profile.languages?.map((language) => ({
-            id: language.id,
-            label: language.label,
-            className: resolveLanguageFlagClass(language.flagCode) ?? '',
-          })) ?? [],
-      })),
+      profiles,
     };
   });
 

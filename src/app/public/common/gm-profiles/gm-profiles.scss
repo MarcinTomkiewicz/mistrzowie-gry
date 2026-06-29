@@ -2,7 +2,7 @@
 @use "/abstracts/variables" as v;
 @use "sass:map";
 
-.our-team-grid {
+.gm-profiles {
   @include m.mg-grid(
     4,
     map.get(v.$spacings, "lg"),
@@ -14,11 +14,13 @@
   justify-items: center;
 }
 
-.mg-card {
+.gm-profiles__card {
   max-width: 270px;
+  width: 100%;
+  text-align: left;
 }
 
-.our-team-card__image-wrap {
+.gm-profiles__image-wrap {
   width: min(100%, 18rem);
   aspect-ratio: 1 / 1;
   overflow: hidden;
@@ -29,7 +31,7 @@
   background: v.$color-bg;
 }
 
-.our-team-card__image {
+.gm-profiles__image {
   display: block;
   width: 100%;
   height: 100%;
@@ -37,7 +39,7 @@
 }
 
 @include m.down("sm") {
-  .our-team-card__image-wrap {
+  .gm-profiles__image-wrap {
     width: min(100%, 14rem);
   }
 }

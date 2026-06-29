@@ -1,0 +1,48 @@
+<div class="gm-profiles">
+  @for (item of items(); track item.profile.profile.id) {
+    <button
+      type="button"
+      class="gm-profiles__card mg-choice-card"
+      [class.active]="selectedProfileId() === item.profile.profile.id"
+      (click)="profileSelected.emit(item.profile)"
+    >
+      <div class="gm-profiles__image-wrap">
+        <img
+          class="gm-profiles__image"
+          [src]="item.imageUrl"
+          [alt]="item.displayName"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      <div class="flex-col-start-stretch gap-sm">
+        <div class="flex-row-between-center gap-sm">
+          <h2 class="mg-section__title mg-section__title--sm m-0">
+            {{ item.displayName }}
+          </h2>
+
+          @if (item.languageFlags.length) {
+            <div class="flex-row-start-center gap-xs">
+              @for (language of item.languageFlags; track language.id) {
+                @if (language.className) {
+                  <span
+                    [class]="language.className"
+                    [attr.aria-label]="language.label"
+                    [attr.title]="language.label"
+                  ></span>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        <p
+          class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full truncate-2 min-h-lines-2"
+        >
+          {{ item.lead }}
+        </p>
+      </div>
+    </button>
+  }
+</div>

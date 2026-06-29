@@ -18,6 +18,7 @@
   },
   "labels": {
     "reservationKind": "Rezerwuję sesję RPG",
+    "showSelectedGmProfile": "Pokaż profil wybranego MG",
     "customerName": "Imię i nazwisko",
     "customerEmail": "E-mail",
     "customerPhone": "Telefon",

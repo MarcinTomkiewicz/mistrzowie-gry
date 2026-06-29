@@ -31,6 +31,7 @@ import { createSessionReservationI18n } from './session-reservation.i18n';
 import { SessionReservationSlotPanel } from './session-reservation-slot-panel';
 import { SessionReservationSummaryCard } from './session-reservation-summary-card';
 import { SessionReservationSystemPanel } from './session-reservation-system-panel';
+import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 
 @Component({
   selector: 'app-session-reservation',
@@ -46,6 +47,7 @@ import { SessionReservationSystemPanel } from './session-reservation-system-pane
     SessionReservationSlotPanel,
     SessionReservationSummaryCard,
     SessionReservationSystemPanel,
+    GmProfileDialog,
   ],
   templateUrl: './session-reservation.html',
   providers: [provideTranslocoScope('sessionReservation', 'common')],
@@ -64,6 +66,7 @@ export class SessionReservation implements OnInit {
   readonly isLoadingSystems = signal(false);
   readonly isLoadingSlots = signal(false);
   readonly isLoadingEntitlements = signal(false);
+  readonly isGmProfileDialogVisible = signal(false);
   readonly loadError = signal<string | null>(null);
   readonly wizardSteps = SESSION_RESERVATION_WIZARD_STEPS;
   readonly activeWizardStep = signal<SessionReservationWizardStep>(
@@ -233,8 +236,6 @@ export class SessionReservation implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.goToWizardStep(SESSION_RESERVATION_WIZARD_STEPS.System);
-
           if (this.store.selectedSystemId()) {
             this.loadSlots();
           }
@@ -324,6 +325,18 @@ export class SessionReservation implements OnInit {
 
   selectCustomerEntitlement(id: string | null): void {
     this.facade.selectCustomerEntitlement(id);
+  }
+
+  openSelectedGmProfileDialog(): void {
+    if (!this.selectedGm()) {
+      return;
+    }
+
+    this.isGmProfileDialogVisible.set(true);
+  }
+
+  onGmProfileDialogVisibleChange(visible: boolean): void {
+    this.isGmProfileDialogVisible.set(visible);
   }
 
   toggleAddon(slug: SessionAddonProductSlug): void {

@@ -159,25 +159,47 @@
       </p-stepper>
 
       <div class="flex-row-between-center flex-col-sm gap-sm mt-lg">
-        <p-button
-          type="button"
-          severity="secondary"
-          [outlined]="true"
-          [label]="data.commonActions.previous"
-          [disabled]="activeWizardStep() === wizardSteps.Offer"
-          (onClick)="goToPreviousWizardStep()"
-        />
-
-        @if (activeWizardStep() !== wizardSteps.Details) {
+        <div class="flex-row-start-center">
           <p-button
             type="button"
-            severity="success"
-            [label]="data.commonActions.next"
-            [disabled]="isNextWizardStepDisabled()"
-            (onClick)="goToNextWizardStep()"
+            severity="secondary"
+            [outlined]="true"
+            [label]="data.commonActions.previous"
+            [disabled]="activeWizardStep() === wizardSteps.Offer"
+            (onClick)="goToPreviousWizardStep()"
           />
-        }
+        </div>
+
+        <div class="flex-row-end-center gap-sm">
+          @if (activeWizardStep() === wizardSteps.Gm) {
+            <p-button
+              type="button"
+              severity="secondary"
+              [outlined]="true"
+              [label]="data.labels.showSelectedGmProfile"
+              [disabled]="!data.selectedGm"
+              (onClick)="openSelectedGmProfileDialog()"
+            />
+          }
+
+          @if (activeWizardStep() !== wizardSteps.Details) {
+            <p-button
+              type="button"
+              severity="success"
+              [label]="data.commonActions.next"
+              [disabled]="isNextWizardStepDisabled()"
+              (onClick)="goToNextWizardStep()"
+            />
+          }
+        </div>
       </div>
     }
+
+    <app-gm-profile-dialog
+      [visible]="isGmProfileDialogVisible()"
+      [profile]="selectedGm()"
+      [profiles]="data.visibleGms"
+      (visibleChange)="onGmProfileDialogVisibleChange($event)"
+    />
   </div>
 </section>

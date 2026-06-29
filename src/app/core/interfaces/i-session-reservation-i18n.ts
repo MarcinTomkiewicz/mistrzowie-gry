@@ -24,6 +24,7 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
   };
   labels: {
     reservationKind: string;
+    showSelectedGmProfile: string;
     customerName: string;
     customerEmail: string;
     customerPhone: string;
