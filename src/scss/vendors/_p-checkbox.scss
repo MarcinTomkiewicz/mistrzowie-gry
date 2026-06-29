@@ -1,0 +1,10 @@
+@use "../abstracts/variables" as v;
+
+:where(.mg-form, form, .mg-card form) {
+  p-checkbox + label,
+  .p-checkbox + label {
+    color: var(--mg-form-label);
+    cursor: pointer;
+    line-height: v.$line-height-base;
+  }
+}

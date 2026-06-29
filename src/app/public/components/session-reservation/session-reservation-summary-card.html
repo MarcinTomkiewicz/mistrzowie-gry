@@ -1,5 +1,5 @@
-<section class="mg-card w-100">
-  <h2 class="mg-section__title mg-section__title--sm">
+<section class="mg-card flex-col-start-stretch gap-md w-100">
+  <h2 class="mg-section__title mg-section__title--sm m-0">
     {{ sections().summary }}
   </h2>
 
@@ -9,7 +9,7 @@
     <dl class="m-0 flex-col-start-stretch gap-sm">
       <div class="flex-row-between-center gap-sm">
         <dt>{{ sections().offer }}</dt>
-        <dd class="m-0">{{ preview.baseProduct.name }}</dd>
+        <dd class="m-0">{{ labels().reservationKind }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
         <dt>{{ sections().gm }}</dt>

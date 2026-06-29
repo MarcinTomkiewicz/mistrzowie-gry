@@ -1,0 +1,45 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+.p-stepper {
+  color: var(--mg-color-text);
+}
+
+.p-steplist {
+  gap: map.get(v.$spacings, "sm");
+}
+
+.p-step-header {
+  color: var(--mg-form-label);
+}
+
+.p-step-number {
+  background: var(--mg-form-bg);
+  color: var(--mg-form-text);
+  border-color: var(--mg-form-border);
+}
+
+.p-step-title {
+  color: var(--mg-form-label);
+}
+
+.p-step:not(.p-disabled) .p-step-header:hover .p-step-number,
+.p-step.p-step-active .p-step-number {
+  background: var(--mg-form-bg-focus);
+  color: var(--mg-form-text);
+  border-color: var(--mg-form-border-focus);
+}
+
+.p-step.p-step-active .p-step-title {
+  color: var(--mg-form-text);
+}
+
+.p-stepper-separator {
+  background: var(--mg-form-border);
+}
+
+.p-steppanels {
+  background: transparent;
+  color: var(--mg-color-text);
+  padding: map.get(v.$spacings, "lg") 0 0;
+}

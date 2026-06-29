@@ -1,0 +1,43 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100">
+  <div class="flex-row-between-center flex-col-sm gap-sm">
+    <h2 class="mg-section__title mg-section__title--sm m-0">
+      {{ sections().slot }}
+    </h2>
+    <p-button
+      type="button"
+      severity="secondary"
+      size="small"
+      icon="pi pi-refresh"
+      [label]="commonActions().refresh"
+      [loading]="isLoadingSlots()"
+      [disabled]="!selectedGmId() || isLoadingSlots()"
+      (onClick)="slotsRefresh.emit()"
+    />
+  </div>
+
+  @if (isLoadingSlots()) {
+    <p class="muted-text">{{ commonStatus().loading }}</p>
+  } @else if (!selectedGmId()) {
+    <p class="muted-text">{{ states().selectGmForSlots }}</p>
+  } @else if (!availableSlots().length) {
+    <p class="muted-text">{{ states().emptySlotsForGm }}</p>
+  }
+
+  <div class="mg-grid-auto-fit gap-sm">
+    @for (slot of availableSlots(); track slot.startsAt) {
+      <button
+        type="button"
+        class="mg-choice-card w-100 text-left"
+        [class.active]="
+          selectedDate() === slot.date && selectedStartTime() === slot.startTime
+        "
+        (click)="slotSelected.emit(slot)"
+      >
+        <span class="flex-row-between-center gap-sm">
+          <strong>{{ slotLabel(slot) }}</strong>
+          <span>{{ slot.durationHours }} h</span>
+        </span>
+      </button>
+    }
+  </div>
+</section>

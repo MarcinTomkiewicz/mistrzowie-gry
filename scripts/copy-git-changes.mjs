@@ -3,8 +3,8 @@ import { basename, dirname, extname, join, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 const OUTPUT_DIR = '.gitchanges';
-const INCLUDED_EXTENSIONS = new Set(['.ts', '.html', '.json']);
-const EXCLUDED_FILENAMES = new Set(['pets.ts']);
+const INCLUDED_EXTENSIONS = new Set(['.ts', '.html', '.json', '.scss']);
+const EXCLUDED_FILENAMES = new Set(['spec.ts']);
 
 function git(args) {
   return execFileSync('git', args, {

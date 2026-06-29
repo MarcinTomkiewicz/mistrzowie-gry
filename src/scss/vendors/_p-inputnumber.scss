@@ -1,0 +1,29 @@
+:where(.mg-form, form, .mg-card form) {
+  .p-inputnumber {
+    width: 100%;
+  }
+
+  .p-inputnumber .p-inputtext {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-text);
+    border-color: var(--mg-form-border);
+  }
+
+  .p-inputnumber-button {
+    background: var(--mg-form-bg);
+    color: var(--mg-form-label);
+    border-color: var(--mg-form-border);
+  }
+
+  .p-inputnumber:not(.p-disabled):hover .p-inputtext,
+  .p-inputnumber:not(.p-disabled):hover .p-inputnumber-button {
+    background: var(--mg-form-bg-hover);
+    border-color: var(--mg-form-border-hover);
+  }
+
+  .p-inputnumber:focus-within .p-inputtext,
+  .p-inputnumber:focus-within .p-inputnumber-button {
+    background: var(--mg-form-bg-focus);
+    border-color: var(--mg-form-border-focus);
+  }
+}

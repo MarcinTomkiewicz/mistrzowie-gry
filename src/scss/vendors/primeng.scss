@@ -6,7 +6,9 @@
 @use "./p-accordion";
 @use "./p-custom-icons";
 @use "./p-inputtext";
+@use "./p-inputnumber";
 @use "./p-textarea";
+@use "./p-checkbox";
 @use "./p-select";
 @use "./p-labels";
 @use "./p-form-messages";
@@ -14,6 +16,7 @@
 @use "./p-confirmpopup";
 @use "./p-password";
 @use "./p-tabs";
+@use "./p-stepper";
 @use "./p_fileupload";
 @use "./p-slider";
 @use "./p-paginator";

@@ -23,6 +23,7 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     summary: string;
   };
   labels: {
+    reservationKind: string;
     customerName: string;
     customerEmail: string;
     customerPhone: string;

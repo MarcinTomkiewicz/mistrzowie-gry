@@ -8,15 +8,16 @@
     "subtitle": "Wybierz Mistrza Gry, system i termin. Na tym etapie pokazujemy podgląd rezerwacji bez zapisu."
   },
   "sections": {
-    "offer": "Tryb i produkt",
+    "offer": "Rodzaj rezerwacji",
     "gm": "Mistrz Gry",
     "system": "System",
     "slot": "Termin",
     "contact": "Dane kontaktowe",
-    "addons": "Dodatki",
+    "addons": "Opcjonalne dodatki do rezerwacji",
     "summary": "Podsumowanie"
   },
   "labels": {
+    "reservationKind": "Rezerwuję sesję RPG",
     "customerName": "Imię i nazwisko",
     "customerEmail": "E-mail",
     "customerPhone": "Telefon",

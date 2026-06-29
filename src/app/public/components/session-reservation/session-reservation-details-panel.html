@@ -1,11 +1,14 @@
-<div class="flex-col-start-start gap-lg">
-  <section class="mg-card w-100">
-    <h2 class="mg-section__title mg-section__title--sm">
+<div class="mg-form flex-col-start-stretch gap-lg">
+  <section class="mg-card flex-col-start-stretch gap-md w-100">
+    <h2 class="mg-section__title mg-section__title--sm m-0">
       {{ sections().contact }}
     </h2>
 
-    <form class="flex-col-start-stretch gap-sm" [formGroup]="contactForm()">
-      <p-iftalabel>
+    <form
+      class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100"
+      [formGroup]="contactForm()"
+    >
+      <p-iftalabel class="w-100">
         <input
           class="w-100"
           pInputText
@@ -17,7 +20,7 @@
         <label for="customerName">{{ labels().customerName }}</label>
       </p-iftalabel>
 
-      <p-iftalabel>
+      <p-iftalabel class="w-100">
         <input
           class="w-100"
           pInputText
@@ -29,7 +32,7 @@
         <label for="customerEmail">{{ labels().customerEmail }}</label>
       </p-iftalabel>
 
-      <p-iftalabel>
+      <p-iftalabel class="w-100">
         <input
           class="w-100"
           pInputText
@@ -40,12 +43,12 @@
         />
         <label for="customerPhone">{{ labels().customerPhone }}</label>
       </p-iftalabel>
-    </form>
 
-    <div class="flex-col-start-stretch gap-sm mt-md">
-      <p-iftalabel>
+      <p-iftalabel class="w-100">
         <p-inputnumber
           class="w-100"
+          styleClass="w-100"
+          inputStyleClass="w-100"
           inputId="playersCount"
           [formControl]="playersCountControl()"
           [min]="1"
@@ -54,142 +57,79 @@
         />
         <label for="playersCount">{{ labels().playersCount }}</label>
       </p-iftalabel>
+    </form>
 
-      <form class="flex-col-start-stretch gap-sm" [formGroup]="gmExtraForm()">
-        <p-iftalabel>
+    <form class="flex-col-start-stretch gap-md" [formGroup]="gmExtraForm()">
+      <p-iftalabel class="w-100">
+        <textarea
+          class="w-100"
+          pTextarea
+          id="message"
+          formControlName="message"
+          [rows]="3"
+          [autoResize]="true"
+        ></textarea>
+        <label for="message">{{ labels().message }}</label>
+      </p-iftalabel>
+
+      <div class="flex-row-start-start gap-sm">
+        <p-checkbox
+          inputId="createCharactersAtTable"
+          formControlName="createCharactersAtTable"
+          [binary]="true"
+        />
+        <label for="createCharactersAtTable">
+          {{ labels().createCharactersAtTable }}
+        </label>
+      </div>
+
+      <div class="flex-row-start-start gap-sm">
+        <p-checkbox
+          inputId="provideCharacterGuidelines"
+          formControlName="provideCharacterGuidelines"
+          [binary]="true"
+        />
+        <label for="provideCharacterGuidelines">
+          {{ labels().provideCharacterGuidelines }}
+        </label>
+      </div>
+
+      @if (provideCharacterGuidelinesControl().value) {
+        <p-iftalabel class="w-100">
           <textarea
             class="w-100"
             pTextarea
-            id="message"
-            formControlName="message"
+            id="characterGuidelines"
+            formControlName="characterGuidelines"
             [rows]="3"
             [autoResize]="true"
           ></textarea>
-          <label for="message">{{ labels().message }}</label>
+          <label for="characterGuidelines">
+            {{ labels().characterGuidelines }}
+          </label>
         </p-iftalabel>
-
-        <label class="flex-row-start-center gap-sm">
-          <p-checkbox
-            formControlName="createCharactersAtTable"
-            [binary]="true"
-          />
-          <span>{{ labels().createCharactersAtTable }}</span>
-        </label>
-
-        <label class="flex-row-start-center gap-sm">
-          <p-checkbox
-            formControlName="provideCharacterGuidelines"
-            [binary]="true"
-          />
-          <span>{{ labels().provideCharacterGuidelines }}</span>
-        </label>
-
-        @if (provideCharacterGuidelinesControl().value) {
-          <p-iftalabel>
-            <textarea
-              class="w-100"
-              pTextarea
-              id="characterGuidelines"
-              formControlName="characterGuidelines"
-              [rows]="3"
-              [autoResize]="true"
-            ></textarea>
-            <label for="characterGuidelines">
-              {{ labels().characterGuidelines }}
-            </label>
-          </p-iftalabel>
-        }
-
-        <p-iftalabel>
-          <textarea
-            class="w-100"
-            pTextarea
-            id="extraNotes"
-            formControlName="extraNotes"
-            [rows]="3"
-            [autoResize]="true"
-          ></textarea>
-          <label for="extraNotes">{{ labels().extraNotes }}</label>
-        </p-iftalabel>
-      </form>
-    </div>
-  </section>
-
-  <section class="mg-card w-100">
-    <h2 class="mg-section__title mg-section__title--sm">
-      {{ sections().addons }}
-    </h2>
-
-    @if (!addonProducts().length) {
-      <p class="muted-text">{{ states().emptyAddons }}</p>
-    }
-
-    <div class="flex-col-start-stretch gap-sm">
-      @for (addon of addonProducts(); track addon.id) {
-        <button
-          type="button"
-          class="mg-card w-100 text-left"
-          [class.active]="isAddonSelected(addon)"
-          (click)="toggleAddon(addon)"
-        >
-          <span class="flex-row-between-center gap-sm">
-            <strong>{{ addon.name }}</strong>
-            <span>{{ productPriceLabel(addon, states()) }}</span>
-          </span>
-          @if (addon.description) {
-            <span class="muted-text d-block mt-xs">
-              {{ addon.description }}
-            </span>
-          }
-        </button>
-
-        @if (isAddonSelected(addon)) {
-          @if (requiresAddonDetails(addon)) {
-            <p-iftalabel>
-              <textarea
-                #addonDetailsInput
-                class="w-100"
-                pTextarea
-                [id]="'addonDetails-' + addon.slug"
-                [value]="addonDetailsValue(addon)"
-                [rows]="3"
-                [autoResize]="true"
-                (input)="setAddonCustomerDetails(addon, addonDetailsInput.value)"
-              ></textarea>
-              <label [for]="'addonDetails-' + addon.slug">
-                {{ addon.metadata.customerDetailsLabel || labels().addonDetails }}
-              </label>
-            </p-iftalabel>
-          }
-
-          @if (requiresAddonQuantity(addon)) {
-            <p-iftalabel>
-              <input
-                #addonQuantityInput
-                class="w-100"
-                pInputText
-                [id]="'addonQuantity-' + addon.slug"
-                type="number"
-                min="1"
-                [value]="addonQuantityValue(addon)"
-                (input)="setAddonQuantity(addon, addonQuantityInput.valueAsNumber)"
-              />
-              <label [for]="'addonQuantity-' + addon.slug">
-                {{ addon.metadata.quantityLabel || labels().addonQuantity }}
-              </label>
-            </p-iftalabel>
-          }
-        }
       }
-    </div>
+
+      <p-iftalabel class="w-100">
+        <textarea
+          class="w-100"
+          pTextarea
+          id="extraNotes"
+          formControlName="extraNotes"
+          [rows]="3"
+          [autoResize]="true"
+        ></textarea>
+        <label for="extraNotes">{{ labels().extraNotes }}</label>
+      </p-iftalabel>
+    </form>
   </section>
 
   @if (requiresManualQuote()) {
-    <section class="mg-card w-100">
-      <h2 class="mg-section__title mg-section__title--sm">
+    <section class="mg-card flex-col-start-stretch gap-md w-100">
+      <h2 class="mg-section__title mg-section__title--sm m-0">
         {{ labels().customServicesRequest }}
       </h2>
-      <p-iftalabel>
+      <p-iftalabel class="w-100">
         <textarea
           class="w-100"
           pTextarea
@@ -206,9 +146,9 @@
   }
 
   @if (requiresCustomerEntitlement()) {
-    <section class="mg-card w-100">
+    <section class="mg-card flex-col-start-stretch gap-md w-100">
       <div class="flex-row-between-center flex-col-sm gap-sm">
-        <h2 class="mg-section__title mg-section__title--sm">
+        <h2 class="mg-section__title mg-section__title--sm m-0">
           {{ labels().entitlement }}
         </h2>
         <p-button
@@ -226,18 +166,18 @@
         <p class="muted-text">{{ states().emptyEntitlements }}</p>
       }
 
-      <div class="flex-col-start-stretch gap-sm">
+      <div class="flex-col-start-stretch gap-md">
         @for (entitlement of customerEntitlements(); track entitlement.id) {
           <button
             type="button"
-            class="mg-card w-100 text-left"
+            class="mg-choice-card w-100 text-left"
             [class.active]="
               state().selectedCustomerEntitlementId === entitlement.id
             "
             (click)="customerEntitlementSelected.emit(entitlement.id)"
           >
             <strong>{{ entitlement.priceSnapshotJson.productName }}</strong>
-            <span class="muted-text d-block mt-xs">
+            <span class="muted-text d-block">
               {{ entitlement.customerEmail }}
             </span>
           </button>

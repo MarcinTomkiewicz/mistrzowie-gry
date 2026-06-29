@@ -1,0 +1,31 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100">
+  <h2 class="mg-section__title mg-section__title--sm m-0">
+    {{ sections().system }}
+  </h2>
+
+  @if (isLoadingSystems()) {
+    <p class="muted-text">{{ commonStatus().loading }}</p>
+  } @else if (!selectedGmId()) {
+    <p class="muted-text">{{ states().selectGmFirst }}</p>
+  } @else if (!systemsForSelectedGm().length) {
+    <p class="muted-text">{{ states().emptySystemsForGm }}</p>
+  }
+
+  <div class="flex-col-start-stretch gap-md">
+    @for (system of systemsForSelectedGm(); track system.id) {
+      <button
+        type="button"
+        class="mg-choice-card w-100 text-left"
+        [class.active]="selectedSystemId() === system.id"
+        (click)="systemSelected.emit(system.id)"
+      >
+        <strong>{{ system.name }}</strong>
+        @if (system.description) {
+          <span class="muted-text d-block truncate-2">
+            {{ system.description }}
+          </span>
+        }
+      </button>
+    }
+  </div>
+</section>

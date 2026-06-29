@@ -1,0 +1,38 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100">
+  <h2 class="mg-section__title mg-section__title--sm m-0">
+    {{ sections().gm }}
+  </h2>
+
+  @if (!visibleGms().length) {
+    <p class="muted-text">{{ states().emptyGms }}</p>
+  }
+
+  <div class="mg-grid-auto-fit gap-md">
+    @for (gm of visibleGms(); track gm.profile.id) {
+      <button
+        type="button"
+        class="mg-choice-card text-center max-w-300 mx-auto w-100"
+        [class.active]="selectedGmId() === gm.profile.id"
+        (click)="gmSelected.emit(gm.profile.id)"
+      >
+        <span class="image__preview image__preview--circle w-80 mx-auto">
+          <img
+            class="image__preview-image"
+            [src]="gmImageUrl(gm)"
+            [alt]="gmName(gm)"
+            loading="lazy"
+            decoding="async"
+          />
+        </span>
+        <strong class="mg-section__title mg-section__title--sm m-0">
+          {{ gmName(gm) }}
+        </strong>
+        @if (gmLead(gm)) {
+          <span class="muted-text d-block truncate-2 min-h-lines-2">
+            {{ gmLead(gm) }}
+          </span>
+        }
+      </button>
+    }
+  </div>
+</section>

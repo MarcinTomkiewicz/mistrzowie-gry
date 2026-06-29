@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "../abstracts/variables" as v;
 
 .mg-card {
@@ -5,20 +6,56 @@
   border: 1px solid v.$color-border;
   background: v.$color-bg-surface;
   box-shadow: v.$shadow-soft;
-  padding: 1rem;
+  padding: map.get(v.$spacings, "md");
 }
 
 .mg-card--legend {
   position: relative;
-  padding-top: 1.35rem;
+  padding-top: map.get(v.$spacings, "lg");
+}
+
+.mg-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: map.get(v.$spacings, "sm");
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-form-border;
+  background: v.$color-form-bg;
+  color: v.$color-text;
+  box-shadow: none;
+  padding: map.get(v.$spacings, "md");
+  cursor: pointer;
+  transition:
+    background-color v.$transition-fast,
+    border-color v.$transition-fast,
+    box-shadow v.$transition-fast;
+}
+
+.mg-choice-card:hover {
+  background: v.$color-form-bg-hover;
+  border-color: v.$color-form-border-hover;
+}
+
+.mg-choice-card:focus-visible {
+  outline: none;
+  background: v.$color-form-bg-focus;
+  border-color: v.$color-form-border-focus;
+  box-shadow: 0 0 0 3px v.$color-form-ring;
+}
+
+.mg-choice-card.active {
+  background: v.$color-form-bg-focus;
+  border-color: v.$color-form-border-focus;
+  box-shadow: 0 0 0 1px v.$color-form-border-focus;
 }
 
 .card-legend {
   position: absolute;
   top: 0;
-  left: 0.9rem;
+  left: map.get(v.$spacings, "md");
   transform: translateY(-50%);
-  padding: 0 0.45rem;
+  padding: 0 map.get(v.$spacings, "sm");
   background: v.$color-bg-surface;
   line-height: 1;
 }
