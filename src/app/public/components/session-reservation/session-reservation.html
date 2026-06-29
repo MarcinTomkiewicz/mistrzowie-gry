@@ -19,42 +19,42 @@
 
     @if (!data.isLoadingInitial) {
       <p-stepper
-        [value]="activeWizardStep()"
+        [value]="wizard.activeWizardStep()"
         [linear]="true"
-        (valueChange)="goToWizardStep($event)"
+        (valueChange)="wizard.goToWizardStep($event)"
       >
         <p-step-list>
-          <p-step [value]="wizardSteps.Offer">
+          <p-step [value]="wizard.wizardSteps.Offer">
             {{ data.sections.offer }}
           </p-step>
           <p-step
-            [value]="wizardSteps.Gm"
-            [disabled]="!canEnterWizardStep(wizardSteps.Gm)"
+            [value]="wizard.wizardSteps.Gm"
+            [disabled]="!wizard.canEnterWizardStep(wizard.wizardSteps.Gm)"
           >
             {{ data.sections.gm }}
           </p-step>
           <p-step
-            [value]="wizardSteps.System"
-            [disabled]="!canEnterWizardStep(wizardSteps.System)"
+            [value]="wizard.wizardSteps.System"
+            [disabled]="!wizard.canEnterWizardStep(wizard.wizardSteps.System)"
           >
             {{ data.sections.system }}
           </p-step>
           <p-step
-            [value]="wizardSteps.Slot"
-            [disabled]="!canEnterWizardStep(wizardSteps.Slot)"
+            [value]="wizard.wizardSteps.Slot"
+            [disabled]="!wizard.canEnterWizardStep(wizard.wizardSteps.Slot)"
           >
             {{ data.sections.slot }}
           </p-step>
           <p-step
-            [value]="wizardSteps.Details"
-            [disabled]="!canEnterWizardStep(wizardSteps.Details)"
+            [value]="wizard.wizardSteps.Details"
+            [disabled]="!wizard.canEnterWizardStep(wizard.wizardSteps.Details)"
           >
             {{ data.sections.summary }}
           </p-step>
         </p-step-list>
 
         <p-step-panels>
-          <p-step-panel [value]="wizardSteps.Offer">
+          <p-step-panel [value]="wizard.wizardSteps.Offer">
             <ng-template #content>
               <app-session-reservation-choice-panel
                 [sections]="data.sections"
@@ -74,19 +74,19 @@
             </ng-template>
           </p-step-panel>
 
-          <p-step-panel [value]="wizardSteps.Gm">
+          <p-step-panel [value]="wizard.wizardSteps.Gm">
             <ng-template #content>
               <app-session-reservation-gm-panel
                 [sections]="data.sections"
                 [states]="data.states"
                 [selectedGmId]="state.selectedGmId"
                 [visibleGms]="data.visibleGms"
-                (gmSelected)="selectGm($event)"
+                (gmSelected)="wizard.selectGm($event)"
               />
             </ng-template>
           </p-step-panel>
 
-          <p-step-panel [value]="wizardSteps.System">
+          <p-step-panel [value]="wizard.wizardSteps.System">
             <ng-template #content>
               <app-session-reservation-system-panel
                 [sections]="data.sections"
@@ -96,12 +96,12 @@
                 [selectedSystemId]="state.selectedSystemId"
                 [systemsForSelectedGm]="data.systemsForSelectedGm"
                 [isLoadingSystems]="data.isLoadingSystems"
-                (systemSelected)="selectSystem($event)"
+                (systemSelected)="wizard.selectSystem($event)"
               />
             </ng-template>
           </p-step-panel>
 
-          <p-step-panel [value]="wizardSteps.Slot">
+          <p-step-panel [value]="wizard.wizardSteps.Slot">
             <ng-template #content>
               <app-session-reservation-slot-panel
                 [sections]="data.sections"
@@ -113,13 +113,13 @@
                 [selectedStartTime]="state.selectedStartTime"
                 [availableSlots]="data.availableSlots"
                 [isLoadingSlots]="data.isLoadingSlots"
-                (slotsRefresh)="loadSlots()"
-                (slotSelected)="selectSlot($event)"
+                (slotsRefresh)="wizard.loadSlots()"
+                (slotSelected)="wizard.selectSlot($event)"
               />
             </ng-template>
           </p-step-panel>
 
-          <p-step-panel [value]="wizardSteps.Details">
+          <p-step-panel [value]="wizard.wizardSteps.Details">
             <ng-template #content>
               <div class="flex-col-start-stretch gap-lg">
                 <app-session-reservation-details-panel
@@ -139,7 +139,7 @@
                   [requiresManualQuote]="data.requiresManualQuote"
                   [requiresCustomerEntitlement]="data.requiresCustomerEntitlement"
                   [isLoadingEntitlements]="data.isLoadingEntitlements"
-                  (entitlementsRefresh)="refreshEntitlements()"
+                  (entitlementsRefresh)="wizard.refreshEntitlements()"
                   (customerEntitlementSelected)="selectCustomerEntitlement($event)"
                 />
 
@@ -165,13 +165,13 @@
             severity="secondary"
             [outlined]="true"
             [label]="data.commonActions.previous"
-            [disabled]="activeWizardStep() === wizardSteps.Offer"
-            (onClick)="goToPreviousWizardStep()"
+            [disabled]="wizard.activeWizardStep() === wizard.wizardSteps.Offer"
+            (onClick)="wizard.goToPreviousWizardStep()"
           />
         </div>
 
         <div class="flex-row-end-center gap-sm">
-          @if (activeWizardStep() === wizardSteps.Gm) {
+          @if (wizard.activeWizardStep() === wizard.wizardSteps.Gm) {
             <p-button
               type="button"
               severity="secondary"
@@ -182,13 +182,13 @@
             />
           }
 
-          @if (activeWizardStep() !== wizardSteps.Details) {
+          @if (wizard.activeWizardStep() !== wizard.wizardSteps.Details) {
             <p-button
               type="button"
               severity="success"
               [label]="data.commonActions.next"
-              [disabled]="isNextWizardStepDisabled()"
-              (onClick)="goToNextWizardStep()"
+              [disabled]="wizard.isNextWizardStepDisabled()"
+              (onClick)="wizard.goToNextWizardStep()"
             />
           }
         </div>
