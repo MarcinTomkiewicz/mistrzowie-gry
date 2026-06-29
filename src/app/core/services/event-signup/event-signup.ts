@@ -11,16 +11,29 @@ import {
   IEventSignupSavePayload,
   IEventSignupSelection,
 } from '../../interfaces/i-event-signup';
-import { IEventProgramItem } from '../../interfaces/i-event-program-item';
+import {
+  ICreateEventProgramItemPayload,
+  IEventProgramItem,
+} from '../../interfaces/i-event-program-item';
+import { IUser } from '../../interfaces/i-user';
+import {
+  ACTIVE_HOST_SIGNUP_STATUSES,
+  HOST_SIGNUP_OCCURRENCE_STATUSES,
+} from '../../types/event-signup';
+import { hasMinimumRole } from '../../utils/roles';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
+import { EventRead } from '../event-read/event-read';
 import { GmSessionsFacade } from '../gm-sessions/gm-sessions';
+import { SessionRead } from '../session-read/session-read';
 
 @Injectable({ providedIn: 'root' })
 export class EventSignup {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
+  private readonly eventRead = inject(EventRead);
   private readonly gmSessions = inject(GmSessionsFacade);
+  private readonly sessionRead = inject(SessionRead);
 
   getMySignup(
     selection: IEventSignupSelection,
@@ -41,13 +54,23 @@ export class EventSignup {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.ensureOccurrenceExists(payload.selection).pipe(
-      switchMap(() => {
+    return this.getHostSignupSaveContext(payload.selection, userId).pipe(
+      switchMap(({ occurrence, canOverrideCapacity }) => {
         if (payload.mode === 'template') {
-          return this.saveTemplateSignup(payload, userId);
+          return this.saveTemplateSignup(
+            payload,
+            userId,
+            occurrence,
+            canOverrideCapacity,
+          );
         }
 
-        return this.saveCustomSignup(payload, userId);
+        return this.saveCustomSignup(
+          payload,
+          userId,
+          occurrence,
+          canOverrideCapacity,
+        );
       }),
     );
   }
@@ -76,42 +99,51 @@ export class EventSignup {
   private saveTemplateSignup(
     payload: Extract<IEventSignupSavePayload, { mode: 'template' }>,
     userId: string,
+    occurrence: IEventOccurrence,
+    canOverrideCapacity: boolean,
   ): Observable<IEventProgramItem> {
-    if (payload.signupId) {
-      return this.getOwnedSignup(payload.signupId, userId).pipe(
-        switchMap((signup) =>
-          this.ensureSameOccurrence(signup, payload.selection).pipe(
-            map(() => signup),
-          ),
-        ),
-        switchMap((signup) =>
-          this.backend.update<IEventProgramItem>(
-            'event_program_items',
-            signup.id,
-            {
+    return this.ensureOwnedTemplateSession(
+      payload.templateSessionId,
+      userId,
+    ).pipe(
+      switchMap(() => {
+        if (payload.signupId) {
+          return this.getActiveOwnedSignupForEdit(
+            payload.signupId,
+            userId,
+            payload.selection,
+          ).pipe(
+            switchMap((signup) =>
+              this.backend.update<IEventProgramItem>(
+                'event_program_items',
+                signup.id,
+                {
+                  sourceKind: EventProgramItemSourceKind.GmSessionTemplate,
+                  gmSessionTemplateId: payload.templateSessionId,
+                  customSessionId: null,
+                  status: EventProgramItemStatus.Published,
+                },
+              ),
+            ),
+          );
+        }
+
+        return this.ensureCanCreateSignup(
+          payload.selection,
+          userId,
+          occurrence,
+          canOverrideCapacity,
+        ).pipe(
+          switchMap(() =>
+            this.createProgramItem({
+              occurrenceId: payload.selection.occurrenceId,
+              hostUserId: userId,
               sourceKind: EventProgramItemSourceKind.GmSessionTemplate,
               gmSessionTemplateId: payload.templateSessionId,
               customSessionId: null,
-              status: EventProgramItemStatus.Submitted,
-            },
+            }),
           ),
-        ),
-      );
-    }
-
-    return this.findMySignup(payload.selection, userId).pipe(
-      switchMap((existing) => {
-        if (existing) {
-          return throwError(() => new Error('Signup already exists.'));
-        }
-
-        return this.createProgramItem({
-          occurrenceId: payload.selection.occurrenceId,
-          hostUserId: userId,
-          sourceKind: EventProgramItemSourceKind.GmSessionTemplate,
-          gmSessionTemplateId: payload.templateSessionId,
-          customSessionId: null,
-        });
+        );
       }),
     );
   }
@@ -119,14 +151,15 @@ export class EventSignup {
   private saveCustomSignup(
     payload: Extract<IEventSignupSavePayload, { mode: 'custom' }>,
     userId: string,
+    occurrence: IEventOccurrence,
+    canOverrideCapacity: boolean,
   ): Observable<IEventProgramItem> {
     if (payload.signupId) {
-      return this.getOwnedSignup(payload.signupId, userId).pipe(
-        switchMap((signup) =>
-          this.ensureSameOccurrence(signup, payload.selection).pipe(
-            map(() => signup),
-          ),
-        ),
+      return this.getActiveOwnedSignupForEdit(
+        payload.signupId,
+        userId,
+        payload.selection,
+      ).pipe(
         switchMap((signup) =>
           this.saveOrUpdateCustomSession(
             payload.customSessionPayload,
@@ -141,24 +174,25 @@ export class EventSignup {
               sourceKind: EventProgramItemSourceKind.CustomSession,
               gmSessionTemplateId: null,
               customSessionId,
-              status: EventProgramItemStatus.Submitted,
+              status: EventProgramItemStatus.Published,
             },
           ),
         ),
       );
     }
 
-    return this.findMySignup(payload.selection, userId).pipe(
-      switchMap((existing) => {
-        if (existing) {
-          return throwError(() => new Error('Signup already exists.'));
-        }
-
-        return this.saveOrUpdateCustomSession(
+    return this.ensureCanCreateSignup(
+      payload.selection,
+      userId,
+      occurrence,
+      canOverrideCapacity,
+    ).pipe(
+      switchMap(() =>
+        this.saveOrUpdateCustomSession(
           payload.customSessionPayload,
           payload.customSourceSessionId,
-        );
-      }),
+        ),
+      ),
       switchMap((customSessionId) =>
         this.createProgramItem({
           occurrenceId: payload.selection.occurrenceId,
@@ -205,18 +239,15 @@ export class EventSignup {
               operator: FilterOperator.EQ,
               value: userId,
             },
+            status: {
+              operator: FilterOperator.IN,
+              value: [...ACTIVE_HOST_SIGNUP_STATUSES],
+            },
           },
         },
         range: { from: 0, to: 9 },
       })
-      .pipe(
-        map(
-          (items) =>
-            items.find(
-              (item) => item.status !== EventProgramItemStatus.Withdrawn,
-            ) ?? null,
-        ),
-      );
+      .pipe(map((items) => items[0] ?? null));
   }
 
   private getOwnedSignup(
@@ -240,9 +271,55 @@ export class EventSignup {
       );
   }
 
-  private ensureOccurrenceExists(
+  private getActiveOwnedSignupForEdit(
+    signupId: string,
+    userId: string,
     selection: IEventSignupSelection,
-  ): Observable<void> {
+  ): Observable<IEventProgramItem> {
+    return this.getOwnedSignup(signupId, userId).pipe(
+      switchMap((signup) => {
+        if (!ACTIVE_HOST_SIGNUP_STATUSES.includes(signup.status)) {
+          return throwError(() => new Error('Signup is not active.'));
+        }
+
+        if (signup.occurrenceId !== selection.occurrenceId) {
+          return throwError(() => new Error('Selection mismatch.'));
+        }
+
+        return of(signup);
+      }),
+    );
+  }
+
+  private getHostSignupSaveContext(
+    selection: IEventSignupSelection,
+    userId: string,
+  ) {
+    return this.getOccurrence(selection).pipe(
+      switchMap((occurrence) =>
+        this.backend.getById<IUser>('users', userId).pipe(
+          switchMap((user) => {
+            if (!user || !hasMinimumRole(user, 'gm')) {
+              return throwError(() => new Error('Forbidden.'));
+            }
+
+            if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status)) {
+              return throwError(() => new Error('Host signup is closed.'));
+            }
+
+            return of({
+              occurrence,
+              canOverrideCapacity: hasMinimumRole(user, 'admin'),
+            });
+          }),
+        ),
+      ),
+    );
+  }
+
+  private getOccurrence(
+    selection: IEventSignupSelection,
+  ): Observable<IEventOccurrence> {
     return this.backend
       .getOneByFields<IEventOccurrence>('event_occurrences', {
         id: selection.occurrenceId,
@@ -254,36 +331,67 @@ export class EventSignup {
             return throwError(() => new Error('Occurrence not found.'));
           }
 
-          return of(void 0);
+          return of(occurrence);
         }),
       );
   }
 
-  private ensureSameOccurrence(
-    signup: IEventProgramItem,
+  private ensureCanCreateSignup(
     selection: IEventSignupSelection,
+    userId: string,
+    occurrence: IEventOccurrence,
+    canOverrideCapacity: boolean,
   ): Observable<void> {
-    if (signup.occurrenceId !== selection.occurrenceId) {
-      return throwError(() => new Error('Selection mismatch.'));
-    }
+    return this.findMySignup(selection, userId).pipe(
+      switchMap((existing) => {
+        if (existing) {
+          return throwError(() => new Error('Signup already exists.'));
+        }
 
-    return of(void 0);
+        if (canOverrideCapacity) {
+          return of(void 0);
+        }
+
+        return this.eventRead.getActiveHostSignupCountByOccurrenceId(
+          occurrence.id,
+        ).pipe(
+          switchMap((signupCount) =>
+            signupCount >= occurrence.slotCapacity
+              ? throwError(() => new Error('Occurrence is full.'))
+              : of(void 0),
+          ),
+        );
+      }),
+    );
+  }
+
+  private ensureOwnedTemplateSession(
+    templateSessionId: string,
+    userId: string,
+  ): Observable<void> {
+    return this.sessionRead
+      .getSessionById(templateSessionId, 'template', userId)
+      .pipe(
+        switchMap((session) =>
+          session
+            ? of(void 0)
+            : throwError(() => new Error('Template session not found.')),
+        ),
+      );
   }
 
   private createProgramItem(
-    payload: Pick<
-      IEventProgramItem,
-      | 'occurrenceId'
-      | 'hostUserId'
-      | 'sourceKind'
-      | 'gmSessionTemplateId'
-      | 'customSessionId'
-    >,
+    payload: Omit<ICreateEventProgramItemPayload, 'status' | 'displayOrder'>,
   ): Observable<IEventProgramItem> {
-    return this.backend.create<IEventProgramItem>('event_program_items', {
+    const createPayload: ICreateEventProgramItemPayload = {
       ...payload,
       status: EventProgramItemStatus.Published,
       displayOrder: null,
-    } as IEventProgramItem);
+    };
+
+    return this.backend.create<
+      IEventProgramItem,
+      ICreateEventProgramItemPayload
+    >('event_program_items', createPayload);
   }
 }

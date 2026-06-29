@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,17 +10,24 @@ import { TabsModule } from 'primeng/tabs';
 
 import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 
+import {
+  buildEventHostSignupRoute,
+  EVENT_SIGNUP_SELECTION_ROUTE,
+} from '../../../core/configs/event-signup.config';
 import { buildSiteUrl } from '../../../core/config/site';
-import { EventOccurrenceStatus } from '../../../core/enums/event';
 import { IEvent } from '../../../core/interfaces/i-event';
-import { IEventOccurrence } from '../../../core/interfaces/i-event-occurence';
-import { IEventProgramItem } from '../../../core/interfaces/i-event-program-item';
+import {
+  EventSignupForm,
+  IEventSignupEventVm,
+  IEventSignupOccurrenceVm,
+} from '../../../core/interfaces/i-event-signup';
 import { IUser } from '../../../core/interfaces/i-user';
 import { Auth } from '../../../core/services/auth/auth';
 import { Backend } from '../../../core/services/backend/backend';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
 import { Seo } from '../../../core/services/seo/seo';
+import { HOST_SIGNUP_OCCURRENCE_STATUSES } from '../../../core/types/event-signup';
 import {
   formatDateLabel,
   getEndOfNextMonthIso,
@@ -32,29 +38,10 @@ import { formatTimeRangeLabel } from '../../../core/utils/time';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { createEventSignupI18n } from './event-signup.i18n';
 
-interface IEventSignupOccurrenceVm {
-  occurrence: IEventOccurrence;
-  label: string;
-  signupCount: number;
-  isFull: boolean;
-  mySignup: IEventProgramItem | null;
-  canOpen: boolean;
-}
-
-interface IEventSignupEventVm {
-  event: IEvent;
-  occurrences: IEventSignupOccurrenceVm[];
-}
-
-type EventSignupForm = FormGroup<{
-  eventId: FormControl<string | null>;
-}>;
-
 @Component({
   selector: 'app-event-signup',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ButtonModule,
     SelectModule,
@@ -72,7 +59,7 @@ export class EventSignupComponent {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
   private readonly seo = inject(Seo);
-  private readonly pageUrl = buildSiteUrl('/auth/event-signup');
+  private readonly pageUrl = buildSiteUrl(EVENT_SIGNUP_SELECTION_ROUTE);
 
   private readonly rangeStartIso = getStartOfCurrentMonthIso();
   private readonly rangeEndIso = getEndOfNextMonthIso();
@@ -81,10 +68,6 @@ export class EventSignupComponent {
 
   readonly form: EventSignupForm = new FormGroup({
     eventId: new FormControl<string | null>(null),
-  });
-
-  readonly currentUser = toSignal(this.loadCurrentUser(), {
-    initialValue: null,
   });
 
   readonly eventsVm = toSignal(this.loadEventsVm(), {
@@ -159,13 +142,9 @@ export class EventSignupComponent {
       return;
     }
 
-    this.router.navigate([
-      '/auth',
-      'event-signup',
-      eventSlug,
-      occurrenceDate,
-      'signup',
-    ]);
+    void this.router.navigate(
+      buildEventHostSignupRoute(eventSlug, occurrenceDate),
+    );
   }
 
   trackByEventId = (_: number, item: IEventSignupEventVm) => item.event.id;
@@ -185,44 +164,49 @@ export class EventSignupComponent {
   }
 
   private loadEventsVm() {
-    return this.backend
-      .getAll<IEvent>({
+    return forkJoin({
+      currentUser: this.loadCurrentUser(),
+      events: this.backend.getAll<IEvent>({
         table: 'events',
         sortBy: 'name',
         sortOrder: 'asc',
-      })
-      .pipe(
-        switchMap((events) => {
-          if (!events.length) {
-            return of([] as IEventSignupEventVm[]);
-          }
-
-          return forkJoin(events.map((event) => this.loadEventVm(event)));
-        }),
-        map((items) => {
-          const currentValue = this.form.controls.eventId.value;
-
-          if (items.length && !currentValue) {
-            this.form.controls.eventId.setValue(items[0].event.id, {
-              emitEvent: false,
-            });
-          }
-
-          return items;
-        }),
-        catchError((error) => {
-          console.error('[EVENT SIGNUP LIST ERROR]', error);
+      }),
+    }).pipe(
+      switchMap(({ currentUser, events }) => {
+        if (!events.length) {
           return of([] as IEventSignupEventVm[]);
-        }),
-      );
+        }
+
+        return forkJoin(
+          events.map((event) => this.loadEventVm(event, currentUser)),
+        );
+      }),
+      map((items) => {
+        const currentValue = this.form.controls.eventId.value;
+
+        if (items.length && !currentValue) {
+          this.form.controls.eventId.setValue(items[0].event.id, {
+            emitEvent: false,
+          });
+        }
+
+        return items;
+      }),
+      catchError((error) => {
+        console.error('[EVENT SIGNUP LIST ERROR]', error);
+        return of([] as IEventSignupEventVm[]);
+      }),
+    );
   }
 
-  private loadEventVm(event: IEvent) {
+  private loadEventVm(event: IEvent, currentUser: IUser | null) {
     return this.eventRead
-      .getOccurrencesInRange(event.id, this.rangeStartIso, this.rangeEndIso, [
-        EventOccurrenceStatus.HostSignupOpen,
-        EventOccurrenceStatus.Published,
-      ])
+      .getOccurrencesInRange(
+        event.id,
+        this.rangeStartIso,
+        this.rangeEndIso,
+        [...HOST_SIGNUP_OCCURRENCE_STATUSES],
+      )
       .pipe(
         switchMap((occurrences) => {
           if (!occurrences.length) {
@@ -235,19 +219,20 @@ export class EventSignupComponent {
           return forkJoin(
             occurrences.map((occurrence) =>
               forkJoin({
-                items: this.eventRead
-                  .getPublishedProgramItemsByOccurrenceId(occurrence.id)
-                  .pipe(catchError(() => of([] as IEventProgramItem[]))),
+                signupCount: this.eventRead
+                  .getActiveHostSignupCountByOccurrenceId(occurrence.id)
+                  .pipe(catchError(() => of(0))),
                 mySignup: this.getMySignupForOccurrence(
                   event.id,
                   occurrence.id,
                 ),
               }).pipe(
-                map(({ items, mySignup }) => {
-                  const signupCount = items.length;
+                map(({ signupCount, mySignup }) => {
                   const isFull = signupCount >= occurrence.slotCapacity;
-                  const isAdmin = hasMinimumRole(this.currentUser(), 'admin');
-                  const canOpen = !isFull || isAdmin || !!mySignup;
+                  const isAdmin = hasMinimumRole(currentUser, 'admin');
+                  const canHostSignup = hasMinimumRole(currentUser, 'gm');
+                  const canOpen =
+                    (canHostSignup && (!isFull || !!mySignup)) || isAdmin;
 
                   return {
                     occurrence,

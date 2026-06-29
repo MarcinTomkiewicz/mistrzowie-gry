@@ -24,3 +24,18 @@ export interface IUserMenuSection {
   title: string;
   items: IUserMenuItem[];
 }
+
+export interface BuildUserMenuArgs {
+  accountTitle: string;
+  gmZoneTitle: string;
+  administrationTitle: string;
+  editProfileLabel: string;
+  eventSignupLabel: string;
+  coworkerProfileLabel: string;
+  myWorkLogLabel: string;
+  gmAvailabilityOverviewLabel: string;
+  workLogOverviewLabel: string;
+  adminUsersLabel: string;
+  canSeeGmZone: boolean;
+  canSeeAdministration: boolean;
+}

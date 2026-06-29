@@ -1,10 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { finalize, forkJoin, Observable, of, startWith, switchMap } from 'rxjs';
+import { startWith } from 'rxjs';
 
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
@@ -14,35 +13,25 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 import { Select, SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
+import { EVENT_SIGNUP_SELECTION_ROUTE } from '../../../core/configs/event-signup.config';
+import { EventProgramItemSourceKind } from '../../../core/enums/event';
 import {
-  EventOccurrenceStatus,
-  EventProgramItemSourceKind,
-} from '../../../core/enums/event';
-import { buildSiteUrl } from '../../../core/config/site';
-import {
-  IEventSignupLoadData,
+  EventSignupFormGroup,
+  EventSignupMode,
+  IEventSignupModeOption,
   IEventSignupSavePayload,
 } from '../../../core/interfaces/i-event-signup';
-import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
 import {
   ISessionFormSubmitData,
   ISessionListLabels,
   ISessionWithRelations,
 } from '../../../core/interfaces/i-session';
-import { Auth } from '../../../core/services/auth/auth';
-import { EventRead } from '../../../core/services/event-read/event-read';
-import { EventSignup } from '../../../core/services/event-signup/event-signup';
 import { Seo } from '../../../core/services/seo/seo';
-import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {
   SESSION_DIFFICULTY_LEVEL_OPTIONS,
   SessionDifficultyLevel,
 } from '../../../core/types/sessions';
-import {
-  formatDateLabel,
-  getEndOfNextMonthIso,
-  getStartOfCurrentMonthIso,
-} from '../../../core/utils/date';
+import { formatDateLabel } from '../../../core/utils/date';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../public/common/occurrence-switcher/occurrence-switcher';
 import {
@@ -50,25 +39,13 @@ import {
   SessionList,
 } from '../../../public/common/session-list/session-list';
 import { SessionForm } from '../../common/session-form/session-form';
+import { EventSignupFormFacade } from './event-signup-form.facade';
 import { createEventSignupFormI18n } from './event-signup-form.i18n';
-
-interface IModeOption {
-  value: EventSignupMode;
-  label: string;
-}
-
-type EventSignupMode = 'template' | 'custom';
-
-type EventSignupFormGroup = FormGroup<{
-  mode: FormControl<EventSignupMode>;
-  customSessionId: FormControl<string | null>;
-}>;
 
 @Component({
   selector: 'app-event-signup-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     BreadcrumbModule,
@@ -84,22 +61,20 @@ type EventSignupFormGroup = FormGroup<{
   ],
   templateUrl: './event-signup-form.html',
   styleUrl: './event-signup-form.scss',
-  providers: [provideTranslocoScope('auth', 'common', 'sessions')],
+  providers: [
+    EventSignupFormFacade,
+    provideTranslocoScope('auth', 'common', 'sessions'),
+  ],
 })
 export class EventSignupFormComponent {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly auth = inject(Auth);
-  private readonly eventRead = inject(EventRead);
-  private readonly eventSignup = inject(EventSignup);
+  private readonly facade = inject(EventSignupFormFacade);
   private readonly seo = inject(Seo);
-  private readonly toast = inject(UiToast);
   private readonly confirmation = inject(ConfirmationService);
 
-  private readonly rangeStartIso = getStartOfCurrentMonthIso();
-  private readonly rangeEndIso = getEndOfNextMonthIso();
-
   readonly i18n = createEventSignupFormI18n();
+  readonly eventSignupSelectionRoute = EVENT_SIGNUP_SELECTION_ROUTE;
+  readonly resolveDifficultyLabelFn = (value: SessionDifficultyLevel) =>
+    this.resolveDifficultyLabel(value);
 
   readonly form: EventSignupFormGroup = new FormGroup({
     mode: new FormControl<EventSignupMode>('template', { nonNullable: true }),
@@ -108,19 +83,13 @@ export class EventSignupFormComponent {
 
   readonly selectedTemplateIdControl = new FormControl<string | null>(null);
 
-  readonly isLoading = signal(true);
-  readonly isSubmitting = signal(false);
+  readonly isSubmitting = this.facade.isSubmitting;
+  readonly isBusy = this.facade.isBusy;
   readonly isEditingSubmittedCustomSession = signal(false);
 
-  readonly data = signal<IEventSignupLoadData>(
-    this.eventRead.createEmptyHostSignupLoadData(),
-  );
-  readonly occurrenceOptions = signal<IOccurrenceSwitcherOption[]>([]);
-
-  readonly routeParams = toSignal(
-    this.route.paramMap.pipe(startWith(this.route.snapshot.paramMap)),
-    { requireSync: true },
-  );
+  readonly occurrenceOptions = this.facade.occurrenceOptions;
+  readonly page = this.facade.page;
+  readonly resources = this.facade.resources;
 
   readonly mode = toSignal(
     this.form.controls.mode.valueChanges.pipe(
@@ -143,12 +112,7 @@ export class EventSignupFormComponent {
     { requireSync: true },
   );
 
-  readonly isBusy = computed(() => this.isLoading() || this.isSubmitting());
-
-  readonly page = computed(() => this.data().page);
-  readonly resources = computed(() => this.data().resources);
-
-  readonly modeOptions = computed<IModeOption[]>(() => [
+  readonly modeOptions = computed<IEventSignupModeOption[]>(() => [
     {
       value: 'template',
       label: this.i18n.mode().templateLabel,
@@ -247,7 +211,7 @@ export class EventSignupFormComponent {
     return [
       {
         label: this.i18n.breadcrumbs().eventSignupLabel,
-        routerLink: '/auth/event-signup',
+        routerLink: EVENT_SIGNUP_SELECTION_ROUTE,
       },
       {
         label: page.event.name,
@@ -317,28 +281,15 @@ export class EventSignupFormComponent {
 
   constructor() {
     effect(() => {
-      this.loadData();
-    });
-
-    effect(() => {
+      this.page();
       this.syncFormWithSignup();
     });
 
     effect(() => {
-      const params = this.routeParams();
-      const eventSlug = params.get('eventSlug');
-      const occurrenceDate = params.get('occurrenceDate');
-      const pageUrl =
-        eventSlug && occurrenceDate
-          ? buildSiteUrl(
-              `/auth/event-signup/${eventSlug}/${occurrenceDate}/signup`,
-            )
-          : buildSiteUrl('/auth/event-signup');
-
       this.seo.apply({
         title: this.i18n.seo().title,
         description: this.i18n.seo().description,
-        canonicalUrl: pageUrl,
+        canonicalUrl: this.facade.pageUrl(),
         robots: 'noindex,nofollow',
       });
     });
@@ -360,20 +311,7 @@ export class EventSignupFormComponent {
   }
 
   onOccurrenceSelect(index: number): void {
-    const page = this.page();
-    const option = this.occurrenceOptions()[index];
-
-    if (!page.event?.slug || !option?.occurrenceDate) {
-      return;
-    }
-
-    this.router.navigate([
-      '/auth',
-      'event-signup',
-      page.event.slug,
-      option.occurrenceDate,
-      'signup',
-    ]);
+    this.facade.navigateToOccurrence(index);
   }
 
   onSubmitTemplate(): void {
@@ -432,7 +370,7 @@ export class EventSignupFormComponent {
       acceptLabel: this.i18n.commonActions().yes,
       rejectLabel: this.i18n.commonActions().no,
       accept: () => {
-        this.runRequest(this.eventSignup.withdraw(signupId), {
+        this.facade.withdraw(signupId, {
           successSummary: this.i18n.toast().withdrawSuccessSummary,
           successDetail: this.i18n.toast().withdrawSuccessDetail,
           errorSummary: this.i18n.toast().withdrawFailedSummary,
@@ -486,119 +424,12 @@ export class EventSignupFormComponent {
   formatDateLabel = formatDateLabel;
 
   private saveSignup(payload: IEventSignupSavePayload): void {
-    this.runRequest(this.eventSignup.saveSignup(payload), {
+    this.facade.saveSignup(payload, {
       successSummary: this.i18n.toast().saveSuccessSummary,
       successDetail: this.i18n.toast().saveSuccessDetail,
       errorSummary: this.i18n.toast().saveFailedSummary,
       errorDetail: this.i18n.toast().saveFailedDetail,
     });
-  }
-
-  private runRequest(
-    request$: Observable<unknown>,
-    toastConfig: {
-      successSummary: string;
-      successDetail: string;
-      errorSummary: string;
-      errorDetail: string;
-    },
-  ): void {
-    this.isSubmitting.set(true);
-
-    request$
-      .pipe(
-        switchMap(() => this.getScreenData()),
-        finalize(() => this.isSubmitting.set(false)),
-      )
-      .subscribe({
-        next: ({ data, occurrenceOptions }) => {
-          this.data.set(data);
-          this.occurrenceOptions.set(occurrenceOptions);
-          this.isEditingSubmittedCustomSession.set(false);
-
-          this.toast.success({
-            summary: toastConfig.successSummary,
-            detail: toastConfig.successDetail,
-          });
-        },
-        error: (error) => {
-          console.error('[EVENT SIGNUP FORM REQUEST ERROR]', error);
-
-          this.toast.danger({
-            summary: toastConfig.errorSummary,
-            detail: toastConfig.errorDetail,
-          });
-        },
-      });
-  }
-
-  private loadData(): void {
-    this.isLoading.set(true);
-
-    this.getScreenData()
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: ({ data, occurrenceOptions }) => {
-          this.data.set(data);
-          this.occurrenceOptions.set(occurrenceOptions);
-        },
-        error: (error) => {
-          console.error('[EVENT SIGNUP FORM LOAD ERROR]', error);
-
-          this.data.set(this.eventRead.createEmptyHostSignupLoadData());
-          this.occurrenceOptions.set([]);
-
-          this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
-            detail: this.i18n.toast().loadFailedDetail,
-          });
-        },
-      });
-  }
-
-  private getScreenData(): Observable<{
-    data: IEventSignupLoadData;
-    occurrenceOptions: IOccurrenceSwitcherOption[];
-  }> {
-    const params = this.routeParams();
-    const eventSlug = params.get('eventSlug');
-    const occurrenceDate = params.get('occurrenceDate');
-    const userId = this.auth.userId();
-
-    if (!eventSlug || !occurrenceDate) {
-      return of({
-        data: this.eventRead.createEmptyHostSignupLoadData(),
-        occurrenceOptions: [],
-      });
-    }
-
-    return this.eventRead
-      .getHostSignupLoadData(eventSlug, occurrenceDate, userId)
-      .pipe(
-        switchMap((data) => {
-          const eventId = data.page.event?.id;
-
-          if (!eventId) {
-            return of({
-              data,
-              occurrenceOptions: [],
-            });
-          }
-
-          return forkJoin({
-            data: of(data),
-            occurrenceOptions: this.eventRead.getOccurrenceOptions(
-              eventId,
-              this.rangeStartIso,
-              this.rangeEndIso,
-              [
-                EventOccurrenceStatus.HostSignupOpen,
-                EventOccurrenceStatus.Published,
-              ],
-            ),
-          });
-        }),
-      );
   }
 
   private syncFormWithSignup(): void {
@@ -622,6 +453,7 @@ export class EventSignupFormComponent {
       return;
     }
 
+    this.isEditingSubmittedCustomSession.set(false);
     this.form.controls.mode.setValue('custom', { emitEvent: false });
     this.selectedTemplateIdControl.setValue(null, { emitEvent: false });
     this.form.controls.customSessionId.setValue(signup.customSessionId, {

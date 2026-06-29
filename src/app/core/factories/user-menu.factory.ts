@@ -1,19 +1,5 @@
-import { IUserMenuSection } from '../types/user-menu';
-
-export interface BuildUserMenuArgs {
-  accountTitle: string;
-  gmZoneTitle: string;
-  administrationTitle: string;
-  editProfileLabel: string;
-  eventSignupLabel: string;
-  coworkerProfileLabel: string;
-  myWorkLogLabel: string;
-  gmAvailabilityOverviewLabel: string;
-  workLogOverviewLabel: string;
-  adminUsersLabel: string;
-  canSeeGmZone: boolean;
-  canSeeAdministration: boolean;
-}
+import { BuildUserMenuArgs, IUserMenuSection } from '../types/user-menu';
+import { EVENT_SIGNUP_SELECTION_ROUTE } from '../configs/event-signup.config';
 
 export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
   const sections: IUserMenuSection[] = [
@@ -38,7 +24,7 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
         {
           id: 'event-signup',
           label: args.eventSignupLabel,
-          path: '/auth/event-signup',
+          path: EVENT_SIGNUP_SELECTION_ROUTE,
         },
         {
           id: 'coworker-profile',

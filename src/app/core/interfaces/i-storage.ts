@@ -14,3 +14,7 @@ export interface IStorageUploadResult {
   path: string;
   publicUrl: string | null;
 }
+
+export interface IPublicStorageUrlResolver {
+  getPublicUrl(path: string | null | undefined, bucket?: string): string | null;
+}

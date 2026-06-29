@@ -15,7 +15,7 @@
       </p>
 
       <div class="mg-chaotic-hero__spark" aria-hidden="true">
-        @for (dice of sparkDice; track trackByIndex($index)) {
+        @for (dice of sparkDice; track dice) {
           <span class="mg-chaotic-hero__dice">
             <i class="pi pi-d20 mg-chaotic-hero__dice-icon"></i>
           </span>
@@ -43,6 +43,17 @@
           size="small"
           routerLink="/contact"
         />
+        @if (canHostSignup()) {
+          <p-button
+            [label]="i18n.heroCta().hostSignupLabel"
+            icon="pi pi-users"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            [disabled]="isLoading() || !selectedOccurrence()"
+            (onClick)="onHostSignupClick()"
+          />
+        }
       </div>
     </header>
   </div>
@@ -50,7 +61,7 @@
 
 <div class="mg-container">
   <div class="mg-section__header">
-    <h3 class="mg-section__title mg-section__title--md tex mb-md">
+    <h3 class="mg-section__title mg-section__title--md mb-md">
       {{ i18n.hero().upcomingSessions }}
     </h3>
   </div>
@@ -97,7 +108,7 @@
       </p>
 
       <div class="mg-chaotic-grid mt-md">
-        @for (h of i18n.highlights(); track trackByIndex($index)) {
+        @for (h of i18n.highlights(); track h.id) {
           <div
             pAnimateOnScroll
             enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
@@ -157,7 +168,7 @@
     </header>
 
     <div class="mg-chaotic-grid">
-      @for (st of i18n.standardsCards(); track trackByIndex($index)) {
+      @for (st of i18n.standardsCards(); track st.id) {
         <div
           pAnimateOnScroll
           enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
@@ -189,7 +200,7 @@
       </h3>
 
       <ul class="mg-chaotic-list m-0">
-        @for (x of i18n.expectations(); track trackByIndex($index)) {
+        @for (x of i18n.expectations(); track x) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -212,8 +223,7 @@
               {{ f.h }}
             </p-accordion-header>
             <p-accordion-content>
-              <p class="mg-section__subtitle mg-section__subtitle--full w-100
-              ">
+              <p class="mg-section__subtitle mg-section__subtitle--full w-100">
                 {{ f.a }}
               </p>
             </p-accordion-content>

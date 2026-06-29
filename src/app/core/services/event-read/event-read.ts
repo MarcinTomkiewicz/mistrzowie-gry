@@ -18,6 +18,10 @@ import {
 import { IOccurrenceSwitcherOption } from '../../interfaces/i-occurrence-switcher';
 import { ISessionWithRelations } from '../../interfaces/i-session';
 import { IUser } from '../../interfaces/i-user';
+import {
+  ACTIVE_HOST_SIGNUP_STATUSES,
+  HOST_SIGNUP_OCCURRENCE_STATUSES,
+} from '../../types/event-signup';
 import { IEventPublicProgramLoadData } from '../../types/event-program';
 import { hasMinimumRole } from '../../utils/roles';
 import { Backend } from '../backend/backend';
@@ -178,6 +182,21 @@ export class EventRead {
     ]);
   }
 
+  getActiveHostSignupCountByOccurrenceId(
+    occurrenceId: string,
+  ): Observable<number> {
+    return this.backend.getCount('event_program_items', {
+      occurrenceId: {
+        operator: FilterOperator.EQ,
+        value: occurrenceId,
+      },
+      status: {
+        operator: FilterOperator.IN,
+        value: [...ACTIVE_HOST_SIGNUP_STATUSES],
+      },
+    });
+  }
+
   getPublicProgramLoadData(
     eventSlug: string,
     options: {
@@ -268,12 +287,25 @@ export class EventRead {
 
         return this.getOccurrenceByDate(event.id, occurrenceDate).pipe(
           switchMap((occurrence) => {
+            const empty = this.createEmptyHostSignupLoadData();
+
             if (!occurrence) {
               return of({
-                ...this.createEmptyHostSignupLoadData(),
+                ...empty,
                 page: {
-                  ...this.createEmptyHostSignupLoadData().page,
+                  ...empty.page,
                   event,
+                },
+              } satisfies IEventSignupLoadData);
+            }
+
+            if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status)) {
+              return of({
+                ...empty,
+                page: {
+                  ...empty.page,
+                  event,
+                  occurrence,
                 },
               } satisfies IEventSignupLoadData);
             }
@@ -282,17 +314,9 @@ export class EventRead {
               user: userId
                 ? this.backend.getById<IUser>('users', userId)
                 : of(null),
-              signups: this.backend.getAll<IEventProgramItem>({
-                table: 'event_program_items',
-                pagination: {
-                  filters: {
-                    occurrenceId: {
-                      operator: FilterOperator.EQ,
-                      value: occurrence.id,
-                    },
-                  },
-                },
-              }),
+              signupCount: this.getActiveHostSignupCountByOccurrenceId(
+                occurrence.id,
+              ),
               mySignup: userId
                 ? this.getMySignupForOccurrence(occurrence.id, userId)
                 : of(null),
@@ -310,7 +334,7 @@ export class EventRead {
               map(
                 ({
                   user,
-                  signups,
+                  signupCount,
                   mySignup,
                   templateSessions,
                   customSessions,
@@ -319,25 +343,20 @@ export class EventRead {
                   triggers,
                   languages,
                 }) => {
-                  const activeSignupCount = signups.filter(
-                    (item) =>
-                      item.status !== EventProgramItemStatus.Withdrawn &&
-                      item.status !== EventProgramItemStatus.Rejected,
-                  ).length;
-
-                  const isFull = activeSignupCount >= occurrence.slotCapacity;
+                  const isFull = signupCount >= occurrence.slotCapacity;
                   const isAdmin = hasMinimumRole(user, 'admin');
-                  const canAccess = !isFull || isAdmin || !!mySignup;
+                  const canHostSignup = hasMinimumRole(user, 'gm');
+                  const canAccess =
+                    (canHostSignup && (!isFull || !!mySignup)) || isAdmin;
 
                   return {
                     page: {
                       event,
                       occurrence,
                       mySignup,
-                      signupCount: activeSignupCount,
+                      signupCount,
                       isFull,
                       canAccess,
-                      isAdmin,
                     },
                     resources: {
                       templateSessions,
@@ -366,7 +385,6 @@ export class EventRead {
         signupCount: 0,
         isFull: false,
         canAccess: false,
-        isAdmin: false,
       },
       resources: {
         templateSessions: [],
@@ -398,17 +416,16 @@ export class EventRead {
               operator: FilterOperator.EQ,
               value: userId,
             },
+            status: {
+              operator: FilterOperator.IN,
+              value: [...ACTIVE_HOST_SIGNUP_STATUSES],
+            },
           },
         },
         range: { from: 0, to: 9 },
       })
       .pipe(
-        map(
-          (items) =>
-            items.find(
-              (item) => item.status !== EventProgramItemStatus.Withdrawn,
-            ) ?? null,
-        ),
+        map((items) => items[0] ?? null),
       );
   }
 

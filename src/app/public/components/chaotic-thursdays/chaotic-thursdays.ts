@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
@@ -7,7 +6,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
@@ -17,6 +16,8 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { catchError, finalize, of } from 'rxjs';
 
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
+import { buildEventHostSignupRoute } from '../../../core/configs/event-signup.config';
+import { EVENT_SLUGS } from '../../../core/configs/events.config';
 import {
   EventOccurrenceStatus,
   EventProgramItemStatus,
@@ -31,6 +32,7 @@ import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence
 import { EventProgramPageVm } from '../../../core/types/event-program';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
+import { Auth } from '../../../core/services/auth/auth';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import {
@@ -40,6 +42,8 @@ import {
   getTodayIso,
 } from '../../../core/utils/date';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import { hasMinimumRole } from '../../../core/utils/roles';
+import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
 import {
   createEventStructuredData,
   createOfferStructuredData,
@@ -55,13 +59,10 @@ import {
 } from './chaotic-thursdays.config';
 import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 
-const CHAOTIC_THURSDAYS_SLUG = 'chaotyczne-czwartki';
-
 @Component({
   selector: 'app-chaotic-thursdays',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     ButtonModule,
     AccordionModule,
@@ -77,6 +78,8 @@ const CHAOTIC_THURSDAYS_SLUG = 'chaotyczne-czwartki';
   providers: [provideTranslocoScope('chaoticThursdays', 'common')],
 })
 export class ChaoticThursdays implements OnInit {
+  private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
   private readonly seo = inject(Seo);
   private readonly eventRead = inject(EventRead);
   private readonly gmRead = inject(GmRead);
@@ -102,11 +105,15 @@ export class ChaoticThursdays implements OnInit {
   );
   readonly isSessionDialogVisible = signal(false);
 
-  readonly selectedFutureOccurrenceIndex = signal(0);
+  readonly selectedOccurrenceIndex = signal(0);
 
   private readonly todayIso = getTodayIso();
   private readonly rangeStartIso = getStartOfCurrentMonthIso();
   private readonly rangeEndIso = getEndOfNextMonthIso();
+
+  readonly canHostSignup = computed(() =>
+    hasMinimumRole(this.auth.user(), 'gm'),
+  );
 
   readonly safeSelectedOccurrenceIndex = computed(() => {
     const count = this.pageVm()?.occurrences.length ?? 0;
@@ -115,7 +122,10 @@ export class ChaoticThursdays implements OnInit {
       return 0;
     }
 
-    return Math.min(this.selectedFutureOccurrenceIndex(), count - 1);
+    return Math.min(
+      Math.max(this.selectedOccurrenceIndex(), 0),
+      count - 1,
+    );
   });
 
   readonly selectedOccurrence = computed<IEventOccurrence | null>(() => {
@@ -126,7 +136,7 @@ export class ChaoticThursdays implements OnInit {
       return null;
     }
 
-    return occurrences[index] ?? occurrences[0] ?? null;
+    return occurrences[index] ?? null;
   });
 
   readonly occurrenceOptions = computed<IOccurrenceSwitcherOption[]>(() => {
@@ -155,7 +165,7 @@ export class ChaoticThursdays implements OnInit {
       id: item.id,
       gmProfileId: item.host.profile.id ?? null,
       title: item.session.title,
-      imageUrl: this.getImageUrl(item.session.image),
+      imageUrl: resolvePublicStorageUrl(this.storage, item.session.image),
       gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
       system: item.session.system ?? null,
       languages: item.session.languages ?? [],
@@ -178,7 +188,7 @@ export class ChaoticThursdays implements OnInit {
       return occurrence.slotCapacity;
     }
 
-    return event?.defaultSlotCapacity ?? 3;
+    return event?.defaultSlotCapacity ?? 0;
   });
 
   private readonly applySeoEffect = effect(() => {
@@ -197,10 +207,20 @@ export class ChaoticThursdays implements OnInit {
     this.loadPage();
   }
 
-  trackByIndex = (i: number) => i;
-
   onOccurrenceSelect(index: number): void {
-    this.selectedFutureOccurrenceIndex.set(index);
+    this.selectedOccurrenceIndex.set(index);
+  }
+
+  onHostSignupClick(): void {
+    const occurrenceDate = this.selectedOccurrence()?.occurrenceDate;
+
+    if (!occurrenceDate) {
+      return;
+    }
+
+    void this.router.navigate(
+      buildEventHostSignupRoute(EVENT_SLUGS.chaoticThursdays, occurrenceDate),
+    );
   }
 
   onSlotSelect(slot: IEventSlotCardVm): void {
@@ -257,7 +277,7 @@ export class ChaoticThursdays implements OnInit {
     this.isLoading.set(true);
 
     this.eventRead
-      .getPublicProgramLoadData(CHAOTIC_THURSDAYS_SLUG, {
+      .getPublicProgramLoadData(EVENT_SLUGS.chaoticThursdays, {
         startIso: this.rangeStartIso,
         endIso: this.rangeEndIso,
         todayIso: this.todayIso,
@@ -289,20 +309,6 @@ export class ChaoticThursdays implements OnInit {
     return this.slotItems().find((item) => item.id === normalizedId) ?? null;
   }
 
-  private getImageUrl(imagePath: string | null | undefined): string | null {
-    const normalized = normalizeText(imagePath);
-
-    if (!normalized) {
-      return null;
-    }
-
-    if (/^https?:\/\//i.test(normalized)) {
-      return normalized;
-    }
-
-    return this.storage.getPublicUrl(normalized);
-  }
-
   private buildStructuredData(pageVm: EventProgramPageVm | null) {
     const title = pageVm?.event.name || this.i18n.hero().title;
     const description =
@@ -311,7 +317,10 @@ export class ChaoticThursdays implements OnInit {
       this.i18n.seo().description ||
       '';
 
-    const image = this.getImageUrl(pageVm?.event.coverImagePath);
+    const image = resolvePublicStorageUrl(
+      this.storage,
+      pageVm?.event.coverImagePath,
+    );
     const eventStartTime = pageVm?.event.startTime ?? '17:00';
     const eventEndTime = pageVm?.event.endTime ?? '22:15';
     const offers = createOfferStructuredData({

@@ -20,7 +20,7 @@ export type ChaoticThursdaysHeroInfoTranslations = {
 
 export type ChaoticThursdaysHeroCtaTranslations = {
   primaryLabel: string;
-  secondaryLabel: string;
+  hostSignupLabel: string;
 };
 
 export type ChaoticThursdaysAboutTranslations = {

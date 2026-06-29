@@ -24,6 +24,16 @@ export interface IEventProgramItem {
   updatedAt: string;
 }
 
+export interface ICreateEventProgramItemPayload {
+  occurrenceId: string;
+  hostUserId: string;
+  sourceKind: EventProgramItemSourceKind;
+  gmSessionTemplateId: string | null;
+  customSessionId: string | null;
+  status: EventProgramItemStatus;
+  displayOrder: number | null;
+}
+
 export interface IEventProgramItemSessionDetails {
   title: string;
   description: string;

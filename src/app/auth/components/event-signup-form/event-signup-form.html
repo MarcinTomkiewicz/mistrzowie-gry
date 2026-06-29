@@ -28,7 +28,7 @@
               [label]="i18n.actions().backToSelectionLabel"
               severity="secondary"
               [outlined]="true"
-              routerLink="/auth/event-signup"
+              [routerLink]="eventSignupSelectionRoute"
             />
           </div>
         </div>
@@ -47,7 +47,7 @@
               [label]="i18n.actions().backToSelectionLabel"
               severity="secondary"
               [outlined]="true"
-              routerLink="/auth/event-signup"
+              [routerLink]="eventSignupSelectionRoute"
             />
           </div>
         </div>
@@ -91,7 +91,7 @@
               [emptyDescription]="i18n.template().emptyDescription"
               [actions]="submittedSessionActions()"
               [busy]="isBusy()"
-              [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
+              [resolveDifficultyLabel]="resolveDifficultyLabelFn"
               [playersLabel]="i18n.playersLabel"
               [minAgeLabel]="i18n.minAgeLabel"
               (edit)="onEditSubmittedCustomSession()"
@@ -139,7 +139,7 @@
                 [selectable]="true"
                 [selectedSessionId]="selectedTemplateId()"
                 [selectLabel]="i18n.actions().selectLabel"
-                [resolveDifficultyLabel]="resolveDifficultyLabel.bind(this)"
+                [resolveDifficultyLabel]="resolveDifficultyLabelFn"
                 [playersLabel]="i18n.playersLabel"
                 [minAgeLabel]="i18n.minAgeLabel"
                 (select)="onTemplateSelect($event)"

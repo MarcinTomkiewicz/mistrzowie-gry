@@ -11,7 +11,7 @@
     "upcomingSessions": "Nadchodzące sesje"
   },
 
-    "heroInfo": {
+  "heroInfo": {
     "title": "W skrócie",
     "chaoticPrice": "Koszt spotkania: 40 zł od osoby",
     "chaoticSchedule": "Kiedy: W każdy czwartek od 17:00",
@@ -20,7 +20,7 @@
 
   "cta": {
     "primaryLabel": "Zadaj pytanie",
-    "secondaryLabel": "Następne wydarzenie"
+    "hostSignupLabel": "Poprowadź sesję"
   },
   "about": {
     "title": "Czym są Chaotyczne Czwartki",
