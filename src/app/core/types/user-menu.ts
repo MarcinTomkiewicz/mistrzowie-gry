@@ -1,5 +1,6 @@
 export type UserMenuItemId =
   | 'edit-profile'
+  | 'session-reservation'
   | 'event-signup'
   | 'coworker-profile'
   | 'my-work-log'
@@ -30,6 +31,7 @@ export interface BuildUserMenuArgs {
   gmZoneTitle: string;
   administrationTitle: string;
   editProfileLabel: string;
+  sessionReservationLabel: string;
   eventSignupLabel: string;
   coworkerProfileLabel: string;
   myWorkLogLabel: string;

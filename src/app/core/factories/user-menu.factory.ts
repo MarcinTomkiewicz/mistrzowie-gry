@@ -12,6 +12,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           label: args.editProfileLabel,
           path: '/auth/edit-profile',
         },
+        {
+          id: 'session-reservation',
+          label: args.sessionReservationLabel,
+          path: '/rezerwacja-sesji',
+        },
       ],
     },
   ];

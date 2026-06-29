@@ -90,11 +90,6 @@ export class SessionReservationFacade {
     );
   }
 
-  clearCustomerEntitlements(): void {
-    this.customerEntitlements.set([]);
-    this.store.selectCustomerEntitlement(null);
-  }
-
   loadAvailableSlotsForSelectedGm(
     fromIso: string,
     toIsoExclusive: string,

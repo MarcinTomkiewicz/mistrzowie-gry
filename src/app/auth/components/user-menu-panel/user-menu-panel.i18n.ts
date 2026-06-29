@@ -1,4 +1,7 @@
-import { createCommonActionsI18n } from '../../../core/translations/common.i18n';
+import {
+  createCommonActionsI18n,
+  createCommonCtaI18n,
+} from '../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
 import { UserMenuTranslations } from '../../../core/types/i18n/auth';
 
@@ -8,9 +11,11 @@ export function createUserMenuPanelI18n() {
     'userMenu',
   );
   const commonActions = createCommonActionsI18n();
+  const commonCta = createCommonCtaI18n();
 
   return {
     userMenu,
     commonActions,
+    commonCta,
   };
 }

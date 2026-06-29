@@ -36,6 +36,7 @@ export class UserMenuPanel {
       gmZoneTitle: this.i18n.userMenu().gmZoneSectionTitle,
       administrationTitle: this.i18n.userMenu().administrationSectionTitle,
       editProfileLabel: this.i18n.userMenu().editProfileLabel,
+      sessionReservationLabel: this.i18n.commonCta().bookSession,
       eventSignupLabel: this.i18n.userMenu().eventSignupLabel,
       coworkerProfileLabel: this.i18n.userMenu().coworkerProfileLabel,
       myWorkLogLabel: this.i18n.userMenu().myWorkLogLabel,

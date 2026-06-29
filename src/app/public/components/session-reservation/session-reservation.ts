@@ -11,6 +11,7 @@ import {
   ISessionReservationAddonCustomerDetailsChange,
   ISessionReservationAddonQuantityChange,
 } from '../../../core/interfaces/i-session-reservation-flow';
+import { Auth } from '../../../core/services/auth/auth';
 import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
 import { Seo } from '../../../core/services/seo/seo';
 import { SessionAddonProductSlug } from '../../../core/types/session-booking-product';
@@ -34,10 +35,10 @@ import { SessionReservationSummaryCard } from './session-reservation-summary-car
 })
 export class SessionReservation implements OnInit {
   private readonly facade = inject(SessionReservationFacade);
+  private readonly auth = inject(Auth);
   private readonly seo = inject(Seo);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
-  private lastCustomerEmail = '';
 
   readonly store = this.facade.store;
   readonly i18n = createSessionReservationI18n();
@@ -139,16 +140,10 @@ export class SessionReservation implements OnInit {
       )
       .subscribe(() => {
         const value = this.contactForm.getRawValue();
-        const customerEmail = value.customerEmail.trim();
-
-        if (customerEmail !== this.lastCustomerEmail) {
-          this.lastCustomerEmail = customerEmail;
-          this.facade.clearCustomerEntitlements();
-        }
 
         this.store.setContact({
           customerName: value.customerName,
-          customerEmail,
+          customerEmail: value.customerEmail.trim(),
           customerPhone: value.customerPhone.trim() || null,
         });
       });
@@ -189,6 +184,7 @@ export class SessionReservation implements OnInit {
 
   ngOnInit(): void {
     this.store.reset();
+    this.prefillContactFromAuthenticatedUser();
     this.facade.selectFlowMode(SESSION_RESERVATION_FLOW_MODES.GmFirst);
     this.isLoadingInitial.set(true);
     this.loadError.set(null);
@@ -210,6 +206,7 @@ export class SessionReservation implements OnInit {
   }
 
   selectGm(gmProfileId: string | null): void {
+    this.loadError.set(null);
     this.isLoadingSystems.set(!!gmProfileId);
 
     this.facade
@@ -234,6 +231,8 @@ export class SessionReservation implements OnInit {
   }
 
   loadSlots(): void {
+    this.loadError.set(null);
+
     if (!this.store.selectedGmId()) {
       return;
     }
@@ -264,13 +263,16 @@ export class SessionReservation implements OnInit {
   }
 
   refreshEntitlements(): void {
+    this.loadError.set(null);
+
     if (!this.store.requiresCustomerEntitlement()) {
       this.facade.selectCustomerEntitlement(null);
       return;
     }
 
-    if (this.contactForm.controls.customerEmail.invalid) {
-      this.contactForm.controls.customerEmail.markAsTouched();
+    const userId = this.auth.userId();
+    if (!userId) {
+      this.loadError.set(this.i18n.commonErrors().unauthorized);
       return;
     }
 
@@ -278,7 +280,7 @@ export class SessionReservation implements OnInit {
 
     this.facade
       .loadCustomerEntitlements({
-        customerEmail: this.contactForm.controls.customerEmail.value.trim(),
+        userId,
       })
       .pipe(
         finalize(() => this.isLoadingEntitlements.set(false)),
@@ -287,6 +289,16 @@ export class SessionReservation implements OnInit {
       .subscribe({
         error: () => this.loadError.set(this.i18n.commonErrors().generic),
       });
+  }
+
+  private prefillContactFromAuthenticatedUser(): void {
+    const user = this.auth.user();
+
+    this.contactForm.reset({
+      customerName: this.auth.displayName(),
+      customerEmail: user?.email ?? '',
+      customerPhone: user?.phoneNumber ?? '',
+    });
   }
 
   selectCustomerEntitlement(id: string | null): void {

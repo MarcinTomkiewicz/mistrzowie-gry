@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 const loaders = {
   home: () => import('./public/components/home/home').then((m) => m.Home),
@@ -46,7 +47,11 @@ export const routes: Routes = [
 
   { path: 'chaotic-thursdays', loadComponent: loaders.chaoticThursdays },
   { path: 'join-the-party', loadComponent: loaders.joinTheParty },
-  { path: 'rezerwacja-sesji', loadComponent: loaders.sessionReservation },
+  {
+    path: 'rezerwacja-sesji',
+    loadComponent: loaders.sessionReservation,
+    canActivate: [authGuard],
+  },
   { path: 'contact', loadComponent: loaders.contact },
   { path: 'not-found', loadComponent: loaders.notFound },
   { path: 'not-authorized', loadComponent: loaders.notAuthorized },
