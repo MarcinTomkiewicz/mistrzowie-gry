@@ -97,6 +97,7 @@
                 [data]="data"
                 [state]="state"
                 (slotsRefresh)="wizard.loadSlots()"
+                (dateSelected)="wizard.selectSlotDate($event)"
                 (slotSelected)="wizard.selectSlot($event)"
               />
             </ng-template>

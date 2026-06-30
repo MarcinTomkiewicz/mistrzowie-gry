@@ -1,4 +1,5 @@
 @use "abstracts/mixins" as m;
+@use "abstracts/variables" as v;
 
 .calendar-viewport {
   width: 100%;
@@ -13,21 +14,26 @@
   line-height: 1;
 }
 
+.calendar-day strong {
+  color: v.$heading-color;
+  font-weight: 700;
+}
+
 .calendar-day {
-  min-height: 5.5rem;
-  border: 1px solid var(--mg-color-border);
-  border-radius: 10px;
+  min-height: calc(#{v.$container-padding} * 3 + #{v.$container-padding});
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
   transition:
-    background-color 0.2s ease-in-out,
-    border-color 0.2s ease-in-out,
-    opacity 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
+    background-color v.$transition-fast,
+    border-color v.$transition-fast,
+    opacity v.$transition-fast,
+    box-shadow v.$transition-fast;
 }
 
 .calendar-day--selected {
-  border-color: var(--mg-heading-color);
-  background: color-mix(in srgb, var(--mg-heading-color) 16%, var(--mg-color-bg-surface));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mg-heading-color) 28%, transparent);
+  border-color: v.$heading-color;
+  background: color-mix(in srgb, #{v.$heading-color} 16%, #{v.$color-bg-surface});
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #{v.$heading-color} 28%, transparent);
 }
 
 .calendar-day--outside,
@@ -36,47 +42,42 @@
 }
 
 .calendar-day.cursor-pointer:hover {
-  border-color: color-mix(in srgb, var(--mg-heading-color) 50%, var(--mg-color-border));
-  background: color-mix(in srgb, var(--mg-heading-color) 10%, var(--mg-color-bg-surface));
+  border-color: color-mix(in srgb, #{v.$heading-color} 50%, #{v.$color-border});
+  background: color-mix(in srgb, #{v.$heading-color} 10%, #{v.$color-bg-surface});
 }
 
 .calendar-day:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--mg-heading-color) 60%, white);
+  outline: 2px solid color-mix(in srgb, #{v.$heading-color} 60%, #{v.$color-white});
   outline-offset: 2px;
 }
 
 .calendar-hour {
   display: block;
   aspect-ratio: 1;
-  border-radius: 1px;
-  background: var(--mg-color-danger);
+  background: v.$color-danger;
 }
 
 .calendar-hour--active {
-  background: var(--mg-color-success);
+  background: v.$color-success;
 }
 
 .calendar-hour--popover {
-  width: 0.625rem;
+  width: v.$radius-md;
 }
 
 .calendar-weekday {
-  color: var(--mg-color-text-muted);
+  color: v.$color-text-muted;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 @include m.down("sm") {
-  .calendar-day {
-    min-height: 5rem;
-  }
-
   .calendar-month {
     min-width: 100%;
   }
 
   .calendar-day {
-    min-height: 3.75rem;
+    min-height: calc(#{v.$container-padding} * 2.5);
   }
 
   .calendar-weekday {

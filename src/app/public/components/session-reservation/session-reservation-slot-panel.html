@@ -1,4 +1,4 @@
-<section class="mg-card flex-col-start-stretch gap-md w-100">
+<section class="flex-col-start-stretch gap-md w-100">
   <div class="flex-row-between-center flex-col-sm gap-sm">
     <h2 class="mg-section__title mg-section__title--sm m-0">
       {{ data().sections.slot }}
@@ -23,22 +23,57 @@
     <p class="muted-text">{{ data().states.emptySlotsForGm }}</p>
   }
 
-  <div class="mg-grid-auto-fit gap-sm">
-    @for (slot of data().availableSlots; track slot.startsAt) {
-      <button
-        type="button"
-        class="mg-choice-card w-100 text-left"
-        [class.active]="
-          state().selectedDate === slot.date &&
-          state().selectedStartTime === slot.startTime
-        "
-        (click)="slotSelected.emit(slot)"
-      >
-        <span class="flex-row-between-center gap-sm">
-          <strong>{{ slotLabel(slot) }}</strong>
-          <span>{{ slot.durationHours }} h</span>
-        </span>
-      </button>
+  @if (data().availableSlots.length) {
+    <app-universal-calendar
+      mode="reservation"
+      [days]="calendarDays()"
+      [selectedDate]="selectedDate()"
+      [disabled]="data().isLoadingSlots || !state().selectedGmId"
+      [minDate]="calendarMinDate"
+      [maxDate]="calendarMaxDate"
+      (dateSelected)="onDateSelected($event)"
+    />
+
+    @if (selectedDate()) {
+      <div class="mg-card flex-col-start-stretch gap-sm w-100">
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
+          <div class="flex-col-start-stretch gap-xs">
+            <label for="reservation-start-time" class="color-text">{{ data().labels.startTime }}</label>
+            <p-select
+              inputId="reservation-start-time"
+              [options]="startHourOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              class="w-100"
+              [formControl]="startOffsetControl"
+              (onChange)="onStartOffsetChange($event.value)"
+            />
+          </div>
+
+          <div class="flex-col-start-stretch gap-xs">
+            <label for="reservation-end-time" class="color-text">{{ data().labels.endTime }}</label>
+            <p-select
+              inputId="reservation-end-time"
+              [options]="endOffsetOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              class="w-100"
+              [disabled]="startOffsetControl.value === null"
+              [formControl]="endOffsetControl"
+              (onChange)="emitSelectedSlotIfValid()"
+            />
+          </div>
+        </div>
+
+        @if (isLongerThanBaseDuration()) {
+          <p-message
+            severity="warn"
+            [text]="data().states.longDurationWarning"
+          />
+        }
+      </div>
     }
-  </div>
+  }
 </section>

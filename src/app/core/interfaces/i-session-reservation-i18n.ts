@@ -41,6 +41,8 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     manualQuote: string;
     grossTotal: string;
     selectedSlot: string;
+    startTime: string;
+    endTime: string;
   };
   states: {
     emptyGms: string;
@@ -53,6 +55,7 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     summaryNotReady: string;
     manualQuoteRequired: string;
     fixedPrice: string;
+    longDurationWarning: string;
   };
 }
 

@@ -1,0 +1,18 @@
+@use "../abstracts/variables" as v;
+
+$text-colors: (
+  "text": v.$color-text,
+  "primary": v.$color-primary,
+  "secondary": v.$color-secondary,
+  "heading": v.$heading-color,
+  "muted": v.$color-text-muted,
+  "link": v.$color-link,
+  "paper": v.$color-paper-text,
+  "paper-muted": v.$color-paper-muted,
+);
+
+@each $name, $color in $text-colors {
+  .color-#{$name} {
+    color: $color !important;
+  }
+}

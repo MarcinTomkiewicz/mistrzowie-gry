@@ -10,7 +10,13 @@ import {
   SESSION_RESERVATION_WIZARD_STEPS,
   SessionReservationWizardStep,
 } from '../../../core/types/session-reservation-wizard';
-import { addDays } from '../../../core/utils/date';
+import {
+  addDays,
+  getEndOfNextMonthIso,
+  parseIsoDate,
+  toIsoDate,
+  toLocalDayStartIso,
+} from '../../../core/utils/date';
 import { createSessionReservationI18n } from './session-reservation.i18n';
 
 @Injectable()
@@ -85,15 +91,14 @@ export class SessionReservationWizardController {
     const from = new Date(
       Date.now() + SESSION_RESERVATION_CONFIG.minLeadTimeHours * 60 * 60 * 1000,
     );
-    const to = addDays(
-      new Date(),
-      SESSION_RESERVATION_CONFIG.bookingHorizonDays,
+    const toExclusive = toLocalDayStartIso(
+      toIsoDate(addDays(parseIsoDate(getEndOfNextMonthIso()) as Date, 1)),
     );
 
     this.isLoadingSlots.set(true);
 
     this.facade
-      .loadAvailableSlotsForSelectedGm(from.toISOString(), to.toISOString())
+      .loadAvailableSlotsForSelectedGm(from.toISOString(), toExclusive)
       .pipe(
         finalize(() => this.isLoadingSlots.set(false)),
         takeUntilDestroyed(this.destroyRef),
@@ -105,7 +110,12 @@ export class SessionReservationWizardController {
 
   selectSlot(slot: ISessionReservationAvailableSlot): void {
     this.store.selectSlot(slot.date, slot.startTime, slot.durationHours);
-    this.goToWizardStep(SESSION_RESERVATION_WIZARD_STEPS.Details);
+  }
+
+  selectSlotDate(date: string | null): void {
+    if (date !== this.store.selectedDate()) {
+      this.store.clearSlot();
+    }
   }
 
   refreshEntitlements(): void {
@@ -151,8 +161,10 @@ export class SessionReservationWizardController {
 
   goToWizardStepFromStepper(step: number | undefined): void {
     if (
-      this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.System &&
-      step === SESSION_RESERVATION_WIZARD_STEPS.Slot
+      (this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.System &&
+        step === SESSION_RESERVATION_WIZARD_STEPS.Slot) ||
+      (this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.Slot &&
+        step === SESSION_RESERVATION_WIZARD_STEPS.Details)
     ) {
       return;
     }

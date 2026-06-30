@@ -34,7 +34,9 @@
     "entitlement": "Pakiet lub abonament",
     "manualQuote": "Wycena",
     "grossTotal": "Suma brutto",
-    "selectedSlot": "Wybrany termin"
+    "selectedSlot": "Wybrany termin",
+    "startTime": "Od",
+    "endTime": "Do"
   },
   "states": {
     "emptyGms": "Brak publicznych Mistrzów Gry.",
@@ -46,6 +48,7 @@
     "emptyEntitlements": "Brak aktywnych pakietów dla podanego e-maila.",
     "summaryNotReady": "Uzupełnij wymagane dane, aby zobaczyć podsumowanie.",
     "manualQuoteRequired": "Wymaga wyceny",
-    "fixedPrice": "Cena stała"
+    "fixedPrice": "Cena stała",
+    "longDurationWarning": "Wybrano czas dłuższy niż 4 godziny. Może to wiązać się z dodatkową opłatą."
   }
 }
