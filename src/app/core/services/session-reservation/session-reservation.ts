@@ -20,49 +20,32 @@ import { CUSTOMER_SESSION_ENTITLEMENT_STATUSES } from '../../types/customer-sess
 import { SessionBookingProductSlug } from '../../types/session-booking-product';
 import { GmRead } from '../gm-read/gm-read';
 import { Backend } from '../backend/backend';
-import { SessionSourceKind, SESSION_SOURCE_CONFIG } from '../../types/session-source';
+import { Auth } from '../auth/auth';
+import { hasMinimumRole } from '../../utils/roles';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationService {
   private readonly backend = inject(Backend);
   private readonly gmRead = inject(GmRead);
+  private readonly auth = inject(Auth);
 
   getActiveSystems(): Observable<ISystem[]> {
     return this.getVisibleGms().pipe(
       switchMap((gms) => {
         const gmProfileIds = gms.map((gm) => gm.profile.id);
 
-        if (!gmProfileIds.length) {
-          return of([] as ISystem[]);
-        }
-
-        return forkJoin([
-          this.getSystemIdsForGms(gmProfileIds, 'template'),
-          this.getSystemIdsForGms(gmProfileIds, 'custom'),
-        ]).pipe(
-          switchMap(([templateSystemIds, customSystemIds]) => {
-            const systemIds = [
-              ...new Set([...templateSystemIds, ...customSystemIds].filter(Boolean)),
-            ];
-
-            if (!systemIds.length) {
-              return of([] as ISystem[]);
-            }
-
-            return this.backend.getByIds<ISystem>('systems', systemIds).pipe(
-              map((systems) =>
-                [...systems].sort((left, right) =>
-                  left.name.localeCompare(right.name, 'pl'),
-                ),
-              ),
-            );
-          }),
+        return this.getTemplateSystemIdsForGms(gmProfileIds).pipe(
+          switchMap((systemIds) => this.getSystemsByIds(systemIds)),
         );
       }),
     );
   }
 
   getVisibleGms(): Observable<IGmPublicProfile[]> {
+    if (hasMinimumRole(this.auth.user(), 'customer_manager')) {
+      return this.gmRead.getNonArchivedProfiles();
+    }
+
     return this.gmRead.getPublicProfiles();
   }
 
@@ -137,40 +120,20 @@ export class SessionReservationService {
   }
 
   getSystemsForGm(gmProfileId: string): Observable<ISystem[]> {
-    return forkJoin([
-      this.getSystemIdsForGm(gmProfileId, 'template'),
-      this.getSystemIdsForGm(gmProfileId, 'custom'),
-    ]).pipe(
-      switchMap(([templateSystemIds, customSystemIds]) => {
-        const systemIds = [
-          ...new Set([...templateSystemIds, ...customSystemIds].filter(Boolean)),
-        ];
-
-        if (!systemIds.length) {
-          return of([] as ISystem[]);
-        }
-
-        return this.backend.getByIds<ISystem>('systems', systemIds).pipe(
-          map((systems) =>
-            [...systems].sort((left, right) =>
-              left.name.localeCompare(right.name, 'pl'),
-            ),
-          ),
-        );
-      }),
+    return this.getTemplateSystemIdsForGm(gmProfileId).pipe(
+      switchMap((systemIds) => this.getSystemsByIds(systemIds)),
     );
   }
 
   getGmsForSystem(systemId: string): Observable<IGmPublicProfile[]> {
-    return forkJoin([
-      this.getGmIdsForSystem(systemId, 'template'),
-      this.getGmIdsForSystem(systemId, 'custom'),
-      this.getVisibleGms(),
-    ]).pipe(
-      map(([templateGmIds, customGmIds, gms]) => {
-        const gmIds = new Set([...templateGmIds, ...customGmIds]);
+    return forkJoin({
+      gmIds: this.getTemplateGmIdsForSystem(systemId),
+      gms: this.getVisibleGms(),
+    }).pipe(
+      map(({ gmIds, gms }) => {
+        const availableGmIds = new Set(gmIds);
 
-        return gms.filter((gm) => gmIds.has(gm.profile.id));
+        return gms.filter((gm) => availableGmIds.has(gm.profile.id));
       }),
     );
   }
@@ -232,26 +195,22 @@ export class SessionReservationService {
     >('session_reservations', payload);
   }
 
-  private getSystemIdsForGm(
+  private getTemplateSystemIdsForGm(
     gmProfileId: string,
-    source: SessionSourceKind,
   ): Observable<string[]> {
-    return this.getSystemIdsForGms([gmProfileId], source);
+    return this.getTemplateSystemIdsForGms([gmProfileId]);
   }
 
-  private getSystemIdsForGms(
+  private getTemplateSystemIdsForGms(
     gmProfileIds: readonly string[],
-    source: SessionSourceKind,
   ): Observable<string[]> {
     if (!gmProfileIds.length) {
       return of([]);
     }
 
-    const config = SESSION_SOURCE_CONFIG[source];
-
     return this.backend
       .getAll<Pick<ISession, 'systemId'>>({
-        table: config.sessionsTable,
+        table: 'gm_session_templates',
         pagination: {
           filters: {
             gmProfileId: {
@@ -268,15 +227,12 @@ export class SessionReservationService {
       );
   }
 
-  private getGmIdsForSystem(
+  private getTemplateGmIdsForSystem(
     systemId: string,
-    source: SessionSourceKind,
   ): Observable<string[]> {
-    const config = SESSION_SOURCE_CONFIG[source];
-
     return this.backend
       .getAll<Pick<ISession, 'gmProfileId'>>({
-        table: config.sessionsTable,
+        table: 'gm_session_templates',
         pagination: {
           filters: {
             systemId: {
@@ -293,5 +249,19 @@ export class SessionReservationService {
           ),
         ]),
       );
+  }
+
+  private getSystemsByIds(systemIds: readonly string[]): Observable<ISystem[]> {
+    if (!systemIds.length) {
+      return of([] as ISystem[]);
+    }
+
+    return this.backend.getByIds<ISystem>('systems', [...systemIds]).pipe(
+      map((systems) =>
+        [...systems].sort((left, right) =>
+          left.name.localeCompare(right.name, 'pl'),
+        ),
+      ),
+    );
   }
 }

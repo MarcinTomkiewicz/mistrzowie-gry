@@ -22,10 +22,10 @@ import {
   GmProfileDialogTabId,
 } from '../../../core/types/gm-dialog';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
-import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Storage } from '../../../core/services/storage/storage';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { SessionList } from '../../common/session-list/session-list';
 import { createGmProfileDialogI18n } from './gm-profile-dialog.i18n';
 import { ISessionListLabels } from '../../../core/interfaces/i-session';
@@ -56,7 +56,6 @@ interface IGmProfileDialogTabOption {
   providers: [provideTranslocoScope('ourTeam', 'common', 'sessions')],
 })
 export class GmProfileDialog {
-  private readonly gmRead = inject(GmRead);
   private readonly storage = inject(Storage);
 
   readonly visible = input(false);
@@ -95,7 +94,7 @@ export class GmProfileDialog {
       return '';
     }
 
-    return this.gmRead.getDisplayName(profile);
+    return getGmPublicProfileDisplayName(profile);
   });
 
   readonly imageUrl = computed(() => {

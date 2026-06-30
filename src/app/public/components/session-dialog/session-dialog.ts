@@ -20,6 +20,7 @@ import { ISessionWithRelations } from '../../../core/interfaces/i-session';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { SessionDetails } from '../../common/session-details/session-details';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createSessionDialogI18n } from './session-dialog.i18n';
@@ -78,7 +79,7 @@ export class SessionDialog {
       return null;
     }
 
-    return this.gmRead.getDisplayName(profile) || null;
+    return getGmPublicProfileDisplayName(profile) || null;
   });
 
   readonly canOpenGmProfile = computed(() => !!this.selectedProfile()?.profile.id);

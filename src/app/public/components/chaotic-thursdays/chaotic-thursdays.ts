@@ -48,6 +48,7 @@ import {
   createEventStructuredData,
   createOfferStructuredData,
 } from '../../../core/utils/structured-data';
+import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { OccurrenceSwitcher } from '../../common/occurrence-switcher/occurrence-switcher';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
@@ -166,7 +167,7 @@ export class ChaoticThursdays implements OnInit {
       gmProfileId: item.host.profile.id ?? null,
       title: item.session.title,
       imageUrl: resolvePublicStorageUrl(this.storage, item.session.image),
-      gmDisplayName: this.gmRead.getDisplayName(item.host) || null,
+      gmDisplayName: getGmPublicProfileDisplayName(item.host) || null,
       system: item.session.system ?? null,
       languages: item.session.languages ?? [],
       difficultyLevel: item.session.difficultyLevel,

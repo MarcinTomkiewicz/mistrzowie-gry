@@ -6,13 +6,13 @@ import {
   IGmProfile,
   IGmProfileWithRelations,
 } from '../../interfaces/i-gm-profile';
+import { FilterDefinition } from '../../interfaces/i-filter';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
 import { IGmProfileStyle, IGmStyle } from '../../interfaces/i-gm-style';
 import { IUser } from '../../interfaces/i-user';
 import { Backend } from '../backend/backend';
 import { IGmProfileLanguage, ILanguage } from '../../interfaces/i-languages';
 import { SessionRead } from '../session-read/session-read';
-import { getUserDisplayName } from '../../utils/user-display';
 
 @Injectable({ providedIn: 'root' })
 export class GmRead {
@@ -62,22 +62,37 @@ export class GmRead {
   }
 
   getPublicProfiles(): Observable<IGmPublicProfile[]> {
+    return this.getProfiles({
+      isPublic: {
+        operator: FilterOperator.EQ,
+        value: true,
+      },
+      isArchived: {
+        operator: FilterOperator.EQ,
+        value: false,
+      },
+    });
+  }
+
+  getNonArchivedProfiles(): Observable<IGmPublicProfile[]> {
+    return this.getProfiles({
+      isArchived: {
+        operator: FilterOperator.EQ,
+        value: false,
+      },
+    });
+  }
+
+  private getProfiles(
+    filters: Record<string, FilterDefinition>,
+  ): Observable<IGmPublicProfile[]> {
     return this.backend
       .getAll<IGmProfile>({
         table: 'gm_profiles',
         sortBy: 'createdAt',
         sortOrder: 'asc',
         pagination: {
-          filters: {
-            isPublic: {
-              operator: FilterOperator.EQ,
-              value: true,
-            },
-            isArchived: {
-              operator: FilterOperator.EQ,
-              value: false,
-            },
-          },
+          filters,
         },
       })
       .pipe(
@@ -97,10 +112,6 @@ export class GmRead {
           );
         }),
       );
-  }
-
-  getDisplayName(profile: IGmPublicProfile): string {
-    return getUserDisplayName(profile.user);
   }
 
   private hydrateProfile(

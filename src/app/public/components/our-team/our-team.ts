@@ -14,6 +14,7 @@ import {
   createOrganizationRef,
   createPageStructuredData,
 } from '../../../core/utils/structured-data';
+import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
@@ -122,7 +123,7 @@ export class OurTeam {
       return {
         '@type': 'Person',
         '@id': `${this.pageUrl}#person-${profileId}`,
-        name: this.gmRead.getDisplayName(profile) || 'Mistrz Gry',
+        name: getGmPublicProfileDisplayName(profile) || 'Mistrz Gry',
         description: profileDescription,
         image: image ?? undefined,
         jobTitle: 'Mistrz Gry',
