@@ -9,18 +9,27 @@
       size="small"
       icon="pi pi-refresh"
       [label]="data().commonActions.refresh"
-      [loading]="data().isLoadingSlots"
-      [disabled]="!state().selectedGmId || data().isLoadingSlots"
+      [disabled]="!canLoadSlots() || data().isLoadingSlots"
       (onClick)="slotsRefresh.emit()"
     />
   </div>
 
-  @if (data().isLoadingSlots) {
-    <p class="muted-text">{{ data().commonStatus.loading }}</p>
-  } @else if (!state().selectedGmId) {
-    <p class="muted-text">{{ data().states.selectGmForSlots }}</p>
-  } @else if (!data().availableSlots.length) {
-    <p class="muted-text">{{ data().states.emptySlotsForGm }}</p>
+  @if (!data().isLoadingSlots && !canLoadSlots()) {
+    <p class="muted-text">
+      {{
+        state().selectedSystemId
+          ? data().states.selectGmForSlots
+          : data().states.selectSystemBeforeSlots
+      }}
+    </p>
+  } @else if (!data().isLoadingSlots && !data().availableSlots.length) {
+    <p class="muted-text">
+      {{
+        state().flowMode === flowModes.SystemFirst
+          ? data().states.emptySlotsForSelectedGmSystem
+          : data().states.emptySlotsForGm
+      }}
+    </p>
   }
 
   @if (data().availableSlots.length) {
@@ -28,7 +37,7 @@
       mode="reservation"
       [days]="calendarDays()"
       [selectedDate]="selectedDate()"
-      [disabled]="data().isLoadingSlots || !state().selectedGmId"
+      [disabled]="data().isLoadingSlots || !canLoadSlots()"
       [minDate]="calendarMinDate"
       [maxDate]="calendarMaxDate"
       (dateSelected)="onDateSelected($event)"
@@ -36,7 +45,7 @@
 
     @if (selectedDate()) {
       <div class="mg-card flex-col-start-stretch gap-sm w-100">
-        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
+        <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-sm">
           <div class="flex-col-start-stretch gap-xs">
             <label for="reservation-start-time" class="color-text">{{ data().labels.startTime }}</label>
             <p-select

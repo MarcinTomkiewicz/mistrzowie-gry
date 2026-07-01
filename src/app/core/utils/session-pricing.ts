@@ -1,6 +1,6 @@
 import { SESSION_RESERVATION_CONFIG } from '../configs/session-reservation.config';
 import { ISessionBookingProduct } from '../interfaces/i-session-booking-product';
-import { SessionReservationAddonDetailsMap } from '../interfaces/i-session-reservation-flow';
+import { SessionReservationAddonDetailsMap } from '../types/session-reservation-addon-details';
 import { SessionAddonProductSlug } from '../types/session-booking-product';
 import { formatMoney } from './pricing';
 

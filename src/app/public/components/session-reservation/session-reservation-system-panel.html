@@ -3,16 +3,23 @@
     {{ data().sections.system }}
   </h2>
 
-  @if (data().isLoadingSystems) {
-    <p class="muted-text">{{ data().commonStatus.loading }}</p>
-  } @else if (!state().selectedGmId) {
+  @if (
+    !data().isLoadingSystems &&
+    state().flowMode === flowModes.GmFirst && !state().selectedGmId
+  ) {
     <p class="muted-text">{{ data().states.selectGmFirst }}</p>
-  } @else if (!data().systemsForSelectedGm.length) {
-    <p class="muted-text">{{ data().states.emptySystemsForGm }}</p>
+  } @else if (!data().isLoadingSystems && !data().systemOptions.length) {
+    <p class="muted-text">
+      {{
+        state().flowMode === flowModes.SystemFirst
+          ? data().states.emptyActiveSystems
+          : data().states.emptySystemsForGm
+      }}
+    </p>
   }
 
   <div class="flex-col-start-stretch gap-md">
-    @for (system of data().systemsForSelectedGm; track system.id) {
+    @for (system of data().systemOptions; track system.id) {
       <button
         type="button"
         class="mg-choice-card w-100 text-left"

@@ -8,4 +8,28 @@
       <strong>{{ data().labels.reservationKind }}</strong>
     </div>
   </div>
+
+  <div class="flex-col-start-stretch color-text gap-md">
+    <strong>{{ data().labels.flowMode }}</strong>
+
+    <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100">
+      <button
+        type="button"
+        class="mg-choice-card w-100 text-left"
+        [class.active]="state().flowMode === flowModes.GmFirst"
+        (click)="flowModeSelected.emit(flowModes.GmFirst)"
+      >
+        <strong>{{ data().labels.gmFirstFlowMode }}</strong>
+      </button>
+
+      <button
+        type="button"
+        class="mg-choice-card w-100 text-left"
+        [class.active]="state().flowMode === flowModes.SystemFirst"
+        (click)="flowModeSelected.emit(flowModes.SystemFirst)"
+      >
+        <strong>{{ data().labels.systemFirstFlowMode }}</strong>
+      </button>
+    </div>
+  </div>
 </section>

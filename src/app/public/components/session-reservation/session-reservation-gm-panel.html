@@ -3,12 +3,24 @@
     {{ data().sections.gm }}
   </h2>
 
-  @if (!data().visibleGms.length) {
-    <p class="muted-text">{{ data().states.emptyGms }}</p>
+  @if (
+    !data().isLoadingGms &&
+    state().flowMode === flowModes.SystemFirst &&
+    !state().selectedSystemId
+  ) {
+    <p class="muted-text">{{ data().states.selectSystemForGms }}</p>
+  } @else if (!data().isLoadingGms && !data().gmOptions.length) {
+    <p class="muted-text">
+      {{
+        state().flowMode === flowModes.SystemFirst
+          ? data().states.emptyGmsForSystemAvailability
+          : data().states.emptyGms
+      }}
+    </p>
   }
 
   <app-gm-profiles
-    [profiles]="data().visibleGms"
+    [profiles]="data().gmOptions"
     [selectedProfileId]="state().selectedGmId"
     (profileSelected)="gmSelected.emit($event.profile.id)"
   />

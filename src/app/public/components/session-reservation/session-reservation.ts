@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { finalize, startWith } from 'rxjs';
 
+import { SESSION_RESERVATION_FLOW_MODES } from '../../../core/configs/session-reservation-flow-mode.config';
 import { SESSION_RESERVATION_CONFIG } from '../../../core/configs/session-reservation.config';
 import {
   ISessionReservationAddonCustomerDetailsChange,
@@ -14,7 +15,9 @@ import { Auth } from '../../../core/services/auth/auth';
 import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
 import { Seo } from '../../../core/services/seo/seo';
 import { SessionAddonProductSlug } from '../../../core/types/session-booking-product';
-import { SESSION_RESERVATION_FLOW_MODES } from '../../../core/types/session-reservation-flow-mode';
+import {
+  SessionReservationFlowMode,
+} from '../../../core/types/session-reservation-flow-mode';
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
@@ -63,6 +66,7 @@ export class SessionReservation implements OnInit {
   readonly wizard = inject(SessionReservationWizardController);
 
   readonly isLoadingInitial = signal(false);
+  readonly isLoadingEntitlements = signal(false);
   readonly isGmProfileDialogVisible = signal(false);
 
   readonly contactForm = this.fb.nonNullable.group({
@@ -93,22 +97,30 @@ export class SessionReservation implements OnInit {
     ),
   );
 
+  readonly gmOptions = computed(() =>
+    this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst
+      ? this.facade.gmsForSelectedSystem()
+      : this.facade.visibleGms(),
+  );
+
+  readonly systemOptions = computed(() =>
+    this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst
+      ? this.facade.activeSystems()
+      : this.facade.systemsForSelectedGm(),
+  );
+
   readonly selectedGm = computed(() => {
     const selectedGmId = this.store.selectedGmId();
 
-    return (
-      this.facade.visibleGms().find((gm) => gm.profile.id === selectedGmId) ??
-      null
-    );
+    return this.gmOptions().find((gm) => gm.profile.id === selectedGmId) ?? null;
   });
 
   readonly selectedSystem = computed(() => {
     const selectedSystemId = this.store.selectedSystemId();
 
     return (
-      this.facade
-        .systemsForSelectedGm()
-        .find((system) => system.id === selectedSystemId) ?? null
+      this.systemOptions().find((system) => system.id === selectedSystemId) ??
+      null
     );
   });
 
@@ -122,8 +134,8 @@ export class SessionReservation implements OnInit {
     commonActions: this.i18n.commonActions(),
     commonStatus: this.i18n.commonStatus(),
     addonProducts: this.addonProducts(),
-    visibleGms: this.facade.visibleGms(),
-    systemsForSelectedGm: this.facade.systemsForSelectedGm(),
+    gmOptions: this.gmOptions(),
+    systemOptions: this.systemOptions(),
     availableSlots: this.facade.availableSlots(),
     customerEntitlements: this.facade.customerEntitlements(),
     selectedGm: this.selectedGm(),
@@ -132,7 +144,8 @@ export class SessionReservation implements OnInit {
     isLoadingInitial: this.isLoadingInitial(),
     isLoadingSystems: this.wizard.isLoadingSystems(),
     isLoadingSlots: this.wizard.isLoadingSlots(),
-    isLoadingEntitlements: this.wizard.isLoadingEntitlements(),
+    isLoadingGms: this.wizard.isLoadingGms(),
+    isLoadingEntitlements: this.isLoadingEntitlements(),
     loadError: this.wizard.loadError(),
     requiresCustomerEntitlement: this.store.requiresCustomerEntitlement(),
     requiresManualQuote: this.store.requiresManualQuote(),
@@ -189,10 +202,9 @@ export class SessionReservation implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.reset();
+    this.facade.resetReservationFlow();
     this.wizard.reset();
     this.prefillContactFromAuthenticatedUser();
-    this.facade.selectFlowMode(SESSION_RESERVATION_FLOW_MODES.GmFirst);
     this.isLoadingInitial.set(true);
 
     this.facade
@@ -219,6 +231,38 @@ export class SessionReservation implements OnInit {
 
   selectCustomerEntitlement(id: string | null): void {
     this.facade.selectCustomerEntitlement(id);
+  }
+
+  refreshEntitlements(): void {
+    this.wizard.clearLoadError();
+
+    if (!this.store.requiresCustomerEntitlement()) {
+      this.facade.selectCustomerEntitlement(null);
+      return;
+    }
+
+    const userId = this.auth.userId();
+
+    if (!userId) {
+      this.wizard.setLoadError(this.i18n.commonErrors().unauthorized);
+      return;
+    }
+
+    this.isLoadingEntitlements.set(true);
+
+    this.facade
+      .loadCustomerEntitlements({ userId })
+      .pipe(
+        finalize(() => this.isLoadingEntitlements.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        error: () => this.wizard.setGenericLoadError(),
+      });
+  }
+
+  selectFlowMode(flowMode: SessionReservationFlowMode): void {
+    this.wizard.selectFlowMode(flowMode);
   }
 
   openSelectedGmProfileDialog(): void {
@@ -256,5 +300,4 @@ export class SessionReservation implements OnInit {
       quantity: change.quantity,
     });
   }
-
 }

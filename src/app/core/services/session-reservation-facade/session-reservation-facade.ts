@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { forkJoin, map, Observable, of, tap } from 'rxjs';
 
+import { SESSION_RESERVATION_FLOW_MODES } from '../../configs/session-reservation-flow-mode.config';
 import {
   ICustomerSessionEntitlement,
   ICustomerSessionEntitlementLookup,
@@ -25,10 +26,7 @@ import {
   SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG,
   SessionReservationBaseProductSlug,
 } from '../../types/session-booking-product';
-import {
-  SESSION_RESERVATION_FLOW_MODES,
-  SessionReservationFlowMode,
-} from '../../types/session-reservation-flow-mode';
+import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
 import { calculateProductsGrossTotal } from '../../utils/session-pricing';
 import { SessionReservationAvailabilityService } from '../session-reservation-availability/session-reservation-availability';
 import { SessionReservationStore } from '../session-reservation-store/session-reservation-store';
@@ -46,21 +44,11 @@ export class SessionReservationFacade {
   readonly visibleGms = signal<readonly IGmPublicProfile[]>([]);
   readonly systemsForSelectedGm = signal<readonly ISystem[]>([]);
   readonly gmsForSelectedSystem = signal<readonly IGmPublicProfile[]>([]);
-  readonly availableSlots = signal<readonly ISessionReservationAvailableSlot[]>(
-    [],
-  );
-  readonly nextSlotsForSelectedSystem = signal<
-    readonly ISessionReservationGmSlot[]
-  >([]);
-  readonly customerEntitlements = signal<
-    readonly ICustomerSessionEntitlement[]
-  >([]);
+  readonly availableSlots = signal<readonly ISessionReservationAvailableSlot[]>([]);
+  readonly customerEntitlements = signal<readonly ICustomerSessionEntitlement[]>([]);
 
   private readonly productBySlug = computed(
-    () =>
-      new Map(
-        this.products().map((product) => [product.slug, product] as const),
-      ),
+    () => new Map(this.products().map((product) => [product.slug, product] as const)),
   );
 
   loadInitialOptions(): Observable<ISessionReservationInitialOptions> {
@@ -90,34 +78,47 @@ export class SessionReservationFacade {
     );
   }
 
+  resetReservationFlow(): void {
+    this.store.reset();
+    this.products.set([]);
+    this.activeSystems.set([]);
+    this.visibleGms.set([]);
+    this.systemsForSelectedGm.set([]);
+    this.gmsForSelectedSystem.set([]);
+    this.availableSlots.set([]);
+    this.customerEntitlements.set([]);
+  }
+
   loadAvailableSlotsForSelectedGm(
     fromIso: string,
     toIsoExclusive: string,
   ): Observable<ISessionReservationAvailableSlot[]> {
     const gmId = this.store.selectedGmId();
 
-    if (!gmId) {
+    if (!gmId || !this.isSelectedGmValidForCurrentSystem()) {
       this.availableSlots.set([]);
       return of([]);
     }
 
-    return this.availability
-      .getAvailableSlotsForGm(
-        gmId,
-        fromIso,
-        toIsoExclusive,
-        this.store.selectedDurationHours(),
-      )
-      .pipe(tap((slots) => this.availableSlots.set(slots)));
+    const toTime = Date.parse(toIsoExclusive);
+
+    return this.loadNextSlotsForSelectedSystem(fromIso).pipe(
+      map((slots) =>
+        slots.filter(
+          (slot) =>
+            slot.gmProfileId === gmId && Date.parse(slot.startsAt) < toTime,
+        ),
+      ),
+      tap((slots) => this.availableSlots.set(slots)),
+    );
   }
 
-  loadNextSlotsForSelectedSystem(
+  private loadNextSlotsForSelectedSystem(
     fromIso: string,
   ): Observable<ISessionReservationGmSlot[]> {
     const systemId = this.store.selectedSystemId();
 
     if (!systemId) {
-      this.nextSlotsForSelectedSystem.set([]);
       return of([]);
     }
 
@@ -126,16 +127,18 @@ export class SessionReservationFacade {
         systemId,
         fromIso,
         this.store.selectedDurationHours(),
-      )
-      .pipe(tap((slots) => this.nextSlotsForSelectedSystem.set(slots)));
+      );
   }
 
   selectFlowMode(flowMode: SessionReservationFlowMode): void {
+    if (flowMode === this.store.flowMode()) {
+      return;
+    }
+
     this.store.setFlowMode(flowMode);
     this.systemsForSelectedGm.set([]);
     this.gmsForSelectedSystem.set([]);
     this.availableSlots.set([]);
-    this.nextSlotsForSelectedSystem.set([]);
   }
 
   selectBaseProduct(product: ISessionBookingProduct): void {
@@ -178,12 +181,23 @@ export class SessionReservationFacade {
     this.store.selectCustomerEntitlement(id);
   }
 
-  selectGm(gmId: string | null): Observable<ISystem[]> {
+  selectGm(gmId: string | null): void {
+    if (gmId === this.store.selectedGmId()) {
+      return;
+    }
+
     this.store.selectGm(gmId);
     this.systemsForSelectedGm.set([]);
     this.availableSlots.set([]);
+  }
 
-    if (!gmId) return of([]);
+  loadSystemsForSelectedGm(): Observable<ISystem[]> {
+    const gmId = this.store.selectedGmId();
+
+    if (!gmId) {
+      this.systemsForSelectedGm.set([]);
+      return of([]);
+    }
 
     return this.reservation.getSystemsForGm(gmId).pipe(
       tap((systems) => {
@@ -199,73 +213,36 @@ export class SessionReservationFacade {
     );
   }
 
-  selectSystem(systemId: string | null): Observable<IGmPublicProfile[]> {
+  selectSystem(systemId: string | null): void {
+    if (systemId === this.store.selectedSystemId()) {
+      return;
+    }
+
     this.store.selectSystem(systemId);
     this.gmsForSelectedSystem.set([]);
-    this.nextSlotsForSelectedSystem.set([]);
+    this.availableSlots.set([]);
+  }
 
-    if (!systemId) return of([]);
+  loadGmsForSelectedSystemAvailability(
+    availabilityFromIso: string,
+  ): Observable<IGmPublicProfile[]> {
+    if (!this.store.selectedSystemId()) {
+      this.gmsForSelectedSystem.set([]);
+      return of([]);
+    }
 
-    return this.reservation
-      .getGmsForSystem(systemId)
-      .pipe(tap((gms) => this.gmsForSelectedSystem.set(gms)));
+    return this.loadNextSlotsForSelectedSystem(availabilityFromIso).pipe(
+      map((slots) => this.toUniqueGms(slots)),
+      tap((gms) => this.gmsForSelectedSystem.set(gms)),
+    );
+  }
+
+  selectSlot(date: string, startTime: string, durationHours: number): void {
+    this.store.selectSlot(date, startTime, durationHours);
   }
 
   clearSlot(): void {
     this.store.clearSlot();
-    this.availableSlots.set([]);
-    this.nextSlotsForSelectedSystem.set([]);
-  }
-
-  syncSelectedGmWithCurrentSlot(): Observable<boolean> {
-    const state = this.store.state();
-
-    if (
-      !state.selectedGmId ||
-      !state.selectedDate ||
-      !state.selectedStartTime
-    ) {
-      return of(false);
-    }
-
-    const availableGms$ = state.selectedSystemId
-      ? this.availability.getAvailableGmsForSystemSlot(
-          state.selectedSystemId,
-          state.selectedDate,
-          state.selectedStartTime,
-          state.selectedDurationHours,
-        )
-      : this.availability.getAvailableGmsForSlot(
-          state.selectedDate,
-          state.selectedStartTime,
-          state.selectedDurationHours,
-        );
-
-    return availableGms$.pipe(
-      tap((gms) => {
-        if (state.selectedSystemId) this.gmsForSelectedSystem.set(gms);
-      }),
-      map((gms) => gms.some((gm) => gm.profile.id === state.selectedGmId)),
-      tap((isValid) => {
-        if (!isValid) this.store.clearGm();
-      }),
-    );
-  }
-
-  syncSelectedSystemWithCurrentGm(): Observable<boolean> {
-    const state = this.store.state();
-
-    if (!state.selectedGmId || !state.selectedSystemId) return of(false);
-
-    return this.reservation.getSystemsForGm(state.selectedGmId).pipe(
-      tap((systems) => this.systemsForSelectedGm.set(systems)),
-      map((systems) =>
-        systems.some((system) => system.id === state.selectedSystemId),
-      ),
-      tap((isValid) => {
-        if (!isValid) this.store.clearSystem();
-      }),
-    );
   }
 
   buildSummaryPreview(): ISessionReservationSummaryPreview | null {
@@ -316,7 +293,9 @@ export class SessionReservationFacade {
     };
   }
 
-  private resolveBookingMode(product: ISessionBookingProduct): SessionBookingMode {
+  private resolveBookingMode(
+    product: ISessionBookingProduct,
+  ): SessionBookingMode {
     if (product.slug === SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG) {
       return SESSION_BOOKING_MODES.CustomQuote;
     }
@@ -330,5 +309,33 @@ export class SessionReservationFacade {
     }
 
     return SESSION_BOOKING_MODES.SingleSession;
+  }
+
+  private toUniqueGms(
+    slots: readonly ISessionReservationGmSlot[],
+  ): IGmPublicProfile[] {
+    return [
+      ...new Map(
+        slots.map((slot) => [slot.gm.profile.id, slot.gm]),
+      ).values(),
+    ];
+  }
+
+  private isSelectedGmValidForCurrentSystem(): boolean {
+    const state = this.store.state();
+
+    if (!state.selectedGmId || !state.selectedSystemId) {
+      return false;
+    }
+
+    if (state.flowMode === SESSION_RESERVATION_FLOW_MODES.SystemFirst) {
+      return this.gmsForSelectedSystem().some(
+        (gm) => gm.profile.id === state.selectedGmId,
+      );
+    }
+
+    return this.systemsForSelectedGm().some(
+      (system) => system.id === state.selectedSystemId,
+    );
   }
 }

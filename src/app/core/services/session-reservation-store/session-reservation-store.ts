@@ -1,18 +1,12 @@
 import { computed, Injectable, signal } from '@angular/core';
 
+import { SESSION_RESERVATION_FLOW_MODES } from '../../configs/session-reservation-flow-mode.config';
 import { SESSION_RESERVATION_CONFIG } from '../../configs/session-reservation.config';
-import {
-  SessionReservationFallbackModeEnum,
-  SessionReservationStepEnum,
-} from '../../enums/session-reservation-flow';
 import { ISessionReservationContact } from '../../interfaces/i-session-reservation-contact';
 import {
   ISessionReservationAddonDetails,
   ISessionReservationFlowState,
   ISessionReservationGmExtraInfo,
-  SessionReservationAddonDetailsMap,
-  SessionReservationFallbackMode,
-  SessionReservationStep,
 } from '../../interfaces/i-session-reservation-flow';
 import {
   SESSION_BOOKING_MODES,
@@ -22,10 +16,8 @@ import {
   SessionAddonProductSlug,
   SessionReservationBaseProductSlug,
 } from '../../types/session-booking-product';
-import {
-  SESSION_RESERVATION_FLOW_MODES,
-  SessionReservationFlowMode,
-} from '../../types/session-reservation-flow-mode';
+import { SessionReservationAddonDetailsMap } from '../../types/session-reservation-addon-details';
+import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationStore {
@@ -37,7 +29,6 @@ export class SessionReservationStore {
 
   readonly flowMode = computed(() => this.state().flowMode);
   readonly bookingMode = computed(() => this.state().bookingMode);
-  readonly step = computed(() => this.state().step);
   readonly selectedBaseProductSlug = computed(
     () => this.state().selectedBaseProductSlug,
   );
@@ -59,7 +50,6 @@ export class SessionReservationStore {
   readonly customServicesRequest = computed(
     () => this.state().customServicesRequest,
   );
-  readonly fallbackMode = computed(() => this.state().fallbackMode);
 
   readonly requiresCustomerEntitlement = computed(
     () =>
@@ -83,11 +73,6 @@ export class SessionReservationStore {
     const state = this.state();
     const contact = state.contact;
     const extraInfo = state.gmExtraInfo;
-    const detailsRequired =
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringCustomerDetails as readonly string[];
-    const quantityRequired =
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringQuantity as readonly string[];
-
     return (
       !!state.selectedGmId &&
       !!state.selectedSystemId &&
@@ -100,31 +85,30 @@ export class SessionReservationStore {
       (!this.requiresManualQuote() || !!state.customServicesRequest?.trim()) &&
       (!this.requiresCustomerEntitlement() ||
         !!state.selectedCustomerEntitlementId) &&
-      state.selectedAddonSlugs.every((slug) => {
-        const details = state.addonDetails[slug];
-        const hasRequiredDetails =
-          !detailsRequired.includes(slug) || !!details?.customerDetails?.trim();
-        const hasRequiredQuantity =
-          !quantityRequired.includes(slug) ||
-          (typeof details?.quantity === 'number' && details.quantity > 0);
-
-        return hasRequiredDetails && hasRequiredQuantity;
-      })
+      this.areSelectedAddonsComplete()
     );
   });
+
+  readonly areSelectedAddonsComplete = computed(() =>
+    this.isAddonSelectionComplete(),
+  );
 
   reset(): void {
     this.stateSource.set(this.createInitialState());
   }
 
   setFlowMode(flowMode: SessionReservationFlowMode): void {
+    if (flowMode === this.flowMode()) {
+      return;
+    }
+
     this.patch({
       flowMode,
       selectedGmId: null,
       selectedSystemId: null,
       selectedDate: null,
       selectedStartTime: null,
-      fallbackMode: SessionReservationFallbackModeEnum.None,
+      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
     });
   }
 
@@ -133,10 +117,6 @@ export class SessionReservationStore {
       bookingMode,
       selectedCustomerEntitlementId: null,
     });
-  }
-
-  setStep(step: SessionReservationStep): void {
-    this.patch({ step });
   }
 
   selectBaseProduct(slug: SessionReservationBaseProductSlug): void {
@@ -185,45 +165,36 @@ export class SessionReservationStore {
   }
 
   selectGm(gmId: string | null): void {
+    if (gmId === this.selectedGmId()) {
+      return;
+    }
+
     const isGmFirst =
       this.flowMode() === SESSION_RESERVATION_FLOW_MODES.GmFirst;
 
     this.patch({
       selectedGmId: gmId,
       selectedSystemId: isGmFirst ? null : this.selectedSystemId(),
-      selectedDate: isGmFirst ? null : this.selectedDate(),
-      selectedStartTime: isGmFirst ? null : this.selectedStartTime(),
-      fallbackMode: SessionReservationFallbackModeEnum.None,
+      selectedDate: null,
+      selectedStartTime: null,
+      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
     });
   }
 
-  clearGm(): void {
-    this.selectGm(null);
-  }
-
   selectSystem(systemId: string | null): void {
+    if (systemId === this.selectedSystemId()) {
+      return;
+    }
+
     const isSystemFirst =
       this.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
 
     this.patch({
       selectedSystemId: systemId,
       selectedGmId: isSystemFirst ? null : this.selectedGmId(),
-      selectedDate: isSystemFirst ? null : this.selectedDate(),
-      selectedStartTime: isSystemFirst ? null : this.selectedStartTime(),
-      fallbackMode: SessionReservationFallbackModeEnum.None,
-    });
-  }
-
-  clearSystem(): void {
-    const isSystemFirst =
-      this.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
-
-    this.patch({
-      selectedSystemId: null,
-      selectedGmId: isSystemFirst ? null : this.selectedGmId(),
       selectedDate: null,
       selectedStartTime: null,
-      fallbackMode: SessionReservationFallbackModeEnum.None,
+      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
     });
   }
 
@@ -232,27 +203,18 @@ export class SessionReservationStore {
     startTime: string,
     durationHours: number = this.selectedDurationHours(),
   ): void {
-    const isSystemFirst =
-      this.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
-
     this.patch({
       selectedDate: date,
       selectedStartTime: startTime,
       selectedDurationHours: durationHours,
-      selectedGmId: isSystemFirst ? null : this.selectedGmId(),
-      fallbackMode: SessionReservationFallbackModeEnum.None,
     });
   }
 
   clearSlot(): void {
-    const isSystemFirst =
-      this.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
-
     this.patch({
       selectedDate: null,
       selectedStartTime: null,
-      selectedGmId: isSystemFirst ? null : this.selectedGmId(),
-      fallbackMode: SessionReservationFallbackModeEnum.None,
+      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
     });
   }
 
@@ -272,19 +234,33 @@ export class SessionReservationStore {
     this.patch({ customServicesRequest });
   }
 
-  setFallbackMode(fallbackMode: SessionReservationFallbackMode): void {
-    this.patch({ fallbackMode });
-  }
-
   private patch(patch: Partial<ISessionReservationFlowState>): void {
     this.stateSource.update((state) => ({ ...state, ...patch }));
+  }
+
+  private isAddonSelectionComplete(): boolean {
+    const state = this.state();
+    const detailsRequired =
+      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringCustomerDetails as readonly string[];
+    const quantityRequired =
+      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringQuantity as readonly string[];
+
+    return state.selectedAddonSlugs.every((slug) => {
+      const details = state.addonDetails[slug];
+      const hasRequiredDetails =
+        !detailsRequired.includes(slug) || !!details?.customerDetails?.trim();
+      const hasRequiredQuantity =
+        !quantityRequired.includes(slug) ||
+        (typeof details?.quantity === 'number' && details.quantity > 0);
+
+      return hasRequiredDetails && hasRequiredQuantity;
+    });
   }
 
   private createInitialState(): ISessionReservationFlowState {
     return {
       flowMode: SESSION_RESERVATION_FLOW_MODES.GmFirst,
       bookingMode: SESSION_RESERVATION_CONFIG.defaultBookingMode,
-      step: SessionReservationStepEnum.Mode,
       selectedBaseProductSlug:
         SESSION_RESERVATION_CONFIG.defaultBaseProductSlug,
       selectedAddonSlugs: [],
@@ -309,7 +285,6 @@ export class SessionReservationStore {
       },
       addonDetails: {},
       customServicesRequest: null,
-      fallbackMode: SessionReservationFallbackModeEnum.None,
     };
   }
 }

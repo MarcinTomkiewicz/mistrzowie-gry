@@ -23,6 +23,9 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     summary: string;
   };
   labels: {
+    flowMode: string;
+    gmFirstFlowMode: string;
+    systemFirstFlowMode: string;
     reservationKind: string;
     showSelectedGmProfile: string;
     customerName: string;
@@ -46,10 +49,15 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
   };
   states: {
     emptyGms: string;
+    emptyGmsForSystemAvailability: string;
+    emptyActiveSystems: string;
     selectGmFirst: string;
+    selectSystemForGms: string;
+    selectSystemBeforeSlots: string;
     emptySystemsForGm: string;
     selectGmForSlots: string;
     emptySlotsForGm: string;
+    emptySlotsForSelectedGmSystem: string;
     emptyAddons: string;
     emptyEntitlements: string;
     summaryNotReady: string;

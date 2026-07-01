@@ -1,4 +1,11 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -11,8 +18,19 @@ import { ISessionReservationFlowState } from '../../../core/interfaces/i-session
 import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { ISelectOption } from '../../../core/interfaces/i-select-option';
 import { IUniversalCalendarDay } from '../../../core/interfaces/i-universal-calendar';
-import { getEndOfNextMonthIso, getStartOfCurrentMonthIso, toLocalDateTime } from '../../../core/utils/date';
-import { createHourOffsetOptions, createLocalDateTimeRangeIso, formatHourOffsetLabel, getHourOffsetDuration, getHourOffsetFromDateTime } from '../../../core/utils/time';
+import { SESSION_RESERVATION_FLOW_MODES } from '../../../core/configs/session-reservation-flow-mode.config';
+import {
+  getEndOfNextMonthIso,
+  getStartOfCurrentMonthIso,
+  toLocalDateTime,
+} from '../../../core/utils/date';
+import {
+  createHourOffsetOptions,
+  createLocalDateTimeRangeIso,
+  formatHourOffsetLabel,
+  getHourOffsetDuration,
+  getHourOffsetFromDateTime,
+} from '../../../core/utils/time';
 import { UniversalCalendar } from '../../common/universal-calendar/universal-calendar';
 
 @Component({
@@ -28,6 +46,7 @@ import { UniversalCalendar } from '../../common/universal-calendar/universal-cal
   templateUrl: './session-reservation-slot-panel.html',
 })
 export class SessionReservationSlotPanel {
+  readonly flowModes = SESSION_RESERVATION_FLOW_MODES;
   readonly data = input.required<ISessionReservationViewModel>();
   readonly state = input.required<ISessionReservationFlowState>();
 
@@ -41,6 +60,22 @@ export class SessionReservationSlotPanel {
 
   readonly calendarMinDate = getStartOfCurrentMonthIso();
   readonly calendarMaxDate = getEndOfNextMonthIso();
+
+  readonly canLoadSlots = computed(() =>
+    !!this.state().selectedSystemId && !!this.state().selectedGmId,
+  );
+
+  constructor() {
+    effect(() => {
+      const selectedDate = this.state().selectedDate;
+
+      if (selectedDate !== this.selectedDate()) {
+        this.selectedDate.set(selectedDate);
+        this.startOffsetControl.setValue(null);
+        this.endOffsetControl.setValue(null);
+      }
+    });
+  }
 
   readonly slotOptions = computed(() =>
     this.data().availableSlots.flatMap((slot) => {
@@ -56,19 +91,21 @@ export class SessionReservationSlotPanel {
   );
 
   readonly calendarDays = computed<IUniversalCalendarDay[]>(() =>
-    [...this.slotOptions().reduce((hoursByDate, { slot, startOffset }) => {
-      const hours = hoursByDate.get(slot.date) ?? Array(24).fill(false);
+    [
+      ...this.slotOptions().reduce((hoursByDate, { slot, startOffset }) => {
+        const hours = hoursByDate.get(slot.date) ?? Array(24).fill(false);
 
-      for (
-        let hour = startOffset;
-        hour < startOffset + slot.durationHours && hour < 24;
-        hour += 1
-      ) {
-        hours[hour] = true;
-      }
+        for (
+          let hour = startOffset;
+          hour < startOffset + slot.durationHours && hour < 24;
+          hour += 1
+        ) {
+          hours[hour] = true;
+        }
 
-      return hoursByDate.set(slot.date, hours);
-    }, new Map<string, boolean[]>())]
+        return hoursByDate.set(slot.date, hours);
+      }, new Map<string, boolean[]>()),
+    ]
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([date, hours]) => ({ date, hours })),
   );
@@ -170,7 +207,11 @@ export class SessionReservationSlotPanel {
 
     this.slotSelected.emit({
       ...slot,
-      ...createLocalDateTimeRangeIso(selectedDate, slot.startTime, durationHours),
+      ...createLocalDateTimeRangeIso(
+        selectedDate,
+        slot.startTime,
+        durationHours,
+      ),
       durationHours,
     });
   }

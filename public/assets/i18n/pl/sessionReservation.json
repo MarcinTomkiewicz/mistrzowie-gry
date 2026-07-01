@@ -17,6 +17,9 @@
     "summary": "Podsumowanie"
   },
   "labels": {
+    "flowMode": "Co chcesz wybrać najpierw?",
+    "gmFirstFlowMode": "Mistrza Gry",
+    "systemFirstFlowMode": "System RPG",
     "reservationKind": "Rezerwuję sesję RPG",
     "showSelectedGmProfile": "Pokaż profil wybranego MG",
     "customerName": "Imię i nazwisko",
@@ -40,10 +43,15 @@
   },
   "states": {
     "emptyGms": "Brak publicznych Mistrzów Gry.",
+    "emptyGmsForSystemAvailability": "Brak Mistrzów Gry z najbliższymi terminami dla wybranego systemu.",
+    "emptyActiveSystems": "Brak aktywnych systemów do wyboru.",
     "selectGmFirst": "Wybierz Mistrza Gry, aby zobaczyć prowadzone systemy.",
+    "selectSystemForGms": "Wybierz system, aby zobaczyć dostępnych Mistrzów Gry.",
+    "selectSystemBeforeSlots": "Wybierz system przed wyborem terminu.",
     "emptySystemsForGm": "Wybrany Mistrz Gry nie ma obecnie publicznych systemów.",
     "selectGmForSlots": "Wybierz Mistrza Gry, aby zobaczyć dostępne terminy.",
     "emptySlotsForGm": "Brak terminów dla wybranego Mistrza Gry w aktualnym zakresie.",
+    "emptySlotsForSelectedGmSystem": "Brak terminów dla wybranego Mistrza Gry i systemu w aktualnym zakresie.",
     "emptyAddons": "Brak dostępnych dodatków.",
     "emptyEntitlements": "Brak aktywnych pakietów dla podanego e-maila.",
     "summaryNotReady": "Uzupełnij wymagane dane, aby zobaczyć podsumowanie.",

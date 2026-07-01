@@ -2,14 +2,15 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
+import { SESSION_RESERVATION_FLOW_MODES } from '../../../core/configs/session-reservation-flow-mode.config';
 import { SESSION_RESERVATION_CONFIG } from '../../../core/configs/session-reservation.config';
 import { ISessionReservationAvailableSlot } from '../../../core/interfaces/i-session-reservation-availability';
-import { Auth } from '../../../core/services/auth/auth';
 import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
 import {
   SESSION_RESERVATION_WIZARD_STEPS,
   SessionReservationWizardStep,
 } from '../../../core/types/session-reservation-wizard';
+import { SessionReservationFlowMode } from '../../../core/types/session-reservation-flow-mode';
 import {
   addDays,
   getEndOfNextMonthIso,
@@ -22,7 +23,6 @@ import { createSessionReservationI18n } from './session-reservation.i18n';
 @Injectable()
 export class SessionReservationWizardController {
   private readonly facade = inject(SessionReservationFacade);
-  private readonly auth = inject(Auth);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = createSessionReservationI18n();
 
@@ -33,8 +33,31 @@ export class SessionReservationWizardController {
   );
   readonly isLoadingSystems = signal(false);
   readonly isLoadingSlots = signal(false);
-  readonly isLoadingEntitlements = signal(false);
-  readonly loadError = signal<string | null>(null);
+  readonly isLoadingGms = signal(false);
+  private readonly loadErrorSource = signal<string | null>(null);
+  readonly loadError = computed(() => this.loadErrorSource());
+
+  readonly orderedWizardSteps = computed(() =>
+    this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst
+      ? [
+          SESSION_RESERVATION_WIZARD_STEPS.Offer,
+          SESSION_RESERVATION_WIZARD_STEPS.System,
+          SESSION_RESERVATION_WIZARD_STEPS.Gm,
+          SESSION_RESERVATION_WIZARD_STEPS.Slot,
+          SESSION_RESERVATION_WIZARD_STEPS.Details,
+        ]
+      : [
+          SESSION_RESERVATION_WIZARD_STEPS.Offer,
+          SESSION_RESERVATION_WIZARD_STEPS.Gm,
+          SESSION_RESERVATION_WIZARD_STEPS.System,
+          SESSION_RESERVATION_WIZARD_STEPS.Slot,
+          SESSION_RESERVATION_WIZARD_STEPS.Details,
+        ],
+  );
+
+  readonly activeWizardStepOrdinal = computed(() =>
+    this.wizardStepOrdinal(this.activeWizardStep()),
+  );
 
   private readonly hasDefaultReservationProduct = computed(() =>
     this.facade.products().some(
@@ -47,20 +70,59 @@ export class SessionReservationWizardController {
     this.activeWizardStep.set(SESSION_RESERVATION_WIZARD_STEPS.Offer);
     this.isLoadingSystems.set(false);
     this.isLoadingSlots.set(false);
-    this.isLoadingEntitlements.set(false);
-    this.loadError.set(null);
+    this.isLoadingGms.set(false);
+    this.clearLoadError();
   }
 
   setGenericLoadError(): void {
-    this.loadError.set(this.i18n.commonErrors().generic);
+    this.setLoadError(this.i18n.commonErrors().generic);
+  }
+
+  setLoadError(message: string | null): void {
+    this.loadErrorSource.set(message);
+  }
+
+  clearLoadError(): void {
+    this.loadErrorSource.set(null);
+  }
+
+  selectFlowMode(flowMode: SessionReservationFlowMode): void {
+    if (flowMode === this.store.flowMode()) {
+      return;
+    }
+
+    this.clearLoadError();
+    this.isLoadingSystems.set(false);
+    this.isLoadingSlots.set(false);
+    this.isLoadingGms.set(false);
+    this.facade.selectFlowMode(flowMode);
+    this.activeWizardStep.set(SESSION_RESERVATION_WIZARD_STEPS.Offer);
   }
 
   selectGm(gmProfileId: string | null): void {
-    this.loadError.set(null);
-    this.isLoadingSystems.set(!!gmProfileId);
+    if (gmProfileId === this.store.selectedGmId()) {
+      return;
+    }
+
+    this.clearLoadError();
+    const isSystemFirst =
+      this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
+
+    this.facade.selectGm(gmProfileId);
+
+    if (!gmProfileId) {
+      return;
+    }
+
+    if (isSystemFirst) {
+      this.loadSlots();
+      return;
+    }
+
+    this.isLoadingSystems.set(true);
 
     this.facade
-      .selectGm(gmProfileId)
+      .loadSystemsForSelectedGm()
       .pipe(
         finalize(() => this.isLoadingSystems.set(false)),
         takeUntilDestroyed(this.destroyRef),
@@ -76,21 +138,45 @@ export class SessionReservationWizardController {
   }
 
   selectSystem(systemId: string | null): void {
-    this.facade.clearSlot();
-    this.store.selectSystem(systemId);
-    this.loadSlots();
-  }
-
-  loadSlots(): void {
-    this.loadError.set(null);
-
-    if (!this.store.selectedGmId()) {
+    if (systemId === this.store.selectedSystemId()) {
       return;
     }
 
-    const from = new Date(
-      Date.now() + SESSION_RESERVATION_CONFIG.minLeadTimeHours * 60 * 60 * 1000,
-    );
+    this.clearLoadError();
+    const isSystemFirst =
+      this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
+
+    this.facade.selectSystem(systemId);
+
+    if (!systemId) {
+      return;
+    }
+
+    if (!isSystemFirst) {
+      this.loadSlots();
+      return;
+    }
+
+    this.isLoadingGms.set(true);
+
+    this.facade
+      .loadGmsForSelectedSystemAvailability(this.getAvailabilityFromIso())
+      .pipe(
+        finalize(() => this.isLoadingGms.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        error: () => this.setGenericLoadError(),
+      });
+  }
+
+  loadSlots(): void {
+    this.clearLoadError();
+
+    if (!this.store.selectedGmId() || !this.store.selectedSystemId()) {
+      return;
+    }
+
     const toExclusive = toLocalDayStartIso(
       toIsoDate(addDays(parseIsoDate(getEndOfNextMonthIso()) as Date, 1)),
     );
@@ -98,7 +184,10 @@ export class SessionReservationWizardController {
     this.isLoadingSlots.set(true);
 
     this.facade
-      .loadAvailableSlotsForSelectedGm(from.toISOString(), toExclusive)
+      .loadAvailableSlotsForSelectedGm(
+        this.getAvailabilityFromIso(),
+        toExclusive,
+      )
       .pipe(
         finalize(() => this.isLoadingSlots.set(false)),
         takeUntilDestroyed(this.destroyRef),
@@ -109,42 +198,13 @@ export class SessionReservationWizardController {
   }
 
   selectSlot(slot: ISessionReservationAvailableSlot): void {
-    this.store.selectSlot(slot.date, slot.startTime, slot.durationHours);
+    this.facade.selectSlot(slot.date, slot.startTime, slot.durationHours);
   }
 
   selectSlotDate(date: string | null): void {
     if (date !== this.store.selectedDate()) {
-      this.store.clearSlot();
+      this.facade.clearSlot();
     }
-  }
-
-  refreshEntitlements(): void {
-    this.loadError.set(null);
-
-    if (!this.store.requiresCustomerEntitlement()) {
-      this.facade.selectCustomerEntitlement(null);
-      return;
-    }
-
-    const userId = this.auth.userId();
-    if (!userId) {
-      this.loadError.set(this.i18n.commonErrors().unauthorized);
-      return;
-    }
-
-    this.isLoadingEntitlements.set(true);
-
-    this.facade
-      .loadCustomerEntitlements({
-        userId,
-      })
-      .pipe(
-        finalize(() => this.isLoadingEntitlements.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        error: () => this.setGenericLoadError(),
-      });
   }
 
   goToWizardStep(step: number | undefined): void {
@@ -159,40 +219,40 @@ export class SessionReservationWizardController {
     this.activeWizardStep.set(step);
   }
 
-  goToWizardStepFromStepper(step: number | undefined): void {
-    if (
-      (this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.System &&
-        step === SESSION_RESERVATION_WIZARD_STEPS.Slot) ||
-      (this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.Slot &&
-        step === SESSION_RESERVATION_WIZARD_STEPS.Details)
-    ) {
+  goToWizardStepOrdinal(ordinal: number | undefined): void {
+    if (ordinal === undefined) {
       return;
     }
 
-    this.goToWizardStep(step);
+    this.goToWizardStep(this.orderedWizardSteps()[ordinal - 1]);
   }
 
   goToPreviousWizardStep(): void {
-    this.goToWizardStep(
-      (this.activeWizardStep() - 1) as SessionReservationWizardStep,
-    );
+    const steps = this.orderedWizardSteps();
+    const currentIndex = steps.indexOf(this.activeWizardStep());
+
+    this.goToWizardStep(steps[currentIndex - 1]);
   }
 
   goToNextWizardStep(): void {
-    this.goToWizardStep(
-      (this.activeWizardStep() + 1) as SessionReservationWizardStep,
-    );
+    const steps = this.orderedWizardSteps();
+    const currentIndex = steps.indexOf(this.activeWizardStep());
+
+    this.goToWizardStep(steps[currentIndex + 1]);
   }
 
   canEnterWizardStep(step: number | undefined): boolean {
     const state = this.store.state();
+    const isSystemFirst =
+      state.flowMode === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
 
     switch (step) {
       case SESSION_RESERVATION_WIZARD_STEPS.Offer:
-      case SESSION_RESERVATION_WIZARD_STEPS.Gm:
         return true;
+      case SESSION_RESERVATION_WIZARD_STEPS.Gm:
+        return isSystemFirst ? !!state.selectedSystemId : true;
       case SESSION_RESERVATION_WIZARD_STEPS.System:
-        return !!state.selectedGmId;
+        return isSystemFirst || !!state.selectedGmId;
       case SESSION_RESERVATION_WIZARD_STEPS.Slot:
         return !!state.selectedGmId && !!state.selectedSystemId;
       case SESSION_RESERVATION_WIZARD_STEPS.Details:
@@ -209,19 +269,31 @@ export class SessionReservationWizardController {
 
   isNextWizardStepDisabled(): boolean {
     const state = this.store.state();
+    const isSystemFirst =
+      state.flowMode === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
 
     switch (this.activeWizardStep()) {
       case SESSION_RESERVATION_WIZARD_STEPS.Offer:
         return (
           !this.hasDefaultReservationProduct() ||
-          !this.areSelectedAddonsComplete()
+          !this.store.areSelectedAddonsComplete()
         );
       case SESSION_RESERVATION_WIZARD_STEPS.Gm:
-        return !state.selectedGmId || this.isLoadingSystems();
+        return (
+          !state.selectedGmId ||
+          (isSystemFirst ? this.isLoadingSlots() : this.isLoadingSystems())
+        );
       case SESSION_RESERVATION_WIZARD_STEPS.System:
-        return !state.selectedSystemId || this.isLoadingSlots();
+        return (
+          !state.selectedSystemId ||
+          (isSystemFirst ? this.isLoadingGms() : this.isLoadingSlots())
+        );
       case SESSION_RESERVATION_WIZARD_STEPS.Slot:
-        return !state.selectedDate || !state.selectedStartTime;
+        return (
+          !state.selectedDate ||
+          !state.selectedStartTime ||
+          state.selectedDurationHours <= 0
+        );
       case SESSION_RESERVATION_WIZARD_STEPS.Details:
         return true;
     }
@@ -235,22 +307,13 @@ export class SessionReservationWizardController {
     );
   }
 
-  private areSelectedAddonsComplete(): boolean {
-    const state = this.store.state();
-    const detailsRequired =
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringCustomerDetails as readonly string[];
-    const quantityRequired =
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringQuantity as readonly string[];
+  wizardStepOrdinal(step: SessionReservationWizardStep): number {
+    return this.orderedWizardSteps().indexOf(step) + 1;
+  }
 
-    return state.selectedAddonSlugs.every((slug) => {
-      const details = state.addonDetails[slug];
-      const hasRequiredDetails =
-        !detailsRequired.includes(slug) || !!details?.customerDetails?.trim();
-      const hasRequiredQuantity =
-        !quantityRequired.includes(slug) ||
-        (typeof details?.quantity === 'number' && details.quantity > 0);
-
-      return hasRequiredDetails && hasRequiredQuantity;
-    });
+  private getAvailabilityFromIso(): string {
+    return new Date(
+      Date.now() + SESSION_RESERVATION_CONFIG.minLeadTimeHours * 60 * 60 * 1000,
+    ).toISOString();
   }
 }

@@ -157,7 +157,7 @@
           size="small"
           icon="pi pi-refresh"
           [label]="data().commonActions.refresh"
-          [loading]="data().isLoadingEntitlements"
+          [disabled]="data().isLoadingEntitlements"
           (onClick)="entitlementsRefresh.emit()"
         />
       </div>

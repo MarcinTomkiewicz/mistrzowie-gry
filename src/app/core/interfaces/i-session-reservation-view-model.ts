@@ -17,8 +17,8 @@ export interface ISessionReservationViewModel {
   commonActions: ISessionReservationCommonI18n['commonActions'];
   commonStatus: ISessionReservationCommonI18n['commonStatus'];
   addonProducts: readonly ISessionBookingProduct[];
-  visibleGms: readonly IGmPublicProfile[];
-  systemsForSelectedGm: readonly ISystem[];
+  gmOptions: readonly IGmPublicProfile[];
+  systemOptions: readonly ISystem[];
   availableSlots: readonly ISessionReservationAvailableSlot[];
   customerEntitlements: readonly ICustomerSessionEntitlement[];
   selectedGm: IGmPublicProfile | null;
@@ -27,6 +27,7 @@ export interface ISessionReservationViewModel {
   isLoadingInitial: boolean;
   isLoadingSystems: boolean;
   isLoadingSlots: boolean;
+  isLoadingGms: boolean;
   isLoadingEntitlements: boolean;
   loadError: string | null;
   requiresCustomerEntitlement: boolean;

@@ -1,19 +1,15 @@
-import { SessionReservationFallbackModeEnum, SessionReservationStepEnum } from '../enums/session-reservation-flow';
-import { ICustomerSessionEntitlement } from './i-customer-session-entitlement';
-import { IGmPublicProfile } from './i-gm-public-profile';
-import { ISessionBookingProduct } from './i-session-booking-product';
-import { ISessionReservationContact } from './i-session-reservation-contact';
-import { ISystem } from './i-system';
-import { SessionBookingMode } from '../types/session-booking-mode';
-import {
+import type { ICustomerSessionEntitlement } from './i-customer-session-entitlement';
+import type { IGmPublicProfile } from './i-gm-public-profile';
+import type { ISessionBookingProduct } from './i-session-booking-product';
+import type { ISessionReservationContact } from './i-session-reservation-contact';
+import type { ISystem } from './i-system';
+import type { SessionBookingMode } from '../types/session-booking-mode';
+import type {
   SessionAddonProductSlug,
   SessionReservationBaseProductSlug,
 } from '../types/session-booking-product';
-import { SessionReservationFlowMode } from '../types/session-reservation-flow-mode';
-
-export type SessionReservationStep = `${SessionReservationStepEnum}`;
-export type SessionReservationFallbackMode =
-  `${SessionReservationFallbackModeEnum}`;
+import type { SessionReservationAddonDetailsMap } from '../types/session-reservation-addon-details';
+import type { SessionReservationFlowMode } from '../types/session-reservation-flow-mode';
 
 export interface ISessionReservationGmExtraInfo {
   message: string | null;
@@ -28,14 +24,9 @@ export interface ISessionReservationAddonDetails {
   quantity: number | null;
 }
 
-export type SessionReservationAddonDetailsMap = Partial<
-  Record<SessionAddonProductSlug, ISessionReservationAddonDetails>
->;
-
 export interface ISessionReservationFlowState {
   flowMode: SessionReservationFlowMode;
   bookingMode: SessionBookingMode;
-  step: SessionReservationStep;
   selectedBaseProductSlug: SessionReservationBaseProductSlug;
   selectedAddonSlugs: readonly SessionAddonProductSlug[];
   selectedCustomerEntitlementId: string | null;
@@ -49,7 +40,6 @@ export interface ISessionReservationFlowState {
   gmExtraInfo: ISessionReservationGmExtraInfo;
   addonDetails: SessionReservationAddonDetailsMap;
   customServicesRequest: string | null;
-  fallbackMode: SessionReservationFallbackMode;
 }
 
 export interface ISessionReservationInitialOptions {
