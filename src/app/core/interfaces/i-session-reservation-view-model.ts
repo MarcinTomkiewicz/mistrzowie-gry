@@ -1,7 +1,10 @@
 import { ICustomerSessionEntitlement } from './i-customer-session-entitlement';
 import { IGmPublicProfile } from './i-gm-public-profile';
 import { ISessionBookingProduct } from './i-session-booking-product';
-import { ISessionReservationAvailableSlot } from './i-session-reservation-availability';
+import {
+  ISessionReservationAvailableSlot,
+  ISessionReservationGmSlot,
+} from './i-session-reservation-availability';
 import { ISessionReservationSummaryPreview } from './i-session-reservation-flow';
 import {
   ISessionReservationCommonI18n,
@@ -20,6 +23,8 @@ export interface ISessionReservationViewModel {
   gmOptions: readonly IGmPublicProfile[];
   systemOptions: readonly ISystem[];
   availableSlots: readonly ISessionReservationAvailableSlot[];
+  nearestSystemSlots: readonly ISessionReservationGmSlot[];
+  otherGmsForSelectedSlot: readonly IGmPublicProfile[];
   customerEntitlements: readonly ICustomerSessionEntitlement[];
   selectedGm: IGmPublicProfile | null;
   selectedSystem: ISystem | null;

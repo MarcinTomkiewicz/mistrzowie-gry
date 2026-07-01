@@ -154,6 +154,32 @@ export class SessionReservationStore {
     });
   }
 
+  selectFallbackGm(gmId: string, preservesSelectedSystem: boolean): void {
+    this.patch({
+      selectedGmId: gmId,
+      selectedSystemId: preservesSelectedSystem ? this.selectedSystemId() : null,
+      selectedDate: preservesSelectedSystem ? this.selectedDate() : null,
+      selectedStartTime: preservesSelectedSystem ? this.selectedStartTime() : null,
+      selectedDurationHours: preservesSelectedSystem
+        ? this.selectedDurationHours()
+        : SESSION_RESERVATION_CONFIG.defaultDurationHours,
+    });
+  }
+
+  selectFallbackSystemSlot(
+    gmId: string,
+    date: string,
+    startTime: string,
+    durationHours: number,
+  ): void {
+    this.patch({
+      selectedGmId: gmId,
+      selectedDate: date,
+      selectedStartTime: startTime,
+      selectedDurationHours: durationHours,
+    });
+  }
+
   selectSystem(systemId: string | null): void {
     if (systemId === this.selectedSystemId()) {
       return;
@@ -165,6 +191,15 @@ export class SessionReservationStore {
     this.patch({
       selectedSystemId: systemId,
       selectedGmId: isSystemFirst ? null : this.selectedGmId(),
+      selectedDate: null,
+      selectedStartTime: null,
+      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
+    });
+  }
+
+  selectSystemForSelectedGm(systemId: string): void {
+    this.patch({
+      selectedSystemId: systemId,
       selectedDate: null,
       selectedStartTime: null,
       selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,

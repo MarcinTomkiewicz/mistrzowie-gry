@@ -13,6 +13,7 @@ import { HOUR_IN_MS, MINUTE_IN_MS } from '../../types/hour-offset';
 import { addMonths, startOfMonth, toIsoDate } from '../../utils/date';
 import {
   ceilToTimeStep,
+  createLocalDateTimeRangeIso,
   doTimeRangesOverlap,
   formatDateTimeAsTimeLabel,
 } from '../../utils/time';
@@ -57,6 +58,61 @@ export class SessionReservationAvailabilityService {
           slots.map((slot) => [slot.gm.profile.id, slot.gm]),
         ).values(),
       ]),
+    );
+  }
+
+  getNearestFallbackSlotsForReservationSystem(
+    systemId: string,
+    durationHours: number,
+    excludedGmId: string | null,
+    limit: number,
+  ): Observable<ISessionReservationGmSlot[]> {
+    return this.getNextReservationSlotsForSystem(systemId, durationHours).pipe(
+      map((slots) =>
+        slots
+          .filter((slot) => !excludedGmId || slot.gmProfileId !== excludedGmId)
+          .slice(0, limit),
+      ),
+    );
+  }
+
+  getAvailableGmsForReservationSlot(
+    date: string,
+    startTime: string,
+    durationHours: number,
+    excludedGmId: string | null = null,
+  ): Observable<IGmPublicProfile[]> {
+    const { startsAt, endsAt } = createLocalDateTimeRangeIso(
+      date,
+      startTime,
+      durationHours,
+    );
+
+    return this.sessionReservation.getVisibleGms().pipe(
+      switchMap((gms) => {
+        if (!gms.length) {
+          return of([] as IGmPublicProfile[]);
+        }
+
+        return this.getAvailableSlotsForGms(
+          gms.map((gm) => gm.profile.id),
+          startsAt,
+          endsAt,
+          durationHours,
+        ).pipe(
+          map((slots) => {
+            const availableGmIds = new Set(
+              slots
+                .filter((slot) => slot.startsAt === startsAt)
+                .map((slot) => slot.gmProfileId),
+            );
+
+            return gms
+              .filter((gm) => availableGmIds.has(gm.profile.id))
+              .filter((gm) => !excludedGmId || gm.profile.id !== excludedGmId);
+          }),
+        );
+      }),
     );
   }
 

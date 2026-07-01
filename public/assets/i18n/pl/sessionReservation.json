@@ -39,7 +39,8 @@
     "grossTotal": "Suma brutto",
     "selectedSlot": "Wybrany termin",
     "startTime": "Od",
-    "endTime": "Do"
+    "endTime": "Do",
+    "selectFallbackSlot": "Wybierz ten termin"
   },
   "states": {
     "emptyGms": "Brak publicznych Mistrzów Gry.",
@@ -57,6 +58,11 @@
     "summaryNotReady": "Uzupełnij wymagane dane, aby zobaczyć podsumowanie.",
     "manualQuoteRequired": "Wymaga wyceny",
     "fixedPrice": "Cena stała",
-    "longDurationWarning": "Wybrano czas dłuższy niż 4 godziny. Może to wiązać się z dodatkową opłatą."
+    "longDurationWarning": "Wybrano czas dłuższy niż 4 godziny. Może to wiązać się z dodatkową opłatą.",
+    "nearestSystemSlotsTitle": "Najbliższe terminy dla tego systemu",
+    "nearestSystemSlotsHint": "Wybrany Mistrz Gry nie ma terminu w aktualnym zakresie. Możesz wybrać termin u innego MG prowadzącego ten system.",
+    "otherGmsForSelectedSlotTitle": "Inni MG dostępni w tym terminie",
+    "otherGmsForSelectedSlotHint": "Ci MG mają wolny wybrany termin, ale nie oznacza to, że prowadzą wskazany system.",
+    "fallbackGmClearsSystemHint": "Jeśli wybierzesz MG bez tego systemu, system i termin zostaną wyczyszczone."
   }
 }

@@ -1,27 +1,29 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { forkJoin, Observable, of, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { SESSION_RESERVATION_FLOW_MODES } from '../../configs/session-reservation-flow-mode.config';
+import { SESSION_RESERVATION_CONFIG } from '../../configs/session-reservation.config';
 import {
   ICustomerSessionEntitlement,
   ICustomerSessionEntitlementLookup,
 } from '../../interfaces/i-customer-session-entitlement';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
 import { ISessionBookingProduct } from '../../interfaces/i-session-booking-product';
-import { ISessionReservationAvailableSlot } from '../../interfaces/i-session-reservation-availability';
+import {
+  ISessionReservationAvailableSlot,
+  ISessionReservationGmSlot,
+} from '../../interfaces/i-session-reservation-availability';
 import {
   ISessionReservationInitialOptions,
   ISessionReservationSummaryPreview,
 } from '../../interfaces/i-session-reservation-flow';
 import { ISystem } from '../../interfaces/i-system';
-import { SessionReservationBaseProductSlug } from '../../types/session-booking-product';
 import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
-import { resolveSessionBookingMode } from '../../utils/session-pricing';
 import { SessionReservationAvailabilityService } from '../session-reservation-availability/session-reservation-availability';
 import { SessionReservationEntitlementService } from '../session-reservation-entitlement/session-reservation-entitlement';
 import { SessionReservationStore } from '../session-reservation-store/session-reservation-store';
-import { SessionReservationService } from '../session-reservation/session-reservation';
 import { SessionReservationSummaryService } from '../session-reservation-summary/session-reservation-summary';
+import { SessionReservationService } from '../session-reservation/session-reservation';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationFacade {
@@ -29,17 +31,22 @@ export class SessionReservationFacade {
   private readonly availability = inject(SessionReservationAvailabilityService);
   private readonly entitlement = inject(SessionReservationEntitlementService);
   private readonly summary = inject(SessionReservationSummaryService);
-
   readonly store = inject(SessionReservationStore);
-
   readonly products = signal<readonly ISessionBookingProduct[]>([]);
   readonly activeSystems = signal<readonly ISystem[]>([]);
   readonly visibleGms = signal<readonly IGmPublicProfile[]>([]);
   readonly systemsForSelectedGm = signal<readonly ISystem[]>([]);
   readonly gmsForSelectedSystem = signal<readonly IGmPublicProfile[]>([]);
-  readonly availableSlots = signal<readonly ISessionReservationAvailableSlot[]>([]);
-  readonly customerEntitlements = signal<readonly ICustomerSessionEntitlement[]>([]);
-
+  readonly availableSlots = signal<readonly ISessionReservationAvailableSlot[]>(
+    [],
+  );
+  readonly nearestSystemSlots = signal<readonly ISessionReservationGmSlot[]>(
+    [],
+  );
+  readonly otherGmsForSelectedSlot = signal<readonly IGmPublicProfile[]>([]);
+  readonly customerEntitlements = signal<
+    readonly ICustomerSessionEntitlement[]
+  >([]);
   loadInitialOptions(): Observable<ISessionReservationInitialOptions> {
     return forkJoin({
       products: this.reservation.getActiveBookingProducts(),
@@ -53,7 +60,6 @@ export class SessionReservationFacade {
       }),
     );
   }
-
   loadCustomerEntitlements(
     customer: ICustomerSessionEntitlementLookup,
   ): Observable<ICustomerSessionEntitlement[]> {
@@ -70,7 +76,6 @@ export class SessionReservationFacade {
       }),
     );
   }
-
   resetReservationFlow(): void {
     this.store.reset();
     this.products.set([]);
@@ -79,21 +84,44 @@ export class SessionReservationFacade {
     this.systemsForSelectedGm.set([]);
     this.gmsForSelectedSystem.set([]);
     this.availableSlots.set([]);
+    this.clearFallbackOptions();
     this.customerEntitlements.set([]);
   }
-
-  loadAvailableSlotsForSelectedGm(): Observable<ISessionReservationAvailableSlot[]> {
+  loadSlotsForSelectedGm(): Observable<void> {
     const gmId = this.store.selectedGmId();
     const systemId = this.store.selectedSystemId();
+    const durationHours = this.store.selectedDurationHours();
+
+    this.clearFallbackOptions();
 
     if (!gmId || !systemId || !this.isSelectedGmValidForCurrentSystem()) {
       this.availableSlots.set([]);
-      return of([]);
+      return of(void 0);
     }
 
     return this.availability
-      .getNextReservationSlotsForGm(gmId, this.store.selectedDurationHours())
-      .pipe(tap((slots) => this.availableSlots.set(slots)));
+      .getNextReservationSlotsForGm(gmId, durationHours)
+      .pipe(
+        switchMap((slots) => {
+          this.availableSlots.set(slots);
+
+          if (slots.length) {
+            return of(void 0);
+          }
+
+          return this.availability
+            .getNearestFallbackSlotsForReservationSystem(
+              systemId,
+              durationHours,
+              gmId,
+              SESSION_RESERVATION_CONFIG.fallbackSlotsLimit,
+            )
+            .pipe(
+              tap((slots) => this.nearestSystemSlots.set(slots)),
+              map(() => void 0),
+            );
+        }),
+      );
   }
 
   selectFlowMode(flowMode: SessionReservationFlowMode): void {
@@ -105,11 +133,7 @@ export class SessionReservationFacade {
     this.systemsForSelectedGm.set([]);
     this.gmsForSelectedSystem.set([]);
     this.availableSlots.set([]);
-  }
-
-  selectBaseProduct(product: ISessionBookingProduct): void {
-    this.store.setBookingMode(resolveSessionBookingMode(product));
-    this.store.selectBaseProduct(product.slug as SessionReservationBaseProductSlug);
+    this.clearFallbackOptions();
   }
 
   selectCustomerEntitlement(id: string | null): void {
@@ -130,6 +154,7 @@ export class SessionReservationFacade {
     this.store.selectGm(gmId);
     this.systemsForSelectedGm.set([]);
     this.availableSlots.set([]);
+    this.clearFallbackOptions();
   }
 
   loadSystemsForSelectedGm(): Observable<ISystem[]> {
@@ -159,9 +184,22 @@ export class SessionReservationFacade {
       return;
     }
 
-    this.store.selectSystem(systemId);
+    const shouldPreserveFallbackGm =
+      !!systemId &&
+      this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst &&
+      !this.store.selectedSystemId() &&
+      !!this.store.selectedGmId() &&
+      this.systemsForSelectedGm().some((system) => system.id === systemId);
+
+    if (shouldPreserveFallbackGm) {
+      this.store.selectSystemForSelectedGm(systemId);
+    } else {
+      this.store.selectSystem(systemId);
+    }
+
     this.gmsForSelectedSystem.set([]);
     this.availableSlots.set([]);
+    this.clearFallbackOptions();
   }
 
   loadGmsForSelectedSystemAvailability(): Observable<IGmPublicProfile[]> {
@@ -180,16 +218,79 @@ export class SessionReservationFacade {
       .pipe(tap((gms) => this.gmsForSelectedSystem.set(gms)));
   }
 
-  selectSlot(date: string, startTime: string, durationHours: number): void {
-    this.store.selectSlot(date, startTime, durationHours);
+  selectSlotAndLoadFallbackGms(
+    slot: ISessionReservationAvailableSlot,
+  ): Observable<void> {
+    this.store.selectSlot(slot.date, slot.startTime, slot.durationHours);
+    this.otherGmsForSelectedSlot.set([]);
+
+    return this.availability
+      .getAvailableGmsForReservationSlot(
+        slot.date,
+        slot.startTime,
+        slot.durationHours,
+        this.store.selectedGmId(),
+      )
+      .pipe(
+        tap((gms) => this.otherGmsForSelectedSlot.set(gms)),
+        map(() => void 0),
+      );
   }
 
   selectSlotDate(date: string | null): void {
     this.store.selectSlotDate(date);
+    this.otherGmsForSelectedSlot.set([]);
   }
 
-  clearSlot(): void {
-    this.store.clearSlot();
+  selectNearestSystemSlot(slot: ISessionReservationGmSlot): void {
+    const systemId = this.store.selectedSystemId();
+    const selectedSystem = this.activeSystems().find(
+      (system) => system.id === systemId,
+    );
+
+    this.systemsForSelectedGm.set(selectedSystem ? [selectedSystem] : []);
+    this.store.selectFallbackSystemSlot(
+      slot.gmProfileId,
+      slot.date,
+      slot.startTime,
+      slot.durationHours,
+    );
+    this.availableSlots.set([slot]);
+    this.clearFallbackOptions();
+  }
+
+  selectOtherGmForSelectedSlot(gmId: string): Observable<boolean> {
+    const selectedSystemId = this.store.selectedSystemId();
+
+    return this.reservation.getSystemsForGm(gmId).pipe(
+      switchMap((systems) => {
+        const preservesSelectedSystem =
+          !!selectedSystemId &&
+          systems.some((system) => system.id === selectedSystemId);
+
+        this.systemsForSelectedGm.set(systems);
+        this.store.selectFallbackGm(gmId, preservesSelectedSystem);
+
+        if (!preservesSelectedSystem) {
+          this.availableSlots.set([]);
+          this.clearFallbackOptions();
+          return of(false);
+        }
+
+        return this.availability
+          .getNextReservationSlotsForGm(
+            gmId,
+            this.store.selectedDurationHours(),
+          )
+          .pipe(
+            tap((slots) => {
+              this.availableSlots.set(slots);
+              this.clearFallbackOptions();
+            }),
+            map(() => true),
+          );
+      }),
+    );
   }
 
   buildSummaryPreview(): ISessionReservationSummaryPreview | null {
@@ -216,5 +317,10 @@ export class SessionReservationFacade {
     return this.systemsForSelectedGm().some(
       (system) => system.id === state.selectedSystemId,
     );
+  }
+
+  private clearFallbackOptions(): void {
+    this.nearestSystemSlots.set([]);
+    this.otherGmsForSelectedSlot.set([]);
   }
 }

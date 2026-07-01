@@ -13,7 +13,10 @@ import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 
 import { SESSION_RESERVATION_CONFIG } from '../../../core/configs/session-reservation.config';
-import { ISessionReservationAvailableSlot } from '../../../core/interfaces/i-session-reservation-availability';
+import {
+  ISessionReservationAvailableSlot,
+  ISessionReservationGmSlot,
+} from '../../../core/interfaces/i-session-reservation-availability';
 import { ISessionReservationFlowState } from '../../../core/interfaces/i-session-reservation-flow';
 import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { ISelectOption } from '../../../core/interfaces/i-select-option';
@@ -31,6 +34,12 @@ import {
   getHourOffsetDuration,
   getHourOffsetFromDateTime,
 } from '../../../core/utils/time';
+import {
+  formatSessionReservationSlotDateLabel,
+  formatSessionReservationSlotTimeRangeLabel,
+} from '../../../core/utils/session-reservation-slots';
+import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
+import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
 import { UniversalCalendar } from '../../common/universal-calendar/universal-calendar';
 
 @Component({
@@ -41,6 +50,7 @@ import { UniversalCalendar } from '../../common/universal-calendar/universal-cal
     MessageModule,
     ReactiveFormsModule,
     SelectModule,
+    GmProfiles,
     UniversalCalendar,
   ],
   templateUrl: './session-reservation-slot-panel.html',
@@ -53,10 +63,15 @@ export class SessionReservationSlotPanel {
   readonly slotsRefresh = output<void>();
   readonly slotSelected = output<ISessionReservationAvailableSlot>();
   readonly dateSelected = output<string | null>();
+  readonly nearestSystemSlotSelected = output<ISessionReservationGmSlot>();
+  readonly otherGmSelected = output<string>();
 
   readonly selectedDate = signal<string | null>(null);
   readonly startOffsetControl = new FormControl<number | null>(null);
   readonly endOffsetControl = new FormControl<number | null>(null);
+  readonly formatSlotDate = formatSessionReservationSlotDateLabel;
+  readonly formatSlotTimeRange = formatSessionReservationSlotTimeRangeLabel;
+  readonly getGmName = getGmPublicProfileDisplayName;
 
   readonly calendarMinDate = getStartOfCurrentMonthIso();
   readonly calendarMaxDate = getEndOfNextMonthIso();
@@ -68,12 +83,33 @@ export class SessionReservationSlotPanel {
   constructor() {
     effect(() => {
       const selectedDate = this.state().selectedDate;
+      const selectedStartTime = this.state().selectedStartTime;
+      const selectedDurationHours = this.state().selectedDurationHours;
 
       if (selectedDate !== this.selectedDate()) {
         this.selectedDate.set(selectedDate);
-        this.startOffsetControl.setValue(null);
-        this.endOffsetControl.setValue(null);
       }
+
+      if (!selectedDate || !selectedStartTime) {
+        this.startOffsetControl.setValue(null, { emitEvent: false });
+        this.endOffsetControl.setValue(null, { emitEvent: false });
+        return;
+      }
+
+      const { startsAt } = createLocalDateTimeRangeIso(
+        selectedDate,
+        selectedStartTime,
+        selectedDurationHours,
+      );
+      const startOffset = getHourOffsetFromDateTime(
+        toLocalDateTime(selectedDate, 0).getTime(),
+        startsAt,
+      );
+
+      this.startOffsetControl.setValue(startOffset, { emitEvent: false });
+      this.endOffsetControl.setValue(startOffset + selectedDurationHours, {
+        emitEvent: false,
+      });
     });
   }
 
@@ -215,4 +251,5 @@ export class SessionReservationSlotPanel {
       durationHours,
     });
   }
+
 }

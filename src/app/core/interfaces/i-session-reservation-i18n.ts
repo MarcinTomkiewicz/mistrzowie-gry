@@ -46,6 +46,7 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     selectedSlot: string;
     startTime: string;
     endTime: string;
+    selectFallbackSlot: string;
   };
   states: {
     emptyGms: string;
@@ -64,6 +65,11 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     manualQuoteRequired: string;
     fixedPrice: string;
     longDurationWarning: string;
+    nearestSystemSlotsTitle: string;
+    nearestSystemSlotsHint: string;
+    otherGmsForSelectedSlotTitle: string;
+    otherGmsForSelectedSlotHint: string;
+    fallbackGmClearsSystemHint: string;
   };
 }
 

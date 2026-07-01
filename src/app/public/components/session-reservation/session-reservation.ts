@@ -105,14 +105,20 @@ export class SessionReservation implements OnInit {
 
   readonly systemOptions = computed(() =>
     this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst
-      ? this.facade.activeSystems()
+      ? this.store.selectedGmId() && !this.store.selectedSystemId()
+        ? this.facade.systemsForSelectedGm()
+        : this.facade.activeSystems()
       : this.facade.systemsForSelectedGm(),
   );
 
   readonly selectedGm = computed(() => {
     const selectedGmId = this.store.selectedGmId();
 
-    return this.gmOptions().find((gm) => gm.profile.id === selectedGmId) ?? null;
+    return (
+      this.facade
+        .visibleGms()
+        .find((gm) => gm.profile.id === selectedGmId) ?? null
+    );
   });
 
   readonly selectedSystem = computed(() => {
@@ -137,6 +143,8 @@ export class SessionReservation implements OnInit {
     gmOptions: this.gmOptions(),
     systemOptions: this.systemOptions(),
     availableSlots: this.facade.availableSlots(),
+    nearestSystemSlots: this.facade.nearestSystemSlots(),
+    otherGmsForSelectedSlot: this.facade.otherGmsForSelectedSlot(),
     customerEntitlements: this.facade.customerEntitlements(),
     selectedGm: this.selectedGm(),
     selectedSystem: this.selectedSystem(),

@@ -32,6 +32,37 @@
     </p>
   }
 
+  @if (
+    !data().isLoadingSlots &&
+    !data().availableSlots.length &&
+    data().nearestSystemSlots.length
+  ) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ data().states.nearestSystemSlotsTitle }}
+      </h3>
+      <p class="muted-text m-0">{{ data().states.nearestSystemSlotsHint }}</p>
+
+      <div class="flex-col-start-stretch gap-sm">
+        @for (slot of data().nearestSystemSlots; track slot.startsAt + slot.gmProfileId) {
+          <button
+            type="button"
+            class="mg-choice-card w-100 text-left"
+            (click)="nearestSystemSlotSelected.emit(slot)"
+          >
+            <strong>{{ getGmName(slot.gm) }}</strong>
+            <span class="muted-text d-block">
+              {{ formatSlotDate(slot) }} · {{ formatSlotTimeRange(slot) }}
+            </span>
+            <span class="d-block color-text">
+              {{ data().labels.selectFallbackSlot }}
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
   @if (data().availableSlots.length) {
     <app-universal-calendar
       mode="reservation"
@@ -84,5 +115,25 @@
         }
       </div>
     }
+  }
+
+  @if (!data().isLoadingGms && data().otherGmsForSelectedSlot.length) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ data().states.otherGmsForSelectedSlotTitle }}
+      </h3>
+      <p class="muted-text m-0">
+        {{ data().states.otherGmsForSelectedSlotHint }}
+      </p>
+      <p class="muted-text m-0">
+        {{ data().states.fallbackGmClearsSystemHint }}
+      </p>
+
+      <app-gm-profiles
+        [profiles]="data().otherGmsForSelectedSlot"
+        [selectedProfileId]="null"
+        (profileSelected)="otherGmSelected.emit($event.profile.id)"
+      />
+    </section>
   }
 </section>

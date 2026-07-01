@@ -21,10 +21,8 @@ import { SESSION_PRICE_STATUSES } from '../types/session-price-status';
 import { SESSION_RESERVATION_SOURCE_KINDS } from '../types/session-reservation-source-kind';
 
 export const SESSION_RESERVATION_CONFIG = {
-  durationOptionsHours: [4, 5, 6, 7, 8],
   defaultDurationHours: 4,
   minLeadTimeHours: 24,
-  bookingHorizonDays: 60,
   slotStepMinutes: 60,
   publicCreatedStatus: SESSION_RESERVATION_STATUSES.Pending,
   defaultBookingMode: SESSION_BOOKING_MODES.SingleSession,
@@ -54,4 +52,5 @@ export const SESSION_RESERVATION_CONFIG = {
     SESSION_ADDON_HYBRID_SERVICE_PRODUCT_SLUG,
   ],
   blockingReservationStatuses: SESSION_RESERVATION_BLOCKING_STATUSES,
+  fallbackSlotsLimit: 6,
 } as const;
