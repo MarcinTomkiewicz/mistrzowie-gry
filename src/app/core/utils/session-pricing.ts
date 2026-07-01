@@ -1,7 +1,14 @@
 import { SESSION_RESERVATION_CONFIG } from '../configs/session-reservation.config';
 import { ISessionBookingProduct } from '../interfaces/i-session-booking-product';
 import { SessionReservationAddonDetailsMap } from '../types/session-reservation-addon-details';
-import { SessionAddonProductSlug } from '../types/session-booking-product';
+import {
+  SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG,
+  SessionAddonProductSlug,
+} from '../types/session-booking-product';
+import {
+  SESSION_BOOKING_MODES,
+  SessionBookingMode,
+} from '../types/session-booking-mode';
 import { formatMoney } from './pricing';
 
 export function formatSessionBookingProductPriceLabel(
@@ -50,4 +57,22 @@ export function calculateProductsGrossTotal(
 
     return total + product.grossPricePln * (details?.quantity ?? 1);
   }, baseTotal);
+}
+
+export function resolveSessionBookingMode(
+  product: ISessionBookingProduct,
+): SessionBookingMode {
+  if (product.slug === SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG) {
+    return SESSION_BOOKING_MODES.CustomQuote;
+  }
+
+  if (product.monthlySessionsCount !== null) {
+    return SESSION_BOOKING_MODES.SubscriptionCredit;
+  }
+
+  if (product.includedSessionsCount !== null) {
+    return SESSION_BOOKING_MODES.PackageCredit;
+  }
+
+  return SESSION_BOOKING_MODES.SingleSession;
 }

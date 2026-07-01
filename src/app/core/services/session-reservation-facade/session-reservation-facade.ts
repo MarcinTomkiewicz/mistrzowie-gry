@@ -1,5 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { forkJoin, map, Observable, of, tap } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { forkJoin, Observable, of, tap } from 'rxjs';
 
 import { SESSION_RESERVATION_FLOW_MODES } from '../../configs/session-reservation-flow-mode.config';
 import {
@@ -8,34 +8,27 @@ import {
 } from '../../interfaces/i-customer-session-entitlement';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
 import { ISessionBookingProduct } from '../../interfaces/i-session-booking-product';
-import {
-  ISessionReservationAvailableSlot,
-  ISessionReservationGmSlot,
-} from '../../interfaces/i-session-reservation-availability';
+import { ISessionReservationAvailableSlot } from '../../interfaces/i-session-reservation-availability';
 import {
   ISessionReservationInitialOptions,
   ISessionReservationSummaryPreview,
 } from '../../interfaces/i-session-reservation-flow';
 import { ISystem } from '../../interfaces/i-system';
-import { CUSTOMER_SESSION_ENTITLEMENT_KINDS } from '../../types/customer-session-entitlement';
-import {
-  SESSION_BOOKING_MODES,
-  SessionBookingMode,
-} from '../../types/session-booking-mode';
-import {
-  SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG,
-  SessionReservationBaseProductSlug,
-} from '../../types/session-booking-product';
+import { SessionReservationBaseProductSlug } from '../../types/session-booking-product';
 import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
-import { calculateProductsGrossTotal } from '../../utils/session-pricing';
+import { resolveSessionBookingMode } from '../../utils/session-pricing';
 import { SessionReservationAvailabilityService } from '../session-reservation-availability/session-reservation-availability';
+import { SessionReservationEntitlementService } from '../session-reservation-entitlement/session-reservation-entitlement';
 import { SessionReservationStore } from '../session-reservation-store/session-reservation-store';
 import { SessionReservationService } from '../session-reservation/session-reservation';
+import { SessionReservationSummaryService } from '../session-reservation-summary/session-reservation-summary';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationFacade {
   private readonly reservation = inject(SessionReservationService);
   private readonly availability = inject(SessionReservationAvailabilityService);
+  private readonly entitlement = inject(SessionReservationEntitlementService);
+  private readonly summary = inject(SessionReservationSummaryService);
 
   readonly store = inject(SessionReservationStore);
 
@@ -46,10 +39,6 @@ export class SessionReservationFacade {
   readonly gmsForSelectedSystem = signal<readonly IGmPublicProfile[]>([]);
   readonly availableSlots = signal<readonly ISessionReservationAvailableSlot[]>([]);
   readonly customerEntitlements = signal<readonly ICustomerSessionEntitlement[]>([]);
-
-  private readonly productBySlug = computed(
-    () => new Map(this.products().map((product) => [product.slug, product] as const)),
-  );
 
   loadInitialOptions(): Observable<ISessionReservationInitialOptions> {
     return forkJoin({
@@ -71,8 +60,12 @@ export class SessionReservationFacade {
     return this.reservation.getCustomerEntitlements(customer).pipe(
       tap((entitlements) => {
         this.customerEntitlements.set(entitlements);
-        this.selectCustomerEntitlement(
-          this.store.selectedCustomerEntitlementId(),
+        this.store.selectCustomerEntitlement(
+          this.entitlement.resolveSelectedEntitlementId(
+            this.store.selectedCustomerEntitlementId(),
+            entitlements,
+            this.store.bookingMode(),
+          ),
         );
       }),
     );
@@ -89,45 +82,18 @@ export class SessionReservationFacade {
     this.customerEntitlements.set([]);
   }
 
-  loadAvailableSlotsForSelectedGm(
-    fromIso: string,
-    toIsoExclusive: string,
-  ): Observable<ISessionReservationAvailableSlot[]> {
+  loadAvailableSlotsForSelectedGm(): Observable<ISessionReservationAvailableSlot[]> {
     const gmId = this.store.selectedGmId();
+    const systemId = this.store.selectedSystemId();
 
-    if (!gmId || !this.isSelectedGmValidForCurrentSystem()) {
+    if (!gmId || !systemId || !this.isSelectedGmValidForCurrentSystem()) {
       this.availableSlots.set([]);
       return of([]);
     }
 
-    const toTime = Date.parse(toIsoExclusive);
-
-    return this.loadNextSlotsForSelectedSystem(fromIso).pipe(
-      map((slots) =>
-        slots.filter(
-          (slot) =>
-            slot.gmProfileId === gmId && Date.parse(slot.startsAt) < toTime,
-        ),
-      ),
-      tap((slots) => this.availableSlots.set(slots)),
-    );
-  }
-
-  private loadNextSlotsForSelectedSystem(
-    fromIso: string,
-  ): Observable<ISessionReservationGmSlot[]> {
-    const systemId = this.store.selectedSystemId();
-
-    if (!systemId) {
-      return of([]);
-    }
-
     return this.availability
-      .getNextSlotsForSystem(
-        systemId,
-        fromIso,
-        this.store.selectedDurationHours(),
-      );
+      .getNextReservationSlotsForGm(gmId, this.store.selectedDurationHours())
+      .pipe(tap((slots) => this.availableSlots.set(slots)));
   }
 
   selectFlowMode(flowMode: SessionReservationFlowMode): void {
@@ -142,43 +108,18 @@ export class SessionReservationFacade {
   }
 
   selectBaseProduct(product: ISessionBookingProduct): void {
-    this.store.setBookingMode(this.resolveBookingMode(product));
+    this.store.setBookingMode(resolveSessionBookingMode(product));
     this.store.selectBaseProduct(product.slug as SessionReservationBaseProductSlug);
   }
 
   selectCustomerEntitlement(id: string | null): void {
-    if (!id || !this.store.requiresCustomerEntitlement()) {
-      this.store.selectCustomerEntitlement(null);
-      return;
-    }
-
-    const entitlement =
-      this.customerEntitlements().find((item) => item.id === id) ?? null;
-
-    if (!entitlement) {
-      this.store.selectCustomerEntitlement(null);
-      return;
-    }
-
-    const bookingMode = this.store.bookingMode();
-
-    if (
-      bookingMode === SESSION_BOOKING_MODES.PackageCredit &&
-      entitlement.kind !== CUSTOMER_SESSION_ENTITLEMENT_KINDS.Package
-    ) {
-      this.store.selectCustomerEntitlement(null);
-      return;
-    }
-
-    if (
-      bookingMode === SESSION_BOOKING_MODES.SubscriptionCredit &&
-      entitlement.kind !== CUSTOMER_SESSION_ENTITLEMENT_KINDS.Subscription
-    ) {
-      this.store.selectCustomerEntitlement(null);
-      return;
-    }
-
-    this.store.selectCustomerEntitlement(id);
+    this.store.selectCustomerEntitlement(
+      this.entitlement.resolveSelectedEntitlementId(
+        id,
+        this.customerEntitlements(),
+        this.store.bookingMode(),
+      ),
+    );
   }
 
   selectGm(gmId: string | null): void {
@@ -223,18 +164,20 @@ export class SessionReservationFacade {
     this.availableSlots.set([]);
   }
 
-  loadGmsForSelectedSystemAvailability(
-    availabilityFromIso: string,
-  ): Observable<IGmPublicProfile[]> {
-    if (!this.store.selectedSystemId()) {
+  loadGmsForSelectedSystemAvailability(): Observable<IGmPublicProfile[]> {
+    const systemId = this.store.selectedSystemId();
+
+    if (!systemId) {
       this.gmsForSelectedSystem.set([]);
       return of([]);
     }
 
-    return this.loadNextSlotsForSelectedSystem(availabilityFromIso).pipe(
-      map((slots) => this.toUniqueGms(slots)),
-      tap((gms) => this.gmsForSelectedSystem.set(gms)),
-    );
+    return this.availability
+      .getAvailableGmsForReservationSystem(
+        systemId,
+        this.store.selectedDurationHours(),
+      )
+      .pipe(tap((gms) => this.gmsForSelectedSystem.set(gms)));
   }
 
   selectSlot(date: string, startTime: string, durationHours: number): void {
@@ -246,79 +189,11 @@ export class SessionReservationFacade {
   }
 
   buildSummaryPreview(): ISessionReservationSummaryPreview | null {
-    if (!this.store.isReadyForSummary()) return null;
-
-    const state = this.store.state();
-    const baseProduct = this.productBySlug().get(state.selectedBaseProductSlug);
-    if (!baseProduct) return null;
-
-    const addonProducts: ISessionBookingProduct[] = [];
-
-    for (const slug of state.selectedAddonSlugs) {
-      const addonProduct = this.productBySlug().get(slug);
-
-      if (!addonProduct) return null;
-
-      addonProducts.push(addonProduct);
-    }
-
-    const customerEntitlement = state.selectedCustomerEntitlementId
-      ? (this.customerEntitlements().find(
-          (entitlement) =>
-            entitlement.id === state.selectedCustomerEntitlementId,
-        ) ?? null)
-      : null;
-
-    if (this.store.requiresCustomerEntitlement() && !customerEntitlement) {
-      return null;
-    }
-
-    const requiresManualQuote =
-      this.store.requiresManualQuote() ||
-      baseProduct.requiresManualQuote ||
-      addonProducts.some((product) => product.requiresManualQuote);
-
-    return {
-      baseProduct,
-      addonProducts,
-      customerEntitlement,
-      requiresManualQuote,
-      grossTotalPln: requiresManualQuote
-        ? null
-        : calculateProductsGrossTotal(
-            baseProduct,
-            addonProducts,
-            state.addonDetails,
-          ),
-    };
-  }
-
-  private resolveBookingMode(
-    product: ISessionBookingProduct,
-  ): SessionBookingMode {
-    if (product.slug === SESSION_CUSTOM_ADDITIONAL_SERVICE_PRODUCT_SLUG) {
-      return SESSION_BOOKING_MODES.CustomQuote;
-    }
-
-    if (product.monthlySessionsCount !== null) {
-      return SESSION_BOOKING_MODES.SubscriptionCredit;
-    }
-
-    if (product.includedSessionsCount !== null) {
-      return SESSION_BOOKING_MODES.PackageCredit;
-    }
-
-    return SESSION_BOOKING_MODES.SingleSession;
-  }
-
-  private toUniqueGms(
-    slots: readonly ISessionReservationGmSlot[],
-  ): IGmPublicProfile[] {
-    return [
-      ...new Map(
-        slots.map((slot) => [slot.gm.profile.id, slot.gm]),
-      ).values(),
-    ];
+    return this.summary.buildSummaryPreview(
+      this.store.state(),
+      this.products(),
+      this.customerEntitlements(),
+    );
   }
 
   private isSelectedGmValidForCurrentSystem(): boolean {

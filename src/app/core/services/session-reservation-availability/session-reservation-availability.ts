@@ -10,10 +10,9 @@ import {
 } from '../../interfaces/i-session-reservation-availability';
 import { ISessionReservation } from '../../interfaces/i-session-reservation';
 import { HOUR_IN_MS, MINUTE_IN_MS } from '../../types/hour-offset';
-import { addDays, toIsoDate } from '../../utils/date';
+import { addMonths, startOfMonth, toIsoDate } from '../../utils/date';
 import {
   ceilToTimeStep,
-  createLocalDateTimeRangeIso,
   doTimeRangesOverlap,
   formatDateTimeAsTimeLabel,
 } from '../../utils/time';
@@ -25,12 +24,21 @@ export class SessionReservationAvailabilityService {
   private readonly gmAvailability = inject(GmAvailability);
   private readonly sessionReservation = inject(SessionReservationService);
 
-  getAvailableSlotsForGm(
+  getNextReservationSlotsForSystem(
+    systemId: string,
+    durationHours: number,
+  ): Observable<ISessionReservationGmSlot[]> {
+    const { fromIso, toIsoExclusive } = this.getReservationAvailabilityWindow();
+
+    return this.getSlotsForSystem(systemId, fromIso, toIsoExclusive, durationHours);
+  }
+
+  getNextReservationSlotsForGm(
     gmProfileId: string,
-    fromIso: string,
-    toIsoExclusive: string,
     durationHours: number,
   ): Observable<ISessionReservationAvailableSlot[]> {
+    const { fromIso, toIsoExclusive } = this.getReservationAvailabilityWindow();
+
     return this.getAvailableSlotsForGms(
       [gmProfileId],
       fromIso,
@@ -39,41 +47,25 @@ export class SessionReservationAvailabilityService {
     );
   }
 
-  getAvailableGmsForSystemSlot(
+  getAvailableGmsForReservationSystem(
     systemId: string,
-    date: string,
-    startTime: string,
     durationHours: number,
   ): Observable<IGmPublicProfile[]> {
-    return this.sessionReservation.getGmsForSystem(systemId).pipe(
-      switchMap((gms) =>
-        this.getAvailableGmsFromCandidates(gms, date, startTime, durationHours),
-      ),
+    return this.getNextReservationSlotsForSystem(systemId, durationHours).pipe(
+      map((slots) => [
+        ...new Map(
+          slots.map((slot) => [slot.gm.profile.id, slot.gm]),
+        ).values(),
+      ]),
     );
   }
 
-  getAvailableGmsForSlot(
-    date: string,
-    startTime: string,
-    durationHours: number,
-  ): Observable<IGmPublicProfile[]> {
-    return this.sessionReservation.getVisibleGms().pipe(
-      switchMap((gms) =>
-        this.getAvailableGmsFromCandidates(gms, date, startTime, durationHours),
-      ),
-    );
-  }
-
-  getNextSlotsForSystem(
+  private getSlotsForSystem(
     systemId: string,
     fromIso: string,
+    toIsoExclusive: string,
     durationHours: number,
   ): Observable<ISessionReservationGmSlot[]> {
-    const toIsoExclusive = addDays(
-      new Date(fromIso),
-      SESSION_RESERVATION_CONFIG.bookingHorizonDays,
-    ).toISOString();
-
     return this.sessionReservation.getGmsForSystem(systemId).pipe(
       switchMap((gms) => {
         if (!gms.length) {
@@ -107,46 +99,15 @@ export class SessionReservationAvailabilityService {
     );
   }
 
-  private getAvailableGmsFromCandidates(
-    gms: readonly IGmPublicProfile[],
-    date: string,
-    startTime: string,
-    durationHours: number,
-  ): Observable<IGmPublicProfile[]> {
-    if (!gms.length) {
-      return of([] as IGmPublicProfile[]);
-    }
+  private getReservationAvailabilityWindow() {
+    const now = new Date();
 
-    const slotRange = createLocalDateTimeRangeIso(date, startTime, durationHours);
-    const slotStart = Date.parse(slotRange.startsAt);
-    const slotEnd = Date.parse(slotRange.endsAt);
-    const gmProfileIds = gms.map((gm) => gm.profile.id);
-
-    return forkJoin({
-      availability: this.gmAvailability.getAvailabilityForGmsOverlapping(
-        gmProfileIds,
-        slotRange.startsAt,
-        slotRange.endsAt,
-      ),
-      blockingReservations:
-        this.sessionReservation.getBlockingReservationsForGms(
-          gmProfileIds,
-          slotRange.startsAt,
-          slotRange.endsAt,
-        ),
-    }).pipe(
-      map(({ availability, blockingReservations }) =>
-        gms.filter((gm) =>
-          this.isGmAvailableForRange(
-            gm.profile.id,
-            slotStart,
-            slotEnd,
-            availability,
-            blockingReservations,
-          ),
-        ),
-      ),
-    );
+    return {
+      fromIso: new Date(
+        now.getTime() + SESSION_RESERVATION_CONFIG.minLeadTimeHours * HOUR_IN_MS,
+      ).toISOString(),
+      toIsoExclusive: startOfMonth(addMonths(now, 2)).toISOString(),
+    };
   }
 
   private getAvailableSlotsForGms(
@@ -247,31 +208,4 @@ export class SessionReservationAvailabilityService {
     return slots;
   }
 
-  private isGmAvailableForRange(
-    gmProfileId: string,
-    slotStart: number,
-    slotEnd: number,
-    availability: readonly IGmAvailabilitySlotRecord[],
-    blockingReservations: readonly ISessionReservation[],
-  ): boolean {
-    const fitsAvailability = availability.some(
-      (record) =>
-        record.gmProfileId === gmProfileId &&
-        Date.parse(record.startsAt) <= slotStart &&
-        Date.parse(record.endsAt) >= slotEnd,
-    );
-    const hasBlockingReservation = blockingReservations.some(
-      (reservation) =>
-        reservation.gmProfileId === gmProfileId &&
-        doTimeRangesOverlap(
-          { start: slotStart, end: slotEnd },
-          {
-            start: Date.parse(reservation.startsAt),
-            end: Date.parse(reservation.endsAt),
-          },
-        ),
-    );
-
-    return fitsAvailability && !hasBlockingReservation;
-  }
 }

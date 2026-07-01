@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { SESSION_RESERVATION_FLOW_MODES } from '../../configs/session-reservation-flow-mode.config';
 import { SESSION_RESERVATION_CONFIG } from '../../configs/session-reservation.config';
@@ -8,19 +8,18 @@ import {
   ISessionReservationFlowState,
   ISessionReservationGmExtraInfo,
 } from '../../interfaces/i-session-reservation-flow';
-import {
-  SESSION_BOOKING_MODES,
-  SessionBookingMode,
-} from '../../types/session-booking-mode';
+import { SessionBookingMode } from '../../types/session-booking-mode';
 import {
   SessionAddonProductSlug,
   SessionReservationBaseProductSlug,
 } from '../../types/session-booking-product';
 import { SessionReservationAddonDetailsMap } from '../../types/session-reservation-addon-details';
 import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
+import { SessionReservationRulesService } from '../session-reservation-rules/session-reservation-rules';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationStore {
+  private readonly rules = inject(SessionReservationRulesService);
   private readonly stateSource = signal<ISessionReservationFlowState>(
     this.createInitialState(),
   );
@@ -51,46 +50,20 @@ export class SessionReservationStore {
     () => this.state().customServicesRequest,
   );
 
-  readonly requiresCustomerEntitlement = computed(
-    () =>
-      this.bookingMode() === SESSION_BOOKING_MODES.PackageCredit ||
-      this.bookingMode() === SESSION_BOOKING_MODES.SubscriptionCredit,
+  readonly requiresCustomerEntitlement = computed(() =>
+    this.rules.requiresCustomerEntitlement(this.state()),
   );
 
-  readonly requiresManualQuote = computed(() => {
-    const state = this.state();
-    const manualQuoteSlugs =
-      SESSION_RESERVATION_CONFIG.manualQuoteProductSlugs as readonly string[];
+  readonly requiresManualQuote = computed(() =>
+    this.rules.requiresManualQuote(this.state()),
+  );
 
-    return (
-      state.bookingMode === SESSION_BOOKING_MODES.CustomQuote ||
-      manualQuoteSlugs.includes(state.selectedBaseProductSlug) ||
-      state.selectedAddonSlugs.some((slug) => manualQuoteSlugs.includes(slug))
-    );
-  });
-
-  readonly isReadyForSummary = computed(() => {
-    const state = this.state();
-    const contact = state.contact;
-    const extraInfo = state.gmExtraInfo;
-    return (
-      !!state.selectedGmId &&
-      !!state.selectedSystemId &&
-      !!state.selectedDate &&
-      !!state.selectedStartTime &&
-      contact.customerName.trim().length > 0 &&
-      contact.customerEmail.trim().length > 0 &&
-      (!extraInfo.provideCharacterGuidelines ||
-        !!extraInfo.characterGuidelines?.trim()) &&
-      (!this.requiresManualQuote() || !!state.customServicesRequest?.trim()) &&
-      (!this.requiresCustomerEntitlement() ||
-        !!state.selectedCustomerEntitlementId) &&
-      this.areSelectedAddonsComplete()
-    );
-  });
+  readonly isReadyForSummary = computed(() =>
+    this.rules.isReadyForSummary(this.state()),
+  );
 
   readonly areSelectedAddonsComplete = computed(() =>
-    this.isAddonSelectionComplete(),
+    this.rules.areSelectedAddonsComplete(this.state()),
   );
 
   reset(): void {
@@ -236,25 +209,6 @@ export class SessionReservationStore {
 
   private patch(patch: Partial<ISessionReservationFlowState>): void {
     this.stateSource.update((state) => ({ ...state, ...patch }));
-  }
-
-  private isAddonSelectionComplete(): boolean {
-    const state = this.state();
-    const detailsRequired =
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringCustomerDetails as readonly string[];
-    const quantityRequired =
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringQuantity as readonly string[];
-
-    return state.selectedAddonSlugs.every((slug) => {
-      const details = state.addonDetails[slug];
-      const hasRequiredDetails =
-        !detailsRequired.includes(slug) || !!details?.customerDetails?.trim();
-      const hasRequiredQuantity =
-        !quantityRequired.includes(slug) ||
-        (typeof details?.quantity === 'number' && details.quantity > 0);
-
-      return hasRequiredDetails && hasRequiredQuantity;
-    });
   }
 
   private createInitialState(): ISessionReservationFlowState {
