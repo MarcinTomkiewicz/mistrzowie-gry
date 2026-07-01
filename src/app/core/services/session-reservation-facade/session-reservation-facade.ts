@@ -184,6 +184,10 @@ export class SessionReservationFacade {
     this.store.selectSlot(date, startTime, durationHours);
   }
 
+  selectSlotDate(date: string | null): void {
+    this.store.selectSlotDate(date);
+  }
+
   clearSlot(): void {
     this.store.clearSlot();
   }

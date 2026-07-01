@@ -183,6 +183,14 @@ export class SessionReservationStore {
     });
   }
 
+  selectSlotDate(date: string | null): void {
+    this.patch({
+      selectedDate: date,
+      selectedStartTime: null,
+      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
+    });
+  }
+
   clearSlot(): void {
     this.patch({
       selectedDate: null,

@@ -143,9 +143,7 @@ export class SessionReservationWizardController {
   }
 
   selectSlotDate(date: string | null): void {
-    if (date !== this.store.selectedDate()) {
-      this.facade.clearSlot();
-    }
+    this.facade.selectSlotDate(date);
   }
 
   goToWizardStep(step: number | undefined): void {
