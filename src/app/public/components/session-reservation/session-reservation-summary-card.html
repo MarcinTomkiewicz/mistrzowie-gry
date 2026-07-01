@@ -1,15 +1,15 @@
-<section class="mg-card flex-col-start-stretch gap-md w-100">
+<section class="mg-card flex-col-start-stretch gap-md w-100 color-text">
   <h2 class="mg-section__title mg-section__title--sm m-0">
     {{ data().sections.summary }}
   </h2>
 
-  @if (data().summary; as preview) {
+  @if (summary(); as preview) {
     @let gm = data().selectedGm;
 
     <dl class="m-0 flex-col-start-stretch gap-sm">
       <div class="flex-row-between-center gap-sm">
         <dt>{{ data().sections.offer }}</dt>
-        <dd class="m-0">{{ data().labels.reservationKind }}</dd>
+        <dd class="m-0">{{ preview.baseProduct.name }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
         <dt>{{ data().sections.gm }}</dt>
@@ -24,9 +24,48 @@
       <div class="flex-row-between-center gap-sm">
         <dt>{{ data().labels.selectedSlot }}</dt>
         <dd class="m-0">
-          {{ state().selectedDate }} {{ state().selectedStartTime }}
+          {{ selectedSlotLabel() }}
         </dd>
       </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ data().labels.duration }}</dt>
+        <dd class="m-0">
+          {{ state().selectedDurationHours }} {{ data().labels.hourShort }}
+        </dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ data().labels.playersCount }}</dt>
+        <dd class="m-0">
+          {{ state().playersCount || "" }}
+        </dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ data().labels.customerName }}</dt>
+        <dd class="m-0">{{ state().contact.customerName }}</dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ data().labels.customerEmail }}</dt>
+        <dd class="m-0">{{ state().contact.customerEmail }}</dd>
+      </div>
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ data().labels.customerPhone }}</dt>
+        <dd class="m-0">{{ state().contact.customerPhone || "" }}</dd>
+      </div>
+      @if (preview.additionalDurationHours) {
+        <div class="flex-row-between-center gap-sm">
+          <dt>{{ data().labels.additionalTime }}</dt>
+          <dd class="m-0">
+            {{
+              preview.additionalDurationHours + " " + data().labels.hourShort
+            }}
+          </dd>
+        </div>
+      } @else {
+        <div class="flex-row-between-center gap-sm">
+          <dt>{{ data().labels.additionalTime }}</dt>
+          <dd class="m-0">{{ data().states.noAdditionalTime }}</dd>
+        </div>
+      }
       <div class="flex-row-between-center gap-sm">
         <dt>{{ data().labels.manualQuote }}</dt>
         <dd class="m-0">
@@ -44,6 +83,44 @@
         </dd>
       </div>
     </dl>
+
+    <section class="flex-col-start-stretch gap-sm">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ data().labels.lineItems }}
+      </h3>
+      <div class="flex-col-start-stretch gap-sm">
+        @for (item of preview.pricingSnapshot.lineItems; track item.productId) {
+          <div class="flex-row-between-center gap-sm">
+            <span>
+              {{ item.label }}
+              @if (item.quantity) {
+                <span class="muted-text">x {{ item.quantity }}</span>
+              }
+            </span>
+            <strong>{{ lineItemTotalLabel(item.grossTotalPln) }}</strong>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="flex-col-start-stretch gap-sm">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ data().labels.entitlement }}
+      </h3>
+      @if (preview.customerEntitlement) {
+        <p class="m-0">
+          {{ preview.customerEntitlement.priceSnapshotJson.productName }}
+        </p>
+      } @else {
+        <p class="muted-text m-0">{{ data().states.noEntitlementSelected }}</p>
+      }
+    </section>
+
+    @if (state().gmExtraInfo.createCharactersAtTable) {
+      <p class="status-text status-text--warn m-0">
+        {{ data().states.createCharactersAtTableWarning }}
+      </p>
+    }
   } @else {
     <p class="muted-text">{{ data().states.summaryNotReady }}</p>
   }

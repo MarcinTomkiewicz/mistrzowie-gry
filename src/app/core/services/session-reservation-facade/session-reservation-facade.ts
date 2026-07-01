@@ -15,9 +15,9 @@ import {
 } from '../../interfaces/i-session-reservation-availability';
 import {
   ISessionReservationInitialOptions,
-  ISessionReservationSummaryPreview,
 } from '../../interfaces/i-session-reservation-flow';
 import { ISystem } from '../../interfaces/i-system';
+import { ISessionReservationFinalSummaryPreview } from '../../interfaces/i-session-reservation-finalization';
 import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
 import { SessionReservationAvailabilityService } from '../session-reservation-availability/session-reservation-availability';
 import { SessionReservationEntitlementService } from '../session-reservation-entitlement/session-reservation-entitlement';
@@ -76,11 +76,15 @@ export class SessionReservationFacade {
       }),
     );
   }
-  resetReservationFlow(): void {
+  resetReservationFlow(clearInitialOptions = false): void {
     this.store.reset();
-    this.products.set([]);
-    this.activeSystems.set([]);
-    this.visibleGms.set([]);
+
+    if (clearInitialOptions) {
+      this.products.set([]);
+      this.activeSystems.set([]);
+      this.visibleGms.set([]);
+    }
+
     this.systemsForSelectedGm.set([]);
     this.gmsForSelectedSystem.set([]);
     this.availableSlots.set([]);
@@ -293,7 +297,7 @@ export class SessionReservationFacade {
     );
   }
 
-  buildSummaryPreview(): ISessionReservationSummaryPreview | null {
+  buildSummaryPreview(): ISessionReservationFinalSummaryPreview | null {
     return this.summary.buildSummaryPreview(
       this.store.state(),
       this.products(),

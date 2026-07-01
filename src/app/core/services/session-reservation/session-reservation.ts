@@ -11,13 +11,13 @@ import { FilterDefinition } from '../../interfaces/i-filter';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
 import { ISessionBookingProduct } from '../../interfaces/i-session-booking-product';
 import {
-  ICreateSessionReservationPayload,
   ISessionReservation,
 } from '../../interfaces/i-session-reservation';
 import { ISession } from '../../interfaces/i-session';
 import { ISystem } from '../../interfaces/i-system';
 import { CUSTOMER_SESSION_ENTITLEMENT_STATUSES } from '../../types/customer-session-entitlement';
 import { SessionBookingProductSlug } from '../../types/session-booking-product';
+import { SessionReservationCreatePayload } from '../../types/session-reservation-create-payload';
 import { GmRead } from '../gm-read/gm-read';
 import { Backend } from '../backend/backend';
 import { Auth } from '../auth/auth';
@@ -187,11 +187,11 @@ export class SessionReservationService {
   }
 
   createSessionReservation(
-    payload: ICreateSessionReservationPayload,
+    payload: SessionReservationCreatePayload,
   ): Observable<ISessionReservation> {
     return this.backend.create<
       ISessionReservation,
-      ICreateSessionReservationPayload
+      SessionReservationCreatePayload
     >('session_reservations', payload);
   }
 

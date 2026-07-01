@@ -83,6 +83,13 @@
         </label>
       </div>
 
+      @if (createCharactersAtTableControl().value) {
+        <p-message
+          severity="warn"
+          [text]="data().states.createCharactersAtTableWarning"
+        />
+      }
+
       <div class="flex-row-start-start gap-sm">
         <p-checkbox
           inputId="provideCharacterGuidelines"

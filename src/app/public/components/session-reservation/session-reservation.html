@@ -1,5 +1,5 @@
-@let data = vm();
-@let state = store.state();
+@let data = page.vm();
+@let state = page.store.state();
 
 <section
   class="mg-section mg-section--full"
@@ -12,9 +12,10 @@
         data.isLoadingSystems ||
         data.isLoadingGms ||
         data.isLoadingSlots ||
-        data.isLoadingEntitlements
+        data.isLoadingEntitlements ||
+        submit.isSubmitting()
       "
-      [label]="data.commonStatus.loading"
+      [label]="submit.isSubmitting() ? data.commonStatus.saving : data.commonStatus.loading"
     />
 
     <header class="mg-section__header">
@@ -67,15 +68,17 @@
               <app-session-reservation-choice-panel
                 [data]="data"
                 [state]="state"
-                (flowModeSelected)="selectFlowMode($event)"
+                (flowModeSelected)="page.selectFlowMode($event)"
               />
 
               <app-session-reservation-addons-panel
                 [data]="data"
                 [state]="state"
-                (addonToggled)="toggleAddon($event)"
-                (addonCustomerDetailsChanged)="setAddonCustomerDetails($event)"
-                (addonQuantityChanged)="setAddonQuantity($event)"
+                (addonToggled)="page.toggleAddon($event)"
+                (addonCustomerDetailsChanged)="
+                  page.setAddonCustomerDetails($event)
+                "
+                (addonQuantityChanged)="page.setAddonQuantity($event)"
               />
             </ng-template>
           </p-step-panel>
@@ -128,16 +131,21 @@
                 <app-session-reservation-details-panel
                   [data]="data"
                   [state]="state"
-                  [contactForm]="contactForm"
-                  [gmExtraForm]="gmExtraForm"
-                  [provideCharacterGuidelinesControl]="
-                    gmExtraForm.controls.provideCharacterGuidelines
+                  [contactForm]="forms.contactForm"
+                  [gmExtraForm]="forms.gmExtraForm"
+                  [createCharactersAtTableControl]="
+                    forms.gmExtraForm.controls.createCharactersAtTable
                   "
-                  [playersCountControl]="playersCountControl"
-                  [customServicesRequestControl]="customServicesRequestControl"
-                  (entitlementsRefresh)="refreshEntitlements()"
+                  [provideCharacterGuidelinesControl]="
+                    forms.gmExtraForm.controls.provideCharacterGuidelines
+                  "
+                  [playersCountControl]="forms.playersCountControl"
+                  [customServicesRequestControl]="
+                    forms.customServicesRequestControl
+                  "
+                  (entitlementsRefresh)="page.refreshEntitlements()"
                   (customerEntitlementSelected)="
-                    selectCustomerEntitlement($event)
+                    page.selectCustomerEntitlement($event)
                   "
                 />
 
@@ -171,7 +179,7 @@
               [outlined]="true"
               [label]="data.labels.showSelectedGmProfile"
               [disabled]="!data.selectedGm"
-              (onClick)="openSelectedGmProfileDialog()"
+              (onClick)="page.openSelectedGmProfileDialog()"
             />
           }
 
@@ -183,16 +191,25 @@
               [disabled]="wizard.isNextWizardStepDisabled()"
               (onClick)="wizard.goToNextWizardStep()"
             />
+          } @else {
+            <p-button
+              type="button"
+              severity="success"
+              [label]="data.commonActions.confirm"
+              [disabled]="submit.isSubmitDisabled()"
+              [loading]="submit.isSubmitting()"
+              (onClick)="submit.submitReservation()"
+            />
           }
         </div>
       </div>
     }
 
     <app-gm-profile-dialog
-      [visible]="isGmProfileDialogVisible()"
-      [profile]="selectedGm()"
+      [visible]="page.isGmProfileDialogVisible()"
+      [profile]="page.selectedGm()"
       [profiles]="data.gmOptions"
-      (visibleChange)="onGmProfileDialogVisibleChange($event)"
+      (visibleChange)="page.onGmProfileDialogVisibleChange($event)"
     />
   </div>
 </section>

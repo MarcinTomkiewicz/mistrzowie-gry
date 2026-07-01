@@ -5,7 +5,7 @@ import {
   ISessionReservationAvailableSlot,
   ISessionReservationGmSlot,
 } from './i-session-reservation-availability';
-import { ISessionReservationSummaryPreview } from './i-session-reservation-flow';
+import { ISessionReservationFinalSummaryPreview } from './i-session-reservation-finalization';
 import {
   ISessionReservationCommonI18n,
   ISessionReservationI18nSections,
@@ -28,7 +28,7 @@ export interface ISessionReservationViewModel {
   customerEntitlements: readonly ICustomerSessionEntitlement[];
   selectedGm: IGmPublicProfile | null;
   selectedSystem: ISystem | null;
-  summary: ISessionReservationSummaryPreview | null;
+  summary: ISessionReservationFinalSummaryPreview | null;
   isLoadingInitial: boolean;
   isLoadingSystems: boolean;
   isLoadingSlots: boolean;

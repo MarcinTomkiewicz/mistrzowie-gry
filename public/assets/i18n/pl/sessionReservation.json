@@ -5,7 +5,7 @@
   },
   "hero": {
     "title": "Rezerwacja sesji RPG",
-    "subtitle": "Wybierz Mistrza Gry, system i termin. Na tym etapie pokazujemy podgląd rezerwacji bez zapisu."
+    "subtitle": "Wybierz Mistrza Gry, system i termin. Na koniec potwierdzisz dane i wyślesz rezerwację."
   },
   "sections": {
     "offer": "Rodzaj rezerwacji",
@@ -37,6 +37,10 @@
     "entitlement": "Pakiet lub abonament",
     "manualQuote": "Wycena",
     "grossTotal": "Suma brutto",
+    "lineItems": "Pozycje wyceny",
+    "additionalTime": "Dodatkowy czas",
+    "duration": "Czas trwania",
+    "hourShort": "h",
     "selectedSlot": "Wybrany termin",
     "startTime": "Od",
     "endTime": "Do",
@@ -59,10 +63,24 @@
     "manualQuoteRequired": "Wymaga wyceny",
     "fixedPrice": "Cena stała",
     "longDurationWarning": "Wybrano czas dłuższy niż 4 godziny. Może to wiązać się z dodatkową opłatą.",
+    "createCharactersAtTableWarning": "Tworzenie postaci przy stole jest wliczone w czas trwania sesji i skróci czas właściwej rozgrywki.",
+    "noAddonsSelected": "Nie wybrano dodatkowych usług.",
+    "noEntitlementSelected": "Nie wybrano pakietu ani abonamentu.",
+    "noAdditionalTime": "Brak dodatkowego czasu.",
     "nearestSystemSlotsTitle": "Najbliższe terminy dla tego systemu",
     "nearestSystemSlotsHint": "Wybrany Mistrz Gry nie ma terminu w aktualnym zakresie. Możesz wybrać termin u innego MG prowadzącego ten system.",
     "otherGmsForSelectedSlotTitle": "Inni MG dostępni w tym terminie",
     "otherGmsForSelectedSlotHint": "Ci MG mają wolny wybrany termin, ale nie oznacza to, że prowadzą wskazany system.",
     "fallbackGmClearsSystemHint": "Jeśli wybierzesz MG bez tego systemu, system i termin zostaną wyczyszczone."
+  },
+  "toast": {
+    "invalidFormSummary": "Sprawdź dane rezerwacji",
+    "invalidFormDetail": "Uzupełnij wymagane pola i popraw błędy formularza.",
+    "saveSuccessSummary": "Rezerwacja wysłana",
+    "saveSuccessDetail": "Otrzymaliśmy Twoją rezerwację i wrócimy z potwierdzeniem.",
+    "saveFailedSummary": "Nie udało się zapisać rezerwacji",
+    "saveFailedDetail": "Spróbuj ponownie za chwilę albo skontaktuj się z nami.",
+    "slotUnavailableSummary": "Termin nie jest już dostępny",
+    "slotUnavailableDetail": "Wybierz inny termin i spróbuj ponownie."
   }
 }

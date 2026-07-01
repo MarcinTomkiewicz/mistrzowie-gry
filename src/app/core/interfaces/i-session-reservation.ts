@@ -88,6 +88,7 @@ export interface ISessionReservationCreateBase
   userId: string | null;
   gmProfileId: string;
   systemId: string;
+  status: SessionReservationStatus;
   startsAt: string;
   endsAt: string;
   durationHours: number;
@@ -105,41 +106,3 @@ export interface ISessionReservationCreateBase
   currency: 'PLN';
   priceStatus: SessionPriceStatus;
 }
-
-export type SessionReservationSourceSelection =
-  | {
-      sourceKind: Extract<SessionReservationSourceKind, 'gm_session_template'>;
-      gmSessionTemplateId: string;
-      customSessionId: null;
-    }
-  | {
-      sourceKind: Extract<SessionReservationSourceKind, 'custom_session'>;
-      gmSessionTemplateId: null;
-      customSessionId: string;
-    }
-  | {
-      sourceKind: Extract<SessionReservationSourceKind, 'system_only'>;
-      gmSessionTemplateId: null;
-      customSessionId: null;
-    };
-
-export type SessionReservationBookingSelection =
-  | {
-      bookingMode: Extract<
-        SessionBookingMode,
-        'single_session' | 'custom_quote'
-      >;
-      customerEntitlementId: null;
-    }
-  | {
-      bookingMode: Extract<
-        SessionBookingMode,
-        'package_credit' | 'subscription_credit'
-      >;
-      customerEntitlementId: string;
-    };
-
-export type ICreateSessionReservationPayload =
-  ISessionReservationCreateBase &
-  SessionReservationSourceSelection &
-  SessionReservationBookingSelection;

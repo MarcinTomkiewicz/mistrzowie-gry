@@ -43,6 +43,10 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     entitlement: string;
     manualQuote: string;
     grossTotal: string;
+    lineItems: string;
+    additionalTime: string;
+    duration: string;
+    hourShort: string;
     selectedSlot: string;
     startTime: string;
     endTime: string;
@@ -65,6 +69,10 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     manualQuoteRequired: string;
     fixedPrice: string;
     longDurationWarning: string;
+    createCharactersAtTableWarning: string;
+    noAddonsSelected: string;
+    noEntitlementSelected: string;
+    noAdditionalTime: string;
     nearestSystemSlotsTitle: string;
     nearestSystemSlotsHint: string;
     otherGmsForSelectedSlotTitle: string;
