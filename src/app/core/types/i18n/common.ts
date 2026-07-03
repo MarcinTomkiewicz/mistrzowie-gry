@@ -50,6 +50,7 @@ export type CommonActionsTranslations = {
 export type CommonNavTranslations = {
   home: string;
   about: string;
+  ourTeam: string;
   offer: string;
   individualOffer: string;
   businessOffer: string;
@@ -61,6 +62,7 @@ export type CommonNavTranslations = {
   contact: string;
   faq: string;
   pricing: string;
+  articles: string;
   blog: string;
   standardsAndLogistics: string;
 };

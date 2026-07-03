@@ -1,4 +1,3 @@
-import { ISeoStructuredDataNode } from '../interfaces/i-seo';
 import {
   ORGANIZATION_ID,
   SITE_URL,
@@ -8,39 +7,13 @@ import {
   VENUE_STREET_ADDRESS,
   WEBSITE_ID,
 } from '../config/site';
-
-type StructuredDataNode = ISeoStructuredDataNode;
-
-type PageStructuredDataOptions = {
-  type: string;
-  id: string;
-  url: string;
-  name: string;
-  description?: string;
-  mainEntity?: StructuredDataNode;
-};
-
-type OfferStructuredDataOptions = {
-  price: string;
-  url: string;
-  priceCurrency?: string;
-  availability?: string;
-};
-
-type EventStructuredDataOptions = {
-  id: string;
-  url: string;
-  name: string;
-  description?: string;
-  image?: string;
-  startDate?: string;
-  endDate?: string;
-  location?: StructuredDataNode;
-  organizer?: StructuredDataNode;
-  offers?: StructuredDataNode;
-  subEvent?: StructuredDataNode[];
-  eventSchedule?: StructuredDataNode;
-};
+import {
+  ArticleStructuredDataOptions,
+  EventStructuredDataOptions,
+  OfferStructuredDataOptions,
+  PageStructuredDataOptions,
+  StructuredDataNode,
+} from '../types/structured-data';
 
 function compactNode<T extends StructuredDataNode>(node: T): T {
   return Object.fromEntries(
@@ -119,5 +92,23 @@ export function createEventStructuredData(
     offers: options.offers,
     subEvent: options.subEvent,
     eventSchedule: options.eventSchedule,
+  });
+}
+
+export function createArticleStructuredData(
+  options: ArticleStructuredDataOptions,
+): StructuredDataNode {
+  return compactNode({
+    '@type': 'Article',
+    '@id': options.id,
+    url: options.url,
+    headline: options.headline,
+    description: options.description,
+    image: options.image,
+    datePublished: options.datePublished,
+    dateModified: options.dateModified,
+    author: createOrganizationRef(),
+    publisher: createOrganizationRef(),
+    isPartOf: createWebsiteRef(),
   });
 }

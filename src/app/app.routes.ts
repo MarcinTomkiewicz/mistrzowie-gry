@@ -8,6 +8,14 @@ const loaders = {
     import('./public/components/our-team/our-team').then((m) => m.OurTeam),
   offerPage: () =>
     import('./public/components/offers/offers').then((m) => m.Offers),
+  contentArticleList: () =>
+    import('./public/components/content-articles/content-article-list/content-article-list').then(
+      (m) => m.ContentArticleList,
+    ),
+  contentArticleDetail: () =>
+    import('./public/components/content-articles/content-article-detail/content-article-detail').then(
+      (m) => m.ContentArticleDetail,
+    ),
   universalCalendarPreview: () =>
     import('./public/components/universal-calendar-preview/universal-calendar-preview').then(
       (m) => m.UniversalCalendarPreview,
@@ -38,6 +46,8 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', loadComponent: loaders.home },
   { path: 'about', loadComponent: loaders.about },
   { path: 'our-team', loadComponent: loaders.ourTeam },
+  { path: 'artykuly', loadComponent: loaders.contentArticleList },
+  { path: 'artykuly/:slug', loadComponent: loaders.contentArticleDetail },
   {
     path: 'preview/universal-calendar',
     loadComponent: loaders.universalCalendarPreview,

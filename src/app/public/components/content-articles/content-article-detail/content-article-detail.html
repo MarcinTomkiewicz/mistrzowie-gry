@@ -1,0 +1,83 @@
+@let data = vm();
+
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative">
+    <app-loading-overlay [visible]="data.isLoading" [label]="data.status.loading" />
+
+    @if (data.error) {
+      <div class="mg-card text-center">
+        <h1 class="mg-section__title mg-section__title--sm">
+          {{ data.errors.detailLoadTitle }}
+        </h1>
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ data.error }}
+        </p>
+      </div>
+    } @else if (data.isNotFound) {
+      <div class="mg-card text-center">
+        <h1 class="mg-section__title mg-section__title--sm">
+          {{ data.errors.detailNotFoundTitle }}
+        </h1>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ data.errors.detailNotFoundDescription }}
+        </p>
+      </div>
+    } @else if (data.article; as article) {
+      <article>
+        <header class="mg-section__header">
+          @if (data.heroImageUrl) {
+            <div class="image__preview image__preview--landscape mb-lg">
+              <img [src]="data.heroImageUrl" [alt]="article.heroImageAlt" />
+            </div>
+          }
+
+          <h1 class="mg-section__title">{{ article.title }}</h1>
+          <p class="mg-section__subtitle">{{ article.excerpt }}</p>
+        </header>
+
+        <div class="flex-col-start-stretch gap-xl">
+          @for (block of article.blocks; track trackByBlockId($index, block)) {
+            @if (isTextSectionBlock(block)) {
+              <section>
+                @if (block.heading) {
+                  <h3 class="mg-section__title mg-section__title--sm">
+                    {{ block.heading }}
+                  </h3>
+                }
+
+                <p class="mg-section__subtitle mg-section__subtitle--full text-pre-line">
+                  {{ block.body }}
+                </p>
+              </section>
+            } @else if (isImageBlock(block)) {
+              @if (resolveImageUrl(block.imagePath); as imageUrl) {
+                <figure class="m-0">
+                  <div class="image__preview image__preview--landscape">
+                    <img [src]="imageUrl" [alt]="block.imageAlt" loading="lazy" />
+                  </div>
+
+                  @if (block.caption) {
+                    <figcaption class="mg-section__subtitle mt-xs text-center">
+                      {{ block.caption }}
+                    </figcaption>
+                  }
+                </figure>
+              }
+            }
+          }
+        </div>
+
+        <div class="flex-row-start-center mt-xl">
+          <p-button
+            [label]="data.cta.backToList"
+            icon="pi pi-arrow-left"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            routerLink="/artykuly"
+          />
+        </div>
+      </article>
+    }
+  </div>
+</section>

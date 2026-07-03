@@ -11,6 +11,11 @@ export const MENU_CONFIG: IMenu[] = [
     path: '/our-team',
     footer: true,
   },
+  {
+    labelKey: 'nav.articles',
+    path: '/artykuly',
+    footer: true,
+  },
 
   {
     labelKey: 'nav.offer',

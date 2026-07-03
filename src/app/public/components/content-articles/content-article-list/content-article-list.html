@@ -1,0 +1,69 @@
+@let data = vm();
+
+<section class="mg-section mg-section--full" [attr.aria-label]="data.hero.title">
+  <div class="mg-container position-relative">
+    <app-loading-overlay [visible]="data.isLoading" [label]="data.status.loading" />
+
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">{{ data.hero.title }}</h1>
+      <p class="mg-section__subtitle">{{ data.hero.subtitle }}</p>
+    </header>
+
+    @if (data.error) {
+      <div class="mg-card">
+        <h2 class="mg-section__title mg-section__title--sm">
+          {{ data.errors.listTitle }}
+        </h2>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ data.error }}
+        </p>
+      </div>
+    } @else if (!data.isLoading && !data.items.length) {
+      <div class="mg-card">
+        <h2 class="mg-section__title mg-section__title--sm">
+          {{ data.empty.title }}
+        </h2>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ data.empty.description }}
+        </p>
+      </div>
+    } @else {
+      <div class="mg-grid mg-grid-3">
+        @for (article of data.items; track trackById($index, article)) {
+          <article class="mg-card flex-col-start-stretch">
+            @if (resolveImageUrl(article.heroImagePath); as imageUrl) {
+              <a
+                class="image__preview image__preview--landscape mb-md"
+                [routerLink]="['/artykuly', article.slug]"
+              >
+                <img [src]="imageUrl" [alt]="article.heroImageAlt" loading="lazy" />
+              </a>
+            }
+
+            <div class="flex-col-start-stretch gap-sm flex-1">
+              <h2 class="mg-section__title mg-section__title--sm">
+                {{ article.title }}
+              </h2>
+
+              <p class="mg-section__subtitle mg-section__subtitle--full">
+                {{ article.excerpt }}
+              </p>
+
+              <div class="mt-auto pt-sm">
+                <p-button
+                  [label]="data.cta.readMore"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  severity="secondary"
+                  size="small"
+                  [outlined]="true"
+                  [routerLink]="['/artykuly', article.slug]"
+                />
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
