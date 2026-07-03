@@ -1,6 +1,9 @@
 // path: src/core/services/backend/backend.ts
 import { inject, Injectable } from '@angular/core';
-import { PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
+import {
+  PostgrestResponse,
+  PostgrestSingleResponse,
+} from '@supabase/supabase-js';
 import { from, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -20,6 +23,18 @@ export type Pagination = {
 @Injectable({ providedIn: 'root' })
 export class Backend {
   private readonly supabase = inject(Supabase).client();
+
+  rpc<TResult>(
+    functionName: string,
+    args?: Record<string, unknown>,
+  ): Observable<TResult> {
+    return from(this.supabase.rpc(functionName, args)).pipe(
+      map((res: PostgrestSingleResponse<TResult>) => {
+        if (res.error) throw new Error(res.error.message);
+        return res.data as TResult;
+      }),
+    );
+  }
 
   getAll<T extends object>(opts: {
     table: string;
