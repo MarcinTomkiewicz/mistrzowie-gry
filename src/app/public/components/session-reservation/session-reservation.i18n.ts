@@ -15,6 +15,7 @@ export function createSessionReservationI18n() {
       sections: 'sections',
       labels: 'labels',
       states: 'states',
+      errors: 'errors',
     },
   );
 

@@ -124,7 +124,8 @@ export class SessionReservationPageController {
       )
       .subscribe({
         next: () => this.seo.apply(this.i18n.seo()),
-        error: () => this.wizard.setGenericLoadError(),
+        error: () =>
+          this.wizard.setLoadError(this.i18n.errors().initialOptionsLoad),
       });
   }
 
@@ -152,7 +153,8 @@ export class SessionReservationPageController {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        error: () => this.wizard.setGenericLoadError(),
+        error: () =>
+          this.wizard.setLoadError(this.i18n.errors().entitlementsLoad),
       });
   }
 

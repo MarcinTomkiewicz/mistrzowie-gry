@@ -16,3 +16,18 @@ export function formatSessionReservationSlotTimeRangeLabel(
     formatDateTimeAsTimeLabel(new Date(slot.endsAt)),
   );
 }
+
+export function isSessionReservationSelectedSlot(
+  slot: ISessionReservationAvailableSlot,
+  selectedGmId: string | null,
+  selectedDate: string | null,
+  selectedStartTime: string | null,
+  selectedDurationHours: number,
+): boolean {
+  return (
+    selectedGmId === slot.gmProfileId &&
+    selectedDate === slot.date &&
+    selectedStartTime === slot.startTime &&
+    selectedDurationHours === slot.durationHours
+  );
+}

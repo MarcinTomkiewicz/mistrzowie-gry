@@ -19,6 +19,7 @@ import {
 import { ISystem } from '../../interfaces/i-system';
 import { ISessionReservationFinalSummaryPreview } from '../../interfaces/i-session-reservation-finalization';
 import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
+import { isSessionReservationSelectedSlot } from '../../utils/session-reservation-slots';
 import { SessionReservationAvailabilityService } from '../session-reservation-availability/session-reservation-availability';
 import { SessionReservationEntitlementService } from '../session-reservation-entitlement/session-reservation-entitlement';
 import { SessionReservationStore } from '../session-reservation-store/session-reservation-store';
@@ -236,7 +237,19 @@ export class SessionReservationFacade {
         this.store.selectedGmId(),
       )
       .pipe(
-        tap((gms) => this.otherGmsForSelectedSlot.set(gms)),
+        tap((gms) => {
+          if (
+            isSessionReservationSelectedSlot(
+              slot,
+              this.store.selectedGmId(),
+              this.store.selectedDate(),
+              this.store.selectedStartTime(),
+              this.store.selectedDurationHours(),
+            )
+          ) {
+            this.otherGmsForSelectedSlot.set(gms);
+          }
+        }),
         map(() => void 0),
       );
   }

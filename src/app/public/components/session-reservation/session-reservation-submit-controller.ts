@@ -82,15 +82,20 @@ export class SessionReservationSubmitController {
   }
 
   private onSubmitError(error: unknown): void {
-    const message =
-      error instanceof Error && error.message
-        ? error.message
-        : SESSION_RESERVATION_SUBMIT_ERRORS.InvalidPayload;
+    const errorCode = this.resolveSubmitErrorCode(error);
 
-    if (message === SESSION_RESERVATION_SUBMIT_ERRORS.SlotUnavailable) {
+    if (errorCode === SESSION_RESERVATION_SUBMIT_ERRORS.SlotUnavailable) {
       this.toast.warn({
         summary: this.submitToast().slotUnavailableSummary,
         detail: this.submitToast().slotUnavailableDetail,
+      });
+      return;
+    }
+
+    if (errorCode === SESSION_RESERVATION_SUBMIT_ERRORS.InvalidPayload) {
+      this.toast.warn({
+        summary: this.submitToast().invalidFormSummary,
+        detail: this.submitToast().invalidFormDetail,
       });
       return;
     }
@@ -99,5 +104,23 @@ export class SessionReservationSubmitController {
       summary: this.submitToast().saveFailedSummary,
       detail: this.submitToast().saveFailedDetail,
     });
+  }
+
+  private resolveSubmitErrorCode(error: unknown): string | null {
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : null;
+
+    if (
+      message === SESSION_RESERVATION_SUBMIT_ERRORS.InvalidPayload ||
+      message === SESSION_RESERVATION_SUBMIT_ERRORS.SlotUnavailable
+    ) {
+      return message;
+    }
+
+    return null;
   }
 }

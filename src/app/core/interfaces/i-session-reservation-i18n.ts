@@ -79,6 +79,15 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     otherGmsForSelectedSlotHint: string;
     fallbackGmClearsSystemHint: string;
   };
+  errors: {
+    initialOptionsLoad: string;
+    systemsForGmLoad: string;
+    gmsForSystemLoad: string;
+    gmsForSlotLoad: string;
+    slotsLoad: string;
+    entitlementsLoad: string;
+    otherGmSelection: string;
+  };
 }
 
 export interface ISessionReservationCommonI18n {

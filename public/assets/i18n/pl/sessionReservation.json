@@ -73,6 +73,15 @@
     "otherGmsForSelectedSlotHint": "Ci MG mają wolny wybrany termin, ale nie oznacza to, że prowadzą wskazany system.",
     "fallbackGmClearsSystemHint": "Jeśli wybierzesz MG bez tego systemu, system i termin zostaną wyczyszczone."
   },
+  "errors": {
+    "initialOptionsLoad": "Nie udało się załadować opcji rezerwacji.",
+    "systemsForGmLoad": "Nie udało się załadować systemów dla wybranego Mistrza Gry.",
+    "gmsForSystemLoad": "Nie udało się załadować Mistrzów Gry dla wybranego systemu.",
+    "gmsForSlotLoad": "Nie udało się załadować Mistrzów Gry dostępnych w wybranym terminie.",
+    "slotsLoad": "Nie udało się załadować dostępnych terminów.",
+    "entitlementsLoad": "Nie udało się odświeżyć pakietów lub abonamentów dla podanego e-maila.",
+    "otherGmSelection": "Nie udało się wybrać innego Mistrza Gry dla tego terminu."
+  },
   "toast": {
     "invalidFormSummary": "Sprawdź dane rezerwacji",
     "invalidFormDetail": "Uzupełnij wymagane pola i popraw błędy formularza.",

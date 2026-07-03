@@ -20,6 +20,7 @@ import {
   SESSION_RESERVATION_WIZARD_STEPS,
   SessionReservationWizardStep,
 } from '../../../core/types/session-reservation-wizard';
+import { isSessionReservationSelectedSlot } from '../../../core/utils/session-reservation-slots';
 import { createSessionReservationI18n } from './session-reservation.i18n';
 
 @Injectable()
@@ -78,10 +79,6 @@ export class SessionReservationWizardController {
     this.clearLoadError();
   }
 
-  setGenericLoadError(): void {
-    this.setLoadError(this.i18n.commonErrors().generic);
-  }
-
   setLoadError(message: string | null): void {
     this.loadErrorSource.set(message);
   }
@@ -93,6 +90,7 @@ export class SessionReservationWizardController {
   private runBlockingLoad<T>(
     loader: Observable<T>,
     setLoading: (isLoading: boolean) => void,
+    errorMessage: string,
     onSuccess?: (value: T) => void,
   ): void {
     this.clearLoadError();
@@ -105,7 +103,7 @@ export class SessionReservationWizardController {
       )
       .subscribe({
         next: (value) => onSuccess?.(value),
-        error: () => this.setGenericLoadError(),
+        error: () => this.setLoadError(errorMessage),
       });
   }
 
@@ -133,19 +131,38 @@ export class SessionReservationWizardController {
   }
 
   loadSlots(): void {
-    this.runBlockingLoad(this.facade.loadSlotsForSelectedGm(), (isLoading) =>
-      this.isLoadingSlots.set(isLoading),
+    this.runBlockingLoad(
+      this.facade.loadSlotsForSelectedGm(),
+      (isLoading) => this.isLoadingSlots.set(isLoading),
+      this.i18n.errors().slotsLoad,
     );
   }
 
   selectSlot(slot: ISessionReservationAvailableSlot): void {
+    this.clearLoadError();
     this.facade
       .selectSlotAndLoadFallbackGms(slot)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ error: () => undefined });
+      .subscribe({
+        error: () => {
+          if (
+            this.activeWizardStep() === SESSION_RESERVATION_WIZARD_STEPS.Slot &&
+            isSessionReservationSelectedSlot(
+              slot,
+              this.store.selectedGmId(),
+              this.store.selectedDate(),
+              this.store.selectedStartTime(),
+              this.store.selectedDurationHours(),
+            )
+          ) {
+            this.setLoadError(this.i18n.errors().gmsForSlotLoad);
+          }
+        },
+      });
   }
 
   selectSlotDate(date: string | null): void {
+    this.clearLoadError();
     this.facade.selectSlotDate(date);
   }
 
@@ -158,6 +175,7 @@ export class SessionReservationWizardController {
     this.runBlockingLoad(
       this.facade.selectOtherGmForSelectedSlot(gmProfileId),
       (isLoading) => this.isLoadingSystems.set(isLoading),
+      this.i18n.errors().otherGmSelection,
       (preservesSelectedSystem) => {
         this.activeWizardStep.set(
           preservesSelectedSystem
@@ -270,6 +288,7 @@ export class SessionReservationWizardController {
     const targetIndex = steps.indexOf(step);
 
     if (targetIndex <= currentIndex) {
+      this.clearLoadError();
       this.activeWizardStep.set(step);
       return;
     }
@@ -280,40 +299,50 @@ export class SessionReservationWizardController {
 
     const isSystemFirst =
       this.store.flowMode() === SESSION_RESERVATION_FLOW_MODES.SystemFirst;
-    let loader: Observable<unknown> | null = null;
-    let setLoading = (_isLoading: boolean): void => undefined;
-
     if (
       currentStep === SESSION_RESERVATION_WIZARD_STEPS.Gm &&
       step === SESSION_RESERVATION_WIZARD_STEPS.System &&
       !isSystemFirst
     ) {
-      loader = this.facade.loadSystemsForSelectedGm();
-      setLoading = (isLoading) => this.isLoadingSystems.set(isLoading);
-    } else if (
+      this.runBlockingLoad(
+        this.facade.loadSystemsForSelectedGm(),
+        (isLoading) => this.isLoadingSystems.set(isLoading),
+        this.i18n.errors().systemsForGmLoad,
+        () => this.activeWizardStep.set(step),
+      );
+      return;
+    }
+
+    if (
       currentStep === SESSION_RESERVATION_WIZARD_STEPS.System &&
       step === SESSION_RESERVATION_WIZARD_STEPS.Gm &&
       isSystemFirst
     ) {
-      loader = this.facade.loadGmsForSelectedSystemAvailability();
-      setLoading = (isLoading) => this.isLoadingGms.set(isLoading);
-    } else if (
+      this.runBlockingLoad(
+        this.facade.loadGmsForSelectedSystemAvailability(),
+        (isLoading) => this.isLoadingGms.set(isLoading),
+        this.i18n.errors().gmsForSystemLoad,
+        () => this.activeWizardStep.set(step),
+      );
+      return;
+    }
+
+    if (
       step === SESSION_RESERVATION_WIZARD_STEPS.Slot &&
       ((currentStep === SESSION_RESERVATION_WIZARD_STEPS.System &&
         !isSystemFirst) ||
         (currentStep === SESSION_RESERVATION_WIZARD_STEPS.Gm && isSystemFirst))
     ) {
-      loader = this.facade.loadSlotsForSelectedGm();
-      setLoading = (isLoading) => this.isLoadingSlots.set(isLoading);
-    }
-
-    if (!loader) {
-      this.activeWizardStep.set(step);
+      this.runBlockingLoad(
+        this.facade.loadSlotsForSelectedGm(),
+        (isLoading) => this.isLoadingSlots.set(isLoading),
+        this.i18n.errors().slotsLoad,
+        () => this.activeWizardStep.set(step),
+      );
       return;
     }
 
-    this.runBlockingLoad(loader, setLoading, () =>
-      this.activeWizardStep.set(step),
-    );
+    this.clearLoadError();
+    this.activeWizardStep.set(step);
   }
 }
