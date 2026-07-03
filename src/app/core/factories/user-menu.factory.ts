@@ -45,27 +45,44 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
     });
   }
 
+  const administrationItems: IUserMenuSection['items'] = [];
+
   if (args.canSeeAdministration) {
+    administrationItems.push(
+      {
+        id: 'gm-availability-overview',
+        label: args.gmAvailabilityOverviewLabel,
+        path: '/auth/admin/gm-availability',
+      },
+      {
+        id: 'work-log-overview',
+        label: args.workLogOverviewLabel,
+        path: '/auth/admin/work-log',
+      },
+    );
+  }
+
+  if (args.canSeeAdminContent) {
+    administrationItems.push({
+      id: 'admin-content',
+      label: args.adminContentLabel,
+      path: '/admin/content',
+    });
+  }
+
+  if (args.canSeeAdministration) {
+    administrationItems.push({
+      id: 'admin-users',
+      label: args.adminUsersLabel,
+      path: '/auth/admin/users',
+    });
+  }
+
+  if (administrationItems.length) {
     sections.push({
       id: 'administration',
       title: args.administrationTitle,
-      items: [
-        {
-          id: 'gm-availability-overview',
-          label: args.gmAvailabilityOverviewLabel,
-          path: '/auth/admin/gm-availability',
-        },
-        {
-          id: 'work-log-overview',
-          label: args.workLogOverviewLabel,
-          path: '/auth/admin/work-log',
-        },
-        {
-          id: 'admin-users',
-          label: args.adminUsersLabel,
-          path: '/auth/admin/users',
-        },
-      ],
+      items: administrationItems,
     });
   }
 

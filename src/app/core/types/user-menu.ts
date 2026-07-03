@@ -6,6 +6,7 @@ export type UserMenuItemId =
   | 'my-work-log'
   | 'gm-availability-overview'
   | 'work-log-overview'
+  | 'admin-content'
   | 'admin-users';
 
 export type UserMenuSectionId =
@@ -37,7 +38,9 @@ export interface BuildUserMenuArgs {
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
+  adminContentLabel: string;
   adminUsersLabel: string;
   canSeeGmZone: boolean;
   canSeeAdministration: boolean;
+  canSeeAdminContent: boolean;
 }

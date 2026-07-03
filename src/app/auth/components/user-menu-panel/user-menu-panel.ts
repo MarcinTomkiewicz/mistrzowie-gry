@@ -43,12 +43,14 @@ export class UserMenuPanel {
       gmAvailabilityOverviewLabel:
         this.i18n.userMenu().gmAvailabilityOverviewLabel,
       workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
+      adminContentLabel: this.i18n.userMenu().adminContentLabel,
       adminUsersLabel: this.i18n.userMenu().adminUsersLabel,
       canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeAdministration: hasMinimumRole(
         this.auth.user(),
         'customer_manager',
       ),
+      canSeeAdminContent: hasMinimumRole(this.auth.user(), 'admin'),
     }),
   );
 

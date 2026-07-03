@@ -147,6 +147,26 @@ export function formatDateLabel(
   return `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}, ${numericDate}`;
 }
 
+export function formatTimestampLabel(
+  timestamp: string | null | undefined,
+  locale: string = 'pl-PL',
+): string | null {
+  if (!timestamp) {
+    return null;
+  }
+
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
+}
+
 export function formatWeekdayLabel(
   dateIso: string,
   locale: string = 'pl-PL',

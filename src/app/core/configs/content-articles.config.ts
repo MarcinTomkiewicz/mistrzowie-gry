@@ -1,3 +1,5 @@
+import { ContentArticleStatus } from '../types/content-article';
+
 export const CONTENT_ARTICLE_RPC = {
   getPublicArticleList: 'get_public_content_article_list',
   getPublicArticleBySlug: 'get_public_content_article_by_slug',
@@ -9,3 +11,11 @@ export const CONTENT_ARTICLE_RPC = {
   archiveAdminArticle: 'archive_admin_content_article',
 } as const;
 
+export const CONTENT_ARTICLE_STATUS_BADGE_CLASS: Record<
+  ContentArticleStatus,
+  string
+> = {
+  draft: 'tag-badge tag-badge--info',
+  published: 'tag-badge tag-badge--success',
+  archived: 'tag-badge tag-badge--muted',
+};

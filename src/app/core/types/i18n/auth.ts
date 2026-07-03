@@ -450,5 +450,6 @@ export interface UserMenuTranslations {
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
+  adminContentLabel: string;
   adminUsersLabel: string;
 }

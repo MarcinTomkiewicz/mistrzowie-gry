@@ -1,0 +1,45 @@
+{
+  "page": {
+    "title": "Zarządzanie treścią",
+    "subtitle": "Lista artykułów SEO i marketingowych. Z tego widoku utworzysz draft, opublikujesz albo zarchiwizujesz artykuł.",
+    "emptyTitle": "Brak artykułów",
+    "emptyDescription": "Utwórz pierwszy draft artykułu.",
+    "errorTitle": "Nie udało się załadować listy artykułów"
+  },
+  "table": {
+    "thumbnail": "Miniatura",
+    "title": "Tytuł",
+    "slug": "Slug",
+    "status": "Status",
+    "publishedAt": "Publikacja",
+    "updatedAt": "Aktualizacja",
+    "actions": "Akcje",
+    "notAvailable": "Brak",
+    "untitledDraft": "Szkic bez tytułu",
+    "thumbnailAlt": "Miniatura artykułu"
+  },
+  "actions": {
+    "createArticle": "Utwórz artykuł",
+    "publishArticle": "Opublikuj",
+    "archiveArticle": "Archiwizuj"
+  },
+  "statusLabels": {
+    "draft": "Szkic",
+    "published": "Opublikowany",
+    "archived": "Zarchiwizowany"
+  },
+  "toast": {
+    "loadFailedSummary": "Nie udało się załadować artykułów",
+    "loadFailedDetail": "Nie udało się pobrać listy artykułów.",
+    "createFailedSummary": "Nie udało się utworzyć artykułu",
+    "createFailedDetail": "Draft artykułu nie został utworzony.",
+    "publishSuccessSummary": "Opublikowano artykuł",
+    "publishSuccessDetail": "Artykuł jest dostępny publicznie.",
+    "publishFailedSummary": "Nie udało się opublikować artykułu",
+    "publishFailedDetail": "Artykuł nie został opublikowany.",
+    "archiveSuccessSummary": "Zarchiwizowano artykuł",
+    "archiveSuccessDetail": "Artykuł został zdjęty z publicznej listy.",
+    "archiveFailedSummary": "Nie udało się zarchiwizować artykułu",
+    "archiveFailedDetail": "Artykuł nie został zarchiwizowany."
+  }
+}

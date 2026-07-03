@@ -1,0 +1,120 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isBusy()"
+      [label]="
+        isCreating() || activeActionKey()
+          ? i18n.commonStatus().saving
+          : i18n.commonStatus().loading
+      "
+    />
+
+    <div class="flex-row-end-center w-100">
+      <p-button
+        [label]="i18n.actions().createArticle"
+        icon="pi pi-plus"
+        [loading]="isCreating()"
+        (onClick)="createArticle()"
+      />
+    </div>
+
+    @if (hasLoadError() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().errorTitle }}
+        </h2>
+
+        <p-button
+          severity="secondary"
+          [label]="i18n.commonActions().retry"
+          icon="pi pi-refresh"
+          (onClick)="loadArticles()"
+        />
+      </section>
+    } @else if (rowVms().length) {
+      <div class="w-100 overflow-x-auto">
+        <p-table [value]="rowVms()" dataKey="article.id" class="w-100 min-w-900">
+          <ng-template #header>
+            <tr>
+              <th class="small-caps">{{ i18n.table().thumbnail }}</th>
+              <th class="small-caps">{{ i18n.table().title }}</th>
+              <th class="small-caps">{{ i18n.table().slug }}</th>
+              <th class="small-caps">{{ i18n.table().status }}</th>
+              <th class="small-caps">{{ i18n.table().publishedAt }}</th>
+              <th class="small-caps">{{ i18n.table().updatedAt }}</th>
+              <th class="small-caps text-right">{{ i18n.table().actions }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template #body let-row>
+            <tr>
+              <td class="w-px-150">
+                @if (row.thumbnailUrl) {
+                  <div class="image__preview image__preview--landscape max-w-150">
+                    <img
+                      [src]="row.thumbnailUrl"
+                      [alt]="row.thumbnailAlt"
+                      loading="lazy"
+                    />
+                  </div>
+                } @else {
+                  <span class="tag-badge tag-badge--muted">
+                    {{ i18n.table().notAvailable }}
+                  </span>
+                }
+              </td>
+              <td>
+                <strong>{{ row.titleLabel }}</strong>
+              </td>
+              <td>{{ row.slugLabel }}</td>
+              <td>
+                <span [class]="row.statusBadgeClass">
+                  {{ row.statusLabel }}
+                </span>
+              </td>
+              <td>{{ row.publishedAtLabel }}</td>
+              <td>{{ row.updatedAtLabel }}</td>
+              <td class="text-right">
+                <div class="flex-row-end-center flex-wrap gap-xs">
+                  <p-button
+                    size="small"
+                    [label]="i18n.actions().publishArticle"
+                    icon="pi pi-send"
+                    [loading]="isActionLoading(row.article.id, 'publish')"
+                    (onClick)="publishArticle(row.article)"
+                  />
+
+                  <p-button
+                    size="small"
+                    severity="danger"
+                    [outlined]="true"
+                    [label]="i18n.actions().archiveArticle"
+                    icon="pi pi-inbox"
+                    [loading]="isActionLoading(row.article.id, 'archive')"
+                    (onClick)="archiveArticle(row.article)"
+                  />
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    } @else if (!isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().emptyTitle }}
+        </h2>
+
+        <p class="m-0">{{ i18n.page().emptyDescription }}</p>
+      </section>
+    }
+  </div>
+</section>

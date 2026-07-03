@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { minimumRoleGuard } from './core/guards/minimum-role.guard';
 
 const loaders = {
   home: () => import('./public/components/home/home').then((m) => m.Home),
@@ -40,6 +41,10 @@ const loaders = {
     import('./public/components/session-reservation/session-reservation').then(
       (m) => m.SessionReservation,
     ),
+  adminContentArticleList: () =>
+    import('./auth/components/admin-content-articles/admin-content-article-list/admin-content-article-list').then(
+      (m) => m.AdminContentArticleList,
+    ),
 } as const;
 
 export const routes: Routes = [
@@ -65,6 +70,11 @@ export const routes: Routes = [
   { path: 'contact', loadComponent: loaders.contact },
   { path: 'not-found', loadComponent: loaders.notFound },
   { path: 'not-authorized', loadComponent: loaders.notAuthorized },
+  {
+    path: 'admin/content',
+    loadComponent: loaders.adminContentArticleList,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
 
   {
     path: 'auth',
