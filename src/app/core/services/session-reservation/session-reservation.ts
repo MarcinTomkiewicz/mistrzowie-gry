@@ -9,19 +9,16 @@ import {
 } from '../../interfaces/i-customer-session-entitlement';
 import { FilterDefinition } from '../../interfaces/i-filter';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
-import { ISessionBookingProduct } from '../../interfaces/i-session-booking-product';
-import {
-  ISessionReservation,
-} from '../../interfaces/i-session-reservation';
 import { ISession } from '../../interfaces/i-session';
+import { ISessionBookingProduct } from '../../interfaces/i-session-booking-product';
+import { ISessionReservation } from '../../interfaces/i-session-reservation';
 import { ISystem } from '../../interfaces/i-system';
 import { CUSTOMER_SESSION_ENTITLEMENT_STATUSES } from '../../types/customer-session-entitlement';
-import { SessionBookingProductSlug } from '../../types/session-booking-product';
 import { SessionReservationCreatePayload } from '../../types/session-reservation-create-payload';
-import { GmRead } from '../gm-read/gm-read';
-import { Backend } from '../backend/backend';
-import { Auth } from '../auth/auth';
 import { hasMinimumRole } from '../../utils/roles';
+import { Auth } from '../auth/auth';
+import { Backend } from '../backend/backend';
+import { GmRead } from '../gm-read/gm-read';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationService {
@@ -69,15 +66,6 @@ export class SessionReservationService {
     });
   }
 
-  getBookingProductBySlug(
-    slug: SessionBookingProductSlug,
-  ): Observable<ISessionBookingProduct | null> {
-    return this.backend.getBySlug<ISessionBookingProduct>(
-      'session_booking_products',
-      slug,
-    );
-  }
-
   getCustomerEntitlements(
     customer: ICustomerSessionEntitlementLookup,
   ): Observable<ICustomerSessionEntitlement[]> {
@@ -101,22 +89,24 @@ export class SessionReservationService {
       };
     }
 
-    return this.backend.getAll<ICustomerSessionEntitlement>({
-      table: 'customer_session_entitlements',
-      sortBy: 'validFrom',
-      sortOrder: 'desc',
-      pagination: {
-        filters,
-      },
-    }).pipe(
-      map((entitlements) =>
-        entitlements.filter(
-          (entitlement) =>
-            entitlement.validFrom <= nowIso &&
-            (!entitlement.validTo || entitlement.validTo >= nowIso),
+    return this.backend
+      .getAll<ICustomerSessionEntitlement>({
+        table: 'customer_session_entitlements',
+        sortBy: 'validFrom',
+        sortOrder: 'desc',
+        pagination: {
+          filters,
+        },
+      })
+      .pipe(
+        map((entitlements) =>
+          entitlements.filter(
+            (entitlement) =>
+              entitlement.validFrom <= nowIso &&
+              (!entitlement.validTo || entitlement.validTo >= nowIso),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   getSystemsForGm(gmProfileId: string): Observable<ISystem[]> {
@@ -135,18 +125,6 @@ export class SessionReservationService {
 
         return gms.filter((gm) => availableGmIds.has(gm.profile.id));
       }),
-    );
-  }
-
-  getBlockingReservationsForGm(
-    gmProfileId: string,
-    fromIso: string,
-    toIsoExclusive: string,
-  ): Observable<ISessionReservation[]> {
-    return this.getBlockingReservationsForGms(
-      [gmProfileId],
-      fromIso,
-      toIsoExclusive,
     );
   }
 
@@ -195,9 +173,7 @@ export class SessionReservationService {
     >('session_reservations', payload);
   }
 
-  private getTemplateSystemIdsForGm(
-    gmProfileId: string,
-  ): Observable<string[]> {
+  private getTemplateSystemIdsForGm(gmProfileId: string): Observable<string[]> {
     return this.getTemplateSystemIdsForGms([gmProfileId]);
   }
 
@@ -222,14 +198,14 @@ export class SessionReservationService {
       })
       .pipe(
         map((sessions) => [
-          ...new Set(sessions.map((session) => session.systemId).filter(Boolean)),
+          ...new Set(
+            sessions.map((session) => session.systemId).filter(Boolean),
+          ),
         ]),
       );
   }
 
-  private getTemplateGmIdsForSystem(
-    systemId: string,
-  ): Observable<string[]> {
+  private getTemplateGmIdsForSystem(systemId: string): Observable<string[]> {
     return this.backend
       .getAll<Pick<ISession, 'gmProfileId'>>({
         table: 'gm_session_templates',
@@ -256,12 +232,14 @@ export class SessionReservationService {
       return of([] as ISystem[]);
     }
 
-    return this.backend.getByIds<ISystem>('systems', [...systemIds]).pipe(
-      map((systems) =>
-        [...systems].sort((left, right) =>
-          left.name.localeCompare(right.name, 'pl'),
+    return this.backend
+      .getByIds<ISystem>('systems', [...systemIds])
+      .pipe(
+        map((systems) =>
+          [...systems].sort((left, right) =>
+            left.name.localeCompare(right.name, 'pl'),
+          ),
         ),
-      ),
-    );
+      );
   }
 }

@@ -8,11 +8,7 @@ import {
   ISessionReservationFlowState,
   ISessionReservationGmExtraInfo,
 } from '../../interfaces/i-session-reservation-flow';
-import { SessionBookingMode } from '../../types/session-booking-mode';
-import {
-  SessionAddonProductSlug,
-  SessionReservationBaseProductSlug,
-} from '../../types/session-booking-product';
+import { SessionAddonProductSlug } from '../../types/session-booking-product';
 import { SessionReservationAddonDetailsMap } from '../../types/session-reservation-addon-details';
 import { SessionReservationFlowMode } from '../../types/session-reservation-flow-mode';
 import { SessionReservationRulesService } from '../session-reservation-rules/session-reservation-rules';
@@ -85,22 +81,6 @@ export class SessionReservationStore {
     });
   }
 
-  setBookingMode(bookingMode: SessionBookingMode): void {
-    this.patch({
-      bookingMode,
-      selectedCustomerEntitlementId: null,
-    });
-  }
-
-  selectBaseProduct(slug: SessionReservationBaseProductSlug): void {
-    this.patch({
-      selectedBaseProductSlug: slug,
-      selectedAddonSlugs: [],
-      addonDetails: {},
-      customServicesRequest: null,
-    });
-  }
-
   toggleAddon(slug: SessionAddonProductSlug): void {
     const currentSlugs = this.selectedAddonSlugs();
     const selectedAddonSlugs = currentSlugs.includes(slug)
@@ -157,9 +137,13 @@ export class SessionReservationStore {
   selectFallbackGm(gmId: string, preservesSelectedSystem: boolean): void {
     this.patch({
       selectedGmId: gmId,
-      selectedSystemId: preservesSelectedSystem ? this.selectedSystemId() : null,
+      selectedSystemId: preservesSelectedSystem
+        ? this.selectedSystemId()
+        : null,
       selectedDate: preservesSelectedSystem ? this.selectedDate() : null,
-      selectedStartTime: preservesSelectedSystem ? this.selectedStartTime() : null,
+      selectedStartTime: preservesSelectedSystem
+        ? this.selectedStartTime()
+        : null,
       selectedDurationHours: preservesSelectedSystem
         ? this.selectedDurationHours()
         : SESSION_RESERVATION_CONFIG.defaultDurationHours,
@@ -221,14 +205,6 @@ export class SessionReservationStore {
   selectSlotDate(date: string | null): void {
     this.patch({
       selectedDate: date,
-      selectedStartTime: null,
-      selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
-    });
-  }
-
-  clearSlot(): void {
-    this.patch({
-      selectedDate: null,
       selectedStartTime: null,
       selectedDurationHours: SESSION_RESERVATION_CONFIG.defaultDurationHours,
     });

@@ -8,6 +8,7 @@ import { formatMoney } from '../../../core/utils/pricing';
 import {
   createLocalDateTimeRangeIso,
   formatDateTimeAsTimeLabel,
+  formatTimeRangeLabel,
 } from '../../../core/utils/time';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 
@@ -45,9 +46,10 @@ export class SessionReservationSummaryCard {
       state.selectedDurationHours,
     );
 
-    return `${formatDateLabel(state.selectedDate, 'pl-PL')}, ${
-      state.selectedStartTime
-    }–${formatDateTimeAsTimeLabel(new Date(endsAt))}`;
+    return `${formatDateLabel(state.selectedDate, 'pl-PL')}, ${formatTimeRangeLabel(
+      state.selectedStartTime,
+      formatDateTimeAsTimeLabel(new Date(endsAt)),
+    )}`;
   }
 
   lineItemTotalLabel(value: number | null): string {
