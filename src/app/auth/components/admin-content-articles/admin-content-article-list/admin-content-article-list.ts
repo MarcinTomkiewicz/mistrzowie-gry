@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -27,6 +28,7 @@ import { createAdminContentArticleListI18n } from './admin-content-article-list.
 })
 export class AdminContentArticleList {
   private readonly articles = inject(ContentArticlesService);
+  private readonly router = inject(Router);
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
 
@@ -103,8 +105,8 @@ export class AdminContentArticleList {
       .createAdminArticleDraft()
       .pipe(finalize(() => this.isCreating.set(false)))
       .subscribe({
-        next: () => {
-          this.loadArticles();
+        next: (article) => {
+          void this.router.navigate(['/admin/content', article.id, 'edit']);
         },
         error: () => {
           this.toast.danger({
@@ -113,6 +115,10 @@ export class AdminContentArticleList {
           });
         },
       });
+  }
+
+  protected editArticle(article: IAdminContentArticleListItem): void {
+    void this.router.navigate(['/admin/content', article.id, 'edit']);
   }
 
   protected publishArticle(article: IAdminContentArticleListItem): void {

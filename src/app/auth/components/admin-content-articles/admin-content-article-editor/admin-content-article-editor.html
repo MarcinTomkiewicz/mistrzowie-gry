@@ -1,0 +1,292 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm w-100">
+        <div class="flex-col-start-start gap-xs">
+          <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+
+          <p class="mg-section__subtitle mg-section__subtitle--full">
+            {{ i18n.page().subtitle }}
+          </p>
+        </div>
+
+        @if (article(); as loadedArticle) {
+          <span [class]="getStatusBadgeClass(loadedArticle.status)">
+            {{ i18n.statusLabels()[loadedArticle.status] }}
+          </span>
+        }
+      </div>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading() || isSaving()"
+      [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+    />
+
+    @if (hasLoadError() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button
+            severity="secondary"
+            [label]="i18n.commonActions().retry"
+            icon="pi pi-refresh"
+            (onClick)="loadArticle()"
+          />
+
+          <p-button
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            (onClick)="goBack()"
+          />
+        </div>
+      </section>
+    } @else if (isNotFound() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().notFoundTitle }}
+        </h2>
+
+        <p-button
+          severity="warn"
+          [outlined]="true"
+          [label]="i18n.commonActions().cancel"
+          icon="pi pi-arrow-left"
+          (onClick)="goBack()"
+        />
+      </section>
+    } @else if (article()) {
+      <form
+        class="mg-form flex-col-start-stretch gap-md w-100"
+        [formGroup]="form"
+        (ngSubmit)="saveArticle()"
+        novalidate
+      >
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.fields().mainSectionTitle }}
+          </h2>
+
+          @for (row of mainFieldRows; track $index) {
+            <div
+              [class]="row.columns === 2 ? 'mg-grid grid-2-cols grid-1-cols-sm gap-md' : 'w-100'"
+            >
+              @for (field of row.fields; track field.controlName) {
+                <div class="w-100">
+                  <p-iftalabel class="w-100">
+                    @if (field.kind === 'textarea') {
+                      <textarea
+                        class="w-100"
+                        pTextarea
+                        [id]="field.inputId"
+                        [formControlName]="field.controlName"
+                        [rows]="field.rows"
+                      ></textarea>
+                    } @else {
+                      <input
+                        class="w-100"
+                        pInputText
+                        [id]="field.inputId"
+                        [formControlName]="field.controlName"
+                        autocomplete="off"
+                        (input)="onFieldInputAction(field.inputAction)"
+                      />
+                    }
+                    <label [for]="field.inputId">
+                      {{ i18n.fields()[field.labelKey] }}
+                    </label>
+                  </p-iftalabel>
+                </div>
+              }
+            </div>
+          }
+          @if (heroPreviewUrl()) {
+            <div class="image__preview image__preview--landscape max-w-450">
+              <img
+                [src]="heroPreviewUrl()!"
+                [alt]="form.controls.heroImageAlt.value || i18n.fields().heroPreviewAlt"
+                loading="lazy"
+              />
+            </div>
+          }
+        </section>
+
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.fields().seoSectionTitle }}
+          </h2>
+
+          @for (row of seoFieldRows; track $index) {
+            <div
+              [class]="row.columns === 2 ? 'mg-grid grid-2-cols grid-1-cols-sm gap-md' : 'w-100'"
+            >
+              @for (field of row.fields; track field.controlName) {
+                <div class="w-100">
+                  <p-iftalabel class="w-100">
+                    @if (field.kind === 'textarea') {
+                      <textarea
+                        class="w-100"
+                        pTextarea
+                        [id]="field.inputId"
+                        [formControlName]="field.controlName"
+                        [rows]="field.rows"
+                      ></textarea>
+                    } @else {
+                      <input
+                        class="w-100"
+                        pInputText
+                        [id]="field.inputId"
+                        [formControlName]="field.controlName"
+                        autocomplete="off"
+                        (input)="onFieldInputAction(field.inputAction)"
+                      />
+                    }
+                    <label [for]="field.inputId">
+                      {{ i18n.fields()[field.labelKey] }}
+                    </label>
+                  </p-iftalabel>
+                </div>
+              }
+            </div>
+          }
+        </section>
+
+        @let blockControls = textBlocks.controls;
+
+        <section class="flex-col-start-stretch gap-md w-100">
+          <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+            <h2 class="mg-section__title mg-section__title--md m-0">
+              {{ i18n.fields().bodySectionTitle }}
+            </h2>
+
+            <p-button
+              type="button"
+              severity="secondary"
+              [label]="i18n.editorActions().addTextSection"
+              icon="pi pi-plus"
+              (onClick)="addTextSectionAfter(null)"
+            />
+          </div>
+
+          @if (!blockControls.length) {
+            <p class="m-0">{{ i18n.validation().emptyBlocksNotice }}</p>
+          }
+
+          @for (block of blockControls; track index; let index = $index) {
+            <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="block">
+              <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+                <span class="tag-badge tag-badge--muted">
+                  {{ index + 1 }}
+                </span>
+
+                <div class="flex-row-end-center flex-wrap gap-xs">
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    size="small"
+                    [text]="true"
+                    [label]="i18n.editorActions().addTextSection"
+                    icon="pi pi-plus"
+                    (onClick)="addTextSectionAfter(index)"
+                  />
+
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    size="small"
+                    [text]="true"
+                    [label]="i18n.editorActions().moveSectionUp"
+                    icon="pi pi-arrow-up"
+                    [disabled]="index === 0"
+                    (onClick)="moveTextSectionUp(index)"
+                  />
+
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    size="small"
+                    [text]="true"
+                    [label]="i18n.editorActions().moveSectionDown"
+                    icon="pi pi-arrow-down"
+                    [disabled]="index === blockControls.length - 1"
+                    (onClick)="moveTextSectionDown(index)"
+                  />
+
+                  <p-button
+                    type="button"
+                    severity="danger"
+                    size="small"
+                    [text]="true"
+                    [label]="i18n.editorActions().removeTextSection"
+                    icon="pi pi-trash"
+                    (onClick)="removeTextSection(index)"
+                  />
+                </div>
+              </div>
+
+              <div class="w-100">
+                <p-iftalabel class="w-100">
+                  <input
+                    class="w-100"
+                    pInputText
+                    [id]="'content-article-block-heading-' + index"
+                    formControlName="heading"
+                    autocomplete="off"
+                  />
+                  <label [for]="'content-article-block-heading-' + index">
+                    {{ i18n.fields().heading }}
+                  </label>
+                </p-iftalabel>
+              </div>
+
+              <div class="w-100">
+                <p-iftalabel class="w-100">
+                  <textarea
+                    class="w-100"
+                    pTextarea
+                    [id]="'content-article-block-body-' + index"
+                    formControlName="body"
+                    rows="8"
+                  ></textarea>
+                  <label [for]="'content-article-block-body-' + index">
+                    {{ i18n.fields().body }}
+                  </label>
+                </p-iftalabel>
+
+                @if (showBlockValidation() && hasHeadingWithoutBody(block)) {
+                  <small>{{ i18n.validation().headingWithoutBody }}</small>
+                }
+              </div>
+            </section>
+          }
+        </section>
+
+        <div class="flex-row-center-center flex-wrap gap-sm w-100">
+          <p-button
+            type="submit"
+            severity="success"
+            [label]="i18n.commonActions().save"
+            icon="pi pi-save"
+            [loading]="isSaving()"
+            [disabled]="isLoading()"
+          />
+
+          <p-button
+            type="button"
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            [disabled]="isSaving()"
+            (onClick)="goBack()"
+          />
+        </div>
+      </form>
+    }
+  </div>
+</section>

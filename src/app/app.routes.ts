@@ -45,6 +45,10 @@ const loaders = {
     import('./auth/components/admin-content-articles/admin-content-article-list/admin-content-article-list').then(
       (m) => m.AdminContentArticleList,
     ),
+  adminContentArticleEditor: () =>
+    import('./auth/components/admin-content-articles/admin-content-article-editor/admin-content-article-editor').then(
+      (m) => m.AdminContentArticleEditor,
+    ),
 } as const;
 
 export const routes: Routes = [
@@ -73,6 +77,11 @@ export const routes: Routes = [
   {
     path: 'admin/content',
     loadComponent: loaders.adminContentArticleList,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/content/:id/edit',
+    loadComponent: loaders.adminContentArticleEditor,
     canActivate: [authGuard, minimumRoleGuard('admin')],
   },
 

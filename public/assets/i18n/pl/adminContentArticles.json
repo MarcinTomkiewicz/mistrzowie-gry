@@ -6,6 +6,12 @@
     "emptyDescription": "Utwórz pierwszy draft artykułu.",
     "errorTitle": "Nie udało się załadować listy artykułów"
   },
+  "editorPage": {
+    "title": "Edycja artykułu",
+    "subtitle": "Uzupełnij pola główne, SEO i tekstowe sekcje artykułu.",
+    "loadErrorTitle": "Nie udało się załadować artykułu",
+    "notFoundTitle": "Nie znaleziono artykułu"
+  },
   "table": {
     "thumbnail": "Miniatura",
     "title": "Tytuł",
@@ -20,8 +26,34 @@
   },
   "actions": {
     "createArticle": "Utwórz artykuł",
+    "editArticle": "Edytuj",
     "publishArticle": "Opublikuj",
     "archiveArticle": "Archiwizuj"
+  },
+  "editorActions": {
+    "addTextSection": "Dodaj sekcję",
+    "removeTextSection": "Usuń sekcję",
+    "moveSectionUp": "Przesuń wyżej",
+    "moveSectionDown": "Przesuń niżej"
+  },
+  "editorFields": {
+    "mainSectionTitle": "Pola główne",
+    "seoSectionTitle": "SEO",
+    "bodySectionTitle": "Treść artykułu",
+    "title": "Tytuł",
+    "slug": "Slug",
+    "excerpt": "Lead",
+    "heroImagePath": "Ścieżka obrazu głównego",
+    "heroImageAlt": "Opis alternatywny obrazu głównego",
+    "seoTitle": "Tytuł SEO",
+    "seoDescription": "Opis SEO",
+    "heading": "Nagłówek sekcji",
+    "body": "Treść sekcji",
+    "heroPreviewAlt": "Podgląd obrazu głównego"
+  },
+  "editorValidation": {
+    "headingWithoutBody": "Sekcja z nagłówkiem musi mieć treść.",
+    "emptyBlocksNotice": "Dodaj sekcję tekstową, jeśli artykuł ma mieć treść."
   },
   "statusLabels": {
     "draft": "Szkic",
@@ -41,5 +73,17 @@
     "archiveSuccessDetail": "Artykuł został zdjęty z publicznej listy.",
     "archiveFailedSummary": "Nie udało się zarchiwizować artykułu",
     "archiveFailedDetail": "Artykuł nie został zarchiwizowany."
+  },
+  "editorToast": {
+    "loadFailedSummary": "Nie udało się załadować artykułu",
+    "loadFailedDetail": "Nie udało się pobrać danych artykułu.",
+    "saveSuccessSummary": "Zapisano artykuł",
+    "saveSuccessDetail": "Zmiany zostały zapisane.",
+    "saveFailedSummary": "Nie udało się zapisać artykułu",
+    "saveFailedDetail": "Zmiany nie zostały zapisane.",
+    "invalidSummary": "Nieprawidłowa treść artykułu",
+    "invalidDetail": "Popraw sekcje tekstowe przed zapisem.",
+    "unsupportedImageBlocksSummary": "Artykuł zawiera bloki obrazów",
+    "unsupportedImageBlocksDetail": "Ten artykuł zawiera bloki obrazów. Ten etap edytora obsługuje tylko sekcje tekstowe, więc zapis został zablokowany do czasu wdrożenia edycji obrazów."
   }
 }

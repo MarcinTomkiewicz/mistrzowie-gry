@@ -86,6 +86,14 @@
                 <div class="flex-row-end-center flex-wrap gap-xs">
                   <p-button
                     size="small"
+                    severity="secondary"
+                    [label]="i18n.actions().editArticle"
+                    icon="pi pi-pencil"
+                    (onClick)="editArticle(row.article)"
+                  />
+
+                  <p-button
+                    size="small"
                     [label]="i18n.actions().publishArticle"
                     icon="pi pi-send"
                     [loading]="isActionLoading(row.article.id, 'publish')"
