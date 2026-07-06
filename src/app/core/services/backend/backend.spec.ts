@@ -1,3 +1,4 @@
+import { PendingTasks } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
   PostgrestError,
@@ -13,12 +14,20 @@ import { Backend } from './backend';
 describe('Backend', () => {
   let service: Backend;
   let supabaseClient: jasmine.SpyObj<Pick<SupabaseClient, 'rpc'>>;
+  let pendingTasks: jasmine.SpyObj<Pick<PendingTasks, 'add'>>;
+  let removePendingTask: jasmine.Spy;
 
   beforeEach(() => {
     supabaseClient = jasmine.createSpyObj<Pick<SupabaseClient, 'rpc'>>(
       'SupabaseClient',
       ['rpc'],
     );
+    removePendingTask = jasmine.createSpy('removePendingTask');
+    pendingTasks = jasmine.createSpyObj<Pick<PendingTasks, 'add'>>(
+      'PendingTasks',
+      ['add'],
+    );
+    pendingTasks.add.and.returnValue(removePendingTask);
 
     TestBed.configureTestingModule({
       providers: [
@@ -27,6 +36,10 @@ describe('Backend', () => {
           useValue: {
             client: () => supabaseClient,
           },
+        },
+        {
+          provide: PendingTasks,
+          useValue: pendingTasks,
         },
       ],
     });
@@ -100,6 +113,58 @@ describe('Backend', () => {
       { p_payload: payload },
     );
   });
+
+  it('releases pending task after rpc success', async () => {
+    supabaseClient.rpc.and.resolveTo(success({ id: 'article-1' }));
+
+    await firstValueFrom(service.rpc('get_article'));
+
+    expect(pendingTasks.add).toHaveBeenCalledTimes(1);
+    expect(removePendingTask).toHaveBeenCalledTimes(1);
+  });
+
+  it('releases pending task after rpc error', async () => {
+    supabaseClient.rpc.and.resolveTo(failure('RPC failed'));
+
+    await expectAsync(
+      firstValueFrom(service.rpc('get_article')),
+    ).toBeRejectedWithError('RPC failed');
+
+    expect(pendingTasks.add).toHaveBeenCalledTimes(1);
+    expect(removePendingTask).toHaveBeenCalledTimes(1);
+  });
+
+  it('releases pending task when rpc subscription is cancelled', async () => {
+    const deferred = createDeferred<PostgrestSingleResponse<{ id: string }>>();
+    supabaseClient.rpc.and.returnValue(
+      deferred.promise as unknown as ReturnType<SupabaseClient['rpc']>,
+    );
+
+    const subscription = service.rpc('get_article').subscribe();
+
+    subscription.unsubscribe();
+
+    expect(pendingTasks.add).toHaveBeenCalledTimes(1);
+    expect(removePendingTask).toHaveBeenCalledTimes(1);
+
+    deferred.resolve(success({ id: 'article-1' }));
+    await deferred.promise;
+
+    expect(removePendingTask).toHaveBeenCalledTimes(1);
+  });
+
+  it('releases pending task when supabase rpc throws synchronously', async () => {
+    supabaseClient.rpc.and.callFake(() => {
+      throw new Error('Sync RPC failed');
+    });
+
+    await expectAsync(
+      firstValueFrom(service.rpc('get_article')),
+    ).toBeRejectedWithError('Sync RPC failed');
+
+    expect(pendingTasks.add).toHaveBeenCalledTimes(1);
+    expect(removePendingTask).toHaveBeenCalledTimes(1);
+  });
 });
 
 function success<T>(data: T): PostgrestSingleResponse<T> {
@@ -126,4 +191,16 @@ function failure<T>(message: string): PostgrestSingleResponse<T> {
     status: 400,
     statusText: 'Bad Request',
   };
+}
+
+function createDeferred<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+} {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+
+  return { promise, resolve };
 }

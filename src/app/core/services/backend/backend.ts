@@ -1,11 +1,10 @@
-// path: src/core/services/backend/backend.ts
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, PendingTasks } from '@angular/core';
 import {
   PostgrestResponse,
   PostgrestSingleResponse,
 } from '@supabase/supabase-js';
-import { from, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { defer, from, Observable, of, throwError } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 
 import { applyFilters } from '../../utils/query';
 import { toCamelCase, toSnakeCase, toSnakeKey } from '../../utils/type-mappings';
@@ -23,17 +22,47 @@ export type Pagination = {
 @Injectable({ providedIn: 'root' })
 export class Backend {
   private readonly supabase = inject(Supabase).client();
+  private readonly pendingTasks = inject(PendingTasks);
 
   rpc<TResult>(
     functionName: string,
     args?: Record<string, unknown>,
   ): Observable<TResult> {
-    return from(this.supabase.rpc(functionName, args)).pipe(
-      map((res: PostgrestSingleResponse<TResult>) => {
-        if (res.error) throw new Error(res.error.message);
-        return res.data as TResult;
-      }),
-    );
+    return defer(() => {
+      const releasePendingTask = this.createPendingTaskRelease();
+      let request: ReturnType<typeof this.supabase.rpc>;
+
+      try {
+        request = this.supabase.rpc(functionName, args);
+      } catch (error) {
+        return throwError(() => error).pipe(finalize(releasePendingTask));
+      }
+
+      return from(request).pipe(
+        map((res: PostgrestSingleResponse<TResult>) => {
+          if (res.error) {
+            throw new Error(res.error.message);
+          }
+
+          return res.data as TResult;
+        }),
+        finalize(releasePendingTask),
+      );
+    });
+  }
+
+  private createPendingTaskRelease(): () => void {
+    const removePendingTask = this.pendingTasks.add();
+    let released = false;
+
+    return () => {
+      if (released) {
+        return;
+      }
+
+      released = true;
+      removePendingTask();
+    };
   }
 
   getAll<T extends object>(opts: {
