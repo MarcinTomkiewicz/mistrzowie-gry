@@ -1,0 +1,180 @@
+@let blockControls = blocks().controls;
+
+<section class="flex-col-start-stretch gap-md w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.fields().bodySectionTitle }}
+    </h2>
+
+    <div class="flex-row-end-center flex-wrap gap-xs">
+      <p-button
+        type="button"
+        severity="secondary"
+        [label]="i18n.editorActions().addTextSection"
+        icon="pi pi-plus"
+        [disabled]="disabled() || isUploading()"
+        (onClick)="addTextSectionAfter(null)"
+      />
+
+      <p-button
+        type="button"
+        severity="secondary"
+        [label]="i18n.editorActions().addImageBlock"
+        icon="pi pi-mona-lisa"
+        [disabled]="disabled() || isUploading()"
+        (onClick)="addImageBlockAfter(null)"
+      />
+    </div>
+  </div>
+
+  @if (!blockControls.length) {
+    <p class="m-0">{{ i18n.validation().emptyBlocksNotice }}</p>
+  }
+
+  @for (block of blockControls; track index; let index = $index) {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="block">
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+        <span class="tag-badge tag-badge--muted">
+          {{ index + 1 }}
+        </span>
+
+        <div class="flex-row-end-center flex-wrap gap-xs">
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().addTextSection"
+            icon="pi pi-plus"
+            [disabled]="disabled() || isUploading()"
+            (onClick)="addTextSectionAfter(index)"
+          />
+
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().addImageBlock"
+            icon="pi pi-mona-lisa"
+            [disabled]="disabled() || isUploading()"
+            (onClick)="addImageBlockAfter(index)"
+          />
+
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().moveSectionUp"
+            icon="pi pi-arrow-up"
+            [disabled]="disabled() || isUploading() || index === 0"
+            (onClick)="moveBlockUp(index)"
+          />
+
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().moveSectionDown"
+            icon="pi pi-arrow-down"
+            [disabled]="disabled() || isUploading() || index === blockControls.length - 1"
+            (onClick)="moveBlockDown(index)"
+          />
+
+          <p-button
+            type="button"
+            severity="danger"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().removeBlock"
+            icon="pi pi-trash"
+            [disabled]="disabled() || isUploading()"
+            (onClick)="removeBlock(index)"
+          />
+        </div>
+      </div>
+
+      @if (block.controls.kind.value === 'text_section') {
+        <div class="w-100">
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              [id]="'content-article-block-heading-' + index"
+              formControlName="heading"
+              autocomplete="off"
+            />
+            <label [for]="'content-article-block-heading-' + index">
+              {{ i18n.fields().heading }}
+            </label>
+          </p-iftalabel>
+        </div>
+
+        <div class="w-100">
+          <p-iftalabel class="w-100">
+            <textarea
+              class="w-100"
+              pTextarea
+              [id]="'content-article-block-body-' + index"
+              formControlName="body"
+              rows="8"
+            ></textarea>
+            <label [for]="'content-article-block-body-' + index">
+              {{ i18n.fields().body }}
+            </label>
+          </p-iftalabel>
+
+          @if (showValidation() && hasHeadingWithoutBody(block)) {
+            <small>{{ i18n.validation().headingWithoutBody }}</small>
+          }
+        </div>
+      } @else {
+        <app-image-upload
+          [currentUrl]="imagePreviewUrl(block.controls.imagePath.value)"
+          [cropHint]="cropHint()"
+          [disabled]="disabled() || isUploading()"
+          [previewAlt]="block.controls.imageAlt.value || i18n.fields().imagePreviewAlt"
+          (fileSelected)="onBlockImageSelected($event, index)"
+        />
+
+        @if (showValidation() && hasImageWithoutPath(block)) {
+          <small>{{ i18n.validation().imageWithoutPath }}</small>
+        }
+
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+          <div class="w-100">
+            <p-iftalabel class="w-100">
+              <input
+                class="w-100"
+                pInputText
+                [id]="'content-article-block-image-alt-' + index"
+                formControlName="imageAlt"
+                autocomplete="off"
+              />
+              <label [for]="'content-article-block-image-alt-' + index">
+                {{ i18n.fields().imageAlt }}
+              </label>
+            </p-iftalabel>
+          </div>
+
+          <div class="w-100">
+            <p-iftalabel class="w-100">
+              <input
+                class="w-100"
+                pInputText
+                [id]="'content-article-block-caption-' + index"
+                formControlName="caption"
+                autocomplete="off"
+              />
+              <label [for]="'content-article-block-caption-' + index">
+                {{ i18n.fields().caption }}
+              </label>
+            </p-iftalabel>
+          </div>
+        </div>
+      }
+    </section>
+  }
+</section>

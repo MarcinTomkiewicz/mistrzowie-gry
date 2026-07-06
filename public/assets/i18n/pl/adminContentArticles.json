@@ -32,7 +32,8 @@
   },
   "editorActions": {
     "addTextSection": "Dodaj sekcję",
-    "removeTextSection": "Usuń sekcję",
+    "addImageBlock": "Dodaj obrazek",
+    "removeBlock": "Usuń blok",
     "moveSectionUp": "Przesuń wyżej",
     "moveSectionDown": "Przesuń niżej"
   },
@@ -43,17 +44,23 @@
     "title": "Tytuł",
     "slug": "Slug",
     "excerpt": "Lead",
-    "heroImagePath": "Ścieżka obrazu głównego",
     "heroImageAlt": "Opis alternatywny obrazu głównego",
     "seoTitle": "Tytuł SEO",
     "seoDescription": "Opis SEO",
     "heading": "Nagłówek sekcji",
     "body": "Treść sekcji",
-    "heroPreviewAlt": "Podgląd obrazu głównego"
+    "imageAlt": "Opis alternatywny obrazu",
+    "caption": "Podpis obrazu",
+    "heroPreviewAlt": "Podgląd obrazu głównego",
+    "imagePreviewAlt": "Podgląd obrazu artykułu"
   },
   "editorValidation": {
     "headingWithoutBody": "Sekcja z nagłówkiem musi mieć treść.",
+    "imageWithoutPath": "Blok obrazu musi mieć przesłany obraz.",
     "emptyBlocksNotice": "Dodaj sekcję tekstową, jeśli artykuł ma mieć treść."
+  },
+  "editorUpload": {
+    "cropHint": "Ustaw kadr obrazu artykułu."
   },
   "statusLabels": {
     "draft": "Szkic",
@@ -74,6 +81,17 @@
     "archiveFailedSummary": "Nie udało się zarchiwizować artykułu",
     "archiveFailedDetail": "Artykuł nie został zarchiwizowany."
   },
+  "publicationValidation": {
+    "summary": "Artykuł nie spełnia wymogów publikacji",
+    "missingPrefix": "Uzupełnij:",
+    "title": "tytuł",
+    "slug": "slug",
+    "excerpt": "lead",
+    "heroImagePath": "obraz główny",
+    "heroImageAlt": "opis alternatywny obrazu głównego",
+    "textSectionBody": "treść artykułu",
+    "imageAlt": "opisy alternatywne obrazów"
+  },
   "editorToast": {
     "loadFailedSummary": "Nie udało się załadować artykułu",
     "loadFailedDetail": "Nie udało się pobrać danych artykułu.",
@@ -83,7 +101,7 @@
     "saveFailedDetail": "Zmiany nie zostały zapisane.",
     "invalidSummary": "Nieprawidłowa treść artykułu",
     "invalidDetail": "Popraw sekcje tekstowe przed zapisem.",
-    "unsupportedImageBlocksSummary": "Artykuł zawiera bloki obrazów",
-    "unsupportedImageBlocksDetail": "Ten artykuł zawiera bloki obrazów. Ten etap edytora obsługuje tylko sekcje tekstowe, więc zapis został zablokowany do czasu wdrożenia edycji obrazów."
+    "uploadFailedSummary": "Nie udało się przesłać obrazu",
+    "uploadFailedDetail": "Obraz nie został przesłany do biblioteki plików."
   }
 }

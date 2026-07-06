@@ -42,12 +42,12 @@ const loaders = {
       (m) => m.SessionReservation,
     ),
   adminContentArticleList: () =>
-    import('./auth/components/admin-content-articles/admin-content-article-list/admin-content-article-list').then(
-      (m) => m.AdminContentArticleList,
+    import('./auth/components/admin-content-articles/article-list/article-list').then(
+      (m) => m.ArticleList,
     ),
   adminContentArticleEditor: () =>
-    import('./auth/components/admin-content-articles/admin-content-article-editor/admin-content-article-editor').then(
-      (m) => m.AdminContentArticleEditor,
+    import('./auth/components/admin-content-articles/article-editor/article-editor').then(
+      (m) => m.ArticleEditor,
     ),
 } as const;
 

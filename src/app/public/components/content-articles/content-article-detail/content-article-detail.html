@@ -25,14 +25,16 @@
     } @else if (data.article; as article) {
       <article>
         <header class="mg-section__header">
+          
+          <h1 class="mg-section__title">{{ article.title }}</h1>
+          <p class="mg-section__subtitle mg-section__subtitle--full">
+            {{ article.excerpt }}
+          </p>
           @if (data.heroImageUrl) {
-            <div class="image__preview image__preview--landscape mb-lg">
+            <div class="image__preview image__preview--landscape my-lg">
               <img [src]="data.heroImageUrl" [alt]="article.heroImageAlt" />
             </div>
           }
-
-          <h1 class="mg-section__title">{{ article.title }}</h1>
-          <p class="mg-section__subtitle">{{ article.excerpt }}</p>
         </header>
 
         <div class="flex-col-start-stretch gap-xl">

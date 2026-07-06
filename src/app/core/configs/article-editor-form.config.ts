@@ -1,6 +1,6 @@
-import { ContentArticleEditorFormFieldRow } from '../types/content-article-editor-form';
+import { ArticleEditorFormFieldRow } from '../types/article-editor-form';
 
-export const CONTENT_ARTICLE_EDITOR_MAIN_FORM_FIELD_ROWS: readonly ContentArticleEditorFormFieldRow[] = [
+export const ARTICLE_EDITOR_MAIN_FORM_FIELD_ROWS: readonly ArticleEditorFormFieldRow[] = [
   {
     columns: 2,
     fields: [
@@ -32,14 +32,8 @@ export const CONTENT_ARTICLE_EDITOR_MAIN_FORM_FIELD_ROWS: readonly ContentArticl
     ],
   },
   {
-    columns: 2,
+    columns: 1,
     fields: [
-      {
-        controlName: 'heroImagePath',
-        inputId: 'content-article-hero-image-path',
-        kind: 'text',
-        labelKey: 'heroImagePath',
-      },
       {
         controlName: 'heroImageAlt',
         inputId: 'content-article-hero-image-alt',
@@ -50,7 +44,7 @@ export const CONTENT_ARTICLE_EDITOR_MAIN_FORM_FIELD_ROWS: readonly ContentArticl
   },
 ] as const;
 
-export const CONTENT_ARTICLE_EDITOR_SEO_FORM_FIELD_ROWS: readonly ContentArticleEditorFormFieldRow[] = [
+export const ARTICLE_EDITOR_SEO_FORM_FIELD_ROWS: readonly ArticleEditorFormFieldRow[] = [
   {
     columns: 1,
     fields: [

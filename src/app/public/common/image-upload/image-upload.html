@@ -1,0 +1,6 @@
+<app-file-upload
+  [texts]="texts()"
+  [options]="options()"
+  [cropConfig]="cropConfig"
+  (valueChange)="fileSelected.emit($event)"
+/>

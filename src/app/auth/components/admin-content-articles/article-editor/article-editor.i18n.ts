@@ -8,6 +8,7 @@ import {
   AdminContentArticleEditorFieldsTranslations,
   AdminContentArticleEditorPageTranslations,
   AdminContentArticleEditorToastTranslations,
+  AdminContentArticleEditorUploadTranslations,
   AdminContentArticleEditorValidationTranslations,
   AdminContentArticleStatusLabelTranslations,
 } from '../../../../core/types/i18n/admin-content-articles';
@@ -18,6 +19,7 @@ export function createAdminContentArticleEditorI18n() {
     editorActions,
     fields,
     validation,
+    upload,
     toast,
     statusLabels,
   } = createScopedSectionsI18n<{
@@ -25,6 +27,7 @@ export function createAdminContentArticleEditorI18n() {
     editorActions: AdminContentArticleEditorActionsTranslations;
     fields: AdminContentArticleEditorFieldsTranslations;
     validation: AdminContentArticleEditorValidationTranslations;
+    upload: AdminContentArticleEditorUploadTranslations;
     toast: AdminContentArticleEditorToastTranslations;
     statusLabels: AdminContentArticleStatusLabelTranslations;
   }>('adminContentArticles', {
@@ -32,6 +35,7 @@ export function createAdminContentArticleEditorI18n() {
     editorActions: 'editorActions',
     fields: 'editorFields',
     validation: 'editorValidation',
+    upload: 'editorUpload',
     toast: 'editorToast',
     statusLabels: 'statusLabels',
   });
@@ -41,6 +45,7 @@ export function createAdminContentArticleEditorI18n() {
     editorActions,
     fields,
     validation,
+    upload,
     toast,
     statusLabels,
     commonActions: createCommonActionsI18n(),
