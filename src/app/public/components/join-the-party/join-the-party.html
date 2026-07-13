@@ -1,7 +1,11 @@
+@let heroInfo = i18n.heroInfo();
+
 <section class="mg-section mg-join-hero" [attr.aria-label]="i18n.hero().title">
   <div class="mg-container">
     <header class="mg-section__header">
-      <div class="mg-join-hero__badge shadow-soft mb-md">{{ i18n.hero().badge }}</div>
+      <div class="mg-join-hero__badge shadow-soft mb-md">
+        {{ i18n.hero().badge }}
+      </div>
 
       <h1 class="mg-section__title">{{ i18n.hero().title }}</h1>
 
@@ -9,15 +13,51 @@
         {{ i18n.hero().subtitle }}
       </p>
 
-      <div class="mg-card mt-md mx-auto flex-col-center-start">
-        <p class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs">{{ i18n.heroInfo().title }}</p>
-        <ul class="flex-col m-0 px-md">
-          <li class="text-start">{{ i18n.heroInfo().orgMeetingFree }}</li>
-          <li>{{ i18n.heroInfo().orgMeetingPrice }}</li>
-          <li>{{ i18n.heroInfo().orgMeetingSchedule }}</li>
-          <li>{{ i18n.heroInfo().orgMeetingPlace }}</li>
-          <li>{{ i18n.heroInfo().sessionPrice }}</li>
-        </ul>
+      <div class="mg-card mt-md mx-auto flex-col-center-start w-100">
+        <p
+          class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs"
+        >
+          {{ heroInfo.title }}
+        </p>
+
+        <p-tabs [(value)]="meetingFormat" lazy class="w-100">
+          <div class="hide-down-sm">
+            <p-tablist>
+              <p-tab value="inPerson">
+                {{ i18n.meetingFormat().inPerson }}
+              </p-tab>
+              <p-tab value="online">
+                {{ i18n.meetingFormat().online }}
+              </p-tab>
+            </p-tablist>
+          </div>
+
+          <div class="show-down-sm mb-md">
+            <p-select
+              [options]="meetingFormatOptions()"
+              [formControl]="mobileMeetingFormatControl"
+              optionLabel="label"
+              optionValue="value"
+              [ariaLabel]="i18n.meetingFormat().label"
+              appendTo="body"
+              class="w-100"
+              (onChange)="onMobileMeetingFormatChange($event.value)"
+            />
+          </div>
+
+          <p-tabpanels>
+            <p-tabpanel value="inPerson">
+              <app-join-the-party-summary [copy]="heroInfo.inPerson" />
+            </p-tabpanel>
+
+            <p-tabpanel value="online">
+              <app-join-the-party-summary
+                [copy]="heroInfo.online"
+                [placeHref]="discordHref()"
+              />
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
       </div>
 
       <div class="flex-row-center-center flex-col-sm mt-md gap-md">
@@ -42,12 +82,17 @@
     </header>
 
     <div class="mg-join-grid">
-      @for (b of i18n.benefits(); track trackByIndex($index)) {
-        <div pAnimateOnScroll
-          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
+      @for (b of i18n.benefits(); track b.id) {
+        <div
+          pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+          class="mg-card"
+        >
           <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ b.icon }}" aria-hidden="true"></i>
-            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
               {{ b.title }}
             </h3>
           </div>
@@ -69,12 +114,17 @@
     </header>
 
     <div class="mg-join-grid">
-      @for (s of i18n.steps(); track trackByIndex($index)) {
-        <div pAnimateOnScroll
-          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
+      @for (s of i18n.steps(); track s.id) {
+        <div
+          pAnimateOnScroll
+          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+          class="mg-card"
+        >
           <div class="flex-row-start-center gap-sm mb-sm">
             <i class="{{ s.icon }}" aria-hidden="true"></i>
-            <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+            <h3
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin"
+            >
               {{ s.title }}
             </h3>
           </div>
@@ -94,7 +144,7 @@
       </h3>
 
       <ul class="mg-join-list m-0">
-        @for (x of i18n.rules(); track trackByIndex($index)) {
+        @for (x of i18n.rules(); track $index) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -109,14 +159,17 @@
       <p class="mg-section__subtitle">{{ i18n.continuation().subtitle }}</p>
     </header>
 
-    <div pAnimateOnScroll
-          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
+    <div
+      pAnimateOnScroll
+      enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+      class="mg-card"
+    >
       <h3 class="mg-section__title mg-section__title--sm">
         {{ i18n.continuationBulletsTitle() }}
       </h3>
 
       <ul class="mg-join-list m-0">
-        @for (x of i18n.continuationBullets(); track trackByIndex($index)) {
+        @for (x of i18n.continuationBullets(); track $index) {
           <li>{{ x }}</li>
         }
       </ul>
@@ -131,14 +184,17 @@
       <p class="mg-section__subtitle">{{ i18n.orgMeeting().subtitle }}</p>
     </header>
 
-    <div pAnimateOnScroll
-          enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both" class="mg-card">
+    <div
+      pAnimateOnScroll
+      enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
+      class="mg-card"
+    >
       <h3 class="mg-section__title mg-section__title--sm">
         {{ i18n.orgMeetingBulletsTitle() }}
       </h3>
 
       <ul class="mg-join-list m-0">
-        @for (x of i18n.orgMeetingBullets(); track trackByIndex($index)) {
+        @for (x of i18n.orgMeetingBullets(); track $index) {
           <li>{{ x }}</li>
         }
       </ul>

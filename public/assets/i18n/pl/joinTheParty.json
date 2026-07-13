@@ -10,13 +10,30 @@
     "subtitle": "Witaj w naszym autorskim programie. To tutaj postawisz swoje pierwsze kroki w grach fabularnych, poznasz Mistrzów Gry i zasady. Nie będziesz czytać setek stron podręczników i zasad. Nasza formuła \"RPG z napisami\" pozwoli Ci poznać gry fabularne w Twoim tempie, poprzez praktykę i regularną grę. Na teorię przyjdzie czas! "
   },
 
+  "meetingFormat": {
+    "label": "Wybierz formę spotkania",
+    "inPerson": "Stacjonarnie",
+    "online": "Online"
+  },
+
   "heroInfo": {
     "title": "W skrócie",
-    "orgMeetingFree": "Przyjdź na nasze bezpłatne spotkanie organizacyjne i poznaj szczegóły",
-    "orgMeetingPrice": "Koszt spotkania: Za darmo!",
-    "orgMeetingSchedule": "Kiedy: W każdą środę o 18:00",
-    "orgMeetingPlace": "Gdzie: Pub Pod Dwoma Miotłami, Wroniecka 21 w Poznaniu",
-    "sessionPrice": "Udział w programie: 40 zł od osoby za spotkanie w programie"
+    "inPerson": {
+      "orgMeetingFree": "Przyjdź na nasze bezpłatne spotkanie organizacyjne i poznaj szczegóły",
+      "orgMeetingPrice": "Koszt spotkania: Za darmo!",
+      "orgMeetingSchedule": "Kiedy: W każdą środę o 18:00",
+      "orgMeetingPlaceLabel": "Gdzie:",
+      "orgMeetingPlace": "Pub Pod Dwoma Miotłami, Wroniecka 21 w Poznaniu",
+      "sessionPrice": "Udział w programie: 40 zł od osoby za spotkanie w programie"
+    },
+    "online": {
+      "orgMeetingFree": "Dołącz do naszego bezpłatnego spotkania organizacyjnego i poznaj szczegóły",
+      "orgMeetingPrice": "Koszt spotkania: Za darmo!",
+      "orgMeetingSchedule": "Kiedy: W każdy poniedziałek o 18:00",
+      "orgMeetingPlaceLabel": "Gdzie:",
+      "orgMeetingPlace": "Discord Mistrzów Gry",
+      "sessionPrice": "Udział w programie: 40 zł od osoby za spotkanie w programie"
+    }
   },
 
   "intro": {

@@ -1,0 +1,18 @@
+@let details = copy();
+
+<ul class="flex-col m-0 px-md">
+  <li class="text-start">{{ details.orgMeetingFree }}</li>
+  <li>{{ details.orgMeetingPrice }}</li>
+  <li>{{ details.orgMeetingSchedule }}</li>
+  <li>
+    <span>{{ details.orgMeetingPlaceLabel }} </span>
+    @if (placeHref(); as href) {
+      <a [href]="href" target="_blank" rel="noopener noreferrer">
+        {{ details.orgMeetingPlace }}
+      </a>
+    } @else {
+      <span>{{ details.orgMeetingPlace }}</span>
+    }
+  </li>
+  <li>{{ details.sessionPrice }}</li>
+</ul>
