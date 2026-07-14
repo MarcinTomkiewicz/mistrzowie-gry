@@ -23,7 +23,7 @@ import {
 import { hasMinimumRole } from '../../utils/roles';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
-import { EventRead } from '../event-read/event-read';
+import { EventProgramRead } from '../event-program-read/event-program-read';
 import { GmSessionsFacade } from '../gm-sessions/gm-sessions';
 import { SessionRead } from '../session-read/session-read';
 
@@ -31,7 +31,7 @@ import { SessionRead } from '../session-read/session-read';
 export class EventSignup {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
-  private readonly eventRead = inject(EventRead);
+  private readonly eventProgramRead = inject(EventProgramRead);
   private readonly gmSessions = inject(GmSessionsFacade);
   private readonly sessionRead = inject(SessionRead);
 
@@ -352,7 +352,7 @@ export class EventSignup {
           return of(void 0);
         }
 
-        return this.eventRead.getActiveHostSignupCountByOccurrenceId(
+        return this.eventProgramRead.getActiveHostSignupCountByOccurrenceId(
           occurrence.id,
         ).pipe(
           switchMap((signupCount) =>

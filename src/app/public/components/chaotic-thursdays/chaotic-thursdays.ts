@@ -30,7 +30,7 @@ import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
 import { EventProgramPageVm } from '../../../core/types/event-program';
-import { EventRead } from '../../../core/services/event-read/event-read';
+import { EventProgramRead } from '../../../core/services/event-program-read/event-program-read';
 import { GmRead } from '../../../core/services/gm-read/gm-read';
 import { Auth } from '../../../core/services/auth/auth';
 import { Seo } from '../../../core/services/seo/seo';
@@ -82,7 +82,7 @@ export class ChaoticThursdays implements OnInit {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
   private readonly seo = inject(Seo);
-  private readonly eventRead = inject(EventRead);
+  private readonly eventProgramRead = inject(EventProgramRead);
   private readonly gmRead = inject(GmRead);
   private readonly storage = inject(Storage);
   private readonly pageUrl = buildSiteUrl('/chaotic-thursdays');
@@ -277,7 +277,7 @@ export class ChaoticThursdays implements OnInit {
   private loadPage(): void {
     this.isLoading.set(true);
 
-    this.eventRead
+    this.eventProgramRead
       .getPublicProgramLoadData(EVENT_SLUGS.chaoticThursdays, {
         startIso: this.rangeStartIso,
         endIso: this.rangeEndIso,

@@ -18,14 +18,18 @@ import {
   EVENT_SIGNUP_SELECTION_ROUTE,
 } from '../../../core/configs/event-signup.config';
 import { buildSiteUrl } from '../../../core/config/site';
+import { IEvent } from '../../../core/interfaces/i-event';
 import {
   IEventSignupLoadData,
   IEventSignupSavePayload,
 } from '../../../core/interfaces/i-event-signup';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
 import { Auth } from '../../../core/services/auth/auth';
+import { EventProgramRead } from '../../../core/services/event-program-read/event-program-read';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
+import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
+import { SessionRead } from '../../../core/services/session-read/session-read';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {
   EventSignupFormToastConfig,
@@ -35,6 +39,7 @@ import {
   getEndOfNextMonthIso,
   getStartOfCurrentMonthIso,
 } from '../../../core/utils/date';
+import { hasMinimumRole } from '../../../core/utils/roles';
 import { createEventSignupFormI18n } from './event-signup-form.i18n';
 
 @Injectable()
@@ -42,8 +47,11 @@ export class EventSignupFormFacade {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly auth = inject(Auth);
+  private readonly eventProgramRead = inject(EventProgramRead);
   private readonly eventRead = inject(EventRead);
   private readonly eventSignup = inject(EventSignup);
+  private readonly gmSessions = inject(GmSessionsFacade);
+  private readonly sessionRead = inject(SessionRead);
   private readonly toast = inject(UiToast);
   private readonly i18n = createEventSignupFormI18n();
 
@@ -52,9 +60,7 @@ export class EventSignupFormFacade {
 
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
-  readonly data = signal<IEventSignupLoadData>(
-    this.eventRead.createEmptyHostSignupLoadData(),
-  );
+  readonly data = signal<IEventSignupLoadData>(this.createEmptyLoadData());
   readonly occurrenceOptions = signal<IOccurrenceSwitcherOption[]>([]);
 
   readonly routeParams = toSignal(
@@ -96,7 +102,7 @@ export class EventSignupFormFacade {
       catchError((error) => {
         console.error('[EVENT SIGNUP FORM LOAD ERROR]', error);
 
-        this.data.set(this.eventRead.createEmptyHostSignupLoadData());
+        this.data.set(this.createEmptyLoadData());
         this.occurrenceOptions.set([]);
 
         this.toast.danger({
@@ -176,38 +182,163 @@ export class EventSignupFormFacade {
     const params = this.routeParams();
     const eventSlug = params.get('eventSlug');
     const occurrenceDate = params.get('occurrenceDate');
-    const userId = this.auth.userId();
 
     if (!eventSlug || !occurrenceDate) {
       return of({
-        data: this.eventRead.createEmptyHostSignupLoadData(),
+        data: this.createEmptyLoadData(),
         occurrenceOptions: [],
       });
     }
 
-    return this.eventRead
-      .getHostSignupLoadData(eventSlug, occurrenceDate, userId)
-      .pipe(
-        switchMap((data) => {
-          const eventId = data.page.event?.id;
-
-          if (!eventId) {
-            return of({
-              data,
-              occurrenceOptions: [],
-            });
-          }
-
-          return forkJoin({
-            data: of(data),
-            occurrenceOptions: this.eventRead.getOccurrenceOptions(
-              eventId,
-              this.rangeStartIso,
-              this.rangeEndIso,
-              [...HOST_SIGNUP_OCCURRENCE_STATUSES],
-            ),
+    return this.eventRead.getEventBySlug(eventSlug).pipe(
+      switchMap((event) => {
+        if (!event) {
+          return of({
+            data: this.createEmptyLoadData(),
+            occurrenceOptions: [],
           });
-        }),
+        }
+
+        return forkJoin({
+          data: this.getSignupLoadData(event, occurrenceDate),
+          occurrenceOptions: this.getOccurrenceOptions(event.id),
+        });
+      }),
+    );
+  }
+
+  private getSignupLoadData(
+    event: IEvent,
+    occurrenceDate: string,
+  ): Observable<IEventSignupLoadData> {
+    return this.eventRead.getOccurrenceByDate(event.id, occurrenceDate).pipe(
+      switchMap((occurrence) => {
+        const empty = this.createEmptyLoadData();
+
+        if (!occurrence) {
+          return of({
+            ...empty,
+            page: {
+              ...empty.page,
+              event,
+            },
+          } satisfies IEventSignupLoadData);
+        }
+
+        if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status)) {
+          return of({
+            ...empty,
+            page: {
+              ...empty.page,
+              event,
+              occurrence,
+            },
+          } satisfies IEventSignupLoadData);
+        }
+
+        const user = this.auth.user();
+
+        return forkJoin({
+          signupCount:
+            this.eventProgramRead.getActiveHostSignupCountByOccurrenceId(
+              occurrence.id,
+            ),
+          mySignup: this.eventSignup.getMySignup({
+            eventId: event.id,
+            occurrenceId: occurrence.id,
+          }),
+          templateSessions: user
+            ? this.sessionRead.getSessionsByGmProfileId(user.id, 'template')
+            : of([]),
+          customSessions: user
+            ? this.sessionRead.getSessionsByGmProfileId(user.id, 'custom')
+            : of([]),
+          systems: this.gmSessions.getAvailableSystems(),
+          styles: this.gmSessions.getAvailableStyles(),
+          triggers: this.gmSessions.getAvailableTriggers(),
+          languages: this.gmSessions.getAvailableLanguages(),
+        }).pipe(
+          map(
+            ({
+              signupCount,
+              mySignup,
+              templateSessions,
+              customSessions,
+              systems,
+              styles,
+              triggers,
+              languages,
+            }) => {
+              const isFull = signupCount >= occurrence.slotCapacity;
+              const isAdmin = hasMinimumRole(user, 'admin');
+              const canHostSignup = hasMinimumRole(user, 'gm');
+              const canAccess =
+                (canHostSignup && (!isFull || !!mySignup)) || isAdmin;
+
+              return {
+                page: {
+                  event,
+                  occurrence,
+                  mySignup,
+                  signupCount,
+                  isFull,
+                  canAccess,
+                },
+                resources: {
+                  templateSessions,
+                  customSessions,
+                  systems,
+                  styles,
+                  triggers,
+                  languages,
+                },
+              } satisfies IEventSignupLoadData;
+            },
+          ),
+        );
+      }),
+    );
+  }
+
+  private getOccurrenceOptions(
+    eventId: string,
+  ): Observable<IOccurrenceSwitcherOption[]> {
+    return this.eventRead
+      .getOccurrencesInRange(
+        eventId,
+        this.rangeStartIso,
+        this.rangeEndIso,
+        [...HOST_SIGNUP_OCCURRENCE_STATUSES],
+      )
+      .pipe(
+        map((occurrences) =>
+          occurrences.map((occurrence) => ({
+            id: occurrence.id,
+            label: occurrence.occurrenceDate,
+            occurrenceDate: occurrence.occurrenceDate,
+          })),
+        ),
       );
+  }
+
+  private createEmptyLoadData(): IEventSignupLoadData {
+    return {
+      page: {
+        event: null,
+        occurrence: null,
+        mySignup: null,
+        signupCount: 0,
+        isFull: false,
+        canAccess: false,
+      },
+      resources: {
+        templateSessions: [],
+        customSessions: [],
+        systems: [],
+        styles: [],
+        triggers: [],
+        languages: [],
+      },
+    };
   }
 }

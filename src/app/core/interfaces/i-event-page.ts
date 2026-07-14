@@ -1,40 +1,37 @@
 import { ParticipantSignupKind } from '../enums/event';
 
-export interface IEvent {
+export interface IPublicEventPage {
+  core: IPublicEventCore;
+  defaultEventId: string | null;
+  editions: IPublicEventEdition[];
+}
+
+export interface IPublicEventCore {
   id: string;
-  eventDefinitionId: string;
-  slug: string;
+  key: string;
   name: string;
   shortDescription: string | null;
   longDescription: string | null;
+}
 
+export interface IPublicEventEdition {
+  id: string;
+  slug: string;
   city: string;
   venueName: string | null;
   venueAddress: string | null;
-
   priceAmount: number | null;
   priceCurrency: string;
   priceLabel: string | null;
-
   coverImagePath: string | null;
   facebookLink: string | null;
-
-  isActive: boolean;
-  isDefaultPublic: boolean;
-  displayOrder: number;
   isForBeginners: boolean;
-
   timezone: string;
   startTime: string;
   endTime: string;
-  singleDate: string | null;
-
   participantSignupKind: ParticipantSignupKind;
   signupRequired: boolean;
-
   defaultSlotCapacity: number;
   defaultParticipantCapacity: number | null;
-
-  createdAt: string;
-  updatedAt: string;
+  displayOrder: number;
 }

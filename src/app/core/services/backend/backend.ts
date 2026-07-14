@@ -12,12 +12,8 @@ import { Supabase } from '../supabase/supabase';
 
 import { FilterDefinition, IFilter } from '../../interfaces/i-filter';
 import { FilterOperator } from '../../enums/filter-operators';
-
-export type Pagination = {
-  page?: number;
-  pageSize?: number;
-  filters?: Record<string, FilterDefinition>;
-};
+import { Pagination } from '../../types/backend';
+import { RpcError } from '../../types/rpc-error';
 
 @Injectable({ providedIn: 'root' })
 export class Backend {
@@ -41,7 +37,13 @@ export class Backend {
       return from(request).pipe(
         map((res: PostgrestSingleResponse<TResult>) => {
           if (res.error) {
-            throw new Error(res.error.message);
+            throw new RpcError(
+              res.error.code,
+              res.error.message,
+              res.error.details,
+              res.error.hint,
+              res.error,
+            );
           }
 
           return res.data as TResult;

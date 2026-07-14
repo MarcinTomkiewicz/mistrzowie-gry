@@ -24,6 +24,7 @@ import {
 import { IUser } from '../../../core/interfaces/i-user';
 import { Auth } from '../../../core/services/auth/auth';
 import { Backend } from '../../../core/services/backend/backend';
+import { EventProgramRead } from '../../../core/services/event-program-read/event-program-read';
 import { EventRead } from '../../../core/services/event-read/event-read';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
 import { Seo } from '../../../core/services/seo/seo';
@@ -54,6 +55,7 @@ import { createEventSignupI18n } from './event-signup.i18n';
 })
 export class EventSignupComponent {
   private readonly backend = inject(Backend);
+  private readonly eventProgramRead = inject(EventProgramRead);
   private readonly eventRead = inject(EventRead);
   private readonly eventSignup = inject(EventSignup);
   private readonly auth = inject(Auth);
@@ -219,7 +221,7 @@ export class EventSignupComponent {
           return forkJoin(
             occurrences.map((occurrence) =>
               forkJoin({
-                signupCount: this.eventRead
+                signupCount: this.eventProgramRead
                   .getActiveHostSignupCountByOccurrenceId(occurrence.id)
                   .pipe(catchError(() => of(0))),
                 mySignup: this.getMySignupForOccurrence(

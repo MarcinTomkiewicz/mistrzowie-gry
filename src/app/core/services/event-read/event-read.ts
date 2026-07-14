@@ -1,40 +1,32 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import {
-  EventOccurrenceStatus,
-  EventProgramItemSourceKind,
-  EventProgramItemStatus,
-} from '../../enums/event';
+import { EVENT_RPC } from '../../configs/event-rpc.config';
+import { EventOccurrenceStatus } from '../../enums/event';
 import { FilterOperator } from '../../enums/filter-operators';
-import { IFilter } from '../../interfaces/i-filter';
 import { IEvent } from '../../interfaces/i-event';
-import { IEventSignupLoadData } from '../../interfaces/i-event-signup';
+import { IHostEventCatalogItem } from '../../interfaces/i-event-catalog';
 import { IEventOccurrence } from '../../interfaces/i-event-occurence';
-import {
-  IEventProgramItem,
-  IEventProgramItemWithDetails,
-} from '../../interfaces/i-event-program-item';
-import { IOccurrenceSwitcherOption } from '../../interfaces/i-occurrence-switcher';
-import { ISessionWithRelations } from '../../interfaces/i-session';
-import { IUser } from '../../interfaces/i-user';
-import {
-  ACTIVE_HOST_SIGNUP_STATUSES,
-  HOST_SIGNUP_OCCURRENCE_STATUSES,
-} from '../../types/event-signup';
-import { IEventPublicProgramLoadData } from '../../types/event-program';
-import { hasMinimumRole } from '../../utils/roles';
+import { IPublicEventPage } from '../../interfaces/i-event-page';
+import { FilterDefinition } from '../../interfaces/i-filter';
 import { Backend } from '../backend/backend';
-import { GmRead } from '../gm-read/gm-read';
-import { GmSessionsFacade } from '../gm-sessions/gm-sessions';
-import { SessionRead } from '../session-read/session-read';
 
 @Injectable({ providedIn: 'root' })
 export class EventRead {
   private readonly backend = inject(Backend);
-  private readonly gmRead = inject(GmRead);
-  private readonly gmSessions = inject(GmSessionsFacade);
-  private readonly sessionRead = inject(SessionRead);
+
+  getPublicPage(eventKey: string): Observable<IPublicEventPage | null> {
+    return this.backend.rpc<IPublicEventPage | null>(
+      EVENT_RPC.getPublicPage,
+      { p_event_key: eventKey },
+    );
+  }
+
+  getHostCatalog(): Observable<IHostEventCatalogItem[]> {
+    return this.backend.rpc<IHostEventCatalogItem[]>(
+      EVENT_RPC.getHostCatalog,
+    );
+  }
 
   getEventBySlug(slug: string): Observable<IEvent | null> {
     return this.backend.getBySlug<IEvent>('events', slug);
@@ -67,15 +59,21 @@ export class EventRead {
     toIso: string,
     statuses?: EventOccurrenceStatus[],
   ): Observable<IEventOccurrence[]> {
-    const filters: Record<string, IFilter> = {
+    const filters: Record<string, FilterDefinition> = {
       eventId: {
         operator: FilterOperator.EQ,
         value: eventId,
       },
-      occurrenceDate: {
-        operator: FilterOperator.GTE,
-        value: fromIso,
-      },
+      occurrenceDate: [
+        {
+          operator: FilterOperator.GTE,
+          value: fromIso,
+        },
+        {
+          operator: FilterOperator.LTE,
+          value: toIso,
+        },
+      ],
     };
 
     if (statuses?.length) {
@@ -85,393 +83,11 @@ export class EventRead {
       };
     }
 
-    return this.backend
-      .getAll<IEventOccurrence>({
-        table: 'event_occurrences',
-        sortBy: 'occurrenceDate',
-        sortOrder: 'asc',
-        pagination: {
-          filters,
-        },
-      })
-      .pipe(
-        map((occurrences) =>
-          occurrences.filter(
-            (occurrence) => occurrence.occurrenceDate <= toIso,
-          ),
-        ),
-      );
-  }
-
-  getOccurrenceOptions(
-    eventId: string,
-    fromIso: string,
-    toIso: string,
-    statuses?: EventOccurrenceStatus[],
-  ): Observable<IOccurrenceSwitcherOption[]> {
-    return this.getOccurrencesInRange(eventId, fromIso, toIso, statuses).pipe(
-      map((occurrences) =>
-        occurrences.map((occurrence) => ({
-          id: occurrence.id,
-          label: occurrence.occurrenceDate,
-          occurrenceDate: occurrence.occurrenceDate,
-        })),
-      ),
-    );
-  }
-
-  getProgramItemsByOccurrenceId(
-    occurrenceId: string,
-    statuses?: EventProgramItemStatus[],
-  ): Observable<IEventProgramItemWithDetails[]> {
-    const filters: Record<string, IFilter> = {
-      occurrenceId: {
-        operator: FilterOperator.EQ,
-        value: occurrenceId,
-      },
-    };
-
-    if (statuses?.length) {
-      filters['status'] = {
-        operator: FilterOperator.IN,
-        value: statuses,
-      };
-    }
-
-    return this.backend
-      .getAll<IEventProgramItem>({
-        table: 'event_program_items',
-        sortBy: 'displayOrder',
-        sortOrder: 'asc',
-        pagination: {
-          filters,
-        },
-      })
-      .pipe(
-        switchMap((items) => {
-          if (!items.length) {
-            return of([] as IEventProgramItemWithDetails[]);
-          }
-
-          return forkJoin(items.map((item) => this.hydrateProgramItem(item)));
-        }),
-        map((items) =>
-          items
-            .filter(
-              (item): item is IEventProgramItemWithDetails => item !== null,
-            )
-            .sort((a, b) => {
-              const aOrder = a.displayOrder ?? Number.MAX_SAFE_INTEGER;
-              const bOrder = b.displayOrder ?? Number.MAX_SAFE_INTEGER;
-
-              if (aOrder !== bOrder) {
-                return aOrder - bOrder;
-              }
-
-              return a.session.title.localeCompare(b.session.title, 'pl');
-            }),
-        ),
-      );
-  }
-
-  getPublishedProgramItemsByOccurrenceId(
-    occurrenceId: string,
-  ): Observable<IEventProgramItemWithDetails[]> {
-    return this.getProgramItemsByOccurrenceId(occurrenceId, [
-      EventProgramItemStatus.Published,
-    ]);
-  }
-
-  getActiveHostSignupCountByOccurrenceId(
-    occurrenceId: string,
-  ): Observable<number> {
-    return this.backend.getCount('event_program_items', {
-      occurrenceId: {
-        operator: FilterOperator.EQ,
-        value: occurrenceId,
-      },
-      status: {
-        operator: FilterOperator.IN,
-        value: [...ACTIVE_HOST_SIGNUP_STATUSES],
-      },
+    return this.backend.getAll<IEventOccurrence>({
+      table: 'event_occurrences',
+      sortBy: 'occurrenceDate',
+      sortOrder: 'asc',
+      pagination: { filters },
     });
-  }
-
-  getPublicProgramLoadData(
-    eventSlug: string,
-    options: {
-      startIso: string;
-      endIso: string;
-      todayIso?: string;
-      occurrenceStatuses?: EventOccurrenceStatus[];
-      programStatuses?: EventProgramItemStatus[];
-      includePastOccurrences?: boolean;
-    },
-  ): Observable<IEventPublicProgramLoadData | null> {
-    return this.getEventBySlug(eventSlug).pipe(
-      switchMap((event) => {
-        if (!event) {
-          return of(null);
-        }
-
-        return this.getOccurrencesInRange(
-          event.id,
-          options.startIso,
-          options.endIso,
-          options.occurrenceStatuses,
-        ).pipe(
-          map((occurrences) => {
-            if (options.includePastOccurrences || !options.todayIso) {
-              return occurrences;
-            }
-
-            return occurrences.filter(
-              (occurrence) => occurrence.occurrenceDate >= options.todayIso!,
-            );
-          }),
-          switchMap((occurrences) => {
-            if (!occurrences.length) {
-              return of({
-                event,
-                occurrences: [],
-                programsByOccurrenceId: new Map<
-                  string,
-                  IEventProgramItemWithDetails[]
-                >(),
-              } satisfies IEventPublicProgramLoadData);
-            }
-
-            return forkJoin(
-              occurrences.map((occurrence) =>
-                this.getProgramItemsByOccurrenceId(
-                  occurrence.id,
-                  options.programStatuses,
-                ).pipe(
-                  map((items) => ({
-                    occurrenceId: occurrence.id,
-                    items,
-                  })),
-                ),
-              ),
-            ).pipe(
-              map(
-                (programs) =>
-                  ({
-                    event,
-                    occurrences,
-                    programsByOccurrenceId: new Map(
-                      programs.map((program) => [
-                        program.occurrenceId,
-                        program.items,
-                      ]),
-                    ),
-                  }) satisfies IEventPublicProgramLoadData,
-              ),
-            );
-          }),
-        );
-      }),
-    );
-  }
-
-  getHostSignupLoadData(
-    eventSlug: string,
-    occurrenceDate: string,
-    userId: string | null,
-  ): Observable<IEventSignupLoadData> {
-    return this.getEventBySlug(eventSlug).pipe(
-      switchMap((event) => {
-        if (!event) {
-          return of(this.createEmptyHostSignupLoadData());
-        }
-
-        return this.getOccurrenceByDate(event.id, occurrenceDate).pipe(
-          switchMap((occurrence) => {
-            const empty = this.createEmptyHostSignupLoadData();
-
-            if (!occurrence) {
-              return of({
-                ...empty,
-                page: {
-                  ...empty.page,
-                  event,
-                },
-              } satisfies IEventSignupLoadData);
-            }
-
-            if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status)) {
-              return of({
-                ...empty,
-                page: {
-                  ...empty.page,
-                  event,
-                  occurrence,
-                },
-              } satisfies IEventSignupLoadData);
-            }
-
-            return forkJoin({
-              user: userId
-                ? this.backend.getById<IUser>('users', userId)
-                : of(null),
-              signupCount: this.getActiveHostSignupCountByOccurrenceId(
-                occurrence.id,
-              ),
-              mySignup: userId
-                ? this.getMySignupForOccurrence(occurrence.id, userId)
-                : of(null),
-              templateSessions: userId
-                ? this.sessionRead.getSessionsByGmProfileId(userId, 'template')
-                : of([] as ISessionWithRelations[]),
-              customSessions: userId
-                ? this.sessionRead.getSessionsByGmProfileId(userId, 'custom')
-                : of([] as ISessionWithRelations[]),
-              systems: this.gmSessions.getAvailableSystems(),
-              styles: this.gmSessions.getAvailableStyles(),
-              triggers: this.gmSessions.getAvailableTriggers(),
-              languages: this.gmSessions.getAvailableLanguages(),
-            }).pipe(
-              map(
-                ({
-                  user,
-                  signupCount,
-                  mySignup,
-                  templateSessions,
-                  customSessions,
-                  systems,
-                  styles,
-                  triggers,
-                  languages,
-                }) => {
-                  const isFull = signupCount >= occurrence.slotCapacity;
-                  const isAdmin = hasMinimumRole(user, 'admin');
-                  const canHostSignup = hasMinimumRole(user, 'gm');
-                  const canAccess =
-                    (canHostSignup && (!isFull || !!mySignup)) || isAdmin;
-
-                  return {
-                    page: {
-                      event,
-                      occurrence,
-                      mySignup,
-                      signupCount,
-                      isFull,
-                      canAccess,
-                    },
-                    resources: {
-                      templateSessions,
-                      customSessions,
-                      systems,
-                      styles,
-                      triggers,
-                      languages,
-                    },
-                  } satisfies IEventSignupLoadData;
-                },
-              ),
-            );
-          }),
-        );
-      }),
-    );
-  }
-
-  createEmptyHostSignupLoadData(): IEventSignupLoadData {
-    return {
-      page: {
-        event: null,
-        occurrence: null,
-        mySignup: null,
-        signupCount: 0,
-        isFull: false,
-        canAccess: false,
-      },
-      resources: {
-        templateSessions: [],
-        customSessions: [],
-        systems: [],
-        styles: [],
-        triggers: [],
-        languages: [],
-      },
-    };
-  }
-
-  private getMySignupForOccurrence(
-    occurrenceId: string,
-    userId: string,
-  ): Observable<IEventProgramItem | null> {
-    return this.backend
-      .getAll<IEventProgramItem>({
-        table: 'event_program_items',
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-        pagination: {
-          filters: {
-            occurrenceId: {
-              operator: FilterOperator.EQ,
-              value: occurrenceId,
-            },
-            hostUserId: {
-              operator: FilterOperator.EQ,
-              value: userId,
-            },
-            status: {
-              operator: FilterOperator.IN,
-              value: [...ACTIVE_HOST_SIGNUP_STATUSES],
-            },
-          },
-        },
-        range: { from: 0, to: 9 },
-      })
-      .pipe(
-        map((items) => items[0] ?? null),
-      );
-  }
-
-  private hydrateProgramItem(
-    item: IEventProgramItem,
-  ): Observable<IEventProgramItemWithDetails | null> {
-    return this.getProgramItemSession(item).pipe(
-      switchMap((session) => {
-        if (!session) {
-          return of(null);
-        }
-
-        return this.gmRead.getProfileById(item.hostUserId).pipe(
-          map((host) => {
-            if (!host) {
-              return null;
-            }
-
-            return {
-              ...item,
-              session,
-              host,
-            } satisfies IEventProgramItemWithDetails;
-          }),
-        );
-      }),
-    );
-  }
-
-  private getProgramItemSession(
-    item: IEventProgramItem,
-  ): Observable<ISessionWithRelations | null> {
-    if (
-      item.sourceKind === EventProgramItemSourceKind.GmSessionTemplate &&
-      item.gmSessionTemplateId
-    ) {
-      return this.sessionRead.getSessionById(item.gmSessionTemplateId, 'template');
-    }
-
-    if (
-      item.sourceKind === EventProgramItemSourceKind.CustomSession &&
-      item.customSessionId
-    ) {
-      return this.sessionRead.getSessionById(item.customSessionId, 'custom');
-    }
-
-    return of(null);
   }
 }
