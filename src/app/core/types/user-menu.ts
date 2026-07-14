@@ -7,6 +7,7 @@ export type UserMenuItemId =
   | 'gm-availability-overview'
   | 'work-log-overview'
   | 'admin-content'
+  | 'admin-events'
   | 'admin-users';
 
 export type UserMenuSectionId =
@@ -14,20 +15,7 @@ export type UserMenuSectionId =
   | 'gm-zone'
   | 'administration';
 
-export interface IUserMenuItem {
-  id: UserMenuItemId;
-  label: string;
-  path?: string;
-  action?: 'logout';
-}
-
-export interface IUserMenuSection {
-  id: UserMenuSectionId;
-  title: string;
-  items: IUserMenuItem[];
-}
-
-export interface BuildUserMenuArgs {
+export type BuildUserMenuArgs = {
   accountTitle: string;
   gmZoneTitle: string;
   administrationTitle: string;
@@ -39,8 +27,9 @@ export interface BuildUserMenuArgs {
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
   adminContentLabel: string;
+  adminEventsLabel: string;
   adminUsersLabel: string;
   canSeeGmZone: boolean;
   canSeeAdministration: boolean;
-  canSeeAdminContent: boolean;
-}
+  canSeeAdminOnlyItems: boolean;
+};

@@ -49,6 +49,14 @@ const loaders = {
     import('./auth/components/admin-content-articles/article-editor/article-editor').then(
       (m) => m.ArticleEditor,
     ),
+  adminEventCoreList: () =>
+    import('./auth/components/admin-events/core-list/core-list').then(
+      (m) => m.EventCoreList,
+    ),
+  adminEventCoreEditor: () =>
+    import('./auth/components/admin-events/core-editor/core-editor').then(
+      (m) => m.EventCoreEditor,
+    ),
 } as const;
 
 export const routes: Routes = [
@@ -82,6 +90,21 @@ export const routes: Routes = [
   {
     path: 'admin/content/:id/edit',
     loadComponent: loaders.adminContentArticleEditor,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/events',
+    loadComponent: loaders.adminEventCoreList,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/events/new',
+    loadComponent: loaders.adminEventCoreEditor,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/events/:coreId/edit',
+    loadComponent: loaders.adminEventCoreEditor,
     canActivate: [authGuard, minimumRoleGuard('admin')],
   },
 

@@ -1,0 +1,332 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">
+        {{ isNew ? i18n.page().createTitle : i18n.page().editTitle }}
+      </h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading() || isSaving()"
+      [label]="
+        isSaving()
+          ? i18n.commonStatus().saving
+          : i18n.commonStatus().loading
+      "
+    />
+
+    @if (loadErrorMessage() && !isLoading()) {
+      <section
+        class="mg-card flex-col-start-stretch gap-sm p-md w-100"
+        role="alert"
+      >
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+
+        <p class="m-0">{{ loadErrorMessage() }}</p>
+
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button
+            severity="secondary"
+            [label]="i18n.commonActions().retry"
+            icon="pi pi-refresh"
+            (onClick)="loadCore()"
+          />
+
+          <p-button
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            (onClick)="goBack()"
+          />
+        </div>
+      </section>
+    } @else if (isNotFound() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.page().notFoundTitle }}
+        </h2>
+
+        <p class="m-0">{{ i18n.page().notFoundDescription }}</p>
+
+        <p-button
+          severity="warn"
+          [outlined]="true"
+          [label]="i18n.commonActions().cancel"
+          icon="pi pi-arrow-left"
+          (onClick)="goBack()"
+        />
+      </section>
+    } @else if (!isLoading() && (isNew || core())) {
+      <form
+        class="mg-form flex-col-start-stretch gap-md w-100"
+        [formGroup]="form"
+        (ngSubmit)="saveCore()"
+        novalidate
+      >
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.fields().coreSectionTitle }}
+          </h2>
+
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel class="w-100">
+                <input
+                  class="w-100"
+                  pInputText
+                  id="event-core-key"
+                  formControlName="key"
+                  autocomplete="off"
+                  [attr.aria-invalid]="
+                    form.controls.key.touched && form.controls.key.invalid
+                  "
+                  (input)="onKeyInput()"
+                />
+                <label for="event-core-key">{{ i18n.fields().key }}</label>
+              </p-iftalabel>
+
+              @if (
+                form.controls.key.touched &&
+                (form.controls.key.hasError("required") ||
+                  form.controls.key.hasError("requiredTrimmed"))
+              ) {
+                <small class="mg-contact-error">
+                  {{ i18n.commonForm().required }}
+                </small>
+              } @else if (
+                form.controls.key.touched &&
+                form.controls.key.hasError("pattern")
+              ) {
+                <small class="mg-contact-error">
+                  {{ i18n.validation().keyPattern }}
+                </small>
+              }
+            </div>
+
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel class="w-100">
+                <input
+                  class="w-100"
+                  pInputText
+                  id="event-core-name"
+                  formControlName="name"
+                  autocomplete="off"
+                  [attr.aria-invalid]="
+                    form.controls.name.touched && form.controls.name.invalid
+                  "
+                />
+                <label for="event-core-name">{{ i18n.fields().name }}</label>
+              </p-iftalabel>
+
+              @if (
+                form.controls.name.touched &&
+                (form.controls.name.hasError("required") ||
+                  form.controls.name.hasError("requiredTrimmed"))
+              ) {
+                <small class="mg-contact-error">
+                  {{ i18n.commonForm().required }}
+                </small>
+              }
+            </div>
+          </div>
+
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+            <p-iftalabel class="w-100">
+              <textarea
+                class="w-100"
+                pTextarea
+                id="event-core-short-description"
+                formControlName="shortDescription"
+                rows="4"
+              ></textarea>
+              <label for="event-core-short-description">
+                {{ i18n.fields().shortDescription }}
+              </label>
+            </p-iftalabel>
+
+            <p-iftalabel class="w-100">
+              <textarea
+                class="w-100"
+                pTextarea
+                id="event-core-long-description"
+                formControlName="longDescription"
+                rows="7"
+              ></textarea>
+              <label for="event-core-long-description">
+                {{ i18n.fields().longDescription }}
+              </label>
+            </p-iftalabel>
+          </div>
+
+          <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel class="w-100">
+                <p-inputnumber
+                  class="w-100"
+                  inputId="event-core-display-order"
+                  formControlName="displayOrder"
+                  [useGrouping]="false"
+                  [min]="0"
+                />
+                <label for="event-core-display-order">
+                  {{ i18n.fields().displayOrder }}
+                </label>
+              </p-iftalabel>
+
+              @if (
+                form.controls.displayOrder.touched &&
+                form.controls.displayOrder.hasError("required")
+              ) {
+                <small class="mg-contact-error">
+                  {{ i18n.commonForm().required }}
+                </small>
+              } @else if (
+                form.controls.displayOrder.touched &&
+                form.controls.displayOrder.hasError("min")
+              ) {
+                <small class="mg-contact-error">
+                  {{ i18n.validation().displayOrderMin }}
+                </small>
+              }
+            </div>
+
+            <div class="flex-row-start-center gap-md w-100">
+              <p-toggleswitch
+                inputId="event-core-is-active"
+                formControlName="isActive"
+              />
+              <label for="event-core-is-active">
+                {{ i18n.fields().isActive }}
+              </label>
+            </div>
+
+            <div class="flex-row-start-center gap-md w-100">
+              <p-toggleswitch
+                inputId="event-core-has-public-page"
+                formControlName="hasPublicPage"
+              />
+              <label for="event-core-has-public-page">
+                {{ i18n.fields().hasPublicPage }}
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <div class="flex-row-center-center flex-wrap gap-sm w-100">
+          <p-button
+            type="submit"
+            severity="success"
+            [label]="i18n.commonActions().save"
+            icon="pi pi-save"
+            [loading]="isSaving()"
+            [disabled]="isLoading()"
+          />
+
+          <p-button
+            type="button"
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            [disabled]="isSaving()"
+            (onClick)="goBack()"
+          />
+        </div>
+      </form>
+
+      @if (core(); as loadedCore) {
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.editions().sectionTitle }}
+          </h2>
+
+          @if (loadedCore.editions.length) {
+            <div class="p-datatable p-component w-100">
+              <div class="p-datatable-table-container overflow-x-auto">
+                <table class="p-datatable-table w-100 min-w-500">
+                  <thead class="p-datatable-thead">
+                    <tr>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.editionTable().city }}
+                      </th>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.editionTable().slug }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.editionTable().active }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.editionTable().defaultPublic }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.editionTable().displayOrder }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.editionTable().occurrenceCount }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.editionTable().programItemCount }}
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody class="p-datatable-tbody">
+                    @for (edition of loadedCore.editions; track edition.id) {
+                      <tr>
+                        <td><strong>{{ edition.city }}</strong></td>
+                        <td>{{ edition.slug }}</td>
+                        <td class="text-center">
+                          <span
+                            [class]="
+                              edition.isActive
+                                ? 'tag-badge tag-badge--success'
+                                : 'tag-badge tag-badge--muted'
+                            "
+                          >
+                            {{
+                              edition.isActive
+                                ? i18n.status().active
+                                : i18n.status().inactive
+                            }}
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          {{
+                            edition.isDefaultPublic
+                              ? i18n.commonActions().yes
+                              : i18n.commonActions().no
+                          }}
+                        </td>
+                        <td class="text-center">{{ edition.displayOrder }}</td>
+                        <td class="text-center">
+                          {{ edition.occurrenceCount }}
+                        </td>
+                        <td class="text-center">
+                          {{ edition.programItemCount }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <h3 class="mg-section__title mg-section__title--sm m-0">
+                {{ i18n.editions().emptyTitle }}
+              </h3>
+              <p class="m-0">{{ i18n.editions().emptyDescription }}</p>
+            </div>
+          }
+        </section>
+      }
+    }
+  </div>
+</section>

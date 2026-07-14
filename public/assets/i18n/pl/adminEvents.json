@@ -1,0 +1,94 @@
+{
+  "list": {
+    "page": {
+      "title": "Zarządzanie wydarzeniami",
+      "subtitle": "Twórz i edytuj Event Core oraz zarządzaj ich dostępnością.",
+      "emptyTitle": "Brak Event Core",
+      "emptyDescription": "Nie utworzono jeszcze żadnego Event Core.",
+      "loadErrorTitle": "Nie udało się załadować Event Core"
+    },
+    "table": {
+      "name": "Nazwa",
+      "key": "Klucz",
+      "shortDescription": "Krótki opis",
+      "active": "Aktywność",
+      "publicPage": "Strona publiczna",
+      "displayOrder": "Kolejność",
+      "editionCount": "Edycje",
+      "activeEditionCount": "Aktywne edycje",
+      "updatedAt": "Ostatnia zmiana",
+      "actions": "Akcje",
+      "notAvailable": "Brak"
+    },
+    "actions": {
+      "createCore": "Dodaj Event Core",
+      "activateCore": "Aktywuj",
+      "deactivateCore": "Dezaktywuj"
+    },
+    "toast": {
+      "loadFailedSummary": "Nie udało się załadować Event Core",
+      "activateSuccessSummary": "Event Core aktywowany",
+      "activateSuccessDetail": "Event Core został aktywowany.",
+      "deactivateSuccessSummary": "Event Core dezaktywowany",
+      "deactivateSuccessDetail": "Event Core został dezaktywowany.",
+      "activationFailedSummary": "Nie udało się zmienić aktywności Event Core"
+    }
+  },
+  "editor": {
+    "page": {
+      "createTitle": "Nowy Event Core",
+      "editTitle": "Edycja Event Core",
+      "subtitle": "Ustaw wspólne dane wydarzenia i zarządzaj jego lokalnymi edycjami.",
+      "loadErrorTitle": "Nie udało się załadować Event Core",
+      "notFoundTitle": "Nie znaleziono Event Core",
+      "notFoundDescription": "Wskazany Event Core nie istnieje."
+    },
+    "fields": {
+      "coreSectionTitle": "Dane Event Core",
+      "key": "Klucz",
+      "name": "Nazwa",
+      "shortDescription": "Krótki opis",
+      "longDescription": "Pełny opis",
+      "isActive": "Aktywny",
+      "hasPublicPage": "Ma stronę publiczną",
+      "displayOrder": "Kolejność wyświetlania"
+    },
+    "validation": {
+      "keyPattern": "Klucz może zawierać wyłącznie małe litery, cyfry i myślniki.",
+      "displayOrderMin": "Kolejność wyświetlania nie może być mniejsza niż 0."
+    },
+    "editions": {
+      "sectionTitle": "Lokalne edycje",
+      "emptyTitle": "Brak lokalnych edycji",
+      "emptyDescription": "Ten Event Core nie ma jeszcze lokalnych edycji."
+    },
+    "editionTable": {
+      "city": "Miasto",
+      "slug": "Slug",
+      "active": "Aktywność",
+      "defaultPublic": "Domyślna publiczna",
+      "displayOrder": "Kolejność",
+      "occurrenceCount": "Terminy",
+      "programItemCount": "Elementy programu"
+    },
+    "toast": {
+      "loadFailedSummary": "Nie udało się załadować Event Core",
+      "saveSuccessSummary": "Event Core zapisany",
+      "saveSuccessDetail": "Zmiany Event Core zostały zapisane.",
+      "saveFailedSummary": "Nie udało się zapisać Event Core"
+    }
+  },
+  "status": {
+    "active": "Aktywny",
+    "inactive": "Nieaktywny"
+  },
+  "rpcErrors": {
+    "forbidden": "Nie masz uprawnień do zarządzania wydarzeniami.",
+    "notFound": "Wskazany Event Core nie istnieje.",
+    "invalid": "Dane Event Core są nieprawidłowe.",
+    "duplicateKey": "Event Core o takim kluczu już istnieje.",
+    "constraint": "Operacja narusza reguły aktywacji lub publikacji Event Core.",
+    "conflict": "Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
+    "unknown": "Wystąpił nieoczekiwany błąd podczas operacji na Event Core."
+  }
+}

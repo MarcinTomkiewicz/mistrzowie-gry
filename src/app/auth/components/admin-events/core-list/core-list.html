@@ -1,0 +1,167 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isBusy()"
+      [label]="
+        activeActionKey()
+          ? i18n.commonStatus().saving
+          : i18n.commonStatus().loading
+      "
+    />
+
+    <div class="flex-row-end-center w-100">
+      <p-button
+        [label]="i18n.actions().createCore"
+        icon="pi pi-plus"
+        [routerLink]="['/admin/events/new']"
+        [disabled]="isBusy()"
+      />
+    </div>
+
+    @if (loadErrorMessage() && !isLoading()) {
+      <section
+        class="mg-card flex-col-start-stretch gap-sm p-md w-100"
+        role="alert"
+      >
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+
+        <p class="m-0">{{ loadErrorMessage() }}</p>
+
+        <p-button
+          severity="secondary"
+          [label]="i18n.commonActions().retry"
+          icon="pi pi-refresh"
+          (onClick)="loadCores()"
+        />
+      </section>
+    } @else if (rowVms().length) {
+      <div class="p-datatable p-component w-100">
+        <div class="p-datatable-table-container overflow-x-auto">
+          <table class="p-datatable-table w-100 min-w-500">
+            <thead class="p-datatable-thead">
+              <tr>
+                <th class="small-caps" scope="col">
+                  {{ i18n.table().name }}
+                </th>
+                <th class="small-caps" scope="col">
+                  {{ i18n.table().key }}
+                </th>
+                <th class="small-caps" scope="col">
+                  {{ i18n.table().shortDescription }}
+                </th>
+                <th class="small-caps text-center" scope="col">
+                  {{ i18n.table().active }}
+                </th>
+                <th class="small-caps text-center" scope="col">
+                  {{ i18n.table().publicPage }}
+                </th>
+                <th class="small-caps text-right" scope="col">
+                  {{ i18n.table().displayOrder }}
+                </th>
+                <th class="small-caps text-right" scope="col">
+                  {{ i18n.table().editionCount }}
+                </th>
+                <th class="small-caps text-right" scope="col">
+                  {{ i18n.table().activeEditionCount }}
+                </th>
+                <th class="small-caps" scope="col">
+                  {{ i18n.table().updatedAt }}
+                </th>
+                <th class="small-caps text-right" scope="col">
+                  {{ i18n.table().actions }}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody class="p-datatable-tbody">
+              @for (row of rowVms(); track row.core.id) {
+                <tr>
+                  <td><strong>{{ row.core.name }}</strong></td>
+                  <td>{{ row.core.key }}</td>
+                  <td>{{ row.shortDescriptionLabel }}</td>
+                  <td class="text-center">
+                    <span [class]="row.activeBadgeClass">
+                      {{ row.activeLabel }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span [class]="row.publicPageBadgeClass">
+                      {{ row.publicPageLabel }}
+                    </span>
+                  </td>
+                  <td class="text-right">{{ row.core.displayOrder }}</td>
+                  <td class="text-right">{{ row.core.editionCount }}</td>
+                  <td class="text-right">
+                    {{ row.core.activeEditionCount }}
+                  </td>
+                  <td>{{ row.updatedAtLabel }}</td>
+                  <td class="text-right">
+                    <div class="flex-row-end-center flex-wrap gap-xs">
+                      <p-button
+                        size="small"
+                        severity="secondary"
+                        [label]="i18n.commonActions().edit"
+                        icon="pi pi-pencil"
+                        [routerLink]="['/admin/events', row.core.id, 'edit']"
+                        [disabled]="isBusy()"
+                      />
+
+                      @if (row.core.isActive) {
+                        <p-button
+                          size="small"
+                          severity="danger"
+                          [outlined]="true"
+                          [label]="i18n.actions().deactivateCore"
+                          icon="pi pi-times-circle"
+                          [loading]="
+                            isActionLoading(row.core.id, 'deactivate')
+                          "
+                          [disabled]="
+                            isBusy() &&
+                            !isActionLoading(row.core.id, 'deactivate')
+                          "
+                          (onClick)="setCoreActive(row.core, false)"
+                        />
+                      } @else {
+                        <p-button
+                          size="small"
+                          severity="success"
+                          [label]="i18n.actions().activateCore"
+                          icon="pi pi-check-circle"
+                          [loading]="isActionLoading(row.core.id, 'activate')"
+                          [disabled]="
+                            isBusy() &&
+                            !isActionLoading(row.core.id, 'activate')
+                          "
+                          (onClick)="setCoreActive(row.core, true)"
+                        />
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    } @else if (!isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().emptyTitle }}
+        </h2>
+
+        <p class="m-0">{{ i18n.page().emptyDescription }}</p>
+      </section>
+    }
+  </div>
+</section>

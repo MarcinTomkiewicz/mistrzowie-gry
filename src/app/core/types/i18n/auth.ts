@@ -354,5 +354,6 @@ export interface UserMenuTranslations {
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
   adminContentLabel: string;
+  adminEventsLabel: string;
   adminUsersLabel: string;
 }

@@ -1,4 +1,5 @@
-import { BuildUserMenuArgs, IUserMenuSection } from '../types/user-menu';
+import type { IUserMenuSection } from '../interfaces/i-user-menu';
+import type { BuildUserMenuArgs } from '../types/user-menu';
 import { EVENT_SIGNUP_SELECTION_ROUTE } from '../configs/event-signup.config';
 
 export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
@@ -62,12 +63,19 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
     );
   }
 
-  if (args.canSeeAdminContent) {
-    administrationItems.push({
-      id: 'admin-content',
-      label: args.adminContentLabel,
-      path: '/admin/content',
-    });
+  if (args.canSeeAdminOnlyItems) {
+    administrationItems.push(
+      {
+        id: 'admin-content',
+        label: args.adminContentLabel,
+        path: '/admin/content',
+      },
+      {
+        id: 'admin-events',
+        label: args.adminEventsLabel,
+        path: '/admin/events',
+      },
+    );
   }
 
   if (args.canSeeAdministration) {

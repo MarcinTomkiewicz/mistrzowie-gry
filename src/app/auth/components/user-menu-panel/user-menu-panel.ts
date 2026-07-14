@@ -6,7 +6,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 
 import { Auth } from '../../../core/services/auth/auth';
-import { IUserMenuItem } from '../../../core/types/user-menu';
+import type { IUserMenuItem } from '../../../core/interfaces/i-user-menu';
 import { createUserMenuPanelI18n } from './user-menu-panel.i18n';
 import { buildUserMenu } from '../../../core/factories/user-menu.factory';
 import { DividerModule } from 'primeng/divider';
@@ -44,13 +44,14 @@ export class UserMenuPanel {
         this.i18n.userMenu().gmAvailabilityOverviewLabel,
       workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
       adminContentLabel: this.i18n.userMenu().adminContentLabel,
+      adminEventsLabel: this.i18n.userMenu().adminEventsLabel,
       adminUsersLabel: this.i18n.userMenu().adminUsersLabel,
       canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeAdministration: hasMinimumRole(
         this.auth.user(),
         'customer_manager',
       ),
-      canSeeAdminContent: hasMinimumRole(this.auth.user(), 'admin'),
+      canSeeAdminOnlyItems: hasMinimumRole(this.auth.user(), 'admin'),
     }),
   );
 
