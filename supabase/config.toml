@@ -339,6 +339,9 @@ email_optional = false
 [auth.web3.solana]
 enabled = false
 
+[functions.coworker-questionnaire]
+verify_jwt = true
+
 # Use Firebase Auth as a third-party provider alongside Supabase Auth.
 [auth.third_party.firebase]
 enabled = false
