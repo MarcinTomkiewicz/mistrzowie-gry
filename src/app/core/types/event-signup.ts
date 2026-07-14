@@ -14,9 +14,18 @@ export const HOST_SIGNUP_OCCURRENCE_STATUSES: readonly EventOccurrenceStatus[] =
   EventOccurrenceStatus.Published,
 ] as const;
 
-export type EventSignupFormToastConfig = {
-  successSummary: string;
-  successDetail: string;
-  errorSummary: string;
-  errorDetail: string;
-};
+export type EventSignupAccessState =
+  | 'allowed'
+  | 'closed'
+  | 'forbidden'
+  | 'full';
+
+export type EventSignupPageLoadError =
+  | {
+      kind: 'catalog';
+      cause: unknown;
+    }
+  | {
+      kind: 'edition-data';
+      cause: unknown;
+    };

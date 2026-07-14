@@ -1,0 +1,95 @@
+{
+  "page": {
+    "seo": {
+      "title": "Poprowadź wydarzenie",
+      "description": "Wybierz wydarzenie i termin, dla którego chcesz zgłosić swoją sesję RPG jako Mistrz Gry."
+    },
+    "page": {
+      "title": "Poprowadź wydarzenie",
+      "subtitle": "Wybierz wydarzenie, lokalną edycję i termin, na który chcesz zgłosić swoją sesję lub inny punkt programu."
+    },
+    "selectors": {
+      "coreLabel": "Wydarzenie",
+      "editionLabel": "Lokalna edycja"
+    },
+    "details": {
+      "cityLabel": "Miasto",
+      "timeLabel": "Godziny wydarzenia",
+      "beginnersLabel": "Dla początkujących"
+    },
+    "occurrences": {
+      "title": "Wybierz termin zgłoszenia",
+      "subtitle": "Poniżej znajdziesz dostępne terminy wydarzenia w bieżącym i następnym miesiącu. Jeśli masz już zgłoszoną sesję na dany termin, odpowiedni przycisk będzie wyróżniony. Jeśli termin jest w całości obsadzony, przycisk będzie nieaktywny. Zawsze możesz edytować swój udział w wydarzeniu, nawet jeśli termin jest pełny."
+    },
+    "emptyCatalog": {
+      "title": "Brak wydarzeń przyjmujących zgłoszenia",
+      "description": "Obecnie nie ma aktywnych wydarzeń, na które możesz zgłosić sesję."
+    },
+    "emptyOccurrences": {
+      "title": "Brak dostępnych terminów",
+      "description": "Dla tego wydarzenia nie ma obecnie otwartych terminów w tym i następnym miesiącu."
+    },
+    "error": {
+      "title": "Nie udało się załadować wydarzeń",
+      "description": "Nie udało się pobrać danych panelu zgłoszeń. Spróbuj ponownie."
+    }
+  },
+  "form": {
+    "seo": {
+      "title": "Zgłoś sesję na wydarzenie",
+      "description": "Wybierz termin i zgłoś swoją sesję RPG do wybranego wydarzenia w serwisie Mistrzowie Gry."
+    },
+    "form": {
+      "modeLabel": "Tryb zgłoszenia"
+    },
+    "actions": {
+      "submitLabel": "Zgłoś sesję",
+      "backToSelectionLabel": "Wróć do wyboru terminu",
+      "selectLabel": "Wybierz"
+    },
+    "confirmation": {
+      "withdrawMessage": "Czy na pewno anulować zgłoszenie?"
+    },
+    "states": {
+      "notFoundTitle": "Nie znaleziono zgłoszenia",
+      "notFoundDescription": "Podane wydarzenie albo termin nie istnieją.",
+      "closedTitle": "Zgłoszenia na ten termin są zamknięte",
+      "closedDescription": "Nie można już zgłosić ani edytować sesji na ten termin.",
+      "forbiddenTitle": "Brak dostępu do zgłoszeń MG",
+      "forbiddenDescription": "Aby zgłosić sesję na wydarzenie, potrzebujesz roli Mistrza Gry.",
+      "fullTitle": "Termin jest już pełny",
+      "fullDescription": "Nie możesz już zgłosić nowej sesji na ten termin."
+    },
+    "mode": {
+      "templateLabel": "Sesja standardowa",
+      "customLabel": "Sesja jednorazowa"
+    },
+    "template": {
+      "emptyTitle": "Brak sesji standardowych",
+      "emptyDescription": "Najpierw dodaj standardową sesję w swoim profilu MG."
+    },
+    "custom": {
+      "previousSessionsLabel": "Twoje poprzednie sesje jednorazowe"
+    },
+    "sections": {
+      "pageTitlePrefix": "Zgłoś sesję",
+      "pageSubtitle": "Poniżej widzisz formularz zgłoszenia dla wybranego terminu. Jeśli masz już zgłoszoną sesję lub punkt programu na ten termin, zobaczysz to poniżej. Jeśli nie, możesz wybrać jedną ze swoich sesji standardowych albo zgłosić sesję jednorazową.",
+      "submittedSessionTitle": "Zgłoszona sesja"
+    },
+    "breadcrumbs": {
+      "eventSignupLabel": "Panel zgłoszeń"
+    },
+    "toast": {
+      "loadFailedSummary": "Nie udało się załadować formularza zgłoszenia",
+      "loadFailedDetail": "Nie udało się załadować danych potrzebnych do zgłoszenia sesji.",
+      "saveSuccessSummary": "Zgłoszenie zapisane",
+      "saveSuccessDetail": "Sesja została poprawnie zgłoszona do wydarzenia.",
+      "saveFailedSummary": "Nie udało się zapisać zgłoszenia",
+      "saveFailedDetail": "Nie udało się zgłosić sesji do wydarzenia.",
+      "withdrawSuccessSummary": "Zgłoszenie wycofane",
+      "withdrawSuccessDetail": "Sesja została wycofana z wydarzenia.",
+      "withdrawFailedSummary": "Nie udało się wycofać zgłoszenia",
+      "withdrawFailedDetail": "Nie udało się wycofać sesji z wydarzenia."
+    }
+  }
+}

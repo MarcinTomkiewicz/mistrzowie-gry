@@ -1,42 +1,25 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
-import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
-
 import {
   buildEventHostSignupRoute,
   EVENT_SIGNUP_SELECTION_ROUTE,
 } from '../../../core/configs/event-signup.config';
 import { buildSiteUrl } from '../../../core/config/site';
-import { IEvent } from '../../../core/interfaces/i-event';
 import {
   EventSignupForm,
-  IEventSignupEventVm,
   IEventSignupOccurrenceVm,
 } from '../../../core/interfaces/i-event-signup';
-import { IUser } from '../../../core/interfaces/i-user';
-import { Auth } from '../../../core/services/auth/auth';
-import { Backend } from '../../../core/services/backend/backend';
-import { EventProgramRead } from '../../../core/services/event-program-read/event-program-read';
-import { EventRead } from '../../../core/services/event-read/event-read';
-import { EventSignup } from '../../../core/services/event-signup/event-signup';
 import { Seo } from '../../../core/services/seo/seo';
-import { HOST_SIGNUP_OCCURRENCE_STATUSES } from '../../../core/types/event-signup';
-import {
-  formatDateLabel,
-  getEndOfNextMonthIso,
-  getStartOfCurrentMonthIso,
-} from '../../../core/utils/date';
-import { hasMinimumRole } from '../../../core/utils/roles';
 import { formatTimeRangeLabel } from '../../../core/utils/time';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { EventSignupPageFacade } from './event-signup.facade';
 import { createEventSignupI18n } from './event-signup.i18n';
 
 @Component({
@@ -51,75 +34,51 @@ import { createEventSignupI18n } from './event-signup.i18n';
   ],
   templateUrl: './event-signup.html',
   styleUrl: './event-signup.scss',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [
+    EventSignupPageFacade,
+    provideTranslocoScope('eventSignup', 'common'),
+  ],
 })
 export class EventSignupComponent {
-  private readonly backend = inject(Backend);
-  private readonly eventProgramRead = inject(EventProgramRead);
-  private readonly eventRead = inject(EventRead);
-  private readonly eventSignup = inject(EventSignup);
-  private readonly auth = inject(Auth);
+  private readonly facade = inject(EventSignupPageFacade);
   private readonly router = inject(Router);
   private readonly seo = inject(Seo);
   private readonly pageUrl = buildSiteUrl(EVENT_SIGNUP_SELECTION_ROUTE);
 
-  private readonly rangeStartIso = getStartOfCurrentMonthIso();
-  private readonly rangeEndIso = getEndOfNextMonthIso();
-
   readonly i18n = createEventSignupI18n();
 
   readonly form: EventSignupForm = new FormGroup({
-    eventId: new FormControl<string | null>(null),
+    coreId: new FormControl<string | null>(null),
+    editionId: new FormControl<string | null>(null),
   });
 
-  readonly eventsVm = toSignal(this.loadEventsVm(), {
-    initialValue: null,
+  readonly catalog = this.facade.catalog;
+  readonly editions = this.facade.editions;
+  readonly occurrences = this.facade.occurrences;
+  readonly selectedCore = this.facade.selectedCore;
+  readonly selectedEdition = this.facade.selectedEdition;
+  readonly isLoading = this.facade.isLoading;
+  readonly loadError = this.facade.loadError;
+
+  readonly selectedEditionTimeLabel = computed(() => {
+    const edition = this.selectedEdition();
+
+    return edition
+      ? formatTimeRangeLabel(edition.startTime, edition.endTime)
+      : '';
   });
 
-  readonly selectedEventId = toSignal(
-    this.form.controls.eventId.valueChanges.pipe(
-      startWith(this.form.controls.eventId.value),
-    ),
-    { initialValue: null },
-  );
+  private readonly syncSelectionEffect = effect(() => {
+    const coreId = this.facade.selectedCoreId();
+    const editionId = this.facade.selectedEditionId();
 
-  readonly isLoading = computed(() => this.eventsVm() === null);
-
-  readonly eventOptions = computed(() =>
-    (this.eventsVm() ?? []).map(({ event }) => ({
-      label: event.name,
-      value: event.id,
-    })),
-  );
-
-  readonly selectedEventVm = computed(() => {
-    const events = this.eventsVm();
-
-    if (!events?.length) {
-      return null;
+    if (this.form.controls.coreId.value !== coreId) {
+      this.form.controls.coreId.setValue(coreId, { emitEvent: false });
     }
 
-    const selectedEventId = this.selectedEventId();
-
-    if (!selectedEventId) {
-      return events[0] ?? null;
+    if (this.form.controls.editionId.value !== editionId) {
+      this.form.controls.editionId.setValue(editionId, { emitEvent: false });
     }
-
-    return (
-      events.find(({ event }) => event.id === selectedEventId) ??
-      events[0] ??
-      null
-    );
-  });
-
-  readonly selectedEventTimeLabel = computed(() => {
-    const event = this.selectedEventVm()?.event;
-
-    if (!event) {
-      return '';
-    }
-
-    return formatTimeRangeLabel(event.startTime, event.endTime);
   });
 
   private readonly applySeoEffect = effect(() => {
@@ -131,142 +90,48 @@ export class EventSignupComponent {
     });
   });
 
-  onEventChange(eventId: string): void {
-    this.form.controls.eventId.setValue(eventId);
+  constructor() {
+    this.facade.load();
   }
 
-  openOccurrence(
-    eventSlug: string,
-    occurrenceDate: string,
-    canOpen: boolean,
-  ): void {
-    if (!canOpen) {
+  onCoreChange(coreId: string | number | null | undefined): void {
+    if (
+      typeof coreId !== 'string' ||
+      coreId === this.facade.selectedCoreId()
+    ) {
+      return;
+    }
+
+    this.form.controls.coreId.setValue(coreId, { emitEvent: false });
+    this.form.controls.editionId.setValue(null, { emitEvent: false });
+    this.facade.selectCore(coreId);
+  }
+
+  onEditionChange(editionId: string | null): void {
+    if (!editionId) {
+      return;
+    }
+
+    this.form.controls.editionId.setValue(editionId, { emitEvent: false });
+    this.facade.selectEdition(editionId);
+  }
+
+  openOccurrence(occurrenceDate: string, canOpen: boolean): void {
+    const edition = this.selectedEdition();
+
+    if (!edition || !canOpen) {
       return;
     }
 
     void this.router.navigate(
-      buildEventHostSignupRoute(eventSlug, occurrenceDate),
+      buildEventHostSignupRoute(edition.slug, occurrenceDate),
     );
   }
 
-  trackByEventId = (_: number, item: IEventSignupEventVm) => item.event.id;
+  onRetry(): void {
+    this.facade.retry();
+  }
+
   trackByOccurrenceId = (_: number, item: IEventSignupOccurrenceVm) =>
     item.occurrence.id;
-
-  private loadCurrentUser() {
-    const userId = this.auth.userId();
-
-    if (!userId) {
-      return of(null);
-    }
-
-    return this.backend
-      .getById<IUser>('users', userId)
-      .pipe(catchError(() => of(null)));
-  }
-
-  private loadEventsVm() {
-    return forkJoin({
-      currentUser: this.loadCurrentUser(),
-      events: this.backend.getAll<IEvent>({
-        table: 'events',
-        sortBy: 'name',
-        sortOrder: 'asc',
-      }),
-    }).pipe(
-      switchMap(({ currentUser, events }) => {
-        if (!events.length) {
-          return of([] as IEventSignupEventVm[]);
-        }
-
-        return forkJoin(
-          events.map((event) => this.loadEventVm(event, currentUser)),
-        );
-      }),
-      map((items) => {
-        const currentValue = this.form.controls.eventId.value;
-
-        if (items.length && !currentValue) {
-          this.form.controls.eventId.setValue(items[0].event.id, {
-            emitEvent: false,
-          });
-        }
-
-        return items;
-      }),
-      catchError((error) => {
-        console.error('[EVENT SIGNUP LIST ERROR]', error);
-        return of([] as IEventSignupEventVm[]);
-      }),
-    );
-  }
-
-  private loadEventVm(event: IEvent, currentUser: IUser | null) {
-    return this.eventRead
-      .getOccurrencesInRange(
-        event.id,
-        this.rangeStartIso,
-        this.rangeEndIso,
-        [...HOST_SIGNUP_OCCURRENCE_STATUSES],
-      )
-      .pipe(
-        switchMap((occurrences) => {
-          if (!occurrences.length) {
-            return of({
-              event,
-              occurrences: [],
-            } as IEventSignupEventVm);
-          }
-
-          return forkJoin(
-            occurrences.map((occurrence) =>
-              forkJoin({
-                signupCount: this.eventProgramRead
-                  .getActiveHostSignupCountByOccurrenceId(occurrence.id)
-                  .pipe(catchError(() => of(0))),
-                mySignup: this.getMySignupForOccurrence(
-                  event.id,
-                  occurrence.id,
-                ),
-              }).pipe(
-                map(({ signupCount, mySignup }) => {
-                  const isFull = signupCount >= occurrence.slotCapacity;
-                  const isAdmin = hasMinimumRole(currentUser, 'admin');
-                  const canHostSignup = hasMinimumRole(currentUser, 'gm');
-                  const canOpen =
-                    (canHostSignup && (!isFull || !!mySignup)) || isAdmin;
-
-                  return {
-                    occurrence,
-                    label: formatDateLabel(
-                      occurrence.occurrenceDate,
-                      'pl-PL',
-                      true,
-                    ),
-                    signupCount,
-                    isFull,
-                    mySignup,
-                    canOpen,
-                  } satisfies IEventSignupOccurrenceVm;
-                }),
-              ),
-            ),
-          ).pipe(
-            map((occurrenceVms) => ({
-              event,
-              occurrences: occurrenceVms,
-            })),
-          );
-        }),
-      );
-  }
-
-  private getMySignupForOccurrence(eventId: string, occurrenceId: string) {
-    return this.eventSignup
-      .getMySignup({
-        eventId,
-        occurrenceId,
-      })
-      .pipe(catchError(() => of(null)));
-  }
 }

@@ -3,8 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   catchError,
+  EMPTY,
   finalize,
-  forkJoin,
   map,
   Observable,
   of,
@@ -18,40 +18,27 @@ import {
   EVENT_SIGNUP_SELECTION_ROUTE,
 } from '../../../core/configs/event-signup.config';
 import { buildSiteUrl } from '../../../core/config/site';
-import { IEvent } from '../../../core/interfaces/i-event';
 import {
   IEventSignupLoadData,
   IEventSignupSavePayload,
+  IEventSignupScreenData,
 } from '../../../core/interfaces/i-event-signup';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
-import { Auth } from '../../../core/services/auth/auth';
-import { EventProgramRead } from '../../../core/services/event-program-read/event-program-read';
-import { EventRead } from '../../../core/services/event-read/event-read';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
-import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
-import { SessionRead } from '../../../core/services/session-read/session-read';
+import { EventSignupRead } from '../../../core/services/event-signup-read/event-signup-read';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import {
-  EventSignupFormToastConfig,
-  HOST_SIGNUP_OCCURRENCE_STATUSES,
-} from '../../../core/types/event-signup';
 import {
   getEndOfNextMonthIso,
   getStartOfCurrentMonthIso,
 } from '../../../core/utils/date';
-import { hasMinimumRole } from '../../../core/utils/roles';
 import { createEventSignupFormI18n } from './event-signup-form.i18n';
 
 @Injectable()
 export class EventSignupFormFacade {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly auth = inject(Auth);
-  private readonly eventProgramRead = inject(EventProgramRead);
-  private readonly eventRead = inject(EventRead);
   private readonly eventSignup = inject(EventSignup);
-  private readonly gmSessions = inject(GmSessionsFacade);
-  private readonly sessionRead = inject(SessionRead);
+  private readonly eventSignupRead = inject(EventSignupRead);
   private readonly toast = inject(UiToast);
   private readonly i18n = createEventSignupFormI18n();
 
@@ -60,7 +47,10 @@ export class EventSignupFormFacade {
 
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
-  readonly data = signal<IEventSignupLoadData>(this.createEmptyLoadData());
+  readonly loadError = signal<unknown | null>(null);
+  readonly data = signal<IEventSignupLoadData>(
+    this.eventSignupRead.createEmptyLoadData(),
+  );
   readonly occurrenceOptions = signal<IOccurrenceSwitcherOption[]>([]);
 
   readonly routeParams = toSignal(
@@ -93,22 +83,16 @@ export class EventSignupFormFacade {
 
   refreshData(): Observable<void> {
     this.isLoading.set(true);
+    this.loadError.set(null);
 
     return this.getScreenData().pipe(
       map(({ data, occurrenceOptions }) => {
         this.data.set(data);
         this.occurrenceOptions.set(occurrenceOptions);
+        this.loadError.set(null);
       }),
       catchError((error) => {
-        console.error('[EVENT SIGNUP FORM LOAD ERROR]', error);
-
-        this.data.set(this.createEmptyLoadData());
-        this.occurrenceOptions.set([]);
-
-        this.toast.danger({
-          summary: this.i18n.toast().loadFailedSummary,
-          detail: this.i18n.toast().loadFailedDetail,
-        });
+        this.handleLoadError(error);
 
         return of(void 0);
       }),
@@ -116,42 +100,64 @@ export class EventSignupFormFacade {
     );
   }
 
-  saveSignup(
-    payload: IEventSignupSavePayload,
-    toastConfig: EventSignupFormToastConfig,
-  ): void {
-    this.runRequest(this.eventSignup.saveSignup(payload), toastConfig);
+  retry(): void {
+    this.refreshData().subscribe();
   }
 
-  withdraw(
-    signupId: string,
-    toastConfig: EventSignupFormToastConfig,
-  ): void {
-    this.runRequest(this.eventSignup.withdraw(signupId), toastConfig);
+  saveSignup(payload: IEventSignupSavePayload): void {
+    this.runRequest(this.eventSignup.saveSignup(payload), 'save');
+  }
+
+  withdraw(signupId: string): void {
+    this.runRequest(this.eventSignup.withdraw(signupId), 'withdraw');
   }
 
   navigateToOccurrence(index: number): void {
     const page = this.page();
     const option = this.occurrenceOptions()[index];
 
-    if (!page.event?.slug || !option?.occurrenceDate) {
+    if (!page.edition?.slug || !option?.occurrenceDate) {
       return;
     }
 
     void this.router.navigate(
-      buildEventHostSignupRoute(page.event.slug, option.occurrenceDate),
+      buildEventHostSignupRoute(page.edition.slug, option.occurrenceDate),
     );
   }
 
   private runRequest(
     request$: Observable<unknown>,
-    toastConfig: EventSignupFormToastConfig,
+    requestKind: 'save' | 'withdraw',
   ): void {
+    const toast = this.i18n.toast();
+    const toastCopy =
+      requestKind === 'save'
+        ? {
+            successSummary: toast.saveSuccessSummary,
+            successDetail: toast.saveSuccessDetail,
+            errorSummary: toast.saveFailedSummary,
+            errorDetail: toast.saveFailedDetail,
+          }
+        : {
+            successSummary: toast.withdrawSuccessSummary,
+            successDetail: toast.withdrawSuccessDetail,
+            errorSummary: toast.withdrawFailedSummary,
+            errorDetail: toast.withdrawFailedDetail,
+          };
+
     this.isSubmitting.set(true);
+    this.loadError.set(null);
 
     request$
       .pipe(
-        switchMap(() => this.getScreenData()),
+        switchMap(() =>
+          this.getScreenData().pipe(
+            catchError((error) => {
+              this.handleLoadError(error);
+              return EMPTY;
+            }),
+          ),
+        ),
         finalize(() => this.isSubmitting.set(false)),
       )
       .subscribe({
@@ -160,185 +166,49 @@ export class EventSignupFormFacade {
           this.occurrenceOptions.set(occurrenceOptions);
 
           this.toast.success({
-            summary: toastConfig.successSummary,
-            detail: toastConfig.successDetail,
+            summary: toastCopy.successSummary,
+            detail: toastCopy.successDetail,
           });
         },
         error: (error) => {
           console.error('[EVENT SIGNUP FORM REQUEST ERROR]', error);
 
           this.toast.danger({
-            summary: toastConfig.errorSummary,
-            detail: toastConfig.errorDetail,
+            summary: toastCopy.errorSummary,
+            detail: toastCopy.errorDetail,
           });
         },
       });
   }
 
-  private getScreenData(): Observable<{
-    data: IEventSignupLoadData;
-    occurrenceOptions: IOccurrenceSwitcherOption[];
-  }> {
+  private handleLoadError(error: unknown): void {
+    console.error('[EVENT SIGNUP FORM LOAD ERROR]', error);
+
+    this.loadError.set(error);
+
+    this.toast.danger({
+      summary: this.i18n.toast().loadFailedSummary,
+      detail: this.i18n.toast().loadFailedDetail,
+    });
+  }
+
+  private getScreenData(): Observable<IEventSignupScreenData> {
     const params = this.routeParams();
     const eventSlug = params.get('eventSlug');
     const occurrenceDate = params.get('occurrenceDate');
 
     if (!eventSlug || !occurrenceDate) {
       return of({
-        data: this.createEmptyLoadData(),
+        data: this.eventSignupRead.createEmptyLoadData(),
         occurrenceOptions: [],
       });
     }
 
-    return this.eventRead.getEventBySlug(eventSlug).pipe(
-      switchMap((event) => {
-        if (!event) {
-          return of({
-            data: this.createEmptyLoadData(),
-            occurrenceOptions: [],
-          });
-        }
-
-        return forkJoin({
-          data: this.getSignupLoadData(event, occurrenceDate),
-          occurrenceOptions: this.getOccurrenceOptions(event.id),
-        });
-      }),
+    return this.eventSignupRead.getFormScreenData(
+      eventSlug,
+      occurrenceDate,
+      this.rangeStartIso,
+      this.rangeEndIso,
     );
-  }
-
-  private getSignupLoadData(
-    event: IEvent,
-    occurrenceDate: string,
-  ): Observable<IEventSignupLoadData> {
-    return this.eventRead.getOccurrenceByDate(event.id, occurrenceDate).pipe(
-      switchMap((occurrence) => {
-        const empty = this.createEmptyLoadData();
-
-        if (!occurrence) {
-          return of({
-            ...empty,
-            page: {
-              ...empty.page,
-              event,
-            },
-          } satisfies IEventSignupLoadData);
-        }
-
-        if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status)) {
-          return of({
-            ...empty,
-            page: {
-              ...empty.page,
-              event,
-              occurrence,
-            },
-          } satisfies IEventSignupLoadData);
-        }
-
-        const user = this.auth.user();
-
-        return forkJoin({
-          signupCount:
-            this.eventProgramRead.getActiveHostSignupCountByOccurrenceId(
-              occurrence.id,
-            ),
-          mySignup: this.eventSignup.getMySignup({
-            eventId: event.id,
-            occurrenceId: occurrence.id,
-          }),
-          templateSessions: user
-            ? this.sessionRead.getSessionsByGmProfileId(user.id, 'template')
-            : of([]),
-          customSessions: user
-            ? this.sessionRead.getSessionsByGmProfileId(user.id, 'custom')
-            : of([]),
-          systems: this.gmSessions.getAvailableSystems(),
-          styles: this.gmSessions.getAvailableStyles(),
-          triggers: this.gmSessions.getAvailableTriggers(),
-          languages: this.gmSessions.getAvailableLanguages(),
-        }).pipe(
-          map(
-            ({
-              signupCount,
-              mySignup,
-              templateSessions,
-              customSessions,
-              systems,
-              styles,
-              triggers,
-              languages,
-            }) => {
-              const isFull = signupCount >= occurrence.slotCapacity;
-              const isAdmin = hasMinimumRole(user, 'admin');
-              const canHostSignup = hasMinimumRole(user, 'gm');
-              const canAccess =
-                (canHostSignup && (!isFull || !!mySignup)) || isAdmin;
-
-              return {
-                page: {
-                  event,
-                  occurrence,
-                  mySignup,
-                  signupCount,
-                  isFull,
-                  canAccess,
-                },
-                resources: {
-                  templateSessions,
-                  customSessions,
-                  systems,
-                  styles,
-                  triggers,
-                  languages,
-                },
-              } satisfies IEventSignupLoadData;
-            },
-          ),
-        );
-      }),
-    );
-  }
-
-  private getOccurrenceOptions(
-    eventId: string,
-  ): Observable<IOccurrenceSwitcherOption[]> {
-    return this.eventRead
-      .getOccurrencesInRange(
-        eventId,
-        this.rangeStartIso,
-        this.rangeEndIso,
-        [...HOST_SIGNUP_OCCURRENCE_STATUSES],
-      )
-      .pipe(
-        map((occurrences) =>
-          occurrences.map((occurrence) => ({
-            id: occurrence.id,
-            label: occurrence.occurrenceDate,
-            occurrenceDate: occurrence.occurrenceDate,
-          })),
-        ),
-      );
-  }
-
-  private createEmptyLoadData(): IEventSignupLoadData {
-    return {
-      page: {
-        event: null,
-        occurrence: null,
-        mySignup: null,
-        signupCount: 0,
-        isFull: false,
-        canAccess: false,
-      },
-      resources: {
-        templateSessions: [],
-        customSessions: [],
-        systems: [],
-        styles: [],
-        triggers: [],
-        languages: [],
-      },
-    };
   }
 }

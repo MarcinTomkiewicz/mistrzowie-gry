@@ -1,10 +1,15 @@
 import { FormControl, FormGroup } from '@angular/forms';
 
+import { EventSignupAccessState } from '../types/event-signup';
 import { IContentTrigger } from './i-content-trigger';
-import { IEvent } from './i-event';
+import {
+  IHostEventCatalogItem,
+  IHostEventEdition,
+} from './i-event-catalog';
 import { IEventOccurrence } from './i-event-occurence';
 import { IEventProgramItem } from './i-event-program-item';
 import { IGmStyle } from './i-gm-style';
+import { IOccurrenceSwitcherOption } from './i-occurrence-switcher';
 import { ISelectOption } from './i-select-option';
 import {
   ISessionFormSubmitData,
@@ -23,7 +28,8 @@ export type EventSignupFormGroup = FormGroup<{
 }>;
 
 export type EventSignupForm = FormGroup<{
-  eventId: FormControl<string | null>;
+  coreId: FormControl<string | null>;
+  editionId: FormControl<string | null>;
 }>;
 
 export interface IEventSignupSelection {
@@ -53,12 +59,13 @@ export type IEventSignupSavePayload = IEventSignupSubmitPayload & {
 };
 
 export interface IEventSignupPageData {
-  event: IEvent | null;
+  core: IHostEventCatalogItem | null;
+  edition: IHostEventEdition | null;
   occurrence: IEventOccurrence | null;
   mySignup: IEventProgramItem | null;
+  submittedSession: ISessionWithRelations | null;
   signupCount: number;
-  isFull: boolean;
-  canAccess: boolean;
+  accessState: EventSignupAccessState | null;
 }
 
 export interface IEventSignupResourcesData {
@@ -75,6 +82,11 @@ export interface IEventSignupLoadData {
   resources: IEventSignupResourcesData;
 }
 
+export interface IEventSignupScreenData {
+  data: IEventSignupLoadData;
+  occurrenceOptions: IOccurrenceSwitcherOption[];
+}
+
 export interface IEventSignupOccurrenceVm {
   occurrence: IEventOccurrence;
   label: string;
@@ -82,9 +94,4 @@ export interface IEventSignupOccurrenceVm {
   isFull: boolean;
   mySignup: IEventProgramItem | null;
   canOpen: boolean;
-}
-
-export interface IEventSignupEventVm {
-  event: IEvent;
-  occurrences: IEventSignupOccurrenceVm[];
 }

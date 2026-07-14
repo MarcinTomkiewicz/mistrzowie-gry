@@ -1,36 +1,58 @@
-import { createCommonStatusI18n } from '../../../core/translations/common.i18n';
+import {
+  createCommonActionsI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
-  EventSignupDetailsTranslations,
-  EventSignupEmptyTranslations,
-  EventSignupOccurrencesTranslations,
-  EventSignupPageTranslations,
-  EventSignupSeoTranslations,
-} from '../../../core/types/i18n/auth';
+  DetailsCopy,
+  SelectorsCopy,
+  TitleDescriptionCopy,
+  TitleSubtitleCopy,
+} from '../../../core/types/i18n/event-signup';
 
 export function createEventSignupI18n() {
-  const { seo, page, details, occurrences, empty } =
+  const {
+    seo,
+    page,
+    selectors,
+    details,
+    occurrences,
+    emptyCatalog,
+    emptyOccurrences,
+    error,
+  } =
     createScopedSectionsI18n<{
-      seo: EventSignupSeoTranslations;
-      page: EventSignupPageTranslations;
-      details: EventSignupDetailsTranslations;
-      occurrences: EventSignupOccurrencesTranslations;
-      empty: EventSignupEmptyTranslations;
-    }>('auth', {
-      seo: 'eventSignup.seo',
-      page: 'eventSignup.page',
-      details: 'eventSignup.details',
-      occurrences: 'eventSignup.occurrences',
-      empty: 'eventSignup.empty',
+      seo: TitleDescriptionCopy;
+      page: TitleSubtitleCopy;
+      selectors: SelectorsCopy;
+      details: DetailsCopy;
+      occurrences: TitleSubtitleCopy;
+      emptyCatalog: TitleDescriptionCopy;
+      emptyOccurrences: TitleDescriptionCopy;
+      error: TitleDescriptionCopy;
+    }>('eventSignup', {
+      seo: 'page.seo',
+      page: 'page.page',
+      selectors: 'page.selectors',
+      details: 'page.details',
+      occurrences: 'page.occurrences',
+      emptyCatalog: 'page.emptyCatalog',
+      emptyOccurrences: 'page.emptyOccurrences',
+      error: 'page.error',
     });
+  const commonActions = createCommonActionsI18n();
   const commonStatus = createCommonStatusI18n();
 
   return {
     seo,
     page,
+    selectors,
     details,
     occurrences,
-    empty,
+    emptyCatalog,
+    emptyOccurrences,
+    error,
+    commonActions,
     commonStatus,
   };
 }

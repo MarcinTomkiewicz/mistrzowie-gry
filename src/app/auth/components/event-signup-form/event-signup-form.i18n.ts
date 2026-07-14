@@ -1,17 +1,16 @@
 import {
-  EventSignupFormActionsTranslations,
-  EventSignupFormBreadcrumbTranslations,
-  EventSignupFormConfirmationTranslations,
-  EventSignupFormCustomTranslations,
-  EventSignupFormModeTranslations,
-  EventSignupFormNavigationTranslations,
-  EventSignupFormSeoTranslations,
-  EventSignupFormSectionsTranslations,
-  EventSignupFormStatesTranslations,
-  EventSignupFormTemplateTranslations,
-  EventSignupFormToastTranslations,
-  EventSignupFormTranslations,
-} from '../../../core/types/i18n/auth';
+  ActionsCopy,
+  BreadcrumbsCopy,
+  ConfirmationCopy,
+  CustomCopy,
+  FormCopy,
+  ModeCopy,
+  SectionsCopy,
+  StatesCopy,
+  TemplateCopy,
+  TitleDescriptionCopy,
+  ToastCopy,
+} from '../../../core/types/i18n/event-signup';
 import {
   createCommonActionsI18n,
   createCommonQuestionsI18n,
@@ -36,34 +35,31 @@ export function createEventSignupFormI18n() {
     custom,
     sections,
     breadcrumbs,
-    navigation,
     toast,
   } = createScopedSectionsI18n<{
-    seo: EventSignupFormSeoTranslations;
-    form: EventSignupFormTranslations;
-    actions: EventSignupFormActionsTranslations;
-    confirmation: EventSignupFormConfirmationTranslations;
-    states: EventSignupFormStatesTranslations;
-    mode: EventSignupFormModeTranslations;
-    template: EventSignupFormTemplateTranslations;
-    custom: EventSignupFormCustomTranslations;
-    sections: EventSignupFormSectionsTranslations;
-    breadcrumbs: EventSignupFormBreadcrumbTranslations;
-    navigation: EventSignupFormNavigationTranslations;
-    toast: EventSignupFormToastTranslations;
-  }>('auth', {
-    seo: 'eventSignupForm.seo',
-    form: 'eventSignupForm.form',
-    actions: 'eventSignupForm.actions',
-    confirmation: 'eventSignupForm.confirmation',
-    states: 'eventSignupForm.states',
-    mode: 'eventSignupForm.mode',
-    template: 'eventSignupForm.template',
-    custom: 'eventSignupForm.custom',
-    sections: 'eventSignupForm.sections',
-    breadcrumbs: 'eventSignupForm.breadcrumbs',
-    navigation: 'eventSignupForm.navigation',
-    toast: 'eventSignupForm.toast',
+    seo: TitleDescriptionCopy;
+    form: FormCopy;
+    actions: ActionsCopy;
+    confirmation: ConfirmationCopy;
+    states: StatesCopy;
+    mode: ModeCopy;
+    template: TemplateCopy;
+    custom: CustomCopy;
+    sections: SectionsCopy;
+    breadcrumbs: BreadcrumbsCopy;
+    toast: ToastCopy;
+  }>('eventSignup', {
+    seo: 'form.seo',
+    form: 'form.form',
+    actions: 'form.actions',
+    confirmation: 'form.confirmation',
+    states: 'form.states',
+    mode: 'form.mode',
+    template: 'form.template',
+    custom: 'form.custom',
+    sections: 'form.sections',
+    breadcrumbs: 'form.breadcrumbs',
+    toast: 'form.toast',
   });
 
   const { sessionForm, difficulty, list } = createScopedSectionsI18n<{
@@ -90,7 +86,6 @@ export function createEventSignupFormI18n() {
     custom,
     sections,
     breadcrumbs,
-    navigation,
     toast,
     sessionForm,
     difficulty,
