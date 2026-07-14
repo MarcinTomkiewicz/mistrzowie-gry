@@ -1,0 +1,37 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+.dropdown-anchor {
+  position: relative;
+}
+
+.dropdown-trigger {
+  position: relative;
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 1100;
+  width: min(360px, calc(100vw - 2rem));
+}
+
+.dropdown-list {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.dropdown-list-item {
+  padding: map.get(v.$spacings, "sm") 0;
+  border-block-start: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.dropdown-list-item:first-child {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.dropdown-list-item:last-child {
+  padding-block-end: 0;
+}

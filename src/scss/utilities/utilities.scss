@@ -1,24 +1,37 @@
 @use "./tag-badge-aliases";
 @use "./truncate";
+
+@use "./display";
+@use "./backgrounds";
+@use "./borders";
+
 @use "./spacings";
 @use "./gap";
 @use "./status-text";
 @use "./text-alignment";
 @use "./text-wrap";
+@use "./text-colors";
+
 @use "./width";
 @use "./height";
+@use "./size";
 @use "./opacity";
 @use "./aspect-ratio";
+
 @use "./shadows";
 @use "./z-index";
 @use "./overflow";
 @use "./position";
 @use "./backdrop";
 @use "./object-fit";
+
 @use "./line-heights";
 @use "./visibility";
 @use "./animations";
 @use "./text-heights";
+
 @use "./interactions";
 @use "./transitions";
-@use "./text-colors";
+
+@use "./dropdowns";
+@use "./fonts";

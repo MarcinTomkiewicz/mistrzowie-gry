@@ -77,13 +77,34 @@ $grid-common-patterns: (
     columns: minmax(0, 2fr) minmax(0, 1fr),
     collapse-bp: "md"
   ),
+  "3-1": (
+    columns: minmax(0, 3fr) minmax(0, 1fr),
+    collapse-bp: "md"
+  ),
   "1-2": (
     columns: minmax(0, 1fr) minmax(0, 2fr),
+    collapse-bp: "md"
+  ),
+  "1-3-1": (
+    columns: minmax(18rem, 1fr) minmax(0, 3fr) minmax(20rem, 1fr),
+    collapse-bp: "xl"
+  ),
+  "1-2-balanced": (
+    columns: minmax(0, 1fr) minmax(0, 2fr),
+    balance-bp: "xl",
     collapse-bp: "md"
   ),
   "1-1": (
     columns: repeat(2, minmax(0, 1fr)),
     collapse-bp: "sm"
+  ),
+  "data-list-row": (
+    columns: 6.5rem minmax(8rem, 1fr) 4rem 5.75rem 5.75rem 13rem,
+    collapse-bp: "md"
+  ),
+  "data-list-row-ranking": (
+    columns: 6.5rem minmax(7rem, 0.9fr) 4rem 5.75rem 5.75rem 5.75rem 13rem,
+    collapse-bp: "md"
   )
 );
 
@@ -117,6 +138,12 @@ $grid-common-patterns: (
       map.get(v.$spacings, "xl"),
       stretch
     );
+
+    @if map.has-key($config, balance-bp) {
+      @include m.down(map.get($config, balance-bp)) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
 
     @include m.down(map.get($config, collapse-bp)) {
       grid-template-columns: 1fr;
@@ -152,6 +179,13 @@ $grid-common-patterns: (
 .mg-grid-auto-fill {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: map.get(v.$spacings, "xl");
+  align-items: stretch;
+}
+
+.mg-grid-auto-fill-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
   gap: map.get(v.$spacings, "xl");
   align-items: stretch;
 }

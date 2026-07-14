@@ -1,3 +1,4 @@
+/* shadows.scss */
 @use "../abstracts/variables" as v;
 
 .shadow-none {
@@ -14,4 +15,24 @@
 
 .shadow-lg {
   box-shadow: v.$shadow-lg !important;
+}
+
+.shadow-shell {
+  box-shadow: v.$shadow-shell !important;
+}
+
+.shadow-premium {
+  box-shadow: v.$shadow-premium !important;
+}
+
+.shadow-elevated {
+  box-shadow: v.$shadow-elevated !important;
+}
+
+.shadow-gold-glow {
+  box-shadow: v.$shadow-gold-glow !important;
+}
+
+.shadow-brand-mark {
+  box-shadow: v.$shadow-brand-mark !important;
 }

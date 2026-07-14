@@ -1,0 +1,38 @@
+@use "../abstracts/variables" as v;
+
+$radius-values: (
+  "sm": v.$radius-sm,
+  "md": v.$radius-md,
+  "lg": v.$radius-lg,
+  "pill": v.$radius-pill,
+);
+
+.border-0 {
+  border: 0 !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid v.$color-border !important;
+}
+
+.border-top {
+  border-top: 1px solid v.$color-border !important;
+}
+
+.border-secondary {
+  border-color: v.$color-secondary !important;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.radius-circle {
+  border-radius: 50% !important;
+}
+
+@each $name, $value in $radius-values {
+  .radius-#{$name} {
+    border-radius: $value !important;
+  }
+}

@@ -1,0 +1,71 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
+$text-sizes: (
+  "xs": map.get(v.$font-sizes, "xs"),
+  "sm": map.get(v.$font-sizes, "sm"),
+  "md": map.get(v.$font-sizes, "md"),
+  "lg": map.get(v.$font-sizes, "lg"),
+  "xl": map.get(v.$font-sizes, "xl"),
+  "xxl": map.get(v.$font-sizes, "xxl"),
+  "hero": map.get(v.$font-sizes, "hero"),
+);
+
+$font-weights: (
+  "light": 300,
+  "normal": 400,
+  "medium": 500,
+  "semibold": 600,
+  "bold": 700,
+  "extrabold": 800,
+  "black": 900,
+);
+
+$font-families: (
+  "display": v.$font-family-display,
+);
+
+$text-transforms: (
+  "uppercase": uppercase,
+);
+
+/* =========================================================
+   FONT SIZE
+   ========================================================= */
+
+@each $name, $value in $text-sizes {
+  .text-#{$name} {
+    font-size: $value !important;
+  }
+}
+
+/* =========================================================
+   FONT WEIGHT
+   ========================================================= */
+
+@each $name, $value in $font-weights {
+  .font-#{$name} {
+    font-weight: $value !important;
+  }
+}
+
+/* =========================================================
+   FONT FAMILY
+   ========================================================= */
+
+@each $name, $value in $font-families {
+  .font-#{$name} {
+    font-family: $value !important;
+  }
+}
+
+/* =========================================================
+   TEXT TRANSFORM
+   ========================================================= */
+
+@each $name, $value in $text-transforms {
+  .#{$name} {
+    text-transform: $value !important;
+  }
+}

@@ -51,7 +51,6 @@ $text-wrap-breakpoints: ("xl", "lg", "md", "sm", "xs");
 @include _emit-text-wrap("text-wrap", normal, wrap);
 @include _emit-text-wrap("text-wrap-auto", normal, wrap);
 @include _emit-text-wrap("text-nowrap", nowrap, nowrap);
-@include _emit-text-wrap("text-pre-line", pre-line);
 @include _emit-text-wrap("text-wrap-balance", normal, balance);
 @include _emit-text-wrap("text-wrap-pretty", normal, pretty);
 @include _emit-text-wrap("text-wrap-stable", normal, stable);

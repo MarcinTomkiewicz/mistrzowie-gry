@@ -24,6 +24,22 @@ $offset-values: map.merge(
   }
 }
 
+.position-center {
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.position-center-x {
+  left: 50% !important;
+  transform: translate(-50%, 0) !important;
+}
+
+.position-center-y {
+  top: 50% !important;
+  transform: translate(0, -50%) !important;
+}
+
 @each $name, $value in $offset-values {
   .inset-#{$name} {
     inset: $value !important;

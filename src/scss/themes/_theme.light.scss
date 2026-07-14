@@ -60,4 +60,16 @@ $light: (
   "form-disabled-text": color.scale($text, $alpha: -45%),
   "form-autofill-bg": color.scale($surface, $lightness: -3%),
   "form-autofill-text": $text,
+  "shadow-shell": 0 0.75rem 2rem rgba(0, 0, 0, 0.42),
+  "shadow-premium": 0 0.8rem 1.8rem rgba(0, 0, 0, 0.2),
+  "shadow-elevated": (
+    0 0.75rem 1.9rem rgba(0, 0, 0, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.035),
+  ),
+
+  "shadow-gold-glow": 0 0 1.15rem rgba(240, 201, 111, 0.24),
+  "shadow-brand-mark": (
+    inset 0 0 0 4px rgba(0, 0, 0, 0.42),
+    0 0 1.2rem rgba(240, 201, 111, 0.22),
+  ),
 );

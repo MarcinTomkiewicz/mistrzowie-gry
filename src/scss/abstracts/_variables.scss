@@ -135,3 +135,14 @@ $color-form-disabled-text: var(--mg-form-disabled-text);
 
 $color-form-autofill-bg: var(--mg-form-autofill-bg);
 $color-form-autofill-text: var(--mg-form-autofill-text);
+
+$radius-pill: 999px;
+
+$shadow-sm: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
+$shadow-lg: 0 0.75rem 2rem rgba(15, 23, 42, 0.12);
+$shadow-shell: var(--mg-shadow-shell, #{$shadow-lg});
+$shadow-premium: var(--mg-shadow-premium, #{$shadow-soft});
+$shadow-elevated: var(--mg-shadow-elevated, #{$shadow-lg});
+$shadow-gold-glow: var(--mg-shadow-gold-glow, none);
+$shadow-brand-mark: var(--mg-shadow-brand-mark, #{$shadow-soft});
