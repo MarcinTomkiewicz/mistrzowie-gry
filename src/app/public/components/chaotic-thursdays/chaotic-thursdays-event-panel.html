@@ -1,0 +1,140 @@
+<div class="mg-container position-relative">
+  <app-loading-overlay
+    [visible]="facade.isLoading()"
+    [label]="i18n().commonStatus().loading"
+  />
+
+  @if (facade.editions().length > 1) {
+    <div class="mt-md mb-md">
+      <p class="small-caps mb-xs">{{ i18n().editionSelector().label }}</p>
+
+      <div class="hide-down-sm">
+        <p-tabs
+          class="w-100"
+          [value]="facade.selectedEventId() ?? ''"
+          [attr.aria-label]="i18n().editionSelector().ariaLabel"
+        >
+          <p-tablist>
+            @for (edition of facade.editions(); track edition.id) {
+              <p-tab
+                [value]="edition.id"
+                (click)="onEditionSelect(edition.id)"
+              >
+                {{ edition.city }}
+              </p-tab>
+            }
+          </p-tablist>
+        </p-tabs>
+      </div>
+
+      <div class="show-down-sm">
+        <p-select
+          inputId="chaotic-thursdays-edition"
+          class="w-100"
+          appendTo="body"
+          [options]="facade.editions()"
+          optionLabel="city"
+          optionValue="id"
+          [formControl]="mobileEditionControl"
+          [ariaLabel]="i18n().editionSelector().ariaLabel"
+          (onChange)="onEditionSelect(mobileEditionControl.value)"
+        />
+      </div>
+    </div>
+  }
+
+  @if (facade.selectedEdition()) {
+    <div class="mg-card mt-md mx-auto flex-col-center-start">
+      <p
+        class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs"
+      >
+        {{ i18n().heroInfo().title }}
+      </p>
+      <ul class="flex-col m-0 px-md">
+        <li>
+          <strong>{{ i18n().heroInfo().cityLabel }}:</strong>
+          {{ cityLabel() }}
+        </li>
+        <li>
+          <strong>{{ i18n().heroInfo().placeLabel }}:</strong>
+          {{ placeLabel() }}
+        </li>
+        <li>
+          <strong>{{ i18n().heroInfo().addressLabel }}:</strong>
+          {{ addressLabel() }}
+        </li>
+        <li>
+          <strong>{{ i18n().heroInfo().scheduleLabel }}:</strong>
+          {{ scheduleLabel() }}
+        </li>
+        <li>
+          <strong>{{ i18n().heroInfo().priceLabel }}:</strong>
+          {{ priceLabel() }}
+        </li>
+      </ul>
+    </div>
+  }
+
+  <div class="flex-row-center-center flex-col-sm mt-md gap-md">
+    <p-button
+      [label]="i18n().heroCta().primaryLabel"
+      icon="pi pi-message-away"
+      severity="primary"
+      size="small"
+      routerLink="/contact"
+    />
+    @if (canHostSignup()) {
+      <p-button
+        [label]="i18n().heroCta().hostSignupLabel"
+        icon="pi pi-users"
+        severity="secondary"
+        size="small"
+        [outlined]="true"
+        [disabled]="facade.isLoading() || !facade.selectedOccurrence()"
+        (onClick)="onHostSignupClick()"
+      />
+    }
+  </div>
+
+  <div class="mg-section__header mt-xl">
+    <h3 class="mg-section__title mg-section__title--md mb-md">
+      {{ i18n().hero().upcomingSessions }}
+    </h3>
+  </div>
+
+  @if (facade.loadError()) {
+    <section
+      class="mg-card flex-col-start-stretch gap-sm mb-md"
+      role="alert"
+    >
+      <p class="m-0">{{ loadErrorMessage() }}</p>
+
+      <p-button
+        [label]="i18n().actions().retry"
+        icon="pi pi-refresh"
+        severity="secondary"
+        size="small"
+        (onClick)="onRetry()"
+      />
+    </section>
+  } @else if (!facade.isLoading() && !facade.occurrences().length) {
+    <section class="mg-card mb-md">
+      <p class="m-0">{{ i18n().states().noOccurrences }}</p>
+    </section>
+  } @else {
+    <app-occurrence-switcher
+      [options]="facade.occurrenceOptions()"
+      [selectedIndex]="facade.safeSelectedOccurrenceIndex()"
+      [disabled]="facade.isLoading()"
+      (selectedIndexChange)="onOccurrenceSelect($event)"
+    />
+
+    <app-event-slots
+      [items]="slotCards()"
+      [slotCount]="slotCount()"
+      [isLoading]="facade.isLoading()"
+      (slotSelect)="slotSelect.emit($event)"
+      (gmSelect)="gmSelect.emit($event)"
+    />
+  }
+</div>

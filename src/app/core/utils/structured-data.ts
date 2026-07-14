@@ -12,6 +12,7 @@ import {
   EventStructuredDataOptions,
   OfferStructuredDataOptions,
   PageStructuredDataOptions,
+  PlaceStructuredDataOptions,
   StructuredDataNode,
 } from '../types/structured-data';
 
@@ -33,17 +34,28 @@ export function createWebsiteRef(siteUrl = SITE_URL): StructuredDataNode {
   };
 }
 
-export function createVenuePlace(): StructuredDataNode {
-  return {
+export function createPlaceStructuredData(
+  options: PlaceStructuredDataOptions,
+): StructuredDataNode {
+  return compactNode({
     '@type': 'Place',
-    name: VENUE_NAME,
-    address: {
+    name: options.venueName ?? undefined,
+    address: compactNode({
       '@type': 'PostalAddress',
-      streetAddress: VENUE_STREET_ADDRESS,
-      addressLocality: VENUE_LOCALITY,
-      addressCountry: VENUE_COUNTRY,
-    },
-  };
+      streetAddress: options.venueAddress ?? undefined,
+      addressLocality: options.city,
+      addressCountry: options.country,
+    }),
+  });
+}
+
+export function createVenuePlace(): StructuredDataNode {
+  return createPlaceStructuredData({
+    venueName: VENUE_NAME,
+    venueAddress: VENUE_STREET_ADDRESS,
+    city: VENUE_LOCALITY,
+    country: VENUE_COUNTRY,
+  });
 }
 
 export function createOfferStructuredData(

@@ -13,9 +13,35 @@
 
   "heroInfo": {
     "title": "W skrócie",
-    "chaoticPrice": "Koszt spotkania: 40 zł od osoby",
-    "chaoticSchedule": "Kiedy: W każdy czwartek od 17:00",
-    "chaoticPlace": "Gdzie: Pub Pod Dwoma Miotłami, Wroniecka 21 w Poznaniu"
+    "cityLabel": "Miasto",
+    "cityMissing": "Nie podano miasta",
+    "placeLabel": "Miejsce",
+    "placeMissing": "Nie podano miejsca",
+    "addressLabel": "Adres",
+    "addressMissing": "Nie podano adresu",
+    "scheduleLabel": "Godziny",
+    "scheduleMissing": "Nie podano godzin",
+    "priceLabel": "Cena",
+    "priceMissing": "Nie podano ceny"
+  },
+
+  "editionSelector": {
+    "label": "Wybierz miasto",
+    "ariaLabel": "Wybierz miasto wydarzenia"
+  },
+
+  "states": {
+    "noOccurrences": "Brak nadchodzących terminów dla wybranego miasta."
+  },
+
+  "errors": {
+    "coreNotFound": "To wydarzenie nie jest obecnie dostępne.",
+    "noEditions": "Brak dostępnych edycji wydarzenia.",
+    "invalidDefault": "Nie udało się wskazać domyślnej edycji wydarzenia.",
+    "groupedRpc": "Nie udało się załadować danych wydarzenia.",
+    "occurrences": "Nie udało się załadować terminów wydarzenia.",
+    "program": "Nie udało się załadować programu wydarzenia.",
+    "gmProfile": "Nie udało się otworzyć profilu Mistrza Gry."
   },
 
   "cta": {

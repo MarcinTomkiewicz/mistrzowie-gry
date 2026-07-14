@@ -2,21 +2,25 @@ import { computed } from '@angular/core';
 
 import { IconTech } from '../../../core/types/icon-tech';
 import {
-  ChaoticThursdaysAboutTranslations,
-  ChaoticThursdaysCardItem,
-  ChaoticThursdaysFaqItem,
-  ChaoticThursdaysHeroCtaTranslations,
-  ChaoticThursdaysHeroInfoTranslations,
-  ChaoticThursdaysHeroTranslations,
-  ChaoticThursdaysSectionTranslations,
-  ChaoticThursdaysSeoTranslations,
-  ChaoticThursdaysStandardsTranslations,
-  ChaoticThursdaysStepItem,
+  AboutCopy,
+  CardCopy,
+  EditionSelectorCopy,
+  ErrorCopy,
+  FaqCopy,
+  HeroCopy,
+  HeroCtaCopy,
+  HeroInfoCopy,
+  SectionCopy,
+  SeoCopy,
+  StandardsCopy,
+  StateCopy,
+  StepCopy,
 } from '../../../core/types/i18n/chaotic-thursdays';
 import {
   createCommonActionsI18n,
   createCommonCtaI18n,
-  createCommonInfoI18n,
+  createCommonErrorsI18n,
+  createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -24,12 +28,6 @@ import {
   numberedDictToStringArray,
   withIcons,
 } from '../../../core/utils/dict-to-sorted-array';
-
-function toSortedById<T>(dict: unknown): T[] {
-  return dictToSortedArray<T>(dict as never, (x) =>
-    Number((x as { id?: number })?.id ?? 0),
-  );
-}
 
 export function createChaoticThursdaysI18n(
   highlightIcons: readonly IconTech[],
@@ -39,6 +37,9 @@ export function createChaoticThursdaysI18n(
     seo,
     hero,
     heroInfo,
+    editionSelector,
+    states,
+    errors,
     heroCta,
     about,
     howItWorks,
@@ -50,23 +51,29 @@ export function createChaoticThursdaysI18n(
     expectationsDict,
     faqItemsDict,
   } = createScopedSectionsI18n<{
-    seo: ChaoticThursdaysSeoTranslations;
-    hero: ChaoticThursdaysHeroTranslations;
-    heroInfo: ChaoticThursdaysHeroInfoTranslations;
-    heroCta: ChaoticThursdaysHeroCtaTranslations;
-    about: ChaoticThursdaysAboutTranslations;
-    howItWorks: ChaoticThursdaysSectionTranslations;
-    standards: ChaoticThursdaysStandardsTranslations;
-    faq: ChaoticThursdaysSectionTranslations;
-    highlightsDict: Record<string, ChaoticThursdaysCardItem>;
-    stepsDict: Record<string, ChaoticThursdaysStepItem>;
-    standardsCardsDict: Record<string, ChaoticThursdaysCardItem>;
+    seo: SeoCopy;
+    hero: HeroCopy;
+    heroInfo: HeroInfoCopy;
+    editionSelector: EditionSelectorCopy;
+    states: StateCopy;
+    errors: ErrorCopy;
+    heroCta: HeroCtaCopy;
+    about: AboutCopy;
+    howItWorks: SectionCopy;
+    standards: StandardsCopy;
+    faq: SectionCopy;
+    highlightsDict: Record<string, CardCopy>;
+    stepsDict: Record<string, StepCopy>;
+    standardsCardsDict: Record<string, CardCopy>;
     expectationsDict: Record<string, string>;
-    faqItemsDict: Record<string, ChaoticThursdaysFaqItem>;
+    faqItemsDict: Record<string, FaqCopy>;
   }>('chaoticThursdays', {
     seo: 'seo',
     hero: 'hero',
     heroInfo: 'heroInfo',
+    editionSelector: 'editionSelector',
+    states: 'states',
+    errors: 'errors',
     heroCta: 'cta',
     about: 'about',
     howItWorks: 'howItWorks',
@@ -80,47 +87,54 @@ export function createChaoticThursdaysI18n(
   });
 
   const actions = createCommonActionsI18n();
-  const info = createCommonInfoI18n();
+  const commonErrors = createCommonErrorsI18n();
   const commonCta = createCommonCtaI18n();
+  const commonStatus = createCommonStatusI18n();
 
   const highlights = computed(() => {
-    const list = toSortedById<ChaoticThursdaysCardItem>(highlightsDict());
+    const list = dictToSortedArray<CardCopy>(
+      highlightsDict(),
+      (item) => item.id,
+    );
     return withIcons(list, highlightIcons);
   });
 
   const steps = computed(() =>
-    toSortedById<ChaoticThursdaysStepItem>(stepsDict()).map(({ time, title, text }) => ({
-      time,
-      title,
-      text,
-    })),
+    dictToSortedArray<StepCopy>(stepsDict(), (item) => item.id),
   );
 
   const standardsCards = computed(() => {
-    const list = toSortedById<ChaoticThursdaysCardItem>(standardsCardsDict());
+    const list = dictToSortedArray<CardCopy>(
+      standardsCardsDict(),
+      (item) => item.id,
+    );
     return withIcons(list, standardsIcons);
   });
 
   const expectations = computed(() =>
-    numberedDictToStringArray(expectationsDict() as never),
+    numberedDictToStringArray(expectationsDict()),
   );
 
   const faqs = computed(() =>
-    toSortedById<ChaoticThursdaysFaqItem>(faqItemsDict()),
+    dictToSortedArray<FaqCopy>(faqItemsDict(), (item) => item.id),
   );
 
   return {
     seo,
     actions,
-    info,
+    commonErrors,
     hero,
     heroInfo,
+    editionSelector,
+    states,
+    errors,
     heroCta,
     about,
     howItWorks,
     standards,
     faq,
     commonCta,
+    commonStatus,
     highlights,
     steps,
     standardsCards,

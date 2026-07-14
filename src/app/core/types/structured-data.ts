@@ -11,6 +11,13 @@ export type PageStructuredDataOptions = {
   mainEntity?: StructuredDataNode;
 };
 
+export type PlaceStructuredDataOptions = {
+  venueName: string | null;
+  venueAddress: string | null;
+  city: string;
+  country: string;
+};
+
 export type OfferStructuredDataOptions = {
   price: string;
   url: string;
@@ -42,4 +49,3 @@ export type ArticleStructuredDataOptions = {
   datePublished?: string;
   dateModified?: string;
 };
-

@@ -21,65 +21,15 @@
           </span>
         }
       </div>
-
-      <div class="mg-card mt-md mx-auto flex-col-center-start">
-        <p
-          class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs"
-        >
-          {{ i18n.heroInfo().title }}
-        </p>
-        <ul class="flex-col m-0 px-md">
-          <li>{{ i18n.heroInfo().chaoticPlace }}</li>
-          <li>{{ i18n.heroInfo().chaoticSchedule }}</li>
-          <li>{{ i18n.heroInfo().chaoticPrice }}</li>
-        </ul>
-      </div>
-
-      <div class="flex-row-center-center flex-col-sm mt-md gap-md">
-        <p-button
-          [label]="i18n.heroCta().primaryLabel"
-          icon="pi pi-message-away"
-          severity="primary"
-          size="small"
-          routerLink="/contact"
-        />
-        @if (canHostSignup()) {
-          <p-button
-            [label]="i18n.heroCta().hostSignupLabel"
-            icon="pi pi-users"
-            severity="secondary"
-            size="small"
-            [outlined]="true"
-            [disabled]="isLoading() || !selectedOccurrence()"
-            (onClick)="onHostSignupClick()"
-          />
-        }
-      </div>
     </header>
   </div>
 </section>
 
-<div class="mg-container">
-  <div class="mg-section__header">
-    <h3 class="mg-section__title mg-section__title--md mb-md">
-      {{ i18n.hero().upcomingSessions }}
-    </h3>
-  </div>
-  <app-occurrence-switcher
-    [options]="occurrenceOptions()"
-    [selectedIndex]="safeSelectedOccurrenceIndex()"
-    [disabled]="isLoading()"
-    (selectedIndexChange)="onOccurrenceSelect($event)"
-  />
-
-  <app-event-slots
-    [items]="slotCards()"
-    [slotCount]="slotCount()"
-    [isLoading]="isLoading()"
-    (slotSelect)="onSlotSelect($event)"
-    (gmSelect)="onGmSelect($event)"
-  />
-</div>
+<app-chaotic-thursdays-event-panel
+  [i18n]="i18n"
+  (slotSelect)="onSlotSelect($event)"
+  (gmSelect)="onGmSelect($event)"
+/>
 
 <app-gm-profile-dialog
   [visible]="isGmDialogVisible()"
@@ -145,17 +95,23 @@
       enterClass="animate-enter-fade-up animate-duration-800 animate-ease-out animate-fill-both"
       class="mg-card"
     >
-      <p-table [value]="i18n.steps()">
-        <ng-template pTemplate="body" let-s>
-          <tr>
-            <td>{{ s.time }}</td>
-            <td class="mg-section__title mg-section__title--sm">
-              {{ s.title }}
-            </td>
-            <td>{{ s.text }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <div class="p-datatable p-component">
+        <div class="p-datatable-table-container overflow-x-auto">
+          <table class="p-datatable-table w-100">
+            <tbody class="p-datatable-tbody">
+              @for (step of i18n.steps(); track step.id) {
+                <tr>
+                  <td>{{ step.time }}</td>
+                  <td class="mg-section__title mg-section__title--sm">
+                    {{ step.title }}
+                  </td>
+                  <td>{{ step.text }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </section>
