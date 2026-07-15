@@ -1,96 +1,35 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { ISelectOption } from '../../../core/interfaces/i-select-option';
 import {
+  IAdminUserRow,
+  IAdminUserUpdateFormValue,
+} from '../../../core/interfaces/i-admin-users';
+import {
+  AdminUserDialogSelectField,
+  AdminUserDialogTextField,
+  AdminUserDialogToggleField,
+  AdminUsersFilterSelectField,
+  AdminUsersFilterSelectFieldVm,
+} from '../../../core/interfaces/i-admin-users-config';
+import {
+  AdminUsersFilterSelectControlName,
   AdminUsersProfileFilter,
   AdminUsersPublicFilter,
   AdminUsersRoleFilter,
   AdminUsersSortField,
   AdminUsersSortOrder,
-  IAdminUserRow,
-  IAdminUsersFilterValue,
-  IAdminUserUpdateFormValue,
 } from '../../../core/types/admin-users';
-import { APP_ROLES, AppRole } from '../../../core/types/app-role';
 import {
-  AdminUsersDialogTranslations,
-  AdminUsersFiltersTranslations,
-} from '../../../core/types/i18n/admin-users';
+  AdminUserDialogForm,
+  AdminUsersFilterForm,
+} from '../../../core/types/admin-users-form';
 import {
+  APP_ROLES,
+  AppRole,
   AppRoleLabels,
-  getAppRoleLabel,
-} from '../../../core/utils/app-role-labels';
-
-export type AdminUsersFilterForm = FormGroup<{
-  searchText: FormControl<string>;
-  role: FormControl<AdminUsersRoleFilter>;
-  profile: FormControl<AdminUsersProfileFilter>;
-  public: FormControl<AdminUsersPublicFilter>;
-  showArchived: FormControl<boolean>;
-  sortBy: FormControl<AdminUsersSortField>;
-  sortOrder: FormControl<AdminUsersSortOrder>;
-}>;
-
-export type AdminUsersFilterSelectControlName = Exclude<
-  keyof IAdminUsersFilterValue,
-  'searchText' | 'showArchived'
->;
-
-export interface AdminUsersFilterSelectField {
-  controlName: AdminUsersFilterSelectControlName;
-  inputId: string;
-  labelKey: keyof AdminUsersFiltersTranslations;
-  options: readonly string[];
-  reloadOnChange?: boolean;
-}
-
-export interface AdminUsersFilterSelectFieldVm
-  extends Pick<
-    AdminUsersFilterSelectField,
-    'controlName' | 'inputId' | 'reloadOnChange'
-  > {
-  label: string;
-  options: ISelectOption<string>[];
-}
-
-export type AdminUserDialogForm = FormGroup<{
-  appRole: FormControl<AppRole>;
-  firstName: FormControl<string | null>;
-  nickname: FormControl<string | null>;
-  useNickname: FormControl<boolean>;
-  phoneNumber: FormControl<string | null>;
-  city: FormControl<string | null>;
-  isTestUser: FormControl<boolean>;
-}>;
-
-export type AdminUserDialogTextControlName =
-  | 'firstName'
-  | 'nickname'
-  | 'phoneNumber'
-  | 'city';
-export type AdminUserDialogToggleControlName = 'useNickname' | 'isTestUser';
-
-export interface AdminUserDialogSelectField {
-  controlName: 'appRole';
-  inputId: string;
-  labelKey: keyof AdminUsersDialogTranslations;
-  options: readonly AppRole[];
-}
-
-export interface AdminUserDialogTextField {
-  controlName: AdminUserDialogTextControlName;
-  inputId: string;
-  labelKey: keyof AdminUsersDialogTranslations;
-  type: string;
-  autocomplete: string;
-  maxLength: number;
-}
-
-export interface AdminUserDialogToggleField {
-  controlName: AdminUserDialogToggleControlName;
-  inputId: string;
-  labelKey: keyof AdminUsersDialogTranslations;
-}
+} from '../../../core/types/app-role';
+import { AdminUsersFiltersTranslations } from '../../../core/types/i18n/admin-users';
+import { getAppRoleLabel } from '../../../core/utils/app-role-labels';
 
 export const ADMIN_USERS_FILTER_SELECT_FIELDS: readonly AdminUsersFilterSelectField[] = [
   {
@@ -259,31 +198,31 @@ function getAdminUsersFilterOptionLabel(
   roleLabels: AppRoleLabels,
 ): string {
   switch (controlName) {
-    case 'role':
-      return value === 'all'
-        ? filters.roleAll
-        : getAppRoleLabel(value as AppRole, roleLabels);
+    case 'role': {
+      if (value === 'all') return filters.roleAll;
+      const role = APP_ROLES.find((appRole) => appRole === value);
+      if (role) return getAppRoleLabel(role, roleLabels);
+      break;
+    }
     case 'profile':
-      return {
-        all: filters.profileAll,
-        with: filters.profileWith,
-        without: filters.profileWithout,
-      }[value]!;
+      if (value === 'all') return filters.profileAll;
+      if (value === 'with') return filters.profileWith;
+      if (value === 'without') return filters.profileWithout;
+      break;
     case 'public':
-      return {
-        all: filters.publicAll,
-        public: filters.publicOnly,
-        not_public: filters.publicHidden,
-      }[value]!;
+      if (value === 'all') return filters.publicAll;
+      if (value === 'public') return filters.publicOnly;
+      if (value === 'not_public') return filters.publicHidden;
+      break;
     case 'sortBy':
-      return {
-        createdAt: filters.sortCreatedAt,
-        updatedAt: filters.sortUpdatedAt,
-      }[value]!;
+      if (value === 'createdAt') return filters.sortCreatedAt;
+      if (value === 'updatedAt') return filters.sortUpdatedAt;
+      break;
     case 'sortOrder':
-      return {
-        desc: filters.sortDesc,
-        asc: filters.sortAsc,
-      }[value]!;
+      if (value === 'desc') return filters.sortDesc;
+      if (value === 'asc') return filters.sortAsc;
+      break;
   }
+
+  throw new Error(`Unsupported admin users filter option: ${controlName}.${value}`);
 }

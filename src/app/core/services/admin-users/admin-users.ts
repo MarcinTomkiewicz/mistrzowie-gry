@@ -2,17 +2,19 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import {
-  IAdminGmProfileCreatePayload,
-  IAdminGmProfileStatusPatch,
   IAdminUserRecord,
   IAdminUserRow,
   IAdminUserUpdateFormValue,
-  IAdminUserUpdatePayload,
-  AdminUsersSortField,
-  AdminUsersSortOrder,
-} from '../../types/admin-users';
+} from '../../interfaces/i-admin-users';
 import { IGmProfile } from '../../interfaces/i-gm-profile';
 import { IUser } from '../../interfaces/i-user';
+import {
+  AdminUsersSortField,
+  AdminUsersSortOrder,
+  IAdminGmProfileCreatePayload,
+  IAdminGmProfileStatusPatch,
+  IAdminUserUpdatePayload,
+} from '../../types/admin-users';
 import { normalizeText } from '../../utils/normalize-text';
 import { Backend } from '../backend/backend';
 

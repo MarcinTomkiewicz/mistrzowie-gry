@@ -1,7 +1,7 @@
 import {
   IAdminUserRow,
   IAdminUsersFilterValue,
-} from '../../../core/types/admin-users';
+} from '../../../core/interfaces/i-admin-users';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { stablePartition } from '../../../core/utils/stable-partition';
 

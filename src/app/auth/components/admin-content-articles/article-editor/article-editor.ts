@@ -24,12 +24,12 @@ import {
   hasArticleEditorHeadingWithoutBody,
   hasArticleEditorImageWithoutPath,
 } from '../../../../core/validators/article-editor-block.validator';
-import { getContentArticleStatusBadgeClass } from '../../../../core/utils/content-articles';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { stringToSlug } from '../../../../core/utils/slug';
 import { ImageUpload } from '../../../../public/common/image-upload/image-upload';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { ArticleBlocksEditor } from '../article-blocks-editor/article-blocks-editor';
+import { getContentArticleStatusBadgeClass } from '../content-article-publication';
 import { createArticleEditorBlockForm, mapArticleEditorFormToPayload } from './article-editor-form';
 import { createAdminContentArticleEditorI18n } from './article-editor.i18n';
 

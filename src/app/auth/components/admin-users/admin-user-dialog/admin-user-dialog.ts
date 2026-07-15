@@ -12,7 +12,12 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import {
   IAdminUserRow,
   IAdminUserUpdateFormValue,
-} from '../../../../core/types/admin-users';
+} from '../../../../core/interfaces/i-admin-users';
+import {
+  AdminUserDialogSelectField,
+  AdminUserDialogTextField,
+  AdminUserDialogToggleField,
+} from '../../../../core/interfaces/i-admin-users-config';
 import {
   createAppRoleOptions,
   getAppRoleLabel,
@@ -22,9 +27,6 @@ import {
   ADMIN_USER_DIALOG_SELECT_FIELDS,
   ADMIN_USER_DIALOG_TEXT_FIELDS,
   ADMIN_USER_DIALOG_TOGGLE_FIELDS,
-  AdminUserDialogSelectField,
-  AdminUserDialogTextField,
-  AdminUserDialogToggleField,
   createAdminUserDialogForm,
   getAdminUserDialogValue,
 } from '../admin-users.config';
@@ -44,7 +46,7 @@ import {
   ],
   templateUrl: './admin-user-dialog.html',
 })
-export class AdminUserDialogComponent {
+export class AdminUserDialog {
   readonly visible = input(false);
   readonly row = input<IAdminUserRow | null>(null);
   readonly saving = input(false);

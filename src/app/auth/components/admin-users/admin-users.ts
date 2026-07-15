@@ -12,23 +12,22 @@ import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize, map, startWith } from 'rxjs';
 
+import {
+  IAdminUserRow,
+  IAdminUserUpdateFormValue,
+} from '../../../core/interfaces/i-admin-users';
+import { AdminUsersFilterSelectFieldVm } from '../../../core/interfaces/i-admin-users-config';
 import { AdminUsers as CoreAdminUsers } from '../../../core/services/admin-users/admin-users';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import {
-  IAdminGmProfileStatusPatch,
-  IAdminUserRow,
-  IAdminUsersFilterValue,
-  IAdminUserUpdateFormValue,
-} from '../../../core/types/admin-users';
+import { IAdminGmProfileStatusPatch } from '../../../core/types/admin-users';
 import { getAppRoleLabel } from '../../../core/utils/app-role-labels';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
-import { AdminUserDialogComponent } from './admin-user-dialog/admin-user-dialog';
+import { AdminUserDialog } from './admin-user-dialog/admin-user-dialog';
 import { AdminUserProfileStatusToggleComponent } from './admin-user-profile-status-toggle/admin-user-profile-status-toggle';
 import { createAdminUsersI18n } from './admin-users.i18n';
 import { getVisibleAdminUserRows } from './admin-user-rows';
 import {
-  AdminUsersFilterSelectFieldVm,
   createAdminUsersFilterSelectFieldVms,
   createAdminUsersFilterForm,
 } from './admin-users.config';
@@ -46,7 +45,7 @@ import {
     TableModule,
     ToggleSwitchModule,
     LoadingOverlay,
-    AdminUserDialogComponent,
+    AdminUserDialog,
     AdminUserProfileStatusToggleComponent,
   ],
   templateUrl: './admin-users.html',
@@ -77,9 +76,9 @@ export class AdminUsers {
   private readonly filterValue = toSignal(
     this.filterForm.valueChanges.pipe(
       startWith(this.filterForm.getRawValue()),
-      map(() => this.filterForm.getRawValue() as IAdminUsersFilterValue),
+      map(() => this.filterForm.getRawValue()),
     ),
-    { initialValue: this.filterForm.getRawValue() as IAdminUsersFilterValue },
+    { initialValue: this.filterForm.getRawValue() },
   );
 
   protected readonly filteredRows = computed(() =>

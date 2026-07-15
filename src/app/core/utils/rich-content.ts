@@ -5,9 +5,9 @@ import {
   RichContentOrderedListBlock,
   RichContentSection,
   RichContentUnorderedListBlock,
-} from '../../core/types/rich-content';
+} from '../types/rich-content';
 
-export function isRichContent(value: RichContentInput): value is RichContent {
+function isRichContent(value: RichContentInput): value is RichContent {
   return !!value && typeof value === 'object' && 'sections' in value;
 }
 
@@ -29,11 +29,11 @@ export function resolveRichContent(value: RichContentInput): RichContent | null 
   return parsePlainTextToRichContent(normalized);
 }
 
-export function normalizePlainText(value: string): string {
+function normalizePlainText(value: string): string {
   return value.replace(/\r\n/g, '\n').trim();
 }
 
-export function parsePlainTextToRichContent(text: string): RichContent {
+function parsePlainTextToRichContent(text: string): RichContent {
   const chunks = text
     .split(/\n{2,}/)
     .map((chunk) => chunk.trim())

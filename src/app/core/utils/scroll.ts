@@ -1,4 +1,4 @@
-export function scrollElementIntoView(
+function scrollElementIntoView(
   element: HTMLElement | null | undefined,
   options: ScrollIntoViewOptions = {
     behavior: 'smooth',
@@ -17,28 +17,23 @@ export function scrollElementIntoView(
 export function scrollElementIntoViewWhenReady(
   getElement: () => HTMLElement | null | undefined,
   options?: ScrollIntoViewOptions,
-  attempt = 0,
-  maxAttempts = 3,
 ): void {
   if (typeof window === 'undefined') {
     return;
   }
 
-  requestAnimationFrame(() => {
-    const element = getElement();
+  const attemptScroll = (attempt: number): void => {
+    requestAnimationFrame(() => {
+      const element = getElement();
 
-    if (element) {
-      scrollElementIntoView(element, options);
-      return;
-    }
+      if (element) {
+        scrollElementIntoView(element, options);
+        return;
+      }
 
-    if (attempt < maxAttempts) {
-      scrollElementIntoViewWhenReady(
-        getElement,
-        options,
-        attempt + 1,
-        maxAttempts,
-      );
-    }
-  });
+      if (attempt < 3) attemptScroll(attempt + 1);
+    });
+  };
+
+  attemptScroll(0);
 }

@@ -32,8 +32,13 @@ export function parseIsoDate(value: string | null | undefined): Date | null {
   const year = Number(match[1]);
   const month = Number(match[2]) - 1;
   const day = Number(match[3]);
+  const date = new Date(year, month, day);
 
-  return new Date(year, month, day);
+  return date.getFullYear() === year &&
+    date.getMonth() === month &&
+    date.getDate() === day
+    ? date
+    : null;
 }
 
 export function compareDatesByDay(left: Date, right: Date): number {
@@ -59,14 +64,14 @@ export function endOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
-export function startOfWeek(date: Date, weekStartsOn: number = 1): Date {
+function startOfWeek(date: Date, weekStartsOn: number = 1): Date {
   const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const diff = (localDate.getDay() - weekStartsOn + 7) % 7;
 
   return addDays(localDate, -diff);
 }
 
-export function endOfWeek(date: Date, weekStartsOn: number = 1): Date {
+function endOfWeek(date: Date, weekStartsOn: number = 1): Date {
   return addDays(startOfWeek(date, weekStartsOn), 6);
 }
 

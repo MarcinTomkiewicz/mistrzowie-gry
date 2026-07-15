@@ -2,31 +2,17 @@ import { from, map, Observable, of, switchMap } from 'rxjs';
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
+import { IPdfLoadResult, IPdfRenderResult } from '../interfaces/i-pdf';
+
 let workerConfigured = false;
-
-function ensurePdfWorker(GlobalWorkerOptions: { workerSrc: string }): void {
-  if (workerConfigured) {
-    return;
-  }
-
-  GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-  workerConfigured = true;
-}
-
-export interface IPdfRenderResult {
-  pageCount: number;
-  pageNumber: number;
-}
-
-export interface IPdfLoadResult {
-  document: PDFDocumentProxy;
-  pageCount: number;
-}
 
 export function loadPdfDocument(src: string): Observable<IPdfLoadResult> {
   return from(import('pdfjs-dist')).pipe(
     switchMap((pdfjs) => {
-      ensurePdfWorker(pdfjs.GlobalWorkerOptions);
+      if (!workerConfigured) {
+        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+        workerConfigured = true;
+      }
 
       return from(pdfjs.getDocument(src).promise).pipe(
         map((document) => ({

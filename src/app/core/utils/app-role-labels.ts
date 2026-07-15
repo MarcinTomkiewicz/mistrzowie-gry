@@ -1,7 +1,5 @@
 import { ISelectOption } from '../interfaces/i-select-option';
-import { APP_ROLES, AppRole } from '../types/app-role';
-
-export type AppRoleLabels = Record<AppRole, string>;
+import { APP_ROLES, AppRole, AppRoleLabels } from '../types/app-role';
 
 export function getAppRoleLabel(
   role: AppRole,

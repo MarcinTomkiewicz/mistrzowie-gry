@@ -28,7 +28,7 @@ export function createOrganizationRef(siteUrl = SITE_URL): StructuredDataNode {
   };
 }
 
-export function createWebsiteRef(siteUrl = SITE_URL): StructuredDataNode {
+function createWebsiteRef(siteUrl = SITE_URL): StructuredDataNode {
   return {
     '@id': siteUrl === SITE_URL ? WEBSITE_ID : `${siteUrl}/#website`,
   };
@@ -49,7 +49,7 @@ export function createPlaceStructuredData(
   });
 }
 
-export function createVenuePlace(): StructuredDataNode {
+function createVenuePlace(): StructuredDataNode {
   return createPlaceStructuredData({
     venueName: VENUE_NAME,
     venueAddress: VENUE_STREET_ADDRESS,

@@ -8,3 +8,5 @@ export const APP_ROLES = [
 ] as const;
 
 export type AppRole = (typeof APP_ROLES)[number];
+
+export type AppRoleLabels = Record<AppRole, string>;

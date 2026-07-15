@@ -14,13 +14,13 @@ import { ContentArticles } from '../../../../core/services/content-articles/cont
 import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { ContentArticlePublicationIssue } from '../../../../core/types/content-article';
-import {
-  getContentArticlePublicationIssues,
-  getContentArticleStatusBadgeClass,
-} from '../../../../core/utils/content-articles';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import {
+  getContentArticlePublicationIssues,
+  getContentArticleStatusBadgeClass,
+} from '../content-article-publication';
 import { createAdminContentArticleListI18n } from './article-list.i18n';
 
 @Component({
