@@ -6,6 +6,17 @@ export enum HourOffsetValue {
   DefaultDayStartOffset = 12,
 }
 
+export type HourOffsetRange = {
+  id: string;
+  startOffset: number;
+  endOffset: number;
+};
+
+export type HourOffsetDay<TRange extends HourOffsetRange = HourOffsetRange> = {
+  date: string;
+  ranges: readonly TRange[];
+};
+
 export type HourOffsetMutationError =
   | 'invalid_duration'
   | 'overlap'

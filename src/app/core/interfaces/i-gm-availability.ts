@@ -1,5 +1,6 @@
 import { IUniversalCalendarDay } from './i-universal-calendar';
 import { ISelectOption } from './i-select-option';
+import { HourOffsetDay, HourOffsetRange } from '../types/hour-offset';
 
 export interface IGmAvailabilitySlotRecord {
   id?: string;
@@ -10,16 +11,10 @@ export interface IGmAvailabilitySlotRecord {
   updatedAt?: string | null;
 }
 
-export interface IGmAvailabilityRange {
-  id: string;
-  startOffset: number;
-  endOffset: number;
-}
+export interface IGmAvailabilityRange extends HourOffsetRange {}
 
-export interface IGmAvailabilityDay {
-  date: string;
-  ranges: readonly IGmAvailabilityRange[];
-}
+export interface IGmAvailabilityDay
+  extends HourOffsetDay<IGmAvailabilityRange> {}
 
 export interface IGmAvailabilityHourOption extends ISelectOption<number> {}
 

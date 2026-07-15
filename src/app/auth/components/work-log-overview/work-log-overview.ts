@@ -20,7 +20,6 @@ import {
   IUserWorkLogExportRow,
   IUserWorkLogOverviewVm,
   IUserWorkLogRecord,
-  WorkLogMonthOffset,
 } from '../../../core/interfaces/i-work-log';
 import { ICoworkerProfile } from '../../../core/interfaces/i-coworker-profile';
 import { Auth } from '../../../core/services/auth/auth';
@@ -28,15 +27,16 @@ import { CoworkerProfile } from '../../../core/services/coworker-profile/coworke
 import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { WorkLog } from '../../../core/services/work-log/work-log';
-import { formatDateLabel } from '../../../core/utils/date';
-import { getUserDisplayName } from '../../../core/utils/user-display';
+import { WorkLogMonthOffset } from '../../../core/types/work-log';
+import { formatWorkLogHours } from '../../../core/domain/work-log/display';
+import { mapWorkLogRecordsToDays } from '../../../core/domain/work-log/mapping';
 import {
-  formatWorkLogHours,
   getWorkLogDayHours,
   getWorkLogMonthScope,
   getWorkLogTotalHours,
-  mapWorkLogRecordsToDays,
-} from '../../../core/utils/work-log/work-log.util';
+} from '../../../core/domain/work-log/rules';
+import { formatDateLabel } from '../../../core/utils/date';
+import { getUserDisplayName } from '../../../core/utils/user-display';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/time';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { createWorkLogOverviewI18n } from './work-log-overview.i18n';
@@ -55,7 +55,7 @@ import { createWorkLogOverviewI18n } from './work-log-overview.i18n';
   templateUrl: './work-log-overview.html',
   providers: [provideTranslocoScope('auth', 'common')],
 })
-export class WorkLogOverviewComponent {
+export class WorkLogOverview {
   private readonly auth = inject(Auth);
   private readonly coworkerProfile = inject(CoworkerProfile);
   private readonly destroyRef = inject(DestroyRef);

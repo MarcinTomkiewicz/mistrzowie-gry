@@ -19,32 +19,38 @@ import { TableModule } from 'primeng/table';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { IGmAvailabilityRange } from '../../../core/interfaces/i-gm-availability';
 import {
+  IWorkLogEditorError,
   IUserWorkLogDay,
   IUserWorkLogRowVm,
-  WorkLogMonthOffset,
 } from '../../../core/interfaces/i-work-log';
 import { Auth } from '../../../core/services/auth/auth';
 import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { WorkLog } from '../../../core/services/work-log/work-log';
 import { HourOffsetValue } from '../../../core/types/hour-offset';
-import { WorkLogHourValue } from '../../../core/types/work-log';
+import {
+  WorkLogHourValue,
+  WorkLogMonthOffset,
+  WorkLogMutationError,
+  WorkLogRangeDraft,
+} from '../../../core/types/work-log';
 import {
   createEndHourOffsetOptions,
   createHourOffsetOptions,
   normalizeEndHourOffset,
 } from '../../../core/utils/time';
 import {
-  createDefaultWorkLogRange,
   createWorkLogRows,
   formatWorkLogHours,
+} from '../../../core/domain/work-log/display';
+import { upsertWorkLogDay } from '../../../core/domain/work-log/mapping';
+import {
+  createDefaultWorkLogRange,
   getWorkLogMonthScope,
   getWorkLogMutationError,
   getWorkLogTotalHours,
-  upsertWorkLogDay,
-} from '../../../core/utils/work-log/work-log.util';
+} from '../../../core/domain/work-log/rules';
 import { InfoDialog } from '../../../public/common/info-dialog/info-dialog';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { createMyWorkLogI18n } from './my-work-log.i18n';
@@ -68,7 +74,7 @@ import { createMyWorkLogI18n } from './my-work-log.i18n';
   templateUrl: './my-work-log.html',
   providers: [provideTranslocoScope('auth', 'common')],
 })
-export class MyWorkLogComponent {
+export class MyWorkLog {
   private readonly auth = inject(Auth);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platform = inject(Platform);
@@ -81,10 +87,9 @@ export class MyWorkLogComponent {
   protected readonly isSaving = signal(false);
   protected readonly monthOffset = signal<WorkLogMonthOffset>(0);
   protected readonly infoDialogVisible = signal(false);
-  protected readonly infoDialogContent = signal<{
-    title: string;
-    body: string;
-  } | null>(null);
+  protected readonly infoDialogContent = signal<IWorkLogEditorError | null>(
+    null,
+  );
 
   private readonly initialDays = signal<readonly IUserWorkLogDay[]>([]);
   private readonly draftDays = signal<readonly IUserWorkLogDay[]>([]);
@@ -154,7 +159,7 @@ export class MyWorkLogComponent {
   }
 
   protected getEndHourOptions(
-    range: Pick<IGmAvailabilityRange, 'startOffset'>,
+    range: Pick<WorkLogRangeDraft, 'startOffset'>,
   ) {
     return createEndHourOffsetOptions(
       range.startOffset,
@@ -344,9 +349,7 @@ export class MyWorkLogComponent {
     this.draftDays.set(upsertWorkLogDay(this.draftDays(), day));
   }
 
-  private handleMutationError(
-    error: 'invalid_duration' | 'overlap' | 'no_space',
-  ): void {
+  private handleMutationError(error: WorkLogMutationError): void {
     const dialog = this.i18n.dialog();
 
     switch (error) {

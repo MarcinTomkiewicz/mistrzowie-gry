@@ -1,7 +1,6 @@
-import { IGmAvailabilityDay, IGmAvailabilityRange } from './i-gm-availability';
+import { HourOffsetDay } from '../types/hour-offset';
+import { WorkLogMonthOffset, WorkLogRangeDraft } from '../types/work-log';
 import { IUser } from './i-user';
-
-export type WorkLogMonthOffset = 0 | -1;
 
 export interface IUserWorkLogRangeRecord {
   id?: string;
@@ -23,7 +22,17 @@ export interface IUserWorkLogRecord {
   userWorkLogRanges?: readonly IUserWorkLogRangeRecord[];
 }
 
-export interface IUserWorkLogDay extends IGmAvailabilityDay {
+export interface IWorkLogOverviewData {
+  users: IUser[];
+  records: IUserWorkLogRecord[];
+}
+
+export interface IWorkLogEditorError {
+  title: string;
+  body: string;
+}
+
+export interface IUserWorkLogDay extends HourOffsetDay<WorkLogRangeDraft> {
   id?: string;
   isChaoticThursday: boolean;
   comment?: string | null;
@@ -60,8 +69,3 @@ export interface IUserWorkLogExportRow {
   totalHours: number;
   chaoticThursdayDatesLabel: string;
 }
-
-export type WorkLogRangeDraft = Pick<
-  IGmAvailabilityRange,
-  'id' | 'startOffset' | 'endOffset'
->;

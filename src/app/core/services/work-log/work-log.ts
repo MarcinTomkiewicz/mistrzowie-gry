@@ -4,16 +4,17 @@ import { map, Observable, of, switchMap, throwError } from 'rxjs';
 import { FilterOperator } from '../../enums/filter-operators';
 import { IUser } from '../../interfaces/i-user';
 import {
+  IWorkLogOverviewData,
   IUserWorkLogDay,
   IUserWorkLogRecord,
-  WorkLogMonthOffset,
 } from '../../interfaces/i-work-log';
+import { WorkLogMonthOffset } from '../../types/work-log';
 import {
-  getWorkLogMonthScope,
   mapWorkLogDaysToRangeRecords,
   mapWorkLogDaysToRecords,
   mapWorkLogRecordsToDays,
-} from '../../utils/work-log/work-log.util';
+} from '../../domain/work-log/mapping';
+import { getWorkLogMonthScope } from '../../domain/work-log/rules';
 import { getRolesAtOrAbove } from '../../utils/roles';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
@@ -33,7 +34,7 @@ export class WorkLog {
     return this.getMonthForUser(userId, monthOffset);
   }
 
-  getMonthForUser(
+  private getMonthForUser(
     userId: string,
     monthOffset: WorkLogMonthOffset,
   ): Observable<IUserWorkLogDay[]> {
@@ -67,7 +68,7 @@ export class WorkLog {
       .pipe(map((records) => mapWorkLogRecordsToDays(records)));
   }
 
-  getWorkLogUsers(): Observable<IUser[]> {
+  private getWorkLogUsers(): Observable<IUser[]> {
     return this.backend.getAll<IUser>({
       table: 'users',
       sortBy: 'createdAt',
@@ -83,7 +84,7 @@ export class WorkLog {
     });
   }
 
-  getMonthForUsers(
+  private getMonthForUsers(
     userIds: readonly string[],
     monthOffset: WorkLogMonthOffset,
   ): Observable<IUserWorkLogRecord[]> {
@@ -119,16 +120,15 @@ export class WorkLog {
     });
   }
 
-  getOverview(monthOffset: WorkLogMonthOffset): Observable<{
-    users: IUser[];
-    records: IUserWorkLogRecord[];
-  }> {
+  getOverview(
+    monthOffset: WorkLogMonthOffset,
+  ): Observable<IWorkLogOverviewData> {
     return this.getWorkLogUsers().pipe(
       switchMap((users) => {
         if (!users.length) {
-          return of({
+          return of<IWorkLogOverviewData>({
             users,
-            records: [] as IUserWorkLogRecord[],
+            records: [],
           });
         }
 
@@ -187,7 +187,7 @@ export class WorkLog {
           const records = mapWorkLogDaysToRecords(userId, days);
 
           if (!records.length) {
-            return of([] as IUserWorkLogDay[]);
+            return of<IUserWorkLogDay[]>([]);
           }
 
           return this.backend

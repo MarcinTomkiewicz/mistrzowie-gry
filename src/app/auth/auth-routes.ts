@@ -18,7 +18,7 @@ const loaders = {
     ),
   myWorkLog: () =>
     import('./components/my-work-log/my-work-log').then(
-      (m) => m.MyWorkLogComponent,
+      (m) => m.MyWorkLog,
     ),
   coworkerProfile: () =>
     import('./components/coworker-profile/coworker-profile').then(
@@ -30,7 +30,7 @@ const loaders = {
     ),
   workLogOverview: () =>
     import('./components/work-log-overview/work-log-overview').then(
-      (m) => m.WorkLogOverviewComponent,
+      (m) => m.WorkLogOverview,
     ),
   adminUsers: () =>
     import('./components/admin-users/admin-users').then(
