@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { from, map, Observable } from 'rxjs';
 import { Supabase } from '../supabase/supabase';
-import { toCamelCase } from '../../utils/type-mappings';
+import { toCamelCase } from '../backend/backend-mapping';
 import type {
   OfferItem,
   OfferPage,

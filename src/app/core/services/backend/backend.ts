@@ -6,8 +6,8 @@ import {
 import { defer, from, Observable, of, throwError } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import { applyFilters } from '../../utils/query';
-import { toCamelCase, toSnakeCase, toSnakeKey } from '../../utils/type-mappings';
+import { toCamelCase, toSnakeCase, toSnakeKey } from './backend-mapping';
+import { applyFilters } from './backend-query';
 import { Supabase } from '../supabase/supabase';
 
 import { FilterDefinition, IFilter } from '../../interfaces/i-filter';

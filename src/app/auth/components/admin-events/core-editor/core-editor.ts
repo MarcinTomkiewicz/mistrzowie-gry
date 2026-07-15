@@ -24,7 +24,7 @@ import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { resolveEventCoreAdminErrorMessage } from '../../../../core/utils/event-admin';
 import { normalizeText } from '../../../../core/utils/normalize-text';
-import { stringToSlug } from '../../../../core/utils/type-mappings';
+import { stringToSlug } from '../../../../core/utils/slug';
 import {
   requiredTrimmedValidator,
 } from '../../../../core/validators/required-trimmed.validator';

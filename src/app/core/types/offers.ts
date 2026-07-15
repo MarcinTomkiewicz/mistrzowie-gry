@@ -48,7 +48,31 @@ export type OfferPageSection = {
 };
 
 export type OfferItemMeta = JsonObject;
-export type OfferItemPricing = JsonObject;
+export type OfferItemPricing = {
+  currency?: string | null;
+  pricingNote?: string | null;
+  min?: number | string | null;
+  max?: number | string | null;
+  monthlyMin?: number | string | null;
+  monthlyMax?: number | string | null;
+  hourlyMin?: number | string | null;
+  hourlyMax?: number | string | null;
+  total?: number | string | null;
+  monthly?: number | string | null;
+  perHour?: number | string | null;
+  unit?: number | string | null;
+  unitLabel?: string | null;
+  minTotal?: number | string | null;
+  surcharge?: number | string | null;
+  percentSurcharge?: number | string | null;
+  percentMin?: number | string | null;
+  percentMax?: number | string | null;
+};
+
+export type PricingFormatted = {
+  value: string;
+  note?: string;
+};
 
 export type OfferItem = {
   id: number;

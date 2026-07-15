@@ -6,7 +6,7 @@ import {
   ProblemCardCopy,
   ProblemsHeader,
 } from '../../../../core/types/i18n/home';
-import { dictToSortedArray } from '../../../../core/utils/dict-to-sorted-array';
+import { recordValuesSortedBy } from '../../../../core/utils/record-values';
 
 export function createProblemsI18n() {
   const { header, cardsDict } = createScopedSectionsI18n<{
@@ -19,14 +19,7 @@ export function createProblemsI18n() {
   const cta = createCommonCtaI18n();
 
   const cardsCopy = computed<ProblemCardCopy[]>(() =>
-    dictToSortedArray<ProblemCardCopy>(
-      cardsDict() as never,
-      (item) => Number((item as { id?: number })?.id ?? 0),
-    ).map((item) => ({
-      id: Number((item as { id?: number })?.id ?? 0),
-      title: String((item as { title?: string })?.title ?? ''),
-      text: String((item as { text?: string })?.text ?? ''),
-    })),
+    recordValuesSortedBy(cardsDict(), (item) => item.id),
   );
 
   return {

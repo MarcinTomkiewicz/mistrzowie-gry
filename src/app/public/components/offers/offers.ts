@@ -20,13 +20,13 @@ import { SITE_URL } from '../../../core/config/site';
 import { Offer } from '../../../core/services/offer/offer';
 import { Seo } from '../../../core/services/seo/seo';
 import type { OfferItemId, OfferPageVm } from '../../../core/types/offers';
-import { normalizeFaqItems } from '../../../core/utils/display-items';
+import { normalizeFaqItems } from './faq-items';
 import { createPageStructuredData } from '../../../core/utils/structured-data';
 import {
   formatAddonPricing,
   formatPricing,
   formatPricingDetailed,
-} from '../../../core/utils/pricing';
+} from './offer-pricing';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
 import { createOffersI18n } from './offers.i18n';
 import { StandardsAndLogistics } from './standards-and-logistics/standards-and-logistics';

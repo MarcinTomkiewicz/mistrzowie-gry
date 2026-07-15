@@ -4,7 +4,7 @@ import { from, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 import { Supabase } from '../supabase/supabase';
-import { formatDate } from '../../utils/date-format';
+import { formatDate } from '../../utils/date';
 import { withDefaults } from '../../utils/with-defaults';
 import type {
   ImageUploadOptions,

@@ -1,10 +1,10 @@
 import { computed } from '@angular/core';
 
 import {
-  dictToSortedArray,
-  numberedDictToStringArray,
-  withIcons,
-} from '../../../core/utils/dict-to-sorted-array';
+  numberedRecordToStringArray,
+  recordValuesSortedBy,
+} from '../../../core/utils/record-values';
+import { withIcons } from '../../common/icon-items/icon-items';
 import { createCommonCtaI18n } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -74,21 +74,21 @@ export function createJoinThePartyI18n(
   const orgMeetingBulletsTitle = computed(() => orgMeetingBulletsBlock().title);
 
   const benefits = computed(() => {
-    const list = dictToSortedArray<CardCopy>(benefitsDict(), (item) => item.id);
+    const list = recordValuesSortedBy(benefitsDict(), (item) => item.id);
     return withIcons(list, benefitIcons);
   });
 
   const steps = computed(() => {
-    const list = dictToSortedArray<CardCopy>(stepsDict(), (item) => item.id);
+    const list = recordValuesSortedBy(stepsDict(), (item) => item.id);
     return withIcons(list, stepIcons);
   });
 
-  const rules = computed(() => numberedDictToStringArray(rulesBlock()));
+  const rules = computed(() => numberedRecordToStringArray(rulesBlock()));
   const continuationBullets = computed(() =>
-    numberedDictToStringArray(continuationBulletsBlock()),
+    numberedRecordToStringArray(continuationBulletsBlock()),
   );
   const orgMeetingBullets = computed(() =>
-    numberedDictToStringArray(orgMeetingBulletsBlock()),
+    numberedRecordToStringArray(orgMeetingBulletsBlock()),
   );
 
   return {

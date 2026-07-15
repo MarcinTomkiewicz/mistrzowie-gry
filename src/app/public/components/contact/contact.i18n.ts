@@ -19,13 +19,7 @@ import {
   ContactSuccessTranslations,
   ContactToastTranslations,
 } from '../../../core/types/i18n/contact';
-import { dictToSortedArray } from '../../../core/utils/dict-to-sorted-array';
-
-function toSortedById<T>(dict: unknown): T[] {
-  return dictToSortedArray<T>(dict as never, (x) =>
-    Number((x as { id?: number })?.id ?? 0),
-  );
-}
+import { recordValuesSortedBy } from '../../../core/utils/record-values';
 
 export function createContactI18n() {
   const { seo, hero, formText, formErrors, success, toast, topicsDict, info } =
@@ -57,10 +51,10 @@ export function createContactI18n() {
   const accessibility = createCommonAccessibilityI18n();
 
   const topics = computed<ContactTopicOption[]>(() =>
-    toSortedById<ContactTopicOption>(topicsDict()).map((item) => ({
-      id: Number((item as { id?: number })?.id ?? 0),
-      value: String((item as { value?: string })?.value ?? ''),
-      label: String((item as { label?: string })?.label ?? ''),
+    recordValuesSortedBy(topicsDict(), (item) => item.id).map((item) => ({
+      id: item.id,
+      value: item.value,
+      label: item.label,
     })),
   );
 

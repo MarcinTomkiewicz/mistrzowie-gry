@@ -7,7 +7,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
 import { Storage } from '../../../core/services/storage/storage';
-import { resolveAltDifficultyLevel } from '../../../core/utils/alt-difficulty-level';
+import { resolveAltDifficultyLevel } from '../session-difficulty/session-difficulty';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { PdfThumbnail } from '../pdf-thumbnail/pdf-thumbnail';
 import { PdfViewerDialog } from '../pdf-viewer-dialog/pdf-viewer-dialog';

@@ -14,7 +14,7 @@ import type {
 } from '../../../../core/types/offers';
 import {
   formatPricingDetailed,
-} from '../../../../core/utils/pricing';
+} from '../offer-pricing';
 
 @Component({
   selector: 'app-standards-and-logistics',

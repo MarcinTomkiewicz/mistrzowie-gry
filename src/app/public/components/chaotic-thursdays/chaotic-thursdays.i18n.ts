@@ -24,10 +24,10 @@ import {
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
-  dictToSortedArray,
-  numberedDictToStringArray,
-  withIcons,
-} from '../../../core/utils/dict-to-sorted-array';
+  numberedRecordToStringArray,
+  recordValuesSortedBy,
+} from '../../../core/utils/record-values';
+import { withIcons } from '../../common/icon-items/icon-items';
 
 export function createChaoticThursdaysI18n(
   highlightIcons: readonly IconTech[],
@@ -92,7 +92,7 @@ export function createChaoticThursdaysI18n(
   const commonStatus = createCommonStatusI18n();
 
   const highlights = computed(() => {
-    const list = dictToSortedArray<CardCopy>(
+    const list = recordValuesSortedBy(
       highlightsDict(),
       (item) => item.id,
     );
@@ -100,11 +100,11 @@ export function createChaoticThursdaysI18n(
   });
 
   const steps = computed(() =>
-    dictToSortedArray<StepCopy>(stepsDict(), (item) => item.id),
+    recordValuesSortedBy(stepsDict(), (item) => item.id),
   );
 
   const standardsCards = computed(() => {
-    const list = dictToSortedArray<CardCopy>(
+    const list = recordValuesSortedBy(
       standardsCardsDict(),
       (item) => item.id,
     );
@@ -112,11 +112,11 @@ export function createChaoticThursdaysI18n(
   });
 
   const expectations = computed(() =>
-    numberedDictToStringArray(expectationsDict()),
+    numberedRecordToStringArray(expectationsDict()),
   );
 
   const faqs = computed(() =>
-    dictToSortedArray<FaqCopy>(faqItemsDict(), (item) => item.id),
+    recordValuesSortedBy(faqItemsDict(), (item) => item.id),
   );
 
   return {

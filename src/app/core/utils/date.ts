@@ -229,3 +229,14 @@ export function toLocalDateTime(
     hourOffset,
   );
 }
+const padDatePart = (value: number): string => value.toString().padStart(2, '0');
+
+export function formatDate(date: Date, format: string): string {
+  return format
+    .replace(/yyyy/g, String(date.getFullYear()))
+    .replace(/MM/g, padDatePart(date.getMonth() + 1))
+    .replace(/dd/g, padDatePart(date.getDate()))
+    .replace(/HH/g, padDatePart(date.getHours()))
+    .replace(/mm/g, padDatePart(date.getMinutes()))
+    .replace(/ss/g, padDatePart(date.getSeconds()));
+}

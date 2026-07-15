@@ -11,9 +11,9 @@ import {
   AboutSeo,
 } from '../../../core/types/i18n/about';
 import {
-  dictToSortedArray,
-  numberedDictToStringArray,
-} from '../../../core/utils/dict-to-sorted-array';
+  numberedRecordToStringArray,
+  recordValuesSortedBy,
+} from '../../../core/utils/record-values';
 
 export function createAboutI18n() {
   const commonCta = createCommonCtaI18n();
@@ -30,28 +30,24 @@ export function createAboutI18n() {
   });
 
   const sections = computed<AboutSection[]>(() =>
-    dictToSortedArray<AboutSectionRaw>(
-      sectionsDict() as never,
-      (item) => Number((item as { id?: number })?.id ?? 0),
+    recordValuesSortedBy(
+      sectionsDict(),
+      (item) => item.id,
     ).map((item) => ({
-      id: Number((item as { id?: number })?.id ?? 0),
-      title: String((item as { title?: string })?.title ?? ''),
-      paragraphs: numberedDictToStringArray(
-        (item as { paragraphs?: Record<string, string> })?.paragraphs,
-      ),
+      id: item.id,
+      title: item.title,
+      paragraphs: numberedRecordToStringArray(item.paragraphs),
     })),
   );
 
   const cards = computed<AboutCard[]>(() =>
-    dictToSortedArray<AboutCardRaw>(
-      cardsDict() as never,
-      (item) => Number((item as { id?: number })?.id ?? 0),
+    recordValuesSortedBy(
+      cardsDict(),
+      (item) => item.id,
     ).map((item) => ({
-      id: Number((item as { id?: number })?.id ?? 0),
-      title: String((item as { title?: string })?.title ?? ''),
-      paragraphs: numberedDictToStringArray(
-        (item as { paragraphs?: Record<string, string> })?.paragraphs,
-      ),
+      id: item.id,
+      title: item.title,
+      paragraphs: numberedRecordToStringArray(item.paragraphs),
     })),
   );
 

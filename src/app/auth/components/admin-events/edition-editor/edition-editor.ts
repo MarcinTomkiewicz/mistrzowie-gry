@@ -28,7 +28,7 @@ import {
   resolveEventEditionAdminErrorMessage,
   resolveParticipantSignupKindLabel,
 } from '../../../../core/utils/event-admin';
-import { stringToSlug } from '../../../../core/utils/type-mappings';
+import { stringToSlug } from '../../../../core/utils/slug';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';
