@@ -20,13 +20,13 @@ import {
   IAdminUsersFilterValue,
   IAdminUserUpdateFormValue,
 } from '../../../core/types/admin-users';
-import { getVisibleAdminUserRows } from '../../../core/utils/admin-users';
 import { getAppRoleLabel } from '../../../core/utils/app-role-labels';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { AdminUserDialogComponent } from './admin-user-dialog/admin-user-dialog';
 import { AdminUserProfileStatusToggleComponent } from './admin-user-profile-status-toggle/admin-user-profile-status-toggle';
 import { createAdminUsersI18n } from './admin-users.i18n';
+import { getVisibleAdminUserRows } from './admin-user-rows';
 import {
   AdminUsersFilterSelectFieldVm,
   createAdminUsersFilterSelectFieldVms,

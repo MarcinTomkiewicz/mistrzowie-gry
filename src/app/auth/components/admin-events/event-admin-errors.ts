@@ -1,13 +1,10 @@
-import { ParticipantSignupKind } from '../enums/event';
-import { ISelectOption } from '../interfaces/i-select-option';
 import {
   CoreRpcErrorsCopy,
   EditionRpcErrorsCopy,
   OccurrenceRpcErrorsCopy,
-  ParticipantKindCopy,
-} from '../types/i18n/admin-events';
-import { RpcError } from '../types/rpc-error';
-import { joinTextParts } from './normalize-text';
+} from '../../../core/types/i18n/admin-events';
+import { RpcError } from '../../../core/types/rpc-error';
+import { joinTextParts } from '../../../core/utils/normalize-text';
 
 export function resolveEventCoreAdminErrorMessage(
   error: unknown,
@@ -91,29 +88,6 @@ export function resolveEventOccurrenceAdminErrorMessage(
       return copy.conflict;
     default:
       return copy.unknown;
-  }
-}
-
-export function createParticipantSignupKindOptions(
-  copy: ParticipantKindCopy,
-): ISelectOption<ParticipantSignupKind>[] {
-  return Object.values(ParticipantSignupKind).map((value) => ({
-    value,
-    label: resolveParticipantSignupKindLabel(value, copy),
-  }));
-}
-
-export function resolveParticipantSignupKindLabel(
-  kind: ParticipantSignupKind,
-  copy: ParticipantKindCopy,
-): string {
-  switch (kind) {
-    case ParticipantSignupKind.WholeEvent:
-      return copy.wholeEvent;
-    case ParticipantSignupKind.ProgramItem:
-      return copy.programItem;
-    case ParticipantSignupKind.Both:
-      return copy.both;
   }
 }
 

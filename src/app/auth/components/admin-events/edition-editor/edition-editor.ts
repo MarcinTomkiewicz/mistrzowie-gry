@@ -26,8 +26,10 @@ import {
 import { formatTimeRangeLabel } from '../../../../core/utils/time';
 import {
   resolveEventEditionAdminErrorMessage,
+} from '../event-admin-errors';
+import {
   resolveParticipantSignupKindLabel,
-} from '../../../../core/utils/event-admin';
+} from '../participant-signup-kind-options';
 import { stringToSlug } from '../../../../core/utils/slug';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';

@@ -7,7 +7,7 @@ import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 import { EventEditionFormGroup } from '../../../../core/types/event-admin-form';
-import { createParticipantSignupKindOptions } from '../../../../core/utils/event-admin';
+import { createParticipantSignupKindOptions } from '../participant-signup-kind-options';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 
 @Component({

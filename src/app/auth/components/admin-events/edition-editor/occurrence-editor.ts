@@ -31,10 +31,10 @@ import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel } from '../../../../core/utils/date';
 import {
-  createParticipantSignupKindOptions,
   resolveEventEditionAdminErrorMessage,
   resolveEventOccurrenceAdminErrorMessage,
-} from '../../../../core/utils/event-admin';
+} from '../event-admin-errors';
+import { createParticipantSignupKindOptions } from '../participant-signup-kind-options';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 
 @Component({

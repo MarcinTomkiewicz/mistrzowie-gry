@@ -1,9 +1,9 @@
 import {
   IAdminUserRow,
   IAdminUsersFilterValue,
-} from '../types/admin-users';
-import { normalizeText } from './normalize-text';
-import { stablePartition } from './stable-partition';
+} from '../../../core/types/admin-users';
+import { normalizeText } from '../../../core/utils/normalize-text';
+import { stablePartition } from '../../../core/utils/stable-partition';
 
 export function getVisibleAdminUserRows(
   rows: readonly IAdminUserRow[],
@@ -14,7 +14,7 @@ export function getVisibleAdminUserRows(
   );
 }
 
-export function matchesAdminUserFilters(
+function matchesAdminUserFilters(
   row: IAdminUserRow,
   filters: IAdminUsersFilterValue,
 ): boolean {
@@ -24,10 +24,11 @@ export function matchesAdminUserFilters(
 
   if (
     query &&
-    ![user.email, user.firstName, user.nickname]
-      .map((value) => normalizeText(value)?.toLowerCase())
-      .filter(Boolean)
-      .some((value) => value!.includes(query))
+    ![user.email, user.firstName, user.nickname].some((value) => {
+      const normalizedValue = normalizeText(value)?.toLowerCase();
+
+      return normalizedValue ? normalizedValue.includes(query) : false;
+    })
   ) {
     return false;
   }
@@ -59,7 +60,7 @@ export function matchesAdminUserFilters(
   return true;
 }
 
-export function sortAdminUserRowsArchivedLast(
+function sortAdminUserRowsArchivedLast(
   rows: readonly IAdminUserRow[],
 ): IAdminUserRow[] {
   return stablePartition(rows, (row) => !row.gmProfile?.isArchived);
