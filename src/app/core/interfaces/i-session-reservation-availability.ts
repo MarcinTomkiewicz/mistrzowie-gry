@@ -1,5 +1,10 @@
 import { IGmPublicProfile } from './i-gm-public-profile';
 
+export interface ISessionReservationAvailabilityWindow {
+  fromIso: string;
+  toIsoExclusive: string;
+}
+
 export interface ISessionReservationAvailableSlot {
   gmProfileId: string;
   startsAt: string;

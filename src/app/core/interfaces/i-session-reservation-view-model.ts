@@ -1,6 +1,6 @@
 import { ICustomerSessionEntitlement } from './i-customer-session-entitlement';
 import { IGmPublicProfile } from './i-gm-public-profile';
-import { ISessionBookingProduct } from './i-session-booking-product';
+import { ISessionAddonBookingProduct } from './i-session-booking-product';
 import {
   ISessionReservationAvailableSlot,
   ISessionReservationGmSlot,
@@ -19,7 +19,7 @@ export interface ISessionReservationViewModel {
   states: ISessionReservationI18nSections['states'];
   commonActions: ISessionReservationCommonI18n['commonActions'];
   commonStatus: ISessionReservationCommonI18n['commonStatus'];
-  addonProducts: readonly ISessionBookingProduct[];
+  addonProducts: readonly ISessionAddonBookingProduct[];
   gmOptions: readonly IGmPublicProfile[];
   systemOptions: readonly ISystem[];
   availableSlots: readonly ISessionReservationAvailableSlot[];

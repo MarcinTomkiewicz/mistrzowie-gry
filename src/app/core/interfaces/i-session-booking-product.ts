@@ -1,5 +1,8 @@
 import { OfferItemKind, OfferPricingType } from '../types/offers';
-import { SessionBookingProductSlug } from '../types/session-booking-product';
+import {
+  SessionAddonProductSlug,
+  SessionBookingProductSlug,
+} from '../types/session-booking-product';
 
 export type SessionBookingProductAppliesPer =
   | 'reservation'
@@ -50,4 +53,9 @@ export interface ISessionBookingProduct {
   metadata: ISessionBookingProductMetadata;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ISessionAddonBookingProduct
+  extends ISessionBookingProduct {
+  slug: SessionAddonProductSlug;
 }

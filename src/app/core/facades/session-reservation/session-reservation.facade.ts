@@ -23,8 +23,8 @@ import { SessionReservationFlowMode } from '../../types/session-reservation-flow
 import { SessionReservationAvailabilityRead } from '../../reads/session-reservation/session-reservation-availability-read';
 import { SessionReservationRead } from '../../reads/session-reservation/session-reservation-read';
 import { SessionReservationStore } from '../../stores/session-reservation/session-reservation.store';
-import { resolveEntitlementId } from '../../utils/session-reservation-entitlement';
-import { isSessionReservationSelectedSlot } from '../../utils/session-reservation-slots';
+import { resolveEntitlementId } from '../../domain/session-reservation/entitlement';
+import { isSessionReservationSelectedSlot } from '../../domain/session-reservation/slots';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationFacade {

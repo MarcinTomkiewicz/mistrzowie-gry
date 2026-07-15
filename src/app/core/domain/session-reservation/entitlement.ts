@@ -1,11 +1,11 @@
-import { ICustomerSessionEntitlement } from '../interfaces/i-customer-session-entitlement';
-import { CUSTOMER_SESSION_ENTITLEMENT_KINDS } from '../types/customer-session-entitlement';
+import { ICustomerSessionEntitlement } from '../../interfaces/i-customer-session-entitlement';
+import { CUSTOMER_SESSION_ENTITLEMENT_KINDS } from '../../types/customer-session-entitlement';
 import {
   SESSION_BOOKING_MODES,
   SessionBookingMode,
-} from '../types/session-booking-mode';
+} from '../../types/session-booking-mode';
 
-export function isEntitlementValid(
+function isEntitlementValid(
   entitlement: ICustomerSessionEntitlement,
   bookingMode: SessionBookingMode,
 ): boolean {
@@ -25,12 +25,9 @@ export function resolveEntitlementId(
   entitlements: readonly ICustomerSessionEntitlement[],
   bookingMode: SessionBookingMode,
 ): string | null {
-  if (!selectedId) {
-    return null;
-  }
+  if (!selectedId) return null;
 
   const entitlement = entitlements.find((item) => item.id === selectedId);
-
   return entitlement && isEntitlementValid(entitlement, bookingMode)
     ? selectedId
     : null;

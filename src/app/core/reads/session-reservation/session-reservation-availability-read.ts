@@ -10,7 +10,7 @@ import { GmAvailability } from '../../services/gm-availability/gm-availability';
 import {
   createSessionReservationAvailableSlots,
   resolveSessionReservationAvailabilityWindow,
-} from '../../utils/session-reservation-slots';
+} from '../../domain/session-reservation/slots';
 import { createLocalDateTimeRangeIso } from '../../utils/time';
 import { SessionReservationRead } from './session-reservation-read';
 

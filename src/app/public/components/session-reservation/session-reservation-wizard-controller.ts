@@ -20,7 +20,7 @@ import {
   SESSION_RESERVATION_WIZARD_STEPS,
   SessionReservationWizardStep,
 } from '../../../core/types/session-reservation-wizard';
-import { isSessionReservationSelectedSlot } from '../../../core/utils/session-reservation-slots';
+import { isSessionReservationSelectedSlot } from '../../../core/domain/session-reservation/slots';
 import { createSessionReservationI18n } from './session-reservation.i18n';
 
 @Injectable()

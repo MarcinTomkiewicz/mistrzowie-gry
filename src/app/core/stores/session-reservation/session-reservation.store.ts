@@ -16,7 +16,7 @@ import {
   isReadyForSummary,
   requiresEntitlement,
   requiresManualQuote,
-} from '../../utils/session-reservation-rules';
+} from '../../domain/session-reservation/rules';
 
 @Injectable({ providedIn: 'root' })
 export class SessionReservationStore {
@@ -91,12 +91,19 @@ export class SessionReservationStore {
       ? currentSlugs.filter((selectedSlug) => selectedSlug !== slug)
       : [...currentSlugs, slug];
 
-    const selected = new Set(selectedAddonSlugs);
-    const addonDetails = Object.fromEntries(
-      Object.entries(this.addonDetails()).filter(([key]) =>
-        selected.has(key as SessionAddonProductSlug),
-      ),
-    ) as SessionReservationAddonDetailsMap;
+    const currentDetails = this.addonDetails();
+    const addonDetails = selectedAddonSlugs.reduce<SessionReservationAddonDetailsMap>(
+      (details, selectedSlug) => {
+        const selectedDetails = currentDetails[selectedSlug];
+
+        if (selectedDetails) {
+          details[selectedSlug] = selectedDetails;
+        }
+
+        return details;
+      },
+      {},
+    );
 
     this.patch({ selectedAddonSlugs, addonDetails });
   }

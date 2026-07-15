@@ -1,6 +1,9 @@
 import type { ICustomerSessionEntitlement } from './i-customer-session-entitlement';
 import type { IGmPublicProfile } from './i-gm-public-profile';
-import type { ISessionBookingProduct } from './i-session-booking-product';
+import type {
+  ISessionAddonBookingProduct,
+  ISessionBookingProduct,
+} from './i-session-booking-product';
 import type { ISessionReservationContact } from './i-session-reservation-contact';
 import type { ISystem } from './i-system';
 import type { SessionBookingMode } from '../types/session-booking-mode';
@@ -50,7 +53,7 @@ export interface ISessionReservationInitialOptions {
 
 export interface ISessionReservationSummaryPreview {
   baseProduct: ISessionBookingProduct;
-  addonProducts: readonly ISessionBookingProduct[];
+  addonProducts: readonly ISessionAddonBookingProduct[];
   customerEntitlement: ICustomerSessionEntitlement | null;
   requiresManualQuote: boolean;
   grossTotalPln: number | null;

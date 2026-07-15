@@ -1,5 +1,8 @@
 import type { ICustomerSessionEntitlement } from './i-customer-session-entitlement';
-import type { ISessionBookingProduct } from './i-session-booking-product';
+import type {
+  ISessionAddonBookingProduct,
+  ISessionBookingProduct,
+} from './i-session-booking-product';
 import type {
   ISessionReservationAddonSnapshot,
   ISessionReservationPricingSnapshot,
@@ -10,7 +13,7 @@ import type {
 } from './i-session-reservation-flow';
 
 export interface ISessionReservationPricingPreview {
-  addonProducts: readonly ISessionBookingProduct[];
+  addonProducts: readonly ISessionAddonBookingProduct[];
   addonsSnapshot: readonly ISessionReservationAddonSnapshot[];
   additionalDurationHours: number;
   requiresManualQuote: boolean;

@@ -2,12 +2,12 @@ import { ICustomerSessionEntitlement } from '../interfaces/i-customer-session-en
 import { ISessionBookingProduct } from '../interfaces/i-session-booking-product';
 import { ISessionReservationFinalSummaryPreview } from '../interfaces/i-session-reservation-finalization';
 import { ISessionReservationFlowState } from '../interfaces/i-session-reservation-flow';
-import { buildPricingPreview } from '../utils/session-pricing';
-import { resolveEntitlementId } from '../utils/session-reservation-entitlement';
+import { resolveEntitlementId } from '../domain/session-reservation/entitlement';
+import { buildPricingPreview } from '../domain/session-reservation/pricing';
 import {
   isReadyForSummary,
   requiresEntitlement,
-} from '../utils/session-reservation-rules';
+} from '../domain/session-reservation/rules';
 
 export function buildSummaryPreview(
   state: ISessionReservationFlowState,

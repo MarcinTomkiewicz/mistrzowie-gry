@@ -4,8 +4,7 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
-import { SESSION_RESERVATION_CONFIG } from '../../../core/configs/session-reservation.config';
-import { ISessionBookingProduct } from '../../../core/interfaces/i-session-booking-product';
+import { ISessionAddonBookingProduct } from '../../../core/interfaces/i-session-booking-product';
 import {
   ISessionReservationAddonCustomerDetailsChange,
   ISessionReservationAddonQuantityChange,
@@ -13,7 +12,11 @@ import {
 } from '../../../core/interfaces/i-session-reservation-flow';
 import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { SessionAddonProductSlug } from '../../../core/types/session-booking-product';
-import { formatSessionBookingProductPriceLabel } from '../../../core/utils/session-pricing';
+import {
+  isAddonCustomerDetailsRequired,
+  isAddonQuantityRequired,
+} from '../../../core/domain/session-reservation/rules';
+import { formatSessionBookingProductPriceLabel } from './session-reservation-labels';
 
 @Component({
   selector: 'app-session-reservation-addons-panel',
@@ -32,53 +35,46 @@ export class SessionReservationAddonsPanel {
     output<ISessionReservationAddonQuantityChange>();
   readonly productPriceLabel = formatSessionBookingProductPriceLabel;
 
-  toggleAddon(product: ISessionBookingProduct): void {
-    this.addonToggled.emit(product.slug as SessionAddonProductSlug);
+  toggleAddon(product: ISessionAddonBookingProduct): void {
+    this.addonToggled.emit(product.slug);
   }
 
-  setAddonCustomerDetails(product: ISessionBookingProduct, value: string): void {
+  setAddonCustomerDetails(
+    product: ISessionAddonBookingProduct,
+    value: string,
+  ): void {
     this.addonCustomerDetailsChanged.emit({
-      slug: product.slug as SessionAddonProductSlug,
+      slug: product.slug,
       customerDetails: value.trim() || null,
     });
   }
 
-  setAddonQuantity(product: ISessionBookingProduct, value: number): void {
+  setAddonQuantity(product: ISessionAddonBookingProduct, value: number): void {
     this.addonQuantityChanged.emit({
-      slug: product.slug as SessionAddonProductSlug,
+      slug: product.slug,
       quantity: Number.isFinite(value) && value > 0 ? value : null,
     });
   }
 
-  isAddonSelected(product: ISessionBookingProduct): boolean {
-    return this.state().selectedAddonSlugs.includes(
-      product.slug as SessionAddonProductSlug,
+  isAddonSelected(product: ISessionAddonBookingProduct): boolean {
+    return this.state().selectedAddonSlugs.includes(product.slug);
+  }
+
+  requiresAddonDetails(product: ISessionAddonBookingProduct): boolean {
+    return isAddonCustomerDetailsRequired(product.slug);
+  }
+
+  requiresAddonQuantity(product: ISessionAddonBookingProduct): boolean {
+    return isAddonQuantityRequired(product.slug);
+  }
+
+  addonDetailsValue(product: ISessionAddonBookingProduct): string {
+    return (
+      this.state().addonDetails[product.slug]?.customerDetails ?? ''
     );
   }
 
-  requiresAddonDetails(product: ISessionBookingProduct): boolean {
-    return (
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringCustomerDetails as readonly string[]
-    ).includes(product.slug);
-  }
-
-  requiresAddonQuantity(product: ISessionBookingProduct): boolean {
-    return (
-      SESSION_RESERVATION_CONFIG.addonProductSlugsRequiringQuantity as readonly string[]
-    ).includes(product.slug);
-  }
-
-  addonDetailsValue(product: ISessionBookingProduct): string {
-    return (
-      this.state().addonDetails[product.slug as SessionAddonProductSlug]
-        ?.customerDetails ?? ''
-    );
-  }
-
-  addonQuantityValue(product: ISessionBookingProduct): number | null {
-    return (
-      this.state().addonDetails[product.slug as SessionAddonProductSlug]
-        ?.quantity ?? null
-    );
+  addonQuantityValue(product: ISessionAddonBookingProduct): number | null {
+    return this.state().addonDetails[product.slug]?.quantity ?? null;
   }
 }

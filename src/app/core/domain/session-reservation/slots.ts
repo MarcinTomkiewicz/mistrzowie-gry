@@ -1,20 +1,21 @@
-import { SESSION_RESERVATION_CONFIG } from '../configs/session-reservation.config';
-import { IGmAvailabilitySlotRecord } from '../interfaces/i-gm-availability';
-import { ISessionReservationAvailableSlot } from '../interfaces/i-session-reservation-availability';
-import { ISessionReservation } from '../interfaces/i-session-reservation';
-import { HOUR_IN_MS, MINUTE_IN_MS } from '../types/hour-offset';
-import { addMonths, formatDateLabel, startOfMonth, toIsoDate } from './date';
+import { SESSION_RESERVATION_CONFIG } from '../../configs/session-reservation.config';
+import { IGmAvailabilitySlotRecord } from '../../interfaces/i-gm-availability';
+import { ISessionReservation } from '../../interfaces/i-session-reservation';
+import {
+  ISessionReservationAvailabilityWindow,
+  ISessionReservationAvailableSlot,
+} from '../../interfaces/i-session-reservation-availability';
+import { HOUR_IN_MS, MINUTE_IN_MS } from '../../types/hour-offset';
+import { addMonths, startOfMonth, toIsoDate } from '../../utils/date';
 import {
   ceilToTimeStep,
   doTimeRangesOverlap,
   formatDateTimeAsTimeLabel,
-  formatTimeRangeLabel,
-} from './time';
+} from '../../utils/time';
 
-export function resolveSessionReservationAvailabilityWindow(now: Date): {
-  fromIso: string;
-  toIsoExclusive: string;
-} {
+export function resolveSessionReservationAvailabilityWindow(
+  now: Date,
+): ISessionReservationAvailabilityWindow {
   return {
     fromIso: new Date(
       now.getTime() + SESSION_RESERVATION_CONFIG.minLeadTimeHours * HOUR_IN_MS,
@@ -62,7 +63,6 @@ export function createSessionReservationAvailableSlots(
 
       if (!isBlocked) {
         const startDate = new Date(slotStart);
-
         slots.push({
           gmProfileId,
           startsAt: startDate.toISOString(),
@@ -78,21 +78,6 @@ export function createSessionReservationAvailableSlots(
   }
 
   return slots;
-}
-
-export function formatSessionReservationSlotDateLabel(
-  slot: ISessionReservationAvailableSlot,
-): string {
-  return formatDateLabel(slot.date, 'pl-PL', true);
-}
-
-export function formatSessionReservationSlotTimeRangeLabel(
-  slot: ISessionReservationAvailableSlot,
-): string {
-  return formatTimeRangeLabel(
-    slot.startTime,
-    formatDateTimeAsTimeLabel(new Date(slot.endsAt)),
-  );
 }
 
 export function isSessionReservationSelectedSlot(

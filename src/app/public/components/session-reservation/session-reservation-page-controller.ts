@@ -9,7 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { SESSION_RESERVATION_FLOW_MODES } from '../../../core/configs/session-reservation-flow-mode.config';
-import { SESSION_RESERVATION_CONFIG } from '../../../core/configs/session-reservation.config';
+import { isSessionAddonBookingProduct } from '../../../core/domain/session-reservation/booking-products';
 import {
   ISessionReservationAddonCustomerDetailsChange,
   ISessionReservationAddonQuantityChange,
@@ -38,11 +38,7 @@ export class SessionReservationPageController {
   readonly isGmProfileDialogVisible = signal(false);
 
   readonly addonProducts = computed(() =>
-    this.facade.products().filter((product) =>
-      (
-        SESSION_RESERVATION_CONFIG.addonProductSlugs as readonly string[]
-      ).includes(product.slug),
-    ),
+    this.facade.products().filter(isSessionAddonBookingProduct),
   );
 
   readonly gmOptions = computed(() =>

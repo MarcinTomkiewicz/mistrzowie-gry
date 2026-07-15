@@ -17,7 +17,9 @@
       >
         <span class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
           <strong>{{ addon.name }}</strong>
-          <span>{{ productPriceLabel(addon, data().states) }}</span>
+          <span>
+            {{ productPriceLabel(addon, data().states.manualQuoteRequired) }}
+          </span>
         </span>
         @if (addon.description) {
           <span class="muted-text d-block">
