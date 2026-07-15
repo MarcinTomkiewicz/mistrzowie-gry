@@ -28,7 +28,7 @@ import {
 import {
   mapGmAvailabilityDaysToCalendarDays,
   mapGmAvailabilityRecordsToCoveredDays,
-} from '../../../core/utils/gm-availability/gm-availability.util';
+} from '../../../core/domain/gm-availability/mapping';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/time';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
@@ -48,7 +48,7 @@ import { createGmAvailabilityOverviewI18n } from './gm-availability-overview.i18
   templateUrl: './gm-availability-overview.html',
   providers: [provideTranslocoScope('auth', 'common')],
 })
-export class GmAvailabilityOverviewComponent {
+export class GmAvailabilityOverview {
   private readonly auth = inject(Auth);
   private readonly gmAvailability = inject(GmAvailability);
   private readonly toast = inject(UiToast);

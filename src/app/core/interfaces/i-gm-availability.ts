@@ -1,5 +1,3 @@
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
-
 import { IUniversalCalendarDay } from './i-universal-calendar';
 import { ISelectOption } from './i-select-option';
 
@@ -31,13 +29,3 @@ export interface IGmAvailabilityEditorError {
 }
 
 export interface IGmAvailabilityCalendarDay extends IUniversalCalendarDay {}
-
-export type GmAvailabilityRangeFormGroup = FormGroup<{
-  id: FormControl<string>;
-  startOffset: FormControl<number>;
-  endOffset: FormControl<number>;
-}>;
-
-export type GmAvailabilityEditorFormGroup = FormGroup<{
-  ranges: FormArray<GmAvailabilityRangeFormGroup>;
-}>;

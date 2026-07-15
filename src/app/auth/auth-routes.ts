@@ -26,7 +26,7 @@ const loaders = {
     ),
   gmAvailabilityOverview: () =>
     import('./components/gm-availability-overview/gm-availability-overview').then(
-      (m) => m.GmAvailabilityOverviewComponent,
+      (m) => m.GmAvailabilityOverview,
     ),
   workLogOverview: () =>
     import('./components/work-log-overview/work-log-overview').then(

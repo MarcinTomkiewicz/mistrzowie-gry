@@ -15,8 +15,6 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
 import {
-  GmAvailabilityRangeFormGroup,
-  GmAvailabilityEditorFormGroup,
   IGmAvailabilityEditorError,
   IGmAvailabilityHourOption,
   IGmAvailabilityRange,
@@ -25,6 +23,10 @@ import { Auth } from '../../../core/services/auth/auth';
 import { GmAvailability as CoreGmAvailability } from '../../../core/services/gm-availability/gm-availability';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { GmAvailabilityStore } from '../../../core/stores/gm-availability/gm-availability.store';
+import {
+  GmAvailabilityEditorFormGroup,
+  GmAvailabilityRangeFormGroup,
+} from '../../../core/types/gm-availability-form';
 import {
   GmAvailabilityHourValue,
   GmAvailabilityMutationError,
@@ -46,13 +48,15 @@ import {
   normalizeEndHourOffset,
 } from '../../../core/utils/time';
 import {
-  createGmAvailabilityEditorRanges,
   createGmAvailabilityRangeFormGroup,
-  createDefaultGmAvailabilityRange,
-  getGmAvailabilityMutationError,
   mapGmAvailabilityRangeFormGroupsToRanges,
   replaceGmAvailabilityRangeFormGroups,
-} from '../../../core/utils/gm-availability/gm-availability.util';
+} from '../../../core/factories/gm-availability-form.factory';
+import {
+  createDefaultGmAvailabilityRange,
+  createGmAvailabilityEditorRanges,
+  getGmAvailabilityMutationError,
+} from '../../../core/domain/gm-availability/rules';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
 import { InfoDialog } from '../../../public/common/info-dialog/info-dialog';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';

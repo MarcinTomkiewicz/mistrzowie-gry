@@ -1,90 +1,12 @@
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
-
 import {
-  GmAvailabilityRangeFormGroup,
   IGmAvailabilityCalendarDay,
   IGmAvailabilityDay,
   IGmAvailabilityRange,
   IGmAvailabilitySlotRecord,
 } from '../../interfaces/i-gm-availability';
-import {
-  GmAvailabilityHourValue,
-  GmAvailabilityMutationError,
-} from '../../types/gm-availability';
 import { HourOffsetValue } from '../../types/hour-offset';
-import { toIsoDate, toLocalDateTime } from '../date';
-import {
-  createDefaultHourOffsetRange,
-  getHourOffsetFromDateTime,
-  hasOverlappingIntervals,
-} from '../time';
-
-export function createGmAvailabilityRangeFormGroup(
-  range: IGmAvailabilityRange,
-): GmAvailabilityRangeFormGroup {
-  return new FormGroup({
-    id: new FormControl(range.id, { nonNullable: true }),
-    startOffset: new FormControl(range.startOffset, { nonNullable: true }),
-    endOffset: new FormControl(range.endOffset, { nonNullable: true }),
-  });
-}
-
-export function replaceGmAvailabilityRangeFormGroups(
-  formArray: FormArray<GmAvailabilityRangeFormGroup>,
-  ranges: readonly IGmAvailabilityRange[],
-): GmAvailabilityRangeFormGroup[] {
-  formArray.clear();
-
-  for (const range of ranges) {
-    formArray.push(createGmAvailabilityRangeFormGroup(range));
-  }
-
-  return [...formArray.controls];
-}
-
-export function mapGmAvailabilityRangeFormGroupsToRanges(
-  rangeGroups: readonly GmAvailabilityRangeFormGroup[],
-): IGmAvailabilityRange[] {
-  return [...rangeGroups]
-    .map((rangeGroup) => ({
-      id: rangeGroup.controls.id.getRawValue(),
-      startOffset: Number(rangeGroup.controls.startOffset.getRawValue()),
-      endOffset: Number(rangeGroup.controls.endOffset.getRawValue()),
-    }))
-    .sort((left, right) => left.startOffset - right.startOffset);
-}
-
-export function createGmAvailabilityEditorRanges(
-  ranges: readonly IGmAvailabilityRange[],
-): IGmAvailabilityRange[] {
-  if (ranges.length) {
-    return [...ranges];
-  }
-
-  const range = createDefaultGmAvailabilityRange([]);
-
-  return range ? [range] : [];
-}
-
-export function createDefaultGmAvailabilityRange(
-  ranges: readonly IGmAvailabilityRange[],
-): IGmAvailabilityRange | null {
-  const candidate = createDefaultHourOffsetRange(ranges, {
-    defaultStartOffset: HourOffsetValue.DefaultDayStartOffset,
-    minDuration: GmAvailabilityHourValue.MinDurationHours,
-    totalHours: HourOffsetValue.DayTotalHours,
-  });
-
-  if (!candidate) {
-    return null;
-  }
-
-  return {
-    id: createGmAvailabilityTempId(),
-    startOffset: candidate.startOffset,
-    endOffset: candidate.endOffset,
-  };
-}
+import { toIsoDate, toLocalDateTime } from '../../utils/date';
+import { getHourOffsetFromDateTime } from '../../utils/time';
 
 export function mapGmAvailabilityRecordsToDays(
   records: readonly IGmAvailabilitySlotRecord[],
@@ -220,74 +142,8 @@ export function mapGmAvailabilityDaysToCalendarDays(
   }
 
   return Array.from(availabilityMap.entries())
-    .map(([date, hours]) => ({
-      date,
-      hours,
-    }))
+    .map(([date, hours]) => ({ date, hours }))
     .sort((left, right) => left.date.localeCompare(right.date));
-}
-
-export function hasOverlappingGmAvailabilityDays(
-  days: readonly IGmAvailabilityDay[],
-): boolean {
-  return hasOverlappingIntervals(
-    days.flatMap((day) =>
-      day.ranges.map((range) => ({
-        start: toLocalDateTime(day.date, range.startOffset).getTime(),
-        end: toLocalDateTime(day.date, range.endOffset).getTime(),
-      })),
-    ),
-  );
-}
-
-export function getGmAvailabilityMutationError(
-  days: readonly IGmAvailabilityDay[],
-  date: string,
-  ranges: readonly IGmAvailabilityRange[],
-): GmAvailabilityMutationError | null {
-  const hasInvalidDuration = ranges.some(
-    (range) =>
-      range.endOffset - range.startOffset <
-        GmAvailabilityHourValue.MinDurationHours,
-  );
-
-  if (hasInvalidDuration) {
-    return 'invalid_duration';
-  }
-
-  if (
-    hasOverlappingGmAvailabilityDays(upsertGmAvailabilityDay(days, date, ranges))
-  ) {
-    return 'overlap';
-  }
-
-  return null;
-}
-
-export function upsertGmAvailabilityDay(
-  days: readonly IGmAvailabilityDay[],
-  date: string,
-  ranges: readonly IGmAvailabilityRange[],
-): IGmAvailabilityDay[] {
-  return days
-    .filter((day) => day.date !== date)
-    .concat(
-      ranges.length
-        ? [
-            {
-              date,
-              ranges: [...ranges].sort(
-                (left, right) => left.startOffset - right.startOffset,
-              ),
-            },
-          ]
-        : [],
-    )
-    .sort((left, right) => left.date.localeCompare(right.date));
-}
-
-export function createGmAvailabilityTempId(): string {
-  return `draft-${crypto.randomUUID()}`;
 }
 
 function mergeGmAvailabilityRanges(

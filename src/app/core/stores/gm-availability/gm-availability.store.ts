@@ -8,8 +8,8 @@ import {
   mapGmAvailabilityDaysToCalendarDays,
   mapGmAvailabilityDaysToRecords,
   mapGmAvailabilityRecordsToDays,
-  upsertGmAvailabilityDay,
-} from '../../utils/gm-availability/gm-availability.util';
+} from '../../domain/gm-availability/mapping';
+import { upsertGmAvailabilityDay } from '../../domain/gm-availability/rules';
 
 @Injectable({ providedIn: 'root' })
 export class GmAvailabilityStore {
