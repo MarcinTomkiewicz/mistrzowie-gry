@@ -348,6 +348,12 @@ verify_jwt = true
 [functions.admin-coworker-documents]
 verify_jwt = true
 
+[functions.coworker-operational-documents]
+verify_jwt = true
+
+[functions.admin-coworker-operational-documents]
+verify_jwt = true
+
 # Use Firebase Auth as a third-party provider alongside Supabase Auth.
 [auth.third_party.firebase]
 enabled = false
