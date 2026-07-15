@@ -10,11 +10,11 @@ const loaders = {
     import('./components/edit-profile/edit-profile').then((m) => m.EditProfile),
   eventSignup: () =>
     import('./components/event-signup/event-signup').then(
-      (m) => m.EventSignupComponent,
+      (m) => m.EventSignup,
     ),
   eventSignupForm: () =>
     import('./components/event-signup-form/event-signup-form').then(
-      (m) => m.EventSignupFormComponent,
+      (m) => m.EventSignupForm,
     ),
   myWorkLog: () =>
     import('./components/my-work-log/my-work-log').then(

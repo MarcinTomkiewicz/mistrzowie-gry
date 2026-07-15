@@ -34,7 +34,7 @@ import { EventSignupSessionEditor } from './event-signup-session-editor';
     provideTranslocoScope('eventSignup', 'common', 'sessions'),
   ],
 })
-export class EventSignupFormComponent {
+export class EventSignupForm {
   private readonly facade = inject(EventSignupFormFacade);
   private readonly seo = inject(Seo);
 

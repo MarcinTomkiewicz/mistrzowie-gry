@@ -39,7 +39,7 @@ import { createEventSignupI18n } from './event-signup.i18n';
     provideTranslocoScope('eventSignup', 'common'),
   ],
 })
-export class EventSignupComponent {
+export class EventSignup {
   private readonly facade = inject(EventSignupPageFacade);
   private readonly router = inject(Router);
   private readonly seo = inject(Seo);
