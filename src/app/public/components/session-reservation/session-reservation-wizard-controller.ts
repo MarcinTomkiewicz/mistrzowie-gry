@@ -14,7 +14,7 @@ import {
   ISessionReservationAvailableSlot,
   ISessionReservationGmSlot,
 } from '../../../core/interfaces/i-session-reservation-availability';
-import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
+import { SessionReservationFacade } from '../../../core/facades/session-reservation/session-reservation.facade';
 import { SessionReservationFlowMode } from '../../../core/types/session-reservation-flow-mode';
 import {
   SESSION_RESERVATION_WIZARD_STEPS,

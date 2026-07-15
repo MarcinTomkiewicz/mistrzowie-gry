@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GmProfile } from './gm-profile';
+import { GmProfileFacade } from '../../facades/gm-profile/gm-profile.facade';
 
-describe('GmProfile', () => {
-  let service: GmProfile;
+describe('GmProfileFacade', () => {
+  let service: GmProfileFacade;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(GmProfile);
+    service = TestBed.inject(GmProfileFacade);
   });
 
   it('should be created', () => {

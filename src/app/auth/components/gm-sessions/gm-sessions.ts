@@ -24,7 +24,7 @@ import {
   SessionDifficultyLevel,
 } from '../../../core/types/sessions';
 import { Auth } from '../../../core/services/auth/auth';
-import { GmSessionsFacade } from '../../../core/services/gm-sessions/gm-sessions';
+import { GmSessions as CoreGmSessions } from '../../../core/services/gm-sessions/gm-sessions';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
@@ -60,7 +60,7 @@ interface ISessionSystemOption {
 export class GmSessions {
   private readonly auth = inject(Auth);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly gmSessionsFacade = inject(GmSessionsFacade);
+  private readonly gmSessions = inject(CoreGmSessions);
   private readonly toast = inject(UiToast);
   private readonly formAnchor = viewChild<ElementRef<HTMLElement>>('formAnchor');
 
@@ -196,12 +196,12 @@ export class GmSessions {
 
     const request$ =
       this.isEditing() && this.editedSessionId()
-        ? this.gmSessionsFacade.updateMySession(
+        ? this.gmSessions.updateMySession(
             this.editedSessionId()!,
             submit,
             'template'
           )
-        : this.gmSessionsFacade.createMySession(submit);
+        : this.gmSessions.createMySession(submit);
 
     request$
       .pipe(
@@ -244,7 +244,7 @@ export class GmSessions {
   deleteSession(sessionId: string): void {
     this.isSubmitting.set(true);
 
-    this.gmSessionsFacade
+    this.gmSessions
       .deleteMySession(sessionId)
       .pipe(
         finalize(() => this.isSubmitting.set(false)),
@@ -286,12 +286,12 @@ export class GmSessions {
     this.isLoading.set(true);
 
     forkJoin({
-      sessions: this.gmSessionsFacade.getMySessions(),
-      systems: this.gmSessionsFacade.getAvailableSystems(),
-      mySessionSystems: this.gmSessionsFacade.getMySessionSystems(),
-      styles: this.gmSessionsFacade.getAvailableStyles(),
-      triggers: this.gmSessionsFacade.getAvailableTriggers(),
-      languages: this.gmSessionsFacade.getAvailableLanguages(),
+      sessions: this.gmSessions.getMySessions(),
+      systems: this.gmSessions.getAvailableSystems(),
+      mySessionSystems: this.gmSessions.getMySessionSystems(),
+      styles: this.gmSessions.getAvailableStyles(),
+      triggers: this.gmSessions.getAvailableTriggers(),
+      languages: this.gmSessions.getAvailableLanguages(),
     })
       .pipe(
         finalize(() => this.isLoading.set(false)),
@@ -320,7 +320,7 @@ export class GmSessions {
   }
 
   private refreshMySessionSystems(): void {
-    this.gmSessionsFacade
+    this.gmSessions
       .getMySessionSystems()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

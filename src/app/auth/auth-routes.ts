@@ -34,7 +34,7 @@ const loaders = {
     ),
   adminUsers: () =>
     import('./components/admin-users/admin-users').then(
-      (m) => m.AdminUsersComponent,
+      (m) => m.AdminUsers,
     ),
 } as const;
 

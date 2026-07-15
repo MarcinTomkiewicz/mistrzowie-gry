@@ -6,7 +6,7 @@ import { catchError, of } from 'rxjs';
 
 import { buildSiteUrl } from '../../../core/config/site';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
-import { GmRead } from '../../../core/services/gm-read/gm-read';
+import { GmRead } from '../../../core/reads/gm/gm-read';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { normalizeText } from '../../../core/utils/normalize-text';

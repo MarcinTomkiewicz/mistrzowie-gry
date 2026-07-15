@@ -13,8 +13,8 @@ import { IEventOccurrence } from '../../../core/interfaces/i-event-occurence';
 import { IPublicEventPage } from '../../../core/interfaces/i-event-page';
 import { IEventProgramItemWithDetails } from '../../../core/interfaces/i-event-program-item';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
-import { EventProgramRead } from '../../../core/services/event-program-read/event-program-read';
-import { EventRead } from '../../../core/services/event-read/event-read';
+import { EventProgramRead } from '../../../core/reads/events/event-program-read';
+import { EventRead } from '../../../core/reads/events/event-read';
 import { ChaoticThursdaysLoadError } from '../../../core/types/chaotic-thursdays';
 import {
   formatDateLabel,

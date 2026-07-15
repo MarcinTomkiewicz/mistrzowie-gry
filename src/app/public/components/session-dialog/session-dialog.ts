@@ -17,7 +17,7 @@ import { catchError, finalize, of } from 'rxjs';
 
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
-import { GmRead } from '../../../core/services/gm-read/gm-read';
+import { GmRead } from '../../../core/reads/gm/gm-read';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';

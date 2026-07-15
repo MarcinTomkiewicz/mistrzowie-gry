@@ -26,8 +26,8 @@ import {
 } from '../../../core/factories/gm-profile-form.factory';
 import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
 import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
+import { GmProfileFacade } from '../../../core/facades/gm-profile/gm-profile.facade';
 import { Auth } from '../../../core/services/auth/auth';
-import { GmProfileFacade } from '../../../core/services/gm-profile/gm-profile';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {

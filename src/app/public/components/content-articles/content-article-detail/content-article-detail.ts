@@ -23,7 +23,7 @@ import {
   IContentArticleTextSectionBlock,
 } from '../../../../core/interfaces/i-content-article';
 import { ResponseStatus } from '../../../../core/services/response-status/response-status';
-import { ContentArticlesService } from '../../../../core/services/content-articles/content-articles';
+import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { Seo } from '../../../../core/services/seo/seo';
 import { Storage } from '../../../../core/services/storage/storage';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
@@ -41,7 +41,7 @@ import { createContentArticlesI18n } from '../content-articles.i18n';
 export class ContentArticleDetail implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
-  private readonly articles = inject(ContentArticlesService);
+  private readonly articles = inject(ContentArticles);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly responseStatus = inject(ResponseStatus);

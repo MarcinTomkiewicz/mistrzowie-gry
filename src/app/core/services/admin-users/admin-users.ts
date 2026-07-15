@@ -17,7 +17,7 @@ import { normalizeText } from '../../utils/normalize-text';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
-export class AdminUsersService {
+export class AdminUsers {
   private readonly backend = inject(Backend);
 
   getUsers(

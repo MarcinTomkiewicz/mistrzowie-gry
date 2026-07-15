@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { startWith } from 'rxjs';
 
 import { Auth } from '../../../core/services/auth/auth';
-import { SessionReservationStore } from '../../../core/services/session-reservation-store/session-reservation-store';
+import { SessionReservationStore } from '../../../core/stores/session-reservation/session-reservation.store';
 
 @Injectable()
 export class SessionReservationFormController {

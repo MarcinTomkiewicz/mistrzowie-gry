@@ -6,14 +6,14 @@
     },
     "page": {
       "title": "Poprowadź wydarzenie",
-      "subtitle": "Wybierz wydarzenie, lokalną edycję i termin, na który chcesz zgłosić swoją sesję lub inny punkt programu."
+      "subtitle": "[PH][subtitle] Wybierz wydarzenie, lokalną edycję i termin, na który chcesz zgłosić swoją sesję lub inny punkt programu."
     },
     "selectors": {
-      "coreLabel": "Wydarzenie",
-      "editionLabel": "Lokalna edycja"
+      "coreLabel": "[PH][coreLabel] Wydarzenie",
+      "editionLabel": "[PH][editionLabel] Lokalna edycja"
     },
     "details": {
-      "cityLabel": "Miasto",
+      "cityLabel": "[PH][cityLabel] Miasto",
       "timeLabel": "Godziny wydarzenia",
       "beginnersLabel": "Dla początkujących"
     },
@@ -22,16 +22,16 @@
       "subtitle": "Poniżej znajdziesz dostępne terminy wydarzenia w bieżącym i następnym miesiącu. Jeśli masz już zgłoszoną sesję na dany termin, odpowiedni przycisk będzie wyróżniony. Jeśli termin jest w całości obsadzony, przycisk będzie nieaktywny. Zawsze możesz edytować swój udział w wydarzeniu, nawet jeśli termin jest pełny."
     },
     "emptyCatalog": {
-      "title": "Brak wydarzeń przyjmujących zgłoszenia",
-      "description": "Obecnie nie ma aktywnych wydarzeń, na które możesz zgłosić sesję."
+      "title": "[PH][title] Brak wydarzeń przyjmujących zgłoszenia",
+      "description": "[PH][description] Obecnie nie ma aktywnych wydarzeń, na które możesz zgłosić sesję."
     },
     "emptyOccurrences": {
       "title": "Brak dostępnych terminów",
       "description": "Dla tego wydarzenia nie ma obecnie otwartych terminów w tym i następnym miesiącu."
     },
     "error": {
-      "title": "Nie udało się załadować wydarzeń",
-      "description": "Nie udało się pobrać danych panelu zgłoszeń. Spróbuj ponownie."
+      "title": "[PH][title] Nie udało się załadować wydarzeń",
+      "description": "[PH][description] Nie udało się pobrać danych panelu zgłoszeń. Spróbuj ponownie."
     }
   },
   "form": {
@@ -53,10 +53,10 @@
     "states": {
       "notFoundTitle": "Nie znaleziono zgłoszenia",
       "notFoundDescription": "Podane wydarzenie albo termin nie istnieją.",
-      "closedTitle": "Zgłoszenia na ten termin są zamknięte",
-      "closedDescription": "Nie można już zgłosić ani edytować sesji na ten termin.",
-      "forbiddenTitle": "Brak dostępu do zgłoszeń MG",
-      "forbiddenDescription": "Aby zgłosić sesję na wydarzenie, potrzebujesz roli Mistrza Gry.",
+      "closedTitle": "[PH][closedTitle] Zgłoszenia na ten termin są zamknięte",
+      "closedDescription": "[PH][closedDescription] Nie można już zgłosić ani edytować sesji na ten termin.",
+      "forbiddenTitle": "[PH][forbiddenTitle] Brak dostępu do zgłoszeń MG",
+      "forbiddenDescription": "[PH][forbiddenDescription] Aby zgłosić sesję na wydarzenie, potrzebujesz roli Mistrza Gry.",
       "fullTitle": "Termin jest już pełny",
       "fullDescription": "Nie możesz już zgłosić nowej sesji na ten termin."
     },

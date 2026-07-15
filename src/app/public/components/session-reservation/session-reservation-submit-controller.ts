@@ -3,12 +3,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { SESSION_RESERVATION_SUBMIT_ERRORS } from '../../../core/configs/session-reservation-submit-errors.config';
+import { SessionReservationFacade } from '../../../core/facades/session-reservation/session-reservation.facade';
 import { ISessionReservationSubmitToastTranslations } from '../../../core/interfaces/i-session-reservation-finalization';
 import { Auth } from '../../../core/services/auth/auth';
-import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
-import { SessionReservationStore } from '../../../core/services/session-reservation-store/session-reservation-store';
-import { SessionReservationSubmitService } from '../../../core/services/session-reservation-submit/session-reservation-submit';
+import { SessionReservation } from '../../../core/services/session-reservation/session-reservation';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+import { SessionReservationStore } from '../../../core/stores/session-reservation/session-reservation.store';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
 import { SessionReservationFormController } from './session-reservation-form-controller';
 import { SessionReservationWizardController } from './session-reservation-wizard-controller';
@@ -20,7 +20,7 @@ export class SessionReservationSubmitController {
   private readonly facade = inject(SessionReservationFacade);
   private readonly forms = inject(SessionReservationFormController);
   private readonly store = inject(SessionReservationStore);
-  private readonly submit = inject(SessionReservationSubmitService);
+  private readonly reservation = inject(SessionReservation);
   private readonly toast = inject(UiToast);
   private readonly wizard = inject(SessionReservationWizardController);
 
@@ -53,7 +53,7 @@ export class SessionReservationSubmitController {
 
     this.isSubmitting.set(true);
 
-    this.submit
+    this.reservation
       .createReservation({
         state: this.store.state(),
         products: this.facade.products(),

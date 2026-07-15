@@ -1,0 +1,287 @@
+<section
+  class="mg-card flex-col-start-stretch gap-md p-md w-100"
+  [formGroup]="form()"
+>
+  <h2 class="mg-section__title mg-section__title--md m-0">
+    {{ i18n.fields().sectionTitle }}
+  </h2>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p class="m-0">{{ i18n.info().scheduleChange }}</p>
+    <p class="m-0">{{ i18n.info().protectedOccurrences }}</p>
+    <p class="m-0">{{ i18n.info().conflict }}</p>
+  </div>
+
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="event-schedule-kind"
+        formControlName="kind"
+        [options]="scheduleKindOptions()"
+        optionLabel="label"
+        optionValue="value"
+      />
+      <label for="event-schedule-kind">{{ i18n.fields().kind }}</label>
+    </p-iftalabel>
+
+    @if (form().controls.kind.value === "single") {
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-schedule-date"
+            type="date"
+            formControlName="date"
+          />
+          <label for="event-schedule-date">{{ i18n.fields().date }}</label>
+        </p-iftalabel>
+
+        @if (form().touched && form().hasError("singleDate")) {
+          <small class="mg-contact-error">
+            {{ i18n.validation().singleDate }}
+          </small>
+        }
+      </div>
+    } @else {
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="event-recurrence-kind"
+          formControlName="recurrenceKind"
+          [options]="recurrenceKindOptions()"
+          optionLabel="label"
+          optionValue="value"
+        />
+        <label for="event-recurrence-kind">
+          {{ i18n.fields().recurrenceKind }}
+        </label>
+      </p-iftalabel>
+    }
+  </div>
+
+  @if (form().controls.kind.value === "recurring") {
+    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="event-recurrence-interval"
+            formControlName="interval"
+            [min]="1"
+            [maxFractionDigits]="0"
+            [useGrouping]="false"
+          />
+          <label for="event-recurrence-interval">
+            {{ i18n.fields().interval }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.interval.touched &&
+          (form().controls.interval.hasError("required") ||
+            form().controls.interval.hasError("integer") ||
+            form().controls.interval.hasError("min"))
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n.validation().intervalMin }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-recurrence-start-date"
+            type="date"
+            formControlName="startDate"
+          />
+          <label for="event-recurrence-start-date">
+            {{ i18n.fields().startDate }}
+          </label>
+        </p-iftalabel>
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-recurrence-end-date"
+            type="date"
+            formControlName="endDate"
+          />
+          <label for="event-recurrence-end-date">
+            {{ i18n.fields().endDate }}
+          </label>
+        </p-iftalabel>
+      </div>
+    </div>
+
+    @if (form().touched && form().hasError("recurrenceDates")) {
+      <small class="mg-contact-error">
+        {{ i18n.validation().recurrenceDates }}
+      </small>
+    } @else if (
+      form().touched && form().hasError("recurrenceDateRange")
+    ) {
+      <small class="mg-contact-error">
+        {{ i18n.validation().recurrenceDateRange }}
+      </small>
+    }
+
+    @switch (form().controls.recurrenceKind.value) {
+      @case ("WEEKLY") {
+        <div
+          class="flex-col-start-stretch gap-sm w-100"
+          role="group"
+          [attr.aria-label]="i18n.fields().byweekday"
+        >
+          <strong>{{ i18n.fields().byweekday }}</strong>
+
+          <div class="flex-row-start-center flex-wrap gap-md">
+            @for (weekday of weekdayOptions; track weekday.value) {
+              <div class="flex-row-start-center gap-xs">
+                <p-checkbox
+                  [inputId]="'event-weekday-' + weekday.value"
+                  [formControl]="form().controls.byweekday"
+                  [value]="weekday.value"
+                />
+                <label [for]="'event-weekday-' + weekday.value">
+                  {{ weekday.label }}
+                </label>
+              </div>
+            }
+          </div>
+
+          @if (form().touched && form().hasError("weeklyDays")) {
+            <small class="mg-contact-error">
+              {{ i18n.validation().weeklyDays }}
+            </small>
+          }
+        </div>
+      }
+      @case ("MONTHLY_NTH_WEEKDAY") {
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              inputId="event-monthly-nth"
+              formControlName="monthlyNth"
+              [options]="monthlyNthOptions()"
+              optionLabel="label"
+              optionValue="value"
+            />
+            <label for="event-monthly-nth">
+              {{ i18n.fields().monthlyNth }}
+            </label>
+          </p-iftalabel>
+
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              inputId="event-monthly-weekday"
+              formControlName="monthlyWeekday"
+              [options]="weekdayOptions"
+              optionLabel="label"
+              optionValue="value"
+            />
+            <label for="event-monthly-weekday">
+              {{ i18n.fields().monthlyWeekday }}
+            </label>
+          </p-iftalabel>
+        </div>
+
+        @if (form().touched && form().hasError("monthlyNth")) {
+          <small class="mg-contact-error">
+            {{ i18n.validation().monthlyNth }}
+          </small>
+        } @else if (
+          form().touched && form().hasError("monthlyWeekday")
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n.validation().monthlyWeekday }}
+          </small>
+        }
+      }
+      @case ("MONTHLY_DAY_OF_MONTH") {
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-inputnumber
+              class="w-100"
+              inputId="event-day-of-month"
+              formControlName="dayOfMonth"
+              [min]="1"
+              [max]="31"
+              [maxFractionDigits]="0"
+              [useGrouping]="false"
+            />
+            <label for="event-day-of-month">
+              {{ i18n.fields().dayOfMonth }}
+            </label>
+          </p-iftalabel>
+
+          @if (form().touched && form().hasError("dayOfMonth")) {
+            <small class="mg-contact-error">
+              {{ i18n.validation().dayOfMonth }}
+            </small>
+          }
+        </div>
+      }
+    }
+
+    <div class="flex-col-start-stretch gap-sm w-100">
+      <div class="flex-row-between-center flex-wrap gap-sm">
+        <strong>{{ i18n.fields().exdates }}</strong>
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          [label]="i18n.commonActions().add"
+          icon="pi pi-plus"
+          (onClick)="addExdate()"
+        />
+      </div>
+
+      @for (
+        exdateControl of form().controls.exdates.controls;
+        track $index
+      ) {
+        <div class="flex-row-start-center flex-col-start-stretch-sm gap-sm">
+          <div class="flex-col-start-stretch gap-xs flex-1 w-100-sm">
+            <p-iftalabel class="w-100">
+              <input
+                class="w-100"
+                pInputText
+                [id]="'event-exdate-' + $index"
+                type="date"
+                [formControl]="exdateControl"
+              />
+              <label [for]="'event-exdate-' + $index">
+                {{ i18n.fields().exdate }} {{ $index + 1 }}
+              </label>
+            </p-iftalabel>
+
+            @if (exdateControl.touched && exdateControl.invalid) {
+              <small class="mg-contact-error">
+                {{ i18n.validation().exdate }}
+              </small>
+            }
+          </div>
+
+          <p-button
+            type="button"
+            severity="danger"
+            [outlined]="true"
+            [label]="i18n.commonActions().remove"
+            icon="pi pi-times"
+            (onClick)="removeExdate($index)"
+          />
+        </div>
+      }
+    </div>
+  }
+</section>

@@ -12,7 +12,7 @@ import {
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
-export class ContentArticlesService {
+export class ContentArticles {
   private readonly backend = inject(Backend);
 
   getPublicArticleList(): Observable<IContentArticleListItem[]> {
@@ -74,4 +74,3 @@ export class ContentArticlesService {
     );
   }
 }
-

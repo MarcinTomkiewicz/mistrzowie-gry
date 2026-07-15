@@ -9,8 +9,8 @@ import { Subscription } from 'rxjs';
 
 import { IHostEventCatalogItem } from '../../../core/interfaces/i-event-catalog';
 import { IEventSignupOccurrenceVm } from '../../../core/interfaces/i-event-signup';
-import { EventRead } from '../../../core/services/event-read/event-read';
-import { EventSignupRead } from '../../../core/services/event-signup-read/event-signup-read';
+import { EventRead } from '../../../core/reads/events/event-read';
+import { EventSignupRead } from '../../../core/reads/events/event-signup-read';
 import { EventSignupPageLoadError } from '../../../core/types/event-signup';
 import {
   getEndOfNextMonthIso,

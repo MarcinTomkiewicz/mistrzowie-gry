@@ -23,16 +23,16 @@ import {
 import { hasMinimumRole } from '../../utils/roles';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
-import { EventProgramRead } from '../event-program-read/event-program-read';
-import { GmSessionsFacade } from '../gm-sessions/gm-sessions';
-import { SessionRead } from '../session-read/session-read';
+import { EventProgramRead } from '../../reads/events/event-program-read';
+import { GmSessions } from '../gm-sessions/gm-sessions';
+import { SessionRead } from '../../reads/sessions/session-read';
 
 @Injectable({ providedIn: 'root' })
 export class EventSignup {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
   private readonly eventProgramRead = inject(EventProgramRead);
-  private readonly gmSessions = inject(GmSessionsFacade);
+  private readonly gmSessions = inject(GmSessions);
   private readonly sessionRead = inject(SessionRead);
 
   getMySignup(

@@ -16,7 +16,7 @@ import {
 } from '../../../core/interfaces/i-session-reservation-flow';
 import { ISessionReservationViewModel } from '../../../core/interfaces/i-session-reservation-view-model';
 import { Auth } from '../../../core/services/auth/auth';
-import { SessionReservationFacade } from '../../../core/services/session-reservation-facade/session-reservation-facade';
+import { SessionReservationFacade } from '../../../core/facades/session-reservation/session-reservation.facade';
 import { Seo } from '../../../core/services/seo/seo';
 import { SessionAddonProductSlug } from '../../../core/types/session-booking-product';
 import { SessionReservationFlowMode } from '../../../core/types/session-reservation-flow-mode';

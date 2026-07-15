@@ -13,35 +13,35 @@
 
   "heroInfo": {
     "title": "W skrócie",
-    "cityLabel": "Miasto",
-    "cityMissing": "Nie podano miasta",
-    "placeLabel": "Miejsce",
-    "placeMissing": "Nie podano miejsca",
-    "addressLabel": "Adres",
-    "addressMissing": "Nie podano adresu",
-    "scheduleLabel": "Godziny",
-    "scheduleMissing": "Nie podano godzin",
-    "priceLabel": "Cena",
-    "priceMissing": "Nie podano ceny"
+    "cityLabel": "[PH][cityLabel] Miasto",
+    "cityMissing": "[PH][cityMissing] Nie podano miasta",
+    "placeLabel": "[PH][placeLabel] Miejsce",
+    "placeMissing": "[PH][placeMissing] Nie podano miejsca",
+    "addressLabel": "[PH][addressLabel] Adres",
+    "addressMissing": "[PH][addressMissing] Nie podano adresu",
+    "scheduleLabel": "[PH][scheduleLabel] Godziny",
+    "scheduleMissing": "[PH][scheduleMissing] Nie podano godzin",
+    "priceLabel": "[PH][priceLabel] Cena",
+    "priceMissing": "[PH][priceMissing] Nie podano ceny"
   },
 
   "editionSelector": {
-    "label": "Wybierz miasto",
-    "ariaLabel": "Wybierz miasto wydarzenia"
+    "label": "[PH][label] Wybierz miasto",
+    "ariaLabel": "[PH][ariaLabel] Wybierz miasto wydarzenia"
   },
 
   "states": {
-    "noOccurrences": "Brak nadchodzących terminów dla wybranego miasta."
+    "noOccurrences": "[PH][noOccurrences] Brak nadchodzących terminów dla wybranego miasta."
   },
 
   "errors": {
-    "coreNotFound": "To wydarzenie nie jest obecnie dostępne.",
-    "noEditions": "Brak dostępnych edycji wydarzenia.",
-    "invalidDefault": "Nie udało się wskazać domyślnej edycji wydarzenia.",
-    "groupedRpc": "Nie udało się załadować danych wydarzenia.",
-    "occurrences": "Nie udało się załadować terminów wydarzenia.",
-    "program": "Nie udało się załadować programu wydarzenia.",
-    "gmProfile": "Nie udało się otworzyć profilu Mistrza Gry."
+    "coreNotFound": "[PH][coreNotFound] To wydarzenie nie jest obecnie dostępne.",
+    "noEditions": "[PH][noEditions] Brak dostępnych edycji wydarzenia.",
+    "invalidDefault": "[PH][invalidDefault] Nie udało się wskazać domyślnej edycji wydarzenia.",
+    "groupedRpc": "[PH][groupedRpc] Nie udało się załadować danych wydarzenia.",
+    "occurrences": "[PH][occurrences] Nie udało się załadować terminów wydarzenia.",
+    "program": "[PH][program] Nie udało się załadować programu wydarzenia.",
+    "gmProfile": "[PH][gmProfile] Nie udało się otworzyć profilu Mistrza Gry."
   },
 
   "cta": {

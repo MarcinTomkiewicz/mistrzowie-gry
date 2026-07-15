@@ -1,0 +1,251 @@
+<div
+  class="flex-col-start-stretch gap-md w-100"
+  [formGroup]="form()"
+>
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n().sections().publication }}
+    </h2>
+
+    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+      <div class="flex-row-start-center gap-md w-100">
+        <p-toggleswitch
+          inputId="event-edition-is-active"
+          formControlName="isActive"
+        />
+        <label for="event-edition-is-active">
+          {{ i18n().fields().isActive }}
+        </label>
+      </div>
+
+      <div class="flex-row-start-center gap-md w-100">
+        <p-toggleswitch
+          inputId="event-edition-is-default-public"
+          formControlName="isDefaultPublic"
+        />
+        <label for="event-edition-is-default-public">
+          {{ i18n().fields().isDefaultPublic }}
+        </label>
+      </div>
+
+      <div class="flex-row-start-center gap-md w-100">
+        <p-toggleswitch
+          inputId="event-edition-is-for-beginners"
+          formControlName="isForBeginners"
+        />
+        <label for="event-edition-is-for-beginners">
+          {{ i18n().fields().isForBeginners }}
+        </label>
+      </div>
+    </div>
+
+    <p class="m-0">{{ i18n().info().publicDefault }}</p>
+
+    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="event-edition-display-order"
+            formControlName="displayOrder"
+            [min]="0"
+            [maxFractionDigits]="0"
+            [useGrouping]="false"
+          />
+          <label for="event-edition-display-order">
+            {{ i18n().fields().displayOrder }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.displayOrder.touched &&
+          (form().controls.displayOrder.hasError("required") ||
+            form().controls.displayOrder.hasError("integer") ||
+            form().controls.displayOrder.hasError("min"))
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().displayOrderMin }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-timezone"
+            formControlName="timezone"
+          />
+          <label for="event-edition-timezone">
+            {{ i18n().fields().timezone }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.timezone.touched &&
+          form().controls.timezone.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+    </div>
+
+    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-start-time"
+            type="time"
+            formControlName="startTime"
+          />
+          <label for="event-edition-start-time">
+            {{ i18n().fields().startTime }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.startTime.touched &&
+          form().controls.startTime.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-end-time"
+            type="time"
+            formControlName="endTime"
+          />
+          <label for="event-edition-end-time">
+            {{ i18n().fields().endTime }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.endTime.touched &&
+          form().controls.endTime.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+
+      <p-iftalabel class="w-100">
+        <input
+          class="w-100"
+          pInputText
+          id="event-edition-facebook-link"
+          formControlName="facebookLink"
+        />
+        <label for="event-edition-facebook-link">
+          {{ i18n().fields().facebookLink }}
+        </label>
+      </p-iftalabel>
+    </div>
+
+    @if (form().touched && form().hasError("timeRange")) {
+      <small class="mg-contact-error">
+        {{ i18n().validation().timeRange }}
+      </small>
+    }
+  </section>
+
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n().sections().signup }}
+    </h2>
+
+    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="event-edition-participant-signup-kind"
+          formControlName="participantSignupKind"
+          [options]="participantSignupKindOptions()"
+          optionLabel="label"
+          optionValue="value"
+        />
+        <label for="event-edition-participant-signup-kind">
+          {{ i18n().fields().participantSignupKind }}
+        </label>
+      </p-iftalabel>
+
+      <div class="flex-row-start-center gap-md w-100">
+        <p-toggleswitch
+          inputId="event-edition-signup-required"
+          formControlName="signupRequired"
+        />
+        <label for="event-edition-signup-required">
+          {{ i18n().fields().signupRequired }}
+        </label>
+      </div>
+    </div>
+
+    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="event-edition-default-slot-capacity"
+            formControlName="defaultSlotCapacity"
+            [min]="1"
+            [max]="12"
+            [maxFractionDigits]="0"
+            [useGrouping]="false"
+          />
+          <label for="event-edition-default-slot-capacity">
+            {{ i18n().fields().defaultSlotCapacity }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.defaultSlotCapacity.touched &&
+          form().controls.defaultSlotCapacity.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().slotCapacityRange }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="event-edition-default-participant-capacity"
+            formControlName="defaultParticipantCapacity"
+            [min]="1"
+            [maxFractionDigits]="0"
+            [useGrouping]="false"
+          />
+          <label for="event-edition-default-participant-capacity">
+            {{ i18n().fields().defaultParticipantCapacity }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.defaultParticipantCapacity.touched &&
+          form().controls.defaultParticipantCapacity.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().participantCapacityMin }}
+          </small>
+        }
+      </div>
+    </div>
+
+    <p class="m-0">{{ i18n().info().capacities }}</p>
+  </section>
+</div>

@@ -10,7 +10,7 @@ import {
   IAdminContentArticleDetail,
   IAdminContentArticleListItem,
 } from '../../../../core/interfaces/i-content-article';
-import { ContentArticlesService } from '../../../../core/services/content-articles/content-articles';
+import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { ContentArticlePublicationIssue } from '../../../../core/types/content-article';
@@ -31,7 +31,7 @@ import { createAdminContentArticleListI18n } from './article-list.i18n';
   providers: [provideTranslocoScope('adminContentArticles', 'common')],
 })
 export class ArticleList {
-  private readonly articles = inject(ContentArticlesService);
+  private readonly articles = inject(ContentArticles);
   private readonly router = inject(Router);
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);

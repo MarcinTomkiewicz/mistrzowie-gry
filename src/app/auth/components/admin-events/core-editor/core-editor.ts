@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
@@ -42,6 +42,7 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
     InputTextModule,
     TextareaModule,
     ToggleSwitchModule,
+    RouterLink,
     LoadingOverlay,
   ],
   templateUrl: './core-editor.html',

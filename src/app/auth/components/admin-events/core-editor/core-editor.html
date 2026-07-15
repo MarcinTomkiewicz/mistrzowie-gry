@@ -243,9 +243,23 @@
 
       @if (core(); as loadedCore) {
         <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-          <h2 class="mg-section__title mg-section__title--md m-0">
-            {{ i18n.editions().sectionTitle }}
-          </h2>
+          <div class="flex-row-between-center flex-wrap gap-sm w-100">
+            <h2 class="mg-section__title mg-section__title--md m-0">
+              {{ i18n.editions().sectionTitle }}
+            </h2>
+
+            <p-button
+              severity="success"
+              [label]="i18n.actions().addEdition"
+              icon="pi pi-plus"
+              [routerLink]="[
+                '/admin/events',
+                loadedCore.id,
+                'editions',
+                'new',
+              ]"
+            />
+          </div>
 
           @if (loadedCore.editions.length) {
             <div class="p-datatable p-component w-100">
@@ -273,6 +287,9 @@
                       </th>
                       <th class="small-caps text-center" scope="col">
                         {{ i18n.editionTable().programItemCount }}
+                      </th>
+                      <th class="small-caps text-right" scope="col">
+                        {{ i18n.editionTable().actions }}
                       </th>
                     </tr>
                   </thead>
@@ -310,6 +327,21 @@
                         </td>
                         <td class="text-center">
                           {{ edition.programItemCount }}
+                        </td>
+                        <td class="text-right">
+                          <p-button
+                            size="small"
+                            severity="secondary"
+                            [label]="i18n.commonActions().edit"
+                            icon="pi pi-pencil"
+                            [routerLink]="[
+                              '/admin/events',
+                              loadedCore.id,
+                              'editions',
+                              edition.id,
+                              'edit',
+                            ]"
+                          />
                         </td>
                       </tr>
                     }

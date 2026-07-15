@@ -8,10 +8,10 @@ import {
 } from '../../interfaces/i-content-article';
 import { Backend } from '../backend/backend';
 
-import { ContentArticlesService } from './content-articles';
+import { ContentArticles } from './content-articles';
 
-describe('ContentArticlesService', () => {
-  let service: ContentArticlesService;
+describe('ContentArticles', () => {
+  let service: ContentArticles;
   let backend: jasmine.SpyObj<Backend>;
 
   const adminArticle: IAdminContentArticleDetail = {
@@ -42,7 +42,7 @@ describe('ContentArticlesService', () => {
         },
       ],
     });
-    service = TestBed.inject(ContentArticlesService);
+    service = TestBed.inject(ContentArticles);
   });
 
   it('should be created', () => {

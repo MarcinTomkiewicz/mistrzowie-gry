@@ -1,0 +1,110 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">
+        {{ isNew ? i18n.page().createTitle : i18n.page().editTitle }}
+      </h1>
+
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading() || isSaving()"
+      [label]="
+        isSaving()
+          ? i18n.commonStatus().saving
+          : i18n.commonStatus().loading
+      "
+    />
+
+    @if (loadErrorMessage() && !isLoading()) {
+      <section
+        class="mg-card flex-col-start-stretch gap-sm p-md w-100"
+        role="alert"
+      >
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+
+        <p class="m-0">{{ loadErrorMessage() }}</p>
+
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button
+            severity="secondary"
+            [label]="i18n.commonActions().retry"
+            icon="pi pi-refresh"
+            (onClick)="loadScreenData()"
+          />
+
+          <p-button
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            (onClick)="goBack()"
+          />
+        </div>
+      </section>
+    } @else if (isNotFound() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.page().notFoundTitle }}
+        </h2>
+
+        <p class="m-0">{{ i18n.page().notFoundDescription }}</p>
+
+        <p-button
+          severity="warn"
+          [outlined]="true"
+          [label]="i18n.commonActions().cancel"
+          icon="pi pi-arrow-left"
+          (onClick)="goBack()"
+        />
+      </section>
+    } @else if (!isLoading() && core(); as loadedCore) {
+      <form
+        class="mg-form flex-col-start-stretch gap-md w-100"
+        [formGroup]="form"
+        (ngSubmit)="saveEdition()"
+        novalidate
+      >
+        <app-event-edition-details-editor
+          [form]="form"
+          [coreName]="loadedCore.name"
+          [i18n]="i18n"
+          (slugEdited)="onSlugInput()"
+        />
+
+        <app-event-edition-settings-editor
+          [form]="form"
+          [i18n]="i18n"
+        />
+
+        <app-event-schedule-editor [form]="form.controls.schedule" />
+
+        <div class="flex-row-center-center flex-wrap gap-sm w-100">
+          <p-button
+            type="submit"
+            severity="success"
+            [label]="i18n.commonActions().save"
+            icon="pi pi-save"
+            [loading]="isSaving()"
+            [disabled]="isLoading()"
+          />
+
+          <p-button
+            type="button"
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            [disabled]="isSaving()"
+            (onClick)="goBack()"
+          />
+        </div>
+      </form>
+    }
+  </div>
+</section>

@@ -12,7 +12,7 @@ import { IEventProgramItemWithDetails } from '../../../core/interfaces/i-event-p
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
-import { GmRead } from '../../../core/services/gm-read/gm-read';
+import { GmRead } from '../../../core/reads/gm/gm-read';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';

@@ -3,9 +3,9 @@ import { of } from 'rxjs';
 
 import { TranslocoTestingModule } from '@jsverse/transloco';
 
-import { Auth } from '../../../core/services/auth/auth';
+import { GmProfileFacade } from '../../../core/facades/gm-profile/gm-profile.facade';
 import { IGmProfileWithRelations } from '../../../core/interfaces/i-gm-profile';
-import { GmProfileFacade } from '../../../core/services/gm-profile/gm-profile';
+import { Auth } from '../../../core/services/auth/auth';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { GmProfile } from './gm-profile';

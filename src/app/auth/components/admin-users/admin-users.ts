@@ -12,7 +12,7 @@ import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize, map, startWith } from 'rxjs';
 
-import { AdminUsersService } from '../../../core/services/admin-users/admin-users';
+import { AdminUsers as CoreAdminUsers } from '../../../core/services/admin-users/admin-users';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {
   IAdminGmProfileStatusPatch,
@@ -52,8 +52,8 @@ import {
   templateUrl: './admin-users.html',
   providers: [provideTranslocoScope('adminUsers', 'common')],
 })
-export class AdminUsersComponent {
-  private readonly adminUsers = inject(AdminUsersService);
+export class AdminUsers {
+  private readonly adminUsers = inject(CoreAdminUsers);
   private readonly toast = inject(UiToast);
 
   protected readonly i18n = createAdminUsersI18n();

@@ -57,6 +57,10 @@ const loaders = {
     import('./auth/components/admin-events/core-editor/core-editor').then(
       (m) => m.EventCoreEditor,
     ),
+  adminEventEditionEditor: () =>
+    import('./auth/components/admin-events/edition-editor/edition-editor').then(
+      (m) => m.EventEditionEditor,
+    ),
 } as const;
 
 export const routes: Routes = [
@@ -105,6 +109,16 @@ export const routes: Routes = [
   {
     path: 'admin/events/:coreId/edit',
     loadComponent: loaders.adminEventCoreEditor,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/events/:coreId/editions/new',
+    loadComponent: loaders.adminEventEditionEditor,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/events/:coreId/editions/:eventId/edit',
+    loadComponent: loaders.adminEventEditionEditor,
     canActivate: [authGuard, minimumRoleGuard('admin')],
   },
 

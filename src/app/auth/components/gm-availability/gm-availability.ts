@@ -22,9 +22,9 @@ import {
   IGmAvailabilityRange,
 } from '../../../core/interfaces/i-gm-availability';
 import { Auth } from '../../../core/services/auth/auth';
-import { GmAvailability } from '../../../core/services/gm-availability/gm-availability';
-import { GmAvailabilityStore } from '../../../core/services/gm-availability-store/gm-availability-store';
+import { GmAvailability as CoreGmAvailability } from '../../../core/services/gm-availability/gm-availability';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+import { GmAvailabilityStore } from '../../../core/stores/gm-availability/gm-availability.store';
 import {
   GmAvailabilityHourValue,
   GmAvailabilityMutationError,
@@ -74,9 +74,9 @@ import { createGmAvailabilityI18n } from './gm-availability.i18n';
   templateUrl: './gm-availability.html',
   providers: [provideTranslocoScope('auth', 'common')],
 })
-export class GmAvailabilityComponent {
+export class GmAvailability {
   private readonly auth = inject(Auth);
-  private readonly gmAvailability = inject(GmAvailability);
+  private readonly gmAvailability = inject(CoreGmAvailability);
   protected readonly store = inject(GmAvailabilityStore);
   private readonly toast = inject(UiToast);
 

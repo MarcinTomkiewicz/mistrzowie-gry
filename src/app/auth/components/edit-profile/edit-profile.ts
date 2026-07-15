@@ -18,7 +18,7 @@ import { Auth } from '../../../core/services/auth/auth';
 import { Seo } from '../../../core/services/seo/seo';
 import { hasMinimumRole } from '../../../core/utils/roles';
 import { ProfileForm } from '../../common/profile-form/profile-form';
-import { GmAvailabilityComponent } from '../gm-availability/gm-availability';
+import { GmAvailability } from '../gm-availability/gm-availability';
 import { GmProfile } from '../gm-profile/gm-profile';
 import { GmSessions } from '../gm-sessions/gm-sessions';
 import { createEditProfileI18n } from './edit-profile.i18n';
@@ -38,7 +38,7 @@ interface IEditProfileTabOption {
     TabsModule,
     SelectModule,
     ProfileForm,
-    GmAvailabilityComponent,
+    GmAvailability,
     GmProfile,
     GmSessions,
   ],

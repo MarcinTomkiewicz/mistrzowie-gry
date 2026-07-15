@@ -25,7 +25,7 @@ import {
 } from '../../../core/interfaces/i-event-signup';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
 import { EventSignup } from '../../../core/services/event-signup/event-signup';
-import { EventSignupRead } from '../../../core/services/event-signup-read/event-signup-read';
+import { EventSignupRead } from '../../../core/reads/events/event-signup-read';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {
   getEndOfNextMonthIso,

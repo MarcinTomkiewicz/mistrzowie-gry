@@ -13,7 +13,7 @@ import {
   ARTICLE_EDITOR_SEO_FORM_FIELD_ROWS,
 } from '../../../../core/configs/article-editor-form.config';
 import { IAdminContentArticleDetail } from '../../../../core/interfaces/i-content-article';
-import { ContentArticlesService } from '../../../../core/services/content-articles/content-articles';
+import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { ImageStorage } from '../../../../core/services/image-storage/image-storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
@@ -50,7 +50,7 @@ import { createAdminContentArticleEditorI18n } from './article-editor.i18n';
   providers: [provideTranslocoScope('adminContentArticles', 'common')],
 })
 export class ArticleEditor {
-  private readonly articles = inject(ContentArticlesService);
+  private readonly articles = inject(ContentArticles);
   private readonly imageStorage = inject(ImageStorage);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);

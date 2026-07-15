@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GmRead } from './gm-read';
+import { GmRead } from '../../reads/gm/gm-read';
 
 describe('GmRead', () => {
   let service: GmRead;

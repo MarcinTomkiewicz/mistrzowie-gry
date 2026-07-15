@@ -1,3 +1,26 @@
+import type { ISession } from '../interfaces/i-session';
+
+export type SessionLinkKey =
+  | 'gmStyleId'
+  | 'contentTriggerId'
+  | 'languageId';
+
+export type SessionRecord = Pick<
+  ISession,
+  | 'gmProfileId'
+  | 'systemId'
+  | 'title'
+  | 'description'
+  | 'image'
+  | 'difficultyLevel'
+  | 'minPlayers'
+  | 'maxPlayers'
+  | 'minAge'
+  | 'hasReadyCharacterSheets'
+  | 'allowsScenarioCustomization'
+  | 'sortOrder'
+> & { id?: string };
+
 export enum SessionDifficultyLevel {
   Beginner = 'beginner',
   Intermediate = 'intermediate',

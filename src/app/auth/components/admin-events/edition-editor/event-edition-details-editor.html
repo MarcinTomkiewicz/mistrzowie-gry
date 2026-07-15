@@ -1,0 +1,215 @@
+<div
+  class="flex-col-start-stretch gap-md w-100"
+  [formGroup]="form()"
+>
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n().sections().identity }}
+    </h2>
+
+    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+      <p-iftalabel class="w-100">
+        <input
+          class="w-100"
+          pInputText
+          id="event-edition-core"
+          [value]="coreName()"
+          readonly
+        />
+        <label for="event-edition-core">
+          {{ i18n().fields().eventCore }}
+        </label>
+      </p-iftalabel>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-city"
+            formControlName="city"
+            autocomplete="off"
+          />
+          <label for="event-edition-city">
+            {{ i18n().fields().city }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.city.touched && form().controls.city.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-slug"
+            formControlName="slug"
+            autocomplete="off"
+            (input)="slugEdited.emit()"
+          />
+          <label for="event-edition-slug">
+            {{ i18n().fields().slug }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.slug.touched &&
+          (form().controls.slug.hasError("required") ||
+            form().controls.slug.hasError("requiredTrimmed"))
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        } @else if (
+          form().controls.slug.touched &&
+          form().controls.slug.hasError("pattern")
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().slugPattern }}
+          </small>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n().sections().venueAndPrice }}
+    </h2>
+
+    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <p-iftalabel class="w-100">
+        <input
+          class="w-100"
+          pInputText
+          id="event-edition-venue-name"
+          formControlName="venueName"
+        />
+        <label for="event-edition-venue-name">
+          {{ i18n().fields().venueName }}
+        </label>
+      </p-iftalabel>
+
+      <p-iftalabel class="w-100">
+        <input
+          class="w-100"
+          pInputText
+          id="event-edition-venue-address"
+          formControlName="venueAddress"
+        />
+        <label for="event-edition-venue-address">
+          {{ i18n().fields().venueAddress }}
+        </label>
+      </p-iftalabel>
+    </div>
+
+    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="event-edition-price-amount"
+            formControlName="priceAmount"
+            mode="decimal"
+            [min]="0"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+          />
+          <label for="event-edition-price-amount">
+            {{ i18n().fields().priceAmount }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.priceAmount.touched &&
+          form().controls.priceAmount.hasError("min")
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().priceAmountMin }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-price-currency"
+            formControlName="priceCurrency"
+          />
+          <label for="event-edition-price-currency">
+            {{ i18n().fields().priceCurrency }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form().controls.priceCurrency.touched &&
+          form().controls.priceCurrency.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+
+      <p-iftalabel class="w-100">
+        <input
+          class="w-100"
+          pInputText
+          id="event-edition-price-label"
+          formControlName="priceLabel"
+        />
+        <label for="event-edition-price-label">
+          {{ i18n().fields().priceLabel }}
+        </label>
+      </p-iftalabel>
+    </div>
+  </section>
+
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n().sections().cover }}
+    </h2>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <input
+          class="w-100"
+          pInputText
+          id="event-edition-cover-image-path"
+          formControlName="coverImagePath"
+        />
+        <label for="event-edition-cover-image-path">
+          {{ i18n().fields().coverImagePath }}
+        </label>
+      </p-iftalabel>
+
+      @if (
+        form().controls.coverImagePath.touched &&
+        form().controls.coverImagePath.hasError("publicUrl")
+      ) {
+        <small class="mg-contact-error">
+          {{ i18n().validation().coverImagePath }}
+        </small>
+      }
+    </div>
+
+    @if (resolveCoverPreviewUrl(); as coverUrl) {
+      <div class="image__preview image__preview--landscape max-w-500">
+        <img
+          [src]="coverUrl"
+          [alt]="i18n().fields().coverPreviewAlt"
+          loading="lazy"
+        />
+      </div>
+    }
+  </section>
+</div>

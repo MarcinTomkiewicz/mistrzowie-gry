@@ -12,32 +12,15 @@ import {
 } from '../../interfaces/i-session';
 import { ISystem } from '../../interfaces/i-system';
 import { SessionSourceKind, SESSION_SOURCE_CONFIG } from '../../types/session-source';
+import type { SessionLinkKey, SessionRecord } from '../../types/sessions';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
-import { GmRead } from '../gm-read/gm-read';
-import { SessionRead } from '../session-read/session-read';
+import { GmRead } from '../../reads/gm/gm-read';
+import { SessionRead } from '../../reads/sessions/session-read';
 import { Storage } from '../storage/storage';
 
-type SessionLinkKey = 'gmStyleId' | 'contentTriggerId' | 'languageId';
-
-type SessionRecord = Pick<
-  ISession,
-  | 'gmProfileId'
-  | 'systemId'
-  | 'title'
-  | 'description'
-  | 'image'
-  | 'difficultyLevel'
-  | 'minPlayers'
-  | 'maxPlayers'
-  | 'minAge'
-  | 'hasReadyCharacterSheets'
-  | 'allowsScenarioCustomization'
-  | 'sortOrder'
-> & { id?: string };
-
 @Injectable({ providedIn: 'root' })
-export class GmSessionsFacade {
+export class GmSessions {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
   private readonly gmRead = inject(GmRead);

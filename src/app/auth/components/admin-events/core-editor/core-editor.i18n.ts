@@ -9,6 +9,7 @@ import {
   EditionTableCopy,
   EditionsCopy,
   EditorFieldsCopy,
+  EditorActionsCopy,
   EditorPageCopy,
   EditorToastCopy,
   EditorValidationCopy,
@@ -22,6 +23,7 @@ export function createEventCoreEditorI18n() {
     validation,
     editions,
     editionTable,
+    actions,
     toast,
     status,
     rpcErrors,
@@ -31,6 +33,7 @@ export function createEventCoreEditorI18n() {
     validation: EditorValidationCopy;
     editions: EditionsCopy;
     editionTable: EditionTableCopy;
+    actions: EditorActionsCopy;
     toast: EditorToastCopy;
     status: StatusCopy;
     rpcErrors: CoreRpcErrorsCopy;
@@ -40,6 +43,7 @@ export function createEventCoreEditorI18n() {
     validation: 'editor.validation',
     editions: 'editor.editions',
     editionTable: 'editor.editionTable',
+    actions: 'editor.actions',
     toast: 'editor.toast',
     status: 'status',
     rpcErrors: 'rpcErrors',
@@ -51,6 +55,7 @@ export function createEventCoreEditorI18n() {
     validation,
     editions,
     editionTable,
+    actions,
     toast,
     status,
     rpcErrors,

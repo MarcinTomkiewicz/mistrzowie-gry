@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { EventRead } from './event-read';
+import { EventRead } from '../../reads/events/event-read';
 
 describe('EventRead', () => {
   let service: EventRead;

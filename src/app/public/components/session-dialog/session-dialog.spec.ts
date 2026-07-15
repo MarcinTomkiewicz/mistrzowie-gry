@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { GmRead } from '../../../core/services/gm-read/gm-read';
+import { GmRead } from '../../../core/reads/gm/gm-read';
 import { SessionDialog } from './session-dialog';
 
 describe('SessionDialog', () => {

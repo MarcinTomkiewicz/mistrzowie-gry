@@ -1,94 +1,221 @@
 {
   "list": {
     "page": {
-      "title": "Zarządzanie wydarzeniami",
-      "subtitle": "Twórz i edytuj Event Core oraz zarządzaj ich dostępnością.",
-      "emptyTitle": "Brak Event Core",
-      "emptyDescription": "Nie utworzono jeszcze żadnego Event Core.",
-      "loadErrorTitle": "Nie udało się załadować Event Core"
+      "title": "[PH][title] Zarządzanie wydarzeniami",
+      "subtitle": "[PH][subtitle] Twórz i edytuj Event Core oraz zarządzaj ich dostępnością.",
+      "emptyTitle": "[PH][emptyTitle] Brak Event Core",
+      "emptyDescription": "[PH][emptyDescription] Nie utworzono jeszcze żadnego Event Core.",
+      "loadErrorTitle": "[PH][loadErrorTitle] Nie udało się załadować Event Core"
     },
     "table": {
-      "name": "Nazwa",
-      "key": "Klucz",
-      "shortDescription": "Krótki opis",
-      "active": "Aktywność",
-      "publicPage": "Strona publiczna",
-      "displayOrder": "Kolejność",
-      "editionCount": "Edycje",
-      "activeEditionCount": "Aktywne edycje",
-      "updatedAt": "Ostatnia zmiana",
-      "actions": "Akcje",
-      "notAvailable": "Brak"
+      "name": "[PH][name] Nazwa",
+      "key": "[PH][key] Klucz",
+      "shortDescription": "[PH][shortDescription] Krótki opis",
+      "active": "[PH][active] Aktywność",
+      "publicPage": "[PH][publicPage] Strona publiczna",
+      "displayOrder": "[PH][displayOrder] Kolejność",
+      "editionCount": "[PH][editionCount] Edycje",
+      "activeEditionCount": "[PH][activeEditionCount] Aktywne edycje",
+      "updatedAt": "[PH][updatedAt] Ostatnia zmiana",
+      "actions": "[PH][actions] Akcje",
+      "notAvailable": "[PH][notAvailable] Brak"
     },
     "actions": {
-      "createCore": "Dodaj Event Core",
-      "activateCore": "Aktywuj",
-      "deactivateCore": "Dezaktywuj"
+      "createCore": "[PH][createCore] Dodaj Event Core",
+      "activateCore": "[PH][activateCore] Aktywuj",
+      "deactivateCore": "[PH][deactivateCore] Dezaktywuj"
     },
     "toast": {
-      "loadFailedSummary": "Nie udało się załadować Event Core",
-      "activateSuccessSummary": "Event Core aktywowany",
-      "activateSuccessDetail": "Event Core został aktywowany.",
-      "deactivateSuccessSummary": "Event Core dezaktywowany",
-      "deactivateSuccessDetail": "Event Core został dezaktywowany.",
-      "activationFailedSummary": "Nie udało się zmienić aktywności Event Core"
+      "loadFailedSummary": "[PH][loadFailedSummary] Nie udało się załadować Event Core",
+      "activateSuccessSummary": "[PH][activateSuccessSummary] Event Core aktywowany",
+      "activateSuccessDetail": "[PH][activateSuccessDetail] Event Core został aktywowany.",
+      "deactivateSuccessSummary": "[PH][deactivateSuccessSummary] Event Core dezaktywowany",
+      "deactivateSuccessDetail": "[PH][deactivateSuccessDetail] Event Core został dezaktywowany.",
+      "activationFailedSummary": "[PH][activationFailedSummary] Nie udało się zmienić aktywności Event Core"
     }
   },
   "editor": {
     "page": {
-      "createTitle": "Nowy Event Core",
-      "editTitle": "Edycja Event Core",
-      "subtitle": "Ustaw wspólne dane wydarzenia i zarządzaj jego lokalnymi edycjami.",
-      "loadErrorTitle": "Nie udało się załadować Event Core",
-      "notFoundTitle": "Nie znaleziono Event Core",
-      "notFoundDescription": "Wskazany Event Core nie istnieje."
+      "createTitle": "[PH][createTitle] Nowy Event Core",
+      "editTitle": "[PH][editTitle] Edycja Event Core",
+      "subtitle": "[PH][subtitle] Ustaw wspólne dane wydarzenia i zarządzaj jego lokalnymi edycjami.",
+      "loadErrorTitle": "[PH][loadErrorTitle] Nie udało się załadować Event Core",
+      "notFoundTitle": "[PH][notFoundTitle] Nie znaleziono Event Core",
+      "notFoundDescription": "[PH][notFoundDescription] Wskazany Event Core nie istnieje."
     },
     "fields": {
-      "coreSectionTitle": "Dane Event Core",
-      "key": "Klucz",
-      "name": "Nazwa",
-      "shortDescription": "Krótki opis",
-      "longDescription": "Pełny opis",
-      "isActive": "Aktywny",
-      "hasPublicPage": "Ma stronę publiczną",
-      "displayOrder": "Kolejność wyświetlania"
+      "coreSectionTitle": "[PH][coreSectionTitle] Dane Event Core",
+      "key": "[PH][key] Klucz",
+      "name": "[PH][name] Nazwa",
+      "shortDescription": "[PH][shortDescription] Krótki opis",
+      "longDescription": "[PH][longDescription] Pełny opis",
+      "isActive": "[PH][isActive] Aktywny",
+      "hasPublicPage": "[PH][hasPublicPage] Ma stronę publiczną",
+      "displayOrder": "[PH][displayOrder] Kolejność wyświetlania"
     },
     "validation": {
-      "keyPattern": "Klucz może zawierać wyłącznie małe litery, cyfry i myślniki.",
-      "displayOrderMin": "Kolejność wyświetlania nie może być mniejsza niż 0."
+      "keyPattern": "[PH][keyPattern] Klucz może zawierać wyłącznie małe litery, cyfry i myślniki.",
+      "displayOrderMin": "[PH][displayOrderMin] Kolejność wyświetlania nie może być mniejsza niż 0."
     },
     "editions": {
-      "sectionTitle": "Lokalne edycje",
-      "emptyTitle": "Brak lokalnych edycji",
-      "emptyDescription": "Ten Event Core nie ma jeszcze lokalnych edycji."
+      "sectionTitle": "[PH][sectionTitle] Lokalne edycje",
+      "emptyTitle": "[PH][emptyTitle] Brak lokalnych edycji",
+      "emptyDescription": "[PH][emptyDescription] Ten Event Core nie ma jeszcze lokalnych edycji."
     },
     "editionTable": {
-      "city": "Miasto",
-      "slug": "Slug",
-      "active": "Aktywność",
-      "defaultPublic": "Domyślna publiczna",
-      "displayOrder": "Kolejność",
-      "occurrenceCount": "Terminy",
-      "programItemCount": "Elementy programu"
+      "city": "[PH][city] Miasto",
+      "slug": "[PH][slug] Slug",
+      "active": "[PH][active] Aktywność",
+      "defaultPublic": "[PH][defaultPublic] Domyślna publiczna",
+      "displayOrder": "[PH][displayOrder] Kolejność",
+      "occurrenceCount": "[PH][occurrenceCount] Terminy",
+      "programItemCount": "[PH][programItemCount] Elementy programu",
+      "actions": "[PH][actions] Akcje"
+    },
+    "actions": {
+      "addEdition": "[PH][addEdition] Dodaj lokalną edycję"
     },
     "toast": {
-      "loadFailedSummary": "Nie udało się załadować Event Core",
-      "saveSuccessSummary": "Event Core zapisany",
-      "saveSuccessDetail": "Zmiany Event Core zostały zapisane.",
-      "saveFailedSummary": "Nie udało się zapisać Event Core"
+      "loadFailedSummary": "[PH][loadFailedSummary] Nie udało się załadować Event Core",
+      "saveSuccessSummary": "[PH][saveSuccessSummary] Event Core zapisany",
+      "saveSuccessDetail": "[PH][saveSuccessDetail] Zmiany Event Core zostały zapisane.",
+      "saveFailedSummary": "[PH][saveFailedSummary] Nie udało się zapisać Event Core"
     }
   },
+  "editionEditor": {
+    "page": {
+      "createTitle": "[PH][createTitle] Nowa lokalna edycja",
+      "editTitle": "[PH][editTitle] Edycja lokalnej edycji",
+      "subtitle": "[PH][subtitle] Ustaw dane lokalnej edycji, zapisy oraz harmonogram terminów.",
+      "loadErrorTitle": "[PH][loadErrorTitle] Nie udało się załadować lokalnej edycji",
+      "notFoundTitle": "[PH][notFoundTitle] Nie znaleziono lokalnej edycji",
+      "notFoundDescription": "[PH][notFoundDescription] Wskazany Event Core lub lokalna edycja nie istnieje."
+    },
+    "sections": {
+      "identity": "[PH][identity] Event Core i lokalizacja",
+      "venueAndPrice": "[PH][venueAndPrice] Miejsce i cena",
+      "publication": "[PH][publication] Publikacja i dostępność",
+      "signup": "[PH][signup] Zapisy i pojemności",
+      "cover": "[PH][cover] Okładka"
+    },
+    "fields": {
+      "eventCore": "[PH][eventCore] Event Core",
+      "slug": "[PH][slug] Slug lokalnej edycji",
+      "city": "[PH][city] Miasto",
+      "venueName": "[PH][venueName] Nazwa miejsca",
+      "venueAddress": "[PH][venueAddress] Adres miejsca",
+      "priceAmount": "[PH][priceAmount] Kwota",
+      "priceCurrency": "[PH][priceCurrency] Waluta",
+      "priceLabel": "[PH][priceLabel] Opis ceny",
+      "coverImagePath": "[PH][coverImagePath] Ścieżka okładki w Storage",
+      "coverPreviewAlt": "[PH][coverPreviewAlt] Podgląd okładki lokalnej edycji",
+      "facebookLink": "[PH][facebookLink] Link do Facebooka",
+      "isActive": "[PH][isActive] Aktywna",
+      "isDefaultPublic": "[PH][isDefaultPublic] Domyślna edycja publiczna",
+      "displayOrder": "[PH][displayOrder] Kolejność wyświetlania",
+      "isForBeginners": "[PH][isForBeginners] Dla początkujących",
+      "timezone": "[PH][timezone] Strefa czasowa",
+      "startTime": "[PH][startTime] Godzina rozpoczęcia",
+      "endTime": "[PH][endTime] Godzina zakończenia",
+      "participantSignupKind": "[PH][participantSignupKind] Rodzaj zapisów uczestników",
+      "signupRequired": "[PH][signupRequired] Zapisy uczestników wymagane",
+      "defaultSlotCapacity": "[PH][defaultSlotCapacity] Domyślna liczba slotów MG",
+      "defaultParticipantCapacity": "[PH][defaultParticipantCapacity] Domyślna liczba uczestników"
+    },
+    "validation": {
+      "slugPattern": "[PH][slugPattern] Slug może zawierać wyłącznie małe litery, cyfry i myślniki.",
+      "priceAmountMin": "Kwota nie może być mniejsza niż 0.",
+      "displayOrderMin": "[PH][displayOrderMin] Kolejność wyświetlania musi być liczbą całkowitą nie mniejszą niż 0.",
+      "timeRange": "[PH][timeRange] Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia tego samego dnia.",
+      "slotCapacityRange": "[PH][slotCapacityRange] Liczba slotów MG musi być liczbą całkowitą od 1 do 12.",
+      "participantCapacityMin": "[PH][participantCapacityMin] Liczba uczestników musi być pusta albo być liczbą całkowitą nie mniejszą niż 1.",
+      "coverImagePath": "[PH][coverImagePath] Podaj ścieżkę pliku w Storage, a nie publiczny URL ani dane base64."
+    },
+    "info": {
+      "capacities": "[PH][capacities] Nowe wartości pojemności dotyczą nowych terminów. Istniejące terminy nie zostaną automatycznie zmienione.",
+      "publicDefault": "[PH][publicDefault] Zmiana domyślnej edycji wpłynie na publiczną stronę tego Event Core."
+    },
+    "participantKinds": {
+      "wholeEvent": "[PH][wholeEvent] Zapisy na całe wydarzenie",
+      "programItem": "[PH][programItem] Zapisy na element programu",
+      "both": "[PH][both] Oba rodzaje zapisów"
+    },
+    "toast": {
+      "loadFailedSummary": "[PH][loadFailedSummary] Nie udało się załadować lokalnej edycji",
+      "saveSuccessSummary": "[PH][saveSuccessSummary] Lokalna edycja zapisana",
+      "saveSuccessDetail": "[PH][saveSuccessDetail] Zmiany lokalnej edycji zostały zapisane.",
+      "saveFailedSummary": "[PH][saveFailedSummary] Nie udało się zapisać lokalnej edycji"
+    }
+  },
+  "scheduleEditor": {
+    "fields": {
+      "sectionTitle": "[PH][sectionTitle] Harmonogram",
+      "kind": "[PH][kind] Rodzaj harmonogramu",
+      "date": "[PH][date] Data wydarzenia",
+      "recurrenceKind": "[PH][recurrenceKind] Sposób powtarzania",
+      "interval": "[PH][interval] Interwał",
+      "byweekday": "[PH][byweekday] Dni tygodnia",
+      "monthlyNth": "[PH][monthlyNth] Które wystąpienie dnia",
+      "monthlyWeekday": "[PH][monthlyWeekday] Dzień tygodnia",
+      "dayOfMonth": "[PH][dayOfMonth] Dzień miesiąca",
+      "startDate": "[PH][startDate] Początek harmonogramu",
+      "endDate": "[PH][endDate] Koniec harmonogramu",
+      "exdates": "[PH][exdates] Wykluczone daty",
+      "exdate": "[PH][exdate] Wykluczona data"
+    },
+    "options": {
+      "single": "[PH][single] Pojedyncza data",
+      "recurring": "[PH][recurring] Harmonogram cykliczny",
+      "weekly": "[PH][weekly] Co tydzień",
+      "monthlyNthWeekday": "[PH][monthlyNthWeekday] Miesięcznie — wybrany dzień tygodnia",
+      "monthlyDayOfMonth": "[PH][monthlyDayOfMonth] Miesięcznie — wybrany dzień miesiąca",
+      "first": "[PH][first] Pierwszy",
+      "second": "[PH][second] Drugi",
+      "third": "[PH][third] Trzeci",
+      "fourth": "[PH][fourth] Czwarty",
+      "last": "[PH][last] Ostatni"
+    },
+    "validation": {
+      "singleDate": "[PH][singleDate] Podaj poprawną datę wydarzenia.",
+      "recurrenceDates": "[PH][recurrenceDates] Podaj poprawną datę początku i końca harmonogramu.",
+      "recurrenceDateRange": "[PH][recurrenceDateRange] Koniec harmonogramu nie może być wcześniejszy niż jego początek.",
+      "weeklyDays": "[PH][weeklyDays] Wybierz co najmniej jeden dzień tygodnia.",
+      "monthlyNth": "[PH][monthlyNth] Wybierz wystąpienie dnia w miesiącu.",
+      "monthlyWeekday": "[PH][monthlyWeekday] Wybierz dzień tygodnia.",
+      "dayOfMonth": "[PH][dayOfMonth] Dzień miesiąca musi mieścić się w zakresie od 1 do 31.",
+      "intervalMin": "[PH][intervalMin] Interwał musi być liczbą całkowitą nie mniejszą niż 1.",
+      "exdate": "[PH][exdate] Podaj poprawną wykluczoną datę."
+    },
+    "info": {
+      "scheduleChange": "[PH][scheduleChange] Zmiana harmonogramu może usunąć przyszłe, niechronione terminy.",
+      "protectedOccurrences": "[PH][protectedOccurrences] Termin z programem, uczestnikami albo rezerwacjami zostanie zablokowany.",
+      "conflict": "[PH][conflict] Konflikt kończy się błędem i harmonogram nie zostanie zapisany."
+    }
+  },
+  "editionRpcErrors": {
+    "forbidden": "[PH][forbidden] Nie masz uprawnień do zarządzania lokalnymi edycjami.",
+    "notFound": "[PH][notFound] Wskazany Event Core lub lokalna edycja nie istnieje.",
+    "invalid": "[PH][invalid] Dane lokalnej edycji lub harmonogramu są nieprawidłowe.",
+    "foreignKey": "Powiązany Event Core nie istnieje albo nie może zostać użyty.",
+    "duplicateSlug": "[PH][duplicateSlug] Lokalna edycja o takim slugu już istnieje.",
+    "activeCityConflict": "[PH][activeCityConflict] Ten Event Core ma już aktywną lokalną edycję w podanym mieście.",
+    "defaultPublicConflict": "[PH][defaultPublicConflict] Ten Event Core ma już inną domyślną edycję publiczną.",
+    "uniqueConflict": "[PH][uniqueConflict] Dane lokalnej edycji powodują konflikt unikalności.",
+    "constraint": "[PH][constraint] Operacja narusza regułę publicznego Event Core lub aktywnej domyślnej edycji.",
+    "conflict": "[PH][conflict] Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
+    "unknown": "[PH][unknown] Wystąpił nieoczekiwany błąd podczas operacji na lokalnej edycji."
+  },
   "status": {
-    "active": "Aktywny",
-    "inactive": "Nieaktywny"
+    "active": "[PH][active] Aktywny",
+    "inactive": "[PH][inactive] Nieaktywny"
   },
   "rpcErrors": {
-    "forbidden": "Nie masz uprawnień do zarządzania wydarzeniami.",
-    "notFound": "Wskazany Event Core nie istnieje.",
-    "invalid": "Dane Event Core są nieprawidłowe.",
-    "duplicateKey": "Event Core o takim kluczu już istnieje.",
-    "constraint": "Operacja narusza reguły aktywacji lub publikacji Event Core.",
-    "conflict": "Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
-    "unknown": "Wystąpił nieoczekiwany błąd podczas operacji na Event Core."
+    "forbidden": "[PH][forbidden] Nie masz uprawnień do zarządzania wydarzeniami.",
+    "notFound": "[PH][notFound] Wskazany Event Core nie istnieje.",
+    "invalid": "[PH][invalid] Dane Event Core są nieprawidłowe.",
+    "duplicateKey": "[PH][duplicateKey] Event Core o takim kluczu już istnieje.",
+    "constraint": "[PH][constraint] Operacja narusza reguły aktywacji lub publikacji Event Core.",
+    "conflict": "[PH][conflict] Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
+    "unknown": "[PH][unknown] Wystąpił nieoczekiwany błąd podczas operacji na Event Core."
   }
 }
