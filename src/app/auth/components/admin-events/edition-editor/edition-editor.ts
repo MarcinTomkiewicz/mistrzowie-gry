@@ -6,6 +6,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { finalize, forkJoin, of } from 'rxjs';
 
+import { ParticipantSignupKind } from '../../../../core/enums/event';
 import {
   createEventEditionForm,
   mapEventEditionFormToPayload,
@@ -13,17 +14,27 @@ import {
 } from '../../../../core/factories/event-edition-form.factory';
 import {
   IAdminEventDetail,
+  IAdminOccurrenceListItem,
   IEventCoreDetail,
 } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { resolveEventEditionAdminErrorMessage } from '../../../../core/utils/event-admin';
+import {
+  formatDateLabel,
+  formatTimestampLabel,
+} from '../../../../core/utils/date';
+import { formatTimeRangeLabel } from '../../../../core/utils/time';
+import {
+  resolveEventEditionAdminErrorMessage,
+  resolveParticipantSignupKindLabel,
+} from '../../../../core/utils/event-admin';
 import { stringToSlug } from '../../../../core/utils/type-mappings';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';
 import { EventEditionSettingsEditor } from './event-edition-settings-editor';
 import { EventScheduleEditor } from './event-schedule-editor';
+import { OccurrenceEditor } from './occurrence-editor';
 
 @Component({
   selector: 'app-event-edition-editor',
@@ -35,6 +46,7 @@ import { EventScheduleEditor } from './event-schedule-editor';
     EventEditionDetailsEditor,
     EventEditionSettingsEditor,
     EventScheduleEditor,
+    OccurrenceEditor,
   ],
   templateUrl: './edition-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common')],
@@ -61,11 +73,16 @@ export class EventEditionEditor {
   protected readonly i18n = createEventEditionEditorI18n();
   protected readonly core = signal<IEventCoreDetail | null>(null);
   protected readonly edition = signal<IAdminEventDetail | null>(null);
+  protected readonly selectedOccurrence =
+    signal<IAdminOccurrenceListItem | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
   protected readonly form = createEventEditionForm(this.coreId);
+  protected readonly formatDateLabel = formatDateLabel;
+  protected readonly formatTimestampLabel = formatTimestampLabel;
+  protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
 
   private readonly slugEdited = signal(false);
 
@@ -144,6 +161,28 @@ export class EventEditionEditor {
 
   protected onSlugInput(): void {
     this.slugEdited.set(true);
+  }
+
+  protected editOccurrence(occurrence: IAdminOccurrenceListItem): void {
+    this.selectedOccurrence.set(occurrence);
+  }
+
+  protected closeOccurrenceEditor(): void {
+    this.selectedOccurrence.set(null);
+  }
+
+  protected onOccurrenceSaved(detail: IAdminEventDetail): void {
+    this.edition.set(detail);
+    this.selectedOccurrence.set(null);
+  }
+
+  protected participantSignupKindLabel(
+    kind: ParticipantSignupKind,
+  ): string {
+    return resolveParticipantSignupKindLabel(
+      kind,
+      this.i18n.participantKinds(),
+    );
   }
 
   protected saveEdition(): void {

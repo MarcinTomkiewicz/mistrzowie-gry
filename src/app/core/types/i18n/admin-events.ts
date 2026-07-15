@@ -1,3 +1,5 @@
+import { EventOccurrenceStatus } from '../../enums/event';
+
 export type ListPageCopy = {
   title: string;
   subtitle: string;
@@ -155,6 +157,69 @@ export type ParticipantKindCopy = {
   wholeEvent: string;
   programItem: string;
   both: string;
+};
+
+export type OccurrencesCopy = {
+  sectionTitle: string;
+  emptyTitle: string;
+  emptyDescription: string;
+};
+
+export type OccurrenceTableCopy = {
+  date: string;
+  status: string;
+  slotCapacity: string;
+  participantCapacity: string;
+  participantSignupKind: string;
+  hostSignupWindow: string;
+  participantSignupWindow: string;
+  publishedAt: string;
+  programItemCount: string;
+  activeParticipantCount: string;
+  actions: string;
+  notAvailable: string;
+};
+
+export type OccurrenceDialogCopy = {
+  title: string;
+};
+
+export type OccurrenceFieldsCopy = {
+  date: string;
+  status: string;
+  slotCapacity: string;
+  participantCapacity: string;
+  participantSignupKind: string;
+  hostSignupWindow: string;
+  hostSignupOpensAt: string;
+  hostSignupClosesAt: string;
+  participantSignupWindow: string;
+  participantSignupOpensAt: string;
+  participantSignupClosesAt: string;
+};
+
+export type OccurrenceValidationCopy = {
+  timestamp: string;
+  hostSignupRange: string;
+  participantSignupRange: string;
+};
+
+export type OccurrenceStatusCopy = Record<EventOccurrenceStatus, string>;
+
+export type OccurrenceToastCopy = {
+  saveSuccessSummary: string;
+  saveSuccessDetail: string;
+  saveFailedSummary: string;
+  reloadFailedSummary: string;
+};
+
+export type OccurrenceRpcErrorsCopy = {
+  forbidden: string;
+  notFound: string;
+  invalid: string;
+  constraint: string;
+  conflict: string;
+  unknown: string;
 };
 
 export type EditionRpcErrorsCopy = {

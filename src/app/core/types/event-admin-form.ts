@@ -1,6 +1,9 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
-import { ParticipantSignupKind } from '../enums/event';
+import {
+  EventOccurrenceStatus,
+  ParticipantSignupKind,
+} from '../enums/event';
 import {
   EventMonthlyNth,
   EventRecurrenceKind,
@@ -44,4 +47,15 @@ export type EventEditionFormGroup = FormGroup<{
   defaultSlotCapacity: FormControl<number>;
   defaultParticipantCapacity: FormControl<number | null>;
   schedule: EventScheduleFormGroup;
+}>;
+
+export type EventOccurrenceFormGroup = FormGroup<{
+  status: FormControl<EventOccurrenceStatus>;
+  slotCapacity: FormControl<number>;
+  participantCapacity: FormControl<number | null>;
+  participantSignupKind: FormControl<ParticipantSignupKind>;
+  hostSignupOpensAt: FormControl<Date | null>;
+  hostSignupClosesAt: FormControl<Date | null>;
+  participantSignupOpensAt: FormControl<Date | null>;
+  participantSignupClosesAt: FormControl<Date | null>;
 }>;

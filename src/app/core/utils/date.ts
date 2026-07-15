@@ -150,6 +150,7 @@ export function formatDateLabel(
 export function formatTimestampLabel(
   timestamp: string | null | undefined,
   locale: string = 'pl-PL',
+  timeZone?: string,
 ): string | null {
   if (!timestamp) {
     return null;
@@ -164,6 +165,7 @@ export function formatTimestampLabel(
   return new Intl.DateTimeFormat(locale, {
     dateStyle: 'short',
     timeStyle: 'short',
+    timeZone,
   }).format(date);
 }
 

@@ -12,6 +12,14 @@ import {
   EditionValidationCopy,
   EditorPageCopy,
   EditorToastCopy,
+  OccurrenceDialogCopy,
+  OccurrenceFieldsCopy,
+  OccurrenceRpcErrorsCopy,
+  OccurrencesCopy,
+  OccurrenceStatusCopy,
+  OccurrenceTableCopy,
+  OccurrenceToastCopy,
+  OccurrenceValidationCopy,
   ParticipantKindCopy,
   ScheduleFieldsCopy,
   ScheduleInfoCopy,
@@ -29,6 +37,14 @@ export function createEventEditionEditorI18n() {
     participantKinds,
     toast,
     rpcErrors,
+    occurrences,
+    occurrenceTable,
+    occurrenceDialog,
+    occurrenceFields,
+    occurrenceValidation,
+    occurrenceStatuses,
+    occurrenceToast,
+    occurrenceRpcErrors,
   } = createScopedSectionsI18n<{
     page: EditorPageCopy;
     sections: EditionSectionsCopy;
@@ -38,6 +54,14 @@ export function createEventEditionEditorI18n() {
     participantKinds: ParticipantKindCopy;
     toast: EditorToastCopy;
     rpcErrors: EditionRpcErrorsCopy;
+    occurrences: OccurrencesCopy;
+    occurrenceTable: OccurrenceTableCopy;
+    occurrenceDialog: OccurrenceDialogCopy;
+    occurrenceFields: OccurrenceFieldsCopy;
+    occurrenceValidation: OccurrenceValidationCopy;
+    occurrenceStatuses: OccurrenceStatusCopy;
+    occurrenceToast: OccurrenceToastCopy;
+    occurrenceRpcErrors: OccurrenceRpcErrorsCopy;
   }>('adminEvents', {
     page: 'editionEditor.page',
     sections: 'editionEditor.sections',
@@ -47,6 +71,14 @@ export function createEventEditionEditorI18n() {
     participantKinds: 'editionEditor.participantKinds',
     toast: 'editionEditor.toast',
     rpcErrors: 'editionRpcErrors',
+    occurrences: 'editionEditor.occurrences',
+    occurrenceTable: 'editionEditor.occurrenceTable',
+    occurrenceDialog: 'occurrenceEditor.dialog',
+    occurrenceFields: 'occurrenceEditor.fields',
+    occurrenceValidation: 'occurrenceEditor.validation',
+    occurrenceStatuses: 'occurrenceEditor.statuses',
+    occurrenceToast: 'occurrenceEditor.toast',
+    occurrenceRpcErrors: 'occurrenceRpcErrors',
   });
 
   return {
@@ -58,6 +90,14 @@ export function createEventEditionEditorI18n() {
     participantKinds,
     toast,
     rpcErrors,
+    occurrences,
+    occurrenceTable,
+    occurrenceDialog,
+    occurrenceFields,
+    occurrenceValidation,
+    occurrenceStatuses,
+    occurrenceToast,
+    occurrenceRpcErrors,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),

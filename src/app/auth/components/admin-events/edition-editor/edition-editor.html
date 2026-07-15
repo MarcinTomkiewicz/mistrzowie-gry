@@ -105,6 +105,174 @@
           />
         </div>
       </form>
+
+      @if (!isNew && edition(); as loadedEdition) {
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.occurrences().sectionTitle }}
+          </h2>
+
+          @if (loadedEdition.occurrences.length) {
+            <div class="p-datatable p-component w-100">
+              <div class="p-datatable-table-container overflow-x-auto">
+                <table class="p-datatable-table w-100 min-w-500">
+                  <thead class="p-datatable-thead">
+                    <tr>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.occurrenceTable().date }}
+                      </th>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.occurrenceTable().status }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.occurrenceTable().slotCapacity }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.occurrenceTable().participantCapacity }}
+                      </th>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.occurrenceTable().participantSignupKind }}
+                      </th>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.occurrenceTable().hostSignupWindow }}
+                      </th>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.occurrenceTable().participantSignupWindow }}
+                      </th>
+                      <th class="small-caps" scope="col">
+                        {{ i18n.occurrenceTable().publishedAt }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.occurrenceTable().programItemCount }}
+                      </th>
+                      <th class="small-caps text-center" scope="col">
+                        {{ i18n.occurrenceTable().activeParticipantCount }}
+                      </th>
+                      <th class="small-caps text-right" scope="col">
+                        {{ i18n.occurrenceTable().actions }}
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody class="p-datatable-tbody">
+                    @for (
+                      occurrence of loadedEdition.occurrences;
+                      track occurrence.id
+                    ) {
+                      <tr>
+                        <td>
+                          <strong>
+                            {{ formatDateLabel(occurrence.date) }}
+                          </strong>
+                        </td>
+                        <td>
+                          <span class="tag-badge tag-badge--muted">
+                            {{ i18n.occurrenceStatuses()[occurrence.status] }}
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          {{ occurrence.slotCapacity }}
+                        </td>
+                        <td class="text-center">
+                          {{
+                            occurrence.participantCapacity ??
+                              i18n.occurrenceTable().notAvailable
+                          }}
+                        </td>
+                        <td>
+                          {{
+                            participantSignupKindLabel(
+                              occurrence.participantSignupKind
+                            )
+                          }}
+                        </td>
+                        <td>
+                          {{
+                            formatTimeRangeLabel(
+                              formatTimestampLabel(
+                                occurrence.hostSignupOpensAt,
+                                "pl-PL",
+                                loadedEdition.timezone
+                              ),
+                              formatTimestampLabel(
+                                occurrence.hostSignupClosesAt,
+                                "pl-PL",
+                                loadedEdition.timezone
+                              )
+                            ) || i18n.occurrenceTable().notAvailable
+                          }}
+                        </td>
+                        <td>
+                          {{
+                            formatTimeRangeLabel(
+                              formatTimestampLabel(
+                                occurrence.participantSignupOpensAt,
+                                "pl-PL",
+                                loadedEdition.timezone
+                              ),
+                              formatTimestampLabel(
+                                occurrence.participantSignupClosesAt,
+                                "pl-PL",
+                                loadedEdition.timezone
+                              )
+                            ) || i18n.occurrenceTable().notAvailable
+                          }}
+                        </td>
+                        <td>
+                          {{
+                            formatTimestampLabel(
+                              occurrence.publishedAt,
+                              "pl-PL",
+                              loadedEdition.timezone
+                            ) ??
+                              i18n.occurrenceTable().notAvailable
+                          }}
+                        </td>
+                        <td class="text-center">
+                          {{ occurrence.programItemCount }}
+                        </td>
+                        <td class="text-center">
+                          {{ occurrence.activeParticipantCount }}
+                        </td>
+                        <td class="text-right">
+                          <p-button
+                            size="small"
+                            severity="secondary"
+                            [label]="i18n.commonActions().edit"
+                            icon="pi pi-pencil"
+                            [disabled]="isSaving()"
+                            (onClick)="editOccurrence(occurrence)"
+                          />
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          } @else {
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <h3 class="mg-section__title mg-section__title--sm m-0">
+                {{ i18n.occurrences().emptyTitle }}
+              </h3>
+              <p class="m-0">
+                {{ i18n.occurrences().emptyDescription }}
+              </p>
+            </div>
+          }
+        </section>
+
+        @if (selectedOccurrence(); as occurrence) {
+          <app-occurrence-editor
+            [eventId]="eventId"
+            [occurrence]="occurrence"
+            [timezone]="loadedEdition.timezone"
+            [i18n]="i18n"
+            (closed)="closeOccurrenceEditor()"
+            (saved)="onOccurrenceSaved($event)"
+          />
+        }
+      }
     }
   </div>
 </section>

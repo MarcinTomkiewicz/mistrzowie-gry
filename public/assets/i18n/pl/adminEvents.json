@@ -145,7 +145,72 @@
       "saveSuccessSummary": "[PH][saveSuccessSummary] Lokalna edycja zapisana",
       "saveSuccessDetail": "[PH][saveSuccessDetail] Zmiany lokalnej edycji zostały zapisane.",
       "saveFailedSummary": "[PH][saveFailedSummary] Nie udało się zapisać lokalnej edycji"
+    },
+    "occurrences": {
+      "sectionTitle": "[PH][sectionTitle] Terminy",
+      "emptyTitle": "[PH][emptyTitle] Brak terminów",
+      "emptyDescription": "[PH][emptyDescription] Ta lokalna edycja nie ma jeszcze terminów."
+    },
+    "occurrenceTable": {
+      "date": "[PH][date] Data",
+      "status": "[PH][status] Status",
+      "slotCapacity": "[PH][slotCapacity] Sloty MG",
+      "participantCapacity": "[PH][participantCapacity] Uczestnicy",
+      "participantSignupKind": "[PH][participantSignupKind] Rodzaj zapisów uczestników",
+      "hostSignupWindow": "[PH][hostSignupWindow] Okno zapisów MG",
+      "participantSignupWindow": "[PH][participantSignupWindow] Okno zapisów uczestników",
+      "publishedAt": "[PH][publishedAt] Opublikowano",
+      "programItemCount": "[PH][programItemCount] Elementy programu",
+      "activeParticipantCount": "[PH][activeParticipantCount] Aktywni uczestnicy",
+      "actions": "[PH][actions] Akcje",
+      "notAvailable": "[PH][notAvailable] Brak"
     }
+  },
+  "occurrenceEditor": {
+    "dialog": {
+      "title": "[PH][title] Edycja terminu"
+    },
+    "fields": {
+      "date": "[PH][date] Data terminu",
+      "status": "[PH][status] Status",
+      "slotCapacity": "[PH][slotCapacity] Liczba slotów MG",
+      "participantCapacity": "[PH][participantCapacity] Liczba uczestników",
+      "participantSignupKind": "[PH][participantSignupKind] Rodzaj zapisów uczestników",
+      "hostSignupWindow": "[PH][hostSignupWindow] Zapisy MG",
+      "hostSignupOpensAt": "[PH][hostSignupOpensAt] Otwarcie zapisów MG",
+      "hostSignupClosesAt": "[PH][hostSignupClosesAt] Zamknięcie zapisów MG",
+      "participantSignupWindow": "[PH][participantSignupWindow] Zapisy uczestników",
+      "participantSignupOpensAt": "[PH][participantSignupOpensAt] Otwarcie zapisów uczestników",
+      "participantSignupClosesAt": "[PH][participantSignupClosesAt] Zamknięcie zapisów uczestników"
+    },
+    "validation": {
+      "timestamp": "[PH][timestamp] Podaj poprawną datę i godzinę.",
+      "hostSignupRange": "[PH][hostSignupRange] Zamknięcie zapisów MG musi być późniejsze niż ich otwarcie.",
+      "participantSignupRange": "[PH][participantSignupRange] Zamknięcie zapisów uczestników musi być późniejsze niż ich otwarcie."
+    },
+    "statuses": {
+      "planned": "[PH][planned] Planowany",
+      "host_signup_open": "[PH][host_signup_open] Zapisy MG otwarte",
+      "host_signup_closed": "[PH][host_signup_closed] Zapisy MG zamknięte",
+      "published": "[PH][published] Opublikowany",
+      "participant_signup_open": "[PH][participant_signup_open] Zapisy uczestników otwarte",
+      "participant_signup_closed": "[PH][participant_signup_closed] Zapisy uczestników zamknięte",
+      "archived": "[PH][archived] Zarchiwizowany"
+    },
+    "toast": {
+      "saveSuccessSummary": "[PH][saveSuccessSummary] Termin zapisany",
+      "saveSuccessDetail": "[PH][saveSuccessDetail] Zmiany terminu zostały zapisane.",
+      "saveFailedSummary": "[PH][saveFailedSummary] Nie udało się zapisać terminu",
+      "reloadFailedSummary": "[PH][reloadFailedSummary] Termin zapisano, ale nie udało się odświeżyć lokalnej edycji"
+    }
+  },
+  "occurrenceRpcErrors": {
+    "forbidden": "[PH][forbidden] Nie masz uprawnień do zarządzania terminami.",
+    "notFound": "[PH][notFound] Wskazany termin nie istnieje.",
+    "invalid": "[PH][invalid] Dane terminu są nieprawidłowe.",
+    "constraint": "[PH][constraint] Operacja narusza reguły terminu lub jego zapisów.",
+    "conflict": "[PH][conflict] Dane terminu zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
+    "unknown": "[PH][unknown] Wystąpił nieoczekiwany błąd podczas operacji na terminie."
   },
   "scheduleEditor": {
     "fields": {

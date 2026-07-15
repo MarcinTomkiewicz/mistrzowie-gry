@@ -1,0 +1,288 @@
+<p-dialog
+  styleClass="mg-dialog mg-dialog--lg"
+  [modal]="true"
+  [visible]="true"
+  [header]="i18n().occurrenceDialog().title"
+  [closable]="!isSaving()"
+  [closeOnEscape]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [draggable]="false"
+  (visibleChange)="onVisibleChange($event)"
+>
+  <form
+    class="mg-form flex-col-start-stretch gap-md w-100"
+    [formGroup]="form"
+    (ngSubmit)="saveOccurrence()"
+    novalidate
+  >
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <span class="small-caps">
+        {{ i18n().occurrenceFields().date }}
+      </span>
+      <strong>
+        {{ formatDateLabel(occurrence().date, "pl-PL", true) }}
+      </strong>
+    </div>
+    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-select
+            class="w-100"
+            inputId="occurrence-status"
+            formControlName="status"
+            [options]="statusOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+          <label for="occurrence-status">
+            {{ i18n().occurrenceFields().status }}
+          </label>
+        </p-iftalabel>
+        @if (
+          form.controls.status.touched &&
+          form.controls.status.hasError("required")
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-select
+            class="w-100"
+            inputId="occurrence-participant-signup-kind"
+            formControlName="participantSignupKind"
+            [options]="participantSignupKindOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+          <label for="occurrence-participant-signup-kind">
+            {{ i18n().occurrenceFields().participantSignupKind }}
+          </label>
+        </p-iftalabel>
+        @if (
+          form.controls.participantSignupKind.touched &&
+          form.controls.participantSignupKind.hasError("required")
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().commonForm().required }}
+          </small>
+        }
+      </div>
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="occurrence-slot-capacity"
+            formControlName="slotCapacity"
+            [useGrouping]="false"
+            [min]="1"
+            [max]="12"
+          />
+          <label for="occurrence-slot-capacity">
+            {{ i18n().occurrenceFields().slotCapacity }}
+          </label>
+        </p-iftalabel>
+        @if (
+          form.controls.slotCapacity.touched &&
+          form.controls.slotCapacity.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().slotCapacityRange }}
+          </small>
+        }
+      </div>
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="occurrence-participant-capacity"
+            formControlName="participantCapacity"
+            [useGrouping]="false"
+            [min]="1"
+          />
+          <label for="occurrence-participant-capacity">
+            {{ i18n().occurrenceFields().participantCapacity }}
+          </label>
+        </p-iftalabel>
+        @if (
+          form.controls.participantCapacity.touched &&
+          form.controls.participantCapacity.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n().validation().participantCapacityMin }}
+          </small>
+        }
+      </div>
+    </div>
+    <section class="flex-col-start-stretch gap-sm w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n().occurrenceFields().hostSignupWindow }}
+      </h3>
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-datepicker
+              class="w-100"
+              inputStyleClass="w-100"
+              inputId="occurrence-host-signup-opens-at"
+              formControlName="hostSignupOpensAt"
+              dateFormat="dd.mm.yy"
+              hourFormat="24"
+              appendTo="body"
+              [showTime]="true"
+              [showSeconds]="true"
+              [showIcon]="true"
+              [showClear]="true"
+              [readonlyInput]="true"
+            />
+            <label for="occurrence-host-signup-opens-at">
+              {{ i18n().occurrenceFields().hostSignupOpensAt }}
+            </label>
+          </p-iftalabel>
+          @if (
+            form.controls.hostSignupOpensAt.touched &&
+            form.controls.hostSignupOpensAt.hasError("validDate")
+          ) {
+            <small class="mg-contact-error">
+              {{ i18n().occurrenceValidation().timestamp }}
+            </small>
+          }
+        </div>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-datepicker
+              class="w-100"
+              inputStyleClass="w-100"
+              inputId="occurrence-host-signup-closes-at"
+              formControlName="hostSignupClosesAt"
+              dateFormat="dd.mm.yy"
+              hourFormat="24"
+              appendTo="body"
+              [showTime]="true"
+              [showSeconds]="true"
+              [showIcon]="true"
+              [showClear]="true"
+              [readonlyInput]="true"
+            />
+            <label for="occurrence-host-signup-closes-at">
+              {{ i18n().occurrenceFields().hostSignupClosesAt }}
+            </label>
+          </p-iftalabel>
+          @if (
+            form.controls.hostSignupClosesAt.touched &&
+            form.controls.hostSignupClosesAt.hasError("validDate")
+          ) {
+            <small class="mg-contact-error">
+              {{ i18n().occurrenceValidation().timestamp }}
+            </small>
+          }
+        </div>
+      </div>
+      @if (
+        form.hasError("hostSignupRange") &&
+        (form.controls.hostSignupOpensAt.touched ||
+          form.controls.hostSignupClosesAt.touched)
+      ) {
+        <small class="mg-contact-error">
+          {{ i18n().occurrenceValidation().hostSignupRange }}
+        </small>
+      }
+    </section>
+    <section class="flex-col-start-stretch gap-sm w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n().occurrenceFields().participantSignupWindow }}
+      </h3>
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-datepicker
+              class="w-100"
+              inputStyleClass="w-100"
+              inputId="occurrence-participant-signup-opens-at"
+              formControlName="participantSignupOpensAt"
+              dateFormat="dd.mm.yy"
+              hourFormat="24"
+              appendTo="body"
+              [showTime]="true"
+              [showSeconds]="true"
+              [showIcon]="true"
+              [showClear]="true"
+              [readonlyInput]="true"
+            />
+            <label for="occurrence-participant-signup-opens-at">
+              {{ i18n().occurrenceFields().participantSignupOpensAt }}
+            </label>
+          </p-iftalabel>
+          @if (
+            form.controls.participantSignupOpensAt.touched &&
+            form.controls.participantSignupOpensAt.hasError("validDate")
+          ) {
+            <small class="mg-contact-error">
+              {{ i18n().occurrenceValidation().timestamp }}
+            </small>
+          }
+        </div>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-datepicker
+              class="w-100"
+              inputStyleClass="w-100"
+              inputId="occurrence-participant-signup-closes-at"
+              formControlName="participantSignupClosesAt"
+              dateFormat="dd.mm.yy"
+              hourFormat="24"
+              appendTo="body"
+              [showTime]="true"
+              [showSeconds]="true"
+              [showIcon]="true"
+              [showClear]="true"
+              [readonlyInput]="true"
+            />
+            <label for="occurrence-participant-signup-closes-at">
+              {{ i18n().occurrenceFields().participantSignupClosesAt }}
+            </label>
+          </p-iftalabel>
+          @if (
+            form.controls.participantSignupClosesAt.touched &&
+            form.controls.participantSignupClosesAt.hasError("validDate")
+          ) {
+            <small class="mg-contact-error">
+              {{ i18n().occurrenceValidation().timestamp }}
+            </small>
+          }
+        </div>
+      </div>
+      @if (
+        form.hasError("participantSignupRange") &&
+        (form.controls.participantSignupOpensAt.touched ||
+          form.controls.participantSignupClosesAt.touched)
+      ) {
+        <small class="mg-contact-error">
+          {{ i18n().occurrenceValidation().participantSignupRange }}
+        </small>
+      }
+    </section>
+    <div class="p-dialog-footer flex-row-end-center gap-sm w-100 p-md">
+      <p-button
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        [label]="i18n().commonActions().cancel"
+        icon="pi pi-times"
+        [disabled]="isSaving()"
+        (onClick)="close()"
+      />
+      <p-button
+        type="submit"
+        severity="success"
+        [label]="i18n().commonActions().save"
+        icon="pi pi-save"
+        [loading]="isSaving()"
+      />
+    </div>
+  </form>
+</p-dialog>

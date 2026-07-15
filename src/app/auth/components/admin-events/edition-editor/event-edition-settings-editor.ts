@@ -6,9 +6,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
-import { ParticipantSignupKind } from '../../../../core/enums/event';
-import { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import { EventEditionFormGroup } from '../../../../core/types/event-admin-form';
+import { createParticipantSignupKindOptions } from '../../../../core/utils/event-admin';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 
 @Component({
@@ -29,20 +28,7 @@ export class EventEditionSettingsEditor {
   readonly i18n =
     input.required<ReturnType<typeof createEventEditionEditorI18n>>();
 
-  protected readonly participantSignupKindOptions = computed<
-    ISelectOption<ParticipantSignupKind>[]
-  >(() => [
-    {
-      value: ParticipantSignupKind.WholeEvent,
-      label: this.i18n().participantKinds().wholeEvent,
-    },
-    {
-      value: ParticipantSignupKind.ProgramItem,
-      label: this.i18n().participantKinds().programItem,
-    },
-    {
-      value: ParticipantSignupKind.Both,
-      label: this.i18n().participantKinds().both,
-    },
-  ]);
+  protected readonly participantSignupKindOptions = computed(() =>
+    createParticipantSignupKindOptions(this.i18n().participantKinds()),
+  );
 }
