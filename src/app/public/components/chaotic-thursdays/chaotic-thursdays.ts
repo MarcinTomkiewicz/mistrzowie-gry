@@ -13,6 +13,7 @@ import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
 import { GmRead } from '../../../core/reads/gm/gm-read';
+import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
@@ -58,6 +59,7 @@ import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 export class ChaoticThursdays {
   private readonly facade = inject(ChaoticThursdaysFacade);
   private readonly gmRead = inject(GmRead);
+  private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
@@ -79,6 +81,31 @@ export class ChaoticThursdays {
 
   private readonly applySeoEffect = effect(() => {
     const seo = this.i18n.seo();
+    const loadError = this.facade.loadError();
+
+    if (this.facade.isLoading()) {
+      this.seo.apply({
+        title: this.i18n.commonStatus().loading,
+        canonicalUrl: this.pageUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
+    if (loadError) {
+      const error = this.i18n.commonErrors().server;
+
+      this.responseStatus.set(503);
+      this.seo.apply({
+        title: error,
+        description: error,
+        canonicalUrl: this.pageUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
+    this.responseStatus.set(200);
 
     this.seo.apply({
       title: seo.title,
@@ -167,14 +194,8 @@ export class ChaoticThursdays {
     const page = this.facade.page();
     const edition = this.facade.selectedEdition();
     const occurrences = this.facade.occurrences();
-    const loadError = this.facade.loadError();
 
-    if (
-      !page ||
-      !edition ||
-      !occurrences.length ||
-      loadError?.kind === 'occurrences'
-    ) {
+    if (!page || !edition || !occurrences.length) {
       return undefined;
     }
 

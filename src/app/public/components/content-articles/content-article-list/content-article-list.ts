@@ -9,6 +9,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { buildSiteUrl } from '../../../../core/config/site';
 import { IContentArticleListItem } from '../../../../core/interfaces/i-content-article';
 import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
+import { ResponseStatus } from '../../../../core/services/response-status/response-status';
 import { Seo } from '../../../../core/services/seo/seo';
 import { Storage } from '../../../../core/services/storage/storage';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
@@ -25,6 +26,7 @@ import { createContentArticlesI18n } from '../content-articles.i18n';
 })
 export class ContentArticleList implements OnInit {
   private readonly articles = inject(ContentArticles);
+  private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly pageUrl = buildSiteUrl('/artykuly');
@@ -48,6 +50,29 @@ export class ContentArticleList implements OnInit {
 
   private readonly applySeoEffect = effect(() => {
     const seo = this.i18n.seo();
+    const error = this.error();
+
+    if (this.isLoading()) {
+      this.seo.apply({
+        title: this.i18n.status().loading,
+        canonicalUrl: this.pageUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
+    if (error) {
+      this.responseStatus.set(503);
+      this.seo.apply({
+        title: this.i18n.errors().listTitle,
+        description: error,
+        canonicalUrl: this.pageUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
+    this.responseStatus.set(200);
 
     this.seo.apply({
       title: seo.listTitle,
@@ -81,7 +106,7 @@ export class ContentArticleList implements OnInit {
     this.articles
       .getPublicArticleList()
       .pipe(
-        catchError((error) => {
+        catchError((error: unknown) => {
           console.error('[content articles] list load error', error);
           this.error.set(this.i18n.errors().listDescription);
           return of([] as IContentArticleListItem[]);

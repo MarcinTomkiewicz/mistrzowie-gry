@@ -7,7 +7,7 @@ export const serverRoutes: ServerRoute[] = [
 
   { path: '', renderMode: RenderMode.Prerender },
   { path: 'about', renderMode: RenderMode.Prerender },
-  { path: 'chaotic-thursdays', renderMode: RenderMode.Prerender },
+  { path: 'chaotic-thursdays', renderMode: RenderMode.Server },
   { path: 'join-the-party', renderMode: RenderMode.Prerender },
   { path: 'contact', renderMode: RenderMode.Prerender },
 

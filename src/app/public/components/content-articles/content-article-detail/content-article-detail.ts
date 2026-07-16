@@ -71,6 +71,7 @@ export class ContentArticleDetail implements OnInit {
 
   private readonly applySeoEffect = effect(() => {
     const article = this.article();
+    const requestedCanonicalUrl = buildSiteUrl(`/artykuly/${this.slug()}`);
 
     if (article) {
       const canonicalUrl = buildSiteUrl(`/artykuly/${article.slug}`);
@@ -115,6 +116,15 @@ export class ContentArticleDetail implements OnInit {
       return;
     }
 
+    if (this.isLoading()) {
+      this.seo.apply({
+        title: this.i18n.status().loading,
+        canonicalUrl: requestedCanonicalUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
     if (!this.isNotFound() && !this.error()) {
       return;
     }
@@ -127,7 +137,7 @@ export class ContentArticleDetail implements OnInit {
       description: isLoadError
         ? errors.detailLoadDescription
         : errors.detailNotFoundDescription,
-      canonicalUrl: buildSiteUrl(`/artykuly/${this.slug()}`),
+      canonicalUrl: requestedCanonicalUrl,
       robots: 'noindex,nofollow',
     });
   });
@@ -181,9 +191,10 @@ export class ContentArticleDetail implements OnInit {
     this.article.set(null);
 
     return this.articles.getPublicArticleBySlug(slug).pipe(
-      catchError((error) => {
+      catchError((error: unknown) => {
         console.error('[content articles] detail load error', error);
         this.error.set(this.i18n.errors().detailLoadDescription);
+        this.responseStatus.set(503);
         return of(null);
       }),
       finalize(() => this.isLoading.set(false)),
