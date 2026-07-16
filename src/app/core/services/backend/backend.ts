@@ -24,47 +24,23 @@ export class Backend {
     functionName: string,
     args?: Record<string, unknown>,
   ): Observable<TResult> {
-    return defer(() => {
-      const releasePendingTask = this.createPendingTaskRelease();
-      let request: ReturnType<typeof this.supabase.rpc>;
+    return this.trackedRequest<PostgrestSingleResponse<TResult>>(() =>
+      this.supabase.rpc(functionName, args),
+    ).pipe(
+      map((res) => {
+        if (res.error) {
+          throw new RpcError(
+            res.error.code,
+            res.error.message,
+            res.error.details,
+            res.error.hint,
+            res.error,
+          );
+        }
 
-      try {
-        request = this.supabase.rpc(functionName, args);
-      } catch (error) {
-        return throwError(() => error).pipe(finalize(releasePendingTask));
-      }
-
-      return from(request).pipe(
-        map((res: PostgrestSingleResponse<TResult>) => {
-          if (res.error) {
-            throw new RpcError(
-              res.error.code,
-              res.error.message,
-              res.error.details,
-              res.error.hint,
-              res.error,
-            );
-          }
-
-          return res.data as TResult;
-        }),
-        finalize(releasePendingTask),
-      );
-    });
-  }
-
-  private createPendingTaskRelease(): () => void {
-    const removePendingTask = this.pendingTasks.add();
-    let released = false;
-
-    return () => {
-      if (released) {
-        return;
-      }
-
-      released = true;
-      removePendingTask();
-    };
+        return res.data;
+      }),
+    );
   }
 
   getAll<T extends object>(opts: {
@@ -77,27 +53,29 @@ export class Backend {
   }): Observable<T[]> {
     const { table, joins, sortBy, sortOrder = 'asc', pagination, range } = opts;
 
-    const select = joins ? `*, ${joins}` : '*';
-    let query = this.supabase.from(table).select(select);
+    return this.trackedRequest<PostgrestResponse<unknown>>(() => {
+      const select = joins ? `*, ${joins}` : '*';
+      let query = this.supabase.from(table).select(select);
 
-    query = applyFilters(query, pagination?.filters);
+      query = applyFilters(query, pagination?.filters);
 
-    if (sortBy) {
-      query = query.order(toSnakeKey(String(sortBy)), { ascending: sortOrder === 'asc' });
-    }
+      if (sortBy) {
+        query = query.order(toSnakeKey(String(sortBy)), { ascending: sortOrder === 'asc' });
+      }
 
-    if (range) {
-      query = query.range(range.from, range.to);
-    } else if (pagination?.page !== undefined && pagination?.pageSize !== undefined) {
-      const fromIndex = (pagination.page - 1) * pagination.pageSize;
-      const toIndex = fromIndex + pagination.pageSize - 1;
-      query = query.range(fromIndex, toIndex);
-    } else {
-      query = query.range(0, 999);
-    }
+      if (range) {
+        query = query.range(range.from, range.to);
+      } else if (pagination?.page !== undefined && pagination?.pageSize !== undefined) {
+        const fromIndex = (pagination.page - 1) * pagination.pageSize;
+        const toIndex = fromIndex + pagination.pageSize - 1;
+        query = query.range(fromIndex, toIndex);
+      } else {
+        query = query.range(0, 999);
+      }
 
-    return from(query).pipe(
-      map((res: PostgrestResponse<any>) => {
+      return query;
+    }).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return (res.data ?? []).map((x) => toCamelCase<T>(x));
       }),
@@ -105,12 +83,14 @@ export class Backend {
   }
 
   getById<T extends object>(table: string, id: string | number): Observable<T | null> {
-    let query = this.supabase.from(table).select('*');
-    query = applyFilters(query, {
-      id: { operator: FilterOperator.EQ, value: id },
-    });
-    return from(query.maybeSingle()).pipe(
-      map((res: PostgrestSingleResponse<any>) => {
+    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() => {
+      let query = this.supabase.from(table).select('*');
+      query = applyFilters(query, {
+        id: { operator: FilterOperator.EQ, value: id },
+      });
+      return query.maybeSingle();
+    }).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return res.data ? toCamelCase<T>(res.data) : null;
       }),
@@ -118,12 +98,14 @@ export class Backend {
   }
 
   getBySlug<T extends object>(table: string, slug: string): Observable<T | null> {
-    let query = this.supabase.from(table).select('*');
-    query = applyFilters(query, {
-      slug: { operator: FilterOperator.EQ, value: slug },
-    });
-    return from(query.maybeSingle()).pipe(
-      map((res: PostgrestSingleResponse<any>) => {
+    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() => {
+      let query = this.supabase.from(table).select('*');
+      query = applyFilters(query, {
+        slug: { operator: FilterOperator.EQ, value: slug },
+      });
+      return query.maybeSingle();
+    }).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return res.data ? toCamelCase<T>(res.data) : null;
       }),
@@ -134,16 +116,18 @@ export class Backend {
     table: string,
     filters: Record<string, unknown>,
   ): Observable<T | null> {
-    let query = this.supabase.from(table).select('*');
+    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() => {
+      let query = this.supabase.from(table).select('*');
 
-    const iFilters: Record<string, IFilter> = {};
-    for (const [key, value] of Object.entries(filters)) {
-      iFilters[key] = { operator: FilterOperator.EQ, value };
-    }
-    query = applyFilters(query, iFilters);
+      const iFilters: Record<string, IFilter> = {};
+      for (const [key, value] of Object.entries(filters)) {
+        iFilters[key] = { operator: FilterOperator.EQ, value };
+      }
+      query = applyFilters(query, iFilters);
 
-    return from(query.maybeSingle()).pipe(
-      map((res: PostgrestSingleResponse<any>) => {
+      return query.maybeSingle();
+    }).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return res.data ? toCamelCase<T>(res.data) : null;
       }),
@@ -151,10 +135,12 @@ export class Backend {
   }
 
   getCount(table: string, filters?: Record<string, FilterDefinition>): Observable<number> {
-    let query = this.supabase.from(table).select('*', { count: 'exact', head: true });
-    query = applyFilters(query, filters);
-    return from(query).pipe(
-      map((res: PostgrestResponse<any>) => {
+    return this.trackedRequest<PostgrestResponse<unknown>>(() => {
+      let query = this.supabase.from(table).select('*', { count: 'exact', head: true });
+      query = applyFilters(query, filters);
+      return query;
+    }).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return res.count ?? 0;
       }),
@@ -163,8 +149,10 @@ export class Backend {
 
   getByIds<T extends object>(table: string, ids: Array<string | number>): Observable<T[]> {
     if (!ids.length) return of([]);
-    return from(this.supabase.from(table).select('*').in('id', ids as any)).pipe(
-      map((res: PostgrestResponse<any>) => {
+    return this.trackedRequest<PostgrestResponse<unknown>>(() =>
+      this.supabase.from(table).select('*').in('id', ids),
+    ).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return (res.data ?? []).map((x) => toCamelCase<T>(x));
       }),
@@ -176,8 +164,10 @@ export class Backend {
     data: TPayload,
   ): Observable<TResult> {
     const snake = toSnakeCase(data);
-    return from(this.supabase.from(table).insert(snake).select('*').single()).pipe(
-      map((res: PostgrestSingleResponse<any>) => {
+    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
+      this.supabase.from(table).insert(snake).select('*').single(),
+    ).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return toCamelCase<TResult>(res.data);
       }),
@@ -187,8 +177,10 @@ export class Backend {
   createMany<T extends object>(table: string, data: T[]): Observable<T[]> {
     if (!data.length) return of([]);
     const snake = toSnakeCase(data);
-    return from(this.supabase.from(table).insert(snake).select('*')).pipe(
-      map((res: PostgrestResponse<any>) => {
+    return this.trackedRequest<PostgrestResponse<unknown>>(() =>
+      this.supabase.from(table).insert(snake).select('*'),
+    ).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return (res.data ?? []).map((x) => toCamelCase<T>(x));
       }),
@@ -197,8 +189,10 @@ export class Backend {
 
   update<T extends object>(table: string, id: string | number, patch: Partial<T>): Observable<T> {
     const snake = toSnakeCase(patch);
-    return from(this.supabase.from(table).update(snake).eq('id', id).select('*').single()).pipe(
-      map((res: PostgrestSingleResponse<any>) => {
+    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
+      this.supabase.from(table).update(snake).eq('id', id).select('*').single(),
+    ).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return toCamelCase<T>(res.data);
       }),
@@ -207,10 +201,10 @@ export class Backend {
 
   upsert<T extends object>(table: string, data: T, conflictTarget: string = 'id'): Observable<T> {
     const snake = toSnakeCase(data);
-    return from(
+    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*').single(),
     ).pipe(
-      map((res: PostgrestSingleResponse<any>) => {
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return toCamelCase<T>(res.data);
       }),
@@ -220,8 +214,10 @@ export class Backend {
   upsertMany<T extends object>(table: string, data: T[], conflictTarget: string = 'id'): Observable<T[]> {
     if (!data.length) return of([]);
     const snake = toSnakeCase(data);
-    return from(this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*')).pipe(
-      map((res: PostgrestResponse<any>) => {
+    return this.trackedRequest<PostgrestResponse<unknown>>(() =>
+      this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*'),
+    ).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return (res.data ?? []).map((x) => toCamelCase<T>(x));
       }),
@@ -229,16 +225,39 @@ export class Backend {
   }
 
   delete(table: string, filters: string | number | Record<string, FilterDefinition>): Observable<void> {
-    let query = this.supabase.from(table).delete();
-    query = typeof filters === 'object'
-      ? applyFilters(query, filters)
-      : applyFilters(query, { id: { operator: FilterOperator.EQ, value: filters } });
+    return this.trackedRequest<PostgrestSingleResponse<null>>(() => {
+      let query = this.supabase.from(table).delete();
+      query = typeof filters === 'object'
+        ? applyFilters(query, filters)
+        : applyFilters(query, { id: { operator: FilterOperator.EQ, value: filters } });
 
-    return from(query).pipe(
-      map((res: any) => {
+      return query;
+    }).pipe(
+      map((res) => {
         if (res.error) throw new Error(res.error.message);
         return void 0;
       }),
     );
+  }
+
+  private trackedRequest<TResult>(
+    requestFactory: () => PromiseLike<TResult>,
+  ): Observable<TResult> {
+    return defer(() => {
+      const removePendingTask = this.pendingTasks.add();
+      let released = false;
+      const releasePendingTask = () => {
+        if (released) return;
+
+        released = true;
+        removePendingTask();
+      };
+
+      try {
+        return from(requestFactory()).pipe(finalize(releasePendingTask));
+      } catch (error) {
+        return throwError(() => error).pipe(finalize(releasePendingTask));
+      }
+    });
   }
 }
