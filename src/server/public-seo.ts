@@ -2,7 +2,7 @@ import type express from 'express';
 import { createClient } from '@supabase/supabase-js';
 
 import publicStaticPaths from '../../scripts/public-routes.json';
-import { buildSiteUrl, SITE_URL } from '../app/core/config/site';
+import { SITE_URL } from '../app/core/config/site';
 import type { ISitemapEntry } from '../app/core/interfaces/i-sitemap-entry';
 import { environment } from '../env/environment';
 
@@ -203,7 +203,7 @@ function serializeSitemap(entries: ISitemapEntry[]): string {
 
       return (
         `  <url>\n` +
-        `    <loc>${escapeXml(buildSiteUrl(entry.path))}</loc>` +
+        `    <loc>${escapeXml(new URL(entry.path, `${SITE_URL}/`).toString())}</loc>` +
         `${lastModified}\n` +
         `  </url>`
       );
