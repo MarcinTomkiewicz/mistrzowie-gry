@@ -47,14 +47,18 @@
 
           <p-tabpanels>
             <p-tabpanel value="inPerson">
-              <app-join-the-party-summary [copy]="heroInfo.inPerson" />
+              @if (heroInfo.inPerson; as inPerson) {
+                <app-join-the-party-summary [copy]="inPerson" />
+              }
             </p-tabpanel>
 
             <p-tabpanel value="online">
-              <app-join-the-party-summary
-                [copy]="heroInfo.online"
-                [placeHref]="discordHref()"
-              />
+              @if (heroInfo.online; as online) {
+                <app-join-the-party-summary
+                  [copy]="online"
+                  [placeHref]="discordHref()"
+                />
+              }
             </p-tabpanel>
           </p-tabpanels>
         </p-tabs>

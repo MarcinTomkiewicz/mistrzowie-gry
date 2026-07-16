@@ -1,16 +1,16 @@
 // path: src/app/core/loaders/transloco.loader.ts
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import {
+  inject,
+  Injectable,
   makeStateKey,
+  PLATFORM_ID,
   TransferState,
 } from '@angular/core';
-import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Translation, TranslocoLoader } from '@jsverse/transloco';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
-const TRANSLATION_CACHE_BUSTER = Date.now().toString(36);
 
 /**
  * Struktura plików:
@@ -33,9 +33,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
   private readonly platformId = inject(PLATFORM_ID);
 
   getTranslation(langOrScopeLang: string): Observable<Translation> {
-    const resolvedUrl = this.resolveUrl(langOrScopeLang);
+    const translationPath = this.resolvePath(langOrScopeLang);
     const stateKey = makeStateKey<Translation>(
-      `transloco:${resolvedUrl}`,
+      `transloco:${translationPath}`,
     );
 
     if (
@@ -47,9 +47,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
       return of(translation);
     }
 
-    const url = this.withCacheBuster(resolvedUrl);
-
-    return this.http.get<Translation>(url).pipe(
+    return this.http.get<Translation>(translationPath).pipe(
       tap((translation) => {
         if (isPlatformServer(this.platformId)) {
           this.transferState.set(stateKey, translation);
@@ -58,7 +56,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     );
   }
 
-  private resolveUrl(langOrScopeLang: string): string {
+  private resolvePath(langOrScopeLang: string): string {
     // scope/lang: bierzemy ostatni segment jako lang, reszta jako namespace
     if (langOrScopeLang.includes('/')) {
       const parts = langOrScopeLang.split('/').filter(Boolean);
@@ -73,11 +71,5 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     // root lang
     const lang = langOrScopeLang || 'pl';
     return `/assets/i18n/${lang}/common.json`;
-  }
-
-  private withCacheBuster(url: string): string {
-    const separator = url.includes('?') ? '&' : '?';
-
-    return `${url}${separator}v=${TRANSLATION_CACHE_BUSTER}`;
   }
 }
