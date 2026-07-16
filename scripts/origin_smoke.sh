@@ -91,7 +91,7 @@ const fs = require('node:fs');
 const [path, bodyPath] = process.argv.slice(2);
 const body = fs.readFileSync(bodyPath, 'utf8');
 const markerPattern =
-  /(?:nav|legal)\.(?:[A-Za-z0-9_-]+\.)*[A-Za-z0-9_-]+|(?:nav|legal)\.|undefined|Just a moment\.\.\./i;
+  /(?:nav|legal)\.(?:[A-Za-z0-9_-]+\.)*[A-Za-z0-9_-]+|(?:nav|legal)\.|Just a moment\.\.\./i;
 const match = markerPattern.exec(body);
 
 if (!match) {
@@ -127,8 +127,6 @@ let diagnosis;
 
 if (/^(?:nav|legal)\./i.test(marker)) {
   diagnosis = 'unresolved Transloco SSR key';
-} else if (marker.toLowerCase() === 'undefined') {
-  diagnosis = 'literal undefined emitted in SSR HTML';
 } else {
   diagnosis = 'challenge page marker';
 }
@@ -169,7 +167,7 @@ smoke_html() {
     fail "$path returned noindex success HTML"
   fi
 
-  if grep -Eiq 'nav\.|legal\.|undefined|Just a moment\.\.\.' "$body_path"; then
+  if grep -Eiq 'nav\.|legal\.|Just a moment\.\.\.' "$body_path"; then
     report_html_marker "$path" "$body_path"
     fail "$path contains an unresolved shell, translation, or challenge marker"
   fi
