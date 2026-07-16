@@ -2,10 +2,6 @@
   "cta": {
     "contactUs": "Zapytaj o ofertę"
   },
-  "seo": {
-    "title": "Nasza oferta",
-    "description": "Przygotowaliśmy dla Ciebie rozwiązania, które pozwolą Ci zacząć grać w RPG. Sesje, kampanie, pakiety a dla firm i instytucji specjalne wydarzenia, które rozszerzą ofertę integracyjną i edukacyjną."
-  },
   "pricingTable": {
     "headers": {
       "variant": "Dostępne opcje",

@@ -88,13 +88,6 @@ export type OfferItem = {
   isTest: boolean;
 };
 
-export type OfferSectionItem = {
-  id: string;
-  sectionId: string;
-  offerItemId: number;
-  position: number;
-};
-
 export type OfferPageVm = {
   page: OfferPage;
   sections: OfferSectionWithItems[];
@@ -102,18 +95,6 @@ export type OfferPageVm = {
 
 export type OfferSectionWithItems = OfferPageSection & {
   items: OfferItem[];
-};
-
-export type OfferPageDbRow = OfferPage & {
-  offerPageSections?: Array<
-    OfferPageSection & {
-      offerPageSectionItems?: Array<
-        OfferSectionItem & {
-          offerItems?: OfferItem | null;
-        }
-      >;
-    }
-  >;
 };
 
 export type OfferItemId = OfferItem['id'];

@@ -2,12 +2,25 @@
 @let pricingHeaders = i18n.pricingHeaders();
 @let empty = i18n.commonEmpty();
 @let status = i18n.commonStatus();
+@let errors = i18n.commonErrors();
 
 <section class="mg-section">
   <div class="mg-container">
-    <app-loading-overlay [visible]="!pageVm()" [label]="status.loading" />
+    <app-loading-overlay [visible]="isLoading()" [label]="status.loading" />
 
-    @if (pageVm(); as data) {
+    @if (hasLoadError()) {
+      <div class="mg-card">
+        <h1 class="mg-section__title mg-section__title--sm">
+          {{ errors.server }}
+        </h1>
+      </div>
+    } @else if (isNotFound()) {
+      <div class="mg-card">
+        <h1 class="mg-section__title mg-section__title--sm">
+          {{ errors.notFound }}
+        </h1>
+      </div>
+    } @else if (pageVm(); as data) {
       <header class="mg-section__header">
         <h1 class="mg-section__title">{{ data.page.title }}</h1>
         <p class="mg-section__subtitle">{{ data.page.subtitle }}</p>

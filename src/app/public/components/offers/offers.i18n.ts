@@ -3,6 +3,7 @@ import { computed } from '@angular/core';
 import {
   createCommonCtaI18n,
   createCommonEmptyI18n,
+  createCommonErrorsI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -11,18 +12,15 @@ import {
   OfferPricingHeadersTranslations,
   StandardsAndLogisticsDict,
 } from '../../../core/types/i18n/offers';
-import { OfferPageSeo } from '../../../core/types/offers';
 
 export function createOffersI18n() {
-  const { pricingHeaders, seo, standardsAndLogisticsDict, commonFootnotes } =
+  const { pricingHeaders, standardsAndLogisticsDict, commonFootnotes } =
     createScopedSectionsI18n<{
       pricingHeaders: OfferPricingHeadersTranslations;
-      seo: OfferPageSeo;
       standardsAndLogisticsDict: StandardsAndLogisticsDict;
       commonFootnotes: OfferFootnotesTranslations;
     }>('offers', {
       pricingHeaders: 'pricingTable.headers',
-      seo: 'seo',
       standardsAndLogisticsDict: 'standardsAndLogistics',
       commonFootnotes: 'footnotes',
     });
@@ -30,6 +28,7 @@ export function createOffersI18n() {
   const commonCta = createCommonCtaI18n();
   const commonStatus = createCommonStatusI18n();
   const commonEmpty = createCommonEmptyI18n();
+  const commonErrors = createCommonErrorsI18n();
 
   const standardsAndLogistics = computed<StandardsAndLogisticsDict>(() => {
     const dict = standardsAndLogisticsDict();
@@ -53,11 +52,11 @@ export function createOffersI18n() {
   });
 
   return {
-    seo,
     pricingHeaders,
     commonCta,
     commonStatus,
     commonEmpty,
+    commonErrors,
     commonFootnotes,
     standardsAndLogistics,
   };

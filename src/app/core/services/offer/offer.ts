@@ -1,74 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { from, map, Observable } from 'rxjs';
-import { Supabase } from '../supabase/supabase';
-import { toCamelCase } from '../backend/backend-mapping';
-import type {
-  OfferItem,
-  OfferPage,
-  OfferPageDbRow,
-  OfferPageSection,
-  OfferPageVm,
-  OfferSectionItem,
-  OfferSectionWithItems,
-} from '../../types/offers';
+import { Observable } from 'rxjs';
+
+import type { OfferPageVm } from '../../types/offers';
+import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
 export class Offer {
-  private readonly supabase = inject(Supabase).client();
+  private readonly backend = inject(Backend);
 
   getOfferPageVmBySlug(slug: string): Observable<OfferPageVm | null> {
-    const query = this.supabase
-      .from('offer_pages')
-      .select(
-        `
-        *,
-        offer_page_sections (
-          *,
-          offer_page_section_items (
-            *,
-            offer_items (*)
-          )
-        )
-      `,
-      )
-      .eq('slug', slug)
-      .maybeSingle();
-
-    return from(query).pipe(
-      map((res) => {
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-
-        if (!res.data) {
-          return null;
-        }
-
-        const raw = toCamelCase<OfferPageDbRow>(res.data);
-
-        const sections: OfferSectionWithItems[] = (raw.offerPageSections ?? [])
-          .filter((section) => section.isActive)
-          .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-          .map((section) => {
-            const items = (section.offerPageSectionItems ?? [])
-              .slice()
-              .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-              .map((link) => link.offerItems)
-              .filter(Boolean) as OfferItem[];
-
-            return {
-              ...section,
-              items,
-            };
-          });
-
-        const { offerPageSections, ...page } = raw;
-
-        return {
-          page,
-          sections,
-        };
-      }),
+    return this.backend.rpc<OfferPageVm | null>(
+      'get_public_offer_page_by_slug',
+      { p_slug: slug },
     );
   }
 }

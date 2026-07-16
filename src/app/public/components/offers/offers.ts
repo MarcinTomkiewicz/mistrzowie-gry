@@ -1,6 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { AccordionModule } from 'primeng/accordion';
@@ -9,6 +16,7 @@ import { TableModule } from 'primeng/table';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { catchError, finalize, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 
 import {
@@ -18,6 +26,7 @@ import {
 } from '../../../core/enums/offers';
 import { SITE_URL } from '../../../core/config/site';
 import { Offer } from '../../../core/services/offer/offer';
+import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
 import type { OfferItemId, OfferPageVm } from '../../../core/types/offers';
 import { normalizeFaqItems } from './faq-items';
@@ -38,7 +47,6 @@ const STANDARDS_AND_LOGISTICS_SLUG = 'standardy-i-logistyka';
   selector: 'app-offers',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     AccordionModule,
     ButtonModule,
@@ -50,9 +58,11 @@ const STANDARDS_AND_LOGISTICS_SLUG = 'standardy-i-logistyka';
   styleUrl: './offers.scss',
   providers: [provideTranslocoScope('offers', 'common')],
 })
-export class Offers {
+export class Offers implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly offer = inject(Offer);
+  private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly siteUrl = SITE_URL;
 
@@ -63,55 +73,71 @@ export class Offers {
     distinctUntilChanged(),
   );
 
-  private readonly slug = toSignal(this.slug$, {
-    initialValue: 'oferta-indywidualna',
-  });
-
-  readonly vm = toSignal(
-    this.slug$.pipe(switchMap((slug) => this.offer.getOfferPageVmBySlug(slug))),
-    { initialValue: null },
-  );
-
-  private readonly resetExpandedLeadsEffect = effect(() => {
-    this.slug();
-    this.expandedLeadIds.set(new Set());
-  });
+  readonly slug = signal('oferta-indywidualna');
+  readonly offerPage = signal<OfferPageVm | null>(null);
+  readonly isLoading = signal(true);
+  readonly hasLoadError = signal(false);
+  readonly isNotFound = signal(false);
 
   private readonly applySeoEffect = effect(() => {
-    const vm = this.vm();
+    const requestedCanonicalUrl = `${this.siteUrl}/offer/${this.slug()}`;
 
-    if (!vm) {
+    if (this.isLoading()) {
       this.seo.apply({
-        title: this.i18n.seo().title || 'Oferta',
-        description: this.i18n.seo().description || '',
-        canonicalUrl: `${this.siteUrl}/offer/${this.slug()}`,
+        title: this.i18n.commonStatus().loading,
+        canonicalUrl: requestedCanonicalUrl,
+        robots: 'noindex,nofollow',
       });
       return;
     }
 
+    if (this.hasLoadError()) {
+      this.seo.apply({
+        title: this.i18n.commonErrors().server,
+        canonicalUrl: requestedCanonicalUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
+    if (this.isNotFound()) {
+      this.seo.apply({
+        title: this.i18n.commonErrors().notFound,
+        canonicalUrl: requestedCanonicalUrl,
+        robots: 'noindex,nofollow',
+      });
+      return;
+    }
+
+    const offerPage = this.offerPage();
+    if (!offerPage) return;
+
     this.seo.apply({
-      title: vm.page.seo.title?.trim() || vm.page.title,
-      description: vm.page.seo.description?.trim() || vm.page.subtitle || '',
+      title: offerPage.page.seo.title?.trim() || offerPage.page.title,
+      description:
+        offerPage.page.seo.description?.trim() ||
+        offerPage.page.subtitle ||
+        '',
       canonicalUrl:
-        vm.page.seo.canonicalUrl?.trim() ||
-        `${this.siteUrl}/offer/${vm.page.slug}`,
+        offerPage.page.seo.canonicalUrl?.trim() ||
+        `${this.siteUrl}/offer/${offerPage.page.slug}`,
       og: {
         title:
-          vm.page.seo.ogTitle?.trim() ||
-          vm.page.seo.title?.trim() ||
-          vm.page.title,
+          offerPage.page.seo.ogTitle?.trim() ||
+          offerPage.page.seo.title?.trim() ||
+          offerPage.page.title,
         description:
-          vm.page.seo.ogDescription?.trim() ||
-          vm.page.seo.description?.trim() ||
-          vm.page.subtitle ||
+          offerPage.page.seo.ogDescription?.trim() ||
+          offerPage.page.seo.description?.trim() ||
+          offerPage.page.subtitle ||
           '',
       },
-      structuredData: this.buildCollectionStructuredData(vm),
+      structuredData: this.buildCollectionStructuredData(offerPage),
     });
   });
 
   readonly pageVm = computed(() => {
-    const vm = this.vm();
+    const vm = this.offerPage();
     if (!vm) return null;
 
     const sections = vm.sections;
@@ -193,6 +219,44 @@ export class Offers {
 
   readonly shouldShowLeadToggle = (text?: string | null) =>
     !!text && text.trim().length > 180;
+
+  ngOnInit(): void {
+    this.slug$
+      .pipe(
+        switchMap((slug) => {
+          this.startLoading(slug);
+
+          return this.offer.getOfferPageVmBySlug(slug).pipe(
+            catchError((error: unknown) => {
+              console.error('[offers] Failed to load public offer page.', error);
+              this.hasLoadError.set(true);
+              this.responseStatus.set(503);
+
+              return of(null);
+            }),
+            finalize(() => this.isLoading.set(false)),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((offerPage) => {
+        this.offerPage.set(offerPage);
+
+        if (this.hasLoadError()) return;
+
+        this.isNotFound.set(!offerPage);
+        this.responseStatus.set(offerPage ? 200 : 404);
+      });
+  }
+
+  private startLoading(slug: string): void {
+    this.slug.set(slug);
+    this.isLoading.set(true);
+    this.hasLoadError.set(false);
+    this.isNotFound.set(false);
+    this.offerPage.set(null);
+    this.expandedLeadIds.set(new Set());
+  }
 
   private buildCollectionStructuredData(vm: OfferPageVm) {
     const canonicalUrl =
