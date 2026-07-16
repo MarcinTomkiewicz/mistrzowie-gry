@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: mistrzowie-gry-production
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,6 +17,9 @@ jobs:
       APP_BASE_HREF: /
       PUBLIC_BASE_URL: https://mistrzowie-gry.pl
       INDEXABLE: "true"
+      DEPLOY_ARCHIVE: /tmp/mistrzowie-gry-dist-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}.tgz
+      DEPLOY_SCRIPT: /tmp/mistrzowie-gry-deploy-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}.sh
+      ORIGIN_SMOKE_SCRIPT: /tmp/mistrzowie-gry-origin-smoke-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}.sh
 
     steps:
       - name: Checkout
@@ -39,17 +46,30 @@ jobs:
       - name: Generate SEO files
         run: node scripts/gen_seo.mjs
 
+      - name: Write deployment metadata
+        env:
+          DEPLOY_SHA: ${{ github.sha }}
+          DEPLOY_RUN_NUMBER: ${{ github.run_number }}
+          DEPLOY_RUN_ID: ${{ github.run_id }}
+          DEPLOY_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          node -e "const fs = require('node:fs'); const metadata = { sha: process.env.DEPLOY_SHA, runNumber: Number(process.env.DEPLOY_RUN_NUMBER), runId: process.env.DEPLOY_RUN_ID, runAttempt: Number(process.env.DEPLOY_RUN_ATTEMPT), builtAt: new Date().toISOString() }; fs.writeFileSync('dist/mistrzowie-gry/deployment-metadata.json', JSON.stringify(metadata, null, 2) + '\n');"
+
       - name: Validate generated files
         run: |
+          test -f dist/mistrzowie-gry/browser/index.html
           test -f dist/mistrzowie-gry/browser/robots.txt
           test -f dist/mistrzowie-gry/browser/sitemap.xml
           test -f dist/mistrzowie-gry/server/server.mjs
+          test -f dist/mistrzowie-gry/deployment-metadata.json
 
       - name: Pack dist
         run: |
-          TAR_PATH="/tmp/mistrzowie-gry-dist.tgz"
-          tar -czf "$TAR_PATH" -C dist/mistrzowie-gry browser server
-          echo "TAR_PATH=$TAR_PATH" >> "$GITHUB_ENV"
+          tar -czf "$DEPLOY_ARCHIVE" \
+            -C dist/mistrzowie-gry \
+            browser \
+            server \
+            deployment-metadata.json
 
       - name: Setup SSH
         run: |
@@ -62,17 +82,20 @@ jobs:
       - name: Upload dist archive
         run: |
           scp -P "${{ secrets.SSH_PORT }}" \
-            "$TAR_PATH" \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/mistrzowie-gry-dist.tgz"
+            "$DEPLOY_ARCHIVE" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$DEPLOY_ARCHIVE"
 
       - name: Upload deploy script
         run: |
           scp -P "${{ secrets.SSH_PORT }}" \
             scripts/deploy_dist.sh \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/mistrzowie-gry-deploy.sh"
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$DEPLOY_SCRIPT"
+          scp -P "${{ secrets.SSH_PORT }}" \
+            scripts/origin_smoke.sh \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$ORIGIN_SMOKE_SCRIPT"
 
       - name: Run remote deploy
         run: |
           ssh -p "${{ secrets.SSH_PORT }}" \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "chmod +x /tmp/mistrzowie-gry-deploy.sh && /tmp/mistrzowie-gry-deploy.sh /tmp/mistrzowie-gry-dist.tgz"
+            "chmod +x '$DEPLOY_SCRIPT' '$ORIGIN_SMOKE_SCRIPT' && '$DEPLOY_SCRIPT' '$DEPLOY_ARCHIVE' '$GITHUB_SHA' '$GITHUB_RUN_ID' '$GITHUB_RUN_ATTEMPT' '$ORIGIN_SMOKE_SCRIPT'"
