@@ -18,15 +18,20 @@ fail() {
 
 fetch_origin() {
   local path="$1"
+  local log_curl_error="${2:-true}"
   local key="${path//\//_}"
   local body_path="$SMOKE_DIR/${key:-root}.body"
   local headers_path="$SMOKE_DIR/${key:-root}.headers"
+  local curl_error_path="$SMOKE_DIR/${key:-root}.curl-error"
   local status
 
-  status="$(
+  : > "$curl_error_path"
+
+  if ! status="$(
     curl \
       --silent \
       --show-error \
+      --stderr "$curl_error_path" \
       --connect-timeout 5 \
       --max-time 30 \
       --header "Host: $PUBLIC_HOST" \
@@ -34,18 +39,34 @@ fetch_origin() {
       --output "$body_path" \
       --write-out "%{http_code}" \
       "$ORIGIN_BASE_URL$path"
-  )"
+  )"; then
+    if [[ "$log_curl_error" == "true" ]]; then
+      report_curl_error "$curl_error_path"
+    fi
+
+    return 1
+  fi
 
   printf '%s\t%s\t%s\n' "$status" "$body_path" "$headers_path"
+}
+
+report_curl_error() {
+  local error_path="$1"
+  local message
+
+  [[ -s "$error_path" ]] || return 0
+  message="$(sed -n '1p' "$error_path")"
+  echo "[origin-smoke] $message" >&2
 }
 
 wait_for_origin() {
   local attempt
   local response
   local status
+  local curl_error_path="$SMOKE_DIR/_.curl-error"
 
   for attempt in {1..15}; do
-    if response="$(fetch_origin '/')"; then
+    if response="$(fetch_origin '/' false)"; then
       IFS=$'\t' read -r status _ _ <<< "$response"
 
       if [[ "$status" == "200" ]]; then
@@ -56,7 +77,69 @@ wait_for_origin() {
     sleep 2
   done
 
+  report_curl_error "$curl_error_path"
   fail "Origin did not become ready"
+}
+
+report_html_marker() {
+  local path="$1"
+  local body_path="$2"
+
+  node - "$path" "$body_path" <<'NODE'
+const fs = require('node:fs');
+
+const [path, bodyPath] = process.argv.slice(2);
+const body = fs.readFileSync(bodyPath, 'utf8');
+const markerPattern =
+  /(?:nav|legal)\.(?:[A-Za-z0-9_-]+\.)*[A-Za-z0-9_-]+|(?:nav|legal)\.|undefined|Just a moment\.\.\./i;
+const match = markerPattern.exec(body);
+
+if (!match) {
+  console.error(
+    `[origin-smoke] marker details unavailable for ${path}; HTML was not logged`,
+  );
+  process.exit(0);
+}
+
+const marker = match[0];
+const lineNumber = body.slice(0, match.index).split('\n').length;
+const fragmentStart = Math.max(0, match.index - 120);
+const fragmentEnd = Math.min(body.length, match.index + marker.length + 120);
+const sensitiveName =
+  '(?:authorization|proxy-authorization|cookie|set-cookie|token|secret|password|api[-_]?key)';
+const attributePattern = new RegExp(
+  `(${sensitiveName}\\s*=\\s*["'])[^"']*(["'])`,
+  'gi',
+);
+const objectPattern = new RegExp(
+  `(["']${sensitiveName}["']\\s*:\\s*["'])[^"']*(["'])`,
+  'gi',
+);
+const fragment = body
+  .slice(fragmentStart, fragmentEnd)
+  .replace(attributePattern, '$1[REDACTED]$2')
+  .replace(objectPattern, '$1[REDACTED]$2')
+  .replace(/\b(?:eyJ[A-Za-z0-9_-]{20,}|[A-Za-z0-9+/_=-]{80,})\b/g, '[REDACTED]')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+let diagnosis;
+
+if (/^(?:nav|legal)\./i.test(marker)) {
+  diagnosis = 'unresolved Transloco SSR key';
+} else if (marker.toLowerCase() === 'undefined') {
+  diagnosis = 'literal undefined emitted in SSR HTML';
+} else {
+  diagnosis = 'challenge page marker';
+}
+
+console.error(
+  `[origin-smoke] matched marker for ${path}: ${JSON.stringify(marker)}`,
+);
+console.error(`[origin-smoke] marker location: HTML line ${lineNumber}`);
+console.error(`[origin-smoke] HTML fragment: ${fragment}`);
+console.error(`[origin-smoke] diagnosis: ${diagnosis}`);
+NODE
 }
 
 smoke_html() {
@@ -87,6 +170,7 @@ smoke_html() {
   fi
 
   if grep -Eiq 'nav\.|legal\.|undefined|Just a moment\.\.\.' "$body_path"; then
+    report_html_marker "$path" "$body_path"
     fail "$path contains an unresolved shell, translation, or challenge marker"
   fi
 }
