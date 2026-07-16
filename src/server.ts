@@ -7,6 +7,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { join } from 'node:path';
 import { registerContactRoute } from './server/contact';
+import { registerPublicSeoRoutes } from './server/public-seo';
 
 dotenv.config({
   path: join(import.meta.dirname, '../.env'),
@@ -20,6 +21,8 @@ export function app(): express.Express {
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '200kb' }));
+
+  registerPublicSeoRoutes(app);
 
   app.use(
     express.static(browserDistFolder, {
