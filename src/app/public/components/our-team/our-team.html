@@ -1,5 +1,6 @@
 @let data = pageVm();
 @let empty = i18n.commonEmpty();
+@let errors = i18n.commonErrors();
 @let status = i18n.commonStatus();
 
 <section class="mg-section">
@@ -12,7 +13,15 @@
         <p class="mg-section__subtitle">{{ vm.page.subtitle }}</p>
       </header>
 
-      @if (!vm.profiles.length) {
+      @if (vm.hasLoadError) {
+        <div class="mg-card">
+          <p
+            class="mg-section__subtitle mg-section__subtitle--full mg-section__subtitle--no-margin"
+          >
+            {{ errors.server }}
+          </p>
+        </div>
+      } @else if (!vm.profiles.length) {
         <div class="mg-card">
           <div class="mg-section__title mg-section__title--sm">
             {{ empty.title }}

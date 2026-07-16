@@ -5,6 +5,7 @@ import {
 } from '../../../core/types/i18n/our-team';
 import {
   createCommonEmptyI18n,
+  createCommonErrorsI18n,
   createCommonSeoI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
@@ -21,6 +22,7 @@ export function createOurTeamI18n() {
     card: 'card',
   });
   const commonEmpty = createCommonEmptyI18n();
+  const commonErrors = createCommonErrorsI18n();
   const commonStatus = createCommonStatusI18n();
   const commonSeo = createCommonSeoI18n();
 
@@ -29,6 +31,7 @@ export function createOurTeamI18n() {
     seo,
     card,
     commonEmpty,
+    commonErrors,
     commonStatus,
     commonSeo,
     imageAltLabel: (displayName: string) =>

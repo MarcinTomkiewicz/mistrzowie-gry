@@ -7,6 +7,7 @@ import { catchError, of } from 'rxjs';
 import { buildSiteUrl } from '../../../core/config/site';
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import { GmRead } from '../../../core/reads/gm/gm-read';
+import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { normalizeText } from '../../../core/utils/normalize-text';
@@ -29,6 +30,7 @@ import { createOurTeamI18n } from './our-team.i18n';
 })
 export class OurTeam {
   private readonly gmRead = inject(GmRead);
+  private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly pageUrl = buildSiteUrl('/our-team');
@@ -37,10 +39,15 @@ export class OurTeam {
 
   readonly isDialogVisible = signal(false);
   readonly selectedProfile = signal<IGmPublicProfile | null>(null);
+  readonly hasLoadError = signal(false);
 
   readonly profiles = toSignal(
     this.gmRead.getPublicProfiles().pipe(
-      catchError(() => of([] as IGmPublicProfile[])),
+      catchError((error: unknown) => {
+        console.error('[our team] profile load error', error);
+        this.hasLoadError.set(true);
+        return of([] as IGmPublicProfile[]);
+      }),
     ),
     { initialValue: null },
   );
@@ -57,18 +64,40 @@ export class OurTeam {
     return {
       page: this.i18n.page(),
       profiles,
+      hasLoadError: this.hasLoadError(),
     };
   });
 
   private readonly applySeoEffect = effect(() => {
     const seo = this.i18n.seo();
     const commonSeo = this.i18n.commonSeo();
+    const commonErrors = this.i18n.commonErrors();
+    const profiles = this.profiles();
 
     const title =
       seo.title?.trim() || commonSeo.defaultTitle?.trim() || 'Mistrzowie Gry';
 
     const description =
       seo.description?.trim() || commonSeo.defaultDescription?.trim() || '';
+
+    if (this.hasLoadError()) {
+      this.responseStatus.set(503);
+      this.seo.apply({
+        title,
+        description: commonErrors.server,
+        canonicalUrl: this.pageUrl,
+        robots: 'noindex,nofollow',
+        og: {
+          title,
+          description: commonErrors.server,
+        },
+      });
+      return;
+    }
+
+    if (profiles !== null) {
+      this.responseStatus.set(200);
+    }
 
     this.seo.apply({
       title,
@@ -78,7 +107,10 @@ export class OurTeam {
         title,
         description,
       },
-      structuredData: this.buildStructuredData(title, description),
+      structuredData:
+        profiles === null
+          ? undefined
+          : this.buildStructuredData(title, description, profiles),
     });
   });
 
@@ -108,9 +140,12 @@ export class OurTeam {
 
     return this.storage.getPublicUrl(imagePath);
   }
-  private buildStructuredData(title: string, description: string) {
-    const profiles = this.profiles() ?? [];
 
+  private buildStructuredData(
+    title: string,
+    description: string,
+    profiles: readonly IGmPublicProfile[],
+  ) {
     const people = profiles.map((profile) => {
       const profileId = normalizeText(profile.profile.id) ?? profile.user.id;
       const image = this.getImageUrl(profile);
