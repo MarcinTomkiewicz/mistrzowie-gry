@@ -1,0 +1,31 @@
+@let data = section();
+@let emptyState = empty();
+
+<div class="mg-card mb-lg">
+  @if (data.title) {
+    <h2 class="mg-section__title mg-section__title--sm">
+      {{ data.title }}
+    </h2>
+  }
+
+  @if (data.subtitle) {
+    <p
+      class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mb-md"
+    >
+      {{ data.subtitle }}
+    </p>
+  }
+
+  @if (items().length) {
+    <app-faq-accordion [items]="items()" />
+  } @else {
+    <div class="mg-card">
+      <div class="mg-section__title mg-section__title--sm">
+        {{ emptyState.title }}
+      </div>
+      <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+        {{ emptyState.description }}
+      </p>
+    </div>
+  }
+</div>

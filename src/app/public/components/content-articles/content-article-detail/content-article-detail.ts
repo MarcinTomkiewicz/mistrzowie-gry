@@ -26,15 +26,20 @@ import { ResponseStatus } from '../../../../core/services/response-status/respon
 import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { Seo } from '../../../../core/services/seo/seo';
 import { Storage } from '../../../../core/services/storage/storage';
+import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
-import { createArticleStructuredData } from '../../../../core/utils/structured-data';
+import {
+  createArticleStructuredData,
+  createBreadcrumbStructuredData,
+} from '../../../../core/utils/structured-data';
+import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { createContentArticlesI18n } from '../content-articles.i18n';
 
 @Component({
   selector: 'app-content-article-detail',
   standalone: true,
-  imports: [RouterModule, ButtonModule, LoadingOverlay],
+  imports: [RouterModule, ButtonModule, Breadcrumbs, LoadingOverlay],
   templateUrl: './content-article-detail.html',
   providers: [provideTranslocoScope('contentArticles', 'common')],
 })
@@ -57,6 +62,27 @@ export class ContentArticleDetail implements OnInit {
   readonly heroImageUrl = computed(() =>
     resolvePublicStorageUrl(this.storage, this.article()?.heroImagePath),
   );
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
+    const article = this.article();
+
+    if (!article) {
+      return [];
+    }
+
+    return [
+      {
+        label: this.i18n.commonCta().goHome,
+        path: '/',
+      },
+      {
+        label: this.i18n.hero().title,
+        path: '/artykuly',
+      },
+      {
+        label: article.title,
+      },
+    ];
+  });
 
   readonly vm = computed(() => ({
     article: this.article(),
@@ -103,15 +129,18 @@ export class ContentArticleDetail implements OnInit {
           description,
           image: imageUrl ?? undefined,
         },
-        structuredData: createArticleStructuredData({
-          id: `${canonicalUrl}#article`,
-          url: canonicalUrl,
-          headline: title,
-          description,
-          image: imageUrl ?? undefined,
-          datePublished: article.publishedAt,
-          dateModified: article.updatedAt,
-        }),
+        structuredData: [
+          createArticleStructuredData({
+            id: `${canonicalUrl}#article`,
+            url: canonicalUrl,
+            headline: title,
+            description,
+            image: imageUrl ?? undefined,
+            datePublished: article.publishedAt,
+            dateModified: article.updatedAt,
+          }),
+          createBreadcrumbStructuredData(this.breadcrumbs()),
+        ],
       });
       return;
     }

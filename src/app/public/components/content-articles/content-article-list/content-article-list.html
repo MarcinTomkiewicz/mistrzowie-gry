@@ -4,6 +4,8 @@
   <div class="mg-container position-relative">
     <app-loading-overlay [visible]="data.isLoading" [label]="data.status.loading" />
 
+    <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
+
     <header class="mg-section__header">
       <h1 class="mg-section__title">{{ data.hero.title }}</h1>
       <p class="mg-section__subtitle">{{ data.hero.subtitle }}</p>

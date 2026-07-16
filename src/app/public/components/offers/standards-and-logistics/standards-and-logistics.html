@@ -151,23 +151,7 @@
     }
 
     @if (data.faq.items.length) {
-      <p-accordion>
-        @for (x of data.faq.items; track x.h) {
-          <p-accordion-panel [value]="x.h">
-            <p-accordion-header class="mg-section__title mg-section__title--xs">
-              {{ x.h }}
-            </p-accordion-header>
-
-            <p-accordion-content>
-              <p
-                class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
-              >
-                {{ x.a }}
-              </p>
-            </p-accordion-content>
-          </p-accordion-panel>
-        }
-      </p-accordion>
+      <app-faq-accordion [items]="data.faq.items" />
     } @else {
       <div class="mg-card">
         <div class="mg-section__title mg-section__title--sm">

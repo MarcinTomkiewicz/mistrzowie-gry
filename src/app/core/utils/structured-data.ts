@@ -7,6 +7,7 @@ import {
   VENUE_STREET_ADDRESS,
   WEBSITE_ID,
 } from '../config/site';
+import type { BreadcrumbItem } from '../types/breadcrumb';
 import {
   ArticleStructuredDataOptions,
   EventStructuredDataOptions,
@@ -25,6 +26,24 @@ function compactNode<T extends StructuredDataNode>(node: T): T {
 export function createOrganizationRef(siteUrl = SITE_URL): StructuredDataNode {
   return {
     '@id': siteUrl === SITE_URL ? ORGANIZATION_ID : `${siteUrl}/#organization`,
+  };
+}
+
+export function createBreadcrumbStructuredData(
+  items: readonly BreadcrumbItem[],
+): StructuredDataNode {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) =>
+      compactNode({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.label,
+        item: item.path
+          ? new URL(item.path, `${SITE_URL}/`).toString()
+          : undefined,
+      }),
+    ),
   };
 }
 

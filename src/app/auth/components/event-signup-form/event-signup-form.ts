@@ -2,14 +2,14 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { MenuItem } from 'primeng/api';
-import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 
 import { EVENT_SIGNUP_SELECTION_ROUTE } from '../../../core/configs/event-signup.config';
 import { Seo } from '../../../core/services/seo/seo';
+import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
 import { formatDateLabel } from '../../../core/utils/date';
 import { joinTextParts } from '../../../core/utils/normalize-text';
+import { Breadcrumbs } from '../../../public/common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../public/common/occurrence-switcher/occurrence-switcher';
 import { EventSignupFormFacade } from './event-signup-form.facade';
@@ -21,8 +21,8 @@ import { EventSignupSessionEditor } from './event-signup-session-editor';
   standalone: true,
   imports: [
     RouterModule,
-    BreadcrumbModule,
     ButtonModule,
+    Breadcrumbs,
     LoadingOverlay,
     OccurrenceSwitcher,
     EventSignupSessionEditor,
@@ -68,7 +68,7 @@ export class EventSignupForm {
       : '';
   });
 
-  readonly breadcrumbs = computed<MenuItem[]>(() => {
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
     const page = this.page();
 
     if (!page.core || !page.edition || !page.occurrence) {
@@ -78,7 +78,7 @@ export class EventSignupForm {
     return [
       {
         label: this.i18n.breadcrumbs().eventSignupLabel,
-        routerLink: EVENT_SIGNUP_SELECTION_ROUTE,
+        path: EVENT_SIGNUP_SELECTION_ROUTE,
       },
       {
         label: page.core.name,

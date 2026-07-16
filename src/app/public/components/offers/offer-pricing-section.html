@@ -1,0 +1,137 @@
+@let data = section();
+@let pricingHeaders = i18n.pricingHeaders();
+@let cta = i18n.commonCta();
+
+<div class="mg-card mb-lg">
+  @if (data.title) {
+    <h2 class="mg-section__title mg-section__title--sm">
+      {{ data.title }}
+    </h2>
+  }
+
+  @if (data.subtitle) {
+    <p
+      class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mb-md"
+    >
+      {{ data.subtitle }}
+    </p>
+  }
+
+  <div class="hide-down-md">
+    <p-table [value]="data.items">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="w-20 small-caps">
+            {{ pricingHeaders.variant }}
+          </th>
+          <th class="w-20 small-caps">{{ pricingHeaders.price }}</th>
+          <th class="small-caps">
+            {{ pricingHeaders.description }}
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.title }}</td>
+          <td>{{ formatPricing(item.pricing) }}</td>
+          <td>
+            <div class="flex-col-start-start">
+              <div
+                class="mg-pricing-lead lh-18"
+                [class.mg-pricing-lead--expanded]="
+                  isLeadExpanded(item.id)
+                "
+              >
+                {{ item.lead }}
+              </div>
+
+              @if (shouldShowLeadToggle(item.lead)) {
+                <p-button
+                  styleClass="arcane"
+                  [label]="
+                    isLeadExpanded(item.id) ? cta.showLess : cta.showMore
+                  "
+                  icon="pi pi-lever"
+                  iconPos="right"
+                  size="small"
+                  class="align-self-end"
+                  [outlined]="true"
+                  (click)="toggleLead(item.id)"
+                  [attr.aria-expanded]="isLeadExpanded(item.id)"
+                />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="show-down-md">
+    <div class="flex-col-start-stretch gap-md">
+      @for (item of data.items; track item.id) {
+        <div class="mg-card">
+          <div class="flex-col-start-stretch gap-sm">
+            <div class="flex-row-start-center gap-sm">
+              <div class="heading-color small-caps flex-fixed-25">
+                {{ pricingHeaders.variantLabel }}
+              </div>
+              <div class="flex-1 min-w-0">
+                {{ item.title }}
+              </div>
+            </div>
+
+            <div class="flex-row-start-start gap-sm">
+              <div class="heading-color small-caps flex-fixed-25">
+                {{ pricingHeaders.price }}
+              </div>
+              <div class="flex-1 min-w-0">
+                {{ formatPricing(item.pricing) }}
+              </div>
+            </div>
+
+            <div class="flex-col-start-stretch gap-xs">
+              <div class="heading-color small-caps">
+                {{ pricingHeaders.description }}
+              </div>
+
+              <div class="flex-col-start-start">
+                <div
+                  class="mg-pricing-lead lh-18"
+                  [class.mg-pricing-lead--expanded]="
+                    isLeadExpanded(item.id)
+                  "
+                >
+                  {{ item.lead }}
+                </div>
+
+                @if (shouldShowLeadToggle(item.lead)) {
+                  <p-button
+                    styleClass="arcane"
+                    [label]="
+                      isLeadExpanded(item.id) ? cta.showLess : cta.showMore
+                    "
+                    icon="pi pi-lever"
+                    iconPos="right"
+                    size="small"
+                    class="align-self-end"
+                    [outlined]="true"
+                    (click)="toggleLead(item.id)"
+                    [attr.aria-expanded]="isLeadExpanded(item.id)"
+                  />
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (pricingFootnote()) {
+    <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">
+      {{ pricingFootnote() }}
+    </p>
+  }
+</div>

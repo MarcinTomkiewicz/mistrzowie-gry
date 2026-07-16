@@ -1,0 +1,17 @@
+<p-accordion>
+  @for (item of items(); track $index) {
+    <p-accordion-panel [value]="$index">
+      <p-accordion-header class="mg-section__title mg-section__title--xs">
+        {{ item.h }}
+      </p-accordion-header>
+
+      <p-accordion-content>
+        <p
+          class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+        >
+          {{ item.a }}
+        </p>
+      </p-accordion-content>
+    </p-accordion-panel>
+  }
+</p-accordion>

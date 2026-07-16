@@ -10,9 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
-import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -28,34 +26,38 @@ import { SITE_URL } from '../../../core/config/site';
 import { Offer } from '../../../core/services/offer/offer';
 import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
-import type { OfferItemId, OfferPageVm } from '../../../core/types/offers';
+import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
+import type { OfferItem, OfferPageVm } from '../../../core/types/offers';
 import { normalizeFaqItems } from './faq-items';
-import { createPageStructuredData } from '../../../core/utils/structured-data';
 import {
-  formatAddonPricing,
-  formatPricing,
-  formatPricingDetailed,
-} from './offer-pricing';
+  createBreadcrumbStructuredData,
+  createPageStructuredData,
+} from '../../../core/utils/structured-data';
+import { Breadcrumbs } from '../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
+import { OfferAddonsSection } from './offer-addons-section';
+import { OfferFaqSection } from './offer-faq-section';
+import { OfferMaterialsSection } from './offer-materials-section';
+import { OfferPricingSection } from './offer-pricing-section';
 import { createOffersI18n } from './offers.i18n';
 import { StandardsAndLogistics } from './standards-and-logistics/standards-and-logistics';
 import { findCardsSectionByKind, findSectionByType } from './offers.utils';
-
-const STANDARDS_AND_LOGISTICS_SLUG = 'standardy-i-logistyka';
 
 @Component({
   selector: 'app-offers',
   standalone: true,
   imports: [
     RouterModule,
-    AccordionModule,
     ButtonModule,
-    TableModule,
+    Breadcrumbs,
     LoadingOverlay,
+    OfferAddonsSection,
+    OfferFaqSection,
+    OfferMaterialsSection,
+    OfferPricingSection,
     StandardsAndLogistics,
   ],
   templateUrl: './offers.html',
-  styleUrl: './offers.scss',
   providers: [provideTranslocoScope('offers', 'common')],
 })
 export class Offers implements OnInit {
@@ -78,6 +80,23 @@ export class Offers implements OnInit {
   readonly isLoading = signal(true);
   readonly hasLoadError = signal(false);
   readonly isNotFound = signal(false);
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
+    const offerPage = this.offerPage();
+
+    if (!offerPage) {
+      return [];
+    }
+
+    return [
+      {
+        label: this.i18n.commonCta().goHome,
+        path: '/',
+      },
+      {
+        label: offerPage.page.title,
+      },
+    ];
+  });
 
   private readonly applySeoEffect = effect(() => {
     const requestedCanonicalUrl = `${this.siteUrl}/offer/${this.slug()}`;
@@ -132,7 +151,10 @@ export class Offers implements OnInit {
           offerPage.page.subtitle ||
           '',
       },
-      structuredData: this.buildCollectionStructuredData(offerPage),
+      structuredData: [
+        this.buildCollectionStructuredData(offerPage),
+        createBreadcrumbStructuredData(this.breadcrumbs()),
+      ],
     });
   });
 
@@ -142,7 +164,7 @@ export class Offers implements OnInit {
 
     const sections = vm.sections;
     const isStandardsAndLogisticsPage =
-      vm.page.slug === STANDARDS_AND_LOGISTICS_SLUG;
+      vm.page.type === OfferPageTypeEnum.StandardsAndLogistics;
 
     const hero = findSectionByType(sections, OfferSectionTypeEnum.Hero);
     const pricing = findSectionByType(
@@ -165,18 +187,20 @@ export class Offers implements OnInit {
 
     const cta = findSectionByType(sections, OfferSectionTypeEnum.Cta);
 
-    const pageType = vm.page?.type;
-
     const footnotes = this.i18n.commonFootnotes();
+    let pricingFootnote: string;
 
-    const FOOTNOTE_BY_PAGE_TYPE: Partial<Record<OfferPageTypeEnum, string>> = {
-      [OfferPageTypeEnum.Business]: footnotes.net,
-      [OfferPageTypeEnum.Institution]: footnotes.net,
-      [OfferPageTypeEnum.StandardsAndLogistics]: footnotes.both,
-    };
-
-    const pricingFootnote =
-      FOOTNOTE_BY_PAGE_TYPE[pageType as OfferPageTypeEnum] ?? footnotes.gross;
+    switch (vm.page.type) {
+      case OfferPageTypeEnum.Business:
+      case OfferPageTypeEnum.Institution:
+        pricingFootnote = footnotes.net;
+        break;
+      case OfferPageTypeEnum.StandardsAndLogistics:
+        pricingFootnote = footnotes.both;
+        break;
+      default:
+        pricingFootnote = footnotes.gross;
+    }
 
     return {
       page: vm.page,
@@ -194,31 +218,6 @@ export class Offers implements OnInit {
       pricingFootnote,
     };
   });
-
-  readonly formatPricing = formatPricing;
-  readonly formatPricingDetailed = formatPricingDetailed;
-  readonly formatAddonPricing = formatAddonPricing;
-
-  readonly expandedLeadIds = signal<Set<OfferItemId>>(new Set());
-
-  readonly isLeadExpanded = (id: OfferItemId) => this.expandedLeadIds().has(id);
-
-  readonly toggleLead = (id: OfferItemId) => {
-    this.expandedLeadIds.update((current) => {
-      const next = new Set(current);
-
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-
-      return next;
-    });
-  };
-
-  readonly shouldShowLeadToggle = (text?: string | null) =>
-    !!text && text.trim().length > 180;
 
   ngOnInit(): void {
     this.slug$
@@ -255,22 +254,18 @@ export class Offers implements OnInit {
     this.hasLoadError.set(false);
     this.isNotFound.set(false);
     this.offerPage.set(null);
-    this.expandedLeadIds.set(new Set());
   }
 
   private buildCollectionStructuredData(vm: OfferPageVm) {
     const canonicalUrl =
       vm.page.seo.canonicalUrl?.trim() || `${this.siteUrl}/offer/${vm.page.slug}`;
 
-    const uniqueItems = new Map<number, { title: string; lead: string | null }>();
+    const uniqueItems = new Map<OfferItem['id'], OfferItem>();
 
     for (const section of vm.sections) {
       for (const item of section.items) {
         if (!uniqueItems.has(item.id)) {
-          uniqueItems.set(item.id, {
-            title: item.title,
-            lead: item.lead,
-          });
+          uniqueItems.set(item.id, item);
         }
       }
     }
@@ -283,11 +278,10 @@ export class Offers implements OnInit {
       description: vm.page.seo.description?.trim() || vm.page.subtitle || '',
       mainEntity: {
         '@type': 'ItemList',
-        itemListElement: Array.from(uniqueItems.entries()).map(
-          ([id, item], index) => ({
+        itemListElement: Array.from(uniqueItems.values()).map(
+          (item, index) => ({
             '@type': 'ListItem',
             position: index + 1,
-            url: `${canonicalUrl}#offer-item-${id}`,
             name: item.title,
             description: item.lead ?? undefined,
           }),

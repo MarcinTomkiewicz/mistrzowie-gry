@@ -1,25 +1,21 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';
 
-import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
-
-import { createOffersI18n } from '../offers.i18n';
 
 import type {
   OfferItemId,
   OfferSectionWithItems,
 } from '../../../../core/types/offers';
-import {
-  formatPricingDetailed,
-} from '../offer-pricing';
+import { FaqAccordion } from '../../../common/faq-accordion/faq-accordion';
+import { formatPricingDetailed } from '../offer-pricing';
+import { createOffersI18n } from '../offers.i18n';
 
 @Component({
   selector: 'app-standards-and-logistics',
   standalone: true,
-  imports: [CommonModule, AccordionModule, ButtonModule],
+  imports: [ButtonModule, FaqAccordion],
   templateUrl: './standards-and-logistics.html',
   styleUrl: './standards-and-logistics.scss',
   providers: [provideTranslocoScope('offers', 'common')],
@@ -32,7 +28,7 @@ export class StandardsAndLogistics {
 
   readonly formatPricingDetailed = formatPricingDetailed;
 
-  readonly expandedLeadIds = signal<Set<OfferItemId>>(new Set());
+  private readonly expandedLeadIds = signal<Set<OfferItemId>>(new Set());
 
   readonly isLeadExpanded = (id: OfferItemId) => this.expandedLeadIds().has(id);
 

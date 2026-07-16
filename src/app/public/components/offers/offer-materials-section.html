@@ -1,0 +1,43 @@
+@let data = section();
+
+<div class="mb-lg">
+  @if (data.title) {
+    <h2 class="mg-section__title mg-section__title--sm">
+      {{ data.title }}
+    </h2>
+  }
+
+  @if (data.subtitle) {
+    <p
+      class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+    >
+      {{ data.subtitle }}
+    </p>
+  }
+
+  <div class="mg-offer-cards">
+    @for (item of data.items; track item.id) {
+      <div class="mg-card">
+        <div class="mg-section__title mg-section__title--sm">
+          {{ item.title }}
+        </div>
+
+        @if (formatPricingDetailed(item.pricing); as pricing) {
+          <div class="mg-section__title mg-section__title--xs">
+            {{ pricing.value }}
+          </div>
+
+          @if (pricing.note) {
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+              {{ pricing.note }}
+            </p>
+          }
+        }
+
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ item.lead }}
+        </p>
+      </div>
+    }
+  </div>
+</div>

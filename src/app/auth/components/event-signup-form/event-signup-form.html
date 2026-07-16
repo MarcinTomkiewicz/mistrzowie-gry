@@ -65,7 +65,7 @@
           </p>
         </header>
 
-        <p-breadcrumb class="w-100" [model]="breadcrumbs()" />
+        <app-breadcrumbs [items]="breadcrumbs()" />
 
         @switch (vm.accessState) {
           @case ("closed") {

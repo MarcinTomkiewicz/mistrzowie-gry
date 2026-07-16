@@ -12,15 +12,20 @@ import { ContentArticles } from '../../../../core/services/content-articles/cont
 import { ResponseStatus } from '../../../../core/services/response-status/response-status';
 import { Seo } from '../../../../core/services/seo/seo';
 import { Storage } from '../../../../core/services/storage/storage';
+import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
-import { createPageStructuredData } from '../../../../core/utils/structured-data';
+import {
+  createBreadcrumbStructuredData,
+  createPageStructuredData,
+} from '../../../../core/utils/structured-data';
+import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { createContentArticlesI18n } from '../content-articles.i18n';
 
 @Component({
   selector: 'app-content-article-list',
   standalone: true,
-  imports: [RouterModule, ButtonModule, LoadingOverlay],
+  imports: [RouterModule, ButtonModule, Breadcrumbs, LoadingOverlay],
   templateUrl: './content-article-list.html',
   providers: [provideTranslocoScope('contentArticles', 'common')],
 })
@@ -36,6 +41,15 @@ export class ContentArticleList implements OnInit {
   readonly items = signal<IContentArticleListItem[]>([]);
   readonly isLoading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    {
+      label: this.i18n.commonCta().goHome,
+      path: '/',
+    },
+    {
+      label: this.i18n.hero().title,
+    },
+  ]);
 
   readonly vm = computed(() => ({
     hero: this.i18n.hero(),
@@ -78,13 +92,16 @@ export class ContentArticleList implements OnInit {
       title: seo.listTitle,
       description: seo.listDescription,
       canonicalUrl: this.pageUrl,
-      structuredData: createPageStructuredData({
-        type: 'CollectionPage',
-        id: `${this.pageUrl}#webpage`,
-        url: this.pageUrl,
-        name: seo.listTitle,
-        description: seo.listDescription,
-      }),
+      structuredData: [
+        createPageStructuredData({
+          type: 'CollectionPage',
+          id: `${this.pageUrl}#webpage`,
+          url: this.pageUrl,
+          name: seo.listTitle,
+          description: seo.listDescription,
+        }),
+        createBreadcrumbStructuredData(this.breadcrumbs()),
+      ],
     });
   });
 

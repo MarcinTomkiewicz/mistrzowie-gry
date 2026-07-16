@@ -1,4 +1,5 @@
 import {
+  createCommonCtaI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -26,6 +27,7 @@ export function createContentArticlesI18n() {
   });
 
   const status = createCommonStatusI18n();
+  const commonCta = createCommonCtaI18n();
 
   return {
     hero,
@@ -34,6 +36,6 @@ export function createContentArticlesI18n() {
     empty,
     errors,
     status,
+    commonCta,
   };
 }
-

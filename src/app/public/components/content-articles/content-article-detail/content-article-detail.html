@@ -23,9 +23,10 @@
         </p>
       </div>
     } @else if (data.article; as article) {
+      <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
+
       <article>
         <header class="mg-section__header">
-          
           <h1 class="mg-section__title">{{ article.title }}</h1>
           <p class="mg-section__subtitle mg-section__subtitle--full">
             {{ article.excerpt }}

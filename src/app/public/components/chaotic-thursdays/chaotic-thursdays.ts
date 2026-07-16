@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { AccordionModule } from 'primeng/accordion';
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { ButtonModule } from 'primeng/button';
 
@@ -26,6 +25,7 @@ import {
   createPlaceStructuredData,
 } from '../../../core/utils/structured-data';
 import { formatTimeLabel } from '../../../core/utils/time';
+import { FaqAccordion } from '../../common/faq-accordion/faq-accordion';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { SessionDialog } from '../session-dialog/session-dialog';
 import {
@@ -43,8 +43,8 @@ import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
   imports: [
     RouterModule,
     ButtonModule,
-    AccordionModule,
     AnimateOnScrollModule,
+    FaqAccordion,
     ChaoticThursdaysEventPanel,
     GmProfileDialog,
     SessionDialog,
