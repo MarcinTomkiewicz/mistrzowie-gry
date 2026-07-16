@@ -9,6 +9,7 @@
     "test": "ng test",
     "serve:ssr:mistrzowie-gry": "node dist/mistrzowie-gry/server/server.mjs",
     "build:ssr": "node scripts/build-ssr.mjs",
+    "audit:public-seo": "node scripts/audit-public-seo.mjs",
     "copy:changes": "node scripts/copy-git-changes.mjs"
   },
   "prettier": {
