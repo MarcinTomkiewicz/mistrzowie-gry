@@ -190,10 +190,6 @@ validate_release() {
 
   [[ -s "$release_path/browser/index.html" ]] ||
     fail "Release is missing browser/index.html"
-  [[ -s "$release_path/browser/robots.txt" ]] ||
-    fail "Release is missing browser/robots.txt"
-  [[ -s "$release_path/browser/sitemap.xml" ]] ||
-    fail "Release is missing browser/sitemap.xml"
   [[ -s "$release_path/server/server.mjs" ]] ||
     fail "Release is missing server/server.mjs"
   [[ -s "$metadata_path" ]] ||

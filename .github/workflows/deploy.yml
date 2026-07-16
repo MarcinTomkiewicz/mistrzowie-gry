@@ -15,8 +15,6 @@ jobs:
 
     env:
       APP_BASE_HREF: /
-      PUBLIC_BASE_URL: https://mistrzowie-gry.pl
-      INDEXABLE: "true"
       DEPLOY_ARCHIVE: /tmp/mistrzowie-gry-dist-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}.tgz
       DEPLOY_SCRIPT: /tmp/mistrzowie-gry-deploy-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}.sh
       ORIGIN_SMOKE_SCRIPT: /tmp/mistrzowie-gry-origin-smoke-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}.sh
@@ -37,15 +35,6 @@ jobs:
       - name: Build (SSR)
         run: npm run build:ssr
 
-      - name: Fetch dynamic routes
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/fetch-dynamic.mjs
-
-      - name: Generate SEO files
-        run: node scripts/gen_seo.mjs
-
       - name: Write deployment metadata
         env:
           DEPLOY_SHA: ${{ github.sha }}
@@ -55,11 +44,9 @@ jobs:
         run: |
           node -e "const fs = require('node:fs'); const metadata = { sha: process.env.DEPLOY_SHA, runNumber: Number(process.env.DEPLOY_RUN_NUMBER), runId: process.env.DEPLOY_RUN_ID, runAttempt: Number(process.env.DEPLOY_RUN_ATTEMPT), builtAt: new Date().toISOString() }; fs.writeFileSync('dist/mistrzowie-gry/deployment-metadata.json', JSON.stringify(metadata, null, 2) + '\n');"
 
-      - name: Validate generated files
+      - name: Validate deployment artifact
         run: |
           test -f dist/mistrzowie-gry/browser/index.html
-          test -f dist/mistrzowie-gry/browser/robots.txt
-          test -f dist/mistrzowie-gry/browser/sitemap.xml
           test -f dist/mistrzowie-gry/server/server.mjs
           test -f dist/mistrzowie-gry/deployment-metadata.json
 
