@@ -24,6 +24,7 @@ import {
 import {
   hasArticleEditorHeadingWithoutBody,
   hasArticleEditorImageWithoutPath,
+  hasInvalidArticleLinkSyntax,
 } from '../../../../core/validators/article-editor-block.validator';
 import { ImageUpload } from '../../../../public/common/image-upload/image-upload';
 import { createArticleEditorBlockForm } from '../article-editor/article-editor-form';
@@ -58,6 +59,7 @@ export class ArticleBlocksEditor {
   protected readonly isUploading = signal(false);
   protected readonly hasHeadingWithoutBody = hasArticleEditorHeadingWithoutBody;
   protected readonly hasImageWithoutPath = hasArticleEditorImageWithoutPath;
+  protected readonly hasInvalidLinkSyntax = hasInvalidArticleLinkSyntax;
 
   protected addTextSectionAfter(index: number | null): void {
     this.addBlockAfter(index, createArticleEditorBlockForm('text_section'));

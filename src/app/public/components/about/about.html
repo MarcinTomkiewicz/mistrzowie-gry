@@ -6,7 +6,7 @@
       </h1>
 
       <p class="mg-section__subtitle">
-        {{ hero().subtitle }}
+        <app-internal-link-text [text]="hero().subtitle" />
       </p>
     </header>
 
@@ -17,7 +17,7 @@
         </h2>
 
         @for (p of section.paragraphs; track trackByIndex($index)) {
-          <p>{{ p }}</p>
+          <p><app-internal-link-text [text]="p" /></p>
         }
       }
 
@@ -33,7 +33,7 @@
             </h3>
 
             @for (p of card.paragraphs; track trackByIndex($index)) {
-              <p>{{ p }}</p>
+              <p><app-internal-link-text [text]="p" /></p>
             }
           </div>
         }

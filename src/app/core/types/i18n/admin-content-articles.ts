@@ -65,6 +65,8 @@ export interface AdminContentArticleEditorValidationTranslations {
   headingWithoutBody: string;
   imageWithoutPath: string;
   emptyBlocksNotice: string;
+  internalLinkHint: string;
+  invalidInternalLink: string;
 }
 
 export interface AdminContentArticleEditorUploadTranslations {

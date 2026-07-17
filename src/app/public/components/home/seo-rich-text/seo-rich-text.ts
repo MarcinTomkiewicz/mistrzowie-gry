@@ -2,17 +2,19 @@ import { Component } from '@angular/core';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
+
 import {
   UiSeoTextColumn,
   UiSeoTextSection,
 } from '../../../../core/types/i18n/home';
+import { InternalLinkText } from '../../../common/internal-link-text/internal-link-text';
 import { createSeoRichTextI18n } from './seo-rich-text.i18n';
-import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-seo-rich-text',
   standalone: true,
-  imports: [AnimateOnScrollModule],
+  imports: [AnimateOnScrollModule, InternalLinkText],
   templateUrl: './seo-rich-text.html',
   providers: [provideTranslocoScope('home')],
 })

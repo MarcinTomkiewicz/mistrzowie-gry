@@ -1,6 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { ButtonModule } from 'primeng/button';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -8,13 +9,18 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { buildSiteUrl } from '../../../core/config/site';
 import { Seo } from '../../../core/services/seo/seo';
 import { createPageStructuredData } from '../../../core/utils/structured-data';
+import { InternalLinkText } from '../../common/internal-link-text/internal-link-text';
 import { createAboutI18n } from './about.i18n';
-import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [RouterModule, ButtonModule, AnimateOnScrollModule],
+  imports: [
+    RouterModule,
+    ButtonModule,
+    AnimateOnScrollModule,
+    InternalLinkText,
+  ],
   templateUrl: './about.html',
   styleUrl: './about.scss',
   providers: [provideTranslocoScope('common', 'about')],

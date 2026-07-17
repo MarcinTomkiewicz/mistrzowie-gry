@@ -23,6 +23,7 @@ import {
 import {
   hasArticleEditorHeadingWithoutBody,
   hasArticleEditorImageWithoutPath,
+  hasInvalidArticleLinkSyntax,
 } from '../../../../core/validators/article-editor-block.validator';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { stringToSlug } from '../../../../core/utils/slug';
@@ -169,7 +170,8 @@ export class ArticleEditor {
     if (
       this.textBlocks.controls.some((block) =>
         hasArticleEditorHeadingWithoutBody(block) ||
-        hasArticleEditorImageWithoutPath(block),
+        hasArticleEditorImageWithoutPath(block) ||
+        hasInvalidArticleLinkSyntax(block),
       )
     ) {
       this.toast.danger({

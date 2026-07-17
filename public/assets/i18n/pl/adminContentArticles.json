@@ -57,7 +57,9 @@
   "editorValidation": {
     "headingWithoutBody": "Sekcja z nagłówkiem musi mieć treść.",
     "imageWithoutPath": "Blok obrazu musi mieć przesłany obraz.",
-    "emptyBlocksNotice": "Dodaj sekcję tekstową, jeśli artykuł ma mieć treść."
+    "emptyBlocksNotice": "Dodaj sekcję tekstową, jeśli artykuł ma mieć treść.",
+    "internalLinkHint": "Link wewnętrzny:\n[url=/ścieżka]tekst linku[/url]\n\nPrzykład:\n[url=/offer/oferta-indywidualna]oferta indywidualna[/url]",
+    "invalidInternalLink": "Popraw składnię linku wewnętrznego przed zapisem."
   },
   "editorUpload": {
     "cropHint": "Ustaw kadr obrazu artykułu."

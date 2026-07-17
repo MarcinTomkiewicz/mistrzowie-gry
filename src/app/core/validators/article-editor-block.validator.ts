@@ -1,4 +1,5 @@
-import { ArticleEditorBlockForm } from '../types/article-editor-form';
+import type { ArticleEditorBlockForm } from '../types/article-editor-form';
+import { hasInvalidInternalLinkSyntax } from '../utils/rich-content';
 import { normalizeText } from '../utils/normalize-text';
 
 export function hasArticleEditorHeadingWithoutBody(
@@ -17,5 +18,14 @@ export function hasArticleEditorImageWithoutPath(
   return (
     block.controls.kind.value === 'image' &&
     !normalizeText(block.controls.imagePath.value)
+  );
+}
+
+export function hasInvalidArticleLinkSyntax(
+  block: ArticleEditorBlockForm,
+): boolean {
+  return (
+    block.controls.kind.value === 'text_section' &&
+    hasInvalidInternalLinkSyntax(block.controls.body.value)
   );
 }

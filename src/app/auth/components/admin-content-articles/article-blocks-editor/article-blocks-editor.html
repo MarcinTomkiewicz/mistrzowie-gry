@@ -126,8 +126,18 @@
             </label>
           </p-iftalabel>
 
+          <small class="d-block mt-xs text-pre-line">
+            {{ i18n.validation().internalLinkHint }}
+          </small>
+
           @if (showValidation() && hasHeadingWithoutBody(block)) {
             <small>{{ i18n.validation().headingWithoutBody }}</small>
+          }
+
+          @if (showValidation() && hasInvalidLinkSyntax(block)) {
+            <small class="d-block mt-xs">
+              {{ i18n.validation().invalidInternalLink }}
+            </small>
           }
         </div>
       } @else {

@@ -1,0 +1,11 @@
+@if (text() !== undefined) {
+  @for (node of nodes(); track $index) {
+    @if (node.type === 'link') {
+      <a [routerLink]="node.href">
+        <strong>{{ node.text }}</strong>
+      </a>
+    } @else {
+      {{ node.text }}
+    }
+  }
+}

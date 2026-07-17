@@ -3,7 +3,7 @@
     <header class="mg-section__header">
       <h2 class="mg-section__title">{{ header().title }}</h2>
       <p class="mg-section__subtitle">
-        {{ header().subtitle }}
+        <app-internal-link-text [text]="header().subtitle" />
       </p>
     </header>
 
@@ -23,7 +23,9 @@
               </h3>
 
               @for (p of section.paragraphs; track trackByIndex($index)) {
-                <p class="text-justify text-left-sm">{{ p }}</p>
+                <p class="text-justify text-left-sm">
+                  <app-internal-link-text [text]="p" />
+                </p>
               }
             }
           </div>

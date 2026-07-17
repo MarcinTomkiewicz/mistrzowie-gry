@@ -49,7 +49,7 @@
                 }
 
                 <p class="mg-section__subtitle mg-section__subtitle--full text-pre-line">
-                  {{ block.body }}
+                  <app-internal-link-text [text]="block.body" />
                 </p>
               </section>
             } @else if (isImageBlock(block)) {
