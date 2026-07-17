@@ -1,5 +1,6 @@
 import { inject, Injectable, PendingTasks } from '@angular/core';
 import {
+  FunctionInvokeOptions,
   PostgrestResponse,
   PostgrestSingleResponse,
 } from '@supabase/supabase-js';
@@ -13,7 +14,10 @@ import { Supabase } from '../supabase/supabase';
 import { FilterDefinition, IFilter } from '../../interfaces/i-filter';
 import { FilterOperator } from '../../enums/filter-operators';
 import { Pagination } from '../../types/backend';
+import { EdgeInvokeOptions } from '../../types/edge-http-method';
 import { RpcError } from '../../types/rpc-error';
+import { isEdgeFunctionSuccess } from '../../utils/edge-contract';
+import { createEdgeFunctionError } from '../../utils/edge-function-error-mapping';
 
 @Injectable({ providedIn: 'root' })
 export class Backend {
@@ -41,6 +45,30 @@ export class Backend {
         return res.data;
       }),
     );
+  }
+
+  invokeEdge<TResult, TBody = never>(
+    functionName: string,
+    options: EdgeInvokeOptions<TBody>,
+  ): Observable<TResult> {
+    return this.trackedRequest<TResult>(async () => {
+      const invokeOptions: FunctionInvokeOptions = { method: options.method };
+
+      if (options.method !== 'GET' && options.body !== undefined) {
+        Object.assign(invokeOptions, { body: options.body });
+      }
+
+      const response = await this.supabase.functions.invoke<TResult>(
+        functionName,
+        invokeOptions,
+      );
+
+      if (!isEdgeFunctionSuccess(response)) {
+        throw await createEdgeFunctionError(response.error);
+      }
+
+      return response.data;
+    });
   }
 
   getAll<T extends object>(opts: {

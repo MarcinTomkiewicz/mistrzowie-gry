@@ -18,3 +18,11 @@ export interface IStorageUploadResult {
 export interface IPublicStorageUrlResolver {
   getPublicUrl(path: string | null | undefined, bucket?: string): string | null;
 }
+
+export interface ISignedStorageUpload {
+  bucket: string;
+  path: string;
+  token: string;
+  file: File;
+  contentType: string;
+}
