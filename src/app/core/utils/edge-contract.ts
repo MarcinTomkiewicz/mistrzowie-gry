@@ -61,7 +61,54 @@ export function readEdgeInteger(value: unknown, path: string): number {
   return value;
 }
 
-function invalidEdgeResponse(path: string, expected: string): EdgeFunctionError {
+export function readEdgeNullableString(
+  value: unknown,
+  path: string,
+): string | null {
+  return value === null ? null : readEdgeString(value, path);
+}
+
+export function readEdgeNullableInteger(
+  value: unknown,
+  path: string,
+): number | null {
+  return value === null ? null : readEdgeInteger(value, path);
+}
+
+export function readEdgeLiteral<TValue extends string>(
+  value: unknown,
+  path: string,
+  allowedValues: readonly TValue[],
+): TValue {
+  const parsed = readEdgeString(value, path);
+  if (!isAllowedLiteral(parsed, allowedValues)) {
+    throw invalidEdgeResponse(path, `one of: ${allowedValues.join(', ')}`);
+  }
+  return parsed;
+}
+
+export function readEdgeNullableLiteral<TValue extends string>(
+  value: unknown,
+  path: string,
+  allowedValues: readonly TValue[],
+): TValue | null {
+  return value === null ? null : readEdgeLiteral(value, path, allowedValues);
+}
+
+export function assertEdgeContract(
+  condition: boolean,
+  path: string,
+  expected: string,
+): asserts condition {
+  if (!condition) {
+    throw invalidEdgeResponse(path, expected);
+  }
+}
+
+function invalidEdgeResponse(
+  path: string,
+  expected: string,
+): EdgeFunctionError {
   const message = `Invalid Edge Function response: ${path} must be ${expected}.`;
 
   return new EdgeFunctionError(
@@ -71,4 +118,11 @@ function invalidEdgeResponse(path: string, expected: string): EdgeFunctionError 
     {},
     new TypeError(message),
   );
+}
+
+function isAllowedLiteral<TValue extends string>(
+  value: string,
+  allowedValues: readonly TValue[],
+): value is TValue {
+  return allowedValues.some((allowedValue) => allowedValue === value);
 }
