@@ -5,6 +5,8 @@ import {
   PAYLOAD_SCHEMA_VERSION,
   RPC,
   VALIDATION_SCHEMA_VERSION,
+  type AdminQuestionnairePurpose,
+  type AdminQuestionnaireScope,
   type QuestionnaireEnvelope,
   type QuestionnaireStatement,
   type RpcName,
@@ -28,11 +30,35 @@ export async function getQuestionnaireEnvelope(
     p_actor_user_id: userId,
     p_purpose: "edit",
   });
-  const envelope = parseEnvelope(data, userId);
+  return parseQuestionnaireEnvelope(data, userId, RPC.getEnvelope);
+}
+
+export async function getAdminQuestionnaireEnvelope(
+  client: SupabaseClient,
+  userId: string,
+  actorUserId: string,
+  scope: AdminQuestionnaireScope,
+  purpose: AdminQuestionnairePurpose,
+): Promise<QuestionnaireEnvelope | null> {
+  const data = await callRpc(client, RPC.getAdminEnvelope, {
+    p_user_id: userId,
+    p_actor_user_id: actorUserId,
+    p_scope: scope,
+    p_purpose: purpose,
+  });
+  return parseQuestionnaireEnvelope(data, userId, RPC.getAdminEnvelope);
+}
+
+async function parseQuestionnaireEnvelope(
+  data: unknown,
+  userId: string,
+  rpcName: RpcName,
+): Promise<QuestionnaireEnvelope | null> {
+  const envelope = parseEnvelope(data, userId, rpcName);
   if (envelope !== null && envelope.currentDeclaration !== null) {
     await validateStatementIntegrity(
       envelope.currentDeclaration,
-      RPC.getEnvelope,
+      rpcName,
     );
   }
   return envelope;
@@ -91,7 +117,12 @@ async function callRpc(
 ): Promise<unknown> {
   const { data, error } = await client.rpc(rpcName, parameters);
   if (error !== null) {
-    throw new RpcCallError(rpcName, error.code ?? null);
+    throw new RpcCallError(
+      rpcName,
+      error.code ?? null,
+      error.message ?? null,
+      error.details ?? null,
+    );
   }
   return data;
 }

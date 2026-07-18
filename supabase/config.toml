@@ -342,6 +342,9 @@ enabled = false
 [functions.coworker-questionnaire]
 verify_jwt = true
 
+[functions.admin-coworker-questionnaire]
+verify_jwt = true
+
 [functions.coworker-documents]
 verify_jwt = true
 

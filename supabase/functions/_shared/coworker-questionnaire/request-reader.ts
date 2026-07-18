@@ -4,6 +4,9 @@ import type {
 } from "./contracts.ts";
 import { QuestionnaireValidationError } from "./errors.ts";
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export function createFieldErrors(): FieldErrors {
   const errors: FieldErrors = Object.create(null);
   return errors;
@@ -48,6 +51,33 @@ export function requestString(
     return "";
   }
   return value;
+}
+
+export function requestUuid(
+  source: UnknownObject,
+  key: string,
+  path: string,
+  errors: FieldErrors,
+): string {
+  const value = requestString(source, key, path, errors);
+  if (!UUID_PATTERN.test(value)) {
+    errors[path] = "Value must be a UUID.";
+  }
+  return value;
+}
+
+export function requestEnum<const TValue extends string>(
+  source: UnknownObject,
+  key: string,
+  path: string,
+  allowedValues: readonly TValue[],
+  errors: FieldErrors,
+): TValue {
+  const value = requestString(source, key, path, errors);
+  if (!allowedValues.includes(value as TValue)) {
+    errors[path] = "Value is not allowed.";
+  }
+  return value as TValue;
 }
 
 export function requestNullableString(

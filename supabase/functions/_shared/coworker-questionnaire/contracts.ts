@@ -5,6 +5,7 @@ export const FINAL_STATEMENT_KEY =
   "coworker.questionnaire.final-declaration";
 
 export const RPC = {
+  getAdminEnvelope: "get_admin_coworker_questionnaire_envelope",
   getEnvelope: "get_coworker_questionnaire_envelope",
   getStatement: "get_coworker_questionnaire_statement",
   saveEnvelope: "save_coworker_questionnaire_envelope",
@@ -13,6 +14,20 @@ export const RPC = {
 export type RpcName = typeof RPC[keyof typeof RPC];
 export type UnknownObject = { [key: string]: unknown };
 export type FieldErrors = { [field: string]: string };
+
+export type AdminQuestionnaireScope = "masked" | "full";
+export type AdminQuestionnairePurpose =
+  | "contract_preparation"
+  | "payroll_processing"
+  | "legal_review"
+  | "data_correction";
+
+export interface AdminQuestionnaireRequest {
+  action: "getQuestionnaire";
+  userId: string;
+  scope: AdminQuestionnaireScope;
+  purpose: AdminQuestionnairePurpose;
+}
 
 export type YesNoAnswer = "yes" | "no" | null;
 export type JoinDeclineAnswer = "join" | "decline" | null;
@@ -212,6 +227,38 @@ export interface QuestionnairePutResponse {
   statement: QuestionnaireStatement;
   currentDeclaration: CurrentDeclaration | null;
 }
+
+interface AdminQuestionnaireView<TData> {
+  userId: string;
+  configured: boolean;
+  revision: number | null;
+  complete: boolean;
+  validationPassed: boolean;
+  completedAt: string | null;
+  updatedAt: string | null;
+  data: TData | null;
+  sensitive: SensitiveMetadata;
+  statement: QuestionnaireStatement;
+  currentDeclaration: CurrentDeclaration | null;
+}
+
+interface AdminQuestionnaireResponseVariant<
+  TScope extends AdminQuestionnaireScope,
+  TData,
+> {
+  ok: true;
+  action: "getQuestionnaire";
+  scope: TScope;
+  purpose: AdminQuestionnairePurpose;
+  questionnaire: AdminQuestionnaireView<TData>;
+}
+
+export type AdminQuestionnaireResponse =
+  | AdminQuestionnaireResponseVariant<
+    "masked",
+    RedactedQuestionnairePayload
+  >
+  | AdminQuestionnaireResponseVariant<"full", QuestionnairePayload>;
 
 export interface QuestionnaireEnvelope {
   userId: string;

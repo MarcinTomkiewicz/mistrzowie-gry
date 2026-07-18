@@ -78,11 +78,11 @@ export function parseStatement(value: unknown): QuestionnaireStatement {
 export function parseEnvelope(
   value: unknown,
   userId: string,
+  rpcName: RpcName,
 ): QuestionnaireEnvelope | null {
   if (value === null) {
     return null;
   }
-  const rpcName = RPC.getEnvelope;
   const source = backendObject(value, ENVELOPE_KEYS, rpcName);
   const revision = backendPositiveInteger(source, "revision", rpcName);
   const envelope: QuestionnaireEnvelope = {

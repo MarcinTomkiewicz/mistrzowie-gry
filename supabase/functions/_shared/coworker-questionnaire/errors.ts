@@ -18,6 +18,8 @@ export class RpcCallError extends Error {
   constructor(
     readonly rpcName: RpcName,
     readonly sqlState: string | null,
+    readonly databaseMessage: string | null,
+    readonly databaseDetails: string | null,
   ) {
     super("Questionnaire RPC call failed.");
     this.name = "RpcCallError";
