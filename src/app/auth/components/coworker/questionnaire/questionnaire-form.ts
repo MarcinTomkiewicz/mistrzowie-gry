@@ -1,45 +1,42 @@
-import { DestroyRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
-import {
-  ICoworkerQuestionnairePayload,
-  ICoworkerQuestionnaireReadPayload,
-} from '../../../../core/interfaces/i-coworker-questionnaire';
-import {
-  CoworkerCorrespondenceAddressForm,
-  CoworkerQuestionnaireForm,
-} from '../../../../core/types/coworker-questionnaire-form';
-import {
+import type { ICoworkerQuestionnaireReadPayload } from '../../../../core/interfaces/i-coworker-questionnaire';
+import type { CountryCode } from '../../../../core/types/country-code';
+import type { CoworkerQuestionnaireForm } from '../../../../core/types/coworker-questionnaire-form';
+import type {
+  QuestionnaireDisabilityDegree,
+  QuestionnaireIdentificationBasis,
+  QuestionnaireIdentityDocumentKind,
+  QuestionnaireInstitutionReference,
+  QuestionnaireJoinDeclineAnswer,
   QuestionnaireYesNo,
-  QuestionnaireYesNoNotApplicable,
 } from '../../../../core/types/coworker-questionnaire';
-import { setControlEnabled } from '../../../../core/utils/form-controls';
 
 export function createCoworkerQuestionnaireForm(
   formBuilder: FormBuilder,
-  destroyRef: DestroyRef,
   initial: ICoworkerQuestionnaireReadPayload | null = null,
 ): CoworkerQuestionnaireForm {
   const form = formBuilder.group({
     personal: formBuilder.group({
       firstName: formBuilder.nonNullable.control(initial?.personal.firstName ?? ''),
       lastName: formBuilder.nonNullable.control(initial?.personal.lastName ?? ''),
-      maidenName: formBuilder.nonNullable.control(initial?.personal.maidenName ?? ''),
-      middleName: formBuilder.nonNullable.control(initial?.personal.middleName ?? ''),
+      maidenName: formBuilder.control<string | null>(
+        initial?.personal.maidenName ?? null,
+      ),
+      middleName: formBuilder.control<string | null>(
+        initial?.personal.middleName ?? null,
+      ),
       birthDate: formBuilder.nonNullable.control(initial?.personal.birthDate ?? ''),
       birthPlace: formBuilder.nonNullable.control(initial?.personal.birthPlace ?? ''),
-      identificationBasis: formBuilder.nonNullable.control(
-        initial?.personal.identificationBasis ?? 'pesel',
+      identificationBasis: formBuilder.control<QuestionnaireIdentificationBasis>(
+        initial?.personal.identificationBasis ?? null,
       ),
-      pesel: formBuilder.nonNullable.control(initial?.personal.pesel ?? ''),
-      nip: formBuilder.nonNullable.control(initial?.personal.nip ?? ''),
-      identityDocumentKind: formBuilder.control(
+      pesel: formBuilder.nonNullable.control(''),
+      nip: formBuilder.control<string | null>(initial?.personal.nip ?? null),
+      identityDocumentKind: formBuilder.control<QuestionnaireIdentityDocumentKind>(
         initial?.personal.identityDocumentKind ?? null,
       ),
-      identityDocumentNumber: formBuilder.nonNullable.control(
-        initial?.personal.identityDocumentNumber ?? '',
-      ),
+      identityDocumentNumber: formBuilder.nonNullable.control(''),
       citizenship: formBuilder.nonNullable.control(initial?.personal.citizenship ?? ''),
       phone: formBuilder.nonNullable.control(initial?.personal.phone ?? ''),
     }),
@@ -48,221 +45,124 @@ export function createCoworkerQuestionnaireForm(
       houseNumber: formBuilder.nonNullable.control(
         initial?.registeredAddress.houseNumber ?? '',
       ),
-      apartmentNumber: formBuilder.nonNullable.control(
-        initial?.registeredAddress.apartmentNumber ?? '',
+      apartmentNumber: formBuilder.control<string | null>(
+        initial?.registeredAddress.apartmentNumber ?? null,
       ),
       postalCode: formBuilder.nonNullable.control(
         initial?.registeredAddress.postalCode ?? '',
       ),
       city: formBuilder.nonNullable.control(initial?.registeredAddress.city ?? ''),
-      country: formBuilder.nonNullable.control(initial?.registeredAddress.country ?? ''),
+      voivodeship: formBuilder.control<string | null>(
+        initial?.registeredAddress.voivodeship ?? null,
+      ),
+      county: formBuilder.control<string | null>(
+        initial?.registeredAddress.county ?? null,
+      ),
+      municipality: formBuilder.control<string | null>(
+        initial?.registeredAddress.municipality ?? null,
+      ),
+      postOffice: formBuilder.control<string | null>(
+        initial?.registeredAddress.postOffice ?? null,
+      ),
+      countryCode: formBuilder.control<CountryCode | null>(
+        initial?.registeredAddress.countryCode ?? null,
+      ),
+      legacyCountryName: formBuilder.control<string | null>(
+        initial?.registeredAddress.legacyCountryName ?? null,
+      ),
     }),
     correspondenceAddress: formBuilder.group({
       sameAsRegistered: formBuilder.nonNullable.control(
-        initial?.correspondenceAddress.sameAsRegistered ?? true,
+        initial?.correspondenceAddress.sameAsRegistered ?? false,
       ),
-      street: formBuilder.nonNullable.control(initial?.correspondenceAddress.street ?? ''),
-      houseNumber: formBuilder.nonNullable.control(
-        initial?.correspondenceAddress.houseNumber ?? '',
+      street: formBuilder.control<string | null>(
+        initial?.correspondenceAddress.street ?? null,
       ),
-      apartmentNumber: formBuilder.nonNullable.control(
-        initial?.correspondenceAddress.apartmentNumber ?? '',
+      houseNumber: formBuilder.control<string | null>(
+        initial?.correspondenceAddress.houseNumber ?? null,
       ),
-      postalCode: formBuilder.nonNullable.control(
-        initial?.correspondenceAddress.postalCode ?? '',
+      apartmentNumber: formBuilder.control<string | null>(
+        initial?.correspondenceAddress.apartmentNumber ?? null,
       ),
-      city: formBuilder.nonNullable.control(initial?.correspondenceAddress.city ?? ''),
-      country: formBuilder.nonNullable.control(initial?.correspondenceAddress.country ?? ''),
+      postalCode: formBuilder.control<string | null>(
+        initial?.correspondenceAddress.postalCode ?? null,
+      ),
+      city: formBuilder.control<string | null>(
+        initial?.correspondenceAddress.city ?? null,
+      ),
+      countryCode: formBuilder.control<CountryCode | null>(
+        initial?.correspondenceAddress.countryCode ?? null,
+      ),
+      legacyCountryName: formBuilder.control<string | null>(
+        initial?.correspondenceAddress.legacyCountryName ?? null,
+      ),
     }),
     institutions: formBuilder.group({
-      taxOffice: formBuilder.nonNullable.control(initial?.institutions.taxOffice ?? ''),
-      nfzBranch: formBuilder.nonNullable.control(initial?.institutions.nfzBranch ?? ''),
+      taxOffice: formBuilder.control<QuestionnaireInstitutionReference>(
+        initial?.institutions.taxOffice ?? null,
+      ),
+      nfzBranch: formBuilder.control<QuestionnaireInstitutionReference>(
+        initial?.institutions.nfzBranch ?? null,
+      ),
     }),
     insurance: formBuilder.group({
-      otherEmployment: formBuilder.nonNullable.control(
-        initial?.insurance.otherEmployment ?? 'no',
+      otherEmployment: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.otherEmployment ?? null,
       ),
-      otherEmploymentAtLeastMinimumWage: formBuilder.nonNullable.control(
-        initial?.insurance.otherEmploymentAtLeastMinimumWage ?? 'not_applicable',
+      otherEmployerName: formBuilder.control<string | null>(
+        initial?.insurance.otherEmployerName ?? null,
       ),
-      studentUnder26: formBuilder.nonNullable.control(
-        initial?.insurance.studentUnder26 ?? 'no',
+      otherEmploymentAtLeastMinimumWage: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.otherEmploymentAtLeastMinimumWage ?? null,
       ),
-      otherMandateContract: formBuilder.nonNullable.control(
-        initial?.insurance.otherMandateContract ?? 'no',
+      studentUnder26: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.studentUnder26 ?? null,
       ),
-      otherMandateContractSocialInsurance: formBuilder.nonNullable.control(
-        initial?.insurance.otherMandateContractSocialInsurance ?? 'not_applicable',
+      schoolOrUniversityName: formBuilder.control<string | null>(
+        initial?.insurance.schoolOrUniversityName ?? null,
       ),
-      subjectToCompulsorySocialInsurance: formBuilder.nonNullable.control(
-        initial?.insurance.subjectToCompulsorySocialInsurance ?? 'no',
+      otherMandateContract: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.otherMandateContract ?? null,
       ),
-      voluntarySicknessInsurance: formBuilder.nonNullable.control(
-        initial?.insurance.voluntarySicknessInsurance ?? 'decline',
+      otherPrincipalName: formBuilder.control<string | null>(
+        initial?.insurance.otherPrincipalName ?? null,
       ),
-      voluntarySicknessInsuranceJoinConfirmed: formBuilder.nonNullable.control(
-        initial?.insurance.voluntarySicknessInsuranceJoinConfirmed ?? false,
+      otherMandateContractSocialInsurance: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.otherMandateContractSocialInsurance ?? null,
       ),
-      pensionDisabilityInsurance: formBuilder.nonNullable.control(
-        initial?.insurance.pensionDisabilityInsurance ?? 'not_applicable',
+      subjectToCompulsorySocialInsurance: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.subjectToCompulsorySocialInsurance ?? null,
       ),
-      disabilityDegree: formBuilder.nonNullable.control(
-        initial?.insurance.disabilityDegree ?? 'none',
+      voluntarySicknessInsurance:
+        formBuilder.control<QuestionnaireJoinDeclineAnswer>(
+          initial?.insurance.voluntarySicknessInsurance ?? null,
+        ),
+      voluntarySicknessInsuranceJoinConfirmed: formBuilder.control<boolean | null>(
+        initial?.insurance.voluntarySicknessInsuranceJoinConfirmed ?? null,
       ),
-      registeredAtEmploymentOffice: formBuilder.nonNullable.control(
-        initial?.insurance.registeredAtEmploymentOffice ?? 'no',
+      voluntaryPensionDisabilityInsurance:
+        formBuilder.control<QuestionnaireJoinDeclineAnswer>(
+          initial?.insurance.voluntaryPensionDisabilityInsurance ?? null,
+        ),
+      hasPensionOrDisabilityPensionRight: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.hasPensionOrDisabilityPensionRight ?? null,
+      ),
+      disabilityDegree: formBuilder.control<QuestionnaireDisabilityDegree>(
+        initial?.insurance.disabilityDegree ?? null,
+      ),
+      registeredAtEmploymentOffice: formBuilder.control<QuestionnaireYesNo>(
+        initial?.insurance.registeredAtEmploymentOffice ?? null,
+      ),
+      employmentOfficeAddress: formBuilder.control<string | null>(
+        initial?.insurance.employmentOfficeAddress ?? null,
       ),
     }),
     payment: formBuilder.group({
       bankName: formBuilder.nonNullable.control(initial?.payment.bankName ?? ''),
-      bankAccount: formBuilder.nonNullable.control(initial?.payment.bankAccount ?? ''),
+      bankAccount: formBuilder.nonNullable.control(''),
     }),
+    finalDeclarationAccepted: formBuilder.nonNullable.control(false),
   });
 
-  bindCorrespondenceAddress(form.controls.correspondenceAddress, destroyRef);
-  bindNotApplicableControl(
-    form.controls.insurance.controls.otherEmployment,
-    form.controls.insurance.controls.otherEmploymentAtLeastMinimumWage,
-    destroyRef,
-  );
-  bindNotApplicableControl(
-    form.controls.insurance.controls.otherMandateContract,
-    form.controls.insurance.controls.otherMandateContractSocialInsurance,
-    destroyRef,
-  );
-
   return form;
-}
-
-export function buildCoworkerQuestionnairePayload(
-  form: CoworkerQuestionnaireForm,
-): ICoworkerQuestionnairePayload {
-  const value = form.getRawValue();
-
-  return {
-    personal: {
-      firstName: value.personal.firstName,
-      lastName: value.personal.lastName,
-      maidenName: emptyStringToNull(value.personal.maidenName),
-      middleName: emptyStringToNull(value.personal.middleName),
-      birthDate: value.personal.birthDate,
-      birthPlace: value.personal.birthPlace,
-      identificationBasis: value.personal.identificationBasis,
-      pesel: value.personal.pesel,
-      nip: emptyStringToNull(value.personal.nip),
-      identityDocumentKind: value.personal.identityDocumentKind,
-      identityDocumentNumber: value.personal.identityDocumentNumber,
-      citizenship: value.personal.citizenship,
-      phone: value.personal.phone,
-    },
-    registeredAddress: {
-      street: value.registeredAddress.street,
-      houseNumber: value.registeredAddress.houseNumber,
-      apartmentNumber: emptyStringToNull(value.registeredAddress.apartmentNumber),
-      postalCode: value.registeredAddress.postalCode,
-      city: value.registeredAddress.city,
-      country: value.registeredAddress.country,
-    },
-    correspondenceAddress: {
-      sameAsRegistered: value.correspondenceAddress.sameAsRegistered,
-      street: emptyStringToNull(value.correspondenceAddress.street),
-      houseNumber: emptyStringToNull(value.correspondenceAddress.houseNumber),
-      apartmentNumber: emptyStringToNull(
-        value.correspondenceAddress.apartmentNumber,
-      ),
-      postalCode: emptyStringToNull(value.correspondenceAddress.postalCode),
-      city: emptyStringToNull(value.correspondenceAddress.city),
-      country: emptyStringToNull(value.correspondenceAddress.country),
-    },
-    institutions: {
-      taxOffice: value.institutions.taxOffice,
-      nfzBranch: value.institutions.nfzBranch,
-    },
-    insurance: {
-      otherEmployment: value.insurance.otherEmployment,
-      otherEmploymentAtLeastMinimumWage:
-        value.insurance.otherEmploymentAtLeastMinimumWage,
-      studentUnder26: value.insurance.studentUnder26,
-      otherMandateContract: value.insurance.otherMandateContract,
-      otherMandateContractSocialInsurance:
-        value.insurance.otherMandateContractSocialInsurance,
-      subjectToCompulsorySocialInsurance:
-        value.insurance.subjectToCompulsorySocialInsurance,
-      voluntarySicknessInsurance: value.insurance.voluntarySicknessInsurance,
-      voluntarySicknessInsuranceJoinConfirmed:
-        value.insurance.voluntarySicknessInsuranceJoinConfirmed,
-      pensionDisabilityInsurance: value.insurance.pensionDisabilityInsurance,
-      disabilityDegree: value.insurance.disabilityDegree,
-      registeredAtEmploymentOffice: value.insurance.registeredAtEmploymentOffice,
-    },
-    payment: {
-      bankName: value.payment.bankName,
-      bankAccount: value.payment.bankAccount,
-    },
-  };
-}
-
-function bindCorrespondenceAddress(
-  form: CoworkerCorrespondenceAddressForm,
-  destroyRef: DestroyRef,
-): void {
-  setCorrespondenceAddressEnabled(form, !form.controls.sameAsRegistered.value);
-
-  form.controls.sameAsRegistered.valueChanges
-    .pipe(takeUntilDestroyed(destroyRef))
-    .subscribe((sameAsRegistered) =>
-      setCorrespondenceAddressEnabled(form, !sameAsRegistered),
-    );
-}
-
-function setCorrespondenceAddressEnabled(
-  form: CoworkerCorrespondenceAddressForm,
-  enabled: boolean,
-): void {
-  const controls = [
-    form.controls.street,
-    form.controls.houseNumber,
-    form.controls.apartmentNumber,
-    form.controls.postalCode,
-    form.controls.city,
-    form.controls.country,
-  ];
-
-  for (const control of controls) {
-    setControlEnabled(control, enabled);
-  }
-}
-
-function bindNotApplicableControl(
-  controlling: FormControl<QuestionnaireYesNo>,
-  dependent: FormControl<QuestionnaireYesNoNotApplicable>,
-  destroyRef: DestroyRef,
-): void {
-  let lastApplicableValue: QuestionnaireYesNo | null =
-    dependent.value === 'not_applicable' ? null : dependent.value;
-
-  const applyControllingValue = (value: QuestionnaireYesNo): void => {
-    if (value === 'no') {
-      if (dependent.value !== 'not_applicable') {
-        lastApplicableValue = dependent.value;
-      }
-      dependent.setValue('not_applicable', { emitEvent: false });
-      setControlEnabled(dependent, false);
-      return;
-    }
-
-    setControlEnabled(dependent, true);
-    if (dependent.value === 'not_applicable' && lastApplicableValue !== null) {
-      dependent.setValue(lastApplicableValue, { emitEvent: false });
-    }
-  };
-
-  applyControllingValue(controlling.value);
-  controlling.valueChanges
-    .pipe(takeUntilDestroyed(destroyRef))
-    .subscribe(applyControllingValue);
-}
-
-function emptyStringToNull(value: string): string | null {
-  return value === '' ? null : value;
 }

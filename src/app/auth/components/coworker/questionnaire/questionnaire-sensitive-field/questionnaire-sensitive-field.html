@@ -1,0 +1,61 @@
+<div class="mg-card flex-col-start-stretch gap-sm w-100">
+  <div class="flex-row-between-center flex-wrap gap-sm">
+    <strong>{{ label() }}</strong>
+    <span class="tag-badge">{{ i18n.sensitive().protectedBadge }}</span>
+  </div>
+
+  @if (metadata().configured) {
+    <p class="m-0">
+      {{ i18n.sensitive().savedValueLabel }}:
+      <strong>{{ metadata().masked }}</strong>
+    </p>
+
+    <div
+      class="flex-row-start-center flex-wrap gap-xs"
+      role="group"
+      [attr.aria-label]="label()"
+    >
+      <p-button
+        type="button"
+        size="small"
+        severity="secondary"
+        [outlined]="replacementMode()"
+        [attr.aria-pressed]="!replacementMode()"
+        [label]="i18n.sensitive().preserveModeLabel"
+        (onClick)="setReplacementMode(false)"
+      />
+      <p-button
+        type="button"
+        size="small"
+        severity="secondary"
+        [outlined]="!replacementMode()"
+        [attr.aria-pressed]="replacementMode()"
+        [label]="i18n.sensitive().replaceModeLabel"
+        (onClick)="setReplacementMode(true)"
+      />
+    </div>
+  } @else {
+    <p class="m-0 muted-text">{{ i18n.sensitive().noSavedValue }}</p>
+  }
+
+  <p class="m-0 muted-text">{{ i18n.sensitive().replacementHint }}</p>
+
+  <p-iftalabel class="w-100">
+    <input
+      pInputText
+      class="w-100"
+      type="text"
+      [id]="inputId()"
+      [formControl]="control()"
+      [autocomplete]="autocomplete()"
+      [attr.data-questionnaire-field]="fieldPath()"
+      [attr.aria-describedby]="errorId()"
+    />
+    <label [for]="inputId()">{{ label() }}</label>
+  </p-iftalabel>
+
+  <app-questionnaire-field-errors
+    [control]="control()"
+    [errorId]="errorId()"
+  />
+</div>

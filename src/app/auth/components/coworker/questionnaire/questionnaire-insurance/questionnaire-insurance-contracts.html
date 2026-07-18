@@ -1,0 +1,84 @@
+<section class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <header class="flex-col-start-stretch gap-xs">
+    <h4 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.sections().insuranceContractsTitle }}
+    </h4>
+    <p class="m-0 muted-text">
+      {{ i18n.sections().insuranceContractsDescription }}
+    </p>
+  </header>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="questionnaire-other-mandate-contract"
+        formControlName="otherMandateContract"
+        [options]="yesNoOptions()"
+        [placeholder]="i18n.options().selectPlaceholder"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        data-questionnaire-field="data.insurance.otherMandateContract"
+        aria-describedby="questionnaire-other-mandate-contract-error"
+      />
+      <label for="questionnaire-other-mandate-contract">
+        {{ i18n.fields().otherMandateContractLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.otherMandateContract"
+      errorId="questionnaire-other-mandate-contract-error"
+    />
+  </div>
+
+  @if (form().controls.otherMandateContract.value === 'yes') {
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-other-principal-name"
+          type="text"
+          formControlName="otherPrincipalName"
+          autocomplete="organization"
+          data-questionnaire-field="data.insurance.otherPrincipalName"
+          aria-describedby="questionnaire-other-principal-name-error"
+        />
+        <label for="questionnaire-other-principal-name">
+          {{ i18n.fields().otherPrincipalNameLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.otherPrincipalName"
+        errorId="questionnaire-other-principal-name-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="questionnaire-other-mandate-social-insurance"
+          formControlName="otherMandateContractSocialInsurance"
+          [options]="yesNoOptions()"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          data-questionnaire-field="data.insurance.otherMandateContractSocialInsurance"
+          aria-describedby="questionnaire-other-mandate-social-insurance-error"
+        />
+        <label for="questionnaire-other-mandate-social-insurance">
+          {{ i18n.fields().otherMandateContractSocialInsuranceLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.otherMandateContractSocialInsurance"
+        errorId="questionnaire-other-mandate-social-insurance-error"
+      />
+    </div>
+  }
+</section>

@@ -1,10 +1,15 @@
-import {
+import type { CountryCode } from '../types/country-code';
+import type {
+  ICoworkerQuestionnaireCatalogReference,
+  ICoworkerQuestionnaireLegacyReference,
+} from './i-coworker-questionnaire-reference';
+import type {
   QuestionnaireDisabilityDegree,
   QuestionnaireIdentificationBasis,
   QuestionnaireIdentityDocumentKind,
-  QuestionnaireSicknessInsuranceChoice,
+  QuestionnaireJoinDeclineAnswer,
+  QuestionnaireStatementKey,
   QuestionnaireYesNo,
-  QuestionnaireYesNoNotApplicable,
 } from '../types/coworker-questionnaire';
 
 export interface ICoworkerQuestionnairePersonalData {
@@ -17,7 +22,7 @@ export interface ICoworkerQuestionnairePersonalData {
   identificationBasis: QuestionnaireIdentificationBasis;
   pesel: string | null;
   nip: string | null;
-  identityDocumentKind: QuestionnaireIdentityDocumentKind | null;
+  identityDocumentKind: QuestionnaireIdentityDocumentKind;
   identityDocumentNumber: string | null;
   citizenship: string;
   phone: string;
@@ -29,7 +34,12 @@ export interface ICoworkerQuestionnaireAddressData {
   apartmentNumber: string | null;
   postalCode: string;
   city: string;
-  country: string;
+  voivodeship: string | null;
+  county: string | null;
+  municipality: string | null;
+  postOffice: string | null;
+  countryCode: CountryCode | null;
+  legacyCountryName: string | null;
 }
 
 export interface ICoworkerCorrespondenceAddressData {
@@ -39,26 +49,38 @@ export interface ICoworkerCorrespondenceAddressData {
   apartmentNumber: string | null;
   postalCode: string | null;
   city: string | null;
-  country: string | null;
+  countryCode: CountryCode | null;
+  legacyCountryName: string | null;
 }
 
 export interface ICoworkerQuestionnaireInstitutionsData {
-  taxOffice: string;
-  nfzBranch: string;
+  taxOffice:
+    | ICoworkerQuestionnaireCatalogReference
+    | ICoworkerQuestionnaireLegacyReference
+    | null;
+  nfzBranch:
+    | ICoworkerQuestionnaireCatalogReference
+    | ICoworkerQuestionnaireLegacyReference
+    | null;
 }
 
 export interface ICoworkerQuestionnaireInsuranceData {
   otherEmployment: QuestionnaireYesNo;
-  otherEmploymentAtLeastMinimumWage: QuestionnaireYesNoNotApplicable;
+  otherEmployerName: string | null;
+  otherEmploymentAtLeastMinimumWage: QuestionnaireYesNo;
   studentUnder26: QuestionnaireYesNo;
+  schoolOrUniversityName: string | null;
   otherMandateContract: QuestionnaireYesNo;
-  otherMandateContractSocialInsurance: QuestionnaireYesNoNotApplicable;
+  otherPrincipalName: string | null;
+  otherMandateContractSocialInsurance: QuestionnaireYesNo;
   subjectToCompulsorySocialInsurance: QuestionnaireYesNo;
-  voluntarySicknessInsurance: QuestionnaireSicknessInsuranceChoice;
-  voluntarySicknessInsuranceJoinConfirmed: boolean;
-  pensionDisabilityInsurance: QuestionnaireYesNoNotApplicable;
+  voluntarySicknessInsurance: QuestionnaireJoinDeclineAnswer;
+  voluntarySicknessInsuranceJoinConfirmed: boolean | null;
+  voluntaryPensionDisabilityInsurance: QuestionnaireJoinDeclineAnswer;
+  hasPensionOrDisabilityPensionRight: QuestionnaireYesNo;
   disabilityDegree: QuestionnaireDisabilityDegree;
   registeredAtEmploymentOffice: QuestionnaireYesNo;
+  employmentOfficeAddress: string | null;
 }
 
 export interface ICoworkerQuestionnairePaymentData {
@@ -80,13 +102,19 @@ export interface ICoworkerQuestionnaireReadPersonalData
     ICoworkerQuestionnairePersonalData,
     'pesel' | 'identityDocumentNumber'
   > {
-  pesel: string;
-  identityDocumentNumber: string;
+  pesel: '';
+  identityDocumentNumber: '';
+}
+
+export interface ICoworkerQuestionnaireReadPaymentData
+  extends Omit<ICoworkerQuestionnairePaymentData, 'bankAccount'> {
+  bankAccount: '';
 }
 
 export interface ICoworkerQuestionnaireReadPayload
-  extends Omit<ICoworkerQuestionnairePayload, 'personal'> {
+  extends Omit<ICoworkerQuestionnairePayload, 'personal' | 'payment'> {
   personal: ICoworkerQuestionnaireReadPersonalData;
+  payment: ICoworkerQuestionnaireReadPaymentData;
 }
 
 export interface ICoworkerSensitiveFieldMetadata {
@@ -100,17 +128,46 @@ export interface ICoworkerQuestionnaireSensitiveMetadata {
   bankAccount: ICoworkerSensitiveFieldMetadata;
 }
 
+export interface ICoworkerQuestionnaireFinalDeclaration {
+  statementKey: QuestionnaireStatementKey;
+  statementVersion: number;
+  accepted: true;
+}
+
+export interface ICoworkerQuestionnaireStatement {
+  statementKey: QuestionnaireStatementKey;
+  statementVersion: number;
+  statementText: string;
+  statementSha256Base64: string;
+}
+
+export interface ICoworkerQuestionnaireCurrentDeclaration
+  extends ICoworkerQuestionnaireStatement {
+  id: string;
+  questionnaireRevision: number;
+  actorUserId: string;
+  source: 'web';
+  acceptedAt: string;
+}
+
 export interface ICoworkerQuestionnaireGetResponse {
   configured: boolean;
   revision: number | null;
   complete: boolean;
+  validationPassed: boolean;
+  completedAt: string | null;
+  updatedAt: string | null;
   data: ICoworkerQuestionnaireReadPayload | null;
   sensitive: ICoworkerQuestionnaireSensitiveMetadata;
+  statement: ICoworkerQuestionnaireStatement;
+  currentDeclaration: ICoworkerQuestionnaireCurrentDeclaration | null;
 }
 
 export interface ICoworkerQuestionnaireSaveRequest {
   data: ICoworkerQuestionnairePayload;
   complete: boolean;
+  expectedRevision: number | null;
+  finalDeclaration: ICoworkerQuestionnaireFinalDeclaration | null;
 }
 
 export interface ICoworkerQuestionnaireSaveResponse {
@@ -118,5 +175,9 @@ export interface ICoworkerQuestionnaireSaveResponse {
   revision: number;
   complete: boolean;
   validationPassed: boolean;
+  completedAt: string | null;
+  updatedAt: string;
   sensitive: ICoworkerQuestionnaireSensitiveMetadata;
+  statement: ICoworkerQuestionnaireStatement;
+  currentDeclaration: ICoworkerQuestionnaireCurrentDeclaration | null;
 }

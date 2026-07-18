@@ -1,0 +1,148 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100">
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().registeredAddressTitle }}
+    </h3>
+    <p class="m-0 muted-text">
+      {{ i18n.sections().registeredAddressDescription }}
+    </p>
+  </header>
+
+  <app-questionnaire-address-fields
+    [form]="registeredAddress()"
+    idPrefix="questionnaire-registered-address"
+    fieldPathPrefix="data.registeredAddress"
+  />
+
+  <div
+    class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100"
+    [formGroup]="registeredAddress()"
+  >
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-registered-voivodeship"
+          type="text"
+          formControlName="voivodeship"
+          autocomplete="address-level1"
+          data-questionnaire-field="data.registeredAddress.voivodeship"
+          aria-describedby="questionnaire-registered-voivodeship-error"
+        />
+        <label for="questionnaire-registered-voivodeship">
+          {{ i18n.fields().voivodeshipLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="registeredAddress().controls.voivodeship"
+        errorId="questionnaire-registered-voivodeship-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-registered-county"
+          type="text"
+          formControlName="county"
+          autocomplete="off"
+          data-questionnaire-field="data.registeredAddress.county"
+          aria-describedby="questionnaire-registered-county-error"
+        />
+        <label for="questionnaire-registered-county">
+          {{ i18n.fields().countyLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="registeredAddress().controls.county"
+        errorId="questionnaire-registered-county-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-registered-municipality"
+          type="text"
+          formControlName="municipality"
+          autocomplete="off"
+          data-questionnaire-field="data.registeredAddress.municipality"
+          aria-describedby="questionnaire-registered-municipality-error"
+        />
+        <label for="questionnaire-registered-municipality">
+          {{ i18n.fields().municipalityLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="registeredAddress().controls.municipality"
+        errorId="questionnaire-registered-municipality-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-registered-post-office"
+          type="text"
+          formControlName="postOffice"
+          autocomplete="off"
+          data-questionnaire-field="data.registeredAddress.postOffice"
+          aria-describedby="questionnaire-registered-post-office-error"
+        />
+        <label for="questionnaire-registered-post-office">
+          {{ i18n.fields().postOfficeLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="registeredAddress().controls.postOffice"
+        errorId="questionnaire-registered-post-office-error"
+      />
+    </div>
+  </div>
+</section>
+
+<section
+  class="mg-card flex-col-start-stretch gap-md w-100"
+  [formGroup]="correspondenceAddress()"
+>
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().correspondenceAddressTitle }}
+    </h3>
+    <p class="m-0 muted-text">
+      {{ i18n.sections().correspondenceAddressDescription }}
+    </p>
+  </header>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <div class="flex-row-start-center gap-sm">
+      <p-checkbox
+        inputId="questionnaire-same-as-registered"
+        formControlName="sameAsRegistered"
+        [binary]="true"
+        data-questionnaire-field="data.correspondenceAddress.sameAsRegistered"
+        aria-describedby="questionnaire-same-as-registered-error"
+      />
+      <label for="questionnaire-same-as-registered">
+        {{ i18n.fields().sameAsRegisteredLabel }}
+      </label>
+    </div>
+    <app-questionnaire-field-errors
+      [control]="correspondenceAddress().controls.sameAsRegistered"
+      errorId="questionnaire-same-as-registered-error"
+    />
+  </div>
+
+  <app-questionnaire-address-fields
+    [form]="correspondenceAddress()"
+    idPrefix="questionnaire-correspondence-address"
+    fieldPathPrefix="data.correspondenceAddress"
+  />
+</section>

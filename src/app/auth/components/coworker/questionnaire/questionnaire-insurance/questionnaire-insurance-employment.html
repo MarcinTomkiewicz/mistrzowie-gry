@@ -1,0 +1,133 @@
+<section class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <header class="flex-col-start-stretch gap-xs">
+    <h4 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.sections().insuranceEmploymentTitle }}
+    </h4>
+    <p class="m-0 muted-text">
+      {{ i18n.sections().insuranceEmploymentDescription }}
+    </p>
+  </header>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="questionnaire-other-employment"
+        formControlName="otherEmployment"
+        [options]="yesNoOptions()"
+        [placeholder]="i18n.options().selectPlaceholder"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        data-questionnaire-field="data.insurance.otherEmployment"
+        aria-describedby="questionnaire-other-employment-error"
+      />
+      <label for="questionnaire-other-employment">
+        {{ i18n.fields().otherEmploymentLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.otherEmployment"
+      errorId="questionnaire-other-employment-error"
+    />
+  </div>
+
+  @if (form().controls.otherEmployment.value === 'yes') {
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-other-employer-name"
+          type="text"
+          formControlName="otherEmployerName"
+          autocomplete="organization"
+          data-questionnaire-field="data.insurance.otherEmployerName"
+          aria-describedby="questionnaire-other-employer-name-error"
+        />
+        <label for="questionnaire-other-employer-name">
+          {{ i18n.fields().otherEmployerNameLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.otherEmployerName"
+        errorId="questionnaire-other-employer-name-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="questionnaire-other-employment-minimum-wage"
+          formControlName="otherEmploymentAtLeastMinimumWage"
+          [options]="yesNoOptions()"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          data-questionnaire-field="data.insurance.otherEmploymentAtLeastMinimumWage"
+          aria-describedby="questionnaire-other-employment-minimum-wage-error"
+        />
+        <label for="questionnaire-other-employment-minimum-wage">
+          {{ i18n.fields().otherEmploymentAtLeastMinimumWageLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.otherEmploymentAtLeastMinimumWage"
+        errorId="questionnaire-other-employment-minimum-wage-error"
+      />
+    </div>
+  }
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="questionnaire-student-under-26"
+        formControlName="studentUnder26"
+        [options]="yesNoOptions()"
+        [placeholder]="i18n.options().selectPlaceholder"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        data-questionnaire-field="data.insurance.studentUnder26"
+        aria-describedby="questionnaire-student-under-26-error"
+      />
+      <label for="questionnaire-student-under-26">
+        {{ i18n.fields().studentUnder26Label }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.studentUnder26"
+      errorId="questionnaire-student-under-26-error"
+    />
+  </div>
+
+  @if (form().controls.studentUnder26.value === 'yes') {
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-school-name"
+          type="text"
+          formControlName="schoolOrUniversityName"
+          autocomplete="organization"
+          data-questionnaire-field="data.insurance.schoolOrUniversityName"
+          aria-describedby="questionnaire-school-name-error"
+        />
+        <label for="questionnaire-school-name">
+          {{ i18n.fields().schoolOrUniversityNameLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.schoolOrUniversityName"
+        errorId="questionnaire-school-name-error"
+      />
+    </div>
+  }
+</section>

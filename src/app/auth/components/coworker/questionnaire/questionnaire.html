@@ -1,0 +1,176 @@
+<div
+  class="position-relative flex-col-start-stretch gap-md w-100"
+  [attr.aria-busy]="isBusy()"
+>
+  <header class="flex-col-start-stretch gap-xs w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.page().title }}
+    </h2>
+    <p class="m-0 muted-text">{{ i18n.page().subtitle }}</p>
+  </header>
+
+  <app-loading-overlay
+    [visible]="isLoading()"
+    [label]="i18n.commonStatus().loading"
+  />
+
+  @if (activeError(); as error) {
+    <section
+      class="mg-card flex-col-start-stretch gap-sm w-100"
+      role="alert"
+      aria-live="assertive"
+    >
+      <h3 class="mg-section__title mg-section__title--sm error-text m-0">
+        {{ errorTitle() }}
+      </h3>
+
+      <p class="m-0">{{ errorDescription() }}</p>
+      @if (error.message !== errorDescription()) {
+        <p class="m-0 muted-text">{{ error.message }}</p>
+      }
+
+      <div class="flex-row-start-center flex-wrap gap-sm muted-text">
+        <span>
+          {{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code>
+        </span>
+        @if (error.status !== null) {
+          <span>
+            {{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code>
+          </span>
+        }
+      </div>
+
+      @if (fieldErrorEntries().length) {
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ i18n.errors().fieldErrorsTitle }}</strong>
+          <ul class="m-0">
+            @for (entry of fieldErrorEntries(); track entry[0]) {
+              <li><code>{{ entry[0] }}</code>: {{ entry[1] }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if ((loadError() || requiresReload()) && !isAccessBlocked()) {
+        <p-button
+          type="button"
+          severity="secondary"
+          icon="pi pi-refresh"
+          [label]="requiresReload() ? i18n.actions().reloadLabel : i18n.commonActions().retry"
+          [disabled]="isLoading()"
+          (onClick)="load()"
+        />
+      }
+    </section>
+  }
+
+  @if (!isLoading() && !isAccessBlocked()) {
+    @if (isComplete()) {
+      <section class="mg-card flex-col-start-stretch gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--sm success-text m-0">
+          {{ i18n.status().completeTitle }}
+        </h3>
+        <p class="m-0">{{ i18n.status().completeDescription }}</p>
+        @if (currentDeclaration(); as declaration) {
+          <p class="m-0 muted-text">
+            {{ i18n.status().declarationAcceptedAtLabel }}:
+            {{ declaration.acceptedAt }}
+          </p>
+        }
+      </section>
+    }
+
+    @if (form(); as form) {
+      <form
+        class="mg-form flex-col-start-stretch gap-md w-100"
+        [formGroup]="form"
+        [attr.inert]="isSubmitting() ? '' : null"
+        [attr.aria-disabled]="isSubmitting()"
+        novalidate
+      >
+        <app-questionnaire-personal
+          [form]="form.controls.personal"
+          [sensitive]="sensitive()"
+        />
+
+        <app-questionnaire-addresses
+          [registeredAddress]="form.controls.registeredAddress"
+          [correspondenceAddress]="form.controls.correspondenceAddress"
+        />
+
+        <app-questionnaire-institutions
+          [form]="form.controls.institutions"
+        />
+
+        <app-questionnaire-insurance [form]="form.controls.insurance" />
+
+        <app-questionnaire-payment
+          [form]="form.controls.payment"
+          [sensitive]="sensitive()"
+        />
+
+        @if (statement(); as currentStatement) {
+          <section class="mg-card flex-col-start-stretch gap-md w-100">
+            <header class="flex-col-start-stretch gap-xs">
+              <h3 class="mg-section__title mg-section__title--sm m-0">
+                {{ i18n.sections().declarationTitle }}
+              </h3>
+              <p class="m-0 muted-text">
+                {{ i18n.sections().declarationDescription }}
+              </p>
+            </header>
+
+            <p class="m-0">{{ currentStatement.statementText }}</p>
+
+            <div class="flex-col-start-stretch gap-xs">
+              <div class="flex-row-start-center gap-sm">
+                <p-checkbox
+                  inputId="questionnaire-final-declaration"
+                  formControlName="finalDeclarationAccepted"
+                  [binary]="true"
+                  data-questionnaire-field="finalDeclaration.accepted"
+                  aria-describedby="questionnaire-final-declaration-error"
+                />
+                <label for="questionnaire-final-declaration">
+                  {{ i18n.fields().finalDeclarationAcceptedLabel }}
+                </label>
+              </div>
+              <app-questionnaire-field-errors
+                [control]="form.controls.finalDeclarationAccepted"
+                errorId="questionnaire-final-declaration-error"
+              />
+            </div>
+          </section>
+        }
+
+        @if (isSaving()) {
+          <p-message severity="info" [text]="i18n.status().savingDraft" />
+        }
+        @if (isCompleting()) {
+          <p-message severity="info" [text]="i18n.status().completing" />
+        }
+
+        <div class="flex-row-end-center flex-wrap gap-sm w-100">
+          <p-button
+            type="button"
+            severity="secondary"
+            icon="pi pi-save"
+            [label]="i18n.actions().saveDraftLabel"
+            [disabled]="isBusy() || requiresReload()"
+            [loading]="isSaving()"
+            (onClick)="saveDraft()"
+          />
+          <p-button
+            type="button"
+            severity="success"
+            icon="pi pi-check"
+            [label]="i18n.actions().completeLabel"
+            [disabled]="isBusy() || requiresReload()"
+            [loading]="isCompleting()"
+            (onClick)="complete()"
+          />
+        </div>
+      </form>
+    }
+  }
+</div>

@@ -1,0 +1,78 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().institutionsTitle }}
+    </h3>
+    <p class="m-0 muted-text">
+      {{ i18n.sections().institutionsDescription }}
+    </p>
+  </header>
+
+  <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="questionnaire-tax-office"
+          formControlName="taxOffice"
+          [options]="taxOfficeOptions"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          [filter]="true"
+          optionLabel="name"
+          filterBy="name,code"
+          dataKey="code"
+          appendTo="body"
+          data-questionnaire-field="data.institutions.taxOffice"
+          aria-describedby="questionnaire-tax-office-error"
+        />
+        <label for="questionnaire-tax-office">
+          {{ i18n.fields().taxOfficeLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.taxOffice"
+        errorId="questionnaire-tax-office-error"
+      />
+      @if (form().controls.taxOffice.value?.kind === 'legacy') {
+        <p-message
+          severity="warn"
+          [text]="i18n.status().legacyInstitutionNotice + ' (' + form().controls.taxOffice.value?.name + ')'"
+        />
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="questionnaire-nfz-branch"
+          formControlName="nfzBranch"
+          [options]="nfzBranchOptions"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          [filter]="true"
+          optionLabel="name"
+          filterBy="name,code"
+          dataKey="code"
+          appendTo="body"
+          data-questionnaire-field="data.institutions.nfzBranch"
+          aria-describedby="questionnaire-nfz-branch-error"
+        />
+        <label for="questionnaire-nfz-branch">
+          {{ i18n.fields().nfzBranchLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.nfzBranch"
+        errorId="questionnaire-nfz-branch-error"
+      />
+      @if (form().controls.nfzBranch.value?.kind === 'legacy') {
+        <p-message
+          severity="warn"
+          [text]="i18n.status().legacyInstitutionNotice + ' (' + form().controls.nfzBranch.value?.name + ')'"
+        />
+      }
+    </div>
+  </div>
+</section>

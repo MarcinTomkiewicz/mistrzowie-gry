@@ -1,0 +1,37 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().paymentTitle }}
+    </h3>
+    <p class="m-0 muted-text">{{ i18n.sections().paymentDescription }}</p>
+  </header>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="questionnaire-bank-name"
+        type="text"
+        formControlName="bankName"
+        autocomplete="off"
+        data-questionnaire-field="data.payment.bankName"
+        aria-describedby="questionnaire-bank-name-error"
+      />
+      <label for="questionnaire-bank-name">{{ i18n.fields().bankNameLabel }}</label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.bankName"
+      errorId="questionnaire-bank-name-error"
+    />
+  </div>
+
+  <app-questionnaire-sensitive-field
+    [control]="form().controls.bankAccount"
+    [metadata]="sensitive().bankAccount"
+    [label]="i18n.fields().bankAccountLabel"
+    inputId="questionnaire-bank-account"
+    fieldPath="data.payment.bankAccount"
+    autocomplete="off"
+  />
+</section>

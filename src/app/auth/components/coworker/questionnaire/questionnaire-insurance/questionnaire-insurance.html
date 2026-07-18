@@ -1,0 +1,32 @@
+<section class="mg-card flex-col-start-stretch gap-lg w-100">
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().insuranceTitle }}
+    </h3>
+    <p class="m-0 muted-text">
+      {{ i18n.sections().insuranceDescription }}
+    </p>
+  </header>
+
+  <app-questionnaire-insurance-employment
+    [form]="form()"
+    [yesNoOptions]="yesNoOptions()"
+  />
+
+  <app-questionnaire-insurance-contracts
+    [form]="form()"
+    [yesNoOptions]="yesNoOptions()"
+  />
+
+  <app-questionnaire-insurance-elections
+    [form]="form()"
+    [yesNoOptions]="yesNoOptions()"
+    [insuranceChoiceOptions]="insuranceChoiceOptions()"
+  />
+
+  <app-questionnaire-insurance-status
+    [form]="form()"
+    [yesNoOptions]="yesNoOptions()"
+    [disabilityDegreeOptions]="disabilityDegreeOptions()"
+  />
+</section>

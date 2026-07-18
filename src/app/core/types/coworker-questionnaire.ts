@@ -1,24 +1,37 @@
-export type QuestionnaireYesNo = 'yes' | 'no';
+import type {
+  ICoworkerQuestionnaireCatalogReference,
+  ICoworkerQuestionnaireLegacyReference,
+} from '../interfaces/i-coworker-questionnaire-reference';
 
-export type QuestionnaireYesNoNotApplicable =
-  | QuestionnaireYesNo
-  | 'not_applicable';
+export type QuestionnaireYesNo = 'yes' | 'no' | null;
 
 export type QuestionnaireIdentificationBasis =
   | 'pesel'
-  | 'identity_document';
+  | 'identity_document'
+  | null;
 
 export type QuestionnaireIdentityDocumentKind =
   | 'id_card'
   | 'passport'
-  | 'other';
+  | 'other'
+  | null;
 
-export type QuestionnaireSicknessInsuranceChoice =
+export type QuestionnaireJoinDeclineAnswer =
   | 'join'
-  | 'decline';
+  | 'decline'
+  | null;
 
 export type QuestionnaireDisabilityDegree =
   | 'none'
   | 'light'
   | 'moderate'
-  | 'severe';
+  | 'severe'
+  | null;
+
+export type QuestionnaireStatementKey =
+  'coworker.questionnaire.final-declaration';
+
+export type QuestionnaireInstitutionReference =
+  | ICoworkerQuestionnaireCatalogReference
+  | ICoworkerQuestionnaireLegacyReference
+  | null;

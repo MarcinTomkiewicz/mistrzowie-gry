@@ -1,0 +1,144 @@
+<div
+  class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100"
+  [formGroup]="form()"
+>
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        formControlName="street"
+        autocomplete="address-line1"
+        [id]="fieldId('street')"
+        [attr.data-questionnaire-field]="fieldPath('street')"
+        [attr.aria-describedby]="errorId('street')"
+      />
+      <label [for]="fieldId('street')">{{ i18n.fields().streetLabel }}</label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.street"
+      [errorId]="errorId('street')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        formControlName="houseNumber"
+        autocomplete="address-line1"
+        [id]="fieldId('house-number')"
+        [attr.data-questionnaire-field]="fieldPath('houseNumber')"
+        [attr.aria-describedby]="errorId('house-number')"
+      />
+      <label [for]="fieldId('house-number')">
+        {{ i18n.fields().houseNumberLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.houseNumber"
+      [errorId]="errorId('house-number')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        formControlName="apartmentNumber"
+        autocomplete="address-line2"
+        [id]="fieldId('apartment-number')"
+        [attr.data-questionnaire-field]="fieldPath('apartmentNumber')"
+        [attr.aria-describedby]="errorId('apartment-number')"
+      />
+      <label [for]="fieldId('apartment-number')">
+        {{ i18n.fields().apartmentNumberLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.apartmentNumber"
+      [errorId]="errorId('apartment-number')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        formControlName="postalCode"
+        autocomplete="postal-code"
+        [id]="fieldId('postal-code')"
+        [attr.data-questionnaire-field]="fieldPath('postalCode')"
+        [attr.aria-describedby]="errorId('postal-code')"
+      />
+      <label [for]="fieldId('postal-code')">
+        {{ i18n.fields().postalCodeLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.postalCode"
+      [errorId]="errorId('postal-code')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        formControlName="city"
+        autocomplete="address-level2"
+        [id]="fieldId('city')"
+        [attr.data-questionnaire-field]="fieldPath('city')"
+        [attr.aria-describedby]="errorId('city')"
+      />
+      <label [for]="fieldId('city')">{{ i18n.fields().cityLabel }}</label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.city"
+      [errorId]="errorId('city')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        formControlName="countryCode"
+        [inputId]="fieldId('country-code')"
+        [options]="countryOptions"
+        [placeholder]="i18n.options().selectPlaceholder"
+        [showClear]="true"
+        [filter]="true"
+        optionLabel="label"
+        optionValue="value"
+        filterBy="label"
+        appendTo="body"
+        [attr.data-questionnaire-field]="fieldPath('countryCode')"
+        [attr.aria-describedby]="errorId('country-code')"
+      />
+      <label [for]="fieldId('country-code')">
+        {{ i18n.fields().countryLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.countryCode"
+      [errorId]="errorId('country-code')"
+    />
+  </div>
+</div>
+
+@if (form().controls.legacyCountryName.value; as legacyCountryName) {
+  <p-message
+    severity="warn"
+    [text]="i18n.status().legacyCountryNotice + ' (' + legacyCountryName + ')'"
+  />
+}

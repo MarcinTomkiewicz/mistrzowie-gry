@@ -1,25 +1,26 @@
 import { FormControl, FormGroup } from '@angular/forms';
 
-import {
+import type { CountryCode } from './country-code';
+import type {
   QuestionnaireDisabilityDegree,
   QuestionnaireIdentificationBasis,
   QuestionnaireIdentityDocumentKind,
-  QuestionnaireSicknessInsuranceChoice,
+  QuestionnaireInstitutionReference,
+  QuestionnaireJoinDeclineAnswer,
   QuestionnaireYesNo,
-  QuestionnaireYesNoNotApplicable,
 } from './coworker-questionnaire';
 
 export type CoworkerQuestionnairePersonalForm = FormGroup<{
   firstName: FormControl<string>;
   lastName: FormControl<string>;
-  maidenName: FormControl<string>;
-  middleName: FormControl<string>;
+  maidenName: FormControl<string | null>;
+  middleName: FormControl<string | null>;
   birthDate: FormControl<string>;
   birthPlace: FormControl<string>;
   identificationBasis: FormControl<QuestionnaireIdentificationBasis>;
   pesel: FormControl<string>;
-  nip: FormControl<string>;
-  identityDocumentKind: FormControl<QuestionnaireIdentityDocumentKind | null>;
+  nip: FormControl<string | null>;
+  identityDocumentKind: FormControl<QuestionnaireIdentityDocumentKind>;
   identityDocumentNumber: FormControl<string>;
   citizenship: FormControl<string>;
   phone: FormControl<string>;
@@ -28,39 +29,50 @@ export type CoworkerQuestionnairePersonalForm = FormGroup<{
 export type CoworkerQuestionnaireAddressForm = FormGroup<{
   street: FormControl<string>;
   houseNumber: FormControl<string>;
-  apartmentNumber: FormControl<string>;
+  apartmentNumber: FormControl<string | null>;
   postalCode: FormControl<string>;
   city: FormControl<string>;
-  country: FormControl<string>;
+  voivodeship: FormControl<string | null>;
+  county: FormControl<string | null>;
+  municipality: FormControl<string | null>;
+  postOffice: FormControl<string | null>;
+  countryCode: FormControl<CountryCode | null>;
+  legacyCountryName: FormControl<string | null>;
 }>;
 
 export type CoworkerCorrespondenceAddressForm = FormGroup<{
   sameAsRegistered: FormControl<boolean>;
-  street: FormControl<string>;
-  houseNumber: FormControl<string>;
-  apartmentNumber: FormControl<string>;
-  postalCode: FormControl<string>;
-  city: FormControl<string>;
-  country: FormControl<string>;
+  street: FormControl<string | null>;
+  houseNumber: FormControl<string | null>;
+  apartmentNumber: FormControl<string | null>;
+  postalCode: FormControl<string | null>;
+  city: FormControl<string | null>;
+  countryCode: FormControl<CountryCode | null>;
+  legacyCountryName: FormControl<string | null>;
 }>;
 
 export type CoworkerQuestionnaireInstitutionsForm = FormGroup<{
-  taxOffice: FormControl<string>;
-  nfzBranch: FormControl<string>;
+  taxOffice: FormControl<QuestionnaireInstitutionReference>;
+  nfzBranch: FormControl<QuestionnaireInstitutionReference>;
 }>;
 
 export type CoworkerQuestionnaireInsuranceForm = FormGroup<{
   otherEmployment: FormControl<QuestionnaireYesNo>;
-  otherEmploymentAtLeastMinimumWage: FormControl<QuestionnaireYesNoNotApplicable>;
+  otherEmployerName: FormControl<string | null>;
+  otherEmploymentAtLeastMinimumWage: FormControl<QuestionnaireYesNo>;
   studentUnder26: FormControl<QuestionnaireYesNo>;
+  schoolOrUniversityName: FormControl<string | null>;
   otherMandateContract: FormControl<QuestionnaireYesNo>;
-  otherMandateContractSocialInsurance: FormControl<QuestionnaireYesNoNotApplicable>;
+  otherPrincipalName: FormControl<string | null>;
+  otherMandateContractSocialInsurance: FormControl<QuestionnaireYesNo>;
   subjectToCompulsorySocialInsurance: FormControl<QuestionnaireYesNo>;
-  voluntarySicknessInsurance: FormControl<QuestionnaireSicknessInsuranceChoice>;
-  voluntarySicknessInsuranceJoinConfirmed: FormControl<boolean>;
-  pensionDisabilityInsurance: FormControl<QuestionnaireYesNoNotApplicable>;
+  voluntarySicknessInsurance: FormControl<QuestionnaireJoinDeclineAnswer>;
+  voluntarySicknessInsuranceJoinConfirmed: FormControl<boolean | null>;
+  voluntaryPensionDisabilityInsurance: FormControl<QuestionnaireJoinDeclineAnswer>;
+  hasPensionOrDisabilityPensionRight: FormControl<QuestionnaireYesNo>;
   disabilityDegree: FormControl<QuestionnaireDisabilityDegree>;
   registeredAtEmploymentOffice: FormControl<QuestionnaireYesNo>;
+  employmentOfficeAddress: FormControl<string | null>;
 }>;
 
 export type CoworkerQuestionnairePaymentForm = FormGroup<{
@@ -75,4 +87,5 @@ export type CoworkerQuestionnaireForm = FormGroup<{
   institutions: CoworkerQuestionnaireInstitutionsForm;
   insurance: CoworkerQuestionnaireInsuranceForm;
   payment: CoworkerQuestionnairePaymentForm;
+  finalDeclarationAccepted: FormControl<boolean>;
 }>;

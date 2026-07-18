@@ -1,0 +1,265 @@
+<section class="mg-card flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().personalTitle }}
+    </h3>
+    <p class="m-0 muted-text">{{ i18n.sections().personalDescription }}</p>
+  </header>
+
+  <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-first-name"
+          type="text"
+          formControlName="firstName"
+          autocomplete="given-name"
+          data-questionnaire-field="data.personal.firstName"
+          aria-describedby="questionnaire-first-name-error"
+        />
+        <label for="questionnaire-first-name">{{ i18n.fields().firstNameLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.firstName"
+        errorId="questionnaire-first-name-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-last-name"
+          type="text"
+          formControlName="lastName"
+          autocomplete="family-name"
+          data-questionnaire-field="data.personal.lastName"
+          aria-describedby="questionnaire-last-name-error"
+        />
+        <label for="questionnaire-last-name">{{ i18n.fields().lastNameLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.lastName"
+        errorId="questionnaire-last-name-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-maiden-name"
+          type="text"
+          formControlName="maidenName"
+          autocomplete="off"
+          data-questionnaire-field="data.personal.maidenName"
+          aria-describedby="questionnaire-maiden-name-error"
+        />
+        <label for="questionnaire-maiden-name">{{ i18n.fields().maidenNameLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.maidenName"
+        errorId="questionnaire-maiden-name-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-middle-name"
+          type="text"
+          formControlName="middleName"
+          autocomplete="additional-name"
+          data-questionnaire-field="data.personal.middleName"
+          aria-describedby="questionnaire-middle-name-error"
+        />
+        <label for="questionnaire-middle-name">{{ i18n.fields().middleNameLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.middleName"
+        errorId="questionnaire-middle-name-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-birth-date"
+          type="date"
+          formControlName="birthDate"
+          autocomplete="bday"
+          data-questionnaire-field="data.personal.birthDate"
+          aria-describedby="questionnaire-birth-date-error"
+        />
+        <label for="questionnaire-birth-date">{{ i18n.fields().birthDateLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.birthDate"
+        errorId="questionnaire-birth-date-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-birth-place"
+          type="text"
+          formControlName="birthPlace"
+          autocomplete="off"
+          data-questionnaire-field="data.personal.birthPlace"
+          aria-describedby="questionnaire-birth-place-error"
+        />
+        <label for="questionnaire-birth-place">{{ i18n.fields().birthPlaceLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.birthPlace"
+        errorId="questionnaire-birth-place-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="questionnaire-identification-basis"
+          formControlName="identificationBasis"
+          [options]="identificationBasisOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          appendTo="body"
+          data-questionnaire-field="data.personal.identificationBasis"
+          aria-describedby="questionnaire-identification-basis-error"
+        />
+        <label for="questionnaire-identification-basis">
+          {{ i18n.fields().identificationBasisLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.identificationBasis"
+        errorId="questionnaire-identification-basis-error"
+      />
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          id="questionnaire-nip"
+          type="text"
+          formControlName="nip"
+          inputmode="numeric"
+          autocomplete="off"
+          data-questionnaire-field="data.personal.nip"
+          aria-describedby="questionnaire-nip-error"
+        />
+        <label for="questionnaire-nip">{{ i18n.fields().nipLabel }}</label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.nip"
+        errorId="questionnaire-nip-error"
+      />
+    </div>
+  </div>
+
+  @if (form().controls.identificationBasis.value === 'pesel') {
+    <app-questionnaire-sensitive-field
+      [control]="form().controls.pesel"
+      [metadata]="sensitive().pesel"
+      [label]="i18n.fields().peselLabel"
+      inputId="questionnaire-pesel"
+      fieldPath="data.personal.pesel"
+      autocomplete="off"
+    />
+  }
+
+  @if (form().controls.identificationBasis.value === 'identity_document') {
+    <div class="flex-col-start-stretch gap-xs">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="questionnaire-identity-document-kind"
+          formControlName="identityDocumentKind"
+          [options]="identityDocumentKindOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          appendTo="body"
+          data-questionnaire-field="data.personal.identityDocumentKind"
+          aria-describedby="questionnaire-identity-document-kind-error"
+        />
+        <label for="questionnaire-identity-document-kind">
+          {{ i18n.fields().identityDocumentKindLabel }}
+        </label>
+      </p-iftalabel>
+      <app-questionnaire-field-errors
+        [control]="form().controls.identityDocumentKind"
+        errorId="questionnaire-identity-document-kind-error"
+      />
+    </div>
+
+    <app-questionnaire-sensitive-field
+      [control]="form().controls.identityDocumentNumber"
+      [metadata]="sensitive().identityDocumentNumber"
+      [label]="i18n.fields().identityDocumentNumberLabel"
+      inputId="questionnaire-identity-document-number"
+      fieldPath="data.personal.identityDocumentNumber"
+      autocomplete="off"
+    />
+  }
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="questionnaire-citizenship"
+        type="text"
+        formControlName="citizenship"
+        autocomplete="country-name"
+        data-questionnaire-field="data.personal.citizenship"
+        aria-describedby="questionnaire-citizenship-error"
+      />
+      <label for="questionnaire-citizenship">
+        {{ i18n.fields().citizenshipLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.citizenship"
+      errorId="questionnaire-citizenship-error"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        id="questionnaire-phone"
+        type="tel"
+        formControlName="phone"
+        autocomplete="tel"
+        data-questionnaire-field="data.personal.phone"
+        aria-describedby="questionnaire-phone-error"
+      />
+      <label for="questionnaire-phone">{{ i18n.fields().phoneLabel }}</label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.phone"
+      errorId="questionnaire-phone-error"
+    />
+  </div>
+</section>

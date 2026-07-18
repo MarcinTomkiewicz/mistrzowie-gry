@@ -1,0 +1,1910 @@
+{
+  "metadata": {
+    "source": "https://www.gov.pl/web/kas/dane-teleadresowe-jednostek-kas",
+    "sourceFileDate": "2026-06-11",
+    "generatedAt": "2026-07-17T07:08:57.191Z",
+    "generatorVersion": "1.0.0"
+  },
+  "taxOffices": [
+    {
+      "code": "0202",
+      "name": "Urząd Skarbowy w Bolesławcu",
+      "city": "Bolesławiec"
+    },
+    {
+      "code": "0203",
+      "name": "Urząd Skarbowy w Bystrzycy Kłodzkiej",
+      "city": "Bystrzyca Kłodzka"
+    },
+    {
+      "code": "0204",
+      "name": "Urząd Skarbowy w Dzierżoniowie",
+      "city": "Dzierżoniów"
+    },
+    {
+      "code": "0205",
+      "name": "Urząd Skarbowy w Głogowie",
+      "city": "Głogów"
+    },
+    {
+      "code": "0206",
+      "name": "Urząd Skarbowy w Jaworze",
+      "city": "Jawor"
+    },
+    {
+      "code": "0207",
+      "name": "Urząd Skarbowy w Jeleniej Górze",
+      "city": "Jelenia Góra"
+    },
+    {
+      "code": "0208",
+      "name": "Urząd Skarbowy w Kamiennej Górze",
+      "city": "Kamienna Góra"
+    },
+    {
+      "code": "0209",
+      "name": "Urząd Skarbowy w Kłodzku",
+      "city": "Kłodzko"
+    },
+    {
+      "code": "0210",
+      "name": "Urząd Skarbowy w Legnicy",
+      "city": "Legnica"
+    },
+    {
+      "code": "0211",
+      "name": "Urząd Skarbowy w Lubaniu",
+      "city": "Lubań"
+    },
+    {
+      "code": "0212",
+      "name": "Urząd Skarbowy w Lubinie",
+      "city": "Lubin"
+    },
+    {
+      "code": "0213",
+      "name": "Urząd Skarbowy w Lwówku Śląskim",
+      "city": "Lwówek Śląski"
+    },
+    {
+      "code": "0214",
+      "name": "Urząd Skarbowy w Miliczu",
+      "city": "Milicz"
+    },
+    {
+      "code": "0215",
+      "name": "Urząd Skarbowy w Nowej Rudzie",
+      "city": "Nowa Ruda"
+    },
+    {
+      "code": "0216",
+      "name": "Urząd Skarbowy w Oleśnicy",
+      "city": "Oleśnica"
+    },
+    {
+      "code": "0217",
+      "name": "Urząd Skarbowy w Oławie",
+      "city": "Oława"
+    },
+    {
+      "code": "0218",
+      "name": "Urząd Skarbowy w Strzelinie",
+      "city": "Strzelin"
+    },
+    {
+      "code": "0219",
+      "name": "Urząd Skarbowy w Środzie Śląskiej",
+      "city": "Środa Śląska"
+    },
+    {
+      "code": "0220",
+      "name": "Urząd Skarbowy w Świdnicy",
+      "city": "Świdnica"
+    },
+    {
+      "code": "0221",
+      "name": "Urząd Skarbowy w Trzebnicy",
+      "city": "Trzebnica"
+    },
+    {
+      "code": "0222",
+      "name": "Urząd Skarbowy w Wałbrzychu",
+      "city": "Wałbrzych"
+    },
+    {
+      "code": "0223",
+      "name": "Urząd Skarbowy w Wołowie",
+      "city": "Wołów"
+    },
+    {
+      "code": "0224",
+      "name": "Urząd Skarbowy Wrocław - Fabryczna",
+      "city": "Wrocław"
+    },
+    {
+      "code": "0225",
+      "name": "Urząd Skarbowy Wrocław - Krzyki",
+      "city": "Wrocław"
+    },
+    {
+      "code": "0226",
+      "name": "Urząd Skarbowy Wrocław - Psie Pole",
+      "city": "Wrocław"
+    },
+    {
+      "code": "0227",
+      "name": "Urząd Skarbowy Wrocław - Stare Miasto",
+      "city": "Wrocław"
+    },
+    {
+      "code": "0228",
+      "name": "Urząd Skarbowy Wrocław - Śródmieście",
+      "city": "Wrocław"
+    },
+    {
+      "code": "0229",
+      "name": "Pierwszy Urząd Skarbowy we Wrocławiu",
+      "city": "Wrocław"
+    },
+    {
+      "code": "0230",
+      "name": "Urząd Skarbowy w Ząbkowicach Śląskich",
+      "city": "Ząbkowice Śląskie"
+    },
+    {
+      "code": "0231",
+      "name": "Urząd Skarbowy w Zgorzelcu",
+      "city": "Zgorzelec"
+    },
+    {
+      "code": "0232",
+      "name": "Urząd Skarbowy w Złotoryi",
+      "city": "Złotoryja"
+    },
+    {
+      "code": "0233",
+      "name": "Urząd skarbowy w Górze",
+      "city": "Góra"
+    },
+    {
+      "code": "0234",
+      "name": "Urząd Skarbowy w Polkowicach",
+      "city": "Polkowice"
+    },
+    {
+      "code": "0402",
+      "name": "Urząd Skarbowy w Aleksandrowie Kujawskim",
+      "city": "Aleksandrów Kujawski"
+    },
+    {
+      "code": "0403",
+      "name": "Urząd Skarbowy w Brodnicy",
+      "city": "Brodnica"
+    },
+    {
+      "code": "0404",
+      "name": "Pierwszy Urząd Skarbowy w Bydgoszczy",
+      "city": "Bydgoszcz"
+    },
+    {
+      "code": "0405",
+      "name": "Drugi Urząd Skarbowy w Bydgoszczy",
+      "city": "Bydgoszcz"
+    },
+    {
+      "code": "0406",
+      "name": "Trzeci Urząd Skarbowy w Bydgoszczy",
+      "city": "Bydgoszcz"
+    },
+    {
+      "code": "0407",
+      "name": "Urząd Skarbowy w Chełmnie",
+      "city": "Chełmno"
+    },
+    {
+      "code": "0408",
+      "name": "Urząd Skarbowy w Grudziądzu",
+      "city": "Grudziądz"
+    },
+    {
+      "code": "0409",
+      "name": "Urząd Skarbowy w Inowrocławiu",
+      "city": "Inowrocław"
+    },
+    {
+      "code": "0410",
+      "name": "Urząd Skarbowy w Lipnie",
+      "city": "Lipno"
+    },
+    {
+      "code": "0411",
+      "name": "Urząd Skarbowy w Mogilnie",
+      "city": "Mogilno"
+    },
+    {
+      "code": "0412",
+      "name": "Urząd Skarbowy w Nakle nad Notecią",
+      "city": "Nakło nad Notecią"
+    },
+    {
+      "code": "0413",
+      "name": "Urząd Skarbowy w Radziejowie",
+      "city": "Radziejów"
+    },
+    {
+      "code": "0414",
+      "name": "Urząd Skarbowy w Rypinie",
+      "city": "Rypin"
+    },
+    {
+      "code": "0415",
+      "name": "Urząd Skarbowy w Świeciu",
+      "city": "Świecie"
+    },
+    {
+      "code": "0416",
+      "name": "Pierwszy Urząd Skarbowy w Toruniu",
+      "city": "Toruń"
+    },
+    {
+      "code": "0417",
+      "name": "Drugi Urząd Skarbowy w Toruniu",
+      "city": "Toruń"
+    },
+    {
+      "code": "0418",
+      "name": "Urząd Skarbowy w Tucholi",
+      "city": "Tuchola"
+    },
+    {
+      "code": "0419",
+      "name": "Urząd Skarbowy w Wąbrzeźnie",
+      "city": "Wąbrzeźno"
+    },
+    {
+      "code": "0420",
+      "name": "Urząd Skarbowy we Włocławku",
+      "city": "Włocławek"
+    },
+    {
+      "code": "0421",
+      "name": "Urząd Skarbowy w Żninie",
+      "city": "Żnin"
+    },
+    {
+      "code": "0422",
+      "name": "Urząd Skarbowy w Golubiu-Dobrzyniu",
+      "city": "Golub-Dobrzyń"
+    },
+    {
+      "code": "0423",
+      "name": "Urząd Skarbowy w Sępólnie Krajeńskim",
+      "city": "Sępólno Krajeńskie"
+    },
+    {
+      "code": "0602",
+      "name": "Urząd Skarbowy w Białej Podlaskiej",
+      "city": "Biała Podlaska"
+    },
+    {
+      "code": "0603",
+      "name": "Urząd Skarbowy w Biłgoraju",
+      "city": "Biłgoraj"
+    },
+    {
+      "code": "0604",
+      "name": "Urząd Skarbowy w Chełmie",
+      "city": "Chełm"
+    },
+    {
+      "code": "0605",
+      "name": "Urząd Skarbowy w Hrubieszowie",
+      "city": "Hrubieszów"
+    },
+    {
+      "code": "0606",
+      "name": "Urząd Skarbowy w Janowie Lubelskim",
+      "city": "Janów Lubelski"
+    },
+    {
+      "code": "0607",
+      "name": "Urząd Skarbowy w Krasnymstawie",
+      "city": "Krasnystaw"
+    },
+    {
+      "code": "0608",
+      "name": "Urząd Skarbowy w Kraśniku",
+      "city": "Kraśnik"
+    },
+    {
+      "code": "0609",
+      "name": "Urząd Skarbowy w Lubartowie",
+      "city": "Lubartów"
+    },
+    {
+      "code": "0610",
+      "name": "Pierwszy Urząd Skarbowy w Lublinie",
+      "city": "Lublin"
+    },
+    {
+      "code": "0611",
+      "name": "Drugi Urząd Skarbowy w Lublinie",
+      "city": "Lublin"
+    },
+    {
+      "code": "0612",
+      "name": "Trzeci Urząd Skarbowy w Lublinie",
+      "city": "Lublin"
+    },
+    {
+      "code": "0613",
+      "name": "Urząd Skarbowy w Łukowie",
+      "city": "Łuków"
+    },
+    {
+      "code": "0614",
+      "name": "Urząd Skarbowy w Opolu Lubelskim",
+      "city": "Opole Lubelskie"
+    },
+    {
+      "code": "0615",
+      "name": "Urząd Skarbowy w Parczewie",
+      "city": "Parczew"
+    },
+    {
+      "code": "0616",
+      "name": "Urząd Skarbowy w Puławach",
+      "city": "Puławy"
+    },
+    {
+      "code": "0617",
+      "name": "Urząd Skarbowy w Radzyniu Podlaskim",
+      "city": "Radzyń Podlaski"
+    },
+    {
+      "code": "0618",
+      "name": "Urząd Skarbowy w Tomaszowie Lubelskim",
+      "city": "Tomaszów Lubelski"
+    },
+    {
+      "code": "0619",
+      "name": "Urząd Skarbowy we Włodawie",
+      "city": "Włodawa"
+    },
+    {
+      "code": "0620",
+      "name": "Urząd Skarbowy w Zamościu",
+      "city": "Zamość"
+    },
+    {
+      "code": "0621",
+      "name": "Urząd Skarbowy w Łęcznej",
+      "city": "Łęczna"
+    },
+    {
+      "code": "0622",
+      "name": "Urząd Skarbowy w Rykach",
+      "city": "Ryki"
+    },
+    {
+      "code": "0802",
+      "name": "Urząd Skarbowy w Gorzowie Wielkopolskim",
+      "city": "Gorzów Wielkopolski"
+    },
+    {
+      "code": "0803",
+      "name": "Urząd Skarbowy w Krośnie Odrzańskim",
+      "city": "Krosno Odrzańskie"
+    },
+    {
+      "code": "0804",
+      "name": "Urząd Skarbowy w Międzyrzeczu",
+      "city": "Międzyrzecz"
+    },
+    {
+      "code": "0805",
+      "name": "Urząd Skarbowy w Nowej Soli",
+      "city": "Nowa Sól"
+    },
+    {
+      "code": "0806",
+      "name": "Urząd Skarbowy w Słubicach",
+      "city": "Słubice"
+    },
+    {
+      "code": "0807",
+      "name": "Urząd Skarbowy w Świebodzinie",
+      "city": "Świebodzin"
+    },
+    {
+      "code": "0808",
+      "name": "Pierwszy Urząd Skarbowy w Zielonej Górze",
+      "city": "Zielona Góra"
+    },
+    {
+      "code": "0809",
+      "name": "Drugi Urząd Skarbowy w Zielonej Górze",
+      "city": "Zielona Góra"
+    },
+    {
+      "code": "0810",
+      "name": "Urząd Skarbowy w Żaganiu",
+      "city": "Żagań"
+    },
+    {
+      "code": "0811",
+      "name": "Urząd Skarbowy w Żarach",
+      "city": "Żary"
+    },
+    {
+      "code": "0812",
+      "name": "Urząd Skarbowy w Drezdenku",
+      "city": "Drezdenko"
+    },
+    {
+      "code": "0813",
+      "name": "Urząd Skarbowy w Sulęcinie",
+      "city": "Sulęcin"
+    },
+    {
+      "code": "0814",
+      "name": "Urząd Skarbowy we Wschowie",
+      "city": "Wschowa"
+    },
+    {
+      "code": "1002",
+      "name": "Urząd Skarbowy w Bełchatowie",
+      "city": "Bełchatów"
+    },
+    {
+      "code": "1003",
+      "name": "Urząd Skarbowy w Brzezinach",
+      "city": "Brzeziny"
+    },
+    {
+      "code": "1004",
+      "name": "Urząd Skarbowy w Głownie",
+      "city": "Głowno"
+    },
+    {
+      "code": "1005",
+      "name": "Urząd Skarbowy w Kutnie",
+      "city": "Kutno"
+    },
+    {
+      "code": "1006",
+      "name": "Urząd Skarbowy w Łasku",
+      "city": "Łask"
+    },
+    {
+      "code": "1007",
+      "name": "Urząd Skarbowy w Łowiczu",
+      "city": "Łowicz"
+    },
+    {
+      "code": "1008",
+      "name": "Pierwszy Urząd Skarbowy Łódź - Bałuty",
+      "city": "Łódź"
+    },
+    {
+      "code": "1009",
+      "name": "Drugi Urząd Skarbowy Łódź - Bałuty",
+      "city": "Łódź"
+    },
+    {
+      "code": "1010",
+      "name": "Pierwszy Urząd Skarbowy Łódź - Górna",
+      "city": "Łódź"
+    },
+    {
+      "code": "1011",
+      "name": "Drugi Urząd Skarbowy Łódź - Górna",
+      "city": "Łódź"
+    },
+    {
+      "code": "1012",
+      "name": "Urząd Skarbowy Łódź - Polesie",
+      "city": "Łódź"
+    },
+    {
+      "code": "1013",
+      "name": "Urząd Skarbowy Łódź - Śródmieście",
+      "city": "Łódź"
+    },
+    {
+      "code": "1014",
+      "name": "Urząd Skarbowy Łódź - Widzew",
+      "city": "Łódź"
+    },
+    {
+      "code": "1015",
+      "name": "Urząd Skarbowy w Opocznie",
+      "city": "Opoczno"
+    },
+    {
+      "code": "1016",
+      "name": "Urząd Skarbowy w Pabianicach",
+      "city": "Pabianice"
+    },
+    {
+      "code": "1017",
+      "name": "Urząd Skarbowy w Piotrkowie Trybunalskim",
+      "city": "Piotrków Trybunalski"
+    },
+    {
+      "code": "1018",
+      "name": "Urząd Skarbowy w Poddębicach",
+      "city": "Poddębice"
+    },
+    {
+      "code": "1019",
+      "name": "Urząd Skarbowy w Radomsku",
+      "city": "Radomsko"
+    },
+    {
+      "code": "1020",
+      "name": "Urząd Skarbowy w Rawie Mazowieckiej",
+      "city": "Rawa Mazowiecka"
+    },
+    {
+      "code": "1021",
+      "name": "Urząd Skarbowy w Sieradzu",
+      "city": "Sieradz"
+    },
+    {
+      "code": "1022",
+      "name": "Urząd Skarbowy w Skierniewicach",
+      "city": "Skierniewice"
+    },
+    {
+      "code": "1023",
+      "name": "Urząd Skarbowy w Tomaszowie Mazowieckim",
+      "city": "Tomaszów Mazowiecki"
+    },
+    {
+      "code": "1024",
+      "name": "Urząd Skarbowy w Wieluniu",
+      "city": "Wieluń"
+    },
+    {
+      "code": "1025",
+      "name": "Urząd Skarbowy w Zduńskiej Woli",
+      "city": "Zduńska Wola"
+    },
+    {
+      "code": "1026",
+      "name": "Urząd Skarbowy w Zgierzu",
+      "city": "Zgierz"
+    },
+    {
+      "code": "1027",
+      "name": "Urząd Skarbowy w Wieruszowie",
+      "city": "Wieruszów"
+    },
+    {
+      "code": "1028",
+      "name": "Urząd Skarbowy w Łęczycy",
+      "city": "Łęczyca"
+    },
+    {
+      "code": "1029",
+      "name": "Urząd Skarbowy w Pajęcznie",
+      "city": "Pajęczno"
+    },
+    {
+      "code": "1202",
+      "name": "Urząd Skarbowy w Bochni",
+      "city": "Bochnia"
+    },
+    {
+      "code": "1203",
+      "name": "Urząd Skarbowy w Brzesku",
+      "city": "Brzesko"
+    },
+    {
+      "code": "1204",
+      "name": "Urząd Skarbowy w Chrzanowie",
+      "city": "Chrzanów"
+    },
+    {
+      "code": "1205",
+      "name": "Urząd Skarbowy w Dąbrowie Tarnowskiej",
+      "city": "Dąbrowa Tarnowska"
+    },
+    {
+      "code": "1206",
+      "name": "Urząd Skarbowy w Gorlicach",
+      "city": "Gorlice"
+    },
+    {
+      "code": "1207",
+      "name": "Pierwszy Urząd Skarbowy Kraków",
+      "city": "Kraków"
+    },
+    {
+      "code": "1208",
+      "name": "Urząd Skarbowy Kraków - Krowodrza",
+      "city": "Kraków"
+    },
+    {
+      "code": "1209",
+      "name": "Urząd Skarbowy Kraków - Nowa Huta",
+      "city": "Kraków"
+    },
+    {
+      "code": "1210",
+      "name": "Urząd Skarbowy Kraków - Podgórze",
+      "city": "Kraków"
+    },
+    {
+      "code": "1211",
+      "name": "Urząd Skarbowy Kraków - Prądnik",
+      "city": "Kraków"
+    },
+    {
+      "code": "1212",
+      "name": "Urząd Skarbowy Kraków - Stare Miasto",
+      "city": "Kraków"
+    },
+    {
+      "code": "1213",
+      "name": "Urząd Skarbowy Kraków - Śródmieście",
+      "city": "Kraków"
+    },
+    {
+      "code": "1214",
+      "name": "Urząd Skarbowy w Limanowej",
+      "city": "Limanowa"
+    },
+    {
+      "code": "1215",
+      "name": "Urząd Skarbowy w Miechowie",
+      "city": "Miechów"
+    },
+    {
+      "code": "1216",
+      "name": "Urząd Skarbowy w Myślenicach",
+      "city": "Myślenice"
+    },
+    {
+      "code": "1217",
+      "name": "Urząd Skarbowy w Nowym Sączu",
+      "city": "Nowy Sącz"
+    },
+    {
+      "code": "1218",
+      "name": "Urząd Skarbowy w Nowym Targu",
+      "city": "Nowy Targ"
+    },
+    {
+      "code": "1219",
+      "name": "Urząd Skarbowy w Olkuszu",
+      "city": "Olkusz"
+    },
+    {
+      "code": "1220",
+      "name": "Urząd Skarbowy w Oświęcimiu",
+      "city": "Oświęcim"
+    },
+    {
+      "code": "1221",
+      "name": "Urząd Skarbowy w Proszowicach",
+      "city": "Proszowice"
+    },
+    {
+      "code": "1222",
+      "name": "Urząd Skarbowy w Suchej Beskidzkiej",
+      "city": "Sucha Beskidzka"
+    },
+    {
+      "code": "1223",
+      "name": "Pierwszy Urząd Skarbowy w Tarnowie",
+      "city": "Tarnów"
+    },
+    {
+      "code": "1224",
+      "name": "Drugi Urząd Skarbowy w Tarnowie",
+      "city": "Tarnów"
+    },
+    {
+      "code": "1225",
+      "name": "Urząd Skarbowy w Wadowicach",
+      "city": "Wadowice"
+    },
+    {
+      "code": "1226",
+      "name": "Urząd Skarbowy w Wieliczce",
+      "city": "Wieliczka"
+    },
+    {
+      "code": "1227",
+      "name": "Urząd Skarbowy w Zakopanem",
+      "city": "Zakopane"
+    },
+    {
+      "code": "1228",
+      "name": "Drugi Urząd Skarbowy Kraków",
+      "city": "Kraków"
+    },
+    {
+      "code": "1402",
+      "name": "Urząd Skarbowy w Białobrzegach",
+      "city": "Białobrzegi"
+    },
+    {
+      "code": "1403",
+      "name": "Urząd Skarbowy w Ciechanowie",
+      "city": "Ciechanów"
+    },
+    {
+      "code": "1404",
+      "name": "Urząd Skarbowy w Garwolinie",
+      "city": "Garwolin"
+    },
+    {
+      "code": "1405",
+      "name": "Urząd Skarbowy w Gostyninie",
+      "city": "Gostynin"
+    },
+    {
+      "code": "1406",
+      "name": "Urząd Skarbowy w Grodzisku Mazowieckim",
+      "city": "Grodzisk Mazowiecki"
+    },
+    {
+      "code": "1407",
+      "name": "Urząd Skarbowy w Grójcu",
+      "city": "Grójec"
+    },
+    {
+      "code": "1408",
+      "name": "Urząd Skarbowy w Kozienicach",
+      "city": "Kozienice"
+    },
+    {
+      "code": "1409",
+      "name": "Urząd Skarbowy w Legionowie",
+      "city": "Legionowo"
+    },
+    {
+      "code": "1410",
+      "name": "Urząd Skarbowy w Łosicach",
+      "city": "Łosice"
+    },
+    {
+      "code": "1411",
+      "name": "Urząd Skarbowy w Makowie Mazowieckim",
+      "city": "Maków Mazowiecki"
+    },
+    {
+      "code": "1412",
+      "name": "Urząd Skarbowy w Mińsku Mazowieckim",
+      "city": "Mińsk Mazowiecki"
+    },
+    {
+      "code": "1413",
+      "name": "Urząd Skarbowy w Mławie",
+      "city": "Mława"
+    },
+    {
+      "code": "1414",
+      "name": "Urząd Skarbowy w Nowym Dworze Mazowieckim",
+      "city": "Nowy Dwór Mazowiecki"
+    },
+    {
+      "code": "1415",
+      "name": "Urząd Skarbowy w Ostrołęce",
+      "city": "Ostrołęka"
+    },
+    {
+      "code": "1416",
+      "name": "Urząd Skarbowy w Ostrowi Mazowieckiej",
+      "city": "Ostrów Mazowiecka"
+    },
+    {
+      "code": "1417",
+      "name": "Urząd Skarbowy w Otwocku",
+      "city": "Otwock"
+    },
+    {
+      "code": "1418",
+      "name": "Urząd Skarbowy w Piasecznie",
+      "city": "Piaseczno"
+    },
+    {
+      "code": "1419",
+      "name": "Urząd Skarbowy w Płocku",
+      "city": "Płock"
+    },
+    {
+      "code": "1420",
+      "name": "Urząd Skarbowy w Płońsku",
+      "city": "Płońsk"
+    },
+    {
+      "code": "1421",
+      "name": "Urząd Skarbowy w Pruszkowie",
+      "city": "Pruszków"
+    },
+    {
+      "code": "1422",
+      "name": "Urząd Skarbowy w Przasnyszu",
+      "city": "Przasnysz"
+    },
+    {
+      "code": "1423",
+      "name": "Urząd Skarbowy w Pułtusku",
+      "city": "Pułtusk"
+    },
+    {
+      "code": "1424",
+      "name": "Pierwszy Urząd Skarbowy w Radomiu",
+      "city": "Radom"
+    },
+    {
+      "code": "1425",
+      "name": "Drugi Urząd Skarbowy w Radomiu",
+      "city": "Radom"
+    },
+    {
+      "code": "1426",
+      "name": "Urząd Skarbowy w Siedlcach",
+      "city": "Siedlce"
+    },
+    {
+      "code": "1427",
+      "name": "Urząd Skarbowy w Sierpcu",
+      "city": "Sierpc"
+    },
+    {
+      "code": "1428",
+      "name": "Urząd Skarbowy w Sochaczewie",
+      "city": "Sochaczew"
+    },
+    {
+      "code": "1429",
+      "name": "Urząd Skarbowy w Sokołowie Podlaskim",
+      "city": "Sokołów Podlaski"
+    },
+    {
+      "code": "1430",
+      "name": "Urząd Skarbowy w Szydłowcu",
+      "city": "Szydłowiec"
+    },
+    {
+      "code": "1431",
+      "name": "Urząd Skarbowy Warszawa - Bemowo",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1432",
+      "name": "Urząd Skarbowy Warszawa - Bielany",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1433",
+      "name": "Urząd Skarbowy Warszawa - Mokotów",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1434",
+      "name": "Urząd Skarbowy Warszawa - Praga",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1435",
+      "name": "Pierwszy Urząd Skarbowy Warszawa - Śródmieście",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1436",
+      "name": "Drugi Urząd Skarbowy Warszawa - Śródmieście",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1437",
+      "name": "Urząd Skarbowy Warszawa - Targówek",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1438",
+      "name": "Urząd Skarbowy Warszawa - Ursynów",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1439",
+      "name": "Urząd Skarbowy Warszawa - Wawer",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1440",
+      "name": "Urząd Skarbowy Warszawa - Wola",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1441",
+      "name": "Urząd Skarbowy w Węgrowie",
+      "city": "Węgrów"
+    },
+    {
+      "code": "1442",
+      "name": "Urząd Skarbowy w Wołominie",
+      "city": "Wołomin"
+    },
+    {
+      "code": "1443",
+      "name": "Urząd Skarbowy w Wyszkowie",
+      "city": "Wyszków"
+    },
+    {
+      "code": "1444",
+      "name": "Urząd Skarbowy w Zwoleniu",
+      "city": "Zwoleń"
+    },
+    {
+      "code": "1445",
+      "name": "Urząd Skarbowy w Żurominie",
+      "city": "Żuromin"
+    },
+    {
+      "code": "1446",
+      "name": "Urząd Skarbowy w Żyrardowie",
+      "city": "Żyrardów"
+    },
+    {
+      "code": "1447",
+      "name": "Urząd Skarbowy w Lipsku",
+      "city": "Lipsko"
+    },
+    {
+      "code": "1448",
+      "name": "Urząd Skarbowy w Przysusze",
+      "city": "Przysucha"
+    },
+    {
+      "code": "1449",
+      "name": "Trzeci Urząd Skarbowy Warszawa - Śródmieście",
+      "city": "Warszawa"
+    },
+    {
+      "code": "1602",
+      "name": "Urząd Skarbowy w Brzegu",
+      "city": "Brzeg"
+    },
+    {
+      "code": "1603",
+      "name": "Urząd Skarbowy w Głubczycach",
+      "city": "Głubczyce"
+    },
+    {
+      "code": "1604",
+      "name": "Urząd Skarbowy w Kędzierzynie-Koźlu",
+      "city": "Kędzierzyn-Koźle"
+    },
+    {
+      "code": "1605",
+      "name": "Urząd Skarbowy w Kluczborku",
+      "city": "Kluczbork"
+    },
+    {
+      "code": "1606",
+      "name": "Urząd Skarbowy w Namysłowie",
+      "city": "Namysłów"
+    },
+    {
+      "code": "1607",
+      "name": "Urząd Skarbowy w Nysie",
+      "city": "Nysa"
+    },
+    {
+      "code": "1608",
+      "name": "Urząd Skarbowy w Oleśnie",
+      "city": "Olesno"
+    },
+    {
+      "code": "1609",
+      "name": "Pierwszy Urząd Skarbowy w Opolu",
+      "city": "Opole"
+    },
+    {
+      "code": "1610",
+      "name": "Drugi Urząd Skarbowy w Opolu",
+      "city": "Opole"
+    },
+    {
+      "code": "1611",
+      "name": "Urząd Skarbowy w Prudniku",
+      "city": "Prudnik"
+    },
+    {
+      "code": "1612",
+      "name": "Urząd Skarbowy w Strzelcach Opolskich",
+      "city": "Strzelce Opolskie"
+    },
+    {
+      "code": "1613",
+      "name": "Urząd Skarbowy w Krapkowicach",
+      "city": "Krapkowice"
+    },
+    {
+      "code": "1802",
+      "name": "Urząd Skarbowy w Brzozowie",
+      "city": "Brzozów"
+    },
+    {
+      "code": "1803",
+      "name": "Urząd Skarbowy w Dębicy",
+      "city": "Dębica"
+    },
+    {
+      "code": "1804",
+      "name": "Urząd Skarbowy w Jarosławiu",
+      "city": "Jarosław"
+    },
+    {
+      "code": "1805",
+      "name": "Urząd Skarbowy w Jaśle",
+      "city": "Jasło"
+    },
+    {
+      "code": "1806",
+      "name": "Urząd Skarbowy w Kolbuszowej",
+      "city": "Kolbuszowa"
+    },
+    {
+      "code": "1807",
+      "name": "Urząd Skarbowy w Krośnie",
+      "city": "Krosno"
+    },
+    {
+      "code": "1808",
+      "name": "Urząd Skarbowy w Lesku",
+      "city": "Lesko"
+    },
+    {
+      "code": "1809",
+      "name": "Urząd Skarbowy w Leżajsku",
+      "city": "Leżajsk"
+    },
+    {
+      "code": "1810",
+      "name": "Urząd Skarbowy w Lubaczowie",
+      "city": "Lubaczów"
+    },
+    {
+      "code": "1811",
+      "name": "Urząd Skarbowy w Łańcucie",
+      "city": "Łańcut"
+    },
+    {
+      "code": "1812",
+      "name": "Urząd Skarbowy w Mielcu",
+      "city": "Mielec"
+    },
+    {
+      "code": "1813",
+      "name": "Urząd Skarbowy w Przemyślu",
+      "city": "Przemyśl"
+    },
+    {
+      "code": "1814",
+      "name": "Urząd Skarbowy w Przeworsku",
+      "city": "Przeworsk"
+    },
+    {
+      "code": "1815",
+      "name": "Urząd Skarbowy w Ropczycach",
+      "city": "Ropczyce"
+    },
+    {
+      "code": "1816",
+      "name": "Pierwszy Urząd Skarbowy w Rzeszowie",
+      "city": "Rzeszów"
+    },
+    {
+      "code": "1817",
+      "name": "Urząd Skarbowy w Sanoku",
+      "city": "Sanok"
+    },
+    {
+      "code": "1818",
+      "name": "Urząd Skarbowy w Stalowej Woli",
+      "city": "Stalowa Wola"
+    },
+    {
+      "code": "1819",
+      "name": "Urząd Skarbowy w Strzyżowie",
+      "city": "Strzyżów"
+    },
+    {
+      "code": "1820",
+      "name": "Urząd Skarbowy w Tarnobrzegu",
+      "city": "Tarnobrzeg"
+    },
+    {
+      "code": "1821",
+      "name": "Urząd Skarbowy w Ustrzykach Dolnych",
+      "city": "Ustrzyki Dolne"
+    },
+    {
+      "code": "1822",
+      "name": "Drugi Urząd Skarbowy w Rzeszowie",
+      "city": "Rzeszów"
+    },
+    {
+      "code": "1823",
+      "name": "Urząd Skarbowy w Nisku",
+      "city": "Nisko"
+    },
+    {
+      "code": "2002",
+      "name": "Urząd Skarbowy w Augustowie",
+      "city": "Augustów"
+    },
+    {
+      "code": "2003",
+      "name": "Pierwszy Urząd Skarbowy w Białymstoku",
+      "city": "Białystok"
+    },
+    {
+      "code": "2004",
+      "name": "Drugi Urząd Skarbowy w Białymstoku",
+      "city": "Białystok"
+    },
+    {
+      "code": "2005",
+      "name": "Urząd Skarbowy w Bielsku Podlaskim",
+      "city": "Bielsk Podlaski"
+    },
+    {
+      "code": "2006",
+      "name": "Urząd Skarbowy w Grajewie",
+      "city": "Grajewo"
+    },
+    {
+      "code": "2007",
+      "name": "Urząd Skarbowy w Kolnie",
+      "city": "Kolno"
+    },
+    {
+      "code": "2008",
+      "name": "Urząd Skarbowy w Łomży",
+      "city": "Łomża"
+    },
+    {
+      "code": "2009",
+      "name": "Urząd Skarbowy w Mońkach",
+      "city": "Mońki"
+    },
+    {
+      "code": "2010",
+      "name": "Urząd Skarbowy w Siemiatyczach",
+      "city": "Siemiatycze"
+    },
+    {
+      "code": "2011",
+      "name": "Urząd Skarbowy w Sokółce",
+      "city": "Sokółka"
+    },
+    {
+      "code": "2012",
+      "name": "Urząd Skarbowy w Suwałkach",
+      "city": "Suwałki"
+    },
+    {
+      "code": "2013",
+      "name": "Urząd Skarbowy w Wysokiem Mazowieckiem",
+      "city": "Wysokie Mazowieckie"
+    },
+    {
+      "code": "2014",
+      "name": "Urząd Skarbowy w Zambrowie",
+      "city": "Zambrów"
+    },
+    {
+      "code": "2015",
+      "name": "Urząd Skarbowy w Hajnówce",
+      "city": "Hajnówka"
+    },
+    {
+      "code": "2202",
+      "name": "Urząd Skarbowy w Bytowie",
+      "city": "Bytów"
+    },
+    {
+      "code": "2203",
+      "name": "Urząd Skarbowy w Chojnicach",
+      "city": "Chojnice"
+    },
+    {
+      "code": "2204",
+      "name": "Urząd Skarbowy w Człuchowie",
+      "city": "Człuchów"
+    },
+    {
+      "code": "2205",
+      "name": "Pierwszy Urząd Skarbowy w Gdańsku",
+      "city": "Gdańsk"
+    },
+    {
+      "code": "2206",
+      "name": "Drugi Urząd Skarbowy w Gdańsku",
+      "city": "Gdańsk"
+    },
+    {
+      "code": "2207",
+      "name": "Trzeci Urząd Skarbowy w Gdańsku",
+      "city": "Gdańsk"
+    },
+    {
+      "code": "2208",
+      "name": "Pierwszy Urząd Skarbowy w Gdyni",
+      "city": "Gdynia"
+    },
+    {
+      "code": "2209",
+      "name": "Drugi Urząd Skarbowy w Gdyni",
+      "city": "Gdynia"
+    },
+    {
+      "code": "2210",
+      "name": "Urząd Skarbowy w Kartuzach",
+      "city": "Kartuzy"
+    },
+    {
+      "code": "2211",
+      "name": "Urząd Skarbowy w Kościerzynie",
+      "city": "Kościerzyna"
+    },
+    {
+      "code": "2212",
+      "name": "Urząd Skarbowy w Kwidzynie",
+      "city": "Kwidzyn"
+    },
+    {
+      "code": "2213",
+      "name": "Urząd Skarbowy w Lęborku",
+      "city": "Lębork"
+    },
+    {
+      "code": "2214",
+      "name": "Urząd Skarbowy w Malborku",
+      "city": "Malbork"
+    },
+    {
+      "code": "2215",
+      "name": "Urząd Skarbowy w Pucku",
+      "city": "Puck"
+    },
+    {
+      "code": "2216",
+      "name": "Urząd Skarbowy w Słupsku",
+      "city": "Słupsk"
+    },
+    {
+      "code": "2217",
+      "name": "Urząd Skarbowy w Sopocie",
+      "city": "Sopot"
+    },
+    {
+      "code": "2218",
+      "name": "Urząd Skarbowy w Starogardzie Gdańskim",
+      "city": "Starogard Gdański"
+    },
+    {
+      "code": "2219",
+      "name": "Urząd Skarbowy w Tczewie",
+      "city": "Tczew"
+    },
+    {
+      "code": "2220",
+      "name": "Urząd Skarbowy w Wejherowie",
+      "city": "Wejherowo"
+    },
+    {
+      "code": "2221",
+      "name": "Urząd Skarbowy w Pruszczu Gdańskim",
+      "city": "Pruszcz Gdański"
+    },
+    {
+      "code": "2402",
+      "name": "Urząd Skarbowy w Będzinie",
+      "city": "Będzin"
+    },
+    {
+      "code": "2403",
+      "name": "Pierwszy Urząd Skarbowy w Bielsku-Białej",
+      "city": "Bielsko-Biała"
+    },
+    {
+      "code": "2404",
+      "name": "Drugi Urząd Skarbowy w Bielsku-Białej",
+      "city": "Bielsko-Biała"
+    },
+    {
+      "code": "2405",
+      "name": "Urząd Skarbowy w Bytomiu",
+      "city": "Bytom"
+    },
+    {
+      "code": "2406",
+      "name": "Urząd Skarbowy w Chorzowie",
+      "city": "Chorzów"
+    },
+    {
+      "code": "2407",
+      "name": "Urząd Skarbowy w Cieszynie",
+      "city": "Cieszyn"
+    },
+    {
+      "code": "2408",
+      "name": "Urząd Skarbowy w Czechowicach-Dziedzicach",
+      "city": "Czechowice-Dziedzice"
+    },
+    {
+      "code": "2409",
+      "name": "Pierwszy Urząd Skarbowy w Częstochowie",
+      "city": "Częstochowa"
+    },
+    {
+      "code": "2410",
+      "name": "Drugi Urząd Skarbowy w Częstochowie",
+      "city": "Częstochowa"
+    },
+    {
+      "code": "2411",
+      "name": "Urząd Skarbowy w Dąbrowie Górniczej",
+      "city": "Dąbrowa Górnicza"
+    },
+    {
+      "code": "2412",
+      "name": "Pierwszy Urząd Skarbowy w Gliwicach",
+      "city": "Gliwice"
+    },
+    {
+      "code": "2413",
+      "name": "Drugi Urząd Skarbowy w Gliwicach",
+      "city": "Gliwice"
+    },
+    {
+      "code": "2414",
+      "name": "Urząd Skarbowy w Jastrzębiu-Zdroju",
+      "city": "Jastrzębie-Zdrój"
+    },
+    {
+      "code": "2415",
+      "name": "Urząd Skarbowy w Jaworznie",
+      "city": "Jaworzno"
+    },
+    {
+      "code": "2416",
+      "name": "Pierwszy Urząd Skarbowy w Katowicach",
+      "city": "Katowice"
+    },
+    {
+      "code": "2417",
+      "name": "Drugi Urząd Skarbowy w Katowicach",
+      "city": "Katowice"
+    },
+    {
+      "code": "2418",
+      "name": "Urząd Skarbowy w Kłobucku",
+      "city": "Kłobuck"
+    },
+    {
+      "code": "2419",
+      "name": "Urząd Skarbowy w Lublińcu",
+      "city": "Lubliniec"
+    },
+    {
+      "code": "2420",
+      "name": "Urząd Skarbowy w Mikołowie",
+      "city": "Mikołów"
+    },
+    {
+      "code": "2421",
+      "name": "Urząd Skarbowy w Mysłowicach",
+      "city": "Mysłowice"
+    },
+    {
+      "code": "2422",
+      "name": "Urząd Skarbowy w Myszkowie",
+      "city": "Myszków"
+    },
+    {
+      "code": "2423",
+      "name": "Urząd Skarbowy w Piekarach Śląskich",
+      "city": "Piekary Śląskie"
+    },
+    {
+      "code": "2424",
+      "name": "Urząd Skarbowy w Pszczynie",
+      "city": "Pszczyna"
+    },
+    {
+      "code": "2425",
+      "name": "Urząd Skarbowy w Raciborzu",
+      "city": "Racibórz"
+    },
+    {
+      "code": "2426",
+      "name": "Urząd Skarbowy w Rudzie Śląskiej",
+      "city": "Ruda Śląska"
+    },
+    {
+      "code": "2427",
+      "name": "Urząd Skarbowy w Rybniku",
+      "city": "Rybnik"
+    },
+    {
+      "code": "2428",
+      "name": "Urząd Skarbowy w Siemianowicach Śląskich",
+      "city": "Siemianowice Śląskie"
+    },
+    {
+      "code": "2429",
+      "name": "Urząd Skarbowy w Sosnowcu",
+      "city": "Sosnowiec"
+    },
+    {
+      "code": "2430",
+      "name": "Urząd Skarbowy w Tarnowskich Górach",
+      "city": "Tarnowskie Góry"
+    },
+    {
+      "code": "2431",
+      "name": "Urząd Skarbowy w Tychach",
+      "city": "Tychy"
+    },
+    {
+      "code": "2432",
+      "name": "Urząd Skarbowy w Wodzisławiu Śląskim",
+      "city": "Wodzisław Śląski"
+    },
+    {
+      "code": "2433",
+      "name": "Urząd Skarbowy w Zabrzu",
+      "city": "Zabrze"
+    },
+    {
+      "code": "2434",
+      "name": "Urząd Skarbowy w Zawierciu",
+      "city": "Zawiercie"
+    },
+    {
+      "code": "2435",
+      "name": "Urząd Skarbowy w Żorach",
+      "city": "Żory"
+    },
+    {
+      "code": "2436",
+      "name": "Urząd Skarbowy w Żywcu",
+      "city": "Żywiec"
+    },
+    {
+      "code": "2602",
+      "name": "Urząd Skarbowy w Busku-Zdroju",
+      "city": "Busko-Zdrój"
+    },
+    {
+      "code": "2603",
+      "name": "Urząd Skarbowy w Jędrzejowie",
+      "city": "Jędrzejów"
+    },
+    {
+      "code": "2604",
+      "name": "Pierwszy Urząd Skarbowy w Kielcach",
+      "city": "Kielce"
+    },
+    {
+      "code": "2605",
+      "name": "Drugi Urząd Skarbowy w Kielcach",
+      "city": "Kielce"
+    },
+    {
+      "code": "2606",
+      "name": "Urząd Skarbowy w Końskich",
+      "city": "Końskie"
+    },
+    {
+      "code": "2607",
+      "name": "Urząd Skarbowy w Opatowie",
+      "city": "Opatów"
+    },
+    {
+      "code": "2608",
+      "name": "Urząd Skarbowy w Ostrowcu Świętokrzyskim",
+      "city": "Ostrowiec Świętokrzyski"
+    },
+    {
+      "code": "2609",
+      "name": "Urząd Skarbowy w Pińczowie",
+      "city": "Pińczów"
+    },
+    {
+      "code": "2610",
+      "name": "Urząd Skarbowy w Sandomierzu",
+      "city": "Sandomierz"
+    },
+    {
+      "code": "2611",
+      "name": "Urząd Skarbowy w Skarżysku-Kamiennej",
+      "city": "Skarżysko-Kamienna"
+    },
+    {
+      "code": "2612",
+      "name": "Urząd Skarbowy w Starachowicach",
+      "city": "Starachowice"
+    },
+    {
+      "code": "2613",
+      "name": "Urząd Skarbowy w Staszowie",
+      "city": "Staszów"
+    },
+    {
+      "code": "2614",
+      "name": "Urząd Skarbowy w Kazimierzy Wielkiej",
+      "city": "Kazimierza Wielka"
+    },
+    {
+      "code": "2615",
+      "name": "Urząd Skarbowy we Włoszczowie",
+      "city": "Włoszczowa"
+    },
+    {
+      "code": "2802",
+      "name": "Urząd Skarbowy w Bartoszycach",
+      "city": "Bartoszyce"
+    },
+    {
+      "code": "2803",
+      "name": "Urząd Skarbowy w Braniewie",
+      "city": "Braniewo"
+    },
+    {
+      "code": "2804",
+      "name": "Urząd Skarbowy w Działdowie",
+      "city": "Działdowo"
+    },
+    {
+      "code": "2805",
+      "name": "Urząd Skarbowy w Elblągu",
+      "city": "Elbląg"
+    },
+    {
+      "code": "2806",
+      "name": "Urząd Skarbowy w Ełku",
+      "city": "Ełk"
+    },
+    {
+      "code": "2807",
+      "name": "Urząd Skarbowy w Giżycku",
+      "city": "Giżycko"
+    },
+    {
+      "code": "2808",
+      "name": "Urząd Skarbowy w Iławie",
+      "city": "Iława"
+    },
+    {
+      "code": "2809",
+      "name": "Urząd Skarbowy w Kętrzynie",
+      "city": "Kętrzyn"
+    },
+    {
+      "code": "2810",
+      "name": "Urząd Skarbowy w Nidzicy",
+      "city": "Nidzica"
+    },
+    {
+      "code": "2811",
+      "name": "Urząd Skarbowy w Nowym Mieście Lubawskim",
+      "city": "Nowe Miasto Lubawskie"
+    },
+    {
+      "code": "2812",
+      "name": "Urząd Skarbowy w Olecku",
+      "city": "Olecko"
+    },
+    {
+      "code": "2813",
+      "name": "Urząd Skarbowy w Olsztynie",
+      "city": "Olsztyn"
+    },
+    {
+      "code": "2814",
+      "name": "Urząd Skarbowy w Ostródzie",
+      "city": "Ostróda"
+    },
+    {
+      "code": "2815",
+      "name": "Urząd Skarbowy w Piszu",
+      "city": "Pisz"
+    },
+    {
+      "code": "2816",
+      "name": "Urząd Skarbowy w Szczytnie",
+      "city": "Szczytno"
+    },
+    {
+      "code": "3002",
+      "name": "Urząd Skarbowy w Czarnkowie",
+      "city": "Czarnków"
+    },
+    {
+      "code": "3003",
+      "name": "Urząd Skarbowy w Gnieźnie",
+      "city": "Gniezno"
+    },
+    {
+      "code": "3004",
+      "name": "Urząd Skarbowy w Gostyniu",
+      "city": "Gostyń"
+    },
+    {
+      "code": "3005",
+      "name": "Urząd Skarbowy w Grodzisku Wielkopolskim",
+      "city": "Grodzisk Wielkopolski"
+    },
+    {
+      "code": "3006",
+      "name": "Urząd Skarbowy w Jarocinie",
+      "city": "Jarocin"
+    },
+    {
+      "code": "3007",
+      "name": "Pierwszy Urząd Skarbowy w Kaliszu",
+      "city": "Kalisz"
+    },
+    {
+      "code": "3008",
+      "name": "Drugi Urząd Skarbowy w Kaliszu",
+      "city": "Kalisz"
+    },
+    {
+      "code": "3009",
+      "name": "Urząd Skarbowy w Kępnie",
+      "city": "Kępno"
+    },
+    {
+      "code": "3010",
+      "name": "Urząd Skarbowy w Kole",
+      "city": "Koło"
+    },
+    {
+      "code": "3011",
+      "name": "Urząd Skarbowy w Koninie",
+      "city": "Konin"
+    },
+    {
+      "code": "3012",
+      "name": "Urząd Skarbowy w Kościanie",
+      "city": "Kościan"
+    },
+    {
+      "code": "3013",
+      "name": "Urząd Skarbowy w Krotoszynie",
+      "city": "Krotoszyn"
+    },
+    {
+      "code": "3014",
+      "name": "Urząd Skarbowy w Lesznie",
+      "city": "Leszno"
+    },
+    {
+      "code": "3015",
+      "name": "Urząd Skarbowy w Międzychodzie",
+      "city": "Międzychód"
+    },
+    {
+      "code": "3016",
+      "name": "Urząd Skarbowy w Nowym Tomyślu",
+      "city": "Nowy Tomyśl"
+    },
+    {
+      "code": "3017",
+      "name": "Urząd Skarbowy w Ostrowie Wielkopolskim",
+      "city": "Ostrów Wielkopolski"
+    },
+    {
+      "code": "3018",
+      "name": "Urząd Skarbowy w Ostrzeszowie",
+      "city": "Ostrzeszów"
+    },
+    {
+      "code": "3019",
+      "name": "Urząd Skarbowy w Pile",
+      "city": "Piła"
+    },
+    {
+      "code": "3020",
+      "name": "Urząd Skarbowy Poznań - Grunwald",
+      "city": "Poznań"
+    },
+    {
+      "code": "3021",
+      "name": "Urząd Skarbowy Poznań - Jeżyce",
+      "city": "Poznań"
+    },
+    {
+      "code": "3022",
+      "name": "Urząd Skarbowy Poznań - Nowe Miasto",
+      "city": "Poznań"
+    },
+    {
+      "code": "3023",
+      "name": "Pierwszy Urząd Skarbowy w Poznaniu",
+      "city": "Poznań"
+    },
+    {
+      "code": "3025",
+      "name": "Urząd Skarbowy Poznań - Winogrady",
+      "city": "Poznań"
+    },
+    {
+      "code": "3026",
+      "name": "Urząd Skarbowy Poznań - Wilda",
+      "city": "Poznań"
+    },
+    {
+      "code": "3027",
+      "name": "Urząd Skarbowy w Rawiczu",
+      "city": "Rawicz"
+    },
+    {
+      "code": "3028",
+      "name": "Urząd Skarbowy w Słupcy",
+      "city": "Słupca"
+    },
+    {
+      "code": "3029",
+      "name": "Urząd Skarbowy w Szamotułach",
+      "city": "Szamotuły"
+    },
+    {
+      "code": "3030",
+      "name": "Urząd Skarbowy w Śremie",
+      "city": "Śrem"
+    },
+    {
+      "code": "3031",
+      "name": "Urząd Skarbowy w Środzie Wielkopolskiej",
+      "city": "Środa Wielkopolska"
+    },
+    {
+      "code": "3032",
+      "name": "Urząd Skarbowy w Turku",
+      "city": "Turek"
+    },
+    {
+      "code": "3033",
+      "name": "Urząd Skarbowy w Wągrowcu",
+      "city": "Wągrowiec"
+    },
+    {
+      "code": "3034",
+      "name": "Urząd Skarbowy w Wolsztynie",
+      "city": "Wolsztyn"
+    },
+    {
+      "code": "3035",
+      "name": "Urząd Skarbowy we Wrześni",
+      "city": "Września"
+    },
+    {
+      "code": "3036",
+      "name": "Urząd Skarbowy w Złotowie",
+      "city": "Złotów"
+    },
+    {
+      "code": "3037",
+      "name": "Urząd Skarbowy w Chodzieży",
+      "city": "Chodzież"
+    },
+    {
+      "code": "3038",
+      "name": "Urząd Skarbowy w Obornikach",
+      "city": "Oborniki"
+    },
+    {
+      "code": "3039",
+      "name": "Urząd Skarbowy w Pleszewie",
+      "city": "Pleszew"
+    },
+    {
+      "code": "3202",
+      "name": "Urząd Skarbowy w Białogardzie",
+      "city": "Białogard"
+    },
+    {
+      "code": "3203",
+      "name": "Urząd Skarbowy w Choszcznie",
+      "city": "Choszczno"
+    },
+    {
+      "code": "3204",
+      "name": "Urząd Skarbowy w Drawsku Pomorskim",
+      "city": "Drawsko Pomorskie"
+    },
+    {
+      "code": "3205",
+      "name": "Urząd Skarbowy w Goleniowie",
+      "city": "Goleniów"
+    },
+    {
+      "code": "3206",
+      "name": "Urząd Skarbowy w Gryficach",
+      "city": "Gryfice"
+    },
+    {
+      "code": "3207",
+      "name": "Urząd Skarbowy w Gryfinie",
+      "city": "Gryfino"
+    },
+    {
+      "code": "3208",
+      "name": "Urząd Skarbowy w Kamieniu Pomorskim",
+      "city": "Kamień Pomorski"
+    },
+    {
+      "code": "3209",
+      "name": "Urząd Skarbowy w Kołobrzegu",
+      "city": "Kołobrzeg"
+    },
+    {
+      "code": "3210",
+      "name": "Pierwszy Urząd Skarbowy w Koszalinie",
+      "city": "Koszalin"
+    },
+    {
+      "code": "3211",
+      "name": "Drugi Urząd Skarbowy w Koszalinie",
+      "city": "Koszalin"
+    },
+    {
+      "code": "3212",
+      "name": "Urząd Skarbowy w Myśliborzu",
+      "city": "Myślibórz"
+    },
+    {
+      "code": "3213",
+      "name": "Urząd Skarbowy w Pyrzycach",
+      "city": "Pyrzyce"
+    },
+    {
+      "code": "3214",
+      "name": "Urząd Skarbowy w Stargardzie",
+      "city": "Stargard"
+    },
+    {
+      "code": "3215",
+      "name": "Pierwszy Urząd Skarbowy w Szczecinie",
+      "city": "Szczecin"
+    },
+    {
+      "code": "3216",
+      "name": "Drugi Urząd Skarbowy w Szczecinie",
+      "city": "Szczecin"
+    },
+    {
+      "code": "3217",
+      "name": "Trzeci Urząd Skarbowy w Szczecinie",
+      "city": "Szczecin"
+    },
+    {
+      "code": "3218",
+      "name": "Urząd Skarbowy w Szczecinku",
+      "city": "Szczecinek"
+    },
+    {
+      "code": "3219",
+      "name": "Urząd Skarbowy w Świnoujściu",
+      "city": "Świnoujście"
+    },
+    {
+      "code": "3220",
+      "name": "Urząd Skarbowy w Wałczu",
+      "city": "Wałcz"
+    }
+  ]
+}

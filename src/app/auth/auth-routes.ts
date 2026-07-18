@@ -24,6 +24,14 @@ const loaders = {
     import('./components/coworker-profile/coworker-profile').then(
       (m) => m.CoworkerProfileComponent,
     ),
+  coworkerShell: () =>
+    import('./components/coworker/coworker-shell/coworker-shell').then(
+      (m) => m.CoworkerShell,
+    ),
+  coworkerQuestionnaire: () =>
+    import('./components/coworker/questionnaire/questionnaire').then(
+      (m) => m.Questionnaire,
+    ),
   gmAvailabilityOverview: () =>
     import('./components/gm-availability-overview/gm-availability-overview').then(
       (m) => m.GmAvailabilityOverview,
@@ -60,6 +68,18 @@ export const authRoutes: Routes = [
     path: 'gm/coworker-profile',
     loadComponent: loaders.coworkerProfile,
     canActivate: [authGuard, minimumRoleGuard('gm')],
+  },
+  {
+    path: 'coworker',
+    loadComponent: loaders.coworkerShell,
+    canActivate: [authGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'questionnaire' },
+      {
+        path: 'questionnaire',
+        loadComponent: loaders.coworkerQuestionnaire,
+      },
+    ],
   },
   {
     path: 'gm/work-log',

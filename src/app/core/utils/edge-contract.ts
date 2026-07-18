@@ -1,5 +1,10 @@
 import { EdgeFunctionError } from '../types/edge-function-error';
 
+const BASE64_PATTERN =
+  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export function isEdgeFunctionSuccess<TResult>(
   response: {
     data: TResult | null;
@@ -45,6 +50,38 @@ export function readEdgeString(value: unknown, path: string): string {
   return value;
 }
 
+export function readEdgeUuid(value: unknown, path: string): string {
+  const parsed = readEdgeString(value, path);
+  if (!UUID_PATTERN.test(parsed)) {
+    throw invalidEdgeResponse(path, 'a UUID');
+  }
+
+  return parsed;
+}
+
+export function readEdgeBase64(
+  value: unknown,
+  path: string,
+  expectedDecodedLength?: number,
+): string {
+  const parsed = readEdgeString(value, path);
+  const decodedLength = base64ByteLength(parsed);
+  if (
+    decodedLength === null ||
+    (expectedDecodedLength !== undefined &&
+      decodedLength !== expectedDecodedLength)
+  ) {
+    throw invalidEdgeResponse(
+      path,
+      expectedDecodedLength === undefined
+        ? 'Base64'
+        : `Base64 decoding to ${expectedDecodedLength} bytes`,
+    );
+  }
+
+  return parsed;
+}
+
 export function readEdgeBoolean(value: unknown, path: string): boolean {
   if (typeof value !== 'boolean') {
     throw invalidEdgeResponse(path, 'a boolean');
@@ -53,12 +90,28 @@ export function readEdgeBoolean(value: unknown, path: string): boolean {
   return value;
 }
 
+export function readEdgeNullableBoolean(
+  value: unknown,
+  path: string,
+): boolean | null {
+  return value === null ? null : readEdgeBoolean(value, path);
+}
+
 export function readEdgeInteger(value: unknown, path: string): number {
   if (typeof value !== 'number' || !Number.isInteger(value)) {
     throw invalidEdgeResponse(path, 'an integer');
   }
 
   return value;
+}
+
+export function readEdgePositiveInteger(value: unknown, path: string): number {
+  const parsed = readEdgeInteger(value, path);
+  if (parsed < 1) {
+    throw invalidEdgeResponse(path, 'a positive integer');
+  }
+
+  return parsed;
 }
 
 export function readEdgeNullableString(
@@ -73,6 +126,22 @@ export function readEdgeNullableInteger(
   path: string,
 ): number | null {
   return value === null ? null : readEdgeInteger(value, path);
+}
+
+export function readEdgeTimestamp(value: unknown, path: string): string {
+  const parsed = readEdgeString(value, path);
+  if (Number.isNaN(Date.parse(parsed))) {
+    throw invalidEdgeResponse(path, 'a timestamp');
+  }
+
+  return parsed;
+}
+
+export function readEdgeNullableTimestamp(
+  value: unknown,
+  path: string,
+): string | null {
+  return value === null ? null : readEdgeTimestamp(value, path);
 }
 
 export function readEdgeLiteral<TValue extends string>(
@@ -118,6 +187,22 @@ function invalidEdgeResponse(
     {},
     new TypeError(message),
   );
+}
+
+function base64ByteLength(value: string): number | null {
+  if (
+    value === '' ||
+    value.length % 4 !== 0 ||
+    !BASE64_PATTERN.test(value)
+  ) {
+    return null;
+  }
+
+  try {
+    return atob(value).length;
+  } catch {
+    return null;
+  }
 }
 
 function isAllowedLiteral<TValue extends string>(
