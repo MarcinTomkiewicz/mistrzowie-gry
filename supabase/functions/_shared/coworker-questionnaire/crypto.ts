@@ -1,8 +1,12 @@
-import type { QuestionnairePayload } from "./questionnaire.ts";
-
-export const ENCRYPTION_KEY_VERSION = 1;
-export const PAYLOAD_SCHEMA_VERSION = 1;
-export const VALIDATION_SCHEMA_VERSION = 1;
+import {
+  ENCRYPTION_KEY_VERSION,
+  PAYLOAD_SCHEMA_VERSION,
+  type QuestionnairePayload,
+} from "./contracts.ts";
+import {
+  CryptoConfigurationError,
+  CryptoOperationError,
+} from "./errors.ts";
 
 const ENCRYPTION_KEY_SECRET = "COWORKER_DATA_ENCRYPTION_KEY_V1";
 const PESEL_HMAC_KEY_SECRET = "COWORKER_PESEL_HMAC_KEY_V1";
@@ -20,26 +24,11 @@ export interface EncryptedQuestionnaire {
   ivBase64: string;
 }
 
-export class CryptoConfigurationError extends Error {
-  constructor() {
-    super("Invalid cryptographic configuration.");
-    this.name = "CryptoConfigurationError";
-  }
-}
-
-export class CryptoOperationError extends Error {
-  constructor() {
-    super("Questionnaire cryptographic operation failed.");
-    this.name = "CryptoOperationError";
-  }
-}
-
 export async function loadQuestionnaireCryptoKeys(): Promise<
   QuestionnaireCryptoKeys
 > {
   const encryptionKeyBytes = readSecretKey(ENCRYPTION_KEY_SECRET);
   const peselHmacKeyBytes = readSecretKey(PESEL_HMAC_KEY_SECRET);
-
   if (bytesEqual(encryptionKeyBytes, peselHmacKeyBytes)) {
     throw new CryptoConfigurationError();
   }
@@ -61,7 +50,6 @@ export async function loadQuestionnaireCryptoKeys(): Promise<
         ["sign"],
       ),
     ]);
-
     return { encryptionKey, peselHmacKey };
   } catch {
     throw new CryptoConfigurationError();
@@ -75,20 +63,17 @@ export async function encryptQuestionnaire(
 ): Promise<EncryptedQuestionnaire> {
   const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH_BYTES));
   const plaintext = new TextEncoder().encode(JSON.stringify(payload));
-  const additionalData = createAdditionalData(userId);
-
   try {
     const encrypted = await crypto.subtle.encrypt(
       {
         name: "AES-GCM",
         iv,
-        additionalData,
+        additionalData: createAdditionalData(userId),
         tagLength: TAG_LENGTH_BITS,
       },
       keys.encryptionKey,
       plaintext,
     );
-
     return {
       ciphertextBase64: encodeBase64(new Uint8Array(encrypted)),
       ivBase64: encodeBase64(iv),
@@ -110,7 +95,6 @@ export async function decryptQuestionnaire(
     if (ciphertext.length < 17 || iv.length !== IV_LENGTH_BYTES) {
       throw new CryptoOperationError();
     }
-
     const decrypted = await crypto.subtle.decrypt(
       {
         name: "AES-GCM",
@@ -121,7 +105,6 @@ export async function decryptQuestionnaire(
       keys.encryptionKey,
       ciphertext,
     );
-
     const json = new TextDecoder("utf-8", { fatal: true }).decode(decrypted);
     return JSON.parse(json) as unknown;
   } catch (error) {
@@ -153,7 +136,6 @@ function readSecretKey(name: string): Uint8Array<ArrayBuffer> {
   if (encoded === undefined || encoded === "") {
     throw new CryptoConfigurationError();
   }
-
   try {
     const decoded = decodeBase64(encoded);
     if (decoded.length !== KEY_LENGTH_BYTES) {
@@ -169,8 +151,14 @@ function readSecretKey(name: string): Uint8Array<ArrayBuffer> {
 }
 
 function createAdditionalData(userId: string): Uint8Array<ArrayBuffer> {
+  const context = [
+    "coworker-questionnaire",
+    userId,
+    `payloadSchema=${PAYLOAD_SCHEMA_VERSION}`,
+    `keyVersion=${ENCRYPTION_KEY_VERSION}`,
+  ].join("|");
   return new TextEncoder().encode(
-    `coworker-questionnaire|${userId}|payloadSchema=${PAYLOAD_SCHEMA_VERSION}|keyVersion=${ENCRYPTION_KEY_VERSION}`,
+    context,
   );
 }
 
@@ -185,13 +173,8 @@ function decodeBase64(value: string): Uint8Array<ArrayBuffer> {
   ) {
     throw new Error("Invalid Base64.");
   }
-
   const binary = atob(compact);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
 function encodeBase64(bytes: Uint8Array): string {
