@@ -1,0 +1,292 @@
+<div
+  class="position-relative flex-col-start-stretch gap-lg w-100"
+  [attr.aria-busy]="isLoading() || downloadingVersionId() !== null"
+  >
+  <header class="flex-col-start-stretch gap-xs w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.page().title }}
+    </h2>
+    <p class="m-0 muted-text">{{ i18n.page().subtitle }}</p>
+  </header>
+
+  <app-loading-overlay
+    [visible]="isLoading()"
+    [label]="i18n.commonStatus().loading"
+  />
+
+  @if (activeError(); as error) {
+    <section
+      class="mg-card flex-col-start-stretch gap-sm w-100"
+      role="alert"
+      aria-live="assertive"
+    >
+      <h3 class="mg-section__title mg-section__title--sm error-text m-0">
+        {{ errorTitle() }}
+      </h3>
+      <p class="m-0">{{ errorDescription() }}</p>
+      @if (error.message !== errorDescription()) {
+        <p class="m-0 muted-text">{{ error.message }}</p>
+      }
+      <div class="flex-row-start-center flex-wrap gap-sm muted-text">
+        <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+        @if (error.status !== null) {
+          <span>
+            {{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code>
+          </span>
+        }
+      </div>
+      @if (
+        (loadError() || error.status === 404 || error.status === 409) &&
+        !isAccessBlocked()
+      ) {
+        <p-button
+          type="button"
+          severity="secondary"
+          icon="pi pi-refresh"
+          [label]="loadError() ? i18n.commonActions().retry : i18n.actions().reload"
+          [disabled]="isLoading()"
+          (onClick)="load()"
+        />
+      }
+    </section>
+  }
+  @if (!isLoading() && !isAccessBlocked() && portal(); as data) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100">
+      <div class="flex-row-between-start flex-wrap gap-sm w-100">
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ i18n.labels().accessGrantedAt }}</strong>
+          <span class="muted-text">
+            {{ formatTimestampLabel(data.access.grantedAt, "pl-PL") }}
+          </span>
+        </div>
+        @if (data.activeOnboardingCase; as onboarding) {
+          <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[onboarding.status]">
+            {{ i18n.statuses().onboarding[onboarding.status] }}
+          </span>
+        }
+      </div>
+
+      @if (data.activeOnboardingCase; as onboarding) {
+        <div class="flex-col-start-stretch gap-xs border-top pt-sm">
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.sections().onboardingTitle }}
+          </h3>
+          <p class="m-0 muted-text">
+            {{ i18n.labels().onboardingOpenedAt }}:
+            {{ formatTimestampLabel(onboarding.openedAt, "pl-PL") }}
+          </p>
+        </div>
+      }
+    </section>
+    <section class="flex-col-start-stretch gap-md w-100">
+      <header class="flex-col-start-stretch gap-xs">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.sections().requirementsTitle }}
+        </h3>
+        <p class="m-0 muted-text">{{ i18n.sections().requirementsDescription }}</p>
+      </header>
+      @if (data.requirements.length === 0) {
+        <div class="mg-card flex-col-start-stretch gap-xs w-100">
+          <strong>{{ i18n.commonEmpty().title }}</strong>
+          <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
+        </div>
+      } @else {
+        @for (requirement of data.requirements; track requirement.id) {
+          <article class="mg-card flex-col-start-stretch gap-md w-100">
+            <header class="flex-row-between-start flex-wrap gap-sm w-100">
+              <div class="flex-col-start-stretch gap-xs min-w-0">
+                <h4 class="mg-section__title mg-section__title--xs m-0">
+                  {{ requirement.documentDefinition.title }}
+                </h4>
+                @if (requirement.documentDefinition.description) {
+                  <p class="m-0 muted-text">
+                    {{ requirement.documentDefinition.description }}
+                  </p>
+                }
+              </div>
+              <div class="tag-badges">
+                <span
+                  [class]="
+                    'tag-badge ' +
+                    (requirement.required
+                      ? 'tag-badge--primary'
+                      : 'tag-badge--muted')
+                  "
+                >
+                  {{
+                    requirement.required
+                      ? i18n.labels().required
+                      : i18n.labels().optional
+                  }}
+                </span>
+                <span
+                  [class]="
+                    'tag-badge ' + STATUS_BADGE_CLASS[requirement.status]
+                  "
+                >
+                  {{ i18n.statuses().requirements[requirement.status] }}
+                </span>
+              </div>
+            </header>
+            @if (requirement.dueAt; as dueAt) {
+              <div class="flex-row-start-center flex-wrap gap-sm">
+                <strong>{{ i18n.labels().deadline }}:</strong>
+                <span>{{ deadlineLabel(dueAt) }}</span>
+                @if (isRequirementLate(dueAt, requirement.status)) {
+                  <span class="tag-badge tag-badge--danger">
+                    {{ i18n.labels().late }}
+                  </span>
+                }
+              </div>
+            }
+            @if (requirement.waiverReason) {
+              <p class="m-0 muted-text">
+                <strong>{{ i18n.labels().waiverReason }}:</strong>
+                {{ requirement.waiverReason }}
+              </p>
+            }
+            <div class="flex-col-start-stretch gap-md border-top pt-sm">
+              <strong>{{ i18n.labels().requirementDocuments }}</strong>
+              @if (requirement.documents.length === 0) {
+                <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
+              } @else {
+                @for (document of requirement.documents; track document.id) {
+                  <article class="flex-col-start-stretch gap-sm border-top pt-sm">
+                    <header class="flex-row-between-start flex-wrap gap-sm w-100">
+                      <strong class="text-wrap-anywhere">
+                        {{ documentTitle(document, requirement.documentDefinition.title) }}
+                      </strong>
+                      <span
+                        [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]"
+                      >
+                        {{ i18n.statuses().documents[document.status] }}
+                      </span>
+                    </header>
+                    @if (document.rejectionReason) {
+                      <p class="m-0 error-text">
+                        <strong>{{ i18n.labels().rejectionReason }}:</strong>
+                        {{ document.rejectionReason }}
+                      </p>
+                    }
+                    <app-document-version-list
+                      [versions]="document.versions"
+                      [currentVersionId]="document.currentVersionId"
+                      [downloadingVersionId]="downloadingVersionId()"
+                      (downloadRequested)="downloadVersion($event)"
+                    />
+                  </article>
+                }
+              }
+            </div>
+          </article>
+        }
+      }
+    </section>
+    <section class="flex-col-start-stretch gap-md w-100">
+      <header class="flex-col-start-stretch gap-xs">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.sections().unassignedTitle }}
+        </h3>
+        <p class="m-0 muted-text">{{ i18n.sections().unassignedDescription }}</p>
+      </header>
+      @if (data.unassignedDocuments.length === 0) {
+        <div class="mg-card flex-col-start-stretch gap-xs w-100">
+          <strong>{{ i18n.commonEmpty().title }}</strong>
+          <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
+        </div>
+      } @else {
+        @for (document of data.unassignedDocuments; track document.id) {
+          <article class="mg-card flex-col-start-stretch gap-md w-100">
+            <header class="flex-row-between-start flex-wrap gap-sm w-100">
+              <h4 class="mg-section__title mg-section__title--xs m-0 text-wrap-anywhere">
+                {{ documentTitle(document) }}
+              </h4>
+              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]">
+                {{ i18n.statuses().documents[document.status] }}
+              </span>
+            </header>
+            @if (document.rejectionReason) {
+              <p class="m-0 error-text">
+                <strong>{{ i18n.labels().rejectionReason }}:</strong>
+                {{ document.rejectionReason }}
+              </p>
+            }
+            <app-document-version-list
+              [versions]="document.versions"
+              [currentVersionId]="document.currentVersionId"
+              [downloadingVersionId]="downloadingVersionId()"
+              (downloadRequested)="downloadVersion($event)"
+            />
+          </article>
+        }
+      }
+    </section>
+    <section class="flex-col-start-stretch gap-md w-100">
+      <header class="flex-col-start-stretch gap-xs">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.sections().definitionsTitle }}
+        </h3>
+        <p class="m-0 muted-text">{{ i18n.sections().definitionsDescription }}</p>
+      </header>
+      @if (data.availableDefinitions.length === 0) {
+        <div class="mg-card flex-col-start-stretch gap-xs w-100">
+          <strong>{{ i18n.commonEmpty().title }}</strong>
+          <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
+        </div>
+      } @else {
+        <div class="mg-grid-auto-fit w-100">
+          @for (definition of data.availableDefinitions; track definition.id) {
+            <article class="mg-card flex-col-start-stretch gap-sm w-100">
+              <header class="flex-col-start-stretch gap-xs">
+                <h4 class="mg-section__title mg-section__title--xs m-0">
+                  {{ definition.title }}
+                </h4>
+                @if (definition.description) {
+                  <p class="m-0 muted-text">{{ definition.description }}</p>
+                }
+              </header>
+              <div class="tag-badges">
+                <span class="tag-badge tag-badge--info">
+                  {{ i18n.statuses().origins[definition.originPolicy] }}
+                </span>
+                <span class="tag-badge tag-badge--muted">
+                  {{ i18n.statuses().multiplicities[definition.multiplicity] }}
+                </span>
+                @if (definition.isRequiredByDefault) {
+                  <span class="tag-badge tag-badge--primary">
+                    {{ i18n.labels().requiredByDefault }}
+                  </span>
+                }
+              </div>
+              <p class="m-0">
+                <strong>{{ i18n.labels().allowedExtensions }}:</strong>
+                {{
+                  definition.allowedExtensions.join(", ") ||
+                    i18n.commonEmpty().title
+                }}
+              </p>
+              <p class="m-0">
+                <strong>{{ i18n.labels().allowedMimeTypes }}:</strong>
+                {{
+                  definition.allowedMimeTypes.join(", ") ||
+                    i18n.commonEmpty().title
+                }}
+              </p>
+              <div class="flex-col-start-stretch gap-xs border-top pt-sm">
+                <strong>{{ i18n.labels().signaturePolicy }}:</strong>
+                <span>{{ definition.signaturePolicy.name }}</span>
+                <span class="muted-text">
+                  {{ i18n.labels().allowedDeclarations }}:
+                  {{
+                    signatureLabels(definition.signaturePolicy.allowedDeclarationTypes) ||
+                      i18n.commonEmpty().title
+                  }}
+                </span>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

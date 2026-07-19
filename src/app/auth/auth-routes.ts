@@ -32,6 +32,10 @@ const loaders = {
     import('./components/coworker/questionnaire/questionnaire').then(
       (m) => m.Questionnaire,
     ),
+  coworkerDocuments: () =>
+    import('./components/coworker/documents/documents').then(
+      (m) => m.Documents,
+    ),
   gmAvailabilityOverview: () =>
     import('./components/gm-availability-overview/gm-availability-overview').then(
       (m) => m.GmAvailabilityOverview,
@@ -78,6 +82,11 @@ export const authRoutes: Routes = [
       {
         path: 'questionnaire',
         loadComponent: loaders.coworkerQuestionnaire,
+      },
+      {
+        path: 'documents',
+        loadComponent: loaders.coworkerDocuments,
+        canActivate: [authGuard],
       },
     ],
   },

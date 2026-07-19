@@ -1,4 +1,10 @@
 import { EdgeFunctionError } from '../types/edge-function-error';
+import {
+  EdgeLiteral,
+  EdgeObjectReaderResult,
+  EdgeReader,
+  EdgeReaderMap,
+} from '../types/edge-contract';
 
 const BASE64_PATTERN =
   /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
@@ -40,6 +46,37 @@ export function readEdgeArray(value: unknown, path: string): readonly unknown[] 
   }
 
   return value;
+}
+
+export function createEdgeObjectReader<const TReaders extends EdgeReaderMap>(
+  readers: TReaders,
+): EdgeReader<EdgeObjectReaderResult<TReaders>> {
+  return (value, path) => {
+    const source = readEdgeObject(value, path);
+    const result = Object.fromEntries(
+      Object.entries(readers).map(([field, reader]) => [
+        field,
+        reader(source[field], joinEdgePath(path, field)),
+      ]),
+    );
+
+    return result as EdgeObjectReaderResult<TReaders>;
+  };
+}
+
+export function createEdgeArrayReader<TResult>(
+  itemReader: EdgeReader<TResult>,
+): EdgeReader<TResult[]> {
+  return (value, path) =>
+    readEdgeArray(value, path).map((item, index) =>
+      itemReader(item, `${path}[${index}]`),
+    );
+}
+
+export function createEdgeNullableReader<TResult>(
+  reader: EdgeReader<TResult>,
+): EdgeReader<TResult | null> {
+  return (value, path) => value === null ? null : reader(value, path);
 }
 
 export function readEdgeString(value: unknown, path: string): string {
@@ -144,19 +181,24 @@ export function readEdgeNullableTimestamp(
   return value === null ? null : readEdgeTimestamp(value, path);
 }
 
-export function readEdgeLiteral<TValue extends string>(
+export function readEdgeLiteral<TValue extends EdgeLiteral>(
   value: unknown,
   path: string,
   allowedValues: readonly TValue[],
 ): TValue {
-  const parsed = readEdgeString(value, path);
-  if (!isAllowedLiteral(parsed, allowedValues)) {
+  if (!isAllowedLiteral(value, allowedValues)) {
     throw invalidEdgeResponse(path, `one of: ${allowedValues.join(', ')}`);
   }
-  return parsed;
+  return value;
 }
 
-export function readEdgeNullableLiteral<TValue extends string>(
+export function createEdgeLiteralReader<
+  const TValues extends readonly EdgeLiteral[],
+>(allowedValues: TValues): EdgeReader<TValues[number]> {
+  return (value, path) => readEdgeLiteral(value, path, allowedValues);
+}
+
+export function readEdgeNullableLiteral<TValue extends EdgeLiteral>(
   value: unknown,
   path: string,
   allowedValues: readonly TValue[],
@@ -189,6 +231,10 @@ function invalidEdgeResponse(
   );
 }
 
+function joinEdgePath(path: string, field: string): string {
+  return path === '' ? field : `${path}.${field}`;
+}
+
 function base64ByteLength(value: string): number | null {
   if (
     value === '' ||
@@ -205,8 +251,8 @@ function base64ByteLength(value: string): number | null {
   }
 }
 
-function isAllowedLiteral<TValue extends string>(
-  value: string,
+function isAllowedLiteral<TValue extends EdgeLiteral>(
+  value: unknown,
   allowedValues: readonly TValue[],
 ): value is TValue {
   return allowedValues.some((allowedValue) => allowedValue === value);

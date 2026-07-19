@@ -93,6 +93,12 @@
   }
 }
 
+.p-select-filter.p-inputtext {
+  background: var(--mg-form-bg);
+  color: var(--mg-form-text);
+  border: 1px solid var(--mg-form-border);
+}
+
 .p-autocomplete-option:hover {
   background: var(--mg-form-border-hover);
 }
