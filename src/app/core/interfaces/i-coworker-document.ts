@@ -2,7 +2,6 @@ import { AppRole } from '../types/app-role';
 import {
   CoworkerActiveOnboardingStatus,
   CoworkerAvailableDocumentOriginPolicy,
-  CoworkerDocumentDownloadAction,
   CoworkerDocumentMultiplicity,
   CoworkerDocumentOriginPolicy,
   CoworkerDocumentVersionStatus,
@@ -178,14 +177,7 @@ export interface ICoworkerDocumentPortalResponse {
   };
 }
 
-export interface ICoworkerDocumentVersionDownloadRequest {
-  readonly action: CoworkerDocumentDownloadAction;
-  readonly documentVersionId: string;
-}
-
-export interface ICoworkerDocumentVersionDownloadResponse {
-  readonly ok: true;
-  readonly action: CoworkerDocumentDownloadAction;
+export interface ICoworkerVersionDownload {
   readonly download: {
     readonly documentId: string;
     readonly documentVersionId: string;
@@ -194,5 +186,15 @@ export interface ICoworkerDocumentVersionDownloadResponse {
     readonly originalFilename: string;
     readonly mimeType: string;
     readonly sizeBytes: number;
+  };
+}
+
+export interface ICoworkerUploadReservation {
+  readonly upload: {
+    readonly uploadSessionId: string;
+  };
+  readonly signedUpload: {
+    readonly path: string;
+    readonly token: string;
   };
 }

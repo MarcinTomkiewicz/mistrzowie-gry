@@ -7,7 +7,7 @@ import {
   ICoworkerDocumentRequirement,
   ICoworkerDocumentSignatureVerification,
   ICoworkerDocumentVersion,
-  ICoworkerDocumentVersionDownloadResponse,
+  ICoworkerVersionDownload,
   ICoworkerNotification,
   ICoworkerPortalDocument,
   ICoworkerSignaturePolicy,
@@ -15,8 +15,8 @@ import {
 import { APP_ROLES } from '../../types/app-role';
 import {
   COWORKER_ACTIVE_ONBOARDING_STATUSES,
-  COWORKER_AVAILABLE_DOCUMENT_ORIGIN_POLICIES,
-  COWORKER_DOCUMENT_DOWNLOAD_ACTION,
+  COWORKER_AVAILABLE_ORIGIN_POLICIES,
+  COWORKER_DOCUMENT_ACTION,
   COWORKER_DOCUMENT_MULTIPLICITIES,
   COWORKER_DOCUMENT_ORIGIN_POLICIES,
   COWORKER_DOCUMENT_VERSION_STATUSES,
@@ -94,7 +94,7 @@ const availableDocumentDefinitionReader:
   EdgeReader<ICoworkerAvailableDocumentDefinition> = createEdgeObjectReader({
     ...documentDefinitionFields,
     originPolicy: createEdgeLiteralReader(
-      COWORKER_AVAILABLE_DOCUMENT_ORIGIN_POLICIES,
+      COWORKER_AVAILABLE_ORIGIN_POLICIES,
     ),
     isActive: trueReader,
   });
@@ -242,11 +242,11 @@ const portalReader: EdgeReader<ICoworkerDocumentPortalResponse> =
   });
 
 const downloadResponseReader:
-  EdgeReader<ICoworkerDocumentVersionDownloadResponse> =
+  EdgeReader<ICoworkerVersionDownload> =
     createEdgeObjectReader({
       ok: trueReader,
       action: createEdgeLiteralReader([
-        COWORKER_DOCUMENT_DOWNLOAD_ACTION,
+        COWORKER_DOCUMENT_ACTION.downloadDocumentVersion,
       ] as const),
       download: createEdgeObjectReader({
         documentId: readEdgeUuid,
@@ -265,8 +265,8 @@ export function parseCoworkerDocumentPortalResponse(
   return portalReader(value, 'response');
 }
 
-export function parseCoworkerDocumentVersionDownloadResponse(
+export function parseDocumentDownloadResponse(
   value: unknown,
-): ICoworkerDocumentVersionDownloadResponse {
+): ICoworkerVersionDownload {
   return downloadResponseReader(value, 'response');
 }

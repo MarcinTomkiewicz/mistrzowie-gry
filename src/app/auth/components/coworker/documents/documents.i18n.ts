@@ -6,11 +6,13 @@ import {
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
   CoworkerDocumentsActionTranslations,
+  CoworkerDocumentConfirmTranslations,
   CoworkerDocumentsErrorTranslations,
   CoworkerDocumentsLabelTranslations,
   CoworkerDocumentsPageTranslations,
   CoworkerDocumentsSectionTranslations,
   CoworkerDocumentsStatusTranslations,
+  CoworkerDocumentsUploadTranslations,
 } from '../../../../core/types/i18n/coworker-document';
 
 export function createDocumentsI18n() {
@@ -21,6 +23,8 @@ export function createDocumentsI18n() {
     actions: CoworkerDocumentsActionTranslations;
     statuses: CoworkerDocumentsStatusTranslations;
     errors: CoworkerDocumentsErrorTranslations;
+    upload: CoworkerDocumentsUploadTranslations;
+    confirmations: CoworkerDocumentConfirmTranslations;
   }>('auth', {
     page: 'coworkerDocuments.page',
     sections: 'coworkerDocuments.sections',
@@ -28,6 +32,8 @@ export function createDocumentsI18n() {
     actions: 'coworkerDocuments.actions',
     statuses: 'coworkerDocuments.statuses',
     errors: 'coworkerDocuments.errors',
+    upload: 'coworkerDocuments.upload',
+    confirmations: 'coworkerDocuments.confirmations',
   });
 
   return {

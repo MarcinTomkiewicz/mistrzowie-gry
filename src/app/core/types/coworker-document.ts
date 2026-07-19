@@ -83,7 +83,7 @@ export const COWORKER_DOCUMENT_ORIGIN_POLICIES = [
   'mixed',
 ] as const;
 
-export const COWORKER_AVAILABLE_DOCUMENT_ORIGIN_POLICIES = [
+export const COWORKER_AVAILABLE_ORIGIN_POLICIES = [
   'coworker_upload',
   'mixed',
 ] as const;
@@ -109,8 +109,15 @@ export const COWORKER_NOTIFICATION_ENTITY_TYPES = [
   'system',
 ] as const;
 
-export const COWORKER_DOCUMENT_DOWNLOAD_ACTION =
-  'downloadDocumentVersion' as const;
+export const COWORKER_DOCUMENT_ACTION = {
+  reserveUpload: 'reserveUpload',
+  finalizeUpload: 'finalizeUpload',
+  cancelUpload: 'cancelUpload',
+  submitDocument: 'submitDocument',
+  withdrawDocument: 'withdrawDocument',
+  downloadDocumentVersion: 'downloadDocumentVersion',
+  markNotificationRead: 'markNotificationRead',
+} as const;
 
 export type CoworkerSignatureDeclarationType =
   (typeof COWORKER_SIGNATURE_DECLARATION_TYPES)[number];
@@ -133,12 +140,55 @@ export type CoworkerActiveOnboardingStatus =
 export type CoworkerDocumentOriginPolicy =
   (typeof COWORKER_DOCUMENT_ORIGIN_POLICIES)[number];
 export type CoworkerAvailableDocumentOriginPolicy =
-  (typeof COWORKER_AVAILABLE_DOCUMENT_ORIGIN_POLICIES)[number];
+  (typeof COWORKER_AVAILABLE_ORIGIN_POLICIES)[number];
 export type CoworkerDocumentMultiplicity =
   (typeof COWORKER_DOCUMENT_MULTIPLICITIES)[number];
 export type CoworkerNotificationSeverity =
   (typeof COWORKER_NOTIFICATION_SEVERITIES)[number];
 export type CoworkerNotificationEntityType =
   (typeof COWORKER_NOTIFICATION_ENTITY_TYPES)[number];
-export type CoworkerDocumentDownloadAction =
-  typeof COWORKER_DOCUMENT_DOWNLOAD_ACTION;
+export type CoworkerDocumentAction =
+  (typeof COWORKER_DOCUMENT_ACTION)[keyof typeof COWORKER_DOCUMENT_ACTION];
+export type CoworkerDocumentUploadState =
+  | 'idle'
+  | 'reserving'
+  | 'uploading'
+  | 'finalizing';
+
+export type CoworkerDocumentActionRequest =
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.reserveUpload;
+      readonly documentId: string | null;
+      readonly requirementId: string | null;
+      readonly documentDefinitionId: string | null;
+      readonly onboardingCaseId: string | null;
+      readonly originalFilename: string;
+      readonly declaredMimeType: string;
+      readonly sizeBytes: number;
+      readonly signatureDeclarationType: CoworkerSignatureDeclarationType;
+      readonly title: string | null;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.finalizeUpload;
+      readonly uploadSessionId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.cancelUpload;
+      readonly uploadSessionId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.submitDocument;
+      readonly documentId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.withdrawDocument;
+      readonly documentId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.downloadDocumentVersion;
+      readonly documentVersionId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.markNotificationRead;
+      readonly notificationId: string;
+    };

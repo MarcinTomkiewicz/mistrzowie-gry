@@ -4,6 +4,8 @@ import {
   CoworkerDocumentMultiplicity,
   CoworkerDocumentVersionStatus,
   CoworkerMalwareScanStatus,
+  CoworkerNotificationEntityType,
+  CoworkerNotificationSeverity,
   CoworkerPortalDocumentStatus,
   CoworkerPortalRequirementStatus,
   CoworkerSignatureDeclarationType,
@@ -25,6 +27,8 @@ export type CoworkerDocumentsSectionTranslations = {
   definitionsTitle: string;
   definitionsDescription: string;
   versionsTitle: string;
+  notificationsTitle: string;
+  notificationsDescription: string;
 };
 
 export type CoworkerDocumentsLabelTranslations = {
@@ -53,11 +57,21 @@ export type CoworkerDocumentsLabelTranslations = {
   allowedDeclarations: string;
   requiredByDefault: string;
   downloadUnavailable: string;
+  unreadNotifications: string;
+  notificationRead: string;
+  notificationUnread: string;
+  notificationCreatedAt: string;
+  notificationTechnicalCode: string;
 };
 
 export type CoworkerDocumentsActionTranslations = {
   download: string;
   reload: string;
+  addDocument: string;
+  addVersion: string;
+  submitDocument: string;
+  withdrawDocument: string;
+  markNotificationRead: string;
 };
 
 export type CoworkerDocumentsErrorTranslations = {
@@ -72,6 +86,9 @@ export type CoworkerDocumentsErrorTranslations = {
   downloadConflict: string;
   storageError: string;
   invalidDownloadResponse: string;
+  actionTitle: string;
+  actionDescription: string;
+  conflictDescription: string;
   unexpectedDescription: string;
   codeLabel: string;
   statusLabel: string;
@@ -88,4 +105,30 @@ export type CoworkerDocumentsStatusTranslations = {
   verifiedSignatures: Record<CoworkerVerifiedSignatureType, string>;
   origins: Record<CoworkerAvailableDocumentOriginPolicy, string>;
   multiplicities: Record<CoworkerDocumentMultiplicity, string>;
+  notificationSeverities: Record<CoworkerNotificationSeverity, string>;
+  notificationEntities: Record<CoworkerNotificationEntityType, string>;
+};
+
+export type CoworkerDocumentsUploadTranslations = {
+  titleLabel: string;
+  signatureLabel: string;
+  signaturePlaceholder: string;
+  signatureRequired: string;
+  chooseFile: string;
+  dropFile: string;
+  reserving: string;
+  uploading: string;
+  finalizing: string;
+  reserveError: string;
+  uploadError: string;
+  finalizeError: string;
+  mismatchError: string;
+  cancelError: string;
+  cleanupError: string;
+};
+
+export type CoworkerDocumentConfirmTranslations = {
+  submit: string;
+  withdraw: string;
+  replace: string;
 };

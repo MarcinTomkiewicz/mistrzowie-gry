@@ -50,6 +50,23 @@ export async function createEdgeFunctionError(
   );
 }
 
+export function normalizeEdgeFunctionError(
+  error: unknown,
+  fallbackMessage: string,
+): EdgeFunctionError {
+  if (error instanceof EdgeFunctionError) {
+    return error;
+  }
+
+  return new EdgeFunctionError(
+    null,
+    'UNEXPECTED_ERROR',
+    fallbackMessage,
+    {},
+    error,
+  );
+}
+
 async function createHttpError(error: FunctionsHttpError): Promise<EdgeFunctionError> {
   const context: unknown = error.context;
 

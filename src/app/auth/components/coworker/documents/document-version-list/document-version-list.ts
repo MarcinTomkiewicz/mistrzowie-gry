@@ -20,6 +20,7 @@ export class DocumentVersionList {
   readonly versions = input.required<readonly ICoworkerDocumentVersion[]>();
   readonly currentVersionId = input<string | null>(null);
   readonly downloadingVersionId = input<string | null>(null);
+  readonly disabled = input(false);
   readonly downloadRequested = output<ICoworkerDocumentVersion>();
 
   protected readonly i18n = createDocumentsI18n();
@@ -28,6 +29,6 @@ export class DocumentVersionList {
   protected readonly SIGNATURE_BADGE_CLASS = SIGNATURE_BADGE_CLASS;
 
   protected canDownload(version: ICoworkerDocumentVersion): boolean {
-    return version.status === 'ready';
+    return version.status === 'ready' || version.status === 'superseded';
   }
 }

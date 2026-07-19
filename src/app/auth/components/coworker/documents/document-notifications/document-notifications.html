@@ -1,0 +1,67 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <header class="flex-row-between-start flex-wrap gap-sm w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.sections().notificationsTitle }}
+      </h3>
+      <p class="m-0 muted-text">{{ i18n.sections().notificationsDescription }}</p>
+    </div>
+    <span class="tag-badge tag-badge--primary">
+      {{ i18n.labels().unreadNotifications }}: {{ unreadCount() }}
+    </span>
+  </header>
+
+  @if (notifications().length === 0) {
+    <div class="mg-card flex-col-start-stretch gap-xs w-100">
+      <strong>{{ i18n.commonEmpty().title }}</strong>
+      <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
+    </div>
+  } @else {
+    @for (notification of notifications(); track notification.id) {
+      <article class="mg-card flex-col-start-stretch gap-sm w-100">
+        <header class="flex-row-between-start flex-wrap gap-sm w-100">
+          <strong class="text-wrap-anywhere">{{ title(notification) }}</strong>
+          <span
+            [class]="
+              'tag-badge ' +
+              (notification.readAt === null
+                ? 'tag-badge--primary'
+                : 'tag-badge--muted')
+            "
+          >
+            {{
+              notification.readAt === null
+                ? i18n.labels().notificationUnread
+                : i18n.labels().notificationRead
+            }}
+          </span>
+        </header>
+
+        <div class="flex-row-start-center flex-wrap gap-sm muted-text">
+          <span>
+            {{ i18n.labels().notificationCreatedAt }}:
+            {{ formatTimestampLabel(notification.createdAt, "pl-PL") }}
+          </span>
+          <span>
+            {{ i18n.labels().notificationTechnicalCode }}:
+            <code>{{ notification.eventCode }}</code>
+          </span>
+        </div>
+
+        @if (notification.readAt === null) {
+          <div class="flex-row-end-center">
+            <p-button
+              type="button"
+              severity="secondary"
+              icon="pi pi-check"
+              [label]="i18n.actions().markNotificationRead"
+              [loading]="activeMutationId() === notification.id"
+              [disabled]="disabled()"
+              (onClick)="markReadRequested.emit(notification.id)"
+            />
+          </div>
+        }
+      </article>
+    }
+  }
+</section>

@@ -101,7 +101,9 @@
               [label]="i18n.actions().download"
               [loading]="downloadingVersionId() === version.id"
               [disabled]="
-                downloadingVersionId() !== null && downloadingVersionId() !== version.id
+                disabled() ||
+                (downloadingVersionId() !== null &&
+                  downloadingVersionId() !== version.id)
               "
               (onClick)="downloadRequested.emit(version)"
             />
