@@ -1,7 +1,7 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-
 import { Observable, catchError, finalize, map, switchMap, tap, throwError } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -20,8 +20,9 @@ import {
   CoworkerSignatureDeclarationType,
 } from '../../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../../core/types/edge-function-error';
-import { normalizeEdgeFunctionError } from '../../../../../core/utils/edge-function-error-mapping';
+import { isEdgeAccessError, normalizeEdgeFunctionError } from '../../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../../core/utils/form-controls';
+import { normalizeText } from '../../../../../core/utils/normalize-text';
 import { FileUpload } from '../../../../../public/common/file-upload/file-upload';
 import { createDocumentsI18n } from '../documents.i18n';
 
@@ -145,7 +146,7 @@ export class DocumentUpload {
       declaredMimeType: file.type.toLowerCase(),
       sizeBytes: file.size,
       signatureDeclarationType,
-      title: this.titleControl.value.trim() || null,
+      title: normalizeText(this.titleControl.value),
     };
 
     this.runUpload(file, request);
@@ -206,8 +207,8 @@ export class DocumentUpload {
       error, this.i18n.errors().unexpectedDescription,
     );
     const fileRejected = phase === 'finalizing' && (
-      (normalized.status === 400 && normalized.code === 'DOCUMENT_STATE_INVALID') ||
-      (normalized.status === 422 && normalized.code === 'UPLOADED_FILE_INVALID')
+      (normalized.status === HttpStatusCode.BadRequest && normalized.code === 'DOCUMENT_STATE_INVALID') ||
+      (normalized.status === HttpStatusCode.UnprocessableEntity && normalized.code === 'UPLOADED_FILE_INVALID')
     );
     this.operationError.set(normalized);
     this.operationErrorDescription.set(
@@ -287,12 +288,12 @@ export class DocumentUpload {
 
   private isAmbiguousFinalizeError(error: EdgeFunctionError): boolean {
     return error.status === null ||
-      error.status === 409 ||
-      (error.status !== null && error.status >= 500);
+      error.status === HttpStatusCode.Conflict || error.status >= HttpStatusCode.InternalServerError;
   }
 
   private emitBlockingError(error: EdgeFunctionError): void {
-    if (error.status === 401 || error.status === 403 || error.status === 409) {
+    if (isEdgeAccessError(error) ||
+      error.status === HttpStatusCode.Conflict) {
       this.blockingError.emit(error);
     }
   }

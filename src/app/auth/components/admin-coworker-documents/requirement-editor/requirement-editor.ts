@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import {
   Component,
   computed,
@@ -28,7 +29,10 @@ import {
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
 import { AdminCoworkerRequirementPayload } from '../../../../core/types/admin-coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
-import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
+import {
+  isEdgeAccessError,
+  normalizeEdgeFunctionError,
+} from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
@@ -161,11 +165,14 @@ export class RequirementEditor {
             this.i18n.errors().assignRequirement,
           );
           this.actionError.set(normalized);
-          if (normalized.status === 401 || normalized.status === 403) {
+          if (isEdgeAccessError(normalized)) {
             this.accessError.emit(normalized);
             return;
           }
-          if (normalized.status === 404 || normalized.status === 409) {
+          if (
+            normalized.status === HttpStatusCode.NotFound ||
+            normalized.status === HttpStatusCode.Conflict
+          ) {
             if (isAdminCoworkerDocumentStaleError(normalized)) {
               this.form.controls.documentDefinitionId.setValue('', {
                 emitEvent: false,

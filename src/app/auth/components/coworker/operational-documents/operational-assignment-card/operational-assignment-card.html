@@ -1,0 +1,300 @@
+<article class="mg-card flex-col-start-stretch gap-md w-100">
+  <header class="flex-row-between-start flex-wrap gap-sm w-100">
+    <div class="flex-col-start-stretch gap-xs min-w-0">
+      <h4 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">
+        {{ assignment().version.title }}
+      </h4>
+      <span class="muted-text">
+        {{ assignment().document.title }} -
+        {{ i18n.fields().version }} {{ assignment().version.versionNumber }}
+      </span>
+      @if (assignment().version.summary; as summary) {
+        <p class="m-0">{{ summary }}</p>
+      } @else if (assignment().document.description; as description) {
+        <p class="m-0">{{ description }}</p>
+      }
+    </div>
+
+    <div class="tag-badges">
+      <span
+        [class]="'tag-badge ' + STATUS_BADGE_CLASS[assignment().status]"
+      >
+        {{ i18n.statuses().assignments[assignment().status] }}
+      </span>
+      <span
+        [class]="
+          'tag-badge ' +
+          (assignment().isCurrentPublishedVersion
+            ? 'tag-badge--primary'
+            : 'tag-badge--muted')
+        "
+      >
+        {{
+          assignment().isCurrentPublishedVersion
+            ? i18n.fields().currentVersion
+            : i18n.fields().historicalVersion
+        }}
+      </span>
+    </div>
+  </header>
+
+  <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+    <h5 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.sections().documentDetails }}
+    </h5>
+    <div class="mg-grid-auto-fit w-100">
+      <div class="flex-col-start-stretch gap-xs">
+        <div class="flex-row-start-center gap-xs">
+          <span class="muted-text">{{ i18n.fields().assignmentStatus }}</span>
+          <app-context-help
+            [text]="i18n.tooltips().assignmentStatus"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.fields().assignmentStatus)"
+          />
+        </div>
+        <strong>{{ i18n.statuses().assignments[assignment().status] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <div class="flex-row-start-center gap-xs">
+          <span class="muted-text">{{ i18n.fields().assignmentActionMode }}</span>
+          <app-context-help
+            [text]="i18n.tooltips().actionMode"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.fields().assignmentActionMode)"
+          />
+        </div>
+        <strong>{{ i18n.statuses().actionModes[assignment().actionMode] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().versionActionMode }}</span>
+        <strong>{{ i18n.statuses().actionModes[assignment().version.actionMode] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().category }}</span>
+        <strong>{{ assignment().document.category }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().documentStatus }}</span>
+        <strong>{{ i18n.statuses().documents[assignment().document.status] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().versionStatus }}</span>
+        <strong>{{ i18n.statuses().versions[assignment().version.status] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().assignedAt }}</span>
+        <strong>{{ formatTimestampLabel(assignment().assignedAt, "pl-PL") }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <div class="flex-row-start-center gap-xs">
+          <span class="muted-text">{{ i18n.fields().dueAt }}</span>
+          <app-context-help
+            [text]="i18n.tooltips().dueAt"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.fields().dueAt)"
+          />
+        </div>
+        <strong>
+          {{
+            formatTimestampLabel(assignment().dueAt, "pl-PL") ??
+              i18n.statuses().notProvided
+          }}
+        </strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().assignmentSource }}</span>
+        <strong>
+          {{ i18n.statuses().assignmentSources[assignment().assignmentSource] }}
+        </strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().requiresReacceptance }}</span>
+        <strong>
+          {{
+            assignment().version.requiresReacceptance
+              ? i18n.statuses().yes
+              : i18n.statuses().no
+          }}
+        </strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+    <h5 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.sections().file }}
+    </h5>
+    <div class="flex-row-start-center flex-wrap gap-md">
+      <span>
+        <strong>{{ i18n.fields().fileName }}:</strong>
+        {{ assignment().version.file.originalFilename }}
+      </span>
+      <span>
+        <strong>{{ i18n.fields().mimeType }}:</strong>
+        {{
+          assignment().version.file.detectedMimeType ??
+            assignment().version.file.declaredMimeType
+        }}
+      </span>
+      <span>
+        <strong>{{ i18n.fields().fileSize }}:</strong>
+        {{ assignment().version.file.sizeBytes ?? i18n.statuses().notProvided }}
+      </span>
+    </div>
+    @if (assignment().downloadAvailable) {
+      <div class="flex-row-start-center gap-xs">
+        <p-button
+          type="button"
+          severity="secondary"
+          icon="pi pi-download"
+          [label]="i18n.actions().download"
+          [loading]="downloadingVersionId() === assignment().documentVersionId"
+          [disabled]="disabled()"
+          (onClick)="downloadRequested.emit(assignment())"
+        />
+        <app-context-help
+          [text]="i18n.tooltips().download"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.actions().download)"
+        />
+      </div>
+    }
+  </section>
+
+  @if (assignment().waiverReason) {
+    <section class="flex-col-start-stretch gap-xs border-top pt-sm w-100">
+      <strong>{{ i18n.fields().waiverReason }}</strong>
+      <p class="m-0">{{ assignment().waiverReason }}</p>
+      <span class="muted-text">
+        {{ i18n.fields().waivedAt }}:
+        {{ formatTimestampLabel(assignment().waivedAt, "pl-PL") }}
+      </span>
+    </section>
+  }
+
+  @if (assignment().inheritedFrom; as inheritedFrom) {
+    <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+      <div class="flex-row-start-center gap-xs">
+        <h5 class="mg-section__title mg-section__title--xs m-0">
+          {{ i18n.sections().inherited }}
+        </h5>
+        <app-context-help
+          [text]="i18n.tooltips().inherited"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.sections().inherited)"
+        />
+      </div>
+      <p class="m-0">{{ i18n.messages().inheritedDescription }}</p>
+      <div class="flex-row-start-center flex-wrap gap-md muted-text">
+        <span>
+          {{ i18n.fields().inheritedVersion }}:
+          {{ inheritedFrom.versionNumber }}
+        </span>
+        <span>
+          {{ i18n.fields().assignmentStatus }}:
+          {{ i18n.statuses().assignments[inheritedFrom.status] }}
+        </span>
+        <span>
+          {{ i18n.fields().actionAt }}:
+          {{
+            formatTimestampLabel(
+              inheritedFrom.acceptedAt ?? inheritedFrom.acknowledgedAt,
+              "pl-PL"
+            )
+          }}
+        </span>
+      </div>
+    </section>
+  }
+
+  @if (assignment().currentAction; as currentAction) {
+    <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+      <div class="flex-row-start-center gap-xs">
+        <h5 class="mg-section__title mg-section__title--xs m-0">
+          {{ i18n.sections().evidence }}
+        </h5>
+        <app-context-help
+          [text]="i18n.tooltips().evidence"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.sections().evidence)"
+        />
+      </div>
+      <div class="flex-row-start-center flex-wrap gap-md">
+        <span>
+          <strong>{{ i18n.fields().currentAction }}:</strong>
+          {{ i18n.statuses().actions[currentAction.action] }}
+        </span>
+        <span>
+          <strong>{{ i18n.fields().actionAt }}:</strong>
+          {{ formatTimestampLabel(currentAction.actedAt, "pl-PL") }}
+        </span>
+        <span>
+          <strong>{{ i18n.fields().actionSource }}:</strong>
+          {{ i18n.statuses().actionSources[currentAction.source] }}
+        </span>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.fields().exactStatement }}</strong>
+        <p class="m-0 text-wrap-anywhere">{{ currentAction.statementText }}</p>
+      </div>
+      @if (currentAction.declineReason) {
+        <p class="m-0">
+          <strong>{{ i18n.fields().declineReason }}:</strong>
+          {{ currentAction.declineReason }}
+        </p>
+      }
+    </section>
+  }
+
+  <footer class="flex-row-end-center flex-wrap gap-md border-top pt-sm w-100">
+    @if (!assignment().isCurrentPublishedVersion) {
+      <p class="m-0 muted-text">{{ i18n.messages().historicalNoAction }}</p>
+    } @else if (assignment().actionMode === "information_only") {
+      <p class="m-0 muted-text">{{ i18n.messages().informationOnly }}</p>
+    } @else if (!assignment().canAct) {
+      <p class="m-0 muted-text">{{ i18n.messages().noAction }}</p>
+    }
+
+    @if (availableActions().includes("acknowledged")) {
+      <div class="flex-row-start-center gap-xs">
+        <p-button
+          type="button"
+          icon="pi pi-check-circle"
+          [label]="i18n.actions().acknowledged"
+          [disabled]="disabled()"
+          (onClick)="actionRequested.emit('acknowledged')"
+        />
+        <app-context-help
+          [text]="i18n.tooltips().acknowledged"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.actions().acknowledged)"
+        />
+      </div>
+    }
+    @if (availableActions().includes("declined")) {
+      <div class="flex-row-start-center gap-xs">
+        <p-button
+          type="button"
+          severity="danger"
+          icon="pi pi-times-circle"
+          [label]="i18n.actions().declined"
+          [disabled]="disabled()"
+          (onClick)="actionRequested.emit('declined')"
+        />
+        <app-context-help
+          [text]="i18n.tooltips().declined"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.actions().declined)"
+        />
+      </div>
+    }
+    @if (availableActions().includes("accepted")) {
+      <div class="flex-row-start-center gap-xs">
+        <p-button
+          type="button"
+          severity="success"
+          icon="pi pi-check"
+          [label]="i18n.actions().accepted"
+          [disabled]="disabled()"
+          (onClick)="actionRequested.emit('accepted')"
+        />
+        <app-context-help
+          [text]="i18n.tooltips().accepted"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.actions().accepted)"
+        />
+      </div>
+    }
+  </footer>
+</article>

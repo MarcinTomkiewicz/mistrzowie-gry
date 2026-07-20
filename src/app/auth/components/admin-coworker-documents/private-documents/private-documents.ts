@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -24,7 +25,10 @@ import {
 } from '../../../../core/types/admin-coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { formatTimestampLabel } from '../../../../core/utils/date';
-import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
+import {
+  isEdgeAccessError,
+  normalizeEdgeFunctionError,
+} from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
@@ -102,6 +106,7 @@ export class PrivateDocuments {
   );
   protected readonly isActionBusy = computed(() => this.activeAction() !== null || this.definitionBusy() || this.requirementBusy());
   protected readonly interactionsBlocked = computed(() => this.isLoading() || this.isActionBusy() || this.loadError() !== null);
+  protected readonly isEdgeAccessError = isEdgeAccessError;
 
   constructor() {
     effect(() => setControlEnabled(this.coworkerControl, !this.interactionsBlocked()));
@@ -168,7 +173,7 @@ export class PrivateDocuments {
         },
         error: (error) => {
           const normalized = normalizeEdgeFunctionError(error, this.i18n.errors().load);
-          if (normalized.status === 401 || normalized.status === 403) {
+          if (isEdgeAccessError(normalized)) {
             this.handleAccessError(normalized);
             return;
           }
@@ -293,13 +298,16 @@ export class PrivateDocuments {
 
   private handleActionError(error: unknown, fallback: string): void {
     const normalized = normalizeEdgeFunctionError(error, fallback);
-    if (normalized.status === 401 || normalized.status === 403) {
+    if (isEdgeAccessError(normalized)) {
       this.handleAccessError(normalized);
       return;
     }
     this.actionErrorFallback.set(fallback);
     this.actionError.set(normalized);
-    if (normalized.status === 404 || normalized.status === 409) {
+    if (
+      normalized.status === HttpStatusCode.NotFound ||
+      normalized.status === HttpStatusCode.Conflict
+    ) {
       if (isAdminCoworkerDocumentStaleError(normalized)) {
         this.reloadAfterStaleOnboarding();
         return;

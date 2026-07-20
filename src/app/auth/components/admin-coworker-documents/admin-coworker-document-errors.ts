@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { AbstractControl } from '@angular/forms';
 
 import { ADMIN_COWORKER_DOCUMENT_ERROR_CODE } from '../../../core/types/admin-coworker-document';
@@ -14,8 +15,8 @@ export function resolveAdminCoworkerDocumentError(
   if (error.code === 'EDGE_INVALID_SUCCESS_RESPONSE') {
     return copy.invalidResponse;
   }
-  if (error.status === 401) return copy.unauthorized;
-  if (error.status === 403) return copy.forbidden;
+  if (error.status === HttpStatusCode.Unauthorized) return copy.unauthorized;
+  if (error.status === HttpStatusCode.Forbidden) return copy.forbidden;
   if (!commandError) return fallback;
 
   switch (error.code) {

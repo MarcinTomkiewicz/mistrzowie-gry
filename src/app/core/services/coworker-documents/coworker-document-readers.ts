@@ -4,6 +4,7 @@ import {
   ICoworkerDocument,
   ICoworkerDocumentSignatureVerification,
   ICoworkerDocumentVersion,
+  ICoworkerNotification,
   ICoworkerPortalDocument,
   ICoworkerSignaturePolicy,
 } from '../../interfaces/i-coworker-document';
@@ -15,6 +16,8 @@ import {
   COWORKER_DOCUMENT_STATUSES,
   COWORKER_DOCUMENT_VERSION_STATUSES,
   COWORKER_MALWARE_SCAN_STATUSES,
+  COWORKER_NOTIFICATION_ENTITY_TYPES,
+  COWORKER_NOTIFICATION_SEVERITIES,
   COWORKER_PORTAL_DOCUMENT_STATUSES,
   COWORKER_SIGNATURE_DECLARATION_TYPES,
   COWORKER_SIGNATURE_VERIFICATION_METHODS,
@@ -33,6 +36,7 @@ import {
   readEdgeNullableInteger,
   readEdgeNullableString,
   readEdgeNullableTimestamp,
+  readEdgeObject,
   readEdgeString,
   readEdgeTimestamp,
   readEdgeUuid,
@@ -110,6 +114,20 @@ export const documentVersionDownloadFieldReaders = {
   mimeType: readEdgeString,
   sizeBytes: readEdgeInteger,
 } as const;
+
+export const coworkerNotificationFieldReaders = {
+  id: readEdgeUuid,
+  eventCode: readEdgeString,
+  severity: createEdgeLiteralReader(COWORKER_NOTIFICATION_SEVERITIES),
+  entityType: createEdgeLiteralReader(COWORKER_NOTIFICATION_ENTITY_TYPES),
+  entityId: nullableUuidReader,
+  payload: readEdgeObject,
+  readAt: readEdgeNullableTimestamp,
+  createdAt: readEdgeTimestamp,
+} as const;
+
+export const coworkerNotificationReader: EdgeReader<ICoworkerNotification> =
+  createEdgeObjectReader(coworkerNotificationFieldReaders);
 
 export const coworkerDocumentVersionReader:
   EdgeReader<ICoworkerDocumentVersion> = createEdgeObjectReader({

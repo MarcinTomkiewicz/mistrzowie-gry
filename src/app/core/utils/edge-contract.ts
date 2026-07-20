@@ -204,6 +204,18 @@ export function readEdgeLiteral<TValue extends EdgeLiteral>(
   return value;
 }
 
+export function readEdgeNonNegativeInteger(
+  value: unknown,
+  path: string,
+): number {
+  const parsed = readEdgeInteger(value, path);
+  if (parsed < 0) {
+    throw invalidEdgeResponse(path, 'a non-negative integer');
+  }
+
+  return parsed;
+}
+
 export function createEdgeLiteralReader<
   const TValues extends readonly EdgeLiteral[],
 >(allowedValues: TValues): EdgeReader<TValues[number]> {

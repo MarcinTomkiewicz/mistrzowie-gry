@@ -1,0 +1,164 @@
+<div
+  class="flex-col-start-stretch gap-lg w-100"
+  [attr.aria-busy]="isBusy()"
+>
+  <header class="flex-col-start-stretch gap-xs w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.page().title }}
+    </h2>
+    <p class="m-0 muted-text">{{ i18n.page().subtitle }}</p>
+  </header>
+
+  <section class="mg-card flex-col-start-stretch gap-md w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.process().title }}
+      </h3>
+      <p class="m-0">{{ i18n.process().description }}</p>
+    </div>
+    <div class="mg-grid-auto-fit w-100">
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.process().readTitle }}</strong>
+        <span class="muted-text">{{ i18n.process().readDescription }}</span>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.process().downloadTitle }}</strong>
+        <span class="muted-text">{{ i18n.process().downloadDescription }}</span>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.process().decisionTitle }}</strong>
+        <span class="muted-text">{{ i18n.process().decisionDescription }}</span>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.process().evidenceTitle }}</strong>
+        <span class="muted-text">{{ i18n.process().evidenceDescription }}</span>
+      </div>
+    </div>
+  </section>
+
+  <app-loading-overlay
+    [visible]="isLoading()"
+    [label]="i18n.commonStatus().loading"
+  />
+
+  @if (pageError(); as error) {
+    <section
+      class="mg-card flex-col-start-stretch gap-sm w-100"
+      role="alert"
+      aria-live="assertive"
+    >
+      <h3 class="mg-section__title mg-section__title--sm error-text m-0">
+        {{ pageErrorTitle() }}
+      </h3>
+      <p class="m-0">{{ pageErrorDescription() }}</p>
+      @if (error.message !== pageErrorDescription()) {
+        <p class="m-0 muted-text">{{ error.message }}</p>
+      }
+      <div class="flex-row-start-center flex-wrap gap-sm muted-text">
+        <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+        @if (error.status !== null) {
+          <span>
+            {{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code>
+          </span>
+        }
+      </div>
+      @if (!isAccessBlocked()) {
+        <p-button
+          type="button"
+          severity="secondary"
+          icon="pi pi-refresh"
+          [label]="i18n.actions().reload"
+          [disabled]="isLoading()"
+          (onClick)="loadPortal()"
+        />
+      }
+    </section>
+  }
+
+  @if (!isLoading() && !isAccessBlocked() && portal(); as data) {
+    <section class="flex-col-start-stretch gap-md w-100">
+      <header class="flex-col-start-stretch gap-xs">
+        <div class="flex-row-start-center gap-xs">
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.sections().currentTitle }}
+          </h3>
+          <app-context-help
+            [text]="i18n.tooltips().currentAssignments"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.sections().currentTitle)"
+          />
+        </div>
+        <p class="m-0 muted-text">{{ i18n.sections().currentDescription }}</p>
+      </header>
+
+      @if (currentAssignments().length === 0) {
+        <div class="mg-card flex-col-start-stretch gap-xs w-100">
+          <p class="m-0">{{ i18n.sections().currentEmpty }}</p>
+        </div>
+      } @else {
+        @for (assignment of currentAssignments(); track assignment.id) {
+          <app-operational-assignment-card
+            [assignment]="assignment"
+            [disabled]="commandsDisabled()"
+            [downloadingVersionId]="downloadingVersionId()"
+            (downloadRequested)="download($event)"
+            (actionRequested)="openAction(assignment, $event)"
+          />
+        }
+      }
+    </section>
+
+    <section class="flex-col-start-stretch gap-md w-100">
+      <header class="flex-col-start-stretch gap-xs">
+        <div class="flex-row-start-center gap-xs">
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.sections().historyTitle }}
+          </h3>
+          <app-context-help
+            [text]="i18n.tooltips().historicalAssignments"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.sections().historyTitle)"
+          />
+        </div>
+        <p class="m-0 muted-text">{{ i18n.sections().historyDescription }}</p>
+      </header>
+
+      @if (historicalAssignments().length === 0) {
+        <div class="mg-card flex-col-start-stretch gap-xs w-100">
+          <p class="m-0">{{ i18n.sections().historyEmpty }}</p>
+        </div>
+      } @else {
+        @for (assignment of historicalAssignments(); track assignment.id) {
+          <app-operational-assignment-card
+            [assignment]="assignment"
+            [disabled]="commandsDisabled()"
+            [downloadingVersionId]="downloadingVersionId()"
+            (downloadRequested)="download($event)"
+            (actionRequested)="openAction(assignment, $event)"
+          />
+        }
+      }
+    </section>
+
+    <app-coworker-notifications
+      [notifications]="data.notifications"
+      [unreadCount]="data.unreadNotificationCount"
+      [copy]="i18n.notifications()"
+      [activeMutationId]="activeNotificationId()"
+      [disabled]="commandsDisabled()"
+      (markReadRequested)="markNotificationRead($event)"
+    />
+  }
+
+  @if (selectedAssignment(); as assignment) {
+    @if (selectedAction(); as action) {
+      <app-operational-action-dialog
+        [assignment]="assignment"
+        [action]="action"
+        [busy]="actionBusy() || isLoading()"
+        [error]="actionError()"
+        [errorDescription]="actionErrorDescription()"
+        (closeRequested)="closeAction()"
+        (actionRequested)="recordAction($event)"
+      />
+    }
+  }
+</div>

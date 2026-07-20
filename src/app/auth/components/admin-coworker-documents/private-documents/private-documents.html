@@ -58,7 +58,7 @@
           [error]="error"
           [description]="resolveError(error, i18n.errors(), i18n.errors().load, false)"
         />
-        @if (error.status !== 401 && error.status !== 403) {
+        @if (!isEdgeAccessError(error)) {
           <p-button
             severity="secondary"
             icon="pi pi-refresh"

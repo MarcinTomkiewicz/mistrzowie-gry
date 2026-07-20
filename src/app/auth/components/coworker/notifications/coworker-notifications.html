@@ -2,19 +2,19 @@
   <header class="flex-row-between-start flex-wrap gap-sm w-100">
     <div class="flex-col-start-stretch gap-xs">
       <h3 class="mg-section__title mg-section__title--sm m-0">
-        {{ i18n.sections().notificationsTitle }}
+        {{ copy().title }}
       </h3>
-      <p class="m-0 muted-text">{{ i18n.sections().notificationsDescription }}</p>
+      <p class="m-0 muted-text">{{ copy().description }}</p>
     </div>
     <span class="tag-badge tag-badge--primary">
-      {{ i18n.labels().unreadNotifications }}: {{ unreadCount() }}
+      {{ copy().unreadCount }}: {{ unreadCount() }}
     </span>
   </header>
 
   @if (notifications().length === 0) {
     <div class="mg-card flex-col-start-stretch gap-xs w-100">
-      <strong>{{ i18n.commonEmpty().title }}</strong>
-      <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
+      <strong>{{ copy().emptyTitle }}</strong>
+      <p class="m-0 muted-text">{{ copy().emptyDescription }}</p>
     </div>
   } @else {
     @for (notification of notifications(); track notification.id) {
@@ -29,21 +29,17 @@
                 : 'tag-badge--muted')
             "
           >
-            {{
-              notification.readAt === null
-                ? i18n.labels().notificationUnread
-                : i18n.labels().notificationRead
-            }}
+            {{ notification.readAt === null ? copy().unread : copy().read }}
           </span>
         </header>
 
         <div class="flex-row-start-center flex-wrap gap-sm muted-text">
           <span>
-            {{ i18n.labels().notificationCreatedAt }}:
+            {{ copy().createdAt }}:
             {{ formatTimestampLabel(notification.createdAt, "pl-PL") }}
           </span>
           <span>
-            {{ i18n.labels().notificationTechnicalCode }}:
+            {{ copy().technicalCode }}:
             <code>{{ notification.eventCode }}</code>
           </span>
         </div>
@@ -54,7 +50,7 @@
               type="button"
               severity="secondary"
               icon="pi pi-check"
-              [label]="i18n.actions().markNotificationRead"
+              [label]="copy().markRead"
               [loading]="activeMutationId() === notification.id"
               [disabled]="disabled()"
               (onClick)="markReadRequested.emit(notification.id)"

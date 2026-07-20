@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import {
   Component,
   computed,
@@ -28,7 +29,10 @@ import {
   COWORKER_DOCUMENT_ORIGIN_POLICIES,
 } from '../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
-import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
+import {
+  isEdgeAccessError,
+  normalizeEdgeFunctionError,
+} from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
@@ -170,11 +174,14 @@ export class DocumentDefinitionEditor {
             this.i18n.errors().saveDefinition,
           );
           this.actionError.set(normalized);
-          if (normalized.status === 401 || normalized.status === 403) {
+          if (isEdgeAccessError(normalized)) {
             this.accessError.emit(normalized);
             return;
           }
-          if (normalized.status === 404 || normalized.status === 409) {
+          if (
+            normalized.status === HttpStatusCode.NotFound ||
+            normalized.status === HttpStatusCode.Conflict
+          ) {
             this.reloadRequested.emit(normalized);
           }
         },

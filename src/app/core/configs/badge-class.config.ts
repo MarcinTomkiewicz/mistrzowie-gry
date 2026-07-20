@@ -7,9 +7,15 @@ import {
   CoworkerSignatureDeclarationType,
   CoworkerSignatureVerificationStatus,
 } from '../types/coworker-document';
+import {
+  CoworkerOperationalAssignmentStatus,
+  CoworkerOperationalDocumentStatus,
+  CoworkerOperationalVersionStatus,
+} from '../types/coworker-operational-document';
 
 export const STATUS_BADGE_CLASS = {
   pending: 'tag-badge--warn',
+  available: 'tag-badge--info',
   submitted: 'tag-badge--info',
   under_review: 'tag-badge--info',
   needs_correction: 'tag-badge--danger',
@@ -19,9 +25,12 @@ export const STATUS_BADGE_CLASS = {
   cancelled: 'tag-badge--muted',
   draft: 'tag-badge--muted',
   accepted: 'tag-badge--success',
+  acknowledged: 'tag-badge--success',
+  declined: 'tag-badge--danger',
   rejected: 'tag-badge--danger',
   withdrawn: 'tag-badge--muted',
   archived: 'tag-badge--muted',
+  published: 'tag-badge--success',
   approved: 'tag-badge--success',
   suspended: 'tag-badge--warn',
   reserved: 'tag-badge--muted',
@@ -44,7 +53,10 @@ export const STATUS_BADGE_CLASS = {
   | CoworkerActiveOnboardingStatus
   | CoworkerDocumentVersionStatus
   | CoworkerMalwareScanStatus
-  | CoworkerSignatureVerificationStatus,
+  | CoworkerSignatureVerificationStatus
+  | CoworkerOperationalAssignmentStatus
+  | CoworkerOperationalDocumentStatus
+  | CoworkerOperationalVersionStatus,
   string
 >;
 

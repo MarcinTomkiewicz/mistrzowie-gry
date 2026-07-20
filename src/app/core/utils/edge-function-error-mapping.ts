@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import {
   FunctionsFetchError,
   FunctionsHttpError,
@@ -65,6 +66,13 @@ export function normalizeEdgeFunctionError(
     {},
     error,
   );
+}
+
+export function isEdgeAccessError(
+  error: EdgeFunctionError | null | undefined,
+): boolean {
+  return error?.status === HttpStatusCode.Unauthorized ||
+    error?.status === HttpStatusCode.Forbidden;
 }
 
 async function createHttpError(error: FunctionsHttpError): Promise<EdgeFunctionError> {

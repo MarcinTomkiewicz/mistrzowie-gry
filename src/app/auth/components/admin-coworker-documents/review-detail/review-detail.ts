@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -19,7 +20,10 @@ import {
   AdminSignatureVerificationInput,
 } from '../../../../core/types/admin-coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
-import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
+import {
+  isEdgeAccessError,
+  normalizeEdgeFunctionError,
+} from '../../../../core/utils/edge-function-error-mapping';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { AdminCoworkerDocumentError } from '../admin-coworker-document-error/admin-coworker-document-error';
@@ -73,6 +77,7 @@ export class ReviewDetail {
   protected readonly actionErrorFallback = signal('');
   protected readonly activeAction = signal<AdminCoworkerDocumentAction | null>(null);
   protected readonly downloadingVersionId = signal<string | null>(null);
+  protected readonly isEdgeAccessError = isEdgeAccessError;
 
   constructor() {
     this.loadDetail();
@@ -206,13 +211,16 @@ export class ReviewDetail {
     const normalized = normalizeEdgeFunctionError(error, fallback);
     this.actionErrorFallback.set(fallback);
     this.actionError.set(normalized);
-    if (normalized.status === 401 || normalized.status === 403) {
+    if (isEdgeAccessError(normalized)) {
       this.detail.set(null);
       this.loadError.set(normalized);
       return;
     }
     if (
-      (normalized.status === 404 || normalized.status === 409) &&
+      (
+        normalized.status === HttpStatusCode.NotFound ||
+        normalized.status === HttpStatusCode.Conflict
+      ) &&
       isAdminCoworkerDocumentStaleError(normalized)
     ) {
       this.loadDetail();

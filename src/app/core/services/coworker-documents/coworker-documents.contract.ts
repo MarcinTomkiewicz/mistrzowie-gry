@@ -4,14 +4,11 @@ import {
   ICoworkerDocumentPortalResponse,
   ICoworkerDocumentRequirement,
   ICoworkerVersionDownload,
-  ICoworkerNotification,
 } from '../../interfaces/i-coworker-document';
 import { APP_ROLES } from '../../types/app-role';
 import {
   COWORKER_AVAILABLE_ORIGIN_POLICIES,
   COWORKER_DOCUMENT_ACTION,
-  COWORKER_NOTIFICATION_ENTITY_TYPES,
-  COWORKER_NOTIFICATION_SEVERITIES,
   COWORKER_PORTAL_REQUIREMENT_STATUSES,
 } from '../../types/coworker-document';
 import { EdgeReader } from '../../types/edge-contract';
@@ -21,11 +18,10 @@ import {
   createEdgeNullableReader,
   createEdgeObjectReader,
   readEdgeBoolean,
-  readEdgeInteger,
+  readEdgeNonNegativeInteger,
   readEdgeNullableInteger,
   readEdgeNullableString,
   readEdgeNullableTimestamp,
-  readEdgeObject,
   readEdgeString,
   readEdgeTimestamp,
   readEdgeUuid,
@@ -34,6 +30,7 @@ import {
   coworkerActiveOnboardingCaseReader,
   coworkerDocumentDefinitionReader,
   coworkerDocumentDefinitionFieldReaders,
+  coworkerNotificationReader,
   coworkerPortalDocumentReader,
   coworkerSignaturePolicyReader,
   documentVersionDownloadFieldReaders,
@@ -73,18 +70,6 @@ const requirementReader: EdgeReader<ICoworkerDocumentRequirement> =
     updatedAt: readEdgeTimestamp,
   });
 
-const notificationReader: EdgeReader<ICoworkerNotification> =
-  createEdgeObjectReader({
-    id: readEdgeUuid,
-    eventCode: readEdgeString,
-    severity: createEdgeLiteralReader(COWORKER_NOTIFICATION_SEVERITIES),
-    entityType: createEdgeLiteralReader(COWORKER_NOTIFICATION_ENTITY_TYPES),
-    entityId: nullableUuidReader,
-    payload: readEdgeObject,
-    readAt: readEdgeNullableTimestamp,
-    createdAt: readEdgeTimestamp,
-  });
-
 const accessReader: EdgeReader<ICoworkerDocumentAccess> =
   createEdgeObjectReader({
     enabled: trueReader,
@@ -106,8 +91,8 @@ const portalReader: EdgeReader<ICoworkerDocumentPortalResponse> =
     availableDefinitions: createEdgeArrayReader(
       availableDocumentDefinitionReader,
     ),
-    notifications: createEdgeArrayReader(notificationReader),
-    unreadNotificationCount: readEdgeInteger,
+    notifications: createEdgeArrayReader(coworkerNotificationReader),
+    unreadNotificationCount: readEdgeNonNegativeInteger,
     viewer: createEdgeObjectReader({
       actorUserId: readEdgeUuid,
       isAdmin: readEdgeBoolean,

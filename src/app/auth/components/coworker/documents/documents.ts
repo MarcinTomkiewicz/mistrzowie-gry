@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -19,19 +20,29 @@ import {
   CoworkerSignatureDeclarationType,
 } from '../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
+import { CoworkerNotificationCopy } from '../../../../core/types/i18n/coworker-notification';
 import { getCoworkerDocumentCapability } from '../../../../core/utils/coworker-document-capability';
 import { formatDateLabel, formatTimestampLabel } from '../../../../core/utils/date';
-import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
+import {
+  isEdgeAccessError,
+  normalizeEdgeFunctionError,
+} from '../../../../core/utils/edge-function-error-mapping';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { CoworkerNotifications } from '../notifications/coworker-notifications';
 import { DocumentCard } from './document-card/document-card';
-import { DocumentNotifications } from './document-notifications/document-notifications';
 import { DocumentUpload } from './document-upload/document-upload';
 import { createDocumentsI18n } from './documents.i18n';
 
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [ButtonModule, DocumentCard, DocumentNotifications, DocumentUpload, LoadingOverlay],
+  imports: [
+    ButtonModule,
+    CoworkerNotifications,
+    DocumentCard,
+    DocumentUpload,
+    LoadingOverlay,
+  ],
   templateUrl: './documents.html',
   providers: [provideTranslocoScope('auth', 'common')],
 })
@@ -57,9 +68,34 @@ export class Documents {
   protected readonly activeError = computed(
     () => this.loadError() ?? this.mutationError() ?? this.downloadError(),
   );
-  protected readonly isAccessBlocked = computed(() => {
-    const status = this.activeError()?.status;
-    return status === 401 || status === 403;
+  protected readonly notificationCopy = computed<CoworkerNotificationCopy>(
+    () => ({
+      title: this.i18n.sections().notificationsTitle,
+      description: this.i18n.sections().notificationsDescription,
+      unreadCount: this.i18n.labels().unreadNotifications,
+      read: this.i18n.labels().notificationRead,
+      unread: this.i18n.labels().notificationUnread,
+      createdAt: this.i18n.labels().notificationCreatedAt,
+      technicalCode: this.i18n.labels().notificationTechnicalCode,
+      markRead: this.i18n.actions().markNotificationRead,
+      emptyTitle: this.i18n.commonEmpty().title,
+      emptyDescription: this.i18n.commonEmpty().description,
+      severities: this.i18n.statuses().notificationSeverities,
+      entities: this.i18n.statuses().notificationEntities,
+    }),
+  );
+  protected readonly isAccessBlocked = computed(() =>
+    isEdgeAccessError(this.activeError()),
+  );
+  protected readonly errorReloadAvailable = computed(() => {
+    const error = this.activeError();
+    return error !== null &&
+      !this.isAccessBlocked() &&
+      (
+        this.loadError() !== null ||
+        error.status === HttpStatusCode.NotFound ||
+        this.requiresReload()
+      );
   });
   protected readonly actionsBlocked = computed(() =>
     this.isLoading() ||
@@ -95,28 +131,28 @@ export class Documents {
   protected readonly errorTitle = computed(() => {
     const error = this.activeError();
     const translations = this.i18n.errors();
-    if (error?.status === 401) return translations.sessionTitle;
-    if (error?.status === 403) return translations.unauthorizedTitle;
+    if (error?.status === HttpStatusCode.Unauthorized) return translations.sessionTitle;
+    if (error?.status === HttpStatusCode.Forbidden) return translations.unauthorizedTitle;
     if (this.loadError()) return translations.loadTitle;
     return this.mutationError() ? translations.actionTitle : translations.downloadTitle;
   });
   protected readonly errorDescription = computed(() => {
     const error = this.activeError();
     const translations = this.i18n.errors();
-    if (error?.status === 401) return translations.sessionDescription;
-    if (error?.status === 403) return translations.unauthorizedDescription;
+    if (error?.status === HttpStatusCode.Unauthorized) return translations.sessionDescription;
+    if (error?.status === HttpStatusCode.Forbidden) return translations.unauthorizedDescription;
     if (this.loadError()) return translations.loadDescription;
     if (this.mutationError()) {
-      return error?.status === 409
+      return error?.status === HttpStatusCode.Conflict
         ? translations.conflictDescription
         : translations.actionDescription;
     }
     if (error?.code === 'EDGE_INVALID_SUCCESS_RESPONSE') {
       return translations.invalidDownloadResponse;
     }
-    if (error?.status === 404) return translations.downloadNotFound;
-    if (error?.status === 409) return translations.downloadConflict;
-    if (error?.status === 502) return translations.storageError;
+    if (error?.status === HttpStatusCode.NotFound) return translations.downloadNotFound;
+    if (error?.status === HttpStatusCode.Conflict) return translations.downloadConflict;
+    if (error?.status === HttpStatusCode.BadGateway) return translations.storageError;
     return translations.unexpectedDescription;
   });
 
@@ -153,20 +189,7 @@ export class Documents {
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.downloadingVersionId.set(null)),
     ).subscribe({
-      next: (response) => {
-        const signedUrl = response.download.signedUrl.trim();
-        if (signedUrl === '') {
-          this.downloadError.set(new EdgeFunctionError(
-            null,
-            'EDGE_INVALID_SUCCESS_RESPONSE',
-            this.i18n.errors().invalidDownloadResponse,
-            {},
-            null,
-          ));
-          return;
-        }
-        this.platform.openNewTab(signedUrl);
-      },
+      next: (response) => this.platform.openNewTab(response.download.signedUrl),
       error: (error: unknown) => {
         const normalized = this.normalizeError(error);
         this.downloadError.set(normalized);
@@ -208,9 +231,9 @@ export class Documents {
     error: EdgeFunctionError,
     exposeAsMutationError = true,
   ): void {
-    if (error.status === 409) this.requiresReload.set(true);
+    if (error.status === HttpStatusCode.Conflict) this.requiresReload.set(true);
     if (exposeAsMutationError &&
-      (error.status === 401 || error.status === 403 || error.status === 409)) {
+      (isEdgeAccessError(error) || error.status === HttpStatusCode.Conflict)) {
       this.mutationError.set(error);
     }
   }
