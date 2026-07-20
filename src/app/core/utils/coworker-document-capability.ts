@@ -1,8 +1,15 @@
 import {
   ICoworkerDocumentDefinition,
+  ICoworkerDocumentVersion,
   ICoworkerPortalDocument,
 } from '../interfaces/i-coworker-document';
 import { CoworkerPortalRequirementStatus } from '../types/coworker-document';
+
+export function canDownloadCoworkerDocumentVersion(
+  version: ICoworkerDocumentVersion,
+): boolean {
+  return version.status === 'ready' || version.status === 'superseded';
+}
 
 export function getCoworkerDocumentCapability(
   definition: ICoworkerDocumentDefinition | null,

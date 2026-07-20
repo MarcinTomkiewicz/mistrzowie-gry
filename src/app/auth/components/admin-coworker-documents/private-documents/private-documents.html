@@ -70,6 +70,11 @@
     }
 
     @if (dashboard(); as data) {
+      <app-admin-coworker-review-queue
+        [items]="data.reviewQueue"
+        [disabled]="interactionsBlocked()"
+      />
+
       <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
         <div class="flex-row-between-center flex-wrap gap-sm w-100">
           <div class="flex-col-start-stretch gap-xs">
@@ -85,15 +90,6 @@
             <p class="m-0">{{ i18n.sections().definitionsSubtitle }}</p>
           </div>
           <div class="flex-row-end-center flex-wrap gap-sm">
-            <div class="flex-row-start-center gap-xs">
-              <span class="tag-badge">
-                {{ i18n.page().reviewQueueLabel }}: {{ data.reviewQueue.length }}
-              </span>
-              <app-context-help
-                [text]="i18n.tooltips().reviewQueue"
-                [ariaLabel]="i18n.contextHelpLabel(i18n.page().reviewQueueLabel)"
-              />
-            </div>
             <p-button
               severity="success"
               icon="pi pi-plus"

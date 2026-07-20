@@ -87,6 +87,18 @@ export function readEdgeString(value: unknown, path: string): string {
   return value;
 }
 
+export function readEdgeNonBlankString(
+  value: unknown,
+  path: string,
+): string {
+  const parsed = readEdgeString(value, path).trim();
+  if (parsed === '') {
+    throw invalidEdgeResponse(path, 'a non-blank string');
+  }
+
+  return parsed;
+}
+
 export function readEdgeUuid(value: unknown, path: string): string {
   const parsed = readEdgeString(value, path);
   if (!UUID_PATTERN.test(parsed)) {

@@ -1,0 +1,112 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-lg">
+    <div class="flex-row-start-center w-100">
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-arrow-left"
+        [label]="i18n.review().actions.backToDocuments"
+        [routerLink]="['/admin/coworkers/private-documents']"
+      />
+    </div>
+
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.review().page.title }}</h1>
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.review().page.subtitle }}
+      </p>
+    </header>
+
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.review().process.title }}
+      </h2>
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+        <p class="m-0">{{ i18n.review().process.start }}</p>
+        <p class="m-0">{{ i18n.review().process.inspect }}</p>
+        <p class="m-0">{{ i18n.review().process.signature }}</p>
+        <p class="m-0">{{ i18n.review().process.decision }}</p>
+      </div>
+    </section>
+
+    <app-loading-overlay
+      [visible]="isBusy()"
+      [label]="activeAction() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+    />
+
+    @if (loadError(); as error) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <app-admin-coworker-document-error
+          [error]="error"
+          [description]="resolveError(error, i18n.errors(), i18n.review().errors.load, false)"
+        />
+        @if (error.status !== 401 && error.status !== 403) {
+          <p-button
+            severity="secondary"
+            icon="pi pi-refresh"
+            [label]="i18n.commonActions().retry"
+            (onClick)="loadDetail()"
+          />
+        }
+      </section>
+    }
+
+    @if (detail(); as data) {
+      <app-admin-review-document-summary
+        [detail]="data"
+      />
+      <app-admin-review-document-versions
+        [document]="data.document"
+        [disabled]="isBusy()"
+        [downloadingVersionId]="downloadingVersionId()"
+        (downloadRequested)="downloadVersion($event)"
+      />
+
+      @if (data.document.status === "submitted") {
+        <section class="mg-card flex-row-between-center flex-wrap gap-md p-md w-100">
+          <div class="flex-col-start-stretch gap-xs">
+            <strong>{{ i18n.review().actions.startReview }}</strong>
+            <p class="m-0">{{ i18n.review().tooltips.startReview }}</p>
+          </div>
+          <div class="flex-row-start-center gap-xs">
+            <p-button
+              icon="pi pi-play"
+              [label]="i18n.review().actions.startReview"
+              [loading]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.startReview"
+              [disabled]="isBusy()"
+              (onClick)="confirmStartReview($event)"
+            />
+            <app-context-help
+              [text]="i18n.review().tooltips.startReview"
+              [ariaLabel]="i18n.contextHelpLabel(i18n.review().actions.startReview)"
+            />
+          </div>
+        </section>
+      }
+
+      @if (actionError(); as error) {
+        <app-admin-coworker-document-error
+          [error]="error"
+          [description]="resolveError(error, i18n.errors(), actionErrorFallback())"
+        />
+      }
+
+      @if (data.document.status === "under_review" && data.document.currentVersion) {
+        <app-admin-signature-verification-editor
+          [disabled]="isBusy()"
+          [busy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature"
+          (verificationRequested)="verifySignature($event)"
+        />
+        <app-admin-review-decision-editor
+          [disabled]="isBusy()"
+          [acceptBusy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument"
+          [rejectBusy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument"
+          (acceptRequested)="acceptDocument($event)"
+          (rejectRequested)="rejectDocument($event)"
+        />
+      }
+
+      <app-admin-coworker-review-history [detail]="data" />
+    }
+  </div>
+</section>

@@ -17,6 +17,7 @@ import {
   AdminCoworkerDocStatusCopy,
   AdminCoworkerDocTooltipCopy,
 } from '../../../../core/types/i18n/admin-coworker-document';
+import { AdminCoworkerDocReviewCopy } from '../../../../core/types/i18n/admin-coworker-document-review';
 
 export function createAdminCoworkerDocumentsI18n() {
   const {
@@ -30,6 +31,7 @@ export function createAdminCoworkerDocumentsI18n() {
     options,
     messages,
     errors,
+    review,
   } =
     createScopedSectionsI18n<{
       page: AdminCoworkerDocPageCopy;
@@ -42,6 +44,7 @@ export function createAdminCoworkerDocumentsI18n() {
       options: AdminCoworkerDocOptionCopy;
       messages: AdminCoworkerDocMessageCopy;
       errors: AdminCoworkerDocErrorCopy;
+      review: AdminCoworkerDocReviewCopy;
     }>('adminCoworkerDocuments', {
       page: 'page',
       sections: 'sections',
@@ -53,6 +56,7 @@ export function createAdminCoworkerDocumentsI18n() {
       options: 'options',
       messages: 'messages',
       errors: 'errors',
+      review: 'review',
     });
 
   function contextHelpLabel(subject: string): string {
@@ -70,6 +74,7 @@ export function createAdminCoworkerDocumentsI18n() {
     options,
     messages,
     errors,
+    review,
     contextHelpLabel,
     commonActions: createCommonActionsI18n(),
     commonEmpty: createCommonEmptyI18n(),

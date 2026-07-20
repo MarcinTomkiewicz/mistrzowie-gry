@@ -1,0 +1,89 @@
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+  <div class="flex-col-start-stretch gap-xs">
+    <div class="flex-row-start-center gap-xs">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.review().sections.signatureVerification }}
+      </h2>
+      <app-context-help
+        [text]="i18n.review().tooltips.signatureVerification"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.review().sections.signatureVerification)"
+      />
+    </div>
+    <p class="m-0">{{ i18n.review().tooltips.signatureVerification }}</p>
+  </div>
+
+  <form
+    class="flex-col-start-stretch gap-md w-100"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+  >
+    <div class="flex-row-start-start gap-xs w-100">
+      <div class="flex-col-start-stretch gap-xs flex-1">
+        <p-iftalabel class="w-100">
+          <p-select
+            class="w-100"
+            inputId="admin-signature-verification-status"
+            formControlName="verificationStatus"
+            [options]="statusOptions()"
+            [placeholder]="i18n.review().options.selectVerificationStatus"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+          <label for="admin-signature-verification-status">
+            {{ i18n.review().fields.verificationStatus }}
+          </label>
+        </p-iftalabel>
+        @if (
+          form.controls.verificationStatus.touched &&
+          form.controls.verificationStatus.invalid
+        ) {
+          <small class="error-text">{{ i18n.commonForm().required }}</small>
+        }
+      </div>
+      <app-context-help
+        [text]="i18n.review().tooltips.verificationStatus"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.review().fields.verificationStatus)"
+      />
+    </div>
+
+    <div class="flex-row-start-start gap-xs w-100">
+      <div class="flex-col-start-stretch gap-xs flex-1">
+        <p-iftalabel class="w-100">
+          <textarea
+            pTextarea
+            class="w-100"
+            id="admin-signature-verification-reason"
+            formControlName="reason"
+            rows="4"
+            [maxlength]="limits.signatureReasonLength"
+          ></textarea>
+          <label for="admin-signature-verification-reason">
+            {{ i18n.review().fields.verificationReason }}
+          </label>
+        </p-iftalabel>
+        @if (form.controls.reason.touched && form.controls.reason.invalid) {
+          <small class="error-text">{{ i18n.commonForm().required }}</small>
+        }
+      </div>
+      <app-context-help
+        [text]="i18n.review().tooltips.verificationReason"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.review().fields.verificationReason)"
+      />
+    </div>
+
+    <div class="flex-row-end-center gap-xs w-100">
+      <p-button
+        type="submit"
+        icon="pi pi-check-circle"
+        [label]="i18n.review().actions.verifySignature"
+        [loading]="busy()"
+        [disabled]="disabled() || busy()"
+      />
+      <app-context-help
+        [text]="i18n.review().tooltips.signatureVerification"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.review().actions.verifySignature)"
+      />
+    </div>
+  </form>
+</section>

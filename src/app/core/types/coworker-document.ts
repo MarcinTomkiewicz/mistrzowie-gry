@@ -7,6 +7,16 @@ export const COWORKER_SIGNATURE_DECLARATION_TYPES = [
   'unknown',
 ] as const;
 
+export const COWORKER_DOCUMENT_STATUSES = [
+  'draft',
+  'submitted',
+  'under_review',
+  'accepted',
+  'rejected',
+  'withdrawn',
+  'archived',
+] as const;
+
 export const COWORKER_PORTAL_DOCUMENT_STATUSES = [
   'draft',
   'submitted',
@@ -55,6 +65,23 @@ export const COWORKER_VERIFIED_SIGNATURE_TYPES = [
   'qualified_electronic',
   'other_electronic',
   'unknown',
+] as const;
+
+export const COWORKER_AUTOMATIC_VERIFICATION_MODES = [
+  'disabled',
+  'optional',
+  'required',
+] as const;
+
+export const COWORKER_DOCUMENT_REQUIREMENT_STATUSES = [
+  'pending',
+  'submitted',
+  'under_review',
+  'needs_correction',
+  'fulfilled',
+  'waived',
+  'expired',
+  'cancelled',
 ] as const;
 
 export const COWORKER_PORTAL_REQUIREMENT_STATUSES = [
@@ -121,6 +148,8 @@ export const COWORKER_DOCUMENT_ACTION = {
 
 export type CoworkerSignatureDeclarationType =
   (typeof COWORKER_SIGNATURE_DECLARATION_TYPES)[number];
+export type CoworkerDocumentStatus =
+  (typeof COWORKER_DOCUMENT_STATUSES)[number];
 export type CoworkerPortalDocumentStatus =
   (typeof COWORKER_PORTAL_DOCUMENT_STATUSES)[number];
 export type CoworkerDocumentVersionStatus =
@@ -133,6 +162,10 @@ export type CoworkerSignatureVerificationStatus =
   (typeof COWORKER_SIGNATURE_VERIFICATION_STATUSES)[number];
 export type CoworkerVerifiedSignatureType =
   (typeof COWORKER_VERIFIED_SIGNATURE_TYPES)[number];
+export type CoworkerAutomaticVerificationMode =
+  (typeof COWORKER_AUTOMATIC_VERIFICATION_MODES)[number];
+export type CoworkerDocumentRequirementStatus =
+  (typeof COWORKER_DOCUMENT_REQUIREMENT_STATUSES)[number];
 export type CoworkerPortalRequirementStatus =
   (typeof COWORKER_PORTAL_REQUIREMENT_STATUSES)[number];
 export type CoworkerActiveOnboardingStatus =

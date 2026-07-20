@@ -14,3 +14,9 @@ export const COWORKER_DOCUMENT_DEFINITION_LIMITS = {
   extensionLength: 16,
   retentionDays: 36500,
 } as const;
+
+export const COWORKER_DOCUMENT_REVIEW_LIMITS = {
+  signatureReasonLength: 2000,
+  rejectionReasonLength: 2000,
+  noteLength: 4000,
+} as const;

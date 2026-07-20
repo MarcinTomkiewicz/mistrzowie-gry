@@ -1,29 +1,18 @@
 import {
   ICoworkerAvailableDocumentDefinition,
   ICoworkerDocumentAccess,
-  ICoworkerDocumentDefinition,
   ICoworkerDocumentPortalResponse,
   ICoworkerDocumentRequirement,
-  ICoworkerDocumentSignatureVerification,
-  ICoworkerDocumentVersion,
   ICoworkerVersionDownload,
   ICoworkerNotification,
-  ICoworkerPortalDocument,
 } from '../../interfaces/i-coworker-document';
 import { APP_ROLES } from '../../types/app-role';
 import {
   COWORKER_AVAILABLE_ORIGIN_POLICIES,
   COWORKER_DOCUMENT_ACTION,
-  COWORKER_DOCUMENT_VERSION_STATUSES,
-  COWORKER_MALWARE_SCAN_STATUSES,
   COWORKER_NOTIFICATION_ENTITY_TYPES,
   COWORKER_NOTIFICATION_SEVERITIES,
-  COWORKER_PORTAL_DOCUMENT_STATUSES,
   COWORKER_PORTAL_REQUIREMENT_STATUSES,
-  COWORKER_SIGNATURE_DECLARATION_TYPES,
-  COWORKER_SIGNATURE_VERIFICATION_METHODS,
-  COWORKER_SIGNATURE_VERIFICATION_STATUSES,
-  COWORKER_VERIFIED_SIGNATURE_TYPES,
 } from '../../types/coworker-document';
 import { EdgeReader } from '../../types/edge-contract';
 import {
@@ -43,8 +32,11 @@ import {
 } from '../../utils/edge-contract';
 import {
   coworkerActiveOnboardingCaseReader,
+  coworkerDocumentDefinitionReader,
   coworkerDocumentDefinitionFieldReaders,
+  coworkerPortalDocumentReader,
   coworkerSignaturePolicyReader,
+  documentVersionDownloadFieldReaders,
 } from './coworker-document-readers';
 
 const nullableUuidReader = createEdgeNullableReader(readEdgeUuid);
@@ -55,9 +47,6 @@ const documentDefinitionFields = {
   signaturePolicy: coworkerSignaturePolicyReader,
 } as const;
 
-const documentDefinitionReader: EdgeReader<ICoworkerDocumentDefinition> =
-  createEdgeObjectReader(documentDefinitionFields);
-
 const availableDocumentDefinitionReader:
   EdgeReader<ICoworkerAvailableDocumentDefinition> = createEdgeObjectReader({
     ...documentDefinitionFields,
@@ -65,75 +54,6 @@ const availableDocumentDefinitionReader:
       COWORKER_AVAILABLE_ORIGIN_POLICIES,
     ),
     isActive: trueReader,
-  });
-
-const signatureVerificationReader:
-  EdgeReader<ICoworkerDocumentSignatureVerification> = createEdgeObjectReader({
-    id: readEdgeUuid,
-    verificationMethod: createEdgeLiteralReader(
-      COWORKER_SIGNATURE_VERIFICATION_METHODS,
-    ),
-    verificationStatus: createEdgeLiteralReader(
-      COWORKER_SIGNATURE_VERIFICATION_STATUSES,
-    ),
-    signatureType: createEdgeLiteralReader(COWORKER_VERIFIED_SIGNATURE_TYPES),
-    reason: readEdgeNullableString,
-    createdAt: readEdgeTimestamp,
-  });
-
-const documentVersionReader: EdgeReader<ICoworkerDocumentVersion> =
-  createEdgeObjectReader({
-    id: readEdgeUuid,
-    documentId: readEdgeUuid,
-    versionNumber: readEdgeInteger,
-    status: createEdgeLiteralReader(COWORKER_DOCUMENT_VERSION_STATUSES),
-    originalFilename: readEdgeString,
-    fileExtension: readEdgeString,
-    declaredMimeType: readEdgeString,
-    detectedMimeType: readEdgeNullableString,
-    expectedSizeBytes: readEdgeInteger,
-    sizeBytes: readEdgeNullableInteger,
-    signatureDeclarationType: createEdgeLiteralReader(
-      COWORKER_SIGNATURE_DECLARATION_TYPES,
-    ),
-    signatureDeclaredAt: readEdgeNullableTimestamp,
-    malwareScanStatus: createEdgeLiteralReader(
-      COWORKER_MALWARE_SCAN_STATUSES,
-    ),
-    uploadedAt: readEdgeNullableTimestamp,
-    finalizedAt: readEdgeNullableTimestamp,
-    supersededAt: readEdgeNullableTimestamp,
-    retentionUntil: readEdgeNullableTimestamp,
-    legalHold: readEdgeBoolean,
-    latestSignatureVerification: createEdgeNullableReader(
-      signatureVerificationReader,
-    ),
-    createdAt: readEdgeTimestamp,
-    updatedAt: readEdgeTimestamp,
-  });
-
-const portalDocumentReader: EdgeReader<ICoworkerPortalDocument> =
-  createEdgeObjectReader({
-    id: readEdgeUuid,
-    userId: readEdgeUuid,
-    onboardingCaseId: nullableUuidReader,
-    requirementId: nullableUuidReader,
-    documentDefinitionId: readEdgeUuid,
-    title: readEdgeNullableString,
-    status: createEdgeLiteralReader(COWORKER_PORTAL_DOCUMENT_STATUSES),
-    currentVersionId: nullableUuidReader,
-    currentVersion: createEdgeNullableReader(documentVersionReader),
-    versions: createEdgeArrayReader(documentVersionReader),
-    submittedAt: readEdgeNullableTimestamp,
-    reviewStartedAt: readEdgeNullableTimestamp,
-    acceptedAt: readEdgeNullableTimestamp,
-    rejectedAt: readEdgeNullableTimestamp,
-    rejectionReason: readEdgeNullableString,
-    withdrawnAt: readEdgeNullableTimestamp,
-    archivedAt: readEdgeNullableTimestamp,
-    revision: readEdgeInteger,
-    createdAt: readEdgeTimestamp,
-    updatedAt: readEdgeTimestamp,
   });
 
 const requirementReader: EdgeReader<ICoworkerDocumentRequirement> =
@@ -147,8 +67,8 @@ const requirementReader: EdgeReader<ICoworkerDocumentRequirement> =
     fulfilledAt: readEdgeNullableTimestamp,
     waivedAt: readEdgeNullableTimestamp,
     waiverReason: readEdgeNullableString,
-    documentDefinition: documentDefinitionReader,
-    documents: createEdgeArrayReader(portalDocumentReader),
+    documentDefinition: coworkerDocumentDefinitionReader,
+    documents: createEdgeArrayReader(coworkerPortalDocumentReader),
     createdAt: readEdgeTimestamp,
     updatedAt: readEdgeTimestamp,
   });
@@ -182,7 +102,7 @@ const portalReader: EdgeReader<ICoworkerDocumentPortalResponse> =
       coworkerActiveOnboardingCaseReader,
     ),
     requirements: createEdgeArrayReader(requirementReader),
-    unassignedDocuments: createEdgeArrayReader(portalDocumentReader),
+    unassignedDocuments: createEdgeArrayReader(coworkerPortalDocumentReader),
     availableDefinitions: createEdgeArrayReader(
       availableDocumentDefinitionReader,
     ),
@@ -201,15 +121,7 @@ const downloadResponseReader:
       action: createEdgeLiteralReader([
         COWORKER_DOCUMENT_ACTION.downloadDocumentVersion,
       ] as const),
-      download: createEdgeObjectReader({
-        documentId: readEdgeUuid,
-        documentVersionId: readEdgeUuid,
-        signedUrl: readEdgeString,
-        expiresInSeconds: readEdgeInteger,
-        originalFilename: readEdgeString,
-        mimeType: readEdgeString,
-        sizeBytes: readEdgeInteger,
-      }),
+      download: createEdgeObjectReader(documentVersionDownloadFieldReaders),
     });
 
 export function parseCoworkerDocumentPortalResponse(

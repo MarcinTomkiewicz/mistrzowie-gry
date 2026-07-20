@@ -7,6 +7,7 @@ import {
   STATUS_BADGE_CLASS,
 } from '../../../../../core/configs/badge-class.config';
 import { ICoworkerDocumentVersion } from '../../../../../core/interfaces/i-coworker-document';
+import { canDownloadCoworkerDocumentVersion } from '../../../../../core/utils/coworker-document-capability';
 import { formatTimestampLabel } from '../../../../../core/utils/date';
 import { createDocumentsI18n } from '../documents.i18n';
 
@@ -27,8 +28,5 @@ export class DocumentVersionList {
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly SIGNATURE_BADGE_CLASS = SIGNATURE_BADGE_CLASS;
-
-  protected canDownload(version: ICoworkerDocumentVersion): boolean {
-    return version.status === 'ready' || version.status === 'superseded';
-  }
+  protected readonly canDownload = canDownloadCoworkerDocumentVersion;
 }

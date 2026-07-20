@@ -36,6 +36,7 @@ import { AdminCoworkerDocumentError } from '../admin-coworker-document-error/adm
 import { DocumentDefinitionEditor } from '../document-definition-editor/document-definition-editor';
 import { DocumentDefinitionList } from '../document-definition-list/document-definition-list';
 import { RequirementEditor } from '../requirement-editor/requirement-editor';
+import { ReviewQueue } from '../review-queue/review-queue';
 import { createAdminCoworkerDocumentsI18n } from './private-documents.i18n';
 
 @Component({
@@ -51,6 +52,7 @@ import { createAdminCoworkerDocumentsI18n } from './private-documents.i18n';
     DocumentDefinitionEditor,
     DocumentDefinitionList,
     RequirementEditor,
+    ReviewQueue,
     AdminCoworkerDocumentError,
   ],
   templateUrl: './private-documents.html',

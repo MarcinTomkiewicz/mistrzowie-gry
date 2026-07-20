@@ -140,5 +140,222 @@
     "diagnosticStatus": "[PH] [diagnosticStatus] Status HTTP",
     "diagnosticCode": "[PH] [diagnosticCode] Kod błędu",
     "diagnosticMessage": "[PH] [diagnosticMessage] Szczegóły techniczne"
+  },
+  "review": {
+    "page": {
+      "title": "[PH] [title] Weryfikacja prywatnego dokumentu",
+      "subtitle": "[PH] [subtitle] Sprawdź przesłany plik, jego podpis i historię, a następnie zaakceptuj dokument albo odeślij go do poprawy."
+    },
+    "process": {
+      "title": "[PH] [title] Jak przebiega weryfikacja?",
+      "start": "[PH] [start] 1. Rozpocznij weryfikację, aby oznaczyć dokument jako sprawdzany przez administratora.",
+      "inspect": "[PH] [inspect] 2. Otwórz właściwą wersję pliku i porównaj ją z wymaganiami rodzaju dokumentu.",
+      "signature": "[PH] [signature] 3. Jeżeli podpis wymaga sprawdzenia, zapisz wynik jego ręcznej weryfikacji.",
+      "decision": "[PH] [decision] 4. Akceptacja kończy sprawdzanie pozytywnie, a odrzucenie zwraca dokument z powodem. System powiadamia współpracownika o decyzji."
+    },
+    "sections": {
+      "queueTitle": "[PH] [queueTitle] Dokumenty oczekujące na weryfikację",
+      "queueSubtitle": "[PH] [queueSubtitle] Otwórz dokument, aby sprawdzić jego dane, wersje i podpis przed podjęciem decyzji.",
+      "queueEmpty": "[PH] [queueEmpty] Obecnie żaden dokument nie oczekuje na weryfikację.",
+      "summary": "[PH] [summary] Dane dokumentu i współpracownika",
+      "versions": "[PH] [versions] Wersje dokumentu",
+      "versionsEmpty": "[PH] [versionsEmpty] Dokument nie ma jeszcze żadnej wersji pliku.",
+      "signatureVerification": "[PH] [signatureVerification] Ręczna weryfikacja podpisu",
+      "signatureHistory": "[PH] [signatureHistory] Historia weryfikacji podpisu",
+      "signatureHistoryEmpty": "[PH] [signatureHistoryEmpty] Nie zapisano jeszcze żadnej weryfikacji podpisu.",
+      "decision": "[PH] [decision] Końcowa decyzja",
+      "decisionHistory": "[PH] [decisionHistory] Historia końcowych decyzji",
+      "decisionHistoryEmpty": "[PH] [decisionHistoryEmpty] Nie zapisano jeszcze żadnej końcowej decyzji."
+    },
+    "fields": {
+      "coworker": "[PH] [coworker] Współpracownik",
+      "email": "[PH] [email] Adres e-mail",
+      "appRole": "[PH] [appRole] Rola w aplikacji",
+      "documentDefinition": "[PH] [documentDefinition] Rodzaj dokumentu",
+      "documentTitle": "[PH] [documentTitle] Nazwa dokumentu",
+      "category": "[PH] [category] Kategoria",
+      "documentStatus": "[PH] [documentStatus] Status dokumentu",
+      "requirementStatus": "[PH] [requirementStatus] Status dokumentu do dostarczenia",
+      "required": "[PH] [required] Obowiązkowość",
+      "dueAt": "[PH] [dueAt] Termin dostarczenia",
+      "versionNumber": "[PH] [versionNumber] Wersja",
+      "documentVersion": "[PH] [documentVersion] Wersja dokumentu",
+      "versionStatus": "[PH] [versionStatus] Status wersji",
+      "sizeBytes": "[PH] [sizeBytes] Rozmiar w bajtach",
+      "declaredMimeType": "[PH] [declaredMimeType] Zadeklarowany typ pliku",
+      "detectedMimeType": "[PH] [detectedMimeType] Wykryty typ pliku",
+      "signatureDeclaration": "[PH] [signatureDeclaration] Zadeklarowany rodzaj podpisu",
+      "malwareScan": "[PH] [malwareScan] Wynik kontroli bezpieczeństwa pliku",
+      "latestSignatureVerification": "[PH] [latestSignatureVerification] Ostatnia weryfikacja podpisu tej wersji",
+      "verificationStatus": "[PH] [verificationStatus] Wynik weryfikacji podpisu",
+      "verificationReason": "[PH] [verificationReason] Uzasadnienie wyniku",
+      "verificationType": "[PH] [verificationType] Rozpoznany rodzaj podpisu",
+      "verificationMethod": "[PH] [verificationMethod] Sposób weryfikacji",
+      "provider": "[PH] [provider] Dostawca weryfikacji",
+      "providerReference": "[PH] [providerReference] Identyfikator u dostawcy",
+      "actorUserId": "[PH] [actorUserId] Identyfikator osoby wykonującej weryfikację",
+      "reviewedBy": "[PH] [reviewedBy] Identyfikator administratora",
+      "reviewedAt": "[PH] [reviewedAt] Data decyzji",
+      "signatureVerificationId": "[PH] [signatureVerificationId] Powiązana weryfikacja podpisu",
+      "note": "[PH] [note] Notatka do decyzji",
+      "rejectionReason": "[PH] [rejectionReason] Powód odrzucenia",
+      "submittedAt": "[PH] [submittedAt] Przesłano do weryfikacji",
+      "reviewStartedAt": "[PH] [reviewStartedAt] Rozpoczęto weryfikację",
+      "signatureRequired": "[PH] [signatureRequired] Podpis wymagany",
+      "allowedSignatureTypes": "[PH] [allowedSignatureTypes] Dozwolone rodzaje podpisu",
+      "manualSignatureReview": "[PH] [manualSignatureReview] Ręczne sprawdzenie podpisu wymagane",
+      "automaticVerificationMode": "[PH] [automaticVerificationMode] Automatyczna weryfikacja podpisu",
+      "actions": "[PH] [actions] Działania"
+    },
+    "actions": {
+      "backToDocuments": "[PH] [backToDocuments] Wróć do prywatnych dokumentów",
+      "openReview": "[PH] [openReview] Otwórz weryfikację",
+      "startReview": "[PH] [startReview] Rozpocznij weryfikację",
+      "download": "[PH] [download] Otwórz plik",
+      "verifySignature": "[PH] [verifySignature] Zapisz weryfikację podpisu",
+      "acceptDocument": "[PH] [acceptDocument] Zaakceptuj dokument",
+      "rejectDocument": "[PH] [rejectDocument] Odrzuć dokument"
+    },
+    "tooltips": {
+      "queue": "[PH] [queue] Kolejka zawiera dokumenty przesłane przez współpracowników, które administrator może otworzyć i zweryfikować.",
+      "queueStatus": "[PH] [queueStatus] Status pokazuje, czy dokument czeka na rozpoczęcie weryfikacji, czy jest już sprawdzany.",
+      "summary": "[PH] [summary] Zestaw danych potrzebnych do porównania dokumentu z przypisanym wymaganiem i zasadami jego rodzaju.",
+      "documentStatus": "[PH] [documentStatus] Status opisuje aktualny etap dokumentu. Widok pozostaje dostępny także po zakończeniu weryfikacji.",
+      "requirementStatus": "[PH] [requirementStatus] Status pokazuje, czy przypisany dokument nadal czeka na realizację, jest sprawdzany, został spełniony albo wymaga poprawy.",
+      "versionStatus": "[PH] [versionStatus] Status wersji informuje, czy plik jest gotowy do otwarcia, nadal przetwarzany, zablokowany albo historyczny.",
+      "signatureDeclaration": "[PH] [signatureDeclaration] Współpracownik wskazuje rodzaj podpisu podczas przesyłania pliku. Ta deklaracja nie jest jeszcze wynikiem weryfikacji.",
+      "malwareScan": "[PH] [malwareScan] Kontrola bezpieczeństwa informuje, czy system wykrył w pliku zagrożenie i czy plik może być bezpiecznie otwarty.",
+      "latestSignatureVerification": "[PH] [latestSignatureVerification] Skrót pokazuje ostatnią weryfikację podpisu zwróconą przez system dla tej konkretnej wersji.",
+      "automaticVerificationMode": "[PH] [automaticVerificationMode] Określa, czy system nie weryfikuje podpisu automatycznie, może wykonać taką weryfikację albo musi ją wykonać zgodnie z zasadami rodzaju dokumentu.",
+      "versions": "[PH] [versions] Lista zawiera wszystkie wersje w kolejności zwróconej przez system. Pierwsza pozycja jest najnowsza.",
+      "download": "[PH] [download] System utworzy krótkotrwały bezpieczny link i otworzy plik w nowej karcie.",
+      "signatureVerification": "[PH] [signatureVerification] Ręczna weryfikacja podpisu zapisuje ocenę podpisu bieżącej wersji. Nie zastępuje końcowej decyzji o dokumencie.",
+      "verificationStatus": "[PH] [verificationStatus] Wybierz potwierdzenie podpisu albo wynik wyjaśniający, dlaczego nie można go potwierdzić.",
+      "verificationReason": "[PH] [verificationReason] Dla wyniku innego niż potwierdzenie opisz przyczynę. Informacja zostanie zapisana w historii podpisu.",
+      "startReview": "[PH] [startReview] Zmienia status przesłanego dokumentu na weryfikowany. Po tej akcji można zapisać sprawdzenie podpisu i końcową decyzję.",
+      "decision": "[PH] [decision] Końcowa decyzja dotyczy bieżącej wersji dokumentu i zamyka aktualny etap sprawdzania.",
+      "decisionNote": "[PH] [decisionNote] Opcjonalna notatka administratora zapisywana razem z końcową decyzją.",
+      "rejectionReason": "[PH] [rejectionReason] Powód jest wymagany przy odrzuceniu i wyjaśnia współpracownikowi, co należy poprawić.",
+      "acceptDocument": "[PH] [acceptDocument] Akceptacja uznaje dokument za prawidłowy, kończy jego bieżącą weryfikację pozytywnie i powoduje powiadomienie współpracownika.",
+      "rejectDocument": "[PH] [rejectDocument] Odrzucenie kończy bieżącą weryfikację, przekazuje współpracownikowi powód wymaganej poprawy i powoduje powiadomienie.",
+      "signatureHistory": "[PH] [signatureHistory] Historia obejmuje wszystkie weryfikacje podpisów wszystkich wersji dokumentu. Jedna wersja może mieć wiele wpisów.",
+      "decisionHistory": "[PH] [decisionHistory] Historia zawiera wyłącznie końcowe decyzje o akceptacji albo odrzuceniu. Nie jest pełnym audytem wszystkich czynności."
+    },
+    "options": {
+      "selectVerificationStatus": "[PH] [selectVerificationStatus] Wybierz wynik weryfikacji",
+      "signatureVerificationStatuses": {
+        "confirmed": "[PH] [confirmed] Podpis potwierdzony",
+        "rejected": "[PH] [rejected] Podpis nieprawidłowy",
+        "indeterminate": "[PH] [indeterminate] Nie można jednoznacznie ocenić",
+        "unsupported": "[PH] [unsupported] Rodzaj podpisu nie jest obsługiwany"
+      }
+    },
+    "statuses": {
+      "documents": {
+        "draft": "[PH] [draft] W przygotowaniu",
+        "submitted": "[PH] [submitted] Przesłany do weryfikacji",
+        "under_review": "[PH] [under_review] W trakcie weryfikacji",
+        "accepted": "[PH] [accepted] Zaakceptowany",
+        "rejected": "[PH] [rejected] Odrzucony",
+        "withdrawn": "[PH] [withdrawn] Wycofany",
+        "archived": "[PH] [archived] Zarchiwizowany"
+      },
+      "requirements": {
+        "pending": "[PH] [pending] Oczekuje na dokument",
+        "submitted": "[PH] [submitted] Dokument przesłany",
+        "under_review": "[PH] [under_review] W trakcie weryfikacji",
+        "needs_correction": "[PH] [needs_correction] Wymaga poprawy",
+        "fulfilled": "[PH] [fulfilled] Zrealizowany",
+        "waived": "[PH] [waived] Odstąpiono od wymagania",
+        "expired": "[PH] [expired] Termin minął",
+        "cancelled": "[PH] [cancelled] Anulowany"
+      },
+      "versions": {
+        "reserved": "[PH] [reserved] Oczekuje na przesłanie",
+        "uploaded": "[PH] [uploaded] Przetwarzany",
+        "ready": "[PH] [ready] Gotowy",
+        "blocked": "[PH] [blocked] Zablokowany",
+        "failed": "[PH] [failed] Przetwarzanie nieudane",
+        "superseded": "[PH] [superseded] Wersja historyczna",
+        "deleted": "[PH] [deleted] Usunięty"
+      },
+      "malware": {
+        "not_scanned": "[PH] [not_scanned] Nie sprawdzono",
+        "pending": "[PH] [pending] Sprawdzanie w toku",
+        "clean": "[PH] [clean] Plik bezpieczny",
+        "infected": "[PH] [infected] Wykryto zagrożenie",
+        "failed": "[PH] [failed] Sprawdzenie nieudane",
+        "unavailable": "[PH] [unavailable] Sprawdzenie niedostępne"
+      },
+      "signatureDeclarations": {
+        "unsigned": "[PH] [unsigned] Bez podpisu",
+        "handwritten": "[PH] [handwritten] Podpis odręczny",
+        "trusted_profile": "[PH] [trusted_profile] Profil zaufany",
+        "qualified_electronic": "[PH] [qualified_electronic] Podpis kwalifikowany",
+        "other_electronic": "[PH] [other_electronic] Inny podpis elektroniczny",
+        "unknown": "[PH] [unknown] Nieznany rodzaj podpisu"
+      },
+      "verificationMethods": {
+        "manual": "[PH] [manual] Weryfikacja ręczna",
+        "automatic": "[PH] [automatic] Weryfikacja automatyczna",
+        "external_provider": "[PH] [external_provider] Weryfikacja zewnętrzna"
+      },
+      "verificationStatuses": {
+        "pending": "[PH] [pending] Oczekuje na wynik",
+        "confirmed": "[PH] [confirmed] Potwierdzony",
+        "rejected": "[PH] [rejected] Nieprawidłowy",
+        "indeterminate": "[PH] [indeterminate] Niejednoznaczny",
+        "unsupported": "[PH] [unsupported] Nieobsługiwany"
+      },
+      "verifiedSignatureTypes": {
+        "handwritten": "[PH] [handwritten] Podpis odręczny",
+        "trusted_profile": "[PH] [trusted_profile] Profil zaufany",
+        "qualified_electronic": "[PH] [qualified_electronic] Podpis kwalifikowany",
+        "other_electronic": "[PH] [other_electronic] Inny podpis elektroniczny",
+        "unknown": "[PH] [unknown] Nieznany rodzaj podpisu"
+      },
+      "decisions": {
+        "accepted": "[PH] [accepted] Zaakceptowano",
+        "rejected": "[PH] [rejected] Odrzucono"
+      },
+      "roles": {
+        "user": "[PH] [user] Użytkownik",
+        "gm": "[PH] [gm] Mistrz Gry",
+        "marketing_manager": "[PH] [marketing_manager] Marketing manager",
+        "customer_manager": "[PH] [customer_manager] Opiekun klienta",
+        "lead_coordinator": "[PH] [lead_coordinator] Koordynator leadów",
+        "admin": "[PH] [admin] Administrator"
+      },
+      "automaticVerificationModes": {
+        "disabled": "[PH] [disabled] Wyłączona",
+        "optional": "[PH] [optional] Opcjonalna",
+        "required": "[PH] [required] Wymagana"
+      },
+      "required": "[PH] [required] Obowiązkowy",
+      "optional": "[PH] [optional] Opcjonalny",
+      "currentVersion": "[PH] [currentVersion] Bieżąca wersja",
+      "historicalVersion": "[PH] [historicalVersion] Wersja historyczna",
+      "noRequirement": "[PH] [noRequirement] Dokument nie jest powiązany z przypisanym dokumentem do dostarczenia",
+      "notProvided": "[PH] [notProvided] Nie podano",
+      "yes": "[PH] [yes] Tak",
+      "no": "[PH] [no] Nie"
+    },
+    "messages": {
+      "startReviewConfirmation": "[PH] [startReviewConfirmation] Rozpocząć weryfikację tego dokumentu? Dokument zostanie oznaczony jako sprawdzany przez administratora.",
+      "acceptConfirmation": "[PH] [acceptConfirmation] Zaakceptować ten dokument? Bieżąca weryfikacja zostanie zakończona pozytywnie.",
+      "rejectConfirmation": "[PH] [rejectConfirmation] Odrzucić ten dokument? Współpracownik otrzyma podany powód i będzie musiał poprawić dokument.",
+      "startReviewSuccess": "[PH] [startReviewSuccess] Rozpoczęto weryfikację dokumentu.",
+      "signatureVerified": "[PH] [signatureVerified] Zapisano wynik weryfikacji podpisu.",
+      "documentAccepted": "[PH] [documentAccepted] Dokument został zaakceptowany.",
+      "documentRejected": "[PH] [documentRejected] Dokument został odrzucony."
+    },
+    "errors": {
+      "load": "[PH] [load] Nie udało się pobrać aktualnych danych dokumentu.",
+      "startReview": "[PH] [startReview] Nie udało się rozpocząć weryfikacji dokumentu.",
+      "verifySignature": "[PH] [verifySignature] Nie udało się zapisać weryfikacji podpisu.",
+      "acceptDocument": "[PH] [acceptDocument] Nie udało się zaakceptować dokumentu.",
+      "rejectDocument": "[PH] [rejectDocument] Nie udało się odrzucić dokumentu.",
+      "download": "[PH] [download] Nie udało się otworzyć pliku dokumentu."
+    }
   }
 }

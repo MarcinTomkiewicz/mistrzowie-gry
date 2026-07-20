@@ -65,6 +65,10 @@ const loaders = {
     import(
       './auth/components/admin-coworker-documents/private-documents/private-documents'
     ).then((m) => m.PrivateDocuments),
+  adminCoworkerDocumentReview: () =>
+    import(
+      './auth/components/admin-coworker-documents/review-detail/review-detail'
+    ).then((m) => m.ReviewDetail),
 } as const;
 
 export const routes: Routes = [
@@ -123,6 +127,11 @@ export const routes: Routes = [
   {
     path: 'admin/events/:coreId/editions/:eventId/edit',
     loadComponent: loaders.adminEventEditionEditor,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/coworkers/private-documents/:userId/review/:documentId',
+    loadComponent: loaders.adminCoworkerDocumentReview,
     canActivate: [authGuard, minimumRoleGuard('admin')],
   },
   {

@@ -1,10 +1,12 @@
 import { AppRole } from '../types/app-role';
 import {
   CoworkerActiveOnboardingStatus,
+  CoworkerAutomaticVerificationMode,
   CoworkerAvailableDocumentOriginPolicy,
   CoworkerDocumentMultiplicity,
   CoworkerDocumentOriginPolicy,
   CoworkerDocumentVersionStatus,
+  CoworkerDocumentStatus,
   CoworkerMalwareScanStatus,
   CoworkerNotificationEntityType,
   CoworkerNotificationSeverity,
@@ -30,7 +32,7 @@ export interface ICoworkerSignaturePolicy {
   readonly signatureRequired: boolean;
   readonly allowedDeclarationTypes: readonly CoworkerSignatureDeclarationType[];
   readonly manualReviewRequired: boolean;
-  readonly automaticVerificationMode: string;
+  readonly automaticVerificationMode: CoworkerAutomaticVerificationMode;
   readonly isActive: boolean;
 }
 
@@ -100,14 +102,13 @@ export interface ICoworkerDocumentVersion {
   readonly updatedAt: string;
 }
 
-export interface ICoworkerPortalDocument {
+export interface ICoworkerDocumentBase {
   readonly id: string;
   readonly userId: string;
   readonly onboardingCaseId: string | null;
   readonly requirementId: string | null;
   readonly documentDefinitionId: string;
   readonly title: string | null;
-  readonly status: CoworkerPortalDocumentStatus;
   readonly currentVersionId: string | null;
   readonly currentVersion: ICoworkerDocumentVersion | null;
   readonly versions: readonly ICoworkerDocumentVersion[];
@@ -121,6 +122,14 @@ export interface ICoworkerPortalDocument {
   readonly revision: number;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+export interface ICoworkerDocument extends ICoworkerDocumentBase {
+  readonly status: CoworkerDocumentStatus;
+}
+
+export interface ICoworkerPortalDocument extends ICoworkerDocumentBase {
+  readonly status: CoworkerPortalDocumentStatus;
 }
 
 export interface ICoworkerDocumentRequirement {

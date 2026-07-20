@@ -1,0 +1,130 @@
+<div class="mg-grid grid-2-cols grid-1-cols-md gap-md w-100">
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <div class="flex-row-start-center gap-xs">
+        <h2 class="mg-section__title mg-section__title--md m-0">
+          {{ i18n.review().sections.signatureHistory }}
+        </h2>
+        <app-context-help
+          [text]="i18n.review().tooltips.signatureHistory"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.review().sections.signatureHistory)"
+        />
+      </div>
+      <p class="m-0">{{ i18n.review().tooltips.signatureHistory }}</p>
+    </div>
+
+    @if (detail().signatureVerifications.length) {
+      @for (verification of detail().signatureVerifications; track verification.id) {
+        <article class="flex-col-start-stretch gap-sm border-top pt-md">
+          <div class="flex-row-between-center flex-wrap gap-sm">
+            <strong>
+              {{ i18n.review().fields.documentVersion }}
+              {{ versionNumber(verification.documentVersionId) ?? verification.documentVersionId }}
+            </strong>
+            <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[verification.verificationStatus]">
+              {{ i18n.review().statuses.verificationStatuses[verification.verificationStatus] }}
+            </span>
+          </div>
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
+            <span>
+              <strong>{{ i18n.review().fields.verificationMethod }}:</strong>
+              {{ i18n.review().statuses.verificationMethods[verification.verificationMethod] }}
+            </span>
+            <span>
+              <strong>{{ i18n.review().fields.verificationType }}:</strong>
+              {{ i18n.review().statuses.verifiedSignatureTypes[verification.signatureType] }}
+            </span>
+            @if (verification.actorUserId) {
+              <span class="text-wrap-anywhere">
+                <strong>{{ i18n.review().fields.actorUserId }}:</strong>
+                {{ verification.actorUserId }}
+              </span>
+            }
+            @if (verification.providerName) {
+              <span>
+                <strong>{{ i18n.review().fields.provider }}:</strong>
+                {{ verification.providerName }}
+              </span>
+            }
+            @if (verification.providerReference) {
+              <span class="text-wrap-anywhere">
+                <strong>{{ i18n.review().fields.providerReference }}:</strong>
+                {{ verification.providerReference }}
+              </span>
+            }
+          </div>
+          @if (verification.reason) {
+            <p class="m-0">
+              <strong>{{ i18n.review().fields.verificationReason }}:</strong>
+              {{ verification.reason }}
+            </p>
+          }
+          <span class="muted-text">
+            {{ formatTimestampLabel(verification.createdAt, "pl-PL") }}
+          </span>
+        </article>
+      }
+    } @else {
+      <p class="m-0 muted-text">{{ i18n.review().sections.signatureHistoryEmpty }}</p>
+    }
+  </section>
+
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <div class="flex-row-start-center gap-xs">
+        <h2 class="mg-section__title mg-section__title--md m-0">
+          {{ i18n.review().sections.decisionHistory }}
+        </h2>
+        <app-context-help
+          [text]="i18n.review().tooltips.decisionHistory"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.review().sections.decisionHistory)"
+        />
+      </div>
+      <p class="m-0">{{ i18n.review().tooltips.decisionHistory }}</p>
+    </div>
+
+    @if (detail().reviews.length) {
+      @for (review of detail().reviews; track review.id) {
+        <article class="flex-col-start-stretch gap-sm border-top pt-md">
+          <div class="flex-row-between-center flex-wrap gap-sm">
+            <strong>
+              {{ i18n.review().fields.documentVersion }}
+              {{ versionNumber(review.documentVersionId) ?? review.documentVersionId }}
+            </strong>
+            <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[review.decision]">
+              {{ i18n.review().statuses.decisions[review.decision] }}
+            </span>
+          </div>
+          <span class="text-wrap-anywhere">
+            <strong>{{ i18n.review().fields.reviewedBy }}:</strong>
+            {{ review.reviewedBy }}
+          </span>
+          <span>
+            <strong>{{ i18n.review().fields.reviewedAt }}:</strong>
+            {{ formatTimestampLabel(review.reviewedAt, "pl-PL") }}
+          </span>
+          @if (review.signatureVerificationId) {
+            <span class="text-wrap-anywhere">
+              <strong>{{ i18n.review().fields.signatureVerificationId }}:</strong>
+              {{ review.signatureVerificationId }}
+            </span>
+          }
+          @if (review.rejectionReason) {
+            <p class="m-0">
+              <strong>{{ i18n.review().fields.rejectionReason }}:</strong>
+              {{ review.rejectionReason }}
+            </p>
+          }
+          @if (review.note) {
+            <p class="m-0">
+              <strong>{{ i18n.review().fields.note }}:</strong>
+              {{ review.note }}
+            </p>
+          }
+        </article>
+      }
+    } @else {
+      <p class="m-0 muted-text">{{ i18n.review().sections.decisionHistoryEmpty }}</p>
+    }
+  </section>
+</div>

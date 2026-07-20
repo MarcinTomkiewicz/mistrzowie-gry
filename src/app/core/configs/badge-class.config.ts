@@ -1,9 +1,9 @@
 import {
   CoworkerActiveOnboardingStatus,
   CoworkerDocumentVersionStatus,
+  CoworkerDocumentStatus,
+  CoworkerDocumentRequirementStatus,
   CoworkerMalwareScanStatus,
-  CoworkerPortalDocumentStatus,
-  CoworkerPortalRequirementStatus,
   CoworkerSignatureDeclarationType,
   CoworkerSignatureVerificationStatus,
 } from '../types/coworker-document';
@@ -16,10 +16,12 @@ export const STATUS_BADGE_CLASS = {
   fulfilled: 'tag-badge--success',
   waived: 'tag-badge--muted',
   expired: 'tag-badge--danger',
+  cancelled: 'tag-badge--muted',
   draft: 'tag-badge--muted',
   accepted: 'tag-badge--success',
   rejected: 'tag-badge--danger',
   withdrawn: 'tag-badge--muted',
+  archived: 'tag-badge--muted',
   approved: 'tag-badge--success',
   suspended: 'tag-badge--warn',
   reserved: 'tag-badge--muted',
@@ -37,8 +39,8 @@ export const STATUS_BADGE_CLASS = {
   indeterminate: 'tag-badge--warn',
   unsupported: 'tag-badge--muted',
 } as const satisfies Record<
-  | CoworkerPortalRequirementStatus
-  | CoworkerPortalDocumentStatus
+  | CoworkerDocumentRequirementStatus
+  | CoworkerDocumentStatus
   | CoworkerActiveOnboardingStatus
   | CoworkerDocumentVersionStatus
   | CoworkerMalwareScanStatus
