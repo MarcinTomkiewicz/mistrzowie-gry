@@ -4,6 +4,7 @@ import {
   createCommonCtaI18n,
   createCommonEmptyI18n,
   createCommonErrorsI18n,
+  createCommonSeoI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -29,6 +30,7 @@ export function createOffersI18n() {
   const commonStatus = createCommonStatusI18n();
   const commonEmpty = createCommonEmptyI18n();
   const commonErrors = createCommonErrorsI18n();
+  const commonSeo = createCommonSeoI18n();
 
   const standardsAndLogistics = computed<StandardsAndLogisticsDict>(() => {
     const dict = standardsAndLogisticsDict();
@@ -57,6 +59,7 @@ export function createOffersI18n() {
     commonStatus,
     commonEmpty,
     commonErrors,
+    commonSeo,
     commonFootnotes,
     standardsAndLogistics,
   };

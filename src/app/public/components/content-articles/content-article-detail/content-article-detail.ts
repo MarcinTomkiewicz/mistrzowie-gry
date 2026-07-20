@@ -61,7 +61,7 @@ export class ContentArticleDetail implements OnInit {
   readonly i18n = createContentArticlesI18n();
 
   readonly article = signal<IContentArticleDetail | null>(null);
-  readonly slug = signal('');
+  readonly slug = signal(this.route.snapshot.paramMap.get('slug') ?? '');
   readonly isLoading = signal(true);
   readonly error = signal<string | null>(null);
   readonly isNotFound = signal(false);
@@ -105,6 +105,7 @@ export class ContentArticleDetail implements OnInit {
   private readonly applySeoEffect = effect(() => {
     const article = this.article();
     const requestedCanonicalUrl = buildSiteUrl(`/artykuly/${this.slug()}`);
+    const routeSeo = this.i18n.seo();
 
     if (article) {
       const canonicalUrl = buildSiteUrl(`/artykuly/${article.slug}`);
@@ -154,9 +155,9 @@ export class ContentArticleDetail implements OnInit {
 
     if (this.isLoading()) {
       this.seo.apply({
-        title: this.i18n.status().loading,
+        title: routeSeo.listTitle,
+        description: routeSeo.listDescription,
         canonicalUrl: requestedCanonicalUrl,
-        robots: 'noindex,nofollow',
       });
       return;
     }

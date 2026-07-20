@@ -85,9 +85,9 @@ export class ChaoticThursdays {
 
     if (this.facade.isLoading()) {
       this.seo.apply({
-        title: this.i18n.commonStatus().loading,
+        title: seo.title,
+        description: seo.description,
         canonicalUrl: this.pageUrl,
-        robots: 'noindex,nofollow',
       });
       return;
     }

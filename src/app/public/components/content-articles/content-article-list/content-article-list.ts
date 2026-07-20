@@ -68,9 +68,9 @@ export class ContentArticleList implements OnInit {
 
     if (this.isLoading()) {
       this.seo.apply({
-        title: this.i18n.status().loading,
+        title: seo.listTitle,
+        description: seo.listDescription,
         canonicalUrl: this.pageUrl,
-        robots: 'noindex,nofollow',
       });
       return;
     }

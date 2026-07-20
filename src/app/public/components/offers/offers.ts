@@ -75,7 +75,9 @@ export class Offers implements OnInit {
     distinctUntilChanged(),
   );
 
-  readonly slug = signal('oferta-indywidualna');
+  readonly slug = signal(
+    this.route.snapshot.paramMap.get('slug') ?? 'oferta-indywidualna',
+  );
   readonly offerPage = signal<OfferPageVm | null>(null);
   readonly isLoading = signal(true);
   readonly hasLoadError = signal(false);
@@ -102,10 +104,12 @@ export class Offers implements OnInit {
     const requestedCanonicalUrl = `${this.siteUrl}/offer/${this.slug()}`;
 
     if (this.isLoading()) {
+      const fallbackSeo = this.i18n.commonSeo();
+
       this.seo.apply({
-        title: this.i18n.commonStatus().loading,
+        title: fallbackSeo.defaultTitle,
+        description: fallbackSeo.defaultDescription,
         canonicalUrl: requestedCanonicalUrl,
-        robots: 'noindex,nofollow',
       });
       return;
     }
