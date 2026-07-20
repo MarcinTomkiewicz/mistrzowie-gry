@@ -30,6 +30,7 @@ import { AdminCoworkerRequirementPayload } from '../../../../core/types/admin-co
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
+import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
   isAdminCoworkerDocumentStaleError,
   resolveAdminCoworkerDocumentError,
@@ -48,6 +49,7 @@ import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-d
     IftaLabelModule,
     SelectModule,
     ToggleSwitchModule,
+    ContextHelp,
     AdminCoworkerDocumentError,
   ],
   templateUrl: './requirement-editor.html',

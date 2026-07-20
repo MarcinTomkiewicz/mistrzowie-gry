@@ -12,15 +12,30 @@ import {
   AdminCoworkerDocMessageCopy,
   AdminCoworkerDocOptionCopy,
   AdminCoworkerDocPageCopy,
+  AdminCoworkerDocProcessCopy,
   AdminCoworkerDocSectionCopy,
   AdminCoworkerDocStatusCopy,
+  AdminCoworkerDocTooltipCopy,
 } from '../../../../core/types/i18n/admin-coworker-document';
 
 export function createAdminCoworkerDocumentsI18n() {
-  const { page, sections, fields, actions, statuses, options, messages, errors } =
+  const {
+    page,
+    sections,
+    process,
+    tooltips,
+    fields,
+    actions,
+    statuses,
+    options,
+    messages,
+    errors,
+  } =
     createScopedSectionsI18n<{
       page: AdminCoworkerDocPageCopy;
       sections: AdminCoworkerDocSectionCopy;
+      process: AdminCoworkerDocProcessCopy;
+      tooltips: AdminCoworkerDocTooltipCopy;
       fields: AdminCoworkerDocFieldCopy;
       actions: AdminCoworkerDocActionCopy;
       statuses: AdminCoworkerDocStatusCopy;
@@ -30,6 +45,8 @@ export function createAdminCoworkerDocumentsI18n() {
     }>('adminCoworkerDocuments', {
       page: 'page',
       sections: 'sections',
+      process: 'process',
+      tooltips: 'tooltips',
       fields: 'fields',
       actions: 'actions',
       statuses: 'statuses',
@@ -38,15 +55,22 @@ export function createAdminCoworkerDocumentsI18n() {
       errors: 'errors',
     });
 
+  function contextHelpLabel(subject: string): string {
+    return `${actions().showExplanation}: ${subject}`;
+  }
+
   return {
     page,
     sections,
+    process,
+    tooltips,
     fields,
     actions,
     statuses,
     options,
     messages,
     errors,
+    contextHelpLabel,
     commonActions: createCommonActionsI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonForm: createCommonFormI18n(),

@@ -1,6 +1,12 @@
 <form class="mg-card mg-form flex-col-start-stretch gap-md p-md w-100" [formGroup]="form" (ngSubmit)="saveDefinition()" novalidate>
   <div class="flex-row-between-center flex-wrap gap-sm w-100">
-    <h3 class="mg-section__title mg-section__title--sm m-0">{{ definition() ? i18n.commonActions().edit : i18n.actions().newDefinition }}</h3>
+    <div class="flex-row-start-center gap-xs">
+      <h3 class="mg-section__title mg-section__title--sm m-0">{{ definition() ? i18n.commonActions().edit : i18n.actions().newDefinition }}</h3>
+      <app-context-help
+        [text]="i18n.tooltips().definitionsSection"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.sections().definitionsTitle)"
+      />
+    </div>
     <span [class]="form.controls.isActive.value ? 'tag-badge tag-badge--success' : 'tag-badge tag-badge--muted'">
       {{ form.controls.isActive.value ? i18n.statuses().active : i18n.statuses().inactive }}
     </span>
@@ -8,94 +14,142 @@
 
   <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <input class="w-100" pInputText id="definition-code" formControlName="code" />
-        <label for="definition-code">{{ i18n.fields().code }}</label>
-      </p-iftalabel>
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <input class="w-100" pInputText id="definition-code" formControlName="code" />
+          <label for="definition-code">{{ i18n.fields().code }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().definitionCode"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().code)"
+        />
+      </div>
       @if (resolveFieldError(form.controls.code, "definition.code", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
     </div>
 
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <input class="w-100" pInputText id="definition-title" formControlName="title" />
-        <label for="definition-title">{{ i18n.fields().title }}</label>
-      </p-iftalabel>
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <input class="w-100" pInputText id="definition-title" formControlName="title" />
+          <label for="definition-title">{{ i18n.fields().title }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().definitionTitle"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().title)"
+        />
+      </div>
       @if (resolveFieldError(form.controls.title, "definition.title", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
     </div>
 
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <input class="w-100" pInputText id="definition-category" formControlName="category" />
-        <label for="definition-category">{{ i18n.fields().category }}</label>
-      </p-iftalabel>
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <input class="w-100" pInputText id="definition-category" formControlName="category" />
+          <label for="definition-category">{{ i18n.fields().category }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().definitionCategory"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().category)"
+        />
+      </div>
       @if (resolveFieldError(form.controls.category, "definition.category", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
     </div>
 
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <p-select
-          class="w-100"
-          inputId="definition-signature-policy"
-          formControlName="signaturePolicyCode"
-          [options]="signaturePolicyOptions()"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <p-select
+            class="w-100"
+            inputId="definition-signature-policy"
+            formControlName="signaturePolicyCode"
+            [options]="signaturePolicyOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+          <label for="definition-signature-policy">{{ i18n.fields().signaturePolicy }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().signaturePolicy"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().signaturePolicy)"
         />
-        <label for="definition-signature-policy">{{ i18n.fields().signaturePolicy }}</label>
-      </p-iftalabel>
+      </div>
       @if (resolveFieldError(form.controls.signaturePolicyCode, "definition.signaturePolicyCode", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
     </div>
   </div>
 
-  <p-iftalabel class="w-100">
-    <textarea class="w-100" pTextarea id="definition-description" formControlName="description" rows="4"></textarea>
-    <label for="definition-description">{{ i18n.fields().description }}</label>
-  </p-iftalabel>
+  <div class="flex-row-start-center gap-xs w-100">
+    <p-iftalabel class="flex-1">
+      <textarea class="w-100" pTextarea id="definition-description" formControlName="description" rows="4"></textarea>
+      <label for="definition-description">{{ i18n.fields().description }}</label>
+    </p-iftalabel>
+    <app-context-help
+      [text]="i18n.tooltips().definitionDescription"
+      [ariaLabel]="i18n.contextHelpLabel(i18n.fields().description)"
+    />
+  </div>
   @if (resolveFieldError(form.controls.description, "definition.description", actionError(), i18n.commonForm()); as error) {
     <small class="mg-contact-error">{{ error }}</small>
   }
 
   <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="definition-origin-policy"
-        formControlName="originPolicy"
-        [options]="originPolicyOptions()"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
+    <div class="flex-row-start-center gap-xs w-100">
+      <p-iftalabel class="flex-1">
+        <p-select
+          class="w-100"
+          inputId="definition-origin-policy"
+          formControlName="originPolicy"
+          [options]="originPolicyOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label for="definition-origin-policy">{{ i18n.fields().originPolicy }}</label>
+      </p-iftalabel>
+      <app-context-help
+        [text]="i18n.tooltips().originPolicy"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.fields().originPolicy)"
       />
-      <label for="definition-origin-policy">{{ i18n.fields().originPolicy }}</label>
-    </p-iftalabel>
+    </div>
 
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="definition-multiplicity"
-        formControlName="multiplicity"
-        [options]="multiplicityOptions()"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
+    <div class="flex-row-start-center gap-xs w-100">
+      <p-iftalabel class="flex-1">
+        <p-select
+          class="w-100"
+          inputId="definition-multiplicity"
+          formControlName="multiplicity"
+          [options]="multiplicityOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label for="definition-multiplicity">{{ i18n.fields().multiplicity }}</label>
+      </p-iftalabel>
+      <app-context-help
+        [text]="i18n.tooltips().multiplicity"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.fields().multiplicity)"
       />
-      <label for="definition-multiplicity">{{ i18n.fields().multiplicity }}</label>
-    </p-iftalabel>
+    </div>
   </div>
 
   <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
     <section class="flex-col-start-stretch gap-sm w-100">
       <div class="flex-row-between-center gap-sm w-100">
-        <strong>{{ i18n.fields().allowedMimeTypes }}</strong>
+        <div class="flex-row-start-center gap-xs">
+          <strong>{{ i18n.fields().allowedMimeTypes }}</strong>
+          <app-context-help
+            [text]="i18n.tooltips().allowedMimeTypes"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.fields().allowedMimeTypes)"
+          />
+        </div>
         <p-button
           type="button"
           size="small"
@@ -135,7 +189,13 @@
 
     <section class="flex-col-start-stretch gap-sm w-100">
       <div class="flex-row-between-center gap-sm w-100">
-        <strong>{{ i18n.fields().allowedExtensions }}</strong>
+        <div class="flex-row-start-center gap-xs">
+          <strong>{{ i18n.fields().allowedExtensions }}</strong>
+          <app-context-help
+            [text]="i18n.tooltips().allowedExtensions"
+            [ariaLabel]="i18n.contextHelpLabel(i18n.fields().allowedExtensions)"
+          />
+        </div>
         <p-button
           type="button"
           size="small"
@@ -176,33 +236,45 @@
 
   <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <p-inputnumber
-          class="w-100"
-          inputId="definition-max-size"
-          formControlName="maxSizeBytes"
-          [useGrouping]="false"
-          [min]="1"
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <p-inputnumber
+            class="w-100"
+            inputId="definition-max-size"
+            formControlName="maxSizeBytes"
+            [useGrouping]="false"
+            [min]="1"
+          />
+          <label for="definition-max-size">{{ i18n.fields().maxSizeBytes }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().maxSizeBytes"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().maxSizeBytes)"
         />
-        <label for="definition-max-size">{{ i18n.fields().maxSizeBytes }}</label>
-      </p-iftalabel>
+      </div>
       @if (resolveFieldError(form.controls.maxSizeBytes, "definition.maxSizeBytes", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
     </div>
 
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <p-inputnumber
-          class="w-100"
-          inputId="definition-retention-days"
-          formControlName="retentionDays"
-          [useGrouping]="false"
-          [min]="0"
-          [showClear]="true"
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <p-inputnumber
+            class="w-100"
+            inputId="definition-retention-days"
+            formControlName="retentionDays"
+            [useGrouping]="false"
+            [min]="0"
+            [showClear]="true"
+          />
+          <label for="definition-retention-days">{{ i18n.fields().retentionDays }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().retentionDays"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().retentionDays)"
         />
-        <label for="definition-retention-days">{{ i18n.fields().retentionDays }}</label>
-      </p-iftalabel>
+      </div>
       @if (resolveFieldError(form.controls.retentionDays, "definition.retentionDays", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
@@ -211,44 +283,56 @@
 
   <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <p-datepicker
-          class="w-100"
-          inputStyleClass="w-100"
-          inputId="definition-active-from"
-          formControlName="activeFrom"
-          dateFormat="dd.mm.yy"
-          hourFormat="24"
-          appendTo="body"
-          [showTime]="true"
-          [showIcon]="true"
-          [showClear]="true"
-          [readonlyInput]="true"
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <p-datepicker
+            class="w-100"
+            inputStyleClass="w-100"
+            inputId="definition-active-from"
+            formControlName="activeFrom"
+            dateFormat="dd.mm.yy"
+            hourFormat="24"
+            appendTo="body"
+            [showTime]="true"
+            [showIcon]="true"
+            [showClear]="true"
+            [readonlyInput]="true"
+          />
+          <label for="definition-active-from">{{ i18n.fields().activeFrom }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().activeFrom"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().activeFrom)"
         />
-        <label for="definition-active-from">{{ i18n.fields().activeFrom }}</label>
-      </p-iftalabel>
+      </div>
       @if (resolveFieldError(form.controls.activeFrom, "definition.activeFrom", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
     </div>
 
     <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <p-datepicker
-          class="w-100"
-          inputStyleClass="w-100"
-          inputId="definition-active-until"
-          formControlName="activeUntil"
-          dateFormat="dd.mm.yy"
-          hourFormat="24"
-          appendTo="body"
-          [showTime]="true"
-          [showIcon]="true"
-          [showClear]="true"
-          [readonlyInput]="true"
+      <div class="flex-row-start-center gap-xs w-100">
+        <p-iftalabel class="flex-1">
+          <p-datepicker
+            class="w-100"
+            inputStyleClass="w-100"
+            inputId="definition-active-until"
+            formControlName="activeUntil"
+            dateFormat="dd.mm.yy"
+            hourFormat="24"
+            appendTo="body"
+            [showTime]="true"
+            [showIcon]="true"
+            [showClear]="true"
+            [readonlyInput]="true"
+          />
+          <label for="definition-active-until">{{ i18n.fields().activeUntil }}</label>
+        </p-iftalabel>
+        <app-context-help
+          [text]="i18n.tooltips().activeUntil"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.fields().activeUntil)"
         />
-        <label for="definition-active-until">{{ i18n.fields().activeUntil }}</label>
-      </p-iftalabel>
+      </div>
       @if (resolveFieldError(form.controls.activeUntil, "definition.activeUntil", actionError(), i18n.commonForm(), form.hasError(activeDateRangeError)); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
@@ -259,10 +343,18 @@
     <div class="flex-row-start-center gap-sm">
       <p-toggleswitch inputId="definition-required" formControlName="isRequiredByDefault" />
       <label for="definition-required">{{ i18n.fields().defaultRequired }}</label>
+      <app-context-help
+        [text]="i18n.tooltips().defaultRequired"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.fields().defaultRequired)"
+      />
     </div>
     <div class="flex-row-start-center gap-sm">
       <p-toggleswitch inputId="definition-active" formControlName="isActive" />
       <label for="definition-active">{{ i18n.fields().active }}</label>
+      <app-context-help
+        [text]="i18n.tooltips().definitionActive"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.fields().active)"
+      />
     </div>
   </div>
 

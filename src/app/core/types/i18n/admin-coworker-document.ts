@@ -22,6 +22,49 @@ export type AdminCoworkerDocSectionCopy = {
   requirementSubtitle: string;
 };
 
+export type AdminCoworkerDocProcessCopy = {
+  title: string;
+  definitionsTitle: string;
+  definitionsDescription: string;
+  onboardingTitle: string;
+  onboardingDescription: string;
+  requirementsTitle: string;
+  requirementsDescription: string;
+  reviewTitle: string;
+  reviewDescription: string;
+};
+
+export type AdminCoworkerDocTooltipCopy = {
+  pagePurpose: string;
+  definitionsSection: string;
+  reviewQueue: string;
+  coworkerSection: string;
+  onboardingSection: string;
+  requirementSection: string;
+  definitionCode: string;
+  definitionTitle: string;
+  definitionDescription: string;
+  definitionCategory: string;
+  originPolicy: string;
+  multiplicity: string;
+  signaturePolicy: string;
+  allowedMimeTypes: string;
+  allowedExtensions: string;
+  maxSizeBytes: string;
+  retentionDays: string;
+  activeFrom: string;
+  activeUntil: string;
+  defaultRequired: string;
+  definitionActive: string;
+  coworkerSelect: string;
+  startOnboarding: string;
+  seedDefaults: string;
+  requirementDefinition: string;
+  requirementRequired: string;
+  requirementDueAt: string;
+  assignRequirement: string;
+};
+
 export type AdminCoworkerDocFieldCopy = {
   code: string;
   title: string;
@@ -51,6 +94,7 @@ export type AdminCoworkerDocActionCopy = {
   assignRequirement: string;
   addMimeType: string;
   addExtension: string;
+  showExplanation: string;
 };
 
 export type AdminCoworkerDocStatusCopy = {

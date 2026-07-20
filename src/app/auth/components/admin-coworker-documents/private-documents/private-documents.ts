@@ -26,6 +26,7 @@ import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
+import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import {
   isAdminCoworkerDocumentStaleError,
@@ -45,6 +46,7 @@ import { createAdminCoworkerDocumentsI18n } from './private-documents.i18n';
     ButtonModule,
     IftaLabelModule,
     SelectModule,
+    ContextHelp,
     LoadingOverlay,
     DocumentDefinitionEditor,
     DocumentDefinitionList,

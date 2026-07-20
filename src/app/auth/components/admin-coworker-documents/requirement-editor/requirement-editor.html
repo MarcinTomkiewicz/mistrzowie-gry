@@ -5,47 +5,65 @@
   novalidate
 >
   <header class="flex-col-start-stretch gap-xs w-100">
-    <h3 class="mg-section__title mg-section__title--sm m-0">
-      {{ i18n.sections().requirementTitle }}
-    </h3>
+    <div class="flex-row-start-center gap-xs">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.sections().requirementTitle }}
+      </h3>
+      <app-context-help
+        [text]="i18n.tooltips().requirementSection"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.sections().requirementTitle)"
+      />
+    </div>
     <p class="m-0">{{ i18n.sections().requirementSubtitle }}</p>
     <strong>{{ coworker().displayName }} - {{ coworker().email }}</strong>
   </header>
 
   <div class="flex-col-start-stretch gap-xs w-100">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="requirement-definition"
-        formControlName="documentDefinitionId"
-        [options]="definitionOptions()"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
+    <div class="flex-row-start-center gap-xs w-100">
+      <p-iftalabel class="flex-1">
+        <p-select
+          class="w-100"
+          inputId="requirement-definition"
+          formControlName="documentDefinitionId"
+          [options]="definitionOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label for="requirement-definition">{{ i18n.fields().documentDefinition }}</label>
+      </p-iftalabel>
+      <app-context-help
+        [text]="i18n.tooltips().requirementDefinition"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.fields().documentDefinition)"
       />
-      <label for="requirement-definition">{{ i18n.fields().documentDefinition }}</label>
-    </p-iftalabel>
+    </div>
     @if (resolveFieldError(form.controls.documentDefinitionId, "requirement.documentDefinitionId", actionError(), i18n.commonForm()); as error) {
       <small class="mg-contact-error">{{ error }}</small>
     }
   </div>
 
-  <p-iftalabel class="w-100">
-    <p-datepicker
-      class="w-100"
-      inputStyleClass="w-100"
-      inputId="requirement-due-at"
-      formControlName="dueAt"
-      dateFormat="dd.mm.yy"
-      hourFormat="24"
-      appendTo="body"
-      [showTime]="true"
-      [showIcon]="true"
-      [showClear]="true"
-      [readonlyInput]="true"
+  <div class="flex-row-start-center gap-xs w-100">
+    <p-iftalabel class="flex-1">
+      <p-datepicker
+        class="w-100"
+        inputStyleClass="w-100"
+        inputId="requirement-due-at"
+        formControlName="dueAt"
+        dateFormat="dd.mm.yy"
+        hourFormat="24"
+        appendTo="body"
+        [showTime]="true"
+        [showIcon]="true"
+        [showClear]="true"
+        [readonlyInput]="true"
+      />
+      <label for="requirement-due-at">{{ i18n.fields().dueAt }}</label>
+    </p-iftalabel>
+    <app-context-help
+      [text]="i18n.tooltips().requirementDueAt"
+      [ariaLabel]="i18n.contextHelpLabel(i18n.fields().dueAt)"
     />
-    <label for="requirement-due-at">{{ i18n.fields().dueAt }}</label>
-  </p-iftalabel>
+  </div>
   @if (resolveFieldError(form.controls.dueAt, "requirement.dueAt", actionError(), i18n.commonForm()); as error) {
     <small class="mg-contact-error">{{ error }}</small>
   }
@@ -53,6 +71,10 @@
   <div class="flex-row-start-center gap-sm w-100">
     <p-toggleswitch inputId="requirement-required" formControlName="required" />
     <label for="requirement-required">{{ i18n.fields().required }}</label>
+    <app-context-help
+      [text]="i18n.tooltips().requirementRequired"
+      [ariaLabel]="i18n.contextHelpLabel(i18n.fields().required)"
+    />
   </div>
   @if (resolveFieldError(form.controls.required, "requirement.required", actionError(), i18n.commonForm()); as error) {
     <small class="mg-contact-error">{{ error }}</small>
@@ -65,7 +87,7 @@
     />
   }
 
-  <div class="flex-row-end-center w-100">
+  <div class="flex-row-end-center gap-xs w-100">
     <p-button
       type="submit"
       severity="success"
@@ -73,6 +95,10 @@
       [label]="i18n.actions().assignRequirement"
       [loading]="isSaving()"
       [disabled]="disabled()"
+    />
+    <app-context-help
+      [text]="i18n.tooltips().assignRequirement"
+      [ariaLabel]="i18n.contextHelpLabel(i18n.actions().assignRequirement)"
     />
   </div>
 </form>

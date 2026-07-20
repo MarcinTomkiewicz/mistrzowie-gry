@@ -21,6 +21,8 @@
   font-size: map.get(v.$font-sizes, "xs");
   line-height: 1.35;
   letter-spacing: 0.02em;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .p-tooltip.p-tooltip-top .p-tooltip-arrow {

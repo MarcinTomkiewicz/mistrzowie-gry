@@ -30,6 +30,7 @@ import {
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { normalizeEdgeFunctionError } from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
+import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
   resolveAdminCoworkerDocumentError,
   resolveAdminCoworkerDocumentFieldError,
@@ -57,6 +58,7 @@ import {
     SelectModule,
     TextareaModule,
     ToggleSwitchModule,
+    ContextHelp,
     AdminCoworkerDocumentError,
   ],
   templateUrl: './document-definition-editor.html',
