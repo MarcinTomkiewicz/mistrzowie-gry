@@ -1,5 +1,4 @@
 import {
-  ICoworkerActiveOnboardingCase,
   ICoworkerAvailableDocumentDefinition,
   ICoworkerDocumentAccess,
   ICoworkerDocumentDefinition,
@@ -10,15 +9,11 @@ import {
   ICoworkerVersionDownload,
   ICoworkerNotification,
   ICoworkerPortalDocument,
-  ICoworkerSignaturePolicy,
 } from '../../interfaces/i-coworker-document';
 import { APP_ROLES } from '../../types/app-role';
 import {
-  COWORKER_ACTIVE_ONBOARDING_STATUSES,
   COWORKER_AVAILABLE_ORIGIN_POLICIES,
   COWORKER_DOCUMENT_ACTION,
-  COWORKER_DOCUMENT_MULTIPLICITIES,
-  COWORKER_DOCUMENT_ORIGIN_POLICIES,
   COWORKER_DOCUMENT_VERSION_STATUSES,
   COWORKER_MALWARE_SCAN_STATUSES,
   COWORKER_NOTIFICATION_ENTITY_TYPES,
@@ -38,53 +33,26 @@ import {
   createEdgeObjectReader,
   readEdgeBoolean,
   readEdgeInteger,
+  readEdgeNullableInteger,
+  readEdgeNullableString,
+  readEdgeNullableTimestamp,
   readEdgeObject,
   readEdgeString,
   readEdgeTimestamp,
   readEdgeUuid,
 } from '../../utils/edge-contract';
+import {
+  coworkerActiveOnboardingCaseReader,
+  coworkerDocumentDefinitionFieldReaders,
+  coworkerSignaturePolicyReader,
+} from './coworker-document-readers';
 
-const nullableStringReader = createEdgeNullableReader(readEdgeString);
-const nullableIntegerReader = createEdgeNullableReader(readEdgeInteger);
-const nullableTimestampReader = createEdgeNullableReader(readEdgeTimestamp);
 const nullableUuidReader = createEdgeNullableReader(readEdgeUuid);
-const stringArrayReader = createEdgeArrayReader(readEdgeString);
 const trueReader = createEdgeLiteralReader([true] as const);
 
-const signaturePolicyReader: EdgeReader<ICoworkerSignaturePolicy> =
-  createEdgeObjectReader({
-    id: readEdgeUuid,
-    code: readEdgeString,
-    name: readEdgeString,
-    description: nullableStringReader,
-    signatureRequired: readEdgeBoolean,
-    allowedDeclarationTypes: createEdgeArrayReader(
-      createEdgeLiteralReader(COWORKER_SIGNATURE_DECLARATION_TYPES),
-    ),
-    manualReviewRequired: readEdgeBoolean,
-    automaticVerificationMode: readEdgeString,
-    isActive: readEdgeBoolean,
-  });
-
 const documentDefinitionFields = {
-  id: readEdgeUuid,
-  code: readEdgeString,
-  title: readEdgeString,
-  description: nullableStringReader,
-  category: readEdgeString,
-  originPolicy: createEdgeLiteralReader(COWORKER_DOCUMENT_ORIGIN_POLICIES),
-  multiplicity: createEdgeLiteralReader(COWORKER_DOCUMENT_MULTIPLICITIES),
-  isRequiredByDefault: readEdgeBoolean,
-  allowedMimeTypes: stringArrayReader,
-  allowedExtensions: stringArrayReader,
-  maxSizeBytes: readEdgeInteger,
-  retentionDays: nullableIntegerReader,
-  isActive: readEdgeBoolean,
-  activeFrom: nullableTimestampReader,
-  activeUntil: nullableTimestampReader,
-  signaturePolicy: signaturePolicyReader,
-  createdAt: readEdgeTimestamp,
-  updatedAt: readEdgeTimestamp,
+  ...coworkerDocumentDefinitionFieldReaders,
+  signaturePolicy: coworkerSignaturePolicyReader,
 } as const;
 
 const documentDefinitionReader: EdgeReader<ICoworkerDocumentDefinition> =
@@ -109,7 +77,7 @@ const signatureVerificationReader:
       COWORKER_SIGNATURE_VERIFICATION_STATUSES,
     ),
     signatureType: createEdgeLiteralReader(COWORKER_VERIFIED_SIGNATURE_TYPES),
-    reason: nullableStringReader,
+    reason: readEdgeNullableString,
     createdAt: readEdgeTimestamp,
   });
 
@@ -122,20 +90,20 @@ const documentVersionReader: EdgeReader<ICoworkerDocumentVersion> =
     originalFilename: readEdgeString,
     fileExtension: readEdgeString,
     declaredMimeType: readEdgeString,
-    detectedMimeType: nullableStringReader,
+    detectedMimeType: readEdgeNullableString,
     expectedSizeBytes: readEdgeInteger,
-    sizeBytes: nullableIntegerReader,
+    sizeBytes: readEdgeNullableInteger,
     signatureDeclarationType: createEdgeLiteralReader(
       COWORKER_SIGNATURE_DECLARATION_TYPES,
     ),
-    signatureDeclaredAt: nullableTimestampReader,
+    signatureDeclaredAt: readEdgeNullableTimestamp,
     malwareScanStatus: createEdgeLiteralReader(
       COWORKER_MALWARE_SCAN_STATUSES,
     ),
-    uploadedAt: nullableTimestampReader,
-    finalizedAt: nullableTimestampReader,
-    supersededAt: nullableTimestampReader,
-    retentionUntil: nullableTimestampReader,
+    uploadedAt: readEdgeNullableTimestamp,
+    finalizedAt: readEdgeNullableTimestamp,
+    supersededAt: readEdgeNullableTimestamp,
+    retentionUntil: readEdgeNullableTimestamp,
     legalHold: readEdgeBoolean,
     latestSignatureVerification: createEdgeNullableReader(
       signatureVerificationReader,
@@ -151,18 +119,18 @@ const portalDocumentReader: EdgeReader<ICoworkerPortalDocument> =
     onboardingCaseId: nullableUuidReader,
     requirementId: nullableUuidReader,
     documentDefinitionId: readEdgeUuid,
-    title: nullableStringReader,
+    title: readEdgeNullableString,
     status: createEdgeLiteralReader(COWORKER_PORTAL_DOCUMENT_STATUSES),
     currentVersionId: nullableUuidReader,
     currentVersion: createEdgeNullableReader(documentVersionReader),
     versions: createEdgeArrayReader(documentVersionReader),
-    submittedAt: nullableTimestampReader,
-    reviewStartedAt: nullableTimestampReader,
-    acceptedAt: nullableTimestampReader,
-    rejectedAt: nullableTimestampReader,
-    rejectionReason: nullableStringReader,
-    withdrawnAt: nullableTimestampReader,
-    archivedAt: nullableTimestampReader,
+    submittedAt: readEdgeNullableTimestamp,
+    reviewStartedAt: readEdgeNullableTimestamp,
+    acceptedAt: readEdgeNullableTimestamp,
+    rejectedAt: readEdgeNullableTimestamp,
+    rejectionReason: readEdgeNullableString,
+    withdrawnAt: readEdgeNullableTimestamp,
+    archivedAt: readEdgeNullableTimestamp,
     revision: readEdgeInteger,
     createdAt: readEdgeTimestamp,
     updatedAt: readEdgeTimestamp,
@@ -174,30 +142,13 @@ const requirementReader: EdgeReader<ICoworkerDocumentRequirement> =
     onboardingCaseId: nullableUuidReader,
     status: createEdgeLiteralReader(COWORKER_PORTAL_REQUIREMENT_STATUSES),
     required: readEdgeBoolean,
-    dueAt: nullableTimestampReader,
+    dueAt: readEdgeNullableTimestamp,
     fulfilledByDocumentId: nullableUuidReader,
-    fulfilledAt: nullableTimestampReader,
-    waivedAt: nullableTimestampReader,
-    waiverReason: nullableStringReader,
+    fulfilledAt: readEdgeNullableTimestamp,
+    waivedAt: readEdgeNullableTimestamp,
+    waiverReason: readEdgeNullableString,
     documentDefinition: documentDefinitionReader,
     documents: createEdgeArrayReader(portalDocumentReader),
-    createdAt: readEdgeTimestamp,
-    updatedAt: readEdgeTimestamp,
-  });
-
-const onboardingCaseReader: EdgeReader<ICoworkerActiveOnboardingCase> =
-  createEdgeObjectReader({
-    id: readEdgeUuid,
-    userId: readEdgeUuid,
-    status: createEdgeLiteralReader(COWORKER_ACTIVE_ONBOARDING_STATUSES),
-    openedAt: readEdgeTimestamp,
-    submittedAt: nullableTimestampReader,
-    reviewStartedAt: nullableTimestampReader,
-    needsCorrectionAt: nullableTimestampReader,
-    approvedAt: nullableTimestampReader,
-    suspendedAt: nullableTimestampReader,
-    closedAt: nullableTimestampReader,
-    revision: readEdgeInteger,
     createdAt: readEdgeTimestamp,
     updatedAt: readEdgeTimestamp,
   });
@@ -210,7 +161,7 @@ const notificationReader: EdgeReader<ICoworkerNotification> =
     entityType: createEdgeLiteralReader(COWORKER_NOTIFICATION_ENTITY_TYPES),
     entityId: nullableUuidReader,
     payload: readEdgeObject,
-    readAt: nullableTimestampReader,
+    readAt: readEdgeNullableTimestamp,
     createdAt: readEdgeTimestamp,
   });
 
@@ -227,7 +178,9 @@ const portalReader: EdgeReader<ICoworkerDocumentPortalResponse> =
   createEdgeObjectReader({
     userId: readEdgeUuid,
     access: accessReader,
-    activeOnboardingCase: createEdgeNullableReader(onboardingCaseReader),
+    activeOnboardingCase: createEdgeNullableReader(
+      coworkerActiveOnboardingCaseReader,
+    ),
     requirements: createEdgeArrayReader(requirementReader),
     unassignedDocuments: createEdgeArrayReader(portalDocumentReader),
     availableDefinitions: createEdgeArrayReader(

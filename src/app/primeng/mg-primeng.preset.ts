@@ -94,10 +94,10 @@ const surfaceScaleDark = {
 
 export const MgPrimePreset = definePreset(Aura, {
   semantic: {
-    // Primary palette — globalnie
+    // Primary palette - globalnie
     primary: primaryScale,
 
-    // Focus ring — spójnie z Waszym secondary/primary
+    // Focus ring - spójnie z Waszym secondary/primary
     focusRing: {
       width: '2px',
       style: 'solid',
@@ -136,7 +136,7 @@ export const MgPrimePreset = definePreset(Aura, {
           },
 
           /**
-           * SEMANTICS — TU MUSZĄ SIEDZIEĆ, żeby Aura ich nie nadpisała.
+           * SEMANTICS - TU MUSZĄ SIEDZIEĆ, żeby Aura ich nie nadpisała.
            * PROJECT RULE: warn = arcane
            */
           info: { color: mg.info },
@@ -169,7 +169,7 @@ export const MgPrimePreset = definePreset(Aura, {
           },
 
           /**
-           * SEMANTICS — jw.
+           * SEMANTICS - jw.
            * PROJECT RULE: warn = arcane
            */
           info: { color: mg.info },

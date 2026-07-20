@@ -1,0 +1,102 @@
+{
+  "page": {
+    "title": "Prywatne dokumenty współpracowników",
+    "subtitle": "Zarządzaj katalogiem dokumentów, onboardingiem i wymaganiami współpracowników.",
+    "reviewQueueLabel": "Dokumenty oczekujące na review",
+    "loadErrorTitle": "Nie udało się załadować panelu dokumentów"
+  },
+  "sections": {
+    "definitionsTitle": "Definicje dokumentów",
+    "definitionsSubtitle": "Katalog typów dokumentów i reguł ich przyjmowania.",
+    "coworkerTitle": "Współpracownik",
+    "coworkerSubtitle": "Wybierz osobę z katalogu zwróconego przez portal dokumentów.",
+    "onboardingTitle": "Onboarding",
+    "onboardingEmpty": "Stan onboardingu zostanie pobrany po użyciu akcji zapewnienia onboardingu.",
+    "requirementTitle": "Przypisz wymaganie",
+    "requirementSubtitle": "Dodaj pojedyncze wymaganie dokumentowe dla wybranego współpracownika."
+  },
+  "fields": {
+    "code": "Kod",
+    "title": "Tytuł",
+    "description": "Opis",
+    "category": "Kategoria",
+    "originPolicy": "Źródło dokumentu",
+    "multiplicity": "Wielokrotność",
+    "defaultRequired": "Wymagany domyślnie",
+    "signaturePolicy": "Polityka podpisu",
+    "allowedMimeTypes": "Dozwolone typy MIME",
+    "allowedExtensions": "Dozwolone rozszerzenia",
+    "maxSizeBytes": "Maksymalny rozmiar w bajtach",
+    "retentionDays": "Retencja w dniach",
+    "active": "Definicja aktywna",
+    "activeFrom": "Aktywna od",
+    "activeUntil": "Aktywna do",
+    "coworker": "Współpracownik",
+    "documentDefinition": "Definicja dokumentu",
+    "required": "Wymagane",
+    "dueAt": "Termin"
+  },
+  "actions": {
+    "newDefinition": "Nowa definicja",
+    "ensureOnboarding": "Zapewnij onboarding",
+    "seedDefaults": "Dodaj domyślne wymagania",
+    "assignRequirement": "Przypisz wymaganie",
+    "addMimeType": "Dodaj typ MIME",
+    "addExtension": "Dodaj rozszerzenie"
+  },
+  "statuses": {
+    "active": "Aktywna",
+    "inactive": "Nieaktywna",
+    "accessEnabled": "Dostęp aktywny",
+    "accessDisabled": "Dostęp wyłączony - akcje są niedostępne",
+    "onboardingCreated": "Utworzono nowy onboarding",
+    "onboardingExisting": "Użyto istniejącego onboardingu",
+    "onboardingStatuses": {
+      "draft": "Szkic",
+      "submitted": "Wysłany",
+      "under_review": "W review",
+      "needs_correction": "Wymaga korekty",
+      "approved": "Zatwierdzony",
+      "suspended": "Wstrzymany"
+    }
+  },
+  "options": {
+    "originPolicies": {
+      "coworker_upload": "Upload współpracownika",
+      "admin_upload": "Upload administratora",
+      "system_generated": "Generowany systemowo",
+      "mixed": "Mieszane"
+    },
+    "multiplicities": {
+      "single": "Pojedynczy",
+      "multiple": "Wiele dokumentów",
+      "versioned_single": "Pojedynczy wersjonowany"
+    }
+  },
+  "messages": {
+    "seedConfirmation": "Dodać domyślne wymagania do tego onboardingu? Ta akcja jest niezależna od jego utworzenia.",
+    "definitionSaved": "Definicja dokumentu została zapisana.",
+    "onboardingEnsured": "Stan onboardingu został pobrany.",
+    "defaultsSeeded": "Domyślne wymagania zostały dodane. Liczba dodanych wymagań: {count}.",
+    "requirementsInserted": "Liczba dodanych wymagań",
+    "requirementAssigned": "Wymaganie zostało przypisane.",
+    "actionSuccessSummary": "Zapisano zmiany"
+  },
+  "errors": {
+    "load": "Nie udało się pobrać aktualnego dashboardu.",
+    "unauthorized": "Sesja wygasła albo nie jest dostępna. Zaloguj się ponownie.",
+    "forbidden": "Nie masz uprawnień administratora do tej operacji.",
+    "notFound": "Nie znaleziono aktualnego modelu. Po odświeżeniu sprawdź aktualne dane i spróbuj ponownie.",
+    "conflict": "Dane zmieniły się na serwerze. Po odświeżeniu sprawdź aktualne wartości i spróbuj ponownie.",
+    "documentConflict": "Operacja koliduje z aktualnym stanem dokumentów. Po odświeżeniu sprawdź aktualne dane i spróbuj ponownie.",
+    "invalidResponse": "Serwer zwrócił odpowiedź niezgodną z kontraktem.",
+    "unexpected": "Operacja nie powiodła się. Spróbuj ponownie.",
+    "saveDefinition": "Nie udało się zapisać definicji.",
+    "ensureOnboarding": "Nie udało się zapewnić onboardingu.",
+    "seedDefaults": "Nie udało się dodać domyślnych wymagań.",
+    "assignRequirement": "Nie udało się przypisać wymagania.",
+    "diagnosticStatus": "Status HTTP",
+    "diagnosticCode": "Kod",
+    "diagnosticMessage": "Szczegóły"
+  }
+}

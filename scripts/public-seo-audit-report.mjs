@@ -30,7 +30,7 @@ export function countPublicSeoFindings(findings, blockers = 0) {
 
 export function formatPublicSeoAuditSummary(report) {
   const lines = [
-    `Public SEO audit — ${report.generatedAt}`,
+    `Public SEO audit - ${report.generatedAt}`,
     'Source: runtime sitemap',
     '',
   ];
@@ -46,18 +46,18 @@ export function formatPublicSeoAuditSummary(report) {
 
     if (target.error) {
       lines.push(
-        `[BLOCKER] ${target.name} ${target.sitemapUrl} — sitemap unavailable — ${target.error}`,
+        `[BLOCKER] ${target.name} ${target.sitemapUrl} - sitemap unavailable - ${target.error}`,
       );
     }
 
     for (const finding of sortFindings(target.findings)) {
       lines.push(
-        `[${finding.severity}] ${target.name} ${finding.url} — ${finding.code} — ${finding.evidence}`,
+        `[${finding.severity}] ${target.name} ${finding.url} - ${finding.code} - ${finding.evidence}`,
       );
     }
 
     if (!target.error && !target.findings.length) {
-      lines.push(`[OK] ${target.name} — no findings`);
+      lines.push(`[OK] ${target.name} - no findings`);
     }
 
     lines.push('');

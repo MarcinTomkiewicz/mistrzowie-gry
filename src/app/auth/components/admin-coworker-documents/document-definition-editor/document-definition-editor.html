@@ -1,0 +1,295 @@
+<form class="mg-card mg-form flex-col-start-stretch gap-md p-md w-100" [formGroup]="form" (ngSubmit)="saveDefinition()" novalidate>
+  <div class="flex-row-between-center flex-wrap gap-sm w-100">
+    <h3 class="mg-section__title mg-section__title--sm m-0">{{ definition() ? i18n.commonActions().edit : i18n.actions().newDefinition }}</h3>
+    <span [class]="form.controls.isActive.value ? 'tag-badge tag-badge--success' : 'tag-badge tag-badge--muted'">
+      {{ form.controls.isActive.value ? i18n.statuses().active : i18n.statuses().inactive }}
+    </span>
+  </div>
+
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <input class="w-100" pInputText id="definition-code" formControlName="code" />
+        <label for="definition-code">{{ i18n.fields().code }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.code, "definition.code", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <input class="w-100" pInputText id="definition-title" formControlName="title" />
+        <label for="definition-title">{{ i18n.fields().title }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.title, "definition.title", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <input class="w-100" pInputText id="definition-category" formControlName="category" />
+        <label for="definition-category">{{ i18n.fields().category }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.category, "definition.category", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          inputId="definition-signature-policy"
+          formControlName="signaturePolicyCode"
+          [options]="signaturePolicyOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label for="definition-signature-policy">{{ i18n.fields().signaturePolicy }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.signaturePolicyCode, "definition.signaturePolicyCode", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+  </div>
+
+  <p-iftalabel class="w-100">
+    <textarea class="w-100" pTextarea id="definition-description" formControlName="description" rows="4"></textarea>
+    <label for="definition-description">{{ i18n.fields().description }}</label>
+  </p-iftalabel>
+  @if (resolveFieldError(form.controls.description, "definition.description", actionError(), i18n.commonForm()); as error) {
+    <small class="mg-contact-error">{{ error }}</small>
+  }
+
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="definition-origin-policy"
+        formControlName="originPolicy"
+        [options]="originPolicyOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+      <label for="definition-origin-policy">{{ i18n.fields().originPolicy }}</label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="definition-multiplicity"
+        formControlName="multiplicity"
+        [options]="multiplicityOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+      <label for="definition-multiplicity">{{ i18n.fields().multiplicity }}</label>
+    </p-iftalabel>
+  </div>
+
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <section class="flex-col-start-stretch gap-sm w-100">
+      <div class="flex-row-between-center gap-sm w-100">
+        <strong>{{ i18n.fields().allowedMimeTypes }}</strong>
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          icon="pi pi-plus"
+          [label]="i18n.actions().addMimeType"
+          [disabled]="disabled() || isSaving()"
+          (onClick)="addArrayItem('allowedMimeTypes')"
+        />
+      </div>
+      <div formArrayName="allowedMimeTypes" class="flex-col-start-stretch gap-xs w-100">
+        @for (control of form.controls.allowedMimeTypes.controls; track control; let index = $index) {
+          <div class="flex-col-start-stretch gap-xs w-100">
+            <div class="flex-row-start-center gap-xs w-100">
+              <input class="w-100" pInputText [id]="'definition-mime-' + index" [formControlName]="index" />
+              <p-button
+                type="button"
+                size="small"
+                severity="danger"
+                [text]="true"
+                icon="pi pi-trash"
+                [ariaLabel]="i18n.commonActions().remove"
+                [disabled]="disabled() || isSaving()"
+                (onClick)="removeArrayItem('allowedMimeTypes', index)"
+              />
+            </div>
+            @if (resolveFieldError(control, "definition.allowedMimeTypes." + index, actionError(), i18n.commonForm()); as error) {
+              <small class="mg-contact-error">{{ error }}</small>
+            }
+          </div>
+        }
+      </div>
+      @if (resolveFieldError(form.controls.allowedMimeTypes, "definition.allowedMimeTypes", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </section>
+
+    <section class="flex-col-start-stretch gap-sm w-100">
+      <div class="flex-row-between-center gap-sm w-100">
+        <strong>{{ i18n.fields().allowedExtensions }}</strong>
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          icon="pi pi-plus"
+          [label]="i18n.actions().addExtension"
+          [disabled]="disabled() || isSaving()"
+          (onClick)="addArrayItem('allowedExtensions')"
+        />
+      </div>
+      <div formArrayName="allowedExtensions" class="flex-col-start-stretch gap-xs w-100">
+        @for (control of form.controls.allowedExtensions.controls; track control; let index = $index) {
+          <div class="flex-col-start-stretch gap-xs w-100">
+            <div class="flex-row-start-center gap-xs w-100">
+              <input class="w-100" pInputText [id]="'definition-extension-' + index" [formControlName]="index" />
+              <p-button
+                type="button"
+                size="small"
+                severity="danger"
+                [text]="true"
+                icon="pi pi-trash"
+                [ariaLabel]="i18n.commonActions().remove"
+                [disabled]="disabled() || isSaving()"
+                (onClick)="removeArrayItem('allowedExtensions', index)"
+              />
+            </div>
+            @if (resolveFieldError(control, "definition.allowedExtensions." + index, actionError(), i18n.commonForm()); as error) {
+              <small class="mg-contact-error">{{ error }}</small>
+            }
+          </div>
+        }
+      </div>
+      @if (resolveFieldError(form.controls.allowedExtensions, "definition.allowedExtensions", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </section>
+  </div>
+
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          class="w-100"
+          inputId="definition-max-size"
+          formControlName="maxSizeBytes"
+          [useGrouping]="false"
+          [min]="1"
+        />
+        <label for="definition-max-size">{{ i18n.fields().maxSizeBytes }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.maxSizeBytes, "definition.maxSizeBytes", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-inputnumber
+          class="w-100"
+          inputId="definition-retention-days"
+          formControlName="retentionDays"
+          [useGrouping]="false"
+          [min]="0"
+          [showClear]="true"
+        />
+        <label for="definition-retention-days">{{ i18n.fields().retentionDays }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.retentionDays, "definition.retentionDays", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+  </div>
+
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-datepicker
+          class="w-100"
+          inputStyleClass="w-100"
+          inputId="definition-active-from"
+          formControlName="activeFrom"
+          dateFormat="dd.mm.yy"
+          hourFormat="24"
+          appendTo="body"
+          [showTime]="true"
+          [showIcon]="true"
+          [showClear]="true"
+          [readonlyInput]="true"
+        />
+        <label for="definition-active-from">{{ i18n.fields().activeFrom }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.activeFrom, "definition.activeFrom", actionError(), i18n.commonForm()); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-datepicker
+          class="w-100"
+          inputStyleClass="w-100"
+          inputId="definition-active-until"
+          formControlName="activeUntil"
+          dateFormat="dd.mm.yy"
+          hourFormat="24"
+          appendTo="body"
+          [showTime]="true"
+          [showIcon]="true"
+          [showClear]="true"
+          [readonlyInput]="true"
+        />
+        <label for="definition-active-until">{{ i18n.fields().activeUntil }}</label>
+      </p-iftalabel>
+      @if (resolveFieldError(form.controls.activeUntil, "definition.activeUntil", actionError(), i18n.commonForm(), form.hasError(activeDateRangeError)); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+    </div>
+  </div>
+
+  <div class="flex-row-start-center flex-wrap gap-lg w-100">
+    <div class="flex-row-start-center gap-sm">
+      <p-toggleswitch inputId="definition-required" formControlName="isRequiredByDefault" />
+      <label for="definition-required">{{ i18n.fields().defaultRequired }}</label>
+    </div>
+    <div class="flex-row-start-center gap-sm">
+      <p-toggleswitch inputId="definition-active" formControlName="isActive" />
+      <label for="definition-active">{{ i18n.fields().active }}</label>
+    </div>
+  </div>
+
+  @if (actionError(); as error) {
+    <app-admin-coworker-document-error
+      [error]="error"
+      [description]="resolveError(error, i18n.errors(), i18n.errors().saveDefinition)"
+    />
+  }
+
+  <div class="flex-row-end-center flex-wrap gap-sm w-100">
+    <p-button
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      [label]="i18n.commonActions().cancel"
+      icon="pi pi-times"
+      [disabled]="disabled() || isSaving()"
+      (onClick)="cancelled.emit()"
+    />
+    <p-button
+      type="submit"
+      severity="success"
+      [label]="i18n.commonActions().save"
+      icon="pi pi-save"
+      [loading]="isSaving()"
+      [disabled]="disabled()"
+    />
+  </div>
+</form>

@@ -23,7 +23,7 @@ import { tap } from 'rxjs/operators';
  *   "about/pl"  -> /assets/i18n/pl/about.json
  *   "common/pl" -> /assets/i18n/pl/common.json
  *
- * Jeśli dostaniemy root lang (np. "pl") — fallbackujemy do common:
+ * Jeśli dostaniemy root lang (np. "pl") - fallbackujemy do common:
  *   "pl" -> /assets/i18n/pl/common.json
  */
 @Injectable({ providedIn: 'root' })

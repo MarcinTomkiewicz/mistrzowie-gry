@@ -34,7 +34,7 @@ export interface ICoworkerSignaturePolicy {
   readonly isActive: boolean;
 }
 
-export interface ICoworkerDocumentDefinition {
+export interface ICoworkerDocumentDefinitionBase {
   readonly id: string;
   readonly code: string;
   readonly title: string;
@@ -50,9 +50,13 @@ export interface ICoworkerDocumentDefinition {
   readonly isActive: boolean;
   readonly activeFrom: string | null;
   readonly activeUntil: string | null;
-  readonly signaturePolicy: ICoworkerSignaturePolicy;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+export interface ICoworkerDocumentDefinition
+  extends ICoworkerDocumentDefinitionBase {
+  readonly signaturePolicy: ICoworkerSignaturePolicy;
 }
 
 export interface ICoworkerAvailableDocumentDefinition

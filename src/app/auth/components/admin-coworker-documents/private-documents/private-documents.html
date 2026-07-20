@@ -1,0 +1,193 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-lg">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading() || isActionBusy()"
+      [label]="isActionBusy() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+    />
+
+    @if (loadError(); as error) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+        <app-admin-coworker-document-error
+          [error]="error"
+          [description]="resolveError(error, i18n.errors(), i18n.errors().load, false)"
+        />
+        @if (error.status !== 401 && error.status !== 403) {
+          <p-button
+            severity="secondary"
+            icon="pi pi-refresh"
+            [label]="i18n.commonActions().retry"
+            (onClick)="loadDashboard()"
+          />
+        }
+      </section>
+    }
+
+    @if (dashboard(); as data) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <div class="flex-row-between-center flex-wrap gap-sm w-100">
+          <div class="flex-col-start-stretch gap-xs">
+            <h2 class="mg-section__title mg-section__title--md m-0">
+              {{ i18n.sections().definitionsTitle }}
+            </h2>
+            <p class="m-0">{{ i18n.sections().definitionsSubtitle }}</p>
+          </div>
+          <div class="flex-row-end-center flex-wrap gap-sm">
+            <span class="tag-badge">
+              {{ i18n.page().reviewQueueLabel }}: {{ data.reviewQueue.length }}
+            </span>
+            <p-button
+              severity="success"
+              icon="pi pi-plus"
+              [label]="i18n.actions().newDefinition"
+              [disabled]="editorOpen() || interactionsBlocked()"
+              (onClick)="openNewDefinition()"
+            />
+          </div>
+        </div>
+
+        @if (data.catalog.documentDefinitions.length) {
+          <app-document-definition-list
+            [definitions]="data.catalog.documentDefinitions"
+            [disabled]="editorOpen() || interactionsBlocked()"
+            (edit)="editDefinition($event)"
+          />
+        } @else {
+          <p class="m-0">{{ i18n.commonEmpty().title }}</p>
+        }
+      </section>
+
+      @if (editorOpen()) {
+        <app-document-definition-editor
+          [definition]="editedDefinition()"
+          [signaturePolicies]="data.catalog.signaturePolicies"
+          [disabled]="interactionsBlocked()"
+          (saved)="onDefinitionSaved()"
+          (cancelled)="closeDefinitionEditor()"
+          (reloadRequested)="handleDefinitionReload($event)"
+          (accessError)="handleAccessError($event)"
+          (busyChange)="definitionBusy.set($event)"
+        />
+      }
+
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <div class="flex-col-start-stretch gap-xs">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.sections().coworkerTitle }}
+          </h2>
+          <p class="m-0">{{ i18n.sections().coworkerSubtitle }}</p>
+        </div>
+
+        <p-iftalabel class="w-100">
+          <p-select
+            class="w-100"
+            inputId="private-documents-coworker"
+            [formControl]="coworkerControl"
+            [options]="coworkerOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            [filter]="true"
+          />
+          <label for="private-documents-coworker">{{ i18n.fields().coworker }}</label>
+        </p-iftalabel>
+
+        @if (selectedCoworker(); as coworker) {
+          <div class="flex-row-between-center flex-wrap gap-sm w-100">
+            <div class="flex-col-start-stretch gap-xs">
+              <strong>{{ coworker.displayName }}</strong>
+              <span>{{ coworker.email }}</span>
+              <span
+                [class]="
+                  coworker.accessEnabled
+                    ? 'tag-badge tag-badge--success'
+                    : 'tag-badge tag-badge--warn'
+                "
+              >
+                {{
+                  coworker.accessEnabled
+                    ? i18n.statuses().accessEnabled
+                    : i18n.statuses().accessDisabled
+                }}
+              </span>
+            </div>
+            <p-button
+              severity="secondary"
+              icon="pi pi-user-plus"
+              [label]="i18n.actions().ensureOnboarding"
+              [loading]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.ensureOnboarding"
+              [disabled]="!coworker.accessEnabled || interactionsBlocked()"
+              (onClick)="ensureOnboarding()"
+            />
+          </div>
+
+          <section class="flex-col-start-stretch gap-sm w-100">
+            <h3 class="mg-section__title mg-section__title--sm m-0">
+              {{ i18n.sections().onboardingTitle }}
+            </h3>
+            @if (onboarding(); as state) {
+              <div class="flex-row-between-center flex-wrap gap-sm w-100">
+                <div class="flex-col-start-stretch gap-xs">
+                  <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[state.case.status]">
+                    {{ i18n.statuses().onboardingStatuses[state.case.status] }}
+                  </span>
+                  <strong>
+                    {{
+                      state.created
+                        ? i18n.statuses().onboardingCreated
+                        : i18n.statuses().onboardingExisting
+                    }}
+                  </strong>
+                  <span>{{ formatTimestampLabel(state.case.openedAt, "pl-PL") }}</span>
+                  @if (lastSeededCount() !== null) {
+                    <small>
+                      {{ i18n.messages().requirementsInserted }}: {{ lastSeededCount() }}
+                    </small>
+                  }
+                </div>
+                <p-button
+                  severity="warn"
+                  [outlined]="true"
+                  icon="pi pi-list-check"
+                  [label]="i18n.actions().seedDefaults"
+                  [loading]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.seedDefaultRequirements"
+                  [disabled]="!coworker.accessEnabled || interactionsBlocked()"
+                  (onClick)="confirmSeedDefaults($event)"
+                />
+              </div>
+            } @else {
+              <p class="m-0">{{ i18n.sections().onboardingEmpty }}</p>
+            }
+          </section>
+
+          @if (actionError(); as error) {
+            <app-admin-coworker-document-error
+              [error]="error"
+              [description]="resolveError(error, i18n.errors(), actionErrorFallback())"
+            />
+          }
+
+          <app-requirement-editor
+            [coworker]="coworker"
+            [definitions]="data.catalog.documentDefinitions"
+            [onboardingCaseId]="onboardingCaseId()"
+            [disabled]="!coworker.accessEnabled || interactionsBlocked()"
+            (assigned)="onRequirementAssigned()"
+            (reloadRequested)="handleRequirementReload($event)"
+            (accessError)="handleAccessError($event)"
+            (busyChange)="requirementBusy.set($event)"
+          />
+        }
+      </section>
+    }
+  </div>
+</section>

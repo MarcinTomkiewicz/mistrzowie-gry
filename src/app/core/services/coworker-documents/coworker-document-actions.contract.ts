@@ -1,8 +1,5 @@
 import { ICoworkerUploadReservation } from '../../interfaces/i-coworker-document';
-import {
-  COWORKER_DOCUMENT_ACTION,
-  CoworkerDocumentAction,
-} from '../../types/coworker-document';
+import { COWORKER_DOCUMENT_ACTION } from '../../types/coworker-document';
 import { EdgeReader } from '../../types/edge-contract';
 import {
   createEdgeLiteralReader,
@@ -69,18 +66,3 @@ export const cancelUploadReader: EdgeReader<void> =
       : cancelUploadWithCleanupResponseReader;
     reader(value, path);
   };
-
-export function createCoworkerDocumentSuccessReader<
-  const TAction extends CoworkerDocumentAction,
->(
-  expectedAction: TAction,
-): EdgeReader<void> {
-  const reader = createEdgeObjectReader({
-    ok: trueReader,
-    action: createEdgeLiteralReader([expectedAction] as const),
-  });
-
-  return (value, path) => {
-    reader(value, path);
-  };
-}

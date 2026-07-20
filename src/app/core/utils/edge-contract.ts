@@ -198,6 +198,19 @@ export function createEdgeLiteralReader<
   return (value, path) => readEdgeLiteral(value, path, allowedValues);
 }
 
+export function createEdgeSuccessReader<const TAction extends EdgeLiteral>(
+  expectedAction: TAction,
+): EdgeReader<void> {
+  const reader = createEdgeObjectReader({
+    ok: createEdgeLiteralReader([true] as const),
+    action: createEdgeLiteralReader([expectedAction] as const),
+  });
+
+  return (value, path) => {
+    reader(value, path);
+  };
+}
+
 export function readEdgeNullableLiteral<TValue extends EdgeLiteral>(
   value: unknown,
   path: string,

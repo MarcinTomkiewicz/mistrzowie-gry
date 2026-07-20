@@ -3,7 +3,7 @@
 @use "../abstracts/mixins" as m;
 
 /* =========================================================
-   PrimeNG >=16 — Accordion (NEW API)
+   PrimeNG >=16 - Accordion (NEW API)
    Cel: tylko kolory, spacing, typografia
    ========================================================= */
 
@@ -38,7 +38,7 @@
   transition: background-color v.$transition-fast, color v.$transition-fast;
 }
 
-/* focus-visible — spójne z resztą UI */
+/* focus-visible - spójne z resztą UI */
 .p-accordionheader:focus-visible {
   outline: 0;
   background: v.$color-text;

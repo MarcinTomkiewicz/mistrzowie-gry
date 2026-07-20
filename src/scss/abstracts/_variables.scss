@@ -60,7 +60,7 @@ $transition-slow: 0.5s ease;
    - Realne liczby siedzą w src/scss/themes/*
    ========================================================= */
 
-/* brand (opcjonalnie — czasem przydaje się w CSS) */
+/* brand (opcjonalnie - czasem przydaje się w CSS) */
 $color-ink: var(--mg-color-ink);
 $color-crimson: var(--mg-color-crimson);
 $color-graphite: var(--mg-color-graphite);
@@ -95,7 +95,7 @@ $color-paper-border: var(--mg-color-paper-border);
 $color-antique: var(--mg-color-antique);
 
 /* =========================================================
-   SEMANTIC COLORS (Warhammer Chaos) — wspólne
+   SEMANTIC COLORS (Warhammer Chaos) - wspólne
    - trzymamy jako CSS vars (bo je ustawiamy w theme-common)
    - plus mapka dla ewentualnych generatorów
    ========================================================= */

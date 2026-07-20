@@ -12,10 +12,10 @@ import {
   CoworkerDocumentActionRequest,
 } from '../../types/coworker-document';
 import { EdgeReader } from '../../types/edge-contract';
+import { createEdgeSuccessReader } from '../../utils/edge-contract';
 import { Backend } from '../backend/backend';
 import {
   cancelUploadReader,
-  createCoworkerDocumentSuccessReader,
   finalizeUploadReader,
   reserveUploadReader,
 } from './coworker-document-actions.contract';
@@ -74,7 +74,7 @@ export class CoworkerDocuments {
         action: COWORKER_DOCUMENT_ACTION.submitDocument,
         documentId,
       },
-      createCoworkerDocumentSuccessReader(
+      createEdgeSuccessReader(
         COWORKER_DOCUMENT_ACTION.submitDocument,
       ),
     );
@@ -86,7 +86,7 @@ export class CoworkerDocuments {
         action: COWORKER_DOCUMENT_ACTION.withdrawDocument,
         documentId,
       },
-      createCoworkerDocumentSuccessReader(
+      createEdgeSuccessReader(
         COWORKER_DOCUMENT_ACTION.withdrawDocument,
       ),
     );
@@ -115,7 +115,7 @@ export class CoworkerDocuments {
         action: COWORKER_DOCUMENT_ACTION.markNotificationRead,
         notificationId,
       },
-      createCoworkerDocumentSuccessReader(
+      createEdgeSuccessReader(
         COWORKER_DOCUMENT_ACTION.markNotificationRead,
       ),
     );

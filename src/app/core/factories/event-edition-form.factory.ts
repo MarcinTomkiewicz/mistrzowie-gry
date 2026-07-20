@@ -28,10 +28,10 @@ import { formatTimeLabel } from '../utils/time';
 import {
   eventScheduleValidator,
   eventTimeRangeValidator,
-  integerValidator,
   isoDateValidator,
   storagePathValidator,
 } from '../validators/event-admin.validator';
+import { integerValidator } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 
 export function createEventEditionForm(

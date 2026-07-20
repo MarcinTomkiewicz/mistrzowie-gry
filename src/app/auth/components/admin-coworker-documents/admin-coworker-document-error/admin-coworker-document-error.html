@@ -1,0 +1,13 @@
+<div class="flex-col-start-stretch gap-xs" role="alert">
+  <p class="mg-contact-error m-0">{{ description() }}</p>
+  <small>
+    {{ i18n.errors().diagnosticStatus }}:
+    {{ error().status ?? i18n.commonEmpty().title }};
+    {{ i18n.errors().diagnosticCode }}: {{ error().code }}
+  </small>
+  @if (error().message !== description()) {
+    <small>
+      {{ i18n.errors().diagnosticMessage }}: {{ error().message }}
+    </small>
+  }
+</div>

@@ -17,7 +17,7 @@ import {
   dateTimeRangeValidator,
   integerValidator,
   validDateValidator,
-} from '../validators/event-admin.validator';
+} from '../validators/form-value.validator';
 
 export function createEventOccurrenceForm(
   getTimeZone: () => string,

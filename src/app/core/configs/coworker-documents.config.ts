@@ -2,3 +2,15 @@ export const COWORKER_DOCUMENTS_STORAGE = {
   bucket: 'coworker-documents',
   maxFileSizeBytes: 25 * 1024 * 1024,
 } as const;
+
+export const COWORKER_DOCUMENT_DEFINITION_LIMITS = {
+  codeLength: 100,
+  titleLength: 250,
+  descriptionLength: 4000,
+  categoryLength: 150,
+  signaturePolicyCodeLength: 100,
+  allowedItemCount: 50,
+  mimeTypeLength: 150,
+  extensionLength: 16,
+  retentionDays: 36500,
+} as const;
