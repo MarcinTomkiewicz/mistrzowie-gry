@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   DestroyRef,
@@ -10,7 +9,6 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -22,6 +20,7 @@ import { PasswordModule } from 'primeng/password';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
+import { PROFILE_TEXT_LIMITS } from '../../../core/configs/profile.config';
 import {
   createUserForm,
   mapUserFormToProfilePayload,
@@ -34,13 +33,13 @@ import { Auth } from '../../../core/services/auth/auth';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { AppAuthError, AuthErrorCode } from '../../../core/types/auth-error';
 import { ProfileFormMode } from '../../../core/types/profile-form';
+import { CharacterCounter } from '../../../public/common/character-counter/character-counter';
 import { createProfileFormI18n } from './profile-form.i18n';
 
 @Component({
   selector: 'app-profile-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ButtonModule,
     IftaLabelModule,
@@ -49,9 +48,9 @@ import { createProfileFormI18n } from './profile-form.i18n';
     PasswordModule,
     TextareaModule,
     ToggleSwitch,
+    CharacterCounter,
   ],
   templateUrl: './profile-form.html',
-  styleUrl: './profile-form.scss',
   providers: [provideTranslocoScope('auth', 'common')],
 })
 export class ProfileForm {
@@ -65,6 +64,7 @@ export class ProfileForm {
   readonly mode = input<ProfileFormMode>('register');
 
   readonly i18n = createProfileFormI18n();
+  readonly limits = PROFILE_TEXT_LIMITS;
 
   readonly form = createUserForm(this.fb, {
     includeEmail: true,
@@ -76,7 +76,6 @@ export class ProfileForm {
 
   readonly isRegisterMode = computed(() => this.mode() === 'register');
   readonly isEditMode = computed(() => this.mode() === 'edit');
-  readonly isSubmitting = computed(() => false);
   readonly currentUser = computed(() => this.auth.user());
   readonly displayEmail = computed(() => this.currentUser()?.email ?? '');
   readonly showExtendedFields = computed(
@@ -217,10 +216,7 @@ export class ProfileForm {
 
     this.auth
       .register(payload)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => undefined),
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user) => {
           this.resetForm();
@@ -255,10 +251,7 @@ export class ProfileForm {
   private updateProfile(): void {
     this.auth
       .updateProfile(mapUserFormToProfilePayload(this.form))
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => undefined),
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.form.markAsPristine();

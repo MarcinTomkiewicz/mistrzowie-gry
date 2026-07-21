@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -20,6 +19,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SliderModule } from 'primeng/slider';
 import { TextareaModule } from 'primeng/textarea';
 
+import { PROFILE_TEXT_LIMITS } from '../../../core/configs/profile.config';
 import {
   createGmProfileForm,
   mapGmProfileFormToPayload,
@@ -38,6 +38,7 @@ import {
 import { setControlValue } from '../../../core/utils/form-controls';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import { CharacterCounter } from '../../../public/common/character-counter/character-counter';
 import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
 import { FileUpload } from '../../../public/common/file-upload/file-upload';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
@@ -47,9 +48,9 @@ import { createGmProfileI18n } from './gm-profile.i18n';
   selector: 'app-gm-profile',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ButtonModule,
+    CharacterCounter,
     ChipPicker,
     FileUpload,
     IftaLabelModule,
@@ -59,7 +60,6 @@ import { createGmProfileI18n } from './gm-profile.i18n';
     TextareaModule,
   ],
   templateUrl: './gm-profile.html',
-  styleUrl: './gm-profile.scss',
   providers: [provideTranslocoScope('auth', 'common')],
 })
 export class GmProfile {
@@ -70,6 +70,7 @@ export class GmProfile {
   private readonly toast = inject(UiToast);
 
   readonly i18n = createGmProfileI18n();
+  readonly limits = PROFILE_TEXT_LIMITS;
 
   readonly form = createGmProfileForm(this.fb);
 
@@ -79,13 +80,6 @@ export class GmProfile {
   readonly languageOptions = signal<IChipPickerOption[]>([]);
   readonly selectedImageFile = signal<File | null>(null);
   readonly storedImagePath = signal<string | null>(null);
-
-  private readonly quoteValue = toSignal(
-    this.form.controls.quote.valueChanges,
-    {
-      initialValue: this.form.controls.quote.getRawValue(),
-    },
-  );
 
   private readonly experienceValue = toSignal(
     this.form.controls.experience.valueChanges,
@@ -154,13 +148,6 @@ export class GmProfile {
 
     return count === 0 || (count >= 3 && count <= 5);
   });
-
-  readonly quoteRemaining = computed(() => {
-    const value = this.quoteValue() ?? '';
-    return Math.max(0, 255 - value.length);
-  });
-
-  readonly isQuoteLimitReached = computed(() => this.quoteRemaining() === 0);
 
   readonly experienceDisplay = computed(() => this.experienceValue() ?? 0);
 

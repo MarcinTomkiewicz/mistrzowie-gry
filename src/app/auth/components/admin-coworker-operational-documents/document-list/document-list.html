@@ -1,0 +1,114 @@
+<section class="mg-section mg-section--full">
+  <div
+    class="mg-container position-relative flex-col-start-stretch gap-lg"
+    [attr.aria-busy]="isLoading()"
+  >
+    <header class="mg-section__header w-100">
+      <div class="flex-row-center-center gap-xs mb-sm w-100">
+        <h1 class="mg-section__title m-0">{{ i18n.page().title }}</h1>
+        <app-context-help
+          [text]="i18n.tooltips().pagePurpose"
+          [ariaLabel]="i18n.contextHelpLabel(i18n.page().title)"
+          position="bottom"
+        />
+      </div>
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <section
+      class="mg-card flex-col-start-stretch gap-md p-md w-100"
+      aria-labelledby="admin-operational-process-title"
+    >
+      <h2
+        id="admin-operational-process-title"
+        class="mg-section__title mg-section__title--md m-0"
+      >
+        {{ i18n.process().title }}
+      </h2>
+      <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ i18n.process().shellTitle }}</strong>
+          <p class="m-0">{{ i18n.process().shellDescription }}</p>
+        </div>
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ i18n.process().versionsTitle }}</strong>
+          <p class="m-0">{{ i18n.process().versionsDescription }}</p>
+        </div>
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ i18n.process().nextStepsTitle }}</strong>
+          <p class="m-0">{{ i18n.process().nextStepsDescription }}</p>
+        </div>
+      </div>
+    </section>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    @if (loadError(); as error) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+        <h2 class="mg-section__title mg-section__title--sm error-text m-0">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+        <p class="m-0">{{ loadErrorDescription() }}</p>
+        @if (error.message !== loadErrorDescription()) {
+          <small class="muted-text">{{ error.message }}</small>
+        }
+        <div class="flex-row-start-center flex-wrap gap-sm muted-text">
+          <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+          @if (error.status !== null) {
+            <span>{{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code></span>
+          }
+        </div>
+        @if (!isAccessBlocked()) {
+          <p-button
+            type="button"
+            severity="secondary"
+            icon="pi pi-refresh"
+            [label]="i18n.actions().reload"
+            [disabled]="isLoading()"
+            (onClick)="loadDashboard()"
+          />
+        }
+      </section>
+    }
+
+    @if (dashboard(); as data) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <div class="flex-row-between-center flex-wrap gap-sm w-100">
+          <div class="flex-col-start-stretch gap-xs">
+            <div class="flex-row-start-center gap-xs">
+              <h2 class="mg-section__title mg-section__title--md m-0">
+                {{ i18n.sections().documentsTitle }}
+              </h2>
+              <app-context-help
+                [text]="i18n.tooltips().documents"
+                [ariaLabel]="i18n.contextHelpLabel(i18n.sections().documentsTitle)"
+              />
+            </div>
+            <p class="m-0">{{ i18n.sections().documentsDescription }}</p>
+          </div>
+          <p-button
+            [routerLink]="['/admin/coworkers/operational-documents/new']"
+            severity="success"
+            icon="pi pi-plus"
+            [label]="i18n.actions().createDocument"
+            [disabled]="isLoading()"
+          />
+        </div>
+
+        @if (data.documents.length === 0) {
+          <p class="m-0">{{ i18n.messages().emptyDocuments }}</p>
+        } @else {
+          <app-admin-operational-document-table
+            [rows]="data.documents"
+            [copy]="tableCopy()"
+          />
+        }
+      </section>
+    }
+  </div>
+</section>

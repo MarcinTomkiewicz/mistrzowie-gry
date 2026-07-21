@@ -69,6 +69,14 @@ const loaders = {
     import(
       './auth/components/admin-coworker-documents/review-detail/review-detail'
     ).then((m) => m.ReviewDetail),
+  adminCoworkerOperationalDocumentList: () =>
+    import(
+      './auth/components/admin-coworker-operational-documents/document-list/document-list'
+    ).then((m) => m.DocumentList),
+  adminCoworkerOperationalDocumentEditor: () =>
+    import(
+      './auth/components/admin-coworker-operational-documents/document-editor/document-editor'
+    ).then((m) => m.DocumentEditor),
 } as const;
 
 export const routes: Routes = [
@@ -137,6 +145,21 @@ export const routes: Routes = [
   {
     path: 'admin/coworkers/private-documents',
     loadComponent: loaders.adminCoworkerPrivateDocuments,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/coworkers/operational-documents',
+    loadComponent: loaders.adminCoworkerOperationalDocumentList,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/coworkers/operational-documents/new',
+    loadComponent: loaders.adminCoworkerOperationalDocumentEditor,
+    canActivate: [authGuard, minimumRoleGuard('admin')],
+  },
+  {
+    path: 'admin/coworkers/operational-documents/:documentId/edit',
+    loadComponent: loaders.adminCoworkerOperationalDocumentEditor,
     canActivate: [authGuard, minimumRoleGuard('admin')],
   },
 

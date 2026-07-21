@@ -3,11 +3,15 @@ export const COWORKER_DOCUMENTS_STORAGE = {
   maxFileSizeBytes: 25 * 1024 * 1024,
 } as const;
 
-export const COWORKER_DOCUMENT_DEFINITION_LIMITS = {
+export const COWORKER_DOCUMENT_SHELL_LIMITS = {
   codeLength: 100,
   titleLength: 250,
   descriptionLength: 4000,
   categoryLength: 150,
+} as const;
+
+export const COWORKER_DOCUMENT_DEFINITION_LIMITS = {
+  ...COWORKER_DOCUMENT_SHELL_LIMITS,
   signaturePolicyCodeLength: 100,
   allowedItemCount: 50,
   mimeTypeLength: 150,

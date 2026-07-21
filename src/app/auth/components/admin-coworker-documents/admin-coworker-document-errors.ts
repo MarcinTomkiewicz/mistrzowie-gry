@@ -1,10 +1,8 @@
 import { HttpStatusCode } from '@angular/common/http';
-import { AbstractControl } from '@angular/forms';
 
 import { ADMIN_COWORKER_DOCUMENT_ERROR_CODE } from '../../../core/types/admin-coworker-document';
 import { EdgeFunctionError } from '../../../core/types/edge-function-error';
 import { AdminCoworkerDocErrorCopy } from '../../../core/types/i18n/admin-coworker-document';
-import { CommonFormTranslations } from '../../../core/types/i18n/common';
 
 export function resolveAdminCoworkerDocumentError(
   error: EdgeFunctionError,
@@ -38,20 +36,4 @@ export function isAdminCoworkerDocumentStaleError(
     error.code === ADMIN_COWORKER_DOCUMENT_ERROR_CODE.resourceNotFound ||
     error.code === ADMIN_COWORKER_DOCUMENT_ERROR_CODE.concurrentModification
   );
-}
-
-export function resolveAdminCoworkerDocumentFieldError(
-  control: AbstractControl<unknown>,
-  fieldPath: string,
-  error: EdgeFunctionError | null,
-  copy: CommonFormTranslations,
-  relatedInvalid = false,
-): string | null {
-  const serverError = error?.fieldErrors[fieldPath];
-  if (serverError) return serverError;
-  if (!control.touched || (!control.invalid && !relatedInvalid)) return null;
-
-  return control.hasError('required') || control.hasError('requiredTrimmed')
-    ? copy.required
-    : copy.invalid;
 }

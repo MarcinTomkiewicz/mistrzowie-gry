@@ -99,6 +99,19 @@ export function readEdgeNonBlankString(
   return parsed;
 }
 
+export function createEdgeLimitedTextReader(
+  maxLength: number,
+  reader: EdgeReader<string> = readEdgeString,
+): EdgeReader<string> {
+  return (value, path) => {
+    const text = reader(value, path);
+    if (text.length > maxLength) {
+      throw invalidEdgeResponse(path, `at most ${maxLength} characters`);
+    }
+    return text;
+  };
+}
+
 export function readEdgeUuid(value: unknown, path: string): string {
   const parsed = readEdgeString(value, path);
   if (!UUID_PATTERN.test(parsed)) {
@@ -251,6 +264,21 @@ export function assertEdgeContract(
   if (!condition) {
     throw invalidEdgeResponse(path, expected);
   }
+}
+
+export function assertEdgeArrayOrder<TValue>(
+  values: readonly TValue[],
+  compare: (left: TValue, right: TValue) => number,
+  path: string,
+): void {
+  assertEdgeContract(
+    values.every(
+      (value, index) =>
+        index === 0 || compare(values[index - 1]!, value) <= 0,
+    ),
+    path,
+    'in frozen contract order',
+  );
 }
 
 function invalidEdgeResponse(

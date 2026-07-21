@@ -29,9 +29,8 @@
           name="gm-quote"
           formControlName="quote"
           autocomplete="off"
-          maxlength="255"
         />
-        <label for="gm-quote" [class.p-error]="isQuoteLimitReached()">
+        <label for="gm-quote">
           {{ i18n.form().quoteLabel }}
         </label>
       </p-iftalabel>
@@ -39,15 +38,16 @@
       <div class="flex-row-between-center flex-col-end-end-xs gap-sm">
         @if (showQuoteError()) {
           <small>
-            {{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}
+            {{ i18n.commonForm().maxLength.replace('{{max}}', limits.quoteLength.toString()) }}
           </small>
         } @else {
           <span></span>
         }
 
-        <small [class.p-error]="isQuoteLimitReached()">
-          {{ quoteRemaining() }}/255
-        </small>
+        <app-character-counter
+          [value]="form.controls.quote.value"
+          [limit]="limits.quoteLength"
+        />
       </div>
     </div>
 

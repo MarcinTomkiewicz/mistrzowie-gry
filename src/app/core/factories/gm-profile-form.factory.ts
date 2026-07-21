@@ -1,5 +1,6 @@
 import { FormBuilder, Validators } from '@angular/forms';
 
+import { PROFILE_TEXT_LIMITS } from '../configs/profile.config';
 import {
   GmProfileFormGroup,
   IGmProfileFormFactoryOptions,
@@ -20,7 +21,7 @@ export function createGmProfileForm(
     description: fb.control<string | null>(initial?.description ?? null),
     image: fb.control<string | null>(initial?.image ?? null),
     quote: fb.control<string | null>(initial?.quote ?? null, {
-      validators: [Validators.maxLength(255)],
+      validators: [Validators.maxLength(PROFILE_TEXT_LIMITS.quoteLength)],
     }),
     gmStyleIds: fb.nonNullable.control<string[]>(initial?.gmStyleIds ?? []),
     languageIds: fb.nonNullable.control<string[]>(initial?.languageIds ?? []),

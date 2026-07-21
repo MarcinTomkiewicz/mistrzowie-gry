@@ -24,6 +24,10 @@
           [ariaLabel]="i18n.contextHelpLabel(i18n.fields().code)"
         />
       </div>
+      <app-character-counter
+        [value]="form.controls.code.value"
+        [limit]="limits.codeLength"
+      />
       @if (resolveFieldError(form.controls.code, "definition.code", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
@@ -40,6 +44,10 @@
           [ariaLabel]="i18n.contextHelpLabel(i18n.fields().title)"
         />
       </div>
+      <app-character-counter
+        [value]="form.controls.title.value"
+        [limit]="limits.titleLength"
+      />
       @if (resolveFieldError(form.controls.title, "definition.title", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
@@ -56,6 +64,10 @@
           [ariaLabel]="i18n.contextHelpLabel(i18n.fields().category)"
         />
       </div>
+      <app-character-counter
+        [value]="form.controls.category.value"
+        [limit]="limits.categoryLength"
+      />
       @if (resolveFieldError(form.controls.category, "definition.category", actionError(), i18n.commonForm()); as error) {
         <small class="mg-contact-error">{{ error }}</small>
       }
@@ -96,6 +108,10 @@
       [ariaLabel]="i18n.contextHelpLabel(i18n.fields().description)"
     />
   </div>
+  <app-character-counter
+    [value]="form.controls.description.value"
+    [limit]="limits.descriptionLength"
+  />
   @if (resolveFieldError(form.controls.description, "definition.description", actionError(), i18n.commonForm()); as error) {
     <small class="mg-contact-error">{{ error }}</small>
   }
@@ -176,6 +192,10 @@
                 (onClick)="removeArrayItem('allowedMimeTypes', index)"
               />
             </div>
+            <app-character-counter
+              [value]="control.value"
+              [limit]="limits.mimeTypeLength"
+            />
             @if (resolveFieldError(control, "definition.allowedMimeTypes." + index, actionError(), i18n.commonForm()); as error) {
               <small class="mg-contact-error">{{ error }}</small>
             }
@@ -222,6 +242,10 @@
                 (onClick)="removeArrayItem('allowedExtensions', index)"
               />
             </div>
+            <app-character-counter
+              [value]="control.value"
+              [limit]="limits.extensionLength"
+            />
             @if (resolveFieldError(control, "definition.allowedExtensions." + index, actionError(), i18n.commonForm()); as error) {
               <small class="mg-contact-error">{{ error }}</small>
             }

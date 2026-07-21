@@ -235,8 +235,15 @@
         </label>
       </p-iftalabel>
 
+      <app-character-counter
+        [value]="form.controls.shortDescription.value"
+        [limit]="limits.shortDescriptionLength"
+      />
+
       @if (showShortDescriptionError()) {
-        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '150') }}</small>
+        <small>
+          {{ i18n.commonForm().maxLength.replace('{{max}}', limits.shortDescriptionLength.toString()) }}
+        </small>
       }
     </div>
 
@@ -256,8 +263,15 @@
         </label>
       </p-iftalabel>
 
+      <app-character-counter
+        [value]="form.controls.longDescription.value"
+        [limit]="limits.longDescriptionLength"
+      />
+
       @if (showLongDescriptionError()) {
-        <small>{{ i18n.commonForm().maxLength.replace('{{max}}', '255') }}</small>
+        <small>
+          {{ i18n.commonForm().maxLength.replace('{{max}}', limits.longDescriptionLength.toString()) }}
+        </small>
       }
     </div>
 

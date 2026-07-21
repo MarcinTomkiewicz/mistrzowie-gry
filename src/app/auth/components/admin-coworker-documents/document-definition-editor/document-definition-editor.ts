@@ -20,6 +20,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize } from 'rxjs';
 
+import { COWORKER_DOCUMENT_DEFINITION_LIMITS } from '../../../../core/configs/coworker-documents.config';
 import { IAdminCoworkerDocumentDefinition } from '../../../../core/interfaces/i-admin-coworker-document';
 import { ICoworkerSignaturePolicy } from '../../../../core/interfaces/i-coworker-document';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
@@ -33,12 +34,13 @@ import {
   isEdgeAccessError,
   normalizeEdgeFunctionError,
 } from '../../../../core/utils/edge-function-error-mapping';
-import { setControlEnabled } from '../../../../core/utils/form-controls';
-import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
-  resolveAdminCoworkerDocumentError,
-  resolveAdminCoworkerDocumentFieldError,
-} from '../admin-coworker-document-errors';
+  resolveEdgeFormFieldError,
+  setControlEnabled,
+} from '../../../../core/utils/form-controls';
+import { CharacterCounter } from '../../../../public/common/character-counter/character-counter';
+import { ContextHelp } from '../../../../public/common/context-help/context-help';
+import { resolveAdminCoworkerDocumentError } from '../admin-coworker-document-errors';
 import { AdminCoworkerDocumentError } from '../admin-coworker-document-error/admin-coworker-document-error';
 import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-documents.i18n';
 import {
@@ -62,6 +64,7 @@ import {
     SelectModule,
     TextareaModule,
     ToggleSwitchModule,
+    CharacterCounter,
     ContextHelp,
     AdminCoworkerDocumentError,
   ],
@@ -80,9 +83,9 @@ export class DocumentDefinitionEditor {
   readonly busyChange = output<boolean>();
 
   protected readonly i18n = createAdminCoworkerDocumentsI18n();
+  protected readonly limits = COWORKER_DOCUMENT_DEFINITION_LIMITS;
   protected readonly resolveError = resolveAdminCoworkerDocumentError;
-  protected readonly resolveFieldError =
-    resolveAdminCoworkerDocumentFieldError;
+  protected readonly resolveFieldError = resolveEdgeFormFieldError;
   protected readonly activeDateRangeError = ACTIVE_DATE_RANGE_ERROR;
   protected readonly isSaving = signal(false);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);

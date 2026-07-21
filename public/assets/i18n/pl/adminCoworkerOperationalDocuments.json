@@ -1,0 +1,172 @@
+{
+  "page": {
+    "title": "[PH] [title] Dokumenty operacyjne współpracowników",
+    "subtitle": "[PH] [subtitle] Twórz i porządkuj dokumenty organizacyjne, z którymi współpracownicy będą mogli zapoznać się lub podjąć wymaganą decyzję.",
+    "editorCreateTitle": "[PH] [editorCreateTitle] Nowy dokument operacyjny",
+    "editorEditTitle": "[PH] [editorEditTitle] Edycja dokumentu operacyjnego",
+    "editorSubtitle": "[PH] [editorSubtitle] Uzupełnij podstawowe informacje o dokumencie. Plik, zasady odbiorców i publikacja należą do kolejnych etapów procesu.",
+    "loadErrorTitle": "[PH] [loadErrorTitle] Nie udało się pobrać dokumentów operacyjnych"
+  },
+  "process": {
+    "title": "[PH] [title] Jak działa ten proces?",
+    "shellTitle": "[PH] [shellTitle] 1. Opisz dokument",
+    "shellDescription": "[PH] [shellDescription] Utwórz kartę dokumentu z kodem, nazwą, opisem i kategorią.",
+    "versionsTitle": "[PH] [versionsTitle] 2. Przygotuj wersję",
+    "versionsDescription": "[PH] [versionsDescription] Kolejne etapy pozwolą dodać plik, określić wymagane działanie i wskazać odbiorców.",
+    "nextStepsTitle": "[PH] [nextStepsTitle] 3. Opublikuj i monitoruj",
+    "nextStepsDescription": "[PH] [nextStepsDescription] Po publikacji dokument trafi do właściwych współpracowników, a ich działania będą zliczane przy wersji."
+  },
+  "sections": {
+    "documentsTitle": "[PH] [documentsTitle] Katalog dokumentów",
+    "documentsDescription": "[PH] [documentsDescription] Lista pokazuje bieżącą opublikowaną wersję dokumentu oraz wersję, która jest obecnie przygotowywana.",
+    "editorTitle": "[PH] [editorTitle] Podstawowe informacje",
+    "editorDescription": "[PH] [editorDescription] Te dane identyfikują dokument w panelu administratora i w późniejszym procesie publikacji.",
+    "versionsTitle": "[PH] [versionsTitle] Wersje dokumentu",
+    "versionsDescription": "[PH] [versionsDescription] Bieżąca opublikowana wersja jest pokazana osobno od starszych i przygotowywanych wersji. W tym etapie dane są tylko do odczytu.",
+    "currentVersion": "[PH] [currentVersion] Bieżąca opublikowana wersja",
+    "historicalVersions": "[PH] [historicalVersions] Pozostałe wersje",
+    "versionDetails": "[PH] [versionDetails] Ustawienia wersji",
+    "file": "[PH] [file] Plik wersji",
+    "targets": "[PH] [targets] Odbiorcy dokumentu",
+    "statements": "[PH] [statements] Treści potwierdzeń i decyzji",
+    "assignmentSummary": "[PH] [assignmentSummary] Stan przypisań"
+  },
+  "fields": {
+    "code": "[PH] [code] Kod dokumentu",
+    "title": "[PH] [title] Nazwa dokumentu",
+    "description": "[PH] [description] Opis dokumentu",
+    "category": "[PH] [category] Kategoria",
+    "status": "[PH] [status] Status dokumentu",
+    "revision": "[PH] [revision] Rewizja danych",
+    "currentVersion": "[PH] [currentVersion] Opublikowana wersja",
+    "unpublishedVersion": "[PH] [unpublishedVersion] Wersja w przygotowaniu",
+    "version": "[PH] [version] Wersja",
+    "versionStatus": "[PH] [versionStatus] Status wersji",
+    "actionMode": "[PH] [actionMode] Wymagane działanie współpracownika",
+    "requiresReacceptance": "[PH] [requiresReacceptance] Ponowna decyzja po nowej wersji",
+    "statementVersion": "[PH] [statementVersion] Wersja treści decyzji",
+    "actionDueAt": "[PH] [actionDueAt] Termin działania",
+    "fileName": "[PH] [fileName] Nazwa pliku",
+    "storedFileName": "[PH] [storedFileName] Nazwa zapisanego pliku",
+    "fileExtension": "[PH] [fileExtension] Rozszerzenie",
+    "mimeType": "[PH] [mimeType] Zadeklarowany typ pliku",
+    "detectedMimeType": "[PH] [detectedMimeType] Rozpoznany typ pliku",
+    "expectedSize": "[PH] [expectedSize] Oczekiwany rozmiar w bajtach",
+    "actualSize": "[PH] [actualSize] Rozmiar pliku w bajtach",
+    "malwareStatus": "[PH] [malwareStatus] Wynik kontroli bezpieczeństwa",
+    "storageBucket": "[PH] [storageBucket] Magazyn pliku",
+    "storagePath": "[PH] [storagePath] Lokalizacja pliku",
+    "totalAssignments": "[PH] [totalAssignments] Wszystkie przypisania",
+    "availableAssignments": "[PH] [availableAssignments] Tylko informacyjne",
+    "pendingAssignments": "[PH] [pendingAssignments] Oczekujące na działanie",
+    "acknowledgedAssignments": "[PH] [acknowledgedAssignments] Potwierdzone zapoznanie",
+    "acceptedAssignments": "[PH] [acceptedAssignments] Zaakceptowane",
+    "declinedAssignments": "[PH] [declinedAssignments] Odrzucone",
+    "publishedAt": "[PH] [publishedAt] Opublikowano",
+    "updatedAt": "[PH] [updatedAt] Ostatnia zmiana"
+  },
+  "actions": {
+    "createDocument": "[PH] [createDocument] Dodaj dokument operacyjny",
+    "editDocument": "[PH] [editDocument] Edytuj dokument",
+    "viewDocument": "[PH] [viewDocument] Zobacz dokument",
+    "backToList": "[PH] [backToList] Wróć do katalogu",
+    "reload": "[PH] [reload] Odśwież dane",
+    "showExplanation": "[PH] [showExplanation] Wyjaśnienie"
+  },
+  "tooltips": {
+    "pagePurpose": "[PH] [pagePurpose] Ten katalog służy do przygotowania dokumentów organizacyjnych przeznaczonych dla współpracowników. Na tym etapie można tworzyć i edytować podstawowe informacje oraz przeglądać istniejące wersje.",
+    "documents": "[PH] [documents] Dokument jest kartą organizującą kolejne wersje pliku. Opublikowana wersja może być inna niż wersja aktualnie przygotowywana.",
+    "documentCode": "[PH] [documentCode] Stały identyfikator dokumentu. Używaj małych liter, cyfr, myślników lub podkreśleń, na przykład regulamin_wspolpracy.",
+    "documentTitle": "[PH] [documentTitle] Czytelna nazwa dokumentu widoczna w panelu administracyjnym i później dla współpracowników.",
+    "documentDescription": "[PH] [documentDescription] Krótkie wyjaśnienie celu dokumentu. Opis może pozostać pusty.",
+    "documentCategory": "[PH] [documentCategory] Nazwa grupy pomagającej porządkować dokumenty, na przykład Procedury albo Bezpieczeństwo.",
+    "documentStatus": "[PH] [documentStatus] Status dotyczy całego dokumentu, niezależnie od statusów jego poszczególnych wersji.",
+    "versions": "[PH] [versions] Każda wersja ma własny plik, sposób działania współpracownika, odbiorców i treści decyzji. Kolejne etapy procesu pozwolą je zmieniać.",
+    "actionMode": "[PH] [actionMode] Określa, czy dokument jest tylko informacyjny, wymaga potwierdzenia zapoznania albo akceptacji lub odrzucenia.",
+    "requiresReacceptance": "[PH] [requiresReacceptance] Informuje, czy współpracownicy mają ponownie wykonać wymagane działanie po opublikowaniu nowej wersji.",
+    "targets": "[PH] [targets] Odbiorcy wskazują grupy lub konkretne osoby, którym dokument zostanie przypisany po publikacji.",
+    "statements": "[PH] [statements] To dokładne treści, które współpracownik potwierdza podczas zapoznania, akceptacji albo odrzucenia dokumentu.",
+    "assignmentSummary": "[PH] [assignmentSummary] Liczniki pokazują stan przypisań tej konkretnej wersji. Nie są pełnym audytem działań użytkowników."
+  },
+  "statuses": {
+    "documents": {
+      "draft": "[PH] [draft] Szkic",
+      "published": "[PH] [published] Opublikowany",
+      "archived": "[PH] [archived] Zarchiwizowany"
+    },
+    "versions": {
+      "reserved": "[PH] [reserved] Oczekuje na plik",
+      "uploaded": "[PH] [uploaded] Plik przesłany",
+      "ready": "[PH] [ready] Gotowa do publikacji",
+      "published": "[PH] [published] Opublikowana",
+      "superseded": "[PH] [superseded] Zastąpiona nowszą",
+      "archived": "[PH] [archived] Zarchiwizowana",
+      "failed": "[PH] [failed] Przygotowanie nieudane",
+      "deleted": "[PH] [deleted] Usunięta"
+    },
+    "actionModes": {
+      "information_only": "[PH] [information_only] Tylko do wiadomości",
+      "acknowledgement_required": "[PH] [acknowledgement_required] Wymaga potwierdzenia zapoznania",
+      "acceptance_required": "[PH] [acceptance_required] Wymaga akceptacji albo odrzucenia"
+    },
+    "targetKinds": {
+      "all_active_coworkers": "[PH] [all_active_coworkers] Wszyscy aktywni współpracownicy",
+      "app_role": "[PH] [app_role] Współpracownicy o wybranej roli",
+      "user": "[PH] [user] Konkretny współpracownik",
+      "event_definition": "[PH] [event_definition] Współpracownicy związani z rodzajem wydarzenia"
+    },
+    "appRoles": {
+      "user": "[PH] [user] Użytkownik",
+      "gm": "[PH] [gm] Mistrz Gry",
+      "marketing_manager": "[PH] [marketing_manager] Manager marketingu",
+      "customer_manager": "[PH] [customer_manager] Opiekun klienta",
+      "lead_coordinator": "[PH] [lead_coordinator] Koordynator leadów",
+      "admin": "[PH] [admin] Administrator"
+    },
+    "malware": {
+      "not_scanned": "[PH] [not_scanned] Jeszcze niesprawdzony",
+      "pending": "[PH] [pending] Sprawdzanie w toku",
+      "clean": "[PH] [clean] Bezpieczny",
+      "infected": "[PH] [infected] Wykryto zagrożenie",
+      "failed": "[PH] [failed] Sprawdzanie nieudane",
+      "unavailable": "[PH] [unavailable] Sprawdzanie niedostępne"
+    },
+    "statementActions": {
+      "acknowledged": "[PH] [acknowledged] Potwierdzenie zapoznania",
+      "accepted": "[PH] [accepted] Akceptacja",
+      "declined": "[PH] [declined] Odrzucenie"
+    },
+    "yes": "[PH] [yes] Tak",
+    "no": "[PH] [no] Nie",
+    "notProvided": "[PH] [notProvided] Nie podano"
+  },
+  "messages": {
+    "emptyDocuments": "[PH] [emptyDocuments] Nie utworzono jeszcze żadnego dokumentu operacyjnego.",
+    "emptyVersions": "[PH] [emptyVersions] Ten dokument nie ma jeszcze żadnej wersji.",
+    "noCurrentVersion": "[PH] [noCurrentVersion] Dokument nie ma bieżącej opublikowanej wersji.",
+    "noHistoricalVersions": "[PH] [noHistoricalVersions] Nie ma pozostałych wersji do wyświetlenia.",
+    "noTargets": "[PH] [noTargets] Odbiorcy nie zostali jeszcze skonfigurowani.",
+    "noStatements": "[PH] [noStatements] Treści działań nie zostały jeszcze skonfigurowane.",
+    "storageUnavailable": "[PH] [storageUnavailable] Magazyn plików nie jest obecnie skonfigurowany.",
+    "savedSummary": "[PH] [savedSummary] Dokument zapisany",
+    "created": "[PH] [created] Utworzono dokument operacyjny.",
+    "updated": "[PH] [updated] Zapisano zmiany dokumentu operacyjnego.",
+    "reloadAfterConflict": "[PH] [reloadAfterConflict] Dane dokumentu mogły się zmienić. Odśwież je przed kolejną próbą zapisu.",
+    "archivedReadOnly": "[PH] [archivedReadOnly] Zarchiwizowanego dokumentu nie można edytować. Jego dane i wersje pozostają dostępne do odczytu."
+  },
+  "errors": {
+    "load": "[PH] [load] Nie udało się pobrać danych dokumentów operacyjnych.",
+    "save": "[PH] [save] Nie udało się zapisać dokumentu operacyjnego.",
+    "unauthorized": "[PH] [unauthorized] Sesja wygasła. Zaloguj się ponownie.",
+    "forbidden": "[PH] [forbidden] Nie masz uprawnień do zarządzania dokumentami operacyjnymi.",
+    "notFound": "[PH] [notFound] Dokument nie istnieje albo nie jest już dostępny.",
+    "conflict": "[PH] [conflict] Dokument o tym kodzie już istnieje albo dane zmieniły się od ostatniego pobrania.",
+    "invalidState": "[PH] [invalidState] Dokument jest w stanie, który nie pozwala na tę zmianę.",
+    "invalidResponse": "[PH] [invalidResponse] Otrzymano nieprawidłowe dane dokumentu. Odśwież stronę i spróbuj ponownie.",
+    "codeLabel": "[PH] [codeLabel] Kod błędu",
+    "statusLabel": "[PH] [statusLabel] Status odpowiedzi"
+  },
+  "validation": {
+    "codePattern": "[PH] [codePattern] Użyj małych liter, cyfr, myślników lub podkreśleń. Pierwszy znak musi być literą albo cyfrą."
+  }
+}

@@ -33,12 +33,14 @@ import {
   isEdgeAccessError,
   normalizeEdgeFunctionError,
 } from '../../../../core/utils/edge-function-error-mapping';
-import { setControlEnabled } from '../../../../core/utils/form-controls';
+import {
+  resolveEdgeFormFieldError,
+  setControlEnabled,
+} from '../../../../core/utils/form-controls';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
   isAdminCoworkerDocumentStaleError,
   resolveAdminCoworkerDocumentError,
-  resolveAdminCoworkerDocumentFieldError,
 } from '../admin-coworker-document-errors';
 import { AdminCoworkerDocumentError } from '../admin-coworker-document-error/admin-coworker-document-error';
 import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-documents.i18n';
@@ -72,8 +74,7 @@ export class RequirementEditor {
 
   protected readonly i18n = createAdminCoworkerDocumentsI18n();
   protected readonly resolveError = resolveAdminCoworkerDocumentError;
-  protected readonly resolveFieldError =
-    resolveAdminCoworkerDocumentFieldError;
+  protected readonly resolveFieldError = resolveEdgeFormFieldError;
   protected readonly isSaving = signal(false);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);
   protected readonly userId = computed(() => this.coworker().userId);

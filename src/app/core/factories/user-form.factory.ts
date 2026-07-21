@@ -4,6 +4,7 @@ import {
   Validators
 } from '@angular/forms';
 
+import { PROFILE_TEXT_LIMITS } from '../configs/profile.config';
 import { IUserProfileFormData } from '../interfaces/i-auth-payloads';
 import { IUserFormFactoryOptions, UserFormGroup } from '../interfaces/i-user-form';
 import { normalizeText } from '../utils/normalize-text';
@@ -45,10 +46,14 @@ export function createUserForm(
       age: fb.control<number | null>(initial?.age ?? null),
 
       shortDescription: fb.control<string | null>(initial?.shortDescription ?? null, {
-        validators: [Validators.maxLength(150)],
+        validators: [
+          Validators.maxLength(PROFILE_TEXT_LIMITS.shortDescriptionLength),
+        ],
       }),
       longDescription: fb.control<string | null>(initial?.longDescription ?? null, {
-        validators: [Validators.maxLength(255)],
+        validators: [
+          Validators.maxLength(PROFILE_TEXT_LIMITS.longDescriptionLength),
+        ],
       }),
       extendedDescription: fb.control<string | null>(
         initial?.extendedDescription ?? null,
