@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
-import { IAdminOperationalDocumentListItem } from '../../../../core/interfaces/i-admin-coworker-operational-document';
+import { IAdminOperationalDocumentListItem } from '../../../../core/interfaces/i-admin-operational-document';
 import { AdminOperationalTableCopy } from '../../../../core/types/i18n/admin-coworker-operational-document';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';

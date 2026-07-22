@@ -1,5 +1,9 @@
 import { AppRoleLabels } from '../app-role';
-import { AdminOperationalTargetKind } from '../admin-coworker-operational-document';
+import {
+  AdminOperationalCleanupStatus,
+  AdminOperationalUploadSessionStatus,
+} from '../admin-operational-upload';
+import { AdminOperationalTargetKind } from '../admin-operational-version';
 import {
   CoworkerOperationalAction,
   CoworkerOperationalActionMode,
@@ -40,6 +44,11 @@ export type AdminOperationalCopy = {
     targets: string;
     statements: string;
     assignmentSummary: string;
+    versionEditorTitle: string;
+    versionEditorDescription: string;
+    versionMetadata: string;
+    versionFile: string;
+    uploadRecovery: string;
   };
   fields: {
     code: string;
@@ -74,6 +83,13 @@ export type AdminOperationalCopy = {
     declinedAssignments: string;
     publishedAt: string;
     updatedAt: string;
+    versionTitle: string;
+    summary: string;
+    targetKind: string;
+    targetValue: string;
+    uploadSessionStatus: string;
+    expiresAt: string;
+    cleanupStatus: string;
   };
   actions: {
     createDocument: string;
@@ -82,6 +98,12 @@ export type AdminOperationalCopy = {
     backToList: string;
     reload: string;
     showExplanation: string;
+    chooseFile: string;
+    finalizeUpload: string;
+    cancelReservation: string;
+    configureVersion: string;
+    addTarget: string;
+    removeTarget: string;
   };
   tooltips: {
     pagePurpose: string;
@@ -97,6 +119,7 @@ export type AdminOperationalCopy = {
     targets: string;
     statements: string;
     assignmentSummary: string;
+    versionEditor: string;
   };
   statuses: {
     documents: Record<CoworkerOperationalDocumentStatus, string>;
@@ -106,6 +129,14 @@ export type AdminOperationalCopy = {
     appRoles: AppRoleLabels;
     malware: Record<CoworkerMalwareScanStatus, string>;
     statementActions: Record<CoworkerOperationalAction, string>;
+    uploadSessions: Record<AdminOperationalUploadSessionStatus, string>;
+    cleanup: Record<AdminOperationalCleanupStatus, string>;
+    versionActions: {
+      reserving: string;
+      uploading: string;
+      finalizing: string;
+      cancelling: string;
+    };
     yes: string;
     no: string;
     notProvided: string;
@@ -123,6 +154,18 @@ export type AdminOperationalCopy = {
     updated: string;
     reloadAfterConflict: string;
     archivedReadOnly: string;
+    targetRequired: string;
+    statementsNotRequired: string;
+    readyVersion: string;
+    dropFile: string;
+    uploadRecovery: string;
+    uploadExpired: string;
+    versionSavedSummary: string;
+    uploadCompleted: string;
+    reservationCancelled: string;
+    configurationSaved: string;
+    reservationCancelledCleanupFailed: string;
+    cancelReservationConfirmation: string;
   };
   errors: {
     load: string;
@@ -135,9 +178,24 @@ export type AdminOperationalCopy = {
     invalidResponse: string;
     codeLabel: string;
     statusLabel: string;
+    reasonLabel: string;
+    versionAction: string;
+    reserve: string;
+    upload: string;
+    finalize: string;
+    cancel: string;
+    configure: string;
+    uploadedFile: string;
+    storage: string;
+    cleanup: string;
+    fileType: string;
+    fileSize: string;
+    storageConfiguration: string;
   };
   validation: {
     codePattern: string;
+    duplicateTarget: string;
+    inactiveCoworkerTarget: string;
   };
 };
 

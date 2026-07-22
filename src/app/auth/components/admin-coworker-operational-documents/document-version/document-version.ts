@@ -3,9 +3,11 @@ import { Component, input } from '@angular/core';
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import {
   IAdminOperationalCatalog,
-  IAdminOperationalStoredVersion,
-  IAdminOperationalTarget,
-} from '../../../../core/interfaces/i-admin-coworker-operational-document';
+} from '../../../../core/interfaces/i-admin-operational-catalog';
+import type {
+  AdminOperationalStoredVersion,
+  AdminOperationalTarget,
+} from '../../../../core/types/admin-operational-version';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
@@ -17,7 +19,7 @@ import { createAdminOperationalDocumentsI18n } from '../admin-operational-docume
   templateUrl: './document-version.html',
 })
 export class DocumentVersion {
-  readonly version = input.required<IAdminOperationalStoredVersion>();
+  readonly version = input.required<AdminOperationalStoredVersion>();
   readonly catalog = input.required<IAdminOperationalCatalog>();
   readonly current = input(false);
 
@@ -25,7 +27,7 @@ export class DocumentVersion {
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
 
-  protected targetValue(target: IAdminOperationalTarget): string {
+  protected targetValue(target: AdminOperationalTarget): string {
     switch (target.targetKind) {
       case 'all_active_coworkers':
         return this.i18n.statuses().targetKinds.all_active_coworkers;

@@ -1,0 +1,144 @@
+<section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+  <header class="flex-row-between-center flex-wrap gap-sm w-100">
+    <div class="flex-row-start-center gap-xs">
+      <h4 class="mg-section__title mg-section__title--xs m-0">
+        {{ i18n.sections().targets }}
+      </h4>
+      <app-context-help
+        [text]="i18n.tooltips().targets"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.sections().targets)"
+      />
+    </div>
+    <p-button
+      type="button"
+      severity="secondary"
+      icon="pi pi-plus"
+      [label]="i18n.actions().addTarget"
+      [disabled]="disabled() || targets().length >= targetLimit"
+      (onClick)="addTarget()"
+    />
+  </header>
+
+  @if (targets().length === 0) {
+    <p class="m-0 muted-text">{{ i18n.messages().targetRequired }}</p>
+  }
+
+  @for (target of targets().controls; track target; let index = $index) {
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="target">
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm w-100">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel>
+            <p-select
+              class="w-100"
+              [inputId]="'operational-target-kind-' + index"
+              formControlName="targetKind"
+              [options]="kindOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              (onChange)="targetKindChanged(index)"
+            />
+            <label [for]="'operational-target-kind-' + index">
+              {{ i18n.fields().targetKind }}
+            </label>
+          </p-iftalabel>
+          @if (fieldError(index, "targetKind"); as error) {
+            <small class="mg-contact-error">{{ error }}</small>
+          }
+        </div>
+
+        @switch (target.controls.targetKind.value) {
+          @case ("app_role") {
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel>
+                <p-select
+                  class="w-100"
+                  [inputId]="'operational-target-role-' + index"
+                  formControlName="appRole"
+                  [options]="roleOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                />
+                <label [for]="'operational-target-role-' + index">
+                  {{ i18n.fields().targetValue }}
+                </label>
+              </p-iftalabel>
+              @if (fieldError(index, "appRole"); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+          @case ("user") {
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel>
+                <p-select
+                  class="w-100"
+                  [inputId]="'operational-target-user-' + index"
+                  formControlName="userId"
+                  [options]="coworkerOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  optionDisabled="disabled"
+                  appendTo="body"
+                  [filter]="true"
+                />
+                <label [for]="'operational-target-user-' + index">
+                  {{ i18n.fields().targetValue }}
+                </label>
+              </p-iftalabel>
+              @if (fieldError(index, "userId"); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+          @case ("event_definition") {
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel>
+                <p-select
+                  class="w-100"
+                  [inputId]="'operational-target-event-' + index"
+                  formControlName="eventDefinitionId"
+                  [options]="eventOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                  [filter]="true"
+                />
+                <label [for]="'operational-target-event-' + index">
+                  {{ i18n.fields().targetValue }}
+                </label>
+              </p-iftalabel>
+              @if (fieldError(index, "eventDefinitionId"); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      @if (rowError(index); as error) {
+        <small class="mg-contact-error">{{ error }}</small>
+      }
+
+      <div class="flex-row-end-center w-100">
+        <p-button
+          type="button"
+          severity="danger"
+          [text]="true"
+          icon="pi pi-trash"
+          [label]="i18n.actions().removeTarget"
+          [disabled]="disabled()"
+          (onClick)="removeTarget(index)"
+        />
+      </div>
+    </div>
+  }
+
+  @if (targets().hasError("uniqueTargets")) {
+    <small class="mg-contact-error">{{ i18n.validation().duplicateTarget }}</small>
+  }
+  @if (error()?.fieldErrors?.["configuration.targets"]; as error) {
+    <small class="mg-contact-error">{{ error }}</small>
+  }
+</section>

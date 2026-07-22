@@ -40,7 +40,7 @@
               icon="pi pi-refresh"
               [label]="i18n.actions().reload"
               [disabled]="isLoading()"
-              (onClick)="loadEditor()"
+              (onClick)="detailReloadRequired() ? reloadDocumentDetail() : loadInitialEditor()"
             />
           }
           <p-button
@@ -242,65 +242,17 @@
       </form>
 
       @if (document(); as loadedDocument) {
-        <section class="flex-col-start-stretch gap-md w-100">
-          <header class="flex-col-start-stretch gap-xs">
-            <div class="flex-row-start-center gap-xs">
-              <h2 class="mg-section__title mg-section__title--md m-0">
-                {{ i18n.sections().versionsTitle }}
-              </h2>
-              <app-context-help
-                [text]="i18n.tooltips().versions"
-                [ariaLabel]="i18n.contextHelpLabel(i18n.sections().versionsTitle)"
-              />
-            </div>
-            <p class="m-0">{{ i18n.sections().versionsDescription }}</p>
-          </header>
-
-          @if (loadedDocument.versions.length === 0) {
-            <div class="mg-card p-md w-100">
-              <p class="m-0">{{ i18n.messages().emptyVersions }}</p>
-            </div>
-          } @else {
-            <section class="flex-col-start-stretch gap-sm w-100">
-              <h3 class="mg-section__title mg-section__title--sm m-0">
-                {{ i18n.sections().currentVersion }}
-              </h3>
-              @if (currentVersion(); as version) {
-                <app-admin-operational-document-version
-                  [version]="version"
-                  [catalog]="loadedCatalog"
-                  [current]="true"
-                />
-              } @else {
-                <div class="mg-card p-md w-100">
-                  <p class="m-0">{{ i18n.messages().noCurrentVersion }}</p>
-                </div>
-              }
-            </section>
-
-            <section class="flex-col-start-stretch gap-sm w-100">
-              <h3 class="mg-section__title mg-section__title--sm m-0">
-                {{ i18n.sections().historicalVersions }}
-              </h3>
-              @if (otherVersions().length === 0) {
-                <div class="mg-card p-md w-100">
-                  <p class="m-0">{{ i18n.messages().noHistoricalVersions }}</p>
-                </div>
-              } @else {
-                @for (version of otherVersions(); track version.id) {
-                  <app-admin-operational-document-version
-                    [version]="version"
-                    [catalog]="loadedCatalog"
-                  />
-                }
-              }
-            </section>
-          }
-        </section>
-      }
-
-      @if (loadedCatalog.storage === null) {
-        <p class="m-0 muted-text">{{ i18n.messages().storageUnavailable }}</p>
+        <app-admin-operational-version-editor
+          [document]="loadedDocument"
+          [catalog]="loadedCatalog"
+          [disabled]="formDisabled()"
+          (busyChange)="versionBusy.set($event)"
+          (reloadRequested)="reloadDocumentDetail()"
+        />
+        <app-admin-operational-version-history
+          [document]="loadedDocument"
+          [catalog]="loadedCatalog"
+        />
       }
     }
   </div>

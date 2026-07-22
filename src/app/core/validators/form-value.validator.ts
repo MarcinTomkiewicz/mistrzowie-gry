@@ -37,6 +37,18 @@ export function validDateValidator(
   };
 }
 
+export function futureDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (value === null || !isValidDate(value)) {
+      return null;
+    }
+
+    return value.getTime() > Date.now() ? null : { futureDate: true };
+  };
+}
+
 export function dateTimeRangeValidator(
   startControlName: string,
   endControlName: string,

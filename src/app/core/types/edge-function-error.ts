@@ -5,6 +5,7 @@ export class EdgeFunctionError extends Error {
     message: string,
     public readonly fieldErrors: Readonly<Record<string, string>>,
     public override readonly cause: unknown,
+    public readonly reason: string | null = null,
   ) {
     super(message, { cause });
     this.name = 'EdgeFunctionError';

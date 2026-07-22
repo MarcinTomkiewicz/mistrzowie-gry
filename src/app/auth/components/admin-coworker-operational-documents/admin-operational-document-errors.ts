@@ -1,6 +1,6 @@
 import { HttpStatusCode } from '@angular/common/http';
 
-import { ADMIN_OPERATIONAL_ERROR_CODE } from '../../../core/types/admin-coworker-operational-document';
+import { ADMIN_OPERATIONAL_ERROR_CODE } from '../../../core/types/admin-operational-document';
 import { EdgeFunctionError } from '../../../core/types/edge-function-error';
 import { AdminOperationalCopy } from '../../../core/types/i18n/admin-coworker-operational-document';
 

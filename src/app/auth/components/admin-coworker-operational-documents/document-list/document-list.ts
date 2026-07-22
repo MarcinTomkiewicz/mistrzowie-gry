@@ -4,7 +4,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
 
-import { IAdminOperationalDashboard } from '../../../../core/interfaces/i-admin-coworker-operational-document';
+import { IAdminOperationalDashboard } from '../../../../core/interfaces/i-admin-operational-document';
 import { AdminCoworkerOperationalDocuments } from '../../../../core/services/admin-coworker-operational-documents/admin-coworker-operational-documents';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { AdminOperationalTableCopy } from '../../../../core/types/i18n/admin-coworker-operational-document';

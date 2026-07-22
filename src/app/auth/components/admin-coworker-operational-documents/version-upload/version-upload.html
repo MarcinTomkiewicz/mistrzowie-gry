@@ -1,0 +1,120 @@
+@if (recovery(); as uploadRecovery) {
+  <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100" role="status">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().uploadRecovery }}
+    </h3>
+    <p class="m-0">{{ i18n.messages().uploadRecovery }}</p>
+    <div class="mg-grid-auto-fit w-100">
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().uploadSessionStatus }}</span>
+        <strong>{{ i18n.statuses().uploadSessions[uploadRecovery.sessionStatus] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().versionStatus }}</span>
+        <strong>{{ i18n.statuses().versions[uploadRecovery.versionStatus] }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().expiresAt }}</span>
+        <strong>{{ formatTimestampLabel(uploadRecovery.expiresAt, "pl-PL") }}</strong>
+      </div>
+      <div class="flex-col-start-stretch gap-xs">
+        <span class="muted-text">{{ i18n.fields().cleanupStatus }}</span>
+        <strong>{{ i18n.statuses().cleanup[uploadRecovery.cleanupStatus] }}</strong>
+      </div>
+    </div>
+    @if (uploadRecovery.expired) {
+      <p class="m-0 error-text">{{ i18n.messages().uploadExpired }}</p>
+    }
+    <div class="flex-row-end-center flex-wrap gap-sm w-100">
+      @if (uploadRecovery.canFinalize && !uploadRecovery.expired) {
+        <p-button
+          type="button"
+          severity="success"
+          icon="pi pi-check"
+          [label]="i18n.actions().finalizeUpload"
+          [loading]="state() === 'finalizing'"
+          [disabled]="disabled() || isBusy() || isAccessBlocked()"
+          (onClick)="finalizeRecovery()"
+        />
+      }
+      @if (uploadRecovery.canCancel) {
+        <p-button
+          type="button"
+          severity="danger"
+          icon="pi pi-trash"
+          [label]="i18n.actions().cancelReservation"
+          [loading]="state() === 'cancelling'"
+          [disabled]="disabled() || isBusy() || isAccessBlocked()"
+          (onClick)="cancelRecovery($event)"
+        />
+      }
+    </div>
+  </section>
+} @else if (!hasReadyVersion() && uploadStorage(); as storage) {
+  <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.sections().versionFile }}
+    </h3>
+    <app-file-upload
+      [texts]="{
+        chooseLabel: i18n.actions().chooseFile,
+        dropLabel: i18n.messages().dropFile,
+        formatsLabel: formatLabel(),
+      }"
+      [options]="{
+        mode: 'files',
+        currentUrl: null,
+        disabled: !canReserve(),
+        previewShape: 'square',
+        accept: acceptedFiles(),
+        maxFileSize: storage.fileSizeLimit,
+        multiple: false,
+        clearAfterSelect: true,
+        chooseIcon: 'pi pi-upload',
+        emptyIcon: 'pi pi-file',
+      }"
+      (filesSelected)="uploadSelectedFiles($event)"
+    />
+    @if (fileError()) {
+      <small class="mg-contact-error" role="alert">{{ fileError() }}</small>
+    }
+  </section>
+} @else if (!hasReadyVersion()) {
+  <p class="m-0 error-text" role="alert">{{ i18n.errors().storageConfiguration }}</p>
+}
+
+@if (progressLabel()) {
+  <p class="m-0 muted-text" aria-live="polite">{{ progressLabel() }}</p>
+}
+
+@if (actionError(); as error) {
+  <div class="flex-col-start-stretch gap-xs error-text" role="alert">
+    <strong>{{ actionErrorDescription() }}</strong>
+    @if (error.message !== actionErrorDescription()) {
+      <span class="muted-text">{{ error.message }}</span>
+    }
+    @if (error.reason) {
+      <span>{{ i18n.errors().reasonLabel }}: <code>{{ error.reason }}</code></span>
+    }
+    @for (fieldError of actionFieldErrors(); track $index) {
+      <span>{{ fieldError }}</span>
+    }
+    <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+    @if (error.status !== null) {
+      <span>{{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code></span>
+    }
+  </div>
+}
+
+@if (cleanupError(); as error) {
+  <div class="flex-col-start-stretch gap-xs error-text" role="alert">
+    <strong>
+      {{ error.code === cleanupErrorCode ? i18n.errors().cleanup : i18n.errors().cancel }}
+    </strong>
+    @if (error.code === cleanupErrorCode) {
+      <span>{{ i18n.messages().reservationCancelledCleanupFailed }}</span>
+    }
+    <span class="muted-text">{{ error.message }}</span>
+    <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+  </div>
+}

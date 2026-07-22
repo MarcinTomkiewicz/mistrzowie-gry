@@ -8,21 +8,24 @@ import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, map, switchMap } from 'rxjs';
+import { finalize, map, of, switchMap } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { COWORKER_DOCUMENT_SHELL_LIMITS } from '../../../../core/configs/coworker-documents.config';
 import {
   IAdminOperationalCatalog,
+} from '../../../../core/interfaces/i-admin-operational-catalog';
+import {
   IAdminOperationalDocumentDetail,
-} from '../../../../core/interfaces/i-admin-coworker-operational-document';
+} from '../../../../core/interfaces/i-admin-operational-document';
 import { AdminCoworkerOperationalDocuments } from '../../../../core/services/admin-coworker-operational-documents/admin-coworker-operational-documents';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { ADMIN_OPERATIONAL_ERROR_CODE } from '../../../../core/types/admin-coworker-operational-document';
+import { ADMIN_OPERATIONAL_ERROR_CODE } from '../../../../core/types/admin-operational-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import {
   isEdgeAccessError,
+  isEdgeMutationResultUncertain,
   normalizeEdgeFunctionError,
 } from '../../../../core/utils/edge-function-error-mapping';
 import {
@@ -34,7 +37,8 @@ import { ContextHelp } from '../../../../public/common/context-help/context-help
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { resolveAdminOperationalError } from '../admin-operational-document-errors';
 import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
-import { DocumentVersion } from '../document-version/document-version';
+import { VersionEditor } from '../version-editor/version-editor';
+import { VersionHistory } from '../version-history/version-history';
 import {
   createAdminOperationalDocumentForm,
   mapAdminOperationalDocumentForm,
@@ -54,7 +58,8 @@ import {
     CharacterCounter,
     ContextHelp,
     LoadingOverlay,
-    DocumentVersion,
+    VersionEditor,
+    VersionHistory,
   ],
   templateUrl: './document-editor.html',
   providers: [
@@ -67,6 +72,7 @@ export class DocumentEditor {
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
   private readonly documentId = this.route.snapshot.paramMap.get('documentId');
+  private formRevision: number | null = null;
 
   protected readonly i18n = createAdminOperationalDocumentsI18n();
   protected readonly limits = COWORKER_DOCUMENT_SHELL_LIMITS;
@@ -77,20 +83,11 @@ export class DocumentEditor {
   protected readonly document = signal<IAdminOperationalDocumentDetail | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
+  protected readonly versionBusy = signal(false);
+  protected readonly detailReloadRequired = signal(false);
   protected readonly loadError = signal<EdgeFunctionError | null>(null);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);
   protected readonly isCreate = this.documentId === null;
-  protected readonly currentVersion = computed(
-    () => this.document()?.currentPublishedVersion ?? null,
-  );
-  protected readonly otherVersions = computed(() => {
-    const document = this.document();
-    return document
-      ? document.versions.filter(
-          (version) => version.id !== document.currentPublishedVersionId,
-        )
-      : [];
-  });
   protected readonly isArchived = computed(
     () => this.document()?.status === 'archived',
   );
@@ -103,6 +100,8 @@ export class DocumentEditor {
     () =>
       this.isLoading() ||
       this.isSaving() ||
+      this.versionBusy() ||
+      this.detailReloadRequired() ||
       this.isArchived() ||
       this.isAccessBlocked(),
   );
@@ -127,7 +126,10 @@ export class DocumentEditor {
       : '';
   });
   protected readonly reloadSuggested = computed(
-    () => this.actionError()?.code === ADMIN_OPERATIONAL_ERROR_CODE.conflict,
+    () =>
+      !this.isCreate &&
+      !this.detailReloadRequired() &&
+      this.actionError()?.code === ADMIN_OPERATIONAL_ERROR_CODE.conflict,
   );
 
   constructor() {
@@ -135,12 +137,13 @@ export class DocumentEditor {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.actionError.set(null));
-    this.loadEditor();
+    this.loadInitialEditor();
   }
 
-  protected loadEditor(): void {
+  protected loadInitialEditor(): void {
     const documentId = this.documentId;
     this.isLoading.set(true);
+    this.detailReloadRequired.set(false);
     this.loadError.set(null);
 
     if (documentId === null) {
@@ -152,7 +155,7 @@ export class DocumentEditor {
             this.catalog.set(dashboard.catalog);
             this.document.set(null);
             this.actionError.set(null);
-            populateAdminOperationalDocumentForm(this.form, null);
+            this.populateShellForm(null);
           },
           error: (error) => this.handleLoadError(error),
         });
@@ -174,7 +177,7 @@ export class DocumentEditor {
           this.catalog.set(dashboard.catalog);
           this.document.set(document);
           this.actionError.set(null);
-          populateAdminOperationalDocumentForm(this.form, document);
+          this.populateShellForm(document);
         },
         error: (error) => this.handleLoadError(error),
       });
@@ -200,7 +203,7 @@ export class DocumentEditor {
     this.isSaving.set(true);
     this.actionError.set(null);
     this.documents
-      .saveDocument(payload, catalog, currentDocument?.revision ?? null)
+      .saveDocument(payload, catalog, this.formRevision)
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (document) => {
@@ -222,7 +225,7 @@ export class DocumentEditor {
             return;
           }
           this.document.set(document);
-          populateAdminOperationalDocumentForm(this.form, document);
+          this.populateShellForm(document);
         },
         error: (error) => {
           const normalizedError = normalizeEdgeFunctionError(
@@ -239,34 +242,46 @@ export class DocumentEditor {
             return;
           }
           this.actionError.set(normalizedError);
-          if (this.isUncertainSaveResult(normalizedError)) {
+          if (isEdgeMutationResultUncertain(normalizedError)) {
             if (payload.id === null) {
               this.recoverCreatedDocument(payload.code);
               return;
             }
-            this.loadEditor();
+            this.reloadDocumentDetail();
           }
         },
       });
   }
 
   protected reloadAfterConflict(): void {
-    if (!this.isCreate) {
-      this.loadEditor();
-      return;
-    }
+    this.loadInitialEditor();
+  }
 
+  protected reloadDocumentDetail(): void {
+    const catalog = this.catalog();
+    const currentDocument = this.document();
+    if (catalog === null || currentDocument === null || this.isLoading()) return;
+
+    const preserveShell = this.form.dirty;
     this.isLoading.set(true);
+    this.detailReloadRequired.set(true);
     this.loadError.set(null);
     this.documents
-      .getDashboard()
+      .getDocumentDetail(currentDocument.id, catalog)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (dashboard) => {
-          this.catalog.set(dashboard.catalog);
-          this.actionError.set(null);
+        next: (document) => {
+          this.document.set(document);
+          this.detailReloadRequired.set(false);
+          if (!preserveShell) {
+            this.populateShellForm(document);
+          }
         },
-        error: (error) => this.handleLoadError(error),
+        error: (error) => {
+          this.loadError.set(
+            normalizeEdgeFunctionError(error, this.i18n.errors().load),
+          );
+        },
       });
   }
 
@@ -295,14 +310,18 @@ export class DocumentEditor {
     this.catalog.set(null);
     this.document.set(null);
     this.actionError.set(null);
+    this.detailReloadRequired.set(false);
+    this.formRevision = null;
     this.loadError.set(
       normalizeEdgeFunctionError(error, this.i18n.errors().load),
     );
   }
 
-  private isUncertainSaveResult(error: EdgeFunctionError): boolean {
-    return error.code === 'EDGE_INVALID_SUCCESS_RESPONSE' ||
-      error.code === 'BACKEND_CONTRACT_ERROR';
+  private populateShellForm(
+    document: IAdminOperationalDocumentDetail | null,
+  ): void {
+    populateAdminOperationalDocumentForm(this.form, document);
+    this.formRevision = document?.revision ?? null;
   }
 
   private recoverCreatedDocument(code: string): void {
@@ -310,20 +329,30 @@ export class DocumentEditor {
     this.loadError.set(null);
     this.documents
       .getDashboard()
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (dashboard) => {
-          this.catalog.set(dashboard.catalog);
+      .pipe(
+        switchMap((dashboard) => {
           const createdDocument = dashboard.documents.find(
             (document) => document.code === code,
           );
-          if (createdDocument === undefined) return;
+          if (createdDocument === undefined) {
+            return of({ dashboard, document: null });
+          }
+          return this.documents
+            .getDocumentDetail(createdDocument.id, dashboard.catalog)
+            .pipe(map((document) => ({ dashboard, document })));
+        }),
+        finalize(() => this.isLoading.set(false)),
+      )
+      .subscribe({
+        next: ({ dashboard, document }) => {
+          this.catalog.set(dashboard.catalog);
+          if (document === null) return;
 
           this.actionError.set(null);
           void this.router.navigate(
             [
               '/admin/coworkers/operational-documents',
-              createdDocument.id,
+              document.id,
               'edit',
             ],
             { replaceUrl: true },

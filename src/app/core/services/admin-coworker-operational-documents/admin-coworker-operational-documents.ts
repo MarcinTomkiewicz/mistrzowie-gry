@@ -4,21 +4,40 @@ import { map, Observable } from 'rxjs';
 import { COWORKER_EDGE_FUNCTION } from '../../configs/coworker-edge-functions.config';
 import {
   IAdminOperationalCatalog,
+} from '../../interfaces/i-admin-operational-catalog';
+import {
   IAdminOperationalDashboard,
   IAdminOperationalDocumentDetail,
-} from '../../interfaces/i-admin-coworker-operational-document';
+} from '../../interfaces/i-admin-operational-document';
 import {
   ADMIN_OPERATIONAL_EDGE_ACTION,
-  AdminOperationalRequest,
-  SaveAdminOperationalDocumentPayload,
-} from '../../types/admin-coworker-operational-document';
-import { EdgeReader } from '../../types/edge-contract';
-import { Backend } from '../backend/backend';
+  type AdminOperationalRequest,
+  type SaveAdminOperationalDocumentPayload,
+} from '../../types/admin-operational-document';
+import type {
+  AdminOperationalFinalizeContext,
+  AdminOperationalUploadReservationResult,
+  ReserveAdminOperationalUploadPayload,
+} from '../../types/admin-operational-upload';
+import type {
+  AdminOperationalStoredVersion,
+  ConfigureAdminOperationalVersionPayload,
+} from '../../types/admin-operational-version';
+import type { EdgeReader } from '../../types/edge-contract';
 import {
-  parseAdminOperationalDashboard,
-  parseAdminOperationalDetail,
-  parseSavedAdminOperationalDocument,
-} from './admin-coworker-operational-documents.contract';
+  parseConfiguration,
+} from '../../contracts/admin-operational-documents/configuration.contract';
+import {
+  parseDashboard,
+  parseDetail,
+  parseSavedDocument,
+} from '../../contracts/admin-operational-documents/document.contract';
+import {
+  parseCancellation,
+  parseFinalization,
+  parseReservation,
+} from '../../contracts/admin-operational-documents/upload.contract';
+import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
 export class AdminCoworkerOperationalDocuments {
@@ -29,7 +48,7 @@ export class AdminCoworkerOperationalDocuments {
       .invokeEdge<unknown>(COWORKER_EDGE_FUNCTION.adminOperationalDocuments, {
         method: 'GET',
       })
-      .pipe(map(parseAdminOperationalDashboard));
+      .pipe(map(parseDashboard));
   }
 
   getDocumentDetail(
@@ -42,7 +61,7 @@ export class AdminCoworkerOperationalDocuments {
         documentId,
       },
       (response) =>
-        parseAdminOperationalDetail(response, documentId, catalog),
+        parseDetail(response, documentId, catalog),
     );
   }
 
@@ -57,12 +76,62 @@ export class AdminCoworkerOperationalDocuments {
         document,
       },
       (response) =>
-        parseSavedAdminOperationalDocument(
+        parseSavedDocument(
           response,
           document,
           previousRevision,
           catalog,
         ),
+    );
+  }
+
+  reserveUpload(
+    upload: ReserveAdminOperationalUploadPayload,
+  ): Observable<AdminOperationalUploadReservationResult> {
+    return this.invokeAction(
+      { action: ADMIN_OPERATIONAL_EDGE_ACTION.reserveUpload, upload },
+      (response) => parseReservation(response, upload),
+    );
+  }
+
+  finalizeUpload(
+    context: AdminOperationalFinalizeContext,
+  ): Observable<AdminOperationalStoredVersion> {
+    const uploadSessionId = context.kind === 'reservation'
+      ? context.reservation.upload.uploadSessionId
+      : context.recovery.uploadSessionId;
+    return this.invokeAction(
+      {
+        action: ADMIN_OPERATIONAL_EDGE_ACTION.finalizeUpload,
+        uploadSessionId,
+      },
+      (response) =>
+        parseFinalization(response, context),
+    );
+  }
+
+  cancelUpload(uploadSessionId: string): Observable<void> {
+    return this.invokeAction(
+      {
+        action: ADMIN_OPERATIONAL_EDGE_ACTION.cancelUpload,
+        uploadSessionId,
+      },
+      (response) =>
+        parseCancellation(response, uploadSessionId),
+    );
+  }
+
+  configureVersion(
+    configuration: ConfigureAdminOperationalVersionPayload,
+    source: AdminOperationalStoredVersion,
+  ): Observable<AdminOperationalStoredVersion> {
+    return this.invokeAction(
+      {
+        action: ADMIN_OPERATIONAL_EDGE_ACTION.configureVersion,
+        configuration,
+      },
+      (response) =>
+        parseConfiguration(response, configuration, source),
     );
   }
 

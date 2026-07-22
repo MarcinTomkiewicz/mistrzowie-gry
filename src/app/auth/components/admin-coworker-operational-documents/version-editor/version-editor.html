@@ -1,0 +1,234 @@
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+  <header class="flex-col-start-stretch gap-xs w-100">
+    <div class="flex-row-start-center gap-xs">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.sections().versionEditorTitle }}
+      </h2>
+      <app-context-help
+        [text]="i18n.tooltips().versionEditor"
+        [ariaLabel]="i18n.contextHelpLabel(i18n.sections().versionEditorTitle)"
+      />
+    </div>
+    <p class="m-0">{{ i18n.sections().versionEditorDescription }}</p>
+  </header>
+
+  @if (!recovery()) {
+    <form
+      class="mg-form flex-col-start-stretch gap-md w-100"
+      [formGroup]="form"
+      (ngSubmit)="configureVersion()"
+      novalidate
+    >
+      <section formGroupName="metadata" class="flex-col-start-stretch gap-md border-top pt-sm w-100">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.sections().versionMetadata }}
+        </h3>
+
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel>
+            <input
+              class="w-100"
+              pInputText
+              id="operational-version-title"
+              formControlName="title"
+              [maxlength]="limits.titleLength"
+            />
+            <label for="operational-version-title">{{ i18n.fields().versionTitle }}</label>
+          </p-iftalabel>
+          <app-character-counter
+            [value]="form.controls.metadata.controls.title.value"
+            [limit]="limits.titleLength"
+          />
+          @if (fieldError("title"); as error) {
+            <small class="mg-contact-error">{{ error }}</small>
+          }
+        </div>
+
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel>
+            <textarea
+              class="w-100"
+              pTextarea
+              id="operational-version-summary"
+              formControlName="summary"
+              rows="3"
+              [maxlength]="limits.summaryLength"
+            ></textarea>
+            <label for="operational-version-summary">{{ i18n.fields().summary }}</label>
+          </p-iftalabel>
+          <app-character-counter
+            [value]="form.controls.metadata.controls.summary.value"
+            [limit]="limits.summaryLength"
+          />
+          @if (fieldError("summary"); as error) {
+            <small class="mg-contact-error">{{ error }}</small>
+          }
+        </div>
+
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+          <div class="flex-col-start-stretch gap-xs w-100">
+            <p-iftalabel>
+              <p-select
+                class="w-100"
+                inputId="operational-version-action-mode"
+                formControlName="actionMode"
+                [options]="actionModeOptions()"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              />
+              <label for="operational-version-action-mode">{{ i18n.fields().actionMode }}</label>
+            </p-iftalabel>
+            @if (fieldError("actionMode"); as error) {
+              <small class="mg-contact-error">{{ error }}</small>
+            }
+          </div>
+
+          <div class="flex-col-start-stretch gap-xs w-100">
+            <p-iftalabel>
+              <p-inputnumber
+                class="w-100"
+                inputStyleClass="w-100"
+                inputId="operational-version-statement-version"
+                formControlName="statementVersion"
+                [min]="1"
+                [useGrouping]="false"
+                [showButtons]="true"
+              />
+              <label for="operational-version-statement-version">
+                {{ i18n.fields().statementVersion }}
+              </label>
+            </p-iftalabel>
+            @if (fieldError("statementVersion"); as error) {
+              <small class="mg-contact-error">{{ error }}</small>
+            }
+          </div>
+        </div>
+
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+          <div class="flex-col-start-stretch gap-xs w-100">
+            <p-iftalabel>
+              <p-datepicker
+                class="w-100"
+                inputStyleClass="w-100"
+                inputId="operational-version-due-at"
+                formControlName="actionDueAt"
+                dateFormat="dd.mm.yy"
+                hourFormat="24"
+                appendTo="body"
+                [showTime]="true"
+                [showIcon]="true"
+                [showClear]="true"
+                [readonlyInput]="true"
+              />
+              <label for="operational-version-due-at">{{ i18n.fields().actionDueAt }}</label>
+            </p-iftalabel>
+            @if (fieldError("actionDueAt"); as error) {
+              <small class="mg-contact-error">{{ error }}</small>
+            }
+          </div>
+
+          <div class="flex-row-start-center gap-sm w-100">
+            <p-toggleswitch
+              inputId="operational-version-reacceptance"
+              formControlName="requiresReacceptance"
+            />
+            <label for="operational-version-reacceptance">
+              {{ i18n.fields().requiresReacceptance }}
+            </label>
+          </div>
+        </div>
+      </section>
+
+      @if (draftVersion(); as draft) {
+        <app-admin-operational-target-editor
+          [targets]="form.controls.targets"
+          [catalog]="catalog()"
+          [error]="actionError()"
+          [disabled]="disabled() || isConfiguring() || uploadBusy() || isAccessBlocked()"
+        />
+
+        <section formArrayName="statements" class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+          <div class="flex-row-start-center gap-xs">
+            <h4 class="mg-section__title mg-section__title--xs m-0">
+              {{ i18n.sections().statements }}
+            </h4>
+            <app-context-help
+              [text]="i18n.tooltips().statements"
+              [ariaLabel]="i18n.contextHelpLabel(i18n.sections().statements)"
+            />
+          </div>
+          @if (form.controls.statements.length === 0) {
+            <p class="m-0 muted-text">{{ i18n.messages().statementsNotRequired }}</p>
+          }
+          @for (statement of form.controls.statements.controls; track statement; let index = $index) {
+            <div class="flex-col-start-stretch gap-xs w-100" [formGroupName]="index">
+              <label [for]="'operational-statement-' + index">
+                {{ i18n.statuses().statementActions[statement.controls.action.value] }}
+              </label>
+              <textarea
+                class="w-100"
+                pTextarea
+                [id]="'operational-statement-' + index"
+                formControlName="text"
+                rows="4"
+                [maxlength]="limits.statementTextLength"
+              ></textarea>
+              <app-character-counter
+                [value]="statement.controls.text.value"
+                [limit]="limits.statementTextLength"
+              />
+              @if (statementError(index); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+          @if (actionError()?.fieldErrors?.["configuration.statements"]; as error) {
+            <small class="mg-contact-error">{{ error }}</small>
+          }
+        </section>
+
+        <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+          <p class="m-0">
+            {{ i18n.messages().readyVersion }} {{ draft.file.originalFilename }}
+          </p>
+          <div class="flex-row-end-center w-100">
+            <p-button
+              type="submit"
+              severity="success"
+              icon="pi pi-save"
+              [label]="i18n.actions().configureVersion"
+              [loading]="isConfiguring()"
+              [disabled]="disabled() || isConfiguring() || uploadBusy() || isAccessBlocked()"
+            />
+          </div>
+        </section>
+      }
+    </form>
+  }
+
+  <app-admin-operational-version-upload
+    [document]="document()"
+    [catalog]="catalog()"
+    [metadata]="form.controls.metadata"
+    [disabled]="disabled() || isAccessBlocked()"
+    (busyChange)="setUploadBusy($event)"
+    (reloadRequested)="reloadRequested.emit()"
+  />
+
+  @if (actionError(); as error) {
+    <div class="flex-col-start-stretch gap-xs error-text" role="alert">
+      <strong>{{ actionErrorDescription() }}</strong>
+      @if (error.message !== actionErrorDescription()) {
+        <span class="muted-text">{{ error.message }}</span>
+      }
+      @if (error.reason) {
+        <span>{{ i18n.errors().reasonLabel }}: <code>{{ error.reason }}</code></span>
+      }
+      <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+      @if (error.status !== null) {
+        <span>{{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code></span>
+      }
+    </div>
+  }
+</section>

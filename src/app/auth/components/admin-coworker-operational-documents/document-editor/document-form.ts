@@ -4,11 +4,9 @@ import {
   ADMIN_OPERATIONAL_DOCUMENT_CODE_PATTERN,
 } from '../../../../core/configs/admin-coworker-operational-documents.config';
 import { COWORKER_DOCUMENT_SHELL_LIMITS } from '../../../../core/configs/coworker-documents.config';
-import { IAdminOperationalDocumentDetail } from '../../../../core/interfaces/i-admin-coworker-operational-document';
-import {
-  AdminOperationalDocumentForm,
-  SaveAdminOperationalDocumentPayload,
-} from '../../../../core/types/admin-coworker-operational-document';
+import { IAdminOperationalDocumentDetail } from '../../../../core/interfaces/i-admin-operational-document';
+import { SaveAdminOperationalDocumentPayload } from '../../../../core/types/admin-operational-document';
+import { AdminOperationalDocumentForm } from '../../../../core/types/admin-operational-forms';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 

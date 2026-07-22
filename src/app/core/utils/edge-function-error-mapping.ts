@@ -10,6 +10,13 @@ import { isEdgeObject } from './edge-contract';
 
 const INVALID_ERROR_MESSAGE = 'Edge Function returned an invalid error response.';
 const INVALID_SUCCESS_MESSAGE = 'Edge Function returned an invalid success response.';
+const UNCERTAIN_MUTATION_ERROR_CODES = new Set([
+  'BACKEND_CONTRACT_ERROR',
+  'EDGE_FETCH_ERROR',
+  'EDGE_INVALID_ERROR_RESPONSE',
+  'EDGE_INVALID_SUCCESS_RESPONSE',
+  'EDGE_RELAY_ERROR',
+]);
 
 export async function createEdgeFunctionError(
   error: unknown,
@@ -110,6 +117,7 @@ function parseErrorResponse(
 
   const parsedFieldErrors: Record<string, string> = {};
   const fieldErrors = value['fieldErrors'];
+  const reason = value['reason'];
 
   if (fieldErrors !== undefined) {
     if (!isEdgeObject(fieldErrors)) {
@@ -124,13 +132,25 @@ function parseErrorResponse(
     }
   }
 
+  if (reason !== undefined && (typeof reason !== 'string' || reason === '')) {
+    return invalidErrorResponse(status, cause);
+  }
+
   return new EdgeFunctionError(
     status,
     code,
     message,
     parsedFieldErrors,
     cause,
+    reason ?? null,
   );
+}
+
+export function isEdgeMutationResultUncertain(
+  error: EdgeFunctionError,
+): boolean {
+  return UNCERTAIN_MUTATION_ERROR_CODES.has(error.code) ||
+    (error.status !== null && error.status >= 500 && error.status < 600);
 }
 
 function invalidErrorResponse(

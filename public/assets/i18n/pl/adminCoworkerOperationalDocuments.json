@@ -29,7 +29,12 @@
     "file": "[PH] [file] Plik wersji",
     "targets": "[PH] [targets] Odbiorcy dokumentu",
     "statements": "[PH] [statements] Treści potwierdzeń i decyzji",
-    "assignmentSummary": "[PH] [assignmentSummary] Stan przypisań"
+    "assignmentSummary": "[PH] [assignmentSummary] Stan przypisań",
+    "versionEditorTitle": "[PH] [versionEditorTitle] Nowa wersja dokumentu",
+    "versionEditorDescription": "[PH] [versionEditorDescription] Prześlij plik, określ wymagane działanie i skonfiguruj odbiorców wersji.",
+    "versionMetadata": "[PH] [versionMetadata] Ustawienia wersji",
+    "versionFile": "[PH] [versionFile] Plik nowej wersji",
+    "uploadRecovery": "[PH] [uploadRecovery] Niedokończone przesyłanie"
   },
   "fields": {
     "code": "[PH] [code] Kod dokumentu",
@@ -63,7 +68,14 @@
     "acceptedAssignments": "[PH] [acceptedAssignments] Zaakceptowane",
     "declinedAssignments": "[PH] [declinedAssignments] Odrzucone",
     "publishedAt": "[PH] [publishedAt] Opublikowano",
-    "updatedAt": "[PH] [updatedAt] Ostatnia zmiana"
+    "updatedAt": "[PH] [updatedAt] Ostatnia zmiana",
+    "versionTitle": "[PH] [versionTitle] Tytuł wersji",
+    "summary": "[PH] [summary] Opis wersji",
+    "targetKind": "[PH] [targetKind] Rodzaj odbiorcy",
+    "targetValue": "[PH] [targetValue] Wybrany odbiorca",
+    "uploadSessionStatus": "[PH] [uploadSessionStatus] Stan przesyłania",
+    "expiresAt": "[PH] [expiresAt] Ważne do",
+    "cleanupStatus": "[PH] [cleanupStatus] Stan usuwania pliku"
   },
   "actions": {
     "createDocument": "[PH] [createDocument] Dodaj dokument operacyjny",
@@ -71,7 +83,13 @@
     "viewDocument": "[PH] [viewDocument] Zobacz dokument",
     "backToList": "[PH] [backToList] Wróć do katalogu",
     "reload": "[PH] [reload] Odśwież dane",
-    "showExplanation": "[PH] [showExplanation] Wyjaśnienie"
+    "showExplanation": "[PH] [showExplanation] Wyjaśnienie",
+    "chooseFile": "[PH] [chooseFile] Wybierz plik",
+    "finalizeUpload": "[PH] [finalizeUpload] Dokończ przesyłanie",
+    "cancelReservation": "[PH] [cancelReservation] Anuluj rezerwację",
+    "configureVersion": "[PH] [configureVersion] Zapisz konfigurację wersji",
+    "addTarget": "[PH] [addTarget] Dodaj odbiorcę",
+    "removeTarget": "[PH] [removeTarget] Usuń odbiorcę"
   },
   "tooltips": {
     "pagePurpose": "[PH] [pagePurpose] Ten katalog służy do przygotowania dokumentów organizacyjnych przeznaczonych dla współpracowników. Na tym etapie można tworzyć i edytować podstawowe informacje oraz przeglądać istniejące wersje.",
@@ -86,7 +104,8 @@
     "requiresReacceptance": "[PH] [requiresReacceptance] Informuje, czy współpracownicy mają ponownie wykonać wymagane działanie po opublikowaniu nowej wersji.",
     "targets": "[PH] [targets] Odbiorcy wskazują grupy lub konkretne osoby, którym dokument zostanie przypisany po publikacji.",
     "statements": "[PH] [statements] To dokładne treści, które współpracownik potwierdza podczas zapoznania, akceptacji albo odrzucenia dokumentu.",
-    "assignmentSummary": "[PH] [assignmentSummary] Liczniki pokazują stan przypisań tej konkretnej wersji. Nie są pełnym audytem działań użytkowników."
+    "assignmentSummary": "[PH] [assignmentSummary] Liczniki pokazują stan przypisań tej konkretnej wersji. Nie są pełnym audytem działań użytkowników.",
+    "versionEditor": "[PH] [versionEditor] Wersja składa się z pliku, ustawień działania, odbiorców i treści oświadczeń. Publikacja jest osobnym etapem."
   },
   "statuses": {
     "documents": {
@@ -136,6 +155,25 @@
       "accepted": "[PH] [accepted] Akceptacja",
       "declined": "[PH] [declined] Odrzucenie"
     },
+    "uploadSessions": {
+      "created": "[PH] [created] Rezerwacja utworzona",
+      "uploaded": "[PH] [uploaded] Plik przesłany",
+      "expired": "[PH] [expired] Rezerwacja wygasła",
+      "failed": "[PH] [failed] Przesyłanie nieudane",
+      "cancelled": "[PH] [cancelled] Rezerwacja anulowana"
+    },
+    "cleanup": {
+      "not_required": "[PH] [not_required] Usuwanie niewymagane",
+      "pending": "[PH] [pending] Oczekuje na usunięcie",
+      "completed": "[PH] [completed] Plik usunięty",
+      "failed": "[PH] [failed] Usuwanie nieudane"
+    },
+    "versionActions": {
+      "reserving": "[PH] [reserving] Tworzenie rezerwacji…",
+      "uploading": "[PH] [uploading] Przesyłanie pliku…",
+      "finalizing": "[PH] [finalizing] Weryfikowanie pliku…",
+      "cancelling": "[PH] [cancelling] Anulowanie rezerwacji i usuwanie pliku…"
+    },
     "yes": "[PH] [yes] Tak",
     "no": "[PH] [no] Nie",
     "notProvided": "[PH] [notProvided] Nie podano"
@@ -152,7 +190,19 @@
     "created": "[PH] [created] Utworzono dokument operacyjny.",
     "updated": "[PH] [updated] Zapisano zmiany dokumentu operacyjnego.",
     "reloadAfterConflict": "[PH] [reloadAfterConflict] Dane dokumentu mogły się zmienić. Odśwież je przed kolejną próbą zapisu.",
-    "archivedReadOnly": "[PH] [archivedReadOnly] Zarchiwizowanego dokumentu nie można edytować. Jego dane i wersje pozostają dostępne do odczytu."
+    "archivedReadOnly": "[PH] [archivedReadOnly] Zarchiwizowanego dokumentu nie można edytować. Jego dane i wersje pozostają dostępne do odczytu.",
+    "targetRequired": "[PH] [targetRequired] Dodaj co najmniej jednego odbiorcę przed zapisaniem konfiguracji.",
+    "statementsNotRequired": "[PH] [statementsNotRequired] Ten tryb nie wymaga treści oświadczenia.",
+    "readyVersion": "[PH] [readyVersion] Plik gotowy do konfiguracji:",
+    "dropFile": "[PH] [dropFile] Przeciągnij plik tutaj albo wybierz go z dysku",
+    "uploadRecovery": "[PH] [uploadRecovery] Poprzednie przesyłanie nie zostało zakończone. Użyj dostępnej akcji, zanim utworzysz nową rezerwację.",
+    "uploadExpired": "[PH] [uploadExpired] Rezerwacja wygasła i nie może zostać sfinalizowana. Anuluj ją, aby wykonać cleanup.",
+    "versionSavedSummary": "[PH] [versionSavedSummary] Wersja dokumentu",
+    "uploadCompleted": "[PH] [uploadCompleted] Plik został zweryfikowany i wersja jest gotowa do konfiguracji.",
+    "reservationCancelled": "[PH] [reservationCancelled] Rezerwacja została anulowana, a plik usunięty.",
+    "configurationSaved": "[PH] [configurationSaved] Konfiguracja wersji została zapisana.",
+    "reservationCancelledCleanupFailed": "[PH] [reservationCancelledCleanupFailed] Rezerwacja jest anulowana, ale usunięcie pliku z magazynu nie powiodło się. Możesz ponowić cleanup.",
+    "cancelReservationConfirmation": "[PH] [cancelReservationConfirmation] Anulowanie rezerwacji usunie przesłany plik i tej operacji nie można cofnąć."
   },
   "errors": {
     "load": "[PH] [load] Nie udało się pobrać danych dokumentów operacyjnych.",
@@ -164,9 +214,24 @@
     "invalidState": "[PH] [invalidState] Dokument jest w stanie, który nie pozwala na tę zmianę.",
     "invalidResponse": "[PH] [invalidResponse] Otrzymano nieprawidłowe dane dokumentu. Odśwież stronę i spróbuj ponownie.",
     "codeLabel": "[PH] [codeLabel] Kod błędu",
-    "statusLabel": "[PH] [statusLabel] Status odpowiedzi"
+    "statusLabel": "[PH] [statusLabel] Status odpowiedzi",
+    "reasonLabel": "[PH] [reasonLabel] Powód walidacji pliku",
+    "versionAction": "[PH] [versionAction] Nie udało się wykonać operacji na wersji dokumentu.",
+    "reserve": "[PH] [reserve] Nie udało się utworzyć rezerwacji pliku.",
+    "upload": "[PH] [upload] Nie udało się przesłać pliku.",
+    "finalize": "[PH] [finalize] Nie udało się zweryfikować i sfinalizować pliku.",
+    "cancel": "[PH] [cancel] Nie udało się anulować rezerwacji.",
+    "configure": "[PH] [configure] Nie udało się zapisać konfiguracji wersji.",
+    "uploadedFile": "[PH] [uploadedFile] Przesłany plik nie spełnia warunków rezerwacji.",
+    "storage": "[PH] [storage] Magazyn plików jest chwilowo niedostępny.",
+    "cleanup": "[PH] [cleanup] Rezerwacja została anulowana, ale cleanup pliku nie powiódł się.",
+    "fileType": "[PH] [fileType] Nazwa, typ pliku lub jego rozszerzenie nie są dozwolone.",
+    "fileSize": "[PH] [fileSize] Plik jest pusty albo przekracza dozwolony rozmiar.",
+    "storageConfiguration": "[PH] [storageConfiguration] Konfiguracja prywatnego magazynu plików jest niekompletna. Przesyłanie jest niedostępne."
   },
   "validation": {
-    "codePattern": "[PH] [codePattern] Użyj małych liter, cyfr, myślników lub podkreśleń. Pierwszy znak musi być literą albo cyfrą."
+    "codePattern": "[PH] [codePattern] Użyj małych liter, cyfr, myślników lub podkreśleń. Pierwszy znak musi być literą albo cyfrą.",
+    "duplicateTarget": "[PH] [duplicateTarget] Każdy odbiorca może wystąpić tylko raz.",
+    "inactiveCoworkerTarget": "[PH] [inactiveCoworkerTarget] Historyczny współpracownik nie ma aktywnego dostępu. Wybierz aktywnego współpracownika."
   }
 }
