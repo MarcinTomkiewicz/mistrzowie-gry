@@ -11,7 +11,6 @@ import {
   COWORKER_DOCUMENT_ACTION,
   CoworkerDocumentActionRequest,
 } from '../../types/coworker-document';
-import { EdgeReader } from '../../types/edge-contract';
 import { createEdgeSuccessReader } from '../../utils/edge-contract';
 import { Backend } from '../backend/backend';
 import {
@@ -42,37 +41,41 @@ export class CoworkerDocuments {
       { action: typeof COWORKER_DOCUMENT_ACTION.reserveUpload }
     >,
   ): Observable<ICoworkerUploadReservation> {
-    return this.invokeAction(
-      request,
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
+      { method: 'POST', body: request },
       reserveUploadReader,
     );
   }
 
   finalizeUpload(uploadSessionId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
       {
-        action: COWORKER_DOCUMENT_ACTION.finalizeUpload,
-        uploadSessionId,
+        method: 'POST',
+        body: { action: COWORKER_DOCUMENT_ACTION.finalizeUpload, uploadSessionId } satisfies CoworkerDocumentActionRequest,
       },
       finalizeUploadReader,
     );
   }
 
   cancelUpload(uploadSessionId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
       {
-        action: COWORKER_DOCUMENT_ACTION.cancelUpload,
-        uploadSessionId,
+        method: 'POST',
+        body: { action: COWORKER_DOCUMENT_ACTION.cancelUpload, uploadSessionId } satisfies CoworkerDocumentActionRequest,
       },
       cancelUploadReader,
     );
   }
 
   submitDocument(documentId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
       {
-        action: COWORKER_DOCUMENT_ACTION.submitDocument,
-        documentId,
+        method: 'POST',
+        body: { action: COWORKER_DOCUMENT_ACTION.submitDocument, documentId } satisfies CoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(
         COWORKER_DOCUMENT_ACTION.submitDocument,
@@ -81,10 +84,11 @@ export class CoworkerDocuments {
   }
 
   withdrawDocument(documentId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
       {
-        action: COWORKER_DOCUMENT_ACTION.withdrawDocument,
-        documentId,
+        method: 'POST',
+        body: { action: COWORKER_DOCUMENT_ACTION.withdrawDocument, documentId } satisfies CoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(
         COWORKER_DOCUMENT_ACTION.withdrawDocument,
@@ -103,33 +107,23 @@ export class CoworkerDocuments {
       documentVersionId,
     };
 
-    return this.invokeAction(
-      request,
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
+      { method: 'POST', body: request },
       parseDocumentDownloadResponse,
     );
   }
 
   markNotificationRead(notificationId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.documents,
       {
-        action: COWORKER_DOCUMENT_ACTION.markNotificationRead,
-        notificationId,
+        method: 'POST',
+        body: { action: COWORKER_DOCUMENT_ACTION.markNotificationRead, notificationId } satisfies CoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(
         COWORKER_DOCUMENT_ACTION.markNotificationRead,
       ),
     );
-  }
-
-  private invokeAction<TResponse>(
-    request: CoworkerDocumentActionRequest,
-    reader: EdgeReader<TResponse>,
-  ): Observable<TResponse> {
-    return this.backend
-      .invokeEdge<unknown, CoworkerDocumentActionRequest>(COWORKER_EDGE_FUNCTION.documents, {
-        method: 'POST',
-        body: request,
-      })
-      .pipe(map((response) => reader(response, 'response')));
   }
 }

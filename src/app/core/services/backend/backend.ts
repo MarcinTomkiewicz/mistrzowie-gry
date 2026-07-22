@@ -1,6 +1,7 @@
 import { inject, Injectable, PendingTasks } from '@angular/core';
 import {
   FunctionInvokeOptions,
+  PostgrestError,
   PostgrestResponse,
   PostgrestSingleResponse,
 } from '@supabase/supabase-js';
@@ -14,6 +15,7 @@ import { Supabase } from '../supabase/supabase';
 import { FilterDefinition, IFilter } from '../../interfaces/i-filter';
 import { FilterOperator } from '../../enums/filter-operators';
 import { Pagination } from '../../types/backend';
+import { EdgeReader } from '../../types/edge-contract';
 import { EdgeInvokeOptions } from '../../types/edge-http-method';
 import { RpcError } from '../../types/rpc-error';
 import { isEdgeFunctionSuccess } from '../../utils/edge-contract';
@@ -71,6 +73,16 @@ export class Backend {
     });
   }
 
+  invokeEdgeParsed<TResult, TBody = never>(
+    functionName: string,
+    options: EdgeInvokeOptions<TBody>,
+    reader: EdgeReader<TResult>,
+  ): Observable<TResult> {
+    return this.invokeEdge<unknown, TBody>(functionName, options).pipe(
+      map((response) => reader(response, 'response')),
+    );
+  }
+
   getAll<T extends object>(opts: {
     table: string;
     joins?: string;
@@ -103,41 +115,16 @@ export class Backend {
 
       return query;
     }).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return (res.data ?? []).map((x) => toCamelCase<T>(x));
-      }),
+      map((res) => this.unwrapList<T>(res)),
     );
   }
 
   getById<T extends object>(table: string, id: string | number): Observable<T | null> {
-    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() => {
-      let query = this.supabase.from(table).select('*');
-      query = applyFilters(query, {
-        id: { operator: FilterOperator.EQ, value: id },
-      });
-      return query.maybeSingle();
-    }).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return res.data ? toCamelCase<T>(res.data) : null;
-      }),
-    );
+    return this.getOneByFields<T>(table, { id });
   }
 
   getBySlug<T extends object>(table: string, slug: string): Observable<T | null> {
-    return this.trackedRequest<PostgrestSingleResponse<unknown>>(() => {
-      let query = this.supabase.from(table).select('*');
-      query = applyFilters(query, {
-        slug: { operator: FilterOperator.EQ, value: slug },
-      });
-      return query.maybeSingle();
-    }).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return res.data ? toCamelCase<T>(res.data) : null;
-      }),
-    );
+    return this.getOneByFields<T>(table, { slug });
   }
 
   getOneByFields<T extends object>(
@@ -156,7 +143,7 @@ export class Backend {
       return query.maybeSingle();
     }).pipe(
       map((res) => {
-        if (res.error) throw new Error(res.error.message);
+        this.throwPostgrestError(res.error);
         return res.data ? toCamelCase<T>(res.data) : null;
       }),
     );
@@ -169,7 +156,7 @@ export class Backend {
       return query;
     }).pipe(
       map((res) => {
-        if (res.error) throw new Error(res.error.message);
+        this.throwPostgrestError(res.error);
         return res.count ?? 0;
       }),
     );
@@ -180,10 +167,7 @@ export class Backend {
     return this.trackedRequest<PostgrestResponse<unknown>>(() =>
       this.supabase.from(table).select('*').in('id', ids),
     ).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return (res.data ?? []).map((x) => toCamelCase<T>(x));
-      }),
+      map((res) => this.unwrapList<T>(res)),
     );
   }
 
@@ -195,10 +179,7 @@ export class Backend {
     return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).insert(snake).select('*').single(),
     ).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return toCamelCase<TResult>(res.data);
-      }),
+      map((res) => this.unwrapRequired<TResult>(res)),
     );
   }
 
@@ -208,10 +189,7 @@ export class Backend {
     return this.trackedRequest<PostgrestResponse<unknown>>(() =>
       this.supabase.from(table).insert(snake).select('*'),
     ).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return (res.data ?? []).map((x) => toCamelCase<T>(x));
-      }),
+      map((res) => this.unwrapList<T>(res)),
     );
   }
 
@@ -220,10 +198,7 @@ export class Backend {
     return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).update(snake).eq('id', id).select('*').single(),
     ).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return toCamelCase<T>(res.data);
-      }),
+      map((res) => this.unwrapRequired<T>(res)),
     );
   }
 
@@ -232,10 +207,7 @@ export class Backend {
     return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*').single(),
     ).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return toCamelCase<T>(res.data);
-      }),
+      map((res) => this.unwrapRequired<T>(res)),
     );
   }
 
@@ -245,10 +217,7 @@ export class Backend {
     return this.trackedRequest<PostgrestResponse<unknown>>(() =>
       this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*'),
     ).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return (res.data ?? []).map((x) => toCamelCase<T>(x));
-      }),
+      map((res) => this.unwrapList<T>(res)),
     );
   }
 
@@ -261,11 +230,28 @@ export class Backend {
 
       return query;
     }).pipe(
-      map((res) => {
-        if (res.error) throw new Error(res.error.message);
-        return void 0;
-      }),
+      map((res) => this.throwPostgrestError(res.error)),
     );
+  }
+
+  private unwrapRequired<TResult extends object>(
+    response: PostgrestSingleResponse<unknown>,
+  ): TResult {
+    this.throwPostgrestError(response.error);
+    return toCamelCase<TResult>(response.data);
+  }
+
+  private unwrapList<TResult extends object>(
+    response: PostgrestResponse<unknown>,
+  ): TResult[] {
+    this.throwPostgrestError(response.error);
+    return (response.data ?? []).map((item) => toCamelCase<TResult>(item));
+  }
+
+  private throwPostgrestError(error: PostgrestError | null): void {
+    if (error) {
+      throw new Error(error.message);
+    }
   }
 
   private trackedRequest<TResult>(

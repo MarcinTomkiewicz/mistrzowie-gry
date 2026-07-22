@@ -6,10 +6,9 @@ import { ICoworkerOperationalAssignment, ICoworkerOperationalPortal } from '../.
 import { ICoworkerVersionDownload } from '../../interfaces/i-coworker-document';
 import {
   COWORKER_OPERATIONAL_EDGE_ACTION,
-  CoworkerOperationalRequest,
+  type CoworkerOperationalRequest,
   RecordCoworkerOperationalActionRequest,
 } from '../../types/coworker-operational-document';
-import { EdgeReader } from '../../types/edge-contract';
 import { createEdgeSuccessReader } from '../../utils/edge-contract';
 import { Backend } from '../backend/backend';
 import {
@@ -33,8 +32,9 @@ export class CoworkerOperationalDocuments {
   recordAction(
     request: RecordCoworkerOperationalActionRequest,
   ): Observable<ICoworkerOperationalAssignment> {
-    return this.invokeAction(
-      request,
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.operationalDocuments,
+      { method: 'POST', body: request },
       (response) =>
         parseCoworkerOperationalAssignment(response, request.assignmentId),
     );
@@ -43,37 +43,32 @@ export class CoworkerOperationalDocuments {
   downloadDocumentVersion(
     documentVersionId: string,
   ): Observable<ICoworkerVersionDownload> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.operationalDocuments,
       {
-        action: COWORKER_OPERATIONAL_EDGE_ACTION.downloadDocumentVersion,
-        documentVersionId,
+        method: 'POST',
+        body: {
+          action: COWORKER_OPERATIONAL_EDGE_ACTION.downloadDocumentVersion,
+          documentVersionId,
+        } satisfies CoworkerOperationalRequest,
       },
-      (response) =>
-        parseCoworkerOperationalDownload(response, documentVersionId),
+      (response) => parseCoworkerOperationalDownload(response, documentVersionId),
     );
   }
 
   markNotificationRead(notificationId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.operationalDocuments,
       {
-        action: COWORKER_OPERATIONAL_EDGE_ACTION.markNotificationRead,
-        notificationId,
+        method: 'POST',
+        body: {
+          action: COWORKER_OPERATIONAL_EDGE_ACTION.markNotificationRead,
+          notificationId,
+        } satisfies CoworkerOperationalRequest,
       },
       createEdgeSuccessReader(
         COWORKER_OPERATIONAL_EDGE_ACTION.markNotificationRead,
       ),
     );
-  }
-
-  private invokeAction<TResult>(
-    request: CoworkerOperationalRequest,
-    reader: EdgeReader<TResult>,
-  ): Observable<TResult> {
-    return this.backend
-      .invokeEdge<unknown, CoworkerOperationalRequest>(
-        COWORKER_EDGE_FUNCTION.operationalDocuments,
-        { method: 'POST', body: request },
-      )
-      .pipe(map((response) => reader(response, 'response')));
   }
 }

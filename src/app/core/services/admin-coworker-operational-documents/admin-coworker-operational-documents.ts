@@ -23,7 +23,6 @@ import type {
   AdminOperationalStoredVersion,
   ConfigureAdminOperationalVersionPayload,
 } from '../../types/admin-operational-version';
-import type { EdgeReader } from '../../types/edge-contract';
 import {
   parseConfiguration,
 } from '../../contracts/admin-operational-documents/configuration.contract';
@@ -55,13 +54,13 @@ export class AdminCoworkerOperationalDocuments {
     documentId: string,
     catalog: IAdminOperationalCatalog,
   ): Observable<IAdminOperationalDocumentDetail> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
       {
-        action: ADMIN_OPERATIONAL_EDGE_ACTION.getDocumentDetail,
-        documentId,
+        method: 'POST',
+        body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.getDocumentDetail, documentId } satisfies AdminOperationalRequest,
       },
-      (response) =>
-        parseDetail(response, documentId, catalog),
+      (response) => parseDetail(response, documentId, catalog),
     );
   }
 
@@ -70,10 +69,11 @@ export class AdminCoworkerOperationalDocuments {
     catalog: IAdminOperationalCatalog,
     previousRevision: number | null,
   ): Observable<IAdminOperationalDocumentDetail> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
       {
-        action: ADMIN_OPERATIONAL_EDGE_ACTION.saveDocument,
-        document,
+        method: 'POST',
+        body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.saveDocument, document } satisfies AdminOperationalRequest,
       },
       (response) =>
         parseSavedDocument(
@@ -88,8 +88,12 @@ export class AdminCoworkerOperationalDocuments {
   reserveUpload(
     upload: ReserveAdminOperationalUploadPayload,
   ): Observable<AdminOperationalUploadReservationResult> {
-    return this.invokeAction(
-      { action: ADMIN_OPERATIONAL_EDGE_ACTION.reserveUpload, upload },
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
+      {
+        method: 'POST',
+        body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.reserveUpload, upload } satisfies AdminOperationalRequest,
+      },
       (response) => parseReservation(response, upload),
     );
   }
@@ -100,24 +104,24 @@ export class AdminCoworkerOperationalDocuments {
     const uploadSessionId = context.kind === 'reservation'
       ? context.reservation.upload.uploadSessionId
       : context.recovery.uploadSessionId;
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
       {
-        action: ADMIN_OPERATIONAL_EDGE_ACTION.finalizeUpload,
-        uploadSessionId,
+        method: 'POST',
+        body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.finalizeUpload, uploadSessionId } satisfies AdminOperationalRequest,
       },
-      (response) =>
-        parseFinalization(response, context),
+      (response) => parseFinalization(response, context),
     );
   }
 
   cancelUpload(uploadSessionId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
       {
-        action: ADMIN_OPERATIONAL_EDGE_ACTION.cancelUpload,
-        uploadSessionId,
+        method: 'POST',
+        body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.cancelUpload, uploadSessionId } satisfies AdminOperationalRequest,
       },
-      (response) =>
-        parseCancellation(response, uploadSessionId),
+      (response) => parseCancellation(response, uploadSessionId),
     );
   }
 
@@ -125,25 +129,13 @@ export class AdminCoworkerOperationalDocuments {
     configuration: ConfigureAdminOperationalVersionPayload,
     source: AdminOperationalStoredVersion,
   ): Observable<AdminOperationalStoredVersion> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
       {
-        action: ADMIN_OPERATIONAL_EDGE_ACTION.configureVersion,
-        configuration,
+        method: 'POST',
+        body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.configureVersion, configuration } satisfies AdminOperationalRequest,
       },
-      (response) =>
-        parseConfiguration(response, configuration, source),
+      (response) => parseConfiguration(response, configuration, source),
     );
-  }
-
-  private invokeAction<TResult>(
-    request: AdminOperationalRequest,
-    reader: EdgeReader<TResult>,
-  ): Observable<TResult> {
-    return this.backend
-      .invokeEdge<unknown, AdminOperationalRequest>(
-        COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
-        { method: 'POST', body: request },
-      )
-      .pipe(map((response) => reader(response, 'response')));
   }
 }

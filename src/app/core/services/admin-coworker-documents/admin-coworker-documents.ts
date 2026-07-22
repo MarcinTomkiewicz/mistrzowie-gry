@@ -11,15 +11,14 @@ import {
 } from '../../interfaces/i-admin-coworker-document';
 import {
   ADMIN_COWORKER_DOCUMENT_ACTION,
-  AdminCoworkerDocumentActionRequest,
   AdminCoworkerAcceptDocumentPayload,
+  type AdminCoworkerDocumentActionRequest,
   AdminCoworkerDocumentDefinitionPayload,
   AdminCoworkerDocumentDownloadPayload,
   AdminCoworkerRejectDocumentPayload,
   AdminCoworkerRequirementPayload,
   AdminSignatureVerificationPayload,
 } from '../../types/admin-coworker-document';
-import { EdgeReader } from '../../types/edge-contract';
 import { createEdgeSuccessReader } from '../../utils/edge-contract';
 import { Backend } from '../backend/backend';
 import {
@@ -45,10 +44,11 @@ export class AdminCoworkerDocuments {
   saveDefinition(
     definition: AdminCoworkerDocumentDefinitionPayload,
   ): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.saveDefinition,
-        definition,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.saveDefinition, definition } satisfies AdminCoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(
         ADMIN_COWORKER_DOCUMENT_ACTION.saveDefinition,
@@ -57,10 +57,11 @@ export class AdminCoworkerDocuments {
   }
 
   ensureOnboarding(userId: string): Observable<IAdminCoworkerOnboardingResult> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.ensureOnboarding,
-        userId,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.ensureOnboarding, userId } satisfies AdminCoworkerDocumentActionRequest,
       },
       ensureOnboardingReader,
     );
@@ -70,11 +71,15 @@ export class AdminCoworkerDocuments {
     userId: string,
     onboardingCaseId: string,
   ): Observable<IAdminCoworkerSeedResult> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.seedDefaultRequirements,
-        userId,
-        onboardingCaseId,
+        method: 'POST',
+        body: {
+          action: ADMIN_COWORKER_DOCUMENT_ACTION.seedDefaultRequirements,
+          userId,
+          onboardingCaseId,
+        } satisfies AdminCoworkerDocumentActionRequest,
       },
       seedDefaultRequirementsReader,
     );
@@ -83,10 +88,11 @@ export class AdminCoworkerDocuments {
   assignRequirement(
     requirement: AdminCoworkerRequirementPayload,
   ): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.assignRequirement,
-        requirement,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.assignRequirement, requirement } satisfies AdminCoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(
         ADMIN_COWORKER_DOCUMENT_ACTION.assignRequirement,
@@ -98,22 +104,26 @@ export class AdminCoworkerDocuments {
     userId: string,
     documentId: string,
   ): Observable<IAdminCoworkerDocumentReviewDetail> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.getReviewDetail,
-        userId,
-        documentId,
+        method: 'POST',
+        body: {
+          action: ADMIN_COWORKER_DOCUMENT_ACTION.getReviewDetail,
+          userId,
+          documentId,
+        } satisfies AdminCoworkerDocumentActionRequest,
       },
       adminCoworkerReviewDetailReader,
     );
   }
 
   startReview(userId: string, documentId: string): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.startReview,
-        userId,
-        documentId,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.startReview, userId, documentId } satisfies AdminCoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(ADMIN_COWORKER_DOCUMENT_ACTION.startReview),
     );
@@ -122,30 +132,33 @@ export class AdminCoworkerDocuments {
   verifySignature(
     payload: AdminSignatureVerificationPayload,
   ): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature,
-        ...payload,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature, ...payload } satisfies AdminCoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature),
     );
   }
 
   acceptDocument(payload: AdminCoworkerAcceptDocumentPayload): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument,
-        ...payload,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument, ...payload } satisfies AdminCoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument),
     );
   }
 
   rejectDocument(payload: AdminCoworkerRejectDocumentPayload): Observable<void> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument,
-        ...payload,
+        method: 'POST',
+        body: { action: ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument, ...payload } satisfies AdminCoworkerDocumentActionRequest,
       },
       createEdgeSuccessReader(ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument),
     );
@@ -154,24 +167,16 @@ export class AdminCoworkerDocuments {
   downloadDocumentVersion(
     payload: AdminCoworkerDocumentDownloadPayload,
   ): Observable<IAdminCoworkerVersionDownload> {
-    return this.invokeAction(
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminDocuments,
       {
-        action: ADMIN_COWORKER_DOCUMENT_ACTION.downloadDocumentVersion,
-        ...payload,
+        method: 'POST',
+        body: {
+          action: ADMIN_COWORKER_DOCUMENT_ACTION.downloadDocumentVersion,
+          ...payload,
+        } satisfies AdminCoworkerDocumentActionRequest,
       },
       adminCoworkerDocumentDownloadReader,
     );
-  }
-
-  private invokeAction<TResponse>(
-    request: AdminCoworkerDocumentActionRequest,
-    reader: EdgeReader<TResponse>,
-  ): Observable<TResponse> {
-    return this.backend
-      .invokeEdge<unknown, AdminCoworkerDocumentActionRequest>(
-        COWORKER_EDGE_FUNCTION.adminDocuments,
-        { method: 'POST', body: request },
-      )
-      .pipe(map((response) => reader(response, 'response')));
   }
 }
