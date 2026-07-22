@@ -39,6 +39,7 @@ export class DocumentList {
     actions: this.i18n.actions(),
     tooltips: this.i18n.tooltips(),
     statuses: this.i18n.statuses(),
+    values: this.i18n.commonValues(),
     contextHelpLabel: this.i18n.contextHelpLabel,
   }));
   protected readonly isAccessBlocked = computed(() =>

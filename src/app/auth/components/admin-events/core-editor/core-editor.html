@@ -289,7 +289,7 @@
                         {{ i18n.editionTable().programItemCount }}
                       </th>
                       <th class="small-caps text-right" scope="col">
-                        {{ i18n.editionTable().actions }}
+                        {{ i18n.commonTable().actions }}
                       </th>
                     </tr>
                   </thead>
@@ -317,8 +317,8 @@
                         <td class="text-center">
                           {{
                             edition.isDefaultPublic
-                              ? i18n.commonActions().yes
-                              : i18n.commonActions().no
+                              ? i18n.commonValues().yes
+                              : i18n.commonValues().no
                           }}
                         </td>
                         <td class="text-center">{{ edition.displayOrder }}</td>

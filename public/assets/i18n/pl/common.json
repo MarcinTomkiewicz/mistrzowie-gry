@@ -40,9 +40,27 @@
     "previousProfile": "Poprzedni profil",
     "submit": "Wyślij",
     "ok": "OK",
-    "logout": "Wyloguj się",
+    "logout": "Wyloguj się"
+  },
+
+  "values": {
     "yes": "Tak",
-    "no": "Nie"
+    "no": "Nie",
+    "notProvided": "Nie podano",
+    "notAvailable": "Brak"
+  },
+
+  "table": {
+    "actions": "Akcje"
+  },
+
+  "appRoles": {
+    "user": "Użytkownik",
+    "gm": "Mistrz Gry",
+    "marketing_manager": "Manager marketingu",
+    "customer_manager": "Manager klienta",
+    "lead_coordinator": "Koordynator leadów",
+    "admin": "Administrator"
   },
 
   "questions": {

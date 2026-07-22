@@ -1,6 +1,7 @@
 import {
   createCommonActionsI18n,
   createCommonStatusI18n,
+  createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -42,6 +43,7 @@ export function createEventSignupI18n() {
     });
   const commonActions = createCommonActionsI18n();
   const commonStatus = createCommonStatusI18n();
+  const commonValues = createCommonValuesI18n();
 
   return {
     seo,
@@ -54,5 +56,6 @@ export function createEventSignupI18n() {
     error,
     commonActions,
     commonStatus,
+    commonValues,
   };
 }

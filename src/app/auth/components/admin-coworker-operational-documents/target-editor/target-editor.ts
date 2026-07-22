@@ -8,6 +8,7 @@ import { ADMIN_OPERATIONAL_VERSION_LIMITS } from '../../../../core/configs/admin
 import { IAdminOperationalCatalog } from '../../../../core/interfaces/i-admin-operational-catalog';
 import { AdminOperationalTargetForm } from '../../../../core/types/admin-operational-forms';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
+import { createAppRoleOptions } from '../../../../core/utils/app-role-labels';
 import { resolveEdgeFormFieldError } from '../../../../core/utils/form-controls';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
@@ -45,10 +46,7 @@ export class TargetEditor {
     })),
   );
   protected readonly roleOptions = computed(() =>
-    this.catalog().appRoles.map((value) => ({
-      value,
-      label: this.i18n.statuses().appRoles[value],
-    })),
+    createAppRoleOptions(this.i18n.appRoles(), this.catalog().appRoles),
   );
   protected readonly coworkerOptions = computed(() =>
     this.catalog().coworkers.map((coworker) => ({

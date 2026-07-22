@@ -102,12 +102,12 @@ export class AdminUserDialog {
 
     return getAppRoleLabel(
       row?.user.appRole ?? this.form.controls.appRole.getRawValue(),
-      this.i18n.roleLabels(),
+      this.i18n.appRoles(),
     );
   }
 
   protected getSelectOptions(field: AdminUserDialogSelectField) {
-    return createAppRoleOptions(this.i18n.roleLabels(), field.options);
+    return createAppRoleOptions(this.i18n.appRoles(), field.options);
   }
 
   protected getSelectLabel(field: AdminUserDialogSelectField): string {

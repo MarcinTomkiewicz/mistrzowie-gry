@@ -27,25 +27,13 @@
     "sortDesc": "Najnowsze pierwsze",
     "sortAsc": "Najstarsze pierwsze"
   },
-  "roleLabels": {
-    "user": "Użytkownik",
-    "gm": "Mistrz Gry",
-    "marketing_manager": "Manager marketingu",
-    "customer_manager": "Manager klienta",
-    "lead_coordinator": "Koordynator leadów",
-    "admin": "Administrator"
-  },
   "table": {
     "user": "Użytkownik",
     "role": "Rola",
     "testUser": "Testowy",
     "hasGmProfile": "Profil MG",
     "isPublic": "Publiczny",
-    "isArchived": "Archiwalny",
-    "actions": "Akcje",
-    "yes": "Tak",
-    "no": "Nie",
-    "notAvailable": "Brak"
+    "isArchived": "Archiwalny"
   },
   "dialog": {
     "title": "Edycja użytkownika",
@@ -59,7 +47,6 @@
     "appRoleLabel": "Rola"
   },
   "actions": {
-    "editUser": "Edytuj",
     "createGmProfile": "Profil MG",
     "saveUser": "Zapisz użytkownika"
   },

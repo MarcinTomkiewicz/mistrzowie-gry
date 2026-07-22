@@ -134,14 +134,6 @@
       "user": "[PH] [user] Konkretny współpracownik",
       "event_definition": "[PH] [event_definition] Współpracownicy związani z rodzajem wydarzenia"
     },
-    "appRoles": {
-      "user": "[PH] [user] Użytkownik",
-      "gm": "[PH] [gm] Mistrz Gry",
-      "marketing_manager": "[PH] [marketing_manager] Manager marketingu",
-      "customer_manager": "[PH] [customer_manager] Opiekun klienta",
-      "lead_coordinator": "[PH] [lead_coordinator] Koordynator leadów",
-      "admin": "[PH] [admin] Administrator"
-    },
     "malware": {
       "not_scanned": "[PH] [not_scanned] Jeszcze niesprawdzony",
       "pending": "[PH] [pending] Sprawdzanie w toku",
@@ -173,10 +165,7 @@
       "uploading": "[PH] [uploading] Przesyłanie pliku…",
       "finalizing": "[PH] [finalizing] Weryfikowanie pliku…",
       "cancelling": "[PH] [cancelling] Anulowanie rezerwacji i usuwanie pliku…"
-    },
-    "yes": "[PH] [yes] Tak",
-    "no": "[PH] [no] Nie",
-    "notProvided": "[PH] [notProvided] Nie podano"
+    }
   },
   "messages": {
     "emptyDocuments": "[PH] [emptyDocuments] Nie utworzono jeszcze żadnego dokumentu operacyjnego.",

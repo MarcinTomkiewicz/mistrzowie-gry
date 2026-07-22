@@ -1,4 +1,3 @@
-import { AppRoleLabels } from '../app-role';
 import {
   AdminOperationalCleanupStatus,
   AdminOperationalUploadSessionStatus,
@@ -11,6 +10,7 @@ import {
   CoworkerOperationalVersionStatus,
 } from '../coworker-operational-document';
 import { CoworkerMalwareScanStatus } from '../coworker-document';
+import { CommonValuesTranslations } from './common';
 
 export type AdminOperationalCopy = {
   page: {
@@ -126,7 +126,6 @@ export type AdminOperationalCopy = {
     versions: Record<CoworkerOperationalVersionStatus, string>;
     actionModes: Record<CoworkerOperationalActionMode, string>;
     targetKinds: Record<AdminOperationalTargetKind, string>;
-    appRoles: AppRoleLabels;
     malware: Record<CoworkerMalwareScanStatus, string>;
     statementActions: Record<CoworkerOperationalAction, string>;
     uploadSessions: Record<AdminOperationalUploadSessionStatus, string>;
@@ -137,9 +136,6 @@ export type AdminOperationalCopy = {
       finalizing: string;
       cancelling: string;
     };
-    yes: string;
-    no: string;
-    notProvided: string;
   };
   messages: {
     emptyDocuments: string;
@@ -203,5 +199,6 @@ export type AdminOperationalTableCopy = Pick<
   AdminOperationalCopy,
   'fields' | 'actions' | 'tooltips' | 'statuses'
 > & {
+  values: CommonValuesTranslations;
   contextHelpLabel(subject: string): string;
 };

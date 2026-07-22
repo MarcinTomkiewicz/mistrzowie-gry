@@ -15,6 +15,7 @@ import {
   createCommonActionsI18n,
   createCommonQuestionsI18n,
   createCommonStatusI18n,
+  createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -74,6 +75,7 @@ export function createEventSignupFormI18n() {
   const commonActions = createCommonActionsI18n();
   const commonQuestions = createCommonQuestionsI18n();
   const commonStatus = createCommonStatusI18n();
+  const commonValues = createCommonValuesI18n();
 
   return {
     seo,
@@ -93,6 +95,7 @@ export function createEventSignupFormI18n() {
     commonActions,
     commonQuestions,
     commonStatus,
+    commonValues,
     playersLabel: (minPlayers: number, maxPlayers: number) =>
       `${minPlayers}-${maxPlayers}`,
     minAgeLabel: (minAge: number) => `${minAge}+`,

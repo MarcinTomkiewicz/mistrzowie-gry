@@ -89,7 +89,7 @@
               <th class="small-caps text-center">{{ i18n.table().hasGmProfile }}</th>
               <th class="small-caps text-center">{{ i18n.table().isPublic }}</th>
               <th class="small-caps text-center">{{ i18n.table().isArchived }}</th>
-              <th class="small-caps text-right">{{ i18n.table().actions }}</th>
+              <th class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
             </tr>
           </ng-template>
 
@@ -100,9 +100,9 @@
                   <strong>{{ getUserDisplayName(row) }}</strong>
                   <span>{{ row.user.email }}</span>
                   <small>
-                    {{ row.user.firstName || i18n.table().notAvailable }}
+                    {{ row.user.firstName || i18n.commonValues().notAvailable }}
                     /
-                    {{ row.user.nickname || i18n.table().notAvailable }}
+                    {{ row.user.nickname || i18n.commonValues().notAvailable }}
                   </small>
                   @if (row.gmProfile?.isArchived) {
                     <small class="tag-badge tag-badge--warn">
@@ -113,21 +113,21 @@
               </td>
               <td>
                 <span class="tag-badge">
-                  {{ getAppRoleLabel(row.user.appRole, i18n.roleLabels()) }}
+                  {{ getAppRoleLabel(row.user.appRole, i18n.appRoles()) }}
                 </span>
               </td>
               <td class="text-center">
-                {{ row.user.isTestUser ? i18n.table().yes : i18n.table().no }}
+                {{ row.user.isTestUser ? i18n.commonValues().yes : i18n.commonValues().no }}
               </td>
               <td class="text-center">
-                {{ row.gmProfile ? i18n.table().yes : i18n.table().no }}
+                {{ row.gmProfile ? i18n.commonValues().yes : i18n.commonValues().no }}
               </td>
               <td class="text-center">
                 <app-admin-user-profile-status-toggle
                   [profile]="row.gmProfile"
                   statusKey="isPublic"
                   [disabled]="savingProfileUserId() === row.user.id"
-                  [notAvailableLabel]="i18n.table().notAvailable"
+                  [notAvailableLabel]="i18n.commonValues().notAvailable"
                   (statusChange)="setGmProfilePublic(row, $event)"
                 />
               </td>
@@ -136,7 +136,7 @@
                   [profile]="row.gmProfile"
                   statusKey="isArchived"
                   [disabled]="savingProfileUserId() === row.user.id"
-                  [notAvailableLabel]="i18n.table().notAvailable"
+                  [notAvailableLabel]="i18n.commonValues().notAvailable"
                   (statusChange)="setGmProfileArchived(row, $event)"
                 />
               </td>
@@ -155,7 +155,7 @@
 
                   <p-button
                     size="small"
-                    [label]="i18n.actions().editUser"
+                    [label]="i18n.commonActions().edit"
                     icon="pi pi-pencil"
                     (onClick)="openUserDialog(row)"
                   />

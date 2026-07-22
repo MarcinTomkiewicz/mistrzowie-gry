@@ -2,6 +2,8 @@ import {
   createCommonActionsI18n,
   createCommonFormI18n,
   createCommonStatusI18n,
+  createCommonTableI18n,
+  createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
@@ -101,6 +103,8 @@ export function createEventEditionEditorI18n() {
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),
+    commonTable: createCommonTableI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }
 

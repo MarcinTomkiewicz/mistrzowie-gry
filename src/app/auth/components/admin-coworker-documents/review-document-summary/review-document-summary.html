@@ -20,7 +20,7 @@
     </div>
     <div class="flex-col-start-stretch gap-xs">
       <span class="muted-text">{{ i18n.review().fields.appRole }}</span>
-      <strong>{{ i18n.review().statuses.roles[detail().user.appRole] }}</strong>
+      <strong>{{ getAppRoleLabel(detail().user.appRole, i18n.appRoles()) }}</strong>
     </div>
     <div class="flex-col-start-stretch gap-xs">
       <span class="muted-text">{{ i18n.review().fields.documentDefinition }}</span>
@@ -76,8 +76,8 @@
       <strong>
         {{
           detail().documentDefinition.signaturePolicy.signatureRequired
-            ? i18n.review().statuses.yes
-            : i18n.review().statuses.no
+            ? i18n.commonValues().yes
+            : i18n.commonValues().no
         }}
       </strong>
     </div>
@@ -111,8 +111,8 @@
       <strong>
         {{
           detail().documentDefinition.signaturePolicy.manualReviewRequired
-            ? i18n.review().statuses.yes
-            : i18n.review().statuses.no
+            ? i18n.commonValues().yes
+            : i18n.commonValues().no
         }}
       </strong>
     </div>
@@ -197,7 +197,7 @@
         <strong>
           {{
             formatTimestampLabel(requirement.dueAt, "pl-PL") ||
-              i18n.review().statuses.notProvided
+              i18n.commonValues().notProvided
           }}
         </strong>
       </div>

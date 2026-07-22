@@ -50,7 +50,7 @@
               <th class="small-caps">{{ i18n.table().status }}</th>
               <th class="small-caps">{{ i18n.table().publishedAt }}</th>
               <th class="small-caps">{{ i18n.table().updatedAt }}</th>
-              <th class="small-caps text-right">{{ i18n.table().actions }}</th>
+              <th class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
             </tr>
           </ng-template>
 
@@ -67,7 +67,7 @@
                   </div>
                 } @else {
                   <span class="tag-badge tag-badge--muted">
-                    {{ i18n.table().notAvailable }}
+                    {{ i18n.commonValues().notAvailable }}
                   </span>
                 }
               </td>
@@ -87,7 +87,7 @@
                   <p-button
                     size="small"
                     severity="secondary"
-                    [label]="i18n.actions().editArticle"
+                    [label]="i18n.commonActions().edit"
                     icon="pi pi-pencil"
                     (onClick)="editArticle(row.article)"
                   />

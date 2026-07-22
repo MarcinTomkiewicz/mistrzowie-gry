@@ -8,6 +8,7 @@ import type {
   AdminOperationalStoredVersion,
   AdminOperationalTarget,
 } from '../../../../core/types/admin-operational-version';
+import { getAppRoleLabel } from '../../../../core/utils/app-role-labels';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
@@ -32,7 +33,7 @@ export class DocumentVersion {
       case 'all_active_coworkers':
         return this.i18n.statuses().targetKinds.all_active_coworkers;
       case 'app_role':
-        return this.i18n.statuses().appRoles[target.appRole];
+        return getAppRoleLabel(target.appRole, this.i18n.appRoles());
       case 'user': {
         const coworker = this.catalog().coworkers.find(
           (option) => option.userId === target.userId,

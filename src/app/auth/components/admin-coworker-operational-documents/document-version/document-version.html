@@ -49,7 +49,7 @@
           />
         </div>
         <strong>
-          {{ version().requiresReacceptance ? i18n.statuses().yes : i18n.statuses().no }}
+          {{ version().requiresReacceptance ? i18n.commonValues().yes : i18n.commonValues().no }}
         </strong>
       </div>
       <div class="flex-col-start-stretch gap-xs">
@@ -59,13 +59,13 @@
       <div class="flex-col-start-stretch gap-xs">
         <span class="muted-text">{{ i18n.fields().actionDueAt }}</span>
         <strong>
-          {{ formatTimestampLabel(version().actionDueAt, "pl-PL") ?? i18n.statuses().notProvided }}
+          {{ formatTimestampLabel(version().actionDueAt, "pl-PL") ?? i18n.commonValues().notProvided }}
         </strong>
       </div>
       <div class="flex-col-start-stretch gap-xs">
         <span class="muted-text">{{ i18n.fields().publishedAt }}</span>
         <strong>
-          {{ formatTimestampLabel(version().publishedAt, "pl-PL") ?? i18n.statuses().notProvided }}
+          {{ formatTimestampLabel(version().publishedAt, "pl-PL") ?? i18n.commonValues().notProvided }}
         </strong>
       </div>
     </div>
@@ -94,7 +94,7 @@
       </div>
       <div class="flex-col-start-stretch gap-xs">
         <span class="muted-text">{{ i18n.fields().detectedMimeType }}</span>
-        <strong>{{ version().file.detectedMimeType ?? i18n.statuses().notProvided }}</strong>
+        <strong>{{ version().file.detectedMimeType ?? i18n.commonValues().notProvided }}</strong>
       </div>
       <div class="flex-col-start-stretch gap-xs">
         <span class="muted-text">{{ i18n.fields().expectedSize }}</span>
@@ -102,7 +102,7 @@
       </div>
       <div class="flex-col-start-stretch gap-xs">
         <span class="muted-text">{{ i18n.fields().actualSize }}</span>
-        <strong>{{ version().file.sizeBytes ?? i18n.statuses().notProvided }}</strong>
+        <strong>{{ version().file.sizeBytes ?? i18n.commonValues().notProvided }}</strong>
       </div>
       <div class="flex-col-start-stretch gap-xs">
         <span class="muted-text">{{ i18n.fields().malwareStatus }}</span>

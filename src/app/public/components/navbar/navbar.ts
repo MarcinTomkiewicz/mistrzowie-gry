@@ -54,8 +54,8 @@ export class Navbar {
   readonly i18n = createNavbarI18n();
 
   readonly menu = computed(() => this.i18n.resolveMenu(this.nav.navbar()));
-  readonly isAuthenticated = computed(() =>
-    this.authSession.isAuthenticated(),
+  readonly hasSessionCookie = computed(() =>
+    this.authSession.hasSessionCookie(),
   );
 
   readonly mobileOpen = signal(false);

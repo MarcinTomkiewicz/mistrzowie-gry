@@ -145,8 +145,8 @@ export class SessionList {
       closeOnEscape: true,
       dismissableMask: true,
       rejectVisible: true,
-      acceptLabel: this.i18n.actions().yes,
-      rejectLabel: this.i18n.actions().no,
+      acceptLabel: this.i18n.values().yes,
+      rejectLabel: this.i18n.values().no,
       accept: () => {
         this.delete.emit(sessionId);
       },

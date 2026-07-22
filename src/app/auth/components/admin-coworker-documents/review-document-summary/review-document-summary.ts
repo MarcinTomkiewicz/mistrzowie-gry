@@ -5,6 +5,7 @@ import {
   STATUS_BADGE_CLASS,
 } from '../../../../core/configs/badge-class.config';
 import { IAdminCoworkerDocumentReviewDetail } from '../../../../core/interfaces/i-admin-coworker-document';
+import { getAppRoleLabel } from '../../../../core/utils/app-role-labels';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-documents.i18n';
@@ -21,5 +22,6 @@ export class ReviewDocumentSummary {
   protected readonly i18n = createAdminCoworkerDocumentsI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly SIGNATURE_BADGE_CLASS = SIGNATURE_BADGE_CLASS;
+  protected readonly getAppRoleLabel = getAppRoleLabel;
   protected readonly formatTimestampLabel = formatTimestampLabel;
 }

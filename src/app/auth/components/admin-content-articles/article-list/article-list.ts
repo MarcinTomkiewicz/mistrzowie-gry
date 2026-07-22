@@ -50,6 +50,7 @@ export class ArticleList {
   protected readonly rowVms = computed(() => {
     const table = this.i18n.table();
     const statusLabels = this.i18n.statusLabels();
+    const values = this.i18n.commonValues();
 
     return this.rows().map((article) => {
       const thumbnailUrl = resolvePublicStorageUrl(
@@ -60,7 +61,7 @@ export class ArticleList {
       return {
         article,
         titleLabel: article.title || table.untitledDraft,
-        slugLabel: article.slug || table.notAvailable,
+        slugLabel: article.slug || values.notAvailable,
         thumbnailUrl,
         thumbnailAlt:
           article.heroImageAlt || article.title || table.thumbnailAlt,
@@ -68,10 +69,10 @@ export class ArticleList {
         statusLabel: statusLabels[article.status],
         publishedAtLabel:
           formatTimestampLabel(article.publishedAt, 'pl-PL') ??
-          table.notAvailable,
+          values.notAvailable,
         updatedAtLabel:
           formatTimestampLabel(article.updatedAt, 'pl-PL') ??
-          table.notAvailable,
+          values.notAvailable,
       };
     });
   });

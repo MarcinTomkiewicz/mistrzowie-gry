@@ -16,9 +16,7 @@
       "displayOrder": "Kolejność",
       "editionCount": "Edycje",
       "activeEditionCount": "Aktywne edycje",
-      "updatedAt": "Ostatnia zmiana",
-      "actions": "Akcje",
-      "notAvailable": "Brak"
+      "updatedAt": "Ostatnia zmiana"
     },
     "actions": {
       "createCore": "Dodaj wydarzenie",
@@ -69,8 +67,7 @@
       "defaultPublic": "Domyślna lokalizacja",
       "displayOrder": "Kolejność",
       "occurrenceCount": "Terminy",
-      "programItemCount": "Elementy programu",
-      "actions": "Akcje"
+      "programItemCount": "Elementy programu"
     },
     "actions": {
       "addEdition": "Dodaj nową lokalizację"
@@ -161,9 +158,7 @@
       "participantSignupWindow": "Okno zapisów uczestników",
       "publishedAt": "Opublikowano",
       "programItemCount": "Elementy programu",
-      "activeParticipantCount": "Aktywni uczestnicy",
-      "actions": "Akcje",
-      "notAvailable": "Brak"
+      "activeParticipantCount": "Aktywni uczestnicy"
     }
   },
   "occurrenceEditor": {

@@ -43,8 +43,17 @@ export type CommonActionsTranslations = {
   submit: string;
   ok: string;
   logout: string;
+};
+
+export type CommonValuesTranslations = {
   yes: string;
   no: string;
+  notProvided: string;
+  notAvailable: string;
+};
+
+export type CommonTableTranslations = {
+  actions: string;
 };
 
 export type CommonNavTranslations = {

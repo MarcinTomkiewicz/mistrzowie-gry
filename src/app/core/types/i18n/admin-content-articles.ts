@@ -22,15 +22,12 @@ export interface AdminContentArticlesTableTranslations {
   status: string;
   publishedAt: string;
   updatedAt: string;
-  actions: string;
-  notAvailable: string;
   untitledDraft: string;
   thumbnailAlt: string;
 }
 
 export interface AdminContentArticlesActionsTranslations {
   createArticle: string;
-  editArticle: string;
   publishArticle: string;
   archiveArticle: string;
 }

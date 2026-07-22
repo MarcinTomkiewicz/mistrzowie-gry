@@ -1,4 +1,3 @@
-import { AppRole } from '../app-role';
 import {
   AdminCoworkerReviewDecision,
   AdminSignatureVerificationStatus,
@@ -132,7 +131,6 @@ export type AdminCoworkerDocReviewCopy = {
     verificationStatuses: Record<CoworkerSignatureVerificationStatus, string>;
     verifiedSignatureTypes: Record<CoworkerVerifiedSignatureType, string>;
     decisions: Record<AdminCoworkerReviewDecision, string>;
-    roles: Record<AppRole, string>;
     automaticVerificationModes: Record<
       CoworkerAutomaticVerificationMode,
       string
@@ -142,9 +140,6 @@ export type AdminCoworkerDocReviewCopy = {
     currentVersion: string;
     historicalVersion: string;
     noRequirement: string;
-    notProvided: string;
-    yes: string;
-    no: string;
   };
   messages: {
     startReviewConfirmation: string;

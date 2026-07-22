@@ -13,7 +13,10 @@ import {
   CommonSeoTranslations,
   CommonSocialTranslations,
   CommonStatusTranslations,
+  CommonTableTranslations,
+  CommonValuesTranslations,
 } from '../types/i18n/common';
+import { AppRoleLabels } from '../types/app-role';
 import { createScopedObjectI18n } from './scoped.i18n';
 
 function createCommonScopeSignal<T>(key: string) {
@@ -26,6 +29,10 @@ export function createCommonAccessibilityI18n() {
 
 export function createCommonActionsI18n() {
   return createCommonScopeSignal<CommonActionsTranslations>('actions');
+}
+
+export function createCommonAppRolesI18n() {
+  return createCommonScopeSignal<AppRoleLabels>('appRoles');
 }
 
 export function createCommonCtaI18n() {
@@ -74,4 +81,12 @@ export function createCommonSocialI18n() {
 
 export function createCommonStatusI18n() {
   return createCommonScopeSignal<CommonStatusTranslations>('status');
+}
+
+export function createCommonTableI18n() {
+  return createCommonScopeSignal<CommonTableTranslations>('table');
+}
+
+export function createCommonValuesI18n() {
+  return createCommonScopeSignal<CommonValuesTranslations>('values');
 }

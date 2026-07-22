@@ -11,9 +11,9 @@ export class AuthSession {
   private readonly document = inject(DOCUMENT);
   private readonly request = inject(REQUEST, { optional: true });
 
-  private readonly _isAuthenticated = signal(false);
+  private readonly _hasSessionCookie = signal(false);
 
-  readonly isAuthenticated = this._isAuthenticated.asReadonly();
+  readonly hasSessionCookie = this._hasSessionCookie.asReadonly();
 
   constructor() {
     this.refresh();
@@ -26,12 +26,12 @@ export class AuthSession {
     this.document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
-  setAuthenticated(next: boolean): void {
-    this._isAuthenticated.set(next);
+  setHasSessionCookie(next: boolean): void {
+    this._hasSessionCookie.set(next);
   }
 
   refresh(): void {
-    this._isAuthenticated.set(this.hasAuthCookie());
+    this._hasSessionCookie.set(this.hasAuthCookie());
   }
 
   private readonly onVisibilityChange = (): void => {

@@ -149,7 +149,7 @@
                         {{ i18n.occurrenceTable().activeParticipantCount }}
                       </th>
                       <th class="small-caps text-right" scope="col">
-                        {{ i18n.occurrenceTable().actions }}
+                        {{ i18n.commonTable().actions }}
                       </th>
                     </tr>
                   </thead>
@@ -176,7 +176,7 @@
                         <td class="text-center">
                           {{
                             occurrence.participantCapacity ??
-                              i18n.occurrenceTable().notAvailable
+                              i18n.commonValues().notAvailable
                           }}
                         </td>
                         <td>
@@ -199,7 +199,7 @@
                                 "pl-PL",
                                 loadedEdition.timezone
                               )
-                            ) || i18n.occurrenceTable().notAvailable
+                            ) || i18n.commonValues().notAvailable
                           }}
                         </td>
                         <td>
@@ -215,7 +215,7 @@
                                 "pl-PL",
                                 loadedEdition.timezone
                               )
-                            ) || i18n.occurrenceTable().notAvailable
+                            ) || i18n.commonValues().notAvailable
                           }}
                         </td>
                         <td>
@@ -225,7 +225,7 @@
                               "pl-PL",
                               loadedEdition.timezone
                             ) ??
-                              i18n.occurrenceTable().notAvailable
+                              i18n.commonValues().notAvailable
                           }}
                         </td>
                         <td class="text-center">

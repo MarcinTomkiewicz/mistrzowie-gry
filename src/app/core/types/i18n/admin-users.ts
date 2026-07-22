@@ -1,7 +1,3 @@
-import { AppRole } from '../app-role';
-
-export type AdminUsersRoleLabelTranslations = Record<AppRole, string>;
-
 export interface AdminUsersPageTranslations {
   title: string;
   subtitle: string;
@@ -39,10 +35,6 @@ export interface AdminUsersTableTranslations {
   hasGmProfile: string;
   isPublic: string;
   isArchived: string;
-  actions: string;
-  yes: string;
-  no: string;
-  notAvailable: string;
 }
 
 export interface AdminUsersDialogTranslations {
@@ -58,7 +50,6 @@ export interface AdminUsersDialogTranslations {
 }
 
 export interface AdminUsersActionsTranslations {
-  editUser: string;
   createGmProfile: string;
   saveUser: string;
 }

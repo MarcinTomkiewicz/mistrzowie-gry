@@ -33,6 +33,7 @@ import { Supabase } from '../supabase/supabase';
 import { AppRole } from '../../types/app-role';
 import { AppAuthError } from '../../types/auth-error';
 import { mapAuthError } from '../../utils/auth-error';
+import { hasRole as userHasRole } from '../../utils/roles';
 import { getUserDisplayName } from '../../utils/user-display';
 
 @Injectable({ providedIn: 'root' })
@@ -76,15 +77,16 @@ export class Auth {
 
         if (!id) {
           this._user.set(null);
-          this.authSession.setAuthenticated(false);
+          this.authSession.setHasSessionCookie(false);
           return of(null);
         }
 
+        this.authSession.setHasSessionCookie(true);
         return this.loadProfile(id);
       }),
       catchError(() => {
         this._user.set(null);
-        this.authSession.setAuthenticated(false);
+        this.authSession.refresh();
         return of(null);
       }),
       finalize(() => {
@@ -111,11 +113,9 @@ export class Auth {
           throw new AppAuthError('user_not_found');
         }
 
+        this.authSession.setHasSessionCookie(true);
         return this.loadProfileRequired(id).pipe(
-          tap(() => {
-            this.authSession.setAuthenticated(true);
-            this._isReady.set(true);
-          }),
+          tap(() => this._isReady.set(true)),
         );
       }),
       catchError((error) => this.toErrorObservable(error)),
@@ -139,6 +139,9 @@ export class Auth {
         if (!id) {
           throw new AppAuthError('user_not_found');
         }
+
+        const hasSession = !!data.session?.user?.id;
+        this.authSession.setHasSessionCookie(hasSession);
 
         const userPayload: IUser = {
           id,
@@ -164,15 +167,13 @@ export class Auth {
 
         return this.backend.upsert<IUser>('users', userPayload).pipe(
           map((user) => {
-            if (data.session?.user?.id) {
+            if (hasSession) {
               this._user.set(user);
-              this.authSession.setAuthenticated(true);
               this._isReady.set(true);
               return user;
             }
 
             this._user.set(null);
-            this.authSession.setAuthenticated(false);
             this._isReady.set(true);
             return null;
           }),
@@ -206,7 +207,7 @@ export class Auth {
         }
 
         this._user.set(null);
-        this.authSession.setAuthenticated(false);
+        this.authSession.setHasSessionCookie(false);
         this._isReady.set(true);
 
         return from(this.router.navigateByUrl(redirectTo)).pipe(
@@ -218,7 +219,7 @@ export class Auth {
   }
 
   hasRole(role: AppRole): boolean {
-    return this._user()?.appRole === role;
+    return userHasRole(this._user(), role);
   }
 
   private initializeAuth(): void {
@@ -237,13 +238,9 @@ export class Auth {
 
   private loadProfile(id: string): Observable<IUser | null> {
     return this.backend.getById<IUser>('users', id).pipe(
-      tap((user) => {
-        this._user.set(user);
-        this.authSession.setAuthenticated(!!user);
-      }),
+      tap((user) => this._user.set(user)),
       catchError(() => {
         this._user.set(null);
-        this.authSession.setAuthenticated(false);
         return of(null);
       }),
     );

@@ -318,14 +318,6 @@
         "accepted": "[PH] [accepted] Zaakceptowano",
         "rejected": "[PH] [rejected] Odrzucono"
       },
-      "roles": {
-        "user": "[PH] [user] Użytkownik",
-        "gm": "[PH] [gm] Mistrz Gry",
-        "marketing_manager": "[PH] [marketing_manager] Marketing manager",
-        "customer_manager": "[PH] [customer_manager] Opiekun klienta",
-        "lead_coordinator": "[PH] [lead_coordinator] Koordynator leadów",
-        "admin": "[PH] [admin] Administrator"
-      },
       "automaticVerificationModes": {
         "disabled": "[PH] [disabled] Wyłączona",
         "optional": "[PH] [optional] Opcjonalna",
@@ -335,10 +327,7 @@
       "optional": "[PH] [optional] Opcjonalny",
       "currentVersion": "[PH] [currentVersion] Bieżąca wersja",
       "historicalVersion": "[PH] [historicalVersion] Wersja historyczna",
-      "noRequirement": "[PH] [noRequirement] Dokument nie jest powiązany z przypisanym dokumentem do dostarczenia",
-      "notProvided": "[PH] [notProvided] Nie podano",
-      "yes": "[PH] [yes] Tak",
-      "no": "[PH] [no] Nie"
+      "noRequirement": "[PH] [noRequirement] Dokument nie jest powiązany z przypisanym dokumentem do dostarczenia"
     },
     "messages": {
       "startReviewConfirmation": "[PH] [startReviewConfirmation] Rozpocząć weryfikację tego dokumentu? Dokument zostanie oznaczony jako sprawdzany przez administratora.",

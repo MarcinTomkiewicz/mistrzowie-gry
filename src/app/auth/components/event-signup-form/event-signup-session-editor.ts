@@ -292,8 +292,8 @@ export class EventSignupSessionEditor {
       closeOnEscape: true,
       dismissableMask: true,
       rejectVisible: true,
-      acceptLabel: i18n.commonActions().yes,
-      rejectLabel: i18n.commonActions().no,
+      acceptLabel: i18n.commonValues().yes,
+      rejectLabel: i18n.commonValues().no,
       accept: () => {
         this.facade.withdraw(signupId);
       },

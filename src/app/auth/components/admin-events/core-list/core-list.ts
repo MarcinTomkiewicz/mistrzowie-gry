@@ -37,23 +37,24 @@ export class EventCoreList {
   protected readonly rowVms = computed(() => {
     const table = this.i18n.table();
     const status = this.i18n.status();
-    const commonActions = this.i18n.commonActions();
+    const commonValues = this.i18n.commonValues();
 
     return this.rows().map((core) => ({
       core,
-      shortDescriptionLabel: core.shortDescription ?? table.notAvailable,
+      shortDescriptionLabel: core.shortDescription ?? commonValues.notAvailable,
       activeLabel: core.isActive ? status.active : status.inactive,
       activeBadgeClass: core.isActive
         ? 'tag-badge tag-badge--success'
         : 'tag-badge tag-badge--muted',
       publicPageLabel: core.hasPublicPage
-        ? commonActions.yes
-        : commonActions.no,
+        ? commonValues.yes
+        : commonValues.no,
       publicPageBadgeClass: core.hasPublicPage
         ? 'tag-badge tag-badge--success'
         : 'tag-badge tag-badge--muted',
       updatedAtLabel:
-        formatTimestampLabel(core.updatedAt, 'pl-PL') ?? table.notAvailable,
+        formatTimestampLabel(core.updatedAt, 'pl-PL') ??
+        commonValues.notAvailable,
     }));
   });
 

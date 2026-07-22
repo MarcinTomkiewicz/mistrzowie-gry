@@ -18,8 +18,6 @@ export type CoreTableCopy = {
   editionCount: string;
   activeEditionCount: string;
   updatedAt: string;
-  actions: string;
-  notAvailable: string;
 };
 
 export type ListActionsCopy = {
@@ -76,7 +74,6 @@ export type EditionTableCopy = {
   displayOrder: string;
   occurrenceCount: string;
   programItemCount: string;
-  actions: string;
 };
 
 export type EditorActionsCopy = {
@@ -176,8 +173,6 @@ export type OccurrenceTableCopy = {
   publishedAt: string;
   programItemCount: string;
   activeParticipantCount: string;
-  actions: string;
-  notAvailable: string;
 };
 
 export type OccurrenceDialogCopy = {

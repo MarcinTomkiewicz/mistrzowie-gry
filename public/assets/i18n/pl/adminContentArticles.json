@@ -19,14 +19,11 @@
     "status": "Status",
     "publishedAt": "Publikacja",
     "updatedAt": "Aktualizacja",
-    "actions": "Akcje",
-    "notAvailable": "Brak",
     "untitledDraft": "Szkic bez tytułu",
     "thumbnailAlt": "Miniatura artykułu"
   },
   "actions": {
     "createArticle": "Utwórz artykuł",
-    "editArticle": "Edytuj",
     "publishArticle": "Opublikuj",
     "archiveArticle": "Archiwizuj"
   },

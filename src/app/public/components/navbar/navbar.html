@@ -50,7 +50,7 @@
       </div>
 
       <div class="flex-row-start-center gap-xs pl-sm">
-        @if (isAuthenticated()) {
+        @if (hasSessionCookie()) {
           <button
             type="button"
             class="mg-icon-btn"

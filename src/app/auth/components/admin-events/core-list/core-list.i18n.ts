@@ -1,6 +1,8 @@
 import {
   createCommonActionsI18n,
   createCommonStatusI18n,
+  createCommonTableI18n,
+  createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
@@ -39,5 +41,7 @@ export function createEventCoreListI18n() {
     rpcErrors,
     commonActions: createCommonActionsI18n(),
     commonStatus: createCommonStatusI18n(),
+    commonTable: createCommonTableI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }

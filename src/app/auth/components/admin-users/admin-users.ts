@@ -70,7 +70,7 @@ export class AdminUsers {
   protected readonly filterSelectFields = computed(() =>
     createAdminUsersFilterSelectFieldVms(
       this.i18n.filters(),
-      this.i18n.roleLabels(),
+      this.i18n.appRoles(),
     ),
   );
   private readonly filterValue = toSignal(

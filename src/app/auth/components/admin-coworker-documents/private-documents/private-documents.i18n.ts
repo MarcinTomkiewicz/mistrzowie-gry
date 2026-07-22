@@ -1,8 +1,10 @@
 import {
   createCommonActionsI18n,
+  createCommonAppRolesI18n,
   createCommonEmptyI18n,
   createCommonFormI18n,
   createCommonStatusI18n,
+  createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
@@ -75,10 +77,12 @@ export function createAdminCoworkerDocumentsI18n() {
     messages,
     errors,
     review,
+    appRoles: createCommonAppRolesI18n(),
     contextHelpLabel,
     commonActions: createCommonActionsI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }

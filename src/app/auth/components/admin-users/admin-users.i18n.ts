@@ -1,7 +1,10 @@
 import {
   createCommonActionsI18n,
+  createCommonAppRolesI18n,
   createCommonFormI18n,
   createCommonStatusI18n,
+  createCommonTableI18n,
+  createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -9,13 +12,12 @@ import {
   AdminUsersDialogTranslations,
   AdminUsersFiltersTranslations,
   AdminUsersPageTranslations,
-  AdminUsersRoleLabelTranslations,
   AdminUsersTableTranslations,
   AdminUsersToastTranslations,
 } from '../../../core/types/i18n/admin-users';
 
 export function createAdminUsersI18n() {
-  const { page, filters, table, dialog, actions, toast, roleLabels } =
+  const { page, filters, table, dialog, actions, toast } =
     createScopedSectionsI18n<{
       page: AdminUsersPageTranslations;
       filters: AdminUsersFiltersTranslations;
@@ -23,7 +25,6 @@ export function createAdminUsersI18n() {
       dialog: AdminUsersDialogTranslations;
       actions: AdminUsersActionsTranslations;
       toast: AdminUsersToastTranslations;
-      roleLabels: AdminUsersRoleLabelTranslations;
     }>('adminUsers', {
       page: 'page',
       filters: 'filters',
@@ -31,7 +32,6 @@ export function createAdminUsersI18n() {
       dialog: 'dialog',
       actions: 'actions',
       toast: 'toast',
-      roleLabels: 'roleLabels',
     });
 
   return {
@@ -41,9 +41,11 @@ export function createAdminUsersI18n() {
     dialog,
     actions,
     toast,
-    roleLabels,
+    appRoles: createCommonAppRolesI18n(),
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),
+    commonTable: createCommonTableI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }
