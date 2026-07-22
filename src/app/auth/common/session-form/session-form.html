@@ -179,7 +179,7 @@
         }"
         [options]="{
           currentUrl: storedImageUrl(),
-          disabled: isSubmitting(),
+          disabled: busy(),
           previewShape: 'landscape',
           accept: 'image/png,image/jpeg,image/webp,image/avif',
           maxFileSize: 5000000,
@@ -323,7 +323,7 @@
           [options]="{
             mode: 'files',
             currentUrl: null,
-            disabled: isSubmitting(),
+            disabled: busy(),
             previewShape: 'square',
             accept: 'application/pdf,.pdf',
             maxFileSize: 10000000,
@@ -382,7 +382,7 @@
       type="submit"
       loadingIcon="pi pi-d20"
       [icon]="'pi pi-scroll-quill'"
-      [loading]="isSubmitting()"
+      [loading]="busy()"
     />
 
     <p-button
@@ -390,7 +390,7 @@
       type="button"
       [label]="cancelLabel()"
       [outlined]="true"
-      [disabled]="isSubmitting()"
+      [disabled]="busy()"
       [icon]="'pi pi-interdiction'"
       (onClick)="onCancel()"
     />

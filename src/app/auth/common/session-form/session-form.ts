@@ -9,9 +9,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { finalize, map, Observable, of, throwError } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -33,14 +31,16 @@ import { IContentTrigger } from '../../../core/interfaces/i-content-trigger';
 import { IGmStyle } from '../../../core/interfaces/i-gm-style';
 import { ILanguage } from '../../../core/interfaces/i-languages';
 import {
-  ISessionCharacterSheet,
   ISessionFormInitialData,
   ISessionFormSubmitData,
 } from '../../../core/interfaces/i-session';
-import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
 import { ISystem } from '../../../core/interfaces/i-system';
-import { Auth } from '../../../core/services/auth/auth';
 import { Storage } from '../../../core/services/storage/storage';
+import {
+  NewSessionCharacterSheet,
+  SessionCharacterSheetCard,
+  SessionCharacterSheetPreview,
+} from '../../../core/types/session-character-sheet';
 import {
   SESSION_DIFFICULTY_LEVEL_OPTIONS,
   SessionDifficultyLevel,
@@ -54,14 +54,6 @@ import { PdfThumbnail } from '../../../public/common/pdf-thumbnail/pdf-thumbnail
 import { PdfViewerDialog } from '../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { SystemAutocomplete } from '../../../public/common/system-autocomplete/system-autocomplete';
 import { createSessionFormI18n } from './session-form.i18n';
-
-type CharacterSheetCard = {
-  id: string;
-  fileName: string;
-  previewUrl: string | null;
-  kind: 'existing' | 'new';
-  removeToken: string | number;
-};
 
 @Component({
   selector: 'app-session-form',
@@ -86,11 +78,9 @@ type CharacterSheetCard = {
   providers: [provideTranslocoScope('sessions', 'common')],
 })
 export class SessionForm {
-  private readonly auth = inject(Auth);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly storage = inject(Storage);
-  private currentNewCharacterSheetFiles: readonly { file: File; previewUrl: string }[] = [];
 
   readonly initial = input<ISessionFormInitialData | null>(null);
   readonly systems = input<readonly ISystem[]>([]);
@@ -107,14 +97,12 @@ export class SessionForm {
   readonly i18n = createSessionFormI18n();
   readonly form = createSessionForm(this.fb);
 
-  readonly isUploadingImage = signal(false);
   readonly selectedImageFile = signal<File | null>(null);
   readonly storedImagePath = signal<string | null>(null);
   readonly removedCharacterSheetIds = signal<string[]>([]);
-  readonly newCharacterSheetFiles = signal<readonly { file: File; previewUrl: string }[]>([]);
-  readonly characterSheetPreview = signal<{ title: string; url: string } | null>(null);
+  readonly newCharacterSheetFiles = signal<readonly NewSessionCharacterSheet[]>([]);
+  readonly characterSheetPreview = signal<SessionCharacterSheetPreview | null>(null);
 
-  readonly isSubmitting = computed(() => this.busy() || this.isUploadingImage());
 
   readonly styleOptions = computed<IChipPickerOption[]>(() =>
     this.styles().map((style) => ({
@@ -177,7 +165,7 @@ export class SessionForm {
     return this.storage.getPublicUrl(this.storedImagePath());
   });
 
-  readonly existingCharacterSheets = computed<readonly ISessionCharacterSheet[]>(() => {
+  readonly existingCharacterSheets = computed(() => {
     const removedIds = new Set(this.removedCharacterSheetIds());
 
     return (this.initial()?.characterSheets ?? []).filter(
@@ -185,20 +173,17 @@ export class SessionForm {
     );
   });
 
-  readonly characterSheetItems = computed<readonly CharacterSheetCard[]>(() => [
+  readonly characterSheetItems = computed<readonly SessionCharacterSheetCard[]>(() => [
     ...this.existingCharacterSheets().map((sheet) => ({
       id: sheet.id,
       fileName: sheet.fileName,
       previewUrl: this.storage.getPublicUrl(sheet.storagePath, 'docs'),
       kind: 'existing' as const,
-      removeToken: sheet.id,
     })),
-    ...this.newCharacterSheetFiles().map((sheet, index) => ({
-      id: `new-${index}`,
+    ...this.newCharacterSheetFiles().map((sheet) => ({
+      ...sheet,
       fileName: sheet.file.name,
-      previewUrl: sheet.previewUrl,
       kind: 'new' as const,
-      removeToken: index,
     })),
   ]);
 
@@ -271,6 +256,7 @@ export class SessionForm {
     this.replaceNewCharacterSheetFiles([
       ...this.newCharacterSheetFiles(),
       ...selectedFiles.map((file) => ({
+        id: crypto.randomUUID(),
         file,
         previewUrl: URL.createObjectURL(file),
       })),
@@ -279,12 +265,14 @@ export class SessionForm {
     this.syncCharacterSheetsCount();
   }
 
-  removeCharacterSheet(item: CharacterSheetCard): void {
+  removeCharacterSheet(item: SessionCharacterSheetCard): void {
     if (item.kind === 'existing') {
-      this.removedCharacterSheetIds.update((ids) => [...new Set([...ids, item.removeToken as string])]);
+      this.removedCharacterSheetIds.update((ids) => [
+        ...new Set([...ids, item.id]),
+      ]);
     } else {
       this.replaceNewCharacterSheetFiles(
-        this.newCharacterSheetFiles().filter((_, index) => index !== item.removeToken),
+        this.newCharacterSheetFiles().filter((sheet) => sheet.id !== item.id),
       );
     }
 
@@ -327,22 +315,15 @@ export class SessionForm {
       return;
     }
 
-    this.isUploadingImage.set(true);
-
-    this.uploadSelectedImageIfNeeded()
-      .pipe(
-        finalize(() => this.isUploadingImage.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: () =>
-          this.save.emit({
-            payload: mapSessionFormToPayload(this.form),
-            newCharacterSheetFiles: this.newCharacterSheetFiles().map((sheet) => sheet.file),
-            removedCharacterSheetIds: this.removedCharacterSheetIds(),
-          }),
-        error: (error) => console.error('[SESSION FORM IMAGE UPLOAD ERROR]', error),
-      });
+    this.save.emit({
+      payload: mapSessionFormToPayload(this.form),
+      imageFile: this.selectedImageFile(),
+      persistedImagePath: this.storedImagePath(),
+      newCharacterSheetFiles: this.newCharacterSheetFiles().map(
+        (sheet) => sheet.file,
+      ),
+      removedCharacterSheetIds: this.removedCharacterSheetIds(),
+    });
   }
 
   onCancel(): void {
@@ -386,15 +367,14 @@ export class SessionForm {
   }
 
   private replaceNewCharacterSheetFiles(
-    nextFiles: readonly { file: File; previewUrl: string }[],
+    nextFiles: readonly NewSessionCharacterSheet[],
   ): void {
     const nextPreviewUrls = new Set(nextFiles.map((file) => file.previewUrl));
 
-    this.currentNewCharacterSheetFiles
+    this.newCharacterSheetFiles()
       .filter((file) => !nextPreviewUrls.has(file.previewUrl))
       .forEach((file) => URL.revokeObjectURL(file.previewUrl));
 
-    this.currentNewCharacterSheetFiles = nextFiles;
     this.newCharacterSheetFiles.set(nextFiles);
   }
 
@@ -403,35 +383,5 @@ export class SessionForm {
       file.type === 'application/pdf' ||
       file.name.toLowerCase().endsWith('.pdf')
     );
-  }
-
-  private uploadSelectedImageIfNeeded(): Observable<IStorageUploadResult | null> {
-    const file = this.selectedImageFile();
-
-    if (!file) {
-      return of(null);
-    }
-
-    const userId = this.auth.userId();
-
-    if (!userId) {
-      return throwError(() => new Error('Unauthorized.'));
-    }
-
-    return this.storage
-      .uploadFile(file, {
-        folder: 'sessionTemplates',
-        ownerId: userId,
-        currentPath: this.storedImagePath(),
-        removePrevious: true,
-        usePublicUrl: false,
-      })
-      .pipe(
-        map((result) => {
-          this.storedImagePath.set(result.path);
-          setControlValue(this.form.controls.image, result.path);
-          return result;
-        }),
-      );
   }
 }

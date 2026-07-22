@@ -108,7 +108,7 @@
           <app-image-upload
             [currentUrl]="heroPreviewUrl()"
             [cropHint]="i18n.upload().cropHint"
-            [disabled]="isLoading() || isSaving() || isUploading()"
+            [disabled]="isLoading() || isSaving() || activeHeroUploads()"
             [previewAlt]="form.controls.heroImageAlt.value || i18n.fields().heroPreviewAlt"
             (fileSelected)="onHeroImageSelected($event)"
           />

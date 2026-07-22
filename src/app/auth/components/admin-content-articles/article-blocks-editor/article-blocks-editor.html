@@ -31,7 +31,7 @@
     <p class="m-0">{{ i18n.validation().emptyBlocksNotice }}</p>
   }
 
-  @for (block of blockControls; track index; let index = $index) {
+  @for (block of blockControls; track block; let index = $index) {
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="block">
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
         <span class="tag-badge tag-badge--muted">
@@ -144,7 +144,7 @@
         <app-image-upload
           [currentUrl]="imagePreviewUrl(block.controls.imagePath.value)"
           [cropHint]="cropHint()"
-          [disabled]="disabled() || isUploading()"
+          [disabled]="disabled() || isBlockUploading(block)"
           [previewAlt]="block.controls.imageAlt.value || i18n.fields().imagePreviewAlt"
           (fileSelected)="onBlockImageSelected($event, index)"
         />

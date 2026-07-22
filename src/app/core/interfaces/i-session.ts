@@ -99,6 +99,8 @@ export interface IUpdateSessionPayload {
 
 export interface ISessionFormSubmitData {
   payload: ICreateSessionPayload | IUpdateSessionPayload;
+  imageFile: File | null;
+  persistedImagePath: string | null;
   newCharacterSheetFiles: File[];
   removedCharacterSheetIds: string[];
 }

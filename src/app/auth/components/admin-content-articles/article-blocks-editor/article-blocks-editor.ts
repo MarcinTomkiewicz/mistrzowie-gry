@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  computed,
   inject,
   input,
   output,
@@ -16,6 +17,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { finalize } from 'rxjs';
 
 import { ImageStorage } from '../../../../core/services/image-storage/image-storage';
+import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
   ArticleEditorBlockForm,
@@ -45,6 +47,7 @@ import { createAdminContentArticleEditorI18n } from '../article-editor/article-e
 })
 export class ArticleBlocksEditor {
   private readonly imageStorage = inject(ImageStorage);
+  private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -56,7 +59,10 @@ export class ArticleBlocksEditor {
   readonly uploadingChange = output<boolean>();
 
   protected readonly i18n = createAdminContentArticleEditorI18n();
-  protected readonly isUploading = signal(false);
+  private readonly activeUploads = signal<ReadonlySet<ArticleEditorBlockForm>>(
+    new Set(),
+  );
+  protected readonly isUploading = computed(() => this.activeUploads().size > 0);
   protected readonly hasHeadingWithoutBody = hasArticleEditorHeadingWithoutBody;
   protected readonly hasImageWithoutPath = hasArticleEditorImageWithoutPath;
   protected readonly hasInvalidLinkSyntax = hasInvalidArticleLinkSyntax;
@@ -91,11 +97,16 @@ export class ArticleBlocksEditor {
   }
 
   protected imagePreviewUrl(path: string): string | null {
-    return path ? this.imageStorage.publicUrl(path) : null;
+    return path ? this.storage.getPublicUrl(path) : null;
+  }
+
+  protected isBlockUploading(block: ArticleEditorBlockForm): boolean {
+    return this.activeUploads().has(block);
   }
 
   protected onBlockImageSelected(file: File | null, index: number): void {
     const block = this.blocks().at(index);
+    const previousPath = block.controls.imagePath.getRawValue();
 
     if (!file) {
       block.controls.imagePath.setValue('');
@@ -103,12 +114,16 @@ export class ArticleBlocksEditor {
       return;
     }
 
-    this.setUploading(true);
+    this.setBlockUploading(block, true);
 
     this.imageStorage
-      .transcodeAndUpload(file, `content/articles/${this.articleId()}`)
+      .transcodeAndUpload(file, {
+        folder: `content/articles/${this.articleId()}`,
+        replacePath: previousPath,
+        usePublicUrl: false,
+      })
       .pipe(
-        finalize(() => this.setUploading(false)),
+        finalize(() => this.setBlockUploading(block, false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
@@ -142,8 +157,19 @@ export class ArticleBlocksEditor {
     this.blocks().markAsDirty();
   }
 
-  private setUploading(isUploading: boolean): void {
-    this.isUploading.set(isUploading);
-    this.uploadingChange.emit(isUploading);
+  private setBlockUploading(
+    block: ArticleEditorBlockForm,
+    isUploading: boolean,
+  ): void {
+    const uploads = new Set(this.activeUploads());
+
+    if (isUploading) {
+      uploads.add(block);
+    } else {
+      uploads.delete(block);
+    }
+
+    this.activeUploads.set(uploads);
+    this.uploadingChange.emit(uploads.size > 0);
   }
 }

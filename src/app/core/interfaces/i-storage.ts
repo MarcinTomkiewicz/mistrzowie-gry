@@ -1,12 +1,10 @@
 export interface IStorageUploadOptions {
   bucket?: string;
   folder: string;
-  ownerId: string;
-  subfolders?: string[];
-  currentPath?: string | null;
-  removePrevious?: boolean;
   fileName?: string;
+  replacePath?: string | null;
   usePublicUrl?: boolean;
+  upsert?: boolean;
 }
 
 export interface IStorageUploadResult {

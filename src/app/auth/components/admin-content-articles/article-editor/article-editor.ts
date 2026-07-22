@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,7 @@ import {
 import { IAdminContentArticleDetail } from '../../../../core/interfaces/i-content-article';
 import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { ImageStorage } from '../../../../core/services/image-storage/image-storage';
+import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
   ArticleEditorForm,
@@ -53,6 +54,7 @@ import { createAdminContentArticleEditorI18n } from './article-editor.i18n';
 export class ArticleEditor {
   private readonly articles = inject(ContentArticles);
   private readonly imageStorage = inject(ImageStorage);
+  private readonly storage = inject(Storage);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
@@ -62,7 +64,11 @@ export class ArticleEditor {
   protected readonly article = signal<IAdminContentArticleDetail | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
-  protected readonly isUploading = signal(false);
+  protected readonly activeHeroUploads = signal(false);
+  private readonly activeBlockUploads = signal(false);
+  protected readonly isUploading = computed(
+    () => this.activeHeroUploads() || this.activeBlockUploads(),
+  );
   protected readonly hasLoadError = signal(false);
   protected readonly isNotFound = signal(false);
   protected readonly showBlockValidation = signal(false);
@@ -90,7 +96,7 @@ export class ArticleEditor {
     this.form.controls.heroImagePath.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((path) =>
-        this.heroPreviewUrl.set(path ? this.imageStorage.publicUrl(path) : null),
+        this.heroPreviewUrl.set(path ? this.storage.getPublicUrl(path) : null),
       );
     this.loadArticle();
   }
@@ -161,7 +167,7 @@ export class ArticleEditor {
   }
 
   protected onBlockUploadingChange(isUploading: boolean): void {
-    this.isUploading.set(isUploading);
+    this.activeBlockUploads.set(isUploading);
   }
 
   protected saveArticle(): void {
@@ -210,6 +216,10 @@ export class ArticleEditor {
   }
 
   protected goBack(): void {
+    if (this.isSaving() || this.isUploading()) {
+      return;
+    }
+
     void this.router.navigate(['/admin/content']);
   }
 
@@ -264,7 +274,7 @@ export class ArticleEditor {
     this.form.markAsUntouched();
     this.heroPreviewUrl.set(
       article.heroImagePath
-        ? this.imageStorage.publicUrl(article.heroImagePath)
+        ? this.storage.getPublicUrl(article.heroImagePath)
         : null,
     );
   }
@@ -285,11 +295,17 @@ export class ArticleEditor {
   }
 
   private uploadArticleImage(file: File) {
-    this.isUploading.set(true);
+    this.activeHeroUploads.set(true);
 
     return this.imageStorage
-      .transcodeAndUpload(file, `content/articles/${this.articleId}`)
-      .pipe(finalize(() => this.isUploading.set(false)));
+      .transcodeAndUpload(file, {
+        folder: `content/articles/${this.articleId}`,
+        replacePath: this.form.controls.heroImagePath.getRawValue(),
+        usePublicUrl: false,
+      })
+      .pipe(
+        finalize(() => this.activeHeroUploads.set(false)),
+      );
   }
 
   private showUploadError(): void {

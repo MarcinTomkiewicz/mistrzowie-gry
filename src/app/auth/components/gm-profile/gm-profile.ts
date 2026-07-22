@@ -1,15 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import {
-  finalize,
-  forkJoin,
-  map,
-  Observable,
-  of,
-  switchMap,
-  throwError,
-} from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -25,7 +17,6 @@ import {
   mapGmProfileFormToPayload,
 } from '../../../core/factories/gm-profile-form.factory';
 import { IChipPickerOption } from '../../../core/interfaces/i-chip-picker';
-import { IStorageUploadResult } from '../../../core/interfaces/i-storage';
 import { GmProfileFacade } from '../../../core/facades/gm-profile/gm-profile.facade';
 import { Auth } from '../../../core/services/auth/auth';
 import { Storage } from '../../../core/services/storage/storage';
@@ -179,14 +170,12 @@ export class GmProfile {
 
     this.isSubmitting.set(true);
 
-    this.uploadSelectedImageIfNeeded()
-      .pipe(
-        switchMap(() => {
-          const payload = mapGmProfileFormToPayload(this.form);
-          return this.gmProfileFacade.upsertMyGmProfile(payload);
-        }),
-        finalize(() => this.isSubmitting.set(false)),
+    this.gmProfileFacade
+      .upsertMyGmProfile(
+        mapGmProfileFormToPayload(this.form),
+        this.selectedImageFile(),
       )
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: (profile) => {
           const styleIds = profile.styles?.map((style) => style.id) ?? [];
@@ -317,35 +306,5 @@ export class GmProfile {
           });
         },
       });
-  }
-
-  private uploadSelectedImageIfNeeded(): Observable<IStorageUploadResult | null> {
-    const file = this.selectedImageFile();
-
-    if (!file) {
-      return of(null);
-    }
-
-    const userId = this.auth.userId();
-
-    if (!userId) {
-      return throwError(() => new Error('Unauthorized.'));
-    }
-
-    return this.storage
-      .uploadFile(file, {
-        folder: 'profilePhotos',
-        ownerId: userId,
-        currentPath: this.storedImagePath(),
-        removePrevious: true,
-        usePublicUrl: false,
-      })
-      .pipe(
-        map((result) => {
-          this.storedImagePath.set(result.path);
-          setControlValue(this.form.controls.image, result.path);
-          return result;
-        }),
-      );
   }
 }

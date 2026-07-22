@@ -1,260 +1,152 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, from, map, Observable, of, switchMap, throwError } from 'rxjs';
-
-import { FilterOperator } from '../../enums/filter-operators';
 import {
-  ICustomSessionCharacterSheetRow,
-  IGmSessionTemplateCharacterSheetRow,
-} from '../../interfaces/i-session';
+  catchError,
+  defer,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
+
 import {
   IStorageUploadOptions,
   IStorageUploadResult,
 } from '../../interfaces/i-storage';
-import { SessionSourceKind, SESSION_SOURCE_CONFIG } from '../../types/session-source';
-import { Backend } from '../backend/backend';
+import { stringToSlug } from '../../utils/slug';
 import { Supabase } from '../supabase/supabase';
-
-type SessionCharacterSheetRow =
-  | IGmSessionTemplateCharacterSheetRow
-  | ICustomSessionCharacterSheetRow;
 
 @Injectable({ providedIn: 'root' })
 export class Storage {
-  private readonly backend = inject(Backend);
   private readonly supabase = inject(Supabase).client();
 
-  uploadFile(file: File, options: IStorageUploadOptions): Observable<IStorageUploadResult> {
-    const bucket = options.bucket ?? 'images';
-    const removePrevious = options.removePrevious ?? true;
-    const path = this.buildStoragePath(file, options);
+  uploadFile(
+    file: Blob,
+    options: IStorageUploadOptions,
+  ): Observable<IStorageUploadResult> {
+    return defer(() => {
+      const bucket = options.bucket ?? 'images';
+      const path = this.buildStoragePath(file, options);
+      const replacePath = this.resolveDestructivePath(
+        options.replacePath,
+        bucket,
+      );
 
-    return from(
-      this.supabase.storage.from(bucket).upload(path, file, {
-        upsert: false,
-        contentType: file.type || undefined,
-      }),
-    ).pipe(
-      switchMap(({ error }) => {
-        if (error) {
-          return throwError(() => error);
-        }
+      return from(
+        this.supabase.storage.from(bucket).upload(path, file, {
+          upsert: options.upsert ?? false,
+          contentType: file.type || undefined,
+        }),
+      ).pipe(
+        switchMap(({ error }) => {
+          if (error) {
+            return throwError(() => error);
+          }
 
-        if (!removePrevious || !options.currentPath || options.currentPath === path) {
-          return of(this.createUploadResult(bucket, path, options.usePublicUrl));
-        }
+          if (!replacePath || replacePath === path) {
+            return of(
+              this.createUploadResult(bucket, path, options.usePublicUrl),
+            );
+          }
 
-        return this.removeFile(options.currentPath, bucket).pipe(
-          map(() => this.createUploadResult(bucket, path, options.usePublicUrl)),
-        );
-      }),
-    );
+          return this.removeFile(replacePath, bucket).pipe(
+            map(() =>
+              this.createUploadResult(bucket, path, options.usePublicUrl),
+            ),
+            catchError((error: unknown) =>
+              this.removeFile(path, bucket).pipe(
+                catchError(() => of(void 0)),
+                switchMap(() => throwError(() => error)),
+              ),
+            ),
+          );
+        }),
+      );
+    });
   }
 
-  uploadImage(file: File, options: IStorageUploadOptions): Observable<IStorageUploadResult> {
-    return this.uploadFile(file, options);
-  }
-
-  removeFile(pathOrUrl: string | null | undefined, bucket = 'images'): Observable<void> {
+  removeFile(
+    pathOrUrl: string | null | undefined,
+    bucket = 'images',
+  ): Observable<void> {
     return this.removeFiles(pathOrUrl ? [pathOrUrl] : [], bucket);
   }
 
-  removeFiles(pathsOrUrls: readonly (string | null | undefined)[], bucket = 'images'): Observable<void> {
-    const normalizedPaths = [...new Set(
-      pathsOrUrls
-        .map((path) => this.normalizeStoragePath(path, bucket))
-        .filter((path): path is string => !!path),
-    )];
+  removeFiles(
+    pathsOrUrls: readonly (string | null | undefined)[],
+    bucket = 'images',
+  ): Observable<void> {
+    return defer(() => {
+      const normalizedPaths = [
+        ...new Set(
+          pathsOrUrls
+            .map((path) => this.resolveDestructivePath(path, bucket))
+            .filter((path): path is string => !!path),
+        ),
+      ];
 
-    if (!normalizedPaths.length) {
-      return of(void 0);
-    }
-
-    return from(
-      this.supabase.storage.from(bucket).remove(normalizedPaths),
-    ).pipe(
-      switchMap(({ error }) => {
-        if (error) {
-          return throwError(() => error);
-        }
-
+      if (!normalizedPaths.length) {
         return of(void 0);
-      }),
-    );
+      }
+
+      return from(
+        this.supabase.storage.from(bucket).remove(normalizedPaths),
+      ).pipe(
+        switchMap(({ error }) => {
+          if (error) {
+            return throwError(() => error);
+          }
+
+          return of(void 0);
+        }),
+      );
+    });
   }
 
-  getPublicUrl(path: string | null | undefined, bucket = 'images'): string | null {
-    const normalizedPath = this.normalizeStoragePath(path, bucket);
+  getPublicUrl(
+    path: string | null | undefined,
+    bucket = 'images',
+  ): string | null {
+    const normalizedPath = this.resolveDisplayPath(path, bucket);
 
     if (!normalizedPath) {
       return null;
     }
 
-    const { data } = this.supabase.storage.from(bucket).getPublicUrl(normalizedPath);
+    const { data } = this.supabase.storage
+      .from(bucket)
+      .getPublicUrl(normalizedPath);
     return data.publicUrl ?? null;
   }
 
-  buildStoragePath(file: File, options: IStorageUploadOptions): string {
-    const fileName = options.fileName?.trim() || this.createFileName(file);
-    const segments = [
-      options.folder,
-      options.ownerId,
-      ...(options.subfolders ?? []),
-      fileName,
-    ];
+  buildStoragePath(file: Blob, options: IStorageUploadOptions): string {
+    const folder = this.normalizeFolderPath(options.folder);
+    const fileName = this.normalizeFileName(
+      options.fileName?.trim() || this.createFileName(file),
+    );
 
-    return segments
-      .map((segment) => this.sanitizePathSegment(segment))
-      .filter(Boolean)
-      .join('/');
-  }
-
-  syncSessionCharacterSheets(
-    sessionId: string,
-    source: SessionSourceKind,
-    ownerId: string,
-    newFiles: readonly File[],
-    removedSheetIds: readonly string[],
-  ): Observable<void> {
-    if (!newFiles.length && !removedSheetIds.length) {
-      return of(void 0);
+    if (!folder || !fileName) {
+      throw new Error('[STORAGE] A valid folder and file name are required.');
     }
 
-    return this.getSessionCharacterSheetRows(sessionId, source).pipe(
-      switchMap((rows) => {
-        const rowsToRemove = rows.filter((row) => removedSheetIds.includes(row.id));
-
-        return this.removeSessionCharacterSheetRows(rowsToRemove, source).pipe(
-          switchMap(() =>
-            this.uploadSessionCharacterSheetFiles(sessionId, source, ownerId, newFiles),
-          ),
-        );
-      }),
-    );
+    return `${folder}/${fileName}`;
   }
 
-  removeSessionCharacterSheets(
-    sessionId: string,
-    source: SessionSourceKind,
-  ): Observable<void> {
-    return this.getSessionCharacterSheetRows(sessionId, source).pipe(
-      switchMap((rows) => this.removeSessionCharacterSheetRows(rows, source)),
-    );
+  normalizeFileBaseName(fileName: string, maxLength?: number): string {
+    const normalized = stringToSlug(this.stripExtension(fileName));
+
+    return maxLength ? normalized.slice(0, maxLength) : normalized;
   }
 
-  private uploadSessionCharacterSheetFiles(
-    sessionId: string,
-    source: SessionSourceKind,
-    ownerId: string,
-    files: readonly File[],
-  ): Observable<void> {
-    if (!files.length) {
-      return of(void 0);
-    }
-
-    const config = SESSION_SOURCE_CONFIG[source];
-
-    return forkJoin(
-      files.map((file) =>
-        this.uploadFile(file, {
-          bucket: 'docs',
-          folder: 'sessions',
-          ownerId,
-          subfolders: [sessionId, 'characters'],
-          usePublicUrl: false,
-        }).pipe(
-          map((result) => ({
-            [config.sessionIdKey]: sessionId,
-            storagePath: result.path,
-            fileName: file.name,
-          })),
-        ),
-      ),
-    ).pipe(
-      switchMap((rows) =>
-        this.backend.createMany<Record<string, string>>(
-          config.characterSheetsTable,
-          rows,
-        ),
-      ),
-      map(() => void 0),
-    );
-  }
-
-  private removeSessionCharacterSheetRows(
-    rows: readonly SessionCharacterSheetRow[],
-    source: SessionSourceKind,
-  ): Observable<void> {
-    if (!rows.length) {
-      return of(void 0);
-    }
-
-    const config = SESSION_SOURCE_CONFIG[source];
-    const ids = rows.map((row) => row.id);
-
-    return this.removeFiles(
-      rows.map((row) => row.storagePath),
-      'docs',
-    ).pipe(
-      switchMap(() =>
-        this.backend.delete(config.characterSheetsTable, {
-          id: {
-            operator: FilterOperator.IN,
-            value: ids,
-          },
-        }),
-      ),
-    );
-  }
-
-  private getSessionCharacterSheetRows(
-    sessionId: string,
-    source: SessionSourceKind,
-  ): Observable<SessionCharacterSheetRow[]> {
-    const config = SESSION_SOURCE_CONFIG[source];
-
-    return this.backend.getAll<SessionCharacterSheetRow>({
-      table: config.characterSheetsTable,
-      sortBy: 'createdAt',
-      sortOrder: 'asc',
-      pagination: {
-        filters: {
-          [config.sessionIdKey]: {
-            operator: FilterOperator.EQ,
-            value: sessionId,
-          },
-        },
-      },
-    });
-  }
-
-  private createUploadResult(
-    bucket: string,
-    path: string,
-    usePublicUrl: boolean | undefined,
-  ): IStorageUploadResult {
-    return {
-      bucket,
-      path,
-      publicUrl: usePublicUrl === false ? null : this.getPublicUrl(path, bucket),
-    };
-  }
-
-  private createFileName(file: File): string {
-    const baseName = this.stripExtension(file.name).trim() || 'file';
-    const extension = this.resolveExtension(file);
-    const timestamp = Date.now();
-
-    return `${this.sanitizePathSegment(baseName)}-${timestamp}.${extension}`;
-  }
-
-  private resolveExtension(file: File): string {
-    const fileNameExtension = this.extractExtension(file.name);
+  resolveFileExtension(fileName: string, mimeType: string): string {
+    const fileNameExtension = this.extractExtension(fileName);
 
     if (fileNameExtension) {
       return fileNameExtension;
     }
 
-    switch (file.type) {
+    switch (mimeType) {
       case 'image/jpeg':
         return 'jpg';
       case 'image/png':
@@ -274,6 +166,32 @@ export class Storage {
     }
   }
 
+  private createUploadResult(
+    bucket: string,
+    path: string,
+    usePublicUrl: boolean | undefined,
+  ): IStorageUploadResult {
+    return {
+      bucket,
+      path,
+      publicUrl: usePublicUrl === false ? null : this.getPublicUrl(path, bucket),
+    };
+  }
+
+  private createFileName(file: Blob): string {
+    const sourceName =
+      'name' in file && typeof file.name === 'string' ? file.name : null;
+
+    if (!sourceName) {
+      throw new Error('[STORAGE] fileName is required for Blob uploads.');
+    }
+
+    const baseName = this.normalizeFileBaseName(sourceName) || 'file';
+    const extension = this.resolveFileExtension(sourceName, file.type);
+
+    return `${baseName}-${crypto.randomUUID()}.${extension}`;
+  }
+
   private extractExtension(fileName: string): string | null {
     const normalized = fileName.trim();
     const lastDotIndex = normalized.lastIndexOf('.');
@@ -289,24 +207,44 @@ export class Storage {
     const normalized = fileName.trim();
     const lastDotIndex = normalized.lastIndexOf('.');
 
-    if (lastDotIndex === -1) {
-      return normalized;
+    return lastDotIndex === -1
+      ? normalized
+      : normalized.slice(0, lastDotIndex);
+  }
+
+  private normalizeFolderPath(folder: string): string {
+    return folder
+      .split('/')
+      .map((segment) => segment.trim())
+      .filter(Boolean)
+      .join('/');
+  }
+
+  private normalizeFileName(fileName: string): string {
+    const extension = this.extractExtension(fileName);
+    const baseName = this.normalizeFileBaseName(fileName);
+
+    if (!baseName) {
+      return '';
     }
 
-    return normalized.slice(0, lastDotIndex);
+    return extension
+      ? `${baseName}.${stringToSlug(extension)}`
+      : baseName;
   }
 
-  private sanitizePathSegment(value: string): string {
-    return value
-      .trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9-_.]+/g, '-')
-      .replace(/-{2,}/g, '-')
-      .replace(/^-+|-+$/g, '');
+  private resolveDisplayPath(
+    pathOrUrl: string | null | undefined,
+    bucket: string,
+  ): string | null {
+    try {
+      return this.resolveDestructivePath(pathOrUrl, bucket);
+    } catch {
+      return null;
+    }
   }
 
-  private normalizeStoragePath(
+  private resolveDestructivePath(
     pathOrUrl: string | null | undefined,
     bucket: string,
   ): string | null {
@@ -316,22 +254,43 @@ export class Storage {
       return null;
     }
 
-    if (!value.startsWith('http://') && !value.startsWith('https://')) {
-      return value.replace(/^\/+/, '');
-    }
+    const hasScheme = /^[a-z][a-z\d+.-]*:/i.test(value);
 
-    try {
-      const url = new URL(value);
-      const marker = `/storage/v1/object/public/${bucket}/`;
-      const index = url.pathname.indexOf(marker);
+    if (!hasScheme) {
+      const path = value.replace(/^\/+/, '');
 
-      if (index === -1) {
-        return null;
+      if (path) {
+        return path;
       }
 
-      return url.pathname.slice(index + marker.length);
-    } catch {
-      return null;
+      throw new Error('[STORAGE] Invalid storage path.');
     }
+
+    if (!value.startsWith('http://') && !value.startsWith('https://')) {
+      throw new Error('[STORAGE] Unsupported storage URL.');
+    }
+
+    let url: URL;
+
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error('[STORAGE] Invalid storage URL.');
+    }
+
+    const marker = `/storage/v1/object/public/${bucket}/`;
+    const index = url.pathname.indexOf(marker);
+
+    if (index === -1) {
+      throw new Error('[STORAGE] URL does not reference the selected bucket.');
+    }
+
+    const path = url.pathname.slice(index + marker.length);
+
+    if (!path) {
+      throw new Error('[STORAGE] URL does not contain a storage path.');
+    }
+
+    return path;
   }
 }

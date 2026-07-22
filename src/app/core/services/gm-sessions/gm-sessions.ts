@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
+import {
+  forkJoin,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 import { FilterOperator } from '../../enums/filter-operators';
 import { IContentTrigger } from '../../interfaces/i-content-trigger';
@@ -17,6 +24,7 @@ import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
 import { GmRead } from '../../reads/gm/gm-read';
 import { SessionRead } from '../../reads/sessions/session-read';
+import { SessionCharacterSheets } from '../session-character-sheets/session-character-sheets';
 import { Storage } from '../storage/storage';
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +33,7 @@ export class GmSessions {
   private readonly backend = inject(Backend);
   private readonly gmRead = inject(GmRead);
   private readonly sessionRead = inject(SessionRead);
+  private readonly characterSheets = inject(SessionCharacterSheets);
   private readonly storage = inject(Storage);
 
   getMySessions(
@@ -180,7 +189,7 @@ export class GmSessions {
     }
 
     return this.getMySessionRequired(sessionId, source).pipe(
-      switchMap(() => this.storage.removeSessionCharacterSheets(sessionId, source)),
+      switchMap(() => this.characterSheets.remove(sessionId, source)),
       switchMap(() =>
         this.backend.delete(config.sessionsTable, {
           id: {
@@ -202,19 +211,43 @@ export class GmSessions {
     sessionId?: string,
   ): Observable<ISessionWithRelations> {
     const userId = this.auth.userId();
-    const config = SESSION_SOURCE_CONFIG[source];
-    const payload = submit.payload;
-
     if (!userId) {
       return throwError(() => new Error('Unauthorized.'));
     }
+
+    return this.uploadSessionImage(
+      submit.imageFile,
+      userId,
+      submit.persistedImagePath,
+    ).pipe(
+      switchMap((uploadedImagePath) =>
+        this.persistMySession(
+          submit,
+          source,
+          userId,
+          uploadedImagePath ?? submit.payload.image,
+          sessionId,
+        ),
+      ),
+    );
+  }
+
+  private persistMySession(
+    submit: ISessionFormSubmitData,
+    source: SessionSourceKind,
+    userId: string,
+    imagePath: string,
+    sessionId?: string,
+  ): Observable<ISessionWithRelations> {
+    const config = SESSION_SOURCE_CONFIG[source];
+    const payload = submit.payload;
 
     const saveRecord$ = sessionId
       ? this.backend.update<SessionRecord>(config.sessionsTable, sessionId, {
           systemId: payload.systemId,
           title: payload.title,
           description: payload.description,
-          image: payload.image,
+          image: imagePath,
           difficultyLevel: payload.difficultyLevel,
           minPlayers: payload.minPlayers,
           maxPlayers: payload.maxPlayers,
@@ -228,7 +261,7 @@ export class GmSessions {
           systemId: payload.systemId,
           title: payload.title,
           description: payload.description,
-          image: payload.image,
+          image: imagePath,
           difficultyLevel: payload.difficultyLevel,
           minPlayers: payload.minPlayers,
           maxPlayers: payload.maxPlayers,
@@ -261,25 +294,39 @@ export class GmSessions {
             'languageId',
             payload.languageIds,
           ),
-          this.storage.syncSessionCharacterSheets(
-            savedSessionId,
-            source,
-            userId,
-            payload.hasReadyCharacterSheets ? submit.newCharacterSheetFiles : [],
-            payload.hasReadyCharacterSheets ? submit.removedCharacterSheetIds : [],
-          ),
+          payload.hasReadyCharacterSheets
+            ? this.characterSheets.sync(
+                savedSessionId,
+                source,
+                userId,
+                submit.newCharacterSheetFiles,
+                submit.removedCharacterSheetIds,
+              )
+            : this.characterSheets.remove(savedSessionId, source),
         ]).pipe(map(() => savedSessionId));
       }),
-      switchMap((savedSessionId) => {
-        if (!payload.hasReadyCharacterSheets) {
-          return this.storage.removeSessionCharacterSheets(savedSessionId, source).pipe(
-            switchMap(() => this.getMySessionRequired(savedSessionId, source)),
-          );
-        }
-
-        return this.getMySessionRequired(savedSessionId, source);
-      }),
+      switchMap((savedSessionId) =>
+        this.getMySessionRequired(savedSessionId, source),
+      ),
     );
+  }
+
+  private uploadSessionImage(
+    file: File | null,
+    userId: string,
+    replacePath: string | null,
+  ): Observable<string | null> {
+    if (!file) {
+      return of(null);
+    }
+
+    return this.storage
+      .uploadFile(file, {
+        folder: `sessionTemplates/${userId}`,
+        replacePath,
+        usePublicUrl: false,
+      })
+      .pipe(map((result) => result.path));
   }
 
   private replaceSessionLinks(

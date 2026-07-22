@@ -5,29 +5,22 @@ import { FilterOperator } from '../../enums/filter-operators';
 import { IContentTrigger } from '../../interfaces/i-content-trigger';
 import { IGmStyle } from '../../interfaces/i-gm-style';
 import {
-  ICustomSessionCharacterSheetRow,
-  ICustomSessionLanguageRow,
-  ICustomSessionStyleRow,
-  ICustomSessionTriggerRow,
-  IGmSessionTemplateCharacterSheetRow,
-  IGmSessionTemplateLanguageRow,
-  IGmSessionTemplateStyleRow,
-  IGmSessionTemplateTriggerRow,
   ISession,
   ISessionCharacterSheet,
   ISessionWithRelations,
 } from '../../interfaces/i-session';
 import { ILanguage } from '../../interfaces/i-languages';
 import { ISystem } from '../../interfaces/i-system';
+import { SessionCharacterSheetRow } from '../../types/session-character-sheet';
+import {
+  SessionLanguageRow,
+  SessionRelationIdKey,
+  SessionRelationRow,
+  SessionStyleRow,
+  SessionTriggerRow,
+} from '../../types/session-relations';
 import { SessionSourceKind, SESSION_SOURCE_CONFIG } from '../../types/session-source';
 import { Backend } from '../../services/backend/backend';
-
-type SessionStyleRow = IGmSessionTemplateStyleRow | ICustomSessionStyleRow;
-type SessionTriggerRow = IGmSessionTemplateTriggerRow | ICustomSessionTriggerRow;
-type SessionLanguageRow = IGmSessionTemplateLanguageRow | ICustomSessionLanguageRow;
-type SessionCharacterSheetRow =
-  | IGmSessionTemplateCharacterSheetRow
-  | ICustomSessionCharacterSheetRow;
 
 @Injectable({ providedIn: 'root' })
 export class SessionRead {
@@ -56,7 +49,7 @@ export class SessionRead {
       .pipe(
         switchMap((sessions) => {
           if (!sessions.length) {
-            return of([] as ISessionWithRelations[]);
+            return of<ISessionWithRelations[]>([]);
           }
 
           return forkJoin(
@@ -187,11 +180,14 @@ export class SessionRead {
       );
   }
 
-  private getLinkedEntities<TRow extends object, TEntity extends { id: string }>(
+  private getLinkedEntities<
+    TRow extends SessionRelationRow,
+    TEntity extends { id: string },
+  >(
     sessionId: string,
     source: SessionSourceKind,
     relationTable: string,
-    relationIdKey: string,
+    relationIdKey: SessionRelationIdKey<TRow>,
     entityTable: string,
     sort: (items: TEntity[]) => TEntity[],
   ): Observable<TEntity[]> {
@@ -200,7 +196,7 @@ export class SessionRead {
     return this.backend
       .getAll<TRow>({
         table: relationTable,
-        sortBy: 'createdAt' as keyof TRow,
+        sortBy: 'createdAt',
         sortOrder: 'asc',
         pagination: {
           filters: {
@@ -216,7 +212,7 @@ export class SessionRead {
           const ids = [
             ...new Set(
               rows.reduce<string[]>((acc, row) => {
-                const value = row[relationIdKey as keyof TRow];
+                const value = row[relationIdKey];
 
                 if (typeof value === 'string' && value) {
                   acc.push(value);
@@ -228,7 +224,7 @@ export class SessionRead {
           ];
 
           if (!ids.length) {
-            return of([] as TEntity[]);
+            return of<TEntity[]>([]);
           }
 
           return this.backend

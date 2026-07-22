@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
+import {
+  forkJoin,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 import { FilterOperator } from '../../enums/filter-operators';
 import {
@@ -12,12 +19,14 @@ import { IGmProfileLanguage, ILanguage } from '../../interfaces/i-languages';
 import { GmRead } from '../../reads/gm/gm-read';
 import { Auth } from '../../services/auth/auth';
 import { Backend } from '../../services/backend/backend';
+import { Storage } from '../../services/storage/storage';
 
 @Injectable({ providedIn: 'root' })
 export class GmProfileFacade {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
   private readonly gmRead = inject(GmRead);
+  private readonly storage = inject(Storage);
 
   getMyGmProfile(): Observable<IGmProfileWithRelations | null> {
     const userId = this.auth.userId();
@@ -63,6 +72,7 @@ export class GmProfileFacade {
 
   upsertMyGmProfile(
     payload: IGmProfileFormData,
+    imageFile: File | null,
   ): Observable<IGmProfileWithRelations> {
     const userId = this.auth.userId();
 
@@ -70,31 +80,54 @@ export class GmProfileFacade {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.getMyGmProfile()
-      .pipe(
-        switchMap((existingProfile) =>
-          this.backend.upsert<
-            Pick<
-              IGmProfile,
-              | 'id'
-              | 'experience'
-              | 'description'
-              | 'image'
-              | 'quote'
-              | 'isPublic'
-              | 'isArchived'
-            >
-          >('gm_profiles', {
-            id: userId,
-            experience: payload.experience,
-            description: payload.description,
-            image: payload.image,
-            quote: payload.quote,
-            isPublic: existingProfile?.isPublic ?? false,
-            isArchived: existingProfile?.isArchived ?? false,
-          }),
+    return this.getMyGmProfile().pipe(
+      switchMap((existingProfile) =>
+        this.uploadProfileImage(
+          imageFile,
+          userId,
+          existingProfile?.image ?? null,
+        ).pipe(
+          switchMap((uploadedImagePath) =>
+            this.persistMyGmProfile(
+              {
+                ...payload,
+                image: uploadedImagePath ?? payload.image,
+              },
+              userId,
+              existingProfile,
+            ),
+          ),
         ),
-      )
+      ),
+    );
+  }
+
+  private persistMyGmProfile(
+    payload: IGmProfileFormData,
+    userId: string,
+    existingProfile: IGmProfileWithRelations | null,
+  ): Observable<IGmProfileWithRelations> {
+    return this.backend
+      .upsert<
+        Pick<
+          IGmProfile,
+          | 'id'
+          | 'experience'
+          | 'description'
+          | 'image'
+          | 'quote'
+          | 'isPublic'
+          | 'isArchived'
+        >
+      >('gm_profiles', {
+        id: userId,
+        experience: payload.experience,
+        description: payload.description,
+        image: payload.image,
+        quote: payload.quote,
+        isPublic: existingProfile?.isPublic ?? false,
+        isArchived: existingProfile?.isArchived ?? false,
+      })
       .pipe(
         switchMap(() =>
           forkJoin([
@@ -104,6 +137,24 @@ export class GmProfileFacade {
         ),
         switchMap(() => this.getMyGmProfileRequired()),
       );
+  }
+
+  private uploadProfileImage(
+    file: File | null,
+    userId: string,
+    replacePath: string | null,
+  ): Observable<string | null> {
+    if (!file) {
+      return of(null);
+    }
+
+    return this.storage
+      .uploadFile(file, {
+        folder: `profilePhotos/${userId}`,
+        replacePath,
+        usePublicUrl: false,
+      })
+      .pipe(map((result) => result.path));
   }
 
   replaceMyGmStyles(gmStyleIds: string[]): Observable<void> {
