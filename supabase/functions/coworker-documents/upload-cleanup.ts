@@ -4,6 +4,7 @@ import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
 import {
   compensateUploadReservation,
   completeUploadCleanup,
+  StorageCleanupError,
 } from "../_shared/coworker-document-edge/upload-cleanup.ts";
 import { RPC } from "./contracts.ts";
 import {
@@ -71,6 +72,9 @@ export async function compensateReservation(
       uploadSessionId: reservation.uploadSessionId,
       errorType: errorName(error),
     }));
+    if (error instanceof StorageCleanupError) {
+      throw error;
+    }
   }
 }
 
