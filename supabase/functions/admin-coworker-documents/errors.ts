@@ -14,6 +14,7 @@ import {
   SigningPackageBackendContractError,
   SigningPackageRequestValidationError,
 } from "./signing-package-contracts.ts";
+import { SigningPackageReviewBackendContractError } from "./signing-package-review-contracts.ts";
 import { getRpcErrorDomain } from "./rpc-error-mapping.ts";
 
 export class InvalidJsonError extends Error {
@@ -173,7 +174,10 @@ export function createErrorResponse(
     );
   }
 
-  if (error instanceof SigningPackageBackendContractError) {
+  if (
+    error instanceof SigningPackageBackendContractError ||
+    error instanceof SigningPackageReviewBackendContractError
+  ) {
     return loggedErrorResponse(
       500,
       "BACKEND_CONTRACT_ERROR",

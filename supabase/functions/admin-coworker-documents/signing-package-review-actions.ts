@@ -1,0 +1,121 @@
+import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
+
+import type { AdminSigningPackageDetail } from "./signing-package-contracts.ts";
+import {
+  SIGNING_PACKAGE_REVIEW_RPC,
+  type SigningPackageReviewActionRequest,
+} from "./signing-package-review-contracts.ts";
+import {
+  parseApproveOnboardingResult,
+  parseSigningPackageReviewDetail,
+} from "./signing-package-review-response-contracts.ts";
+import {
+  acceptSigningPackage,
+  approveOnboarding,
+  rejectSigningPackage,
+  returnSigningPackageItemForCorrection,
+  startSigningPackageReview,
+} from "./signing-package-review-rpc.ts";
+
+export async function handleSigningPackageReviewAction(
+  client: SupabaseClient,
+  actorUserId: string,
+  action: SigningPackageReviewActionRequest,
+): Promise<Response> {
+  switch (action.action) {
+    case "startSigningPackageReview": {
+      const data = await startSigningPackageReview(
+        client,
+        actorUserId,
+        action.packageId,
+      );
+      return detailResponse(action.action, parseSigningPackageReviewDetail(
+        data,
+        SIGNING_PACKAGE_REVIEW_RPC.startReview,
+        {
+          packageId: action.packageId,
+          packageStatus: "under_review",
+        },
+      ));
+    }
+    case "returnSigningPackageItemForCorrection": {
+      const data = await returnSigningPackageItemForCorrection(
+        client,
+        actorUserId,
+        action.packageItemId,
+        action.reason,
+        action.note,
+      );
+      return detailResponse(action.action, parseSigningPackageReviewDetail(
+        data,
+        SIGNING_PACKAGE_REVIEW_RPC.returnItemForCorrection,
+        {
+          packageItemId: action.packageItemId,
+          packageStatus: "needs_correction",
+          packageItemStatus: "needs_correction",
+        },
+      ));
+    }
+    case "rejectSigningPackage": {
+      const data = await rejectSigningPackage(
+        client,
+        actorUserId,
+        action.packageId,
+        action.reason,
+        action.note,
+      );
+      return detailResponse(action.action, parseSigningPackageReviewDetail(
+        data,
+        SIGNING_PACKAGE_REVIEW_RPC.rejectPackage,
+        {
+          packageId: action.packageId,
+          packageStatus: "rejected",
+        },
+      ));
+    }
+    case "acceptSigningPackage": {
+      const data = await acceptSigningPackage(
+        client,
+        actorUserId,
+        action.packageId,
+        action.note,
+      );
+      return detailResponse(action.action, parseSigningPackageReviewDetail(
+        data,
+        SIGNING_PACKAGE_REVIEW_RPC.acceptPackage,
+        {
+          packageId: action.packageId,
+          packageStatus: "accepted",
+        },
+      ));
+    }
+    case "approveOnboarding": {
+      const data = await approveOnboarding(
+        client,
+        actorUserId,
+        action.userId,
+        action.onboardingCaseId,
+      );
+      return Response.json({
+        ok: true,
+        action: "approveOnboarding",
+        result: parseApproveOnboardingResult(
+          data,
+          action.userId,
+          action.onboardingCaseId,
+        ),
+      });
+    }
+  }
+}
+
+function detailResponse(
+  action:
+    | "startSigningPackageReview"
+    | "returnSigningPackageItemForCorrection"
+    | "rejectSigningPackage"
+    | "acceptSigningPackage",
+  detail: AdminSigningPackageDetail,
+): Response {
+  return Response.json({ ok: true, action, detail });
+}

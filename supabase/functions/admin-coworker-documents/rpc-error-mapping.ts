@@ -1,5 +1,6 @@
 import type { RpcErrorDomain } from "../_shared/coworker-document-edge/error-response.ts";
 import { isSigningPackageRpcName } from "./signing-package-contracts.ts";
+import { isSigningPackageReviewRpcName } from "./signing-package-review-contracts.ts";
 import { isSigningSourceRpcName } from "./signing-source-contracts.ts";
 
 const DOCUMENT_RPC_ERRORS: RpcErrorDomain = {
@@ -83,7 +84,10 @@ export function getRpcErrorDomain(
   if (isSigningSourceRpcName(rpcName)) {
     return SIGNING_SOURCE_RPC_ERRORS;
   }
-  if (isSigningPackageRpcName(rpcName)) {
+  if (
+    isSigningPackageRpcName(rpcName) ||
+    isSigningPackageReviewRpcName(rpcName)
+  ) {
     return SIGNING_PACKAGE_RPC_ERRORS;
   }
   return DOCUMENT_RPC_ERRORS;
