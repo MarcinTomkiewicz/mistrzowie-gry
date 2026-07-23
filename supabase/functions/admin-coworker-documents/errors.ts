@@ -1,8 +1,16 @@
 import {
-  BackendContractError,
-  RequestValidationError,
-  type RpcName,
-} from "./contracts.ts";
+  createLoggedErrorResponse as loggedErrorResponse,
+  mapRpcError,
+} from "../_shared/coworker-document-edge/error-response.ts";
+import { RpcCallError } from "../_shared/coworker-document-edge/rpc.ts";
+import { StorageCallError } from "../_shared/coworker-document-edge/signed-storage.ts";
+import { StorageCleanupError } from "../_shared/coworker-document-edge/upload-cleanup.ts";
+import { BackendContractError, RequestValidationError } from "./contracts.ts";
+import {
+  SigningSourceBackendContractError,
+  SigningSourceRequestValidationError,
+} from "./signing-source-contracts.ts";
+import { getRpcErrorDomain } from "./rpc-error-mapping.ts";
 
 export class InvalidJsonError extends Error {
   constructor() {
@@ -18,20 +26,22 @@ export class MissingUserClaimsError extends Error {
   }
 }
 
-export class RpcCallError extends Error {
+export class UploadedFileValidationError extends Error {
   constructor(
-    readonly rpcName: RpcName,
-    readonly sqlState: string | null,
+    readonly reason:
+      | "SIZE_MISMATCH"
+      | "SHA256_UNAVAILABLE"
+      | "SHA256_MISMATCH",
   ) {
-    super("RPC call failed.");
-    this.name = "RpcCallError";
+    super("Uploaded file validation failed.");
+    this.name = "UploadedFileValidationError";
   }
 }
 
-export class StorageCallError extends Error {
-  constructor(readonly operation: string) {
-    super("Storage operation failed.");
-    this.name = "StorageCallError";
+export class OnboardingStateInvalidError extends Error {
+  constructor() {
+    super("The onboarding resource is in an invalid state.");
+    this.name = "OnboardingStateInvalidError";
   }
 }
 
@@ -39,6 +49,16 @@ export function createErrorResponse(
   error: unknown,
   requestId: string,
 ): Response {
+  if (error instanceof SigningSourceRequestValidationError) {
+    return loggedErrorResponse(
+      400,
+      "VALIDATION_FAILED",
+      "Signing source request validation failed.",
+      requestId,
+      { fieldErrors: error.fieldErrors },
+    );
+  }
+
   if (error instanceof RequestValidationError) {
     return loggedErrorResponse(
       400,
@@ -71,6 +91,39 @@ export function createErrorResponse(
     return rpcErrorResponse(error, requestId);
   }
 
+  if (error instanceof OnboardingStateInvalidError) {
+    return loggedErrorResponse(
+      400,
+      "ONBOARDING_STATE_INVALID",
+      "The signing source operation is invalid for the current state.",
+      requestId,
+    );
+  }
+
+  if (error instanceof UploadedFileValidationError) {
+    return loggedErrorResponse(
+      422,
+      "UPLOADED_FILE_INVALID",
+      "The uploaded file does not match the reserved upload contract.",
+      requestId,
+      { reason: error.reason },
+    );
+  }
+
+  if (error instanceof StorageCleanupError) {
+    return loggedErrorResponse(
+      502,
+      "STORAGE_CLEANUP_FAILED",
+      "The upload was cancelled, but the stored object could not be cleaned up.",
+      requestId,
+      {
+        uploadSessionId: error.uploadSessionId,
+        cancelled: true,
+        cleanupStatus: "failed",
+      },
+    );
+  }
+
   if (error instanceof StorageCallError) {
     return loggedErrorResponse(
       502,
@@ -94,6 +147,18 @@ export function createErrorResponse(
     );
   }
 
+  if (error instanceof SigningSourceBackendContractError) {
+    return loggedErrorResponse(
+      500,
+      "BACKEND_CONTRACT_ERROR",
+      "The signing source service returned an invalid response.",
+      requestId,
+      undefined,
+      undefined,
+      error.rpcName,
+    );
+  }
+
   return loggedErrorResponse(
     500,
     "INTERNAL_ERROR",
@@ -102,107 +167,22 @@ export function createErrorResponse(
   );
 }
 
-function rpcErrorResponse(error: RpcCallError, requestId: string): Response {
-  switch (error.sqlState) {
-    case "42501":
-      return loggedErrorResponse(
-        403,
-        "ADMIN_ACCESS_DENIED",
-        "Administrator privileges are required.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "P0002":
-      return loggedErrorResponse(
-        404,
-        "DOCUMENT_RESOURCE_NOT_FOUND",
-        "The requested document resource was not found.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "23505":
-      return loggedErrorResponse(
-        409,
-        "DOCUMENT_CONFLICT",
-        "The document operation conflicts with the current state.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "40001":
-      return loggedErrorResponse(
-        409,
-        "CONCURRENT_MODIFICATION",
-        "The document changed concurrently. Reload and retry.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "22023":
-    case "22P02":
-    case "22007":
-    case "23514":
-      return loggedErrorResponse(
-        400,
-        "DOCUMENT_STATE_INVALID",
-        "The document request is invalid for the current state.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    default:
-      return loggedErrorResponse(
-        500,
-        "BACKEND_ERROR",
-        "The admin document service is unavailable.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-  }
-}
-
-function loggedErrorResponse(
-  status: number,
-  code: string,
-  message: string,
+function rpcErrorResponse(
+  error: RpcCallError,
   requestId: string,
-  extra?: { [key: string]: unknown },
-  storageOperation?: string,
-  rpcName?: RpcName | null,
 ): Response {
-  const logEntry: {
-    code: string;
-    requestId: string;
-    rpcName?: RpcName;
-    status: number;
-    storageOperation?: string;
-  } = { code, requestId, status };
+  const definition = mapRpcError(
+    error.sqlState,
+    getRpcErrorDomain(error.rpcName),
+  );
 
-  if (rpcName !== undefined && rpcName !== null) {
-    logEntry.rpcName = rpcName;
-  }
-  if (storageOperation !== undefined) {
-    logEntry.storageOperation = storageOperation;
-  }
-
-  console.error(JSON.stringify(logEntry));
-
-  return Response.json(
-    {
-      ok: false,
-      code,
-      message,
-      ...(extra ?? {}),
-    },
-    { status },
+  return loggedErrorResponse(
+    definition.status,
+    definition.code,
+    definition.message,
+    requestId,
+    undefined,
+    undefined,
+    error.rpcName,
   );
 }

@@ -1,8 +1,41 @@
 import {
-  BackendContractError,
-  RequestValidationError,
-  type RpcName,
-} from "./contracts.ts";
+  createLoggedErrorResponse as loggedErrorResponse,
+  mapRpcError,
+  type RpcErrorDomain,
+} from "../_shared/coworker-document-edge/error-response.ts";
+import { RpcCallError } from "../_shared/coworker-document-edge/rpc.ts";
+import { StorageCallError } from "../_shared/coworker-document-edge/signed-storage.ts";
+import { StorageCleanupError } from "../_shared/coworker-document-edge/upload-cleanup.ts";
+import { BackendContractError, RequestValidationError } from "./contracts.ts";
+
+const OPERATIONAL_DOCUMENT_CONFLICT = {
+  status: 409,
+  code: "OPERATIONAL_DOCUMENT_CONFLICT",
+  message:
+    "The operational document changed concurrently or conflicts with its current state.",
+} as const;
+
+const OPERATIONAL_RPC_ERRORS: RpcErrorDomain = {
+  notFound: {
+    status: 404,
+    code: "OPERATIONAL_DOCUMENT_NOT_FOUND",
+    message: "The requested operational document resource was not found.",
+  },
+  conflict: OPERATIONAL_DOCUMENT_CONFLICT,
+  foreignKeyConflict: OPERATIONAL_DOCUMENT_CONFLICT,
+  concurrent: OPERATIONAL_DOCUMENT_CONFLICT,
+  invalidState: {
+    status: 400,
+    code: "OPERATIONAL_DOCUMENT_STATE_INVALID",
+    message:
+      "The operational document request is invalid for the current state.",
+  },
+  unavailable: {
+    status: 500,
+    code: "BACKEND_ERROR",
+    message: "The admin operational document service is unavailable.",
+  },
+};
 
 export class InvalidJsonError extends Error {
   constructor() {
@@ -18,34 +51,10 @@ export class MissingUserClaimsError extends Error {
   }
 }
 
-export class RpcCallError extends Error {
-  constructor(
-    readonly rpcName: RpcName,
-    readonly sqlState: string | null,
-  ) {
-    super("RPC call failed.");
-    this.name = "RpcCallError";
-  }
-}
-
-export class StorageCallError extends Error {
-  constructor(readonly operation: string) {
-    super("Storage operation failed.");
-    this.name = "StorageCallError";
-  }
-}
-
 export class UploadedFileValidationError extends Error {
   constructor(readonly reason: string) {
     super("Uploaded file validation failed.");
     this.name = "UploadedFileValidationError";
-  }
-}
-
-export class StorageCleanupError extends Error {
-  constructor(readonly uploadSessionId: string) {
-    super("Upload was cancelled, but Storage cleanup failed.");
-    this.name = "StorageCleanupError";
   }
 }
 
@@ -141,98 +150,14 @@ export function createErrorResponse(
 }
 
 function rpcErrorResponse(error: RpcCallError, requestId: string): Response {
-  switch (error.sqlState) {
-    case "42501":
-      return loggedErrorResponse(
-        403,
-        "ADMIN_ACCESS_DENIED",
-        "Administrator privileges are required.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "P0002":
-      return loggedErrorResponse(
-        404,
-        "OPERATIONAL_DOCUMENT_NOT_FOUND",
-        "The requested operational document resource was not found.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "23505":
-    case "23503":
-    case "40001":
-      return loggedErrorResponse(
-        409,
-        "OPERATIONAL_DOCUMENT_CONFLICT",
-        "The operational document changed concurrently or conflicts with its current state.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "22023":
-    case "22P02":
-    case "22007":
-    case "23514":
-      return loggedErrorResponse(
-        400,
-        "OPERATIONAL_DOCUMENT_STATE_INVALID",
-        "The operational document request is invalid for the current state.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    default:
-      return loggedErrorResponse(
-        500,
-        "BACKEND_ERROR",
-        "The admin operational document service is unavailable.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-  }
-}
-
-function loggedErrorResponse(
-  status: number,
-  code: string,
-  message: string,
-  requestId: string,
-  extra?: { [key: string]: unknown },
-  storageOperation?: string,
-  rpcName?: RpcName | null,
-): Response {
-  const logEntry: {
-    code: string;
-    requestId: string;
-    rpcName?: RpcName;
-    status: number;
-    storageOperation?: string;
-  } = { code, requestId, status };
-
-  if (rpcName !== undefined && rpcName !== null) {
-    logEntry.rpcName = rpcName;
-  }
-  if (storageOperation !== undefined) {
-    logEntry.storageOperation = storageOperation;
-  }
-
-  console.error(JSON.stringify(logEntry));
-
-  return Response.json(
-    {
-      ok: false,
-      code,
-      message,
-      ...(extra ?? {}),
-    },
-    { status },
+  const definition = mapRpcError(error.sqlState, OPERATIONAL_RPC_ERRORS);
+  return loggedErrorResponse(
+    definition.status,
+    definition.code,
+    definition.message,
+    requestId,
+    undefined,
+    undefined,
+    error.rpcName,
   );
 }

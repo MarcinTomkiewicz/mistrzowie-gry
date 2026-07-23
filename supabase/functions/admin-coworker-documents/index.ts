@@ -1,7 +1,10 @@
 import { withSupabase } from "npm:@supabase/server@^1";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
+import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
+import { createSignedDownloadUrl } from "../_shared/coworker-document-edge/signed-storage.ts";
 import {
+  type AdminDocumentActionRequest,
   parseAdminDashboard,
   parseAdminDocumentActionRequest,
   parseDocumentResult,
@@ -13,16 +16,17 @@ import {
   parseSeedRequirementsResult,
   parseSignatureVerification,
   RPC,
-  type AdminDocumentActionRequest,
-  type RpcName,
 } from "./contracts.ts";
 import {
   createErrorResponse,
   InvalidJsonError,
   MissingUserClaimsError,
-  RpcCallError,
-  StorageCallError,
 } from "./errors.ts";
+import { handleSigningSourceAction } from "./signing-source-actions.ts";
+import {
+  isSigningSourceAction,
+  parseSigningSourceActionRequest,
+} from "./signing-source-request.ts";
 
 const ALLOWED_METHODS = "GET, POST, OPTIONS";
 
@@ -93,6 +97,14 @@ async function handlePost(
     body = (await request.json()) as unknown;
   } catch {
     throw new InvalidJsonError();
+  }
+
+  if (isSigningSourceAction(body)) {
+    return await handleSigningSourceAction(
+      client,
+      actorUserId,
+      parseSigningSourceActionRequest(body),
+    );
   }
 
   const action = parseAdminDocumentActionRequest(body);
@@ -366,18 +378,12 @@ async function createDownloadUrl(
     action.purpose,
   );
 
-  const { data, error } = await client.storage
-    .from(target.bucket)
-    .createSignedUrl(
-      target.path,
-      target.signedUrlExpiresInSeconds,
-    );
-
-  if (error !== null || data === null) {
-    throw new StorageCallError("create_admin_signed_download_url");
-  }
-
-  const signedUrl = readStorageSignedUrl(data);
+  const signedUrl = await createSignedDownloadUrl(
+    client,
+    target,
+    target.signedUrlExpiresInSeconds,
+    "create_admin_signed_download_url",
+  );
 
   return Response.json({
     ok: true,
@@ -393,31 +399,4 @@ async function createDownloadUrl(
       purpose: target.purpose,
     },
   });
-}
-
-async function callRpc(
-  client: SupabaseClient,
-  rpcName: RpcName,
-  parameters: { [key: string]: unknown },
-): Promise<unknown> {
-  const { data, error } = await client.rpc(rpcName, parameters);
-
-  if (error !== null) {
-    throw new RpcCallError(rpcName, error.code ?? null);
-  }
-
-  return data;
-}
-
-function readStorageSignedUrl(value: unknown): string {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    throw new StorageCallError("create_admin_signed_download_url");
-  }
-
-  const signedUrl = (value as { [key: string]: unknown }).signedUrl;
-  if (typeof signedUrl !== "string" || signedUrl === "") {
-    throw new StorageCallError("create_admin_signed_download_url");
-  }
-
-  return signedUrl;
 }

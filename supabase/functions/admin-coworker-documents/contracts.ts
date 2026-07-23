@@ -1,3 +1,10 @@
+import {
+  createContractReaders,
+  type UnknownObject,
+} from "../_shared/coworker-document-edge/contract-readers.ts";
+
+export type { UnknownObject } from "../_shared/coworker-document-edge/contract-readers.ts";
+
 export const RPC = {
   getCatalog: "get_admin_coworker_document_catalog",
   saveDefinition: "save_admin_coworker_document_definition",
@@ -14,7 +21,6 @@ export const RPC = {
 } as const;
 
 export type RpcName = typeof RPC[keyof typeof RPC];
-export type UnknownObject = { [key: string]: unknown };
 
 export type OriginPolicy =
   | "coworker_upload"
@@ -161,6 +167,36 @@ export class BackendContractError extends Error {
   }
 }
 
+const {
+  assertOnlyKeys,
+  assertUnique,
+  backendArray,
+  backendBoolean,
+  backendEnum,
+  backendNonNegativeInteger,
+  backendObject,
+  backendPositiveInteger,
+  backendString,
+  backendTimestamp,
+  backendUuid,
+  requestBoolean,
+  requestEnum,
+  requestInteger,
+  requestNullableInteger,
+  requestNullableString,
+  requestNullableTimestamp,
+  requestNullableUuid,
+  requestObject,
+  requestString,
+  requestStringArray,
+  requestUuid,
+  throwIfRequestInvalid,
+  validated,
+} = createContractReaders<RpcName | null>({
+  createRequestError: (fieldErrors) => new RequestValidationError(fieldErrors),
+  createBackendError: (rpcName) => new BackendContractError(rpcName),
+});
+
 const ACTIONS = [
   "getReviewDetail",
   "saveDefinition",
@@ -199,14 +235,9 @@ const DOWNLOAD_PURPOSES = [
   "admin_download",
 ] as const;
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const DEFINITION_CODE_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
 
-const DEFINITION_CODE_PATTERN =
-  /^[a-z0-9][a-z0-9_-]*$/;
-
-const MIME_PATTERN =
-  /^[a-z0-9][a-z0-9.+-]*\/[a-z0-9][a-z0-9.+-]*$/;
+const MIME_PATTERN = /^[a-z0-9][a-z0-9.+-]*\/[a-z0-9][a-z0-9.+-]*$/;
 
 const EXTENSION_PATTERN = /^[a-z0-9]{1,16}$/;
 
@@ -686,8 +717,7 @@ function parseVerifySignature(
   );
 
   if (verificationStatus !== "confirmed" && reason === null) {
-    errors.reason =
-      "A reason is required when the signature is not confirmed.";
+    errors.reason = "A reason is required when the signature is not confirmed.";
   }
 
   return validated(
@@ -756,10 +786,10 @@ export function parseSeedRequirementsResult(
   if (
     backendUuid(result, "userId", RPC.seedDefaultRequirements) !== userId ||
     backendUuid(
-      result,
-      "onboardingCaseId",
-      RPC.seedDefaultRequirements,
-    ) !== onboardingCaseId
+        result,
+        "onboardingCaseId",
+        RPC.seedDefaultRequirements,
+      ) !== onboardingCaseId
   ) {
     throw new BackendContractError(RPC.seedDefaultRequirements);
   }
@@ -839,15 +869,15 @@ export function parseSignatureVerification(
     backendUuid(verification, "documentId", RPC.verifySignature) !==
       documentId ||
     backendUuid(
-      verification,
-      "documentVersionId",
-      RPC.verifySignature,
-    ) !== documentVersionId ||
+        verification,
+        "documentVersionId",
+        RPC.verifySignature,
+      ) !== documentVersionId ||
     backendString(
-      verification,
-      "verificationStatus",
-      RPC.verifySignature,
-    ) !== expectedStatus ||
+        verification,
+        "verificationStatus",
+        RPC.verifySignature,
+      ) !== expectedStatus ||
     userId === ""
   ) {
     throw new BackendContractError(RPC.verifySignature);
@@ -911,363 +941,4 @@ export function parseDownloadTarget(
   }
 
   return target;
-}
-
-function requestObject(
-  value: unknown,
-  path: string,
-  errors: { [field: string]: string },
-): UnknownObject {
-  if (!isObject(value)) {
-    errors[path || "request"] = "Expected an object.";
-    return {};
-  }
-  return value;
-}
-
-function assertOnlyKeys(
-  source: UnknownObject,
-  allowedKeys: readonly string[],
-  path: string,
-  errors: { [field: string]: string },
-): void {
-  const allowed = new Set(allowedKeys);
-  for (const key of Object.keys(source)) {
-    if (!allowed.has(key)) {
-      errors[path === "" ? key : `${path}.${key}`] = "Unexpected field.";
-    }
-  }
-}
-
-function requestString(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxLength: number,
-  errors: { [field: string]: string },
-): string {
-  const value = source[key];
-  if (typeof value !== "string" || value.trim() === "") {
-    errors[path] = "Expected a non-empty string.";
-    return "";
-  }
-  const normalized = value.trim();
-  if (normalized.length > maxLength) {
-    errors[path] = `Maximum length is ${maxLength}.`;
-  }
-  return normalized;
-}
-
-function requestNullableString(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxLength: number,
-  errors: { [field: string]: string },
-): string | null {
-  const value = source[key];
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-  if (typeof value !== "string") {
-    errors[path] = "Expected a string or null.";
-    return null;
-  }
-  const normalized = value.trim();
-  if (normalized === "") {
-    return null;
-  }
-  if (normalized.length > maxLength) {
-    errors[path] = `Maximum length is ${maxLength}.`;
-  }
-  return normalized;
-}
-
-function requestUuid(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string {
-  const value = requestString(source, key, path, 36, errors);
-  if (value !== "" && !UUID_PATTERN.test(value)) {
-    errors[path] = "Expected a valid UUID.";
-  }
-  return value;
-}
-
-function requestNullableUuid(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string | null {
-  const value = requestNullableString(source, key, path, 36, errors);
-  if (value !== null && !UUID_PATTERN.test(value)) {
-    errors[path] = "Expected a valid UUID or null.";
-  }
-  return value;
-}
-
-function requestBoolean(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): boolean {
-  const value = source[key];
-  if (typeof value !== "boolean") {
-    errors[path] = "Expected a boolean.";
-    return false;
-  }
-  return value;
-}
-
-function requestInteger(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  minimum: number,
-  maximum: number,
-  errors: { [field: string]: string },
-): number {
-  const value = source[key];
-  if (
-    typeof value !== "number" ||
-    !Number.isInteger(value) ||
-    value < minimum ||
-    value > maximum
-  ) {
-    errors[path] = `Expected an integer from ${minimum} to ${maximum}.`;
-    return minimum;
-  }
-  return value;
-}
-
-function requestNullableInteger(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  minimum: number,
-  maximum: number,
-  errors: { [field: string]: string },
-): number | null {
-  const value = source[key];
-  if (value === undefined || value === null) {
-    return null;
-  }
-  if (
-    typeof value !== "number" ||
-    !Number.isInteger(value) ||
-    value < minimum ||
-    value > maximum
-  ) {
-    errors[path] =
-      `Expected null or an integer from ${minimum} to ${maximum}.`;
-    return null;
-  }
-  return value;
-}
-
-function requestNullableTimestamp(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string | null {
-  const value = requestNullableString(source, key, path, 100, errors);
-  if (value !== null && Number.isNaN(Date.parse(value))) {
-    errors[path] = "Expected a valid timestamp or null.";
-  }
-  return value;
-}
-
-function requestStringArray(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxItems: number,
-  maxItemLength: number,
-  errors: { [field: string]: string },
-): string[] {
-  const value = source[key];
-  if (!Array.isArray(value) || value.length === 0) {
-    errors[path] = "Expected a non-empty string array.";
-    return [];
-  }
-  if (value.length > maxItems) {
-    errors[path] = `Maximum item count is ${maxItems}.`;
-  }
-
-  const result: string[] = [];
-  for (let index = 0; index < value.length; index += 1) {
-    const item = value[index];
-    if (typeof item !== "string" || item.trim() === "") {
-      errors[`${path}.${index}`] = "Expected a non-empty string.";
-      continue;
-    }
-    const normalized = item.trim();
-    if (normalized.length > maxItemLength) {
-      errors[`${path}.${index}`] =
-        `Maximum length is ${maxItemLength}.`;
-    }
-    result.push(normalized);
-  }
-  return result;
-}
-
-function requestEnum<const T extends readonly string[]>(
-  source: UnknownObject,
-  key: string,
-  allowedValues: T,
-  path: string,
-  errors: { [field: string]: string },
-): T[number] {
-  const value = source[key];
-  if (
-    typeof value !== "string" ||
-    !allowedValues.includes(value as T[number])
-  ) {
-    errors[path] = `Expected one of: ${allowedValues.join(", ")}.`;
-    return allowedValues[0];
-  }
-  return value as T[number];
-}
-
-function assertUnique(
-  values: string[],
-  path: string,
-  errors: { [field: string]: string },
-): void {
-  if (new Set(values).size !== values.length) {
-    errors[path] = "Duplicate values are not allowed.";
-  }
-}
-
-function throwIfRequestInvalid(errors: { [field: string]: string }): void {
-  if (Object.keys(errors).length > 0) {
-    throw new RequestValidationError(errors);
-  }
-}
-
-function validated<T>(
-  value: T,
-  errors: { [field: string]: string },
-): T {
-  throwIfRequestInvalid(errors);
-  return value;
-}
-
-function backendObject(
-  value: unknown,
-  rpcName: RpcName | null,
-): UnknownObject {
-  if (!isObject(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendArray(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): unknown[] {
-  const value = source[key];
-  if (!Array.isArray(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendString(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName | null,
-): string {
-  const value = source[key];
-  if (typeof value !== "string" || value === "") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendUuid(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = backendString(source, key, rpcName);
-  if (!UUID_PATTERN.test(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendBoolean(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): boolean {
-  const value = source[key];
-  if (typeof value !== "boolean") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendPositiveInteger(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): number {
-  const value = source[key];
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendNonNegativeInteger(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): number {
-  const value = source[key];
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendTimestamp(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = backendString(source, key, rpcName);
-  if (Number.isNaN(Date.parse(value))) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendEnum<const T extends readonly string[]>(
-  source: UnknownObject,
-  key: string,
-  allowedValues: T,
-  rpcName: RpcName,
-): T[number] {
-  const value = source[key];
-  if (
-    typeof value !== "string" ||
-    !allowedValues.includes(value as T[number])
-  ) {
-    throw new BackendContractError(rpcName);
-  }
-  return value as T[number];
-}
-
-function isObject(value: unknown): value is UnknownObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

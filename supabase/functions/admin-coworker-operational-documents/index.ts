@@ -1,7 +1,21 @@
 import { withSupabase } from "npm:@supabase/server@^1";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
+import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
+import { sha256Base64 } from "../_shared/coworker-document-edge/sha256.ts";
 import {
+  createSignedDownloadUrl,
+  createSignedUploadUrl,
+  downloadStorageObject,
+} from "../_shared/coworker-document-edge/signed-storage.ts";
+import {
+  compensateUploadReservation,
+  completeUploadCleanup,
+} from "../_shared/coworker-document-edge/upload-cleanup.ts";
+import {
+  type AdminOperationalRequest,
+  type CancelUploadResult,
+  type CleanupResult,
   parseActivation,
   parseAssignment,
   parseAssignmentList,
@@ -14,27 +28,19 @@ import {
   parsePublishResult,
   parseRequest,
   parseReservation,
-  parseSignedUploadData,
   parseUploadTarget,
   parseVersion,
   RPC,
-  type AdminOperationalRequest,
-  type CancelUploadResult,
-  type RpcName,
   type UploadReservation,
 } from "./contracts.ts";
 import {
   createErrorResponse,
   InvalidJsonError,
   MissingUserClaimsError,
-  RpcCallError,
-  StorageCallError,
-  StorageCleanupError,
   UploadedFileValidationError,
 } from "./errors.ts";
 
 const ALLOWED_METHODS = "GET, POST, OPTIONS";
-const STORAGE_REMOVE_FAILURE_CODE = "storage_remove_failed";
 
 export default {
   fetch: withSupabase({ auth: "user" }, async (request, context) => {
@@ -222,15 +228,11 @@ async function reserveUpload(
     );
     const activation = parseActivation(activationData, reservation);
 
-    const { data, error } = await client.storage
-      .from(activation.bucket)
-      .createSignedUploadUrl(activation.path, { upsert: false });
-
-    if (error !== null) {
-      throw new StorageCallError("create_operational_signed_upload_url");
-    }
-
-    const signedUpload = parseSignedUploadData(data);
+    const signedUpload = await createSignedUploadUrl(
+      client,
+      activation,
+      "create_operational_signed_upload_url",
+    );
 
     return Response.json({
       ok: true,
@@ -277,15 +279,11 @@ async function finalizeUpload(
   let contentSha256Base64 = target.contentSha256Base64;
 
   if (!target.finalized) {
-    const { data, error } = await client.storage
-      .from(target.bucket)
-      .download(target.path);
-
-    if (error !== null || data === null) {
-      throw new StorageCallError("download_operational_upload_for_hash");
-    }
-
-    const bytes = await data.arrayBuffer();
+    const bytes = await downloadStorageObject(
+      client,
+      target,
+      "download_operational_upload_for_hash",
+    );
 
     if (bytes.byteLength !== target.expectedSizeBytes) {
       throw new UploadedFileValidationError("SIZE_MISMATCH");
@@ -332,7 +330,7 @@ async function cancelUpload(
     });
   }
 
-  const cleanup = await removeCancelledObject(
+  const cleanup = await completeCleanup(
     client,
     actorUserId,
     cancellation,
@@ -343,8 +341,8 @@ async function cancelUpload(
     action: "cancelUpload",
     uploadSessionId,
     cancelled: true,
-    cleanupStatus: cleanup.cleanupStatus,
-    cleanupCompletedAt: cleanup.cleanupCompletedAt,
+    cleanupStatus: cleanup?.cleanupStatus ?? "completed",
+    cleanupCompletedAt: cleanup?.cleanupCompletedAt ?? null,
   });
 }
 
@@ -476,15 +474,12 @@ async function createDownloadUrl(
     action.purpose,
   );
 
-  const { data, error } = await client.storage
-    .from(target.bucket)
-    .createSignedUrl(target.path, target.signedUrlExpiresInSeconds);
-
-  if (error !== null || data === null) {
-    throw new StorageCallError("create_admin_operational_download_url");
-  }
-
-  const signedUrl = readSignedUrl(data);
+  const signedUrl = await createSignedDownloadUrl(
+    client,
+    target,
+    target.signedUrlExpiresInSeconds,
+    "create_admin_operational_download_url",
+  );
 
   return Response.json({
     ok: true,
@@ -515,42 +510,23 @@ async function cancelUploadInDatabase(
   return parseCancelResult(data, uploadSessionId);
 }
 
-async function removeCancelledObject(
+function completeCleanup(
   client: SupabaseClient,
   actorUserId: string,
   cancellation: CancelUploadResult,
-) {
-  const { error } = await client.storage
-    .from(cancellation.cleanupTarget.bucket)
-    .remove([cancellation.cleanupTarget.path]);
-
-  if (error !== null) {
-    try {
-      await recordCleanup(
+): Promise<CleanupResult | null> {
+  return completeUploadCleanup(
+    client,
+    cancellation,
+    (success, failureCode) =>
+      recordCleanup(
         client,
         actorUserId,
         cancellation.uploadSessionId,
-        false,
-        STORAGE_REMOVE_FAILURE_CODE,
-      );
-    } catch (recordError) {
-      console.error(JSON.stringify({
-        code: "CLEANUP_FAILURE_RECORD_FAILED",
-        requestId: crypto.randomUUID(),
-        uploadSessionId: cancellation.uploadSessionId,
-        errorType: errorName(recordError),
-      }));
-    }
-
-    throw new StorageCleanupError(cancellation.uploadSessionId);
-  }
-
-  return await recordCleanup(
-    client,
-    actorUserId,
-    cancellation.uploadSessionId,
-    true,
-    null,
+        success,
+        failureCode,
+      ),
+    (error) => logCleanupRecordFailure(cancellation.uploadSessionId, error),
   );
 }
 
@@ -578,15 +554,15 @@ async function compensateReservation(
   requestId: string,
 ): Promise<void> {
   try {
-    const cancellation = await cancelUploadInDatabase(
-      client,
-      actorUserId,
-      reservation.uploadSessionId,
+    await compensateUploadReservation(
+      () =>
+        cancelUploadInDatabase(
+          client,
+          actorUserId,
+          reservation.uploadSessionId,
+        ),
+      (cancellation) => completeCleanup(client, actorUserId, cancellation),
     );
-
-    if (cancellation.cleanupStatus !== "completed") {
-      await removeCancelledObject(client, actorUserId, cancellation);
-    }
   } catch (error) {
     console.error(JSON.stringify({
       code: "UPLOAD_RESERVATION_COMPENSATION_FAILED",
@@ -597,53 +573,18 @@ async function compensateReservation(
   }
 }
 
-async function callRpc(
-  client: SupabaseClient,
-  rpcName: RpcName,
-  parameters: { [key: string]: unknown },
-): Promise<unknown> {
-  const { data, error } = await client.rpc(rpcName, parameters);
-
-  if (error !== null) {
-    throw new RpcCallError(rpcName, error.code ?? null);
-  }
-
-  return data;
-}
-
-async function sha256Base64(bytes: ArrayBuffer): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return bytesToBase64(new Uint8Array(digest));
-}
-
-function bytesToBase64(bytes: Uint8Array): string {
-  let binary = "";
-  const chunkSize = 0x8000;
-
-  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    const chunk = bytes.subarray(
-      offset,
-      Math.min(offset + chunkSize, bytes.length),
-    );
-    binary += String.fromCharCode(...chunk);
-  }
-
-  return btoa(binary);
-}
-
-function readSignedUrl(value: unknown): string {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    throw new StorageCallError("create_admin_operational_download_url");
-  }
-
-  const signedUrl = (value as { [key: string]: unknown }).signedUrl;
-  if (typeof signedUrl !== "string" || signedUrl === "") {
-    throw new StorageCallError("create_admin_operational_download_url");
-  }
-
-  return signedUrl;
-}
-
 function errorName(error: unknown): string {
   return error instanceof Error ? error.name : "UnknownError";
+}
+
+function logCleanupRecordFailure(
+  uploadSessionId: string,
+  error: unknown,
+): void {
+  console.error(JSON.stringify({
+    code: "CLEANUP_FAILURE_RECORD_FAILED",
+    requestId: crypto.randomUUID(),
+    uploadSessionId,
+    errorType: errorName(error),
+  }));
 }

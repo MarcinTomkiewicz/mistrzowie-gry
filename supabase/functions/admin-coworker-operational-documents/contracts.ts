@@ -1,3 +1,10 @@
+import {
+  createContractReaders,
+  type UnknownObject,
+} from "../_shared/coworker-document-edge/contract-readers.ts";
+
+export type { UnknownObject } from "../_shared/coworker-document-edge/contract-readers.ts";
+
 export const RPC = {
   getCatalog: "get_admin_coworker_operational_document_catalog",
   getList: "get_admin_coworker_operational_document_list",
@@ -18,7 +25,6 @@ export const RPC = {
 } as const;
 
 export type RpcName = typeof RPC[keyof typeof RPC];
-export type UnknownObject = { [key: string]: unknown };
 
 export type ActionMode =
   | "information_only"
@@ -222,6 +228,34 @@ export class BackendContractError extends Error {
   }
 }
 
+const {
+  assertOnlyKeys,
+  backendArray,
+  backendBoolean,
+  backendEnum,
+  backendNullableString,
+  backendNullableTimestamp,
+  backendObject,
+  backendPositiveInteger,
+  backendString,
+  backendTimestamp,
+  backendUuid,
+  requestBoolean,
+  requestEnum,
+  requestInteger,
+  requestNullableString,
+  requestNullableUuid,
+  requestObject,
+  requestString,
+  requestUuid,
+  throwIfRequestInvalid: throwIfInvalid,
+  validated,
+} = createContractReaders<RpcName>({
+  createRequestError: (fieldErrors) => new RequestValidationError(fieldErrors),
+  createBackendError: (rpcName) => new BackendContractError(rpcName),
+  allowEmptyBackendNullableString: false,
+});
+
 const ACTIONS = [
   "saveDocument",
   "getDocumentDetail",
@@ -257,12 +291,27 @@ const STATEMENT_ACTIONS = [
 
 const DOWNLOAD_PURPOSES = ["admin_review", "admin_download"] as const;
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 const CODE_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
-const MIME_PATTERN =
-  /^[a-z0-9][a-z0-9.+-]*\/[a-z0-9][a-z0-9.+-]*$/;
+const MIME_PATTERN = /^[a-z0-9][a-z0-9.+-]*\/[a-z0-9][a-z0-9.+-]*$/;
+
+function requestNullableFutureTimestamp(
+  source: UnknownObject,
+  key: string,
+  path: string,
+  errors: { [field: string]: string },
+): string | null {
+  const value = requestNullableString(source, key, path, 100, errors);
+  if (value === null) {
+    return null;
+  }
+  const timestamp = Date.parse(value);
+  if (Number.isNaN(timestamp)) {
+    errors[path] = "Expected a valid timestamp or null.";
+  } else if (timestamp <= Date.now()) {
+    errors[path] = "Expected a future timestamp or null.";
+  }
+  return value;
+}
 
 export function parseRequest(value: unknown): AdminOperationalRequest {
   const errors: { [field: string]: string } = {};
@@ -689,8 +738,7 @@ function parseTargets(
   errors: { [field: string]: string },
 ): TargetPayload[] {
   if (!Array.isArray(value) || value.length === 0 || value.length > 500) {
-    errors["configuration.targets"] =
-      "Expected from 1 to 500 target objects.";
+    errors["configuration.targets"] = "Expected from 1 to 500 target objects.";
     return [];
   }
 
@@ -733,13 +781,12 @@ function parseTargets(
       errors,
     );
 
-    const validSelector =
-      (
-        targetKind === "all_active_coworkers" &&
-        appRole === null &&
-        userId === null &&
-        eventDefinitionId === null
-      ) ||
+    const validSelector = (
+      targetKind === "all_active_coworkers" &&
+      appRole === null &&
+      userId === null &&
+      eventDefinitionId === null
+    ) ||
       (
         targetKind === "app_role" &&
         appRole !== null &&
@@ -1233,329 +1280,4 @@ export function parseDownloadTarget(
     throw new BackendContractError(RPC.getDownloadTarget);
   }
   return parsed;
-}
-
-export function parseSignedUploadData(value: unknown): {
-  signedUrl: string;
-  token: string;
-} {
-  const result = backendObject(value, null);
-  return {
-    signedUrl: backendString(result, "signedUrl", null),
-    token: backendString(result, "token", null),
-  };
-}
-
-function requestObject(
-  value: unknown,
-  path: string,
-  errors: { [field: string]: string },
-): UnknownObject {
-  if (!isObject(value)) {
-    errors[path] = "Expected an object.";
-    return {};
-  }
-  return value;
-}
-
-function assertOnlyKeys(
-  source: UnknownObject,
-  allowedKeys: readonly string[],
-  path: string,
-  errors: { [field: string]: string },
-): void {
-  const allowed = new Set(allowedKeys);
-  for (const key of Object.keys(source)) {
-    if (!allowed.has(key)) {
-      errors[path === "" ? key : `${path}.${key}`] = "Unexpected field.";
-    }
-  }
-}
-
-function requestString(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxLength: number,
-  errors: { [field: string]: string },
-): string {
-  const value = source[key];
-  if (typeof value !== "string" || value.trim() === "") {
-    errors[path] = "Expected a non-empty string.";
-    return "";
-  }
-  const normalized = value.trim();
-  if (normalized.length > maxLength) {
-    errors[path] = `Maximum length is ${maxLength}.`;
-  }
-  return normalized;
-}
-
-function requestNullableString(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxLength: number,
-  errors: { [field: string]: string },
-): string | null {
-  const value = source[key];
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-  if (typeof value !== "string") {
-    errors[path] = "Expected a string or null.";
-    return null;
-  }
-  const normalized = value.trim();
-  if (normalized === "") {
-    return null;
-  }
-  if (normalized.length > maxLength) {
-    errors[path] = `Maximum length is ${maxLength}.`;
-  }
-  return normalized;
-}
-
-function requestUuid(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string {
-  const value = requestString(source, key, path, 36, errors);
-  if (value !== "" && !UUID_PATTERN.test(value)) {
-    errors[path] = "Expected a valid UUID.";
-  }
-  return value;
-}
-
-function requestNullableUuid(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string | null {
-  const value = requestNullableString(source, key, path, 36, errors);
-  if (value !== null && !UUID_PATTERN.test(value)) {
-    errors[path] = "Expected a valid UUID or null.";
-  }
-  return value;
-}
-
-function requestBoolean(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): boolean {
-  const value = source[key];
-  if (typeof value !== "boolean") {
-    errors[path] = "Expected a boolean.";
-    return false;
-  }
-  return value;
-}
-
-function requestInteger(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  minimum: number,
-  maximum: number,
-  errors: { [field: string]: string },
-): number {
-  const value = source[key];
-  if (
-    typeof value !== "number" ||
-    !Number.isInteger(value) ||
-    value < minimum ||
-    value > maximum
-  ) {
-    errors[path] = `Expected an integer from ${minimum} to ${maximum}.`;
-    return minimum;
-  }
-  return value;
-}
-
-function requestNullableFutureTimestamp(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string | null {
-  const value = requestNullableString(source, key, path, 100, errors);
-  if (value === null) {
-    return null;
-  }
-  const timestamp = Date.parse(value);
-  if (Number.isNaN(timestamp)) {
-    errors[path] = "Expected a valid timestamp or null.";
-  } else if (timestamp <= Date.now()) {
-    errors[path] = "Expected a future timestamp or null.";
-  }
-  return value;
-}
-
-function requestEnum<const T extends readonly string[]>(
-  source: UnknownObject,
-  key: string,
-  allowedValues: T,
-  path: string,
-  errors: { [field: string]: string },
-): T[number] {
-  const value = source[key];
-  if (
-    typeof value !== "string" ||
-    !allowedValues.includes(value as T[number])
-  ) {
-    errors[path] = `Expected one of: ${allowedValues.join(", ")}.`;
-    return allowedValues[0];
-  }
-  return value as T[number];
-}
-
-function validated<T>(
-  value: T,
-  errors: { [field: string]: string },
-): T {
-  throwIfInvalid(errors);
-  return value;
-}
-
-function throwIfInvalid(errors: { [field: string]: string }): void {
-  if (Object.keys(errors).length > 0) {
-    throw new RequestValidationError(errors);
-  }
-}
-
-function backendObject(
-  value: unknown,
-  rpcName: RpcName | null,
-): UnknownObject {
-  if (!isObject(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendArray(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): unknown[] {
-  const value = source[key];
-  if (!Array.isArray(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendString(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName | null,
-): string {
-  const value = source[key];
-  if (typeof value !== "string" || value === "") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendNullableString(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string | null {
-  const value = source[key];
-  if (value === null) {
-    return null;
-  }
-  if (typeof value !== "string" || value === "") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendUuid(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = backendString(source, key, rpcName);
-  if (!UUID_PATTERN.test(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendBoolean(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): boolean {
-  const value = source[key];
-  if (typeof value !== "boolean") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendPositiveInteger(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): number {
-  const value = source[key];
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendTimestamp(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = backendString(source, key, rpcName);
-  if (Number.isNaN(Date.parse(value))) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendNullableTimestamp(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string | null {
-  const value = source[key];
-  if (value === null) {
-    return null;
-  }
-  if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendEnum<const T extends readonly string[]>(
-  source: UnknownObject,
-  key: string,
-  allowedValues: T,
-  rpcName: RpcName,
-): T[number] {
-  const value = source[key];
-  if (
-    typeof value !== "string" ||
-    !allowedValues.includes(value as T[number])
-  ) {
-    throw new BackendContractError(rpcName);
-  }
-  return value as T[number];
-}
-
-function isObject(value: unknown): value is UnknownObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
