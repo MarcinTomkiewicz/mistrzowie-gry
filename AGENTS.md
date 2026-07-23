@@ -35,7 +35,7 @@ The generated README may be stale and must not override them.
 - Zoneless change detection, client hydration, and server-side rendering.
 - PrimeNG 21, Transloco, RxJS, and Supabase.
 - Production build: `npm run build` (`ng build`; the Angular application builder
-  produces the browser and server output).
+  produces the browser and server output) - only for Angular frontend tasks.
 - Deployment/base-href SSR build: `npm run build:ssr` when the task affects SSR
   deployment, base href, deploy URL, or `scripts/build-ssr.mjs`.
 - Main areas:
@@ -191,7 +191,7 @@ implementation work. Do not run unit, integration, end-to-end, browser, or
 snapshot test commands. This project does not treat generated tests as useful
 evidence at the current stage.
 
-- `npm run build` is the mandatory automated correctness gate.
+- `npm run build` is the mandatory automated correctness gate - Angular tasks only.
 - Existing specs may receive only the mechanical import, path, or symbol-name
   updates required by production moves and renames.
 - Do not add assertions, mocks, fixtures, test helpers, or new spec files.
@@ -220,7 +220,7 @@ Work is complete only when all of the following are true:
 - the Angular 21 naming gate passes;
 - every in-scope file above 300 lines is listed; every structurally edited one
   has the required compact audit and all four quality principles pass;
-- `npm run build` passes in the final state;
+- `npm run build` passes in the final state - Angular tasks only;
 - applicable static verification passes;
 - the final response uses the fixed report below.
 
@@ -273,7 +273,7 @@ Expand a line only for the exceptional cases defined in the over-300-LOC gate.
 Then continue the same report:
 
 ```md
-Build:
+Build (Angular tasks only):
 - `npm run build`: PASS | FAIL | NOT RUN — ...
 - `npm run build:ssr`: PASS | FAIL | NOT RUN | N/A — ...
 

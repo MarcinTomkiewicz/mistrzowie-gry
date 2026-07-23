@@ -10,6 +10,10 @@ import {
   SigningSourceBackendContractError,
   SigningSourceRequestValidationError,
 } from "./signing-source-contracts.ts";
+import {
+  SigningPackageBackendContractError,
+  SigningPackageRequestValidationError,
+} from "./signing-package-contracts.ts";
 import { getRpcErrorDomain } from "./rpc-error-mapping.ts";
 
 export class InvalidJsonError extends Error {
@@ -54,6 +58,16 @@ export function createErrorResponse(
       400,
       "VALIDATION_FAILED",
       "Signing source request validation failed.",
+      requestId,
+      { fieldErrors: error.fieldErrors },
+    );
+  }
+
+  if (error instanceof SigningPackageRequestValidationError) {
+    return loggedErrorResponse(
+      400,
+      "VALIDATION_FAILED",
+      "Signing package request validation failed.",
       requestId,
       { fieldErrors: error.fieldErrors },
     );
@@ -152,6 +166,18 @@ export function createErrorResponse(
       500,
       "BACKEND_CONTRACT_ERROR",
       "The signing source service returned an invalid response.",
+      requestId,
+      undefined,
+      undefined,
+      error.rpcName,
+    );
+  }
+
+  if (error instanceof SigningPackageBackendContractError) {
+    return loggedErrorResponse(
+      500,
+      "BACKEND_CONTRACT_ERROR",
+      "The signing package service returned an invalid response.",
       requestId,
       undefined,
       undefined,

@@ -1,4 +1,5 @@
 import type { RpcErrorDomain } from "../_shared/coworker-document-edge/error-response.ts";
+import { isSigningPackageRpcName } from "./signing-package-contracts.ts";
 import { isSigningSourceRpcName } from "./signing-source-contracts.ts";
 
 const DOCUMENT_RPC_ERRORS: RpcErrorDomain = {
@@ -57,10 +58,23 @@ const SIGNING_SOURCE_RPC_ERRORS: RpcErrorDomain = {
   },
 };
 
+const SIGNING_PACKAGE_RPC_ERRORS: RpcErrorDomain = {
+  ...SIGNING_SOURCE_RPC_ERRORS,
+  unavailable: {
+    status: 500,
+    code: "INTERNAL_ERROR",
+    message: "The signing package service is unavailable.",
+  },
+};
+
 export function getRpcErrorDomain(
   rpcName: string,
 ): RpcErrorDomain {
-  return isSigningSourceRpcName(rpcName)
-    ? SIGNING_SOURCE_RPC_ERRORS
-    : DOCUMENT_RPC_ERRORS;
+  if (isSigningSourceRpcName(rpcName)) {
+    return SIGNING_SOURCE_RPC_ERRORS;
+  }
+  if (isSigningPackageRpcName(rpcName)) {
+    return SIGNING_PACKAGE_RPC_ERRORS;
+  }
+  return DOCUMENT_RPC_ERRORS;
 }

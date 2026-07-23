@@ -27,6 +27,11 @@ import {
   isSigningSourceAction,
   parseSigningSourceActionRequest,
 } from "./signing-source-request.ts";
+import { handleSigningPackageAction } from "./signing-package-actions.ts";
+import {
+  isSigningPackageAction,
+  parseSigningPackageActionRequest,
+} from "./signing-package-request.ts";
 
 const ALLOWED_METHODS = "GET, POST, OPTIONS";
 
@@ -104,6 +109,14 @@ async function handlePost(
       client,
       actorUserId,
       parseSigningSourceActionRequest(body),
+    );
+  }
+
+  if (isSigningPackageAction(body)) {
+    return await handleSigningPackageAction(
+      client,
+      actorUserId,
+      parseSigningPackageActionRequest(body),
     );
   }
 
