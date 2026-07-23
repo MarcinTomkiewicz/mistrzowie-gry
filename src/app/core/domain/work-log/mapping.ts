@@ -4,7 +4,7 @@ import {
   IUserWorkLogRecord,
 } from '../../interfaces/i-work-log';
 import { parseIsoDate } from '../../utils/date';
-import { getHourOffsetFromDateTime } from '../../utils/time';
+import { getHourOffsetFromDateTime } from '../../utils/hour-offset';
 
 export function mapWorkLogRecordsToDays(
   records: readonly IUserWorkLogRecord[],

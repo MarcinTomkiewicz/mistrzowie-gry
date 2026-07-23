@@ -6,7 +6,7 @@ import {
   IGmProfile,
   IGmProfileWithRelations,
 } from '../../interfaces/i-gm-profile';
-import { FilterDefinition } from '../../interfaces/i-filter';
+import { FilterDefinition } from '../../types/filter';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
 import { IGmProfileStyle, IGmStyle } from '../../interfaces/i-gm-style';
 import { IGmProfileLanguage, ILanguage } from '../../interfaces/i-languages';

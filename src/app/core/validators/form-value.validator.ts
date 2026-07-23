@@ -1,6 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-import { timeZoneDateToTimestamp } from '../utils/time';
+import { timeZoneDateToTimestamp } from '../utils/time-zone';
 
 export function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

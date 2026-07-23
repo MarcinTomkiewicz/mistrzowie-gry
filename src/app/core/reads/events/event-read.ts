@@ -8,7 +8,7 @@ import { IEvent } from '../../interfaces/i-event';
 import { IHostEventCatalogItem } from '../../interfaces/i-event-catalog';
 import { IEventOccurrence } from '../../interfaces/i-event-occurence';
 import { IPublicEventPage } from '../../interfaces/i-event-page';
-import { FilterDefinition } from '../../interfaces/i-filter';
+import { FilterDefinition } from '../../types/filter';
 import { Backend } from '../../services/backend/backend';
 
 @Injectable({ providedIn: 'root' })

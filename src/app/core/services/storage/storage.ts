@@ -14,7 +14,7 @@ import {
   IStorageUploadOptions,
   IStorageUploadResult,
 } from '../../interfaces/i-storage';
-import { stringToSlug } from '../../utils/slug';
+import { stringToSlug } from '../../utils/normalize-text';
 import { Supabase } from '../supabase/supabase';
 
 @Injectable({ providedIn: 'root' })

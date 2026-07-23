@@ -1,9 +1,9 @@
-import { FilterDefinition } from '../interfaces/i-filter';
+import { FilterDefinition } from './filter';
 
 export type Pagination = {
   page?: number;
   pageSize?: number;
-  filters?: Record<string, FilterDefinition>;
+  filters?: Readonly<Record<string, FilterDefinition>>;
 };
 
 export type BackendFilterQuery<TQuery> = {

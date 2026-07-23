@@ -23,14 +23,14 @@ import {
   formatDateLabel,
   formatTimestampLabel,
 } from '../../../../core/utils/date';
-import { formatTimeRangeLabel } from '../../../../core/utils/time';
+import { formatTimeRangeLabel } from '../../../../core/utils/time-format';
 import {
   resolveEventEditionAdminErrorMessage,
 } from '../event-admin-errors';
 import {
   resolveParticipantSignupKindLabel,
 } from '../participant-signup-kind-options';
-import { stringToSlug } from '../../../../core/utils/slug';
+import { stringToSlug } from '../../../../core/utils/normalize-text';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';

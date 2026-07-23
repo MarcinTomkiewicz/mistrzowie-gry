@@ -37,7 +37,7 @@ import {
 } from '../../../core/domain/work-log/rules';
 import { formatDateLabel } from '../../../core/utils/date';
 import { getUserDisplayName } from '../../../core/utils/user-display';
-import { formatHourOffsetRangeLabel } from '../../../core/utils/time';
+import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { createWorkLogOverviewI18n } from './work-log-overview.i18n';
 

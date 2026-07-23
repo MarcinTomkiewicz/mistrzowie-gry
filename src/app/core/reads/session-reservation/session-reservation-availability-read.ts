@@ -11,7 +11,7 @@ import {
   createSessionReservationAvailableSlots,
   resolveSessionReservationAvailabilityWindow,
 } from '../../domain/session-reservation/slots';
-import { createLocalDateTimeRangeIso } from '../../utils/time';
+import { createLocalDateTimeRangeIso } from '../../utils/time-zone';
 import { SessionReservationRead } from './session-reservation-read';
 
 @Injectable({ providedIn: 'root' })

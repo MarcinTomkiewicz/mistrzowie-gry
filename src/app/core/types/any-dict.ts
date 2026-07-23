@@ -1,1 +1,0 @@
-export type AnyDict = Record<string, any>;

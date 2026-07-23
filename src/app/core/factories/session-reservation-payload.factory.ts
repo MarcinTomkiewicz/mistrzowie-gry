@@ -5,7 +5,7 @@ import { ISessionReservationFlowState } from '../interfaces/i-session-reservatio
 import { SESSION_BOOKING_MODES } from '../types/session-booking-mode';
 import { SessionReservationCreatePayload } from '../types/session-reservation-create-payload';
 import { SESSION_RESERVATION_SOURCE_KINDS } from '../types/session-reservation-source-kind';
-import { createLocalDateTimeRangeIso } from '../utils/time';
+import { createLocalDateTimeRangeIso } from '../utils/time-zone';
 
 export function buildReservationPayload(
   state: ISessionReservationFlowState,

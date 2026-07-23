@@ -6,10 +6,10 @@ import { ISessionReservationViewModel } from '../../../core/interfaces/i-session
 import { formatDateLabel } from '../../../core/utils/date';
 import { formatMoney } from '../../../core/utils/pricing';
 import {
-  createLocalDateTimeRangeIso,
   formatDateTimeAsTimeLabel,
   formatTimeRangeLabel,
-} from '../../../core/utils/time';
+} from '../../../core/utils/time-format';
+import { createLocalDateTimeRangeIso } from '../../../core/utils/time-zone';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 
 @Component({

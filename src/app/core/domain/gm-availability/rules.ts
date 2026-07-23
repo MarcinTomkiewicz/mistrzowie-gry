@@ -10,8 +10,8 @@ import { HourOffsetValue } from '../../types/hour-offset';
 import { toLocalDateTime } from '../../utils/date';
 import {
   createDefaultHourOffsetRange,
-  hasOverlappingIntervals,
-} from '../../utils/time';
+} from '../../utils/hour-offset';
+import { hasOverlappingIntervals } from '../../utils/intervals';
 
 export function createGmAvailabilityEditorRanges(
   ranges: readonly IGmAvailabilityRange[],

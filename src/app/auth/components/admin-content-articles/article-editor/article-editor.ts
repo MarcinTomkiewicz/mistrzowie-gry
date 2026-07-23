@@ -26,8 +26,7 @@ import {
   hasArticleEditorImageWithoutPath,
   hasInvalidArticleLinkSyntax,
 } from '../../../../core/validators/article-editor-block.validator';
-import { normalizeText } from '../../../../core/utils/normalize-text';
-import { stringToSlug } from '../../../../core/utils/slug';
+import { normalizeText, stringToSlug } from '../../../../core/utils/normalize-text';
 import { ImageUpload } from '../../../../public/common/image-upload/image-upload';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { ArticleBlocksEditor } from '../article-blocks-editor/article-blocks-editor';

@@ -12,11 +12,12 @@ import { toCamelCase, toSnakeCase, toSnakeKey } from './backend-mapping';
 import { applyFilters } from './backend-query';
 import { Supabase } from '../supabase/supabase';
 
-import { FilterDefinition, IFilter } from '../../interfaces/i-filter';
+import { IFilter } from '../../interfaces/i-filter';
 import { FilterOperator } from '../../enums/filter-operators';
 import { Pagination } from '../../types/backend';
 import { EdgeReader } from '../../types/edge-contract';
 import { EdgeInvokeOptions } from '../../types/edge-http-method';
+import { FilterDefinition } from '../../types/filter';
 import { RpcError } from '../../types/rpc-error';
 import { isEdgeFunctionSuccess } from '../../utils/edge-contract';
 import { createEdgeFunctionError } from '../../utils/edge-function-error-mapping';
@@ -149,7 +150,10 @@ export class Backend {
     );
   }
 
-  getCount(table: string, filters?: Record<string, FilterDefinition>): Observable<number> {
+  getCount(
+    table: string,
+    filters?: Readonly<Record<string, FilterDefinition>>,
+  ): Observable<number> {
     return this.trackedRequest<PostgrestResponse<unknown>>(() => {
       let query = this.supabase.from(table).select('*', { count: 'exact', head: true });
       query = applyFilters(query, filters);
@@ -221,7 +225,10 @@ export class Backend {
     );
   }
 
-  delete(table: string, filters: string | number | Record<string, FilterDefinition>): Observable<void> {
+  delete(
+    table: string,
+    filters: string | number | Readonly<Record<string, FilterDefinition>>,
+  ): Observable<void> {
     return this.trackedRequest<PostgrestSingleResponse<null>>(() => {
       let query = this.supabase.from(table).delete();
       query = typeof filters === 'object'

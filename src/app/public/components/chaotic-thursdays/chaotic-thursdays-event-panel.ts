@@ -22,7 +22,7 @@ import { normalizeText } from '../../../core/utils/normalize-text';
 import { formatMoney } from '../../../core/utils/pricing';
 import { hasMinimumRole } from '../../../core/utils/roles';
 import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
-import { formatTimeRangeLabel } from '../../../core/utils/time';
+import { formatTimeRangeLabel } from '../../../core/utils/time-format';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';

@@ -29,7 +29,7 @@ import {
   mapGmAvailabilityDaysToCalendarDays,
   mapGmAvailabilityRecordsToCoveredDays,
 } from '../../../core/domain/gm-availability/mapping';
-import { formatHourOffsetRangeLabel } from '../../../core/utils/time';
+import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { UniversalCalendar } from '../../../public/common/universal-calendar/universal-calendar';

@@ -16,7 +16,7 @@ import { ResponseStatus } from '../../../core/services/response-status/response-
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import { StructuredDataNode } from '../../../core/types/structured-data';
+import type { ISeoStructuredDataNode } from '../../../core/interfaces/i-seo';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
 import {
@@ -24,7 +24,7 @@ import {
   createOfferStructuredData,
   createPlaceStructuredData,
 } from '../../../core/utils/structured-data';
-import { formatTimeLabel } from '../../../core/utils/time';
+import { formatTimeLabel } from '../../../core/utils/time-format';
 import { FaqAccordion } from '../../common/faq-accordion/faq-accordion';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { SessionDialog } from '../session-dialog/session-dialog';
@@ -190,7 +190,7 @@ export class ChaoticThursdays {
     );
   }
 
-  private buildStructuredData(): StructuredDataNode | undefined {
+  private buildStructuredData(): ISeoStructuredDataNode | undefined {
     const page = this.facade.page();
     const edition = this.facade.selectedEdition();
     const occurrences = this.facade.occurrences();

@@ -12,7 +12,7 @@ import { EventOccurrenceFormGroup } from '../types/event-admin-form';
 import {
   timestampToTimeZoneDate,
   timeZoneDateToTimestamp,
-} from '../utils/time';
+} from '../utils/time-zone';
 import {
   dateTimeRangeValidator,
   integerValidator,

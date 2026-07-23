@@ -17,7 +17,7 @@ import {
   IEventSignupOccurrenceVm,
 } from '../../../core/interfaces/i-event-signup';
 import { Seo } from '../../../core/services/seo/seo';
-import { formatTimeRangeLabel } from '../../../core/utils/time';
+import { formatTimeRangeLabel } from '../../../core/utils/time-format';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { EventSignupPageFacade } from './event-signup.facade';
 import { createEventSignupI18n } from './event-signup.i18n';

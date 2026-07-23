@@ -29,11 +29,11 @@ import {
 } from '../../../core/utils/date';
 import {
   createHourOffsetOptions,
-  createLocalDateTimeRangeIso,
   formatHourOffsetLabel,
   getHourOffsetDuration,
   getHourOffsetFromDateTime,
-} from '../../../core/utils/time';
+} from '../../../core/utils/hour-offset';
+import { createLocalDateTimeRangeIso } from '../../../core/utils/time-zone';
 import {
   formatSessionReservationSlotDateLabel,
   formatSessionReservationSlotTimeRangeLabel,

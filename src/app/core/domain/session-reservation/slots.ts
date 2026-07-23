@@ -10,8 +10,8 @@ import { addMonths, startOfMonth, toIsoDate } from '../../utils/date';
 import {
   ceilToTimeStep,
   doTimeRangesOverlap,
-  formatDateTimeAsTimeLabel,
-} from '../../utils/time';
+} from '../../utils/intervals';
+import { formatDateTimeAsTimeLabel } from '../../utils/time-format';
 
 export function resolveSessionReservationAvailabilityWindow(
   now: Date,

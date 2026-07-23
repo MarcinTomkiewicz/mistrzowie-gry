@@ -21,8 +21,8 @@ import {
 import {
   createDefaultHourOffsetRange,
   getHourOffsetDuration,
-  hasOverlappingIntervals,
-} from '../../utils/time';
+} from '../../utils/hour-offset';
+import { hasOverlappingIntervals } from '../../utils/intervals';
 
 export function getWorkLogMonthScope(
   monthOffset: WorkLogMonthOffset,

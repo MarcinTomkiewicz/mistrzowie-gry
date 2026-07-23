@@ -1,11 +1,11 @@
 import { FilterOperator } from '../../enums/filter-operators';
-import { FilterDefinition } from '../../interfaces/i-filter';
 import { BackendFilterQuery } from '../../types/backend';
+import { FilterDefinition } from '../../types/filter';
 import { toSnakeKey } from './backend-mapping';
 
 export function applyFilters<TQuery extends BackendFilterQuery<TQuery>>(
   query: TQuery,
-  filters?: Record<string, FilterDefinition>,
+  filters?: Readonly<Record<string, FilterDefinition>>,
 ): TQuery {
   if (!filters) return query;
 
@@ -19,7 +19,7 @@ export function applyFilters<TQuery extends BackendFilterQuery<TQuery>>(
     for (const filter of normalizedFilters) {
       if (filter.value === undefined) continue;
 
-      const operator = filter.operator || FilterOperator.EQ;
+      const operator = filter.operator ?? FilterOperator.EQ;
       const snakeKey = toSnakeKey(key);
 
       switch (operator) {

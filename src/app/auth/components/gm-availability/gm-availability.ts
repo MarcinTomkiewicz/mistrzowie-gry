@@ -46,7 +46,7 @@ import {
   createEndHourOffsetOptions,
   createHourOffsetOptions,
   normalizeEndHourOffset,
-} from '../../../core/utils/time';
+} from '../../../core/utils/hour-offset';
 import {
   createGmAvailabilityRangeFormGroup,
   mapGmAvailabilityRangeFormGroupsToRanges,

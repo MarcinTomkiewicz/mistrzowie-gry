@@ -7,23 +7,25 @@ import {
   VENUE_STREET_ADDRESS,
   WEBSITE_ID,
 } from '../config/site';
-import type { BreadcrumbItem } from '../types/breadcrumb';
-import {
+import type {
   ArticleStructuredDataOptions,
   EventStructuredDataOptions,
+  ISeoStructuredDataNode,
   OfferStructuredDataOptions,
   PageStructuredDataOptions,
   PlaceStructuredDataOptions,
-  StructuredDataNode,
-} from '../types/structured-data';
+} from '../interfaces/i-seo';
+import type { BreadcrumbItem } from '../types/breadcrumb';
 
-function compactNode<T extends StructuredDataNode>(node: T): T {
+function compactNode<T extends ISeoStructuredDataNode>(node: T): T {
   return Object.fromEntries(
     Object.entries(node).filter(([, value]) => value !== undefined),
   ) as T;
 }
 
-export function createOrganizationRef(siteUrl = SITE_URL): StructuredDataNode {
+export function createOrganizationRef(
+  siteUrl = SITE_URL,
+): ISeoStructuredDataNode {
   return {
     '@id': siteUrl === SITE_URL ? ORGANIZATION_ID : `${siteUrl}/#organization`,
   };
@@ -31,7 +33,7 @@ export function createOrganizationRef(siteUrl = SITE_URL): StructuredDataNode {
 
 export function createBreadcrumbStructuredData(
   items: readonly BreadcrumbItem[],
-): StructuredDataNode {
+): ISeoStructuredDataNode {
   return {
     '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) =>
@@ -47,7 +49,7 @@ export function createBreadcrumbStructuredData(
   };
 }
 
-function createWebsiteRef(siteUrl = SITE_URL): StructuredDataNode {
+function createWebsiteRef(siteUrl = SITE_URL): ISeoStructuredDataNode {
   return {
     '@id': siteUrl === SITE_URL ? WEBSITE_ID : `${siteUrl}/#website`,
   };
@@ -55,7 +57,7 @@ function createWebsiteRef(siteUrl = SITE_URL): StructuredDataNode {
 
 export function createPlaceStructuredData(
   options: PlaceStructuredDataOptions,
-): StructuredDataNode {
+): ISeoStructuredDataNode {
   return compactNode({
     '@type': 'Place',
     name: options.venueName ?? undefined,
@@ -68,7 +70,7 @@ export function createPlaceStructuredData(
   });
 }
 
-function createVenuePlace(): StructuredDataNode {
+function createVenuePlace(): ISeoStructuredDataNode {
   return createPlaceStructuredData({
     venueName: VENUE_NAME,
     venueAddress: VENUE_STREET_ADDRESS,
@@ -79,7 +81,7 @@ function createVenuePlace(): StructuredDataNode {
 
 export function createOfferStructuredData(
   options: OfferStructuredDataOptions,
-): StructuredDataNode {
+): ISeoStructuredDataNode {
   return compactNode({
     '@type': 'Offer',
     price: options.price,
@@ -91,7 +93,7 @@ export function createOfferStructuredData(
 
 export function createPageStructuredData(
   options: PageStructuredDataOptions,
-): StructuredDataNode {
+): ISeoStructuredDataNode {
   return compactNode({
     '@type': options.type,
     '@id': options.id,
@@ -106,7 +108,7 @@ export function createPageStructuredData(
 
 export function createEventStructuredData(
   options: EventStructuredDataOptions,
-): StructuredDataNode {
+): ISeoStructuredDataNode {
   return compactNode({
     '@type': 'Event',
     '@id': options.id,
@@ -128,7 +130,7 @@ export function createEventStructuredData(
 
 export function createArticleStructuredData(
   options: ArticleStructuredDataOptions,
-): StructuredDataNode {
+): ISeoStructuredDataNode {
   return compactNode({
     '@type': 'Article',
     '@id': options.id,

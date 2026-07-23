@@ -6,7 +6,7 @@ import { formatMoney } from '../../../core/utils/pricing';
 import {
   formatDateTimeAsTimeLabel,
   formatTimeRangeLabel,
-} from '../../../core/utils/time';
+} from '../../../core/utils/time-format';
 
 export function formatSessionBookingProductPriceLabel(
   product: ISessionBookingProduct,

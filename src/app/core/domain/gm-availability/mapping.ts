@@ -6,7 +6,7 @@ import {
 } from '../../interfaces/i-gm-availability';
 import { HourOffsetValue } from '../../types/hour-offset';
 import { toIsoDate, toLocalDateTime } from '../../utils/date';
-import { getHourOffsetFromDateTime } from '../../utils/time';
+import { getHourOffsetFromDateTime } from '../../utils/hour-offset';
 
 export function mapGmAvailabilityRecordsToDays(
   records: readonly IGmAvailabilitySlotRecord[],

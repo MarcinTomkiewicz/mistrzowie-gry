@@ -7,7 +7,7 @@ import {
   ICustomerSessionEntitlement,
   ICustomerSessionEntitlementLookup,
 } from '../../interfaces/i-customer-session-entitlement';
-import { FilterDefinition } from '../../interfaces/i-filter';
+import { FilterDefinition } from '../../types/filter';
 import { IGmPublicProfile } from '../../interfaces/i-gm-public-profile';
 import { ISession } from '../../interfaces/i-session';
 import { ISessionBookingProduct } from '../../interfaces/i-session-booking-product';

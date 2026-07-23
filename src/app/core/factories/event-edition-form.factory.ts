@@ -24,7 +24,7 @@ import {
   EventScheduleKind,
 } from '../types/event';
 import { normalizeText } from '../utils/normalize-text';
-import { formatTimeLabel } from '../utils/time';
+import { formatTimeLabel } from '../utils/time-format';
 import {
   eventScheduleValidator,
   eventTimeRangeValidator,

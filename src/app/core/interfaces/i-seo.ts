@@ -10,6 +10,54 @@ export interface ISeoOpenGraphImage {
 
 export type ISeoStructuredDataNode = Record<string, unknown>;
 
+export interface PageStructuredDataOptions {
+  type: string;
+  id: string;
+  url: string;
+  name: string;
+  description?: string;
+  mainEntity?: ISeoStructuredDataNode;
+}
+
+export interface PlaceStructuredDataOptions {
+  venueName: string | null;
+  venueAddress: string | null;
+  city: string;
+  country: string;
+}
+
+export interface OfferStructuredDataOptions {
+  price: string;
+  url: string;
+  priceCurrency?: string;
+  availability?: string;
+}
+
+export interface EventStructuredDataOptions {
+  id: string;
+  url: string;
+  name: string;
+  description?: string;
+  image?: string;
+  startDate?: string;
+  endDate?: string;
+  location?: ISeoStructuredDataNode;
+  organizer?: ISeoStructuredDataNode;
+  offers?: ISeoStructuredDataNode;
+  subEvent?: ISeoStructuredDataNode[];
+  eventSchedule?: ISeoStructuredDataNode;
+}
+
+export interface ArticleStructuredDataOptions {
+  id: string;
+  url: string;
+  headline: string;
+  description?: string;
+  image?: string;
+  datePublished?: string;
+  dateModified?: string;
+}
+
 export interface ISeoConfig {
   /** <title> */
   title: string;

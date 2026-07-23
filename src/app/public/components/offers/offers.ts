@@ -9,11 +9,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-
-import { ButtonModule } from 'primeng/button';
-
 import { provideTranslocoScope } from '@jsverse/transloco';
-
+import { ButtonModule } from 'primeng/button';
 import { catchError, finalize, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 
@@ -28,7 +25,6 @@ import { ResponseStatus } from '../../../core/services/response-status/response-
 import { Seo } from '../../../core/services/seo/seo';
 import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
 import type { OfferItem, OfferPageVm } from '../../../core/types/offers';
-import { normalizeFaqItems } from './faq-items';
 import {
   createBreadcrumbStructuredData,
   createPageStructuredData,
@@ -41,7 +37,11 @@ import { OfferMaterialsSection } from './offer-materials-section';
 import { OfferPricingSection } from './offer-pricing-section';
 import { createOffersI18n } from './offers.i18n';
 import { StandardsAndLogistics } from './standards-and-logistics/standards-and-logistics';
-import { findCardsSectionByKind, findSectionByType } from './offers.utils';
+import {
+  findCardsSectionByKind,
+  findSectionByType,
+  normalizeFaqItems,
+} from './offers.utils';
 
 @Component({
   selector: 'app-offers',
