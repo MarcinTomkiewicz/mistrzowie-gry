@@ -1,4 +1,5 @@
 import { createContractReaders } from "../_shared/coworker-document-edge/contract-readers.ts";
+import { COWORKER_DOCUMENTS_BUCKET } from "../_shared/coworker-document-edge/storage-config.ts";
 
 export const SIGNING_SOURCE_RPC = {
   getCatalog: "get_admin_coworker_signing_source_catalog",
@@ -40,7 +41,7 @@ export type CleanupStatus =
   | "completed"
   | "failed";
 
-export const SIGNING_SOURCE_STORAGE_BUCKET = "coworker-documents";
+export const SIGNING_SOURCE_STORAGE_BUCKET = COWORKER_DOCUMENTS_BUCKET;
 export const SIGNING_SOURCE_SHA256_BASE64_PATTERN = /^[A-Za-z0-9+/]{43}=$/;
 
 export interface ReserveSigningSourceUploadPayload {

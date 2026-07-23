@@ -1,13 +1,16 @@
 import type { RpcErrorDomain } from "../_shared/coworker-document-edge/error-response.ts";
-import { isSigningPackageRpcName } from "./signing-package-contracts.ts";
-import { isSigningSourceRpcName } from "./signing-source-contracts.ts";
+import { isCoworkerSigningPackageRpcName } from "./signing-package-contracts.ts";
+
+const COWORKER_ACCESS_DENIED = {
+  status: 403,
+  code: "COWORKER_ACCESS_DENIED",
+  message: "Active coworker access is required.",
+} as const;
+
+export const SIGNING_PACKAGE_RPC_ERROR_CONTEXT = "signing_package";
 
 const DOCUMENT_RPC_ERRORS: RpcErrorDomain = {
-  accessDenied: {
-    status: 403,
-    code: "ADMIN_ACCESS_DENIED",
-    message: "Administrator privileges are required.",
-  },
+  accessDenied: COWORKER_ACCESS_DENIED,
   notFound: {
     status: 404,
     code: "DOCUMENT_RESOURCE_NOT_FOUND",
@@ -31,16 +34,12 @@ const DOCUMENT_RPC_ERRORS: RpcErrorDomain = {
   unavailable: {
     status: 500,
     code: "BACKEND_ERROR",
-    message: "The admin document service is unavailable.",
+    message: "The document service is unavailable.",
   },
 };
 
-const SIGNING_SOURCE_RPC_ERRORS: RpcErrorDomain = {
-  accessDenied: {
-    status: 403,
-    code: "ADMIN_ACCESS_DENIED",
-    message: "Administrator privileges are required.",
-  },
+const SIGNING_PACKAGE_RPC_ERRORS: RpcErrorDomain = {
+  accessDenied: COWORKER_ACCESS_DENIED,
   notFound: {
     status: 404,
     code: "ONBOARDING_RESOURCE_NOT_FOUND",
@@ -64,27 +63,16 @@ const SIGNING_SOURCE_RPC_ERRORS: RpcErrorDomain = {
   unavailable: {
     status: 500,
     code: "INTERNAL_ERROR",
-    message: "The signing source service is unavailable.",
-  },
-};
-
-const SIGNING_PACKAGE_RPC_ERRORS: RpcErrorDomain = {
-  ...SIGNING_SOURCE_RPC_ERRORS,
-  unavailable: {
-    status: 500,
-    code: "INTERNAL_ERROR",
     message: "The signing package service is unavailable.",
   },
 };
 
 export function getRpcErrorDomain(
   rpcName: string,
+  errorContext: string | null,
 ): RpcErrorDomain {
-  if (isSigningSourceRpcName(rpcName)) {
-    return SIGNING_SOURCE_RPC_ERRORS;
-  }
-  if (isSigningPackageRpcName(rpcName)) {
-    return SIGNING_PACKAGE_RPC_ERRORS;
-  }
-  return DOCUMENT_RPC_ERRORS;
+  return errorContext === SIGNING_PACKAGE_RPC_ERROR_CONTEXT ||
+      isCoworkerSigningPackageRpcName(rpcName)
+    ? SIGNING_PACKAGE_RPC_ERRORS
+    : DOCUMENT_RPC_ERRORS;
 }

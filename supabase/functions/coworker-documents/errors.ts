@@ -1,8 +1,15 @@
 import {
+  createLoggedErrorResponse as loggedErrorResponse,
+  mapRpcError,
+} from "../_shared/coworker-document-edge/error-response.ts";
+import { RpcCallError } from "../_shared/coworker-document-edge/rpc.ts";
+import { StorageCallError } from "../_shared/coworker-document-edge/signed-storage.ts";
+import { StorageCleanupError } from "../_shared/coworker-document-edge/upload-cleanup.ts";
+import {
   BackendContractError,
   RequestValidationError,
-  type RpcName,
-} from "./contracts.ts";
+} from "./contract-context.ts";
+import { getRpcErrorDomain } from "./rpc-error-mapping.ts";
 
 export class InvalidJsonError extends Error {
   constructor() {
@@ -15,30 +22,6 @@ export class MissingUserClaimsError extends Error {
   constructor() {
     super("Authenticated user claims are missing.");
     this.name = "MissingUserClaimsError";
-  }
-}
-
-export class RpcCallError extends Error {
-  constructor(
-    readonly rpcName: RpcName,
-    readonly sqlState: string | null,
-  ) {
-    super("RPC call failed.");
-    this.name = "RpcCallError";
-  }
-}
-
-export class StorageCallError extends Error {
-  constructor(readonly operation: string) {
-    super("Storage operation failed.");
-    this.name = "StorageCallError";
-  }
-}
-
-export class StorageCleanupError extends Error {
-  constructor(readonly uploadSessionId: string) {
-    super("Upload was cancelled, but Storage cleanup failed.");
-    this.name = "StorageCleanupError";
   }
 }
 
@@ -75,7 +58,19 @@ export function createErrorResponse(
   }
 
   if (error instanceof RpcCallError) {
-    return rpcErrorResponse(error, requestId);
+    const definition = mapRpcError(
+      error.sqlState,
+      getRpcErrorDomain(error.rpcName, error.errorContext),
+    );
+    return loggedErrorResponse(
+      definition.status,
+      definition.code,
+      definition.message,
+      requestId,
+      undefined,
+      undefined,
+      error.rpcName,
+    );
   }
 
   if (error instanceof StorageCleanupError) {
@@ -120,110 +115,5 @@ export function createErrorResponse(
     "INTERNAL_ERROR",
     "The document service is unavailable.",
     requestId,
-  );
-}
-
-function rpcErrorResponse(error: RpcCallError, requestId: string): Response {
-  switch (error.sqlState) {
-    case "42501":
-      return loggedErrorResponse(
-        403,
-        "COWORKER_ACCESS_DENIED",
-        "Active coworker access is required.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "P0002":
-      return loggedErrorResponse(
-        404,
-        "DOCUMENT_RESOURCE_NOT_FOUND",
-        "The requested document resource was not found.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "23505":
-      return loggedErrorResponse(
-        409,
-        "DOCUMENT_CONFLICT",
-        "The document operation conflicts with the current state.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "40001":
-      return loggedErrorResponse(
-        409,
-        "CONCURRENT_MODIFICATION",
-        "The document changed concurrently. Reload and retry.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    case "22023":
-    case "22P02":
-    case "22007":
-    case "23514":
-      return loggedErrorResponse(
-        400,
-        "DOCUMENT_STATE_INVALID",
-        "The document request is invalid for the current state.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-    default:
-      return loggedErrorResponse(
-        500,
-        "BACKEND_ERROR",
-        "The document service is unavailable.",
-        requestId,
-        undefined,
-        undefined,
-        error.rpcName,
-      );
-  }
-}
-
-function loggedErrorResponse(
-  status: number,
-  code: string,
-  message: string,
-  requestId: string,
-  extra?: { [key: string]: unknown },
-  storageOperation?: string,
-  rpcName?: RpcName | null,
-): Response {
-  const logEntry: {
-    code: string;
-    requestId: string;
-    rpcName?: RpcName;
-    status: number;
-    storageOperation?: string;
-  } = { code, requestId, status };
-
-  if (rpcName !== undefined && rpcName !== null) {
-    logEntry.rpcName = rpcName;
-  }
-  if (storageOperation !== undefined) {
-    logEntry.storageOperation = storageOperation;
-  }
-
-  console.error(JSON.stringify(logEntry));
-
-  return Response.json(
-    {
-      ok: false,
-      code,
-      message,
-      ...(extra ?? {}),
-    },
-    { status },
   );
 }

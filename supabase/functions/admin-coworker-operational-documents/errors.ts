@@ -16,6 +16,11 @@ const OPERATIONAL_DOCUMENT_CONFLICT = {
 } as const;
 
 const OPERATIONAL_RPC_ERRORS: RpcErrorDomain = {
+  accessDenied: {
+    status: 403,
+    code: "ADMIN_ACCESS_DENIED",
+    message: "Administrator privileges are required.",
+  },
   notFound: {
     status: 404,
     code: "OPERATIONAL_DOCUMENT_NOT_FOUND",

@@ -5,6 +5,7 @@ export interface ErrorDefinition {
 }
 
 export interface RpcErrorDomain {
+  accessDenied: ErrorDefinition;
   notFound: ErrorDefinition;
   conflict: ErrorDefinition;
   concurrent: ErrorDefinition;
@@ -19,11 +20,7 @@ export function mapRpcError(
 ): ErrorDefinition {
   switch (sqlState) {
     case "42501":
-      return {
-        status: 403,
-        code: "ADMIN_ACCESS_DENIED",
-        message: "Administrator privileges are required.",
-      };
+      return domain.accessDenied;
     case "P0002":
       return domain.notFound;
     case "23505":
