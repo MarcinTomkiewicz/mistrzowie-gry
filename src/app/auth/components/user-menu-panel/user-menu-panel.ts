@@ -64,10 +64,8 @@ export class UserMenuPanel {
       workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
       adminContentLabel: this.i18n.userMenu().adminContentLabel,
       adminEventsLabel: this.i18n.userMenu().adminEventsLabel,
-      adminCoworkerPrivateDocumentsLabel:
-        this.i18n.userMenu().adminCoworkerPrivateDocumentsLabel,
-      adminCoworkerOperationalDocumentsLabel:
-        this.i18n.userMenu().adminCoworkerOperationalDocumentsLabel,
+      adminCoworkerRecordsLabel:
+        this.i18n.userMenu().adminCoworkerRecordsLabel,
       adminUsersLabel: this.i18n.userMenu().adminUsersLabel,
       canSeeCoworker: this.accessContext()?.enabled === true,
       canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),

@@ -8,8 +8,7 @@ export type UserMenuItemId =
   | 'work-log-overview'
   | 'admin-content'
   | 'admin-events'
-  | 'admin-coworker-private-documents'
-  | 'admin-coworker-operational-documents'
+  | 'admin-coworker-records'
   | 'admin-users';
 
 export type UserMenuSectionId =
@@ -32,8 +31,7 @@ export type BuildUserMenuArgs = {
   workLogOverviewLabel: string;
   adminContentLabel: string;
   adminEventsLabel: string;
-  adminCoworkerPrivateDocumentsLabel: string;
-  adminCoworkerOperationalDocumentsLabel: string;
+  adminCoworkerRecordsLabel: string;
   adminUsersLabel: string;
   canSeeCoworker: boolean;
   canSeeGmZone: boolean;

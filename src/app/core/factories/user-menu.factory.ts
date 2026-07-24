@@ -85,14 +85,9 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
         path: '/admin/events',
       },
       {
-        id: 'admin-coworker-private-documents',
-        label: args.adminCoworkerPrivateDocumentsLabel,
-        path: '/admin/coworkers/private-documents',
-      },
-      {
-        id: 'admin-coworker-operational-documents',
-        label: args.adminCoworkerOperationalDocumentsLabel,
-        path: '/admin/coworkers/operational-documents',
+        id: 'admin-coworker-records',
+        label: args.adminCoworkerRecordsLabel,
+        path: '/admin/coworkers',
       },
     );
   }

@@ -1,16 +1,15 @@
-<section class="mg-section mg-section--full">
-  <div
-    class="mg-container position-relative flex-col-start-stretch gap-lg"
-    [attr.aria-busy]="isLoading() || isSaving()"
-  >
-    <header class="mg-section__header w-100">
-      <h1 class="mg-section__title">
+<div
+  class="position-relative flex-col-start-stretch gap-lg w-100"
+  [attr.aria-busy]="isLoading() || isSaving()"
+>
+    <header class="mg-section__header">
+      <h2 class="mg-section__title mg-section__title--md">
         {{
           isCreate
             ? i18n.page().editorCreateTitle
             : i18n.page().editorEditTitle
         }}
-      </h1>
+      </h2>
       <p class="mg-section__subtitle mg-section__subtitle--full">
         {{ i18n.page().editorSubtitle }}
       </p>
@@ -27,7 +26,7 @@
 
     @if (loadError(); as error) {
       <section
-        class="mg-card flex-col-start-stretch gap-sm p-md w-100"
+        class="mg-card flex-col-start-stretch gap-sm w-100"
         role="alert"
       >
         <h2
@@ -106,5 +105,4 @@
         />
       }
     }
-  </div>
-</section>
+</div>

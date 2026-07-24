@@ -1,10 +1,11 @@
-<section class="mg-section mg-section--full">
-  <div
-    class="mg-container position-relative flex-col-start-stretch gap-lg"
-    [attr.aria-busy]="isLoading()"
-  >
-    <header class="mg-section__header w-100">
-      <h1 class="mg-section__title">{{ i18n.page().assignmentTitle }}</h1>
+<div
+  class="position-relative flex-col-start-stretch gap-lg w-100"
+  [attr.aria-busy]="isLoading()"
+>
+    <header class="mg-section__header">
+      <h2 class="mg-section__title mg-section__title--md">
+        {{ i18n.page().assignmentTitle }}
+      </h2>
       <p class="mg-section__subtitle mg-section__subtitle--full">
         {{ i18n.page().assignmentSubtitle }}
       </p>
@@ -16,7 +17,7 @@
     />
 
     @if (loadError(); as error) {
-      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+      <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
         <strong class="error-text">{{ loadErrorDescription() }}</strong>
         @if (error.message !== loadErrorDescription()) {
           <span class="muted-text">{{ error.message }}</span>
@@ -40,7 +41,7 @@
 
     @if (document(); as loadedDocument) {
       @if (version(); as loadedVersion) {
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <section class="mg-card flex-col-start-stretch gap-md w-100">
           <header class="flex-row-between-start flex-wrap gap-sm w-100">
             <div class="flex-col-start-stretch gap-xs">
               <h2 class="mg-section__title mg-section__title--md m-0">
@@ -114,8 +115,7 @@
         </section>
       }
     }
-  </div>
-</section>
+</div>
 
 @if (selectedItem(); as item) {
   <app-admin-operational-waiver-dialog

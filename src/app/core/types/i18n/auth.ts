@@ -101,6 +101,16 @@ export interface EditProfileTabsTranslations {
   gmAvailability: string;
 }
 
+export interface AdminCoworkerShellTranslations {
+  title: string;
+  subtitle: string;
+}
+
+export interface AdminCoworkerShellTabsTranslations {
+  privateDocuments: string;
+  sharedDocuments: string;
+}
+
 export interface GmProfileFormTranslations {
   displayNameLabel: string;
   experienceLabel: string;
@@ -322,7 +332,6 @@ export interface UserMenuTranslations {
   workLogOverviewLabel: string;
   adminContentLabel: string;
   adminEventsLabel: string;
-  adminCoworkerPrivateDocumentsLabel: string;
-  adminCoworkerOperationalDocumentsLabel: string;
+  adminCoworkerRecordsLabel: string;
   adminUsersLabel: string;
 }

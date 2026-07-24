@@ -1,0 +1,10 @@
+<app-route-tab-shell
+  [heading]="i18n.shell().title"
+  [subtitle]="i18n.shell().subtitle"
+  [seoTitle]="i18n.shell().title"
+  [seoDescription]="i18n.shell().subtitle"
+  [canonicalUrl]="pageUrl"
+  [tabs]="tabs()"
+>
+  <router-outlet />
+</app-route-tab-shell>

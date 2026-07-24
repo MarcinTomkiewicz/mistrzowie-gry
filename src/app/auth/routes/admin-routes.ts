@@ -24,26 +24,6 @@ const loaders = {
     import('../components/admin-events/edition-editor/edition-editor').then(
       (m) => m.EventEditionEditor,
     ),
-  coworkerPrivateDocuments: () =>
-    import(
-      '../components/admin-coworker-documents/private-documents/private-documents'
-    ).then((m) => m.PrivateDocuments),
-  coworkerDocumentReview: () =>
-    import(
-      '../components/admin-coworker-documents/review-detail/review-detail'
-    ).then((m) => m.ReviewDetail),
-  operationalDocumentList: () =>
-    import(
-      '../components/admin-coworker-operational-documents/document-list/document-list'
-    ).then((m) => m.DocumentList),
-  operationalDocumentEditor: () =>
-    import(
-      '../components/admin-coworker-operational-documents/document-editor/document-editor'
-    ).then((m) => m.DocumentEditor),
-  operationalAssignmentList: () =>
-    import(
-      '../components/admin-coworker-operational-documents/assignment-list/assignment-list'
-    ).then((m) => m.AssignmentList),
   gmAvailability: () =>
     import(
       '../components/gm-availability-overview/gm-availability-overview'
@@ -92,28 +72,9 @@ const adminChildren: Routes = [
     loadComponent: loaders.eventEditionEditor,
   },
   {
-    path: 'coworkers/private-documents/:userId/review/:documentId',
-    loadComponent: loaders.coworkerDocumentReview,
-  },
-  {
-    path: 'coworkers/private-documents',
-    loadComponent: loaders.coworkerPrivateDocuments,
-  },
-  {
-    path: 'coworkers/operational-documents',
-    loadComponent: loaders.operationalDocumentList,
-  },
-  {
-    path: 'coworkers/operational-documents/new',
-    loadComponent: loaders.operationalDocumentEditor,
-  },
-  {
-    path: 'coworkers/operational-documents/:documentId/edit',
-    loadComponent: loaders.operationalDocumentEditor,
-  },
-  {
-    path: 'coworkers/operational-documents/:documentId/versions/:documentVersionId/assignments',
-    loadComponent: loaders.operationalAssignmentList,
+    path: 'coworkers',
+    loadChildren: () =>
+      import('./admin-coworker-routes').then((m) => m.adminCoworkerRoutes),
   },
 ];
 

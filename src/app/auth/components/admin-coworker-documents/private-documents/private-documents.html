@@ -1,21 +1,6 @@
-<section class="mg-section mg-section--full">
-  <div class="mg-container position-relative flex-col-start-stretch gap-lg">
-    <header class="mg-section__header w-100">
-      <div class="flex-row-center-center gap-xs mb-sm w-100">
-        <h1 class="mg-section__title m-0">{{ i18n.page().title }}</h1>
-        <app-context-help
-          [text]="i18n.tooltips().pagePurpose"
-          [ariaLabel]="i18n.contextHelpLabel(i18n.page().title)"
-          position="bottom"
-        />
-      </div>
-      <p class="mg-section__subtitle mg-section__subtitle--full">
-        {{ i18n.page().subtitle }}
-      </p>
-    </header>
-
+<div class="position-relative flex-col-start-stretch gap-lg w-100">
     <section
-      class="mg-card flex-col-start-stretch gap-md p-md w-100"
+      class="mg-card flex-col-start-stretch gap-md w-100"
       aria-labelledby="admin-coworker-process-title"
     >
       <h2
@@ -50,7 +35,7 @@
     />
 
     @if (loadError(); as error) {
-      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+      <section class="mg-card flex-col-start-stretch gap-sm w-100">
         <h2 class="mg-section__title mg-section__title--sm m-0">
           {{ i18n.page().loadErrorTitle }}
         </h2>
@@ -75,7 +60,7 @@
         [disabled]="interactionsBlocked()"
       />
 
-      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <section class="mg-card flex-col-start-stretch gap-md w-100">
         <div class="flex-row-between-center flex-wrap gap-sm w-100">
           <div class="flex-col-start-stretch gap-xs">
             <div class="flex-row-start-center gap-xs">
@@ -124,7 +109,7 @@
         />
       }
 
-      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <section class="mg-card flex-col-start-stretch gap-md w-100">
         <div class="flex-col-start-stretch gap-xs">
           <div class="flex-row-start-center gap-xs">
             <h2 class="mg-section__title mg-section__title--md m-0">
@@ -264,5 +249,4 @@
         }
       </section>
     }
-  </div>
-</section>
+</div>
