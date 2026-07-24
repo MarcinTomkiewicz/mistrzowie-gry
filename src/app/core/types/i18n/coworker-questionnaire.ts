@@ -3,6 +3,12 @@ export type CoworkerShellTranslations = {
   subtitle: string;
 };
 
+export type CoworkerShellTabsTranslations = {
+  questionnaire: string;
+  privateDocuments: string;
+  sharedDocuments: string;
+};
+
 export type QuestionnairePageTranslations = {
   title: string;
   subtitle: string;

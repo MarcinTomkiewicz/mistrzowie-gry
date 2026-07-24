@@ -1,0 +1,15 @@
+<section class="mg-section">
+  <div class="mg-container">
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">{{ heading() }}</h1>
+      <p class="mg-section__subtitle">{{ subtitle() }}</p>
+    </header>
+
+    <app-route-tabs
+      [tabs]="tabs()"
+      (activeTabChange)="onActiveTabChange($event)"
+    />
+
+    <ng-content />
+  </div>
+</section>

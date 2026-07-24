@@ -28,19 +28,9 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
       title: args.coworkerTitle,
       items: [
         {
-          id: 'coworker-questionnaire',
-          label: args.coworkerQuestionnaireLabel,
-          path: '/auth/coworker/questionnaire',
-        },
-        {
-          id: 'coworker-private-documents',
-          label: args.coworkerPrivateDocumentsLabel,
-          path: '/auth/coworker/documents',
-        },
-        {
-          id: 'coworker-operational-documents',
-          label: args.coworkerOperationalDocumentsLabel,
-          path: '/auth/coworker/operational-documents',
+          id: 'coworker-records',
+          label: args.coworkerRecordsLabel,
+          path: '/auth/coworker',
         },
       ],
     });

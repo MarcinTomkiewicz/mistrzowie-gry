@@ -1,41 +1,75 @@
 <header class="flex-col-start-center min-w-200">
-  <div class="mg-section__title mg-section__title--sm m-0">
+  <div
+    class="mg-section__title mg-section__title--sm flex-row-start-center gap-xs m-0"
+  >
     {{ i18n.userMenu().greeting }}
-    @if (hasUsername()) {
-      <span>{{ usernameDisplay() }}</span>
+    @if (isAuthLoading()) {
+      <p-skeleton width="6.5rem" height="1rem" borderRadius="6px" />
     } @else {
-      <span
-        class="mg-user-menu__name-placeholder"
-        aria-hidden="true"
-      ></span>
+      @if (usernameDisplay(); as username) {
+        <span>{{ username }}</span>
+      }
     }
   </div>
   <p-divider />
 
-  @for (section of menuSections(); track section.id) {
-    <div class="flex-col-start-start w-100">
-      <div class="small-caps align-self-center">
-        {{ section.title }}
+  @if (isAuthLoading()) {
+    <div
+      class="flex-col-start-stretch gap-sm w-100"
+      aria-hidden="true"
+    >
+      <div class="align-self-center">
+        <p-skeleton width="5rem" height="0.75rem" />
       </div>
+      <p-skeleton width="100%" height="2rem" />
+      <p-divider />
 
-      <ul class="m-0 p-0 flex-col-start-stretch gap-xs w-100">
-        @for (item of section.items; track item.id) {
-          <li class="li--unset">
-            @if (!isActionItem(item)) {
-              <a
-                class="mg-popover-menu__link"
-                [routerLink]="item.path"
-                (click)="onNavigate()"
-              >
-                {{ item.label }}
-              </a>
-            }
-          </li>
-        }
-      </ul>
+      <div class="align-self-center">
+        <p-skeleton width="6rem" height="0.75rem" />
+      </div>
+      <p-skeleton width="100%" height="2rem" />
       <p-divider />
     </div>
+  } @else {
+    @for (section of menuSections(); track section.id) {
+      <div class="flex-col-start-start w-100">
+        <div class="small-caps align-self-center">
+          {{ section.title }}
+        </div>
+
+        <ul class="m-0 p-0 flex-col-start-stretch gap-xs w-100">
+          @for (item of section.items; track item.id) {
+            <li class="li--unset">
+              @if (!isActionItem(item)) {
+                <a
+                  class="mg-popover-menu__link"
+                  [routerLink]="item.path"
+                  (click)="onNavigate()"
+                >
+                  {{ item.label }}
+                </a>
+              }
+            </li>
+          }
+        </ul>
+        <p-divider />
+      </div>
+
+      @if ($first && coworkerAccessLoading()) {
+        <div
+          class="flex-col-start-stretch gap-sm w-100"
+          aria-hidden="true"
+        >
+          <div class="align-self-center">
+            <p-skeleton width="5rem" height="0.75rem" />
+          </div>
+          <p-skeleton width="100%" height="2rem" />
+          <p-divider />
+        </div>
+      }
+    }
   }
+
   <p-button type="button" severity="danger" size="small" (onClick)="logout()">{{
     logoutLabel()
   }}</p-button>

@@ -1,9 +1,7 @@
 export type UserMenuItemId =
   | 'edit-profile'
   | 'session-reservation'
-  | 'coworker-questionnaire'
-  | 'coworker-private-documents'
-  | 'coworker-operational-documents'
+  | 'coworker-records'
   | 'event-signup'
   | 'my-work-log'
   | 'gm-availability-overview'
@@ -27,9 +25,7 @@ export type BuildUserMenuArgs = {
   administrationTitle: string;
   editProfileLabel: string;
   sessionReservationLabel: string;
-  coworkerQuestionnaireLabel: string;
-  coworkerPrivateDocumentsLabel: string;
-  coworkerOperationalDocumentsLabel: string;
+  coworkerRecordsLabel: string;
   eventSignupLabel: string;
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;

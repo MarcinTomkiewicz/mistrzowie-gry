@@ -1,27 +1,25 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { buildSiteUrl } from '../../../core/config/site';
 import { Auth } from '../../../core/services/auth/auth';
-import { Seo } from '../../../core/services/seo/seo';
 import type { RouteTabDefinition } from '../../../core/types/route-tab';
 import { hasMinimumRole } from '../../../core/utils/roles';
-import { RouteTabs } from '../../../public/common/route-tabs/route-tabs';
+import { RouteTabShell } from '../../common/route-tab-shell/route-tab-shell';
 import { createEditProfileI18n } from './edit-profile.i18n';
 
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
-  imports: [RouterOutlet, RouteTabs],
+  imports: [RouterOutlet, RouteTabShell],
   templateUrl: './edit-profile.html',
   providers: [provideTranslocoScope('auth', 'common')],
 })
 export class EditProfile {
   private readonly auth = inject(Auth);
-  private readonly seo = inject(Seo);
-  private readonly pageUrl = buildSiteUrl('/auth/edit-profile');
+  protected readonly pageUrl = buildSiteUrl('/auth/edit-profile');
 
   readonly i18n = createEditProfileI18n();
 
@@ -65,23 +63,4 @@ export class EditProfile {
 
     return tabs;
   });
-
-  constructor() {
-    effect(() => {
-      this.applySeo(this.i18n.seo().title);
-    });
-  }
-
-  onActiveTabChange(tab: RouteTabDefinition): void {
-    this.applySeo(`${this.i18n.seo().title} — ${tab.label}`);
-  }
-
-  private applySeo(title: string): void {
-    this.seo.apply({
-      title,
-      description: this.i18n.seo().description,
-      canonicalUrl: this.pageUrl,
-      robots: 'noindex,nofollow',
-    });
-  }
 }

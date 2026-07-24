@@ -313,9 +313,7 @@ export interface UserMenuTranslations {
   gmZoneSectionTitle: string;
   administrationSectionTitle: string;
   editProfileLabel: string;
-  coworkerQuestionnaireLabel: string;
-  coworkerPrivateDocumentsLabel: string;
-  coworkerOperationalDocumentsLabel: string;
+  coworkerRecordsLabel: string;
   coworkerAccessLoadFailedSummary: string;
   coworkerAccessLoadFailedDetail: string;
   eventSignupLabel: string;

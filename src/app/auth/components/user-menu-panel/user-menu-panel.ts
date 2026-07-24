@@ -12,6 +12,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { SkeletonModule } from 'primeng/skeleton';
 
 import { buildUserMenu } from '../../../core/factories/user-menu.factory';
 import type { ICoworkerAccessContext } from '../../../core/interfaces/i-coworker-access-context';
@@ -25,9 +26,8 @@ import { createUserMenuPanelI18n } from './user-menu-panel.i18n';
 @Component({
   selector: 'app-user-menu-panel',
   standalone: true,
-  imports: [RouterLink, ButtonModule, DividerModule],
+  imports: [RouterLink, ButtonModule, DividerModule, SkeletonModule],
   templateUrl: './user-menu-panel.html',
-  styleUrl: './user-menu-panel.scss',
   providers: [provideTranslocoScope('auth', 'common')],
 })
 export class UserMenuPanel {
@@ -40,10 +40,13 @@ export class UserMenuPanel {
   readonly i18n = createUserMenuPanelI18n();
 
   readonly usernameDisplay = computed(() => this.auth.displayName());
-  readonly hasUsername = computed(() => !!this.usernameDisplay().trim());
+  readonly isAuthLoading = computed(() => !this.auth.isReady());
 
   private readonly accessContext =
     signal<ICoworkerAccessContext | null>(null);
+  private readonly isCoworkerAccessLoading = signal(false);
+
+  readonly coworkerAccessLoading = this.isCoworkerAccessLoading.asReadonly();
 
   readonly menuSections = computed(() =>
     buildUserMenu({
@@ -53,12 +56,7 @@ export class UserMenuPanel {
       administrationTitle: this.i18n.userMenu().administrationSectionTitle,
       editProfileLabel: this.i18n.userMenu().editProfileLabel,
       sessionReservationLabel: this.i18n.commonCta().bookSession,
-      coworkerQuestionnaireLabel:
-        this.i18n.userMenu().coworkerQuestionnaireLabel,
-      coworkerPrivateDocumentsLabel:
-        this.i18n.userMenu().coworkerPrivateDocumentsLabel,
-      coworkerOperationalDocumentsLabel:
-        this.i18n.userMenu().coworkerOperationalDocumentsLabel,
+      coworkerRecordsLabel: this.i18n.userMenu().coworkerRecordsLabel,
       eventSignupLabel: this.i18n.userMenu().eventSignupLabel,
       myWorkLogLabel: this.i18n.userMenu().myWorkLogLabel,
       gmAvailabilityOverviewLabel:
@@ -86,21 +84,31 @@ export class UserMenuPanel {
   constructor() {
     effect((onCleanup) => {
       this.accessContext.set(null);
+      this.isCoworkerAccessLoading.set(false);
 
       if (!this.auth.isReady() || this.auth.userId() === null) {
         return;
       }
 
+      this.isCoworkerAccessLoading.set(true);
+
       const subscription = this.coworkerAccess.getContext().subscribe({
-        next: (access) => this.accessContext.set(access),
+        next: (access) => {
+          this.accessContext.set(access);
+          this.isCoworkerAccessLoading.set(false);
+        },
         error: () => {
+          this.isCoworkerAccessLoading.set(false);
           this.toast.danger({
             summary: this.i18n.userMenu().coworkerAccessLoadFailedSummary,
             detail: this.i18n.userMenu().coworkerAccessLoadFailedDetail,
           });
         },
       });
-      onCleanup(() => subscription.unsubscribe());
+      onCleanup(() => {
+        subscription.unsubscribe();
+        this.isCoworkerAccessLoading.set(false);
+      });
     });
   }
 

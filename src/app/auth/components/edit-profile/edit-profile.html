@@ -1,20 +1,10 @@
-<section class="mg-section">
-  <div class="mg-container">
-    <header class="mg-section__header">
-      <h1 class="mg-section__title">
-        {{ i18n.hero().title }}
-      </h1>
-
-      <p class="mg-section__subtitle">
-        {{ i18n.hero().subtitle }}
-      </p>
-    </header>
-
-    <app-route-tabs
-      [tabs]="tabs()"
-      (activeTabChange)="onActiveTabChange($event)"
-    />
-
-    <router-outlet />
-  </div>
-</section>
+<app-route-tab-shell
+  [heading]="i18n.hero().title"
+  [subtitle]="i18n.hero().subtitle"
+  [seoTitle]="i18n.seo().title"
+  [seoDescription]="i18n.seo().description"
+  [canonicalUrl]="pageUrl"
+  [tabs]="tabs()"
+>
+  <router-outlet />
+</app-route-tab-shell>
