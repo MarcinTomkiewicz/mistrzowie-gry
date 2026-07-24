@@ -1,0 +1,42 @@
+<p-tabs [value]="activeTab()?.id">
+  <div class="hide-down-sm">
+    <p-tablist>
+      @for (tab of tabs(); track tab.id) {
+        <p-tab [value]="tab.id" [routerLink]="tab.path">
+          <span class="flex-row-center-center gap-xs">
+            <i [class]="tab.icon" aria-hidden="true"></i>
+            <span>{{ tab.label }}</span>
+          </span>
+        </p-tab>
+      }
+    </p-tablist>
+  </div>
+
+  <div class="show-down-sm mb-md">
+    <p-select
+      [options]="selectOptions()"
+      [ngModel]="activeTab()?.path"
+      optionLabel="label"
+      optionValue="path"
+      appendTo="body"
+      class="w-100"
+      (onChange)="onMobileTabChange($event.value)"
+    >
+      <ng-template #selectedItem let-option>
+        @if (option) {
+          <span class="flex-row-start-center gap-xs">
+            <i [class]="option.icon" aria-hidden="true"></i>
+            <span>{{ option.label }}</span>
+          </span>
+        }
+      </ng-template>
+
+      <ng-template #item let-option>
+        <span class="flex-row-start-center gap-xs">
+          <i [class]="option.icon" aria-hidden="true"></i>
+          <span>{{ option.label }}</span>
+        </span>
+      </ng-template>
+    </p-select>
+  </div>
+</p-tabs>
