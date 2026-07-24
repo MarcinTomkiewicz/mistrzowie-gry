@@ -2,7 +2,7 @@
   class="position-relative flex-col-start-stretch gap-lg w-100"
   [attr.aria-busy]="isLoading() || mutationBusy() || downloadingVersionId() !== null"
 >
-  <header class="mg-section__header w-100 m-sm">
+  <header class="mg-section__header">
     <h2 class="mg-section__title mg-section__title--md">
       {{ i18n.page().title }}
     </h2>
@@ -224,68 +224,18 @@
           <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
         </div>
       } @else {
-        <div class="mg-grid-auto-fit w-100">
+        <div class="mg-grid-2 gap-md w-100">
           @for (definition of data.availableDefinitions; track definition.id) {
-            <article class="mg-card flex-col-start-stretch gap-sm w-100">
-              <header class="flex-col-start-stretch gap-xs">
-                <h4 class="mg-section__title mg-section__title--xs m-0">
-                  {{ definition.title }}
-                </h4>
-                @if (definition.description) {
-                  <p class="m-0 muted-text">{{ definition.description }}</p>
-                }
-              </header>
-              <div class="tag-badges">
-                <span class="tag-badge tag-badge--info">
-                  {{ i18n.statuses().origins[definition.originPolicy] }}
-                </span>
-                <span class="tag-badge tag-badge--muted">
-                  {{ i18n.statuses().multiplicities[definition.multiplicity] }}
-                </span>
-                @if (definition.isRequiredByDefault) {
-                  <span class="tag-badge tag-badge--primary">
-                    {{ i18n.labels().requiredByDefault }}
-                  </span>
-                }
-              </div>
-              <p class="m-0">
-                <strong>{{ i18n.labels().allowedExtensions }}:</strong>
-                {{ definition.allowedExtensions.join(", ") || i18n.commonEmpty().title }}
-              </p>
-              <p class="m-0">
-                <strong>{{ i18n.labels().allowedMimeTypes }}:</strong>
-                {{ definition.allowedMimeTypes.join(", ") || i18n.commonEmpty().title }}
-              </p>
-              <div class="flex-col-start-stretch gap-xs border-top pt-sm">
-                <strong>{{ i18n.labels().signaturePolicy }}:</strong>
-                <span>{{ definition.signaturePolicy.name }}</span>
-                <span class="muted-text">
-                  {{ i18n.labels().allowedDeclarations }}:
-                  {{
-                    signatureLabels(definition.signaturePolicy.allowedDeclarationTypes) ||
-                      i18n.commonEmpty().title
-                  }}
-                </span>
-              </div>
-              @if (
-                getDocumentCapability(
-                  definition,
-                  unassignedDocumentsByDefinition().get(definition.id) ?? [],
-                  null,
-                  null
-                ).canAddDocument
-              ) {
-                <app-document-upload
-                  [definition]="definition"
-                  [onboardingCaseId]="data.activeOnboardingCase?.id ?? null"
-                  [disabled]="actionsBlocked()"
-                  (completed)="handleUploadCompleted()"
-                  (busyChange)="handleUploadBusy($event)"
-                  (blockingError)="registerBlockingError($event)"
-                  (reloadRequired)="requestReload()"
-                />
-              }
-            </article>
+            <app-available-document-card
+              [definition]="definition"
+              [documents]="unassignedDocumentsByDefinition().get(definition.id) ?? []"
+              [onboardingCaseId]="data.activeOnboardingCase?.id ?? null"
+              [disabled]="actionsBlocked()"
+              (completed)="handleUploadCompleted()"
+              (busyChange)="handleUploadBusy($event)"
+              (blockingError)="registerBlockingError($event)"
+              (reloadRequired)="requestReload()"
+            />
           }
         </div>
       }

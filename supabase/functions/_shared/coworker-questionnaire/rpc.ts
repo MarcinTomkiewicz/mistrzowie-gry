@@ -3,17 +3,16 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 import {
   ENCRYPTION_KEY_VERSION,
   PAYLOAD_SCHEMA_VERSION,
-  RPC,
   VALIDATION_SCHEMA_VERSION,
   type AdminQuestionnairePurpose,
   type AdminQuestionnaireScope,
   type QuestionnaireEnvelope,
   type QuestionnaireStatement,
-  type RpcName,
   type SaveEnvelopeInput,
   type SaveEnvelopeResult,
 } from "./contracts.ts";
 import { RpcCallError } from "./errors.ts";
+import { RPC, type RpcName } from "./rpc-names.ts";
 import {
   parseEnvelope,
   parseSaveResult,
@@ -110,7 +109,7 @@ export async function saveQuestionnaireEnvelope(
   return result;
 }
 
-async function callRpc(
+export async function callRpc(
   client: SupabaseClient,
   rpcName: RpcName,
   parameters: { [key: string]: unknown },

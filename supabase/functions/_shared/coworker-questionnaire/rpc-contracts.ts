@@ -13,16 +13,15 @@ import {
   ENCRYPTION_KEY_VERSION,
   FINAL_STATEMENT_KEY,
   PAYLOAD_SCHEMA_VERSION,
-  RPC,
   VALIDATION_SCHEMA_VERSION,
   type CurrentDeclaration,
   type QuestionnaireEnvelope,
   type QuestionnaireStatement,
-  type RpcName,
   type SaveEnvelopeInput,
   type SaveEnvelopeResult,
 } from "./contracts.ts";
 import { BackendContractError } from "./errors.ts";
+import { RPC, type RpcName } from "./rpc-names.ts";
 
 const STATEMENT_KEYS = [
   "statementKey",

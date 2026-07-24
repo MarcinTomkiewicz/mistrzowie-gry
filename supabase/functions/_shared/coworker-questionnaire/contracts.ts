@@ -4,14 +4,6 @@ export const VALIDATION_SCHEMA_VERSION = 2;
 export const FINAL_STATEMENT_KEY =
   "coworker.questionnaire.final-declaration";
 
-export const RPC = {
-  getAdminEnvelope: "get_admin_coworker_questionnaire_envelope",
-  getEnvelope: "get_coworker_questionnaire_envelope",
-  getStatement: "get_coworker_questionnaire_statement",
-  saveEnvelope: "save_coworker_questionnaire_envelope",
-} as const;
-
-export type RpcName = typeof RPC[keyof typeof RPC];
 export type UnknownObject = { [key: string]: unknown };
 export type FieldErrors = { [field: string]: string };
 

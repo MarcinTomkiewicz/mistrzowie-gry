@@ -1,7 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import {
-  RPC,
   type AdminQuestionnaireResponse,
   type QuestionnairePayload,
 } from "./contracts.ts";
@@ -11,6 +10,7 @@ import {
   getAdminQuestionnaireEnvelope,
   getQuestionnaireStatement,
 } from "./rpc.ts";
+import { RPC } from "./rpc-names.ts";
 import {
   buildSensitiveMetadata,
   emptySensitiveMetadata,

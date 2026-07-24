@@ -1,7 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import {
-  RPC,
   type QuestionnaireGetResponse,
   type QuestionnairePayload,
   type QuestionnairePutResponse,
@@ -13,11 +12,13 @@ import {
   type QuestionnaireCryptoKeys,
 } from "./crypto.ts";
 import { parseQuestionnairePutRequest } from "./parse-questionnaire.ts";
+import { ensureQuestionnaireDocument } from "./questionnaire-document.ts";
+import { saveQuestionnaireWithRecovery } from "./questionnaire-save-recovery.ts";
 import {
   getQuestionnaireEnvelope,
   getQuestionnaireStatement,
-  saveQuestionnaireEnvelope,
 } from "./rpc.ts";
+import { RPC } from "./rpc-names.ts";
 import {
   buildSensitiveMetadata,
   emptySensitiveMetadata,
@@ -79,6 +80,7 @@ export async function putSelfQuestionnaire(
   client: SupabaseClient,
   userId: string,
   body: unknown,
+  requestId: string,
 ): Promise<QuestionnairePutResponse> {
   const request = parseQuestionnairePutRequest(body);
   const [keys, statement] = await Promise.all([
@@ -105,7 +107,7 @@ export async function putSelfQuestionnaire(
     ? null
     : await createPeselHmacBase64(payload.personal.pesel, keys);
   const encrypted = await encryptQuestionnaire(payload, userId, keys);
-  const result = await saveQuestionnaireEnvelope(
+  const result = await saveQuestionnaireWithRecovery(
     client,
     {
       userId,
@@ -118,7 +120,18 @@ export async function putSelfQuestionnaire(
       finalDeclaration: request.finalDeclaration,
     },
     statement,
+    payload,
+    keys,
   );
+  if (request.complete) {
+    await ensureQuestionnaireDocument(
+      client,
+      userId,
+      payload,
+      result,
+      requestId,
+    );
+  }
 
   return {
     saved: true,

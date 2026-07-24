@@ -1,4 +1,4 @@
-# AGENTS.md — Mistrzowie Gry
+# AGENTS.md - Mistrzowie Gry
 
 This file is the repository-level execution contract for Codex. It applies to
 the entire repository unless a more specific `AGENTS.md` or
@@ -39,14 +39,14 @@ The generated README may be stale and must not override them.
 - Deployment/base-href SSR build: `npm run build:ssr` when the task affects SSR
   deployment, base href, deploy URL, or `scripts/build-ssr.mjs`.
 - Main areas:
-  - `src/app/public` — public UI and public feature composition;
-  - `src/app/auth` — authenticated UI and workflows;
-  - `src/app/core` — shared contracts, configuration, services, state, and pure
+  - `src/app/public` - public UI and public feature composition;
+  - `src/app/auth` - authenticated UI and workflows;
+  - `src/app/core` - shared contracts, configuration, services, state, and pure
     domain/application utilities;
-  - `src/scss` — global styling system and utilities;
-  - `public/assets/i18n/pl` — player-facing Polish copy;
-  - `supabase` — local Supabase configuration and Edge Functions;
-  - `scripts` — build, deployment, and generation scripts.
+  - `src/scss` - global styling system and utilities;
+  - `public/assets/i18n/pl` - player-facing Polish copy;
+  - `supabase` - local Supabase configuration and Edge Functions;
+  - `scripts` - build, deployment, and generation scripts.
 
 ## Before editing
 
@@ -248,7 +248,7 @@ Implemented:
 Quality:
 - reuse: ...
 - cleanup: ...
-- Angular 21 naming: PASS | FAIL — ...
+- Angular 21 naming: PASS | FAIL - ...
 - architecture: ...
 
 Files over 300 LOC:
@@ -259,13 +259,13 @@ For each structurally changed in-scope file over 300 lines, replace `- none`
 with one compact line:
 
 ```md
-- `<path>` — `<line count>` LOC — structural — kept | reduced | split — `<reason>` — SRP/SoC/DRY/KISS: PASS/PASS/PASS/PASS
+- `<path>` - `<line count>` LOC - structural - kept | reduced | split - `<reason>` - SRP/SoC/DRY/KISS: PASS/PASS/PASS/PASS
 ```
 
 For a mechanical-only edit, use:
 
 ```md
-- `<path>` — `<line count>` LOC — mechanical-only — kept — `<import/path/symbol change>; no structural or behavioral edit` — SRP/SoC/DRY/KISS: unchanged
+- `<path>` - `<line count>` LOC - mechanical-only - kept - `<import/path/symbol change>; no structural or behavioral edit` - SRP/SoC/DRY/KISS: unchanged
 ```
 
 Expand a line only for the exceptional cases defined in the over-300-LOC gate.
@@ -274,14 +274,14 @@ Then continue the same report:
 
 ```md
 Build (Angular tasks only):
-- `npm run build`: PASS | FAIL | NOT RUN — ...
-- `npm run build:ssr`: PASS | FAIL | NOT RUN | N/A — ...
+- `npm run build`: PASS | FAIL | NOT RUN - ...
+- `npm run build:ssr`: PASS | FAIL | NOT RUN | N/A - ...
 
 Other verification:
-- `git diff --check`: PASS | FAIL — ...
+- `git diff --check`: PASS | FAIL - ...
 - static checks: ...
-- tests: NOT WRITTEN OR RUN — project policy
-- manual smoke: N/A — user-side
+- tests: NOT WRITTEN OR RUN - project policy
+- manual smoke: N/A - user-side
 - final `git status --short`: ...
 
 Risks / blockers:

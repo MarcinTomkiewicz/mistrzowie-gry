@@ -15,10 +15,7 @@ import {
 } from '../../../../core/interfaces/i-coworker-document';
 import { CoworkerDocuments as CoworkerDocumentsApi } from '../../../../core/services/coworker-documents/coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
-import {
-  CoworkerPortalRequirementStatus,
-  CoworkerSignatureDeclarationType,
-} from '../../../../core/types/coworker-document';
+import { CoworkerPortalRequirementStatus } from '../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { CoworkerNotificationCopy } from '../../../../core/types/i18n/coworker-notification';
 import { getCoworkerDocumentCapability } from '../../../../core/utils/coworker-document-capability';
@@ -29,6 +26,7 @@ import {
 } from '../../../../core/utils/edge-function-error-mapping';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { CoworkerNotifications } from '../notifications/coworker-notifications';
+import { AvailableDocumentCard } from './available-document-card/available-document-card';
 import { DocumentCard } from './document-card/document-card';
 import { DocumentUpload } from './document-upload/document-upload';
 import { createDocumentsI18n } from './documents.i18n';
@@ -37,6 +35,7 @@ import { createDocumentsI18n } from './documents.i18n';
   selector: 'app-documents',
   standalone: true,
   imports: [
+    AvailableDocumentCard,
     ButtonModule,
     CoworkerNotifications,
     DocumentCard,
@@ -247,11 +246,6 @@ export class Documents {
     status: CoworkerPortalRequirementStatus,
   ): boolean {
     return status === 'pending' && new Date(dueAt).getTime() < Date.now();
-  }
-
-  protected signatureLabels(types: readonly CoworkerSignatureDeclarationType[]): string {
-    const labels = this.i18n.statuses().signatures;
-    return types.map((type) => labels[type]).join(', ');
   }
 
   private runMutation(mutationId: string, request: Observable<void>): void {

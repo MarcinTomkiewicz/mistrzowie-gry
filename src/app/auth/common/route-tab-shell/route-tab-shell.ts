@@ -27,7 +27,7 @@ export class RouteTabShell {
   }
 
   protected onActiveTabChange(tab: RouteTabDefinition): void {
-    this.applySeo(`${this.seoTitle()} — ${tab.label}`);
+    this.applySeo(`${this.seoTitle()} - ${tab.label}`);
   }
 
   private applySeo(title: string): void {

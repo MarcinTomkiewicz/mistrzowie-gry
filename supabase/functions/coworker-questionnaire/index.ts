@@ -32,6 +32,7 @@ export default {
               context.supabaseAdmin,
               userId,
               await readJson(request),
+              requestId,
             ),
           );
         default:

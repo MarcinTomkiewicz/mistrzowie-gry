@@ -1,4 +1,5 @@
-import type { FieldErrors, RpcName } from "./contracts.ts";
+import type { FieldErrors } from "./contracts.ts";
+import type { RpcName } from "./rpc-names.ts";
 
 export class QuestionnaireValidationError extends Error {
   constructor(readonly fieldErrors: FieldErrors) {
@@ -37,5 +38,33 @@ export class CryptoOperationError extends Error {
   constructor() {
     super("Questionnaire cryptographic operation failed.");
     this.name = "CryptoOperationError";
+  }
+}
+
+export class QuestionnairePdfGenerationError extends Error {
+  constructor() {
+    super("Questionnaire PDF generation failed.");
+    this.name = "QuestionnairePdfGenerationError";
+  }
+}
+
+export class QuestionnaireDocumentStorageError extends Error {
+  constructor() {
+    super("Questionnaire document Storage upload failed.");
+    this.name = "QuestionnaireDocumentStorageError";
+  }
+}
+
+export class QuestionnaireDocumentFinalizationError extends Error {
+  constructor() {
+    super("Questionnaire document finalization failed.");
+    this.name = "QuestionnaireDocumentFinalizationError";
+  }
+}
+
+export class QuestionnaireDocumentCleanupError extends Error {
+  constructor() {
+    super("Questionnaire document cleanup failed.");
+    this.name = "QuestionnaireDocumentCleanupError";
   }
 }

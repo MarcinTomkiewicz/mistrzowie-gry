@@ -55,6 +55,10 @@ export type CoworkerDocumentsLabelTranslations = {
   allowedMimeTypes: string;
   signaturePolicy: string;
   allowedDeclarations: string;
+  signatureRequired: string;
+  signatureNotRequired: string;
+  uploadSource: string;
+  documentMultiplicity: string;
   requiredByDefault: string;
   downloadUnavailable: string;
   unreadNotifications: string;
@@ -72,6 +76,8 @@ export type CoworkerDocumentsActionTranslations = {
   submitDocument: string;
   withdrawDocument: string;
   markNotificationRead: string;
+  showRules: string;
+  hideRules: string;
 };
 
 export type CoworkerDocumentsErrorTranslations = {

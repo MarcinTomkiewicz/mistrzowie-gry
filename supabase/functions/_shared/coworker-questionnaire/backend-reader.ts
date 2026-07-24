@@ -1,5 +1,6 @@
-import type { RpcName, UnknownObject } from "./contracts.ts";
+import type { UnknownObject } from "./contracts.ts";
 import { BackendContractError } from "./errors.ts";
+import type { RpcName } from "./rpc-names.ts";
 
 const BASE64_PATTERN =
   /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;

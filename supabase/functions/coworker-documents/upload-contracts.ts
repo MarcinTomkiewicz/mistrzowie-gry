@@ -1,4 +1,5 @@
 import { COWORKER_DOCUMENTS_BUCKET } from "../_shared/coworker-document-edge/storage-config.ts";
+import { createCoworkerDocumentParser } from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 import { RPC } from "./contracts.ts";
 import {
   BackendContractError,
@@ -52,6 +53,10 @@ const {
   backendTimestamp,
   backendUuid,
 } = coworkerDocumentReaders;
+const { parseCoworkerDocument } = createCoworkerDocumentParser(
+  coworkerDocumentReaders,
+  (rpcName: typeof RPC.finalizeUpload) => new BackendContractError(rpcName),
+);
 
 export function parseUploadReservation(
   value: unknown,
@@ -162,8 +167,16 @@ export function parseFinalizationResult(
   value: unknown,
   userId: string,
   uploadSessionId: string,
+  expectedDocument?: {
+    documentId: string;
+    documentVersionId: string;
+  },
 ): UnknownObject {
-  const result = backendObject(value, RPC.finalizeUpload);
+  const result = backendObject(value, RPC.finalizeUpload, [
+    "uploadSessionId",
+    "finalized",
+    "document",
+  ]);
   if (
     backendUuid(result, "uploadSessionId", RPC.finalizeUpload) !==
       uploadSessionId ||
@@ -172,8 +185,20 @@ export function parseFinalizationResult(
     throw new BackendContractError(RPC.finalizeUpload);
   }
 
-  const document = backendObject(result.document, RPC.finalizeUpload);
-  if (backendUuid(document, "userId", RPC.finalizeUpload) !== userId) {
+  const document = parseCoworkerDocument(
+    result.document,
+    RPC.finalizeUpload,
+  );
+  if (
+    backendUuid(document, "userId", RPC.finalizeUpload) !== userId ||
+    (expectedDocument !== undefined &&
+      (
+        backendUuid(document, "id", RPC.finalizeUpload) !==
+          expectedDocument.documentId ||
+        backendUuid(document, "currentVersionId", RPC.finalizeUpload) !==
+          expectedDocument.documentVersionId
+      ))
+  ) {
     throw new BackendContractError(RPC.finalizeUpload);
   }
   return result;

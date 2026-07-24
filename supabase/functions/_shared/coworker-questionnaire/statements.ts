@@ -2,13 +2,13 @@ import {
   FINAL_STATEMENT_KEY,
   type FinalDeclarationAcceptance,
   type QuestionnaireStatement,
-  type RpcName,
 } from "./contracts.ts";
 import {
   BackendContractError,
   QuestionnaireValidationError,
 } from "./errors.ts";
 import { createFieldErrors } from "./request-reader.ts";
+import type { RpcName } from "./rpc-names.ts";
 
 export async function validateStatementIntegrity(
   statement: QuestionnaireStatement,

@@ -1,4 +1,4 @@
-# COWORKER-DOC-EDGE-1 — coworker-documents
+# COWORKER-DOC-EDGE-1 - coworker-documents
 
 ## Files
 

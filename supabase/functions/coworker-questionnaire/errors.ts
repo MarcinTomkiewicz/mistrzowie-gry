@@ -2,11 +2,15 @@ import {
   CryptoConfigurationError,
   CryptoOperationError,
   BackendContractError,
+  QuestionnaireDocumentCleanupError,
+  QuestionnaireDocumentFinalizationError,
+  QuestionnaireDocumentStorageError,
+  QuestionnairePdfGenerationError,
   QuestionnaireValidationError,
   RpcCallError,
 } from "../_shared/coworker-questionnaire/errors.ts";
 import { jsonNoStore } from "../_shared/coworker-questionnaire/http.ts";
-import type { RpcName } from "../_shared/coworker-questionnaire/contracts.ts";
+import type { RpcName } from "../_shared/coworker-questionnaire/rpc-names.ts";
 
 const ALLOWED_METHODS = "GET, PUT";
 
@@ -86,6 +90,38 @@ export function createErrorResponse(
     return loggedErrorResponse(
       500,
       "CRYPTO_OPERATION_FAILED",
+      "The questionnaire service is unavailable.",
+      requestId,
+    );
+  }
+  if (error instanceof QuestionnairePdfGenerationError) {
+    return loggedErrorResponse(
+      500,
+      "QUESTIONNAIRE_PDF_GENERATION_FAILED",
+      "The questionnaire document could not be generated.",
+      requestId,
+    );
+  }
+  if (error instanceof QuestionnaireDocumentStorageError) {
+    return loggedErrorResponse(
+      500,
+      "QUESTIONNAIRE_DOCUMENT_STORAGE_FAILED",
+      "The questionnaire document could not be stored.",
+      requestId,
+    );
+  }
+  if (error instanceof QuestionnaireDocumentFinalizationError) {
+    return loggedErrorResponse(
+      500,
+      "QUESTIONNAIRE_DOCUMENT_FINALIZATION_FAILED",
+      "The questionnaire document could not be finalized.",
+      requestId,
+    );
+  }
+  if (error instanceof QuestionnaireDocumentCleanupError) {
+    return loggedErrorResponse(
+      500,
+      "INTERNAL_ERROR",
       "The questionnaire service is unavailable.",
       requestId,
     );

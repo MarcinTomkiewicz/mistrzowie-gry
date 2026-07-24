@@ -15,13 +15,13 @@ export function formatAdminOperationalCoworkerLabel(
   coworker: Pick<IAdminOperationalCoworkerOption, 'email' | 'firstName'>,
 ): string {
   const firstName = coworker.firstName?.trim();
-  return firstName ? `${firstName} — ${coworker.email}` : coworker.email;
+  return firstName ? `${firstName} - ${coworker.email}` : coworker.email;
 }
 
 export function formatAdminOperationalEventLabel(
   eventDefinition: Pick<IAdminOperationalEventOption, 'key' | 'name'>,
 ): string {
-  return `${eventDefinition.name} — ${eventDefinition.key}`;
+  return `${eventDefinition.name} - ${eventDefinition.key}`;
 }
 
 export function resolveAdminOperationalTargetLabel(

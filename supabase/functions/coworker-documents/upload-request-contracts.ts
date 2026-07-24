@@ -2,15 +2,12 @@ import {
   coworkerDocumentReaders,
   type UnknownObject,
 } from "./contract-context.ts";
+import {
+  COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES,
+} from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 
-export const SIGNATURE_DECLARATION_TYPES = [
-  "unsigned",
-  "handwritten",
-  "trusted_profile",
-  "qualified_electronic",
-  "other_electronic",
-  "unknown",
-] as const;
+export const SIGNATURE_DECLARATION_TYPES =
+  COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES;
 
 export type SignatureDeclarationType =
   typeof SIGNATURE_DECLARATION_TYPES[number];

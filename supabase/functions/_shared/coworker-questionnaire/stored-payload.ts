@@ -1,7 +1,6 @@
 import type {
   QuestionnaireEnvelope,
   QuestionnairePayload,
-  RpcName,
 } from "./contracts.ts";
 import {
   decryptQuestionnaire,
@@ -12,6 +11,7 @@ import {
   QuestionnaireValidationError,
 } from "./errors.ts";
 import { parseStoredQuestionnairePayload } from "./parse-questionnaire.ts";
+import type { RpcName } from "./rpc-names.ts";
 import { validateQuestionnairePayload } from "./validation.ts";
 
 export async function readStoredQuestionnairePayload(

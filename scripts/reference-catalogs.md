@@ -8,8 +8,8 @@ w runtime żadnych requestów do KAS, NFZ, ISO ani ONZ.
 - KAS: [Dane teleadresowe jednostek Krajowej Administracji Skarbowej](https://www.gov.pl/web/kas/dane-teleadresowe-jednostek-kas).
 - NFZ: [identyfikatory oddziałów wojewódzkich](https://www.nfz.gov.pl/o-nfz/struktura-nfz/identyfikatory-oddzialow-wojewodzkich-nfz/)
   oraz [oficjalna struktura i siedziby oddziałów](https://www.nfz.gov.pl/kontakt/oddzialy-nfz/).
-- ISO: [ISO 3166 — kody krajów](https://www.iso.org/iso-3166-country-codes.html).
-- ONZ: [UN M49 — lista krajów i obszarów](https://unstats.un.org/unsd/methodology/m49/overview/).
+- ISO: [ISO 3166 - kody krajów](https://www.iso.org/iso-3166-country-codes.html).
+- ONZ: [UN M49 - lista krajów i obszarów](https://unstats.un.org/unsd/methodology/m49/overview/).
 
 ## Urzędy Skarbowe
 

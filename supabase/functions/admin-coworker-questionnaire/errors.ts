@@ -1,4 +1,3 @@
-import type { RpcName } from "../_shared/coworker-questionnaire/contracts.ts";
 import {
   BackendContractError,
   CryptoConfigurationError,
@@ -7,6 +6,7 @@ import {
   RpcCallError,
 } from "../_shared/coworker-questionnaire/errors.ts";
 import { jsonNoStore } from "../_shared/coworker-questionnaire/http.ts";
+import type { RpcName } from "../_shared/coworker-questionnaire/rpc-names.ts";
 
 const ALLOWED_METHODS = "POST";
 

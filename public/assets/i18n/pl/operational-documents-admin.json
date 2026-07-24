@@ -11,7 +11,7 @@
   },
   "process": {
     "title": "[PH] [title] Jak działa ten proces?",
-    "shellTitle": "[PH] [shellTitle] 1. Opisz dokument",
+    "shellTitle": "1. Zdefiniuj dokument",
     "shellDescription": "[PH] [shellDescription] Utwórz kartę dokumentu z kodem, nazwą, opisem i kategorią.",
     "versionsTitle": "[PH] [versionsTitle] 2. Przygotuj wersję",
     "versionsDescription": "[PH] [versionsDescription] Kolejne etapy pozwolą dodać plik, określić wymagane działanie i wskazać odbiorców.",
