@@ -1,3 +1,12 @@
+import {
+  createContractReaders,
+  type UnknownObject,
+} from "../_shared/coworker-document-edge/contract-readers.ts";
+import type { OperationalAssignment } from "../_shared/coworker-document-edge/operational-assignment-models.ts";
+import { createOperationalAssignmentParser } from "../_shared/coworker-document-edge/operational-assignment-parser.ts";
+
+export type { UnknownObject } from "../_shared/coworker-document-edge/contract-readers.ts";
+
 export const RPC = {
   getPortal: "get_coworker_operational_document_portal",
   getDownloadTarget: "get_coworker_operational_download_target",
@@ -6,7 +15,6 @@ export const RPC = {
 } as const;
 
 export type RpcName = typeof RPC[keyof typeof RPC];
-export type UnknownObject = { [key: string]: unknown };
 export type OperationalAction = "acknowledged" | "accepted" | "declined";
 
 export interface DownloadAction {
@@ -57,6 +65,35 @@ export class BackendContractError extends Error {
   }
 }
 
+const contractReaders = createContractReaders<RpcName>({
+  createRequestError: (fieldErrors) => new RequestValidationError(fieldErrors),
+  createBackendError: (rpcName) => new BackendContractError(rpcName),
+});
+
+const {
+  assertOnlyKeys,
+  backendArray,
+  backendBoolean,
+  backendEnum,
+  backendNonNegativeInteger,
+  backendObject,
+  backendPositiveInteger,
+  backendString,
+  backendTimestamp,
+  backendUuid,
+  requestEnum,
+  requestNullableString,
+  requestObject,
+  requestUuid,
+  throwIfRequestInvalid: throwIfInvalid,
+  validated,
+} = contractReaders;
+
+const { parseOperationalAssignment } = createOperationalAssignmentParser(
+  contractReaders,
+  (rpcName) => new BackendContractError(rpcName),
+);
+
 const ACTIONS = [
   "downloadDocumentVersion",
   "recordAction",
@@ -69,17 +106,14 @@ const DOCUMENT_ACTIONS = [
   "declined",
 ] as const;
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 export function parseRequest(value: unknown): CoworkerOperationalRequest {
   const errors: { [field: string]: string } = {};
-  const root = requestObject(value, errors);
+  const root = requestObject(value, "", errors);
   const action = requestEnum(root, "action", ACTIONS, "action", errors);
 
   switch (action) {
     case "downloadDocumentVersion":
-      assertOnlyKeys(root, ["action", "documentVersionId"], errors);
+      assertOnlyKeys(root, ["action", "documentVersionId"], "", errors);
       return validated(
         {
           action,
@@ -97,6 +131,7 @@ export function parseRequest(value: unknown): CoworkerOperationalRequest {
       assertOnlyKeys(
         root,
         ["action", "assignmentId", "documentAction", "declineReason"],
+        "",
         errors,
       );
       const documentAction = requestEnum(
@@ -139,7 +174,7 @@ export function parseRequest(value: unknown): CoworkerOperationalRequest {
     }
 
     case "markNotificationRead":
-      assertOnlyKeys(root, ["action", "notificationId"], errors);
+      assertOnlyKeys(root, ["action", "notificationId"], "", errors);
       return validated(
         {
           action,
@@ -166,25 +201,30 @@ export function parsePortal(value: unknown, userId: string): UnknownObject {
   if (backendUuid(portal, "userId", RPC.getPortal) !== userId) {
     throw new BackendContractError(RPC.getPortal);
   }
-  backendArray(portal, "assignments", RPC.getPortal);
+  const assignments = backendArray(portal, "assignments", RPC.getPortal).map(
+    (assignment) => parseOperationalAssignment(assignment, RPC.getPortal),
+  );
+  if (assignments.some((assignment) => assignment.userId !== userId)) {
+    throw new BackendContractError(RPC.getPortal);
+  }
   backendArray(portal, "notifications", RPC.getPortal);
   backendNonNegativeInteger(
     portal,
     "unreadNotificationCount",
     RPC.getPortal,
   );
-  return portal;
+  return { ...portal, assignments };
 }
 
 export function parseAssignment(
   value: unknown,
   userId: string,
   assignmentId: string,
-): UnknownObject {
-  const assignment = backendObject(value, RPC.recordAction);
+): OperationalAssignment {
+  const assignment = parseOperationalAssignment(value, RPC.recordAction);
   if (
-    backendUuid(assignment, "id", RPC.recordAction) !== assignmentId ||
-    backendUuid(assignment, "userId", RPC.recordAction) !== userId
+    assignment.id !== assignmentId ||
+    assignment.userId !== userId
   ) {
     throw new BackendContractError(RPC.recordAction);
   }
@@ -258,231 +298,4 @@ export function parseNotificationRead(
   }
   backendTimestamp(notification, "readAt", RPC.markNotificationRead);
   return notification;
-}
-
-function requestObject(
-  value: unknown,
-  errors: { [field: string]: string },
-): UnknownObject {
-  if (!isObject(value)) {
-    errors.request = "Expected an object.";
-    return {};
-  }
-  return value;
-}
-
-function assertOnlyKeys(
-  source: UnknownObject,
-  allowedKeys: readonly string[],
-  errors: { [field: string]: string },
-): void {
-  const allowed = new Set(allowedKeys);
-  for (const key of Object.keys(source)) {
-    if (!allowed.has(key)) {
-      errors[key] = "Unexpected field.";
-    }
-  }
-}
-
-function requestString(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxLength: number,
-  errors: { [field: string]: string },
-): string {
-  const value = source[key];
-  if (typeof value !== "string" || value.trim() === "") {
-    errors[path] = "Expected a non-empty string.";
-    return "";
-  }
-  const normalized = value.trim();
-  if (normalized.length > maxLength) {
-    errors[path] = `Maximum length is ${maxLength}.`;
-  }
-  return normalized;
-}
-
-function requestNullableString(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  maxLength: number,
-  errors: { [field: string]: string },
-): string | null {
-  const value = source[key];
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-  if (typeof value !== "string") {
-    errors[path] = "Expected a string or null.";
-    return null;
-  }
-  const normalized = value.trim();
-  if (normalized === "") {
-    return null;
-  }
-  if (normalized.length > maxLength) {
-    errors[path] = `Maximum length is ${maxLength}.`;
-  }
-  return normalized;
-}
-
-function requestUuid(
-  source: UnknownObject,
-  key: string,
-  path: string,
-  errors: { [field: string]: string },
-): string {
-  const value = requestString(source, key, path, 36, errors);
-  if (value !== "" && !UUID_PATTERN.test(value)) {
-    errors[path] = "Expected a valid UUID.";
-  }
-  return value;
-}
-
-function requestEnum<const T extends readonly string[]>(
-  source: UnknownObject,
-  key: string,
-  allowedValues: T,
-  path: string,
-  errors: { [field: string]: string },
-): T[number] {
-  const value = source[key];
-  if (
-    typeof value !== "string" ||
-    !allowedValues.includes(value as T[number])
-  ) {
-    errors[path] = `Expected one of: ${allowedValues.join(", ")}.`;
-    return allowedValues[0];
-  }
-  return value as T[number];
-}
-
-function validated<T>(
-  value: T,
-  errors: { [field: string]: string },
-): T {
-  throwIfInvalid(errors);
-  return value;
-}
-
-function throwIfInvalid(errors: { [field: string]: string }): void {
-  if (Object.keys(errors).length > 0) {
-    throw new RequestValidationError(errors);
-  }
-}
-
-function backendObject(
-  value: unknown,
-  rpcName: RpcName,
-): UnknownObject {
-  if (!isObject(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendArray(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): unknown[] {
-  const value = source[key];
-  if (!Array.isArray(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendString(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = source[key];
-  if (typeof value !== "string" || value === "") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendUuid(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = backendString(source, key, rpcName);
-  if (!UUID_PATTERN.test(value)) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendBoolean(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): boolean {
-  const value = source[key];
-  if (typeof value !== "boolean") {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendPositiveInteger(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): number {
-  const value = source[key];
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendNonNegativeInteger(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): number {
-  const value = source[key];
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendTimestamp(
-  source: UnknownObject,
-  key: string,
-  rpcName: RpcName,
-): string {
-  const value = backendString(source, key, rpcName);
-  if (Number.isNaN(Date.parse(value))) {
-    throw new BackendContractError(rpcName);
-  }
-  return value;
-}
-
-function backendEnum<const T extends readonly string[]>(
-  source: UnknownObject,
-  key: string,
-  allowedValues: T,
-  rpcName: RpcName,
-): T[number] {
-  const value = source[key];
-  if (
-    typeof value !== "string" ||
-    !allowedValues.includes(value as T[number])
-  ) {
-    throw new BackendContractError(rpcName);
-  }
-  return value as T[number];
-}
-
-function isObject(value: unknown): value is UnknownObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

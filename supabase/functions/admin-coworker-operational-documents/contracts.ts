@@ -276,7 +276,7 @@ const ACTION_MODES = [
   "acceptance_required",
 ] as const;
 
-const TARGET_KINDS = [
+export const TARGET_KINDS = [
   "all_active_coworkers",
   "app_role",
   "user",
@@ -1131,24 +1131,6 @@ export function parsePublishResult(
     throw new BackendContractError(RPC.publishVersion);
   }
   return result;
-}
-
-export function parseAssignmentList(value: unknown): unknown[] {
-  if (!Array.isArray(value)) {
-    throw new BackendContractError(RPC.getAssignmentList);
-  }
-  return value;
-}
-
-export function parseAssignment(
-  value: unknown,
-  assignmentId: string,
-): UnknownObject {
-  const assignment = backendObject(value, RPC.waiveAssignment);
-  if (backendUuid(assignment, "id", RPC.waiveAssignment) !== assignmentId) {
-    throw new BackendContractError(RPC.waiveAssignment);
-  }
-  return assignment;
 }
 
 export function parseCancelResult(

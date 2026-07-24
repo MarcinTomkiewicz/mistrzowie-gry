@@ -13,12 +13,14 @@ import {
   completeUploadCleanup,
 } from "../_shared/coworker-document-edge/upload-cleanup.ts";
 import {
+  parseAssignmentList,
+  parseWaivedAssignment,
+} from "./assignment-contracts.ts";
+import {
   type AdminOperationalRequest,
   type CancelUploadResult,
   type CleanupResult,
   parseActivation,
-  parseAssignment,
-  parseAssignmentList,
   parseCancelResult,
   parseCleanupResult,
   parseDashboard,
@@ -406,7 +408,7 @@ async function getAssignmentList(
   return Response.json({
     ok: true,
     action: "getAssignmentList",
-    assignments: parseAssignmentList(data),
+    assignments: parseAssignmentList(data, action.documentVersionId),
   });
 }
 
@@ -427,7 +429,7 @@ async function waiveAssignment(
   return Response.json({
     ok: true,
     action: "waiveAssignment",
-    assignment: parseAssignment(data, action.assignmentId),
+    assignment: parseWaivedAssignment(data, action.assignmentId),
   });
 }
 
