@@ -309,9 +309,15 @@ export interface WorkLogOverviewToastTranslations {
 export interface UserMenuTranslations {
   greeting: string;
   accountSectionTitle: string;
+  coworkerSectionTitle: string;
   gmZoneSectionTitle: string;
   administrationSectionTitle: string;
   editProfileLabel: string;
+  coworkerQuestionnaireLabel: string;
+  coworkerPrivateDocumentsLabel: string;
+  coworkerOperationalDocumentsLabel: string;
+  coworkerAccessLoadFailedSummary: string;
+  coworkerAccessLoadFailedDetail: string;
   eventSignupLabel: string;
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;

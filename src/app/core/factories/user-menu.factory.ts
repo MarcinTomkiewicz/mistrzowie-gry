@@ -22,6 +22,30 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
     },
   ];
 
+  if (args.canSeeCoworker) {
+    sections.push({
+      id: 'coworker',
+      title: args.coworkerTitle,
+      items: [
+        {
+          id: 'coworker-questionnaire',
+          label: args.coworkerQuestionnaireLabel,
+          path: '/auth/coworker/questionnaire',
+        },
+        {
+          id: 'coworker-private-documents',
+          label: args.coworkerPrivateDocumentsLabel,
+          path: '/auth/coworker/documents',
+        },
+        {
+          id: 'coworker-operational-documents',
+          label: args.coworkerOperationalDocumentsLabel,
+          path: '/auth/coworker/operational-documents',
+        },
+      ],
+    });
+  }
+
   if (args.canSeeGmZone) {
     sections.push({
       id: 'gm-zone',

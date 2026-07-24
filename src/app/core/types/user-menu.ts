@@ -1,6 +1,9 @@
 export type UserMenuItemId =
   | 'edit-profile'
   | 'session-reservation'
+  | 'coworker-questionnaire'
+  | 'coworker-private-documents'
+  | 'coworker-operational-documents'
   | 'event-signup'
   | 'my-work-log'
   | 'gm-availability-overview'
@@ -13,15 +16,20 @@ export type UserMenuItemId =
 
 export type UserMenuSectionId =
   | 'account'
+  | 'coworker'
   | 'gm-zone'
   | 'administration';
 
 export type BuildUserMenuArgs = {
   accountTitle: string;
+  coworkerTitle: string;
   gmZoneTitle: string;
   administrationTitle: string;
   editProfileLabel: string;
   sessionReservationLabel: string;
+  coworkerQuestionnaireLabel: string;
+  coworkerPrivateDocumentsLabel: string;
+  coworkerOperationalDocumentsLabel: string;
   eventSignupLabel: string;
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;
@@ -31,6 +39,7 @@ export type BuildUserMenuArgs = {
   adminCoworkerPrivateDocumentsLabel: string;
   adminCoworkerOperationalDocumentsLabel: string;
   adminUsersLabel: string;
+  canSeeCoworker: boolean;
   canSeeGmZone: boolean;
   canSeeAdministration: boolean;
   canSeeAdminOnlyItems: boolean;
