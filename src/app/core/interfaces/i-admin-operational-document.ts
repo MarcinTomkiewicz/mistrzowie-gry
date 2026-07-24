@@ -2,6 +2,7 @@ import type {
   AdminOperationalStoredVersion,
   AdminOperationalUnpublishedVersion,
 } from '../types/admin-operational-version';
+import type { AdminOperationalDownloadPurpose } from '../types/admin-operational-document';
 import type {
   CoworkerOperationalActionMode,
   CoworkerOperationalDocumentStatus,
@@ -47,4 +48,17 @@ export interface IAdminOperationalDocumentDetail {
 export interface IAdminOperationalDashboard {
   readonly catalog: IAdminOperationalCatalog;
   readonly documents: readonly IAdminOperationalDocumentListItem[];
+}
+
+export interface IAdminOperationalVersionDownload {
+  readonly download: {
+    readonly documentId: string;
+    readonly documentVersionId: string;
+    readonly signedUrl: string;
+    readonly expiresInSeconds: number;
+    readonly originalFilename: string;
+    readonly mimeType: string;
+    readonly sizeBytes: number;
+    readonly purpose: AdminOperationalDownloadPurpose;
+  };
 }

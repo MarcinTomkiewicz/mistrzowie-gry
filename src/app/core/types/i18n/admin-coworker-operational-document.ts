@@ -6,6 +6,8 @@ import { AdminOperationalTargetKind } from '../admin-operational-version';
 import {
   CoworkerOperationalAction,
   CoworkerOperationalActionMode,
+  CoworkerOperationalAssignmentSource,
+  CoworkerOperationalAssignmentStatus,
   CoworkerOperationalDocumentStatus,
   CoworkerOperationalVersionStatus,
 } from '../coworker-operational-document';
@@ -19,6 +21,8 @@ export type AdminOperationalCopy = {
     editorCreateTitle: string;
     editorEditTitle: string;
     editorSubtitle: string;
+    assignmentTitle: string;
+    assignmentSubtitle: string;
     loadErrorTitle: string;
   };
   process: {
@@ -49,6 +53,10 @@ export type AdminOperationalCopy = {
     versionMetadata: string;
     versionFile: string;
     uploadRecovery: string;
+    assignmentReport: string;
+    assignmentReportDescription: string;
+    assignmentEvidence: string;
+    targetProvenance: string;
   };
   fields: {
     code: string;
@@ -90,6 +98,13 @@ export type AdminOperationalCopy = {
     uploadSessionStatus: string;
     expiresAt: string;
     cleanupStatus: string;
+    coworker: string;
+    assignmentSource: string;
+    assignedAt: string;
+    dueAt: string;
+    declineReason: string;
+    waiverReason: string;
+    inheritedVersion: string;
   };
   actions: {
     createDocument: string;
@@ -104,6 +119,11 @@ export type AdminOperationalCopy = {
     configureVersion: string;
     addTarget: string;
     removeTarget: string;
+    publishVersion: string;
+    viewAssignments: string;
+    downloadVersion: string;
+    archiveDocument: string;
+    waiveAssignment: string;
   };
   tooltips: {
     pagePurpose: string;
@@ -120,6 +140,9 @@ export type AdminOperationalCopy = {
     statements: string;
     assignmentSummary: string;
     versionEditor: string;
+    assignmentReport: string;
+    targetProvenance: string;
+    inheritedSatisfaction: string;
   };
   statuses: {
     documents: Record<CoworkerOperationalDocumentStatus, string>;
@@ -130,6 +153,8 @@ export type AdminOperationalCopy = {
     statementActions: Record<CoworkerOperationalAction, string>;
     uploadSessions: Record<AdminOperationalUploadSessionStatus, string>;
     cleanup: Record<AdminOperationalCleanupStatus, string>;
+    assignments: Record<CoworkerOperationalAssignmentStatus, string>;
+    assignmentSources: Record<CoworkerOperationalAssignmentSource, string>;
     versionActions: {
       reserving: string;
       uploading: string;
@@ -162,6 +187,21 @@ export type AdminOperationalCopy = {
     configurationSaved: string;
     reservationCancelledCleanupFailed: string;
     cancelReservationConfirmation: string;
+    emptyAssignments: string;
+    noTargetProvenance: string;
+    directSatisfaction: string;
+    inheritedSatisfaction: string;
+    accessEnabled: string;
+    accessDisabled: string;
+    publishConfirmation: string;
+    archiveConfirmation: string;
+    publishedSummary: string;
+    published: string;
+    archivedSummary: string;
+    archived: string;
+    waiverSuccessSummary: string;
+    waiverSuccess: string;
+    waiverDialogDescription: string;
   };
   errors: {
     load: string;
@@ -187,11 +227,17 @@ export type AdminOperationalCopy = {
     fileType: string;
     fileSize: string;
     storageConfiguration: string;
+    publish: string;
+    archive: string;
+    download: string;
+    assignmentLoad: string;
+    waiver: string;
   };
   validation: {
     codePattern: string;
     duplicateTarget: string;
     inactiveCoworkerTarget: string;
+    waiverReason: string;
   };
 };
 

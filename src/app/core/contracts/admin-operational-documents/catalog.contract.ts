@@ -21,6 +21,15 @@ import {
 
 const falseReader = createEdgeLiteralReader([false] as const);
 
+export const adminOperationalCoworkerOptionReader =
+  createEdgeObjectReader({
+    userId: readEdgeUuid,
+    email: readEdgeNonBlankString,
+    firstName: readEdgeNullableString,
+    appRole: createEdgeLiteralReader(APP_ROLES),
+    accessEnabled: readEdgeBoolean,
+  });
+
 export const catalogReader:
   EdgeReader<IAdminOperationalCatalog> = createEdgeObjectReader({
     actionModes: createEdgeArrayReader(
@@ -30,15 +39,7 @@ export const catalogReader:
       createEdgeLiteralReader(ADMIN_OPERATIONAL_TARGET_KINDS),
     ),
     appRoles: createEdgeArrayReader(createEdgeLiteralReader(APP_ROLES)),
-    coworkers: createEdgeArrayReader(
-      createEdgeObjectReader({
-        userId: readEdgeUuid,
-        email: readEdgeNonBlankString,
-        firstName: readEdgeNullableString,
-        appRole: createEdgeLiteralReader(APP_ROLES),
-        accessEnabled: readEdgeBoolean,
-      }),
-    ),
+    coworkers: createEdgeArrayReader(adminOperationalCoworkerOptionReader),
     eventDefinitions: createEdgeArrayReader(
       createEdgeObjectReader({
         id: readEdgeUuid,

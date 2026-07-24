@@ -28,7 +28,13 @@ import {
   IAdminOperationalDocumentDetail,
 } from '../../../../core/interfaces/i-admin-operational-document';
 import { AdminCoworkerOperationalDocuments } from '../../../../core/services/admin-coworker-operational-documents/admin-coworker-operational-documents';
+import { Platform } from '../../../../core/services/platform/platform';
+import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import type {
+  AdminOperationalStatementForm,
+  AdminOperationalVersionMetadataForm,
+} from '../../../../core/types/admin-operational-forms';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import {
   isEdgeAccessError,
@@ -71,6 +77,8 @@ import {
 })
 export class VersionEditor {
   private readonly documents = inject(AdminCoworkerOperationalDocuments);
+  private readonly confirm = inject(UiConfirm);
+  private readonly platform = inject(Platform);
   private readonly toast = inject(UiToast);
   private loadedFormKey: string | null = null;
 
@@ -84,8 +92,11 @@ export class VersionEditor {
   protected readonly limits = ADMIN_OPERATIONAL_VERSION_LIMITS;
   protected readonly form = createAdminOperationalVersionForm();
   protected readonly isConfiguring = signal(false);
+  protected readonly isPublishing = signal(false);
+  protected readonly isDownloading = signal(false);
   protected readonly uploadBusy = signal(false);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);
+  protected readonly actionErrorFallback = signal<string | null>(null);
   protected readonly isAccessBlocked = computed(
     () => isEdgeAccessError(this.actionError()),
   );
@@ -106,7 +117,7 @@ export class VersionEditor {
       : resolveAdminOperationalError(
           error,
           this.i18n.errors(),
-          this.i18n.errors().configure,
+          this.actionErrorFallback() ?? this.i18n.errors().configure,
         );
   });
 
@@ -130,6 +141,8 @@ export class VersionEditor {
         this.form,
         !this.disabled() &&
           !this.isConfiguring() &&
+          !this.isPublishing() &&
+          !this.isDownloading() &&
           !this.uploadBusy() &&
           !this.isAccessBlocked() &&
           this.recovery() === null,
@@ -151,8 +164,7 @@ export class VersionEditor {
     if (
       draft === null ||
       this.form.invalid ||
-      this.isConfiguring() ||
-      this.uploadBusy() ||
+      this.actionsBusy() ||
       this.isAccessBlocked() ||
       this.disabled()
     ) {
@@ -162,6 +174,7 @@ export class VersionEditor {
 
     const configuration = mapAdminOperationalConfiguration(this.form, draft.id);
     this.actionError.set(null);
+    this.actionErrorFallback.set(this.i18n.errors().configure);
     this.setConfiguring(true);
     this.documents.configureVersion(configuration, draft).pipe(
       finalize(() => this.setConfiguring(false)),
@@ -191,8 +204,66 @@ export class VersionEditor {
     });
   }
 
-  protected fieldError(field: string): string | null {
-    const control = this.form.controls.metadata.get(field)!;
+  protected confirmPublish(event: Event): void {
+    this.form.controls.metadata.controls.actionDueAt.updateValueAndValidity();
+    const draft = this.draftVersion();
+    if (
+      draft === null ||
+      this.form.dirty ||
+      this.form.invalid ||
+      this.actionsBusy() ||
+      this.isAccessBlocked() ||
+      this.disabled()
+    ) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.confirm.decision(event, {
+      message: this.i18n.messages().publishConfirmation,
+      acceptLabel: this.i18n.actions().publishVersion,
+      rejectLabel: this.i18n.commonActions().cancel,
+      accept: () => this.publishVersion(draft.id),
+    });
+  }
+
+  protected downloadVersion(): void {
+    const draft = this.draftVersion();
+    if (
+      draft === null ||
+      this.actionsBusy() ||
+      this.isAccessBlocked() ||
+      this.disabled()
+    ) {
+      return;
+    }
+
+    this.actionError.set(null);
+    this.actionErrorFallback.set(this.i18n.errors().download);
+    this.isDownloading.set(true);
+    this.emitBusy();
+    this.documents
+      .downloadDocumentVersion({
+        documentVersionId: draft.id,
+        purpose: 'admin_review',
+      })
+      .pipe(finalize(() => {
+        this.isDownloading.set(false);
+        this.emitBusy();
+      }))
+      .subscribe({
+        next: (response) =>
+          this.platform.openNewTab(response.download.signedUrl),
+        error: (error) => this.actionError.set(
+          normalizeEdgeFunctionError(error, this.i18n.errors().download),
+        ),
+      });
+  }
+
+  protected fieldError(
+    field: keyof AdminOperationalVersionMetadataForm['controls'],
+  ): string | null {
+    const control = this.form.controls.metadata.controls[field];
     const prefix = this.draftVersion() === null ? 'upload' : 'configuration';
     return resolveEdgeFormFieldError(
       control,
@@ -202,9 +273,12 @@ export class VersionEditor {
     );
   }
 
-  protected statementError(index: number): string | null {
+  protected statementError(
+    statement: AdminOperationalStatementForm,
+    index: number,
+  ): string | null {
     return resolveEdgeFormFieldError(
-      this.form.controls.statements.controls[index]!.controls.text,
+      statement.controls.text,
       `configuration.statements.${index}.text`,
       this.actionError(),
       this.i18n.commonForm(),
@@ -213,11 +287,61 @@ export class VersionEditor {
 
   protected setUploadBusy(busy: boolean): void {
     this.uploadBusy.set(busy);
-    this.busyChange.emit(busy || this.isConfiguring());
+    this.emitBusy();
   }
 
   private setConfiguring(configuring: boolean): void {
     this.isConfiguring.set(configuring);
-    this.busyChange.emit(configuring || this.uploadBusy());
+    this.emitBusy();
+  }
+
+  private publishVersion(documentVersionId: string): void {
+    this.actionError.set(null);
+    this.actionErrorFallback.set(this.i18n.errors().publish);
+    this.isPublishing.set(true);
+    this.emitBusy();
+    this.documents
+      .publishVersion(documentVersionId, this.catalog())
+      .pipe(finalize(() => {
+        this.isPublishing.set(false);
+        this.emitBusy();
+      }))
+      .subscribe({
+        next: () => {
+          this.loadedFormKey = null;
+          this.toast.success({
+            summary: this.i18n.messages().publishedSummary,
+            detail: this.i18n.messages().published,
+          });
+          this.reloadRequested.emit();
+        },
+        error: (error) => {
+          const normalized = normalizeEdgeFunctionError(
+            error,
+            this.i18n.errors().publish,
+          );
+          this.actionError.set(normalized);
+          if (
+            normalized.status === HttpStatusCode.Conflict ||
+            isEdgeMutationResultUncertain(normalized)
+          ) {
+            this.loadedFormKey = null;
+            this.reloadRequested.emit();
+          }
+        },
+      });
+  }
+
+  private actionsBusy(): boolean {
+    return (
+      this.isConfiguring() ||
+      this.isPublishing() ||
+      this.isDownloading() ||
+      this.uploadBusy()
+    );
+  }
+
+  private emitBusy(): void {
+    this.busyChange.emit(this.actionsBusy());
   }
 }

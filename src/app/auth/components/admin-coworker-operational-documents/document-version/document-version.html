@@ -136,7 +136,7 @@
         @for (target of version().targets; track target.id) {
           <div class="flex-row-between-center flex-wrap gap-sm border-top pt-sm">
             <span>{{ i18n.statuses().targetKinds[target.targetKind] }}</span>
-            <strong>{{ targetValue(target) }}</strong>
+            <strong>{{ targetLabel(target) }}</strong>
           </div>
         }
       </div>
@@ -186,4 +186,31 @@
       <span>{{ i18n.fields().declinedAssignments }}: <strong>{{ version().assignmentSummary.declined }}</strong></span>
     </div>
   </section>
+
+  <footer class="flex-row-end-center flex-wrap gap-sm border-top pt-sm w-100">
+    <p-button
+      type="button"
+      severity="secondary"
+      icon="pi pi-download"
+      [label]="i18n.actions().downloadVersion"
+      [loading]="downloading()"
+      [disabled]="downloading()"
+      (onClick)="downloadRequested.emit(version())"
+    />
+    @if (version().publishedAt !== null) {
+      <p-button
+        type="button"
+        severity="info"
+        icon="pi pi-table"
+        [label]="i18n.actions().viewAssignments"
+        [routerLink]="[
+          '/admin/coworkers/operational-documents',
+          version().documentId,
+          'versions',
+          version().id,
+          'assignments'
+        ]"
+      />
+    }
+  </footer>
 </article>

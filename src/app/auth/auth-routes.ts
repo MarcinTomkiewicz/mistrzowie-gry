@@ -1,122 +1,34 @@
-import { Routes } from '@angular/router';
-import { authGuard } from '../core/guards/auth.guard';
-import { minimumRoleGuard } from '../core/guards/minimum-role.guard';
+import type { Routes } from '@angular/router';
 
-const loaders = {
-  // login: () => import('./components/login/login').then((m) => m.Login),
-  register: () =>
-    import('./components/register/register').then((m) => m.Register),
-  editProfile: () =>
-    import('./components/edit-profile/edit-profile').then((m) => m.EditProfile),
-  eventSignup: () =>
-    import('./components/event-signup/event-signup').then(
-      (m) => m.EventSignup,
-    ),
-  eventSignupForm: () =>
-    import('./components/event-signup-form/event-signup-form').then(
-      (m) => m.EventSignupForm,
-    ),
-  myWorkLog: () =>
-    import('./components/my-work-log/my-work-log').then(
-      (m) => m.MyWorkLog,
-    ),
-  coworkerProfile: () =>
-    import('./components/coworker-profile/coworker-profile').then(
-      (m) => m.CoworkerProfileComponent,
-    ),
-  coworkerShell: () =>
-    import('./components/coworker/coworker-shell/coworker-shell').then(
-      (m) => m.CoworkerShell,
-    ),
-  coworkerQuestionnaire: () =>
-    import('./components/coworker/questionnaire/questionnaire').then(
-      (m) => m.Questionnaire,
-    ),
-  coworkerDocuments: () =>
-    import('./components/coworker/documents/documents').then(
-      (m) => m.Documents,
-    ),
-  coworkerOperationalDocuments: () =>
-    import(
-      './components/coworker/operational-documents/operational-documents'
-    ).then((m) => m.OperationalDocuments),
-  gmAvailabilityOverview: () =>
-    import('./components/gm-availability-overview/gm-availability-overview').then(
-      (m) => m.GmAvailabilityOverview,
-    ),
-  workLogOverview: () =>
-    import('./components/work-log-overview/work-log-overview').then(
-      (m) => m.WorkLogOverview,
-    ),
-  adminUsers: () =>
-    import('./components/admin-users/admin-users').then(
-      (m) => m.AdminUsers,
-    ),
-} as const;
+import { accountRoutes } from './routes/account-routes';
 
-export const authRoutes: Routes = [
-  // { path: 'login', loadComponent: loaders.login },
-  { path: 'secret-register', loadComponent: loaders.register },
-  {
-    path: 'edit-profile',
-    loadComponent: loaders.editProfile,
-    canActivate: [authGuard],
-  },
+const authChildren: Routes = [
+  ...accountRoutes,
   {
     path: 'event-signup',
-    loadComponent: loaders.eventSignup,
-    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./routes/event-routes').then((m) => m.eventRoutes),
   },
   {
-    path: 'event-signup/:eventSlug/:occurrenceDate/signup',
-    loadComponent: loaders.eventSignupForm,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'gm/coworker-profile',
-    loadComponent: loaders.coworkerProfile,
-    canActivate: [authGuard, minimumRoleGuard('gm')],
+    path: 'gm',
+    loadChildren: () =>
+      import('./routes/gm-routes').then((m) => m.gmRoutes),
   },
   {
     path: 'coworker',
-    loadComponent: loaders.coworkerShell,
-    canActivate: [authGuard],
-    children: [
-      { path: '', pathMatch: 'full', redirectTo: 'questionnaire' },
-      {
-        path: 'questionnaire',
-        loadComponent: loaders.coworkerQuestionnaire,
-      },
-      {
-        path: 'documents',
-        loadComponent: loaders.coworkerDocuments,
-        canActivate: [authGuard],
-      },
-      {
-        path: 'operational-documents',
-        loadComponent: loaders.coworkerOperationalDocuments,
-        canActivate: [authGuard],
-      },
-    ],
+    loadChildren: () =>
+      import('./routes/coworker-routes').then((m) => m.coworkerRoutes),
   },
   {
-    path: 'gm/work-log',
-    loadComponent: loaders.myWorkLog,
-    canActivate: [authGuard, minimumRoleGuard('gm')],
+    path: 'admin',
+    loadChildren: () =>
+      import('./routes/admin-routes').then((m) => m.authAdminRoutes),
   },
+];
+
+export const authRoutes: Routes = [
   {
-    path: 'admin/gm-availability',
-    loadComponent: loaders.gmAvailabilityOverview,
-    canActivate: [authGuard, minimumRoleGuard('customer_manager')],
-  },
-  {
-    path: 'admin/work-log',
-    loadComponent: loaders.workLogOverview,
-    canActivate: [authGuard, minimumRoleGuard('customer_manager')],
-  },
-  {
-    path: 'admin/users',
-    loadComponent: loaders.adminUsers,
-    canActivate: [authGuard, minimumRoleGuard('marketing_manager')],
+    path: 'auth',
+    children: authChildren,
   },
 ];

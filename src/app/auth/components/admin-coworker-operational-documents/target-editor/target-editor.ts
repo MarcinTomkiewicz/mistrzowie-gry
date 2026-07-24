@@ -13,6 +13,10 @@ import { resolveEdgeFormFieldError } from '../../../../core/utils/form-controls'
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
 import {
+  formatAdminOperationalCoworkerLabel,
+  formatAdminOperationalEventLabel,
+} from '../operational-labels';
+import {
   createAdminOperationalTargetForm,
   activeAdminOperationalCoworkerIds,
   refreshTargetCoworkerValidators,
@@ -51,16 +55,14 @@ export class TargetEditor {
   protected readonly coworkerOptions = computed(() =>
     this.catalog().coworkers.map((coworker) => ({
       value: coworker.userId,
-      label: coworker.firstName === null
-        ? coworker.email
-        : `${coworker.firstName} - ${coworker.email}`,
+      label: formatAdminOperationalCoworkerLabel(coworker),
       disabled: !coworker.accessEnabled,
     })),
   );
   protected readonly eventOptions = computed(() =>
     this.catalog().eventDefinitions.map((eventDefinition) => ({
       value: eventDefinition.id,
-      label: `${eventDefinition.name} - ${eventDefinition.key}`,
+      label: formatAdminOperationalEventLabel(eventDefinition),
     })),
   );
 
@@ -88,11 +90,14 @@ export class TargetEditor {
   }
 
   protected targetKindChanged(index: number): void {
-    resetAdminOperationalTargetSelector(this.targets().controls[index]!);
+    resetAdminOperationalTargetSelector(this.targets().at(index));
   }
 
-  protected fieldError(index: number, field: string): string | null {
-    const target = this.targets().controls[index]!;
+  protected fieldError(
+    index: number,
+    field: keyof AdminOperationalTargetForm['controls'],
+  ): string | null {
+    const target = this.targets().at(index);
     const serverPath = `configuration.targets.${index}.${field}`;
     if (
       field === 'userId' &&
@@ -102,7 +107,7 @@ export class TargetEditor {
       return this.i18n.validation().inactiveCoworkerTarget;
     }
     return resolveEdgeFormFieldError(
-      target.get(field)!,
+      target.controls[field],
       serverPath,
       this.error(),
       this.i18n.commonForm(),

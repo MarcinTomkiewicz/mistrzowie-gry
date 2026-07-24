@@ -8,9 +8,12 @@ import {
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import { AdminOperationalCopy } from '../../../core/types/i18n/admin-coworker-operational-document';
 
+export const OPERATIONAL_DOCUMENTS_ADMIN_SCOPE =
+  'operational-documents-admin';
+
 export function createAdminOperationalDocumentsI18n() {
   const sections = createScopedSectionsI18n<AdminOperationalCopy>(
-    'adminCoworkerOperationalDocuments',
+    OPERATIONAL_DOCUMENTS_ADMIN_SCOPE,
     {
       page: 'page',
       process: 'process',

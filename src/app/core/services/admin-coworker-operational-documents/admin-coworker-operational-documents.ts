@@ -8,10 +8,13 @@ import {
 import {
   IAdminOperationalDashboard,
   IAdminOperationalDocumentDetail,
+  IAdminOperationalVersionDownload,
 } from '../../interfaces/i-admin-operational-document';
+import type { IAdminOperationalAssignmentListItem } from '../../interfaces/i-admin-operational-assignment';
 import {
   ADMIN_OPERATIONAL_EDGE_ACTION,
   type AdminOperationalRequest,
+  type DownloadAdminOperationalVersionRequest,
   type SaveAdminOperationalDocumentPayload,
 } from '../../types/admin-operational-document';
 import type {
@@ -36,6 +39,16 @@ import {
   parseFinalization,
   parseReservation,
 } from '../../contracts/admin-operational-documents/upload.contract';
+import {
+  parseAssignmentList,
+  parseWaivedAssignment,
+} from '../../contracts/admin-operational-documents/assignment.contract';
+import {
+  parseArchivedDocument,
+  parsePublishedVersion,
+  parseVersionDownload,
+} from '../../contracts/admin-operational-documents/lifecycle.contract';
+import type { ICoworkerOperationalAssignment } from '../../interfaces/i-coworker-operational-document';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -136,6 +149,91 @@ export class AdminCoworkerOperationalDocuments {
         body: { action: ADMIN_OPERATIONAL_EDGE_ACTION.configureVersion, configuration } satisfies AdminOperationalRequest,
       },
       (response) => parseConfiguration(response, configuration, source),
+    );
+  }
+
+  publishVersion(
+    documentVersionId: string,
+    catalog: IAdminOperationalCatalog,
+  ): Observable<void> {
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
+      {
+        method: 'POST',
+        body: {
+          action: ADMIN_OPERATIONAL_EDGE_ACTION.publishVersion,
+          documentVersionId,
+        } satisfies AdminOperationalRequest,
+      },
+      (response) =>
+        parsePublishedVersion(response, documentVersionId, catalog),
+    );
+  }
+
+  getAssignmentList(
+    documentVersionId: string,
+  ): Observable<IAdminOperationalAssignmentListItem[]> {
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
+      {
+        method: 'POST',
+        body: {
+          action: ADMIN_OPERATIONAL_EDGE_ACTION.getAssignmentList,
+          documentVersionId,
+        } satisfies AdminOperationalRequest,
+      },
+      (response) => parseAssignmentList(response, documentVersionId),
+    );
+  }
+
+  waiveAssignment(
+    assignmentId: string,
+    reason: string,
+  ): Observable<ICoworkerOperationalAssignment> {
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
+      {
+        method: 'POST',
+        body: {
+          action: ADMIN_OPERATIONAL_EDGE_ACTION.waiveAssignment,
+          assignmentId,
+          reason,
+        } satisfies AdminOperationalRequest,
+      },
+      (response) => parseWaivedAssignment(response, assignmentId),
+    );
+  }
+
+  archiveDocument(
+    documentId: string,
+    catalog: IAdminOperationalCatalog,
+  ): Observable<IAdminOperationalDocumentDetail> {
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
+      {
+        method: 'POST',
+        body: {
+          action: ADMIN_OPERATIONAL_EDGE_ACTION.archiveDocument,
+          documentId,
+        } satisfies AdminOperationalRequest,
+      },
+      (response) => parseArchivedDocument(response, documentId, catalog),
+    );
+  }
+
+  downloadDocumentVersion(
+    request: DownloadAdminOperationalVersionRequest,
+  ): Observable<IAdminOperationalVersionDownload> {
+    return this.backend.invokeEdgeParsed(
+      COWORKER_EDGE_FUNCTION.adminOperationalDocuments,
+      {
+        method: 'POST',
+        body: {
+          action: ADMIN_OPERATIONAL_EDGE_ACTION.downloadDocumentVersion,
+          ...request,
+        } satisfies AdminOperationalRequest,
+      },
+      (response) => parseVersionDownload(response, request),
     );
   }
 }

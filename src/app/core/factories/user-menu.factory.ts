@@ -33,11 +33,6 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           path: EVENT_SIGNUP_SELECTION_ROUTE,
         },
         {
-          id: 'coworker-profile',
-          label: args.coworkerProfileLabel,
-          path: '/auth/gm/coworker-profile',
-        },
-        {
           id: 'my-work-log',
           label: args.myWorkLogLabel,
           path: '/auth/gm/work-log',
@@ -74,6 +69,16 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
         id: 'admin-events',
         label: args.adminEventsLabel,
         path: '/admin/events',
+      },
+      {
+        id: 'admin-coworker-private-documents',
+        label: args.adminCoworkerPrivateDocumentsLabel,
+        path: '/admin/coworkers/private-documents',
+      },
+      {
+        id: 'admin-coworker-operational-documents',
+        label: args.adminCoworkerOperationalDocumentsLabel,
+        path: '/admin/coworkers/operational-documents',
       },
     );
   }

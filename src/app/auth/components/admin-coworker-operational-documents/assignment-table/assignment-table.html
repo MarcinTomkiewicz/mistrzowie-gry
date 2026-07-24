@@ -1,0 +1,162 @@
+<div class="w-100 overflow-x-auto">
+  <p-table
+    [value]="assignments()"
+    dataKey="assignment.id"
+    class="w-100 min-w-500"
+  >
+    <ng-template #header>
+      <tr>
+        <th class="small-caps">{{ i18n.fields().coworker }}</th>
+        <th class="small-caps">{{ i18n.sections().assignmentEvidence }}</th>
+        <th class="small-caps">{{ i18n.fields().assignmentSource }}</th>
+        <th>
+          <div class="flex-row-start-center gap-xs">
+            <span class="small-caps">
+              {{ i18n.sections().targetProvenance }}
+            </span>
+            <app-context-help
+              [text]="i18n.tooltips().targetProvenance"
+              [ariaLabel]="
+                i18n.contextHelpLabel(i18n.sections().targetProvenance)
+              "
+            />
+          </div>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-item>
+      <tr>
+        <td>
+          <div class="flex-col-start-stretch gap-xs">
+            <strong>{{ formatCoworkerLabel(item.user) }}</strong>
+            <span>
+              {{ getAppRoleLabel(item.user.appRole, i18n.appRoles()) }}
+            </span>
+            <span
+              [class]="
+                item.user.accessEnabled
+                  ? 'tag-badge tag-badge--success'
+                  : 'tag-badge tag-badge--muted'
+              "
+            >
+              {{
+                item.user.accessEnabled
+                  ? i18n.messages().accessEnabled
+                  : i18n.messages().accessDisabled
+              }}
+            </span>
+          </div>
+        </td>
+        <td>
+          <div class="flex-col-start-stretch gap-xs">
+            <span
+              [class]="
+                'tag-badge ' + assignmentStatusClass(item.assignment.status)
+              "
+            >
+              {{ assignmentStatusLabel(item.assignment.status) }}
+            </span>
+            <span>
+              {{ actionModeLabel(item.assignment.actionMode) }}
+            </span>
+            @if (item.assignment.satisfiedByPreviousVersion) {
+              <div class="flex-row-start-center gap-xs">
+                <strong>{{ i18n.messages().inheritedSatisfaction }}</strong>
+                <app-context-help
+                  [text]="i18n.tooltips().inheritedSatisfaction"
+                  [ariaLabel]="
+                    i18n.contextHelpLabel(
+                      i18n.messages().inheritedSatisfaction
+                    )
+                  "
+                />
+              </div>
+              @if (item.assignment.inheritedFrom; as inherited) {
+                <span>
+                  {{ i18n.fields().inheritedVersion }}
+                  {{ inherited.versionNumber }}
+                </span>
+              }
+            }
+            @if (item.assignment.currentAction; as action) {
+              <span>{{ i18n.messages().directSatisfaction }}</span>
+              <span>
+                {{ statementActionLabel(action.action) }}
+                — {{ formatTimestampLabel(action.actedAt, "pl-PL") }}
+              </span>
+              <small class="text-wrap-anywhere">
+                {{ action.statementText }}
+              </small>
+            }
+            @if (item.assignment.declineReason; as reason) {
+              <strong>{{ i18n.fields().declineReason }}</strong>
+              <span class="text-wrap-anywhere">{{ reason }}</span>
+            }
+            @if (item.assignment.waiverReason; as reason) {
+              <strong>{{ i18n.fields().waiverReason }}</strong>
+              <span class="text-wrap-anywhere">{{ reason }}</span>
+              <small>
+                {{
+                  formatTimestampLabel(item.assignment.waivedAt, "pl-PL")
+                }}
+              </small>
+            }
+          </div>
+        </td>
+        <td>
+          <div class="flex-col-start-stretch gap-xs">
+            <strong>
+              {{ assignmentSourceLabel(item.assignment.assignmentSource) }}
+            </strong>
+            <span>
+              {{ i18n.fields().assignedAt }}:
+              {{
+                formatTimestampLabel(item.assignment.assignedAt, "pl-PL")
+              }}
+            </span>
+            <span>
+              {{ i18n.fields().dueAt }}:
+              {{
+                formatTimestampLabel(item.assignment.dueAt, "pl-PL") ??
+                  i18n.commonValues().notProvided
+              }}
+            </span>
+          </div>
+        </td>
+        <td>
+          @if (item.targetProvenance.length === 0) {
+            {{ i18n.messages().noTargetProvenance }}
+          } @else {
+            <div class="flex-col-start-stretch gap-xs">
+              @for (
+                target of item.targetProvenance;
+                track target.targetId
+              ) {
+                <span>
+                  <strong>
+                    {{ targetKindLabel(target) }}:
+                  </strong>
+                  {{ targetLabel(target) }}
+                </span>
+              }
+            </div>
+          }
+        </td>
+        <td class="text-right">
+          @if (canWaive(item)) {
+            <p-button
+              type="button"
+              size="small"
+              severity="warn"
+              icon="pi pi-user-minus"
+              [label]="i18n.actions().waiveAssignment"
+              [disabled]="waiverBusy()"
+              (onClick)="requestWaiver(item)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

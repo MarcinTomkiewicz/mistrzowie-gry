@@ -5,6 +5,8 @@
     "editorCreateTitle": "[PH] [editorCreateTitle] Nowy dokument operacyjny",
     "editorEditTitle": "[PH] [editorEditTitle] Edycja dokumentu operacyjnego",
     "editorSubtitle": "[PH] [editorSubtitle] Uzupełnij podstawowe informacje o dokumencie. Plik, zasady odbiorców i publikacja należą do kolejnych etapów procesu.",
+    "assignmentTitle": "[PH] [assignmentTitle] Raport odbiorców wersji",
+    "assignmentSubtitle": "[PH] [assignmentSubtitle] Sprawdź stan przypisań, źródło objęcia dokumentem oraz zapisane decyzje współpracowników.",
     "loadErrorTitle": "[PH] [loadErrorTitle] Nie udało się pobrać dokumentów operacyjnych"
   },
   "process": {
@@ -34,7 +36,11 @@
     "versionEditorDescription": "[PH] [versionEditorDescription] Prześlij plik, określ wymagane działanie i skonfiguruj odbiorców wersji.",
     "versionMetadata": "[PH] [versionMetadata] Ustawienia wersji",
     "versionFile": "[PH] [versionFile] Plik nowej wersji",
-    "uploadRecovery": "[PH] [uploadRecovery] Niedokończone przesyłanie"
+    "uploadRecovery": "[PH] [uploadRecovery] Niedokończone przesyłanie",
+    "assignmentReport": "[PH] [assignmentReport] Przypisania wersji",
+    "assignmentReportDescription": "[PH] [assignmentReportDescription] Raport pokazuje autorytatywny stan wszystkich odbiorców tej wersji bez dodatkowego pobierania danych dla poszczególnych wierszy.",
+    "assignmentEvidence": "[PH] [assignmentEvidence] Stan i zapis działania",
+    "targetProvenance": "[PH] [targetProvenance] Źródło objęcia wersją"
   },
   "fields": {
     "code": "[PH] [code] Kod dokumentu",
@@ -75,7 +81,14 @@
     "targetValue": "[PH] [targetValue] Wybrany odbiorca",
     "uploadSessionStatus": "[PH] [uploadSessionStatus] Stan przesyłania",
     "expiresAt": "[PH] [expiresAt] Ważne do",
-    "cleanupStatus": "[PH] [cleanupStatus] Stan usuwania pliku"
+    "cleanupStatus": "[PH] [cleanupStatus] Stan usuwania pliku",
+    "coworker": "[PH] [coworker] Współpracownik",
+    "assignmentSource": "[PH] [assignmentSource] Sposób przypisania",
+    "assignedAt": "[PH] [assignedAt] Przypisano",
+    "dueAt": "[PH] [dueAt] Termin działania",
+    "declineReason": "[PH] [declineReason] Powód odmowy",
+    "waiverReason": "[PH] [waiverReason] Powód zwolnienia",
+    "inheritedVersion": "[PH] [inheritedVersion] Spełniono na podstawie wersji"
   },
   "actions": {
     "createDocument": "[PH] [createDocument] Dodaj dokument operacyjny",
@@ -89,7 +102,12 @@
     "cancelReservation": "[PH] [cancelReservation] Anuluj rezerwację",
     "configureVersion": "[PH] [configureVersion] Zapisz konfigurację wersji",
     "addTarget": "[PH] [addTarget] Dodaj odbiorcę",
-    "removeTarget": "[PH] [removeTarget] Usuń odbiorcę"
+    "removeTarget": "[PH] [removeTarget] Usuń odbiorcę",
+    "publishVersion": "[PH] [publishVersion] Opublikuj wersję",
+    "viewAssignments": "[PH] [viewAssignments] Raport odbiorców",
+    "downloadVersion": "[PH] [downloadVersion] Pobierz plik",
+    "archiveDocument": "[PH] [archiveDocument] Archiwizuj dokument",
+    "waiveAssignment": "[PH] [waiveAssignment] Zwolnij z obowiązku"
   },
   "tooltips": {
     "pagePurpose": "[PH] [pagePurpose] Ten katalog służy do przygotowania dokumentów organizacyjnych przeznaczonych dla współpracowników. Na tym etapie można tworzyć i edytować podstawowe informacje oraz przeglądać istniejące wersje.",
@@ -105,7 +123,10 @@
     "targets": "[PH] [targets] Odbiorcy wskazują grupy lub konkretne osoby, którym dokument zostanie przypisany po publikacji.",
     "statements": "[PH] [statements] To dokładne treści, które współpracownik potwierdza podczas zapoznania, akceptacji albo odrzucenia dokumentu.",
     "assignmentSummary": "[PH] [assignmentSummary] Liczniki pokazują stan przypisań tej konkretnej wersji. Nie są pełnym audytem działań użytkowników.",
-    "versionEditor": "[PH] [versionEditor] Wersja składa się z pliku, ustawień działania, odbiorców i treści oświadczeń. Publikacja jest osobnym etapem."
+    "versionEditor": "[PH] [versionEditor] Wersja składa się z pliku, ustawień działania, odbiorców i treści oświadczeń. Publikacja jest osobnym etapem.",
+    "assignmentReport": "[PH] [assignmentReport] Raport pochodzi z jednego odczytu backendowego i obejmuje stan przypisania, dowody działań oraz źródłowe targety.",
+    "targetProvenance": "[PH] [targetProvenance] Pokazuje dokładne targety opublikowanej wersji, przez które współpracownik został objęty dokumentem.",
+    "inheritedSatisfaction": "[PH] [inheritedSatisfaction] Odziedziczone spełnienie pochodzi z wcześniejszej wersji i nie oznacza wykonania nowej akcji na tej wersji."
   },
   "statuses": {
     "documents": {
@@ -160,6 +181,21 @@
       "completed": "[PH] [completed] Plik usunięty",
       "failed": "[PH] [failed] Usuwanie nieudane"
     },
+    "assignments": {
+      "available": "[PH] [available] Dostępny informacyjnie",
+      "pending": "[PH] [pending] Oczekuje na działanie",
+      "acknowledged": "[PH] [acknowledged] Zapoznanie potwierdzone",
+      "accepted": "[PH] [accepted] Zaakceptowany",
+      "declined": "[PH] [declined] Odrzucony przez współpracownika",
+      "waived": "[PH] [waived] Zwolniono z obowiązku",
+      "expired": "[PH] [expired] Wygasł"
+    },
+    "assignmentSources": {
+      "target_sync": "[PH] [target_sync] Automatycznie według targetów",
+      "admin_manual": "[PH] [admin_manual] Ręcznie przez administratora",
+      "system": "[PH] [system] Przez system",
+      "migration": "[PH] [migration] Z migracji danych"
+    },
     "versionActions": {
       "reserving": "[PH] [reserving] Tworzenie rezerwacji…",
       "uploading": "[PH] [uploading] Przesyłanie pliku…",
@@ -191,7 +227,22 @@
     "reservationCancelled": "[PH] [reservationCancelled] Rezerwacja została anulowana, a plik usunięty.",
     "configurationSaved": "[PH] [configurationSaved] Konfiguracja wersji została zapisana.",
     "reservationCancelledCleanupFailed": "[PH] [reservationCancelledCleanupFailed] Rezerwacja jest anulowana, ale usunięcie pliku z magazynu nie powiodło się. Możesz ponowić cleanup.",
-    "cancelReservationConfirmation": "[PH] [cancelReservationConfirmation] Anulowanie rezerwacji usunie przesłany plik i tej operacji nie można cofnąć."
+    "cancelReservationConfirmation": "[PH] [cancelReservationConfirmation] Anulowanie rezerwacji usunie przesłany plik i tej operacji nie można cofnąć.",
+    "emptyAssignments": "[PH] [emptyAssignments] Ta wersja nie ma żadnych przypisań.",
+    "noTargetProvenance": "[PH] [noTargetProvenance] Brak targetu źródłowego dla tego przypisania.",
+    "directSatisfaction": "[PH] [directSatisfaction] Stan wynika bezpośrednio z działania na tej wersji.",
+    "inheritedSatisfaction": "[PH] [inheritedSatisfaction] Spełnienie odziedziczono z wcześniejszej wersji; nie zapisano nowej decyzji na tej wersji.",
+    "accessEnabled": "[PH] [accessEnabled] Aktywny",
+    "accessDisabled": "[PH] [accessDisabled] Wyłączony",
+    "publishConfirmation": "[PH] [publishConfirmation] Publikacja jest nieodwracalnym etapem tej wersji. Plik, targety i treści oświadczeń staną się niezmienne, przypisania zostaną zmaterializowane, a wcześniejsze nierozstrzygnięte przypisania mogą wygasnąć. Ustawienie ponownej akceptacji zdecyduje, czy wcześniejsze spełnienie może zostać odziedziczone.",
+    "archiveConfirmation": "[PH] [archiveConfirmation] Dokument przestanie być aktywny i nie będzie można dalej nim zarządzać. Wersje oraz raporty historyczne pozostaną dostępne do odczytu. Tej operacji nie należy traktować jak zwykłego zapisu.",
+    "publishedSummary": "[PH] [publishedSummary] Wersja opublikowana",
+    "published": "[PH] [published] Wersja została opublikowana, a raport odbiorców jest dostępny.",
+    "archivedSummary": "[PH] [archivedSummary] Dokument zarchiwizowany",
+    "archived": "[PH] [archived] Dokument został wyłączony z aktywnego obiegu.",
+    "waiverSuccessSummary": "[PH] [waiverSuccessSummary] Przypisanie zaktualizowane",
+    "waiverSuccess": "[PH] [waiverSuccess] Współpracownik został zwolniony z obowiązku dla tej wersji.",
+    "waiverDialogDescription": "[PH] [waiverDialogDescription] Podaj trwały powód zwolnienia współpracownika z obowiązku dotyczącego tej wersji."
   },
   "errors": {
     "load": "[PH] [load] Nie udało się pobrać danych dokumentów operacyjnych.",
@@ -216,11 +267,17 @@
     "cleanup": "[PH] [cleanup] Rezerwacja została anulowana, ale cleanup pliku nie powiódł się.",
     "fileType": "[PH] [fileType] Nazwa, typ pliku lub jego rozszerzenie nie są dozwolone.",
     "fileSize": "[PH] [fileSize] Plik jest pusty albo przekracza dozwolony rozmiar.",
-    "storageConfiguration": "[PH] [storageConfiguration] Konfiguracja prywatnego magazynu plików jest niekompletna. Przesyłanie jest niedostępne."
+    "storageConfiguration": "[PH] [storageConfiguration] Konfiguracja prywatnego magazynu plików jest niekompletna. Przesyłanie jest niedostępne.",
+    "publish": "[PH] [publish] Nie udało się opublikować wersji dokumentu.",
+    "archive": "[PH] [archive] Nie udało się zarchiwizować dokumentu.",
+    "download": "[PH] [download] Nie udało się przygotować bezpiecznego pobrania pliku.",
+    "assignmentLoad": "[PH] [assignmentLoad] Nie udało się pobrać raportu odbiorców.",
+    "waiver": "[PH] [waiver] Nie udało się zapisać zwolnienia z obowiązku."
   },
   "validation": {
     "codePattern": "[PH] [codePattern] Użyj małych liter, cyfr, myślników lub podkreśleń. Pierwszy znak musi być literą albo cyfrą.",
     "duplicateTarget": "[PH] [duplicateTarget] Każdy odbiorca może wystąpić tylko raz.",
-    "inactiveCoworkerTarget": "[PH] [inactiveCoworkerTarget] Historyczny współpracownik nie ma aktywnego dostępu. Wybierz aktywnego współpracownika."
+    "inactiveCoworkerTarget": "[PH] [inactiveCoworkerTarget] Historyczny współpracownik nie ma aktywnego dostępu. Wybierz aktywnego współpracownika.",
+    "waiverReason": "[PH] [waiverReason] Podaj niepusty powód zwolnienia, nie dłuższy niż 2000 znaków."
   }
 }

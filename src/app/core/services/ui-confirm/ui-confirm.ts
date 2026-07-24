@@ -81,6 +81,24 @@ export class UiConfirm {
     });
   }
 
+  dangerDecision(event: PopupTargetEvent, options: DecisionPopupOptions): void {
+    void this.confirm(event, {
+      message: options.message,
+      icon: options.icon ?? 'pi pi-exclamation-triangle',
+      accept: options.accept ?? (() => {}),
+      reject: options.reject ?? (() => {}),
+      acceptLabel: options.acceptLabel,
+      rejectLabel: options.rejectLabel,
+      acceptButtonProps: {
+        severity: 'danger',
+      },
+      rejectButtonProps: {
+        severity: 'secondary',
+        outlined: true,
+      },
+    });
+  }
+
   private async confirm(
     event: PopupTargetEvent,
     config: Record<string, unknown>,

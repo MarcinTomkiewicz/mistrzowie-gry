@@ -93,7 +93,7 @@ const documentListItemReader: EdgeReader<IAdminOperationalDocumentListItem> =
     ),
   });
 
-const documentDetailReader: EdgeReader<IAdminOperationalDocumentDetail> =
+export const documentDetailReader: EdgeReader<IAdminOperationalDocumentDetail> =
   createEdgeObjectReader({
     ...documentFields,
     currentPublishedVersion: createEdgeNullableReader(
@@ -160,7 +160,11 @@ export function parseDetail(
     'response.document.id',
     'equal to the requested documentId',
   );
-  assertDetail(document, catalog, 'response.document');
+  assertAdminOperationalDocumentDetail(
+    document,
+    catalog,
+    'response.document',
+  );
   return document;
 }
 
@@ -188,7 +192,11 @@ export function parseSavedDocument(
       'the updated document with a newer revision',
     );
   }
-  assertDetail(document, catalog, 'response.document');
+  assertAdminOperationalDocumentDetail(
+    document,
+    catalog,
+    'response.document',
+  );
   return document;
 }
 
@@ -223,7 +231,7 @@ function assertListItem(
   }
 }
 
-function assertDetail(
+export function assertAdminOperationalDocumentDetail(
   document: IAdminOperationalDocumentDetail,
   catalog: IAdminOperationalCatalog,
   path: string,
@@ -236,11 +244,12 @@ function assertDetail(
   );
   if (currentVersion !== null) {
     assertEdgeContract(
-      currentVersion.documentId === document.id &&
+      (document.status === 'published' || document.status === 'archived') &&
+        currentVersion.documentId === document.id &&
         currentVersion.id === document.currentPublishedVersionId &&
-        currentVersion.status === 'published',
+        currentVersion.status === document.status,
       `${path}.currentPublishedVersion`,
-      'the document current published version',
+      'the current version matching the document id, pointer, and lifecycle',
     );
     assertTargetRelations(
       currentVersion.targets,

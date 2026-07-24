@@ -1,4 +1,6 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import {
@@ -8,46 +10,34 @@ import type {
   AdminOperationalStoredVersion,
   AdminOperationalTarget,
 } from '../../../../core/types/admin-operational-version';
-import { getAppRoleLabel } from '../../../../core/utils/app-role-labels';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
+import { resolveAdminOperationalTargetLabel } from '../operational-labels';
 
 @Component({
   selector: 'app-admin-operational-document-version',
   standalone: true,
-  imports: [ContextHelp],
+  imports: [RouterLink, ButtonModule, ContextHelp],
   templateUrl: './document-version.html',
 })
 export class DocumentVersion {
   readonly version = input.required<AdminOperationalStoredVersion>();
   readonly catalog = input.required<IAdminOperationalCatalog>();
   readonly current = input(false);
+  readonly downloading = input(false);
+  readonly downloadRequested = output<AdminOperationalStoredVersion>();
 
   protected readonly i18n = createAdminOperationalDocumentsI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
 
-  protected targetValue(target: AdminOperationalTarget): string {
-    switch (target.targetKind) {
-      case 'all_active_coworkers':
-        return this.i18n.statuses().targetKinds.all_active_coworkers;
-      case 'app_role':
-        return getAppRoleLabel(target.appRole, this.i18n.appRoles());
-      case 'user': {
-        const coworker = this.catalog().coworkers.find(
-          (option) => option.userId === target.userId,
-        )!;
-        return coworker.firstName === null
-          ? coworker.email
-          : `${coworker.firstName} - ${coworker.email}`;
-      }
-      case 'event_definition': {
-        const eventDefinition = this.catalog().eventDefinitions.find(
-          (option) => option.id === target.eventDefinitionId,
-        )!;
-        return `${eventDefinition.name} - ${eventDefinition.key}`;
-      }
-    }
+  protected targetLabel(target: AdminOperationalTarget): string {
+    return resolveAdminOperationalTargetLabel(
+      target,
+      this.catalog(),
+      this.i18n.statuses().targetKinds,
+      this.i18n.appRoles(),
+    );
   }
 }

@@ -11,6 +11,10 @@ export const ADMIN_OPERATIONAL_VERSION_LIMITS = {
   targetCount: 500,
 } as const;
 
+export const ADMIN_OPERATIONAL_ASSIGNMENT_LIMITS = {
+  waiverReasonLength: 2000,
+} as const;
+
 export const ADMIN_OPERATIONAL_UPLOAD_FORMATS = [
   {
     mimeType: 'application/pdf',

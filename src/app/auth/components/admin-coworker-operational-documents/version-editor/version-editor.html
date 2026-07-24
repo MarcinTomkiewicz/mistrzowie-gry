@@ -178,7 +178,7 @@
                 [value]="statement.controls.text.value"
                 [limit]="limits.statementTextLength"
               />
-              @if (statementError(index); as error) {
+              @if (statementError(statement, index); as error) {
                 <small class="mg-contact-error">{{ error }}</small>
               }
             </div>
@@ -192,14 +192,32 @@
           <p class="m-0">
             {{ i18n.messages().readyVersion }} {{ draft.file.originalFilename }}
           </p>
-          <div class="flex-row-end-center w-100">
+          <div class="flex-row-end-center flex-wrap gap-sm w-100">
+            <p-button
+              type="button"
+              severity="secondary"
+              icon="pi pi-download"
+              [label]="i18n.actions().downloadVersion"
+              [loading]="isDownloading()"
+              [disabled]="disabled() || isConfiguring() || isPublishing() || uploadBusy() || isAccessBlocked()"
+              (onClick)="downloadVersion()"
+            />
             <p-button
               type="submit"
               severity="success"
               icon="pi pi-save"
               [label]="i18n.actions().configureVersion"
               [loading]="isConfiguring()"
-              [disabled]="disabled() || isConfiguring() || uploadBusy() || isAccessBlocked()"
+              [disabled]="disabled() || isConfiguring() || isPublishing() || isDownloading() || uploadBusy() || isAccessBlocked()"
+            />
+            <p-button
+              type="button"
+              severity="warn"
+              icon="pi pi-send"
+              [label]="i18n.actions().publishVersion"
+              [loading]="isPublishing()"
+              [disabled]="disabled() || form.dirty || form.invalid || isConfiguring() || isPublishing() || isDownloading() || uploadBusy() || isAccessBlocked()"
+              (onClick)="confirmPublish($event)"
             />
           </div>
         </section>

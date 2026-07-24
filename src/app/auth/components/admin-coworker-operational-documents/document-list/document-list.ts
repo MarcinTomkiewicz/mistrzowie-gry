@@ -15,7 +15,10 @@ import {
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { resolveAdminOperationalError } from '../admin-operational-document-errors';
-import { createAdminOperationalDocumentsI18n } from '../admin-operational-documents.i18n';
+import {
+  createAdminOperationalDocumentsI18n,
+  OPERATIONAL_DOCUMENTS_ADMIN_SCOPE,
+} from '../admin-operational-documents.i18n';
 import { DocumentTable } from '../document-table/document-table';
 
 @Component({
@@ -24,7 +27,7 @@ import { DocumentTable } from '../document-table/document-table';
   imports: [RouterLink, ButtonModule, ContextHelp, LoadingOverlay, DocumentTable],
   templateUrl: './document-list.html',
   providers: [
-    provideTranslocoScope('adminCoworkerOperationalDocuments', 'common'),
+    provideTranslocoScope(OPERATIONAL_DOCUMENTS_ADMIN_SCOPE, 'common'),
   ],
 })
 export class DocumentList {

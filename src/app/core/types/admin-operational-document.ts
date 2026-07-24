@@ -8,6 +8,11 @@ export const ADMIN_OPERATIONAL_EDGE_ACTION = {
   finalizeUpload: 'finalizeUpload',
   cancelUpload: 'cancelUpload',
   configureVersion: 'configureVersion',
+  publishVersion: 'publishVersion',
+  getAssignmentList: 'getAssignmentList',
+  waiveAssignment: 'waiveAssignment',
+  archiveDocument: 'archiveDocument',
+  downloadDocumentVersion: 'downloadDocumentVersion',
 } as const;
 
 export const ADMIN_OPERATIONAL_ERROR_CODE = {
@@ -25,6 +30,15 @@ export type SaveAdminOperationalDocumentPayload = {
   readonly title: string;
   readonly description: string | null;
   readonly category: string;
+};
+
+export type AdminOperationalDownloadPurpose =
+  | 'admin_review'
+  | 'admin_download';
+
+export type DownloadAdminOperationalVersionRequest = {
+  readonly documentVersionId: string;
+  readonly purpose: AdminOperationalDownloadPurpose;
 };
 
 export type AdminOperationalRequest =
@@ -50,4 +64,25 @@ export type AdminOperationalRequest =
   | {
       readonly action: typeof ADMIN_OPERATIONAL_EDGE_ACTION.configureVersion;
       readonly configuration: ConfigureAdminOperationalVersionPayload;
+    }
+  | {
+      readonly action:
+        | typeof ADMIN_OPERATIONAL_EDGE_ACTION.publishVersion
+        | typeof ADMIN_OPERATIONAL_EDGE_ACTION.getAssignmentList;
+      readonly documentVersionId: string;
+    }
+  | {
+      readonly action: typeof ADMIN_OPERATIONAL_EDGE_ACTION.waiveAssignment;
+      readonly assignmentId: string;
+      readonly reason: string;
+    }
+  | {
+      readonly action: typeof ADMIN_OPERATIONAL_EDGE_ACTION.archiveDocument;
+      readonly documentId: string;
+    }
+  | {
+      readonly action:
+        typeof ADMIN_OPERATIONAL_EDGE_ACTION.downloadDocumentVersion;
+      readonly documentVersionId: string;
+      readonly purpose: AdminOperationalDownloadPurpose;
     };

@@ -29,7 +29,8 @@ function assertDocumentLifecycle(
 
   if (
     assignment.version.status === 'published' ||
-    assignment.version.status === 'superseded'
+    assignment.version.status === 'superseded' ||
+    assignment.version.status === 'archived'
   ) {
     assertEdgeContract(
       assignment.version.publishedAt !== null,
@@ -39,14 +40,22 @@ function assertDocumentLifecycle(
   }
 
   const pointsToCurrentPublishedVersion =
-    assignment.document.status === 'published' &&
     assignment.document.currentPublishedVersionId ===
-      assignment.documentVersionId &&
-    assignment.version.status === 'published';
+      assignment.documentVersionId;
   assertEdgeContract(
     assignment.isCurrentPublishedVersion === pointsToCurrentPublishedVersion,
     `${path}.isCurrentPublishedVersion`,
-    'consistent with the document current version and version lifecycle',
+    'consistent with the document current version id',
+  );
+
+  const downloadAvailable =
+    assignment.version.status === 'published' ||
+    assignment.version.status === 'superseded' ||
+    assignment.version.status === 'archived';
+  assertEdgeContract(
+    assignment.downloadAvailable === downloadAvailable,
+    `${path}.downloadAvailable`,
+    'consistent with the version lifecycle',
   );
 }
 

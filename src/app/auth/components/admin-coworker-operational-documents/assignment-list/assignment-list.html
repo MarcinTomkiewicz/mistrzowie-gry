@@ -1,0 +1,129 @@
+<section class="mg-section mg-section--full">
+  <div
+    class="mg-container position-relative flex-col-start-stretch gap-lg"
+    [attr.aria-busy]="isLoading()"
+  >
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.page().assignmentTitle }}</h1>
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().assignmentSubtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    @if (loadError(); as error) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+        <strong class="error-text">{{ loadErrorDescription() }}</strong>
+        @if (error.message !== loadErrorDescription()) {
+          <span class="muted-text">{{ error.message }}</span>
+        }
+        <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+        @if (error.status !== null) {
+          <span>{{ i18n.errors().statusLabel }}: <code>{{ error.status }}</code></span>
+        }
+        @if (!isAccessBlocked()) {
+          <p-button
+            type="button"
+            severity="secondary"
+            icon="pi pi-refresh"
+            [label]="i18n.actions().reload"
+            [disabled]="isLoading()"
+            (onClick)="loadReport()"
+          />
+        }
+      </section>
+    }
+
+    @if (document(); as loadedDocument) {
+      @if (version(); as loadedVersion) {
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <header class="flex-row-between-start flex-wrap gap-sm w-100">
+            <div class="flex-col-start-stretch gap-xs">
+              <h2 class="mg-section__title mg-section__title--md m-0">
+                {{ loadedDocument.title }}
+              </h2>
+              <span>
+                {{ i18n.fields().version }} {{ loadedVersion.versionNumber }}
+                — {{ loadedVersion.title }}
+              </span>
+              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[loadedVersion.status]">
+                {{ i18n.statuses().versions[loadedVersion.status] }}
+              </span>
+            </div>
+            <div class="flex-row-end-center flex-wrap gap-sm">
+              <p-button
+                type="button"
+                severity="secondary"
+                icon="pi pi-arrow-left"
+                [label]="i18n.actions().backToList"
+                [routerLink]="[
+                  '/admin/coworkers/operational-documents',
+                  loadedDocument.id,
+                  'edit'
+                ]"
+              />
+              <p-button
+                type="button"
+                severity="secondary"
+                icon="pi pi-download"
+                [label]="i18n.actions().downloadVersion"
+                [loading]="downloading()"
+                [disabled]="downloading()"
+                (onClick)="downloadVersion()"
+              />
+            </div>
+          </header>
+
+          <div class="flex-col-start-stretch gap-xs">
+            <div class="flex-row-start-center gap-xs">
+              <h3 class="mg-section__title mg-section__title--sm m-0">
+                {{ i18n.sections().assignmentReport }}
+              </h3>
+              <app-context-help
+                [text]="i18n.tooltips().assignmentReport"
+                [ariaLabel]="i18n.contextHelpLabel(i18n.sections().assignmentReport)"
+              />
+            </div>
+            <p class="m-0">{{ i18n.sections().assignmentReportDescription }}</p>
+          </div>
+
+          @if (downloadError(); as error) {
+            <section class="flex-col-start-stretch gap-xs" role="alert">
+              <strong class="error-text">{{ downloadErrorDescription() }}</strong>
+              @if (error.message !== downloadErrorDescription()) {
+                <span class="muted-text">{{ error.message }}</span>
+              }
+              <span>{{ i18n.errors().codeLabel }}: <code>{{ error.code }}</code></span>
+            </section>
+          }
+
+          @if (assignments().length === 0) {
+            <p class="m-0">{{ i18n.messages().emptyAssignments }}</p>
+          } @else if (catalog(); as loadedCatalog) {
+            <app-admin-operational-assignment-table
+              [assignments]="assignments()"
+              [catalog]="loadedCatalog"
+              [waiverBusy]="waiverBusy()"
+              (waiverRequested)="openWaiver($event)"
+            />
+          }
+        </section>
+      }
+    }
+  </div>
+</section>
+
+@if (selectedItem(); as item) {
+  <app-admin-operational-waiver-dialog
+    [item]="item"
+    [busy]="waiverBusy()"
+    [error]="waiverError()"
+    [errorDescription]="waiverErrorDescription()"
+    (closeRequested)="closeWaiver()"
+    (waiverRequested)="waiveAssignment($event)"
+  />
+}

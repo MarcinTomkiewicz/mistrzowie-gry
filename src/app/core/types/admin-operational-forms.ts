@@ -1,6 +1,7 @@
 import type { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import type { AppRole } from './app-role';
+import type { SaveAdminOperationalDocumentPayload } from './admin-operational-document';
 import type {
   CoworkerOperationalAction,
   CoworkerOperationalActionMode,
@@ -13,6 +14,11 @@ export type AdminOperationalDocumentForm = FormGroup<{
   description: FormControl<string>;
   category: FormControl<string>;
 }>;
+
+export type AdminOperationalDocumentFormSubmission = {
+  readonly document: SaveAdminOperationalDocumentPayload;
+  readonly revision: number | null;
+};
 
 export type AdminOperationalVersionMetadataForm = FormGroup<{
   title: FormControl<string>;
@@ -39,4 +45,8 @@ export type AdminOperationalVersionForm = FormGroup<{
   metadata: AdminOperationalVersionMetadataForm;
   targets: FormArray<AdminOperationalTargetForm>;
   statements: FormArray<AdminOperationalStatementForm>;
+}>;
+
+export type AdminOperationalWaiverForm = FormGroup<{
+  reason: FormControl<string>;
 }>;
