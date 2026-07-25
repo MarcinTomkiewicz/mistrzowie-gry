@@ -11,6 +11,8 @@ import {
   GmAvailabilityTranslations,
 } from '../../../core/types/i18n/auth';
 
+export const GM_AVAILABILITY_SCOPE = 'gmAvailability';
+
 export function createGmAvailabilityI18n() {
   const { gmAvailability, actions, form, dialog, toast } =
     createScopedSectionsI18n<{
@@ -19,12 +21,12 @@ export function createGmAvailabilityI18n() {
       form: GmAvailabilityFormTranslations;
       dialog: GmAvailabilityDialogTranslations;
       toast: GmAvailabilityToastTranslations;
-    }>('auth', {
-      gmAvailability: 'gmAvailability',
-      actions: 'gmAvailability.actions',
-      form: 'gmAvailability.form',
-      dialog: 'gmAvailability.dialog',
-      toast: 'gmAvailability.toast',
+    }>(GM_AVAILABILITY_SCOPE, {
+      gmAvailability: 'page',
+      actions: 'actions',
+      form: 'form',
+      dialog: 'dialog',
+      toast: 'toast',
     });
   const commonActions = createCommonActionsI18n();
   const commonStatus = createCommonStatusI18n();

@@ -4,13 +4,15 @@ import type {
   AdminCoworkerShellTranslations,
 } from '../../../../core/types/i18n/auth';
 
+export const ADMIN_COWORKER_SHELL_SCOPE = 'adminCoworkerShell';
+
 export function createAdminCoworkerShellI18n() {
   const { shell, tabs } = createScopedSectionsI18n<{
     shell: AdminCoworkerShellTranslations;
     tabs: AdminCoworkerShellTabsTranslations;
-  }>('auth', {
-    shell: 'adminCoworkerShell',
-    tabs: 'adminCoworkerShell.tabs',
+  }>(ADMIN_COWORKER_SHELL_SCOPE, {
+    shell: 'shell',
+    tabs: 'tabs',
   });
 
   return {

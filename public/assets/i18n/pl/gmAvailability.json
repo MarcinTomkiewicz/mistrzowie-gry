@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Dyspozycyjność Mistrza Gry",
+    "subtitle": "Poniżej możesz ustawić swoje przedziały dostępności do prowadzenia sesji RPG. Przedział musi trwać minimum 4 godziny i możesz w ciągu danego dnia mieć więcej niż jeden przedział. System umożliwia wybranie przedziału na przełomie dni - czyli przed i po północy.",
+    "editorTitle": "Przedziały dla wybranego dnia",
+    "hint": "Każdy przedział musi trwać minimum 4 godziny. Po uzupełnieniu wszystkich dni, kliknij przycisk „Zapisz dyspozycyjność” na dole strony."
+  },
+  "actions": {
+    "addRangeLabel": "Dodaj przedział",
+    "removeRangeLabel": "Usuń przedział",
+    "clearDayLabel": "Wyczyść dzień",
+    "previousDayLabel": "Poprzedni dzień",
+    "nextDayLabel": "Następny dzień",
+    "saveLabel": "Zapisz dyspozycyjność"
+  },
+  "form": {
+    "fromLabel": "Od",
+    "toLabel": "Do",
+    "rangeSummaryLabel": "Przedział",
+    "emptyTitle": "Brak przedziałów dla tego dnia",
+    "emptyDescription": "Dodaj zakres godzin."
+  },
+  "dialog": {
+    "invalidDurationTitle": "Za krótki przedział",
+    "invalidDurationBody": "Każdy przedział dostępności musi trwać minimum 4 godziny.",
+    "overlapTitle": "Nakładające się przedziały",
+    "overlapBody": "Ten zakres nachodzi na inny przedział dostępności. Zmień godziny tak, aby zakresy się nie pokrywały.",
+    "noSpaceTitle": "Brak miejsca na kolejny przedział",
+    "noSpaceBody": "Dla tego dnia nie ma już wolnego miejsca na kolejny przedział spełniający minimum 4 godziny."
+  },
+  "toast": {
+    "loadFailedSummary": "Nie udało się załadować dyspozycyjności",
+    "loadFailedDetail": "Nie udało się pobrać Twoich przedziałów dostępności.",
+    "saveSuccessSummary": "Zapisano dyspozycyjność",
+    "saveSuccessDetail": "Twoje przedziały dostępności zostały zapisane.",
+    "saveFailedSummary": "Nie udało się zapisać dyspozycyjności",
+    "saveFailedDetail": "Nie udało się zapisać zmian w dyspozycyjności."
+  }
+}

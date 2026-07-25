@@ -5,14 +5,17 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { buildSiteUrl } from '../../../../core/config/site';
 import type { RouteTabDefinition } from '../../../../core/types/route-tab';
 import { RouteTabShell } from '../../../common/route-tab-shell/route-tab-shell';
-import { createAdminCoworkerShellI18n } from './admin-coworker-shell.i18n';
+import {
+  ADMIN_COWORKER_SHELL_SCOPE,
+  createAdminCoworkerShellI18n,
+} from './admin-coworker-shell.i18n';
 
 @Component({
   selector: 'app-admin-coworker-shell',
   standalone: true,
   imports: [RouterOutlet, RouteTabShell],
   templateUrl: './admin-coworker-shell.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope(ADMIN_COWORKER_SHELL_SCOPE)],
 })
 export class AdminCoworkerShell {
   protected readonly pageUrl = buildSiteUrl('/admin/coworkers');

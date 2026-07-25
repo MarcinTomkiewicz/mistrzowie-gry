@@ -2,20 +2,27 @@ import { createCommonStatusI18n } from '../../../../core/translations/common.i18
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import { CoworkerOperationalCopy } from '../../../../core/types/i18n/coworker-operational-document';
 
+export const COWORKER_OPERATIONAL_DOCUMENTS_SCOPE =
+  'coworkerOperationalDocuments';
+
 export function createOperationalDocumentsI18n() {
-  const sections = createScopedSectionsI18n<CoworkerOperationalCopy>('auth', {
-    page: 'coworkerOperationalDocuments.page',
-    process: 'coworkerOperationalDocuments.process',
-    sections: 'coworkerOperationalDocuments.sections',
-    fields: 'coworkerOperationalDocuments.fields',
-    actions: 'coworkerOperationalDocuments.actions',
-    tooltips: 'coworkerOperationalDocuments.tooltips',
-    statuses: 'coworkerOperationalDocuments.statuses',
-    messages: 'coworkerOperationalDocuments.messages',
-    dialog: 'coworkerOperationalDocuments.dialog',
-    errors: 'coworkerOperationalDocuments.errors',
-    notifications: 'coworkerOperationalDocuments.notifications',
-  });
+  const sections =
+    createScopedSectionsI18n<CoworkerOperationalCopy>(
+      COWORKER_OPERATIONAL_DOCUMENTS_SCOPE,
+      {
+        page: 'page',
+        process: 'process',
+        sections: 'sections',
+        fields: 'fields',
+        actions: 'actions',
+        tooltips: 'tooltips',
+        statuses: 'statuses',
+        messages: 'messages',
+        dialog: 'dialog',
+        errors: 'errors',
+        notifications: 'notifications',
+      },
+    );
 
   return {
     ...sections,

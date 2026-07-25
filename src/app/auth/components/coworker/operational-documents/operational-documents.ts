@@ -28,7 +28,10 @@ import { LoadingOverlay } from '../../../../public/common/loading-overlay/loadin
 import { CoworkerNotifications } from '../notifications/coworker-notifications';
 import { OperationalActionDialog } from './operational-action-dialog/operational-action-dialog';
 import { OperationalAssignmentCard } from './operational-assignment-card/operational-assignment-card';
-import { createOperationalDocumentsI18n } from './operational-documents.i18n';
+import {
+  COWORKER_OPERATIONAL_DOCUMENTS_SCOPE,
+  createOperationalDocumentsI18n,
+} from './operational-documents.i18n';
 
 @Component({
   selector: 'app-operational-documents',
@@ -42,7 +45,9 @@ import { createOperationalDocumentsI18n } from './operational-documents.i18n';
     OperationalAssignmentCard,
   ],
   templateUrl: './operational-documents.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [
+    provideTranslocoScope(COWORKER_OPERATIONAL_DOCUMENTS_SCOPE, 'common'),
+  ],
 })
 export class OperationalDocuments {
   private readonly api = inject(OperationalDocumentsApi);

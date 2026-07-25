@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "Czas pracy Mistrza Gry",
+    "subtitle": "Poniżej uzupełnisz swoje przedziały czasu pracy dla bieżącego i poprzedniego miesiąca. Możesz dodać więcej niż jeden zakres na dzień, także na przełomie dni.",
+    "monthHint": "Możesz przełączać się między bieżącym i poprzednim miesiącem.",
+    "totalHoursLabel": "Suma godzin",
+    "lockedPreviousMonthTitle": "Poprzedni miesiąc jest już zablokowany do edycji!",
+    "lockedPreviousMonthDescription": "Podgląd poprzedniego miesiąca pozostaje dostępny, ale po 5. dniu bieżącego miesiąca nie można już zapisywać zmian."
+  },
+  "actions": {
+    "previousMonthLabel": "Poprzedni miesiąc",
+    "currentMonthLabel": "Bieżący miesiąc",
+    "addRangeLabel": "Dodaj zakres",
+    "clearDayLabel": "Wyczyść dzień",
+    "resetChangesLabel": "Przywróć zmiany"
+  },
+  "form": {
+    "dateLabel": "Data",
+    "rangesLabel": "Zakresy godzin",
+    "commentLabel": "Komentarz",
+    "chaoticThursdayLabel": "Chaotyczny Czwartek",
+    "chaoticThursdayTooltip": "Udział w Chaotycznym Czwartku nie wlicza się do ewidencji godzin i jest rozliczany osobnym trybem.",
+    "totalHoursLabel": "Suma godzin",
+    "toLabel": "do",
+    "emptyDayDescription": "Brak zakresów godzin dla tego dnia."
+  },
+  "dialog": {
+    "invalidDurationTitle": "Nieprawidłowy zakres",
+    "invalidDurationBody": "Każdy zakres czasu pracy musi mieć dodatnią długość.",
+    "overlapTitle": "Nakładające się zakresy",
+    "overlapBody": "Zakresy czasu pracy nie mogą się na siebie nakładać.",
+    "noSpaceTitle": "Brak miejsca na kolejny zakres",
+    "noSpaceBody": "Nie udało się znaleźć wolnego miejsca na kolejny zakres godzin dla tego dnia."
+  },
+  "toast": {
+    "loadFailedSummary": "Nie udało się załadować czasu pracy",
+    "loadFailedDetail": "Nie udało się pobrać Twojej ewidencji czasu pracy.",
+    "saveSuccessSummary": "Zapisano czas pracy",
+    "saveSuccessDetail": "Twoja ewidencja czasu pracy została zapisana.",
+    "saveFailedSummary": "Nie udało się zapisać czasu pracy",
+    "saveFailedDetail": "Nie udało się zapisać zmian w ewidencji czasu pracy."
+  }
+}

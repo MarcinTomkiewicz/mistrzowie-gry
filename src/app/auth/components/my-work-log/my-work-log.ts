@@ -53,7 +53,7 @@ import {
 } from '../../../core/domain/work-log/rules';
 import { InfoDialog } from '../../../public/common/info-dialog/info-dialog';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
-import { createMyWorkLogI18n } from './my-work-log.i18n';
+import { createMyWorkLogI18n, MY_WORK_LOG_SCOPE } from './my-work-log.i18n';
 
 @Component({
   selector: 'app-my-work-log',
@@ -72,7 +72,7 @@ import { createMyWorkLogI18n } from './my-work-log.i18n';
     InfoDialog,
   ],
   templateUrl: './my-work-log.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope(MY_WORK_LOG_SCOPE, 'common')],
 })
 export class MyWorkLog {
   private readonly auth = inject(Auth);

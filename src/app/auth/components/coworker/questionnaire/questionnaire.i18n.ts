@@ -15,6 +15,8 @@ import {
   QuestionnaireToastTranslations,
 } from '../../../../core/types/i18n/coworker-questionnaire';
 
+export const COWORKER_QUESTIONNAIRE_SCOPE = 'coworkerQuestionnaire';
+
 export function createQuestionnaireI18n() {
   const sections = createScopedSectionsI18n<{
     page: QuestionnairePageTranslations;
@@ -26,16 +28,16 @@ export function createQuestionnaireI18n() {
     status: QuestionnaireStatusTranslations;
     errors: QuestionnaireErrorsTranslations;
     toast: QuestionnaireToastTranslations;
-  }>('auth', {
-    page: 'coworkerQuestionnaire.page',
-    sections: 'coworkerQuestionnaire.sections',
-    fields: 'coworkerQuestionnaire.fields',
-    options: 'coworkerQuestionnaire.options',
-    sensitive: 'coworkerQuestionnaire.sensitive',
-    actions: 'coworkerQuestionnaire.actions',
-    status: 'coworkerQuestionnaire.status',
-    errors: 'coworkerQuestionnaire.errors',
-    toast: 'coworkerQuestionnaire.toast',
+  }>(COWORKER_QUESTIONNAIRE_SCOPE, {
+    page: 'page',
+    sections: 'sections',
+    fields: 'fields',
+    options: 'options',
+    sensitive: 'sensitive',
+    actions: 'actions',
+    status: 'status',
+    errors: 'errors',
+    toast: 'toast',
   });
 
   return {

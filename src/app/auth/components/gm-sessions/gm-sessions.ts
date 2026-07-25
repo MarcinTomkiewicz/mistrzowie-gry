@@ -29,7 +29,7 @@ import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
 import { SessionForm } from '../../common/session-form/session-form';
-import { createGmSessionsI18n } from './gm-sessions.i18n';
+import { createGmSessionsI18n, GM_SESSIONS_SCOPE } from './gm-sessions.i18n';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import {
   ISessionListAction,
@@ -55,7 +55,7 @@ interface ISessionSystemOption {
   ],
   templateUrl: './gm-sessions.html',
   styleUrl: './gm-sessions.scss',
-  providers: [provideTranslocoScope('auth', 'common', 'sessions')],
+  providers: [provideTranslocoScope(GM_SESSIONS_SCOPE, 'common', 'sessions')],
 })
 export class GmSessions {
   private readonly auth = inject(Auth);

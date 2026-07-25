@@ -5,13 +5,15 @@ import {
   GmAvailabilityOverviewTranslations,
 } from '../../../core/types/i18n/auth';
 
+export const GM_AVAILABILITY_OVERVIEW_SCOPE = 'gmAvailabilityOverview';
+
 export function createGmAvailabilityOverviewI18n() {
   const { gmAvailabilityOverview, toast } = createScopedSectionsI18n<{
     gmAvailabilityOverview: GmAvailabilityOverviewTranslations;
     toast: GmAvailabilityOverviewToastTranslations;
-  }>('auth', {
-    gmAvailabilityOverview: 'gmAvailabilityOverview',
-    toast: 'gmAvailabilityOverview.toast',
+  }>(GM_AVAILABILITY_OVERVIEW_SCOPE, {
+    gmAvailabilityOverview: 'page',
+    toast: 'toast',
   });
   const commonStatus = createCommonStatusI18n();
 

@@ -33,7 +33,10 @@ import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { UniversalCalendar } from '../../../public/common/universal-calendar/universal-calendar';
-import { createGmAvailabilityOverviewI18n } from './gm-availability-overview.i18n';
+import {
+  createGmAvailabilityOverviewI18n,
+  GM_AVAILABILITY_OVERVIEW_SCOPE,
+} from './gm-availability-overview.i18n';
 
 @Component({
   selector: 'app-gm-availability-overview',
@@ -46,7 +49,9 @@ import { createGmAvailabilityOverviewI18n } from './gm-availability-overview.i18
     LoadingOverlay,
   ],
   templateUrl: './gm-availability-overview.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [
+    provideTranslocoScope(GM_AVAILABILITY_OVERVIEW_SCOPE, 'common'),
+  ],
 })
 export class GmAvailabilityOverview {
   private readonly auth = inject(Auth);

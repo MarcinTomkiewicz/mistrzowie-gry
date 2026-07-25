@@ -39,7 +39,10 @@ import { formatDateLabel } from '../../../core/utils/date';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
-import { createWorkLogOverviewI18n } from './work-log-overview.i18n';
+import {
+  createWorkLogOverviewI18n,
+  WORK_LOG_OVERVIEW_SCOPE,
+} from './work-log-overview.i18n';
 
 @Component({
   selector: 'app-work-log-overview',
@@ -53,7 +56,7 @@ import { createWorkLogOverviewI18n } from './work-log-overview.i18n';
     WorkLogExportComponent,
   ],
   templateUrl: './work-log-overview.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope(WORK_LOG_OVERVIEW_SCOPE, 'common')],
 })
 export class WorkLogOverview {
   private readonly auth = inject(Auth);

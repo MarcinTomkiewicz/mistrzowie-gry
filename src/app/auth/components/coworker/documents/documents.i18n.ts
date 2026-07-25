@@ -15,6 +15,8 @@ import {
   CoworkerDocumentsUploadTranslations,
 } from '../../../../core/types/i18n/coworker-document';
 
+export const COWORKER_DOCUMENTS_SCOPE = 'coworkerDocuments';
+
 export function createDocumentsI18n() {
   const sections = createScopedSectionsI18n<{
     page: CoworkerDocumentsPageTranslations;
@@ -25,15 +27,15 @@ export function createDocumentsI18n() {
     errors: CoworkerDocumentsErrorTranslations;
     upload: CoworkerDocumentsUploadTranslations;
     confirmations: CoworkerDocumentConfirmTranslations;
-  }>('auth', {
-    page: 'coworkerDocuments.page',
-    sections: 'coworkerDocuments.sections',
-    labels: 'coworkerDocuments.labels',
-    actions: 'coworkerDocuments.actions',
-    statuses: 'coworkerDocuments.statuses',
-    errors: 'coworkerDocuments.errors',
-    upload: 'coworkerDocuments.upload',
-    confirmations: 'coworkerDocuments.confirmations',
+  }>(COWORKER_DOCUMENTS_SCOPE, {
+    page: 'page',
+    sections: 'sections',
+    labels: 'labels',
+    actions: 'actions',
+    statuses: 'statuses',
+    errors: 'errors',
+    upload: 'upload',
+    confirmations: 'confirmations',
   });
 
   return {

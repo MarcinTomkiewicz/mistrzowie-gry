@@ -16,6 +16,8 @@ import {
   SessionListLabelsTranslations,
 } from '../../../core/types/i18n/sessions';
 
+export const GM_SESSIONS_SCOPE = 'gmSessions';
+
 export function createGmSessionsI18n() {
   const { gmSessions, actions, empty, form, toast } =
     createScopedSectionsI18n<{
@@ -24,12 +26,12 @@ export function createGmSessionsI18n() {
       empty: GmSessionsEmptyTranslations;
       form: GmSessionsFormTranslations;
       toast: GmSessionsToastTranslations;
-    }>('auth', {
-      gmSessions: 'gmSessions',
-      actions: 'gmSessions.actions',
-      empty: 'gmSessions.empty',
-      form: 'gmSessions.form',
-      toast: 'gmSessions.toast',
+    }>(GM_SESSIONS_SCOPE, {
+      gmSessions: 'page',
+      actions: 'actions',
+      empty: 'empty',
+      form: 'form',
+      toast: 'toast',
     });
   const { sessionForm, difficulty, list } = createScopedSectionsI18n<{
     sessionForm: SessionFormTranslations;

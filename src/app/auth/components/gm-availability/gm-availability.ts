@@ -61,7 +61,7 @@ import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
 import { InfoDialog } from '../../../public/common/info-dialog/info-dialog';
 import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
 import { UniversalCalendar } from '../../../public/common/universal-calendar/universal-calendar';
-import { createGmAvailabilityI18n } from './gm-availability.i18n';
+import { createGmAvailabilityI18n, GM_AVAILABILITY_SCOPE } from './gm-availability.i18n';
 
 @Component({
   selector: 'app-gm-availability',
@@ -76,7 +76,7 @@ import { createGmAvailabilityI18n } from './gm-availability.i18n';
     InfoDialog,
   ],
   templateUrl: './gm-availability.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope(GM_AVAILABILITY_SCOPE, 'common')],
 })
 export class GmAvailability {
   private readonly auth = inject(Auth);

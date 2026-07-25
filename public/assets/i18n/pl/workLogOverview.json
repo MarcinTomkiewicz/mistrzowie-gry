@@ -1,0 +1,30 @@
+{
+  "page": {
+    "title": "Przegląd czasu pracy Mistrzów Gry",
+    "subtitle": "Ten widok pokazuje ewidencję czasu pracy wszystkich osób z rolą GM i wyższą dla wybranego miesiąca wraz z możliwością eksportu danych.",
+    "totalHoursLabel": "Suma godzin",
+    "emptyStateTitle": "Brak danych do wyświetlenia",
+    "emptyStateDescription": "Nie znaleziono jeszcze żadnych work logów ani użytkowników do pokazania w tym widoku.",
+    "emptyUserTitle": "Brak wpisów dla tego użytkownika",
+    "emptyUserDescription": "W wybranym miesiącu ta osoba nie ma jeszcze zapisanych zakresów czasu pracy."
+  },
+  "actions": {
+    "previousMonthLabel": "Poprzedni miesiąc",
+    "currentMonthLabel": "Bieżący miesiąc",
+    "exportCsvLabel": "Eksport CSV",
+    "exportXlsLabel": "Eksport XLSX"
+  },
+  "form": {
+    "dateLabel": "Data",
+    "rangesLabel": "Zakresy godzin",
+    "commentLabel": "Komentarz",
+    "chaoticThursdayLabel": "Chaotyczny Czwartek",
+    "chaoticThursdayYes": "Tak",
+    "chaoticThursdayNo": "Nie",
+    "totalHoursLabel": "Suma godzin"
+  },
+  "toast": {
+    "loadFailedSummary": "Nie udało się załadować przeglądu czasu pracy",
+    "loadFailedDetail": "Nie udało się pobrać listy użytkowników albo ich wpisów czasu pracy."
+  }
+}

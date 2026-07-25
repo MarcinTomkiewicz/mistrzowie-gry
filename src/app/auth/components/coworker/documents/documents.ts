@@ -29,7 +29,7 @@ import { CoworkerNotifications } from '../notifications/coworker-notifications';
 import { AvailableDocumentCard } from './available-document-card/available-document-card';
 import { DocumentCard } from './document-card/document-card';
 import { DocumentUpload } from './document-upload/document-upload';
-import { createDocumentsI18n } from './documents.i18n';
+import { COWORKER_DOCUMENTS_SCOPE, createDocumentsI18n } from './documents.i18n';
 
 @Component({
   selector: 'app-documents',
@@ -43,7 +43,7 @@ import { createDocumentsI18n } from './documents.i18n';
     LoadingOverlay,
   ],
   templateUrl: './documents.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope(COWORKER_DOCUMENTS_SCOPE, 'common')],
 })
 export class Documents {
   private readonly coworkerDocuments = inject(CoworkerDocumentsApi);

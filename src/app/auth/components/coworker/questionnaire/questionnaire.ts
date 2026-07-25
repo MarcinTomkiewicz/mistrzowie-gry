@@ -36,7 +36,7 @@ import { bindQuestionnaireDependencies } from './questionnaire-dependencies';
 import { createCoworkerQuestionnaireForm } from './questionnaire-form';
 import { QuestionnaireInstitutions } from './questionnaire-institutions/questionnaire-institutions';
 import { QuestionnaireInsurance } from './questionnaire-insurance/questionnaire-insurance';
-import { createQuestionnaireI18n } from './questionnaire.i18n';
+import { COWORKER_QUESTIONNAIRE_SCOPE, createQuestionnaireI18n } from './questionnaire.i18n';
 import { QuestionnairePayment } from './questionnaire-payment/questionnaire-payment';
 import { QuestionnairePersonal } from './questionnaire-personal/questionnaire-personal';
 import { buildCoworkerQuestionnaireSaveRequest } from './questionnaire-request';
@@ -58,7 +58,7 @@ import { buildCoworkerQuestionnaireSaveRequest } from './questionnaire-request';
     QuestionnairePersonal,
   ],
   templateUrl: './questionnaire.html',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope(COWORKER_QUESTIONNAIRE_SCOPE, 'common')],
 })
 export class Questionnaire {
   private readonly destroyRef = inject(DestroyRef);

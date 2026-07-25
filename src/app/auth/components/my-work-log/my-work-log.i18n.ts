@@ -11,6 +11,8 @@ import {
   MyWorkLogTranslations,
 } from '../../../core/types/i18n/auth';
 
+export const MY_WORK_LOG_SCOPE = 'myWorkLog';
+
 export function createMyWorkLogI18n() {
   const { myWorkLog, actions, form, dialog, toast } = createScopedSectionsI18n<{
     myWorkLog: MyWorkLogTranslations;
@@ -18,12 +20,12 @@ export function createMyWorkLogI18n() {
     form: MyWorkLogFormTranslations;
     dialog: MyWorkLogDialogTranslations;
     toast: MyWorkLogToastTranslations;
-  }>('auth', {
-    myWorkLog: 'myWorkLog',
-    actions: 'myWorkLog.actions',
-    form: 'myWorkLog.form',
-    dialog: 'myWorkLog.dialog',
-    toast: 'myWorkLog.toast',
+  }>(MY_WORK_LOG_SCOPE, {
+    myWorkLog: 'page',
+    actions: 'actions',
+    form: 'form',
+    dialog: 'dialog',
+    toast: 'toast',
   });
   const commonActions = createCommonActionsI18n();
   const commonStatus = createCommonStatusI18n();

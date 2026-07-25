@@ -89,6 +89,26 @@ The generated README may be stale and must not override them.
 - Prefer a small coherent diff. A smaller diff is not an excuse for leaving a
   clear violation inside touched code.
 
+## Copy approval contract
+
+- `[PH]` marks only work-in-progress copy that the user has not approved.
+- Copy without `[PH]` is approved. Do not add `[PH]` to it, restore an earlier
+  placeholder, paraphrase it, or otherwise change its wording without an
+  explicit instruction in the current task.
+- An instruction may change approved copy only when it identifies the specific
+  key or text and provides the replacement wording, or explicitly requires
+  synchronization with a protected source.
+- `docs/attachments/Kwestionariusz-osobowy-zleceniobiorcy (2).pdf` is the
+  protected source for questionnaire section names, labels, HR/accounting
+  terminology, contractor declaration copy, and substantive ordering unless a
+  task states an explicit UX exception. Preserve source-derived copy literally;
+  do not paraphrase it or mark it with `[PH]`.
+- Refactoring i18n does not authorize wording changes. Moving a key between
+  namespaces must preserve its value byte-for-byte unless the current task
+  explicitly changes that copy.
+- Do not introduce `[APPROVED]`, `[OK]`, or any other approval marker into
+  rendered copy. Approval is represented by the absence of `[PH]`.
+
 ## Angular 21 naming gate
 
 The Angular 21-era naming model used by this repository names an artifact for

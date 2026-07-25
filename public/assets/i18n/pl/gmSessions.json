@@ -1,0 +1,31 @@
+{
+  "page": {
+    "title": "Sesje RPG",
+    "subtitle": "Tu możesz podać swoje sesje standardowe. Przez sesje standardowe rozumiemy takie, które masz już przećwiczone, ograne, dopracowane i możesz je poprowadzić w każdym dowolnym momencie bez większego przygotowania. Sesje standardowe to Twoje baza, na której budujemy współpracę w ramach projektu."
+  },
+  "actions": {
+    "addLabel": "Dodaj sesję",
+    "createLabel": "Zapisz sesję",
+    "updateLabel": "Zapisz zmiany"
+  },
+  "form": {
+    "systemFilterAllLabel": "Wszystkie systemy",
+    "systemFilterLabel": "Filtruj po systemie"
+  },
+  "empty": {
+    "title": "Nie masz jeszcze żadnych sesji RPG",
+    "description": "Dodaj pierwszą sesję, aby pokazać na profilu systemy i scenariusze, które prowadzisz."
+  },
+  "toast": {
+    "loadFailedSummary": "Nie udało się załadować sesji",
+    "loadFailedDetail": "Nie udało się załadować Twoich sesji RPG.",
+    "saveSuccessSummary": "Zapisano sesję",
+    "saveSuccessDetail": "Sesja RPG została zapisana.",
+    "saveFailedSummary": "Nie udało się zapisać sesji",
+    "saveFailedDetail": "Nie udało się zapisać sesji RPG.",
+    "deleteSuccessSummary": "Usunięto sesję",
+    "deleteSuccessDetail": "Sesja RPG została usunięta.",
+    "deleteFailedSummary": "Nie udało się usunąć sesji",
+    "deleteFailedDetail": "Nie udało się usunąć sesji RPG."
+  }
+}
