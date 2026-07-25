@@ -20,6 +20,7 @@ import { CoworkerQuestionnaireForm } from '../../../../core/types/coworker-quest
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { QuestionnaireAddresses } from './questionnaire-addresses/questionnaire-addresses';
+import { createQuestionnaireCompletionError } from './questionnaire-completion-error';
 import {
   getQuestionnaireErrorDescription,
   getQuestionnaireErrorTitle,
@@ -218,21 +219,12 @@ export class Questionnaire {
     this.fieldErrors.set({});
     this.submitError.set(null);
 
-    if (complete && !form.controls.finalDeclarationAccepted.value) {
-      const fieldErrors = {
-        'finalDeclaration.accepted':
-          this.i18n.errors().finalDeclarationAccepted,
-      };
-      this.submitError.set(
-        new EdgeFunctionError(
-          400,
-          'VALIDATION_FAILED',
-          this.i18n.errors().validationDescription,
-          fieldErrors,
-          null,
-        ),
-      );
-      this.applyFieldErrors(fieldErrors);
+    const completionError = complete
+      ? createQuestionnaireCompletionError(form, this.i18n.errors())
+      : null;
+    if (completionError !== null) {
+      this.submitError.set(completionError);
+      this.applyFieldErrors(completionError.fieldErrors);
       return;
     }
 

@@ -110,18 +110,13 @@
 
   <div class="flex-col-start-stretch gap-xs">
     <p-iftalabel class="w-100">
-      <p-select
+      <app-questionnaire-catalog-autocomplete
         class="w-100"
         formControlName="countryCode"
         [inputId]="fieldId('country-code')"
         [options]="countryOptions"
         [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        [filter]="true"
-        optionLabel="label"
-        optionValue="value"
-        filterBy="label"
-        appendTo="body"
+        autocomplete="country-name"
         [attr.data-questionnaire-field]="fieldPath('countryCode')"
         [attr.aria-describedby]="errorId('country-code')"
       />

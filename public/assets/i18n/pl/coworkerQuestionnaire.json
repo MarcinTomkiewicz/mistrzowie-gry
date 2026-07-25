@@ -109,6 +109,7 @@
     "completeTitle": "[PH] Kwestionariusz został ukończony",
     "completeDescription": "[PH] Dane zostały zapisane i przeszły walidację. Formularz pozostaje dostępny, jeśli później będzie potrzebna korekta.",
     "legacyCountryNotice": "[PH] Zapisany kraj wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
+    "legacyCitizenshipNotice": "[PH] Zapisane obywatelstwo wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
     "legacyInstitutionNotice": "[PH] Zapisana wartość wymaga świadomego wybrania pozycji z aktualnego katalogu przed ukończeniem.",
     "declarationAcceptedAtLabel": "[PH] Ostatnia akceptacja"
   },
@@ -126,6 +127,7 @@
     "statementChangedDescription": "Treść aktualnego oświadczenia uległa zmianie. Pobierz aktualne dane, przeczytaj oświadczenie ponownie i zaakceptuj je przed ukończeniem kwestionariusza.",
     "peselConflictDescription": "Podany PESEL jest już przypisany do innego kwestionariusza.",
     "peselConflictField": "Ten PESEL jest już przypisany do innego kwestionariusza.",
+    "citizenshipCatalogRequired": "[PH] Wybierz obywatelstwo z listy przed ukończeniem kwestionariusza.",
     "finalDeclarationAccepted": "Zaakceptuj aktualne oświadczenie przed ukończeniem kwestionariusza.",
     "fatalTitle": "Usługa kwestionariusza jest niedostępna",
     "unexpectedDescription": "Wystąpił nieoczekiwany błąd podczas obsługi kwestionariusza.",

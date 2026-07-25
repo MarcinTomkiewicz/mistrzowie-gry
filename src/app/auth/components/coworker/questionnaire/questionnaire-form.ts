@@ -11,6 +11,7 @@ import type {
   QuestionnaireJoinDeclineAnswer,
   QuestionnaireYesNo,
 } from '../../../../core/types/coworker-questionnaire';
+import { normalizeKnownCitizenship } from '../../../../core/utils/citizenship-options';
 
 export function createCoworkerQuestionnaireForm(
   formBuilder: FormBuilder,
@@ -37,7 +38,9 @@ export function createCoworkerQuestionnaireForm(
         initial?.personal.identityDocumentKind ?? null,
       ),
       identityDocumentNumber: formBuilder.nonNullable.control(''),
-      citizenship: formBuilder.nonNullable.control(initial?.personal.citizenship ?? ''),
+      citizenship: formBuilder.nonNullable.control(
+        normalizeKnownCitizenship(initial?.personal.citizenship ?? ''),
+      ),
       phone: formBuilder.nonNullable.control(initial?.personal.phone ?? ''),
     }),
     registeredAddress: formBuilder.group({

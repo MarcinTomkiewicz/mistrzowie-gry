@@ -194,13 +194,14 @@
   <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100">
     <div class="flex-col-start-stretch gap-xs">
       <p-iftalabel class="w-100">
-        <input
-          pInputText
+        <app-questionnaire-catalog-autocomplete
           class="w-100"
-          id="questionnaire-citizenship"
-          type="text"
           formControlName="citizenship"
-          autocomplete="country-name"
+          autocomplete="off"
+          inputId="questionnaire-citizenship"
+          [options]="citizenshipOptions"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [emptyValue]="''"
           data-questionnaire-field="data.personal.citizenship"
           aria-describedby="questionnaire-citizenship-error"
         />
@@ -212,6 +213,12 @@
         [control]="form().controls.citizenship"
         errorId="questionnaire-citizenship-error"
       />
+      @if (unrecognizedCitizenship(); as citizenship) {
+        <p-message
+          severity="warn"
+          [text]="i18n.status().legacyCitizenshipNotice + ' (' + citizenship + ')'"
+        />
+      }
     </div>
 
     <div class="flex-col-start-stretch gap-xs">

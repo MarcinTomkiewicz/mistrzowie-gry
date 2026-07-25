@@ -125,6 +125,7 @@ export type QuestionnaireStatusTranslations = {
   completeTitle: string;
   completeDescription: string;
   legacyCountryNotice: string;
+  legacyCitizenshipNotice: string;
   legacyInstitutionNotice: string;
   declarationAcceptedAtLabel: string;
 };
@@ -143,6 +144,7 @@ export type QuestionnaireErrorsTranslations = {
   statementChangedDescription: string;
   peselConflictDescription: string;
   peselConflictField: string;
+  citizenshipCatalogRequired: string;
   finalDeclarationAccepted: string;
   fatalTitle: string;
   unexpectedDescription: string;

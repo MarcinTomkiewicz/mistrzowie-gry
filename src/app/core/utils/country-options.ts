@@ -15,9 +15,13 @@ export function buildCountryOptions(
       value: code,
       label: displayNames?.of(code) ?? code,
     }))
-    .sort(
-      (left, right) =>
+    .sort((left, right) => {
+      if (left.value === 'PL') return -1;
+      if (right.value === 'PL') return 1;
+
+      return (
         collator.compare(left.label, right.label) ||
-        left.value.localeCompare(right.value),
-    );
+        left.value.localeCompare(right.value)
+      );
+    });
 }

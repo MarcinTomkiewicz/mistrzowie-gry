@@ -5,13 +5,13 @@ import { TranslocoService } from '@jsverse/transloco';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
-import { SelectModule } from 'primeng/select';
 
 import {
   CoworkerCorrespondenceAddressForm,
   CoworkerQuestionnaireAddressForm,
 } from '../../../../../core/types/coworker-questionnaire-form';
 import { buildCountryOptions } from '../../../../../core/utils/country-options';
+import { QuestionnaireCatalogAutocomplete } from '../questionnaire-catalog-autocomplete';
 import { QuestionnaireFieldErrors } from '../questionnaire-field-errors';
 import { createQuestionnaireI18n } from '../questionnaire.i18n';
 
@@ -23,7 +23,7 @@ import { createQuestionnaireI18n } from '../questionnaire.i18n';
     IftaLabelModule,
     InputTextModule,
     MessageModule,
-    SelectModule,
+    QuestionnaireCatalogAutocomplete,
     QuestionnaireFieldErrors,
   ],
   templateUrl: './questionnaire-address-fields.html',
