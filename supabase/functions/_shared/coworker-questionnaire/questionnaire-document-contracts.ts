@@ -116,6 +116,32 @@ export function parseQuestionnaireDocumentReservation(
   return reservation;
 }
 
+export function assertRecoveredQuestionnaireDocumentReservation(
+  previous: QuestionnaireDocumentReservation,
+  recovered: QuestionnaireDocumentReservation,
+): void {
+  if (
+    previous.userId !== recovered.userId ||
+    previous.questionnaireRevision !== recovered.questionnaireRevision ||
+    previous.declarationId !== recovered.declarationId ||
+    previous.documentId !== recovered.documentId ||
+    previous.documentVersionId !== recovered.documentVersionId ||
+    previous.versionNumber !== recovered.versionNumber ||
+    previous.bucket !== recovered.bucket ||
+    previous.path !== recovered.path ||
+    previous.originalFilename !== recovered.originalFilename ||
+    previous.storedFilename !== recovered.storedFilename ||
+    previous.declaredMimeType !== recovered.declaredMimeType ||
+    previous.expectedSizeBytes !== recovered.expectedSizeBytes ||
+    previous.signatureDeclarationType !==
+      recovered.signatureDeclarationType ||
+    (!recovered.alreadyFinalized &&
+      recovered.uploadSessionId !== previous.uploadSessionId)
+  ) {
+    throw new BackendContractError(RPC.reserveQuestionnaireDocument);
+  }
+}
+
 function readBucket(value: string): "coworker-documents" {
   if (value !== "coworker-documents") {
     throw new BackendContractError(RPC.reserveQuestionnaireDocument);

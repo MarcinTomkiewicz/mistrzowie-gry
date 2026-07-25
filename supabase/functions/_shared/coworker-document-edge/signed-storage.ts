@@ -71,6 +71,31 @@ export async function createSignedDownloadUrl(
   }
 }
 
+export async function uploadStorageBytes(
+  client: SupabaseClient,
+  target: StorageObject,
+  bytes: Uint8Array,
+  contentType: string,
+  operation: string,
+): Promise<void> {
+  try {
+    const { error } = await client.storage
+      .from(target.bucket)
+      .upload(target.path, bytes, {
+        contentType,
+        upsert: false,
+      });
+    if (error !== null) {
+      throw new StorageCallError(operation);
+    }
+  } catch (error) {
+    if (error instanceof StorageCallError) {
+      throw error;
+    }
+    throw new StorageCallError(operation);
+  }
+}
+
 export async function downloadStorageObject(
   client: SupabaseClient,
   target: StorageObject,

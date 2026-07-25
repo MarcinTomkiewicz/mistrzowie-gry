@@ -15,6 +15,8 @@ const FONT_SIZE = 9;
 const LINE_HEIGHT = 12;
 const ROW_GAP = 7;
 const SECTION_GAP = 18;
+const SIGNATURE_LINE_WIDTH = 220;
+const SIGNATURE_FIELD_HEIGHT = 52;
 
 export class QuestionnairePdfRenderer {
   private page: PDFPage;
@@ -41,7 +43,7 @@ export class QuestionnairePdfRenderer {
   }
 
   drawSection(section: QuestionnairePdfSection): void {
-    this.ensureSpace(28);
+    this.ensureSpace(SECTION_GAP + LINE_HEIGHT);
     this.page.drawText(section.title, {
       x: PAGE_MARGIN,
       y: this.y,
@@ -49,12 +51,35 @@ export class QuestionnairePdfRenderer {
       font: this.boldFont,
       color: rgb(0.1, 0.25, 0.42),
     });
-    this.y -= 20;
+    this.y -= SECTION_GAP;
 
     for (const [label, content] of section.rows) {
       this.drawRow(label, content);
     }
     this.y -= SECTION_GAP;
+  }
+
+  drawSignatureBlock(placeAndDateLabel: string, signatureLabel: string): void {
+    this.ensureSpace((2 * SIGNATURE_FIELD_HEIGHT) + SECTION_GAP);
+    this.drawSignatureField(placeAndDateLabel);
+    this.drawSignatureField(signatureLabel);
+  }
+
+  private drawSignatureField(label: string): void {
+    this.page.drawText(label, {
+      x: PAGE_MARGIN,
+      y: this.y,
+      size: FONT_SIZE,
+      font: this.boldFont,
+    });
+    this.y -= 32;
+    this.page.drawLine({
+      start: { x: PAGE_MARGIN, y: this.y },
+      end: { x: PAGE_MARGIN + SIGNATURE_LINE_WIDTH, y: this.y },
+      thickness: 0.75,
+      color: rgb(0.25, 0.25, 0.25),
+    });
+    this.y -= 20;
   }
 
   private drawRow(label: string, content: string): void {

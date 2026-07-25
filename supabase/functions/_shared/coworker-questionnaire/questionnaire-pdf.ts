@@ -36,8 +36,9 @@ export async function generateQuestionnairePdf(
   ]);
 
   document.setTitle(COPY.title);
-  document.setCreationDate(new Date(declaration.acceptedAt));
-  document.setModificationDate(new Date(saveResult.updatedAt));
+  const declarationDate = new Date(declaration.acceptedAt);
+  document.setCreationDate(declarationDate);
+  document.setModificationDate(declarationDate);
 
   const renderer = new QuestionnairePdfRenderer(
     document,
@@ -50,10 +51,13 @@ export async function generateQuestionnairePdf(
   ) {
     renderer.drawSection(section);
   }
+  renderer.drawSignatureBlock(
+    COPY.signature.placeAndDate,
+    COPY.signature.coworker,
+  );
 
   return await document.save({
     addDefaultPage: false,
-    objectsPerTick: Number.MAX_SAFE_INTEGER,
     useObjectStreams: false,
   });
 }
