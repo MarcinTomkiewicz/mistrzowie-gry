@@ -4,6 +4,7 @@ import {
   ICoworkerQuestionnaireStatement,
 } from '../../../../core/interfaces/i-coworker-questionnaire';
 import { CoworkerQuestionnaireForm } from '../../../../core/types/coworker-questionnaire-form';
+import { normalizeBankAccount } from '../../../../core/utils/bank-account';
 
 export function buildCoworkerQuestionnaireSaveRequest(
   form: CoworkerQuestionnaireForm,
@@ -136,7 +137,7 @@ export function buildCoworkerQuestionnairePayload(
     },
     payment: {
       bankName: value.payment.bankName,
-      bankAccount: value.payment.bankAccount,
+      bankAccount: normalizeBankAccount(value.payment.bankAccount),
     },
   };
 }

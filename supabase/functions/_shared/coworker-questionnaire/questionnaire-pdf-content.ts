@@ -5,6 +5,7 @@ import type {
   QuestionnairePayload,
   YesNoAnswer,
 } from "./contracts.ts";
+import { formatBankAccount } from "../../../../src/app/core/utils/bank-account.ts";
 import { QUESTIONNAIRE_PDF_COPY as COPY } from "./questionnaire-pdf-copy.ts";
 
 export type QuestionnairePdfRow = readonly [label: string, value: string];
@@ -165,7 +166,10 @@ export function buildQuestionnairePdfSections(
       title: COPY.sections.payment,
       rows: [
         [COPY.labels.bankName, value(payload.payment.bankName)],
-        [COPY.labels.bankAccount, value(payload.payment.bankAccount)],
+        [
+          COPY.labels.bankAccount,
+          value(formatBankAccount(payload.payment.bankAccount)),
+        ],
       ],
     },
     {

@@ -1,4 +1,7 @@
 import { ISO_ALPHA_2_CODES } from "./country-codes.ts";
+import {
+  normalizeBankAccount as normalizeBankAccountValue,
+} from "../../../../src/app/core/utils/bank-account.ts";
 
 export function normalizePesel(value: string): string {
   return value.replace(/[ -]/g, "");
@@ -57,8 +60,7 @@ export function isValidNip(nip: string): boolean {
 }
 
 export function normalizeBankAccount(value: string): string | null {
-  const input = value.toUpperCase().replace(/[ -]/g, "");
-  const canonical = /^\d{26}$/.test(input) ? `PL${input}` : input;
+  const canonical = normalizeBankAccountValue(value);
   if (!/^PL\d{26}$/.test(canonical)) {
     return null;
   }

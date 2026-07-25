@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 
+import { BankAccountInput } from '../../../../../core/directives/bank-account-input/bank-account-input';
 import { ICoworkerSensitiveFieldMetadata } from '../../../../../core/interfaces/i-coworker-questionnaire';
 import { setControlEnabled } from '../../../../../core/utils/form-controls';
 import { QuestionnaireFieldErrors } from '../questionnaire-field-errors';
@@ -18,6 +19,7 @@ import { createQuestionnaireI18n } from '../questionnaire.i18n';
     ButtonModule,
     IftaLabelModule,
     InputTextModule,
+    BankAccountInput,
     QuestionnaireFieldErrors,
   ],
   templateUrl: './questionnaire-sensitive-field.html',
@@ -29,6 +31,7 @@ export class QuestionnaireSensitiveField {
   readonly fieldPath = input.required<string>();
   readonly label = input.required<string>();
   readonly autocomplete = input('off');
+  readonly bankAccount = input(false);
 
   protected readonly i18n = createQuestionnaireI18n();
   protected readonly replacementMode = signal(false);

@@ -41,16 +41,30 @@
   <p class="m-0 muted-text">{{ i18n.sensitive().replacementHint }}</p>
 
   <p-iftalabel class="w-100">
-    <input
-      pInputText
-      class="w-100"
-      type="text"
-      [id]="inputId()"
-      [formControl]="control()"
-      [autocomplete]="autocomplete()"
-      [attr.data-questionnaire-field]="fieldPath()"
-      [attr.aria-describedby]="errorId()"
-    />
+    @if (bankAccount()) {
+      <input
+        pInputText
+        appBankAccountInput
+        class="w-100"
+        type="text"
+        [id]="inputId()"
+        [formControl]="control()"
+        [autocomplete]="autocomplete()"
+        [attr.data-questionnaire-field]="fieldPath()"
+        [attr.aria-describedby]="errorId()"
+      />
+    } @else {
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        [id]="inputId()"
+        [formControl]="control()"
+        [autocomplete]="autocomplete()"
+        [attr.data-questionnaire-field]="fieldPath()"
+        [attr.aria-describedby]="errorId()"
+      />
+    }
     <label [for]="inputId()">{{ label() }}</label>
   </p-iftalabel>
 
