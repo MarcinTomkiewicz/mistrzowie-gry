@@ -1,12 +1,13 @@
+import { buildCountryOptions } from "../../../../src/app/core/utils/country-options.ts";
 import type {
-  CurrentDeclaration,
-  InstitutionReference,
+  InsuranceData,
   JoinDeclineAnswer,
+  PersonalData,
   QuestionnairePayload,
   YesNoAnswer,
 } from "./contracts.ts";
-import { formatBankAccount } from "../../../../src/app/core/utils/bank-account.ts";
 import { QUESTIONNAIRE_PDF_COPY as COPY } from "./questionnaire-pdf-copy.ts";
+import { buildQuestionnaireDeclarationRows } from "./questionnaire-pdf-declaration-content.ts";
 
 export type QuestionnairePdfRow = readonly [label: string, value: string];
 export type QuestionnairePdfSection = {
@@ -14,241 +15,246 @@ export type QuestionnairePdfSection = {
   rows: readonly QuestionnairePdfRow[];
 };
 
+const POLISH_COUNTRY_OPTIONS = buildCountryOptions("pl");
+
 export function buildQuestionnairePdfSections(
   payload: QuestionnairePayload,
-  declaration: CurrentDeclaration,
+  statementText: string,
 ): readonly QuestionnairePdfSection[] {
-  const personal = payload.personal;
-  const registered = payload.registeredAddress;
-  const correspondence = payload.correspondenceAddress;
-  const insurance = payload.insurance;
-
-  return [
+  const sections: QuestionnairePdfSection[] = [
     {
       title: COPY.sections.personal,
-      rows: [
-        [COPY.labels.firstName, value(personal.firstName)],
-        [COPY.labels.lastName, value(personal.lastName)],
-        [COPY.labels.maidenName, value(personal.maidenName)],
-        [COPY.labels.middleName, value(personal.middleName)],
-        [COPY.labels.birthDate, value(personal.birthDate)],
-        [COPY.labels.birthPlace, value(personal.birthPlace)],
-        [
-          COPY.labels.identificationBasis,
-          personal.identificationBasis === "pesel"
-            ? COPY.values.pesel
-            : COPY.values.identityDocument,
-        ],
-        ...(personal.identificationBasis === "pesel"
-          ? [[COPY.labels.pesel, value(personal.pesel)] as const]
-          : [
-            [
-              COPY.labels.identityDocumentKind,
-              identityDocumentKind(personal.identityDocumentKind),
-            ] as const,
-            [
-              COPY.labels.identityDocumentNumber,
-              value(personal.identityDocumentNumber),
-            ] as const,
-          ]),
-        [COPY.labels.nip, value(personal.nip)],
-        [COPY.labels.citizenship, value(personal.citizenship)],
-        [COPY.labels.phone, value(personal.phone)],
-      ],
+      rows: personalRows(payload.personal),
     },
     {
       title: COPY.sections.registeredAddress,
-      rows: [
-        [COPY.labels.street, value(registered.street)],
-        [COPY.labels.houseNumber, value(registered.houseNumber)],
-        [COPY.labels.apartmentNumber, value(registered.apartmentNumber)],
-        [COPY.labels.postalCode, value(registered.postalCode)],
-        [COPY.labels.city, value(registered.city)],
-        [COPY.labels.voivodeship, value(registered.voivodeship)],
-        [COPY.labels.county, value(registered.county)],
-        [COPY.labels.municipality, value(registered.municipality)],
-        [COPY.labels.postOffice, value(registered.postOffice)],
-        [COPY.labels.countryCode, value(registered.countryCode)],
-        [COPY.labels.legacyCountryName, value(registered.legacyCountryName)],
-      ],
+      rows: registeredAddressRows(payload),
     },
-    {
+  ];
+
+  if (!payload.correspondenceAddress.sameAsRegistered) {
+    sections.push({
       title: COPY.sections.correspondenceAddress,
-      rows: [
-        [
-          COPY.labels.sameAsRegistered,
-          booleanValue(correspondence.sameAsRegistered),
-        ],
-        [COPY.labels.street, value(correspondence.street)],
-        [COPY.labels.houseNumber, value(correspondence.houseNumber)],
-        [COPY.labels.apartmentNumber, value(correspondence.apartmentNumber)],
-        [COPY.labels.postalCode, value(correspondence.postalCode)],
-        [COPY.labels.city, value(correspondence.city)],
-        [COPY.labels.countryCode, value(correspondence.countryCode)],
-        [
-          COPY.labels.legacyCountryName,
-          value(correspondence.legacyCountryName),
-        ],
-      ],
-    },
+      rows: correspondenceAddressRows(payload),
+    });
+  }
+
+  sections.push(
     {
       title: COPY.sections.institutions,
       rows: [
-        ...institutionRows(
-          payload.institutions.taxOffice,
-          COPY.labels.taxOfficeKind,
-          COPY.labels.taxOfficeCode,
-          COPY.labels.taxOfficeName,
+        row(
+          COPY.labels.taxOffice,
+          value(payload.institutions.taxOffice?.name ?? null),
         ),
-        ...institutionRows(
-          payload.institutions.nfzBranch,
-          COPY.labels.nfzBranchKind,
-          COPY.labels.nfzBranchCode,
-          COPY.labels.nfzBranchName,
+        row(
+          COPY.labels.nfzBranch,
+          value(payload.institutions.nfzBranch?.name ?? null),
         ),
       ],
     },
     {
       title: COPY.sections.insurance,
-      rows: [
-        [COPY.labels.otherEmployment, yesNo(insurance.otherEmployment)],
-        [COPY.labels.otherEmployerName, value(insurance.otherEmployerName)],
-        [
-          COPY.labels.otherEmploymentAtLeastMinimumWage,
-          yesNo(insurance.otherEmploymentAtLeastMinimumWage),
-        ],
-        [COPY.labels.studentUnder26, yesNo(insurance.studentUnder26)],
-        [
-          COPY.labels.schoolOrUniversityName,
-          value(insurance.schoolOrUniversityName),
-        ],
-        [
-          COPY.labels.otherMandateContract,
-          yesNo(insurance.otherMandateContract),
-        ],
-        [COPY.labels.otherPrincipalName, value(insurance.otherPrincipalName)],
-        [
-          COPY.labels.otherMandateContractSocialInsurance,
-          yesNo(insurance.otherMandateContractSocialInsurance),
-        ],
-        [
-          COPY.labels.subjectToCompulsorySocialInsurance,
-          yesNo(insurance.subjectToCompulsorySocialInsurance),
-        ],
-        [
-          COPY.labels.voluntarySicknessInsurance,
-          joinDecline(insurance.voluntarySicknessInsurance),
-        ],
-        [
-          COPY.labels.voluntarySicknessInsuranceJoinConfirmed,
-          nullableBoolean(insurance.voluntarySicknessInsuranceJoinConfirmed),
-        ],
-        [
-          COPY.labels.voluntaryPensionDisabilityInsurance,
-          joinDecline(insurance.voluntaryPensionDisabilityInsurance),
-        ],
-        [
-          COPY.labels.hasPensionOrDisabilityPensionRight,
-          yesNo(insurance.hasPensionOrDisabilityPensionRight),
-        ],
-        [COPY.labels.disabilityDegree, disability(insurance.disabilityDegree)],
-        [
-          COPY.labels.registeredAtEmploymentOffice,
-          yesNo(insurance.registeredAtEmploymentOffice),
-        ],
-        [
-          COPY.labels.employmentOfficeAddress,
-          value(insurance.employmentOfficeAddress),
-        ],
-      ],
+      rows: [],
     },
     {
-      title: COPY.sections.payment,
-      rows: [
-        [COPY.labels.bankName, value(payload.payment.bankName)],
-        [
-          COPY.labels.bankAccount,
-          value(formatBankAccount(payload.payment.bankAccount)),
-        ],
-      ],
+      title: COPY.sections.insuranceExclusions,
+      rows: insuranceExclusionRows(payload.insurance),
+    },
+    {
+      title: COPY.sections.compulsoryInsurance,
+      rows: compulsoryInsuranceRows(payload.insurance),
     },
     {
       title: COPY.sections.declaration,
-      rows: [
-        [COPY.labels.statementKey, declaration.statementKey],
-        [COPY.labels.statementVersion, String(declaration.statementVersion)],
-        [COPY.labels.statementText, declaration.statementText],
-        [
-          COPY.labels.questionnaireRevision,
-          String(declaration.questionnaireRevision),
-        ],
-        [COPY.labels.acceptedAt, declaration.acceptedAt],
-        [COPY.labels.actorUserId, declaration.actorUserId],
-        [COPY.labels.source, declaration.source],
-      ],
+      rows: buildQuestionnaireDeclarationRows(payload, statementText),
     },
+  );
+
+  return sections;
+}
+
+function personalRows(personal: PersonalData): QuestionnairePdfRow[] {
+  const rows = [
+    row(COPY.labels.lastName, value(personal.lastName)),
+    row(COPY.labels.firstName, value(personal.firstName)),
+    row(COPY.labels.maidenName, value(personal.maidenName)),
+    row(COPY.labels.middleName, value(personal.middleName)),
+    row(COPY.labels.birthDate, value(personal.birthDate)),
+    row(COPY.labels.birthPlace, value(personal.birthPlace)),
+  ];
+
+  if (personal.identificationBasis === "pesel") {
+    rows.push(row(COPY.labels.pesel, value(personal.pesel)));
+  }
+  rows.push(row(COPY.labels.nip, value(personal.nip)));
+  if (personal.identificationBasis === "identity_document") {
+    rows.push(identityDocumentRow(personal));
+  }
+  rows.push(
+    row(COPY.labels.citizenship, value(personal.citizenship)),
+    row(COPY.labels.phone, value(personal.phone)),
+  );
+
+  return rows;
+}
+
+function registeredAddressRows(
+  payload: QuestionnairePayload,
+): QuestionnairePdfRow[] {
+  const address = payload.registeredAddress;
+  const rows = [
+    row(COPY.labels.postalCode, value(address.postalCode)),
+    row(COPY.labels.city, value(address.city)),
+    row(COPY.labels.street, value(address.street)),
+    row(COPY.labels.houseNumber, value(address.houseNumber)),
+    row(COPY.labels.apartmentNumber, value(address.apartmentNumber)),
+  ];
+
+  if (address.countryCode === "PL") {
+    rows.push(
+      row(COPY.labels.voivodeship, value(address.voivodeship)),
+      row(COPY.labels.county, value(address.county)),
+      row(COPY.labels.municipality, value(address.municipality)),
+      row(COPY.labels.postOffice, value(address.postOffice)),
+    );
+  }
+  rows.push(row(COPY.labels.country, countryName(address.countryCode)));
+
+  return rows;
+}
+
+function correspondenceAddressRows(
+  payload: QuestionnairePayload,
+): QuestionnairePdfRow[] {
+  const address = payload.correspondenceAddress;
+  return [
+    row(COPY.labels.postalCode, value(address.postalCode)),
+    row(COPY.labels.city, value(address.city)),
+    row(COPY.labels.street, value(address.street)),
+    row(COPY.labels.houseNumber, value(address.houseNumber)),
+    row(COPY.labels.apartmentNumber, value(address.apartmentNumber)),
+    row(COPY.labels.country, countryName(address.countryCode)),
   ];
 }
 
-function institutionRows(
-  reference: InstitutionReference,
-  kindLabel: string,
-  codeLabel: string,
-  nameLabel: string,
-): readonly QuestionnairePdfRow[] {
-  return [
-    [
-      kindLabel,
-      reference === null
-        ? COPY.values.empty
-        : reference.kind === "catalog"
-        ? COPY.values.catalog
-        : COPY.values.legacy,
-    ],
-    [codeLabel, value(reference?.code ?? null)],
-    [nameLabel, value(reference?.name ?? null)],
+function insuranceExclusionRows(
+  insurance: InsuranceData,
+): QuestionnairePdfRow[] {
+  const rows = [
+    row(COPY.labels.otherEmployment, yesNo(insurance.otherEmployment)),
   ];
+  if (insurance.otherEmployment === "yes") {
+    rows.push(
+      row(
+        COPY.labels.otherEmployerName,
+        value(insurance.otherEmployerName),
+      ),
+      row(
+        COPY.labels.otherEmploymentAtLeastMinimumWage,
+        yesNo(insurance.otherEmploymentAtLeastMinimumWage),
+      ),
+    );
+  }
+
+  rows.push(row(COPY.labels.studentUnder26, yesNo(insurance.studentUnder26)));
+  if (insurance.studentUnder26 === "yes") {
+    rows.push(
+      row(
+        COPY.labels.schoolOrUniversityName,
+        value(insurance.schoolOrUniversityName),
+      ),
+    );
+  }
+
+  rows.push(
+    row(
+      COPY.labels.otherMandateContract,
+      yesNo(insurance.otherMandateContract),
+    ),
+  );
+  if (insurance.otherMandateContract === "yes") {
+    rows.push(
+      row(
+        COPY.labels.otherPrincipalName,
+        value(insurance.otherPrincipalName),
+      ),
+      row(
+        COPY.labels.otherMandateContractSocialInsurance,
+        yesNo(insurance.otherMandateContractSocialInsurance),
+      ),
+    );
+  }
+
+  if (insurance.subjectToCompulsorySocialInsurance === "no") {
+    rows.push(
+      row(
+        "",
+        selectedJoinDeclineStatement(
+          insurance.voluntaryPensionDisabilityInsurance,
+          COPY.statements.voluntaryPensionDisabilityInsurance,
+        ),
+      ),
+    );
+  }
+
+  return rows;
+}
+
+function compulsoryInsuranceRows(
+  insurance: InsuranceData,
+): QuestionnairePdfRow[] {
+  return [
+    row(
+      COPY.labels.subjectToCompulsorySocialInsurance,
+      yesNo(insurance.subjectToCompulsorySocialInsurance),
+    ),
+    row(
+      "",
+      selectedJoinDeclineStatement(
+        insurance.voluntarySicknessInsurance,
+        COPY.statements.voluntarySicknessInsurance,
+      ),
+    ),
+  ];
+}
+
+function countryName(countryCode: string | null): string {
+  if (countryCode === null) return COPY.values.empty;
+  return POLISH_COUNTRY_OPTIONS.find(
+    (option) => option.value === countryCode,
+  )?.label ?? COPY.values.empty;
+}
+
+function row(label: string, content: string): QuestionnairePdfRow {
+  return [label, content];
 }
 
 function value(input: string | null): string {
   return input === null || input === "" ? COPY.values.empty : input;
 }
 
-function booleanValue(input: boolean): string {
-  return input ? COPY.values.yes : COPY.values.no;
-}
-
-function nullableBoolean(input: boolean | null): string {
-  return input === null ? COPY.values.empty : booleanValue(input);
-}
-
 function yesNo(input: YesNoAnswer): string {
   return input === null ? COPY.values.empty : COPY.values[input];
 }
 
-function joinDecline(input: JoinDeclineAnswer): string {
-  return input === null ? COPY.values.empty : COPY.values[input];
+function selectedJoinDeclineStatement(
+  answer: JoinDeclineAnswer,
+  variants: Readonly<{ join: string; decline: string }>,
+): string {
+  return answer === null ? COPY.values.empty : variants[answer];
 }
 
-function identityDocumentKind(
-  input: QuestionnairePayload["personal"]["identityDocumentKind"],
-): string {
-  if (input === null) return COPY.values.empty;
-  return {
-    id_card: COPY.values.idCard,
-    passport: COPY.values.passport,
-    other: COPY.values.otherDocument,
-  }[input];
-}
+function identityDocumentRow(personal: PersonalData): QuestionnairePdfRow {
+  const number = value(personal.identityDocumentNumber);
+  const kind = personal.identityDocumentKind;
+  const label = kind === null
+    ? COPY.values.empty
+    : {
+      id_card: COPY.labels.identityDocument,
+      passport: COPY.values.passport,
+      other: COPY.values.otherDocument,
+    }[kind];
 
-function disability(
-  input: QuestionnairePayload["insurance"]["disabilityDegree"],
-): string {
-  if (input === null) return COPY.values.empty;
-  return {
-    none: COPY.values.disabilityNone,
-    light: COPY.values.disabilityLight,
-    moderate: COPY.values.disabilityModerate,
-    severe: COPY.values.disabilitySevere,
-  }[input];
+  return row(label, number);
 }

@@ -47,7 +47,10 @@ export async function generateQuestionnairePdf(
   );
   renderer.drawTitle(COPY.title);
   for (
-    const section of buildQuestionnairePdfSections(payload, declaration)
+    const section of buildQuestionnairePdfSections(
+      payload,
+      declaration.statementText,
+    )
   ) {
     renderer.drawSection(section);
   }
