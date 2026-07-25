@@ -3,11 +3,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 
 import { ISelectOption } from '../../../../../core/interfaces/i-select-option';
 import { CoworkerQuestionnaireInsuranceForm } from '../../../../../core/types/coworker-questionnaire-form';
 import { QuestionnaireYesNo } from '../../../../../core/types/coworker-questionnaire';
+import { QuestionnaireChoiceField } from '../questionnaire-choice-field';
 import { QuestionnaireFieldErrors } from '../questionnaire-field-errors';
 import { createQuestionnaireI18n } from '../questionnaire.i18n';
 
@@ -18,7 +18,7 @@ import { createQuestionnaireI18n } from '../questionnaire.i18n';
     ReactiveFormsModule,
     IftaLabelModule,
     InputTextModule,
-    SelectModule,
+    QuestionnaireChoiceField,
     QuestionnaireFieldErrors,
   ],
   templateUrl: './questionnaire-insurance-contracts.html',

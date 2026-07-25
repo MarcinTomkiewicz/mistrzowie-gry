@@ -8,99 +8,52 @@
     </p>
   </header>
 
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="questionnaire-compulsory-social-insurance"
-        formControlName="subjectToCompulsorySocialInsurance"
-        [options]="yesNoOptions()"
-        [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        data-questionnaire-field="data.insurance.subjectToCompulsorySocialInsurance"
-        aria-describedby="questionnaire-compulsory-social-insurance-error"
-      />
-      <label for="questionnaire-compulsory-social-insurance">
-        {{ i18n.fields().subjectToCompulsorySocialInsuranceLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
+  <div class="flex-col-start-stretch gap-md w-100">
+    <app-questionnaire-choice-field
       [control]="form().controls.subjectToCompulsorySocialInsurance"
-      errorId="questionnaire-compulsory-social-insurance-error"
+      [label]="i18n.fields().subjectToCompulsorySocialInsuranceLabel"
+      [options]="yesNoOptions()"
+      fieldPath="data.insurance.subjectToCompulsorySocialInsurance"
+      inputId="questionnaire-compulsory-social-insurance"
     />
-  </div>
 
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="questionnaire-voluntary-sickness-insurance"
-        formControlName="voluntarySicknessInsurance"
-        [options]="insuranceChoiceOptions()"
-        [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        data-questionnaire-field="data.insurance.voluntarySicknessInsurance"
-        aria-describedby="questionnaire-voluntary-sickness-insurance-error"
-      />
-      <label for="questionnaire-voluntary-sickness-insurance">
-        {{ i18n.fields().voluntarySicknessInsuranceLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
+    <app-questionnaire-choice-field
       [control]="form().controls.voluntarySicknessInsurance"
-      errorId="questionnaire-voluntary-sickness-insurance-error"
+      [label]="i18n.fields().voluntarySicknessInsuranceLabel"
+      [options]="insuranceChoiceOptions()"
+      fieldPath="data.insurance.voluntarySicknessInsurance"
+      inputId="questionnaire-voluntary-sickness-insurance"
     />
-  </div>
 
-  @if (form().controls.voluntarySicknessInsurance.value === 'join') {
-    <div class="flex-col-start-stretch gap-xs">
-      <div class="flex-row-start-center gap-sm">
-        <p-checkbox
-          inputId="questionnaire-sickness-confirmed"
-          formControlName="voluntarySicknessInsuranceJoinConfirmed"
-          [binary]="true"
-          data-questionnaire-field="data.insurance.voluntarySicknessInsuranceJoinConfirmed"
-          aria-describedby="questionnaire-sickness-confirmed-error"
+    @if (form().controls.voluntarySicknessInsurance.value === 'join') {
+      <div class="flex-col-start-stretch gap-xs">
+        <div class="flex-row-start-center gap-sm">
+          <p-checkbox
+            inputId="questionnaire-sickness-confirmed"
+            formControlName="voluntarySicknessInsuranceJoinConfirmed"
+            [binary]="true"
+            data-questionnaire-field="data.insurance.voluntarySicknessInsuranceJoinConfirmed"
+            aria-describedby="questionnaire-sickness-confirmed-error"
+          />
+          <label for="questionnaire-sickness-confirmed">
+            {{ i18n.fields().voluntarySicknessInsuranceJoinConfirmedLabel }}
+          </label>
+        </div>
+        <app-questionnaire-field-errors
+          [control]="form().controls.voluntarySicknessInsuranceJoinConfirmed"
+          errorId="questionnaire-sickness-confirmed-error"
         />
-        <label for="questionnaire-sickness-confirmed">
-          {{ i18n.fields().voluntarySicknessInsuranceJoinConfirmedLabel }}
-        </label>
       </div>
-      <app-questionnaire-field-errors
-        [control]="form().controls.voluntarySicknessInsuranceJoinConfirmed"
-        errorId="questionnaire-sickness-confirmed-error"
-      />
-    </div>
-  }
+    }
 
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="questionnaire-voluntary-pension-disability-insurance"
-        formControlName="voluntaryPensionDisabilityInsurance"
+    @if (form().controls.subjectToCompulsorySocialInsurance.value === 'no') {
+      <app-questionnaire-choice-field
+        [control]="form().controls.voluntaryPensionDisabilityInsurance"
+        [label]="i18n.fields().voluntaryPensionDisabilityInsuranceLabel"
         [options]="insuranceChoiceOptions()"
-        [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        data-questionnaire-field="data.insurance.voluntaryPensionDisabilityInsurance"
-        aria-describedby="questionnaire-voluntary-pension-disability-insurance-error"
+        fieldPath="data.insurance.voluntaryPensionDisabilityInsurance"
+        inputId="questionnaire-voluntary-pension-disability-insurance"
       />
-      <label for="questionnaire-voluntary-pension-disability-insurance">
-        {{ i18n.fields().voluntaryPensionDisabilityInsuranceLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
-      [control]="form().controls.voluntaryPensionDisabilityInsurance"
-      errorId="questionnaire-voluntary-pension-disability-insurance-error"
-    />
+    }
   </div>
 </section>

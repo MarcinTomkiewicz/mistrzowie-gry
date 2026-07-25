@@ -1,0 +1,36 @@
+<div class="flex-col-start-stretch gap-xs w-100">
+  <div
+    [class]="
+      stacked()
+        ? 'flex-col-start-stretch gap-xs w-100'
+        : 'grid-3-1 grid-items-center gap-md w-100'
+    "
+  >
+    <span [id]="labelId()">{{ label() }}</span>
+
+    <div
+      class="flex-row-start-center flex-wrap gap-md"
+      role="radiogroup"
+      [attr.aria-labelledby]="labelId()"
+      [attr.aria-describedby]="errorId()"
+      [attr.data-questionnaire-field]="fieldPath()"
+    >
+      @for (option of options(); track option.value) {
+        <div class="flex-row-start-center gap-xs">
+          <p-radiobutton
+            [formControl]="control()"
+            [inputId]="optionInputId(option.value)"
+            [name]="inputId()"
+            [value]="option.value"
+          />
+          <label [for]="optionInputId(option.value)">{{ option.label }}</label>
+        </div>
+      }
+    </div>
+  </div>
+
+  <app-questionnaire-field-errors
+    [control]="control()"
+    [errorId]="errorId()"
+  />
+</div>

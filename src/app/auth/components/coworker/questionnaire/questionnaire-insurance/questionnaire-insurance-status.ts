@@ -11,6 +11,7 @@ import {
   QuestionnaireDisabilityDegree,
   QuestionnaireYesNo,
 } from '../../../../../core/types/coworker-questionnaire';
+import { QuestionnaireChoiceField } from '../questionnaire-choice-field';
 import { QuestionnaireFieldErrors } from '../questionnaire-field-errors';
 import { createQuestionnaireI18n } from '../questionnaire.i18n';
 
@@ -22,6 +23,7 @@ import { createQuestionnaireI18n } from '../questionnaire.i18n';
     IftaLabelModule,
     InputTextModule,
     SelectModule,
+    QuestionnaireChoiceField,
     QuestionnaireFieldErrors,
   ],
   templateUrl: './questionnaire-insurance-status.html',

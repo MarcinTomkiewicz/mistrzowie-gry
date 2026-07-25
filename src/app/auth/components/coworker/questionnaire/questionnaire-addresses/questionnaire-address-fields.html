@@ -8,6 +8,48 @@
         pInputText
         class="w-100"
         type="text"
+        formControlName="postalCode"
+        autocomplete="postal-code"
+        [id]="fieldId('postal-code')"
+        [attr.data-questionnaire-field]="fieldPath('postalCode')"
+        [attr.aria-describedby]="errorId('postal-code')"
+      />
+      <label [for]="fieldId('postal-code')">
+        {{ i18n.fields().postalCodeLabel }}
+      </label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.postalCode"
+      [errorId]="errorId('postal-code')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
+        formControlName="city"
+        autocomplete="address-level2"
+        [id]="fieldId('city')"
+        [attr.data-questionnaire-field]="fieldPath('city')"
+        [attr.aria-describedby]="errorId('city')"
+      />
+      <label [for]="fieldId('city')">{{ i18n.fields().cityLabel }}</label>
+    </p-iftalabel>
+    <app-questionnaire-field-errors
+      [control]="form().controls.city"
+      [errorId]="errorId('city')"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        type="text"
         formControlName="street"
         autocomplete="address-line1"
         [id]="fieldId('street')"
@@ -63,48 +105,6 @@
     <app-questionnaire-field-errors
       [control]="form().controls.apartmentNumber"
       [errorId]="errorId('apartment-number')"
-    />
-  </div>
-
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <input
-        pInputText
-        class="w-100"
-        type="text"
-        formControlName="postalCode"
-        autocomplete="postal-code"
-        [id]="fieldId('postal-code')"
-        [attr.data-questionnaire-field]="fieldPath('postalCode')"
-        [attr.aria-describedby]="errorId('postal-code')"
-      />
-      <label [for]="fieldId('postal-code')">
-        {{ i18n.fields().postalCodeLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
-      [control]="form().controls.postalCode"
-      [errorId]="errorId('postal-code')"
-    />
-  </div>
-
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <input
-        pInputText
-        class="w-100"
-        type="text"
-        formControlName="city"
-        autocomplete="address-level2"
-        [id]="fieldId('city')"
-        [attr.data-questionnaire-field]="fieldPath('city')"
-        [attr.aria-describedby]="errorId('city')"
-      />
-      <label [for]="fieldId('city')">{{ i18n.fields().cityLabel }}</label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
-      [control]="form().controls.city"
-      [errorId]="errorId('city')"
     />
   </div>
 

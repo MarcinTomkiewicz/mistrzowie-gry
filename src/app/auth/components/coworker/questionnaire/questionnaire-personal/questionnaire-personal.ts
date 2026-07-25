@@ -3,7 +3,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 
 import { ICoworkerQuestionnaireSensitiveMetadata } from '../../../../../core/interfaces/i-coworker-questionnaire';
 import { ISelectOption } from '../../../../../core/interfaces/i-select-option';
@@ -12,6 +11,7 @@ import {
   QuestionnaireIdentificationBasis,
   QuestionnaireIdentityDocumentKind,
 } from '../../../../../core/types/coworker-questionnaire';
+import { QuestionnaireChoiceField } from '../questionnaire-choice-field';
 import { QuestionnaireFieldErrors } from '../questionnaire-field-errors';
 import { createQuestionnaireI18n } from '../questionnaire.i18n';
 import { QuestionnaireSensitiveField } from '../questionnaire-sensitive-field/questionnaire-sensitive-field';
@@ -23,7 +23,7 @@ import { QuestionnaireSensitiveField } from '../questionnaire-sensitive-field/qu
     ReactiveFormsModule,
     IftaLabelModule,
     InputTextModule,
-    SelectModule,
+    QuestionnaireChoiceField,
     QuestionnaireFieldErrors,
     QuestionnaireSensitiveField,
   ],

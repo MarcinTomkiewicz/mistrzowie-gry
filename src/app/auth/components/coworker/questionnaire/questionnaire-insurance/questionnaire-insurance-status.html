@@ -8,102 +8,70 @@
     </p>
   </header>
 
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="questionnaire-pension-right"
-        formControlName="hasPensionOrDisabilityPensionRight"
-        [options]="yesNoOptions()"
-        [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        data-questionnaire-field="data.insurance.hasPensionOrDisabilityPensionRight"
-        aria-describedby="questionnaire-pension-right-error"
-      />
-      <label for="questionnaire-pension-right">
-        {{ i18n.fields().hasPensionOrDisabilityPensionRightLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
+  <div class="flex-col-start-stretch gap-md w-100">
+    <app-questionnaire-choice-field
       [control]="form().controls.hasPensionOrDisabilityPensionRight"
-      errorId="questionnaire-pension-right-error"
+      [label]="i18n.fields().hasPensionOrDisabilityPensionRightLabel"
+      [options]="yesNoOptions()"
+      fieldPath="data.insurance.hasPensionOrDisabilityPensionRight"
+      inputId="questionnaire-pension-right"
     />
-  </div>
 
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="questionnaire-disability-degree"
-        formControlName="disabilityDegree"
-        [options]="disabilityDegreeOptions()"
-        [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        data-questionnaire-field="data.insurance.disabilityDegree"
-        aria-describedby="questionnaire-disability-degree-error"
-      />
-      <label for="questionnaire-disability-degree">
-        {{ i18n.fields().disabilityDegreeLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
-      [control]="form().controls.disabilityDegree"
-      errorId="questionnaire-disability-degree-error"
-    />
-  </div>
-
-  <div class="flex-col-start-stretch gap-xs">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="questionnaire-employment-office"
-        formControlName="registeredAtEmploymentOffice"
-        [options]="yesNoOptions()"
-        [placeholder]="i18n.options().selectPlaceholder"
-        [showClear]="true"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        data-questionnaire-field="data.insurance.registeredAtEmploymentOffice"
-        aria-describedby="questionnaire-employment-office-error"
-      />
-      <label for="questionnaire-employment-office">
-        {{ i18n.fields().registeredAtEmploymentOfficeLabel }}
-      </label>
-    </p-iftalabel>
-    <app-questionnaire-field-errors
-      [control]="form().controls.registeredAtEmploymentOffice"
-      errorId="questionnaire-employment-office-error"
-    />
-  </div>
-
-  @if (form().controls.registeredAtEmploymentOffice.value === 'yes') {
     <div class="flex-col-start-stretch gap-xs">
-      <p-iftalabel class="w-100">
-        <input
-          pInputText
-          class="w-100"
-          id="questionnaire-employment-office-address"
-          type="text"
-          formControlName="employmentOfficeAddress"
-          autocomplete="off"
-          data-questionnaire-field="data.insurance.employmentOfficeAddress"
-          aria-describedby="questionnaire-employment-office-address-error"
-        />
-        <label for="questionnaire-employment-office-address">
-          {{ i18n.fields().employmentOfficeAddressLabel }}
+      <div class="grid-3-1 grid-items-center gap-md w-100">
+        <label for="questionnaire-disability-degree">
+          {{ i18n.fields().disabilityDegreeLabel }}
         </label>
-      </p-iftalabel>
+        <p-select
+          class="w-100"
+          inputId="questionnaire-disability-degree"
+          formControlName="disabilityDegree"
+          [options]="disabilityDegreeOptions()"
+          [placeholder]="i18n.options().selectPlaceholder"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          data-questionnaire-field="data.insurance.disabilityDegree"
+          aria-describedby="questionnaire-disability-degree-error"
+        />
+      </div>
       <app-questionnaire-field-errors
-        [control]="form().controls.employmentOfficeAddress"
-        errorId="questionnaire-employment-office-address-error"
+        [control]="form().controls.disabilityDegree"
+        errorId="questionnaire-disability-degree-error"
       />
     </div>
-  }
+
+    <app-questionnaire-choice-field
+      [control]="form().controls.registeredAtEmploymentOffice"
+      [label]="i18n.fields().registeredAtEmploymentOfficeLabel"
+      [options]="yesNoOptions()"
+      fieldPath="data.insurance.registeredAtEmploymentOffice"
+      inputId="questionnaire-employment-office"
+    />
+
+    @if (form().controls.registeredAtEmploymentOffice.value === 'yes') {
+      <div class="flex-col-start-stretch gap-xs">
+        <p-iftalabel class="w-100">
+          <input
+            pInputText
+            class="w-100"
+            id="questionnaire-employment-office-address"
+            type="text"
+            formControlName="employmentOfficeAddress"
+            autocomplete="off"
+            data-questionnaire-field="data.insurance.employmentOfficeAddress"
+            aria-describedby="questionnaire-employment-office-address-error"
+          />
+          <label for="questionnaire-employment-office-address">
+            {{ i18n.fields().employmentOfficeAddressLabel }}
+          </label>
+        </p-iftalabel>
+        <app-questionnaire-field-errors
+          [control]="form().controls.employmentOfficeAddress"
+          errorId="questionnaire-employment-office-address-error"
+        />
+      </div>
+    }
+  </div>
 </section>

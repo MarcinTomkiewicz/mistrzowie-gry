@@ -2,8 +2,6 @@ import { Component, input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { CheckboxModule } from 'primeng/checkbox';
-import { IftaLabelModule } from 'primeng/iftalabel';
-import { SelectModule } from 'primeng/select';
 
 import { ISelectOption } from '../../../../../core/interfaces/i-select-option';
 import { CoworkerQuestionnaireInsuranceForm } from '../../../../../core/types/coworker-questionnaire-form';
@@ -11,6 +9,7 @@ import {
   QuestionnaireJoinDeclineAnswer,
   QuestionnaireYesNo,
 } from '../../../../../core/types/coworker-questionnaire';
+import { QuestionnaireChoiceField } from '../questionnaire-choice-field';
 import { QuestionnaireFieldErrors } from '../questionnaire-field-errors';
 import { createQuestionnaireI18n } from '../questionnaire.i18n';
 
@@ -20,8 +19,7 @@ import { createQuestionnaireI18n } from '../questionnaire.i18n';
   imports: [
     ReactiveFormsModule,
     CheckboxModule,
-    IftaLabelModule,
-    SelectModule,
+    QuestionnaireChoiceField,
     QuestionnaireFieldErrors,
   ],
   templateUrl: './questionnaire-insurance-elections.html',

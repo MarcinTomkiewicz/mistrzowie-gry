@@ -14,98 +14,100 @@
     fieldPathPrefix="data.registeredAddress"
   />
 
-  <div
-    class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100"
-    [formGroup]="registeredAddress()"
-  >
-    <div class="flex-col-start-stretch gap-xs">
-      <p-iftalabel class="w-100">
-        <input
-          pInputText
-          class="w-100"
-          id="questionnaire-registered-voivodeship"
-          type="text"
-          formControlName="voivodeship"
-          autocomplete="address-level1"
-          data-questionnaire-field="data.registeredAddress.voivodeship"
-          aria-describedby="questionnaire-registered-voivodeship-error"
+  @if (registeredAddress().controls.countryCode.value === 'PL') {
+    <div
+      class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100"
+      [formGroup]="registeredAddress()"
+    >
+      <div class="flex-col-start-stretch gap-xs">
+        <p-iftalabel class="w-100">
+          <input
+            pInputText
+            class="w-100"
+            id="questionnaire-registered-voivodeship"
+            type="text"
+            formControlName="voivodeship"
+            autocomplete="address-level1"
+            data-questionnaire-field="data.registeredAddress.voivodeship"
+            aria-describedby="questionnaire-registered-voivodeship-error"
+          />
+          <label for="questionnaire-registered-voivodeship">
+            {{ i18n.fields().voivodeshipLabel }}
+          </label>
+        </p-iftalabel>
+        <app-questionnaire-field-errors
+          [control]="registeredAddress().controls.voivodeship"
+          errorId="questionnaire-registered-voivodeship-error"
         />
-        <label for="questionnaire-registered-voivodeship">
-          {{ i18n.fields().voivodeshipLabel }}
-        </label>
-      </p-iftalabel>
-      <app-questionnaire-field-errors
-        [control]="registeredAddress().controls.voivodeship"
-        errorId="questionnaire-registered-voivodeship-error"
-      />
-    </div>
+      </div>
 
-    <div class="flex-col-start-stretch gap-xs">
-      <p-iftalabel class="w-100">
-        <input
-          pInputText
-          class="w-100"
-          id="questionnaire-registered-county"
-          type="text"
-          formControlName="county"
-          autocomplete="off"
-          data-questionnaire-field="data.registeredAddress.county"
-          aria-describedby="questionnaire-registered-county-error"
+      <div class="flex-col-start-stretch gap-xs">
+        <p-iftalabel class="w-100">
+          <input
+            pInputText
+            class="w-100"
+            id="questionnaire-registered-county"
+            type="text"
+            formControlName="county"
+            autocomplete="off"
+            data-questionnaire-field="data.registeredAddress.county"
+            aria-describedby="questionnaire-registered-county-error"
+          />
+          <label for="questionnaire-registered-county">
+            {{ i18n.fields().countyLabel }}
+          </label>
+        </p-iftalabel>
+        <app-questionnaire-field-errors
+          [control]="registeredAddress().controls.county"
+          errorId="questionnaire-registered-county-error"
         />
-        <label for="questionnaire-registered-county">
-          {{ i18n.fields().countyLabel }}
-        </label>
-      </p-iftalabel>
-      <app-questionnaire-field-errors
-        [control]="registeredAddress().controls.county"
-        errorId="questionnaire-registered-county-error"
-      />
-    </div>
+      </div>
 
-    <div class="flex-col-start-stretch gap-xs">
-      <p-iftalabel class="w-100">
-        <input
-          pInputText
-          class="w-100"
-          id="questionnaire-registered-municipality"
-          type="text"
-          formControlName="municipality"
-          autocomplete="off"
-          data-questionnaire-field="data.registeredAddress.municipality"
-          aria-describedby="questionnaire-registered-municipality-error"
+      <div class="flex-col-start-stretch gap-xs">
+        <p-iftalabel class="w-100">
+          <input
+            pInputText
+            class="w-100"
+            id="questionnaire-registered-municipality"
+            type="text"
+            formControlName="municipality"
+            autocomplete="off"
+            data-questionnaire-field="data.registeredAddress.municipality"
+            aria-describedby="questionnaire-registered-municipality-error"
+          />
+          <label for="questionnaire-registered-municipality">
+            {{ i18n.fields().municipalityLabel }}
+          </label>
+        </p-iftalabel>
+        <app-questionnaire-field-errors
+          [control]="registeredAddress().controls.municipality"
+          errorId="questionnaire-registered-municipality-error"
         />
-        <label for="questionnaire-registered-municipality">
-          {{ i18n.fields().municipalityLabel }}
-        </label>
-      </p-iftalabel>
-      <app-questionnaire-field-errors
-        [control]="registeredAddress().controls.municipality"
-        errorId="questionnaire-registered-municipality-error"
-      />
-    </div>
+      </div>
 
-    <div class="flex-col-start-stretch gap-xs">
-      <p-iftalabel class="w-100">
-        <input
-          pInputText
-          class="w-100"
-          id="questionnaire-registered-post-office"
-          type="text"
-          formControlName="postOffice"
-          autocomplete="off"
-          data-questionnaire-field="data.registeredAddress.postOffice"
-          aria-describedby="questionnaire-registered-post-office-error"
+      <div class="flex-col-start-stretch gap-xs">
+        <p-iftalabel class="w-100">
+          <input
+            pInputText
+            class="w-100"
+            id="questionnaire-registered-post-office"
+            type="text"
+            formControlName="postOffice"
+            autocomplete="off"
+            data-questionnaire-field="data.registeredAddress.postOffice"
+            aria-describedby="questionnaire-registered-post-office-error"
+          />
+          <label for="questionnaire-registered-post-office">
+            {{ i18n.fields().postOfficeLabel }}
+          </label>
+        </p-iftalabel>
+        <app-questionnaire-field-errors
+          [control]="registeredAddress().controls.postOffice"
+          errorId="questionnaire-registered-post-office-error"
         />
-        <label for="questionnaire-registered-post-office">
-          {{ i18n.fields().postOfficeLabel }}
-        </label>
-      </p-iftalabel>
-      <app-questionnaire-field-errors
-        [control]="registeredAddress().controls.postOffice"
-        errorId="questionnaire-registered-post-office-error"
-      />
+      </div>
     </div>
-  </div>
+  }
 </section>
 
 <section
@@ -140,9 +142,11 @@
     />
   </div>
 
-  <app-questionnaire-address-fields
-    [form]="correspondenceAddress()"
-    idPrefix="questionnaire-correspondence-address"
-    fieldPathPrefix="data.correspondenceAddress"
-  />
+  @if (!correspondenceAddress().controls.sameAsRegistered.value) {
+    <app-questionnaire-address-fields
+      [form]="correspondenceAddress()"
+      idPrefix="questionnaire-correspondence-address"
+      fieldPathPrefix="data.correspondenceAddress"
+    />
+  }
 </section>
