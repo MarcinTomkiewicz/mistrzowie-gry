@@ -187,6 +187,7 @@ async function recoverReservation(
       questionnaireRevision,
       declarationId,
       expectedSizeBytes,
+      previous.originalFilename,
     );
   } catch (error) {
     logQuestionnaireDocumentFailure(

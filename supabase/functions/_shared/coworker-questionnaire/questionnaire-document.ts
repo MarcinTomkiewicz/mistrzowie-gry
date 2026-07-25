@@ -5,6 +5,7 @@ import {
   BackendContractError,
   QuestionnairePdfGenerationError,
 } from "./errors.ts";
+import { buildQuestionnairePdfFilename } from "./questionnaire-document-filename.ts";
 import { completeQuestionnaireDocumentLifecycle } from "./questionnaire-document-lifecycle.ts";
 import { logQuestionnaireDocumentFailure } from "./questionnaire-document-log.ts";
 import { reserveQuestionnaireDocument } from "./questionnaire-document-rpc.ts";
@@ -26,6 +27,10 @@ export async function ensureQuestionnaireDocument(
   ) {
     throw new BackendContractError(RPC.saveEnvelope);
   }
+  const originalFilename = buildQuestionnairePdfFilename(
+    payload.personal.firstName,
+    payload.personal.lastName,
+  );
 
   let pdfBytes: Uint8Array;
   try {
@@ -48,6 +53,7 @@ export async function ensureQuestionnaireDocument(
     saveResult.revision,
     declaration.id,
     pdfBytes.byteLength,
+    originalFilename,
   );
   if (reservation.alreadyFinalized) return;
 

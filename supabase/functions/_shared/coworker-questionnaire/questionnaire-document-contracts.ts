@@ -58,6 +58,7 @@ export function parseQuestionnaireDocumentReservation(
     questionnaireRevision: number;
     declarationId: string;
     expectedSizeBytes: number;
+    originalFilename: string;
   },
 ): QuestionnaireDocumentReservation {
   const rpcName = RPC.reserveQuestionnaireDocument;
@@ -109,6 +110,7 @@ export function parseQuestionnaireDocumentReservation(
     reservation.questionnaireRevision !== expected.questionnaireRevision ||
     reservation.declarationId !== expected.declarationId ||
     reservation.expectedSizeBytes !== expected.expectedSizeBytes ||
+    reservation.originalFilename !== expected.originalFilename ||
     (!reservation.alreadyFinalized && reservation.uploadSessionId === null)
   ) {
     throw new BackendContractError(rpcName);

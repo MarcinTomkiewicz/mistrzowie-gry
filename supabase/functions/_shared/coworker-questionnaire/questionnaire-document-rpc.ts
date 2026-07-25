@@ -21,18 +21,21 @@ export async function reserveQuestionnaireDocument(
   questionnaireRevision: number,
   declarationId: string,
   expectedSizeBytes: number,
+  originalFilename: string,
 ): Promise<QuestionnaireDocumentReservation> {
   const data = await callRpc(client, RPC.reserveQuestionnaireDocument, {
     p_user_id: userId,
     p_actor_user_id: userId,
     p_questionnaire_revision: questionnaireRevision,
     p_expected_size_bytes: expectedSizeBytes,
+    p_original_filename: originalFilename,
   });
   return parseQuestionnaireDocumentReservation(data, {
     userId,
     questionnaireRevision,
     declarationId,
     expectedSizeBytes,
+    originalFilename,
   });
 }
 
