@@ -77,9 +77,18 @@
         @if (currentDeclaration(); as declaration) {
           <p class="m-0 muted-text">
             {{ i18n.status().declarationAcceptedAtLabel }}:
-            {{ declaration.acceptedAt }}
+            {{ formatTimestampLabel(declaration.acceptedAt, "pl-PL") }}
           </p>
         }
+        <div class="flex-row-start-center">
+          <p-button
+            type="button"
+            severity="secondary"
+            icon="pi pi-lock"
+            [label]="i18n.actions().goToPrivateDocumentsLabel"
+            [routerLink]="['/auth/coworker/documents']"
+          />
+        </div>
       </section>
     }
 

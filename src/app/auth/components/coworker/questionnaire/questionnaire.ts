@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, ElementRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { finalize, Subscription } from 'rxjs';
@@ -18,6 +19,7 @@ import { CoworkerQuestionnaire as CoworkerQuestionnaireApi } from '../../../../c
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { CoworkerQuestionnaireForm } from '../../../../core/types/coworker-questionnaire-form';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
+import { formatTimestampLabel } from '../../../../core/utils/date';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { QuestionnaireAddresses } from './questionnaire-addresses/questionnaire-addresses';
 import { createQuestionnaireCompletionError } from './questionnaire-completion-error';
@@ -47,6 +49,7 @@ import { buildCoworkerQuestionnaireSaveRequest } from './questionnaire-request';
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     ButtonModule,
     CheckboxModule,
     MessageModule,
@@ -70,6 +73,7 @@ export class Questionnaire {
   private formBinding: Subscription | null = null;
 
   protected readonly i18n = createQuestionnaireI18n();
+  protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly form = signal<CoworkerQuestionnaireForm | null>(null);
   protected readonly revision = signal<number | null>(null);
   protected readonly statement =
@@ -246,7 +250,6 @@ export class Questionnaire {
       )
       .subscribe({
         next: (response) => {
-          savingState.set(false);
           this.revision.set(response.revision);
           this.statement.set(response.statement);
           this.currentDeclaration.set(response.currentDeclaration);
@@ -270,7 +273,6 @@ export class Questionnaire {
           );
         },
         error: (error: unknown) => {
-          savingState.set(false);
           const normalized = normalizeQuestionnaireError(
             error,
             this.i18n.errors().unexpectedDescription,

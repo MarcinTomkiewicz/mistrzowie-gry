@@ -101,13 +101,14 @@
   "actions": {
     "saveDraftLabel": "Zapisz wersję roboczą",
     "completeLabel": "Ukończ kwestionariusz",
-    "reloadLabel": "Pobierz aktualne dane"
+    "reloadLabel": "Pobierz aktualne dane",
+    "goToPrivateDocumentsLabel": "[PH] Przejdź do Dokumentów prywatnych"
   },
   "status": {
     "savingDraft": "[PH] Zapisywanie wersji roboczej…",
     "completing": "[PH] Kończenie kwestionariusza…",
     "completeTitle": "[PH] Kwestionariusz został ukończony",
-    "completeDescription": "[PH] Dane zostały zapisane i przeszły walidację. Formularz pozostaje dostępny, jeśli później będzie potrzebna korekta.",
+    "completeDescription": "[PH] PDF został utworzony i jest dostępny w Dokumentach prywatnych. Dokument nie pobierze się automatycznie.",
     "legacyCountryNotice": "[PH] Zapisany kraj wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
     "legacyCitizenshipNotice": "[PH] Zapisane obywatelstwo wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
     "legacyInstitutionNotice": "[PH] Zapisana wartość wymaga świadomego wybrania pozycji z aktualnego katalogu przed ukończeniem.",
@@ -138,7 +139,7 @@
   "toast": {
     "draftSavedSummary": "[PH] Zapisano wersję roboczą",
     "draftSavedDetail": "[PH] Możesz wrócić do kwestionariusza i dokończyć go później.",
-    "completeSummary": "[PH] Kwestionariusz ukończony",
-    "completeDetail": "[PH] Dane zostały zapisane i zweryfikowane."
+    "completeSummary": "[PH] Kwestionariusz został ukończony",
+    "completeDetail": "[PH] PDF został utworzony i jest dostępny w Dokumentach prywatnych. Dokument nie pobierze się automatycznie."
   }
 }

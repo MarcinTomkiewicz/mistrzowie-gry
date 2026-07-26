@@ -117,6 +117,7 @@ export type QuestionnaireActionsTranslations = {
   saveDraftLabel: string;
   completeLabel: string;
   reloadLabel: string;
+  goToPrivateDocumentsLabel: string;
 };
 
 export type QuestionnaireStatusTranslations = {
