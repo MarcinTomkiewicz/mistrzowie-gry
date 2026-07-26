@@ -2,7 +2,7 @@ import fontkit from "npm:@pdf-lib/fontkit@1.1.1";
 import { PDFDocument } from "npm:pdf-lib@1.17.1";
 
 import type { QuestionnairePayload, SaveEnvelopeResult } from "./contracts.ts";
-import { buildQuestionnairePdfSections } from "./questionnaire-pdf-content.ts";
+import { buildQuestionnairePdfContent } from "./questionnaire-pdf-content.ts";
 import { QUESTIONNAIRE_PDF_COPY as COPY } from "./questionnaire-pdf-copy.ts";
 import { QuestionnairePdfRenderer } from "./questionnaire-pdf-renderer.ts";
 
@@ -46,17 +46,8 @@ export async function generateQuestionnairePdf(
     boldFont,
   );
   renderer.drawTitle(COPY.title);
-  for (
-    const section of buildQuestionnairePdfSections(
-      payload,
-      declaration.statementText,
-    )
-  ) {
-    renderer.drawSection(section);
-  }
-  renderer.drawSignatureBlock(
-    COPY.signature.placeAndDate,
-    COPY.signature.coworker,
+  renderer.drawContent(
+    buildQuestionnairePdfContent(payload, declaration.statementText),
   );
 
   return await document.save({

@@ -1,25 +1,30 @@
+import { PageSizes, type PDFDocument, type PDFFont } from "npm:pdf-lib@1.17.1";
+
+import type {
+  QuestionnairePdfContent,
+  QuestionnairePdfFieldGrid,
+  QuestionnairePdfFormRows,
+  QuestionnairePdfTextBlock,
+} from "./questionnaire-pdf-content-model.ts";
 import {
-  PageSizes,
-  type PDFDocument,
-  type PDFFont,
-  type PDFPage,
-  rgb,
-} from "npm:pdf-lib@1.17.1";
-
-import type { QuestionnairePdfSection } from "./questionnaire-pdf-content.ts";
-
-const PAGE_MARGIN = 48;
-const LABEL_WIDTH = 170;
-const COLUMN_GAP = 16;
-const FONT_SIZE = 9;
-const LINE_HEIGHT = 12;
-const ROW_GAP = 7;
-const SECTION_GAP = 18;
-const SIGNATURE_LINE_WIDTH = 220;
-const SIGNATURE_FIELD_HEIGHT = 52;
+  layoutQuestionnairePdfFieldRows,
+  layoutQuestionnairePdfFormRows,
+  layoutQuestionnairePdfParagraphs,
+  QUESTIONNAIRE_PDF_LAYOUT as LAYOUT,
+  type QuestionnairePdfFieldRowLayout,
+  type QuestionnairePdfFormRowLayout,
+  type QuestionnairePdfParagraphLayout,
+} from "./questionnaire-pdf-layout.ts";
+import {
+  QuestionnairePdfPageRenderer,
+} from "./questionnaire-pdf-page-renderer.ts";
+import {
+  drawQuestionnairePdfSignatureBlock,
+  QUESTIONNAIRE_PDF_SIGNATURE_HEIGHT,
+} from "./questionnaire-pdf-signature.ts";
 
 export class QuestionnairePdfRenderer {
-  private page: PDFPage;
+  private pageRenderer: QuestionnairePdfPageRenderer;
   private y: number;
 
   constructor(
@@ -27,180 +32,240 @@ export class QuestionnairePdfRenderer {
     private readonly regularFont: PDFFont,
     private readonly boldFont: PDFFont,
   ) {
-    this.page = this.addPage();
-    this.y = this.page.getHeight() - PAGE_MARGIN;
+    this.pageRenderer = this.createPageRenderer();
+    this.y = this.pageRenderer.pageTop;
   }
 
   drawTitle(title: string): void {
-    this.page.drawText(title, {
-      x: PAGE_MARGIN,
-      y: this.y,
-      size: 17,
-      font: this.boldFont,
-      color: rgb(0.08, 0.12, 0.18),
-    });
-    this.y -= 30;
+    this.y = this.pageRenderer.drawTitle(this.y, title);
   }
 
-  drawSection(section: QuestionnairePdfSection): void {
-    this.ensureSpace(SECTION_GAP + LINE_HEIGHT);
-    this.page.drawText(section.title, {
-      x: PAGE_MARGIN,
-      y: this.y,
-      size: 12,
-      font: this.boldFont,
-      color: rgb(0.1, 0.25, 0.42),
-    });
-    this.y -= SECTION_GAP;
-
-    for (const [label, content] of section.rows) {
-      this.drawRow(label, content);
+  drawContent(content: readonly QuestionnairePdfContent[]): void {
+    for (const [index, element] of content.entries()) {
+      const keepTogether = content[index - 1]?.kind !== "heading";
+      switch (element.kind) {
+        case "heading":
+          this.ensureSpace(this.headingChainHeight(content, index));
+          this.y = this.pageRenderer.drawHeading(this.y, element);
+          break;
+        case "field-grid":
+          this.drawFieldGrid(element, keepTogether);
+          break;
+        case "form-rows":
+          this.drawFormRows(element, keepTogether);
+          break;
+        case "text":
+          this.drawTextBlock(element, keepTogether, content[index + 1]);
+          break;
+        case "signature":
+          this.drawSignatureBlock(
+            element.placeAndDateLabel,
+            element.signatureLabel,
+          );
+          break;
+      }
     }
-    this.y -= SECTION_GAP;
   }
 
-  drawSignatureBlock(placeAndDateLabel: string, signatureLabel: string): void {
-    this.ensureSpace((2 * SIGNATURE_FIELD_HEIGHT) + SECTION_GAP);
-    this.drawSignatureField(placeAndDateLabel);
-    this.drawSignatureField(signatureLabel);
-  }
-
-  private drawSignatureField(label: string): void {
-    this.page.drawText(label, {
-      x: PAGE_MARGIN,
-      y: this.y,
-      size: FONT_SIZE,
-      font: this.boldFont,
-    });
-    this.y -= 32;
-    this.page.drawLine({
-      start: { x: PAGE_MARGIN, y: this.y },
-      end: { x: PAGE_MARGIN + SIGNATURE_LINE_WIDTH, y: this.y },
-      thickness: 0.75,
-      color: rgb(0.25, 0.25, 0.25),
-    });
-    this.y -= 20;
-  }
-
-  private drawRow(label: string, content: string): void {
-    const valueWidth = this.page.getWidth() - (2 * PAGE_MARGIN) -
-      LABEL_WIDTH - COLUMN_GAP;
-    const labelLines = wrapText(
-      label,
-      this.boldFont,
-      FONT_SIZE,
-      LABEL_WIDTH,
-    );
-    const valueLines = wrapText(
-      content,
+  private drawSignatureBlock(
+    placeAndDateLabel: string,
+    signatureLabel: string,
+  ): void {
+    this.ensureSpace(QUESTIONNAIRE_PDF_SIGNATURE_HEIGHT);
+    this.y = drawQuestionnairePdfSignatureBlock(
+      this.pageRenderer.page,
       this.regularFont,
-      FONT_SIZE,
-      valueWidth,
+      this.y,
+      this.pageRenderer.contentWidth,
+      placeAndDateLabel,
+      signatureLabel,
     );
-    const lineCount = Math.max(labelLines.length, valueLines.length);
-    let lineIndex = 0;
+  }
 
-    while (lineIndex < lineCount) {
-      this.ensureSpace(LINE_HEIGHT);
-      const availableLines = Math.max(
-        1,
-        Math.floor((this.y - PAGE_MARGIN) / LINE_HEIGHT),
+  private drawFieldGrid(
+    grid: QuestionnairePdfFieldGrid,
+    keepTogether: boolean,
+  ): void {
+    const rows = this.layoutFieldRows(grid);
+    if (keepTogether) this.keepBlockTogether(totalFieldGridHeight(rows));
+
+    for (const [index, row] of rows.entries()) {
+      this.ensureSpace(row.height);
+      this.y = this.pageRenderer.drawFieldRow(this.y, row);
+      if (index < rows.length - 1) this.y -= LAYOUT.field.rowGap;
+    }
+    this.y -= LAYOUT.blockGap;
+  }
+
+  private drawFormRows(
+    block: QuestionnairePdfFormRows,
+    keepTogether: boolean,
+  ): void {
+    const rows = this.layoutFormRows(block);
+    if (keepTogether) this.keepBlockTogether(totalFormRowsHeight(rows));
+
+    for (const row of rows) {
+      this.ensureSpace(row.height);
+      this.y = this.pageRenderer.drawFormRow(this.y, row);
+    }
+    this.y -= LAYOUT.blockGap;
+  }
+
+  private drawTextBlock(
+    block: QuestionnairePdfTextBlock,
+    keepTogether: boolean,
+    next: QuestionnairePdfContent | undefined,
+  ): void {
+    const paragraphs = this.layoutParagraphs(block);
+    const height = totalTextBlockHeight(paragraphs);
+    if (keepTogether) {
+      this.keepBlockTogether(
+        next?.kind === "signature"
+          ? height + QUESTIONNAIRE_PDF_SIGNATURE_HEIGHT
+          : height,
       );
-      const chunkSize = Math.min(lineCount - lineIndex, availableLines);
+    }
 
-      for (let offset = 0; offset < chunkSize; offset += 1) {
-        const current = lineIndex + offset;
-        const baseline = this.y - (offset * LINE_HEIGHT);
-        const labelLine = labelLines[current];
-        const valueLine = valueLines[current];
-        if (labelLine !== undefined) {
-          this.page.drawText(labelLine, {
-            x: PAGE_MARGIN,
-            y: baseline,
-            size: FONT_SIZE,
-            font: this.boldFont,
-          });
-        }
-        if (valueLine !== undefined) {
-          this.page.drawText(valueLine, {
-            x: PAGE_MARGIN + LABEL_WIDTH + COLUMN_GAP,
-            y: baseline,
-            size: FONT_SIZE,
-            font: this.regularFont,
-          });
-        }
-      }
-
-      lineIndex += chunkSize;
-      this.y -= (chunkSize * LINE_HEIGHT) + ROW_GAP;
-      if (lineIndex < lineCount) {
-        this.page = this.addPage();
-        this.y = this.page.getHeight() - PAGE_MARGIN;
+    for (const [index, paragraph] of paragraphs.entries()) {
+      this.drawTextLinesAcrossPages(paragraph.lines);
+      if (index < paragraphs.length - 1) {
+        this.y -= LAYOUT.text.paragraphGap;
       }
     }
+    this.y -= LAYOUT.blockGap;
+  }
+
+  private drawTextLinesAcrossPages(lines: readonly string[]): void {
+    let index = 0;
+    while (index < lines.length) {
+      const availableLines = Math.floor(
+        (this.y - LAYOUT.pageMargin) / LAYOUT.text.lineHeight,
+      );
+      if (availableLines < 1) {
+        this.startPage();
+        continue;
+      }
+      const chunk = lines.slice(index, index + availableLines);
+      this.y = this.pageRenderer.drawTextLines(this.y, chunk);
+      index += chunk.length;
+      if (index < lines.length) this.startPage();
+    }
+  }
+
+  private headingChainHeight(
+    content: readonly QuestionnairePdfContent[],
+    startIndex: number,
+  ): number {
+    let height = 0;
+    let index = startIndex;
+    while (true) {
+      const element = content[index];
+      if (element?.kind !== "heading") break;
+      height += this.pageRenderer.headingHeight(element);
+      index += 1;
+    }
+    const next = content[index];
+    if (next === undefined) return height;
+    return height + this.minimumBlockHeight(next);
+  }
+
+  private minimumBlockHeight(element: QuestionnairePdfContent): number {
+    switch (element.kind) {
+      case "field-grid":
+        return this.layoutFieldRows(element)[0]?.height ?? 0;
+      case "form-rows":
+        return this.layoutFormRows(element)[0]?.height ?? 0;
+      case "text":
+        return (this.layoutParagraphs(element)[0]?.lines.length ?? 0) > 0
+          ? LAYOUT.text.lineHeight
+          : 0;
+      case "signature":
+        return QUESTIONNAIRE_PDF_SIGNATURE_HEIGHT;
+      case "heading":
+        return this.pageRenderer.headingHeight(element);
+    }
+  }
+
+  private layoutFieldRows(
+    grid: QuestionnairePdfFieldGrid,
+  ): QuestionnairePdfFieldRowLayout[] {
+    return layoutQuestionnairePdfFieldRows(
+      grid.fields,
+      this.regularFont,
+      this.boldFont,
+      this.pageRenderer.contentWidth,
+    );
+  }
+
+  private layoutFormRows(
+    block: QuestionnairePdfFormRows,
+  ): QuestionnairePdfFormRowLayout[] {
+    return layoutQuestionnairePdfFormRows(
+      block.rows,
+      this.regularFont,
+      this.boldFont,
+      this.pageRenderer.contentWidth,
+    );
+  }
+
+  private layoutParagraphs(
+    block: QuestionnairePdfTextBlock,
+  ): QuestionnairePdfParagraphLayout[] {
+    return layoutQuestionnairePdfParagraphs(
+      block.paragraphs,
+      this.regularFont,
+      this.pageRenderer.contentWidth,
+    );
+  }
+
+  private keepBlockTogether(height: number): void {
+    if (height <= this.pageRenderer.pageCapacity) this.ensureSpace(height);
   }
 
   private ensureSpace(requiredHeight: number): void {
-    if (this.y - requiredHeight >= PAGE_MARGIN) return;
-    this.page = this.addPage();
-    this.y = this.page.getHeight() - PAGE_MARGIN;
+    if (this.y - requiredHeight >= LAYOUT.pageMargin) return;
+    if (this.y < this.pageRenderer.pageTop) this.startPage();
   }
 
-  private addPage(): PDFPage {
-    return this.document.addPage(PageSizes.A4);
+  private startPage(): void {
+    this.pageRenderer = this.createPageRenderer();
+    this.y = this.pageRenderer.pageTop;
+  }
+
+  private createPageRenderer(): QuestionnairePdfPageRenderer {
+    return new QuestionnairePdfPageRenderer(
+      this.document.addPage(PageSizes.A4),
+      this.regularFont,
+      this.boldFont,
+    );
   }
 }
 
-function wrapText(
-  text: string,
-  font: PDFFont,
-  size: number,
-  maxWidth: number,
-): string[] {
-  const lines: string[] = [];
-  for (const paragraph of text.split(/\r?\n/)) {
-    const words = paragraph.split(/\s+/).filter((word) => word !== "");
-    if (words.length === 0) {
-      lines.push("");
-      continue;
-    }
-    let line = "";
-    for (
-      const word of words.flatMap((item) =>
-        breakLongWord(item, font, size, maxWidth)
-      )
-    ) {
-      const candidate = line === "" ? word : `${line} ${word}`;
-      if (font.widthOfTextAtSize(candidate, size) <= maxWidth) {
-        line = candidate;
-      } else {
-        lines.push(line);
-        line = word;
-      }
-    }
-    if (line !== "") lines.push(line);
-  }
-  return lines;
+function totalFieldGridHeight(
+  rows: readonly QuestionnairePdfFieldRowLayout[],
+): number {
+  const rowHeights = rows.reduce((total, row) => total + row.height, 0);
+  const gaps = Math.max(0, rows.length - 1) * LAYOUT.field.rowGap;
+  return rowHeights + gaps + LAYOUT.blockGap;
 }
 
-function breakLongWord(
-  word: string,
-  font: PDFFont,
-  size: number,
-  maxWidth: number,
-): string[] {
-  if (font.widthOfTextAtSize(word, size) <= maxWidth) return [word];
-  const chunks: string[] = [];
-  let chunk = "";
-  for (const character of word) {
-    const candidate = chunk + character;
-    if (chunk !== "" && font.widthOfTextAtSize(candidate, size) > maxWidth) {
-      chunks.push(chunk);
-      chunk = character;
-    } else {
-      chunk = candidate;
-    }
-  }
-  if (chunk !== "") chunks.push(chunk);
-  return chunks;
+function totalFormRowsHeight(
+  rows: readonly QuestionnairePdfFormRowLayout[],
+): number {
+  return rows.reduce<number>(
+    (total, row) => total + row.height,
+    LAYOUT.blockGap,
+  );
+}
+
+function totalTextBlockHeight(
+  paragraphs: readonly QuestionnairePdfParagraphLayout[],
+): number {
+  const textHeight = paragraphs.reduce(
+    (total, paragraph) => total + paragraph.height,
+    0,
+  );
+  const gaps = Math.max(0, paragraphs.length - 1) *
+    LAYOUT.text.paragraphGap;
+  return textHeight + gaps + LAYOUT.blockGap;
 }

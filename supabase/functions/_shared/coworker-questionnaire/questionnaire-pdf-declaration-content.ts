@@ -4,53 +4,58 @@ import type {
   QuestionnairePayload,
   YesNoAnswer,
 } from "./contracts.ts";
+import type {
+  QuestionnairePdfContent,
+  QuestionnairePdfField,
+} from "./questionnaire-pdf-content-model.ts";
 import { QUESTIONNAIRE_PDF_COPY as COPY } from "./questionnaire-pdf-copy.ts";
-import type { QuestionnairePdfRow } from "./questionnaire-pdf-content.ts";
 
 const STATEMENT_CONTRACT_ERROR =
   "Questionnaire statement text does not match the PDF content contract.";
 
-export function buildQuestionnaireDeclarationRows(
+export function buildQuestionnaireDeclarationContent(
   payload: QuestionnairePayload,
   statementText: string,
-): readonly QuestionnairePdfRow[] {
+): readonly QuestionnairePdfContent[] {
   const statement = splitStatementText(statementText);
   const insurance = payload.insurance;
-  const rows: QuestionnairePdfRow[] = [
-    ["", statement.opening],
-    [
-      "",
+  const content: QuestionnairePdfContent[] = [
+    textBlock([statement.opening]),
+    textBlock([
       selectedYesNoStatement(
         insurance.hasPensionOrDisabilityPensionRight,
         COPY.statements.pensionOrDisabilityPensionRight,
       ),
-    ],
-    ["", disabilityStatement(insurance.disabilityDegree)],
-    [
-      "",
+      disabilityStatement(insurance.disabilityDegree),
       selectedYesNoStatement(
         insurance.registeredAtEmploymentOffice,
         COPY.statements.employmentOfficeRegistration,
       ),
-    ],
+    ]),
   ];
 
   if (insurance.registeredAtEmploymentOffice === "yes") {
-    rows.push([
-      COPY.labels.employmentOfficeAddress,
-      value(insurance.employmentOfficeAddress),
-    ]);
+    content.push(
+      fieldGrid([
+        fullWidthField(
+          COPY.labels.employmentOfficeAddress,
+          value(insurance.employmentOfficeAddress),
+        ),
+      ]),
+    );
   }
-  rows.push(
-    [
-      COPY.labels.bankAccount,
-      value(formatBankAccount(payload.payment.bankAccount)),
-    ],
-    [COPY.labels.bankName, value(payload.payment.bankName)],
-    ["", statement.confirmation],
+  content.push(
+    fieldGrid([
+      fullWidthField(
+        COPY.labels.bankAccount,
+        value(formatBankAccount(payload.payment.bankAccount)),
+      ),
+      fullWidthField(COPY.labels.bankName, value(payload.payment.bankName)),
+    ]),
+    textBlock([statement.confirmation]),
   );
 
-  return rows;
+  return content;
 }
 
 function splitStatementText(statementText: string): {
@@ -93,4 +98,21 @@ function disabilityStatement(degree: DisabilityDegree): string {
 
 function value(input: string | null): string {
   return input === null || input === "" ? COPY.values.empty : input;
+}
+
+function textBlock(paragraphs: readonly string[]): QuestionnairePdfContent {
+  return { kind: "text", paragraphs };
+}
+
+function fieldGrid(
+  fields: readonly QuestionnairePdfField[],
+): QuestionnairePdfContent {
+  return { kind: "field-grid", fields };
+}
+
+function fullWidthField(
+  label: string,
+  fieldValue: string,
+): QuestionnairePdfField {
+  return { label, value: fieldValue, span: "full" };
 }
