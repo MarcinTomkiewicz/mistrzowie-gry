@@ -1,4 +1,3 @@
-import { buildCountryOptions } from "../../../../src/app/core/utils/country-options.ts";
 import type {
   InsuranceData,
   JoinDeclineAnswer,
@@ -16,7 +15,10 @@ import type {
 import { QUESTIONNAIRE_PDF_COPY as COPY } from "./questionnaire-pdf-copy.ts";
 import { buildQuestionnaireDeclarationContent } from "./questionnaire-pdf-declaration-content.ts";
 
-const POLISH_COUNTRY_OPTIONS = buildCountryOptions("pl");
+const POLISH_REGION_NAMES = new Intl.DisplayNames(["pl"], {
+  type: "region",
+  fallback: "none",
+});
 
 export function buildQuestionnairePdfContent(
   payload: QuestionnairePayload,
@@ -265,10 +267,10 @@ function selectedJoinDeclineStatement(
 }
 
 function countryName(countryCode: string | null): string {
-  if (countryCode === null) return COPY.values.empty;
-  return POLISH_COUNTRY_OPTIONS.find(
-    (option) => option.value === countryCode,
-  )?.label ?? COPY.values.empty;
+  if (countryCode === null || !/^[A-Z]{2}$/.test(countryCode)) {
+    return COPY.values.empty;
+  }
+  return POLISH_REGION_NAMES.of(countryCode) ?? COPY.values.empty;
 }
 
 function identityDocumentField(
