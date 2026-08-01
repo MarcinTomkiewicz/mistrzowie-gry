@@ -1,27 +1,16 @@
 import { createContractReaders } from "../_shared/coworker-document-edge/contract-readers.ts";
-import {
-  type SigningCoworkerSummary,
-  type SigningOnboardingCaseSummary,
-  type SigningPackage,
-  type SigningPackageStatus,
-} from "../_shared/coworker-document-edge/signing-package-models.ts";
+import type { SigningPackage } from "../_shared/coworker-document-edge/signing-package-models.ts";
 
 export {
-  ONBOARDING_STAGES,
-  ONBOARDING_STATUSES,
-  SIGNING_PACKAGE_DOCUMENTS,
   SIGNING_PACKAGE_ITEM_STATUSES,
+  SIGNING_PACKAGE_REASONS,
   SIGNING_PACKAGE_STATUSES,
 } from "../_shared/coworker-document-edge/signing-package-models.ts";
 export type {
-  OnboardingStage,
-  OnboardingStatus,
-  PackageDocumentCode,
-  SigningCoworkerSummary,
-  SigningOnboardingCaseSummary,
   SigningPackage,
   SigningPackageItem,
   SigningPackageItemStatus,
+  SigningPackageReason,
   SigningPackageStatus,
 } from "../_shared/coworker-document-edge/signing-package-models.ts";
 
@@ -80,46 +69,18 @@ export interface CoworkerDocumentExternalDelivery {
   documentId: string;
   documentVersionId: string;
   destination: "accounting";
-  deliveryType: "onboarding_questionnaire";
-  note: string | null;
-  deliveredBy: string;
+  deliveryType:
+    | "onboarding_questionnaire"
+    | "questionnaire_update"
+    | "other";
   deliveredAt: string;
-  createdAt: string;
-}
-
-export interface ExternalDeliveryResult {
-  created: boolean;
-  delivery: CoworkerDocumentExternalDelivery;
-}
-
-export interface AdminSigningPackageListItem {
-  id: string;
-  userId: string;
-  onboardingCaseId: string;
-  coworker: SigningCoworkerSummary;
-  status: SigningPackageStatus;
-  itemCount: 4;
-  pendingItemCount: number;
-  submittedItemCount: number;
-  needsCorrectionItemCount: number;
-  acceptedItemCount: number;
-  issuedAt: string;
-  submittedAt: string | null;
-  reviewStartedAt: string | null;
-  acceptedAt: string | null;
-  rejectedAt: string | null;
-  revision: number;
-  updatedAt: string;
-}
-
-export interface AdminSigningPackageDetail {
-  package: SigningPackage;
-  coworker: SigningCoworkerSummary;
-  onboardingCase: SigningOnboardingCaseSummary;
+  deliveredBy: string;
+  note: string | null;
 }
 
 export interface IssueSigningPackageResult {
-  created: boolean;
+  issued: true;
+  idempotent: boolean;
   package: SigningPackage;
 }
 
@@ -137,13 +98,14 @@ export class SigningPackageBackendContractError extends Error {
   }
 }
 
-export const signingPackageReaders =
-  createContractReaders<SigningPackageRpcName>({
-    createRequestError: (fieldErrors) =>
-      new SigningPackageRequestValidationError(fieldErrors),
-    createBackendError: (rpcName) =>
-      new SigningPackageBackendContractError(rpcName),
-  });
+export const signingPackageReaders = createContractReaders<
+  SigningPackageRpcName
+>({
+  createRequestError: (fieldErrors) =>
+    new SigningPackageRequestValidationError(fieldErrors),
+  createBackendError: (rpcName) =>
+    new SigningPackageBackendContractError(rpcName),
+});
 
 export function isSigningPackageRpcName(
   value: string,

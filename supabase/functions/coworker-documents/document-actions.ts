@@ -2,15 +2,13 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
 import { createSignedDownloadUrl } from "../_shared/coworker-document-edge/signed-storage.ts";
+import { type CoworkerDocumentActionRequest, RPC } from "./contracts.ts";
 import {
-  type CoworkerDocumentActionRequest,
-  RPC,
-} from "./contracts.ts";
-import {
-  parseDocumentResult,
   parseDownloadTarget,
   parseNotificationReadResult,
   parsePortalResult,
+  parseSubmittedDocumentResult,
+  parseWithdrawnDocumentResult,
 } from "./document-response-contracts.ts";
 
 type DocumentCommandAction = Exclude<
@@ -36,7 +34,12 @@ export async function handleDocumentCommandAction(
 ): Promise<Response> {
   switch (action.action) {
     case "submitDocument":
-      return await submitDocument(client, userId, action.documentId);
+      return await submitDocument(
+        client,
+        userId,
+        action.documentId,
+        action.documentVersionId,
+      );
     case "withdrawDocument":
       return await withdrawDocument(client, userId, action.documentId);
     case "downloadDocumentVersion":
@@ -58,20 +61,22 @@ async function submitDocument(
   client: SupabaseClient,
   userId: string,
   documentId: string,
+  documentVersionId: string,
 ): Promise<Response> {
   const data = await callRpc(client, RPC.submitDocument, {
     p_user_id: userId,
     p_actor_user_id: userId,
     p_document_id: documentId,
+    p_document_version_id: documentVersionId,
   });
   return Response.json({
     ok: true,
     action: "submitDocument",
-    document: parseDocumentResult(
+    document: parseSubmittedDocumentResult(
       data,
-      RPC.submitDocument,
       userId,
       documentId,
+      documentVersionId,
     ),
   });
 }
@@ -89,9 +94,8 @@ async function withdrawDocument(
   return Response.json({
     ok: true,
     action: "withdrawDocument",
-    document: parseDocumentResult(
+    document: parseWithdrawnDocumentResult(
       data,
-      RPC.withdrawDocument,
       userId,
       documentId,
     ),

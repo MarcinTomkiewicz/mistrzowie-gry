@@ -190,12 +190,11 @@ export function parseFinalizationResult(
     RPC.finalizeUpload,
   );
   if (
-    backendUuid(document, "userId", RPC.finalizeUpload) !== userId ||
+    document.userId !== userId ||
     (expectedDocument !== undefined &&
       (
-        backendUuid(document, "id", RPC.finalizeUpload) !==
-          expectedDocument.documentId ||
-        backendUuid(document, "currentVersionId", RPC.finalizeUpload) !==
+        document.id !== expectedDocument.documentId ||
+        document.currentVersionId !==
           expectedDocument.documentVersionId
       ))
   ) {

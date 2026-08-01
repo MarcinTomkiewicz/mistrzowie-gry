@@ -1,13 +1,13 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
-import type { AdminSigningPackageDetail } from "./signing-package-contracts.ts";
+import type { SigningPackage } from "../_shared/coworker-document-edge/signing-package-models.ts";
 import {
   SIGNING_PACKAGE_REVIEW_RPC,
   type SigningPackageReviewActionRequest,
 } from "./signing-package-review-contracts.ts";
 import {
   parseApproveOnboardingResult,
-  parseSigningPackageReviewDetail,
+  parseSigningPackageReviewResult,
 } from "./signing-package-review-response-contracts.ts";
 import {
   acceptSigningPackage,
@@ -29,14 +29,17 @@ export async function handleSigningPackageReviewAction(
         actorUserId,
         action.packageId,
       );
-      return detailResponse(action.action, parseSigningPackageReviewDetail(
-        data,
-        SIGNING_PACKAGE_REVIEW_RPC.startReview,
-        {
-          packageId: action.packageId,
-          packageStatus: "under_review",
-        },
-      ));
+      return detailResponse(
+        action.action,
+        parseSigningPackageReviewResult(
+          data,
+          SIGNING_PACKAGE_REVIEW_RPC.startReview,
+          {
+            packageId: action.packageId,
+            status: "under_review",
+          },
+        ),
+      );
     }
     case "returnSigningPackageItemForCorrection": {
       const data = await returnSigningPackageItemForCorrection(
@@ -46,15 +49,18 @@ export async function handleSigningPackageReviewAction(
         action.reason,
         action.note,
       );
-      return detailResponse(action.action, parseSigningPackageReviewDetail(
-        data,
-        SIGNING_PACKAGE_REVIEW_RPC.returnItemForCorrection,
-        {
-          packageItemId: action.packageItemId,
-          packageStatus: "needs_correction",
-          packageItemStatus: "needs_correction",
-        },
-      ));
+      return detailResponse(
+        action.action,
+        parseSigningPackageReviewResult(
+          data,
+          SIGNING_PACKAGE_REVIEW_RPC.returnItemForCorrection,
+          {
+            packageItemId: action.packageItemId,
+            status: "needs_correction",
+            itemStatus: "needs_correction",
+          },
+        ),
+      );
     }
     case "rejectSigningPackage": {
       const data = await rejectSigningPackage(
@@ -64,14 +70,17 @@ export async function handleSigningPackageReviewAction(
         action.reason,
         action.note,
       );
-      return detailResponse(action.action, parseSigningPackageReviewDetail(
-        data,
-        SIGNING_PACKAGE_REVIEW_RPC.rejectPackage,
-        {
-          packageId: action.packageId,
-          packageStatus: "rejected",
-        },
-      ));
+      return detailResponse(
+        action.action,
+        parseSigningPackageReviewResult(
+          data,
+          SIGNING_PACKAGE_REVIEW_RPC.rejectPackage,
+          {
+            packageId: action.packageId,
+            status: "rejected",
+          },
+        ),
+      );
     }
     case "acceptSigningPackage": {
       const data = await acceptSigningPackage(
@@ -80,14 +89,17 @@ export async function handleSigningPackageReviewAction(
         action.packageId,
         action.note,
       );
-      return detailResponse(action.action, parseSigningPackageReviewDetail(
-        data,
-        SIGNING_PACKAGE_REVIEW_RPC.acceptPackage,
-        {
-          packageId: action.packageId,
-          packageStatus: "accepted",
-        },
-      ));
+      return detailResponse(
+        action.action,
+        parseSigningPackageReviewResult(
+          data,
+          SIGNING_PACKAGE_REVIEW_RPC.acceptPackage,
+          {
+            packageId: action.packageId,
+            status: "approved",
+          },
+        ),
+      );
     }
     case "approveOnboarding": {
       const data = await approveOnboarding(
@@ -115,7 +127,7 @@ function detailResponse(
     | "returnSigningPackageItemForCorrection"
     | "rejectSigningPackage"
     | "acceptSigningPackage",
-  detail: AdminSigningPackageDetail,
+  detail: SigningPackage,
 ): Response {
   return Response.json({ ok: true, action, detail });
 }

@@ -53,6 +53,27 @@ export function parseDocumentActionRequest(
         ),
       }, errors);
     case "submitDocument":
+      assertOnlyKeys(
+        root,
+        ["action", "documentId", "documentVersionId"],
+        "",
+        errors,
+      );
+      return validated({
+        action,
+        documentId: requestUuid(
+          root,
+          "documentId",
+          "documentId",
+          errors,
+        ),
+        documentVersionId: requestUuid(
+          root,
+          "documentVersionId",
+          "documentVersionId",
+          errors,
+        ),
+      }, errors);
     case "withdrawDocument":
       assertOnlyKeys(root, ["action", "documentId"], "", errors);
       return validated({

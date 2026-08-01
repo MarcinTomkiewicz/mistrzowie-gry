@@ -1,59 +1,25 @@
 import { createContractReaders } from "./contract-readers.ts";
-import type { UnknownObject } from "./contract-reader-foundation.ts";
+import {
+  COWORKER_DOCUMENT_MALWARE_SCAN_STATUSES,
+  COWORKER_DOCUMENT_ORIGINS,
+  COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES,
+  COWORKER_DOCUMENT_STATUSES,
+  COWORKER_DOCUMENT_VERIFICATION_METHODS,
+  COWORKER_DOCUMENT_VERIFICATION_STATUSES,
+  COWORKER_DOCUMENT_VERIFIED_SIGNATURE_TYPES,
+  COWORKER_DOCUMENT_VERSION_STATUSES,
+  type CoworkerDocument,
+  type CoworkerDocumentSignatureVerification,
+  type CoworkerDocumentVersion,
+} from "./coworker-document-models.ts";
 
-export const COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES = [
-  "unsigned",
-  "handwritten",
-  "trusted_profile",
-  "qualified_electronic",
-  "other_electronic",
-  "unknown",
-] as const;
+export * from "./coworker-document-models.ts";
 
-const DOCUMENT_STATUSES = [
-  "draft",
+const STATUSES_REQUIRING_SUBMITTED_VERSION = [
   "submitted",
   "under_review",
   "accepted",
   "rejected",
-  "withdrawn",
-  "archived",
-] as const;
-const VERSION_STATUSES = [
-  "reserved",
-  "uploaded",
-  "ready",
-  "blocked",
-  "failed",
-  "superseded",
-  "deleted",
-] as const;
-const MALWARE_SCAN_STATUSES = [
-  "not_scanned",
-  "pending",
-  "clean",
-  "infected",
-  "failed",
-  "unavailable",
-] as const;
-const VERIFICATION_METHODS = [
-  "manual",
-  "automatic",
-  "external_provider",
-] as const;
-const VERIFICATION_STATUSES = [
-  "pending",
-  "confirmed",
-  "rejected",
-  "indeterminate",
-  "unsupported",
-] as const;
-const VERIFIED_SIGNATURE_TYPES = [
-  "handwritten",
-  "trusted_profile",
-  "qualified_electronic",
-  "other_electronic",
-  "unknown",
 ] as const;
 
 const DOCUMENT_KEYS = [
@@ -63,9 +29,12 @@ const DOCUMENT_KEYS = [
   "requirementId",
   "documentDefinitionId",
   "title",
+  "origin",
   "status",
   "currentVersionId",
   "currentVersion",
+  "submittedVersionId",
+  "submittedVersion",
   "versions",
   "submittedAt",
   "reviewStartedAt",
@@ -136,15 +105,15 @@ export function createCoworkerDocumentParser<Context>(
   function parseCoworkerDocument(
     value: unknown,
     context: Context,
-  ): UnknownObject {
+  ): CoworkerDocument {
     const source = backendObject(value, context, DOCUMENT_KEYS);
     const documentId = backendUuid(source, "id", context);
-    backendUuid(source, "userId", context);
-    backendNullableUuid(source, "onboardingCaseId", context);
-    backendNullableUuid(source, "requirementId", context);
-    backendUuid(source, "documentDefinitionId", context);
-    backendNullableString(source, "title", context);
-    backendEnum(source, "status", DOCUMENT_STATUSES, context);
+    const status = backendEnum(
+      source,
+      "status",
+      COWORKER_DOCUMENT_STATUSES,
+      context,
+    );
     const currentVersionId = backendNullableUuid(
       source,
       "currentVersionId",
@@ -152,81 +121,200 @@ export function createCoworkerDocumentParser<Context>(
     );
     const currentVersion = source.currentVersion === null
       ? null
-      : parseVersion(source.currentVersion, documentId, context);
-    const versions = backendArrayValue(source.versions, context).map(
-      (version) => parseVersion(version, documentId, context),
+      : parseCoworkerDocumentVersion(
+        source.currentVersion,
+        documentId,
+        context,
+      );
+    const submittedVersionId = backendNullableUuid(
+      source,
+      "submittedVersionId",
+      context,
     );
-    backendNullableTimestamp(source, "submittedAt", context);
-    backendNullableTimestamp(source, "reviewStartedAt", context);
-    backendNullableTimestamp(source, "acceptedAt", context);
-    backendNullableTimestamp(source, "rejectedAt", context);
-    backendNullableString(source, "rejectionReason", context);
-    backendNullableTimestamp(source, "withdrawnAt", context);
-    backendNullableTimestamp(source, "archivedAt", context);
-    backendPositiveInteger(source, "revision", context);
-    backendTimestamp(source, "createdAt", context);
-    backendTimestamp(source, "updatedAt", context);
+    const submittedVersion = source.submittedVersion === null
+      ? null
+      : parseCoworkerDocumentVersion(
+        source.submittedVersion,
+        documentId,
+        context,
+      );
+    const versions = backendArrayValue(source.versions, context).map(
+      (version) => parseCoworkerDocumentVersion(version, documentId, context),
+    );
+    const parsed: CoworkerDocument = {
+      id: documentId,
+      userId: backendUuid(source, "userId", context),
+      onboardingCaseId: backendNullableUuid(
+        source,
+        "onboardingCaseId",
+        context,
+      ),
+      requirementId: backendNullableUuid(source, "requirementId", context),
+      documentDefinitionId: backendUuid(
+        source,
+        "documentDefinitionId",
+        context,
+      ),
+      title: backendNullableString(source, "title", context),
+      origin: backendEnum(
+        source,
+        "origin",
+        COWORKER_DOCUMENT_ORIGINS,
+        context,
+      ),
+      status,
+      currentVersionId,
+      currentVersion,
+      submittedVersionId,
+      submittedVersion,
+      versions,
+      submittedAt: backendNullableTimestamp(source, "submittedAt", context),
+      reviewStartedAt: backendNullableTimestamp(
+        source,
+        "reviewStartedAt",
+        context,
+      ),
+      acceptedAt: backendNullableTimestamp(source, "acceptedAt", context),
+      rejectedAt: backendNullableTimestamp(source, "rejectedAt", context),
+      rejectionReason: backendNullableString(
+        source,
+        "rejectionReason",
+        context,
+      ),
+      withdrawnAt: backendNullableTimestamp(source, "withdrawnAt", context),
+      archivedAt: backendNullableTimestamp(source, "archivedAt", context),
+      revision: backendPositiveInteger(source, "revision", context),
+      createdAt: backendTimestamp(source, "createdAt", context),
+      updatedAt: backendTimestamp(source, "updatedAt", context),
+    };
 
     if (
       (currentVersionId === null) !== (currentVersion === null) ||
       (currentVersion !== null && currentVersion.id !== currentVersionId) ||
+      (submittedVersionId === null) !== (submittedVersion === null) ||
+      (submittedVersion !== null &&
+        submittedVersion.id !== submittedVersionId) ||
       (currentVersionId !== null &&
         !versions.some((version) => version.id === currentVersionId)) ||
+      (submittedVersionId !== null &&
+        !versions.some((version) => version.id === submittedVersionId)) ||
+      (STATUSES_REQUIRING_SUBMITTED_VERSION.some(
+        (requiredStatus) => requiredStatus === status,
+      ) && submittedVersion === null) ||
       new Set(versions.map((version) => version.id)).size !== versions.length
     ) {
       throw createBackendError(context);
     }
-    return source;
+    return parsed;
   }
 
-  function parseVersion(
+  function parseCoworkerDocumentVersion(
     value: unknown,
     documentId: string,
     context: Context,
-  ): { id: string } {
+  ): CoworkerDocumentVersion {
     const source = backendObject(value, context, VERSION_KEYS);
     const id = backendUuid(source, "id", context);
-    if (backendUuid(source, "documentId", context) !== documentId) {
+    const parsed: CoworkerDocumentVersion = {
+      id,
+      documentId: backendUuid(source, "documentId", context),
+      versionNumber: backendPositiveInteger(
+        source,
+        "versionNumber",
+        context,
+      ),
+      status: backendEnum(
+        source,
+        "status",
+        COWORKER_DOCUMENT_VERSION_STATUSES,
+        context,
+      ),
+      originalFilename: backendString(source, "originalFilename", context),
+      fileExtension: backendString(source, "fileExtension", context),
+      declaredMimeType: backendString(source, "declaredMimeType", context),
+      detectedMimeType: backendNullableString(
+        source,
+        "detectedMimeType",
+        context,
+      ),
+      expectedSizeBytes: backendPositiveInteger(
+        source,
+        "expectedSizeBytes",
+        context,
+      ),
+      sizeBytes: backendNullablePositiveInteger(source, "sizeBytes", context),
+      signatureDeclarationType: backendEnum(
+        source,
+        "signatureDeclarationType",
+        COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES,
+        context,
+      ),
+      signatureDeclaredAt: backendNullableTimestamp(
+        source,
+        "signatureDeclaredAt",
+        context,
+      ),
+      malwareScanStatus: backendEnum(
+        source,
+        "malwareScanStatus",
+        COWORKER_DOCUMENT_MALWARE_SCAN_STATUSES,
+        context,
+      ),
+      uploadedAt: backendNullableTimestamp(source, "uploadedAt", context),
+      finalizedAt: backendNullableTimestamp(source, "finalizedAt", context),
+      supersededAt: backendNullableTimestamp(
+        source,
+        "supersededAt",
+        context,
+      ),
+      retentionUntil: backendNullableTimestamp(
+        source,
+        "retentionUntil",
+        context,
+      ),
+      legalHold: backendBoolean(source, "legalHold", context),
+      latestSignatureVerification: source.latestSignatureVerification === null
+        ? null
+        : parseVerification(source.latestSignatureVerification, context),
+      createdAt: backendTimestamp(source, "createdAt", context),
+      updatedAt: backendTimestamp(source, "updatedAt", context),
+    };
+
+    if (parsed.documentId !== documentId) {
       throw createBackendError(context);
     }
-    backendPositiveInteger(source, "versionNumber", context);
-    backendEnum(source, "status", VERSION_STATUSES, context);
-    backendString(source, "originalFilename", context);
-    backendString(source, "fileExtension", context);
-    backendString(source, "declaredMimeType", context);
-    backendNullableString(source, "detectedMimeType", context);
-    backendPositiveInteger(source, "expectedSizeBytes", context);
-    backendNullablePositiveInteger(source, "sizeBytes", context);
-    backendEnum(
-      source,
-      "signatureDeclarationType",
-      COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES,
-      context,
-    );
-    backendNullableTimestamp(source, "signatureDeclaredAt", context);
-    backendEnum(source, "malwareScanStatus", MALWARE_SCAN_STATUSES, context);
-    backendNullableTimestamp(source, "uploadedAt", context);
-    backendNullableTimestamp(source, "finalizedAt", context);
-    backendNullableTimestamp(source, "supersededAt", context);
-    backendNullableTimestamp(source, "retentionUntil", context);
-    backendBoolean(source, "legalHold", context);
-    if (source.latestSignatureVerification !== null) {
-      parseVerification(source.latestSignatureVerification, context);
-    }
-    backendTimestamp(source, "createdAt", context);
-    backendTimestamp(source, "updatedAt", context);
-    return { id };
+    return parsed;
   }
 
-  function parseVerification(value: unknown, context: Context): void {
+  function parseVerification(
+    value: unknown,
+    context: Context,
+  ): CoworkerDocumentSignatureVerification {
     const source = backendObject(value, context, VERIFICATION_KEYS);
-    backendUuid(source, "id", context);
-    backendEnum(source, "verificationMethod", VERIFICATION_METHODS, context);
-    backendEnum(source, "verificationStatus", VERIFICATION_STATUSES, context);
-    backendEnum(source, "signatureType", VERIFIED_SIGNATURE_TYPES, context);
-    backendNullableString(source, "reason", context);
-    backendTimestamp(source, "createdAt", context);
+    return {
+      id: backendUuid(source, "id", context),
+      verificationMethod: backendEnum(
+        source,
+        "verificationMethod",
+        COWORKER_DOCUMENT_VERIFICATION_METHODS,
+        context,
+      ),
+      verificationStatus: backendEnum(
+        source,
+        "verificationStatus",
+        COWORKER_DOCUMENT_VERIFICATION_STATUSES,
+        context,
+      ),
+      signatureType: backendEnum(
+        source,
+        "signatureType",
+        COWORKER_DOCUMENT_VERIFIED_SIGNATURE_TYPES,
+        context,
+      ),
+      reason: backendNullableString(source, "reason", context),
+      createdAt: backendTimestamp(source, "createdAt", context),
+    };
   }
 
-  return { parseCoworkerDocument };
+  return { parseCoworkerDocument, parseCoworkerDocumentVersion };
 }

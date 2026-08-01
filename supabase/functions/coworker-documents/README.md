@@ -121,7 +121,8 @@ with `uploadToSignedUrl(path, token, file, { contentType })`.
 ```json
 {
   "action": "submitDocument",
-  "documentId": "<UUID>"
+  "documentId": "<UUID>",
+  "documentVersionId": "<UUID>"
 }
 ```
 

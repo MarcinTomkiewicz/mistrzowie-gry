@@ -45,8 +45,14 @@ export type UploadSessionAction =
     uploadSessionId: string;
   };
 
-export interface DocumentActionRequest {
-  action: "submitDocument" | "withdrawDocument";
+export interface SubmitDocumentAction {
+  action: "submitDocument";
+  documentId: string;
+  documentVersionId: string;
+}
+
+export interface WithdrawDocumentAction {
+  action: "withdrawDocument";
   documentId: string;
 }
 
@@ -63,6 +69,7 @@ export interface NotificationAction {
 export type CoworkerDocumentActionRequest =
   | ReserveUploadAction
   | UploadSessionAction
-  | DocumentActionRequest
+  | SubmitDocumentAction
+  | WithdrawDocumentAction
   | DownloadAction
   | NotificationAction;

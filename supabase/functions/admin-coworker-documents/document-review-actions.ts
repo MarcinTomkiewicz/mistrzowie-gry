@@ -2,14 +2,13 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
 import { createSignedDownloadUrl } from "../_shared/coworker-document-edge/signed-storage.ts";
+import { type AdminDocumentActionRequest, RPC } from "./contracts.ts";
 import {
-  type AdminDocumentActionRequest,
   parseDocumentResult,
   parseDownloadTarget,
   parseReviewDetail,
   parseSignatureVerification,
-  RPC,
-} from "./contracts.ts";
+} from "./document-response-contracts.ts";
 
 export async function getReviewDetail(
   client: SupabaseClient,

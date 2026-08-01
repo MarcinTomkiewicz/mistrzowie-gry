@@ -1,14 +1,13 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
+import { type AdminDocumentActionRequest, RPC } from "./contracts.ts";
 import {
-  type AdminDocumentActionRequest,
   parseOnboardingResult,
   parseRequirementResult,
   parseSavedDefinition,
   parseSeedRequirementsResult,
-  RPC,
-} from "./contracts.ts";
+} from "./document-setup-response-contracts.ts";
 
 export async function saveDefinition(
   client: SupabaseClient,

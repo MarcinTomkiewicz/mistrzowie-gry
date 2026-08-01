@@ -167,18 +167,14 @@ export class BackendContractError extends Error {
   }
 }
 
+export const adminDocumentReaders = createContractReaders<RpcName | null>({
+  createRequestError: (fieldErrors) => new RequestValidationError(fieldErrors),
+  createBackendError: (rpcName) => new BackendContractError(rpcName),
+});
+
 const {
   assertOnlyKeys,
   assertUnique,
-  backendArray,
-  backendBoolean,
-  backendEnum,
-  backendNonNegativeInteger,
-  backendObject,
-  backendPositiveInteger,
-  backendString,
-  backendTimestamp,
-  backendUuid,
   requestBoolean,
   requestEnum,
   requestInteger,
@@ -192,10 +188,7 @@ const {
   requestUuid,
   throwIfRequestInvalid,
   validated,
-} = createContractReaders<RpcName | null>({
-  createRequestError: (fieldErrors) => new RequestValidationError(fieldErrors),
-  createBackendError: (rpcName) => new BackendContractError(rpcName),
-});
+} = adminDocumentReaders;
 
 const ACTIONS = [
   "getReviewDetail",
@@ -731,214 +724,4 @@ function parseVerifySignature(
     },
     errors,
   );
-}
-
-export function parseAdminDashboard(
-  catalogValue: unknown,
-  queueValue: unknown,
-): UnknownObject {
-  const catalog = backendObject(catalogValue, RPC.getCatalog);
-  backendArray(catalog, "signaturePolicies", RPC.getCatalog);
-  backendArray(catalog, "documentDefinitions", RPC.getCatalog);
-
-  if (!Array.isArray(queueValue)) {
-    throw new BackendContractError(RPC.getReviewQueue);
-  }
-
-  return {
-    catalog,
-    reviewQueue: queueValue,
-  };
-}
-
-export function parseSavedDefinition(value: unknown): UnknownObject {
-  const definition = backendObject(value, RPC.saveDefinition);
-  backendUuid(definition, "id", RPC.saveDefinition);
-  backendString(definition, "code", RPC.saveDefinition);
-  backendString(definition, "title", RPC.saveDefinition);
-  return definition;
-}
-
-export function parseOnboardingResult(
-  value: unknown,
-  userId: string,
-): UnknownObject {
-  const result = backendObject(value, RPC.ensureOnboarding);
-  backendBoolean(result, "created", RPC.ensureOnboarding);
-  const onboardingCase = backendObject(result.case, RPC.ensureOnboarding);
-  backendUuid(onboardingCase, "id", RPC.ensureOnboarding);
-
-  if (
-    backendUuid(onboardingCase, "userId", RPC.ensureOnboarding) !== userId
-  ) {
-    throw new BackendContractError(RPC.ensureOnboarding);
-  }
-
-  return result;
-}
-
-export function parseSeedRequirementsResult(
-  value: unknown,
-  userId: string,
-  onboardingCaseId: string,
-): UnknownObject {
-  const result = backendObject(value, RPC.seedDefaultRequirements);
-  if (
-    backendUuid(result, "userId", RPC.seedDefaultRequirements) !== userId ||
-    backendUuid(
-        result,
-        "onboardingCaseId",
-        RPC.seedDefaultRequirements,
-      ) !== onboardingCaseId
-  ) {
-    throw new BackendContractError(RPC.seedDefaultRequirements);
-  }
-  backendNonNegativeInteger(
-    result,
-    "insertedCount",
-    RPC.seedDefaultRequirements,
-  );
-  return result;
-}
-
-export function parseRequirementResult(
-  value: unknown,
-  userId: string,
-): UnknownObject {
-  const requirement = backendObject(value, RPC.assignRequirement);
-  backendUuid(requirement, "id", RPC.assignRequirement);
-  if (
-    backendUuid(requirement, "userId", RPC.assignRequirement) !== userId
-  ) {
-    throw new BackendContractError(RPC.assignRequirement);
-  }
-  return requirement;
-}
-
-export function parseReviewDetail(
-  value: unknown,
-  userId: string,
-  documentId: string,
-): UnknownObject {
-  const detail = backendObject(value, RPC.getReviewDetail);
-  const user = backendObject(detail.user, RPC.getReviewDetail);
-  const document = backendObject(detail.document, RPC.getReviewDetail);
-
-  if (
-    backendUuid(user, "userId", RPC.getReviewDetail) !== userId ||
-    backendUuid(document, "id", RPC.getReviewDetail) !== documentId ||
-    backendUuid(document, "userId", RPC.getReviewDetail) !== userId
-  ) {
-    throw new BackendContractError(RPC.getReviewDetail);
-  }
-
-  backendArray(detail, "signatureVerifications", RPC.getReviewDetail);
-  backendArray(detail, "reviews", RPC.getReviewDetail);
-  return detail;
-}
-
-export function parseDocumentResult(
-  value: unknown,
-  rpcName:
-    | typeof RPC.startReview
-    | typeof RPC.acceptDocument
-    | typeof RPC.rejectDocument,
-  userId: string,
-  documentId: string,
-): UnknownObject {
-  const document = backendObject(value, rpcName);
-  if (
-    backendUuid(document, "id", rpcName) !== documentId ||
-    backendUuid(document, "userId", rpcName) !== userId
-  ) {
-    throw new BackendContractError(rpcName);
-  }
-  return document;
-}
-
-export function parseSignatureVerification(
-  value: unknown,
-  userId: string,
-  documentId: string,
-  documentVersionId: string,
-  expectedStatus: VerificationStatus,
-): UnknownObject {
-  const verification = backendObject(value, RPC.verifySignature);
-
-  if (
-    backendUuid(verification, "documentId", RPC.verifySignature) !==
-      documentId ||
-    backendUuid(
-        verification,
-        "documentVersionId",
-        RPC.verifySignature,
-      ) !== documentVersionId ||
-    backendString(
-        verification,
-        "verificationStatus",
-        RPC.verifySignature,
-      ) !== expectedStatus ||
-    userId === ""
-  ) {
-    throw new BackendContractError(RPC.verifySignature);
-  }
-
-  backendUuid(verification, "id", RPC.verifySignature);
-  backendTimestamp(verification, "createdAt", RPC.verifySignature);
-  return verification;
-}
-
-export function parseDownloadTarget(
-  value: unknown,
-  documentVersionId: string,
-  purpose: AdminDownloadPurpose,
-): DownloadTarget {
-  const result = backendObject(value, RPC.getDownloadTarget);
-  const target: DownloadTarget = {
-    documentId: backendUuid(
-      result,
-      "documentId",
-      RPC.getDownloadTarget,
-    ),
-    documentVersionId: backendUuid(
-      result,
-      "documentVersionId",
-      RPC.getDownloadTarget,
-    ),
-    bucket: backendString(result, "bucket", RPC.getDownloadTarget),
-    path: backendString(result, "path", RPC.getDownloadTarget),
-    originalFilename: backendString(
-      result,
-      "originalFilename",
-      RPC.getDownloadTarget,
-    ),
-    mimeType: backendString(result, "mimeType", RPC.getDownloadTarget),
-    sizeBytes: backendPositiveInteger(
-      result,
-      "sizeBytes",
-      RPC.getDownloadTarget,
-    ),
-    purpose: backendEnum(
-      result,
-      "purpose",
-      DOWNLOAD_PURPOSES,
-      RPC.getDownloadTarget,
-    ),
-    signedUrlExpiresInSeconds: backendPositiveInteger(
-      result,
-      "signedUrlExpiresInSeconds",
-      RPC.getDownloadTarget,
-    ),
-  };
-
-  if (
-    target.documentVersionId !== documentVersionId ||
-    target.purpose !== purpose ||
-    target.bucket !== "coworker-documents" ||
-    target.signedUrlExpiresInSeconds > 300
-  ) {
-    throw new BackendContractError(RPC.getDownloadTarget);
-  }
-
-  return target;
 }

@@ -1,4 +1,8 @@
 import { COWORKER_DOCUMENTS_BUCKET } from "../_shared/coworker-document-edge/storage-config.ts";
+import {
+  type CoworkerDocument,
+  createCoworkerDocumentParser,
+} from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 import { RPC } from "./contracts.ts";
 import {
   BackendContractError,
@@ -27,6 +31,10 @@ const {
   backendTimestamp,
   backendUuid,
 } = coworkerDocumentReaders;
+const { parseCoworkerDocument } = createCoworkerDocumentParser(
+  coworkerDocumentReaders,
+  (rpcName) => new BackendContractError(rpcName),
+);
 
 export function parsePortalResult(
   value: unknown,
@@ -39,18 +47,38 @@ export function parsePortalResult(
   return result;
 }
 
-export function parseDocumentResult(
+export function parseSubmittedDocumentResult(
   value: unknown,
-  rpcName: typeof RPC.submitDocument | typeof RPC.withdrawDocument,
   userId: string,
   documentId: string,
-): UnknownObject {
-  const result = backendObject(value, rpcName);
+  documentVersionId: string,
+): CoworkerDocument {
+  const result = parseCoworkerDocument(value, RPC.submitDocument);
   if (
-    backendUuid(result, "id", rpcName) !== documentId ||
-    backendUuid(result, "userId", rpcName) !== userId
+    result.id !== documentId ||
+    result.userId !== userId ||
+    result.status !== "submitted" ||
+    result.origin !== "coworker_upload" ||
+    result.submittedVersionId !== documentVersionId ||
+    result.submittedVersion?.id !== documentVersionId
   ) {
-    throw new BackendContractError(rpcName);
+    throw new BackendContractError(RPC.submitDocument);
+  }
+  return result;
+}
+
+export function parseWithdrawnDocumentResult(
+  value: unknown,
+  userId: string,
+  documentId: string,
+): CoworkerDocument {
+  const result = parseCoworkerDocument(value, RPC.withdrawDocument);
+  if (
+    result.id !== documentId ||
+    result.userId !== userId ||
+    result.status !== "withdrawn"
+  ) {
+    throw new BackendContractError(RPC.withdrawDocument);
   }
   return result;
 }

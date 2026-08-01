@@ -2,11 +2,8 @@ import { withSupabase } from "npm:@supabase/server@^1";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
-import {
-  parseAdminDashboard,
-  parseAdminDocumentActionRequest,
-  RPC,
-} from "./contracts.ts";
+import { parseAdminDocumentActionRequest, RPC } from "./contracts.ts";
+import { parseAdminDashboard } from "./document-response-contracts.ts";
 import {
   acceptDocument,
   createDownloadUrl,

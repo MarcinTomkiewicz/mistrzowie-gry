@@ -2,10 +2,10 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import type { SigningPackageActionRequest } from "./signing-package-contracts.ts";
 import {
-  parseAdminSigningPackageDetail,
   parseAdminSigningPackageList,
-  parseExternalDeliveryResult,
+  parseExternalDelivery,
   parseIssueSigningPackageResult,
+  parseSigningPackageDetail,
 } from "./signing-package-response-contracts.ts";
 import {
   getSigningPackageDetail,
@@ -33,7 +33,7 @@ export async function handleSigningPackageAction(
       return Response.json({
         ok: true,
         action: "recordQuestionnaireDelivery",
-        result: parseExternalDeliveryResult(data, {
+        result: parseExternalDelivery(data, {
           userId: action.userId,
           onboardingCaseId: action.onboardingCaseId,
           documentId: action.documentId,
@@ -75,7 +75,7 @@ export async function handleSigningPackageAction(
       return Response.json({
         ok: true,
         action: "getSigningPackageDetail",
-        detail: parseAdminSigningPackageDetail(data, action.packageId),
+        detail: parseSigningPackageDetail(data, action.packageId),
       });
     }
   }

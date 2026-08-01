@@ -1,22 +1,22 @@
 import { createSigningPackageModelParsers } from "../_shared/coworker-document-edge/signing-package-model-parser.ts";
 import type {
+  SigningPackage,
   SigningPackageItemStatus,
   SigningPackageStatus,
 } from "../_shared/coworker-document-edge/signing-package-models.ts";
-import type { AdminSigningPackageDetail } from "./signing-package-contracts.ts";
 import {
   type ApproveOnboardingResult,
   SIGNING_PACKAGE_REVIEW_RPC,
   SigningPackageReviewBackendContractError,
-  type SigningPackageReviewRpcName,
   signingPackageReviewReaders,
+  type SigningPackageReviewRpcName,
 } from "./signing-package-review-contracts.ts";
 
 interface DetailExpectation {
   packageId?: string;
   packageItemId?: string;
-  packageStatus: SigningPackageStatus;
-  packageItemStatus?: SigningPackageItemStatus;
+  status: SigningPackageStatus;
+  itemStatus?: SigningPackageItemStatus;
 }
 
 const {
@@ -27,41 +27,22 @@ const {
   backendUuid,
 } = signingPackageReviewReaders;
 
-const {
-  parseSigningCoworkerSummary,
-  parseSigningOnboardingCaseSummary,
-  parseSigningPackage,
-} = createSigningPackageModelParsers(
+const { parseSigningPackage } = createSigningPackageModelParsers(
   signingPackageReviewReaders,
   (rpcName) => new SigningPackageReviewBackendContractError(rpcName),
 );
 
-export function parseSigningPackageReviewDetail(
+export function parseSigningPackageReviewResult(
   value: unknown,
   rpcName: SigningPackageReviewRpcName,
   expected: DetailExpectation,
-): AdminSigningPackageDetail {
-  const result = backendObject(value, rpcName, [
-    "package",
-    "coworker",
-    "onboardingCase",
-  ]);
-  const parsed: AdminSigningPackageDetail = {
-    package: parseSigningPackage(result.package, rpcName),
-    coworker: parseSigningCoworkerSummary(result.coworker, rpcName),
-    onboardingCase: parseSigningOnboardingCaseSummary(
-      result.onboardingCase,
-      rpcName,
-    ),
-  };
+): SigningPackage {
+  const parsed = parseSigningPackage(value, rpcName);
 
   if (
-    parsed.coworker.userId !== parsed.package.userId ||
-    parsed.onboardingCase.id !== parsed.package.onboardingCaseId ||
-    parsed.onboardingCase.userId !== parsed.package.userId ||
-    parsed.package.status !== expected.packageStatus ||
+    parsed.status !== expected.status ||
     (expected.packageId !== undefined &&
-      parsed.package.id !== expected.packageId) ||
+      parsed.id !== expected.packageId) ||
     !matchesExpectedItem(parsed, expected)
   ) {
     throw new SigningPackageReviewBackendContractError(rpcName);
@@ -121,15 +102,14 @@ export function parseApproveOnboardingResult(
 }
 
 function matchesExpectedItem(
-  detail: AdminSigningPackageDetail,
+  packageModel: SigningPackage,
   expected: DetailExpectation,
 ): boolean {
   if (expected.packageItemId === undefined) {
     return true;
   }
-  return detail.package.items.some((item) =>
+  return packageModel.items.some((item) =>
     item.id === expected.packageItemId &&
-    (expected.packageItemStatus === undefined ||
-      item.status === expected.packageItemStatus)
+    (expected.itemStatus === undefined || item.status === expected.itemStatus)
   );
 }

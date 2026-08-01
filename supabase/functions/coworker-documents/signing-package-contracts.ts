@@ -1,7 +1,4 @@
-import type {
-  SigningOnboardingCaseSummary,
-  SigningPackage,
-} from "../_shared/coworker-document-edge/signing-package-models.ts";
+import type { SigningPackage } from "../_shared/coworker-document-edge/signing-package-models.ts";
 import type {
   SignatureDeclarationType,
   UploadFilePayload,
@@ -15,10 +12,9 @@ export const COWORKER_SIGNING_PACKAGE_RPC = {
   submitItem: "submit_coworker_signing_package_item",
 } as const;
 
-export type CoworkerSigningPackageRpcName =
-  typeof COWORKER_SIGNING_PACKAGE_RPC[
-    keyof typeof COWORKER_SIGNING_PACKAGE_RPC
-  ];
+export type CoworkerSigningPackageRpcName = typeof COWORKER_SIGNING_PACKAGE_RPC[
+  keyof typeof COWORKER_SIGNING_PACKAGE_RPC
+];
 
 export const COWORKER_SIGNING_PACKAGE_ACTIONS = [
   "getSigningPackagePortal",
@@ -62,30 +58,10 @@ export type CoworkerSigningPackageActionRequest =
   | RecoverUploadAction
   | SubmitSigningPackageItemAction;
 
-export interface SigningPackageUploadRecovery {
-  packageItemId: string;
-  uploadSessionId: string;
-  documentId: string;
-  documentVersionId: string;
-  originalFilename: string;
-  declaredMimeType: string;
-  expectedSizeBytes: number;
-  expiresAt: string;
-  canActivate: boolean;
-  canFinalize: boolean;
-  canCancel: boolean;
-  cleanupStatus: "not_required" | "pending" | "completed" | "failed";
-}
-
 export interface CoworkerSigningPackagePortal {
   userId: string;
-  onboardingCase: SigningOnboardingCaseSummary;
-  package: SigningPackage | null;
-  uploadRecovery: SigningPackageUploadRecovery | null;
-  viewer: {
-    actorUserId: string;
-    isAdmin: false;
-  };
+  packages: SigningPackage[];
+  activePackage: SigningPackage | null;
 }
 
 export interface SigningPackageSourceDownloadTarget {
@@ -119,18 +95,6 @@ export interface SigningPackageItemUploadReservation {
   expectedSizeBytes: number;
   signatureDeclarationType: SignatureDeclarationType;
   expiresAt: string;
-}
-
-export interface SubmitSigningPackageItemResult {
-  packageId: string;
-  packageItemId: string;
-  documentId: string;
-  documentVersionId: string;
-  itemStatus: "submitted";
-  packageStatus: "in_progress" | "submitted";
-  submittedAt: string;
-  packageSubmittedAt: string | null;
-  idempotent: boolean;
 }
 
 export function isCoworkerSigningPackageRpcName(

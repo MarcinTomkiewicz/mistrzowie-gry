@@ -10,7 +10,7 @@ import { parseCoworkerSigningPackagePortal } from "./signing-package-portal-cont
 import {
   parseSigningPackageItemUploadReservation,
   parseSigningPackageSourceDownloadTarget,
-  parseSubmitSigningPackageItemResult,
+  parseSubmittedSigningPackageItem,
 } from "./signing-package-response-contracts.ts";
 import {
   getSigningPackagePortal,
@@ -18,10 +18,7 @@ import {
   reserveSigningPackageItemUpload,
   submitSigningPackageItem,
 } from "./signing-package-rpc.ts";
-import {
-  activateUploadReservation,
-  recoverUpload,
-} from "./upload-actions.ts";
+import { activateUploadReservation, recoverUpload } from "./upload-actions.ts";
 import { compensateReservation } from "./upload-cleanup.ts";
 
 export async function handleCoworkerSigningPackageAction(
@@ -68,7 +65,7 @@ export async function handleCoworkerSigningPackageAction(
       return Response.json({
         ok: true,
         action: "submitSigningPackageItem",
-        result: parseSubmitSigningPackageItemResult(
+        result: parseSubmittedSigningPackageItem(
           data,
           action.packageItemId,
         ),

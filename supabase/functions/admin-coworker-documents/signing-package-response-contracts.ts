@@ -1,53 +1,28 @@
+import type { SigningPackage } from "../_shared/coworker-document-edge/signing-package-models.ts";
+import { createSigningPackageModelParsers } from "../_shared/coworker-document-edge/signing-package-model-parser.ts";
 import {
-  type AdminSigningPackageDetail,
-  type AdminSigningPackageListItem,
-  type ExternalDeliveryResult,
+  type CoworkerDocumentExternalDelivery,
   type IssueSigningPackageResult,
   SIGNING_PACKAGE_RPC,
-  SIGNING_PACKAGE_STATUSES,
   SigningPackageBackendContractError,
   signingPackageReaders,
-  type SigningPackageRpcName,
 } from "./signing-package-contracts.ts";
-import {
-  parseSigningCoworkerSummary,
-  parseSigningOnboardingCaseSummary,
-  parseSigningPackage,
-} from "./signing-package-model-contracts.ts";
-
-const LIST_ITEM_KEYS = [
-  "id",
-  "userId",
-  "onboardingCaseId",
-  "coworker",
-  "status",
-  "itemCount",
-  "pendingItemCount",
-  "submittedItemCount",
-  "needsCorrectionItemCount",
-  "acceptedItemCount",
-  "issuedAt",
-  "submittedAt",
-  "reviewStartedAt",
-  "acceptedAt",
-  "rejectedAt",
-  "revision",
-  "updatedAt",
-] as const;
 
 const {
   backendArrayValue,
   backendBoolean,
   backendEnum,
   backendLiteral,
-  backendNonNegativeInteger,
   backendNullableString,
-  backendNullableTimestamp,
   backendObject,
-  backendPositiveInteger,
   backendTimestamp,
   backendUuid,
 } = signingPackageReaders;
+
+const { parseSigningPackage } = createSigningPackageModelParsers(
+  signingPackageReaders,
+  (rpcName) => new SigningPackageBackendContractError(rpcName),
+);
 
 export interface ExternalDeliveryExpectation {
   userId: string;
@@ -56,13 +31,12 @@ export interface ExternalDeliveryExpectation {
   documentVersionId: string;
 }
 
-export function parseExternalDeliveryResult(
+export function parseExternalDelivery(
   value: unknown,
   expected: ExternalDeliveryExpectation,
-): ExternalDeliveryResult {
+): CoworkerDocumentExternalDelivery {
   const rpcName = SIGNING_PACKAGE_RPC.recordQuestionnaireDelivery;
-  const result = backendObject(value, rpcName, ["created", "delivery"]);
-  const delivery = backendObject(result.delivery, rpcName, [
+  const result = backendObject(value, rpcName, [
     "id",
     "userId",
     "onboardingCaseId",
@@ -70,51 +44,33 @@ export function parseExternalDeliveryResult(
     "documentVersionId",
     "destination",
     "deliveryType",
-    "note",
-    "deliveredBy",
     "deliveredAt",
-    "createdAt",
+    "deliveredBy",
+    "note",
   ]);
-  const parsed: ExternalDeliveryResult = {
-    created: backendBoolean(result, "created", rpcName),
-    delivery: {
-      id: backendUuid(delivery, "id", rpcName),
-      userId: backendUuid(delivery, "userId", rpcName),
-      onboardingCaseId: backendUuid(
-        delivery,
-        "onboardingCaseId",
-        rpcName,
-      ),
-      documentId: backendUuid(delivery, "documentId", rpcName),
-      documentVersionId: backendUuid(
-        delivery,
-        "documentVersionId",
-        rpcName,
-      ),
-      destination: backendLiteral(
-        delivery,
-        "destination",
-        "accounting",
-        rpcName,
-      ),
-      deliveryType: backendLiteral(
-        delivery,
-        "deliveryType",
-        "onboarding_questionnaire",
-        rpcName,
-      ),
-      note: backendNullableString(delivery, "note", rpcName),
-      deliveredBy: backendUuid(delivery, "deliveredBy", rpcName),
-      deliveredAt: backendTimestamp(delivery, "deliveredAt", rpcName),
-      createdAt: backendTimestamp(delivery, "createdAt", rpcName),
-    },
+  const parsed: CoworkerDocumentExternalDelivery = {
+    id: backendUuid(result, "id", rpcName),
+    userId: backendUuid(result, "userId", rpcName),
+    onboardingCaseId: backendUuid(result, "onboardingCaseId", rpcName),
+    documentId: backendUuid(result, "documentId", rpcName),
+    documentVersionId: backendUuid(result, "documentVersionId", rpcName),
+    destination: backendLiteral(result, "destination", "accounting", rpcName),
+    deliveryType: backendEnum(
+      result,
+      "deliveryType",
+      ["onboarding_questionnaire", "questionnaire_update", "other"] as const,
+      rpcName,
+    ),
+    deliveredAt: backendTimestamp(result, "deliveredAt", rpcName),
+    deliveredBy: backendUuid(result, "deliveredBy", rpcName),
+    note: backendNullableString(result, "note", rpcName),
   };
 
   if (
-    parsed.delivery.userId !== expected.userId ||
-    parsed.delivery.onboardingCaseId !== expected.onboardingCaseId ||
-    parsed.delivery.documentId !== expected.documentId ||
-    parsed.delivery.documentVersionId !== expected.documentVersionId
+    parsed.userId !== expected.userId ||
+    parsed.onboardingCaseId !== expected.onboardingCaseId ||
+    parsed.documentId !== expected.documentId ||
+    parsed.documentVersionId !== expected.documentVersionId
   ) {
     throw new SigningPackageBackendContractError(rpcName);
   }
@@ -127,9 +83,14 @@ export function parseIssueSigningPackageResult(
   onboardingCaseId: string,
 ): IssueSigningPackageResult {
   const rpcName = SIGNING_PACKAGE_RPC.issuePackage;
-  const result = backendObject(value, rpcName, ["created", "package"]);
+  const result = backendObject(value, rpcName, [
+    "issued",
+    "idempotent",
+    "package",
+  ]);
   const parsed: IssueSigningPackageResult = {
-    created: backendBoolean(result, "created", rpcName),
+    issued: backendLiteral(result, "issued", true, rpcName),
+    idempotent: backendBoolean(result, "idempotent", rpcName),
     package: parseSigningPackage(result.package, rpcName),
   };
 
@@ -144,10 +105,10 @@ export function parseIssueSigningPackageResult(
 
 export function parseAdminSigningPackageList(
   value: unknown,
-): AdminSigningPackageListItem[] {
+): SigningPackage[] {
   const rpcName = SIGNING_PACKAGE_RPC.getPackageList;
   const packages = backendArrayValue(value, rpcName).map((item) =>
-    parseAdminSigningPackageListItem(item, rpcName)
+    parseSigningPackage(item, rpcName)
   );
 
   if (new Set(packages.map((item) => item.id)).size !== packages.length) {
@@ -156,119 +117,15 @@ export function parseAdminSigningPackageList(
   return packages;
 }
 
-export function parseAdminSigningPackageDetail(
+export function parseSigningPackageDetail(
   value: unknown,
   packageId: string,
-): AdminSigningPackageDetail {
+): SigningPackage {
   const rpcName = SIGNING_PACKAGE_RPC.getPackageDetail;
-  const result = backendObject(value, rpcName, [
-    "package",
-    "coworker",
-    "onboardingCase",
-  ]);
-  const parsed: AdminSigningPackageDetail = {
-    package: parseSigningPackage(result.package, rpcName),
-    coworker: parseSigningCoworkerSummary(result.coworker, rpcName),
-    onboardingCase: parseSigningOnboardingCaseSummary(
-      result.onboardingCase,
-      rpcName,
-    ),
-  };
+  const parsed = parseSigningPackage(value, rpcName);
 
-  if (
-    parsed.package.id !== packageId ||
-    parsed.coworker.userId !== parsed.package.userId ||
-    parsed.onboardingCase.id !== parsed.package.onboardingCaseId ||
-    parsed.onboardingCase.userId !== parsed.package.userId
-  ) {
+  if (parsed.id !== packageId) {
     throw new SigningPackageBackendContractError(rpcName);
   }
   return parsed;
-}
-
-function parseAdminSigningPackageListItem(
-  value: unknown,
-  rpcName: SigningPackageRpcName,
-): AdminSigningPackageListItem {
-  const result = backendObject(value, rpcName, LIST_ITEM_KEYS);
-  const coworker = parseSigningCoworkerSummary(result.coworker, rpcName);
-  const userId = backendUuid(result, "userId", rpcName);
-  const itemCount = backendPositiveInteger(result, "itemCount", rpcName);
-  const pendingItemCount = packageItemCount(
-    result,
-    "pendingItemCount",
-    rpcName,
-  );
-  const submittedItemCount = packageItemCount(
-    result,
-    "submittedItemCount",
-    rpcName,
-  );
-  const needsCorrectionItemCount = packageItemCount(
-    result,
-    "needsCorrectionItemCount",
-    rpcName,
-  );
-  const acceptedItemCount = packageItemCount(
-    result,
-    "acceptedItemCount",
-    rpcName,
-  );
-  const listedStatusItemCount = pendingItemCount +
-    submittedItemCount +
-    needsCorrectionItemCount +
-    acceptedItemCount;
-
-  if (
-    itemCount !== 4 ||
-    listedStatusItemCount > itemCount ||
-    coworker.userId !== userId
-  ) {
-    throw new SigningPackageBackendContractError(rpcName);
-  }
-
-  return {
-    id: backendUuid(result, "id", rpcName),
-    userId,
-    onboardingCaseId: backendUuid(result, "onboardingCaseId", rpcName),
-    coworker,
-    status: backendEnum(
-      result,
-      "status",
-      SIGNING_PACKAGE_STATUSES,
-      rpcName,
-    ),
-    itemCount: 4,
-    pendingItemCount,
-    submittedItemCount,
-    needsCorrectionItemCount,
-    acceptedItemCount,
-    issuedAt: backendTimestamp(result, "issuedAt", rpcName),
-    submittedAt: backendNullableTimestamp(
-      result,
-      "submittedAt",
-      rpcName,
-    ),
-    reviewStartedAt: backendNullableTimestamp(
-      result,
-      "reviewStartedAt",
-      rpcName,
-    ),
-    acceptedAt: backendNullableTimestamp(result, "acceptedAt", rpcName),
-    rejectedAt: backendNullableTimestamp(result, "rejectedAt", rpcName),
-    revision: backendPositiveInteger(result, "revision", rpcName),
-    updatedAt: backendTimestamp(result, "updatedAt", rpcName),
-  };
-}
-
-function packageItemCount(
-  source: { [key: string]: unknown },
-  key: string,
-  rpcName: SigningPackageRpcName,
-): number {
-  const count = backendNonNegativeInteger(source, key, rpcName);
-  if (count > 4) {
-    throw new SigningPackageBackendContractError(rpcName);
-  }
-  return count;
 }
