@@ -4,6 +4,8 @@ import type {
   QuestionnairePayload,
 } from "./contracts.ts";
 
+const POLISH_POSTAL_CODE_PATTERN = /^\d{2}-\d{3}$/;
+
 export function validateCompletion(
   payload: QuestionnairePayload,
   errors: FieldErrors,
@@ -77,6 +79,14 @@ function validateRegisteredAddress(
   );
 
   if (address.countryCode === "PL") {
+    if (
+      address.postalCode !== null &&
+      address.postalCode !== "" &&
+      !POLISH_POSTAL_CODE_PATTERN.test(address.postalCode)
+    ) {
+      errors["data.registeredAddress.postalCode"] =
+        "Polish postal code must use NN-NNN format.";
+    }
     for (const [key, value] of [
       ["voivodeship", address.voivodeship],
       ["county", address.county],
@@ -110,6 +120,16 @@ function validateCorrespondenceAddress(
     "data.correspondenceAddress",
     errors,
   );
+
+  if (
+    address.countryCode === "PL" &&
+    address.postalCode !== null &&
+    address.postalCode !== "" &&
+    !POLISH_POSTAL_CODE_PATTERN.test(address.postalCode)
+  ) {
+    errors["data.correspondenceAddress.postalCode"] =
+      "Polish postal code must use NN-NNN format.";
+  }
 }
 
 function validateInstitutions(
