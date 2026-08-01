@@ -22,19 +22,7 @@ import {
 import { AdminCoworkerDocReviewCopy } from '../../../../core/types/i18n/admin-coworker-document-review';
 
 export function createAdminCoworkerDocumentsI18n() {
-  const {
-    page,
-    sections,
-    process,
-    tooltips,
-    fields,
-    actions,
-    statuses,
-    options,
-    messages,
-    errors,
-    review,
-  } =
+  const sections =
     createScopedSectionsI18n<{
       page: AdminCoworkerDocPageCopy;
       sections: AdminCoworkerDocSectionCopy;
@@ -61,24 +49,11 @@ export function createAdminCoworkerDocumentsI18n() {
       review: 'review',
     });
 
-  function contextHelpLabel(subject: string): string {
-    return `${actions().showExplanation}: ${subject}`;
-  }
-
   return {
-    page,
-    sections,
-    process,
-    tooltips,
-    fields,
-    actions,
-    statuses,
-    options,
-    messages,
-    errors,
-    review,
+    ...sections,
     appRoles: createCommonAppRolesI18n(),
-    contextHelpLabel,
+    contextHelpLabel: (subject: string) =>
+      `${sections.actions().showExplanation}: ${subject}`,
     commonActions: createCommonActionsI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonForm: createCommonFormI18n(),
