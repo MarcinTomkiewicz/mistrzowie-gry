@@ -1,7 +1,13 @@
 @use "abstracts/variables" as v;
 
-.mg-loading-overlay {
+.mg-loading-overlay__backdrop {
   background: color-mix(in srgb, #{v.$color-bg} 82%, transparent);
+}
+
+.mg-loading-overlay__content {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
 }
 
 .mg-loading-overlay__logo {

@@ -1,22 +1,26 @@
 @if (visible()) {
   <div
-    class="mg-loading-overlay position-absolute inset-0 z-5 backdrop-blur-sm pointer-events-auto flex-col-center-center gap-sm"
+    class="mg-loading-overlay position-absolute inset-0 z-5 pointer-events-auto"
     role="status"
     aria-live="polite"
     [attr.aria-label]="label()"
   >
-    <img
-      [ngSrc]="logoSrc"
-      width="320"
-      height="320"
-      alt=""
-      aria-hidden="true"
-      class="mg-loading-overlay__logo"
-      priority
-    />
+    <div class="mg-loading-overlay__backdrop position-absolute inset-0 backdrop-blur-sm"></div>
 
-    <p class="mg-loading-overlay__label m-0">
-      {{ label() }}
-    </p>
+    <div class="mg-loading-overlay__content flex-col-center-center gap-sm">
+      <img
+        [ngSrc]="logoSrc"
+        width="320"
+        height="320"
+        alt=""
+        aria-hidden="true"
+        class="mg-loading-overlay__logo"
+        priority
+      />
+
+      <p class="mg-loading-overlay__label m-0">
+        {{ label() }}
+      </p>
+    </div>
   </div>
 }
