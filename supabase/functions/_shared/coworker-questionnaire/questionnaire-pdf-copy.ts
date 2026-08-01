@@ -41,7 +41,7 @@ export const QUESTIONNAIRE_PDF_COPY = {
     taxOffice: "Nazwa Urzędu Skarbowego:",
     nfzBranch: "Nazwa Oddziału Narodowego Funduszu Zdrowia",
     otherEmployment:
-      "Informuję, że jestem zatrudniony(a) na podstawie umowy o pracę u innego pracodawcy niż",
+      "Informuję, że jestem zatrudniony(a) na podstawie umowy o pracę u innego pracodawcy niż MISTRZOWIE GRY SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
     otherEmployerName: "Nazwa zakładu pracy",
     otherEmploymentAtLeastMinimumWage:
       "a moje wynagrodzenie z umowy o pracę jest równe lub większe niż kwota minimalnego wynagrodzenia.",
@@ -49,7 +49,7 @@ export const QUESTIONNAIRE_PDF_COPY = {
       "Jestem studentem(ką) w wieku do ukończenia 26 lat lub uczniem/uczennicą szkoły ponadpodstawowej (nr leg. Szkolnej lub studenckiej)",
     schoolOrUniversityName: "Nazwa Szkoły/uczelni",
     otherMandateContract:
-      "Świadczę usługi na podstawie INNEJ umowy zlecenia na rzecz INNEGO zleceniodawcy niż",
+      "Świadczę usługi na podstawie INNEJ umowy zlecenia na rzecz INNEGO zleceniodawcy niż MISTRZOWIE GRY SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
     otherPrincipalName: "Nazwa innego zleceniodawcy",
     otherMandateContractSocialInsurance:
       "i odprowadzam już składkę ZUS z tytułu umowy zlecenia.",
