@@ -120,6 +120,7 @@ export class AppShell {
               this.uiToast.markHostReady();
               resolve();
             });
+            componentRef.changeDetectorRef.detectChanges();
           },
         }),
       ).catch(reject);

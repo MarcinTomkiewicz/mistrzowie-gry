@@ -13,8 +13,14 @@
   </header>
 
   <app-loading-overlay
-    [visible]="isLoading()"
-    [label]="i18n.commonStatus().loading"
+    [visible]="isBusy()"
+    [label]="
+      isSaving()
+        ? i18n.status().savingDraft
+        : isCompleting()
+          ? i18n.status().completing
+          : i18n.commonStatus().loading
+    "
   />
 
   @if (activeError(); as error) {
@@ -153,13 +159,6 @@
               />
             </div>
           </section>
-        }
-
-        @if (isSaving()) {
-          <p-message severity="info" [text]="i18n.status().savingDraft" />
-        }
-        @if (isCompleting()) {
-          <p-message severity="info" [text]="i18n.status().completing" />
         }
 
         <div class="flex-row-end-center flex-wrap gap-sm w-100">
