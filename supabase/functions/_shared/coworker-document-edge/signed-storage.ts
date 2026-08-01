@@ -47,11 +47,16 @@ export async function createSignedDownloadUrl(
   target: StorageObject,
   expiresInSeconds: number,
   operation: string,
+  downloadFilename?: string,
 ): Promise<string> {
   try {
     const { data, error } = await client.storage
       .from(target.bucket)
-      .createSignedUrl(target.path, expiresInSeconds);
+      .createSignedUrl(
+        target.path,
+        expiresInSeconds,
+        downloadFilename ? { download: downloadFilename } : undefined,
+      );
 
     if (
       error !== null ||

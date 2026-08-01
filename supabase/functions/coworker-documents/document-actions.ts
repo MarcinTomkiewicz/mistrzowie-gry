@@ -119,6 +119,7 @@ async function createDownloadUrl(
     target,
     target.signedUrlExpiresInSeconds,
     "create_signed_download_url",
+    target.originalFilename,
   );
 
   return Response.json({

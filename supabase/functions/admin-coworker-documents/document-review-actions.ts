@@ -172,6 +172,7 @@ export async function createDownloadUrl(
     target,
     target.signedUrlExpiresInSeconds,
     "create_admin_signed_download_url",
+    target.originalFilename,
   );
 
   return Response.json({
