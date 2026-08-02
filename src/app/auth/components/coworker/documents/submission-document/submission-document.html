@@ -67,6 +67,8 @@
       <app-document-upload
         [definition]="definition()"
         [document]="document"
+        [requirementId]="requirementId()"
+        [onboardingCaseId]="onboardingCaseId()"
         [disabled]="mutationsBlocked()"
         (completed)="uploadCompleted.emit()"
         (busyChange)="uploadBusyChange.emit($event)"

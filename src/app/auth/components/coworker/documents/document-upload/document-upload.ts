@@ -46,8 +46,8 @@ export class DocumentUpload {
 
   readonly definition = input.required<ICoworkerDocumentDefinition>();
   readonly document = input<ICoworkerDocumentPortalSubmission | null>(null);
-  readonly requirementId = input<string | null>(null);
-  readonly onboardingCaseId = input<string | null>(null);
+  readonly requirementId = input.required<string>();
+  readonly onboardingCaseId = input.required<string | null>();
   readonly disabled = input(false);
 
   readonly completed = output<void>();
@@ -142,14 +142,13 @@ export class DocumentUpload {
     if (file === undefined || signatureDeclarationType === null) return;
 
     const document = this.document();
-    const requirementId = document === null ? this.requirementId() : null;
+    const isNewDocument = document === null;
     const request: Extract<CoworkerDocumentActionRequest, { action: typeof COWORKER_DOCUMENT_ACTION.reserveUpload }> = {
       action: COWORKER_DOCUMENT_ACTION.reserveUpload,
       documentId: document?.id ?? null,
-      requirementId,
-      documentDefinitionId:
-        document === null && requirementId === null ? this.definition().id : null,
-      onboardingCaseId: this.onboardingCaseId(),
+      requirementId: isNewDocument ? this.requirementId() : null,
+      documentDefinitionId: isNewDocument ? this.definition().id : null,
+      onboardingCaseId: isNewDocument ? this.onboardingCaseId() : null,
       originalFilename: file.name,
       declaredMimeType: file.type.toLowerCase(),
       sizeBytes: file.size,

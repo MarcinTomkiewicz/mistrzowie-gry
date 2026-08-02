@@ -32,7 +32,7 @@ export class SubmissionDocument {
   readonly definition = input.required<ICoworkerDocumentDefinition>();
   readonly requirementId = input.required<string>();
   readonly requirementStatus = input.required<CoworkerDocumentRequirementStatus>();
-  readonly onboardingCaseId = input<string | null>(null);
+  readonly onboardingCaseId = input.required<string | null>();
   readonly mutationsBlocked = input(false);
   readonly activeMutationId = input<string | null>(null);
   readonly downloadingVersionId = input<string | null>(null);
