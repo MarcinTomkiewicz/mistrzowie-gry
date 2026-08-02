@@ -165,5 +165,8 @@ export function createCoworkerDocumentDefinitionParser<Context>(
     );
   }
 
-  return { parseCoworkerDocumentDefinition };
+  return {
+    parseCoworkerDocumentDefinition,
+    parseCoworkerSignaturePolicy: parseSignaturePolicy,
+  };
 }

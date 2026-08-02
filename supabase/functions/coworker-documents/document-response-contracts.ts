@@ -7,7 +7,6 @@ import { RPC } from "./contracts.ts";
 import {
   BackendContractError,
   coworkerDocumentReaders,
-  type UnknownObject,
 } from "./contract-context.ts";
 
 export { parsePortalResult } from "./document-portal-response-contract.ts";
@@ -25,8 +24,8 @@ export interface DownloadTarget {
 }
 
 const {
-  backendBoolean,
   backendEnum,
+  backendLiteral,
   backendObject,
   backendPositiveInteger,
   backendString,
@@ -128,17 +127,28 @@ export function parseDownloadTarget(
   return target;
 }
 
+export interface NotificationReadResult {
+  id: string;
+  read: true;
+  readAt: string;
+}
+
 export function parseNotificationReadResult(
   value: unknown,
   notificationId: string,
-): UnknownObject {
-  const result = backendObject(value, RPC.markNotificationRead);
-  if (
-    backendUuid(result, "id", RPC.markNotificationRead) !== notificationId ||
-    backendBoolean(result, "read", RPC.markNotificationRead) !== true
-  ) {
+): NotificationReadResult {
+  const result = backendObject(value, RPC.markNotificationRead, [
+    "id",
+    "read",
+    "readAt",
+  ]);
+  const id = backendUuid(result, "id", RPC.markNotificationRead);
+  if (id !== notificationId) {
     throw new BackendContractError(RPC.markNotificationRead);
   }
-  backendTimestamp(result, "readAt", RPC.markNotificationRead);
-  return result;
+  return {
+    id,
+    read: backendLiteral(result, "read", true, RPC.markNotificationRead),
+    readAt: backendTimestamp(result, "readAt", RPC.markNotificationRead),
+  };
 }

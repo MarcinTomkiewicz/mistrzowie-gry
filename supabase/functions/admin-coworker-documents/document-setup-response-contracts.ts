@@ -1,4 +1,10 @@
-import type { UnknownObject } from "../_shared/coworker-document-edge/contract-readers.ts";
+import { createCoworkerDocumentDefinitionParser } from "../_shared/coworker-document-edge/coworker-document-definition-parser.ts";
+import {
+  COWORKER_DOCUMENT_REQUIREMENT_STATUSES,
+  type CoworkerDocumentDefinition,
+  type CoworkerOnboardingCase,
+} from "../_shared/coworker-document-edge/coworker-document-models.ts";
+import { createCoworkerOnboardingCaseParser } from "../_shared/coworker-document-edge/coworker-onboarding-case-parser.ts";
 import {
   adminDocumentReaders,
   BackendContractError,
@@ -7,68 +13,195 @@ import {
 
 const {
   backendBoolean,
+  backendEnum,
   backendNonNegativeInteger,
+  backendNullableString,
+  backendNullableTimestamp,
+  backendNullableUuid,
   backendObject,
-  backendString,
+  backendTimestamp,
   backendUuid,
 } = adminDocumentReaders;
+const { parseCoworkerDocumentDefinition } =
+  createCoworkerDocumentDefinitionParser(adminDocumentReaders);
+const { parseCoworkerOnboardingCase } = createCoworkerOnboardingCaseParser(
+  adminDocumentReaders,
+);
 
-export function parseSavedDefinition(value: unknown): UnknownObject {
-  const definition = backendObject(value, RPC.saveDefinition);
-  backendUuid(definition, "id", RPC.saveDefinition);
-  backendString(definition, "code", RPC.saveDefinition);
-  backendString(definition, "title", RPC.saveDefinition);
-  return definition;
+export interface AdminOnboardingResult {
+  created: boolean;
+  case: CoworkerOnboardingCase;
+}
+
+export interface SeedRequirementsResult {
+  userId: string;
+  onboardingCaseId: string;
+  insertedCount: number;
+}
+
+export interface AdminDocumentRequirementResult {
+  id: string;
+  userId: string;
+  onboardingCaseId: string | null;
+  documentDefinitionId: string;
+  status: typeof COWORKER_DOCUMENT_REQUIREMENT_STATUSES[number];
+  required: boolean;
+  dueAt: string | null;
+  fulfilledByDocumentId: string | null;
+  fulfilledAt: string | null;
+  waivedAt: string | null;
+  waiverReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function parseSavedDefinition(
+  value: unknown,
+): CoworkerDocumentDefinition {
+  return parseCoworkerDocumentDefinition(value, RPC.saveDefinition);
 }
 
 export function parseOnboardingResult(
   value: unknown,
   userId: string,
-): UnknownObject {
-  const result = backendObject(value, RPC.ensureOnboarding);
-  backendBoolean(result, "created", RPC.ensureOnboarding);
-  const onboardingCase = backendObject(result.case, RPC.ensureOnboarding);
-  backendUuid(onboardingCase, "id", RPC.ensureOnboarding);
+): AdminOnboardingResult {
+  const result = backendObject(value, RPC.ensureOnboarding, [
+    "created",
+    "case",
+  ]);
+  const onboardingCase = parseCoworkerOnboardingCase(
+    result.case,
+    RPC.ensureOnboarding,
+  );
 
-  if (
-    backendUuid(onboardingCase, "userId", RPC.ensureOnboarding) !== userId
-  ) {
+  if (onboardingCase.userId !== userId) {
     throw new BackendContractError(RPC.ensureOnboarding);
   }
-  return result;
+  return {
+    created: backendBoolean(result, "created", RPC.ensureOnboarding),
+    case: onboardingCase,
+  };
 }
 
 export function parseSeedRequirementsResult(
   value: unknown,
   userId: string,
   onboardingCaseId: string,
-): UnknownObject {
-  const result = backendObject(value, RPC.seedDefaultRequirements);
-  if (
-    backendUuid(result, "userId", RPC.seedDefaultRequirements) !== userId ||
-    backendUuid(result, "onboardingCaseId", RPC.seedDefaultRequirements) !==
-      onboardingCaseId
-  ) {
-    throw new BackendContractError(RPC.seedDefaultRequirements);
-  }
-  backendNonNegativeInteger(
+): SeedRequirementsResult {
+  const result = backendObject(value, RPC.seedDefaultRequirements, [
+    "userId",
+    "onboardingCaseId",
+    "insertedCount",
+  ]);
+  const parsedUserId = backendUuid(
+    result,
+    "userId",
+    RPC.seedDefaultRequirements,
+  );
+  const parsedOnboardingCaseId = backendUuid(
+    result,
+    "onboardingCaseId",
+    RPC.seedDefaultRequirements,
+  );
+  const insertedCount = backendNonNegativeInteger(
     result,
     "insertedCount",
     RPC.seedDefaultRequirements,
   );
-  return result;
+  if (
+    parsedUserId !== userId ||
+    parsedOnboardingCaseId !== onboardingCaseId
+  ) {
+    throw new BackendContractError(RPC.seedDefaultRequirements);
+  }
+  return {
+    userId: parsedUserId,
+    onboardingCaseId: parsedOnboardingCaseId,
+    insertedCount,
+  };
 }
 
 export function parseRequirementResult(
   value: unknown,
   userId: string,
-): UnknownObject {
-  const requirement = backendObject(value, RPC.assignRequirement);
-  backendUuid(requirement, "id", RPC.assignRequirement);
-  if (
-    backendUuid(requirement, "userId", RPC.assignRequirement) !== userId
-  ) {
+): AdminDocumentRequirementResult {
+  const requirement = backendObject(value, RPC.assignRequirement, [
+    "id",
+    "userId",
+    "onboardingCaseId",
+    "documentDefinitionId",
+    "status",
+    "required",
+    "dueAt",
+    "fulfilledByDocumentId",
+    "fulfilledAt",
+    "waivedAt",
+    "waiverReason",
+    "createdAt",
+    "updatedAt",
+  ]);
+  const parsedUserId = backendUuid(
+    requirement,
+    "userId",
+    RPC.assignRequirement,
+  );
+  if (parsedUserId !== userId) {
     throw new BackendContractError(RPC.assignRequirement);
   }
-  return requirement;
+  return {
+    id: backendUuid(requirement, "id", RPC.assignRequirement),
+    userId: parsedUserId,
+    onboardingCaseId: backendNullableUuid(
+      requirement,
+      "onboardingCaseId",
+      RPC.assignRequirement,
+    ),
+    documentDefinitionId: backendUuid(
+      requirement,
+      "documentDefinitionId",
+      RPC.assignRequirement,
+    ),
+    status: backendEnum(
+      requirement,
+      "status",
+      COWORKER_DOCUMENT_REQUIREMENT_STATUSES,
+      RPC.assignRequirement,
+    ),
+    required: backendBoolean(requirement, "required", RPC.assignRequirement),
+    dueAt: backendNullableTimestamp(
+      requirement,
+      "dueAt",
+      RPC.assignRequirement,
+    ),
+    fulfilledByDocumentId: backendNullableUuid(
+      requirement,
+      "fulfilledByDocumentId",
+      RPC.assignRequirement,
+    ),
+    fulfilledAt: backendNullableTimestamp(
+      requirement,
+      "fulfilledAt",
+      RPC.assignRequirement,
+    ),
+    waivedAt: backendNullableTimestamp(
+      requirement,
+      "waivedAt",
+      RPC.assignRequirement,
+    ),
+    waiverReason: backendNullableString(
+      requirement,
+      "waiverReason",
+      RPC.assignRequirement,
+    ),
+    createdAt: backendTimestamp(
+      requirement,
+      "createdAt",
+      RPC.assignRequirement,
+    ),
+    updatedAt: backendTimestamp(
+      requirement,
+      "updatedAt",
+      RPC.assignRequirement,
+    ),
+  };
 }

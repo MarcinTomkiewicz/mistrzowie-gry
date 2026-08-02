@@ -1,3 +1,4 @@
+import { createCoworkerDocumentDefinitionParser } from "../_shared/coworker-document-edge/coworker-document-definition-parser.ts";
 import { createCoworkerDocumentParser } from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 import type { UnknownObject } from "../_shared/coworker-document-edge/contract-readers.ts";
 import {
@@ -14,7 +15,6 @@ import {
   parseReviewRequirement,
   parseReviewUser,
 } from "./document-review-metadata-parser.ts";
-import { parseReviewDocumentDefinition } from "./document-definition-response-contract.ts";
 
 const STATUSES_REQUIRING_SUBMITTED_VERSION = [
   "submitted",
@@ -29,6 +29,8 @@ const { parseCoworkerDocumentVersion } = createCoworkerDocumentParser(
   adminDocumentReaders,
   (rpcName) => new BackendContractError(rpcName),
 );
+const { parseCoworkerDocumentDefinition } =
+  createCoworkerDocumentDefinitionParser(adminDocumentReaders);
 
 export function parseReviewDetail(
   value: unknown,
@@ -48,8 +50,9 @@ export function parseReviewDetail(
     "reviews",
   ]);
   const user = parseReviewUser(detail.user);
-  const documentDefinition = parseReviewDocumentDefinition(
+  const documentDefinition = parseCoworkerDocumentDefinition(
     detail.documentDefinition,
+    rpcName,
   );
   const requirement = detail.requirement === null
     ? null
@@ -80,6 +83,9 @@ export function parseReviewDetail(
     parseReviewHistoryItem,
   );
   const versionIds = new Set(versions.map((version) => version.id));
+  const signatureVerificationIds = new Set(
+    signatureVerifications.map((verification) => verification.id),
+  );
 
   if (
     user.userId !== userId ||
@@ -98,7 +104,15 @@ export function parseReviewDetail(
     (STATUSES_REQUIRING_SUBMITTED_VERSION.some(
       (status) => status === document.status,
     ) && submittedVersion === null) ||
-    versionIds.size !== versions.length
+    versionIds.size !== versions.length ||
+    signatureVerifications.some((verification) =>
+      !versionIds.has(verification.documentVersionId)
+    ) ||
+    reviews.some((review) =>
+      !versionIds.has(review.documentVersionId) ||
+      (review.signatureVerificationId !== null &&
+        !signatureVerificationIds.has(review.signatureVerificationId))
+    )
   ) {
     throw new BackendContractError(rpcName);
   }

@@ -1,25 +1,29 @@
+import { createCoworkerDocumentDefinitionParser } from "../_shared/coworker-document-edge/coworker-document-definition-parser.ts";
+import {
+  COWORKER_DOCUMENT_VERIFICATION_METHODS,
+  COWORKER_DOCUMENT_VERIFICATION_STATUSES,
+  COWORKER_DOCUMENT_VERIFIED_SIGNATURE_TYPES,
+  type CoworkerDocumentDefinition,
+  type CoworkerSignaturePolicy,
+} from "../_shared/coworker-document-edge/coworker-document-models.ts";
 import { createCoworkerDocumentParser } from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 import type { CoworkerDocument } from "../_shared/coworker-document-edge/coworker-document-parser.ts";
-import type { UnknownObject } from "../_shared/coworker-document-edge/contract-readers.ts";
 import {
   adminDocumentReaders,
-  type AdminDownloadPurpose,
   BackendContractError,
-  type DownloadTarget,
   RPC,
   type VerificationStatus,
 } from "./contracts.ts";
 export { parseReviewDetail } from "./document-review-model-parser.ts";
 
 const REVIEW_QUEUE_STATUSES = ["submitted", "under_review"] as const;
-const DOWNLOAD_PURPOSES = ["admin_review", "admin_download"] as const;
-
 const {
   backendArray,
   backendArrayValue,
   backendEnum,
   backendNullableString,
   backendNullableTimestamp,
+  backendNullableUuid,
   backendObject,
   backendPositiveInteger,
   backendString,
@@ -31,14 +35,58 @@ const { parseCoworkerDocument } = createCoworkerDocumentParser(
   adminDocumentReaders,
   (rpcName) => new BackendContractError(rpcName),
 );
+const {
+  parseCoworkerDocumentDefinition,
+  parseCoworkerSignaturePolicy,
+} = createCoworkerDocumentDefinitionParser(adminDocumentReaders);
+
+export interface AdminDocumentCatalog {
+  signaturePolicies: CoworkerSignaturePolicy[];
+  documentDefinitions: CoworkerDocumentDefinition[];
+}
+
+export interface AdminDocumentDashboard {
+  catalog: AdminDocumentCatalog;
+  reviewQueue: ReturnType<typeof parseReviewQueueItem>[];
+}
+
+export interface AdminSignatureVerification {
+  id: string;
+  documentId: string;
+  documentVersionId: string;
+  verificationMethod: typeof COWORKER_DOCUMENT_VERIFICATION_METHODS[number];
+  verificationStatus: VerificationStatus;
+  signatureType: typeof COWORKER_DOCUMENT_VERIFIED_SIGNATURE_TYPES[number];
+  actorUserId: string | null;
+  providerName: string | null;
+  providerReference: string | null;
+  reason: string | null;
+  details: Record<string, unknown>;
+  createdAt: string;
+}
 
 export function parseAdminDashboard(
   catalogValue: unknown,
   queueValue: unknown,
-): UnknownObject {
-  const catalog = backendObject(catalogValue, RPC.getCatalog);
-  backendArray(catalog, "signaturePolicies", RPC.getCatalog);
-  backendArray(catalog, "documentDefinitions", RPC.getCatalog);
+): AdminDocumentDashboard {
+  const source = backendObject(catalogValue, RPC.getCatalog, [
+    "signaturePolicies",
+    "documentDefinitions",
+  ]);
+  const catalog: AdminDocumentCatalog = {
+    signaturePolicies: backendArray(
+      source,
+      "signaturePolicies",
+      RPC.getCatalog,
+    ).map((policy) => parseCoworkerSignaturePolicy(policy, RPC.getCatalog)),
+    documentDefinitions: backendArray(
+      source,
+      "documentDefinitions",
+      RPC.getCatalog,
+    ).map((definition) =>
+      parseCoworkerDocumentDefinition(definition, RPC.getCatalog)
+    ),
+  };
   const reviewQueue = backendArrayValue(queueValue, RPC.getReviewQueue).map(
     parseReviewQueueItem,
   );
@@ -143,92 +191,91 @@ export function parseDocumentResult(
 
 export function parseSignatureVerification(
   value: unknown,
-  userId: string,
   documentId: string,
   documentVersionId: string,
   expectedStatus: VerificationStatus,
-): UnknownObject {
-  const verification = backendObject(value, RPC.verifySignature);
+): AdminSignatureVerification {
+  const verification = backendObject(value, RPC.verifySignature, [
+    "id",
+    "documentId",
+    "documentVersionId",
+    "verificationMethod",
+    "verificationStatus",
+    "signatureType",
+    "actorUserId",
+    "providerName",
+    "providerReference",
+    "reason",
+    "details",
+    "createdAt",
+  ]);
+  const parsedDocumentId = backendUuid(
+    verification,
+    "documentId",
+    RPC.verifySignature,
+  );
+  const parsedDocumentVersionId = backendUuid(
+    verification,
+    "documentVersionId",
+    RPC.verifySignature,
+  );
+  const verificationStatus = backendEnum(
+    verification,
+    "verificationStatus",
+    COWORKER_DOCUMENT_VERIFICATION_STATUSES,
+    RPC.verifySignature,
+  );
 
   if (
-    backendUuid(verification, "documentId", RPC.verifySignature) !==
-      documentId ||
-    backendUuid(
-        verification,
-        "documentVersionId",
-        RPC.verifySignature,
-      ) !== documentVersionId ||
-    backendString(
-        verification,
-        "verificationStatus",
-        RPC.verifySignature,
-      ) !== expectedStatus ||
-    userId === ""
+    parsedDocumentId !== documentId ||
+    parsedDocumentVersionId !== documentVersionId ||
+    verificationStatus !== expectedStatus
   ) {
     throw new BackendContractError(RPC.verifySignature);
   }
 
-  backendUuid(verification, "id", RPC.verifySignature);
-  backendTimestamp(verification, "createdAt", RPC.verifySignature);
-  return verification;
-}
-
-export function parseDownloadTarget(
-  value: unknown,
-  documentVersionId: string,
-  purpose: AdminDownloadPurpose,
-): DownloadTarget {
-  const result = backendObject(value, RPC.getDownloadTarget, [
-    "documentId",
-    "documentVersionId",
-    "bucket",
-    "path",
-    "originalFilename",
-    "mimeType",
-    "sizeBytes",
-    "purpose",
-    "signedUrlExpiresInSeconds",
-  ]);
-  const target: DownloadTarget = {
-    documentId: backendUuid(result, "documentId", RPC.getDownloadTarget),
-    documentVersionId: backendUuid(
-      result,
-      "documentVersionId",
-      RPC.getDownloadTarget,
+  return {
+    id: backendUuid(verification, "id", RPC.verifySignature),
+    documentId: parsedDocumentId,
+    documentVersionId: parsedDocumentVersionId,
+    verificationMethod: backendEnum(
+      verification,
+      "verificationMethod",
+      COWORKER_DOCUMENT_VERIFICATION_METHODS,
+      RPC.verifySignature,
     ),
-    bucket: backendString(result, "bucket", RPC.getDownloadTarget),
-    path: backendString(result, "path", RPC.getDownloadTarget),
-    originalFilename: backendString(
-      result,
-      "originalFilename",
-      RPC.getDownloadTarget,
+    verificationStatus: expectedStatus,
+    signatureType: backendEnum(
+      verification,
+      "signatureType",
+      COWORKER_DOCUMENT_VERIFIED_SIGNATURE_TYPES,
+      RPC.verifySignature,
     ),
-    mimeType: backendString(result, "mimeType", RPC.getDownloadTarget),
-    sizeBytes: backendPositiveInteger(
-      result,
-      "sizeBytes",
-      RPC.getDownloadTarget,
+    actorUserId: backendNullableUuid(
+      verification,
+      "actorUserId",
+      RPC.verifySignature,
     ),
-    purpose: backendEnum(
-      result,
-      "purpose",
-      DOWNLOAD_PURPOSES,
-      RPC.getDownloadTarget,
+    providerName: backendNullableString(
+      verification,
+      "providerName",
+      RPC.verifySignature,
     ),
-    signedUrlExpiresInSeconds: backendPositiveInteger(
-      result,
-      "signedUrlExpiresInSeconds",
-      RPC.getDownloadTarget,
+    providerReference: backendNullableString(
+      verification,
+      "providerReference",
+      RPC.verifySignature,
+    ),
+    reason: backendNullableString(
+      verification,
+      "reason",
+      RPC.verifySignature,
+    ),
+    details: backendObject(verification.details, RPC.verifySignature),
+    createdAt: backendTimestamp(
+      verification,
+      "createdAt",
+      RPC.verifySignature,
     ),
   };
-
-  if (
-    target.documentVersionId !== documentVersionId ||
-    target.purpose !== purpose ||
-    target.bucket !== "coworker-documents" ||
-    target.signedUrlExpiresInSeconds > 300
-  ) {
-    throw new BackendContractError(RPC.getDownloadTarget);
-  }
-  return target;
 }

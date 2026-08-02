@@ -1,5 +1,6 @@
 import {
   COWORKER_DOCUMENT_ORIGINS,
+  COWORKER_DOCUMENT_REQUIREMENT_STATUSES,
   COWORKER_DOCUMENT_STATUSES,
 } from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 import { adminDocumentReaders, RPC } from "./contracts.ts";
@@ -11,17 +12,6 @@ const APP_ROLES = [
   "customer_manager",
   "lead_coordinator",
   "admin",
-] as const;
-
-const REQUIREMENT_STATUSES = [
-  "pending",
-  "submitted",
-  "under_review",
-  "needs_correction",
-  "fulfilled",
-  "waived",
-  "expired",
-  "cancelled",
 ] as const;
 
 const {
@@ -76,7 +66,7 @@ export function parseReviewRequirement(value: unknown) {
     status: backendEnum(
       source,
       "status",
-      REQUIREMENT_STATUSES,
+      COWORKER_DOCUMENT_REQUIREMENT_STATUSES,
       RPC.getReviewDetail,
     ),
     required: backendBoolean(source, "required", RPC.getReviewDetail),

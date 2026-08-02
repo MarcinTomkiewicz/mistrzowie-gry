@@ -3,9 +3,9 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
 import { createSignedDownloadUrl } from "../_shared/coworker-document-edge/signed-storage.ts";
 import { type AdminDocumentActionRequest, RPC } from "./contracts.ts";
+import { parseDownloadTarget } from "./document-download-response-contract.ts";
 import {
   parseDocumentResult,
-  parseDownloadTarget,
   parseReviewDetail,
   parseSignatureVerification,
 } from "./document-response-contracts.ts";
@@ -83,7 +83,6 @@ export async function verifySignature(
     action: "verifySignature",
     verification: parseSignatureVerification(
       data,
-      action.userId,
       action.documentId,
       action.documentVersionId,
       action.verificationStatus,
