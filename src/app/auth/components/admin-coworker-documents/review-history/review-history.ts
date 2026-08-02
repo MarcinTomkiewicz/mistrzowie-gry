@@ -20,7 +20,7 @@ export class ReviewHistory {
   protected readonly formatTimestampLabel = formatTimestampLabel;
 
   protected versionNumber(versionId: string): number | null {
-    return this.detail().document.versions.find(
+    return this.detail().versions.find(
       (version) => version.id === versionId,
     )?.versionNumber ?? null;
   }

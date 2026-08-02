@@ -133,31 +133,50 @@
             }
             <div class="flex-col-start-stretch gap-md border-top pt-sm">
               <strong>{{ i18n.labels().requirementDocuments }}</strong>
-              @if (requirement.documents.length === 0) {
+              @if (
+                requirement.sourceDocument === null &&
+                requirement.submissionDocument === null
+              ) {
                 <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
-              } @else {
-                @for (document of requirement.documents; track document.id) {
-                  <app-document-card
-                    [document]="document"
-                    [definition]="requirement.documentDefinition"
-                    [requirementStatus]="requirement.status"
-                    [mutationsBlocked]="actionsBlocked()"
-                    [activeMutationId]="activeMutationId()"
-                    [downloadingVersionId]="downloadingVersionId()"
-                    (downloadRequested)="downloadVersion($event)"
-                    (submitRequested)="submitDocument($event)"
-                    (withdrawRequested)="withdrawDocument($event)"
-                    (uploadCompleted)="handleUploadCompleted()"
-                    (uploadBusyChange)="handleUploadBusy($event)"
-                    (blockingError)="registerBlockingError($event)"
-                    (reloadRequired)="requestReload()"
-                  />
-                }
+              }
+              @if (requirement.sourceDocument; as document) {
+                <app-document-card
+                  [document]="document"
+                  [definition]="requirement.documentDefinition"
+                  [requirementStatus]="requirement.status"
+                  [mutationsBlocked]="actionsBlocked()"
+                  [activeMutationId]="activeMutationId()"
+                  [downloadingVersionId]="downloadingVersionId()"
+                  (downloadRequested)="downloadVersion($event)"
+                  (submitRequested)="submitDocument($event)"
+                  (withdrawRequested)="withdrawDocument($event)"
+                  (uploadCompleted)="handleUploadCompleted()"
+                  (uploadBusyChange)="handleUploadBusy($event)"
+                  (blockingError)="registerBlockingError($event)"
+                  (reloadRequired)="requestReload()"
+                />
+              }
+              @if (requirement.submissionDocument; as document) {
+                <app-document-card
+                  [document]="document"
+                  [definition]="requirement.documentDefinition"
+                  [requirementStatus]="requirement.status"
+                  [mutationsBlocked]="actionsBlocked()"
+                  [activeMutationId]="activeMutationId()"
+                  [downloadingVersionId]="downloadingVersionId()"
+                  (downloadRequested)="downloadVersion($event)"
+                  (submitRequested)="submitDocument($event)"
+                  (withdrawRequested)="withdrawDocument($event)"
+                  (uploadCompleted)="handleUploadCompleted()"
+                  (uploadBusyChange)="handleUploadBusy($event)"
+                  (blockingError)="registerBlockingError($event)"
+                  (reloadRequired)="requestReload()"
+                />
               }
               @if (
                 getDocumentCapability(
                   requirement.documentDefinition,
-                  requirement.documents,
+                  requirementDocuments(requirement),
                   null,
                   requirement.status
                 ).canAddDocument
@@ -182,59 +201,20 @@
     <section class="flex-col-start-stretch gap-md w-100">
       <header class="flex-col-start-stretch gap-xs">
         <h3 class="mg-section__title mg-section__title--sm m-0">
-          {{ i18n.sections().unassignedTitle }}
-        </h3>
-        <p class="m-0 muted-text">{{ i18n.sections().unassignedDescription }}</p>
-      </header>
-      @if (data.unassignedDocuments.length === 0) {
-        <div class="mg-card flex-col-start-stretch gap-xs w-100">
-          <strong>{{ i18n.commonEmpty().title }}</strong>
-          <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
-        </div>
-      } @else {
-        @for (document of data.unassignedDocuments; track document.id) {
-          <app-document-card
-            [document]="document"
-            [definition]="documentDefinitions().get(document.documentDefinitionId) ?? null"
-            [mutationsBlocked]="actionsBlocked()"
-            [activeMutationId]="activeMutationId()"
-            [downloadingVersionId]="downloadingVersionId()"
-            (downloadRequested)="downloadVersion($event)"
-            (submitRequested)="submitDocument($event)"
-            (withdrawRequested)="withdrawDocument($event)"
-            (uploadCompleted)="handleUploadCompleted()"
-            (uploadBusyChange)="handleUploadBusy($event)"
-            (blockingError)="registerBlockingError($event)"
-            (reloadRequired)="requestReload()"
-          />
-        }
-      }
-    </section>
-
-    <section class="flex-col-start-stretch gap-md w-100">
-      <header class="flex-col-start-stretch gap-xs">
-        <h3 class="mg-section__title mg-section__title--sm m-0">
           {{ i18n.sections().definitionsTitle }}
         </h3>
         <p class="m-0 muted-text">{{ i18n.sections().definitionsDescription }}</p>
       </header>
-      @if (data.availableDefinitions.length === 0) {
+      @if (data.documentCatalog.length === 0) {
         <div class="mg-card flex-col-start-stretch gap-xs w-100">
           <strong>{{ i18n.commonEmpty().title }}</strong>
           <p class="m-0 muted-text">{{ i18n.commonEmpty().description }}</p>
         </div>
       } @else {
         <div class="mg-grid-2 gap-md w-100">
-          @for (definition of data.availableDefinitions; track definition.id) {
+          @for (definition of data.documentCatalog; track definition.id) {
             <app-available-document-card
               [definition]="definition"
-              [documents]="unassignedDocumentsByDefinition().get(definition.id) ?? []"
-              [onboardingCaseId]="data.activeOnboardingCase?.id ?? null"
-              [disabled]="actionsBlocked()"
-              (completed)="handleUploadCompleted()"
-              (busyChange)="handleUploadBusy($event)"
-              (blockingError)="registerBlockingError($event)"
-              (reloadRequired)="requestReload()"
             />
           }
         </div>

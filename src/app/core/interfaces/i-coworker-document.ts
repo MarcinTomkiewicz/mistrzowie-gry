@@ -1,27 +1,23 @@
-import { AppRole } from '../types/app-role';
 import {
-  CoworkerActiveOnboardingStatus,
-  CoworkerAutomaticVerificationMode,
-  CoworkerAvailableDocumentOriginPolicy,
+  AutomaticVerificationMode,
   CoworkerDocumentMultiplicity,
+  CoworkerDocumentOrigin,
   CoworkerDocumentOriginPolicy,
-  CoworkerDocumentVersionStatus,
+  CoworkerDocumentRequirementStatus,
   CoworkerDocumentStatus,
-  CoworkerMalwareScanStatus,
-  CoworkerNotificationEntityType,
-  CoworkerNotificationSeverity,
-  CoworkerPortalDocumentStatus,
-  CoworkerPortalRequirementStatus,
-  CoworkerSignatureDeclarationType,
-  CoworkerSignatureVerificationMethod,
-  CoworkerSignatureVerificationStatus,
-  CoworkerVerifiedSignatureType,
+  CoworkerDocumentVersionStatus,
+  CoworkerOnboardingStatus,
+  MalwareScanStatus,
+  SignatureDeclarationType,
+  SignatureVerificationMethod,
+  SignatureVerificationStatus,
+  VerifiedSignatureType,
 } from '../types/coworker-document';
 
 export interface ICoworkerDocumentAccess {
-  readonly enabled: true;
-  readonly grantedAt: string;
-  readonly grantedViaRole: AppRole | null;
+  readonly enabled: boolean;
+  readonly grantedAt: string | null;
+  readonly grantedViaRole: boolean;
 }
 
 export interface ICoworkerSignaturePolicy {
@@ -30,9 +26,9 @@ export interface ICoworkerSignaturePolicy {
   readonly name: string;
   readonly description: string | null;
   readonly signatureRequired: boolean;
-  readonly allowedDeclarationTypes: readonly CoworkerSignatureDeclarationType[];
+  readonly allowedDeclarationTypes: readonly SignatureDeclarationType[];
   readonly manualReviewRequired: boolean;
-  readonly automaticVerificationMode: CoworkerAutomaticVerificationMode;
+  readonly automaticVerificationMode: AutomaticVerificationMode;
   readonly isActive: boolean;
 }
 
@@ -61,17 +57,11 @@ export interface ICoworkerDocumentDefinition
   readonly signaturePolicy: ICoworkerSignaturePolicy;
 }
 
-export interface ICoworkerAvailableDocumentDefinition
-  extends Omit<ICoworkerDocumentDefinition, 'originPolicy' | 'isActive'> {
-  readonly originPolicy: CoworkerAvailableDocumentOriginPolicy;
-  readonly isActive: true;
-}
-
 export interface ICoworkerDocumentSignatureVerification {
   readonly id: string;
-  readonly verificationMethod: CoworkerSignatureVerificationMethod;
-  readonly verificationStatus: CoworkerSignatureVerificationStatus;
-  readonly signatureType: CoworkerVerifiedSignatureType;
+  readonly verificationMethod: SignatureVerificationMethod;
+  readonly verificationStatus: SignatureVerificationStatus;
+  readonly signatureType: VerifiedSignatureType;
   readonly reason: string | null;
   readonly createdAt: string;
 }
@@ -87,9 +77,9 @@ export interface ICoworkerDocumentVersion {
   readonly detectedMimeType: string | null;
   readonly expectedSizeBytes: number;
   readonly sizeBytes: number | null;
-  readonly signatureDeclarationType: CoworkerSignatureDeclarationType;
+  readonly signatureDeclarationType: SignatureDeclarationType;
   readonly signatureDeclaredAt: string | null;
-  readonly malwareScanStatus: CoworkerMalwareScanStatus;
+  readonly malwareScanStatus: MalwareScanStatus;
   readonly uploadedAt: string | null;
   readonly finalizedAt: string | null;
   readonly supersededAt: string | null;
@@ -102,15 +92,19 @@ export interface ICoworkerDocumentVersion {
   readonly updatedAt: string;
 }
 
-export interface ICoworkerDocumentBase {
+export interface ICoworkerDocument {
   readonly id: string;
   readonly userId: string;
   readonly onboardingCaseId: string | null;
   readonly requirementId: string | null;
   readonly documentDefinitionId: string;
   readonly title: string | null;
+  readonly origin: CoworkerDocumentOrigin;
+  readonly status: CoworkerDocumentStatus;
   readonly currentVersionId: string | null;
   readonly currentVersion: ICoworkerDocumentVersion | null;
+  readonly submittedVersionId: string | null;
+  readonly submittedVersion: ICoworkerDocumentVersion | null;
   readonly versions: readonly ICoworkerDocumentVersion[];
   readonly submittedAt: string | null;
   readonly reviewStartedAt: string | null;
@@ -124,34 +118,10 @@ export interface ICoworkerDocumentBase {
   readonly updatedAt: string;
 }
 
-export interface ICoworkerDocument extends ICoworkerDocumentBase {
-  readonly status: CoworkerDocumentStatus;
-}
-
-export interface ICoworkerPortalDocument extends ICoworkerDocumentBase {
-  readonly status: CoworkerPortalDocumentStatus;
-}
-
-export interface ICoworkerDocumentRequirement {
-  readonly id: string;
-  readonly onboardingCaseId: string | null;
-  readonly status: CoworkerPortalRequirementStatus;
-  readonly required: boolean;
-  readonly dueAt: string | null;
-  readonly fulfilledByDocumentId: string | null;
-  readonly fulfilledAt: string | null;
-  readonly waivedAt: string | null;
-  readonly waiverReason: string | null;
-  readonly documentDefinition: ICoworkerDocumentDefinition;
-  readonly documents: readonly ICoworkerPortalDocument[];
-  readonly createdAt: string;
-  readonly updatedAt: string;
-}
-
-export interface ICoworkerActiveOnboardingCase {
+export interface ICoworkerOnboardingCase {
   readonly id: string;
   readonly userId: string;
-  readonly status: CoworkerActiveOnboardingStatus;
+  readonly status: CoworkerOnboardingStatus;
   readonly openedAt: string;
   readonly submittedAt: string | null;
   readonly reviewStartedAt: string | null;
@@ -164,11 +134,47 @@ export interface ICoworkerActiveOnboardingCase {
   readonly updatedAt: string;
 }
 
+export interface ICoworkerDocumentPortalSource {
+  readonly id: string;
+  readonly origin: 'system_generated' | 'admin_upload';
+  readonly title: string | null;
+  readonly status: CoworkerDocumentStatus;
+  readonly currentVersion: ICoworkerDocumentVersion | null;
+  readonly historyCount: number;
+}
+
+export interface ICoworkerDocumentPortalSubmission {
+  readonly id: string;
+  readonly origin: 'coworker_upload';
+  readonly title: string | null;
+  readonly status: CoworkerDocumentStatus;
+  readonly currentVersion: ICoworkerDocumentVersion | null;
+  readonly submittedVersionId: string | null;
+  readonly historyCount: number;
+}
+
+export interface ICoworkerDocumentRequirement {
+  readonly id: string;
+  readonly onboardingCaseId: string | null;
+  readonly status: CoworkerDocumentRequirementStatus;
+  readonly required: boolean;
+  readonly dueAt: string | null;
+  readonly fulfilledByDocumentId: string | null;
+  readonly fulfilledAt: string | null;
+  readonly waivedAt: string | null;
+  readonly waiverReason: string | null;
+  readonly documentDefinition: ICoworkerDocumentDefinition;
+  readonly sourceDocument: ICoworkerDocumentPortalSource | null;
+  readonly submissionDocument: ICoworkerDocumentPortalSubmission | null;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
 export interface ICoworkerNotification {
   readonly id: string;
   readonly eventCode: string;
-  readonly severity: CoworkerNotificationSeverity;
-  readonly entityType: CoworkerNotificationEntityType;
+  readonly severity: string;
+  readonly entityType: string;
   readonly entityId: string | null;
   readonly payload: Readonly<Record<string, unknown>>;
   readonly readAt: string | null;
@@ -178,10 +184,9 @@ export interface ICoworkerNotification {
 export interface ICoworkerDocumentPortalResponse {
   readonly userId: string;
   readonly access: ICoworkerDocumentAccess;
-  readonly activeOnboardingCase: ICoworkerActiveOnboardingCase | null;
+  readonly activeOnboardingCase: ICoworkerOnboardingCase | null;
   readonly requirements: readonly ICoworkerDocumentRequirement[];
-  readonly unassignedDocuments: readonly ICoworkerPortalDocument[];
-  readonly availableDefinitions: readonly ICoworkerAvailableDocumentDefinition[];
+  readonly documentCatalog: readonly ICoworkerDocumentDefinition[];
   readonly notifications: readonly ICoworkerNotification[];
   readonly unreadNotificationCount: number;
   readonly viewer: {
@@ -199,15 +204,5 @@ export interface ICoworkerVersionDownload {
     readonly originalFilename: string;
     readonly mimeType: string;
     readonly sizeBytes: number;
-  };
-}
-
-export interface ICoworkerUploadReservation {
-  readonly upload: {
-    readonly uploadSessionId: string;
-  };
-  readonly signedUpload: {
-    readonly path: string;
-    readonly token: string;
   };
 }

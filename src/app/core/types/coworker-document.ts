@@ -7,6 +7,12 @@ export const COWORKER_SIGNATURE_DECLARATION_TYPES = [
   'unknown',
 ] as const;
 
+export const COWORKER_DOCUMENT_ORIGINS = [
+  'system_generated',
+  'coworker_upload',
+  'admin_upload',
+] as const;
+
 export const COWORKER_DOCUMENT_STATUSES = [
   'draft',
   'submitted',
@@ -15,15 +21,6 @@ export const COWORKER_DOCUMENT_STATUSES = [
   'rejected',
   'withdrawn',
   'archived',
-] as const;
-
-export const COWORKER_PORTAL_DOCUMENT_STATUSES = [
-  'draft',
-  'submitted',
-  'under_review',
-  'accepted',
-  'rejected',
-  'withdrawn',
 ] as const;
 
 export const COWORKER_DOCUMENT_VERSION_STATUSES = [
@@ -84,16 +81,6 @@ export const COWORKER_DOCUMENT_REQUIREMENT_STATUSES = [
   'cancelled',
 ] as const;
 
-export const COWORKER_PORTAL_REQUIREMENT_STATUSES = [
-  'pending',
-  'submitted',
-  'under_review',
-  'needs_correction',
-  'fulfilled',
-  'waived',
-  'expired',
-] as const;
-
 export const COWORKER_ACTIVE_ONBOARDING_STATUSES = [
   'draft',
   'submitted',
@@ -107,11 +94,6 @@ export const COWORKER_DOCUMENT_ORIGIN_POLICIES = [
   'coworker_upload',
   'admin_upload',
   'system_generated',
-  'mixed',
-] as const;
-
-export const COWORKER_AVAILABLE_ORIGIN_POLICIES = [
-  'coworker_upload',
   'mixed',
 ] as const;
 
@@ -138,42 +120,47 @@ export const COWORKER_NOTIFICATION_ENTITY_TYPES = [
 
 export const COWORKER_DOCUMENT_ACTION = {
   reserveUpload: 'reserveUpload',
+  recoverUpload: 'recoverUpload',
   finalizeUpload: 'finalizeUpload',
   cancelUpload: 'cancelUpload',
   submitDocument: 'submitDocument',
   withdrawDocument: 'withdrawDocument',
   downloadDocumentVersion: 'downloadDocumentVersion',
   markNotificationRead: 'markNotificationRead',
+  getDeletionCapabilities: 'getDeletionCapabilities',
+  deleteDocumentVersion: 'deleteDocumentVersion',
+  deleteDocument: 'deleteDocument',
 } as const;
 
-export type CoworkerSignatureDeclarationType =
+export const COWORKER_DOCUMENT_PRESERVATION_KINDS = [
+  'historical',
+  'permanent',
+] as const;
+
+export type SignatureDeclarationType =
   (typeof COWORKER_SIGNATURE_DECLARATION_TYPES)[number];
+export type CoworkerDocumentOrigin =
+  (typeof COWORKER_DOCUMENT_ORIGINS)[number];
 export type CoworkerDocumentStatus =
   (typeof COWORKER_DOCUMENT_STATUSES)[number];
-export type CoworkerPortalDocumentStatus =
-  (typeof COWORKER_PORTAL_DOCUMENT_STATUSES)[number];
 export type CoworkerDocumentVersionStatus =
   (typeof COWORKER_DOCUMENT_VERSION_STATUSES)[number];
-export type CoworkerMalwareScanStatus =
+export type MalwareScanStatus =
   (typeof COWORKER_MALWARE_SCAN_STATUSES)[number];
-export type CoworkerSignatureVerificationMethod =
+export type SignatureVerificationMethod =
   (typeof COWORKER_SIGNATURE_VERIFICATION_METHODS)[number];
-export type CoworkerSignatureVerificationStatus =
+export type SignatureVerificationStatus =
   (typeof COWORKER_SIGNATURE_VERIFICATION_STATUSES)[number];
-export type CoworkerVerifiedSignatureType =
+export type VerifiedSignatureType =
   (typeof COWORKER_VERIFIED_SIGNATURE_TYPES)[number];
-export type CoworkerAutomaticVerificationMode =
+export type AutomaticVerificationMode =
   (typeof COWORKER_AUTOMATIC_VERIFICATION_MODES)[number];
 export type CoworkerDocumentRequirementStatus =
   (typeof COWORKER_DOCUMENT_REQUIREMENT_STATUSES)[number];
-export type CoworkerPortalRequirementStatus =
-  (typeof COWORKER_PORTAL_REQUIREMENT_STATUSES)[number];
-export type CoworkerActiveOnboardingStatus =
+export type CoworkerOnboardingStatus =
   (typeof COWORKER_ACTIVE_ONBOARDING_STATUSES)[number];
 export type CoworkerDocumentOriginPolicy =
   (typeof COWORKER_DOCUMENT_ORIGIN_POLICIES)[number];
-export type CoworkerAvailableDocumentOriginPolicy =
-  (typeof COWORKER_AVAILABLE_ORIGIN_POLICIES)[number];
 export type CoworkerDocumentMultiplicity =
   (typeof COWORKER_DOCUMENT_MULTIPLICITIES)[number];
 export type CoworkerNotificationSeverity =
@@ -188,6 +175,18 @@ export type CoworkerDocumentUploadState =
   | 'uploading'
   | 'finalizing';
 
+export type CoworkerDocumentPreservationKind =
+  (typeof COWORKER_DOCUMENT_PRESERVATION_KINDS)[number];
+
+// Still consumed by UI scheduled for later lifecycle slices.
+export type CoworkerSignatureDeclarationType = SignatureDeclarationType;
+export type CoworkerMalwareScanStatus = MalwareScanStatus;
+export type CoworkerSignatureVerificationMethod = SignatureVerificationMethod;
+export type CoworkerSignatureVerificationStatus = SignatureVerificationStatus;
+export type CoworkerVerifiedSignatureType = VerifiedSignatureType;
+export type CoworkerAutomaticVerificationMode = AutomaticVerificationMode;
+export type CoworkerActiveOnboardingStatus = CoworkerOnboardingStatus;
+
 export type CoworkerDocumentActionRequest =
   | {
       readonly action: typeof COWORKER_DOCUMENT_ACTION.reserveUpload;
@@ -198,8 +197,12 @@ export type CoworkerDocumentActionRequest =
       readonly originalFilename: string;
       readonly declaredMimeType: string;
       readonly sizeBytes: number;
-      readonly signatureDeclarationType: CoworkerSignatureDeclarationType;
+      readonly signatureDeclarationType: SignatureDeclarationType;
       readonly title: string | null;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.recoverUpload;
+      readonly uploadSessionId: string;
     }
   | {
       readonly action: typeof COWORKER_DOCUMENT_ACTION.finalizeUpload;
@@ -212,6 +215,7 @@ export type CoworkerDocumentActionRequest =
   | {
       readonly action: typeof COWORKER_DOCUMENT_ACTION.submitDocument;
       readonly documentId: string;
+      readonly documentVersionId: string;
     }
   | {
       readonly action: typeof COWORKER_DOCUMENT_ACTION.withdrawDocument;
@@ -224,4 +228,17 @@ export type CoworkerDocumentActionRequest =
   | {
       readonly action: typeof COWORKER_DOCUMENT_ACTION.markNotificationRead;
       readonly notificationId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.getDeletionCapabilities;
+      readonly documentId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.deleteDocumentVersion;
+      readonly documentId: string;
+      readonly documentVersionId: string;
+    }
+  | {
+      readonly action: typeof COWORKER_DOCUMENT_ACTION.deleteDocument;
+      readonly documentId: string;
     };

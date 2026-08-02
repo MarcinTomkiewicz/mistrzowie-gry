@@ -57,10 +57,12 @@
         [detail]="data"
       />
       <app-admin-review-document-versions
-        [document]="data.document"
+        [versions]="data.versions"
+        [currentVersionId]="data.currentVersion?.id ?? null"
+        [submittedVersion]="data.submittedVersion"
         [disabled]="isBusy()"
         [downloadingVersionId]="downloadingVersionId()"
-        (downloadRequested)="downloadVersion($event)"
+        (downloadRequested)="downloadSubmittedVersion()"
       />
 
       @if (data.document.status === "submitted") {
@@ -92,7 +94,7 @@
         />
       }
 
-      @if (data.document.status === "under_review" && data.document.currentVersion) {
+      @if (data.document.status === "under_review" && data.submittedVersion) {
         <app-admin-signature-verification-editor
           [disabled]="isBusy()"
           [busy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature"

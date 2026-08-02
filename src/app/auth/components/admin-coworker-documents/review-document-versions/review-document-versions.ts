@@ -5,10 +5,7 @@ import {
   SIGNATURE_BADGE_CLASS,
   STATUS_BADGE_CLASS,
 } from '../../../../core/configs/badge-class.config';
-import {
-  ICoworkerDocument,
-  ICoworkerDocumentVersion,
-} from '../../../../core/interfaces/i-coworker-document';
+import { ICoworkerDocumentVersion } from '../../../../core/interfaces/i-coworker-document';
 import { canDownloadCoworkerDocumentVersion } from '../../../../core/utils/coworker-document-capability';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
@@ -21,10 +18,12 @@ import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-d
   templateUrl: './review-document-versions.html',
 })
 export class ReviewDocumentVersions {
-  readonly document = input.required<ICoworkerDocument>();
+  readonly versions = input.required<readonly ICoworkerDocumentVersion[]>();
+  readonly currentVersionId = input<string | null>(null);
+  readonly submittedVersion = input<ICoworkerDocumentVersion | null>(null);
   readonly disabled = input(false);
   readonly downloadingVersionId = input<string | null>(null);
-  readonly downloadRequested = output<ICoworkerDocumentVersion>();
+  readonly downloadRequested = output<void>();
 
   protected readonly i18n = createAdminCoworkerDocumentsI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;

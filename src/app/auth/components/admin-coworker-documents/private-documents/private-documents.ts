@@ -6,16 +6,17 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { SelectModule } from 'primeng/select';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import {
-  IAdminCoworkerCatalogEntry,
-  IAdminCoworkerDocumentDefinition,
   IAdminCoworkerDocumentsDashboard,
   IAdminCoworkerOnboardingResult,
 } from '../../../../core/interfaces/i-admin-coworker-document';
+import { ICoworkerDocumentDefinition } from '../../../../core/interfaces/i-coworker-document';
+import { IUser } from '../../../../core/interfaces/i-user';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
+import { AdminUsers } from '../../../../core/services/admin-users/admin-users';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
@@ -30,6 +31,7 @@ import {
   normalizeEdgeFunctionError,
 } from '../../../../core/utils/edge-function-error-mapping';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
+import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import {
@@ -64,6 +66,7 @@ import { createAdminCoworkerDocumentsI18n } from './private-documents.i18n';
 })
 export class PrivateDocuments {
   private readonly documents = inject(AdminCoworkerDocuments);
+  private readonly adminUsers = inject(AdminUsers);
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
   private replaceEditedDefinitionOnNextSuccessfulLoad = false;
@@ -74,6 +77,7 @@ export class PrivateDocuments {
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly dashboard = signal<IAdminCoworkerDocumentsDashboard | null>(null);
+  protected readonly users = signal<readonly IUser[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal<EdgeFunctionError | null>(null);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);
@@ -84,24 +88,21 @@ export class PrivateDocuments {
   protected readonly onboarding = signal<IAdminCoworkerOnboardingResult | null>(null);
   protected readonly lastSeededCount = signal<number | null>(null);
   protected readonly editorOpen = signal(false);
-  protected readonly editedDefinition = signal<IAdminCoworkerDocumentDefinition | null>(null);
+  protected readonly editedDefinition = signal<ICoworkerDocumentDefinition | null>(null);
   protected readonly coworkerControl = new FormControl<string | null>(null);
   private readonly selectedCoworkerId = toSignal(
     this.coworkerControl.valueChanges,
     { initialValue: this.coworkerControl.value },
   );
 
-  protected readonly selectedCoworker = computed<IAdminCoworkerCatalogEntry | null>(
-    () => this.dashboard()?.catalog.coworkers.find((coworker) =>
-      coworker.userId === this.selectedCoworkerId()) ?? null,
+  protected readonly selectedCoworker = computed<IUser | null>(
+    () => this.users().find((user) => user.id === this.selectedCoworkerId()) ?? null,
   );
   protected readonly onboardingCaseId = computed(() => this.onboarding()?.case.id ?? null);
   protected readonly coworkerOptions = computed(() =>
-    (this.dashboard()?.catalog.coworkers ?? []).map((coworker) => ({
-      value: coworker.userId,
-      label: `${coworker.displayName} - ${coworker.email}${coworker.accessEnabled
-        ? ''
-        : ` - ${this.i18n.statuses().accessDisabled}`}`,
+    this.users().map((coworker) => ({
+      value: coworker.id,
+      label: this.coworkerLabel(coworker),
     })),
   );
   protected readonly isActionBusy = computed(() => this.activeAction() !== null || this.definitionBusy() || this.requirementBusy());
@@ -145,17 +146,18 @@ export class PrivateDocuments {
     this.isLoading.set(true);
     this.loadError.set(null);
 
-    this.documents
-      .getDashboard()
+    forkJoin({
+      dashboard: this.documents.getDashboard(),
+      users: this.adminUsers.getUsers(),
+    })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (dashboard) => {
+        next: ({ dashboard, users }) => {
           this.dashboard.set(dashboard);
+          this.users.set(users.map(({ user }) => user));
           if (
             this.coworkerControl.value !== null &&
-            !dashboard.catalog.coworkers.some(
-              (coworker) => coworker.userId === this.coworkerControl.value,
-            )
+            !users.some(({ user }) => user.id === this.coworkerControl.value)
           ) {
             this.coworkerControl.setValue(null);
           }
@@ -187,7 +189,7 @@ export class PrivateDocuments {
     this.editorOpen.set(true);
   }
 
-  protected editDefinition(definition: IAdminCoworkerDocumentDefinition): void {
+  protected editDefinition(definition: ICoworkerDocumentDefinition): void {
     this.editedDefinition.set(definition);
     this.editorOpen.set(true);
   }
@@ -208,11 +210,11 @@ export class PrivateDocuments {
 
   protected ensureOnboarding(): void {
     const coworker = this.selectedCoworker();
-    if (!coworker?.accessEnabled || this.interactionsBlocked()) return;
+    if (coworker === null || this.interactionsBlocked()) return;
 
     this.startAction(ADMIN_COWORKER_DOCUMENT_ACTION.ensureOnboarding);
     this.documents
-      .ensureOnboarding(coworker.userId)
+      .ensureOnboarding(coworker.id)
       .pipe(finalize(() => this.activeAction.set(null)))
       .subscribe({
         next: (result) => {
@@ -229,7 +231,7 @@ export class PrivateDocuments {
   }
 
   protected confirmSeedDefaults(event: Event): void {
-    if (!this.onboarding() || !this.selectedCoworker()?.accessEnabled || this.interactionsBlocked()) return;
+    if (!this.onboarding() || !this.selectedCoworker() || this.interactionsBlocked()) return;
     this.confirm.decision(event, {
       message: this.i18n.messages().seedConfirmation,
       acceptLabel: this.i18n.actions().seedDefaults,
@@ -255,6 +257,7 @@ export class PrivateDocuments {
   protected handleAccessError(error: EdgeFunctionError): void {
     this.replaceEditedDefinitionOnNextSuccessfulLoad = false;
     this.dashboard.set(null);
+    this.users.set([]);
     this.loadError.set(error);
     this.actionError.set(null);
     this.actionErrorFallback.set('');
@@ -267,11 +270,11 @@ export class PrivateDocuments {
   private seedDefaultRequirements(): void {
     const coworker = this.selectedCoworker();
     const onboarding = this.onboarding();
-    if (!coworker?.accessEnabled || !onboarding || this.interactionsBlocked()) return;
+    if (!coworker || !onboarding || this.interactionsBlocked()) return;
 
     this.startAction(ADMIN_COWORKER_DOCUMENT_ACTION.seedDefaultRequirements);
     this.documents
-      .seedDefaultRequirements(coworker.userId, onboarding.case.id)
+      .seedDefaultRequirements(coworker.id, onboarding.case.id)
       .pipe(finalize(() => this.activeAction.set(null)))
       .subscribe({
         next: (result) => {
@@ -294,6 +297,11 @@ export class PrivateDocuments {
     this.activeAction.set(action);
     this.actionError.set(null);
     this.actionErrorFallback.set('');
+  }
+
+  protected coworkerLabel(coworker: IUser): string {
+    const displayName = getUserDisplayName(coworker);
+    return displayName === '' ? coworker.email : `${displayName} - ${coworker.email}`;
   }
 
   private handleActionError(error: unknown, fallback: string): void {

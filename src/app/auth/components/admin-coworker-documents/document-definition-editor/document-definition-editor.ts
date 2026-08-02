@@ -21,8 +21,10 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize } from 'rxjs';
 
 import { COWORKER_DOCUMENT_DEFINITION_LIMITS } from '../../../../core/configs/coworker-documents.config';
-import { IAdminCoworkerDocumentDefinition } from '../../../../core/interfaces/i-admin-coworker-document';
-import { ICoworkerSignaturePolicy } from '../../../../core/interfaces/i-coworker-document';
+import {
+  ICoworkerDocumentDefinition,
+  ICoworkerSignaturePolicy,
+} from '../../../../core/interfaces/i-coworker-document';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
 import { AdminCoworkerDocumentArrayField } from '../../../../core/types/admin-coworker-document';
 import {
@@ -73,7 +75,7 @@ import {
 export class DocumentDefinitionEditor {
   private readonly documents = inject(AdminCoworkerDocuments);
 
-  readonly definition = input<IAdminCoworkerDocumentDefinition | null>(null);
+  readonly definition = input<ICoworkerDocumentDefinition | null>(null);
   readonly signaturePolicies = input.required<readonly ICoworkerSignaturePolicy[]>();
   readonly disabled = input(false);
   readonly saved = output<void>();

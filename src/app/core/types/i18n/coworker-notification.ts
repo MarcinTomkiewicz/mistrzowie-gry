@@ -1,8 +1,3 @@
-import {
-  CoworkerNotificationEntityType,
-  CoworkerNotificationSeverity,
-} from '../coworker-document';
-
 export type CoworkerNotificationCopy = {
   title: string;
   description: string;
@@ -14,6 +9,6 @@ export type CoworkerNotificationCopy = {
   markRead: string;
   emptyTitle: string;
   emptyDescription: string;
-  severities: Record<CoworkerNotificationSeverity, string>;
-  entities: Record<CoworkerNotificationEntityType, string>;
+  severities: Readonly<Record<string, string>>;
+  entities: Readonly<Record<string, string>>;
 };

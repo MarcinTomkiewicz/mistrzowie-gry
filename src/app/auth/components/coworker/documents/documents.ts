@@ -9,13 +9,15 @@ import { ButtonModule } from 'primeng/button';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import {
+  ICoworkerDocumentPortalSource,
+  ICoworkerDocumentPortalSubmission,
   ICoworkerDocumentPortalResponse,
+  ICoworkerDocumentRequirement,
   ICoworkerDocumentVersion,
-  ICoworkerPortalDocument,
 } from '../../../../core/interfaces/i-coworker-document';
 import { CoworkerDocuments as CoworkerDocumentsApi } from '../../../../core/services/coworker-documents/coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
-import { CoworkerPortalRequirementStatus } from '../../../../core/types/coworker-document';
+import { CoworkerDocumentRequirementStatus } from '../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { CoworkerNotificationCopy } from '../../../../core/types/i18n/coworker-notification';
 import { getCoworkerDocumentCapability } from '../../../../core/utils/coworker-document-capability';
@@ -30,6 +32,10 @@ import { AvailableDocumentCard } from './available-document-card/available-docum
 import { DocumentCard } from './document-card/document-card';
 import { DocumentUpload } from './document-upload/document-upload';
 import { COWORKER_DOCUMENTS_SCOPE, createDocumentsI18n } from './documents.i18n';
+
+type CoworkerPortalDocument =
+  | ICoworkerDocumentPortalSource
+  | ICoworkerDocumentPortalSubmission;
 
 @Component({
   selector: 'app-documents',
@@ -104,29 +110,6 @@ export class Documents {
     this.requiresReload() ||
     this.isAccessBlocked()
   );
-  protected readonly documentDefinitions = computed(() => {
-    const data = this.portal();
-    const definitions = data === null ? [] : [
-      ...data.availableDefinitions,
-      ...data.requirements.map((requirement) => requirement.documentDefinition),
-    ];
-    return new Map(definitions.map((definition) => [definition.id, definition]));
-  });
-  protected readonly unassignedDocumentsByDefinition = computed(() => {
-    const result = new Map<string, ICoworkerPortalDocument[]>();
-    const data = this.portal();
-    if (data === null) return result;
-
-    for (const document of data.unassignedDocuments) {
-      const grouped = result.get(document.documentDefinitionId);
-      if (grouped === undefined) {
-        result.set(document.documentDefinitionId, [document]);
-      } else {
-        grouped.push(document);
-      }
-    }
-    return result;
-  });
   protected readonly errorTitle = computed(() => {
     const error = this.activeError();
     const translations = this.i18n.errors();
@@ -197,8 +180,14 @@ export class Documents {
     });
   }
 
-  protected submitDocument(documentId: string): void {
-    this.runMutation(documentId, this.coworkerDocuments.submitDocument(documentId));
+  protected submitDocument(document: ICoworkerDocumentPortalSubmission): void {
+    const version = document.currentVersion;
+    if (version === null) return;
+
+    this.runMutation(
+      document.id,
+      this.coworkerDocuments.submitDocument(document.id, version.id),
+    );
   }
 
   protected withdrawDocument(documentId: string): void {
@@ -243,12 +232,23 @@ export class Documents {
 
   protected isRequirementLate(
     dueAt: string,
-    status: CoworkerPortalRequirementStatus,
+    status: CoworkerDocumentRequirementStatus,
   ): boolean {
     return status === 'pending' && new Date(dueAt).getTime() < Date.now();
   }
 
-  private runMutation(mutationId: string, request: Observable<void>): void {
+  protected requirementDocuments(
+    requirement: ICoworkerDocumentRequirement,
+  ): readonly CoworkerPortalDocument[] {
+    return [requirement.sourceDocument, requirement.submissionDocument].filter(
+      (document): document is CoworkerPortalDocument => document !== null,
+    );
+  }
+
+  private runMutation<TResult>(
+    mutationId: string,
+    request: Observable<TResult>,
+  ): void {
     if (this.actionsBlocked()) return;
     this.mutationError.set(null);
     this.downloadError.set(null);

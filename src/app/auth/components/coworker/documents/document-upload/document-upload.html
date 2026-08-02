@@ -85,6 +85,12 @@
       </div>
     }
 
+    @if (cleanupFailed()) {
+      <div class="flex-col-start-stretch gap-xs error-text" role="alert">
+        <strong>{{ i18n.upload().cleanupError }}</strong>
+      </div>
+    }
+
     @if (!isBusy()) {
       <div class="flex-row-end-center">
         <p-button

@@ -22,10 +22,8 @@ import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize } from 'rxjs';
 
-import {
-  IAdminCoworkerCatalogEntry,
-  IAdminCoworkerDocumentDefinition,
-} from '../../../../core/interfaces/i-admin-coworker-document';
+import { ICoworkerDocumentDefinition } from '../../../../core/interfaces/i-coworker-document';
+import { IUser } from '../../../../core/interfaces/i-user';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
 import { AdminCoworkerRequirementPayload } from '../../../../core/types/admin-coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
@@ -37,6 +35,7 @@ import {
   resolveEdgeFormFieldError,
   setControlEnabled,
 } from '../../../../core/utils/form-controls';
+import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { ContextHelp } from '../../../../public/common/context-help/context-help';
 import {
   isAdminCoworkerDocumentStaleError,
@@ -63,8 +62,8 @@ import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-d
 export class RequirementEditor {
   private readonly documents = inject(AdminCoworkerDocuments);
 
-  readonly coworker = input.required<IAdminCoworkerCatalogEntry>();
-  readonly definitions = input.required<readonly IAdminCoworkerDocumentDefinition[]>();
+  readonly coworker = input.required<IUser>();
+  readonly definitions = input.required<readonly ICoworkerDocumentDefinition[]>();
   readonly onboardingCaseId = input<string | null>(null);
   readonly disabled = input(false);
   readonly assigned = output<void>();
@@ -77,7 +76,14 @@ export class RequirementEditor {
   protected readonly resolveFieldError = resolveEdgeFormFieldError;
   protected readonly isSaving = signal(false);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);
-  protected readonly userId = computed(() => this.coworker().userId);
+  protected readonly userId = computed(() => this.coworker().id);
+  protected readonly coworkerLabel = computed(() => {
+    const coworker = this.coworker();
+    const displayName = getUserDisplayName(coworker);
+    return displayName === ''
+      ? coworker.email
+      : `${displayName} - ${coworker.email}`;
+  });
   protected readonly definitionOptions = computed(() =>
     this.definitions()
       .filter((definition) => definition.isActive)

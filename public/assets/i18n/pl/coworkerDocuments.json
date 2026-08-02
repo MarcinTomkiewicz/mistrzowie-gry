@@ -9,7 +9,7 @@
     "requirementsDescription": "Każde wymaganie pokazuje termin, status i powiązane dokumenty.",
     "unassignedTitle": "Pozostałe dokumenty",
     "unassignedDescription": "Dokumenty, które nie są przypisane do konkretnego wymagania.",
-    "definitionsTitle": "Dokumenty, które możesz dodać",
+    "definitionsTitle": "Rodzaje dokumentów i zasady",
     "definitionsDescription": "Dostępne rodzaje dokumentów i obowiązujące dla nich zasady.",
     "versionsTitle": "Wersje dokumentu",
     "notificationsTitle": "Powiadomienia",
@@ -39,10 +39,10 @@
     "allowedMimeTypes": "Dozwolone typy plików",
     "signaturePolicy": "Zasady podpisu",
     "allowedDeclarations": "Dozwolone deklaracje",
-    "signatureRequired": "[PH] Podpis wymagany",
-    "signatureNotRequired": "[PH] Podpis niewymagany",
-    "uploadSource": "[PH] Kto może przesłać",
-    "documentMultiplicity": "[PH] Liczba dokumentów i wersje",
+    "signatureRequired": "Podpis wymagany",
+    "signatureNotRequired": "Podpis niewymagany",
+    "uploadSource": "Kto może przesłać",
+    "documentMultiplicity": "Liczba dokumentów i wersje",
     "requiredByDefault": "Domyślnie wymagany",
     "downloadUnavailable": "Pobieranie niedostępne dla tej wersji",
     "unreadNotifications": "Nieprzeczytane",
@@ -59,8 +59,8 @@
     "submitDocument": "Wyślij do weryfikacji",
     "withdrawDocument": "Wycofaj dokument",
     "markNotificationRead": "Oznacz jako przeczytane",
-    "showRules": "[PH] Zobacz zasady",
-    "hideRules": "[PH] Ukryj zasady"
+    "showRules": "Zobacz zasady",
+    "hideRules": "Ukryj zasady"
   },
   "statuses": {
     "requirements": {
@@ -70,7 +70,8 @@
       "needs_correction": "Wymaga poprawy",
       "fulfilled": "Spełnione",
       "waived": "Zwolniono",
-      "expired": "Wygasło"
+      "expired": "Wygasło",
+      "cancelled": "Anulowane"
     },
     "documents": {
       "draft": "Wersja robocza",
@@ -78,7 +79,8 @@
       "under_review": "W trakcie weryfikacji",
       "accepted": "Zaakceptowany",
       "rejected": "Odrzucony",
-      "withdrawn": "Wycofany"
+      "withdrawn": "Wycofany",
+      "archived": "Zarchiwizowany"
     },
     "versions": {
       "reserved": "Zarezerwowana",
@@ -129,7 +131,9 @@
     },
     "origins": {
       "coworker_upload": "Przesyłany przez współpracownika",
-      "mixed": "Przesyłany przez współpracownika lub administrację"
+      "mixed": "Przesyłany przez współpracownika lub administrację",
+      "admin_upload": "Przesyłany przez administratora",
+      "system_generated": "Tworzony przez system"
     },
     "multiplicities": {
       "single": "Jeden dokument",

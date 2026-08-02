@@ -146,21 +146,7 @@
         @if (selectedCoworker(); as coworker) {
           <div class="flex-row-between-center flex-wrap gap-sm w-100">
             <div class="flex-col-start-stretch gap-xs">
-              <strong>{{ coworker.displayName }}</strong>
-              <span>{{ coworker.email }}</span>
-              <span
-                [class]="
-                  coworker.accessEnabled
-                    ? 'tag-badge tag-badge--success'
-                    : 'tag-badge tag-badge--warn'
-                "
-              >
-                {{
-                  coworker.accessEnabled
-                    ? i18n.statuses().accessEnabled
-                    : i18n.statuses().accessDisabled
-                }}
-              </span>
+              <strong>{{ coworkerLabel(coworker) }}</strong>
             </div>
             <div class="flex-row-end-center gap-xs">
               <p-button
@@ -168,7 +154,7 @@
                 icon="pi pi-user-plus"
                 [label]="i18n.actions().ensureOnboarding"
                 [loading]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.ensureOnboarding"
-                [disabled]="!coworker.accessEnabled || interactionsBlocked()"
+                [disabled]="interactionsBlocked()"
                 (onClick)="ensureOnboarding()"
               />
               <app-context-help
@@ -215,7 +201,7 @@
                     icon="pi pi-list-check"
                     [label]="i18n.actions().seedDefaults"
                     [loading]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.seedDefaultRequirements"
-                    [disabled]="!coworker.accessEnabled || interactionsBlocked()"
+                    [disabled]="interactionsBlocked()"
                     (onClick)="confirmSeedDefaults($event)"
                   />
                   <app-context-help
@@ -240,7 +226,7 @@
             [coworker]="coworker"
             [definitions]="data.catalog.documentDefinitions"
             [onboardingCaseId]="onboardingCaseId()"
-            [disabled]="!coworker.accessEnabled || interactionsBlocked()"
+            [disabled]="interactionsBlocked()"
             (assigned)="onRequirementAssigned()"
             (reloadRequested)="handleRequirementReload($event)"
             (accessError)="handleAccessError($event)"

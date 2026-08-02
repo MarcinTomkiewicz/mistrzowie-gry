@@ -24,8 +24,8 @@ export class CoworkerNotifications {
 
   protected title(notification: ICoworkerNotification): string {
     const copy = this.copy();
-    return `${copy.entities[notification.entityType]} - ${
-      copy.severities[notification.severity]
-    }`;
+    const entity = copy.entities[notification.entityType] ?? notification.entityType;
+    const severity = copy.severities[notification.severity] ?? notification.severity;
+    return `${entity} - ${severity}`;
   }
 }

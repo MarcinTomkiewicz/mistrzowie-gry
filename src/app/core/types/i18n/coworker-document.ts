@@ -1,13 +1,13 @@
 import {
   CoworkerActiveOnboardingStatus,
-  CoworkerAvailableDocumentOriginPolicy,
   CoworkerDocumentMultiplicity,
+  CoworkerDocumentOriginPolicy,
+  CoworkerDocumentRequirementStatus,
+  CoworkerDocumentStatus,
   CoworkerDocumentVersionStatus,
   CoworkerMalwareScanStatus,
   CoworkerNotificationEntityType,
   CoworkerNotificationSeverity,
-  CoworkerPortalDocumentStatus,
-  CoworkerPortalRequirementStatus,
   CoworkerSignatureDeclarationType,
   CoworkerSignatureVerificationStatus,
   CoworkerVerifiedSignatureType,
@@ -101,15 +101,15 @@ export type CoworkerDocumentsErrorTranslations = {
 };
 
 export type CoworkerDocumentsStatusTranslations = {
-  requirements: Record<CoworkerPortalRequirementStatus, string>;
-  documents: Record<CoworkerPortalDocumentStatus, string>;
+  requirements: Record<CoworkerDocumentRequirementStatus, string>;
+  documents: Record<CoworkerDocumentStatus, string>;
   versions: Record<CoworkerDocumentVersionStatus, string>;
   malware: Record<CoworkerMalwareScanStatus, string>;
   verification: Record<CoworkerSignatureVerificationStatus, string>;
   onboarding: Record<CoworkerActiveOnboardingStatus, string>;
   signatures: Record<CoworkerSignatureDeclarationType, string>;
   verifiedSignatures: Record<CoworkerVerifiedSignatureType, string>;
-  origins: Record<CoworkerAvailableDocumentOriginPolicy, string>;
+  origins: Record<CoworkerDocumentOriginPolicy, string>;
   multiplicities: Record<CoworkerDocumentMultiplicity, string>;
   notificationSeverities: Record<CoworkerNotificationSeverity, string>;
   notificationEntities: Record<CoworkerNotificationEntityType, string>;

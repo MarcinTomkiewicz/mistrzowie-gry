@@ -33,7 +33,7 @@ import {
 import {
   coworkerNotificationFieldReaders,
   documentVersionDownloadFieldReaders,
-} from '../coworker-documents/coworker-document-readers';
+} from '../../contracts/coworker-documents/coworker-document-readers';
 import { assertOperationalAssignmentContract } from './coworker-operational-assignment.contract';
 import { assertOperationalPortalContract } from './coworker-operational-portal.contract';
 

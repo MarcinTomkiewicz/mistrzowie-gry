@@ -1,9 +1,14 @@
 import {
   ICoworkerDocumentDefinition,
+  ICoworkerDocumentPortalSource,
+  ICoworkerDocumentPortalSubmission,
   ICoworkerDocumentVersion,
-  ICoworkerPortalDocument,
 } from '../interfaces/i-coworker-document';
-import { CoworkerPortalRequirementStatus } from '../types/coworker-document';
+import { CoworkerDocumentRequirementStatus } from '../types/coworker-document';
+
+type CoworkerPortalDocument =
+  | ICoworkerDocumentPortalSource
+  | ICoworkerDocumentPortalSubmission;
 
 export function canDownloadCoworkerDocumentVersion(
   version: ICoworkerDocumentVersion,
@@ -13,9 +18,9 @@ export function canDownloadCoworkerDocumentVersion(
 
 export function getCoworkerDocumentCapability(
   definition: ICoworkerDocumentDefinition | null,
-  documents: readonly ICoworkerPortalDocument[],
-  document: ICoworkerPortalDocument | null,
-  requirementStatus: CoworkerPortalRequirementStatus | null,
+  documents: readonly CoworkerPortalDocument[],
+  document: CoworkerPortalDocument | null,
+  requirementStatus: CoworkerDocumentRequirementStatus | null,
 ) {
   const requirementAllowsUpload = requirementStatus === null ||
     requirementStatus === 'pending' ||
@@ -26,26 +31,35 @@ export function getCoworkerDocumentCapability(
     definition.isActive &&
     (definition.originPolicy === 'coworker_upload' ||
       definition.originPolicy === 'mixed');
-  const hasActiveUpload = document?.versions.some(
-    (version) => version.status === 'reserved' || version.status === 'uploaded',
-  ) ?? false;
+  const hasActiveUpload = document?.currentVersion?.status === 'reserved' ||
+    document?.currentVersion?.status === 'uploaded';
+  const hasSubmission = documents.some(
+    (candidate) => candidate.origin === 'coworker_upload',
+  );
+  const isSubmission = document?.origin === 'coworker_upload';
+  const signatureAllowsSubmit =
+    definition?.signaturePolicy.signatureRequired !== true ||
+    document?.currentVersion?.signatureDeclarationType !== 'unsigned';
 
   return {
     canAddDocument: requirementAllowsUpload &&
       definitionAllowsUpload &&
       document === null &&
-      (definition.multiplicity === 'multiple' || documents.length === 0),
+      !hasSubmission,
     canAddVersion: requirementAllowsUpload &&
       definitionAllowsUpload &&
       !hasActiveUpload &&
-      document !== null &&
+      isSubmission &&
       (document.status === 'draft' ||
         document.status === 'rejected' ||
         document.status === 'withdrawn'),
     canSubmit: requirementAllowsUpload &&
-      document?.status === 'draft' &&
-      document.currentVersion?.status === 'ready',
+      isSubmission &&
+      document.status === 'draft' &&
+      document.currentVersion?.status === 'ready' &&
+      signatureAllowsSubmit,
     canWithdraw: requirementAllowsWithdraw &&
-      document?.status === 'submitted',
+      isSubmission &&
+      document.status === 'submitted',
   } as const;
 }

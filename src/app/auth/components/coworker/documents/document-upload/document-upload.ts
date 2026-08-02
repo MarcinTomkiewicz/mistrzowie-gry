@@ -2,16 +2,20 @@ import { HttpStatusCode } from '@angular/common/http';
 import { Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Observable, catchError, finalize, map, switchMap, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, switchMap, tap, throwError } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
 import { COWORKER_DOCUMENTS_STORAGE } from '../../../../../core/configs/coworker-documents.config';
-import { ICoworkerDocumentDefinition, ICoworkerPortalDocument } from '../../../../../core/interfaces/i-coworker-document';
+import {
+  ICoworkerDocumentDefinition,
+  ICoworkerDocumentPortalSubmission,
+} from '../../../../../core/interfaces/i-coworker-document';
+import { ICoworkerUploadCancellationResult } from '../../../../../core/interfaces/i-coworker-document-upload';
+import { CoworkerDocumentUploadOrchestrator } from '../../../../../core/services/coworker-document-upload/coworker-document-upload-orchestrator';
 import { CoworkerDocuments as CoworkerDocumentsApi } from '../../../../../core/services/coworker-documents/coworker-documents';
-import { SignedStorage } from '../../../../../core/services/signed-storage/signed-storage';
 import { UiConfirm } from '../../../../../core/services/ui-confirm/ui-confirm';
 import {
   COWORKER_DOCUMENT_ACTION,
@@ -35,13 +39,13 @@ import { createDocumentsI18n } from '../documents.i18n';
 export class DocumentUpload {
   private readonly coworkerDocuments = inject(CoworkerDocumentsApi);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly signedStorage = inject(SignedStorage);
   private readonly confirm = inject(UiConfirm);
+  private readonly uploadOrchestrator = inject(CoworkerDocumentUploadOrchestrator);
   private activeUploadSessionId: string | null = null;
   private operationCompleted = true;
 
   readonly definition = input.required<ICoworkerDocumentDefinition>();
-  readonly document = input<ICoworkerPortalDocument | null>(null);
+  readonly document = input<ICoworkerDocumentPortalSubmission | null>(null);
   readonly requirementId = input<string | null>(null);
   readonly onboardingCaseId = input<string | null>(null);
   readonly disabled = input(false);
@@ -59,6 +63,10 @@ export class DocumentUpload {
   protected readonly operationError = signal<EdgeFunctionError | null>(null);
   protected readonly operationErrorDescription = signal('');
   protected readonly cleanupError = signal<EdgeFunctionError | null>(null);
+  protected readonly cancellationResult = signal<ICoworkerUploadCancellationResult | null>(null);
+  protected readonly cleanupFailed = computed(
+    () => this.cancellationResult()?.cleanupStatus === 'failed',
+  );
   protected readonly controlId = computed(() => this.document()?.id ?? this.requirementId() ?? this.definition().id);
 
   protected readonly isBusy = computed(() => this.state() !== 'idle');
@@ -163,6 +171,7 @@ export class DocumentUpload {
     this.operationError.set(null);
     this.operationErrorDescription.set('');
     this.cleanupError.set(null);
+    this.cancellationResult.set(null);
     this.state.set('reserving');
     this.busyChange.emit(true);
 
@@ -172,13 +181,11 @@ export class DocumentUpload {
         errorDescription = this.i18n.upload().uploadError;
         this.state.set('uploading');
       }),
-      switchMap((response) => this.signedStorage.upload({
-        bucket: COWORKER_DOCUMENTS_STORAGE.bucket,
-        path: response.signedUpload.path,
-        token: response.signedUpload.token,
+      switchMap((response) => this.uploadOrchestrator.transfer(
         file,
-        contentType: request.declaredMimeType,
-      }).pipe(map(() => response))),
+        request.declaredMimeType,
+        response,
+      )),
       tap(() => {
         errorDescription = this.i18n.upload().finalizeError;
         this.state.set('finalizing');
@@ -206,35 +213,32 @@ export class DocumentUpload {
     const normalized = normalizeEdgeFunctionError(
       error, this.i18n.errors().unexpectedDescription,
     );
-    const fileRejected = phase === 'finalizing' && (
-      (normalized.status === HttpStatusCode.BadRequest && normalized.code === 'DOCUMENT_STATE_INVALID') ||
-      (normalized.status === HttpStatusCode.UnprocessableEntity && normalized.code === 'UPLOADED_FILE_INVALID')
-    );
+    const documentStateInvalid = normalized.code === 'DOCUMENT_STATE_INVALID';
+    const uploadedFileInvalid = phase === 'finalizing' &&
+      normalized.code === 'UPLOADED_FILE_INVALID';
     this.operationError.set(normalized);
     this.operationErrorDescription.set(
-      fileRejected ? this.i18n.upload().mismatchError : description,
+      uploadedFileInvalid ? this.i18n.upload().mismatchError : description,
     );
     this.emitBlockingError(normalized);
 
-    const shouldCancel = phase === 'uploading' || fileRejected;
+    const shouldCancel = !documentStateInvalid &&
+      (phase === 'uploading' || uploadedFileInvalid);
     const uploadSessionId = this.activeUploadSessionId;
 
     if (!shouldCancel || uploadSessionId === null) {
       this.operationCompleted = true;
-      if (phase === 'finalizing') {
+      if (phase === 'finalizing' || documentStateInvalid) {
         this.activeUploadSessionId = null;
-        if (this.isAmbiguousFinalizeError(normalized)) {
+        if (documentStateInvalid || this.isAmbiguousFinalizeError(normalized)) {
           this.reloadRequired.emit();
         }
       }
       return throwError(() => normalized);
     }
 
-    return this.coworkerDocuments.cancelUpload(uploadSessionId).pipe(
-      tap(() => {
-        this.activeUploadSessionId = null;
-        this.operationCompleted = true;
-      }),
+    return this.uploadOrchestrator.cancel(uploadSessionId).pipe(
+      tap((result) => this.completeCancellation(result)),
       catchError((cancelError: unknown) => {
         const cleanupError = normalizeEdgeFunctionError(
           cancelError, this.i18n.upload().cancelError,
@@ -260,6 +264,7 @@ export class DocumentUpload {
     this.operationError.set(null);
     this.operationErrorDescription.set('');
     this.cleanupError.set(null);
+    this.cancellationResult.set(null);
     this.state.set('idle');
   }
 
@@ -267,11 +272,8 @@ export class DocumentUpload {
     const uploadSessionId = this.activeUploadSessionId;
     if (uploadSessionId === null || this.operationCompleted) return;
 
-    this.coworkerDocuments.cancelUpload(uploadSessionId).subscribe({
-      next: () => {
-        this.activeUploadSessionId = null;
-        this.operationCompleted = true;
-      },
+    this.uploadOrchestrator.cancel(uploadSessionId).subscribe({
+      next: (result) => this.completeCancellation(result),
       error: (error: unknown) => {
         const normalized = normalizeEdgeFunctionError(
           error, this.i18n.upload().cancelError,
@@ -284,6 +286,14 @@ export class DocumentUpload {
         this.operationCompleted = true;
       },
     });
+  }
+
+  private completeCancellation(
+    result: ICoworkerUploadCancellationResult,
+  ): void {
+    this.cancellationResult.set(result);
+    this.activeUploadSessionId = null;
+    this.operationCompleted = true;
   }
 
   private isAmbiguousFinalizeError(error: EdgeFunctionError): boolean {

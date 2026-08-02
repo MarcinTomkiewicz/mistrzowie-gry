@@ -12,7 +12,7 @@ import {
   COWORKER_DOCUMENT_DEFINITION_LIMITS,
   COWORKER_DOCUMENTS_STORAGE,
 } from '../../../../core/configs/coworker-documents.config';
-import { IAdminCoworkerDocumentDefinition } from '../../../../core/interfaces/i-admin-coworker-document';
+import { ICoworkerDocumentDefinition } from '../../../../core/interfaces/i-coworker-document';
 import {
   AdminCoworkerDocumentArrayField,
   AdminCoworkerDocumentDefinitionForm,
@@ -143,7 +143,7 @@ export function addDocumentDefinitionArrayItem(
 
 export function populateDocumentDefinitionForm(
   form: AdminCoworkerDocumentDefinitionForm,
-  definition: IAdminCoworkerDocumentDefinition | null,
+  definition: ICoworkerDocumentDefinition | null,
 ): void {
   form.reset(
     {
@@ -156,7 +156,7 @@ export function populateDocumentDefinitionForm(
       multiplicity:
         definition?.multiplicity ?? COWORKER_DOCUMENT_MULTIPLICITIES[0],
       isRequiredByDefault: definition?.isRequiredByDefault ?? false,
-      signaturePolicyCode: definition?.signaturePolicyCode ?? '',
+      signaturePolicyCode: definition?.signaturePolicy.code ?? '',
       maxSizeBytes:
         definition?.maxSizeBytes ?? COWORKER_DOCUMENTS_STORAGE.maxFileSizeBytes,
       retentionDays: definition?.retentionDays ?? null,

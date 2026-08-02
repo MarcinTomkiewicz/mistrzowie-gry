@@ -42,17 +42,6 @@
       (onClick)="toggleRules()"
     />
 
-    @if (capability().canAddDocument) {
-      <app-document-upload
-        [definition]="definition()"
-        [onboardingCaseId]="onboardingCaseId()"
-        [disabled]="disabled()"
-        (completed)="completed.emit()"
-        (busyChange)="busyChange.emit($event)"
-        (blockingError)="blockingError.emit($event)"
-        (reloadRequired)="reloadRequired.emit()"
-      />
-    }
   </div>
 
   @if (rulesExpanded()) {

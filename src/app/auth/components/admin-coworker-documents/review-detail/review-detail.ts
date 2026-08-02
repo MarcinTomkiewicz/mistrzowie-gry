@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { finalize, Observable } from 'rxjs';
 
 import { IAdminCoworkerDocumentReviewDetail } from '../../../../core/interfaces/i-admin-coworker-document';
-import { ICoworkerDocumentVersion } from '../../../../core/interfaces/i-coworker-document';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
@@ -124,7 +123,7 @@ export class ReviewDetail {
   protected verifySignature(
     input: AdminSignatureVerificationInput,
   ): void {
-    const version = this.detail()?.document.currentVersion;
+    const version = this.detail()?.submittedVersion;
     if (!version || this.isBusy()) return;
     this.runCommand(
       ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature,
@@ -158,8 +157,9 @@ export class ReviewDetail {
     );
   }
 
-  protected downloadVersion(version: ICoworkerDocumentVersion): void {
-    if (this.isBusy()) return;
+  protected downloadSubmittedVersion(): void {
+    const version = this.detail()?.submittedVersion;
+    if (version === null || version === undefined || this.isBusy()) return;
     this.activeAction.set(ADMIN_COWORKER_DOCUMENT_ACTION.downloadDocumentVersion);
     this.downloadingVersionId.set(version.id);
     this.actionError.set(null);
@@ -186,9 +186,9 @@ export class ReviewDetail {
     return this.isLoading() || this.activeAction() !== null;
   }
 
-  private runCommand(
+  private runCommand<TResult>(
     action: AdminCoworkerDocumentAction,
-    request: Observable<void>,
+    request: Observable<TResult>,
     success: string,
     fallback: string,
   ): void {

@@ -2,7 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 
-import { IAdminCoworkerDocumentDefinition } from '../../../../core/interfaces/i-admin-coworker-document';
+import { ICoworkerDocumentDefinition } from '../../../../core/interfaces/i-coworker-document';
 import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-documents.i18n';
 
 @Component({
@@ -12,9 +12,9 @@ import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-d
   templateUrl: './document-definition-list.html',
 })
 export class DocumentDefinitionList {
-  readonly definitions = input.required<readonly IAdminCoworkerDocumentDefinition[]>();
+  readonly definitions = input.required<readonly ICoworkerDocumentDefinition[]>();
   readonly disabled = input(false);
-  readonly edit = output<IAdminCoworkerDocumentDefinition>();
+  readonly edit = output<ICoworkerDocumentDefinition>();
 
   protected readonly i18n = createAdminCoworkerDocumentsI18n();
   protected readonly rows = computed(() => [...this.definitions()]);

@@ -3,6 +3,8 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import {
   CoworkerDocumentMultiplicity,
   CoworkerDocumentOriginPolicy,
+  CoworkerDocumentPreservationKind,
+  SignatureVerificationStatus,
 } from './coworker-document';
 
 export const ADMIN_COWORKER_DOCUMENT_ACTION = {
@@ -16,6 +18,10 @@ export const ADMIN_COWORKER_DOCUMENT_ACTION = {
   acceptDocument: 'acceptDocument',
   rejectDocument: 'rejectDocument',
   downloadDocumentVersion: 'downloadDocumentVersion',
+  getDeletionCapabilities: 'getDeletionCapabilities',
+  deleteDocumentVersion: 'deleteDocumentVersion',
+  deleteDocument: 'deleteDocument',
+  setDocumentVersionPreservation: 'setDocumentVersionPreservation',
 } as const;
 
 export const ADMIN_SIGNATURE_VERIFICATION_STATUSES = [
@@ -47,8 +53,11 @@ export type AdminCoworkerDocumentAction =
 export type AdminSignatureVerificationStatus =
   (typeof ADMIN_SIGNATURE_VERIFICATION_STATUSES)[number];
 
-export type AdminCoworkerReviewDecision =
+export type ReviewDecision =
   (typeof ADMIN_COWORKER_REVIEW_DECISIONS)[number];
+
+export type AdminCoworkerReviewDecision =
+  ReviewDecision;
 
 export type AdminCoworkerDownloadPurpose =
   (typeof ADMIN_COWORKER_DOWNLOAD_PURPOSES)[number];
@@ -88,7 +97,10 @@ export type AdminCoworkerReviewTarget = {
 export type AdminSignatureVerificationPayload =
   AdminCoworkerReviewTarget & {
     readonly documentVersionId: string;
-    readonly verificationStatus: AdminSignatureVerificationStatus;
+    readonly verificationStatus: Extract<
+      SignatureVerificationStatus,
+      AdminSignatureVerificationStatus
+    >;
     readonly reason: string | null;
   };
 
@@ -121,6 +133,22 @@ export type AdminCoworkerDocumentDownloadPayload = {
   readonly documentVersionId: string;
   readonly purpose: AdminCoworkerDownloadPurpose;
 };
+
+export type AdminCoworkerDocumentDeletionTarget = {
+  readonly userId: string;
+  readonly documentId: string;
+};
+
+export type AdminCoworkerDocumentVersionDeletionTarget =
+  AdminCoworkerDocumentDeletionTarget & {
+    readonly documentVersionId: string;
+  };
+
+export type AdminCoworkerDocumentPreservationPayload =
+  AdminCoworkerDocumentVersionDeletionTarget & {
+    readonly preservationKind: CoworkerDocumentPreservationKind | null;
+    readonly note: string | null;
+  };
 
 export type AdminSignatureVerificationForm = FormGroup<{
   verificationStatus: FormControl<AdminSignatureVerificationStatus | null>;
@@ -189,4 +217,16 @@ export type AdminCoworkerDocumentActionRequest =
     })
   | (AdminCoworkerDocumentDownloadPayload & {
       readonly action: typeof ADMIN_COWORKER_DOCUMENT_ACTION.downloadDocumentVersion;
+    })
+  | (AdminCoworkerDocumentDeletionTarget & {
+      readonly action: typeof ADMIN_COWORKER_DOCUMENT_ACTION.getDeletionCapabilities;
+    })
+  | (AdminCoworkerDocumentVersionDeletionTarget & {
+      readonly action: typeof ADMIN_COWORKER_DOCUMENT_ACTION.deleteDocumentVersion;
+    })
+  | (AdminCoworkerDocumentDeletionTarget & {
+      readonly action: typeof ADMIN_COWORKER_DOCUMENT_ACTION.deleteDocument;
+    })
+  | (AdminCoworkerDocumentPreservationPayload & {
+      readonly action: typeof ADMIN_COWORKER_DOCUMENT_ACTION.setDocumentVersionPreservation;
     });
