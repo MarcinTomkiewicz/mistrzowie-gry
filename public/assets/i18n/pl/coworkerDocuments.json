@@ -46,6 +46,8 @@
     "documentMultiplicity": "Liczba dokumentów i wersje",
     "requiredByDefault": "Domyślnie wymagany",
     "downloadUnavailable": "Pobieranie niedostępne dla tej wersji",
+    "deletionBlocked": "Nie można usunąć",
+    "deletionPending": "Usunięcie dokumentu zostało zlecone i jest w toku.",
     "unreadNotifications": "Nieprzeczytane",
     "notificationRead": "Przeczytane",
     "notificationUnread": "Nowe",
@@ -59,6 +61,8 @@
     "addVersion": "Zastąp podpisany dokument",
     "submitDocument": "Wyślij tę wersję do weryfikacji",
     "withdrawDocument": "Wycofaj dokument",
+    "deleteVersion": "Usuń wersję",
+    "deleteDocument": "Usuń dokument",
     "markNotificationRead": "Oznacz jako przeczytane",
     "showRules": "Zobacz zasady",
     "hideRules": "Ukryj zasady"
@@ -183,6 +187,8 @@
   "confirmations": {
     "submit": "Do weryfikacji zostanie wysłana dokładnie ta wersja: plik „{filename}”, wersja {versionNumber}, deklarowany podpis: {signature}, data: {date}. Kontynuować?",
     "withdraw": "Wycofać wysłany dokument? Po tej operacji będzie wymagał ponownego przesłania.",
-    "replace": "Dodanie nowej wersji zastąpi odrzuconą wersję dokumentu. Kontynuować?"
+    "replace": "Dodanie nowej wersji zastąpi odrzuconą wersję dokumentu. Kontynuować?",
+    "deleteVersion": "Usunąć bieżącą wersję dokumentu? Tej operacji nie można cofnąć.",
+    "deleteDocument": "Usunąć cały dokument wraz z jego wersjami? Tej operacji nie można cofnąć."
   }
 }

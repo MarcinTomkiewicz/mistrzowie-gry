@@ -1,4 +1,6 @@
 <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+  @let deletion = deletionState();
+
   <header class="flex-row-between-start flex-wrap gap-sm w-100">
     <div class="flex-col-start-stretch gap-xs min-w-0">
       <h5 class="mg-section__title mg-section__title--xs m-0">
@@ -45,8 +47,13 @@
           type="button"
           icon="pi pi-send"
           [label]="i18n.actions().submitDocument"
-          [loading]="activeMutationId() === document.id"
-          [disabled]="mutationsBlocked()"
+          [loading]="
+            isMutationActive(
+              COWORKER_DOCUMENT_ACTION.submitDocument,
+              document.currentVersion?.id
+            )
+          "
+          [disabled]="deletion.actionsBlocked"
           (onClick)="confirmSubmit($event)"
         />
       }
@@ -56,40 +63,93 @@
           severity="danger"
           icon="pi pi-undo"
           [label]="i18n.actions().withdrawDocument"
-          [loading]="activeMutationId() === document.id"
-          [disabled]="mutationsBlocked()"
+          [loading]="
+            isMutationActive(
+              COWORKER_DOCUMENT_ACTION.withdrawDocument,
+              document.id
+            )
+          "
+          [disabled]="deletion.actionsBlocked"
           (onClick)="confirmWithdraw($event)"
+        />
+      }
+      @if (deletion.canDeleteCurrentVersion) {
+        <p-button
+          type="button"
+          severity="danger"
+          icon="pi pi-trash"
+          [label]="i18n.actions().deleteVersion"
+          [loading]="
+            isMutationActive(
+              COWORKER_DOCUMENT_ACTION.deleteDocumentVersion,
+              deletion.currentVersion?.id
+            )
+          "
+          [disabled]="deletion.actionsBlocked"
+          (onClick)="confirmDeleteVersion($event)"
+        />
+      }
+      @if (deletion.canDeleteDocument) {
+        <p-button
+          type="button"
+          severity="danger"
+          icon="pi pi-trash"
+          [label]="i18n.actions().deleteDocument"
+          [loading]="
+            isMutationActive(
+              COWORKER_DOCUMENT_ACTION.deleteDocument,
+              deletion.document?.id
+            )
+          "
+          [disabled]="deletion.actionsBlocked"
+          (onClick)="confirmDeleteDocument($event)"
         />
       }
     </div>
 
-    @if (capability().canAddVersion) {
-      <app-document-upload
-        [definition]="definition()"
-        [document]="document"
-        [requirementId]="requirementId()"
-        [onboardingCaseId]="onboardingCaseId()"
-        [disabled]="mutationsBlocked()"
-        (completed)="uploadCompleted.emit()"
-        (busyChange)="uploadBusyChange.emit($event)"
-        (blockingError)="blockingError.emit($event)"
-        (reloadRequired)="reloadRequired.emit()"
-      />
+    @if (deletion.deletionRequested) {
+      <p class="m-0 muted-text">{{ i18n.labels().deletionPending }}</p>
+    }
+
+    @if (
+      deletion.currentVersionBlockingReasons.length > 0 ||
+      deletion.documentBlockingReasons.length > 0
+    ) {
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <strong class="error-text">{{ i18n.labels().deletionBlocked }}</strong>
+        @if (deletion.currentVersionBlockingReasons.length > 0) {
+          <span>{{ i18n.actions().deleteVersion }}:</span>
+          <ul class="m-0">
+            @for (reason of deletion.currentVersionBlockingReasons; track $index) {
+              <li>{{ reason }}</li>
+            }
+          </ul>
+        }
+        @if (deletion.documentBlockingReasons.length > 0) {
+          <span>{{ i18n.actions().deleteDocument }}:</span>
+          <ul class="m-0">
+            @for (reason of deletion.documentBlockingReasons; track $index) {
+              <li>{{ reason }}</li>
+            }
+          </ul>
+        }
+      </div>
     }
   } @else {
     <p class="m-0 muted-text">{{ i18n.labels().missingSubmissionDocument }}</p>
+  }
 
-    @if (capability().canAddDocument) {
-      <app-document-upload
-        [definition]="definition()"
-        [requirementId]="requirementId()"
-        [onboardingCaseId]="onboardingCaseId()"
-        [disabled]="mutationsBlocked()"
-        (completed)="uploadCompleted.emit()"
-        (busyChange)="uploadBusyChange.emit($event)"
-        (blockingError)="blockingError.emit($event)"
-        (reloadRequired)="reloadRequired.emit()"
-      />
-    }
+  @if (capability().canAddDocument || capability().canAddVersion) {
+    <app-document-upload
+      [definition]="definition()"
+      [document]="document()"
+      [requirementId]="requirementId()"
+      [onboardingCaseId]="onboardingCaseId()"
+      [disabled]="deletion.actionsBlocked"
+      (completed)="uploadCompleted.emit()"
+      (busyChange)="uploadBusyChange.emit($event)"
+      (blockingError)="blockingError.emit($event)"
+      (reloadRequired)="reloadRequired.emit()"
+    />
   }
 </section>

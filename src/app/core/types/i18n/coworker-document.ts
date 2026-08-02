@@ -60,6 +60,8 @@ export type CoworkerDocumentsLabelTranslations = {
   documentMultiplicity: string;
   requiredByDefault: string;
   downloadUnavailable: string;
+  deletionBlocked: string;
+  deletionPending: string;
   unreadNotifications: string;
   notificationRead: string;
   notificationUnread: string;
@@ -74,6 +76,8 @@ export type CoworkerDocumentsActionTranslations = {
   addVersion: string;
   submitDocument: string;
   withdrawDocument: string;
+  deleteVersion: string;
+  deleteDocument: string;
   markNotificationRead: string;
   showRules: string;
   hideRules: string;
@@ -141,4 +145,6 @@ export type CoworkerDocumentConfirmTranslations = {
   submit: string;
   withdraw: string;
   replace: string;
+  deleteVersion: string;
+  deleteDocument: string;
 };

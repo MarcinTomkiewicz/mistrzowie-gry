@@ -3,7 +3,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { Observable, finalize } from 'rxjs';
+import { Observable, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -13,9 +13,16 @@ import {
   ICoworkerDocumentPortalResponse,
   ICoworkerDocumentVersion,
 } from '../../../../core/interfaces/i-coworker-document';
+import {
+  ICoworkerDocumentDeletionCapabilities,
+} from '../../../../core/interfaces/i-coworker-document-deletion';
 import { CoworkerDocuments as CoworkerDocumentsApi } from '../../../../core/services/coworker-documents/coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import {
+  COWORKER_DOCUMENT_ACTION,
+  CoworkerDocumentMutationTarget,
+} from '../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { CoworkerNotificationCopy } from '../../../../core/types/i18n/coworker-notification';
 import { ToastOptions } from '../../../../core/types/toast';
@@ -53,10 +60,17 @@ export class Documents {
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly portal = signal<ICoworkerDocumentPortalResponse | null>(null);
+  protected readonly deletionCapabilities = signal<
+    ReadonlyMap<string, ICoworkerDocumentDeletionCapabilities>
+  >(new Map());
   protected readonly isLoading = signal(false);
   protected readonly downloadingVersionId = signal<string | null>(null);
-  protected readonly mutationBusy = signal(false);
-  protected readonly activeMutationId = signal<string | null>(null);
+  protected readonly uploadBusy = signal(false);
+  protected readonly activeMutationTarget =
+    signal<CoworkerDocumentMutationTarget | null>(null);
+  protected readonly busy = computed(
+    () => this.uploadBusy() || this.activeMutationTarget() !== null,
+  );
   protected readonly requiresReload = signal(false);
   protected readonly loadError = signal<EdgeFunctionError | null>(null);
   protected readonly downloadError = signal<EdgeFunctionError | null>(null);
@@ -81,6 +95,12 @@ export class Documents {
       entities: this.i18n.statuses().notificationEntities,
     }),
   );
+  protected readonly activeNotificationMutationId = computed(() => {
+    const target = this.activeMutationTarget();
+    return target?.action === COWORKER_DOCUMENT_ACTION.markNotificationRead
+      ? target.id
+      : null;
+  });
   protected readonly isAccessBlocked = computed(() =>
     isEdgeAccessError(this.activeError()),
   );
@@ -90,14 +110,13 @@ export class Documents {
       !this.isAccessBlocked() &&
       (
         this.loadError() !== null ||
-        error.status === HttpStatusCode.NotFound ||
         this.requiresReload()
       );
   });
   protected readonly actionsBlocked = computed(() =>
     this.isLoading() ||
     this.loadError() !== null ||
-    this.mutationBusy() ||
+    this.busy() ||
     this.downloadingVersionId() !== null ||
     this.requiresReload() ||
     this.isAccessBlocked()
@@ -117,7 +136,8 @@ export class Documents {
     if (error?.status === HttpStatusCode.Forbidden) return translations.unauthorizedDescription;
     if (this.loadError()) return translations.loadDescription;
     if (this.mutationError()) {
-      return error?.status === HttpStatusCode.Conflict
+      return error?.status === HttpStatusCode.Conflict ||
+          error?.status === HttpStatusCode.NotFound
         ? translations.conflictDescription
         : translations.actionDescription;
     }
@@ -142,11 +162,34 @@ export class Documents {
     this.mutationError.set(null);
 
     this.coworkerDocuments.getPortal().pipe(
+      switchMap((portal) => {
+        const documentIds = new Set(
+          portal.requirements.flatMap((requirement) =>
+            requirement.submissionDocument === null
+              ? []
+              : [requirement.submissionDocument.id]
+          ),
+        );
+        const requests = [...documentIds].map((documentId) =>
+          this.coworkerDocuments.getDeletionCapabilities(documentId)
+        );
+
+        return requests.length === 0
+          ? of([portal, []] as const)
+          : forkJoin(requests).pipe(
+              map((capabilities) => [portal, capabilities] as const),
+            );
+      }),
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.isLoading.set(false)),
     ).subscribe({
-      next: (portal) => {
+      next: ([portal, capabilities]) => {
         this.portal.set(portal);
+        this.deletionCapabilities.set(
+          new Map(
+            capabilities.map((item) => [item.documentId, item] as const),
+          ),
+        );
         this.requiresReload.set(false);
       },
       error: (error: unknown) => this.loadError.set(this.normalizeError(error)),
@@ -178,7 +221,10 @@ export class Documents {
     const translations = this.i18n.toast();
 
     this.runMutation(
-      document.id,
+      {
+        action: COWORKER_DOCUMENT_ACTION.submitDocument,
+        id: version.id,
+      },
       this.coworkerDocuments.submitDocument(document.id, version.id),
       {
         summary: translations.submitSummary,
@@ -191,7 +237,10 @@ export class Documents {
     const translations = this.i18n.toast();
 
     this.runMutation(
-      documentId,
+      {
+        action: COWORKER_DOCUMENT_ACTION.withdrawDocument,
+        id: documentId,
+      },
       this.coworkerDocuments.withdrawDocument(documentId),
       {
         summary: translations.withdrawSummary,
@@ -200,17 +249,44 @@ export class Documents {
     );
   }
 
+  protected deleteDocumentVersion(version: ICoworkerDocumentVersion): void {
+    this.runMutation(
+      {
+        action: COWORKER_DOCUMENT_ACTION.deleteDocumentVersion,
+        id: version.id,
+      },
+      this.coworkerDocuments.deleteDocumentVersion(
+        version.documentId,
+        version.id,
+      ),
+      null,
+    );
+  }
+
+  protected deleteDocument(documentId: string): void {
+    this.runMutation(
+      {
+        action: COWORKER_DOCUMENT_ACTION.deleteDocument,
+        id: documentId,
+      },
+      this.coworkerDocuments.deleteDocument(documentId),
+      null,
+    );
+  }
+
   protected markNotificationRead(notificationId: string): void {
     this.runMutation(
-      notificationId,
+      {
+        action: COWORKER_DOCUMENT_ACTION.markNotificationRead,
+        id: notificationId,
+      },
       this.coworkerDocuments.markNotificationRead(notificationId),
       null,
     );
   }
 
   protected handleUploadBusy(busy: boolean): void {
-    this.mutationBusy.set(busy);
-    this.activeMutationId.set(null);
+    this.uploadBusy.set(busy);
   }
 
   protected handleUploadCompleted(): void {
@@ -226,40 +302,33 @@ export class Documents {
     error: EdgeFunctionError,
     exposeAsMutationError = true,
   ): void {
-    if (error.status === HttpStatusCode.Conflict) this.requiresReload.set(true);
-    if (exposeAsMutationError &&
-      (isEdgeAccessError(error) || error.status === HttpStatusCode.Conflict)) {
-      this.mutationError.set(error);
-    }
+    if (
+      error.status === HttpStatusCode.Conflict ||
+      error.status === HttpStatusCode.NotFound
+    ) this.requiresReload.set(true);
+    if (exposeAsMutationError) this.mutationError.set(error);
   }
 
   private runMutation<TResult>(
-    mutationId: string,
+    target: CoworkerDocumentMutationTarget,
     request: Observable<TResult>,
     successToast: ToastOptions | null,
   ): void {
     if (this.actionsBlocked()) return;
     this.mutationError.set(null);
     this.downloadError.set(null);
-    this.mutationBusy.set(true);
-    this.activeMutationId.set(mutationId);
+    this.activeMutationTarget.set(target);
 
     request.pipe(
       takeUntilDestroyed(this.destroyRef),
-      finalize(() => {
-        this.mutationBusy.set(false);
-        this.activeMutationId.set(null);
-      }),
+      finalize(() => this.activeMutationTarget.set(null)),
     ).subscribe({
       next: () => {
         if (successToast !== null) this.toast.success(successToast);
         this.load();
       },
-      error: (error: unknown) => {
-        const normalized = this.normalizeError(error);
-        this.mutationError.set(normalized);
-        this.registerBlockingError(normalized);
-      },
+      error: (error: unknown) =>
+        this.registerBlockingError(this.normalizeError(error)),
     });
   }
 

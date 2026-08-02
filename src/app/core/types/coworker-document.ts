@@ -167,8 +167,16 @@ export type CoworkerNotificationSeverity =
   (typeof COWORKER_NOTIFICATION_SEVERITIES)[number];
 export type CoworkerNotificationEntityType =
   (typeof COWORKER_NOTIFICATION_ENTITY_TYPES)[number];
-export type CoworkerDocumentAction =
-  (typeof COWORKER_DOCUMENT_ACTION)[keyof typeof COWORKER_DOCUMENT_ACTION];
+type CoworkerDocumentMutationAction =
+  | typeof COWORKER_DOCUMENT_ACTION.submitDocument
+  | typeof COWORKER_DOCUMENT_ACTION.withdrawDocument
+  | typeof COWORKER_DOCUMENT_ACTION.deleteDocumentVersion
+  | typeof COWORKER_DOCUMENT_ACTION.deleteDocument
+  | typeof COWORKER_DOCUMENT_ACTION.markNotificationRead;
+export interface CoworkerDocumentMutationTarget {
+  readonly action: CoworkerDocumentMutationAction;
+  readonly id: string;
+}
 export type CoworkerDocumentUploadState =
   | 'idle'
   | 'reserving'

@@ -1,6 +1,6 @@
 <div
   class="position-relative flex-col-start-stretch gap-lg w-100"
-  [attr.aria-busy]="isLoading() || mutationBusy() || downloadingVersionId() !== null"
+  [attr.aria-busy]="isLoading() || busy() || downloadingVersionId() !== null"
 >
   <header class="mg-section__header">
     <h2 class="mg-section__title mg-section__title--md">
@@ -96,12 +96,19 @@
         @for (requirement of data.requirements; track requirement.id) {
           <app-document-requirement-card
             [requirement]="requirement"
+            [deletionCapabilities]="
+              requirement.submissionDocument
+                ? (deletionCapabilities().get(requirement.submissionDocument.id) ?? null)
+                : null
+            "
             [mutationsBlocked]="actionsBlocked()"
-            [activeMutationId]="activeMutationId()"
+            [activeMutationTarget]="activeMutationTarget()"
             [downloadingVersionId]="downloadingVersionId()"
             (downloadRequested)="downloadVersion($event)"
             (submitRequested)="submitDocument($event)"
             (withdrawRequested)="withdrawDocument($event)"
+            (deleteVersionRequested)="deleteDocumentVersion($event)"
+            (deleteDocumentRequested)="deleteDocument($event)"
             (uploadCompleted)="handleUploadCompleted()"
             (uploadBusyChange)="handleUploadBusy($event)"
             (blockingError)="registerBlockingError($event)"
@@ -137,7 +144,7 @@
       [notifications]="data.notifications"
       [unreadCount]="data.unreadNotificationCount"
       [copy]="notificationCopy()"
-      [activeMutationId]="activeMutationId()"
+      [activeMutationId]="activeNotificationMutationId()"
       [disabled]="actionsBlocked()"
       (markReadRequested)="markNotificationRead($event)"
     />
