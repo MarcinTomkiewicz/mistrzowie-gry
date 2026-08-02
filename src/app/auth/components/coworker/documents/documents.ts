@@ -15,8 +15,10 @@ import {
 } from '../../../../core/interfaces/i-coworker-document';
 import { CoworkerDocuments as CoworkerDocumentsApi } from '../../../../core/services/coworker-documents/coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
+import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { CoworkerNotificationCopy } from '../../../../core/types/i18n/coworker-notification';
+import { ToastOptions } from '../../../../core/types/toast';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import {
   isEdgeAccessError,
@@ -45,6 +47,7 @@ export class Documents {
   private readonly coworkerDocuments = inject(CoworkerDocumentsApi);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platform = inject(Platform);
+  private readonly toast = inject(UiToast);
 
   protected readonly i18n = createDocumentsI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
@@ -172,21 +175,36 @@ export class Documents {
   protected submitDocument(document: ICoworkerDocumentPortalSubmission): void {
     const version = document.currentVersion;
     if (version === null) return;
+    const translations = this.i18n.toast();
 
     this.runMutation(
       document.id,
       this.coworkerDocuments.submitDocument(document.id, version.id),
+      {
+        summary: translations.submitSummary,
+        detail: translations.submitDetail,
+      },
     );
   }
 
   protected withdrawDocument(documentId: string): void {
-    this.runMutation(documentId, this.coworkerDocuments.withdrawDocument(documentId));
+    const translations = this.i18n.toast();
+
+    this.runMutation(
+      documentId,
+      this.coworkerDocuments.withdrawDocument(documentId),
+      {
+        summary: translations.withdrawSummary,
+        detail: translations.withdrawDetail,
+      },
+    );
   }
 
   protected markNotificationRead(notificationId: string): void {
     this.runMutation(
       notificationId,
       this.coworkerDocuments.markNotificationRead(notificationId),
+      null,
     );
   }
 
@@ -218,6 +236,7 @@ export class Documents {
   private runMutation<TResult>(
     mutationId: string,
     request: Observable<TResult>,
+    successToast: ToastOptions | null,
   ): void {
     if (this.actionsBlocked()) return;
     this.mutationError.set(null);
@@ -232,7 +251,10 @@ export class Documents {
         this.activeMutationId.set(null);
       }),
     ).subscribe({
-      next: () => this.load(),
+      next: () => {
+        if (successToast !== null) this.toast.success(successToast);
+        this.load();
+      },
       error: (error: unknown) => {
         const normalized = this.normalizeError(error);
         this.mutationError.set(normalized);

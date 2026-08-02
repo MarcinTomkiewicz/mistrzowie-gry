@@ -174,8 +174,14 @@
     "cancelError": "Nie udało się anulować rezerwacji po błędzie uploadu.",
     "cleanupError": "Rezerwację anulowano, ale nie udało się usunąć przesłanego pliku."
   },
+  "toast": {
+    "submitSummary": "Wersja wysłana do weryfikacji",
+    "submitDetail": "Wybrana wersja dokumentu została wysłana do weryfikacji.",
+    "withdrawSummary": "Dokument wycofany",
+    "withdrawDetail": "Dokument został wycofany. Przed ponownym wysłaniem dodaj jego nową wersję."
+  },
   "confirmations": {
-    "submit": "Dokument zostanie wysłany do weryfikacji. Kontynuować?",
+    "submit": "Do weryfikacji zostanie wysłana dokładnie ta wersja: plik „{filename}”, wersja {versionNumber}, deklarowany podpis: {signature}, data: {date}. Kontynuować?",
     "withdraw": "Wycofać wysłany dokument? Po tej operacji będzie wymagał ponownego przesłania.",
     "replace": "Dodanie nowej wersji zastąpi odrzuconą wersję dokumentu. Kontynuować?"
   }

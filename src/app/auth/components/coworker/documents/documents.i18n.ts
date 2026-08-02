@@ -12,6 +12,7 @@ import {
   CoworkerDocumentsPageTranslations,
   CoworkerDocumentsSectionTranslations,
   CoworkerDocumentsStatusTranslations,
+  CoworkerDocumentsToastTranslations,
   CoworkerDocumentsUploadTranslations,
 } from '../../../../core/types/i18n/coworker-document';
 
@@ -26,6 +27,7 @@ export function createDocumentsI18n() {
     statuses: CoworkerDocumentsStatusTranslations;
     errors: CoworkerDocumentsErrorTranslations;
     upload: CoworkerDocumentsUploadTranslations;
+    toast: CoworkerDocumentsToastTranslations;
     confirmations: CoworkerDocumentConfirmTranslations;
   }>(COWORKER_DOCUMENTS_SCOPE, {
     page: 'page',
@@ -35,6 +37,7 @@ export function createDocumentsI18n() {
     statuses: 'statuses',
     errors: 'errors',
     upload: 'upload',
+    toast: 'toast',
     confirmations: 'confirmations',
   });
 

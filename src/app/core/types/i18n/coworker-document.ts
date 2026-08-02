@@ -130,6 +130,13 @@ export type CoworkerDocumentsUploadTranslations = {
   cleanupError: string;
 };
 
+export type CoworkerDocumentsToastTranslations = {
+  submitSummary: string;
+  submitDetail: string;
+  withdrawSummary: string;
+  withdrawDetail: string;
+};
+
 export type CoworkerDocumentConfirmTranslations = {
   submit: string;
   withdraw: string;

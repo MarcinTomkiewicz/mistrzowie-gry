@@ -15,6 +15,7 @@ import { UiConfirm } from '../../../../../core/services/ui-confirm/ui-confirm';
 import { CoworkerDocumentRequirementStatus } from '../../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../../core/types/edge-function-error';
 import { getCoworkerDocumentCapability } from '../../../../../core/utils/coworker-document-capability';
+import { formatDateLabel } from '../../../../../core/utils/date';
 import { DocumentUpload } from '../document-upload/document-upload';
 import { DocumentVersionSummary } from '../document-version-summary/document-version-summary';
 import { createDocumentsI18n } from '../documents.i18n';
@@ -69,7 +70,7 @@ export class SubmissionDocument {
     if (document === null || document.currentVersion === null) return;
 
     this.confirm.decision(event, {
-      message: this.i18n.confirmations().submit,
+      message: this.buildSubmitConfirmation(document.currentVersion),
       acceptLabel: this.i18n.actions().submitDocument,
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => this.submitRequested.emit(document),
@@ -86,5 +87,18 @@ export class SubmissionDocument {
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => this.withdrawRequested.emit(document.id),
     });
+  }
+
+  private buildSubmitConfirmation(version: ICoworkerDocumentVersion): string {
+    const timestamp = version.uploadedAt ?? version.createdAt;
+
+    return this.i18n.confirmations().submit
+      .replace('{versionNumber}', String(version.versionNumber))
+      .replace(
+        '{signature}',
+        this.i18n.statuses().signatures[version.signatureDeclarationType],
+      )
+      .replace('{date}', formatDateLabel(timestamp.slice(0, 10), 'pl-PL'))
+      .replace('{filename}', () => version.originalFilename);
   }
 }
