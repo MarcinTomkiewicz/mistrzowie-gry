@@ -1,10 +1,12 @@
 import { COWORKER_DOCUMENTS_BUCKET } from "../_shared/coworker-document-edge/storage-config.ts";
-import { createCoworkerDocumentParser } from "../_shared/coworker-document-edge/coworker-document-parser.ts";
+import {
+  type CoworkerDocument,
+  createCoworkerDocumentParser,
+} from "../_shared/coworker-document-edge/coworker-document-parser.ts";
 import { RPC } from "./contracts.ts";
 import {
   BackendContractError,
   coworkerDocumentReaders,
-  type UnknownObject,
 } from "./contract-context.ts";
 import {
   SIGNATURE_DECLARATION_TYPES,
@@ -44,6 +46,33 @@ export interface SignedUploadActivation {
   expiresAt: string;
 }
 
+export interface UploadFinalizationResult {
+  uploadSessionId: string;
+  finalized: true;
+  document: CoworkerDocument;
+}
+
+type UploadReservationRpcName =
+  | typeof RPC.reserveNewUpload
+  | typeof RPC.reserveVersionUpload;
+
+const RESERVATION_KEYS = [
+  "userId",
+  "documentId",
+  "documentCreated",
+  "documentVersionId",
+  "versionNumber",
+  "uploadSessionId",
+  "bucket",
+  "path",
+  "originalFilename",
+  "storedFilename",
+  "declaredMimeType",
+  "expectedSizeBytes",
+  "signatureDeclarationType",
+  "expiresAt",
+] as const;
+
 const {
   backendBoolean,
   backendEnum,
@@ -61,67 +90,72 @@ const { parseCoworkerDocument } = createCoworkerDocumentParser(
 export function parseUploadReservation(
   value: unknown,
   userId: string,
+  rpcName: UploadReservationRpcName,
+  documentId: string | null,
 ): UploadReservation {
-  const result = backendObject(value, RPC.reserveUpload);
+  const result = backendObject(value, rpcName, RESERVATION_KEYS);
   const reservation: UploadReservation = {
-    userId: backendString(result, "userId", RPC.reserveUpload),
-    documentId: backendUuid(result, "documentId", RPC.reserveUpload),
+    userId: backendString(result, "userId", rpcName),
+    documentId: backendUuid(result, "documentId", rpcName),
     documentCreated: backendBoolean(
       result,
       "documentCreated",
-      RPC.reserveUpload,
+      rpcName,
     ),
     documentVersionId: backendUuid(
       result,
       "documentVersionId",
-      RPC.reserveUpload,
+      rpcName,
     ),
     versionNumber: backendPositiveInteger(
       result,
       "versionNumber",
-      RPC.reserveUpload,
+      rpcName,
     ),
     uploadSessionId: backendUuid(
       result,
       "uploadSessionId",
-      RPC.reserveUpload,
+      rpcName,
     ),
-    bucket: backendString(result, "bucket", RPC.reserveUpload),
-    path: backendString(result, "path", RPC.reserveUpload),
+    bucket: backendString(result, "bucket", rpcName),
+    path: backendString(result, "path", rpcName),
     originalFilename: backendString(
       result,
       "originalFilename",
-      RPC.reserveUpload,
+      rpcName,
     ),
     storedFilename: backendString(
       result,
       "storedFilename",
-      RPC.reserveUpload,
+      rpcName,
     ),
     declaredMimeType: backendString(
       result,
       "declaredMimeType",
-      RPC.reserveUpload,
+      rpcName,
     ),
     expectedSizeBytes: backendPositiveInteger(
       result,
       "expectedSizeBytes",
-      RPC.reserveUpload,
+      rpcName,
     ),
     signatureDeclarationType: backendEnum(
       result,
       "signatureDeclarationType",
       SIGNATURE_DECLARATION_TYPES,
-      RPC.reserveUpload,
+      rpcName,
     ),
-    expiresAt: backendTimestamp(result, "expiresAt", RPC.reserveUpload),
+    expiresAt: backendTimestamp(result, "expiresAt", rpcName),
   };
 
   if (
     reservation.userId !== userId ||
-    reservation.bucket !== COWORKER_DOCUMENTS_BUCKET
+    reservation.bucket !== COWORKER_DOCUMENTS_BUCKET ||
+    (documentId === null && !reservation.documentCreated) ||
+    (documentId !== null &&
+      (reservation.documentCreated || reservation.documentId !== documentId))
   ) {
-    throw new BackendContractError(RPC.reserveUpload);
+    throw new BackendContractError(rpcName);
   }
   return reservation;
 }
@@ -167,11 +201,7 @@ export function parseFinalizationResult(
   value: unknown,
   userId: string,
   uploadSessionId: string,
-  expectedDocument?: {
-    documentId: string;
-    documentVersionId: string;
-  },
-): UnknownObject {
+): UploadFinalizationResult {
   const result = backendObject(value, RPC.finalizeUpload, [
     "uploadSessionId",
     "finalized",
@@ -190,17 +220,15 @@ export function parseFinalizationResult(
     RPC.finalizeUpload,
   );
   if (
-    document.userId !== userId ||
-    (expectedDocument !== undefined &&
-      (
-        document.id !== expectedDocument.documentId ||
-        document.currentVersionId !==
-          expectedDocument.documentVersionId
-      ))
+    document.userId !== userId
   ) {
     throw new BackendContractError(RPC.finalizeUpload);
   }
-  return result;
+  return {
+    uploadSessionId,
+    finalized: true,
+    document,
+  };
 }
 
 function parseActivation(value: unknown): SignedUploadActivation {

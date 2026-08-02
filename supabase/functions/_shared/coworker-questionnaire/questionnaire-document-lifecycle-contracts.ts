@@ -52,7 +52,6 @@ const {
   backendNullableString,
   backendNullableTimestamp,
   backendObject,
-  backendPositiveInteger,
   backendString,
   backendTimestamp,
   backendUuid,
@@ -158,38 +157,26 @@ export function parseQuestionnaireDocumentFinalization(
   }
 
   const document = parseCoworkerDocument(source.document, rpcName);
+  const currentVersion = document.currentVersion;
   if (
-    backendUuid(document, "userId", rpcName) !== userId ||
-    backendUuid(document, "id", rpcName) !== reservation.documentId ||
-    backendUuid(document, "currentVersionId", rpcName) !==
-      reservation.documentVersionId
+    document.userId !== userId ||
+    document.id !== reservation.documentId ||
+    document.currentVersionId !== reservation.documentVersionId ||
+    currentVersion === null
   ) {
     throw new BackendContractError(rpcName);
   }
 
-  const currentVersion = backendObject(
-    document.currentVersion,
-    rpcName,
-  );
-  const detectedMimeType = backendNullableString(
-    currentVersion,
-    "detectedMimeType",
-    rpcName,
-  );
-  backendTimestamp(currentVersion, "finalizedAt", rpcName);
   if (
-    backendUuid(currentVersion, "id", rpcName) !==
-      reservation.documentVersionId ||
-    backendString(currentVersion, "status", rpcName) !== "ready" ||
-    backendPositiveInteger(currentVersion, "expectedSizeBytes", rpcName) !==
-      reservation.expectedSizeBytes ||
-    backendPositiveInteger(currentVersion, "sizeBytes", rpcName) !==
-      reservation.expectedSizeBytes ||
-    backendString(currentVersion, "declaredMimeType", rpcName) !==
-      "application/pdf" ||
-    (detectedMimeType !== null && detectedMimeType !== "application/pdf") ||
-    backendString(currentVersion, "signatureDeclarationType", rpcName) !==
-      "unsigned"
+    currentVersion.id !== reservation.documentVersionId ||
+    currentVersion.status !== "ready" ||
+    currentVersion.expectedSizeBytes !== reservation.expectedSizeBytes ||
+    currentVersion.sizeBytes !== reservation.expectedSizeBytes ||
+    currentVersion.declaredMimeType !== "application/pdf" ||
+    (currentVersion.detectedMimeType !== null &&
+      currentVersion.detectedMimeType !== "application/pdf") ||
+    currentVersion.signatureDeclarationType !== "unsigned" ||
+    currentVersion.finalizedAt === null
   ) {
     throw new BackendContractError(rpcName);
   }

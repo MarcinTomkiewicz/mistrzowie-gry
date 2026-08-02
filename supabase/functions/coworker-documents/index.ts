@@ -5,6 +5,10 @@ import {
   getDocumentPortal,
   handleDocumentCommandAction,
 } from "./document-actions.ts";
+import {
+  handleCoworkerDocumentDeletionAction,
+  isCoworkerDocumentDeletionAction,
+} from "./document-deletion-actions.ts";
 import { parseDocumentActionRequest } from "./document-request.ts";
 import {
   createErrorResponse,
@@ -88,6 +92,14 @@ async function handlePost(
     action.action === "cancelUpload"
   ) {
     return await handleDocumentUploadAction(
+      client,
+      userId,
+      action,
+      requestId,
+    );
+  }
+  if (isCoworkerDocumentDeletionAction(action)) {
+    return await handleCoworkerDocumentDeletionAction(
       client,
       userId,
       action,

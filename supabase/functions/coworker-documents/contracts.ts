@@ -16,7 +16,8 @@ export type { SignatureDeclarationType } from "./upload-request-contracts.ts";
 
 export const RPC = {
   getPortal: "get_coworker_document_portal",
-  reserveUpload: "reserve_coworker_document_upload",
+  reserveNewUpload: "reserve_new_coworker_document_upload",
+  reserveVersionUpload: "reserve_coworker_document_version_upload",
   activateSignedUpload: "activate_coworker_document_signed_upload",
   finalizeUpload: "finalize_coworker_document_upload",
   cancelUpload: "cancel_coworker_document_upload",
@@ -142,10 +143,32 @@ export interface NotificationAction {
   notificationId: string;
 }
 
+export interface GetDeletionCapabilitiesAction {
+  action: "getDeletionCapabilities";
+  documentId: string;
+}
+
+export interface DeleteDocumentVersionAction {
+  action: "deleteDocumentVersion";
+  documentId: string;
+  documentVersionId: string;
+}
+
+export interface DeleteDocumentAction {
+  action: "deleteDocument";
+  documentId: string;
+}
+
+export type CoworkerDocumentDeletionAction =
+  | GetDeletionCapabilitiesAction
+  | DeleteDocumentVersionAction
+  | DeleteDocumentAction;
+
 export type CoworkerDocumentActionRequest =
   | ReserveUploadAction
   | UploadSessionAction
   | SubmitDocumentAction
   | WithdrawDocumentAction
   | DownloadAction
-  | NotificationAction;
+  | NotificationAction
+  | CoworkerDocumentDeletionAction;

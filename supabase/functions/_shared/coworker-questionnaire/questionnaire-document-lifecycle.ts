@@ -9,6 +9,7 @@ import {
   completeUploadCleanup,
   StorageCleanupError,
 } from "../coworker-document-edge/upload-cleanup.ts";
+import { attemptDocumentRetentionCleanup } from "../coworker-document-retention/retention-cleanup.ts";
 import {
   BackendContractError,
   QuestionnaireDocumentCleanupError,
@@ -65,6 +66,12 @@ export async function completeQuestionnaireDocumentLifecycle(
     reservation,
     pdfBytes.byteLength,
     requestId,
+  );
+  await attemptDocumentRetentionCleanup(
+    client,
+    reservation.documentId,
+    requestId,
+    "questionnaire_document_finalized",
   );
 }
 

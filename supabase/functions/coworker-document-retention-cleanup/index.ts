@@ -7,8 +7,11 @@ import {
   parseRetentionCleanupRequest,
   type RetentionCleanupRequest,
   RetentionCleanupRequestContractError,
-} from "./contracts.ts";
-import { logWorkerError, runRetentionCleanup } from "./retention-cleanup.ts";
+} from "../_shared/coworker-document-retention/contracts.ts";
+import {
+  logWorkerError,
+  runRetentionCleanup,
+} from "../_shared/coworker-document-retention/retention-cleanup.ts";
 
 const ALLOWED_METHODS = "POST";
 

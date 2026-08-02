@@ -1,18 +1,15 @@
-import {
-  COWORKER_DOCUMENT_ORIGINS,
-  type CoworkerDocumentOrigin,
-} from "../_shared/coworker-document-edge/coworker-document-models.ts";
-import { createContractReaders } from "../_shared/coworker-document-edge/contract-readers.ts";
+import type { CoworkerDocumentOrigin } from "../coworker-document-edge/coworker-document-models.ts";
+import { createContractReaders } from "../coworker-document-edge/contract-readers.ts";
 
 export const RETENTION_CLEANUP_RPC = {
   claim: "claim_coworker_document_retention_cleanup",
+  claimForDocument: "claim_coworker_document_retention_cleanup_for_document",
   recordResult: "record_coworker_document_retention_cleanup_result",
   getReport: "get_coworker_document_retention_cleanup_report",
 } as const;
 
 export const RETENTION_CLEANUP_CANDIDATE_REASONS = [
-  "system_superseded",
-  "upload_history_limit",
+  "unprotected_superseded",
 ] as const;
 
 export const RETENTION_CLEANUP_DEAD_LETTER_FAILURE_CODES = [
@@ -29,28 +26,6 @@ export const RETENTION_CLEANUP_SUMMARY_KEYS = [
 ] as const;
 
 export const RETENTION_CLEANUP_BUCKET = "coworker-documents" as const;
-
-const REPORT_KEYS = [
-  "summary",
-  "completedVersionCount",
-  "completedRecordedBytes",
-  "readyToRetry",
-  "deadLetterCount",
-  "failedJobs",
-] as const;
-
-const FAILED_JOB_KEYS = [
-  "jobId",
-  "documentVersionId",
-  "documentId",
-  "origin",
-  "candidateReason",
-  "attemptCount",
-  "nextAttemptAt",
-  "failureCode",
-  "bucket",
-  "path",
-] as const;
 
 export type RetentionCleanupRpcName =
   typeof RETENTION_CLEANUP_RPC[keyof typeof RETENTION_CLEANUP_RPC];
@@ -81,7 +56,15 @@ export const retentionCleanupReaders = createContractReaders<
 
 export interface RetentionCleanupRequest {
   limit: number;
+  documentId: string | null;
 }
+
+export type RetentionCleanupSource =
+  | "document_upload_finalized"
+  | "questionnaire_document_finalized"
+  | "document_version_deletion_requested"
+  | "document_deletion_requested"
+  | "document_version_preservation_changed";
 
 export interface RetentionCleanupClaim {
   jobId: string;
@@ -155,128 +138,26 @@ export function parseRetentionCleanupRequest(
 ): RetentionCleanupRequest {
   const errors: Record<string, string> = {};
   const source = retentionCleanupReaders.requestObject(value, "", errors);
-  retentionCleanupReaders.assertOnlyKeys(source, ["limit"], "", errors);
+  retentionCleanupReaders.assertOnlyKeys(
+    source,
+    ["limit", "documentId"],
+    "",
+    errors,
+  );
   return retentionCleanupReaders.validated({
     limit: retentionCleanupReaders.requestInteger(
       source,
       "limit",
       "limit",
       1,
-      50,
+      100,
+      errors,
+    ),
+    documentId: retentionCleanupReaders.requestNullableUuid(
+      source,
+      "documentId",
+      "documentId",
       errors,
     ),
   }, errors);
-}
-
-export function parseRetentionCleanupReport(
-  value: unknown,
-): RetentionCleanupReport {
-  const context = RETENTION_CLEANUP_RPC.getReport;
-  const source = retentionCleanupReaders.backendObject(
-    value,
-    context,
-    REPORT_KEYS,
-  );
-  return {
-    summary: parseSummary(source.summary),
-    completedVersionCount: retentionCleanupReaders.backendNonNegativeInteger(
-      source,
-      "completedVersionCount",
-      context,
-    ),
-    completedRecordedBytes: retentionCleanupReaders.backendNonNegativeInteger(
-      source,
-      "completedRecordedBytes",
-      context,
-    ),
-    readyToRetry: retentionCleanupReaders.backendNonNegativeInteger(
-      source,
-      "readyToRetry",
-      context,
-    ),
-    deadLetterCount: retentionCleanupReaders.backendNonNegativeInteger(
-      source,
-      "deadLetterCount",
-      context,
-    ),
-    failedJobs: retentionCleanupReaders.backendArray(
-      source,
-      "failedJobs",
-      context,
-    ).map(parseFailedJob),
-  };
-}
-
-function parseFailedJob(value: unknown): RetentionCleanupReportFailedJob {
-  const context = RETENTION_CLEANUP_RPC.getReport;
-  const source = retentionCleanupReaders.backendObject(
-    value,
-    context,
-    FAILED_JOB_KEYS,
-  );
-  return {
-    jobId: retentionCleanupReaders.backendUuid(source, "jobId", context),
-    documentVersionId: retentionCleanupReaders.backendUuid(
-      source,
-      "documentVersionId",
-      context,
-    ),
-    documentId: retentionCleanupReaders.backendUuid(
-      source,
-      "documentId",
-      context,
-    ),
-    origin: retentionCleanupReaders.backendEnum(
-      source,
-      "origin",
-      COWORKER_DOCUMENT_ORIGINS,
-      context,
-    ),
-    candidateReason: retentionCleanupReaders.backendEnum(
-      source,
-      "candidateReason",
-      RETENTION_CLEANUP_CANDIDATE_REASONS,
-      context,
-    ),
-    attemptCount: retentionCleanupReaders.backendPositiveInteger(
-      source,
-      "attemptCount",
-      context,
-    ),
-    nextAttemptAt: retentionCleanupReaders.backendTimestamp(
-      source,
-      "nextAttemptAt",
-      context,
-    ),
-    failureCode: retentionCleanupReaders.backendString(
-      source,
-      "failureCode",
-      context,
-    ),
-    bucket: retentionCleanupReaders.backendLiteral(
-      source,
-      "bucket",
-      RETENTION_CLEANUP_BUCKET,
-      context,
-    ),
-    path: retentionCleanupReaders.backendString(source, "path", context),
-  };
-}
-
-function parseSummary(value: unknown): Record<string, number> {
-  const context = RETENTION_CLEANUP_RPC.getReport;
-  const source = retentionCleanupReaders.backendObject(value, context);
-  if (
-    Object.keys(source).some((key) =>
-      !RETENTION_CLEANUP_SUMMARY_KEYS.some((allowed) => allowed === key)
-    )
-  ) {
-    throw new RetentionCleanupBackendContractError(context);
-  }
-  return Object.fromEntries(
-    Object.keys(source).map((key) => [
-      key,
-      retentionCleanupReaders.backendNonNegativeInteger(source, key, context),
-    ]),
-  );
 }

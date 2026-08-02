@@ -2,6 +2,7 @@ import {
   createLoggedErrorResponse as loggedErrorResponse,
   mapRpcError,
 } from "../_shared/coworker-document-edge/error-response.ts";
+import { CoworkerDocumentDeletionBackendContractError } from "../_shared/coworker-document-edge/coworker-document-deletion-parser.ts";
 import { RpcCallError } from "../_shared/coworker-document-edge/rpc.ts";
 import { StorageCallError } from "../_shared/coworker-document-edge/signed-storage.ts";
 import { StorageCleanupError } from "../_shared/coworker-document-edge/upload-cleanup.ts";
@@ -98,7 +99,10 @@ export function createErrorResponse(
     );
   }
 
-  if (error instanceof BackendContractError) {
+  if (
+    error instanceof BackendContractError ||
+    error instanceof CoworkerDocumentDeletionBackendContractError
+  ) {
     return loggedErrorResponse(
       500,
       "BACKEND_CONTRACT_ERROR",

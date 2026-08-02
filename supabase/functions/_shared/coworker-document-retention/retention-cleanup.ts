@@ -1,49 +1,19 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
-import { COWORKER_DOCUMENT_ORIGINS } from "../_shared/coworker-document-edge/coworker-document-models.ts";
-import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
-import { removeStorageObject } from "../_shared/coworker-document-edge/signed-storage.ts";
+import { callRpc } from "../coworker-document-edge/rpc.ts";
+import { removeStorageObject } from "../coworker-document-edge/signed-storage.ts";
 import {
-  parseRetentionCleanupReport,
-  RETENTION_CLEANUP_BUCKET,
-  RETENTION_CLEANUP_CANDIDATE_REASONS,
   RETENTION_CLEANUP_RPC,
   RetentionCleanupBackendContractError,
   type RetentionCleanupClaim,
-  retentionCleanupReaders,
   type RetentionCleanupRequest,
-  type RetentionCleanupRpcName,
+  type RetentionCleanupSource,
   type RetentionCleanupWorkerItemResult,
   type RetentionCleanupWorkerResponse,
 } from "./contracts.ts";
+import { parseRetentionCleanupClaims } from "./retention-cleanup-claim-parser.ts";
 import { parseRetentionCleanupResult } from "./retention-cleanup-parser.ts";
-
-const CLAIM_KEYS = [
-  "jobId",
-  "claimToken",
-  "claimExpiresAt",
-  "attemptCount",
-  "documentVersionId",
-  "documentId",
-  "userId",
-  "origin",
-  "candidateReason",
-  "versionNumber",
-  "recordedSizeBytes",
-  "bucket",
-  "path",
-] as const;
-const {
-  backendArrayValue,
-  backendEnum,
-  backendLiteral,
-  backendNullablePositiveInteger,
-  backendObject,
-  backendPositiveInteger,
-  backendString,
-  backendTimestamp,
-  backendUuid,
-} = retentionCleanupReaders;
+import { parseRetentionCleanupReport } from "./retention-cleanup-report-parser.ts";
 
 export async function runRetentionCleanup(
   client: SupabaseClient,
@@ -54,13 +24,10 @@ export async function runRetentionCleanup(
     code: "RETENTION_CLEANUP_STARTED",
     requestId,
     limit: request.limit,
+    documentId: request.documentId,
   });
 
-  const claims = parseRetentionCleanupClaims(
-    await callRpc(client, RETENTION_CLEANUP_RPC.claim, {
-      p_limit: request.limit,
-    }),
-  );
+  const claims = await claimRetentionJobs(client, request);
   const results: RetentionCleanupWorkerItemResult[] = [];
 
   for (const claim of claims) {
@@ -86,6 +53,7 @@ export async function runRetentionCleanup(
   logInfo({
     code: "RETENTION_CLEANUP_FINISHED",
     requestId,
+    documentId: request.documentId,
     claimed: response.claimed,
     completed: response.completed,
     failed: response.failed,
@@ -94,6 +62,49 @@ export async function runRetentionCleanup(
     workerErrors: response.workerErrors,
   });
   return response;
+}
+
+export async function attemptDocumentRetentionCleanup(
+  client: SupabaseClient,
+  documentId: string,
+  requestId: string,
+  source: RetentionCleanupSource,
+): Promise<void> {
+  try {
+    const result = await runRetentionCleanup(
+      client,
+      { limit: 100, documentId },
+      requestId,
+    );
+    if (result.workerErrors > 0) {
+      logDeferredCleanup(requestId, documentId, source, "WorkerItemError");
+    }
+  } catch (error) {
+    logDeferredCleanup(requestId, documentId, source, errorName(error));
+  }
+}
+
+async function claimRetentionJobs(
+  client: SupabaseClient,
+  request: RetentionCleanupRequest,
+): Promise<RetentionCleanupClaim[]> {
+  const rpcName = request.documentId === null
+    ? RETENTION_CLEANUP_RPC.claim
+    : RETENTION_CLEANUP_RPC.claimForDocument;
+  const parameters = request.documentId === null
+    ? { p_limit: request.limit }
+    : { p_document_id: request.documentId, p_limit: request.limit };
+  const claims = parseRetentionCleanupClaims(
+    await callRpc(client, rpcName, parameters),
+    rpcName,
+  );
+  if (
+    request.documentId !== null &&
+    claims.some((claim) => claim.documentId !== request.documentId)
+  ) {
+    throw new RetentionCleanupBackendContractError(rpcName);
+  }
+  return claims;
 }
 
 async function processClaim(
@@ -198,70 +209,21 @@ function logError(entry: Record<string, unknown>): void {
   console.error(JSON.stringify(entry));
 }
 
-function parseRetentionCleanupClaims(
-  value: unknown,
-): RetentionCleanupClaim[] {
-  const claims = backendArrayValue(value, RETENTION_CLEANUP_RPC.claim).map(
-    parseClaim,
-  );
-  assertUnique(claims.map((claim) => claim.jobId));
-  assertUnique(claims.map((claim) => claim.claimToken));
-  assertUnique(claims.map((claim) => claim.documentVersionId));
-  assertUnique(claims.map((claim) => `${claim.bucket}\u0000${claim.path}`));
-  return claims;
+function logDeferredCleanup(
+  requestId: string,
+  documentId: string,
+  source: RetentionCleanupSource,
+  errorType: string,
+): void {
+  logError({
+    code: "RETENTION_CLEANUP_DEFERRED",
+    requestId,
+    documentId,
+    source,
+    errorType,
+  });
 }
 
-function parseClaim(value: unknown): RetentionCleanupClaim {
-  const context = RETENTION_CLEANUP_RPC.claim;
-  const source = backendObject(value, context, CLAIM_KEYS);
-  return {
-    jobId: backendUuid(source, "jobId", context),
-    claimToken: backendUuid(source, "claimToken", context),
-    claimExpiresAt: backendTimestamp(source, "claimExpiresAt", context),
-    attemptCount: backendPositiveInteger(source, "attemptCount", context),
-    documentVersionId: backendUuid(source, "documentVersionId", context),
-    documentId: backendUuid(source, "documentId", context),
-    userId: backendUuid(source, "userId", context),
-    origin: backendEnum(source, "origin", COWORKER_DOCUMENT_ORIGINS, context),
-    candidateReason: backendEnum(
-      source,
-      "candidateReason",
-      RETENTION_CLEANUP_CANDIDATE_REASONS,
-      context,
-    ),
-    versionNumber: backendPositiveInteger(source, "versionNumber", context),
-    recordedSizeBytes: backendNullablePositiveInteger(
-      source,
-      "recordedSizeBytes",
-      context,
-    ),
-    bucket: backendLiteral(source, "bucket", RETENTION_CLEANUP_BUCKET, context),
-    path: parseClaimPath(source, context),
-  };
-}
-
-function parseClaimPath(
-  source: Record<string, unknown>,
-  context: RetentionCleanupRpcName,
-): string {
-  const path = backendString(source, "path", context);
-  if (
-    path.trim() === "" ||
-    path.startsWith("/") ||
-    path.includes("\\") ||
-    path.includes("?") ||
-    path.includes("#") ||
-    path.split("/").some((segment) => segment === "." || segment === "..")
-  ) {
-    throw new RetentionCleanupBackendContractError(context);
-  }
-  return path;
-}
-
-function assertUnique(values: string[]): void {
-  if (new Set(values).size !== values.length) {
-    throw new RetentionCleanupBackendContractError(
-      RETENTION_CLEANUP_RPC.claim,
-    );
-  }
+function errorName(error: unknown): string {
+  return error instanceof Error ? error.name : "UnknownError";
 }

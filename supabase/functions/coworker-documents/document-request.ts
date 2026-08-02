@@ -17,6 +17,9 @@ const ACTIONS = [
   "withdrawDocument",
   "downloadDocumentVersion",
   "markNotificationRead",
+  "getDeletionCapabilities",
+  "deleteDocumentVersion",
+  "deleteDocument",
 ] as const;
 
 const {
@@ -75,6 +78,8 @@ export function parseDocumentActionRequest(
         ),
       }, errors);
     case "withdrawDocument":
+    case "getDeletionCapabilities":
+    case "deleteDocument":
       assertOnlyKeys(root, ["action", "documentId"], "", errors);
       return validated({
         action,
@@ -82,6 +87,28 @@ export function parseDocumentActionRequest(
           root,
           "documentId",
           "documentId",
+          errors,
+        ),
+      }, errors);
+    case "deleteDocumentVersion":
+      assertOnlyKeys(
+        root,
+        ["action", "documentId", "documentVersionId"],
+        "",
+        errors,
+      );
+      return validated({
+        action,
+        documentId: requestUuid(
+          root,
+          "documentId",
+          "documentId",
+          errors,
+        ),
+        documentVersionId: requestUuid(
+          root,
+          "documentVersionId",
+          "documentVersionId",
           errors,
         ),
       }, errors);

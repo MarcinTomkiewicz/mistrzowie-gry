@@ -2,14 +2,9 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
 import { createSignedUploadUrl } from "../_shared/coworker-document-edge/signed-storage.ts";
-import {
-  type CoworkerDocumentActionRequest,
-  RPC,
-} from "./contracts.ts";
-import {
-  cancelUploadAction,
-  compensateReservation,
-} from "./upload-cleanup.ts";
+import { attemptDocumentRetentionCleanup } from "../_shared/coworker-document-retention/retention-cleanup.ts";
+import { type CoworkerDocumentActionRequest, RPC } from "./contracts.ts";
+import { cancelUploadAction, compensateReservation } from "./upload-cleanup.ts";
 import {
   parseFinalizationResult,
   parseRecoveredSignedUploadActivation,
@@ -42,7 +37,12 @@ export async function handleDocumentUploadAction(
     case "reserveUpload":
       return await reserveUpload(client, userId, action, requestId);
     case "finalizeUpload":
-      return await finalizeUpload(client, userId, action.uploadSessionId);
+      return await finalizeUpload(
+        client,
+        userId,
+        action.uploadSessionId,
+        requestId,
+      );
     case "cancelUpload":
       return await cancelUploadAction(
         client,
@@ -127,7 +127,10 @@ async function reserveUpload(
   action: Extract<DocumentUploadAction, { action: "reserveUpload" }>,
   requestId: string,
 ): Promise<Response> {
-  const reservationData = await callRpc(client, RPC.reserveUpload, {
+  const rpcName = action.documentId === null
+    ? RPC.reserveNewUpload
+    : RPC.reserveVersionUpload;
+  const reservationData = await callRpc(client, rpcName, {
     p_user_id: userId,
     p_actor_user_id: userId,
     p_payload: {
@@ -142,7 +145,12 @@ async function reserveUpload(
       title: action.title,
     },
   });
-  const reservation = parseUploadReservation(reservationData, userId);
+  const reservation = parseUploadReservation(
+    reservationData,
+    userId,
+    rpcName,
+    action.documentId,
+  );
 
   try {
     const { activation, signedUpload } = await activateUploadReservation(
@@ -179,7 +187,7 @@ async function reserveUpload(
       userId,
       reservation,
       requestId,
-      RPC.reserveUpload,
+      rpcName,
     );
     throw error;
   }
@@ -189,16 +197,24 @@ async function finalizeUpload(
   client: SupabaseClient,
   userId: string,
   uploadSessionId: string,
+  requestId: string,
 ): Promise<Response> {
   const data = await callRpc(client, RPC.finalizeUpload, {
     p_user_id: userId,
     p_actor_user_id: userId,
     p_upload_session_id: uploadSessionId,
   });
+  const result = parseFinalizationResult(data, userId, uploadSessionId);
+  await attemptDocumentRetentionCleanup(
+    client,
+    result.document.id,
+    requestId,
+    "document_upload_finalized",
+  );
   return Response.json({
     ok: true,
     action: "finalizeUpload",
-    result: parseFinalizationResult(data, userId, uploadSessionId),
+    result,
   });
 }
 

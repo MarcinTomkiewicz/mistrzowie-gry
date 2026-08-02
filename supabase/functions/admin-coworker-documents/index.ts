@@ -3,6 +3,11 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
 import { parseAdminDocumentActionRequest, RPC } from "./contracts.ts";
+import { handleAdminDocumentDeletionAction } from "./document-deletion-actions.ts";
+import {
+  isAdminDocumentDeletionAction,
+  parseAdminDocumentDeletionAction,
+} from "./document-deletion-request.ts";
 import { parseAdminDashboard } from "./document-response-contracts.ts";
 import {
   acceptDocument,
@@ -59,6 +64,7 @@ export default {
             request,
             context.supabaseAdmin,
             actorUserId,
+            requestId,
           );
         default:
           return Response.json(
@@ -102,6 +108,7 @@ async function handlePost(
   request: Request,
   client: SupabaseClient,
   actorUserId: string,
+  requestId: string,
 ): Promise<Response> {
   let body: unknown;
   try {
@@ -131,6 +138,15 @@ async function handlePost(
       client,
       actorUserId,
       parseSigningPackageReviewActionRequest(body),
+    );
+  }
+
+  if (isAdminDocumentDeletionAction(body)) {
+    return await handleAdminDocumentDeletionAction(
+      client,
+      actorUserId,
+      parseAdminDocumentDeletionAction(body),
+      requestId,
     );
   }
 

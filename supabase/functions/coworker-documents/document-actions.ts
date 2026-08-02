@@ -13,7 +13,15 @@ import {
 
 type DocumentCommandAction = Exclude<
   CoworkerDocumentActionRequest,
-  { action: "reserveUpload" | "finalizeUpload" | "cancelUpload" }
+  {
+    action:
+      | "reserveUpload"
+      | "finalizeUpload"
+      | "cancelUpload"
+      | "getDeletionCapabilities"
+      | "deleteDocumentVersion"
+      | "deleteDocument";
+  }
 >;
 
 export async function getDocumentPortal(
