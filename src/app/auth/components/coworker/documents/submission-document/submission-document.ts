@@ -2,10 +2,12 @@ import { Component, computed, inject, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 
-import { STATUS_BADGE_CLASS } from '../../../../../core/configs/badge-class.config';
+import {
+  SIGNATURE_BADGE_CLASS,
+  STATUS_BADGE_CLASS,
+} from '../../../../../core/configs/badge-class.config';
 import {
   ICoworkerDocumentDefinition,
-  ICoworkerDocumentPortalSource,
   ICoworkerDocumentPortalSubmission,
   ICoworkerDocumentVersion,
 } from '../../../../../core/interfaces/i-coworker-document';
@@ -14,25 +16,23 @@ import { CoworkerDocumentRequirementStatus } from '../../../../../core/types/cow
 import { EdgeFunctionError } from '../../../../../core/types/edge-function-error';
 import { getCoworkerDocumentCapability } from '../../../../../core/utils/coworker-document-capability';
 import { DocumentUpload } from '../document-upload/document-upload';
-import { DocumentVersionList } from '../document-version-list/document-version-list';
+import { DocumentVersionSummary } from '../document-version-summary/document-version-summary';
 import { createDocumentsI18n } from '../documents.i18n';
 
-type CoworkerPortalDocument =
-  | ICoworkerDocumentPortalSource
-  | ICoworkerDocumentPortalSubmission;
-
 @Component({
-  selector: 'app-document-card',
+  selector: 'app-submission-document',
   standalone: true,
-  imports: [ButtonModule, DocumentUpload, DocumentVersionList],
-  templateUrl: './document-card.html',
+  imports: [ButtonModule, DocumentUpload, DocumentVersionSummary],
+  templateUrl: './submission-document.html',
 })
-export class DocumentCard {
+export class SubmissionDocument {
   private readonly confirm = inject(UiConfirm);
 
-  readonly document = input.required<CoworkerPortalDocument>();
-  readonly definition = input<ICoworkerDocumentDefinition | null>(null);
-  readonly requirementStatus = input<CoworkerDocumentRequirementStatus | null>(null);
+  readonly document = input.required<ICoworkerDocumentPortalSubmission | null>();
+  readonly definition = input.required<ICoworkerDocumentDefinition>();
+  readonly requirementId = input.required<string>();
+  readonly requirementStatus = input.required<CoworkerDocumentRequirementStatus>();
+  readonly onboardingCaseId = input<string | null>(null);
   readonly mutationsBlocked = input(false);
   readonly activeMutationId = input<string | null>(null);
   readonly downloadingVersionId = input<string | null>(null);
@@ -47,31 +47,25 @@ export class DocumentCard {
 
   protected readonly i18n = createDocumentsI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
-  protected readonly submissionDocument = computed(() => {
+  protected readonly SIGNATURE_BADGE_CLASS = SIGNATURE_BADGE_CLASS;
+  protected readonly capability = computed(() => {
     const document = this.document();
-    return document.origin === 'coworker_upload' ? document : null;
+
+    return getCoworkerDocumentCapability(
+      this.definition(),
+      document === null ? [] : [document],
+      document,
+      this.requirementStatus(),
+    );
   });
-  protected readonly versions = computed<readonly ICoworkerDocumentVersion[]>(
-    () => {
-      const version = this.document().currentVersion;
-      return version === null ? [] : [version];
-    },
-  );
-  protected readonly capability = computed(() => getCoworkerDocumentCapability(
-    this.definition(),
-    [this.document()],
-    this.document(),
-    this.requirementStatus(),
-  ));
   protected readonly title = computed(() =>
-    this.document().title ??
-      this.document().currentVersion?.originalFilename ??
-      this.definition()?.title ??
+    this.document()?.title ??
+      this.document()?.currentVersion?.originalFilename ??
       this.i18n.labels().documentFallback
   );
 
   protected confirmSubmit(event: Event): void {
-    const document = this.submissionDocument();
+    const document = this.document();
     if (document === null || document.currentVersion === null) return;
 
     this.confirm.decision(event, {
@@ -83,7 +77,7 @@ export class DocumentCard {
   }
 
   protected confirmWithdraw(event: Event): void {
-    const document = this.submissionDocument();
+    const document = this.document();
     if (document === null) return;
 
     this.confirm.decision(event, {

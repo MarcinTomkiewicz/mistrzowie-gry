@@ -1,17 +1,15 @@
 {
   "page": {
     "title": "Dokumenty prywatne",
-    "subtitle": "Sprawdź wymagane dokumenty, ich aktualny stan i historię wersji."
+    "subtitle": "Sprawdź wymagane dokumenty i ich aktualny stan."
   },
   "sections": {
     "onboardingTitle": "Proces wdrożenia",
+    "onboardingEmpty": "Brak aktywnego procesu wdrożenia.",
     "requirementsTitle": "Wymagane dokumenty",
     "requirementsDescription": "Każde wymaganie pokazuje termin, status i powiązane dokumenty.",
-    "unassignedTitle": "Pozostałe dokumenty",
-    "unassignedDescription": "Dokumenty, które nie są przypisane do konkretnego wymagania.",
     "definitionsTitle": "Rodzaje dokumentów i zasady",
     "definitionsDescription": "Dostępne rodzaje dokumentów i obowiązujące dla nich zasady.",
-    "versionsTitle": "Wersje dokumentu",
     "notificationsTitle": "Powiadomienia",
     "notificationsDescription": "Najnowsze informacje dotyczące Twoich dokumentów i procesu wdrożenia."
   },
@@ -23,24 +21,27 @@
     "deadline": "Termin",
     "late": "Po terminie",
     "waiverReason": "Powód zwolnienia",
-    "rejectionReason": "Powód odrzucenia",
     "documentFallback": "Dokument bez nazwy",
-    "requirementDocuments": "Dokumenty w wymaganiu",
-    "currentVersion": "Aktualna wersja",
-    "historicalVersion": "Wersja historyczna",
+    "sourceDocument": "Dokument źródłowy",
+    "submissionDocument": "Twój podpisany dokument",
+    "missingSubmissionDocument": "Brak podpisanego dokumentu",
+    "historyCount": "Historia wersji",
     "versionNumber": "Wersja",
     "signatureDeclaration": "Deklarowany podpis",
-    "signatureVerification": "Weryfikacja podpisu",
-    "verificationReason": "Informacja o weryfikacji",
-    "malwareScan": "Skan bezpieczeństwa",
     "uploadedAt": "Przesłano",
     "createdAt": "Utworzono",
+    "category": "Kategoria",
+    "allowedFormats": "Dozwolone formaty",
     "allowedExtensions": "Dozwolone rozszerzenia",
     "allowedMimeTypes": "Dozwolone typy plików",
+    "maxFileSize": "Maksymalny rozmiar pliku",
     "signaturePolicy": "Zasady podpisu",
     "allowedDeclarations": "Dozwolone deklaracje",
+    "automaticVerification": "Automatyczna weryfikacja podpisu",
     "signatureRequired": "Podpis wymagany",
     "signatureNotRequired": "Podpis niewymagany",
+    "active": "Aktywny",
+    "inactive": "Nieaktywny",
     "uploadSource": "Kto może przesłać",
     "documentMultiplicity": "Liczba dokumentów i wersje",
     "requiredByDefault": "Domyślnie wymagany",
@@ -54,9 +55,9 @@
   "actions": {
     "download": "Pobierz",
     "reload": "Pobierz aktualne dane",
-    "addDocument": "Dodaj dokument",
-    "addVersion": "Dodaj wersję",
-    "submitDocument": "Wyślij do weryfikacji",
+    "addDocument": "Dodaj podpisany dokument",
+    "addVersion": "Zastąp podpisany dokument",
+    "submitDocument": "Wyślij tę wersję do weryfikacji",
     "withdrawDocument": "Wycofaj dokument",
     "markNotificationRead": "Oznacz jako przeczytane",
     "showRules": "Zobacz zasady",
@@ -91,21 +92,6 @@
       "superseded": "Zastąpiona",
       "deleted": "Usunięta"
     },
-    "malware": {
-      "not_scanned": "Nie przeskanowano",
-      "pending": "Skanowanie",
-      "clean": "Bezpieczny plik",
-      "infected": "Wykryto zagrożenie",
-      "failed": "Błąd skanowania",
-      "unavailable": "Skan niedostępny"
-    },
-    "verification": {
-      "pending": "Oczekuje",
-      "confirmed": "Potwierdzony",
-      "rejected": "Odrzucony",
-      "indeterminate": "Niejednoznaczny",
-      "unsupported": "Nieobsługiwany"
-    },
     "onboarding": {
       "draft": "Wersja robocza",
       "submitted": "Przesłany",
@@ -122,12 +108,10 @@
       "other_electronic": "Inny podpis elektroniczny",
       "unknown": "Nieznany rodzaj podpisu"
     },
-    "verifiedSignatures": {
-      "handwritten": "Podpis odręczny",
-      "trusted_profile": "Profil zaufany",
-      "qualified_electronic": "Podpis kwalifikowany",
-      "other_electronic": "Inny podpis elektroniczny",
-      "unknown": "Nieznany rodzaj podpisu"
+    "automaticVerification": {
+      "disabled": "Wyłączona",
+      "optional": "Opcjonalna",
+      "required": "Wymagana"
     },
     "origins": {
       "coworker_upload": "Przesyłany przez współpracownika",

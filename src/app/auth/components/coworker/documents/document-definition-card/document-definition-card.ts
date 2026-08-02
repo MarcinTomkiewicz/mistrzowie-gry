@@ -3,15 +3,16 @@ import { Component, computed, input, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 
 import type { ICoworkerDocumentDefinition } from '../../../../../core/interfaces/i-coworker-document';
+import { formatFileSizeMiB } from '../../../../../core/utils/file-size';
 import { createDocumentsI18n } from '../documents.i18n';
 
 @Component({
-  selector: 'app-available-document-card',
+  selector: 'app-document-definition-card',
   standalone: true,
   imports: [ButtonModule],
-  templateUrl: './available-document-card.html',
+  templateUrl: './document-definition-card.html',
 })
-export class AvailableDocumentCard {
+export class DocumentDefinitionCard {
   readonly definition = input.required<ICoworkerDocumentDefinition>();
 
   protected readonly i18n = createDocumentsI18n();
@@ -23,12 +24,16 @@ export class AvailableDocumentCard {
   );
   protected readonly signatureDeclarations = computed(() => {
     const labels = this.i18n.statuses().signatures;
+
     return this.definition().signaturePolicy.allowedDeclarationTypes
       .map((type) => labels[type])
       .join(', ');
   });
+  protected readonly maxFileSize = computed(() =>
+    formatFileSizeMiB(this.definition().maxSizeBytes)
+  );
   protected readonly rulesId = computed(() =>
-    `available-document-rules-${this.definition().id}`
+    `document-definition-rules-${this.definition().id}`
   );
 
   protected toggleRules(): void {

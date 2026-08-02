@@ -1,0 +1,48 @@
+@if (version(); as version) {
+  <article class="flex-col-start-stretch gap-sm w-100">
+    <header class="flex-row-between-start flex-wrap gap-sm w-100">
+      <div class="flex-col-start-stretch gap-xs min-w-0">
+        <strong class="text-wrap-anywhere">{{ version.originalFilename }}</strong>
+        <span class="muted-text">
+          {{ i18n.labels().versionNumber }} {{ version.versionNumber }}
+        </span>
+      </div>
+
+      <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[version.status]">
+        {{ i18n.statuses().versions[version.status] }}
+      </span>
+    </header>
+
+    <div class="flex-row-start-center flex-wrap gap-md muted-text">
+      <span>
+        {{ version.uploadedAt ? i18n.labels().uploadedAt : i18n.labels().createdAt }}:
+        {{ formatTimestampLabel(version.uploadedAt ?? version.createdAt, "pl-PL") }}
+      </span>
+      <span>{{ i18n.labels().historyCount }}: {{ historyCount() }}</span>
+    </div>
+
+    <div class="flex-row-end-center flex-wrap gap-sm w-100">
+      @if (canDownload(version)) {
+        <p-button
+          type="button"
+          icon="pi pi-download"
+          [label]="i18n.actions().download"
+          [loading]="downloadingVersionId() === version.id"
+          [disabled]="
+            disabled() ||
+            (downloadingVersionId() !== null &&
+              downloadingVersionId() !== version.id)
+          "
+          (onClick)="downloadRequested.emit(version)"
+        />
+      } @else {
+        <span class="muted-text">{{ i18n.labels().downloadUnavailable }}</span>
+      }
+    </div>
+  </article>
+} @else {
+  <div class="flex-col-start-stretch gap-xs muted-text">
+    <p class="m-0">{{ i18n.commonEmpty().description }}</p>
+    <span>{{ i18n.labels().historyCount }}: {{ historyCount() }}</span>
+  </div>
+}

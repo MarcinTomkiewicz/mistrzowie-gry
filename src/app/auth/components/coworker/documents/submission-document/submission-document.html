@@ -1,0 +1,93 @@
+<section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+  <header class="flex-row-between-start flex-wrap gap-sm w-100">
+    <div class="flex-col-start-stretch gap-xs min-w-0">
+      <h5 class="mg-section__title mg-section__title--xs m-0">
+        {{ i18n.labels().submissionDocument }}
+      </h5>
+      @if (document()) {
+        <strong class="text-wrap-anywhere">{{ title() }}</strong>
+      }
+    </div>
+
+    @if (document(); as document) {
+      <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]">
+        {{ i18n.statuses().documents[document.status] }}
+      </span>
+    }
+  </header>
+
+  @if (document(); as document) {
+    <app-document-version-summary
+      [version]="document.currentVersion"
+      [historyCount]="document.historyCount"
+      [downloadingVersionId]="downloadingVersionId()"
+      [disabled]="mutationsBlocked()"
+      (downloadRequested)="downloadRequested.emit($event)"
+    />
+
+    @if (document.currentVersion; as version) {
+      <div class="flex-row-start-center flex-wrap gap-sm">
+        <span class="muted-text">{{ i18n.labels().signatureDeclaration }}:</span>
+        <span
+          [class]="
+            'tag-badge ' +
+            SIGNATURE_BADGE_CLASS[version.signatureDeclarationType]
+          "
+        >
+          {{ i18n.statuses().signatures[version.signatureDeclarationType] }}
+        </span>
+      </div>
+    }
+
+    <div class="flex-row-end-center flex-wrap gap-sm w-100">
+      @if (capability().canSubmit) {
+        <p-button
+          type="button"
+          icon="pi pi-send"
+          [label]="i18n.actions().submitDocument"
+          [loading]="activeMutationId() === document.id"
+          [disabled]="mutationsBlocked()"
+          (onClick)="confirmSubmit($event)"
+        />
+      }
+      @if (capability().canWithdraw) {
+        <p-button
+          type="button"
+          severity="danger"
+          icon="pi pi-undo"
+          [label]="i18n.actions().withdrawDocument"
+          [loading]="activeMutationId() === document.id"
+          [disabled]="mutationsBlocked()"
+          (onClick)="confirmWithdraw($event)"
+        />
+      }
+    </div>
+
+    @if (capability().canAddVersion) {
+      <app-document-upload
+        [definition]="definition()"
+        [document]="document"
+        [disabled]="mutationsBlocked()"
+        (completed)="uploadCompleted.emit()"
+        (busyChange)="uploadBusyChange.emit($event)"
+        (blockingError)="blockingError.emit($event)"
+        (reloadRequired)="reloadRequired.emit()"
+      />
+    }
+  } @else {
+    <p class="m-0 muted-text">{{ i18n.labels().missingSubmissionDocument }}</p>
+
+    @if (capability().canAddDocument) {
+      <app-document-upload
+        [definition]="definition()"
+        [requirementId]="requirementId()"
+        [onboardingCaseId]="onboardingCaseId()"
+        [disabled]="mutationsBlocked()"
+        (completed)="uploadCompleted.emit()"
+        (busyChange)="uploadBusyChange.emit($event)"
+        (blockingError)="blockingError.emit($event)"
+        (reloadRequired)="reloadRequired.emit()"
+      />
+    }
+  }
+</section>

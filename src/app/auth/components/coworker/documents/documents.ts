@@ -9,43 +9,33 @@ import { ButtonModule } from 'primeng/button';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import {
-  ICoworkerDocumentPortalSource,
   ICoworkerDocumentPortalSubmission,
   ICoworkerDocumentPortalResponse,
-  ICoworkerDocumentRequirement,
   ICoworkerDocumentVersion,
 } from '../../../../core/interfaces/i-coworker-document';
 import { CoworkerDocuments as CoworkerDocumentsApi } from '../../../../core/services/coworker-documents/coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
-import { CoworkerDocumentRequirementStatus } from '../../../../core/types/coworker-document';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { CoworkerNotificationCopy } from '../../../../core/types/i18n/coworker-notification';
-import { getCoworkerDocumentCapability } from '../../../../core/utils/coworker-document-capability';
-import { formatDateLabel, formatTimestampLabel } from '../../../../core/utils/date';
+import { formatTimestampLabel } from '../../../../core/utils/date';
 import {
   isEdgeAccessError,
   normalizeEdgeFunctionError,
 } from '../../../../core/utils/edge-function-error-mapping';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { CoworkerNotifications } from '../notifications/coworker-notifications';
-import { AvailableDocumentCard } from './available-document-card/available-document-card';
-import { DocumentCard } from './document-card/document-card';
-import { DocumentUpload } from './document-upload/document-upload';
+import { DocumentDefinitionCard } from './document-definition-card/document-definition-card';
+import { DocumentRequirementCard } from './document-requirement-card/document-requirement-card';
 import { COWORKER_DOCUMENTS_SCOPE, createDocumentsI18n } from './documents.i18n';
-
-type CoworkerPortalDocument =
-  | ICoworkerDocumentPortalSource
-  | ICoworkerDocumentPortalSubmission;
 
 @Component({
   selector: 'app-documents',
   standalone: true,
   imports: [
-    AvailableDocumentCard,
     ButtonModule,
     CoworkerNotifications,
-    DocumentCard,
-    DocumentUpload,
+    DocumentDefinitionCard,
+    DocumentRequirementCard,
     LoadingOverlay,
   ],
   templateUrl: './documents.html',
@@ -58,7 +48,6 @@ export class Documents {
 
   protected readonly i18n = createDocumentsI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
-  protected readonly getDocumentCapability = getCoworkerDocumentCapability;
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly portal = signal<ICoworkerDocumentPortalResponse | null>(null);
   protected readonly isLoading = signal(false);
@@ -224,25 +213,6 @@ export class Documents {
       (isEdgeAccessError(error) || error.status === HttpStatusCode.Conflict)) {
       this.mutationError.set(error);
     }
-  }
-
-  protected deadlineLabel(dueAt: string): string {
-    return formatDateLabel(dueAt.slice(0, 10), 'pl-PL', true);
-  }
-
-  protected isRequirementLate(
-    dueAt: string,
-    status: CoworkerDocumentRequirementStatus,
-  ): boolean {
-    return status === 'pending' && new Date(dueAt).getTime() < Date.now();
-  }
-
-  protected requirementDocuments(
-    requirement: ICoworkerDocumentRequirement,
-  ): readonly CoworkerPortalDocument[] {
-    return [requirement.sourceDocument, requirement.submissionDocument].filter(
-      (document): document is CoworkerPortalDocument => document !== null,
-    );
   }
 
   private runMutation<TResult>(

@@ -1,16 +1,14 @@
 import {
+  AutomaticVerificationMode,
   CoworkerActiveOnboardingStatus,
   CoworkerDocumentMultiplicity,
   CoworkerDocumentOriginPolicy,
   CoworkerDocumentRequirementStatus,
   CoworkerDocumentStatus,
   CoworkerDocumentVersionStatus,
-  CoworkerMalwareScanStatus,
   CoworkerNotificationEntityType,
   CoworkerNotificationSeverity,
   CoworkerSignatureDeclarationType,
-  CoworkerSignatureVerificationStatus,
-  CoworkerVerifiedSignatureType,
 } from '../coworker-document';
 
 export type CoworkerDocumentsPageTranslations = {
@@ -20,13 +18,11 @@ export type CoworkerDocumentsPageTranslations = {
 
 export type CoworkerDocumentsSectionTranslations = {
   onboardingTitle: string;
+  onboardingEmpty: string;
   requirementsTitle: string;
   requirementsDescription: string;
-  unassignedTitle: string;
-  unassignedDescription: string;
   definitionsTitle: string;
   definitionsDescription: string;
-  versionsTitle: string;
   notificationsTitle: string;
   notificationsDescription: string;
 };
@@ -39,24 +35,27 @@ export type CoworkerDocumentsLabelTranslations = {
   deadline: string;
   late: string;
   waiverReason: string;
-  rejectionReason: string;
   documentFallback: string;
-  requirementDocuments: string;
-  currentVersion: string;
-  historicalVersion: string;
+  sourceDocument: string;
+  submissionDocument: string;
+  missingSubmissionDocument: string;
+  historyCount: string;
   versionNumber: string;
   signatureDeclaration: string;
-  signatureVerification: string;
-  verificationReason: string;
-  malwareScan: string;
   uploadedAt: string;
   createdAt: string;
+  category: string;
+  allowedFormats: string;
   allowedExtensions: string;
   allowedMimeTypes: string;
+  maxFileSize: string;
   signaturePolicy: string;
   allowedDeclarations: string;
+  automaticVerification: string;
   signatureRequired: string;
   signatureNotRequired: string;
+  active: string;
+  inactive: string;
   uploadSource: string;
   documentMultiplicity: string;
   requiredByDefault: string;
@@ -104,11 +103,9 @@ export type CoworkerDocumentsStatusTranslations = {
   requirements: Record<CoworkerDocumentRequirementStatus, string>;
   documents: Record<CoworkerDocumentStatus, string>;
   versions: Record<CoworkerDocumentVersionStatus, string>;
-  malware: Record<CoworkerMalwareScanStatus, string>;
-  verification: Record<CoworkerSignatureVerificationStatus, string>;
   onboarding: Record<CoworkerActiveOnboardingStatus, string>;
   signatures: Record<CoworkerSignatureDeclarationType, string>;
-  verifiedSignatures: Record<CoworkerVerifiedSignatureType, string>;
+  automaticVerification: Record<AutomaticVerificationMode, string>;
   origins: Record<CoworkerDocumentOriginPolicy, string>;
   multiplicities: Record<CoworkerDocumentMultiplicity, string>;
   notificationSeverities: Record<CoworkerNotificationSeverity, string>;

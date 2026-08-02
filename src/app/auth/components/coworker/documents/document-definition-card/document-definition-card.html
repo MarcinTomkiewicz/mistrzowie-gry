@@ -10,6 +10,7 @@
     </div>
 
     <div class="tag-badges">
+      <span class="tag-badge tag-badge--info">{{ definition().category }}</span>
       <span class="tag-badge tag-badge--info">
         {{ formatBadge() || i18n.commonEmpty().title }}
       </span>
@@ -27,6 +28,14 @@
             : i18n.labels().signatureNotRequired
         }}
       </span>
+      <span
+        [class]="
+          'tag-badge ' +
+          (definition().isActive ? 'tag-badge--success' : 'tag-badge--muted')
+        "
+      >
+        {{ definition().isActive ? i18n.labels().active : i18n.labels().inactive }}
+      </span>
     </div>
   </header>
 
@@ -41,7 +50,6 @@
       [attr.aria-controls]="rulesId()"
       (onClick)="toggleRules()"
     />
-
   </div>
 
   @if (rulesExpanded()) {
@@ -49,6 +57,11 @@
       class="flex-col-start-stretch gap-sm border-top pt-sm w-100"
       [id]="rulesId()"
     >
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.labels().category }}</strong>
+        <span>{{ definition().category }}</span>
+      </div>
+
       <div class="flex-col-start-stretch gap-xs">
         <strong>{{ i18n.labels().uploadSource }}</strong>
         <span>{{ i18n.statuses().origins[definition().originPolicy] }}</span>
@@ -74,6 +87,11 @@
       </div>
 
       <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.labels().maxFileSize }}</strong>
+        <span>{{ maxFileSize() }}</span>
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs">
         <strong>{{ i18n.labels().signaturePolicy }}</strong>
         <span>{{ definition().signaturePolicy.name }}</span>
         @if (definition().signaturePolicy.description) {
@@ -86,6 +104,17 @@
       <div class="flex-col-start-stretch gap-xs">
         <strong>{{ i18n.labels().allowedDeclarations }}</strong>
         <span>{{ signatureDeclarations() || i18n.commonEmpty().title }}</span>
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs">
+        <strong>{{ i18n.labels().automaticVerification }}</strong>
+        <span>
+          {{
+            i18n.statuses().automaticVerification[
+              definition().signaturePolicy.automaticVerificationMode
+            ]
+          }}
+        </span>
       </div>
 
       @if (definition().isRequiredByDefault) {
