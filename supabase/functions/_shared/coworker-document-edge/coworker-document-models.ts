@@ -13,6 +13,45 @@ export const COWORKER_DOCUMENT_ORIGINS = [
   "admin_upload",
 ] as const;
 
+export const COWORKER_DOCUMENT_ORIGIN_POLICIES = [
+  "coworker_upload",
+  "admin_upload",
+  "system_generated",
+  "mixed",
+] as const;
+
+export const COWORKER_DOCUMENT_MULTIPLICITIES = [
+  "single",
+  "multiple",
+  "versioned_single",
+] as const;
+
+export const COWORKER_DOCUMENT_AUTOMATIC_VERIFICATION_MODES = [
+  "disabled",
+  "optional",
+  "required",
+] as const;
+
+export const COWORKER_DOCUMENT_REQUIREMENT_STATUSES = [
+  "pending",
+  "submitted",
+  "under_review",
+  "needs_correction",
+  "fulfilled",
+  "waived",
+  "expired",
+  "cancelled",
+] as const;
+
+export const COWORKER_ACTIVE_ONBOARDING_STATUSES = [
+  "draft",
+  "submitted",
+  "under_review",
+  "needs_correction",
+  "approved",
+  "suspended",
+] as const;
+
 export const COWORKER_DOCUMENT_STATUSES = [
   "draft",
   "submitted",
@@ -66,6 +105,57 @@ export const COWORKER_DOCUMENT_VERIFIED_SIGNATURE_TYPES = [
 
 export type CoworkerDocumentOrigin = typeof COWORKER_DOCUMENT_ORIGINS[number];
 export type CoworkerDocumentStatus = typeof COWORKER_DOCUMENT_STATUSES[number];
+
+export interface CoworkerSignaturePolicy {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  signatureRequired: boolean;
+  allowedDeclarationTypes:
+    typeof COWORKER_DOCUMENT_SIGNATURE_DECLARATION_TYPES[number][];
+  manualReviewRequired: boolean;
+  automaticVerificationMode:
+    typeof COWORKER_DOCUMENT_AUTOMATIC_VERIFICATION_MODES[number];
+  isActive: boolean;
+}
+
+export interface CoworkerDocumentDefinition {
+  id: string;
+  code: string;
+  title: string;
+  description: string | null;
+  category: string;
+  originPolicy: typeof COWORKER_DOCUMENT_ORIGIN_POLICIES[number];
+  multiplicity: typeof COWORKER_DOCUMENT_MULTIPLICITIES[number];
+  isRequiredByDefault: boolean;
+  allowedMimeTypes: string[];
+  allowedExtensions: string[];
+  maxSizeBytes: number;
+  retentionDays: number | null;
+  isActive: boolean;
+  activeFrom: string | null;
+  activeUntil: string | null;
+  signaturePolicy: CoworkerSignaturePolicy;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CoworkerOnboardingCase {
+  id: string;
+  userId: string;
+  status: typeof COWORKER_ACTIVE_ONBOARDING_STATUSES[number];
+  openedAt: string;
+  submittedAt: string | null;
+  reviewStartedAt: string | null;
+  needsCorrectionAt: string | null;
+  approvedAt: string | null;
+  suspendedAt: string | null;
+  closedAt: string | null;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface CoworkerDocumentSignatureVerification {
   id: string;

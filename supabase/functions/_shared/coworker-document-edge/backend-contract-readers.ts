@@ -112,6 +112,18 @@ export function createBackendContractReaders<Context>(
     return value;
   }
 
+  function backendInteger(
+    source: UnknownObject,
+    key: string,
+    context: Context,
+  ): number {
+    const value = source[key];
+    if (typeof value !== "number" || !Number.isInteger(value)) {
+      throw config.createBackendError(context);
+    }
+    return value;
+  }
+
   function backendPositiveInteger(
     source: UnknownObject,
     key: string,
@@ -231,6 +243,7 @@ export function createBackendContractReaders<Context>(
     backendArrayValue,
     backendBoolean,
     backendEnum,
+    backendInteger,
     backendLiteral,
     backendNonNegativeInteger,
     backendNullableEnum,

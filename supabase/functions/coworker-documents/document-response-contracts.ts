@@ -10,6 +10,8 @@ import {
   type UnknownObject,
 } from "./contract-context.ts";
 
+export { parsePortalResult } from "./document-portal-response-contract.ts";
+
 export interface DownloadTarget {
   documentId: string;
   documentVersionId: string;
@@ -35,17 +37,6 @@ const { parseCoworkerDocument } = createCoworkerDocumentParser(
   coworkerDocumentReaders,
   (rpcName) => new BackendContractError(rpcName),
 );
-
-export function parsePortalResult(
-  value: unknown,
-  userId: string,
-): UnknownObject {
-  const result = backendObject(value, RPC.getPortal);
-  if (backendString(result, "userId", RPC.getPortal) !== userId) {
-    throw new BackendContractError(RPC.getPortal);
-  }
-  return result;
-}
 
 export function parseSubmittedDocumentResult(
   value: unknown,
