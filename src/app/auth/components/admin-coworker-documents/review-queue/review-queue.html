@@ -39,6 +39,9 @@
                 />
               </div>
             </th>
+            <th class="small-caps">
+              {{ i18n.review().fields.submittedVersionId }}
+            </th>
             <th class="small-caps">{{ i18n.review().fields.submittedAt }}</th>
             <th class="small-caps text-right">{{ i18n.review().fields.actions }}</th>
           </tr>
@@ -62,6 +65,9 @@
               <span [class]="statusBadge(item)">
                 {{ statusLabel(item) }}
               </span>
+            </td>
+            <td>
+              <code class="text-wrap-anywhere">{{ item.submittedVersionId }}</code>
             </td>
             <td>{{ formatTimestampLabel(item.submittedAt, "pl-PL") }}</td>
             <td class="text-right">

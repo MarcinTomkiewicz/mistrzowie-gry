@@ -4,6 +4,7 @@ import {
 } from '../admin-coworker-document';
 import {
   CoworkerAutomaticVerificationMode,
+  CoworkerDocumentOrigin,
   CoworkerDocumentRequirementStatus,
   CoworkerDocumentStatus,
   CoworkerDocumentVersionStatus,
@@ -32,7 +33,8 @@ export type AdminCoworkerDocReviewCopy = {
     queueEmpty: string;
     summary: string;
     versions: string;
-    versionsEmpty: string;
+    submittedVersionEmpty: string;
+    versionHistory: string;
     signatureVerification: string;
     signatureHistory: string;
     signatureHistoryEmpty: string;
@@ -47,12 +49,14 @@ export type AdminCoworkerDocReviewCopy = {
     documentDefinition: string;
     documentTitle: string;
     category: string;
+    origin: string;
     documentStatus: string;
     requirementStatus: string;
     required: string;
     dueAt: string;
     versionNumber: string;
     documentVersion: string;
+    submittedVersionId: string;
     versionStatus: string;
     sizeBytes: string;
     declaredMimeType: string;
@@ -123,6 +127,7 @@ export type AdminCoworkerDocReviewCopy = {
   };
   statuses: {
     documents: Record<CoworkerDocumentStatus, string>;
+    origins: Record<CoworkerDocumentOrigin, string>;
     requirements: Record<CoworkerDocumentRequirementStatus, string>;
     versions: Record<CoworkerDocumentVersionStatus, string>;
     malware: Record<CoworkerMalwareScanStatus, string>;
@@ -137,6 +142,7 @@ export type AdminCoworkerDocReviewCopy = {
     >;
     required: string;
     optional: string;
+    submittedVersion: string;
     currentVersion: string;
     historicalVersion: string;
     noRequirement: string;

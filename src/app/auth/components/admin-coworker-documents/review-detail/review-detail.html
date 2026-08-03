@@ -58,14 +58,14 @@
       />
       <app-admin-review-document-versions
         [versions]="data.versions"
-        [currentVersionId]="data.currentVersion?.id ?? null"
+        [currentVersion]="data.currentVersion"
         [submittedVersion]="data.submittedVersion"
         [disabled]="isBusy()"
         [downloadingVersionId]="downloadingVersionId()"
-        (downloadRequested)="downloadSubmittedVersion()"
+        (downloadRequested)="downloadVersion($event)"
       />
 
-      @if (data.document.status === "submitted") {
+      @if (data.document.status === "submitted" && data.submittedVersion) {
         <section class="mg-card flex-row-between-center flex-wrap gap-md w-100">
           <div class="flex-col-start-stretch gap-xs">
             <strong>{{ i18n.review().actions.startReview }}</strong>

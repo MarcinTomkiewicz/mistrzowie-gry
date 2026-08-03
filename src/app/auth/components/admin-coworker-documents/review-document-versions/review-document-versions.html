@@ -9,123 +9,46 @@
     />
   </div>
 
-  @for (version of versions(); track version.id) {
-    <article class="flex-col-start-stretch gap-md border-top pt-md w-100">
-      <header class="flex-row-between-start flex-wrap gap-sm w-100">
-        <div class="flex-col-start-stretch gap-xs min-w-0">
-          <strong class="text-wrap-anywhere">{{ version.originalFilename }}</strong>
-          <span class="muted-text">
-            {{ i18n.review().fields.versionNumber }} {{ version.versionNumber }}
-          </span>
-        </div>
-        <div class="tag-badges">
-          <span
-            [class]="
-              'tag-badge ' +
-              (version.id === currentVersionId()
-                ? 'tag-badge--primary'
-                : 'tag-badge--muted')
-            "
-          >
-            {{
-              version.id === currentVersionId()
-                ? i18n.review().statuses.currentVersion
-                : i18n.review().statuses.historicalVersion
-            }}
-          </span>
-          <div class="flex-row-start-center gap-xs">
-            <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[version.status]">
-              {{ i18n.review().statuses.versions[version.status] }}
-            </span>
-            <app-context-help
-              [text]="i18n.review().tooltips.versionStatus"
-              [ariaLabel]="i18n.contextHelpLabel(i18n.review().fields.versionStatus)"
-            />
-          </div>
-        </div>
-      </header>
+  @if (submittedVersion(); as version) {
+    <app-admin-review-document-version
+      role="submitted"
+      [version]="version"
+      [isCurrent]="version.id === currentVersion()?.id"
+      [disabled]="disabled()"
+      [downloadingVersionId]="downloadingVersionId()"
+      (downloadRequested)="downloadRequested.emit($event)"
+    />
+  } @else {
+    <p class="m-0 muted-text">
+      {{ i18n.review().sections.submittedVersionEmpty }}
+    </p>
+  }
 
-      <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md w-100">
-        <div class="flex-col-start-stretch gap-xs">
-          <span class="muted-text">{{ i18n.review().fields.sizeBytes }}</span>
-          <strong>{{ version.sizeBytes ?? version.expectedSizeBytes }}</strong>
-        </div>
-        <div class="flex-col-start-stretch gap-xs">
-          <span class="muted-text">{{ i18n.review().fields.declaredMimeType }}</span>
-          <strong>{{ version.declaredMimeType }}</strong>
-        </div>
-        @if (version.detectedMimeType) {
-          <div class="flex-col-start-stretch gap-xs">
-            <span class="muted-text">{{ i18n.review().fields.detectedMimeType }}</span>
-            <strong>{{ version.detectedMimeType }}</strong>
-          </div>
-        }
-        <div class="flex-col-start-stretch gap-xs">
-          <div class="flex-row-start-center gap-xs">
-            <span class="muted-text">{{ i18n.review().fields.signatureDeclaration }}</span>
-            <app-context-help
-              [text]="i18n.review().tooltips.signatureDeclaration"
-              [ariaLabel]="i18n.contextHelpLabel(i18n.review().fields.signatureDeclaration)"
-            />
-          </div>
-          <span [class]="'tag-badge ' + SIGNATURE_BADGE_CLASS[version.signatureDeclarationType]">
-            {{ i18n.review().statuses.signatureDeclarations[version.signatureDeclarationType] }}
-          </span>
-        </div>
-        <div class="flex-col-start-stretch gap-xs">
-          <div class="flex-row-start-center gap-xs">
-            <span class="muted-text">{{ i18n.review().fields.malwareScan }}</span>
-            <app-context-help
-              [text]="i18n.review().tooltips.malwareScan"
-              [ariaLabel]="i18n.contextHelpLabel(i18n.review().fields.malwareScan)"
-            />
-          </div>
-          <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[version.malwareScanStatus]">
-            {{ i18n.review().statuses.malware[version.malwareScanStatus] }}
-          </span>
-        </div>
-      </div>
+  @if (distinctCurrentVersion(); as version) {
+    <app-admin-review-document-version
+      role="current"
+      [version]="version"
+    />
+  }
 
-      @if (version.latestSignatureVerification; as verification) {
-        <div class="flex-col-start-stretch gap-sm border-top pt-sm">
-          <div class="flex-row-start-center gap-xs">
-            <strong>{{ i18n.review().fields.latestSignatureVerification }}</strong>
-            <app-context-help
-              [text]="i18n.review().tooltips.latestSignatureVerification"
-              [ariaLabel]="i18n.contextHelpLabel(i18n.review().fields.latestSignatureVerification)"
-            />
+  @if (historicalVersions().length > 0) {
+    <p-accordion class="w-100">
+      <p-accordion-panel value="version-history">
+        <p-accordion-header>
+          {{ i18n.review().sections.versionHistory }}
+          ({{ historicalVersions().length }})
+        </p-accordion-header>
+        <p-accordion-content>
+          <div class="flex-col-start-stretch gap-md w-100">
+            @for (version of historicalVersions(); track version.id) {
+              <app-admin-review-document-version
+                role="historical"
+                [version]="version"
+              />
+            }
           </div>
-          <div class="flex-row-start-center flex-wrap gap-sm">
-            <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[verification.verificationStatus]">
-              {{ i18n.review().statuses.verificationStatuses[verification.verificationStatus] }}
-            </span>
-            <span>{{ i18n.review().statuses.verifiedSignatureTypes[verification.signatureType] }}</span>
-            <span class="muted-text">{{ formatTimestampLabel(verification.createdAt, "pl-PL") }}</span>
-          </div>
-          @if (verification.reason) {
-            <p class="m-0">{{ verification.reason }}</p>
-          }
-        </div>
-      }
-
-      <div class="flex-row-end-center gap-xs w-100">
-        @if (version.id === submittedVersion()?.id && canDownload(version)) {
-          <p-button
-            type="button"
-            icon="pi pi-external-link"
-            [label]="i18n.review().actions.download"
-            [loading]="downloadingVersionId() === version.id"
-            [disabled]="disabled() || downloadingVersionId() !== null"
-            (onClick)="downloadRequested.emit()"
-          />
-          <app-context-help
-            [text]="i18n.review().tooltips.download"
-            [ariaLabel]="i18n.contextHelpLabel(i18n.review().actions.download)"
-          />
-        }
-      </div>
-    </article>
-  } @empty {
-    <p class="m-0 muted-text">{{ i18n.review().sections.versionsEmpty }}</p>
+        </p-accordion-content>
+      </p-accordion-panel>
+    </p-accordion>
   }
 </section>

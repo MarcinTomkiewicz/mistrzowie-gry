@@ -1,11 +1,13 @@
 import { HttpStatusCode } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { finalize, Observable } from 'rxjs';
 
 import { IAdminCoworkerDocumentReviewDetail } from '../../../../core/interfaces/i-admin-coworker-document';
+import { ICoworkerDocumentVersion } from '../../../../core/interfaces/i-coworker-document';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
@@ -56,6 +58,7 @@ import { SignatureVerificationEditor } from '../signature-verification-editor/si
   providers: [provideTranslocoScope('adminCoworkerDocuments', 'common')],
 })
 export class ReviewDetail {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly documents = inject(AdminCoworkerDocuments);
   private readonly platform = inject(Platform);
@@ -87,7 +90,10 @@ export class ReviewDetail {
     this.loadError.set(null);
     this.documents
       .getReviewDetail(this.target.userId, this.target.documentId)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isLoading.set(false)),
+      )
       .subscribe({
         next: (detail) => {
           this.detail.set(detail);
@@ -106,7 +112,7 @@ export class ReviewDetail {
   }
 
   protected confirmStartReview(event: Event): void {
-    if (this.isBusy()) return;
+    if (!this.detail()?.submittedVersion || this.isBusy()) return;
     this.confirm.decision(event, {
       message: this.i18n.review().messages.startReviewConfirmation,
       acceptLabel: this.i18n.review().actions.startReview,
@@ -138,7 +144,7 @@ export class ReviewDetail {
   }
 
   protected acceptDocument(input: AdminCoworkerAcceptDocumentInput): void {
-    if (this.isBusy()) return;
+    if (!this.detail()?.submittedVersion || this.isBusy()) return;
     this.runCommand(
       ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument,
       this.documents.acceptDocument({ ...this.target, ...input }),
@@ -148,7 +154,7 @@ export class ReviewDetail {
   }
 
   protected rejectDocument(input: AdminCoworkerRejectDocumentInput): void {
-    if (this.isBusy()) return;
+    if (!this.detail()?.submittedVersion || this.isBusy()) return;
     this.runCommand(
       ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument,
       this.documents.rejectDocument({ ...this.target, ...input }),
@@ -157,9 +163,10 @@ export class ReviewDetail {
     );
   }
 
-  protected downloadSubmittedVersion(): void {
-    const version = this.detail()?.submittedVersion;
-    if (version === null || version === undefined || this.isBusy()) return;
+  protected downloadVersion(version: ICoworkerDocumentVersion): void {
+    if (this.detail()?.submittedVersion?.id !== version.id || this.isBusy()) {
+      return;
+    }
     this.activeAction.set(ADMIN_COWORKER_DOCUMENT_ACTION.downloadDocumentVersion);
     this.downloadingVersionId.set(version.id);
     this.actionError.set(null);
@@ -169,10 +176,13 @@ export class ReviewDetail {
         documentVersionId: version.id,
         purpose: 'admin_review',
       })
-      .pipe(finalize(() => {
-        this.activeAction.set(null);
-        this.downloadingVersionId.set(null);
-      }))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.activeAction.set(null);
+          this.downloadingVersionId.set(null);
+        }),
+      )
       .subscribe({
         next: (response) => this.platform.openNewTab(response.download.signedUrl),
         error: (error) => this.handleCommandError(
@@ -195,7 +205,10 @@ export class ReviewDetail {
     this.activeAction.set(action);
     this.actionError.set(null);
     this.actionErrorFallback.set('');
-    request.pipe(finalize(() => this.activeAction.set(null))).subscribe({
+    request.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.activeAction.set(null)),
+    ).subscribe({
       next: () => {
         this.toast.success({
           summary: this.i18n.messages().actionSuccessSummary,

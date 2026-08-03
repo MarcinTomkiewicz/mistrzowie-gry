@@ -37,6 +37,12 @@
       <strong>{{ detail().documentDefinition.category }}</strong>
     </div>
     <div class="flex-col-start-stretch gap-xs">
+      <span class="muted-text">{{ i18n.review().fields.origin }}</span>
+      <strong>
+        {{ i18n.review().statuses.origins[detail().document.origin] }}
+      </strong>
+    </div>
+    <div class="flex-col-start-stretch gap-xs">
       <div class="flex-row-start-center gap-xs">
         <span class="muted-text">{{ i18n.review().fields.documentStatus }}</span>
         <app-context-help
