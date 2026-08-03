@@ -4,6 +4,9 @@ export class RpcCallError<RpcName extends string = string> extends Error {
   constructor(
     readonly rpcName: RpcName,
     readonly sqlState: string | null,
+    readonly databaseMessage: string,
+    readonly details: string | null,
+    readonly hint: string | null,
     readonly errorContext: string | null = null,
   ) {
     super("RPC call failed.");
@@ -20,7 +23,14 @@ export async function callRpc<RpcName extends string>(
   const { data, error } = await client.rpc(rpcName, parameters);
 
   if (error !== null) {
-    throw new RpcCallError(rpcName, error.code ?? null, errorContext);
+    throw new RpcCallError(
+      rpcName,
+      error.code ?? null,
+      error.message,
+      error.details,
+      error.hint,
+      errorContext,
+    );
   }
 
   return data;

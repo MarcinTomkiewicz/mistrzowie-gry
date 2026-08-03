@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
-import { callRpc } from "../_shared/coworker-document-edge/rpc.ts";
+import {
+  callRpc,
+  RpcCallError,
+} from "../_shared/coworker-document-edge/rpc.ts";
 import { createSignedDownloadUrl } from "../_shared/coworker-document-edge/signed-storage.ts";
 import { type AdminDocumentActionRequest, RPC } from "./contracts.ts";
 import { parseDownloadTarget } from "./document-download-response-contract.ts";
@@ -17,12 +20,22 @@ export async function getReviewDetail(
     AdminDocumentActionRequest,
     { action: "getReviewDetail" }
   >,
+  requestId: string,
 ): Promise<Response> {
-  const data = await callRpc(client, RPC.getReviewDetail, {
-    p_user_id: action.userId,
-    p_document_id: action.documentId,
-    p_actor_user_id: actorUserId,
-  });
+  let data: unknown;
+
+  try {
+    data = await callRpc(client, RPC.getReviewDetail, {
+      p_user_id: action.userId,
+      p_document_id: action.documentId,
+      p_actor_user_id: actorUserId,
+    });
+  } catch (error: unknown) {
+    if (error instanceof RpcCallError) {
+      logReviewDetailRpcError(error, requestId, actorUserId, action);
+    }
+    throw error;
+  }
 
   return Response.json({
     ok: true,
@@ -33,6 +46,40 @@ export async function getReviewDetail(
       action.documentId,
     ),
   });
+}
+
+function logReviewDetailRpcError(
+  error: RpcCallError,
+  requestId: string,
+  actorUserId: string,
+  action: Extract<
+    AdminDocumentActionRequest,
+    { action: "getReviewDetail" }
+  >,
+): void {
+  const deploymentId = Deno.env.get("DENO_DEPLOYMENT_ID") ?? null;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+
+  console.error(JSON.stringify({
+    requestId,
+    functionName: "admin-coworker-documents",
+    deploymentId,
+    deploymentVersion: deploymentId?.split("_").at(-1) ?? null,
+    projectRef: supabaseUrl === undefined
+      ? null
+      : new URL(supabaseUrl).hostname.split(".")[0],
+    actorUserId,
+    action: {
+      name: action.action,
+      userId: action.userId,
+      documentId: action.documentId,
+    },
+    rpcName: error.rpcName,
+    sqlState: error.sqlState,
+    message: error.databaseMessage,
+    details: error.details,
+    hint: error.hint,
+  }));
 }
 
 export async function startReview(

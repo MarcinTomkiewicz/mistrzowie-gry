@@ -138,7 +138,6 @@ export function parseCoworkerDocumentPortalResponse(
   const portal = portalReader(value, 'response');
   assertEdgeContract(
     portal.viewer.actorUserId === portal.userId &&
-      !portal.viewer.isAdmin &&
       (portal.activeOnboardingCase === null ||
         portal.activeOnboardingCase.userId === portal.userId) &&
       isUnique(portal.requirements.map((requirement) => requirement.id)) &&
