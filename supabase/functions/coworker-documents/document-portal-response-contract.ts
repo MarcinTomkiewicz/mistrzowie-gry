@@ -83,7 +83,6 @@ export function parsePortalResult(
   if (
     portal.userId !== userId ||
     portal.viewer.actorUserId !== userId ||
-    portal.viewer.isAdmin ||
     (activeOnboardingCase !== null &&
       activeOnboardingCase.userId !== portal.userId) ||
     hasDuplicates(requirements.map((requirement) => requirement.id)) ||
