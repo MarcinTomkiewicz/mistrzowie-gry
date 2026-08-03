@@ -1,13 +1,14 @@
 import { HttpStatusCode } from '@angular/common/http';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { finalize, Observable } from 'rxjs';
+import { finalize, forkJoin, Observable } from 'rxjs';
 
 import { IAdminCoworkerDocumentReviewDetail } from '../../../../core/interfaces/i-admin-coworker-document';
 import { ICoworkerDocumentVersion } from '../../../../core/interfaces/i-coworker-document';
+import { ICoworkerDocumentDeletionCapabilities } from '../../../../core/interfaces/i-coworker-document-deletion';
 import { AdminCoworkerDocuments } from '../../../../core/services/admin-coworker-documents/admin-coworker-documents';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
@@ -16,6 +17,7 @@ import {
   ADMIN_COWORKER_DOCUMENT_ACTION,
   AdminCoworkerAcceptDocumentInput,
   AdminCoworkerDocumentAction,
+  AdminCoworkerDocumentPreservationInput,
   AdminCoworkerRejectDocumentInput,
   AdminCoworkerReviewTarget,
   AdminSignatureVerificationInput,
@@ -34,6 +36,7 @@ import {
 } from '../admin-coworker-document-errors';
 import { createAdminCoworkerDocumentsI18n } from '../private-documents/private-documents.i18n';
 import { ReviewDecisionEditor } from '../review-decision-editor/review-decision-editor';
+import { ReviewDocumentDeletion } from '../review-document-deletion/review-document-deletion';
 import { ReviewDocumentSummary } from '../review-document-summary/review-document-summary';
 import { ReviewDocumentVersions } from '../review-document-versions/review-document-versions';
 import { ReviewHistory } from '../review-history/review-history';
@@ -49,6 +52,7 @@ import { SignatureVerificationEditor } from '../signature-verification-editor/si
     LoadingOverlay,
     AdminCoworkerDocumentError,
     ReviewDecisionEditor,
+    ReviewDocumentDeletion,
     ReviewDocumentSummary,
     ReviewDocumentVersions,
     ReviewHistory,
@@ -73,12 +77,22 @@ export class ReviewDetail {
   protected readonly resolveError = resolveAdminCoworkerDocumentError;
   protected readonly ADMIN_COWORKER_DOCUMENT_ACTION = ADMIN_COWORKER_DOCUMENT_ACTION;
   protected readonly detail = signal<IAdminCoworkerDocumentReviewDetail | null>(null);
+  protected readonly deletionCapabilities =
+    signal<ICoworkerDocumentDeletionCapabilities | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal<EdgeFunctionError | null>(null);
   protected readonly actionError = signal<EdgeFunctionError | null>(null);
   protected readonly actionErrorFallback = signal('');
   protected readonly activeAction = signal<AdminCoworkerDocumentAction | null>(null);
   protected readonly downloadingVersionId = signal<string | null>(null);
+  protected readonly isBusy = computed(
+    () => this.isLoading() || this.activeAction() !== null,
+  );
+  protected readonly mutationsBlocked = computed(
+    () =>
+      this.isBusy() ||
+      this.deletionCapabilities()?.deletionRequested === true,
+  );
   protected readonly isEdgeAccessError = isEdgeAccessError;
 
   constructor() {
@@ -88,14 +102,21 @@ export class ReviewDetail {
   protected loadDetail(): void {
     this.isLoading.set(true);
     this.loadError.set(null);
-    this.documents
-      .getReviewDetail(this.target.userId, this.target.documentId)
+    const { documentId, userId } = this.target;
+    forkJoin({
+      detail: this.documents.getReviewDetail(userId, documentId),
+      deletionCapabilities: this.documents.getDeletionCapabilities(
+        userId,
+        documentId,
+      ),
+    })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: (detail) => {
+        next: ({ detail, deletionCapabilities }) => {
+          this.deletionCapabilities.set(deletionCapabilities);
           this.detail.set(detail);
           this.actionError.set(null);
           this.actionErrorFallback.set('');
@@ -106,13 +127,14 @@ export class ReviewDetail {
             this.i18n.review().errors.load,
           );
           this.detail.set(null);
+          this.deletionCapabilities.set(null);
           this.loadError.set(normalized);
         },
       });
   }
 
   protected confirmStartReview(event: Event): void {
-    if (!this.detail()?.submittedVersion || this.isBusy()) return;
+    if (!this.detail()?.submittedVersion || this.mutationsBlocked()) return;
     this.confirm.decision(event, {
       message: this.i18n.review().messages.startReviewConfirmation,
       acceptLabel: this.i18n.review().actions.startReview,
@@ -126,11 +148,9 @@ export class ReviewDetail {
     });
   }
 
-  protected verifySignature(
-    input: AdminSignatureVerificationInput,
-  ): void {
+  protected verifySignature(input: AdminSignatureVerificationInput): void {
     const version = this.detail()?.submittedVersion;
-    if (!version || this.isBusy()) return;
+    if (!version || this.mutationsBlocked()) return;
     this.runCommand(
       ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature,
       this.documents.verifySignature({
@@ -144,7 +164,7 @@ export class ReviewDetail {
   }
 
   protected acceptDocument(input: AdminCoworkerAcceptDocumentInput): void {
-    if (!this.detail()?.submittedVersion || this.isBusy()) return;
+    if (!this.detail()?.submittedVersion || this.mutationsBlocked()) return;
     this.runCommand(
       ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument,
       this.documents.acceptDocument({ ...this.target, ...input }),
@@ -154,12 +174,58 @@ export class ReviewDetail {
   }
 
   protected rejectDocument(input: AdminCoworkerRejectDocumentInput): void {
-    if (!this.detail()?.submittedVersion || this.isBusy()) return;
+    if (!this.detail()?.submittedVersion || this.mutationsBlocked()) return;
     this.runCommand(
       ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument,
       this.documents.rejectDocument({ ...this.target, ...input }),
       this.i18n.review().messages.documentRejected,
       this.i18n.review().errors.rejectDocument,
+    );
+  }
+
+  protected deleteVersion(version: ICoworkerDocumentVersion): void {
+    if (
+      version.documentId !== this.target.documentId ||
+      this.mutationsBlocked()
+    ) return;
+    this.runCommand(
+      ADMIN_COWORKER_DOCUMENT_ACTION.deleteDocumentVersion,
+      this.documents.deleteDocumentVersion(
+        this.target.userId,
+        version.documentId,
+        version.id,
+      ),
+      this.i18n.review().messages.versionDeletionRequested,
+      this.i18n.review().errors.deleteVersion,
+    );
+  }
+
+  protected deleteDocument(documentId: string): void {
+    if (documentId !== this.target.documentId || this.mutationsBlocked()) return;
+    this.runCommand(
+      ADMIN_COWORKER_DOCUMENT_ACTION.deleteDocument,
+      this.documents.deleteDocument(this.target.userId, documentId),
+      this.i18n.review().messages.documentDeletionRequested,
+      this.i18n.review().errors.deleteDocument,
+    );
+  }
+
+  protected setVersionPreservation(
+    input: AdminCoworkerDocumentPreservationInput,
+  ): void {
+    const versionExists = this.detail()?.versions.some(
+      (version) => version.id === input.documentVersionId,
+    );
+    if (this.mutationsBlocked() || !versionExists) return;
+    this.runCommand(
+      ADMIN_COWORKER_DOCUMENT_ACTION.setDocumentVersionPreservation,
+      this.documents.setDocumentVersionPreservation({
+        ...this.target,
+        ...input,
+        note: null,
+      }),
+      this.i18n.review().messages.preservationUpdated,
+      this.i18n.review().errors.updatePreservation,
     );
   }
 
@@ -192,10 +258,6 @@ export class ReviewDetail {
       });
   }
 
-  protected isBusy(): boolean {
-    return this.isLoading() || this.activeAction() !== null;
-  }
-
   private runCommand<TResult>(
     action: AdminCoworkerDocumentAction,
     request: Observable<TResult>,
@@ -226,6 +288,7 @@ export class ReviewDetail {
     this.actionError.set(normalized);
     if (isEdgeAccessError(normalized)) {
       this.detail.set(null);
+      this.deletionCapabilities.set(null);
       this.loadError.set(normalized);
       return;
     }

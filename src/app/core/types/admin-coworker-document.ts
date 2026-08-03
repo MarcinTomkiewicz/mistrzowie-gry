@@ -150,6 +150,11 @@ export type AdminCoworkerDocumentPreservationPayload =
     readonly note: string | null;
   };
 
+export type AdminCoworkerDocumentPreservationInput = Pick<
+  AdminCoworkerDocumentPreservationPayload,
+  'documentVersionId' | 'preservationKind'
+>;
+
 export type AdminSignatureVerificationForm = FormGroup<{
   verificationStatus: FormControl<AdminSignatureVerificationStatus | null>;
   reason: FormControl<string>;

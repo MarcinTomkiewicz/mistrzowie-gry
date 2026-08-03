@@ -161,6 +161,7 @@
       "versions": "[PH] [versions] Wersje dokumentu",
       "submittedVersionEmpty": "[PH] [submittedVersionEmpty] Brak wersji wysłanej do weryfikacji.",
       "versionHistory": "[PH] [versionHistory] Historia wersji",
+      "deletion": "[PH] [deletion] Usuwanie dokumentu",
       "signatureVerification": "[PH] [signatureVerification] Ręczna weryfikacja podpisu",
       "signatureHistory": "[PH] [signatureHistory] Historia weryfikacji podpisu",
       "signatureHistoryEmpty": "[PH] [signatureHistoryEmpty] Nie zapisano jeszcze żadnej weryfikacji podpisu.",
@@ -208,6 +209,7 @@
       "allowedSignatureTypes": "[PH] [allowedSignatureTypes] Dozwolone rodzaje podpisu",
       "manualSignatureReview": "[PH] [manualSignatureReview] Ręczne sprawdzenie podpisu wymagane",
       "automaticVerificationMode": "[PH] [automaticVerificationMode] Automatyczna weryfikacja podpisu",
+      "preservation": "[PH] [preservation] Trwałość wersji",
       "actions": "[PH] [actions] Działania"
     },
     "actions": {
@@ -217,7 +219,12 @@
       "download": "[PH] [download] Otwórz plik",
       "verifySignature": "[PH] [verifySignature] Zapisz weryfikację podpisu",
       "acceptDocument": "[PH] [acceptDocument] Zaakceptuj dokument",
-      "rejectDocument": "[PH] [rejectDocument] Odrzuć dokument"
+      "rejectDocument": "[PH] [rejectDocument] Odrzuć dokument",
+      "deleteVersion": "[PH] [deleteVersion] Usuń wersję",
+      "deleteDocument": "[PH] [deleteDocument] Usuń dokument",
+      "markHistorical": "[PH] [markHistorical] Oznacz jako historyczną",
+      "markPermanent": "[PH] [markPermanent] Oznacz jako permanentną",
+      "clearPreservation": "[PH] [clearPreservation] Usuń oznaczenie trwałości"
     },
     "tooltips": {
       "queue": "[PH] [queue] Kolejka zawiera dokumenty przesłane przez współpracowników, które administrator może otworzyć i zweryfikować.",
@@ -242,7 +249,8 @@
       "acceptDocument": "[PH] [acceptDocument] Akceptacja uznaje dokument za prawidłowy, kończy jego bieżącą weryfikację pozytywnie i powoduje powiadomienie współpracownika.",
       "rejectDocument": "[PH] [rejectDocument] Odrzucenie kończy bieżącą weryfikację, przekazuje współpracownikowi powód wymaganej poprawy i powoduje powiadomienie.",
       "signatureHistory": "[PH] [signatureHistory] Historia obejmuje wszystkie weryfikacje podpisów wszystkich wersji dokumentu. Jedna wersja może mieć wiele wpisów.",
-      "decisionHistory": "[PH] [decisionHistory] Historia zawiera wyłącznie końcowe decyzje o akceptacji albo odrzuceniu. Nie jest pełnym audytem wszystkich czynności."
+      "decisionHistory": "[PH] [decisionHistory] Historia zawiera wyłącznie końcowe decyzje o akceptacji albo odrzuceniu. Nie jest pełnym audytem wszystkich czynności.",
+      "preservation": "[PH] [preservation] Oznaczenie historyczne albo permanentne chroni wybraną wersję zgodnie z zasadami przechowywania dokumentów. Opcja usunięcia trwałości przywraca brak oznaczenia."
     },
     "options": {
       "selectVerificationStatus": "[PH] [selectVerificationStatus] Wybierz wynik weryfikacji",
@@ -336,7 +344,9 @@
       "submittedVersion": "[PH] [submittedVersion] Wersja wysłana do weryfikacji",
       "currentVersion": "[PH] [currentVersion] Bieżąca wersja",
       "historicalVersion": "[PH] [historicalVersion] Wersja historyczna",
-      "noRequirement": "[PH] [noRequirement] Dokument nie jest powiązany z przypisanym dokumentem do dostarczenia"
+      "noRequirement": "[PH] [noRequirement] Dokument nie jest powiązany z przypisanym dokumentem do dostarczenia",
+      "deletionBlocked": "[PH] [deletionBlocked] Nie można usunąć",
+      "deletionPending": "[PH] [deletionPending] Usunięcie dokumentu zostało zlecone i jest w toku."
     },
     "messages": {
       "startReviewConfirmation": "[PH] [startReviewConfirmation] Rozpocząć weryfikację tego dokumentu? Dokument zostanie oznaczony jako sprawdzany przez administratora.",
@@ -345,7 +355,12 @@
       "startReviewSuccess": "[PH] [startReviewSuccess] Rozpoczęto weryfikację dokumentu.",
       "signatureVerified": "[PH] [signatureVerified] Zapisano wynik weryfikacji podpisu.",
       "documentAccepted": "[PH] [documentAccepted] Dokument został zaakceptowany.",
-      "documentRejected": "[PH] [documentRejected] Dokument został odrzucony."
+      "documentRejected": "[PH] [documentRejected] Dokument został odrzucony.",
+      "deleteVersionConfirmation": "[PH] [deleteVersionConfirmation] Usunąć tę wersję dokumentu? Tej operacji nie można cofnąć.",
+      "deleteDocumentConfirmation": "[PH] [deleteDocumentConfirmation] Usunąć cały dokument wraz z jego wersjami? Tej operacji nie można cofnąć.",
+      "versionDeletionRequested": "[PH] [versionDeletionRequested] Usunięcie wersji dokumentu zostało zlecone.",
+      "documentDeletionRequested": "[PH] [documentDeletionRequested] Usunięcie dokumentu zostało zlecone.",
+      "preservationUpdated": "[PH] [preservationUpdated] Zmieniono oznaczenie trwałości wersji."
     },
     "errors": {
       "load": "[PH] [load] Nie udało się pobrać aktualnych danych dokumentu.",
@@ -353,7 +368,10 @@
       "verifySignature": "[PH] [verifySignature] Nie udało się zapisać weryfikacji podpisu.",
       "acceptDocument": "[PH] [acceptDocument] Nie udało się zaakceptować dokumentu.",
       "rejectDocument": "[PH] [rejectDocument] Nie udało się odrzucić dokumentu.",
-      "download": "[PH] [download] Nie udało się otworzyć pliku dokumentu."
+      "download": "[PH] [download] Nie udało się otworzyć pliku dokumentu.",
+      "deleteVersion": "[PH] [deleteVersion] Nie udało się zlecić usunięcia wersji dokumentu.",
+      "deleteDocument": "[PH] [deleteDocument] Nie udało się zlecić usunięcia dokumentu.",
+      "updatePreservation": "[PH] [updatePreservation] Nie udało się zmienić oznaczenia trwałości wersji."
     }
   }
 }

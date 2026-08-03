@@ -35,6 +35,7 @@ export type AdminCoworkerDocReviewCopy = {
     versions: string;
     submittedVersionEmpty: string;
     versionHistory: string;
+    deletion: string;
     signatureVerification: string;
     signatureHistory: string;
     signatureHistoryEmpty: string;
@@ -82,6 +83,7 @@ export type AdminCoworkerDocReviewCopy = {
     allowedSignatureTypes: string;
     manualSignatureReview: string;
     automaticVerificationMode: string;
+    preservation: string;
     actions: string;
   };
   actions: {
@@ -92,6 +94,11 @@ export type AdminCoworkerDocReviewCopy = {
     verifySignature: string;
     acceptDocument: string;
     rejectDocument: string;
+    deleteVersion: string;
+    deleteDocument: string;
+    markHistorical: string;
+    markPermanent: string;
+    clearPreservation: string;
   };
   tooltips: {
     queue: string;
@@ -117,6 +124,7 @@ export type AdminCoworkerDocReviewCopy = {
     rejectDocument: string;
     signatureHistory: string;
     decisionHistory: string;
+    preservation: string;
   };
   options: {
     selectVerificationStatus: string;
@@ -146,6 +154,8 @@ export type AdminCoworkerDocReviewCopy = {
     currentVersion: string;
     historicalVersion: string;
     noRequirement: string;
+    deletionBlocked: string;
+    deletionPending: string;
   };
   messages: {
     startReviewConfirmation: string;
@@ -155,6 +165,11 @@ export type AdminCoworkerDocReviewCopy = {
     signatureVerified: string;
     documentAccepted: string;
     documentRejected: string;
+    deleteVersionConfirmation: string;
+    deleteDocumentConfirmation: string;
+    versionDeletionRequested: string;
+    documentDeletionRequested: string;
+    preservationUpdated: string;
   };
   errors: {
     load: string;
@@ -163,5 +178,8 @@ export type AdminCoworkerDocReviewCopy = {
     acceptDocument: string;
     rejectDocument: string;
     download: string;
+    deleteVersion: string;
+    deleteDocument: string;
+    updatePreservation: string;
   };
 };

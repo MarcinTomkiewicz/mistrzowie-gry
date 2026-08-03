@@ -154,7 +154,7 @@ async function handlePost(
 
   switch (action.action) {
     case "getReviewDetail":
-      return await getReviewDetail(client, actorUserId, action, requestId);
+      return await getReviewDetail(client, actorUserId, action);
     case "saveDefinition":
       return await saveDefinition(client, actorUserId, action);
     case "ensureOnboarding":

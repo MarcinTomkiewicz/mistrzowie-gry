@@ -56,14 +56,27 @@
       <app-admin-review-document-summary
         [detail]="data"
       />
-      <app-admin-review-document-versions
-        [versions]="data.versions"
-        [currentVersion]="data.currentVersion"
-        [submittedVersion]="data.submittedVersion"
-        [disabled]="isBusy()"
-        [downloadingVersionId]="downloadingVersionId()"
-        (downloadRequested)="downloadVersion($event)"
-      />
+
+      @if (deletionCapabilities(); as deletion) {
+        <app-admin-review-document-deletion
+          [capabilities]="deletion"
+          [disabled]="mutationsBlocked()"
+          [busy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.deleteDocument"
+          (deleteRequested)="deleteDocument($event)"
+        />
+        <app-admin-review-document-versions
+          [versions]="data.versions"
+          [currentVersion]="data.currentVersion"
+          [submittedVersion]="data.submittedVersion"
+          [deletionCapabilities]="deletion"
+          [disabled]="mutationsBlocked()"
+          [downloadDisabled]="isBusy()"
+          [downloadingVersionId]="downloadingVersionId()"
+          (downloadRequested)="downloadVersion($event)"
+          (deleteVersionRequested)="deleteVersion($event)"
+          (preservationRequested)="setVersionPreservation($event)"
+        />
+      }
 
       @if (data.document.status === "submitted" && data.submittedVersion) {
         <section class="mg-card flex-row-between-center flex-wrap gap-md w-100">
@@ -76,7 +89,7 @@
               icon="pi pi-play"
               [label]="i18n.review().actions.startReview"
               [loading]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.startReview"
-              [disabled]="isBusy()"
+              [disabled]="mutationsBlocked()"
               (onClick)="confirmStartReview($event)"
             />
             <app-context-help
@@ -96,12 +109,12 @@
 
       @if (data.document.status === "under_review" && data.submittedVersion) {
         <app-admin-signature-verification-editor
-          [disabled]="isBusy()"
+          [disabled]="mutationsBlocked()"
           [busy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.verifySignature"
           (verificationRequested)="verifySignature($event)"
         />
         <app-admin-review-decision-editor
-          [disabled]="isBusy()"
+          [disabled]="mutationsBlocked()"
           [acceptBusy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.acceptDocument"
           [rejectBusy]="activeAction() === ADMIN_COWORKER_DOCUMENT_ACTION.rejectDocument"
           (acceptRequested)="acceptDocument($event)"
