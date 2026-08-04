@@ -37,6 +37,12 @@ export class AdminCoworkerShell {
         icon: 'pi pi-book',
         path: '/admin/coworkers/operational-documents',
       },
+      {
+        id: 'signing-sources',
+        label: labels.signingSources,
+        icon: 'pi pi-file-edit',
+        path: '/admin/coworkers/signing-sources',
+      },
     ];
   });
 }

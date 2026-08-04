@@ -9,6 +9,10 @@ const loaders = {
     import(
       '../components/admin-coworker-documents/private-documents/private-documents'
     ).then((m) => m.PrivateDocuments),
+  signingSources: () =>
+    import(
+      '../components/admin-coworker-signing-sources/signing-sources/signing-sources'
+    ).then((m) => m.SigningSources),
   documentReview: () =>
     import(
       '../components/admin-coworker-documents/review-detail/review-detail'
@@ -40,6 +44,10 @@ export const adminCoworkerRoutes: Routes = [
       {
         path: 'private-documents',
         loadComponent: loaders.privateDocuments,
+      },
+      {
+        path: 'signing-sources',
+        loadComponent: loaders.signingSources,
       },
       {
         path: 'operational-documents/new',

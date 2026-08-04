@@ -2,7 +2,7 @@ import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i
 import type {
   AdminCoworkerShellTabsTranslations,
   AdminCoworkerShellTranslations,
-} from '../../../../core/types/i18n/auth';
+} from '../../../../core/types/i18n/admin-coworker-shell';
 
 export const ADMIN_COWORKER_SHELL_SCOPE = 'adminCoworkerShell';
 

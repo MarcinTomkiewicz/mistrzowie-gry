@@ -5,6 +5,7 @@
   },
   "tabs": {
     "privateDocuments": "Dokumenty prywatne",
-    "sharedDocuments": "Dokumenty wspólne"
+    "sharedDocuments": "Dokumenty wspólne",
+    "signingSources": "Materiały do podpisu"
   }
 }

@@ -1,0 +1,53 @@
+<section class="flex-col-start-stretch gap-sm border-top pt-sm w-100">
+  <h3 class="mg-section__title mg-section__title--sm m-0">
+    {{ i18n.actions().uploadVersion }}
+  </h3>
+
+  <app-file-upload
+    [texts]="{
+      chooseLabel: i18n.upload().chooseFile,
+      dropLabel: i18n.upload().dropFile,
+      formatsLabel: i18n.upload().formats,
+    }"
+    [options]="{
+      mode: 'files',
+      currentUrl: null,
+      disabled: disabled() || isBusy(),
+      previewShape: 'square',
+      accept: '',
+      maxFileSize: 26214400,
+      multiple: false,
+      clearAfterSelect: true,
+      chooseIcon: 'pi pi-upload',
+      emptyIcon: 'pi pi-file',
+    }"
+    (filesSelected)="uploadSelectedFiles($event)"
+  />
+
+  @if (progressLabel()) {
+    <p class="m-0 muted-text" aria-live="polite">{{ progressLabel() }}</p>
+  }
+
+  @if (fileError()) {
+    <small class="error-text" role="alert">{{ fileError() }}</small>
+  }
+
+  @if (operationError(); as error) {
+    <div class="flex-col-start-stretch gap-xs error-text" role="alert">
+      <strong>{{ operationErrorDescription() }}</strong>
+      @if (error.message !== operationErrorDescription()) {
+        <span class="muted-text">{{ error.message }}</span>
+      }
+      @for (fieldError of operationFieldErrors(); track $index) {
+        <span>{{ fieldError }}</span>
+      }
+    </div>
+  }
+
+  @if (cleanupError(); as error) {
+    <div class="flex-col-start-stretch gap-xs error-text" role="alert">
+      <strong>{{ i18n.errors().cleanup }}</strong>
+      <span class="muted-text">{{ error.message }}</span>
+    </div>
+  }
+</section>

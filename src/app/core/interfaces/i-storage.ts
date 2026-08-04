@@ -24,3 +24,11 @@ export interface ISignedStorageUpload {
   file: File;
   contentType: string;
 }
+
+export interface ISignedStorageUrlUpload {
+  bucket: string;
+  signedUrl: string;
+  token: string;
+  file: File;
+  contentType: string;
+}
