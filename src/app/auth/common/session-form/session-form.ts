@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
@@ -371,7 +372,7 @@ export class SessionForm {
   ): void {
     const nextPreviewUrls = new Set(nextFiles.map((file) => file.previewUrl));
 
-    this.newCharacterSheetFiles()
+    untracked(this.newCharacterSheetFiles)
       .filter((file) => !nextPreviewUrls.has(file.previewUrl))
       .forEach((file) => URL.revokeObjectURL(file.previewUrl));
 
