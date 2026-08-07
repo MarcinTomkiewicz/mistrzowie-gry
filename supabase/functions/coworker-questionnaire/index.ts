@@ -30,9 +30,9 @@ export default {
           return jsonNoStore(
             await putSelfQuestionnaire(
               context.supabaseAdmin,
+              context.supabase,
               userId,
               await readJson(request),
-              requestId,
             ),
           );
         default:

@@ -1,110 +1,88 @@
 import { withSupabase } from "npm:@supabase/server@^1";
-import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import {
-  getDocumentPortal,
-  handleDocumentCommandAction,
-} from "./document-actions.ts";
+  CoworkerDocumentRequestError,
+  parseCoworkerJsonRequest,
+  parseCoworkerMultipartRequest,
+} from "../_shared/coworker-documents.schemas.ts";
 import {
-  handleCoworkerDocumentDeletionAction,
-  isCoworkerDocumentDeletionAction,
-} from "./document-deletion-actions.ts";
-import { parseDocumentActionRequest } from "./document-request.ts";
-import {
-  createErrorResponse,
-  InvalidJsonError,
-  MissingUserClaimsError,
-} from "./errors.ts";
-import { handleCoworkerSigningPackageAction } from "./signing-package-actions.ts";
-import {
-  isCoworkerSigningPackageAction,
-  parseCoworkerSigningPackageActionRequest,
-} from "./signing-package-request.ts";
-import { handleDocumentUploadAction } from "./upload-actions.ts";
+  CoworkerDocumentAuthenticationError,
+  documentErrorResponse,
+  normalizeDocumentResponse,
+  successResponse,
+} from "../_shared/coworker-documents.ts";
+import { handleCoworkerAction } from "./actions.ts";
+import { getCoworkerDownload } from "./downloads.ts";
+import { uploadSignedDocument } from "./uploads.ts";
 
-const ALLOWED_METHODS = "GET, POST, OPTIONS";
+const authenticatedFetch = withSupabase(
+  { auth: "user" },
+  async (request, context) => {
+    const requestId = crypto.randomUUID();
+    try {
+      if (request.method !== "POST") {
+        throw new CoworkerDocumentRequestError();
+      }
+      const userId = context.userClaims?.id;
+      if (typeof userId !== "string" || userId === "") {
+        throw new CoworkerDocumentAuthenticationError();
+      }
+
+      const contentType = request.headers.get("content-type") ?? "";
+      if (contentType.startsWith("multipart/form-data")) {
+        const upload = parseCoworkerMultipartRequest(
+          await readFormData(request),
+        );
+        return successResponse(
+          await uploadSignedDocument(
+            context.supabase,
+            context.supabaseAdmin,
+            upload,
+          ),
+        );
+      }
+
+      const action = parseCoworkerJsonRequest(await readJson(request));
+      if (action.action === "getDownloadUrl") {
+        return successResponse(
+          await getCoworkerDownload(
+            context.supabase,
+            context.supabaseAdmin,
+            action,
+          ),
+        );
+      }
+      return successResponse(
+        await handleCoworkerAction(
+          context.supabase,
+          context.supabaseAdmin,
+          userId,
+          action,
+        ),
+      );
+    } catch (error) {
+      return documentErrorResponse(error, requestId);
+    }
+  },
+);
 
 export default {
-  fetch: withSupabase({ auth: "user" }, async (request, context) => {
-    const requestId = crypto.randomUUID();
-
-    try {
-      const userId = context.userClaims?.id;
-      if (userId === undefined) {
-        throw new MissingUserClaimsError();
-      }
-
-      switch (request.method) {
-        case "GET":
-          return await getDocumentPortal(context.supabaseAdmin, userId);
-        case "POST":
-          return await handlePost(
-            request,
-            context.supabaseAdmin,
-            userId,
-            requestId,
-          );
-        default:
-          return Response.json(
-            {
-              ok: false,
-              code: "METHOD_NOT_ALLOWED",
-              message: "Method not allowed.",
-            },
-            {
-              status: 405,
-              headers: { Allow: ALLOWED_METHODS },
-            },
-          );
-      }
-    } catch (error) {
-      return createErrorResponse(error, requestId);
-    }
-  }),
+  fetch: async (request: Request) =>
+    await normalizeDocumentResponse(await authenticatedFetch(request)),
 };
 
-async function handlePost(
-  request: Request,
-  client: SupabaseClient,
-  userId: string,
-  requestId: string,
-): Promise<Response> {
-  let body: unknown;
+async function readJson(request: Request): Promise<unknown> {
   try {
-    body = (await request.json()) as unknown;
+    return (await request.json()) as unknown;
   } catch {
-    throw new InvalidJsonError();
+    throw new CoworkerDocumentRequestError();
   }
+}
 
-  if (isCoworkerSigningPackageAction(body)) {
-    return await handleCoworkerSigningPackageAction(
-      client,
-      userId,
-      parseCoworkerSigningPackageActionRequest(body),
-      requestId,
-    );
+async function readFormData(request: Request): Promise<FormData> {
+  try {
+    return await request.formData();
+  } catch {
+    throw new CoworkerDocumentRequestError();
   }
-
-  const action = parseDocumentActionRequest(body);
-  if (
-    action.action === "reserveUpload" ||
-    action.action === "finalizeUpload" ||
-    action.action === "cancelUpload"
-  ) {
-    return await handleDocumentUploadAction(
-      client,
-      userId,
-      action,
-      requestId,
-    );
-  }
-  if (isCoworkerDocumentDeletionAction(action)) {
-    return await handleCoworkerDocumentDeletionAction(
-      client,
-      userId,
-      action,
-      requestId,
-    );
-  }
-  return await handleDocumentCommandAction(client, userId, action);
 }

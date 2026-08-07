@@ -55,16 +55,9 @@ export class QuestionnaireDocumentStorageError extends Error {
   }
 }
 
-export class QuestionnaireDocumentFinalizationError extends Error {
+export class QuestionnaireOnboardingStateError extends Error {
   constructor() {
-    super("Questionnaire document finalization failed.");
-    this.name = "QuestionnaireDocumentFinalizationError";
-  }
-}
-
-export class QuestionnaireDocumentCleanupError extends Error {
-  constructor() {
-    super("Questionnaire document cleanup failed.");
-    this.name = "QuestionnaireDocumentCleanupError";
+    super("Questionnaire requires an in-progress onboarding.");
+    this.name = "QuestionnaireOnboardingStateError";
   }
 }

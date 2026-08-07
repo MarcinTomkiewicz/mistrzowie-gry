@@ -14,10 +14,7 @@ import {
 import { parseQuestionnairePutRequest } from "./parse-questionnaire.ts";
 import { ensureQuestionnaireDocument } from "./questionnaire-document.ts";
 import { saveQuestionnaireWithRecovery } from "./questionnaire-save-recovery.ts";
-import {
-  getQuestionnaireEnvelope,
-  getQuestionnaireStatement,
-} from "./rpc.ts";
+import { getQuestionnaireEnvelope, getQuestionnaireStatement } from "./rpc.ts";
 import { RPC } from "./rpc-names.ts";
 import {
   buildSensitiveMetadata,
@@ -77,15 +74,15 @@ export async function getSelfQuestionnaire(
 }
 
 export async function putSelfQuestionnaire(
-  client: SupabaseClient,
+  adminClient: SupabaseClient,
+  userClient: SupabaseClient,
   userId: string,
   body: unknown,
-  requestId: string,
 ): Promise<QuestionnairePutResponse> {
   const request = parseQuestionnairePutRequest(body);
   const [keys, statement] = await Promise.all([
     loadQuestionnaireCryptoKeys(),
-    getQuestionnaireStatement(client, userId),
+    getQuestionnaireStatement(adminClient, userId),
   ]);
   validateFinalDeclaration(
     request.complete,
@@ -94,7 +91,7 @@ export async function putSelfQuestionnaire(
   );
 
   const existing = hasSensitivePreservation(request.preserveSensitive)
-    ? await readExistingPayload(client, userId, keys)
+    ? await readExistingPayload(adminClient, userId, keys)
     : null;
   const merged = mergeSensitiveValues(
     request.data,
@@ -108,7 +105,7 @@ export async function putSelfQuestionnaire(
     : await createPeselHmacBase64(payload.personal.pesel, keys);
   const encrypted = await encryptQuestionnaire(payload, userId, keys);
   const result = await saveQuestionnaireWithRecovery(
-    client,
+    adminClient,
     {
       userId,
       expectedRevision: request.expectedRevision,
@@ -125,11 +122,10 @@ export async function putSelfQuestionnaire(
   );
   if (request.complete) {
     await ensureQuestionnaireDocument(
-      client,
-      userId,
+      adminClient,
+      userClient,
       payload,
       result,
-      requestId,
     );
   }
 
@@ -152,12 +148,10 @@ async function readExistingPayload(
   keys: QuestionnaireCryptoKeys,
 ): Promise<QuestionnairePayload | null> {
   const envelope = await getQuestionnaireEnvelope(client, userId);
-  return envelope === null
-    ? null
-    : await readStoredQuestionnairePayload(
-      envelope,
-      userId,
-      keys,
-      RPC.getEnvelope,
-    );
+  return envelope === null ? null : await readStoredQuestionnairePayload(
+    envelope,
+    userId,
+    keys,
+    RPC.getEnvelope,
+  );
 }

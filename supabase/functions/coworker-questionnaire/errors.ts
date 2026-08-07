@@ -1,16 +1,15 @@
 import {
+  BackendContractError,
   CryptoConfigurationError,
   CryptoOperationError,
-  BackendContractError,
-  QuestionnaireDocumentCleanupError,
-  QuestionnaireDocumentFinalizationError,
   QuestionnaireDocumentStorageError,
+  QuestionnaireOnboardingStateError,
   QuestionnairePdfGenerationError,
   QuestionnaireValidationError,
   RpcCallError,
 } from "../_shared/coworker-questionnaire/errors.ts";
+import { CoworkerDocumentRpcError } from "../_shared/coworker-documents.ts";
 import { jsonNoStore } from "../_shared/coworker-questionnaire/http.ts";
-import type { RpcName } from "../_shared/coworker-questionnaire/rpc-names.ts";
 
 const ALLOWED_METHODS = "GET, PUT";
 
@@ -78,6 +77,9 @@ export function createErrorResponse(
   if (error instanceof RpcCallError) {
     return rpcErrorResponse(error, requestId);
   }
+  if (error instanceof CoworkerDocumentRpcError) {
+    return documentRpcErrorResponse(error, requestId);
+  }
   if (error instanceof CryptoConfigurationError) {
     return loggedErrorResponse(
       500,
@@ -110,19 +112,11 @@ export function createErrorResponse(
       requestId,
     );
   }
-  if (error instanceof QuestionnaireDocumentFinalizationError) {
+  if (error instanceof QuestionnaireOnboardingStateError) {
     return loggedErrorResponse(
-      500,
-      "QUESTIONNAIRE_DOCUMENT_FINALIZATION_FAILED",
-      "The questionnaire document could not be finalized.",
-      requestId,
-    );
-  }
-  if (error instanceof QuestionnaireDocumentCleanupError) {
-    return loggedErrorResponse(
-      500,
-      "INTERNAL_ERROR",
-      "The questionnaire service is unavailable.",
+      400,
+      "QUESTIONNAIRE_STATE_INVALID",
+      "An in-progress onboarding is required.",
       requestId,
     );
   }
@@ -144,7 +138,10 @@ export function createErrorResponse(
   );
 }
 
-function rpcErrorResponse(error: RpcCallError, requestId: string): Response {
+function rpcErrorResponse(
+  error: RpcCallError,
+  requestId: string,
+): Response {
   switch (error.sqlState) {
     case "42501":
       return rpcError(
@@ -200,11 +197,69 @@ function rpcErrorResponse(error: RpcCallError, requestId: string): Response {
   }
 }
 
+function documentRpcErrorResponse(
+  error: CoworkerDocumentRpcError,
+  requestId: string,
+): Response {
+  switch (error.sqlState) {
+    case "42501":
+      if (error.rpcName !== "register_questionnaire_private_document") {
+        return rpcError(
+          403,
+          "COWORKER_ACCESS_DENIED",
+          "Active coworker access is required.",
+          error,
+          requestId,
+        );
+      }
+      return rpcError(
+        500,
+        "FUNCTION_CONFIGURATION_ERROR",
+        "The questionnaire service is not configured correctly.",
+        error,
+        requestId,
+      );
+    case "22023":
+      return rpcError(
+        400,
+        "QUESTIONNAIRE_STATE_INVALID",
+        "The questionnaire request is invalid for the current state.",
+        error,
+        requestId,
+      );
+    case "P0002":
+      return rpcError(
+        404,
+        "QUESTIONNAIRE_RESOURCE_NOT_FOUND",
+        "The requested questionnaire resource was not found.",
+        error,
+        requestId,
+      );
+    case "23514":
+    case "23505":
+      return rpcError(
+        409,
+        "QUESTIONNAIRE_DOCUMENT_CONFLICT",
+        "The questionnaire document conflicts with the current state.",
+        error,
+        requestId,
+      );
+    default:
+      return rpcError(
+        500,
+        "BACKEND_ERROR",
+        "The questionnaire service is unavailable.",
+        error,
+        requestId,
+      );
+  }
+}
+
 function rpcError(
   status: number,
   code: string,
   message: string,
-  error: RpcCallError,
+  error: RpcCallError | CoworkerDocumentRpcError,
   requestId: string,
 ): Response {
   return loggedErrorResponse(
@@ -223,13 +278,13 @@ function loggedErrorResponse(
   message: string,
   requestId: string,
   extra?: { [key: string]: unknown },
-  rpcName?: RpcName | null,
+  rpcName?: string | null,
   headers?: HeadersInit,
 ): Response {
   const logEntry: {
     code: string;
     requestId: string;
-    rpcName?: RpcName;
+    rpcName?: string;
     status: number;
   } = { code, requestId, status };
   if (rpcName !== undefined && rpcName !== null) {
