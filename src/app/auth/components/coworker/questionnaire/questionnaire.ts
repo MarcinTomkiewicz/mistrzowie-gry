@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, ElementRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { finalize, Subscription } from 'rxjs';
@@ -69,6 +69,7 @@ export class Questionnaire {
   private readonly formBuilder = inject(FormBuilder);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly questionnaire = inject(CoworkerQuestionnaireApi);
+  private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
   private formBinding: Subscription | null = null;
 
@@ -271,6 +272,13 @@ export class Questionnaire {
                   detail: toast.draftSavedDetail,
                 },
           );
+
+          if (complete && response.complete) {
+            void this.router.navigateByUrl(this.router.url, {
+              onSameUrlNavigation: 'reload',
+              replaceUrl: true,
+            });
+          }
         },
         error: (error: unknown) => {
           const normalized = normalizeQuestionnaireError(

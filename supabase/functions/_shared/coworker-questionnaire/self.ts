@@ -12,7 +12,10 @@ import {
   type QuestionnaireCryptoKeys,
 } from "./crypto.ts";
 import { parseQuestionnairePutRequest } from "./parse-questionnaire.ts";
-import { ensureQuestionnaireDocument } from "./questionnaire-document.ts";
+import {
+  ensureQuestionnaireDocument,
+  reconcileQuestionnaireDocument,
+} from "./questionnaire-document.ts";
 import { saveQuestionnaireWithRecovery } from "./questionnaire-save-recovery.ts";
 import { getQuestionnaireEnvelope, getQuestionnaireStatement } from "./rpc.ts";
 import { RPC } from "./rpc-names.ts";
@@ -29,12 +32,13 @@ import { readStoredQuestionnairePayload } from "./stored-payload.ts";
 import { validateQuestionnairePayload } from "./validation.ts";
 
 export async function getSelfQuestionnaire(
-  client: SupabaseClient,
+  adminClient: SupabaseClient,
+  userClient: SupabaseClient,
   userId: string,
 ): Promise<QuestionnaireGetResponse> {
   const [envelope, statement] = await Promise.all([
-    getQuestionnaireEnvelope(client, userId),
-    getQuestionnaireStatement(client, userId),
+    getQuestionnaireEnvelope(adminClient, userId),
+    getQuestionnaireStatement(adminClient, userId),
   ]);
 
   if (envelope === null) {
@@ -58,6 +62,12 @@ export async function getSelfQuestionnaire(
     userId,
     keys,
     RPC.getEnvelope,
+  );
+  await reconcileQuestionnaireDocument(
+    adminClient,
+    userClient,
+    payload,
+    envelope,
   );
   return {
     configured: true,

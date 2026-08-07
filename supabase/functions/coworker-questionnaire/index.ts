@@ -24,7 +24,11 @@ export default {
       switch (request.method) {
         case "GET":
           return jsonNoStore(
-            await getSelfQuestionnaire(context.supabaseAdmin, userId),
+            await getSelfQuestionnaire(
+              context.supabaseAdmin,
+              context.supabase,
+              userId,
+            ),
           );
         case "PUT":
           return jsonNoStore(

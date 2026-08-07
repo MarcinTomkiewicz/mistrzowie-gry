@@ -314,8 +314,6 @@ export interface UserMenuTranslations {
   administrationSectionTitle: string;
   editProfileLabel: string;
   coworkerRecordsLabel: string;
-  coworkerAccessLoadFailedSummary: string;
-  coworkerAccessLoadFailedDetail: string;
   eventSignupLabel: string;
   myWorkLogLabel: string;
   gmAvailabilityOverviewLabel: string;

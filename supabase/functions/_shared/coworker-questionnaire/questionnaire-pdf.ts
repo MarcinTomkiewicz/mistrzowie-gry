@@ -17,9 +17,9 @@ const BOLD_FONT_URL = new URL(
 
 export async function generateQuestionnairePdf(
   payload: QuestionnairePayload,
-  saveResult: SaveEnvelopeResult,
+  questionnaire: Pick<SaveEnvelopeResult, "currentDeclaration">,
 ): Promise<Uint8Array> {
-  const declaration = saveResult.currentDeclaration;
+  const declaration = questionnaire.currentDeclaration;
   if (declaration === null) {
     throw new Error("Completed questionnaire declaration is missing.");
   }

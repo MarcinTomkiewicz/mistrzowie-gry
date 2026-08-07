@@ -9,10 +9,11 @@ import { TableModule } from 'primeng/table';
 import { finalize, forkJoin } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
-import type { IAdminUserRow } from '../../../../core/interfaces/i-admin-users';
-import type { IAdminCoworkerOnboardingRow } from '../../../../core/interfaces/i-admin-coworker-onboarding';
+import type {
+  IAdminCoworkerOnboardingCandidate,
+  IAdminCoworkerOnboardingRow,
+} from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import { AdminCoworkerOnboarding } from '../../../../core/services/admin-coworker-onboarding/admin-coworker-onboarding';
-import { AdminUsers } from '../../../../core/services/admin-users/admin-users';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
   COWORKER_ONBOARDING_SCOPE,
@@ -39,7 +40,6 @@ import { LoadingOverlay } from '../../../../public/common/loading-overlay/loadin
 })
 export class CoworkerOnboardingList {
   private readonly api = inject(AdminCoworkerOnboarding);
-  private readonly adminUsers = inject(AdminUsers);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
 
@@ -47,26 +47,24 @@ export class CoworkerOnboardingList {
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly onboardings = signal<IAdminCoworkerOnboardingRow[]>([]);
-  protected readonly users = signal<readonly IAdminUserRow[]>([]);
+  protected readonly candidates =
+    signal<readonly IAdminCoworkerOnboardingCandidate[]>([]);
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly loadFailed = signal(false);
   protected readonly coworkerControl = new FormControl<string | null>(null);
 
-  protected readonly candidateOptions = computed(() => {
-    const activeUserIds = new Set(
-      this.onboardings()
-        .filter(({ status }) => status === 'in_progress')
-        .map(({ user_id }) => user_id),
-    );
-
-    return this.users()
-      .filter(({ user }) => user.appRole === 'gm' && !activeUserIds.has(user.id))
-      .map(({ user }) => ({
-        value: user.id,
-        label: getUserDisplayName(user) || user.email,
-      }));
-  });
+  protected readonly candidateOptions = computed(() =>
+    this.candidates().map((candidate) => ({
+      value: candidate.user_id,
+      label:
+        getUserDisplayName({
+          firstName: candidate.first_name,
+          nickname: candidate.nickname,
+          useNickname: candidate.use_nickname,
+        }) || candidate.email,
+    })),
+  );
 
   constructor() {
     this.load();
@@ -78,13 +76,13 @@ export class CoworkerOnboardingList {
 
     forkJoin({
       onboardings: this.api.getOnboardings(),
-      users: this.adminUsers.getUsers(),
+      candidates: this.api.getOnboardingCandidates(),
     })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: ({ onboardings, users }) => {
+        next: ({ onboardings, candidates }) => {
           this.onboardings.set([...onboardings]);
-          this.users.set(users);
+          this.candidates.set(candidates);
         },
         error: () => this.loadFailed.set(true),
       });

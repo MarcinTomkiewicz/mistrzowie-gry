@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import type {
+  IAdminCoworkerOnboardingCandidate,
   IAdminCoworkerOnboardingDocumentRow,
   IAdminCoworkerOnboardingRow,
   IAdminSharedDocumentAssignmentRow,
@@ -20,6 +21,7 @@ import {
 } from "../_shared/coworker-documents.ts";
 
 const RPC = {
+  listOnboardingCandidates: "list_admin_coworker_onboarding_candidates",
   listOnboardings: "list_admin_coworker_onboardings",
   listOnboardingDocuments: "list_admin_coworker_onboarding_documents",
   startOnboarding: "start_coworker_onboarding",
@@ -42,6 +44,11 @@ export async function handleAdminAction(
   request: AdminCommandRequest,
 ): Promise<unknown> {
   switch (request.action) {
+    case "listOnboardingCandidates":
+      return await callCoworkerRpc<IAdminCoworkerOnboardingCandidate[]>(
+        client,
+        RPC.listOnboardingCandidates,
+      );
     case "listOnboardings":
       return await listAdminOnboardings(client);
     case "getOnboarding":

@@ -232,4 +232,9 @@
   }
 </div>
 
-<app-pdf-viewer-dialog [preview]="preview()" (closed)="preview.set(null)" />
+@defer (when preview()) {
+  <app-pdf-viewer-dialog
+    [preview]="preview()"
+    (closed)="preview.set(null)"
+  />
+}

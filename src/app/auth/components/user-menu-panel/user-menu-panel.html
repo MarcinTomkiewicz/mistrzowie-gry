@@ -39,34 +39,21 @@
 
         <ul class="m-0 p-0 flex-col-start-stretch gap-xs w-100">
           @for (item of section.items; track item.id) {
-            <li class="li--unset">
-              @if (!isActionItem(item)) {
+            @if (item.path; as path) {
+              <li class="li--unset">
                 <a
                   class="mg-popover-menu__link"
-                  [routerLink]="item.path"
+                  [routerLink]="path"
                   (click)="onNavigate()"
                 >
                   {{ item.label }}
                 </a>
-              }
-            </li>
+              </li>
+            }
           }
         </ul>
         <p-divider />
       </div>
-
-      @if ($first && coworkerAccessLoading()) {
-        <div
-          class="flex-col-start-stretch gap-sm w-100"
-          aria-hidden="true"
-        >
-          <div class="align-self-center">
-            <p-skeleton width="5rem" height="0.75rem" />
-          </div>
-          <p-skeleton width="100%" height="2rem" />
-          <p-divider />
-        </div>
-      }
     }
   }
 

@@ -1,3 +1,4 @@
+import type { AppRole } from '../types/app-role';
 import type {
   CoworkerDocumentAssignmentStatus,
   CoworkerDocumentLifecycleStatus,
@@ -6,6 +7,15 @@ import type {
   CoworkerDocumentSource,
   CoworkerOnboardingLifecycleStatus,
 } from '../types/coworker-onboarding';
+
+export interface IAdminCoworkerOnboardingCandidate {
+  readonly user_id: string;
+  readonly email: string;
+  readonly first_name: string | null;
+  readonly nickname: string | null;
+  readonly use_nickname: boolean;
+  readonly app_role: AppRole;
+}
 
 export interface IAdminCoworkerOnboardingRow {
   readonly onboarding_id: string;

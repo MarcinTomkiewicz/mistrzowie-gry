@@ -21,6 +21,7 @@ export function parseAdminJsonRequest(value: unknown) {
   const action = readText(source["action"]);
 
   switch (action) {
+    case "listOnboardingCandidates":
     case "listOnboardings":
     case "listSharedDocuments":
       return { action } as const;

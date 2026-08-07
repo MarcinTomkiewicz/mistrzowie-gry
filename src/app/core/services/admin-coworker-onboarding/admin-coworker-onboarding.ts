@@ -5,6 +5,7 @@ import { COWORKER_EDGE_FUNCTION } from '../../configs/coworker-edge-functions.co
 import type {
   AdminSharedDocument,
   AdminSharedDocumentAssignment,
+  IAdminCoworkerOnboardingCandidate,
   IAdminCoworkerOnboardingDetail,
   IAdminCoworkerOnboardingRow,
   IAdminPrivateDocumentUpload,
@@ -26,6 +27,12 @@ import { Backend } from '../backend/backend';
 @Injectable({ providedIn: 'root' })
 export class AdminCoworkerOnboarding {
   private readonly backend = inject(Backend);
+
+  getOnboardingCandidates(): Observable<
+    readonly IAdminCoworkerOnboardingCandidate[]
+  > {
+    return this.invoke({ action: 'listOnboardingCandidates' });
+  }
 
   getOnboardings(): Observable<readonly IAdminCoworkerOnboardingRow[]> {
     return this.invoke({ action: 'listOnboardings' });

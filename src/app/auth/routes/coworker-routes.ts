@@ -11,20 +11,10 @@ const loaders = {
     import('../components/coworker/questionnaire/questionnaire').then(
       (m) => m.Questionnaire,
     ),
-  documents: () =>
-    import(
-      '../components/coworker/onboarding-documents/onboarding-documents'
-    ).then(
-      (m) => m.CoworkerOnboardingDocuments,
-    ),
-  sharedDocuments: () =>
+  onboardingDocuments: () =>
     import(
       '../components/coworker/onboarding-documents/onboarding-documents'
     ).then((m) => m.CoworkerOnboardingDocuments),
-  operationalDocuments: () =>
-    import(
-      '../components/coworker/operational-documents/operational-documents'
-    ).then((m) => m.OperationalDocuments),
 } as const;
 
 export const coworkerRoutes: Routes = [
@@ -40,15 +30,11 @@ export const coworkerRoutes: Routes = [
       },
       {
         path: 'documents',
-        loadComponent: loaders.documents,
+        loadComponent: loaders.onboardingDocuments,
       },
       {
         path: 'shared-documents',
-        loadComponent: loaders.sharedDocuments,
-      },
-      {
-        path: 'operational-documents',
-        loadComponent: loaders.operationalDocuments,
+        loadComponent: loaders.onboardingDocuments,
       },
     ],
   },

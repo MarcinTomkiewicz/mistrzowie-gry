@@ -5,6 +5,7 @@ import type {
 } from "../../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
 import type {
   ICoworkerOnboardingRow,
+  ICoworkerPrivateDocumentRow,
 } from "../../../../src/app/core/interfaces/i-coworker-onboarding.ts";
 import {
   callCoworkerRpc,
@@ -13,7 +14,11 @@ import {
   removeDocumentPaths,
   uploadPdf,
 } from "../coworker-documents.ts";
-import type { QuestionnairePayload, SaveEnvelopeResult } from "./contracts.ts";
+import type {
+  QuestionnaireEnvelope,
+  QuestionnairePayload,
+  SaveEnvelopeResult,
+} from "./contracts.ts";
 import {
   BackendContractError,
   QuestionnaireDocumentStorageError,
@@ -25,19 +30,25 @@ import { generateQuestionnairePdf } from "./questionnaire-pdf.ts";
 import { RPC } from "./rpc-names.ts";
 
 const GET_ONBOARDING_RPC = "get_coworker_onboarding";
+const LIST_PRIVATE_DOCUMENTS_RPC = "list_coworker_private_documents";
 const REGISTER_DOCUMENT_RPC = "register_questionnaire_private_document";
 const QUESTIONNAIRE_TITLE = "Kwestionariusz osobowy";
+
+type QuestionnaireDocumentState = Pick<
+  SaveEnvelopeResult,
+  "isComplete" | "validationPassed" | "currentDeclaration"
+>;
 
 export async function ensureQuestionnaireDocument(
   adminClient: SupabaseClient,
   userClient: SupabaseClient,
   payload: QuestionnairePayload,
-  saveResult: SaveEnvelopeResult,
+  questionnaire: QuestionnaireDocumentState,
 ): Promise<void> {
   if (
-    !saveResult.isComplete ||
-    !saveResult.validationPassed ||
-    saveResult.currentDeclaration === null
+    !questionnaire.isComplete ||
+    !questionnaire.validationPassed ||
+    questionnaire.currentDeclaration === null
   ) {
     throw new BackendContractError(RPC.saveEnvelope);
   }
@@ -53,7 +64,7 @@ export async function ensureQuestionnaireDocument(
 
   let pdfBytes: Uint8Array;
   try {
-    pdfBytes = await generateQuestionnairePdf(payload, saveResult);
+    pdfBytes = await generateQuestionnairePdf(payload, questionnaire);
   } catch {
     throw new QuestionnairePdfGenerationError();
   }
@@ -106,4 +117,49 @@ export async function ensureQuestionnaireDocument(
       }));
     }
   }
+}
+
+export async function reconcileQuestionnaireDocument(
+  adminClient: SupabaseClient,
+  userClient: SupabaseClient,
+  payload: QuestionnairePayload,
+  questionnaire: QuestionnaireEnvelope,
+): Promise<void> {
+  if (
+    !questionnaire.isComplete ||
+    !questionnaire.validationPassed ||
+    questionnaire.currentDeclaration === null
+  ) {
+    return;
+  }
+
+  const [onboardingRows, privateDocuments] = await Promise.all([
+    callCoworkerRpc<ICoworkerOnboardingRow[]>(
+      userClient,
+      GET_ONBOARDING_RPC,
+    ),
+    callCoworkerRpc<ICoworkerPrivateDocumentRow[]>(
+      userClient,
+      LIST_PRIVATE_DOCUMENTS_RPC,
+    ),
+  ]);
+  const onboarding = onboardingRows[0];
+  if (
+    onboarding === undefined ||
+    onboarding.status !== "in_progress" ||
+    privateDocuments.some((document) =>
+      document.onboarding_id === onboarding.onboarding_id &&
+      document.source === "generated" &&
+      document.title === QUESTIONNAIRE_TITLE
+    )
+  ) {
+    return;
+  }
+
+  await ensureQuestionnaireDocument(
+    adminClient,
+    userClient,
+    payload,
+    questionnaire,
+  );
 }
