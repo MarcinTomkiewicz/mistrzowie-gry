@@ -2,16 +2,19 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { catchError, filter, of, startWith, switchMap } from 'rxjs';
+import { catchError, filter, map, of, startWith, switchMap } from 'rxjs';
 
 import { buildSiteUrl } from '../../../../core/config/site';
 import { CoworkerOnboarding } from '../../../../core/services/coworker-onboarding/coworker-onboarding';
+import type { CoworkerPortalState } from '../../../../core/types/coworker-portal-state';
 import type { RouteTabDefinition } from '../../../../core/types/route-tab';
 import { RouteTabShell } from '../../../common/route-tab-shell/route-tab-shell';
 import {
   COWORKER_SHELL_SCOPE,
   createCoworkerShellI18n,
 } from './coworker-shell.i18n';
+
+const INITIAL_PORTAL_STATE: CoworkerPortalState = { status: 'loading' };
 
 @Component({
   selector: 'app-coworker-shell',
@@ -23,17 +26,22 @@ import {
 export class CoworkerShell {
   private readonly onboarding = inject(CoworkerOnboarding);
   private readonly router = inject(Router);
-  private readonly portal = toSignal(
+  private readonly portalState = toSignal(
     this.router.events.pipe(
       filter(
         (event): event is NavigationEnd => event instanceof NavigationEnd,
       ),
       startWith(null),
       switchMap(() =>
-        this.onboarding.getPortal().pipe(catchError(() => of(null))),
+        this.onboarding.getPortal().pipe(
+          map(
+            (portal): CoworkerPortalState => ({ status: 'loaded', portal }),
+          ),
+          catchError(() => of<CoworkerPortalState>({ status: 'error' })),
+        ),
       ),
     ),
-    { initialValue: undefined },
+    { initialValue: INITIAL_PORTAL_STATE },
   );
 
   protected readonly pageUrl = buildSiteUrl('/auth/coworker');
@@ -41,14 +49,19 @@ export class CoworkerShell {
   protected readonly i18n = createCoworkerShellI18n();
 
   private readonly privateDocumentsAvailable = computed(() => {
-    const portal = this.portal();
+    const state = this.portalState();
 
-    return !!portal?.onboarding && portal.questionnaire_complete;
+    return (
+      state.status === 'loaded' &&
+      !!state.portal.onboarding &&
+      state.portal.questionnaire_complete
+    );
   });
 
   protected readonly tabs = computed<readonly RouteTabDefinition[]>(() => {
     const labels = this.i18n.tabs();
-    const portal = this.portal();
+    const state = this.portalState();
+    const portal = state.status === 'loaded' ? state.portal : undefined;
     const tabs: RouteTabDefinition[] = [
       {
         id: 'questionnaire',
@@ -84,9 +97,9 @@ export class CoworkerShell {
 
   constructor() {
     effect(() => {
-      const portal = this.portal();
+      const state = this.portalState();
 
-      if (portal === undefined) return;
+      if (state.status !== 'loaded') return;
 
       const path = this.router.url.split(/[?#]/, 1)[0];
 
