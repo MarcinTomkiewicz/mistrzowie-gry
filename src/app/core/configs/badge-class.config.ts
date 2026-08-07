@@ -1,4 +1,9 @@
 import {
+  CoworkerDocumentAssignmentStatus,
+  CoworkerDocumentLifecycleStatus,
+  CoworkerOnboardingLifecycleStatus,
+} from '../types/coworker-onboarding';
+import {
   CoworkerActiveOnboardingStatus,
   CoworkerDocumentVersionStatus,
   CoworkerDocumentStatus,
@@ -15,6 +20,9 @@ import {
 
 export const STATUS_BADGE_CLASS = {
   pending: 'tag-badge--warn',
+  in_progress: 'tag-badge--info',
+  completed: 'tag-badge--success',
+  active: 'tag-badge--success',
   available: 'tag-badge--info',
   submitted: 'tag-badge--info',
   under_review: 'tag-badge--info',
@@ -26,6 +34,7 @@ export const STATUS_BADGE_CLASS = {
   draft: 'tag-badge--muted',
   accepted: 'tag-badge--success',
   acknowledged: 'tag-badge--success',
+  revoked: 'tag-badge--muted',
   declined: 'tag-badge--danger',
   rejected: 'tag-badge--danger',
   withdrawn: 'tag-badge--muted',
@@ -56,7 +65,10 @@ export const STATUS_BADGE_CLASS = {
   | CoworkerSignatureVerificationStatus
   | CoworkerOperationalAssignmentStatus
   | CoworkerOperationalDocumentStatus
-  | CoworkerOperationalVersionStatus,
+  | CoworkerOperationalVersionStatus
+  | CoworkerOnboardingLifecycleStatus
+  | CoworkerDocumentLifecycleStatus
+  | CoworkerDocumentAssignmentStatus,
   string
 >;
 

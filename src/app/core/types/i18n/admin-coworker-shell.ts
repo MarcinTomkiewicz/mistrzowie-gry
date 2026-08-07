@@ -4,7 +4,6 @@ export interface AdminCoworkerShellTranslations {
 }
 
 export interface AdminCoworkerShellTabsTranslations {
-  privateDocuments: string;
+  onboarding: string;
   sharedDocuments: string;
-  signingSources: string;
 }

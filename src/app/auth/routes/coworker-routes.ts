@@ -12,9 +12,15 @@ const loaders = {
       (m) => m.Questionnaire,
     ),
   documents: () =>
-    import('../components/coworker/documents/documents').then(
-      (m) => m.Documents,
+    import(
+      '../components/coworker/onboarding-documents/onboarding-documents'
+    ).then(
+      (m) => m.CoworkerOnboardingDocuments,
     ),
+  sharedDocuments: () =>
+    import(
+      '../components/coworker/onboarding-documents/onboarding-documents'
+    ).then((m) => m.CoworkerOnboardingDocuments),
   operationalDocuments: () =>
     import(
       '../components/coworker/operational-documents/operational-documents'
@@ -35,6 +41,10 @@ export const coworkerRoutes: Routes = [
       {
         path: 'documents',
         loadComponent: loaders.documents,
+      },
+      {
+        path: 'shared-documents',
+        loadComponent: loaders.sharedDocuments,
       },
       {
         path: 'operational-documents',

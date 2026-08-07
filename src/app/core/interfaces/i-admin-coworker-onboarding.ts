@@ -98,6 +98,32 @@ export interface IAdminSharedDocumentAssignmentRow {
   readonly updated_at: string;
 }
 
+export type AdminCoworkerOnboardingDocument = Omit<
+  IAdminCoworkerOnboardingDocumentRow,
+  'storage_path' | 'signed_storage_path'
+>;
+
+export type AdminSharedDocument = Omit<
+  IAdminSharedDocumentRow,
+  'storage_path'
+>;
+
+export type AdminSharedDocumentAssignment = Omit<
+  IAdminSharedDocumentAssignmentRow,
+  'storage_path'
+>;
+
+export interface IAdminCoworkerOnboardingDetail {
+  readonly onboarding: IAdminCoworkerOnboardingRow;
+  readonly documents: readonly AdminCoworkerOnboardingDocument[];
+}
+
+export interface IAdminPrivateDocumentUpload {
+  readonly title: string;
+  readonly requires_signed_upload: boolean;
+  readonly file: File;
+}
+
 export interface IStartCoworkerOnboardingResult {
   readonly onboarding_id: string;
   readonly user_id: string;

@@ -1,0 +1,235 @@
+<div class="flex-col-start-stretch gap-lg w-100 position-relative">
+  <app-loading-overlay
+    [visible]="loading()"
+    [label]="i18n.commonStatus().loading"
+  />
+
+  @if (loadFailed()) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+      <p class="m-0 error-text">
+        {{ sharedView ? i18n.coworkerShared().loadError : i18n.coworkerPrivate().loadError }}
+      </p>
+      <p-button
+        severity="secondary"
+        icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry"
+        (onClick)="load()"
+      />
+    </section>
+  } @else if (portal(); as data) {
+    @if (!sharedView) {
+      <section class="flex-col-start-stretch gap-md w-100">
+      <header class="mg-section__header w-100">
+        <h2 class="mg-section__title mg-section__title--md">
+          {{ i18n.coworkerPrivate().title }}
+        </h2>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ i18n.coworkerPrivate().subtitle }}
+        </p>
+      </header>
+
+      @if (!data.onboarding) {
+        <section class="mg-card w-100">
+          <p class="m-0 muted-text">{{ i18n.coworkerPrivate().noOnboarding }}</p>
+        </section>
+      } @else if (!data.questionnaire_complete) {
+        <section class="mg-card flex-col-start-stretch gap-sm w-100">
+          <p class="m-0">{{ i18n.coworkerPrivate().questionnaireRequired }}</p>
+          <div>
+            <p-button
+              routerLink="/auth/coworker/questionnaire"
+              icon="pi pi-id-card"
+              [label]="i18n.actions().goToQuestionnaire"
+            />
+          </div>
+        </section>
+      } @else {
+        @for (document of data.private_assignments; track document.assignment_id) {
+          <article class="mg-card flex-col-start-stretch gap-md w-100">
+            <div class="flex-row-between-start flex-wrap gap-sm w-100">
+              <div class="flex-col-start-start gap-xs">
+                <strong>{{ document.title }}</strong>
+                <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.assignment_status]">
+                  {{ i18n.statuses().assignment[document.assignment_status] }}
+                </span>
+              </div>
+              <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>
+            </div>
+
+            @if (document.rejection_reason) {
+              <p class="m-0 error-text">
+                {{ i18n.coworkerPrivate().rejectionReason }}: {{ document.rejection_reason }}
+              </p>
+            }
+
+            <div class="flex-row-start-center flex-wrap gap-xs">
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-eye"
+                [label]="i18n.actions().preview"
+                (onClick)="previewDocument(document, 'source')"
+              />
+              <p-button
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                icon="pi pi-download"
+                [label]="i18n.actions().download"
+                (onClick)="download(document, 'source')"
+              />
+              @if (document.signed_original_filename) {
+                <p-button
+                  size="small"
+                  severity="secondary"
+                  icon="pi pi-eye"
+                  [label]="i18n.actions().previewSigned"
+                  (onClick)="previewDocument(document, 'signed')"
+                />
+                <p-button
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  icon="pi pi-download"
+                  [label]="i18n.actions().downloadSigned"
+                  (onClick)="download(document, 'signed')"
+                />
+              }
+            </div>
+
+            @if (
+              document.required_action === 'upload_signed' &&
+              (document.assignment_status === 'pending' || document.assignment_status === 'rejected')
+            ) {
+              <div class="flex-col-start-stretch gap-sm w-100">
+                <app-file-upload
+                  [options]="uploadOptions()"
+                  [texts]="uploadTexts()"
+                  (filesSelected)="selectSignedFile(document.assignment_id, $event)"
+                />
+                @if (selectedFiles().get(document.assignment_id); as file) {
+                  <small class="tag-badge tag-badge--muted">
+                    {{ i18n.upload().selected }}: {{ file.name }}
+                  </small>
+                }
+                <div class="flex-row-start-center gap-sm">
+                  <p-checkbox
+                    [binary]="true"
+                    [inputId]="'signed-declaration-' + document.assignment_id"
+                    [ngModel]="declaredAssignmentIds().has(document.assignment_id)"
+                    (ngModelChange)="setDeclared(document.assignment_id, $event)"
+                  />
+                  <label [for]="'signed-declaration-' + document.assignment_id">
+                    {{ i18n.coworkerPrivate().declaration }}
+                  </label>
+                </div>
+                <div>
+                  <p-button
+                    icon="pi pi-upload"
+                    [label]="i18n.actions().uploadSigned"
+                    [loading]="activeAssignmentId() === document.assignment_id"
+                    [disabled]="
+                      !selectedFiles().has(document.assignment_id) ||
+                      !declaredAssignmentIds().has(document.assignment_id)
+                    "
+                    (onClick)="uploadSigned(document)"
+                  />
+                </div>
+              </div>
+            }
+          </article>
+        } @empty {
+          <section class="mg-card w-100">
+            <p class="m-0 muted-text">{{ i18n.coworkerPrivate().empty }}</p>
+          </section>
+        }
+      }
+      </section>
+    } @else {
+      <section class="flex-col-start-stretch gap-md w-100">
+      <header class="mg-section__header w-100">
+        <h2 class="mg-section__title mg-section__title--md">
+          {{ i18n.coworkerShared().title }}
+        </h2>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ i18n.coworkerShared().subtitle }}
+        </p>
+      </header>
+
+      @if (data.onboarding?.status !== 'completed') {
+        <section class="mg-card w-100">
+          <p class="m-0 muted-text">{{ i18n.coworkerShared().onboardingRequired }}</p>
+        </section>
+      } @else {
+        @for (document of data.shared_assignments; track document.assignment_id) {
+          <article class="mg-card flex-col-start-stretch gap-md w-100">
+            <div class="flex-row-between-start flex-wrap gap-sm w-100">
+              <div class="flex-col-start-start gap-xs">
+                <strong>{{ document.title }}</strong>
+                <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.assignment_status]">
+                  {{ i18n.statuses().assignment[document.assignment_status] }}
+                </span>
+              </div>
+              <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>
+            </div>
+
+            <div class="flex-row-start-center flex-wrap gap-xs">
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-eye"
+                [label]="i18n.actions().preview"
+                (onClick)="previewDocument(document, 'source')"
+              />
+              <p-button
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                icon="pi pi-download"
+                [label]="i18n.actions().download"
+                (onClick)="download(document, 'source')"
+              />
+            </div>
+
+            @if (document.assignment_status === 'pending') {
+              <div class="flex-row-start-center gap-sm">
+                <p-checkbox
+                  [binary]="true"
+                  [inputId]="'shared-acknowledgement-' + document.assignment_id"
+                  [ngModel]="acknowledgedAssignmentIds().has(document.assignment_id)"
+                  (ngModelChange)="setAcknowledged(document.assignment_id, $event)"
+                />
+                <label [for]="'shared-acknowledgement-' + document.assignment_id">
+                  {{ i18n.coworkerShared().acknowledgement }}
+                </label>
+              </div>
+            } @else if (document.acknowledged_at) {
+              <small>
+                {{ i18n.coworkerShared().acknowledgedAt }}:
+                {{ formatTimestampLabel(document.acknowledged_at) }}
+              </small>
+            }
+          </article>
+        } @empty {
+          <section class="mg-card w-100">
+            <p class="m-0 muted-text">{{ i18n.coworkerShared().empty }}</p>
+          </section>
+        }
+
+        @if (acknowledgedAssignmentIds().size) {
+          <div class="flex-row-end-center">
+            <p-button
+              icon="pi pi-check"
+              [label]="i18n.actions().acknowledge"
+              [loading]="activeAssignmentId() === 'acknowledge'"
+              (onClick)="acknowledge()"
+            />
+          </div>
+        }
+      }
+      </section>
+    }
+  }
+</div>
+
+<app-pdf-viewer-dialog [preview]="preview()" (closed)="preview.set(null)" />

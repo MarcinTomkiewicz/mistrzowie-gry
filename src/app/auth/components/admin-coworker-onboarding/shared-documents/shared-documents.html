@@ -1,0 +1,208 @@
+<div class="flex-col-start-stretch gap-lg w-100 position-relative">
+  <header class="mg-section__header w-100">
+    <h2 class="mg-section__title mg-section__title--md">
+      {{ i18n.adminShared().title }}
+    </h2>
+    <p class="mg-section__subtitle mg-section__subtitle--full">
+      {{ i18n.adminShared().subtitle }}
+    </p>
+  </header>
+
+  <app-loading-overlay
+    [visible]="loading() || busy()"
+    [label]="busy() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+  />
+
+  <section class="mg-card flex-col-start-stretch gap-md w-100">
+    <div class="flex-row-between-center flex-wrap gap-sm">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ editedDocument() ? i18n.adminShared().formTitleReplace : i18n.adminShared().formTitleNew }}
+      </h3>
+      @if (editedDocument()) {
+        <p-button
+          severity="secondary"
+          [outlined]="true"
+          [label]="i18n.commonActions().cancel"
+          (onClick)="cancelEdit()"
+        />
+      }
+    </div>
+
+    <form class="flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="save()">
+      <p-iftalabel class="w-100">
+        <input pInputText class="w-100" id="shared-document-title" formControlName="title" />
+        <label for="shared-document-title">{{ i18n.fields().title }}</label>
+      </p-iftalabel>
+
+      <div class="flex-row-start-center gap-sm">
+        <p-toggleswitch
+          inputId="shared-document-auto-assign"
+          formControlName="assign_after_onboarding"
+        />
+        <label for="shared-document-auto-assign">{{ i18n.fields().autoAssign }}</label>
+      </div>
+
+      @if (replacementThumbnail(); as thumbnail) {
+        <div class="w-100 max-w-300">
+          <app-pdf-thumbnail [src]="thumbnail.url" [title]="thumbnail.title" />
+        </div>
+      }
+
+      <app-file-upload
+        [options]="uploadOptions()"
+        [texts]="uploadTexts()"
+        (filesSelected)="selectFile($event)"
+      />
+
+      @if (form.controls.file.value; as file) {
+        <small class="tag-badge tag-badge--muted">
+          {{ i18n.upload().selected }}: {{ file.name }}
+        </small>
+      } @else if (form.controls.file.touched) {
+        <small class="error-text">{{ i18n.upload().missingFile }}</small>
+      }
+
+      <div class="flex-row-end-center">
+        <p-button
+          type="submit"
+          icon="pi pi-upload"
+          [label]="editedDocument() ? i18n.actions().replaceShared : i18n.actions().saveShared"
+          [loading]="busy()"
+        />
+      </div>
+    </form>
+  </section>
+
+  <section class="flex-col-start-stretch gap-md w-100">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.adminShared().listTitle }}
+    </h3>
+
+    @if (loadFailed()) {
+      <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+        <p class="m-0 error-text">{{ i18n.adminShared().loadError }}</p>
+        <p-button
+          severity="secondary"
+          icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry"
+          (onClick)="load()"
+        />
+      </section>
+    } @else {
+      @for (document of documents(); track document.document_id) {
+        <article class="mg-card flex-col-start-stretch gap-md w-100">
+          <div class="flex-row-between-start flex-wrap gap-sm w-100">
+            <div class="flex-col-start-start gap-xs">
+              <strong>{{ document.title }}</strong>
+              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]">
+                {{ i18n.statuses().document[document.status] }}
+              </span>
+            </div>
+            <div class="flex-row-start-center flex-wrap gap-md">
+              <span>{{ i18n.fields().version }}: {{ document.version_number }}</span>
+              <span>{{ i18n.fields().assignments }}: {{ document.assignment_count }}</span>
+              <span>{{ i18n.fields().pendingAssignments }}: {{ document.pending_assignment_count }}</span>
+              <span>{{ i18n.fields().acknowledgedAssignments }}: {{ document.acknowledged_assignment_count }}</span>
+            </div>
+          </div>
+
+          <div class="flex-row-start-center flex-wrap gap-xs">
+            @if (document.current_version_id) {
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-eye"
+                [label]="i18n.actions().preview"
+                (onClick)="previewDocument(document)"
+              />
+              <p-button
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                icon="pi pi-download"
+                [label]="i18n.actions().download"
+                (onClick)="download(document)"
+              />
+            }
+            <p-button
+              size="small"
+              severity="secondary"
+              [outlined]="true"
+              icon="pi pi-users"
+              [label]="i18n.actions().showConfirmations"
+              (onClick)="showAssignments(document)"
+            />
+            @if (document.status === 'active') {
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-upload"
+                [label]="i18n.actions().replaceShared"
+                (onClick)="edit(document)"
+              />
+              <p-button
+                size="small"
+                severity="danger"
+                [text]="true"
+                icon="pi pi-box"
+                [label]="i18n.actions().archive"
+                (onClick)="confirmArchive($event, document.document_id)"
+              />
+            }
+          </div>
+        </article>
+      } @empty {
+        @if (!loading()) {
+          <section class="mg-card w-100">
+            <p class="m-0 muted-text">{{ i18n.adminShared().empty }}</p>
+          </section>
+        }
+      }
+    }
+  </section>
+</div>
+
+<p-dialog
+  [header]="i18n.adminShared().confirmationsTitle"
+  [visible]="assignmentsDocument() !== null"
+  [modal]="true"
+  [style]="{ width: 'min(60rem, 95vw)' }"
+  (visibleChange)="$event ? null : closeAssignments()"
+>
+  @if (assignmentsLoading()) {
+    <div class="flex-col-center-center gap-sm py-lg" role="status">
+      <i class="pi pi-d20 mg-spin-cw"></i>
+      <span>{{ i18n.commonStatus().loading }}</span>
+    </div>
+  } @else if (assignments().length) {
+    <div class="w-100 overflow-x-auto">
+      <p-table [value]="assignments()" dataKey="assignment_id" class="w-100 min-w-500">
+        <ng-template #header>
+          <tr>
+            <th>{{ i18n.fields().user }}</th>
+            <th>{{ i18n.fields().status }}</th>
+            <th>{{ i18n.coworkerShared().acknowledgedAt }}</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-assignment>
+          <tr>
+            <td>
+              <strong>{{ assignment.nickname || assignment.first_name || assignment.email }}</strong>
+              <small class="d-block">{{ assignment.email }}</small>
+            </td>
+            <td>
+              <span [class]="'tag-badge ' + assignmentStatusClass(assignment.status)">
+                {{ assignmentStatusLabel(assignment.status) }}
+              </span>
+            </td>
+            <td>{{ formatTimestampLabel(assignment.acknowledged_at) }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  } @else {
+    <p class="m-0 muted-text">{{ i18n.adminShared().emptyConfirmations }}</p>
+  }
+</p-dialog>
+
+<app-pdf-viewer-dialog [preview]="preview()" (closed)="preview.set(null)" />

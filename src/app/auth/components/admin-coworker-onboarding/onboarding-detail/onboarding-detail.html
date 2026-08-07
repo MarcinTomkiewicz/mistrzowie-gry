@@ -1,0 +1,228 @@
+<div class="flex-col-start-stretch gap-lg w-100 position-relative">
+  <header class="mg-section__header w-100">
+    <h2 class="mg-section__title mg-section__title--md">
+      {{ i18n.adminDetail().title }}
+    </h2>
+    <p class="mg-section__subtitle mg-section__subtitle--full">
+      {{ i18n.adminDetail().subtitle }}
+    </p>
+  </header>
+
+  <app-loading-overlay
+    [visible]="loading() || busy()"
+    [label]="busy() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+  />
+
+  @if (loadFailed()) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+      <p class="m-0 error-text">{{ i18n.adminDetail().loadError }}</p>
+      <p-button
+        severity="secondary"
+        icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry"
+        (onClick)="load()"
+      />
+    </section>
+  } @else if (detail(); as data) {
+    <section class="mg-card flex-col-start-stretch gap-md w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.adminDetail().userSection }}
+      </h3>
+      <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-start gap-xs">
+          <small>{{ i18n.fields().user }}</small>
+          <strong>{{ data.onboarding.nickname || data.onboarding.first_name || data.onboarding.email }}</strong>
+          <span>{{ data.onboarding.email }}</span>
+        </div>
+        <div class="flex-col-start-start gap-xs">
+          <small>{{ i18n.fields().status }}</small>
+          <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[data.onboarding.status]">
+            {{ i18n.statuses().onboarding[data.onboarding.status] }}
+          </span>
+        </div>
+        <div class="flex-col-start-start gap-xs">
+          <small>{{ i18n.fields().startedAt }}</small>
+          <span>{{ formatTimestampLabel(data.onboarding.started_at) }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex-col-start-stretch gap-md w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.adminDetail().documentsSection }}
+      </h3>
+
+      @for (document of data.documents; track document.document_id) {
+        <article class="mg-card flex-col-start-stretch gap-md w-100">
+          <div class="flex-row-between-start flex-wrap gap-sm w-100">
+            <div class="flex-col-start-start gap-xs">
+              <strong>{{ document.title }}</strong>
+              <div class="flex-row-start-center flex-wrap gap-xs">
+                @if (document.source === 'generated') {
+                  <span class="tag-badge tag-badge--info">
+                    {{ i18n.adminDetail().questionnaireBadge }}
+                  </span>
+                }
+                @if (document.assignment_status; as status) {
+                  <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[status]">
+                    {{ i18n.statuses().assignment[status] }}
+                  </span>
+                }
+              </div>
+            </div>
+            @if (document.version_number) {
+              <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>
+            }
+          </div>
+
+          @if (document.rejection_reason) {
+            <p class="m-0 error-text">
+              {{ i18n.adminDetail().rejectionReason }}: {{ document.rejection_reason }}
+            </p>
+          }
+
+          <div class="flex-row-start-center flex-wrap gap-xs">
+            @if (document.original_filename) {
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-eye"
+                [label]="i18n.actions().preview"
+                (onClick)="previewSource(document)"
+              />
+              <p-button
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                icon="pi pi-download"
+                [label]="i18n.actions().download"
+                (onClick)="downloadSource(document)"
+              />
+            }
+            @if (document.signed_original_filename) {
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-eye"
+                [label]="i18n.actions().previewSigned"
+                (onClick)="previewSigned(document)"
+              />
+              <p-button
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                icon="pi pi-download"
+                [label]="i18n.actions().downloadSigned"
+                (onClick)="downloadSigned(document)"
+              />
+            }
+            @if (document.assignment_status === 'submitted') {
+              <p-button
+                size="small"
+                severity="success"
+                icon="pi pi-check"
+                [label]="i18n.actions().accept"
+                (onClick)="accept(document)"
+              />
+              <p-button
+                size="small"
+                severity="danger"
+                [outlined]="true"
+                icon="pi pi-times"
+                [label]="i18n.actions().reject"
+                (onClick)="openRejection(document)"
+              />
+            }
+            @if (
+              document.source === 'uploaded' &&
+              data.onboarding.status === 'in_progress'
+            ) {
+              <p-button
+                size="small"
+                severity="danger"
+                [text]="true"
+                icon="pi pi-trash"
+                [label]="i18n.actions().removeDocument"
+                (onClick)="confirmRemove($event, document.document_id)"
+              />
+            }
+          </div>
+        </article>
+      } @empty {
+        <section class="mg-card w-100">
+          <p class="m-0 muted-text">{{ i18n.adminDetail().emptyDocuments }}</p>
+        </section>
+      }
+    </section>
+
+    @if (data.onboarding.status === 'in_progress') {
+      <section class="flex-col-start-stretch gap-md w-100">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.adminDetail().uploadSection }}
+        </h3>
+        <app-private-document-batch [busy]="busy()" (upload)="upload($event)" />
+      </section>
+
+      <section class="mg-card flex-col-start-stretch gap-md w-100">
+        <div class="flex-col-start-stretch gap-xs">
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.adminDetail().completeSection }}
+          </h3>
+          <p class="m-0 muted-text">{{ i18n.adminDetail().completeDescription }}</p>
+        </div>
+        <div>
+          <p-button
+            icon="pi pi-check-circle"
+            [label]="i18n.actions().complete"
+            (onClick)="confirmComplete($event)"
+          />
+        </div>
+      </section>
+    }
+  }
+</div>
+
+<p-dialog
+  [header]="i18n.dialogs().rejectionTitle"
+  [visible]="rejectionAssignmentId() !== null"
+  [modal]="true"
+  [style]="{ width: 'min(32rem, 95vw)' }"
+  (visibleChange)="$event ? null : closeRejection()"
+>
+  <div class="flex-col-start-stretch gap-md w-100">
+    <p class="m-0 muted-text">{{ i18n.dialogs().rejectionDescription }}</p>
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        class="w-100"
+        id="coworker-document-rejection-reason"
+        rows="5"
+        maxlength="1000"
+        [formControl]="rejectionReason"
+      ></textarea>
+      <label for="coworker-document-rejection-reason">
+        {{ i18n.fields().rejectionReason }}
+      </label>
+    </p-iftalabel>
+    @if (rejectionReason.touched && rejectionReason.invalid) {
+      <small class="error-text">{{ i18n.commonForm().required }}</small>
+    }
+    <div class="flex-row-end-center gap-sm">
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        [label]="i18n.commonActions().cancel"
+        (onClick)="closeRejection()"
+      />
+      <p-button
+        severity="danger"
+        icon="pi pi-times"
+        [label]="i18n.actions().reject"
+        [loading]="busy()"
+        (onClick)="reject()"
+      />
+    </div>
+  </div>
+</p-dialog>
+
+<app-pdf-viewer-dialog [preview]="preview()" (closed)="preview.set(null)" />

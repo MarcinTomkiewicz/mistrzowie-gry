@@ -1,0 +1,110 @@
+<div class="flex-col-start-stretch gap-lg w-100 position-relative">
+  <header class="mg-section__header w-100">
+    <h2 class="mg-section__title mg-section__title--md">
+      {{ i18n.adminList().title }}
+    </h2>
+    <p class="mg-section__subtitle mg-section__subtitle--full">
+      {{ i18n.adminList().subtitle }}
+    </p>
+  </header>
+
+  <app-loading-overlay
+    [visible]="loading() || saving()"
+    [label]="saving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+  />
+
+  <section class="mg-card flex-col-start-stretch gap-md w-100">
+    <div class="flex-col-start-stretch gap-xs">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.adminList().startTitle }}
+      </h3>
+      <p class="m-0 muted-text">{{ i18n.adminList().startDescription }}</p>
+    </div>
+
+    @if (candidateOptions().length) {
+      <div class="flex-row-start-end flex-wrap gap-sm w-100">
+        <p-iftalabel class="w-100 max-w-500">
+          <p-select
+            class="w-100"
+            inputId="coworker-onboarding-user"
+            [formControl]="coworkerControl"
+            [options]="candidateOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+          <label for="coworker-onboarding-user">{{ i18n.adminList().gmLabel }}</label>
+        </p-iftalabel>
+
+        <p-button
+          [label]="i18n.actions().start"
+          icon="pi pi-play"
+          [disabled]="!coworkerControl.value || saving()"
+          (onClick)="start()"
+        />
+      </div>
+    } @else if (!loading()) {
+      <p class="m-0 muted-text">{{ i18n.adminList().noCandidates }}</p>
+    }
+  </section>
+
+  @if (loadFailed()) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+      <p class="m-0 error-text">{{ i18n.adminList().loadError }}</p>
+      <p-button
+        severity="secondary"
+        icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry"
+        (onClick)="load()"
+      />
+    </section>
+  } @else if (onboardings().length) {
+    <div class="w-100 overflow-x-auto">
+      <p-table [value]="onboardings()" dataKey="onboarding_id" class="w-100 min-w-500">
+        <ng-template #header>
+          <tr>
+            <th>{{ i18n.fields().user }}</th>
+            <th>{{ i18n.fields().status }}</th>
+            <th>{{ i18n.fields().startedAt }}</th>
+            <th>{{ i18n.fields().completedAt }}</th>
+            <th class="text-center">{{ i18n.fields().documents }}</th>
+            <th class="text-center">{{ i18n.fields().pendingActions }}</th>
+            <th class="text-right">{{ i18n.commonTable().actions }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-row>
+          <tr>
+            <td>
+              <div class="flex-col-start-start gap-xs">
+                <strong>{{ row.nickname || row.first_name || row.email }}</strong>
+                <small>{{ row.email }}</small>
+              </div>
+            </td>
+            <td>
+              <span [class]="'tag-badge ' + statusClass(row.status)">
+                {{ statusLabel(row.status) }}
+              </span>
+            </td>
+            <td>{{ formatTimestampLabel(row.started_at) }}</td>
+            <td>{{ formatTimestampLabel(row.completed_at) }}</td>
+            <td class="text-center">{{ row.private_document_count }}</td>
+            <td class="text-center">{{ row.pending_private_action_count }}</td>
+            <td class="text-right">
+              <p-button
+                size="small"
+                icon="pi pi-arrow-right"
+                [label]="i18n.actions().open"
+                (onClick)="open(row.onboarding_id)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  } @else if (!loading()) {
+    <section class="mg-card w-100">
+      <p class="m-0 muted-text">{{ i18n.adminList().empty }}</p>
+    </section>
+  }
+</div>

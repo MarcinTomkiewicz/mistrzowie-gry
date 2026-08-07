@@ -26,22 +26,16 @@ export class AdminCoworkerShell {
 
     return [
       {
-        id: 'private-documents',
-        label: labels.privateDocuments,
-        icon: 'pi pi-lock',
-        path: '/admin/coworkers/private-documents',
+        id: 'onboarding',
+        label: labels.onboarding,
+        icon: 'pi pi-users',
+        path: '/admin/coworkers/onboarding',
       },
       {
         id: 'shared-documents',
         label: labels.sharedDocuments,
         icon: 'pi pi-book',
-        path: '/admin/coworkers/operational-documents',
-      },
-      {
-        id: 'signing-sources',
-        label: labels.signingSources,
-        icon: 'pi pi-file-edit',
-        path: '/admin/coworkers/signing-sources',
+        path: '/admin/coworkers/shared-documents',
       },
     ];
   });

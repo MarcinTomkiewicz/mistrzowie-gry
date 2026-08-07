@@ -1,0 +1,98 @@
+<form
+  class="flex-col-start-stretch gap-md w-100"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  novalidate
+>
+  <div class="flex-col-start-stretch gap-md w-100" formArrayName="documents">
+    @for (row of rows.controls; track row; let index = $index) {
+      <section class="mg-card flex-col-start-stretch gap-md w-100" [formGroupName]="index">
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              [inputId]="'private-document-preset-' + index"
+              formControlName="preset"
+              [options]="presetOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              (onChange)="applyPreset(index)"
+            />
+            <label [for]="'private-document-preset-' + index">
+              {{ i18n.fields().preset }}
+            </label>
+          </p-iftalabel>
+
+          <p-iftalabel class="w-100">
+            <input
+              pInputText
+              class="w-100"
+              [id]="'private-document-title-' + index"
+              formControlName="title"
+            />
+            <label [for]="'private-document-title-' + index">
+              {{ i18n.fields().title }}
+            </label>
+          </p-iftalabel>
+        </div>
+
+        <div class="flex-row-start-center gap-sm">
+          <p-toggleswitch
+            [inputId]="'private-document-signed-' + index"
+            formControlName="requires_signed_upload"
+          />
+          <label [for]="'private-document-signed-' + index">
+            {{ i18n.fields().requiresSignedUpload }}
+          </label>
+        </div>
+
+        <app-file-upload
+          [options]="uploadOptions()"
+          [texts]="uploadTexts()"
+          (filesSelected)="selectFile(index, $event)"
+        />
+
+        @if (row.controls.file.value; as file) {
+          <small class="tag-badge tag-badge--muted">
+            {{ i18n.upload().selected }}: {{ file.name }}
+          </small>
+        } @else if (row.controls.file.touched) {
+          <small class="error-text">{{ i18n.upload().missingFile }}</small>
+        }
+
+        @if (rows.length > 1) {
+          <div class="flex-row-end-center">
+            <p-button
+              type="button"
+              severity="danger"
+              [outlined]="true"
+              icon="pi pi-trash"
+              [label]="i18n.commonActions().remove"
+              [disabled]="busy()"
+              (onClick)="removeRow(index)"
+            />
+          </div>
+        }
+      </section>
+    }
+  </div>
+
+  <div class="flex-row-between-center flex-wrap gap-sm w-100">
+    <p-button
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      icon="pi pi-plus"
+      [label]="i18n.actions().addRow"
+      [disabled]="busy()"
+      (onClick)="addRow()"
+    />
+    <p-button
+      type="submit"
+      icon="pi pi-upload"
+      [label]="i18n.actions().uploadDocuments"
+      [loading]="busy()"
+    />
+  </div>
+</form>

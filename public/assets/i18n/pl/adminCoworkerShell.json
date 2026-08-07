@@ -4,8 +4,7 @@
     "subtitle": "Zarządzaj prywatnymi i wspólnymi dokumentami współpracowników."
   },
   "tabs": {
-    "privateDocuments": "Dokumenty prywatne",
-    "sharedDocuments": "Dokumenty wspólne",
-    "signingSources": "Materiały do podpisu"
+    "onboarding": "Onboarding [PH]",
+    "sharedDocuments": "Dokumenty wspólne"
   }
 }
