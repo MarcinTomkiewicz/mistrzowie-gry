@@ -14,16 +14,37 @@ import {
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, map, of, switchMap } from 'rxjs';
 
+import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 import { loadPdfDocument, renderPdfPageToCanvas } from '../../../core/utils/pdf';
-import { ButtonModule } from 'primeng/button';
+
+const PDF_ZOOM_MIN = 0.5;
+const PDF_ZOOM_MAX = 3;
 
 export interface IPdfPreviewDialogValue {
   title: string;
   url: string;
+}
+
+interface PointerPosition {
+  readonly x: number;
+  readonly y: number;
+}
+
+interface ViewportAnchor {
+  readonly contentLeft: number;
+  readonly contentTop: number;
+  readonly viewportLeft: number;
+  readonly viewportTop: number;
+}
+
+interface PinchGesture {
+  readonly anchor: ViewportAnchor;
+  readonly distance: number;
+  readonly zoom: number;
 }
 
 @Component({
@@ -38,8 +59,9 @@ export class PdfViewerDialog {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly viewport = viewChild<ElementRef<HTMLDivElement>>('viewport');
-  private pendingViewportAnchor: { left: number; top: number } | 'top' | null =
-    null;
+  private readonly touchPointers = new Map<number, PointerPosition>();
+  private pendingViewportAnchor: ViewportAnchor | 'top' | null = null;
+  private pinchGesture: PinchGesture | null = null;
   private activePointerId: number | null = null;
   private pointerStartX = 0;
   private pointerStartY = 0;
@@ -58,7 +80,7 @@ export class PdfViewerDialog {
   readonly isPanning = signal(false);
   readonly canGoPrevious = computed(() => this.pageNumber() > 1);
   readonly canGoNext = computed(() => this.pageNumber() < this.pageCount());
-  readonly canZoomOut = computed(() => this.zoom() > 0.5);
+  readonly canZoomOut = computed(() => this.zoom() > PDF_ZOOM_MIN);
   readonly zoomLabel = computed(() => `${(this.zoom() * 100).toFixed(0)}%`);
   readonly canPan = computed(() => {
     const viewport = this.viewport()?.nativeElement;
@@ -112,7 +134,7 @@ export class PdfViewerDialog {
           this.pageNumber.set(1);
           this.zoom.set(1);
           this.pendingViewportAnchor = 'top';
-          this.clearPointerPan();
+          this.clearPointerInteraction();
 
           if (!url || !isPlatformBrowser(this.platformId)) {
             this.document.set(null);
@@ -214,12 +236,16 @@ export class PdfViewerDialog {
     }
 
     this.rememberViewportCenter();
-    this.zoom.update((value) => Math.max(0.5, +(value - 0.25).toFixed(2)));
+    this.zoom.update((value) =>
+      Math.max(PDF_ZOOM_MIN, +(value - 0.25).toFixed(2)),
+    );
   }
 
   zoomIn(): void {
     this.rememberViewportCenter();
-    this.zoom.update((value) => Math.min(3, +(value + 0.25).toFixed(2)));
+    this.zoom.update((value) =>
+      Math.min(PDF_ZOOM_MAX, +(value + 0.25).toFixed(2)),
+    );
   }
 
   resetZoom(): void {
@@ -230,26 +256,45 @@ export class PdfViewerDialog {
   onViewportPointerDown(event: PointerEvent): void {
     const viewport = this.viewport()?.nativeElement;
 
-    if (!viewport || !this.canPan() || event.button !== 0) {
+    if (!viewport || event.button !== 0) {
       return;
     }
 
-    this.activePointerId = event.pointerId;
-    this.pointerStartX = event.clientX;
-    this.pointerStartY = event.clientY;
-    this.pointerStartScrollLeft = viewport.scrollLeft;
-    this.pointerStartScrollTop = viewport.scrollTop;
-    this.isPanning.set(true);
+    if (event.pointerType === 'touch') {
+      this.touchPointers.set(event.pointerId, this.pointerPosition(event));
+    } else if (!this.canPan()) {
+      return;
+    }
+
     viewport.setPointerCapture(event.pointerId);
+
+    if (this.touchPointers.size === 2) {
+      this.startPinch(viewport);
+    } else if (this.touchPointers.size < 2) {
+      this.startPan(viewport, event.pointerId, this.pointerPosition(event));
+    }
+
     event.preventDefault();
   }
 
   onViewportPointerMove(event: PointerEvent): void {
     const viewport = this.viewport()?.nativeElement;
 
-    if (!viewport || this.activePointerId !== event.pointerId) {
+    if (!viewport) {
       return;
     }
+
+    if (this.touchPointers.has(event.pointerId)) {
+      this.touchPointers.set(event.pointerId, this.pointerPosition(event));
+
+      if (this.touchPointers.size >= 2) {
+        this.updatePinch(viewport);
+        event.preventDefault();
+        return;
+      }
+    }
+
+    if (this.activePointerId !== event.pointerId) return;
 
     viewport.scrollLeft =
       this.pointerStartScrollLeft - (event.clientX - this.pointerStartX);
@@ -261,36 +306,55 @@ export class PdfViewerDialog {
   onViewportPointerUp(event: PointerEvent): void {
     const viewport = this.viewport()?.nativeElement;
 
-    if (
-      viewport &&
-      this.activePointerId === event.pointerId &&
-      viewport.hasPointerCapture(event.pointerId)
-    ) {
+    if (viewport?.hasPointerCapture(event.pointerId)) {
       viewport.releasePointerCapture(event.pointerId);
     }
 
-    this.clearPointerPan();
+    if (!this.touchPointers.delete(event.pointerId)) {
+      this.clearPointerPan();
+      return;
+    }
+
+    this.pinchGesture = null;
+
+    if (!viewport) {
+      this.clearPointerInteraction();
+      return;
+    }
+
+    if (this.touchPointers.size >= 2) {
+      this.startPinch(viewport);
+      return;
+    }
+
+    const remainingPointer = this.touchPointers.entries().next().value;
+
+    if (remainingPointer) {
+      this.startPan(viewport, remainingPointer[0], remainingPointer[1]);
+    } else {
+      this.clearPointerPan();
+    }
   }
 
   close(): void {
-    this.clearPointerPan();
+    this.clearPointerInteraction();
     this.closed.emit();
   }
 
   private rememberViewportCenter(): void {
     const viewport = this.viewport()?.nativeElement;
+    const canvas = this.canvas()?.nativeElement;
 
-    if (!viewport) {
+    if (!viewport || !canvas) {
       return;
     }
 
-    const maxLeft = Math.max(viewport.scrollWidth - viewport.clientWidth, 0);
-    const maxTop = Math.max(viewport.scrollHeight - viewport.clientHeight, 0);
-
-    this.pendingViewportAnchor = {
-      left: maxLeft ? viewport.scrollLeft / maxLeft : 0,
-      top: maxTop ? viewport.scrollTop / maxTop : 0,
-    };
+    this.pendingViewportAnchor = this.createViewportAnchor(
+      viewport,
+      canvas,
+      viewport.clientWidth / 2,
+      viewport.clientHeight / 2,
+    );
   }
 
   private applyPendingViewportAnchor(): void {
@@ -306,14 +370,138 @@ export class PdfViewerDialog {
       return;
     }
 
-    const maxLeft = Math.max(viewport.scrollWidth - viewport.clientWidth, 0);
-    const maxTop = Math.max(viewport.scrollHeight - viewport.clientHeight, 0);
+    const canvas = this.canvas()?.nativeElement;
+
+    if (!canvas) return;
 
     viewport.scrollTo({
-      left: this.pendingViewportAnchor.left * maxLeft,
-      top: this.pendingViewportAnchor.top * maxTop,
+      left:
+        canvas.offsetLeft +
+        this.pendingViewportAnchor.contentLeft * canvas.offsetWidth -
+        this.pendingViewportAnchor.viewportLeft,
+      top:
+        canvas.offsetTop +
+        this.pendingViewportAnchor.contentTop * canvas.offsetHeight -
+        this.pendingViewportAnchor.viewportTop,
     });
     this.pendingViewportAnchor = null;
+  }
+
+  private startPan(
+    viewport: HTMLDivElement,
+    pointerId: number,
+    position: PointerPosition,
+  ): void {
+    if (!this.canPan()) {
+      this.clearPointerPan();
+      return;
+    }
+
+    this.activePointerId = pointerId;
+    this.pointerStartX = position.x;
+    this.pointerStartY = position.y;
+    this.pointerStartScrollLeft = viewport.scrollLeft;
+    this.pointerStartScrollTop = viewport.scrollTop;
+    this.isPanning.set(true);
+  }
+
+  private startPinch(viewport: HTMLDivElement): void {
+    const pointers = this.pinchPointers();
+    const canvas = this.canvas()?.nativeElement;
+
+    if (!pointers || !canvas) return;
+
+    const center = this.pointerCenter(...pointers);
+    const bounds = viewport.getBoundingClientRect();
+
+    this.clearPointerPan();
+    this.pinchGesture = {
+      anchor: this.createViewportAnchor(
+        viewport,
+        canvas,
+        center.x - bounds.left,
+        center.y - bounds.top,
+      ),
+      distance: this.pointerDistance(...pointers),
+      zoom: this.zoom(),
+    };
+  }
+
+  private updatePinch(viewport: HTMLDivElement): void {
+    const pointers = this.pinchPointers();
+    const gesture = this.pinchGesture;
+
+    if (!pointers || !gesture || gesture.distance === 0) return;
+
+    const center = this.pointerCenter(...pointers);
+    const bounds = viewport.getBoundingClientRect();
+    const zoom = Math.min(
+      PDF_ZOOM_MAX,
+      Math.max(
+        PDF_ZOOM_MIN,
+        +(
+          (gesture.zoom * this.pointerDistance(...pointers)) /
+          gesture.distance
+        ).toFixed(2),
+      ),
+    );
+
+    this.pendingViewportAnchor = {
+      ...gesture.anchor,
+      viewportLeft: center.x - bounds.left,
+      viewportTop: center.y - bounds.top,
+    };
+    this.zoom.set(zoom);
+  }
+
+  private createViewportAnchor(
+    viewport: HTMLDivElement,
+    canvas: HTMLCanvasElement,
+    viewportLeft: number,
+    viewportTop: number,
+  ): ViewportAnchor {
+    return {
+      contentLeft:
+        (viewport.scrollLeft + viewportLeft - canvas.offsetLeft) /
+        canvas.offsetWidth,
+      contentTop:
+        (viewport.scrollTop + viewportTop - canvas.offsetTop) /
+        canvas.offsetHeight,
+      viewportLeft,
+      viewportTop,
+    };
+  }
+
+  private pinchPointers(): readonly [PointerPosition, PointerPosition] | null {
+    const [first, second] = this.touchPointers.values();
+    return first && second ? [first, second] : null;
+  }
+
+  private pointerPosition(event: PointerEvent): PointerPosition {
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  private pointerCenter(
+    first: PointerPosition,
+    second: PointerPosition,
+  ): PointerPosition {
+    return {
+      x: (first.x + second.x) / 2,
+      y: (first.y + second.y) / 2,
+    };
+  }
+
+  private pointerDistance(
+    first: PointerPosition,
+    second: PointerPosition,
+  ): number {
+    return Math.hypot(second.x - first.x, second.y - first.y);
+  }
+
+  private clearPointerInteraction(): void {
+    this.touchPointers.clear();
+    this.pinchGesture = null;
+    this.clearPointerPan();
   }
 
   private clearPointerPan(): void {

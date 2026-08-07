@@ -61,13 +61,31 @@ export function renderPdfPageToCanvas(
           canvas.width = Math.ceil(viewport.width);
           canvas.height = Math.ceil(viewport.height);
 
-          return from(
-            page.render({
-              canvas,
-              canvasContext: context,
-              viewport,
-            }).promise,
-          ).pipe(
+          const renderTask = page.render({
+            canvas,
+            canvasContext: context,
+            viewport,
+          });
+
+          return new Observable<void>((subscriber) => {
+            let settled = false;
+
+            renderTask.promise.then(
+              () => {
+                settled = true;
+                subscriber.next();
+                subscriber.complete();
+              },
+              (error: unknown) => {
+                settled = true;
+                subscriber.error(error);
+              },
+            );
+
+            return () => {
+              if (!settled) renderTask.cancel();
+            };
+          }).pipe(
             map(() => ({
               pageCount: document.numPages,
               pageNumber: resolvePageNumber(document, pageNumber),

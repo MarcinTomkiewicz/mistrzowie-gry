@@ -115,8 +115,7 @@
       } @else {
         <div
           #viewport
-          class="pdf-viewer-dialog__viewport w-100 overflow-auto p-md"
-          [class.touch-action-none]="canPan()"
+          class="pdf-viewer-dialog__viewport w-100 overflow-auto p-md touch-action-none"
           [class.cursor-grab]="canPan() && !isPanning()"
           [class.cursor-grabbing]="isPanning()"
           [class.user-select-none]="isPanning()"

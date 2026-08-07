@@ -33,12 +33,18 @@ export class CoworkerShell {
         this.onboarding.getPortal().pipe(catchError(() => of(null))),
       ),
     ),
-    { initialValue: null },
+    { initialValue: undefined },
   );
 
   protected readonly pageUrl = buildSiteUrl('/auth/coworker');
 
   protected readonly i18n = createCoworkerShellI18n();
+
+  private readonly privateDocumentsAvailable = computed(() => {
+    const portal = this.portal();
+
+    return !!portal?.onboarding && portal.questionnaire_complete;
+  });
 
   protected readonly tabs = computed<readonly RouteTabDefinition[]>(() => {
     const labels = this.i18n.tabs();
@@ -52,7 +58,7 @@ export class CoworkerShell {
       },
     ];
 
-    if (portal?.onboarding && portal.questionnaire_complete) {
+    if (this.privateDocumentsAvailable()) {
       tabs.push({
         id: 'private-documents',
         label: labels.privateDocuments,
@@ -80,20 +86,17 @@ export class CoworkerShell {
     effect(() => {
       const portal = this.portal();
 
-      if (!portal) return;
+      if (portal === undefined) return;
 
       const path = this.router.url.split(/[?#]/, 1)[0];
-      const privateBlocked =
-        path === '/auth/coworker/documents' &&
-        (!portal.onboarding || !portal.questionnaire_complete);
-      const sharedBlocked =
-        path === '/auth/coworker/shared-documents' &&
-        (!portal.questionnaire_complete ||
-          portal.onboarding?.status !== 'completed');
 
-      if (privateBlocked || sharedBlocked) {
-        void this.router.navigateByUrl('/auth/coworker/questionnaire');
-      }
+      if (path !== '/auth/coworker' && path !== '/auth/coworker/') return;
+
+      const target = this.privateDocumentsAvailable()
+        ? '/auth/coworker/documents'
+        : '/auth/coworker/questionnaire';
+
+      void this.router.navigateByUrl(target, { replaceUrl: true });
     });
   }
 }

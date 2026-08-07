@@ -23,7 +23,6 @@ export const coworkerRoutes: Routes = [
     loadComponent: loaders.shell,
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'questionnaire' },
       {
         path: 'questionnaire',
         loadComponent: loaders.questionnaire,
