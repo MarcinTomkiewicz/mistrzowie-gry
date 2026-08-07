@@ -37,11 +37,11 @@ export class CoworkerOnboarding {
     return this.invoke(body);
   }
 
-  acknowledgeSharedDocuments(
+  acknowledgeDocuments(
     assignmentIds: readonly string[],
   ): Observable<IAcknowledgeCoworkerDocumentsResult> {
     return this.invoke({
-      action: 'acknowledgeSharedDocuments',
+      action: 'acknowledgeDocuments',
       assignment_ids: assignmentIds,
     });
   }

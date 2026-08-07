@@ -51,7 +51,7 @@ export function parseCoworkerJsonRequest(value: unknown) {
   switch (action) {
     case "getPortal":
       return { action } as const;
-    case "acknowledgeSharedDocuments":
+    case "acknowledgeDocuments":
       return {
         action,
         assignment_ids: readUuidArray(source["assignment_ids"]),

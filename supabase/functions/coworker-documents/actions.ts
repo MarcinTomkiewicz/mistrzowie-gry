@@ -32,7 +32,7 @@ export async function handleCoworkerAction(
   switch (request.action) {
     case "getPortal":
       return await getPortal(client, adminClient, userId);
-    case "acknowledgeSharedDocuments":
+    case "acknowledgeDocuments":
       return await callSingleCoworkerRpc<
         IAcknowledgeCoworkerDocumentsResult
       >(client, RPC.acknowledgeDocuments, {

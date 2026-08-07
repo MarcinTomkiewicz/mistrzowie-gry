@@ -137,6 +137,23 @@
                 </div>
               </div>
             }
+
+            @if (
+              document.required_action === 'acknowledge' &&
+              document.assignment_status === 'pending'
+            ) {
+              <div class="flex-row-start-center gap-sm">
+                <p-checkbox
+                  [binary]="true"
+                  [inputId]="'private-acknowledgement-' + document.assignment_id"
+                  [ngModel]="acknowledgedAssignmentIds().has(document.assignment_id)"
+                  (ngModelChange)="setAcknowledged(document.assignment_id, $event)"
+                />
+                <label [for]="'private-acknowledgement-' + document.assignment_id">
+                  {{ i18n.fields().acknowledgement }}
+                </label>
+              </div>
+            }
           </article>
         } @empty {
           <section class="mg-card w-100">
@@ -200,7 +217,7 @@
                   (ngModelChange)="setAcknowledged(document.assignment_id, $event)"
                 />
                 <label [for]="'shared-acknowledgement-' + document.assignment_id">
-                  {{ i18n.coworkerShared().acknowledgement }}
+                  {{ i18n.fields().acknowledgement }}
                 </label>
               </div>
             } @else if (document.acknowledged_at) {
@@ -215,19 +232,19 @@
             <p class="m-0 muted-text">{{ i18n.coworkerShared().empty }}</p>
           </section>
         }
-
-        @if (acknowledgedAssignmentIds().size) {
-          <div class="flex-row-end-center">
-            <p-button
-              icon="pi pi-check"
-              [label]="i18n.actions().acknowledge"
-              [loading]="activeAssignmentId() === 'acknowledge'"
-              (onClick)="acknowledge()"
-            />
-          </div>
-        }
       }
       </section>
+    }
+
+    @if (acknowledgedAssignmentIds().size) {
+      <div class="flex-row-end-center">
+        <p-button
+          icon="pi pi-check"
+          [label]="i18n.actions().acknowledge"
+          [loading]="activeAssignmentId() === 'acknowledge'"
+          (onClick)="acknowledge()"
+        />
+      </div>
     }
   }
 </div>

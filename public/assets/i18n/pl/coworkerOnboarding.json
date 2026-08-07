@@ -47,7 +47,6 @@
     "subtitle": "Zapoznaj się z przydzielonymi dokumentami i potwierdź ich przeczytanie. [PH]",
     "onboardingRequired": "Dokumenty wspólne będą dostępne po zakończeniu onboardingu. [PH]",
     "empty": "Nie masz przydzielonych dokumentów wspólnych. [PH]",
-    "acknowledgement": "Potwierdzam zapoznanie się z dokumentem. [PH]",
     "acknowledgedAt": "Potwierdzono [PH]",
     "loadError": "Nie udało się pobrać dokumentów wspólnych. [PH]"
   },
@@ -67,7 +66,8 @@
     "pendingAssignments": "Oczekujące [PH]",
     "acknowledgedAssignments": "Potwierdzone [PH]",
     "autoAssign": "Przydzielaj po zakończeniu onboardingu [PH]",
-    "rejectionReason": "Powód odrzucenia [PH]"
+    "rejectionReason": "Powód odrzucenia [PH]",
+    "acknowledgement": "Potwierdzam zapoznanie się z dokumentem. [PH]"
   },
   "actions": {
     "start": "Rozpocznij onboarding [PH]",

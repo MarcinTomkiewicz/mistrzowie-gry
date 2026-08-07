@@ -56,7 +56,6 @@ export interface CoworkerOnboardingSharedTranslations {
   subtitle: string;
   onboardingRequired: string;
   empty: string;
-  acknowledgement: string;
   acknowledgedAt: string;
   loadError: string;
 }
@@ -78,6 +77,7 @@ export interface CoworkerOnboardingFieldsTranslations {
   acknowledgedAssignments: string;
   autoAssign: string;
   rejectionReason: string;
+  acknowledgement: string;
 }
 
 export interface CoworkerOnboardingActionsTranslations {

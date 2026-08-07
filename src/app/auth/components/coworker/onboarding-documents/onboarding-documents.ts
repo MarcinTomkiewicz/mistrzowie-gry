@@ -150,7 +150,7 @@ export class CoworkerOnboardingDocuments {
 
     this.activeAssignmentId.set('acknowledge');
     this.api
-      .acknowledgeSharedDocuments(assignmentIds)
+      .acknowledgeDocuments(assignmentIds)
       .pipe(finalize(() => this.activeAssignmentId.set(null)))
       .subscribe({
         next: () => {
