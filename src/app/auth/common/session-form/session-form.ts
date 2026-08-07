@@ -36,11 +36,11 @@ import {
   ISessionFormSubmitData,
 } from '../../../core/interfaces/i-session';
 import { ISystem } from '../../../core/interfaces/i-system';
+import type { IPdfPreview } from '../../../core/interfaces/i-pdf';
 import { Storage } from '../../../core/services/storage/storage';
 import {
   NewSessionCharacterSheet,
   SessionCharacterSheetCard,
-  SessionCharacterSheetPreview,
 } from '../../../core/types/session-character-sheet';
 import {
   SESSION_DIFFICULTY_LEVEL_OPTIONS,
@@ -102,8 +102,7 @@ export class SessionForm {
   readonly storedImagePath = signal<string | null>(null);
   readonly removedCharacterSheetIds = signal<string[]>([]);
   readonly newCharacterSheetFiles = signal<readonly NewSessionCharacterSheet[]>([]);
-  readonly characterSheetPreview = signal<SessionCharacterSheetPreview | null>(null);
-
+  readonly characterSheetPreview = signal<IPdfPreview | null>(null);
 
   readonly styleOptions = computed<IChipPickerOption[]>(() =>
     this.styles().map((style) => ({

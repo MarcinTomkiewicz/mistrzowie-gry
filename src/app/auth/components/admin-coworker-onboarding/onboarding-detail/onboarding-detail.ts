@@ -10,10 +10,11 @@ import { finalize, Observable } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import type {
-  AdminCoworkerOnboardingDocument,
+  IAdminCoworkerOnboardingDocument,
   IAdminCoworkerOnboardingDetail,
   IAdminPrivateDocumentUpload,
 } from '../../../../core/interfaces/i-admin-coworker-onboarding';
+import type { IPdfPreview } from '../../../../core/interfaces/i-pdf';
 import { AdminCoworkerOnboarding } from '../../../../core/services/admin-coworker-onboarding/admin-coworker-onboarding';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
@@ -22,12 +23,11 @@ import {
   COWORKER_ONBOARDING_SCOPE,
   createCoworkerOnboardingI18n,
 } from '../../../../core/translations/coworker-onboarding.i18n';
+import type { CoworkerDocumentReviewDecision } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
+import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import {
-  IPdfPreviewDialogValue,
-  PdfViewerDialog,
-} from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { PdfViewerDialog } from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { PrivateDocumentBatch } from '../private-document-batch/private-document-batch';
 
 @Component({
@@ -57,11 +57,12 @@ export class CoworkerOnboardingDetail {
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
+  protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly detail = signal<IAdminCoworkerOnboardingDetail | null>(null);
   protected readonly loading = signal(true);
   protected readonly busy = signal(false);
   protected readonly loadFailed = signal(false);
-  protected readonly preview = signal<IPdfPreviewDialogValue | null>(null);
+  protected readonly preview = signal<IPdfPreview | null>(null);
   protected readonly rejectionAssignmentId = signal<string | null>(null);
   protected readonly rejectionReason = new FormControl('', {
     nonNullable: true,
@@ -90,7 +91,7 @@ export class CoworkerOnboardingDetail {
       });
   }
 
-  protected previewSource(document: AdminCoworkerOnboardingDocument): void {
+  protected previewSource(document: IAdminCoworkerOnboardingDocument): void {
     if (!this.onboardingId) return;
     this.prepareDownload(
       this.api.getSourceDownload(document.document_id, this.onboardingId),
@@ -98,7 +99,7 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  protected downloadSource(document: AdminCoworkerOnboardingDocument): void {
+  protected downloadSource(document: IAdminCoworkerOnboardingDocument): void {
     if (!this.onboardingId) return;
     this.prepareDownload(
       this.api.getSourceDownload(document.document_id, this.onboardingId),
@@ -106,7 +107,7 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  protected previewSigned(document: AdminCoworkerOnboardingDocument): void {
+  protected previewSigned(document: IAdminCoworkerOnboardingDocument): void {
     if (!document.assignment_id || !this.onboardingId) return;
     this.prepareDownload(
       this.api.getSignedDownload(document.assignment_id, this.onboardingId),
@@ -114,7 +115,7 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  protected downloadSigned(document: AdminCoworkerOnboardingDocument): void {
+  protected downloadSigned(document: IAdminCoworkerOnboardingDocument): void {
     if (!document.assignment_id || !this.onboardingId) return;
     this.prepareDownload(
       this.api.getSignedDownload(document.assignment_id, this.onboardingId),
@@ -122,12 +123,12 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  protected accept(document: AdminCoworkerOnboardingDocument): void {
+  protected accept(document: IAdminCoworkerOnboardingDocument): void {
     if (!document.assignment_id) return;
     this.review(document.assignment_id, 'accepted', null);
   }
 
-  protected openRejection(document: AdminCoworkerOnboardingDocument): void {
+  protected openRejection(document: IAdminCoworkerOnboardingDocument): void {
     if (!document.assignment_id) return;
     this.rejectionReason.reset();
     this.rejectionAssignmentId.set(document.assignment_id);
@@ -174,7 +175,7 @@ export class CoworkerOnboardingDetail {
 
   private review(
     assignmentId: string,
-    decision: 'accepted' | 'rejected',
+    decision: CoworkerDocumentReviewDecision,
     rejectionReason: string | null,
   ): void {
     this.runMutation(

@@ -5,7 +5,7 @@ import type {
 } from "../../../src/app/core/interfaces/i-coworker-onboarding.ts";
 import {
   CoworkerDocumentRequestError,
-  type CoworkerMultipartRequest,
+  type parseCoworkerMultipartRequest,
 } from "../_shared/coworker-documents.schemas.ts";
 import {
   callSingleCoworkerRpc,
@@ -21,7 +21,7 @@ const RPC = "register_coworker_signed_submission";
 export async function uploadSignedDocument(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: CoworkerMultipartRequest,
+  request: ReturnType<typeof parseCoworkerMultipartRequest>,
 ): Promise<
   Omit<
     IRegisterCoworkerSignedSubmissionResult,

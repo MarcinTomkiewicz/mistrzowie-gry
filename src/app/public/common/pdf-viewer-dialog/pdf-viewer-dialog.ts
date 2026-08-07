@@ -19,33 +19,16 @@ import { DialogModule } from 'primeng/dialog';
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
+import type {
+  IPdfPinchGesture,
+  IPdfPointerPosition,
+  IPdfPreview,
+  IPdfViewportAnchor,
+} from '../../../core/interfaces/i-pdf';
 import { loadPdfDocument, renderPdfPageToCanvas } from '../../../core/utils/pdf';
 
 const PDF_ZOOM_MIN = 0.5;
 const PDF_ZOOM_MAX = 3;
-
-export interface IPdfPreviewDialogValue {
-  title: string;
-  url: string;
-}
-
-interface PointerPosition {
-  readonly x: number;
-  readonly y: number;
-}
-
-interface ViewportAnchor {
-  readonly contentLeft: number;
-  readonly contentTop: number;
-  readonly viewportLeft: number;
-  readonly viewportTop: number;
-}
-
-interface PinchGesture {
-  readonly anchor: ViewportAnchor;
-  readonly distance: number;
-  readonly zoom: number;
-}
 
 @Component({
   selector: 'app-pdf-viewer-dialog',
@@ -59,16 +42,16 @@ export class PdfViewerDialog {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly viewport = viewChild<ElementRef<HTMLDivElement>>('viewport');
-  private readonly touchPointers = new Map<number, PointerPosition>();
-  private pendingViewportAnchor: ViewportAnchor | 'top' | null = null;
-  private pinchGesture: PinchGesture | null = null;
+  private readonly touchPointers = new Map<number, IPdfPointerPosition>();
+  private pendingViewportAnchor: IPdfViewportAnchor | 'top' | null = null;
+  private pinchGesture: IPdfPinchGesture | null = null;
   private activePointerId: number | null = null;
   private pointerStartX = 0;
   private pointerStartY = 0;
   private pointerStartScrollLeft = 0;
   private pointerStartScrollTop = 0;
 
-  readonly preview = input<IPdfPreviewDialogValue | null>(null);
+  readonly preview = input<IPdfPreview | null>(null);
   readonly closed = output<void>();
 
   readonly document = signal<PDFDocumentProxy | null>(null);
@@ -390,7 +373,7 @@ export class PdfViewerDialog {
   private startPan(
     viewport: HTMLDivElement,
     pointerId: number,
-    position: PointerPosition,
+    position: IPdfPointerPosition,
   ): void {
     if (!this.canPan()) {
       this.clearPointerPan();
@@ -459,7 +442,7 @@ export class PdfViewerDialog {
     canvas: HTMLCanvasElement,
     viewportLeft: number,
     viewportTop: number,
-  ): ViewportAnchor {
+  ): IPdfViewportAnchor {
     return {
       contentLeft:
         (viewport.scrollLeft + viewportLeft - canvas.offsetLeft) /
@@ -472,19 +455,22 @@ export class PdfViewerDialog {
     };
   }
 
-  private pinchPointers(): readonly [PointerPosition, PointerPosition] | null {
+  private pinchPointers(): readonly [
+    IPdfPointerPosition,
+    IPdfPointerPosition,
+  ] | null {
     const [first, second] = this.touchPointers.values();
     return first && second ? [first, second] : null;
   }
 
-  private pointerPosition(event: PointerEvent): PointerPosition {
+  private pointerPosition(event: PointerEvent): IPdfPointerPosition {
     return { x: event.clientX, y: event.clientY };
   }
 
   private pointerCenter(
-    first: PointerPosition,
-    second: PointerPosition,
-  ): PointerPosition {
+    first: IPdfPointerPosition,
+    second: IPdfPointerPosition,
+  ): IPdfPointerPosition {
     return {
       x: (first.x + second.x) / 2,
       y: (first.y + second.y) / 2,
@@ -492,8 +478,8 @@ export class PdfViewerDialog {
   }
 
   private pointerDistance(
-    first: PointerPosition,
-    second: PointerPosition,
+    first: IPdfPointerPosition,
+    second: IPdfPointerPosition,
   ): number {
     return Math.hypot(second.x - first.x, second.y - first.y);
   }

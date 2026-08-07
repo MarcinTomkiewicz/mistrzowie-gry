@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
-import type { AdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
+import type { parseAdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
 import {
   CoworkerDocumentNotFoundError,
   createDocumentDownload,
@@ -10,15 +10,13 @@ import {
   listAdminSharedDocuments,
 } from "./actions.ts";
 
-type DownloadRequest = Extract<
-  AdminJsonRequest,
-  { action: "getDownloadUrl" }
->;
-
 export async function getAdminDownload(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: DownloadRequest,
+  request: Extract<
+    ReturnType<typeof parseAdminJsonRequest>,
+    { action: "getDownloadUrl" }
+  >,
 ): Promise<{ url: string; filename: string }> {
   const target = request.target === "signed"
     ? await findSignedTarget(client, request)
@@ -33,7 +31,10 @@ export async function getAdminDownload(
 
 async function findSignedTarget(
   client: SupabaseClient,
-  request: Extract<DownloadRequest, { target: "signed" }>,
+  request: Extract<
+    ReturnType<typeof parseAdminJsonRequest>,
+    { action: "getDownloadUrl"; target: "signed" }
+  >,
 ): Promise<{ path: string; filename: string } | null> {
   const documents = await listAdminOnboardingDocuments(
     client,
@@ -57,7 +58,10 @@ async function findSignedTarget(
 
 async function findSourceTarget(
   client: SupabaseClient,
-  request: Extract<DownloadRequest, { target: "source" }>,
+  request: Extract<
+    ReturnType<typeof parseAdminJsonRequest>,
+    { action: "getDownloadUrl"; target: "source" }
+  >,
 ): Promise<{ path: string; filename: string } | null> {
   const documents = request.onboarding_id === null
     ? await listAdminSharedDocuments(client)

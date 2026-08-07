@@ -49,7 +49,7 @@
 
         <app-file-upload
           [options]="uploadOptions()"
-          [texts]="uploadTexts()"
+          [texts]="i18n.fileUploadTexts()"
           (filesSelected)="selectFile(index, $event)"
         />
 

@@ -2,37 +2,18 @@ import {
   BackendContractError,
   CryptoConfigurationError,
   CryptoOperationError,
+  loggedErrorResponse,
+  questionnaireHttpErrorResponse,
   QuestionnaireDocumentStorageError,
   QuestionnaireOnboardingStateError,
   QuestionnairePdfGenerationError,
   QuestionnaireValidationError,
+  rpcError,
   RpcCallError,
 } from "../_shared/coworker-questionnaire/errors.ts";
 import { CoworkerDocumentRpcError } from "../_shared/coworker-documents.ts";
-import { jsonNoStore } from "../_shared/coworker-questionnaire/http.ts";
 
 const ALLOWED_METHODS = "GET, PUT";
-
-export class InvalidJsonError extends Error {
-  constructor() {
-    super("Invalid JSON.");
-    this.name = "InvalidJsonError";
-  }
-}
-
-export class MissingUserClaimsError extends Error {
-  constructor() {
-    super("Authenticated user claims are missing.");
-    this.name = "MissingUserClaimsError";
-  }
-}
-
-export class MethodNotAllowedError extends Error {
-  constructor() {
-    super("Method not allowed.");
-    this.name = "MethodNotAllowedError";
-  }
-}
 
 export function createErrorResponse(
   error: unknown,
@@ -47,33 +28,12 @@ export function createErrorResponse(
       { fieldErrors: error.fieldErrors },
     );
   }
-  if (error instanceof InvalidJsonError) {
-    return loggedErrorResponse(
-      400,
-      "INVALID_JSON",
-      "Request body must contain valid JSON.",
-      requestId,
-    );
-  }
-  if (error instanceof MissingUserClaimsError) {
-    return loggedErrorResponse(
-      401,
-      "UNAUTHENTICATED",
-      "A valid user session is required.",
-      requestId,
-    );
-  }
-  if (error instanceof MethodNotAllowedError) {
-    return loggedErrorResponse(
-      405,
-      "METHOD_NOT_ALLOWED",
-      "Method not allowed.",
-      requestId,
-      undefined,
-      undefined,
-      { Allow: ALLOWED_METHODS },
-    );
-  }
+  const httpResponse = questionnaireHttpErrorResponse(
+    error,
+    requestId,
+    ALLOWED_METHODS,
+  );
+  if (httpResponse !== null) return httpResponse;
   if (error instanceof RpcCallError) {
     return rpcErrorResponse(error, requestId);
   }
@@ -253,47 +213,4 @@ function documentRpcErrorResponse(
         requestId,
       );
   }
-}
-
-function rpcError(
-  status: number,
-  code: string,
-  message: string,
-  error: RpcCallError | CoworkerDocumentRpcError,
-  requestId: string,
-): Response {
-  return loggedErrorResponse(
-    status,
-    code,
-    message,
-    requestId,
-    undefined,
-    error.rpcName,
-  );
-}
-
-function loggedErrorResponse(
-  status: number,
-  code: string,
-  message: string,
-  requestId: string,
-  extra?: { [key: string]: unknown },
-  rpcName?: string | null,
-  headers?: HeadersInit,
-): Response {
-  const logEntry: {
-    code: string;
-    requestId: string;
-    rpcName?: string;
-    status: number;
-  } = { code, requestId, status };
-  if (rpcName !== undefined && rpcName !== null) {
-    logEntry.rpcName = rpcName;
-  }
-  console.error(JSON.stringify(logEntry));
-
-  return jsonNoStore(
-    { ok: false, code, message, ...(extra ?? {}) },
-    { status, headers },
-  );
 }

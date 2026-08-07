@@ -7,7 +7,7 @@ import type {
   ICoworkerSharedDocumentRow,
 } from "../../../src/app/core/interfaces/i-coworker-onboarding.ts";
 import { getQuestionnaireEnvelope } from "../_shared/coworker-questionnaire/rpc.ts";
-import type { CoworkerJsonRequest } from "../_shared/coworker-documents.schemas.ts";
+import type { parseCoworkerJsonRequest } from "../_shared/coworker-documents.schemas.ts";
 import {
   callCoworkerRpc,
   callSingleCoworkerRpc,
@@ -20,16 +20,14 @@ const RPC = {
   acknowledgeDocuments: "acknowledge_coworker_documents",
 } as const;
 
-type CoworkerCommandRequest = Exclude<
-  CoworkerJsonRequest,
-  { action: "getDownloadUrl" }
->;
-
 export async function handleCoworkerAction(
   client: SupabaseClient,
   adminClient: SupabaseClient,
   userId: string,
-  request: CoworkerCommandRequest,
+  request: Exclude<
+    ReturnType<typeof parseCoworkerJsonRequest>,
+    { action: "getDownloadUrl" }
+  >,
 ): Promise<unknown> {
   switch (request.action) {
     case "getPortal":

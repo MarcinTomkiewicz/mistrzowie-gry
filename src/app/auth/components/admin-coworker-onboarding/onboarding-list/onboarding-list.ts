@@ -46,6 +46,7 @@ export class CoworkerOnboardingList {
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
+  protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly onboardings = signal<IAdminCoworkerOnboardingRow[]>([]);
   protected readonly candidates =
     signal<readonly IAdminCoworkerOnboardingCandidate[]>([]);
@@ -84,7 +85,11 @@ export class CoworkerOnboardingList {
           this.onboardings.set([...onboardings]);
           this.candidates.set(candidates);
         },
-        error: () => this.loadFailed.set(true),
+        error: () => {
+          this.candidates.set([]);
+          this.coworkerControl.reset();
+          this.loadFailed.set(true);
+        },
       });
   }
 
@@ -112,12 +117,10 @@ export class CoworkerOnboardingList {
     void this.router.navigate(['/admin/coworkers/onboarding', onboardingId]);
   }
 
-  protected statusClass(status: CoworkerOnboardingLifecycleStatus): string {
-    return STATUS_BADGE_CLASS[status];
-  }
-
-  protected statusLabel(status: CoworkerOnboardingLifecycleStatus): string {
-    return this.i18n.statuses().onboarding[status];
+  protected asOnboardingStatus(
+    status: CoworkerOnboardingLifecycleStatus,
+  ): CoworkerOnboardingLifecycleStatus {
+    return status;
   }
 
   private showSuccess(): void {

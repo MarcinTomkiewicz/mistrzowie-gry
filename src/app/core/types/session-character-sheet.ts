@@ -30,8 +30,3 @@ export type NewSessionCharacterSheetCard = NewSessionCharacterSheet & {
 export type SessionCharacterSheetCard =
   | ExistingSessionCharacterSheetCard
   | NewSessionCharacterSheetCard;
-
-export type SessionCharacterSheetPreview = {
-  title: string;
-  url: string;
-};

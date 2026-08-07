@@ -11,6 +11,7 @@ import {
   normalizeDocumentResponse,
   successResponse,
 } from "../_shared/coworker-documents.ts";
+import { readFormData, readJson } from "../_shared/http.ts";
 import { handleCoworkerAction } from "./actions.ts";
 import { getCoworkerDownload } from "./downloads.ts";
 import { uploadSignedDocument } from "./uploads.ts";
@@ -31,7 +32,7 @@ const authenticatedFetch = withSupabase(
       const contentType = request.headers.get("content-type") ?? "";
       if (contentType.startsWith("multipart/form-data")) {
         const upload = parseCoworkerMultipartRequest(
-          await readFormData(request),
+          await readFormData(request, CoworkerDocumentRequestError),
         );
         return successResponse(
           await uploadSignedDocument(
@@ -42,7 +43,9 @@ const authenticatedFetch = withSupabase(
         );
       }
 
-      const action = parseCoworkerJsonRequest(await readJson(request));
+      const action = parseCoworkerJsonRequest(
+        await readJson(request, CoworkerDocumentRequestError),
+      );
       if (action.action === "getDownloadUrl") {
         return successResponse(
           await getCoworkerDownload(
@@ -70,19 +73,3 @@ export default {
   fetch: async (request: Request) =>
     await normalizeDocumentResponse(await authenticatedFetch(request)),
 };
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return (await request.json()) as unknown;
-  } catch {
-    throw new CoworkerDocumentRequestError();
-  }
-}
-
-async function readFormData(request: Request): Promise<FormData> {
-  try {
-    return await request.formData();
-  } catch {
-    throw new CoworkerDocumentRequestError();
-  }
-}

@@ -1,14 +1,17 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
+import {
+  COWORKER_DOCUMENT_MAX_FILE_SIZE,
+  COWORKER_DOCUMENT_PDF_MIME_TYPE,
+} from "../../../src/app/core/configs/coworker-document.config.ts";
 import type {
   CoworkerDocumentApiErrorCode,
 } from "../../../src/app/core/types/coworker-onboarding.ts";
 import { CoworkerDocumentRequestError } from "./coworker-documents.schemas.ts";
+import { jsonNoStore } from "./http.ts";
 
-export const COWORKER_DOCUMENTS_BUCKET = "coworker-documents";
-export const COWORKER_DOCUMENT_MAX_FILE_SIZE = 26_214_400;
-export const COWORKER_DOCUMENT_DOWNLOAD_TTL = 300;
-const PDF_MIME_TYPE = "application/pdf";
+const COWORKER_DOCUMENTS_BUCKET = "coworker-documents";
+const COWORKER_DOCUMENT_DOWNLOAD_TTL = 300;
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2d] as const;
 
 export class CoworkerDocumentRpcError extends Error {
@@ -47,7 +50,7 @@ export class CoworkerDocumentNotFoundError extends Error {
   }
 }
 
-export class CoworkerDocumentContractError extends Error {
+class CoworkerDocumentContractError extends Error {
   constructor() {
     super("Coworker document backend returned an invalid result.");
     this.name = "CoworkerDocumentContractError";
@@ -80,7 +83,7 @@ export async function readPdfFile(file: File): Promise<Uint8Array> {
   if (
     file.size < PDF_MAGIC.length ||
     file.size > COWORKER_DOCUMENT_MAX_FILE_SIZE ||
-    file.type !== PDF_MIME_TYPE ||
+    file.type !== COWORKER_DOCUMENT_PDF_MIME_TYPE ||
     !file.name.toLowerCase().endsWith(".pdf")
   ) {
     throw new CoworkerDocumentRequestError();
@@ -99,7 +102,10 @@ export async function uploadPdf(
 ): Promise<void> {
   const { error } = await client.storage
     .from(COWORKER_DOCUMENTS_BUCKET)
-    .upload(path, bytes, { contentType: PDF_MIME_TYPE, upsert: false });
+    .upload(path, bytes, {
+      contentType: COWORKER_DOCUMENT_PDF_MIME_TYPE,
+      upsert: false,
+    });
   if (error !== null) {
     throw new CoworkerDocumentStorageError("UPLOAD_FAILED");
   }
@@ -135,10 +141,7 @@ export async function createDocumentDownload(
 }
 
 export function successResponse(data: unknown): Response {
-  return Response.json(
-    { ok: true, data },
-    { headers: { "Cache-Control": "no-store", Pragma: "no-cache" } },
-  );
+  return jsonNoStore({ ok: true, data });
 }
 
 export async function normalizeDocumentResponse(
@@ -257,12 +260,9 @@ function errorResponse(
   code: CoworkerDocumentApiErrorCode,
   message: string,
 ): Response {
-  return Response.json(
+  return jsonNoStore(
     { ok: false, code, message },
-    {
-      status,
-      headers: { "Cache-Control": "no-store", Pragma: "no-cache" },
-    },
+    { status },
   );
 }
 

@@ -6,6 +6,7 @@ import { ImageModule } from 'primeng/image';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ISessionWithRelations } from '../../../core/interfaces/i-session';
+import type { IPdfPreview } from '../../../core/interfaces/i-pdf';
 import { Storage } from '../../../core/services/storage/storage';
 import { resolveAltDifficultyLevel } from '../session-difficulty/session-difficulty';
 import { normalizeText } from '../../../core/utils/normalize-text';
@@ -34,7 +35,7 @@ export class SessionDetails {
   readonly gmProfileSelect = output<void>();
 
   readonly i18n = createSessionDetailsI18n();
-  readonly characterSheetPreview = signal<{ title: string; url: string } | null>(null);
+  readonly characterSheetPreview = signal<IPdfPreview | null>(null);
 
   readonly imageUrl = computed(() => {
     const imagePath = normalizeText(this.session().image);

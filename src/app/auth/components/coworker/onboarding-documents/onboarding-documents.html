@@ -104,7 +104,7 @@
               <div class="flex-col-start-stretch gap-sm w-100">
                 <app-file-upload
                   [options]="uploadOptions()"
-                  [texts]="uploadTexts()"
+                  [texts]="i18n.fileUploadTexts()"
                   (filesSelected)="selectSignedFile(document.assignment_id, $event)"
                 />
                 @if (selectedFiles().get(document.assignment_id); as file) {

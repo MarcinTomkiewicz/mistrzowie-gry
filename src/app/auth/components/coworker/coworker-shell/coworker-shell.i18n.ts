@@ -1,3 +1,7 @@
+import {
+  createCommonActionsI18n,
+  createCommonErrorsI18n,
+} from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type {
   CoworkerShellTabsTranslations,
@@ -16,6 +20,8 @@ export function createCoworkerShellI18n() {
   });
 
   return {
+    commonActions: createCommonActionsI18n(),
+    commonErrors: createCommonErrorsI18n(),
     shell,
     tabs,
   };

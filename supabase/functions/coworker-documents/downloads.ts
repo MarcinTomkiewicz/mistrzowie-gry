@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
-import type { CoworkerJsonRequest } from "../_shared/coworker-documents.schemas.ts";
+import type { parseCoworkerJsonRequest } from "../_shared/coworker-documents.schemas.ts";
 import {
   CoworkerDocumentNotFoundError,
   createDocumentDownload,
@@ -10,15 +10,13 @@ import {
   listCoworkerSharedDocuments,
 } from "./actions.ts";
 
-type DownloadRequest = Extract<
-  CoworkerJsonRequest,
-  { action: "getDownloadUrl" }
->;
-
 export async function getCoworkerDownload(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: DownloadRequest,
+  request: Extract<
+    ReturnType<typeof parseCoworkerJsonRequest>,
+    { action: "getDownloadUrl" }
+  >,
 ): Promise<{ url: string; filename: string }> {
   const [privateDocuments, sharedDocuments] = await Promise.all([
     listCoworkerPrivateDocuments(client),

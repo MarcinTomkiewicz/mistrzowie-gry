@@ -2,7 +2,17 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { catchError, filter, map, of, startWith, switchMap } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import {
+  catchError,
+  filter,
+  map,
+  merge,
+  of,
+  startWith,
+  Subject,
+  switchMap,
+} from 'rxjs';
 
 import { buildSiteUrl } from '../../../../core/config/site';
 import { CoworkerOnboarding } from '../../../../core/services/coworker-onboarding/coworker-onboarding';
@@ -19,18 +29,23 @@ const INITIAL_PORTAL_STATE: CoworkerPortalState = { status: 'loading' };
 @Component({
   selector: 'app-coworker-shell',
   standalone: true,
-  imports: [RouterOutlet, RouteTabShell],
+  imports: [RouterOutlet, ButtonModule, RouteTabShell],
   templateUrl: './coworker-shell.html',
-  providers: [provideTranslocoScope(COWORKER_SHELL_SCOPE)],
+  providers: [provideTranslocoScope(COWORKER_SHELL_SCOPE, 'common')],
 })
 export class CoworkerShell {
   private readonly onboarding = inject(CoworkerOnboarding);
   private readonly router = inject(Router);
-  private readonly portalState = toSignal(
-    this.router.events.pipe(
-      filter(
-        (event): event is NavigationEnd => event instanceof NavigationEnd,
+  private readonly portalReload$ = new Subject<void>();
+  protected readonly portalState = toSignal(
+    merge(
+      this.router.events.pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        ),
       ),
+      this.portalReload$,
+    ).pipe(
       startWith(null),
       switchMap(() =>
         this.onboarding.getPortal().pipe(
@@ -111,5 +126,9 @@ export class CoworkerShell {
 
       void this.router.navigateByUrl(target, { replaceUrl: true });
     });
+  }
+
+  protected retryPortal(): void {
+    this.portalReload$.next();
   }
 }

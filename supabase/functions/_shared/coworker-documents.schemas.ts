@@ -7,8 +7,6 @@ const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REJECTION_REASON_MAX_LENGTH = 1_000;
 
-type JsonObject = { [key: string]: unknown };
-
 export class CoworkerDocumentRequestError extends Error {
   constructor() {
     super("Coworker document request validation failed.");
@@ -116,16 +114,7 @@ export function parseCoworkerMultipartRequest(
   } as const;
 }
 
-export type AdminJsonRequest = ReturnType<typeof parseAdminJsonRequest>;
-export type CoworkerJsonRequest = ReturnType<typeof parseCoworkerJsonRequest>;
-export type AdminMultipartRequest = ReturnType<
-  typeof parseAdminMultipartRequest
->;
-export type CoworkerMultipartRequest = ReturnType<
-  typeof parseCoworkerMultipartRequest
->;
-
-function parseReviewRequest(source: JsonObject) {
+function parseReviewRequest(source: Record<string, unknown>) {
   const decision = readEnum(
     source["decision"],
     COWORKER_DOCUMENT_REVIEW_DECISIONS,
@@ -149,7 +138,7 @@ function parseReviewRequest(source: JsonObject) {
   } as const;
 }
 
-function parseAdminDownloadRequest(source: JsonObject) {
+function parseAdminDownloadRequest(source: Record<string, unknown>) {
   const target = readEnum(
     source["target"],
     COWORKER_DOCUMENT_DOWNLOAD_TARGETS,
@@ -194,11 +183,11 @@ function readPrivateDocumentMetadata(formData: FormData) {
   });
 }
 
-function readObject(value: unknown): JsonObject {
+function readObject(value: unknown): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw invalid();
   }
-  return value as JsonObject;
+  return value as Record<string, unknown>;
 }
 
 function readText(value: unknown): string {
@@ -209,7 +198,7 @@ function readText(value: unknown): string {
 }
 
 function readNullableString(
-  source: JsonObject,
+  source: Record<string, unknown>,
   key: string,
   maxLength: number,
 ): string | null {

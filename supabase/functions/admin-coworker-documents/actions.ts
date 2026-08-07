@@ -12,7 +12,7 @@ import type {
   IReviewCoworkerSignedSubmissionResult,
   IStartCoworkerOnboardingResult,
 } from "../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
-import type { AdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
+import type { parseAdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
 import {
   callCoworkerRpc,
   callSingleCoworkerRpc,
@@ -33,15 +33,13 @@ const RPC = {
   completeOnboarding: "complete_coworker_onboarding",
 } as const;
 
-type AdminCommandRequest = Exclude<
-  AdminJsonRequest,
-  { action: "getDownloadUrl" }
->;
-
 export async function handleAdminAction(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: AdminCommandRequest,
+  request: Exclude<
+    ReturnType<typeof parseAdminJsonRequest>,
+    { action: "getDownloadUrl" }
+  >,
 ): Promise<unknown> {
   switch (request.action) {
     case "listOnboardingCandidates":

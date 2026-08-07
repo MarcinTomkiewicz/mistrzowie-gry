@@ -1,13 +1,13 @@
 import { withSupabase } from "npm:@supabase/server@^1";
 
 import { getAdminQuestionnaire } from "../_shared/coworker-questionnaire/admin.ts";
-import { jsonNoStore } from "../_shared/coworker-questionnaire/http.ts";
 import {
-  createErrorResponse,
   InvalidJsonError,
   MethodNotAllowedError,
   MissingUserClaimsError,
-} from "./errors.ts";
+} from "../_shared/coworker-questionnaire/errors.ts";
+import { jsonNoStore, readJson } from "../_shared/http.ts";
+import { createErrorResponse } from "./errors.ts";
 
 export default {
   fetch: withSupabase({ auth: "user" }, async (request, context) => {
@@ -25,7 +25,7 @@ export default {
         await getAdminQuestionnaire(
           context.supabaseAdmin,
           actorUserId,
-          await readJson(request),
+          await readJson(request, InvalidJsonError),
         ),
       );
     } catch (error) {
@@ -33,11 +33,3 @@ export default {
     }
   }),
 };
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return (await request.json()) as unknown;
-  } catch {
-    throw new InvalidJsonError();
-  }
-}

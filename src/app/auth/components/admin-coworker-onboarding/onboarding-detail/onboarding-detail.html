@@ -31,7 +31,15 @@
       <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
         <div class="flex-col-start-start gap-xs">
           <small>{{ i18n.fields().user }}</small>
-          <strong>{{ data.onboarding.nickname || data.onboarding.first_name || data.onboarding.email }}</strong>
+          <strong>
+            {{
+              getUserDisplayName({
+                firstName: data.onboarding.first_name,
+                nickname: data.onboarding.nickname,
+                useNickname: data.onboarding.use_nickname,
+              }) || data.onboarding.email
+            }}
+          </strong>
           <span>{{ data.onboarding.email }}</span>
         </div>
         <div class="flex-col-start-start gap-xs">

@@ -1,10 +1,12 @@
+import {
+  COWORKER_DOCUMENT_MAX_FILE_SIZE,
+  COWORKER_DOCUMENT_PDF_MIME_TYPE,
+} from './coworker-document.config';
 import type { FileUploadOptions } from '../types/file-upload';
-
-export const COWORKER_DOCUMENT_MAX_FILE_SIZE = 26_214_400;
 
 export const COWORKER_PDF_UPLOAD_OPTIONS = {
   mode: 'files',
-  accept: 'application/pdf',
+  accept: COWORKER_DOCUMENT_PDF_MIME_TYPE,
   maxFileSize: COWORKER_DOCUMENT_MAX_FILE_SIZE,
   currentUrl: null,
   disabled: false,

@@ -67,15 +67,14 @@ export interface ICoworkerSharedDocumentRow {
   readonly updated_at: string;
 }
 
-export type CoworkerPrivateDocument = Omit<
-  ICoworkerPrivateDocumentRow,
-  'storage_path' | 'signed_storage_path'
->;
+export interface ICoworkerPrivateDocument
+  extends Omit<
+    ICoworkerPrivateDocumentRow,
+    'storage_path' | 'signed_storage_path'
+  > {}
 
-export type CoworkerSharedDocument = Omit<
-  ICoworkerSharedDocumentRow,
-  'storage_path'
->;
+export interface ICoworkerSharedDocument
+  extends Omit<ICoworkerSharedDocumentRow, 'storage_path'> {}
 
 export interface ICoworkerDocumentEdgeResponse<T> {
   readonly ok: true;
@@ -90,8 +89,8 @@ export interface ICoworkerDocumentDownload {
 export interface ICoworkerDocumentPortal {
   readonly onboarding: ICoworkerOnboardingRow | null;
   readonly questionnaire_complete: boolean;
-  readonly private_assignments: readonly CoworkerPrivateDocument[];
-  readonly shared_assignments: readonly CoworkerSharedDocument[];
+  readonly private_assignments: readonly ICoworkerPrivateDocument[];
+  readonly shared_assignments: readonly ICoworkerSharedDocument[];
 }
 
 export interface IRegisterCoworkerSignedSubmissionResult {

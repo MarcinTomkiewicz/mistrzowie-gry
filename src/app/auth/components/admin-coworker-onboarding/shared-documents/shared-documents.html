@@ -50,7 +50,7 @@
 
       <app-file-upload
         [options]="uploadOptions()"
-        [texts]="uploadTexts()"
+        [texts]="i18n.fileUploadTexts()"
         (filesSelected)="selectFile($event)"
       />
 
@@ -187,12 +187,21 @@
         <ng-template #body let-assignment>
           <tr>
             <td>
-              <strong>{{ assignment.nickname || assignment.first_name || assignment.email }}</strong>
+              <strong>
+                {{
+                  getUserDisplayName({
+                    firstName: assignment.first_name,
+                    nickname: assignment.nickname,
+                    useNickname: assignment.use_nickname,
+                  }) || assignment.email
+                }}
+              </strong>
               <small class="d-block">{{ assignment.email }}</small>
             </td>
             <td>
-              <span [class]="'tag-badge ' + assignmentStatusClass(assignment.status)">
-                {{ assignmentStatusLabel(assignment.status) }}
+              @let status = asAssignmentStatus(assignment.status);
+              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[status]">
+                {{ i18n.statuses().assignment[status] }}
               </span>
             </td>
             <td>{{ formatTimestampLabel(assignment.acknowledged_at) }}</td>

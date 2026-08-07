@@ -15,14 +15,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
 import type { IAdminPrivateDocumentUpload } from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import { createCoworkerOnboardingI18n } from '../../../../core/translations/coworker-onboarding.i18n';
+import type { PrivateDocumentRowForm } from '../../../../core/types/private-document-row-form';
 import { FileUpload } from '../../../../public/common/file-upload/file-upload';
-
-type PrivateDocumentRowForm = FormGroup<{
-  preset: FormControl<string | null>;
-  title: FormControl<string>;
-  requires_signed_upload: FormControl<boolean>;
-  file: FormControl<File | null>;
-}>;
 
 @Component({
   selector: 'app-private-document-batch',
@@ -50,11 +44,6 @@ export class PrivateDocumentBatch {
   protected readonly uploadOptions = computed(() => ({
     ...COWORKER_PDF_UPLOAD_OPTIONS,
     disabled: this.busy(),
-  }));
-  protected readonly uploadTexts = computed(() => ({
-    chooseLabel: this.i18n.upload().choose,
-    dropLabel: this.i18n.upload().drop,
-    formatsLabel: this.i18n.upload().formats,
   }));
   protected readonly presetOptions = computed(() => [
     {

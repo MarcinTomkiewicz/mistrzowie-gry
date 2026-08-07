@@ -33,7 +33,7 @@
             optionValue="value"
             appendTo="body"
           />
-          <label for="coworker-onboarding-user">{{ i18n.adminList().gmLabel }}</label>
+          <label for="coworker-onboarding-user">{{ i18n.fields().user }}</label>
         </p-iftalabel>
 
         <p-button
@@ -43,7 +43,7 @@
           (onClick)="start()"
         />
       </div>
-    } @else if (!loading()) {
+    } @else if (!loading() && !loadFailed()) {
       <p class="m-0 muted-text">{{ i18n.adminList().noCandidates }}</p>
     }
   </section>
@@ -77,13 +77,22 @@
           <tr>
             <td>
               <div class="flex-col-start-start gap-xs">
-                <strong>{{ row.nickname || row.first_name || row.email }}</strong>
+                <strong>
+                  {{
+                    getUserDisplayName({
+                      firstName: row.first_name,
+                      nickname: row.nickname,
+                      useNickname: row.use_nickname,
+                    }) || row.email
+                  }}
+                </strong>
                 <small>{{ row.email }}</small>
               </div>
             </td>
             <td>
-              <span [class]="'tag-badge ' + statusClass(row.status)">
-                {{ statusLabel(row.status) }}
+              @let status = asOnboardingStatus(row.status);
+              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[status]">
+                {{ i18n.statuses().onboarding[status] }}
               </span>
             </td>
             <td>{{ formatTimestampLabel(row.started_at) }}</td>

@@ -10,6 +10,20 @@ import type {
   QuestionnaireYesNo,
 } from './coworker-questionnaire';
 
+export type QuestionnaireChoiceValue = Exclude<
+  | QuestionnaireIdentificationBasis
+  | QuestionnaireIdentityDocumentKind
+  | QuestionnaireJoinDeclineAnswer
+  | QuestionnaireYesNo,
+  null
+>;
+
+export type QuestionnaireChoiceControl =
+  | FormControl<QuestionnaireIdentificationBasis>
+  | FormControl<QuestionnaireIdentityDocumentKind>
+  | FormControl<QuestionnaireJoinDeclineAnswer>
+  | FormControl<QuestionnaireYesNo>;
+
 export type CoworkerQuestionnairePersonalForm = FormGroup<{
   firstName: FormControl<string>;
   lastName: FormControl<string>;

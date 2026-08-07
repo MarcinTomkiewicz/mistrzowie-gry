@@ -3,9 +3,8 @@
     "title": "Onboarding współpracowników [PH]",
     "subtitle": "Rozpoczynaj onboarding i sprawdzaj postęp dokumentów współpracowników. [PH]",
     "startTitle": "Rozpocznij onboarding [PH]",
-    "startDescription": "Wybierz Mistrza Gry, który nie ma aktywnego onboardingu. [PH]",
-    "gmLabel": "Mistrz Gry [PH]",
-    "noCandidates": "Brak Mistrzów Gry dostępnych do rozpoczęcia onboardingu. [PH]",
+    "startDescription": "Wybierz współpracownika z rolą Mistrz Gry lub wyższą, który nie ma aktywnego onboardingu. [PH]",
+    "noCandidates": "Brak współpracowników z rolą Mistrz Gry lub wyższą dostępnych do rozpoczęcia onboardingu. [PH]",
     "empty": "Nie rozpoczęto jeszcze żadnego onboardingu. [PH]",
     "loadError": "Nie udało się pobrać listy onboardingów. [PH]"
   },

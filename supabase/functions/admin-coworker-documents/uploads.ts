@@ -5,8 +5,8 @@ import type {
   IRegisterSharedDocumentResult,
 } from "../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
 import {
-  type AdminMultipartRequest,
   CoworkerDocumentRequestError,
+  type parseAdminMultipartRequest,
 } from "../_shared/coworker-documents.schemas.ts";
 import {
   callCoworkerRpc,
@@ -29,7 +29,7 @@ const RPC = {
 export async function handleAdminUpload(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: AdminMultipartRequest,
+  request: ReturnType<typeof parseAdminMultipartRequest>,
 ): Promise<unknown> {
   return request.action === "uploadPrivateDocuments"
     ? await uploadPrivateDocuments(client, storageClient, request)
@@ -40,7 +40,7 @@ async function uploadPrivateDocuments(
   client: SupabaseClient,
   storageClient: SupabaseClient,
   request: Extract<
-    AdminMultipartRequest,
+    ReturnType<typeof parseAdminMultipartRequest>,
     { action: "uploadPrivateDocuments" }
   >,
 ): Promise<IRegisterAdminPrivateDocumentResult[]> {
@@ -88,7 +88,10 @@ async function uploadPrivateDocuments(
 async function uploadSharedDocument(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: Extract<AdminMultipartRequest, { action: "uploadSharedDocument" }>,
+  request: Extract<
+    ReturnType<typeof parseAdminMultipartRequest>,
+    { action: "uploadSharedDocument" }
+  >,
 ): Promise<IRegisterSharedDocumentResult> {
   const documents = await listAdminSharedDocuments(client);
   if (request.document_id !== null) {

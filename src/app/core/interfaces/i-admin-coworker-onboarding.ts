@@ -7,6 +7,7 @@ import type {
   CoworkerDocumentSource,
   CoworkerOnboardingLifecycleStatus,
 } from '../types/coworker-onboarding';
+import type { ICoworkerOnboardingRow } from './i-coworker-onboarding';
 
 export interface IAdminCoworkerOnboardingCandidate {
   readonly user_id: string;
@@ -17,21 +18,12 @@ export interface IAdminCoworkerOnboardingCandidate {
   readonly app_role: AppRole;
 }
 
-export interface IAdminCoworkerOnboardingRow {
-  readonly onboarding_id: string;
-  readonly user_id: string;
+export interface IAdminCoworkerOnboardingRow
+  extends ICoworkerOnboardingRow {
   readonly email: string | null;
   readonly first_name: string | null;
   readonly nickname: string | null;
-  readonly status: CoworkerOnboardingLifecycleStatus;
-  readonly started_at: string;
-  readonly started_by: string;
-  readonly completed_at: string | null;
-  readonly completed_by: string | null;
-  readonly cancelled_at: string | null;
-  readonly cancelled_by: string | null;
-  readonly created_at: string;
-  readonly updated_at: string;
+  readonly use_nickname: boolean;
   readonly private_document_count: number;
   readonly pending_private_action_count: number;
 }
@@ -95,6 +87,7 @@ export interface IAdminSharedDocumentAssignmentRow {
   readonly email: string | null;
   readonly first_name: string | null;
   readonly nickname: string | null;
+  readonly use_nickname: boolean;
   readonly onboarding_id: string | null;
   readonly required_action: CoworkerDocumentRequiredAction;
   readonly status: CoworkerDocumentAssignmentStatus;
@@ -108,24 +101,21 @@ export interface IAdminSharedDocumentAssignmentRow {
   readonly updated_at: string;
 }
 
-export type AdminCoworkerOnboardingDocument = Omit<
-  IAdminCoworkerOnboardingDocumentRow,
-  'storage_path' | 'signed_storage_path'
->;
+export interface IAdminCoworkerOnboardingDocument
+  extends Omit<
+    IAdminCoworkerOnboardingDocumentRow,
+    'storage_path' | 'signed_storage_path'
+  > {}
 
-export type AdminSharedDocument = Omit<
-  IAdminSharedDocumentRow,
-  'storage_path'
->;
+export interface IAdminSharedDocument
+  extends Omit<IAdminSharedDocumentRow, 'storage_path'> {}
 
-export type AdminSharedDocumentAssignment = Omit<
-  IAdminSharedDocumentAssignmentRow,
-  'storage_path'
->;
+export interface IAdminSharedDocumentAssignment
+  extends Omit<IAdminSharedDocumentAssignmentRow, 'storage_path'> {}
 
 export interface IAdminCoworkerOnboardingDetail {
   readonly onboarding: IAdminCoworkerOnboardingRow;
-  readonly documents: readonly AdminCoworkerOnboardingDocument[];
+  readonly documents: readonly IAdminCoworkerOnboardingDocument[];
 }
 
 export interface IAdminPrivateDocumentUpload {

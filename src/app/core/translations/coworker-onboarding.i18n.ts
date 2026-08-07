@@ -1,3 +1,5 @@
+import { computed } from '@angular/core';
+
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
@@ -48,8 +50,15 @@ export function createCoworkerOnboardingI18n() {
     statuses: 'statuses',
   });
 
+  const fileUploadTexts = computed(() => ({
+    chooseLabel: sections.upload().choose,
+    dropLabel: sections.upload().drop,
+    formatsLabel: sections.upload().formats,
+  }));
+
   return {
     ...sections,
+    fileUploadTexts,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),

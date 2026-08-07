@@ -9,7 +9,6 @@ export interface CoworkerOnboardingAdminListTranslations {
   subtitle: string;
   startTitle: string;
   startDescription: string;
-  gmLabel: string;
   noCandidates: string;
   empty: string;
   loadError: string;

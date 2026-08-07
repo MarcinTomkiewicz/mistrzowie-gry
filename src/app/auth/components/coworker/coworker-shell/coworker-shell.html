@@ -6,5 +6,17 @@
   [canonicalUrl]="pageUrl"
   [tabs]="tabs()"
 >
-  <router-outlet />
+  @if (portalState().status === 'error') {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+      <p class="m-0 error-text">{{ i18n.commonErrors().generic }}</p>
+      <p-button
+        severity="secondary"
+        icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry"
+        (onClick)="retryPortal()"
+      />
+    </section>
+  } @else {
+    <router-outlet />
+  }
 </app-route-tab-shell>

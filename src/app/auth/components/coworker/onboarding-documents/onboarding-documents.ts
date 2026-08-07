@@ -9,10 +9,11 @@ import { finalize } from 'rxjs';
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
 import type {
-  CoworkerPrivateDocument,
-  CoworkerSharedDocument,
   ICoworkerDocumentPortal,
+  ICoworkerPrivateDocument,
+  ICoworkerSharedDocument,
 } from '../../../../core/interfaces/i-coworker-onboarding';
+import type { IPdfPreview } from '../../../../core/interfaces/i-pdf';
 import { CoworkerOnboarding } from '../../../../core/services/coworker-onboarding/coworker-onboarding';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -24,10 +25,7 @@ import type { CoworkerDocumentDownloadTarget } from '../../../../core/types/cowo
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { FileUpload } from '../../../../public/common/file-upload/file-upload';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import {
-  IPdfPreviewDialogValue,
-  PdfViewerDialog,
-} from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { PdfViewerDialog } from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
 
 @Component({
   selector: 'app-coworker-onboarding-documents',
@@ -64,15 +62,10 @@ export class CoworkerOnboardingDocuments {
     signal<ReadonlySet<string>>(new Set());
   protected readonly acknowledgedAssignmentIds =
     signal<ReadonlySet<string>>(new Set());
-  protected readonly preview = signal<IPdfPreviewDialogValue | null>(null);
+  protected readonly preview = signal<IPdfPreview | null>(null);
   protected readonly uploadOptions = computed(() => ({
     ...COWORKER_PDF_UPLOAD_OPTIONS,
     disabled: this.activeAssignmentId() !== null,
-  }));
-  protected readonly uploadTexts = computed(() => ({
-    chooseLabel: this.i18n.upload().choose,
-    dropLabel: this.i18n.upload().drop,
-    formatsLabel: this.i18n.upload().formats,
   }));
 
   constructor() {
@@ -113,7 +106,7 @@ export class CoworkerOnboardingDocuments {
     });
   }
 
-  protected uploadSigned(document: CoworkerPrivateDocument): void {
+  protected uploadSigned(document: ICoworkerPrivateDocument): void {
     const file = this.selectedFiles().get(document.assignment_id);
     if (!file || !this.declaredAssignmentIds().has(document.assignment_id)) {
       return;
@@ -170,14 +163,14 @@ export class CoworkerOnboardingDocuments {
   }
 
   protected previewDocument(
-    document: CoworkerPrivateDocument | CoworkerSharedDocument,
+    document: ICoworkerPrivateDocument | ICoworkerSharedDocument,
     target: CoworkerDocumentDownloadTarget,
   ): void {
     this.prepareDownload(document.assignment_id, target, true);
   }
 
   protected download(
-    document: CoworkerPrivateDocument | CoworkerSharedDocument,
+    document: ICoworkerPrivateDocument | ICoworkerSharedDocument,
     target: CoworkerDocumentDownloadTarget,
   ): void {
     this.prepareDownload(document.assignment_id, target, false);

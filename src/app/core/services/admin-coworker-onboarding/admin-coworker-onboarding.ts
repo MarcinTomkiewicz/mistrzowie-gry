@@ -3,12 +3,12 @@ import { map, Observable } from 'rxjs';
 
 import { COWORKER_EDGE_FUNCTION } from '../../configs/coworker-edge-functions.config';
 import type {
-  AdminSharedDocument,
-  AdminSharedDocumentAssignment,
   IAdminCoworkerOnboardingCandidate,
   IAdminCoworkerOnboardingDetail,
   IAdminCoworkerOnboardingRow,
   IAdminPrivateDocumentUpload,
+  IAdminSharedDocument,
+  IAdminSharedDocumentAssignment,
   IArchiveSharedDocumentResult,
   ICompleteCoworkerOnboardingResult,
   IRegisterAdminPrivateDocumentResult,
@@ -102,7 +102,7 @@ export class AdminCoworkerOnboarding {
     });
   }
 
-  getSharedDocuments(): Observable<readonly AdminSharedDocument[]> {
+  getSharedDocuments(): Observable<readonly IAdminSharedDocument[]> {
     return this.invoke({ action: 'listSharedDocuments' });
   }
 
@@ -132,7 +132,7 @@ export class AdminCoworkerOnboarding {
 
   getSharedDocumentAssignments(
     documentId: string,
-  ): Observable<readonly AdminSharedDocumentAssignment[]> {
+  ): Observable<readonly IAdminSharedDocumentAssignment[]> {
     return this.invoke({
       action: 'listSharedDocumentAssignments',
       document_id: documentId,

@@ -17,9 +17,10 @@ import { finalize } from 'rxjs';
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
 import type {
-  AdminSharedDocument,
-  AdminSharedDocumentAssignment,
+  IAdminSharedDocument,
+  IAdminSharedDocumentAssignment,
 } from '../../../../core/interfaces/i-admin-coworker-onboarding';
+import type { IPdfPreview } from '../../../../core/interfaces/i-pdf';
 import { AdminCoworkerOnboarding } from '../../../../core/services/admin-coworker-onboarding/admin-coworker-onboarding';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
@@ -30,13 +31,11 @@ import {
 } from '../../../../core/translations/coworker-onboarding.i18n';
 import type { CoworkerDocumentAssignmentStatus } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
+import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { FileUpload } from '../../../../public/common/file-upload/file-upload';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { PdfThumbnail } from '../../../../public/common/pdf-thumbnail/pdf-thumbnail';
-import {
-  IPdfPreviewDialogValue,
-  PdfViewerDialog,
-} from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { PdfViewerDialog } from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
 
 @Component({
   selector: 'app-admin-shared-documents',
@@ -66,13 +65,14 @@ export class AdminSharedDocuments {
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
-  protected readonly documents = signal<readonly AdminSharedDocument[]>([]);
-  protected readonly assignments = signal<AdminSharedDocumentAssignment[]>([]);
-  protected readonly editedDocument = signal<AdminSharedDocument | null>(null);
-  protected readonly assignmentsDocument = signal<AdminSharedDocument | null>(null);
-  protected readonly preview = signal<IPdfPreviewDialogValue | null>(null);
+  protected readonly getUserDisplayName = getUserDisplayName;
+  protected readonly documents = signal<readonly IAdminSharedDocument[]>([]);
+  protected readonly assignments = signal<IAdminSharedDocumentAssignment[]>([]);
+  protected readonly editedDocument = signal<IAdminSharedDocument | null>(null);
+  protected readonly assignmentsDocument = signal<IAdminSharedDocument | null>(null);
+  protected readonly preview = signal<IPdfPreview | null>(null);
   protected readonly replacementThumbnail =
-    signal<IPdfPreviewDialogValue | null>(null);
+    signal<IPdfPreview | null>(null);
   protected readonly loading = signal(true);
   protected readonly busy = signal(false);
   protected readonly assignmentsLoading = signal(false);
@@ -89,12 +89,6 @@ export class AdminSharedDocuments {
     ...COWORKER_PDF_UPLOAD_OPTIONS,
     disabled: this.busy(),
   }));
-  protected readonly uploadTexts = computed(() => ({
-    chooseLabel: this.i18n.upload().choose,
-    dropLabel: this.i18n.upload().drop,
-    formatsLabel: this.i18n.upload().formats,
-  }));
-
   constructor() {
     this.load();
   }
@@ -115,7 +109,7 @@ export class AdminSharedDocuments {
     this.form.controls.file.setValue(files[0] ?? null);
   }
 
-  protected edit(document: AdminSharedDocument): void {
+  protected edit(document: IAdminSharedDocument): void {
     this.editedDocument.set(document);
     this.replacementThumbnail.set(null);
     this.form.reset({
@@ -172,11 +166,11 @@ export class AdminSharedDocuments {
       });
   }
 
-  protected previewDocument(document: AdminSharedDocument): void {
+  protected previewDocument(document: IAdminSharedDocument): void {
     this.prepareDownload(document, true);
   }
 
-  protected download(document: AdminSharedDocument): void {
+  protected download(document: IAdminSharedDocument): void {
     this.prepareDownload(document, false);
   }
 
@@ -189,7 +183,7 @@ export class AdminSharedDocuments {
     });
   }
 
-  protected showAssignments(document: AdminSharedDocument): void {
+  protected showAssignments(document: IAdminSharedDocument): void {
     this.assignmentsDocument.set(document);
     this.assignments.set([]);
     this.assignmentsLoading.set(true);
@@ -210,16 +204,10 @@ export class AdminSharedDocuments {
     this.assignments.set([]);
   }
 
-  protected assignmentStatusClass(
+  protected asAssignmentStatus(
     status: CoworkerDocumentAssignmentStatus,
-  ): string {
-    return STATUS_BADGE_CLASS[status];
-  }
-
-  protected assignmentStatusLabel(
-    status: CoworkerDocumentAssignmentStatus,
-  ): string {
-    return this.i18n.statuses().assignment[status];
+  ): CoworkerDocumentAssignmentStatus {
+    return status;
   }
 
   private archive(documentId: string): void {
@@ -237,7 +225,7 @@ export class AdminSharedDocuments {
   }
 
   private prepareDownload(
-    document: AdminSharedDocument,
+    document: IAdminSharedDocument,
     showPreview: boolean,
   ): void {
     this.api.getSourceDownload(document.document_id, null).subscribe({

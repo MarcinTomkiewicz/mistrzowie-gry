@@ -1,30 +1,14 @@
 import { Component, computed, input } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { RadioButtonModule } from 'primeng/radiobutton';
 
 import { ISelectOption } from '../../../../core/interfaces/i-select-option';
-import {
-  QuestionnaireIdentificationBasis,
-  QuestionnaireIdentityDocumentKind,
-  QuestionnaireJoinDeclineAnswer,
-  QuestionnaireYesNo,
-} from '../../../../core/types/coworker-questionnaire';
+import type {
+  QuestionnaireChoiceControl,
+  QuestionnaireChoiceValue,
+} from '../../../../core/types/coworker-questionnaire-form';
 import { QuestionnaireFieldErrors } from './questionnaire-field-errors';
-
-type QuestionnaireChoiceValue = Exclude<
-  | QuestionnaireIdentificationBasis
-  | QuestionnaireIdentityDocumentKind
-  | QuestionnaireJoinDeclineAnswer
-  | QuestionnaireYesNo,
-  null
->;
-
-type QuestionnaireChoiceControl =
-  | FormControl<QuestionnaireIdentificationBasis>
-  | FormControl<QuestionnaireIdentityDocumentKind>
-  | FormControl<QuestionnaireJoinDeclineAnswer>
-  | FormControl<QuestionnaireYesNo>;
 
 @Component({
   selector: 'app-questionnaire-choice-field',

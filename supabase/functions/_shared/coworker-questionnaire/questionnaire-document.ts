@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
+import { COWORKER_DOCUMENT_PDF_MIME_TYPE } from "../../../../src/app/core/configs/coworker-document.config.ts";
 import type {
   IRegisterQuestionnairePrivateDocumentResult,
 } from "../../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
@@ -34,16 +35,15 @@ const LIST_PRIVATE_DOCUMENTS_RPC = "list_coworker_private_documents";
 const REGISTER_DOCUMENT_RPC = "register_questionnaire_private_document";
 const QUESTIONNAIRE_TITLE = "Kwestionariusz osobowy";
 
-type QuestionnaireDocumentState = Pick<
-  SaveEnvelopeResult,
-  "isComplete" | "validationPassed" | "currentDeclaration"
->;
-
 export async function ensureQuestionnaireDocument(
   adminClient: SupabaseClient,
   userClient: SupabaseClient,
   payload: QuestionnairePayload,
-  questionnaire: QuestionnaireDocumentState,
+  questionnaire: Pick<
+    SaveEnvelopeResult,
+    "isComplete" | "validationPassed" | "currentDeclaration"
+  >,
+  resolvedOnboarding?: ICoworkerOnboardingRow,
 ): Promise<void> {
   if (
     !questionnaire.isComplete ||
@@ -53,11 +53,11 @@ export async function ensureQuestionnaireDocument(
     throw new BackendContractError(RPC.saveEnvelope);
   }
 
-  const onboardingRows = await callCoworkerRpc<ICoworkerOnboardingRow[]>(
-    userClient,
-    GET_ONBOARDING_RPC,
-  );
-  const onboarding = onboardingRows[0];
+  const onboarding = resolvedOnboarding ??
+    (await callCoworkerRpc<ICoworkerOnboardingRow[]>(
+      userClient,
+      GET_ONBOARDING_RPC,
+    ))[0];
   if (onboarding === undefined || onboarding.status !== "in_progress") {
     throw new QuestionnaireOnboardingStateError();
   }
@@ -93,7 +93,7 @@ export async function ensureQuestionnaireDocument(
       p_title: QUESTIONNAIRE_TITLE,
       p_storage_path: storagePath,
       p_original_filename: originalFilename,
-      p_mime_type: "application/pdf",
+      p_mime_type: COWORKER_DOCUMENT_PDF_MIME_TYPE,
       p_size_bytes: pdfBytes.byteLength,
     });
   } catch (error) {
@@ -149,8 +149,7 @@ export async function reconcileQuestionnaireDocument(
     onboarding.status !== "in_progress" ||
     privateDocuments.some((document) =>
       document.onboarding_id === onboarding.onboarding_id &&
-      document.source === "generated" &&
-      document.title === QUESTIONNAIRE_TITLE
+      document.source === "generated"
     )
   ) {
     return;
@@ -161,5 +160,6 @@ export async function reconcileQuestionnaireDocument(
     userClient,
     payload,
     questionnaire,
+    onboarding,
   );
 }
