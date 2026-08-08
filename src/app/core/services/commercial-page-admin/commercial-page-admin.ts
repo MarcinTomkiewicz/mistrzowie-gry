@@ -7,14 +7,13 @@ import {
 } from '../../configs/commercial-pages.config';
 import type {
   CommercialPageAdminDetail,
+  CommercialPageAdminDocument,
   CommercialPageAdminListItem,
   CommercialPagePublicationIssue,
   CommercialPagePublishResult,
+  CommercialPageAdminSavePayload,
 } from '../../types/commercial-page-admin';
-import type {
-  CommercialPageDocument,
-  StoredCommercialPageDocument,
-} from '../../types/commercial-page';
+import type { CommercialPageDocument } from '../../types/commercial-page';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -39,12 +38,18 @@ export class CommercialPageAdmin {
 
   saveDraft(
     pageId: string,
-    document: StoredCommercialPageDocument,
+    document: CommercialPageAdminDocument,
     locale = COMMERCIAL_PAGE_DEFAULT_LOCALE,
   ): Observable<CommercialPageAdminDetail> {
+    const payload = {
+      p_page_id: pageId,
+      p_locale: locale,
+      p_document: document,
+    } satisfies CommercialPageAdminSavePayload;
+
     return this.backend.rpc<CommercialPageAdminDetail>(
       COMMERCIAL_PAGE_RPC.saveAdminDraft,
-      { p_page_id: pageId, p_locale: locale, p_document: document },
+      payload,
     );
   }
 

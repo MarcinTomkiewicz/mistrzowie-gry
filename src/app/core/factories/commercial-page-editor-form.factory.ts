@@ -1,9 +1,17 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import type { StoredCommercialPageDocument } from '../types/commercial-page';
-import type { CommercialPageEditorForm } from '../types/commercial-page-editor-form';
+import type { CommercialPageAdminDocument } from '../types/commercial-page-admin';
+import type {
+  CommercialPageEditorForm,
+  CommercialSectionEditorForm,
+} from '../types/commercial-page-editor-form';
 import { normalizeText } from '../utils/normalize-text';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
+import { createCommercialSectionEditorForm } from './commercial-section-editor-form.factory';
+import {
+  mapCommercialSectionEditorForm,
+  syncCommercialSectionEditorOptionalControls,
+} from './commercial-section-editor-form.mapper';
 
 const requiredTextValidators = [
   Validators.required,
@@ -32,12 +40,13 @@ export function createCommercialPageEditorForm(): CommercialPageEditorForm {
       ogDescription: new FormControl('', { nonNullable: true }),
       canonicalUrl: new FormControl('', { nonNullable: true }),
     }),
+    sections: new FormArray<CommercialSectionEditorForm>([]),
   });
 }
 
 export function resetCommercialPageEditorForm(
   form: CommercialPageEditorForm,
-  document: StoredCommercialPageDocument,
+  document: CommercialPageAdminDocument,
 ): void {
   form.reset(
     {
@@ -55,12 +64,24 @@ export function resetCommercialPageEditorForm(
     },
     { emitEvent: false },
   );
+
+  form.controls.sections.clear({ emitEvent: false });
+  for (const section of [...document.sections].sort(
+    (left, right) => left.position - right.position,
+  )) {
+    form.controls.sections.push(
+      createCommercialSectionEditorForm(section),
+      { emitEvent: false },
+    );
+  }
+
+  syncCommercialPageEditorOptionalControls(form);
 }
 
 export function mapCommercialPageEditorFormToDocument(
   form: CommercialPageEditorForm,
-  document: StoredCommercialPageDocument,
-): StoredCommercialPageDocument {
+  document: CommercialPageAdminDocument,
+): CommercialPageAdminDocument {
   const value = form.getRawValue();
 
   return {
@@ -74,5 +95,16 @@ export function mapCommercialPageEditorFormToDocument(
       ogDescription: normalizeText(value.seo.ogDescription),
       canonicalUrl: normalizeText(value.seo.canonicalUrl),
     },
+    sections: form.controls.sections.controls.map((section, index) =>
+      mapCommercialSectionEditorForm(section, (index + 1) * 10),
+    ),
   };
+}
+
+export function syncCommercialPageEditorOptionalControls(
+  form: CommercialPageEditorForm,
+): void {
+  for (const section of form.controls.sections.controls) {
+    syncCommercialSectionEditorOptionalControls(section);
+  }
 }

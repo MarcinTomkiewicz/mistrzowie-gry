@@ -1,0 +1,37 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <app-commercial-section-base-editor
+    [heading]="form().controls.heading"
+    [lead]="form().controls.lead"
+    [controlId]="controlId()"
+  />
+
+  <p-iftalabel class="w-100">
+    <textarea
+      pTextarea
+      class="w-100"
+      rows="5"
+      [id]="controlId() + '-body'"
+      formControlName="body"
+    ></textarea>
+    <label [for]="controlId() + '-body'">{{ i18n.items().body }}</label>
+  </p-iftalabel>
+
+  <div class="flex-row-start-center gap-xs">
+    <p-checkbox
+      [inputId]="controlId() + '-has-action'"
+      formControlName="hasAction"
+      [binary]="true"
+      (onChange)="syncAction()"
+    />
+    <label [for]="controlId() + '-has-action'">
+      {{ i18n.action().enabled }}
+    </label>
+  </div>
+
+  @if (form().controls.hasAction.value) {
+    <app-commercial-action-editor
+      [form]="form().controls.action"
+      [controlId]="controlId() + '-action'"
+    />
+  }
+</div>

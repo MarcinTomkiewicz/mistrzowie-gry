@@ -1,0 +1,90 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <div class="w-100">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        [id]="controlId() + '-title'"
+        formControlName="title"
+        autocomplete="off"
+      />
+      <label [for]="controlId() + '-title'">{{ i18n.items().title }}</label>
+    </p-iftalabel>
+
+    @if (form().controls.title.touched && form().controls.title.invalid) {
+      <small class="error-text">{{ i18n.commonForm().required }}</small>
+    }
+  </div>
+
+  <p-iftalabel class="w-100">
+    <textarea
+      pTextarea
+      class="w-100"
+      rows="4"
+      [id]="controlId() + '-body'"
+      formControlName="body"
+    ></textarea>
+    <label [for]="controlId() + '-body'">{{ i18n.items().body }}</label>
+  </p-iftalabel>
+
+  @if (!priceRequired()) {
+    <div class="flex-row-start-center gap-xs">
+      <p-checkbox
+        [inputId]="controlId() + '-has-price'"
+        formControlName="hasPrice"
+        [binary]="true"
+        (onChange)="syncPrice()"
+      />
+      <label [for]="controlId() + '-has-price'">
+        {{ i18n.price().enabled }}
+      </label>
+    </div>
+  }
+
+  @if (form().controls.hasPrice.value) {
+    <app-commercial-price-editor
+      [form]="form().controls.price"
+      [controlId]="controlId() + '-price'"
+    />
+  }
+
+  <div class="flex-row-start-center flex-wrap gap-md">
+    <div class="flex-row-start-center gap-xs">
+      <p-checkbox
+        [inputId]="controlId() + '-has-capacity'"
+        formControlName="hasCapacity"
+        [binary]="true"
+        (onChange)="syncCapacity()"
+      />
+      <label [for]="controlId() + '-has-capacity'">
+        {{ i18n.capacity().enabled }}
+      </label>
+    </div>
+
+    <div class="flex-row-start-center gap-xs">
+      <p-checkbox
+        [inputId]="controlId() + '-has-schedule'"
+        formControlName="hasSchedule"
+        [binary]="true"
+        (onChange)="syncSchedule()"
+      />
+      <label [for]="controlId() + '-has-schedule'">
+        {{ i18n.schedule().enabled }}
+      </label>
+    </div>
+  </div>
+
+  @if (form().controls.hasCapacity.value) {
+    <app-commercial-capacity-editor
+      [form]="form().controls.capacity"
+      [controlId]="controlId() + '-capacity'"
+    />
+  }
+
+  @if (form().controls.hasSchedule.value) {
+    <app-commercial-schedule-editor
+      [form]="form().controls.schedule"
+      [controlId]="controlId() + '-schedule'"
+    />
+  }
+</div>

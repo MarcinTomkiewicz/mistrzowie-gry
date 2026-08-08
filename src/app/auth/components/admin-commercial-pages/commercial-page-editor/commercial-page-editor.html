@@ -102,6 +102,13 @@
           [requiredMessage]="i18n.commonForm().required"
         />
 
+        <app-commercial-page-sections-editor
+          [sections]="form.controls.sections"
+          [allowedSectionTypes]="pageDetail.allowedSectionTypes"
+          [pageKey]="pageDetail.page.key"
+          [locale]="pageDetail.page.locale"
+        />
+
         <div class="flex-row-center-center flex-wrap gap-sm w-100">
           <p-button
             type="submit"

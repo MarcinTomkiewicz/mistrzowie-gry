@@ -1,0 +1,49 @@
+@if (sharedReferenceForm(); as shared) {
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <span class="small-caps">{{ i18n.sections().sharedSource }}</span>
+    <strong>
+      {{ i18n.sharedSource()[shared.controls.sharedSource.value.key] }}
+    </strong>
+  </div>
+} @else if (heroForm(); as hero) {
+  <app-commercial-hero-section-editor
+    [form]="hero"
+    [controlId]="controlId()"
+  />
+} @else if (richTextForm(); as richText) {
+  <app-commercial-rich-text-section-editor
+    [form]="richText"
+    [controlId]="controlId()"
+  />
+} @else if (pricedForm(); as priced) {
+  <div class="flex-col-start-stretch gap-md w-100">
+    @if (sharedSource(); as source) {
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <span class="small-caps">{{ i18n.sections().sharedSource }}</span>
+        <strong>{{ i18n.sharedSource()[source.key] }}</strong>
+        <p class="m-0 text-muted">{{ i18n.sections().sharedNotice }}</p>
+      </div>
+    }
+
+    <app-commercial-priced-section-editor
+      [form]="priced"
+      [controlId]="controlId()"
+      [priceRequired]="priceRequired()"
+    />
+  </div>
+} @else if (processForm(); as process) {
+  <app-commercial-process-section-editor
+    [form]="process"
+    [controlId]="controlId()"
+  />
+} @else if (faqForm(); as faq) {
+  <app-commercial-faq-section-editor
+    [form]="faq"
+    [controlId]="controlId()"
+  />
+} @else if (ctaForm(); as cta) {
+  <app-commercial-cta-section-editor
+    [form]="cta"
+    [controlId]="controlId()"
+  />
+}

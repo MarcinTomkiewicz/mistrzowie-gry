@@ -87,8 +87,10 @@ export type CommercialCapacity = {
   tableCount: number | null;
 };
 
+export type CommercialDurationMode = 'standard_session' | 'custom';
+
 export type CommercialSchedule = {
-  durationMode: 'standard_session' | 'custom';
+  durationMode: CommercialDurationMode;
   durationMinutes: number | null;
   sessionCount: number | null;
   sessionsPerMonth: number | null;
@@ -181,7 +183,7 @@ export type CommercialPageSection =
   | CommercialCtaSection
   | CommercialLogisticsFeesSection;
 
-type StoredCommercialSharedSection<
+export type StoredCommercialSharedSection<
   TType extends 'card_grid' | 'logistics_fees',
 > = Pick<CommercialSectionBase<TType>, 'id' | 'type' | 'position'> & {
   heading?: never;
@@ -195,8 +197,7 @@ export type StoredCommercialCardGridSection =
   | StoredCommercialSharedSection<'card_grid'>;
 
 export type StoredCommercialLogisticsFeesSection =
-  | (CommercialLogisticsFeesSection & { sharedSource?: never })
-  | StoredCommercialSharedSection<'logistics_fees'>;
+  StoredCommercialSharedSection<'logistics_fees'>;
 
 export type StoredCommercialSection =
   | CommercialHeroSection

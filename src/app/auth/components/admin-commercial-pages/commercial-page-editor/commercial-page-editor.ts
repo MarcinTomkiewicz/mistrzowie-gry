@@ -10,6 +10,7 @@ import {
   createCommercialPageEditorForm,
   mapCommercialPageEditorFormToDocument,
   resetCommercialPageEditorForm,
+  syncCommercialPageEditorOptionalControls,
 } from '../../../../core/factories/commercial-page-editor-form.factory';
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -17,6 +18,7 @@ import type { CommercialPageAdminDetail } from '../../../../core/types/commercia
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor';
+import { CommercialPageSectionsEditor } from './commercial-page-sections-editor';
 import { CommercialPageSeoEditor } from './commercial-page-seo-editor';
 
 @Component({
@@ -26,6 +28,7 @@ import { CommercialPageSeoEditor } from './commercial-page-seo-editor';
     ButtonModule,
     LoadingOverlay,
     CommercialPageMetadataEditor,
+    CommercialPageSectionsEditor,
     CommercialPageSeoEditor,
   ],
   templateUrl: './commercial-page-editor.html',
@@ -113,6 +116,7 @@ export class CommercialPageEditor {
       .pipe(
         finalize(() => {
           this.form.enable({ emitEvent: false });
+          syncCommercialPageEditorOptionalControls(this.form);
           this.isSaving.set(false);
         }),
       )

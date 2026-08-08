@@ -50,6 +50,82 @@
       "ogDescription": "[PH] Opis Open Graph",
       "canonicalUrl": "[PH] Canonical URL"
     },
+    "sections": {
+      "sectionTitle": "[PH] Sekcje strony",
+      "empty": "[PH] Dokument nie zawiera żadnych sekcji.",
+      "addSection": "[PH] Dodaj sekcję",
+      "sharedNotice": "Zmiana wspólna dla wszystkich ofert.",
+      "sharedSource": "[PH] Współdzielone źródło"
+    },
+    "sectionBase": {
+      "heading": "[PH] Nagłówek sekcji",
+      "lead": "[PH] Lead sekcji"
+    },
+    "items": {
+      "empty": "[PH] Sekcja nie zawiera żadnych elementów.",
+      "addItem": "[PH] Dodaj element",
+      "title": "[PH] Tytuł",
+      "body": "[PH] Treść",
+      "question": "[PH] Pytanie",
+      "answer": "[PH] Odpowiedź"
+    },
+    "action": {
+      "sectionTitle": "[PH] Przycisk CTA",
+      "enabled": "[PH] Pokaż przycisk CTA",
+      "label": "[PH] Etykieta przycisku",
+      "route": "[PH] Wewnętrzna ścieżka",
+      "appearance": "[PH] Wygląd przycisku"
+    },
+    "price": {
+      "sectionTitle": "[PH] Cena",
+      "enabled": "[PH] Dodaj cenę",
+      "type": "[PH] Rodzaj ceny",
+      "amount": "[PH] Kwota",
+      "minAmount": "[PH] Kwota minimalna",
+      "maxAmount": "[PH] Kwota maksymalna",
+      "value": "[PH] Wartość procentowa",
+      "minValue": "[PH] Minimalna wartość procentowa",
+      "maxValue": "[PH] Maksymalna wartość procentowa",
+      "unit": "[PH] Jednostka rozliczeniowa",
+      "basis": "[PH] Podstawa rozliczenia",
+      "note": "[PH] Nota cenowa"
+    },
+    "capacity": {
+      "sectionTitle": "[PH] Pojemność",
+      "enabled": "[PH] Dodaj informacje o pojemności",
+      "participantsMin": "[PH] Minimalna liczba uczestników",
+      "participantsMax": "[PH] Maksymalna liczba uczestników",
+      "participantsPerFacilitatorMax": "[PH] Maksymalnie uczestników na prowadzącego",
+      "facilitatorCount": "[PH] Liczba prowadzących",
+      "tableCount": "[PH] Liczba stołów"
+    },
+    "schedule": {
+      "sectionTitle": "[PH] Harmonogram",
+      "enabled": "[PH] Dodaj harmonogram",
+      "durationMode": "[PH] Sposób określenia czasu",
+      "durationMinutes": "[PH] Czas trwania w minutach",
+      "sessionCount": "[PH] Liczba sesji",
+      "sessionsPerMonth": "[PH] Liczba sesji w miesiącu",
+      "meetingCountMin": "[PH] Minimalna liczba spotkań",
+      "meetingCountMax": "[PH] Maksymalna liczba spotkań"
+    },
+    "actions": {
+      "moveSectionUp": "[PH] Przesuń sekcję wyżej",
+      "moveSectionDown": "[PH] Przesuń sekcję niżej",
+      "removeSection": "[PH] Usuń sekcję",
+      "moveItemUp": "[PH] Przesuń element wyżej",
+      "moveItemDown": "[PH] Przesuń element niżej",
+      "removeItem": "[PH] Usuń element"
+    },
+    "validation": {
+      "invalidPrice": "[PH] Uzupełnij wymagane dane ceny.",
+      "invalidPriceRange": "[PH] Minimalna kwota nie może być większa od maksymalnej.",
+      "invalidPercentage": "[PH] Podaj jedną wartość procentową albo pełny zakres.",
+      "priceNoteRequired": "[PH] Nota jest wymagana dla tego rodzaju ceny.",
+      "invalidCapacity": "[PH] Uzupełnij pojemność poprawnymi nieujemnymi liczbami całkowitymi i zakresem.",
+      "invalidSchedule": "[PH] Uzupełnij poprawny czas i zakres harmonogramu.",
+      "invalidRoute": "[PH] Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku „/”."
+    },
     "toast": {
       "loadFailedSummary": "[PH] Nie udało się załadować strony ofertowej",
       "loadFailedDetail": "[PH] Dane strony ofertowej nie zostały pobrane.",
@@ -72,5 +148,64 @@
     "net": "[PH] Ceny netto",
     "audience_dependent": "[PH] Zależnie od odbiorcy",
     "none": "[PH] Bez informacji podatkowej"
+  },
+  "sectionType": {
+    "hero": "[PH] Hero",
+    "rich_text": "[PH] Treść tekstowa",
+    "card_grid": "[PH] Karty",
+    "pricing_table": "[PH] Cennik",
+    "process": "[PH] Proces",
+    "faq": "[PH] FAQ",
+    "cta": "[PH] CTA",
+    "logistics_fees": "[PH] Opłaty logistyczne"
+  },
+  "sharedSource": {
+    "standards": "[PH] Standardy",
+    "logistics": "[PH] Logistyka"
+  },
+  "actionAppearance": {
+    "primary": "[PH] Główny",
+    "success": "[PH] Sukces",
+    "secondary": "[PH] Drugorzędny"
+  },
+  "priceType": {
+    "fixed": "[PH] Stała kwota",
+    "range": "[PH] Zakres kwot",
+    "from": "[PH] Cena od",
+    "percentage": "[PH] Procent",
+    "actual_cost": "[PH] Koszt rzeczywisty",
+    "custom_quote": "[PH] Wycena indywidualna"
+  },
+  "billingUnit": {
+    "session": "[PH] Sesja",
+    "hour": "[PH] Godzina",
+    "month": "[PH] Miesiąc",
+    "event": "[PH] Wydarzenie",
+    "package": "[PH] Pakiet",
+    "table": "[PH] Stół",
+    "table_hour": "[PH] Stół za godzinę",
+    "facilitator": "[PH] Prowadzący",
+    "participant": "[PH] Uczestnik",
+    "piece": "[PH] Sztuka",
+    "day": "[PH] Dzień",
+    "half_day": "[PH] Pół dnia",
+    "night": "[PH] Noc",
+    "kilometer": "[PH] Kilometr"
+  },
+  "percentageBasis": {
+    "base_service": "[PH] Usługa bazowa",
+    "package": "[PH] Pakiet",
+    "table": "[PH] Stół",
+    "facilitator": "[PH] Prowadzący"
+  },
+  "actualCostBasis": {
+    "ticket": "[PH] Bilet",
+    "accommodation": "[PH] Nocleg",
+    "documented_expense": "[PH] Udokumentowany wydatek",
+    "other": "[PH] Inny koszt"
+  },
+  "durationMode": {
+    "standard_session": "[PH] Standardowa sesja",
+    "custom": "[PH] Własny czas"
   }
 }

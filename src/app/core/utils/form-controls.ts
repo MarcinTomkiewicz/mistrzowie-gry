@@ -1,7 +1,14 @@
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 
 import { EdgeFunctionError } from '../types/edge-function-error';
 import { CommonFormTranslations } from '../types/i18n/common';
+
+type MovableFormArray<TControl extends AbstractControl> = Pick<
+  FormArray<TControl>,
+  'insert' | 'markAsDirty' | 'removeAt'
+> & {
+  readonly controls: TControl[];
+};
 
 export function setControlValue<T>(
   control: AbstractControl<T>,
@@ -27,6 +34,22 @@ export function setControlEnabled(
   }
 
   control.disable({ emitEvent: false });
+}
+
+export function moveFormArrayControl<TControl extends AbstractControl>(
+  formArray: MovableFormArray<TControl>,
+  fromIndex: number,
+  toIndex: number,
+): void {
+  const control = formArray.controls[fromIndex];
+
+  if (!control) {
+    throw new RangeError(`FormArray control ${fromIndex} does not exist.`);
+  }
+
+  formArray.removeAt(fromIndex);
+  formArray.insert(toIndex, control);
+  formArray.markAsDirty();
 }
 
 export function resolveEdgeFormFieldError(

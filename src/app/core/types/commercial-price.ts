@@ -78,3 +78,5 @@ export type CommercialPrice =
   | CommercialPercentagePrice
   | CommercialActualCostPrice
   | CommercialCustomQuotePrice;
+
+export type CommercialPriceType = CommercialPrice['type'];

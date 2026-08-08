@@ -1,0 +1,84 @@
+<section
+  class="flex-col-start-stretch gap-md w-100"
+  [formGroup]="form()"
+>
+  <h4 class="mg-section__title mg-section__title--xs m-0">
+    {{ i18n.capacity().sectionTitle }}
+  </h4>
+
+  <div class="mg-grid-2 gap-md w-100">
+    <p-iftalabel class="w-100">
+      <p-inputnumber
+        class="w-100"
+        [inputId]="controlId() + '-participants-min'"
+        formControlName="participantsMin"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [useGrouping]="false"
+      />
+      <label [for]="controlId() + '-participants-min'">
+        {{ i18n.capacity().participantsMin }}
+      </label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-inputnumber
+        class="w-100"
+        [inputId]="controlId() + '-participants-max'"
+        formControlName="participantsMax"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [useGrouping]="false"
+      />
+      <label [for]="controlId() + '-participants-max'">
+        {{ i18n.capacity().participantsMax }}
+      </label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-inputnumber
+        class="w-100"
+        [inputId]="controlId() + '-participants-per-facilitator'"
+        formControlName="participantsPerFacilitatorMax"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [useGrouping]="false"
+      />
+      <label [for]="controlId() + '-participants-per-facilitator'">
+        {{ i18n.capacity().participantsPerFacilitatorMax }}
+      </label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-inputnumber
+        class="w-100"
+        [inputId]="controlId() + '-facilitator-count'"
+        formControlName="facilitatorCount"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [useGrouping]="false"
+      />
+      <label [for]="controlId() + '-facilitator-count'">
+        {{ i18n.capacity().facilitatorCount }}
+      </label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-inputnumber
+        class="w-100"
+        [inputId]="controlId() + '-table-count'"
+        formControlName="tableCount"
+        [min]="0"
+        [maxFractionDigits]="0"
+        [useGrouping]="false"
+      />
+      <label [for]="controlId() + '-table-count'">
+        {{ i18n.capacity().tableCount }}
+      </label>
+    </p-iftalabel>
+  </div>
+
+  @if (form().touched && form().invalid) {
+    <small class="error-text">{{ i18n.validation().invalidCapacity }}</small>
+  }
+</section>

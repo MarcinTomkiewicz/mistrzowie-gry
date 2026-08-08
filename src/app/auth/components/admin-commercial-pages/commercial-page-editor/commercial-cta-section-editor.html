@@ -1,0 +1,23 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <app-commercial-section-base-editor
+    [heading]="form().controls.heading"
+    [lead]="form().controls.lead"
+    [controlId]="controlId()"
+  />
+
+  <p-iftalabel class="w-100">
+    <textarea
+      pTextarea
+      class="w-100"
+      rows="4"
+      [id]="controlId() + '-body'"
+      formControlName="body"
+    ></textarea>
+    <label [for]="controlId() + '-body'">{{ i18n.items().body }}</label>
+  </p-iftalabel>
+
+  <app-commercial-action-editor
+    [form]="form().controls.action"
+    [controlId]="controlId() + '-action'"
+  />
+</div>

@@ -1,0 +1,83 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.sections().sectionTitle }}
+    </h2>
+
+    <div class="flex-row-end-center flex-col-start-stretch-sm gap-xs">
+      <p-select
+        class="w-100"
+        inputId="commercial-page-new-section-type"
+        [formControl]="selectedType"
+        [options]="sectionTypeOptions()"
+        [placeholder]="i18n.sections().addSection"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+
+      <p-button
+        type="button"
+        severity="secondary"
+        [label]="i18n.sections().addSection"
+        icon="pi pi-plus"
+        [disabled]="!selectedType.value"
+        (onClick)="addSection()"
+      />
+    </div>
+  </div>
+
+  @if (!sections().length) {
+    <p class="m-0">{{ i18n.sections().empty }}</p>
+  }
+
+  @for (section of sections().controls; track section; let index = $index) {
+    <section class="mg-card flex-col-start-stretch gap-md w-100">
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+        <div class="flex-row-start-center flex-wrap gap-xs">
+          <span class="tag-badge tag-badge--muted">{{ index + 1 }}</span>
+          <strong>{{ i18n.sectionType()[section.controls.type.value] }}</strong>
+        </div>
+
+        <div class="flex-row-end-center flex-wrap gap-xs">
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().moveSectionUp"
+            icon="pi pi-arrow-up"
+            [disabled]="index === 0"
+            (onClick)="moveSection(index, -1)"
+          />
+
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().moveSectionDown"
+            icon="pi pi-arrow-down"
+            [disabled]="index === sections().length - 1"
+            (onClick)="moveSection(index, 1)"
+          />
+
+          <p-button
+            type="button"
+            severity="danger"
+            size="small"
+            [text]="true"
+            [label]="i18n.editorActions().removeSection"
+            icon="pi pi-trash"
+            (onClick)="removeSection(index)"
+          />
+        </div>
+      </div>
+
+      <app-commercial-section-editor
+        [form]="section"
+        [controlId]="'commercial-page-section-' + index"
+      />
+    </section>
+  }
+</section>
