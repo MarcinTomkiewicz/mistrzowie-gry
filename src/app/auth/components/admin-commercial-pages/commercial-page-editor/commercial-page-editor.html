@@ -1,0 +1,128 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm w-100">
+        <div class="flex-col-start-start gap-xs">
+          <h1 class="mg-section__title">{{ i18n.editorPage().title }}</h1>
+
+          <p class="mg-section__subtitle mg-section__subtitle--full">
+            {{ i18n.editorPage().subtitle }}
+          </p>
+        </div>
+
+        @if (detail()) {
+          <span [class]="draftStatusClass()">{{ draftStatusLabel() }}</span>
+        }
+      </div>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading() || isSaving()"
+      [label]="
+        isSaving()
+          ? i18n.commonStatus().saving
+          : i18n.commonStatus().loading
+      "
+    />
+
+    @if (hasLoadError() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.editorPage().loadErrorTitle }}
+        </h2>
+
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button
+            severity="secondary"
+            [label]="i18n.commonActions().retry"
+            icon="pi pi-refresh"
+            (onClick)="loadPage()"
+          />
+
+          <p-button
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            (onClick)="goBack()"
+          />
+        </div>
+      </section>
+    } @else if (detail(); as pageDetail) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <h2 class="mg-section__title mg-section__title--md m-0">
+          {{ i18n.identity().sectionTitle }}
+        </h2>
+
+        <dl class="mg-grid-2 gap-md m-0">
+          <div>
+            <dt class="small-caps">{{ i18n.identity().key }}</dt>
+            <dd class="m-0">{{ pageDetail.page.key }}</dd>
+          </div>
+          <div>
+            <dt class="small-caps">{{ i18n.identity().navigationLabel }}</dt>
+            <dd class="m-0">{{ pageDetail.page.navigationLabel }}</dd>
+          </div>
+          <div>
+            <dt class="small-caps">{{ i18n.identity().slug }}</dt>
+            <dd class="m-0">{{ pageDetail.page.slug }}</dd>
+          </div>
+          <div>
+            <dt class="small-caps">{{ i18n.identity().locale }}</dt>
+            <dd class="m-0">{{ pageDetail.page.locale }}</dd>
+          </div>
+          <div>
+            <dt class="small-caps">{{ i18n.identity().kind }}</dt>
+            <dd class="m-0">{{ i18n.kind()[pageDetail.page.kind] }}</dd>
+          </div>
+          <div>
+            <dt class="small-caps">{{ i18n.identity().taxDisplayMode }}</dt>
+            <dd class="m-0">
+              {{ i18n.taxDisplayMode()[pageDetail.page.taxDisplayMode] }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <form
+        class="mg-form flex-col-start-stretch gap-md w-100"
+        [formGroup]="form"
+        (ngSubmit)="saveDraft()"
+        novalidate
+      >
+        <app-commercial-page-metadata-editor
+          [form]="form.controls.metadata"
+          [copy]="i18n.metadata()"
+          [requiredMessage]="i18n.commonForm().required"
+        />
+
+        <app-commercial-page-seo-editor
+          [form]="form.controls.seo"
+          [copy]="i18n.seo()"
+          [requiredMessage]="i18n.commonForm().required"
+        />
+
+        <div class="flex-row-center-center flex-wrap gap-sm w-100">
+          <p-button
+            type="submit"
+            severity="success"
+            [label]="i18n.commonActions().save"
+            icon="pi pi-save"
+            [loading]="isSaving()"
+            [disabled]="isLoading() || form.pristine"
+          />
+
+          <p-button
+            type="button"
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            [disabled]="isSaving()"
+            (onClick)="goBack()"
+          />
+        </div>
+      </form>
+    }
+  </div>
+</section>

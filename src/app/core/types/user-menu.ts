@@ -7,6 +7,7 @@ export type UserMenuItemId =
   | 'gm-availability-overview'
   | 'work-log-overview'
   | 'admin-content'
+  | 'admin-offers'
   | 'admin-events'
   | 'admin-coworker-records'
   | 'admin-users';
@@ -30,6 +31,7 @@ export type BuildUserMenuArgs = {
   gmAvailabilityOverviewLabel: string;
   workLogOverviewLabel: string;
   adminContentLabel: string;
+  adminOffersLabel: string;
   adminEventsLabel: string;
   adminCoworkerRecordsLabel: string;
   adminUsersLabel: string;

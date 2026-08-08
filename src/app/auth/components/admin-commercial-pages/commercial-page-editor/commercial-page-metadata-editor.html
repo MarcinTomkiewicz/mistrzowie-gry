@@ -1,0 +1,36 @@
+<section
+  class="mg-card flex-col-start-stretch gap-md p-md w-100"
+  [formGroup]="form()"
+>
+  <h2 class="mg-section__title mg-section__title--md m-0">
+    {{ copy().sectionTitle }}
+  </h2>
+
+  <div class="w-100">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        id="commercial-page-heading"
+        class="w-100"
+        formControlName="heading"
+        autocomplete="off"
+      />
+      <label for="commercial-page-heading">{{ copy().heading }}</label>
+    </p-iftalabel>
+
+    @if (form().controls.heading.touched && form().controls.heading.invalid) {
+      <small class="error-text">{{ requiredMessage() }}</small>
+    }
+  </div>
+
+  <p-iftalabel class="w-100">
+    <textarea
+      pTextarea
+      id="commercial-page-lead"
+      class="w-100"
+      formControlName="lead"
+      rows="4"
+    ></textarea>
+    <label for="commercial-page-lead">{{ copy().lead }}</label>
+  </p-iftalabel>
+</section>

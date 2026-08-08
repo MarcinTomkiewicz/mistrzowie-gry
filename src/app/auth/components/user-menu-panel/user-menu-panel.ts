@@ -44,6 +44,7 @@ export class UserMenuPanel {
         this.i18n.userMenu().gmAvailabilityOverviewLabel,
       workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
       adminContentLabel: this.i18n.userMenu().adminContentLabel,
+      adminOffersLabel: this.i18n.userMenu().adminOffersLabel,
       adminEventsLabel: this.i18n.userMenu().adminEventsLabel,
       adminCoworkerRecordsLabel:
         this.i18n.userMenu().adminCoworkerRecordsLabel,

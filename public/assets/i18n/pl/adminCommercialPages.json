@@ -1,0 +1,76 @@
+{
+  "list": {
+    "page": {
+      "title": "[PH] Strony ofertowe",
+      "subtitle": "[PH] Zarządzaj wersjami roboczymi pięciu stałych stron ofertowych.",
+      "emptyTitle": "[PH] Brak stron ofertowych",
+      "emptyDescription": "[PH] Nie znaleziono stron dostępnych do edycji.",
+      "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych"
+    },
+    "table": {
+      "navigationLabel": "[PH] Nazwa w nawigacji",
+      "heading": "[PH] Nagłówek",
+      "slug": "[PH] Slug",
+      "locale": "[PH] Język",
+      "draftStatus": "[PH] Stan draftu",
+      "draftUpdatedAt": "[PH] Aktualizacja draftu",
+      "publishedAt": "[PH] Publikacja",
+      "effectiveFrom": "[PH] Obowiązuje od"
+    },
+    "toast": {
+      "loadFailedSummary": "[PH] Nie udało się załadować stron ofertowych",
+      "loadFailedDetail": "[PH] Lista stron ofertowych nie została pobrana."
+    }
+  },
+  "editor": {
+    "page": {
+      "title": "[PH] Edycja strony ofertowej",
+      "subtitle": "[PH] Zmień metadane i ustawienia SEO wersji roboczej.",
+      "loadErrorTitle": "[PH] Nie udało się załadować strony ofertowej"
+    },
+    "identity": {
+      "sectionTitle": "[PH] Dane strony",
+      "key": "[PH] Klucz",
+      "navigationLabel": "[PH] Nazwa w nawigacji",
+      "slug": "[PH] Slug",
+      "locale": "[PH] Język",
+      "kind": "[PH] Rodzaj strony",
+      "taxDisplayMode": "[PH] Sposób prezentacji podatku"
+    },
+    "metadata": {
+      "sectionTitle": "[PH] Treść strony",
+      "heading": "[PH] Nagłówek strony",
+      "lead": "[PH] Lead"
+    },
+    "seo": {
+      "sectionTitle": "[PH] SEO",
+      "title": "[PH] Tytuł SEO",
+      "description": "[PH] Opis SEO",
+      "ogTitle": "[PH] Tytuł Open Graph",
+      "ogDescription": "[PH] Opis Open Graph",
+      "canonicalUrl": "[PH] Canonical URL"
+    },
+    "toast": {
+      "loadFailedSummary": "[PH] Nie udało się załadować strony ofertowej",
+      "loadFailedDetail": "[PH] Dane strony ofertowej nie zostały pobrane.",
+      "saveSuccessSummary": "[PH] Zapisano draft strony ofertowej",
+      "saveSuccessDetail": "[PH] Zmiany wersji roboczej zostały zapisane.",
+      "saveFailedSummary": "[PH] Nie udało się zapisać draftu strony ofertowej",
+      "saveFailedDetail": "[PH] Zmiany wersji roboczej nie zostały zapisane."
+    }
+  },
+  "draftStatus": {
+    "dirty": "[PH] Zmieniony draft",
+    "clean": "[PH] Zgodny z publikacją"
+  },
+  "kind": {
+    "offer": "[PH] Oferta",
+    "information": "[PH] Strona informacyjna"
+  },
+  "taxDisplayMode": {
+    "gross": "[PH] Ceny brutto",
+    "net": "[PH] Ceny netto",
+    "audience_dependent": "[PH] Zależnie od odbiorcy",
+    "none": "[PH] Bez informacji podatkowej"
+  }
+}

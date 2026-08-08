@@ -12,6 +12,14 @@ const loaders = {
     import(
       '../components/admin-content-articles/article-editor/article-editor'
     ).then((m) => m.ArticleEditor),
+  commercialPageList: () =>
+    import(
+      '../components/admin-commercial-pages/commercial-page-list/commercial-page-list'
+    ).then((m) => m.CommercialPageList),
+  commercialPageEditor: () =>
+    import(
+      '../components/admin-commercial-pages/commercial-page-editor/commercial-page-editor'
+    ).then((m) => m.CommercialPageEditor),
   eventList: () =>
     import('../components/admin-events/core-list/core-list').then(
       (m) => m.EventCoreList,
@@ -50,6 +58,14 @@ const adminChildren: Routes = [
   {
     path: 'content/:id/edit',
     loadComponent: loaders.contentEditor,
+  },
+  {
+    path: 'offers',
+    loadComponent: loaders.commercialPageList,
+  },
+  {
+    path: 'offers/:id/edit',
+    loadComponent: loaders.commercialPageEditor,
   },
   {
     path: 'events',

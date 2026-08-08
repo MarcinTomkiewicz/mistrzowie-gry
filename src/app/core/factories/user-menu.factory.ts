@@ -80,6 +80,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
         path: '/admin/content',
       },
       {
+        id: 'admin-offers',
+        label: args.adminOffersLabel,
+        path: '/admin/offers',
+      },
+      {
         id: 'admin-events',
         label: args.adminEventsLabel,
         path: '/admin/events',

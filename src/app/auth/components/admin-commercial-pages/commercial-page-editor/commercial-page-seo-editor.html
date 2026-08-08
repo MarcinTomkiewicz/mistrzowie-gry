@@ -1,0 +1,84 @@
+<section
+  class="mg-card flex-col-start-stretch gap-md p-md w-100"
+  [formGroup]="form()"
+>
+  <h2 class="mg-section__title mg-section__title--md m-0">
+    {{ copy().sectionTitle }}
+  </h2>
+
+  <div class="w-100">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        id="commercial-page-seo-title"
+        class="w-100"
+        formControlName="title"
+        autocomplete="off"
+      />
+      <label for="commercial-page-seo-title">{{ copy().title }}</label>
+    </p-iftalabel>
+
+    @if (form().controls.title.touched && form().controls.title.invalid) {
+      <small class="error-text">{{ requiredMessage() }}</small>
+    }
+  </div>
+
+  <div class="w-100">
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        id="commercial-page-seo-description"
+        class="w-100"
+        formControlName="description"
+        rows="4"
+      ></textarea>
+      <label for="commercial-page-seo-description">
+        {{ copy().description }}
+      </label>
+    </p-iftalabel>
+
+    @if (
+      form().controls.description.touched &&
+      form().controls.description.invalid
+    ) {
+      <small class="error-text">{{ requiredMessage() }}</small>
+    }
+  </div>
+
+  <div class="mg-grid-2 gap-md">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        id="commercial-page-og-title"
+        class="w-100"
+        formControlName="ogTitle"
+        autocomplete="off"
+      />
+      <label for="commercial-page-og-title">{{ copy().ogTitle }}</label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        id="commercial-page-og-description"
+        class="w-100"
+        formControlName="ogDescription"
+        rows="3"
+      ></textarea>
+      <label for="commercial-page-og-description">
+        {{ copy().ogDescription }}
+      </label>
+    </p-iftalabel>
+  </div>
+
+  <p-iftalabel class="w-100">
+    <input
+      pInputText
+      id="commercial-page-canonical-url"
+      class="w-100"
+      formControlName="canonicalUrl"
+      autocomplete="off"
+    />
+    <label for="commercial-page-canonical-url">{{ copy().canonicalUrl }}</label>
+  </p-iftalabel>
+</section>
