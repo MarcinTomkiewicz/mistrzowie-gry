@@ -4,6 +4,7 @@ import {
   buildPublicSeoFindings,
   countPublicSeoFindings,
 } from './public-seo-audit-report.mjs';
+import { buildSitemapCoverage } from './public-seo-audit-sitemap.mjs';
 
 const CONCURRENCY = 6;
 
@@ -57,6 +58,10 @@ function normalizeBaseUrl(value) {
 
 async function auditTarget(target, publicBaseUrl) {
   const sitemapUrl = new URL('/sitemap.xml', `${target.baseUrl}/`).toString();
+  const articleListUrl = new URL(
+    '/artykuly',
+    `${target.baseUrl}/`,
+  ).toString();
 
   try {
     const sitemap = await fetchText(sitemapUrl, target.hostHeader);
@@ -65,19 +70,38 @@ async function auditTarget(target, publicBaseUrl) {
       throw new Error(`HTTP ${sitemap.status}`);
     }
 
-    const publicUrls = parseSitemapUrls(sitemap.body, publicBaseUrl);
+    const articleList = await fetchText(articleListUrl, target.hostHeader);
+
+    if (articleList.status !== 200) {
+      throw new Error(`/artykuly returned HTTP ${articleList.status}`);
+    }
+
+    if (!articleList.contentType?.toLowerCase().includes('text/html')) {
+      throw new Error('/artykuly did not return HTML');
+    }
+
+    const sitemapCoverage = buildSitemapCoverage({
+      sitemapXml: sitemap.body,
+      articleListHtml: articleList.body,
+      publicBaseUrl,
+    });
     const pages = await mapWithConcurrency(
-      publicUrls,
+      sitemapCoverage.sitemapUrls,
       CONCURRENCY,
       (publicUrl) => auditPage(target, publicUrl),
     );
-    const findings = buildPublicSeoFindings(target, pages);
+    const findings = buildPublicSeoFindings(
+      target,
+      pages,
+      sitemapCoverage,
+    );
 
     return {
       name: target.name,
       baseUrl: target.baseUrl,
       sitemapUrl,
       error: null,
+      sitemapCoverage,
       pages,
       findings,
       counts: countPublicSeoFindings(findings),
@@ -90,34 +114,12 @@ async function auditTarget(target, publicBaseUrl) {
       baseUrl: target.baseUrl,
       sitemapUrl,
       error: message,
+      sitemapCoverage: null,
       pages: [],
       findings: [],
       counts: countPublicSeoFindings([], 1),
     };
   }
-}
-
-function parseSitemapUrls(xml, publicBaseUrl) {
-  const publicOrigin = new URL(publicBaseUrl).origin;
-  const urls = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)].map((match) =>
-    decodeXml(match[1].trim()),
-  );
-
-  if (!urls.length) {
-    throw new Error('Runtime sitemap contains no <loc> entries');
-  }
-
-  const normalized = urls.map((value) => {
-    const url = new URL(value);
-
-    if (url.origin !== publicOrigin || url.search || url.hash) {
-      throw new Error(`Invalid public sitemap URL: ${value}`);
-    }
-
-    return normalizeSeoUrl(url.toString());
-  });
-
-  return [...new Set(normalized)].sort();
 }
 
 async function auditPage(target, publicUrl) {
@@ -169,28 +171,6 @@ async function auditPage(target, publicUrl) {
       fetchError: error instanceof Error ? error.message : String(error),
     };
   }
-}
-
-function normalizeSeoUrl(value) {
-  const url = new URL(value);
-
-  url.search = '';
-  url.hash = '';
-
-  if (url.pathname !== '/') {
-    url.pathname = url.pathname.replace(/\/+$/, '');
-  }
-
-  return url.toString();
-}
-
-function decodeXml(value) {
-  return value
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&apos;', "'");
 }
 
 async function mapWithConcurrency(values, concurrency, mapper) {

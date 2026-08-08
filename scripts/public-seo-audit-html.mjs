@@ -43,6 +43,12 @@ export function parsePublicSeoHtml(html) {
   };
 }
 
+export function extractHtmlHrefs(html) {
+  return [...html.matchAll(/<[a-z][^>]*>/gi)]
+    .map((match) => parseAttributes(match[0]).get('href'))
+    .filter((href) => href !== undefined);
+}
+
 function getElementTexts(html, tagName) {
   const pattern = new RegExp(
     `<${tagName}\\b[^>]*>([\\s\\S]*?)<\\/${tagName}>`,

@@ -188,6 +188,14 @@ smoke_sitemap() {
   local status
   local body_path
   local headers_path
+  local article_body_path
+
+  response="$(fetch_origin '/artykuly')"
+  IFS=$'\t' read -r status article_body_path headers_path <<< "$response"
+
+  [[ "$status" == "200" ]] || fail "/artykuly returned HTTP $status"
+  grep -Eiq '^content-type:.*text/html' "$headers_path" ||
+    fail "/artykuly did not return HTML"
 
   response="$(fetch_origin '/sitemap.xml')"
   IFS=$'\t' read -r status body_path headers_path <<< "$response"
@@ -207,6 +215,131 @@ smoke_sitemap() {
   if grep -Eiq '<(priority|changefreq)([ >])' "$body_path"; then
     fail "/sitemap.xml contains unsupported priority or changefreq"
   fi
+
+  node - "$article_body_path" "$body_path" "$SITE_URL" <<'NODE'
+const fs = require('node:fs');
+
+const [articleBodyPath, sitemapBodyPath, siteUrl] = process.argv.slice(2);
+const site = new URL(siteUrl);
+const articleHtml = fs.readFileSync(articleBodyPath, 'utf8');
+const sitemapXml = fs.readFileSync(sitemapBodyPath, 'utf8');
+const articlePattern = /^\/artykuly\/[^/]+$/;
+const articleHrefCandidatePattern = /(?:^|\/)artykuly\//;
+
+function decodeXml(value) {
+  return value
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) =>
+      String.fromCodePoint(Number.parseInt(code, 16)),
+    )
+    .replaceAll('&amp;', '&')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&apos;', "'");
+}
+
+function decodeHtmlEntities(value) {
+  return decodeXml(value).replaceAll('&nbsp;', ' ');
+}
+
+function normalizeArticleRoute(value) {
+  const href = decodeHtmlEntities(value);
+  const candidate = articleHrefCandidatePattern.test(href.trim());
+  let url;
+
+  try {
+    url = new URL(href, site);
+  } catch (error) {
+    if (candidate) throw new Error(`Malformed public article href: ${href}`);
+    return null;
+  }
+
+  if (url.origin !== site.origin) {
+    return null;
+  }
+
+  if (candidate) {
+    try {
+      decodeURI(url.pathname);
+    } catch (error) {
+      throw new Error(`Malformed public article href: ${href}`);
+    }
+  }
+
+  url.search = '';
+  url.hash = '';
+  if (url.pathname !== '/') url.pathname = url.pathname.replace(/\/+$/, '');
+  return articlePattern.test(url.pathname) ? url.pathname : null;
+}
+
+function normalizeSitemapRoute(value) {
+  const loc = decodeXml(value);
+  let url;
+
+  try {
+    url = new URL(loc);
+  } catch (error) {
+    throw new Error(`Malformed sitemap URL: ${loc}`);
+  }
+
+  if (url.origin !== site.origin || url.search || url.hash) {
+    throw new Error(`Invalid public sitemap URL: ${loc}`);
+  }
+
+  if (url.pathname !== '/') url.pathname = url.pathname.replace(/\/+$/, '');
+  return url.pathname;
+}
+
+function extractValues(value, pattern) {
+  return [...value.matchAll(pattern)].map((match) =>
+    (match[1] ?? match[2] ?? match[3]).trim(),
+  );
+}
+
+try {
+  const hrefs = extractValues(
+    articleHtml,
+    /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/gi,
+  );
+  const articleRoutes = new Set(
+    hrefs.map(normalizeArticleRoute).filter((route) => route !== null),
+  );
+  const locs = extractValues(sitemapXml, /<loc>([\s\S]*?)<\/loc>/gi);
+
+  if (!locs.length) throw new Error('/sitemap.xml contains no <loc> entries');
+
+  const sitemapRoutes = locs.map(normalizeSitemapRoute);
+  const counts = new Map();
+  sitemapRoutes.forEach((route) =>
+    counts.set(route, (counts.get(route) ?? 0) + 1),
+  );
+  const duplicates = [...counts].filter(([, count]) => count > 1);
+  const sitemapArticles = new Set(
+    sitemapRoutes.filter((route) => articlePattern.test(route)),
+  );
+  const missing = [...articleRoutes].filter(
+    (route) => !sitemapArticles.has(route),
+  );
+  const stale = [...sitemapArticles].filter(
+    (route) => !articleRoutes.has(route),
+  );
+  const errors = [
+    ...duplicates.map(([route, count]) => `duplicate <loc> (${count}x): ${route}`),
+    ...missing.map((route) => `article missing from sitemap: ${route}`),
+    ...stale.map((route) => `stale article in sitemap: ${route}`),
+  ];
+
+  if (errors.length) {
+    errors.forEach((error) => console.error(`[origin-smoke] ERROR: ${error}`));
+    process.exit(1);
+  }
+} catch (error) {
+  console.error(`[origin-smoke] ERROR: ${error.message}`);
+  process.exit(1);
+}
+NODE
 
   require_runtime_cache_control "$headers_path" "/sitemap.xml"
 }

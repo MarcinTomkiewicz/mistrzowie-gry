@@ -1,7 +1,10 @@
 const SEVERITIES = ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'];
 
-export function buildPublicSeoFindings(target, pages) {
-  const findings = pages.flatMap((page) => buildPageFindings(target, page));
+export function buildPublicSeoFindings(target, pages, sitemapCoverage) {
+  const findings = [
+    ...buildSitemapFindings(sitemapCoverage),
+    ...pages.flatMap((page) => buildPageFindings(target, page)),
+  ];
 
   addDuplicateFindings(pages, findings, 'title', 'DUPLICATE_TITLE');
   addDuplicateFindings(
@@ -15,9 +18,7 @@ export function buildPublicSeoFindings(target, pages) {
 }
 
 export function countPublicSeoFindings(findings, blockers = 0) {
-  const counts = Object.fromEntries(
-    SEVERITIES.map((severity) => [severity, 0]),
-  );
+  const counts = Object.fromEntries(SEVERITIES.map((severity) => [severity, 0]));
 
   counts.BLOCKER = blockers;
 
@@ -46,7 +47,7 @@ export function formatPublicSeoAuditSummary(report) {
 
     if (target.error) {
       lines.push(
-        `[BLOCKER] ${target.name} ${target.sitemapUrl} - sitemap unavailable - ${target.error}`,
+        `[BLOCKER] ${target.name} ${target.sitemapUrl} - sitemap coverage unavailable - ${target.error}`,
       );
     }
 
@@ -64,6 +65,39 @@ export function formatPublicSeoAuditSummary(report) {
   }
 
   return `${lines.join('\n').trimEnd()}\n`;
+}
+
+function buildSitemapFindings(coverage) {
+  const findings = [];
+
+  for (const missing of coverage.missingUrls) {
+    findings.push({
+      severity: 'BLOCKER',
+      url: missing.url,
+      code: 'SITEMAP_MISSING_URL',
+      evidence: `expected from ${missing.source}`,
+    });
+  }
+
+  for (const url of coverage.unexpectedArticleUrls) {
+    findings.push({
+      severity: 'BLOCKER',
+      url,
+      code: 'SITEMAP_UNEXPECTED_ARTICLE_URL',
+      evidence: 'present in sitemap but absent from SSR /artykuly',
+    });
+  }
+
+  for (const duplicate of coverage.duplicateLocs) {
+    findings.push({
+      severity: 'BLOCKER',
+      url: duplicate.url,
+      code: 'SITEMAP_DUPLICATE_LOC',
+      evidence: `<loc> occurs ${duplicate.count} times`,
+    });
+  }
+
+  return findings;
 }
 
 function buildPageFindings(target, page) {
