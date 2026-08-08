@@ -16,56 +16,33 @@
     </p>
   }
 
-  <div class="mg-pricing-table">
-    <table>
-      <thead>
+  <div class="w-100 overflow-x-auto">
+    <p-table
+      [value]="data.items"
+      class="w-100 min-w-500"
+    >
+      <ng-template #header>
         <tr>
-          <th scope="col" class="small-caps">
+          <th scope="col" class="small-caps w-20">
             {{ pricingHeaders.variant }}
           </th>
-          <th scope="col" class="small-caps">
+          <th scope="col" class="small-caps w-20">
             {{ pricingHeaders.price }}
           </th>
           <th scope="col" class="small-caps">
             {{ pricingHeaders.description }}
           </th>
         </tr>
-      </thead>
+      </ng-template>
 
-      <tbody>
-        @for (item of data.items; track item.id) {
-          <tr>
-            <td>
-              <span
-                class="mg-pricing-table__mobile-label heading-color small-caps"
-                aria-hidden="true"
-              >
-                {{ pricingHeaders.variantLabel }}
-              </span>
-              <span>{{ item.title }}</span>
-            </td>
-            <td>
-              <span
-                class="mg-pricing-table__mobile-label heading-color small-caps"
-                aria-hidden="true"
-              >
-                {{ pricingHeaders.price }}
-              </span>
-              <span>{{ formatPricing(item.pricing) }}</span>
-            </td>
-            <td>
-              <span
-                class="mg-pricing-table__mobile-label heading-color small-caps"
-                aria-hidden="true"
-              >
-                {{ pricingHeaders.description }}
-              </span>
-              <app-expandable-text [text]="item.lead" />
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+      <ng-template #body let-item>
+        <tr>
+          <td>{{ item.title }}</td>
+          <td>{{ formatPricing(item.pricing) }}</td>
+          <td><app-expandable-text [text]="item.lead" /></td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
   @if (pricingFootnote()) {

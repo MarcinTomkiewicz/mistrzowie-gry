@@ -1,0 +1,42 @@
+{
+  "page": {
+    "effectiveFrom": "Oferta obowiązuje od:"
+  },
+  "pricing": {
+    "from": "od",
+    "units": {
+      "session": "[PH] sesję",
+      "hour": "[PH] godzinę",
+      "month": "[PH] miesiąc",
+      "event": "[PH] wydarzenie",
+      "package": "[PH] pakiet",
+      "table": "[PH] stół",
+      "table_hour": "[PH] stół za godzinę",
+      "facilitator": "[PH] osobę prowadzącą",
+      "participant": "[PH] uczestnika",
+      "piece": "[PH] sztukę",
+      "day": "[PH] dzień",
+      "half_day": "[PH] pół dnia",
+      "night": "[PH] noc",
+      "kilometer": "[PH] kilometr"
+    },
+    "percentageBases": {
+      "base_service": "[PH] wartości usługi podstawowej",
+      "package": "[PH] wartości pakietu",
+      "table": "[PH] wartości stołu",
+      "facilitator": "[PH] wartości osoby prowadzącej"
+    }
+  },
+  "itemDetails": {
+    "from": "[PH] od",
+    "to": "[PH] do",
+    "participants": "[PH] Liczba uczestników",
+    "participantsPerFacilitator": "[PH] Uczestnicy na osobę prowadzącą",
+    "facilitators": "[PH] Liczba osób prowadzących",
+    "tables": "[PH] Liczba stołów",
+    "durationMinutes": "[PH] Czas trwania w minutach",
+    "sessions": "[PH] Liczba sesji",
+    "sessionsPerMonth": "[PH] Sesje w miesiącu",
+    "meetings": "[PH] Liczba spotkań"
+  }
+}

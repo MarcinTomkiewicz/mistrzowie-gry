@@ -1,0 +1,10 @@
+@if (details().length) {
+  <dl class="m-0 mt-md">
+    @for (detail of details(); track $index) {
+      <div class="flex-row-between-start flex-wrap gap-sm">
+        <dt><strong>{{ detail.label }}</strong></dt>
+        <dd class="m-0">{{ detail.value }}</dd>
+      </div>
+    }
+  </dl>
+}

@@ -1,6 +1,7 @@
 import { Component, input } from '@angular/core';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { TableModule } from 'primeng/table';
 
 import type { OfferSectionWithItems } from '../../../core/types/offers';
 import { ExpandableText } from '../../common/expandable-text/expandable-text';
@@ -9,9 +10,8 @@ import { createOffersI18n } from './offers.i18n';
 
 @Component({
   selector: 'app-offer-pricing-section',
-  imports: [ExpandableText],
+  imports: [TableModule, ExpandableText],
   templateUrl: './offer-pricing-section.html',
-  styleUrl: './offer-pricing-section.scss',
   providers: [provideTranslocoScope('offers', 'common')],
 })
 export class OfferPricingSection {

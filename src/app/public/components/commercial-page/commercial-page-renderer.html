@@ -1,0 +1,32 @@
+@let data = document();
+@let page = data.page;
+
+<section class="mg-section">
+  <div class="mg-container">
+    <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
+
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">{{ page.heading }}</h1>
+
+      @if (page.lead) {
+        <p class="mg-section__subtitle">{{ page.lead }}</p>
+      }
+
+      @if (effectiveFrom(); as date) {
+        <p class="mg-section__subtitle mt-md">
+          <strong>{{ i18n.page().effectiveFrom }}</strong>
+          <time [attr.datetime]="page.effectiveFrom">{{ date }}</time>
+        </p>
+      }
+    </header>
+
+    @for (section of data.sections; track section.id) {
+      <app-commercial-page-section
+        [class.mt-xl]="!$first"
+        [section]="section"
+        [locale]="page.locale"
+        [pricingFootnote]="pricingFootnote()"
+      />
+    }
+  </div>
+</section>
