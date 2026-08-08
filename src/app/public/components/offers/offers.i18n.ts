@@ -32,7 +32,7 @@ export function createOffersI18n() {
   const commonErrors = createCommonErrorsI18n();
   const commonSeo = createCommonSeoI18n();
 
-  const standardsAndLogistics = computed<StandardsAndLogisticsDict>(() => {
+  const standardsAndLogistics = computed(() => {
     const dict = standardsAndLogisticsDict();
 
     return {

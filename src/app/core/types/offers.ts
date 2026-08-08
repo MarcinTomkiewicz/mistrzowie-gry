@@ -69,11 +69,6 @@ export type OfferItemPricing = {
   percentMax?: number | string | null;
 };
 
-export type PricingFormatted = {
-  value: string;
-  note?: string;
-};
-
 export type OfferItem = {
   id: number;
   title: string;
@@ -96,5 +91,3 @@ export type OfferPageVm = {
 export type OfferSectionWithItems = OfferPageSection & {
   items: OfferItem[];
 };
-
-export type OfferItemId = OfferItem['id'];

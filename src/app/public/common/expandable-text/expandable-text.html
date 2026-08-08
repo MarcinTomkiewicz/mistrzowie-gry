@@ -1,0 +1,26 @@
+@let labels = cta();
+
+<div class="flex-col-start-start">
+  <p
+    class="lh-18 m-0"
+    [class.truncate-3]="collapsed()"
+    [class.mg-section__subtitle]="muted()"
+    [class.mg-section__subtitle--full]="muted()"
+  >
+    {{ text() }}
+  </p>
+
+  @if (expandable()) {
+    <p-button
+      styleClass="arcane"
+      [label]="expanded() ? labels.showLess : labels.showMore"
+      [icon]="icon()"
+      iconPos="right"
+      size="small"
+      class="align-self-end"
+      [outlined]="true"
+      (click)="toggle()"
+      [attr.aria-expanded]="expanded()"
+    />
+  }
+</div>

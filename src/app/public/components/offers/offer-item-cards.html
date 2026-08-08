@@ -1,0 +1,38 @@
+<div class="mg-grid-2 gap-lg mt-md">
+  @for (item of items(); track item.id) {
+    @let presentation = getPresentation(item);
+
+    <div class="mg-card">
+      <div class="mg-section__title mg-section__title--sm">
+        {{ item.title }}
+      </div>
+
+      @if (presentation.pricing; as pricing) {
+        <div class="mg-section__title mg-section__title--xs">
+          {{ pricing.value }}
+          @if (pricing.note && presentation.pricingNoteInline) {
+            -&nbsp;{{ pricing.note }}
+          }
+        </div>
+
+        @if (pricing.note && !presentation.pricingNoteInline) {
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+            {{ pricing.note }}
+          </p>
+        }
+      }
+
+      @if (presentation.expandableLead) {
+        <app-expandable-text
+          [text]="item.lead"
+          [muted]="true"
+          [icon]="presentation.expandableIcon"
+        />
+      } @else {
+        <p class="mg-section__subtitle mg-section__subtitle--no-margin">
+          {{ item.lead }}
+        </p>
+      }
+    </div>
+  }
+</div>

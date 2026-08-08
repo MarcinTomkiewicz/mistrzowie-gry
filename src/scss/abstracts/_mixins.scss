@@ -1,5 +1,4 @@
 @use "sass:map";
-@use "sass:math";
 @use "./variables" as v;
 
 /* Media queries */
@@ -159,6 +158,8 @@
 /* Text truncation */
 @mixin truncate($lines: 1) {
   @if $lines == 1 {
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: initial;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -167,6 +168,8 @@
     -webkit-line-clamp: $lines;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: clip;
+    white-space: normal;
   }
 }
 

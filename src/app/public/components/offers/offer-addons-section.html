@@ -1,5 +1,4 @@
 @let data = section();
-@let commonCta = cta();
 
 <div class="mb-lg">
   @if (data.title) {
@@ -16,51 +15,7 @@
     </p>
   }
 
-  <div class="mg-offer-cards">
-    @for (item of data.items; track item.id) {
-      <div class="mg-card">
-        <div class="mg-section__title mg-section__title--sm">
-          {{ item.title }}
-        </div>
-
-        @if (formatAddonPricing(item.pricing); as pricing) {
-          <div class="mg-section__title mg-section__title--xs">
-            {{ pricing.value }}
-            @if (pricing.note) {
-              -&nbsp;{{ pricing.note }}
-            }
-          </div>
-        }
-
-        <div class="flex-col-start-start">
-          <p
-            class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mg-pricing-lead lh-18"
-            [class.mg-pricing-lead--expanded]="isLeadExpanded(item.id)"
-          >
-            {{ item.lead }}
-          </p>
-
-          @if (shouldShowLeadToggle(item.lead)) {
-            <p-button
-              styleClass="arcane"
-              [label]="
-                isLeadExpanded(item.id)
-                  ? commonCta.showLess
-                  : commonCta.showMore
-              "
-              icon="pi pi-lever"
-              iconPos="right"
-              size="small"
-              class="align-self-end"
-              [outlined]="true"
-              (click)="toggleLead(item.id)"
-              [attr.aria-expanded]="isLeadExpanded(item.id)"
-            />
-          }
-        </div>
-      </div>
-    }
-  </div>
+  <app-offer-item-cards [items]="data.items" />
 
   @if (pricingFootnote()) {
     <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">

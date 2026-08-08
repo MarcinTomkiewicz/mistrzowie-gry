@@ -1,4 +1,3 @@
-@let cta = i18n.commonCta();
 @let data = vm();
 @let empty = i18n.commonEmpty();
 
@@ -36,7 +35,7 @@
       }
     </div>
 
-    <div class="mg-offer-cards">
+    <div class="mg-grid-2 gap-lg mt-md">
       @for (it of data.standard.items; track it.title) {
         <div class="mg-card">
           <div class="mg-section__title mg-section__title--sm">
@@ -71,47 +70,7 @@
     </div>
 
     @if (data.logistics.items.length) {
-      <div class="mg-offer-cards">
-        @for (it of data.logistics.items; track it.id) {
-          <div class="mg-card">
-            <div class="mg-section__title mg-section__title--sm">
-              {{ it.title }}
-            </div>
-
-            @if (formatPricingDetailed(it.pricing); as p) {
-              <div class="mg-section__title mg-section__title--xs">
-                {{ p.value }}
-                @if (p.note) {
-                  -&nbsp;{{ p.note }}
-                }
-              </div>
-            }
-
-            <div class="flex-col-start-start">
-              <p
-                class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mg-pricing-lead lh-18"
-                [class.mg-pricing-lead--expanded]="isLeadExpanded(it.id)"
-              >
-                {{ it.lead }}
-              </p>
-
-              @if (shouldShowLeadToggle(it.lead)) {
-                <p-button
-                  styleClass="arcane"
-                  iconPos="right"
-                  size="small"
-                  class="align-self-end"
-                  [outlined]="true"
-                  (click)="toggleLead(it.id)"
-                  [attr.aria-expanded]="isLeadExpanded(it.id)"
-                >
-                  {{ isLeadExpanded(it.id) ? cta.showLess : cta.showMore }}
-                </p-button>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <app-offer-item-cards [items]="data.logistics.items" />
     } @else {
       <div class="mg-card">
         <div class="mg-section__title mg-section__title--sm">

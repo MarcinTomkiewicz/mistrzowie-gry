@@ -1,4 +1,4 @@
-import { OfferItemPricing, PricingFormatted } from '../../../core/types/offers';
+import type { OfferItemPricing } from '../../../core/types/offers';
 import { formatMoney } from '../../../core/utils/pricing';
 
 function toNumber(value: unknown): number | null {
@@ -14,9 +14,7 @@ export function formatPricing(pricing: OfferItemPricing): string {
   return formatPricingDetailed(pricing)?.value ?? '';
 }
 
-export function formatPricingDetailed(
-  pricing: OfferItemPricing,
-): PricingFormatted | null {
+export function formatPricingDetailed(pricing: OfferItemPricing) {
   const currency = pricing.currency ?? 'PLN';
   const note = pricing.pricingNote ?? undefined;
   const formatRange = (
@@ -33,9 +31,17 @@ export function formatPricingDetailed(
 
   const range = formatRange(pricing.min, pricing.max);
   if (range) return { value: range, note };
-  const monthlyRange = formatRange(pricing.monthlyMin, pricing.monthlyMax, '/ miesiąc');
+  const monthlyRange = formatRange(
+    pricing.monthlyMin,
+    pricing.monthlyMax,
+    '/ miesiąc',
+  );
   if (monthlyRange) return { value: monthlyRange, note };
-  const hourlyRange = formatRange(pricing.hourlyMin, pricing.hourlyMax, '/ godzina');
+  const hourlyRange = formatRange(
+    pricing.hourlyMin,
+    pricing.hourlyMax,
+    '/ godzina',
+  );
   if (hourlyRange) return { value: hourlyRange, note };
 
   const total = formatMoney(pricing.total, currency);
@@ -63,7 +69,7 @@ export function formatPricingDetailed(
   return null;
 }
 
-export function formatAddonPricing(pricing: OfferItemPricing): PricingFormatted | null {
+export function formatAddonPricing(pricing: OfferItemPricing) {
   const formatted = formatPricingDetailed(pricing);
   if (!formatted) return null;
   if (

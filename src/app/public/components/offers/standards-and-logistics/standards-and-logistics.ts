@@ -1,23 +1,17 @@
-import { Component, computed, input, signal } from '@angular/core';
-
-import { ButtonModule } from 'primeng/button';
+import { Component, computed, input } from '@angular/core';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import type {
-  OfferItemId,
-  OfferSectionWithItems,
-} from '../../../../core/types/offers';
+import type { OfferSectionWithItems } from '../../../../core/types/offers';
 import { FaqAccordion } from '../../../common/faq-accordion/faq-accordion';
-import { formatPricingDetailed } from '../offer-pricing';
+import { OfferItemCards } from '../offer-item-cards';
 import { createOffersI18n } from '../offers.i18n';
 
 @Component({
   selector: 'app-standards-and-logistics',
   standalone: true,
-  imports: [ButtonModule, FaqAccordion],
+  imports: [FaqAccordion, OfferItemCards],
   templateUrl: './standards-and-logistics.html',
-  styleUrl: './standards-and-logistics.scss',
   providers: [provideTranslocoScope('offers', 'common')],
 })
 export class StandardsAndLogistics {
@@ -26,55 +20,21 @@ export class StandardsAndLogistics {
 
   readonly i18n = createOffersI18n();
 
-  readonly formatPricingDetailed = formatPricingDetailed;
-
-  private readonly expandedLeadIds = signal<Set<OfferItemId>>(new Set());
-
-  readonly isLeadExpanded = (id: OfferItemId) => this.expandedLeadIds().has(id);
-
-  readonly toggleLead = (id: OfferItemId) => {
-    this.expandedLeadIds.update((current) => {
-      const next = new Set(current);
-
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-
-      return next;
-    });
-  };
-
-  readonly shouldShowLeadToggle = (text?: string | null) =>
-    !!text && text.trim().length > 180;
-
   readonly vm = computed(() => {
     const block = this.i18n.standardsAndLogistics();
     const logisticsSection = this.logisticsSection();
 
     return {
-      intro: block?.intro ?? { title: '', subtitle: '' },
-
-      standard: {
-        title: block?.standard?.title ?? '',
-        subtitle: block?.standard?.subtitle ?? '',
-        items: Array.isArray(block?.standard?.items) ? block.standard.items : [],
-      },
+      intro: block.intro,
+      standard: block.standard,
 
       logistics: {
         title: logisticsSection?.title ?? '',
         subtitle: logisticsSection?.subtitle ?? '',
-        items: Array.isArray(logisticsSection?.items)
-          ? logisticsSection.items
-          : [],
+        items: logisticsSection?.items ?? [],
       },
 
-      faq: {
-        title: block?.faq?.title ?? '',
-        subtitle: block?.faq?.subtitle ?? '',
-        items: Array.isArray(block?.faq?.items) ? block.faq.items : [],
-      },
+      faq: block.faq,
     };
   });
 }
