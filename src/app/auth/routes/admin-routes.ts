@@ -20,6 +20,10 @@ const loaders = {
     import(
       '../components/admin-commercial-pages/commercial-page-editor/commercial-page-editor'
     ).then((m) => m.CommercialPageEditor),
+  commercialPagePreview: () =>
+    import(
+      '../components/admin-commercial-pages/commercial-page-preview/commercial-page-preview'
+    ).then((m) => m.CommercialPagePreview),
   eventList: () =>
     import('../components/admin-events/core-list/core-list').then(
       (m) => m.EventCoreList,
@@ -66,6 +70,10 @@ const adminChildren: Routes = [
   {
     path: 'offers/:id/edit',
     loadComponent: loaders.commercialPageEditor,
+  },
+  {
+    path: 'offers/:id/preview',
+    loadComponent: loaders.commercialPagePreview,
   },
   {
     path: 'events',

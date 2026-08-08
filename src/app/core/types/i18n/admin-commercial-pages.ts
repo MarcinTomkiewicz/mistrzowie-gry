@@ -29,6 +29,7 @@ export type AdminCommercialPagesListTableTranslations = {
   draftStatus: string;
   draftUpdatedAt: string;
   publishedAt: string;
+  publishedBy: string;
   effectiveFrom: string;
 };
 
@@ -75,6 +76,51 @@ export type AdminCommercialPagesEditorToastTranslations = {
   saveSuccessDetail: string;
   saveFailedSummary: string;
   saveFailedDetail: string;
+};
+
+export type AdminCommercialPagesPreviewPageTranslations = {
+  seoTitle: string;
+  badge: string;
+  loadErrorTitle: string;
+  loadErrorDescription: string;
+  backToEditor: string;
+};
+
+export type AdminCommercialPagesPublicationTranslations = {
+  sectionTitle: string;
+  dialogTitle: string;
+  description: string;
+  effectiveFrom: string;
+  validate: string;
+  preview: string;
+  publish: string;
+  validationReady: string;
+  validationIssues: string;
+  issuePath: string;
+};
+
+export type AdminCommercialPagesPublicationMetadataTranslations = {
+  sectionTitle: string;
+  draftRevision: string;
+  previewedRevision: string;
+  draftUpdatedAt: string;
+  draftUpdatedBy: string;
+  publishedAt: string;
+  publishedBy: string;
+  effectiveFrom: string;
+};
+
+export type AdminCommercialPagesPublicationToastTranslations = {
+  validationReadySummary: string;
+  validationReadyDetail: string;
+  validationBlockedSummary: string;
+  validationBlockedDetail: string;
+  validationFailedSummary: string;
+  validationFailedDetail: string;
+  publishSuccessSummary: string;
+  publishSuccessDetail: string;
+  publishFailedSummary: string;
+  publishFailedDetail: string;
 };
 
 export type AdminCommercialPagesSectionsTranslations = {

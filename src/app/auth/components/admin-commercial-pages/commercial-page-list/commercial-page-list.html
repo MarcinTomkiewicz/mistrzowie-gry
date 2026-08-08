@@ -28,7 +28,7 @@
       </section>
     } @else if (rowVms().length) {
       <div class="w-100 overflow-x-auto">
-        <p-table [value]="rowVms()" class="w-100 min-w-500">
+        <p-table [value]="rowVms()" class="w-100 min-w-900">
           <ng-template #header>
             <tr>
               <th class="small-caps">{{ i18n.listTable().navigationLabel }}</th>
@@ -38,6 +38,7 @@
               <th class="small-caps">{{ i18n.listTable().draftStatus }}</th>
               <th class="small-caps">{{ i18n.listTable().draftUpdatedAt }}</th>
               <th class="small-caps">{{ i18n.listTable().publishedAt }}</th>
+              <th class="small-caps">{{ i18n.listTable().publishedBy }}</th>
               <th class="small-caps">{{ i18n.listTable().effectiveFrom }}</th>
               <th class="small-caps text-right">
                 {{ i18n.commonTable().actions }}
@@ -58,15 +59,35 @@
               </td>
               <td>{{ row.draftUpdatedAtLabel }}</td>
               <td>{{ row.publishedAtLabel }}</td>
+              <td>{{ row.publishedByLabel }}</td>
               <td>{{ row.effectiveFromLabel }}</td>
               <td class="text-right">
-                <p-button
-                  size="small"
-                  severity="secondary"
-                  [label]="i18n.commonActions().edit"
-                  icon="pi pi-pencil"
-                  (onClick)="editPage(row.page)"
-                />
+                <div class="flex-row-end-center flex-wrap gap-xs">
+                  <p-button
+                    size="small"
+                    severity="secondary"
+                    [label]="i18n.commonActions().edit"
+                    icon="pi pi-pencil"
+                    (onClick)="editPage(row.page)"
+                  />
+
+                  <p-button
+                    size="small"
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="i18n.publication().preview"
+                    icon="pi pi-eye"
+                    (onClick)="previewPage(row.page)"
+                  />
+
+                  <p-button
+                    size="small"
+                    severity="success"
+                    [label]="i18n.publication().publish"
+                    icon="pi pi-send"
+                    (onClick)="openPublication(row.page)"
+                  />
+                </div>
               </td>
             </tr>
           </ng-template>
@@ -83,3 +104,26 @@
     }
   </div>
 </section>
+
+@if (publicationPage(); as page) {
+  <p-dialog
+    styleClass="mg-dialog mg-dialog--md"
+    [modal]="true"
+    [visible]="true"
+    [header]="i18n.publication().dialogTitle"
+    [closable]="!isPublicationBusy()"
+    [closeOnEscape]="!isPublicationBusy()"
+    [dismissableMask]="!isPublicationBusy()"
+    [draggable]="false"
+    (visibleChange)="onPublicationVisibleChange($event)"
+  >
+    <app-commercial-page-publication
+      [pageId]="page.id"
+      [locale]="page.locale"
+      [effectiveFrom]="page.effectiveFrom"
+      [autoValidate]="true"
+      (busyChange)="onPublicationBusyChange($event)"
+      (published)="onPublished()"
+    />
+  </p-dialog>
+}

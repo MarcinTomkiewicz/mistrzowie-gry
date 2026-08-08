@@ -15,6 +15,10 @@ import {
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { CommercialPageAdminDetail } from '../../../../core/types/commercial-page-admin';
+import {
+  formatDateLabel,
+  formatTimestampLabel,
+} from '../../../../core/utils/date';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor';
@@ -59,6 +63,30 @@ export class CommercialPageEditor {
       ? 'tag-badge tag-badge--warn'
       : 'tag-badge tag-badge--success',
   );
+
+  protected readonly publicationMetadata = computed(() => {
+    const detail = this.detail();
+    if (!detail) return null;
+
+    const values = this.i18n.commonValues();
+
+    return {
+      draftRevision: String(detail.draftRevision),
+      previewedRevision:
+        detail.previewedRevision?.toString() ?? values.notAvailable,
+      draftUpdatedAt:
+        formatTimestampLabel(detail.draftUpdatedAt, detail.page.locale) ??
+        values.notAvailable,
+      draftUpdatedBy: detail.draftUpdatedBy ?? values.notAvailable,
+      publishedAt:
+        formatTimestampLabel(detail.publishedAt, detail.page.locale) ??
+        values.notAvailable,
+      publishedBy: detail.publishedBy ?? values.notAvailable,
+      effectiveFrom: detail.effectiveFrom
+        ? formatDateLabel(detail.effectiveFrom, detail.page.locale)
+        : values.notAvailable,
+    };
+  });
 
   constructor() {
     this.loadPage();
@@ -141,6 +169,12 @@ export class CommercialPageEditor {
     if (this.isSaving()) return;
 
     void this.router.navigate(['/admin/offers']);
+  }
+
+  protected previewDraft(): void {
+    if (this.isSaving() || this.form.dirty) return;
+
+    void this.router.navigate(['/admin/offers', this.pageId, 'preview']);
   }
 
   private applyDetail(detail: CommercialPageAdminDetail): void {

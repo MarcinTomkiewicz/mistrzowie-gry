@@ -84,6 +84,59 @@
         </dl>
       </section>
 
+      @if (publicationMetadata(); as metadata) {
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.publicationMetadata().sectionTitle }}
+          </h2>
+
+          <dl class="mg-grid-2 gap-md m-0">
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().draftRevision }}
+              </dt>
+              <dd class="m-0">{{ metadata.draftRevision }}</dd>
+            </div>
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().previewedRevision }}
+              </dt>
+              <dd class="m-0">{{ metadata.previewedRevision }}</dd>
+            </div>
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().draftUpdatedAt }}
+              </dt>
+              <dd class="m-0">{{ metadata.draftUpdatedAt }}</dd>
+            </div>
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().draftUpdatedBy }}
+              </dt>
+              <dd class="m-0">{{ metadata.draftUpdatedBy }}</dd>
+            </div>
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().publishedAt }}
+              </dt>
+              <dd class="m-0">{{ metadata.publishedAt }}</dd>
+            </div>
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().publishedBy }}
+              </dt>
+              <dd class="m-0">{{ metadata.publishedBy }}</dd>
+            </div>
+            <div>
+              <dt class="small-caps">
+                {{ i18n.publicationMetadata().effectiveFrom }}
+              </dt>
+              <dd class="m-0">{{ metadata.effectiveFrom }}</dd>
+            </div>
+          </dl>
+        </section>
+      }
+
       <form
         class="mg-form flex-col-start-stretch gap-md w-100"
         [formGroup]="form"
@@ -117,6 +170,16 @@
             icon="pi pi-save"
             [loading]="isSaving()"
             [disabled]="isLoading() || form.pristine"
+          />
+
+          <p-button
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            [label]="i18n.publication().preview"
+            icon="pi pi-eye"
+            [disabled]="isSaving() || form.dirty"
+            (onClick)="previewDraft()"
           />
 
           <p-button

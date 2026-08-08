@@ -147,6 +147,25 @@
     "server": "Błąd serwera. Spróbuj później."
   },
 
+  "commercial": {
+    "validation": {
+      "required": "[PH] Brakuje wymaganej wartości.",
+      "invalidSectionType": "[PH] Typ sekcji jest niedozwolony.",
+      "duplicateSectionPosition": "[PH] Sekcje mają powtórzoną pozycję.",
+      "duplicateItemPosition": "[PH] Elementy sekcji mają powtórzoną pozycję.",
+      "invalidAction": "[PH] Konfiguracja akcji jest niepoprawna.",
+      "invalidActionRoute": "[PH] Ścieżka akcji jest niepoprawna.",
+      "invalidPrice": "[PH] Konfiguracja ceny jest niepoprawna.",
+      "invalidPriceRange": "[PH] Zakres ceny jest niepoprawny.",
+      "invalidPercentage": "[PH] Wartość procentowa jest niepoprawna.",
+      "invalidCapacity": "[PH] Pojemność jest niepoprawna.",
+      "invalidSchedule": "[PH] Harmonogram jest niepoprawny.",
+      "sharedSourceMissing": "[PH] Brakuje współdzielonego źródła sekcji.",
+      "placeholderPresent": "[PH] Treść zawiera marker [PH].",
+      "previewRequired": "[PH] Bieżąca rewizja draftu wymaga ponownego podglądu."
+    }
+  },
+
   "contactLegalNotice": {
     "prefix": "Wysy\u0142aj\u0105c wiadomo\u015b\u0107 z formularza potwierdzasz, \u017ce jest Ci znana",
     "privacyPolicyLabel": "Polityka Prywatno\u015bci"

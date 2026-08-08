@@ -15,6 +15,7 @@
       "draftStatus": "[PH] Stan draftu",
       "draftUpdatedAt": "[PH] Aktualizacja draftu",
       "publishedAt": "[PH] Publikacja",
+      "publishedBy": "[PH] Opublikował",
       "effectiveFrom": "[PH] Obowiązuje od"
     },
     "toast": {
@@ -133,6 +134,51 @@
       "saveSuccessDetail": "[PH] Zmiany wersji roboczej zostały zapisane.",
       "saveFailedSummary": "[PH] Nie udało się zapisać draftu strony ofertowej",
       "saveFailedDetail": "[PH] Zmiany wersji roboczej nie zostały zapisane."
+    }
+  },
+  "preview": {
+    "page": {
+      "seoTitle": "[PH] Podgląd wersji roboczej strony ofertowej",
+      "badge": "Podgląd wersji roboczej",
+      "loadErrorTitle": "[PH] Nie udało się załadować podglądu",
+      "loadErrorDescription": "[PH] Podgląd wersji roboczej nie został pobrany.",
+      "backToEditor": "[PH] Wróć do edytora"
+    }
+  },
+  "publication": {
+    "panel": {
+      "sectionTitle": "[PH] Publikacja",
+      "dialogTitle": "[PH] Publikuj stronę ofertową",
+      "description": "[PH] Sprawdź draft na serwerze, wybierz datę obowiązywania i opublikuj bieżącą wersję.",
+      "effectiveFrom": "[PH] Oferta obowiązuje od",
+      "validate": "[PH] Sprawdź gotowość",
+      "preview": "[PH] Podgląd",
+      "publish": "[PH] Opublikuj",
+      "validationReady": "[PH] Draft jest gotowy do publikacji.",
+      "validationIssues": "[PH] Problemy blokujące publikację",
+      "issuePath": "[PH] Ścieżka"
+    },
+    "metadata": {
+      "sectionTitle": "[PH] Stan publikacji",
+      "draftRevision": "[PH] Rewizja draftu",
+      "previewedRevision": "[PH] Rewizja podglądu",
+      "draftUpdatedAt": "[PH] Aktualizacja draftu",
+      "draftUpdatedBy": "[PH] Draft zaktualizował",
+      "publishedAt": "[PH] Data publikacji",
+      "publishedBy": "[PH] Opublikował",
+      "effectiveFrom": "[PH] Obowiązuje od"
+    },
+    "toast": {
+      "validationReadySummary": "[PH] Draft gotowy do publikacji",
+      "validationReadyDetail": "[PH] Walidacja serwerowa nie wykryła problemów.",
+      "validationBlockedSummary": "[PH] Publikacja zablokowana",
+      "validationBlockedDetail": "[PH] Usuń problemy wskazane przez walidację serwerową.",
+      "validationFailedSummary": "[PH] Nie udało się sprawdzić draftu",
+      "validationFailedDetail": "[PH] Walidacja serwerowa nie została wykonana.",
+      "publishSuccessSummary": "[PH] Opublikowano stronę ofertową",
+      "publishSuccessDetail": "[PH] Strona ofertowa została opublikowana.",
+      "publishFailedSummary": "[PH] Nie udało się opublikować strony",
+      "publishFailedDetail": "[PH] Publikacja nie została wykonana."
     }
   },
   "draftStatus": {

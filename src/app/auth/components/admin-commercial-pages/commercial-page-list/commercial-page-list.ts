@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { finalize } from 'rxjs';
 
@@ -15,10 +16,17 @@ import {
 } from '../../../../core/utils/date';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
+import { CommercialPagePublication } from '../commercial-page-publication/commercial-page-publication';
 
 @Component({
   selector: 'app-commercial-page-list',
-  imports: [ButtonModule, TableModule, LoadingOverlay],
+  imports: [
+    ButtonModule,
+    DialogModule,
+    TableModule,
+    LoadingOverlay,
+    CommercialPagePublication,
+  ],
   templateUrl: './commercial-page-list.html',
   providers: [provideTranslocoScope('adminCommercialPages', 'common')],
 })
@@ -31,6 +39,9 @@ export class CommercialPageList {
   protected readonly rows = signal<CommercialPageAdminListItem[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly hasLoadError = signal(false);
+  protected readonly publicationPage =
+    signal<CommercialPageAdminListItem | null>(null);
+  protected readonly isPublicationBusy = signal(false);
 
   protected readonly rowVms = computed(() => {
     const draftStatus = this.i18n.draftStatus();
@@ -50,6 +61,7 @@ export class CommercialPageList {
       publishedAtLabel:
         formatTimestampLabel(page.publishedAt, page.locale) ??
         values.notAvailable,
+      publishedByLabel: page.publishedBy ?? values.notAvailable,
       effectiveFromLabel: page.effectiveFrom
         ? formatDateLabel(page.effectiveFrom, page.locale)
         : values.notAvailable,
@@ -84,5 +96,30 @@ export class CommercialPageList {
 
   protected editPage(page: CommercialPageAdminListItem): void {
     void this.router.navigate(['/admin/offers', page.id, 'edit']);
+  }
+
+  protected previewPage(page: CommercialPageAdminListItem): void {
+    void this.router.navigate(['/admin/offers', page.id, 'preview']);
+  }
+
+  protected openPublication(page: CommercialPageAdminListItem): void {
+    this.isPublicationBusy.set(false);
+    this.publicationPage.set(page);
+  }
+
+  protected onPublicationVisibleChange(visible: boolean): void {
+    if (!visible && !this.isPublicationBusy()) {
+      this.publicationPage.set(null);
+    }
+  }
+
+  protected onPublicationBusyChange(isBusy: boolean): void {
+    this.isPublicationBusy.set(isBusy);
+  }
+
+  protected onPublished(): void {
+    this.isPublicationBusy.set(false);
+    this.publicationPage.set(null);
+    this.loadPages();
   }
 }

@@ -1,0 +1,69 @@
+@if (isLoading()) {
+  <section class="mg-section mg-section--full position-relative">
+    <div class="mg-container">
+      <app-loading-overlay
+        [visible]="true"
+        [label]="i18n.commonStatus().loading"
+      />
+    </div>
+  </section>
+} @else if (hasLoadError()) {
+  <section class="mg-section mg-section--full">
+    <div class="mg-container flex-col-start-stretch gap-md">
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h1 class="mg-section__title mg-section__title--sm m-0">
+          {{ i18n.previewPage().loadErrorTitle }}
+        </h1>
+
+        <p class="m-0">{{ i18n.previewPage().loadErrorDescription }}</p>
+
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button
+            severity="secondary"
+            [label]="i18n.commonActions().retry"
+            icon="pi pi-refresh"
+            (onClick)="loadPreview()"
+          />
+
+          <p-button
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.previewPage().backToEditor"
+            icon="pi pi-arrow-left"
+            (onClick)="goToEditor()"
+          />
+        </div>
+      </section>
+    </div>
+  </section>
+} @else if (document(); as pageDocument) {
+  <div class="mg-container mt-xl">
+    <div class="mg-card flex-row-between-center flex-col-start-stretch-sm gap-sm p-md w-100">
+      <span class="tag-badge tag-badge--warn">
+        {{ i18n.previewPage().badge }}
+      </span>
+
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        [label]="i18n.previewPage().backToEditor"
+        icon="pi pi-arrow-left"
+        (onClick)="goToEditor()"
+      />
+    </div>
+  </div>
+
+  <app-commercial-page-renderer [document]="pageDocument" />
+
+  <div class="mg-container mb-xl">
+    <section class="mg-card p-md w-100">
+      <app-commercial-page-publication
+        [pageId]="pageDocument.page.id"
+        [locale]="pageDocument.page.locale"
+        [effectiveFrom]="pageDocument.page.effectiveFrom"
+        [autoValidate]="true"
+        (published)="onPublished()"
+      />
+    </section>
+  </div>
+}

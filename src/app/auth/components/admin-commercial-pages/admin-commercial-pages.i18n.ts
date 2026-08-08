@@ -25,8 +25,12 @@ import type {
   AdminCommercialPagesListToastTranslations,
   AdminCommercialPagesMetadataTranslations,
   AdminCommercialPagesPercentageBasisTranslations,
+  AdminCommercialPagesPreviewPageTranslations,
   AdminCommercialPagesPriceTranslations,
   AdminCommercialPagesPriceTypeTranslations,
+  AdminCommercialPagesPublicationMetadataTranslations,
+  AdminCommercialPagesPublicationToastTranslations,
+  AdminCommercialPagesPublicationTranslations,
   AdminCommercialPagesScheduleTranslations,
   AdminCommercialPagesSectionBaseTranslations,
   AdminCommercialPagesSectionsTranslations,
@@ -44,6 +48,10 @@ export function createAdminCommercialPagesI18n() {
     listToast: AdminCommercialPagesListToastTranslations;
     editorPage: AdminCommercialPagesEditorPageTranslations;
     editorToast: AdminCommercialPagesEditorToastTranslations;
+    previewPage: AdminCommercialPagesPreviewPageTranslations;
+    publication: AdminCommercialPagesPublicationTranslations;
+    publicationMetadata: AdminCommercialPagesPublicationMetadataTranslations;
+    publicationToast: AdminCommercialPagesPublicationToastTranslations;
     identity: AdminCommercialPagesIdentityTranslations;
     metadata: AdminCommercialPagesMetadataTranslations;
     seo: AdminCommercialPagesSeoTranslations;
@@ -73,6 +81,10 @@ export function createAdminCommercialPagesI18n() {
     listToast: 'list.toast',
     editorPage: 'editor.page',
     editorToast: 'editor.toast',
+    previewPage: 'preview.page',
+    publication: 'publication.panel',
+    publicationMetadata: 'publication.metadata',
+    publicationToast: 'publication.toast',
     identity: 'editor.identity',
     metadata: 'editor.metadata',
     seo: 'editor.seo',

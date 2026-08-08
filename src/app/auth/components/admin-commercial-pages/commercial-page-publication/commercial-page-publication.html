@@ -1,0 +1,87 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.publication().sectionTitle }}
+    </h2>
+
+    <p class="m-0">{{ i18n.publication().description }}</p>
+  </div>
+
+  <form
+    class="mg-form flex-col-start-stretch gap-md w-100"
+    (ngSubmit)="publishPage()"
+    novalidate
+  >
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <label class="small-caps" for="commercial-page-effective-from">
+        {{ i18n.publication().effectiveFrom }}
+      </label>
+
+      <p-datepicker
+        class="w-100"
+        inputId="commercial-page-effective-from"
+        [formControl]="effectiveFromControl"
+        dateFormat="dd.mm.yy"
+        appendTo="body"
+        [showIcon]="true"
+      />
+
+      @if (
+        effectiveFromControl.touched &&
+        effectiveFromControl.hasError("required")
+      ) {
+        <small class="mg-contact-error">
+          {{ i18n.commonForm().required }}
+        </small>
+      }
+    </div>
+
+    @if (hasValidated()) {
+      @if (issues().length) {
+        <section class="flex-col-start-stretch gap-xs w-100">
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ i18n.publication().validationIssues }}
+          </h3>
+
+          <ul class="m-0">
+            @for (issue of issues(); track $index) {
+              <li>
+                {{ ("common." + issue.messageKey) | transloco }}
+                <span class="d-block">
+                  <strong>{{ i18n.publication().issuePath }}:</strong>
+                  <code>{{ issue.path }}</code>
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      } @else {
+        <span class="tag-badge tag-badge--success align-self-start">
+          {{ i18n.publication().validationReady }}
+        </span>
+      }
+    }
+
+    <div class="flex-row-end-center flex-wrap gap-sm w-100">
+      <p-button
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        [label]="i18n.publication().validate"
+        icon="pi pi-check-circle"
+        [loading]="isValidating()"
+        [disabled]="isBusy()"
+        (onClick)="validateDraft()"
+      />
+
+      <p-button
+        type="submit"
+        severity="success"
+        [label]="i18n.publication().publish"
+        icon="pi pi-send"
+        [loading]="isPublishing()"
+        [disabled]="!canPublish()"
+      />
+    </div>
+  </form>
+</section>
