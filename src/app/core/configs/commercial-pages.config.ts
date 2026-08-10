@@ -1,7 +1,10 @@
 import type {
   CommercialActionAppearance,
   CommercialDurationMode,
+  CommercialPageKey,
 } from '../types/commercial-page';
+import type { CommercialConstantValueType } from '../types/commercial-constant-admin';
+import type { CommonNavTranslations } from '../types/i18n/common';
 import type {
   CommercialActualCostBasis,
   CommercialBillingUnit,
@@ -28,6 +31,20 @@ export const COMMERCIAL_CONSTANT_RPC = {
   deleteAdmin: 'delete_admin_commercial_constant',
   publishAdmin: 'publish_admin_commercial_constants',
 } as const;
+
+export const COMMERCIAL_CONSTANT_VALUE_TYPES = [
+  'duration',
+  'integer',
+  'text',
+] as const satisfies readonly CommercialConstantValueType[];
+
+export const COMMERCIAL_PAGE_NAVIGATION_LABEL_KEYS = {
+  'individual-offer': 'individualOffer',
+  'business-offer': 'businessOffer',
+  'institution-offer': 'institutionOffer',
+  'event-offer': 'eventOffer',
+  'standards-logistics': 'standardsAndLogistics',
+} as const satisfies Record<CommercialPageKey, keyof CommonNavTranslations>;
 
 export const COMMERCIAL_ACTION_APPEARANCES = [
   'primary',

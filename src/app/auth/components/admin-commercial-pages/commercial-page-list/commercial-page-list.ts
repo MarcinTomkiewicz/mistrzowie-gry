@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -23,6 +23,7 @@ import { CommercialPagePublication } from '../commercial-page-publication/commer
   imports: [
     ButtonModule,
     DialogModule,
+    RouterLink,
     TableModule,
     LoadingOverlay,
     CommercialPagePublication,

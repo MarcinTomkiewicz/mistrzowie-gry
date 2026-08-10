@@ -19,6 +19,7 @@ export type AdminCommercialPagesListPageTranslations = {
   emptyTitle: string;
   emptyDescription: string;
   loadErrorTitle: string;
+  manageConstants: string;
 };
 
 export type AdminCommercialPagesListTableTranslations = {

@@ -1,0 +1,200 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ i18n.page().subtitle }}
+      </p>
+    </header>
+
+    <div class="flex-row-between-center flex-wrap gap-sm w-100">
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-arrow-left"
+        [label]="i18n.page().backToPages"
+        routerLink="/admin/offers"
+      />
+
+      <div class="flex-row-end-center flex-wrap gap-xs">
+        <p-button
+          severity="success"
+          icon="pi pi-send"
+          [label]="i18n.page().publishAll"
+          [disabled]="!draftConstants().length || isBusy()"
+          [loading]="activeAction()?.startsWith('publish:') ?? false"
+          (onClick)="publishAll()"
+        />
+        <p-button
+          icon="pi pi-plus"
+          [label]="i18n.page().create"
+          [disabled]="isBusy()"
+          (onClick)="openCreate()"
+        />
+      </div>
+    </div>
+
+    <app-loading-overlay
+      [visible]="isBusy()"
+      [label]="isLoading() ? i18n.commonStatus().loading : i18n.commonStatus().saving"
+    />
+
+    @if (hasLoadError() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+        <p-button
+          severity="secondary"
+          [label]="i18n.commonActions().retry"
+          icon="pi pi-refresh"
+          (onClick)="loadConstants()"
+        />
+      </section>
+    } @else if (rowVms().length) {
+      <div class="w-100 overflow-x-auto">
+        <p-table
+          [value]="rowVms()"
+          class="w-100 min-w-900"
+        >
+          <ng-template #header>
+            <tr>
+              <th class="small-caps">{{ i18n.table().constant }}</th>
+              <th class="small-caps">{{ i18n.table().type }}</th>
+              <th class="small-caps">{{ i18n.table().draft }}</th>
+              <th class="small-caps">{{ i18n.table().published }}</th>
+              <th class="small-caps">{{ i18n.table().status }}</th>
+              <th class="small-caps">{{ i18n.table().usage }}</th>
+              <th class="small-caps text-right">
+                {{ i18n.commonTable().actions }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template #body let-row>
+            <tr>
+              <td>
+                <div class="flex-col-start-start gap-xs">
+                  <strong>{{ row.constant.label }}</strong>
+                  <code>{{ row.constant.syntax }}</code>
+                  <p-button
+                    size="small"
+                    severity="secondary"
+                    [text]="true"
+                    icon="pi pi-copy"
+                    [label]="i18n.actions().copyToken"
+                    (onClick)="copyToken(row.constant)"
+                  />
+                </div>
+              </td>
+              <td>{{ row.typeLabel }}</td>
+              <td>
+                <div class="flex-col-start-start gap-xs">
+                  <strong>{{ row.draftValueLabel }}</strong>
+                  <small>
+                    {{ i18n.table().updatedAt }}:
+                    {{ row.draftUpdatedAtLabel }}
+                  </small>
+                  <small>
+                    {{ i18n.table().updatedBy }}:
+                    {{ row.draftUpdatedByLabel }}
+                  </small>
+                </div>
+              </td>
+              <td>
+                <div class="flex-col-start-start gap-xs">
+                  <strong>{{ row.publishedValueLabel }}</strong>
+                  <small>
+                    {{ i18n.table().publishedAt }}:
+                    {{ row.publishedAtLabel }}
+                  </small>
+                  <small>
+                    {{ i18n.table().publishedBy }}:
+                    {{ row.publishedByLabel }}
+                  </small>
+                </div>
+              </td>
+              <td>
+                <div class="flex-col-start-start gap-xs">
+                  <span [class]="row.publicationClass">
+                    {{ row.publicationLabel }}
+                  </span>
+                  <span [class]="row.draftClass">{{ row.draftLabel }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="flex-col-start-start gap-xs">
+                  <small>
+                    {{ i18n.table().draftUsage }}:
+                    {{ row.constant.usage.draftPages.length }}
+                  </small>
+                  @if (row.constant.usage.draftPages.length) {
+                    <small>{{ row.draftUsageLabels }}</small>
+                  }
+                  <small>
+                    {{ i18n.table().publishedUsage }}:
+                    {{ row.constant.usage.publishedPages.length }}
+                  </small>
+                  @if (row.constant.usage.publishedPages.length) {
+                    <small>{{ row.publishedUsageLabels }}</small>
+                  }
+                </div>
+              </td>
+              <td class="text-right">
+                <div class="flex-row-end-center flex-wrap gap-xs">
+                  <p-button
+                    size="small"
+                    severity="secondary"
+                    icon="pi pi-pencil"
+                    [label]="i18n.commonActions().edit"
+                    [disabled]="isBusy()"
+                    (onClick)="openEdit(row.constant)"
+                  />
+                  <p-button
+                    size="small"
+                    severity="success"
+                    icon="pi pi-send"
+                    [label]="i18n.actions().publish"
+                    [disabled]="!row.constant.hasDraftChanges || isBusy()"
+                    [loading]="activeAction() === 'publish:' + row.constant.id"
+                    (onClick)="publishOne(row.constant)"
+                  />
+                  <p-button
+                    size="small"
+                    severity="danger"
+                    [outlined]="true"
+                    icon="pi pi-trash"
+                    [label]="i18n.commonActions().delete"
+                    [disabled]="!row.constant.canDelete || isBusy()"
+                    [title]="
+                      row.constant.canDelete
+                        ? i18n.commonActions().delete
+                        : i18n.actions().deleteUnavailable
+                    "
+                    [loading]="activeAction() === 'delete:' + row.constant.id"
+                    (onClick)="confirmDelete($event, row.constant)"
+                  />
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    } @else if (!isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().emptyTitle }}
+        </h2>
+        <p class="m-0">{{ i18n.page().emptyDescription }}</p>
+      </section>
+    }
+  </div>
+</section>
+
+<app-commercial-constant-editor
+  [visible]="editorVisible()"
+  [constant]="selectedConstant()"
+  [saving]="isSaving()"
+  (visibleChange)="onEditorVisibleChange($event)"
+  (save)="saveConstant($event)"
+/>

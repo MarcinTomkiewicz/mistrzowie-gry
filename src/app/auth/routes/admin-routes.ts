@@ -16,6 +16,10 @@ const loaders = {
     import(
       '../components/admin-commercial-pages/commercial-page-list/commercial-page-list'
     ).then((m) => m.CommercialPageList),
+  commercialConstantList: () =>
+    import(
+      '../components/admin-commercial-pages/commercial-constant-list/commercial-constant-list'
+    ).then((m) => m.CommercialConstantList),
   commercialPageEditor: () =>
     import(
       '../components/admin-commercial-pages/commercial-page-editor/commercial-page-editor'
@@ -66,6 +70,10 @@ const adminChildren: Routes = [
   {
     path: 'offers',
     loadComponent: loaders.commercialPageList,
+  },
+  {
+    path: 'offers/constants',
+    loadComponent: loaders.commercialConstantList,
   },
   {
     path: 'offers/:id/edit',

@@ -1,0 +1,193 @@
+<p-dialog
+  styleClass="mg-dialog mg-dialog--md"
+  [modal]="true"
+  [visible]="visible()"
+  [header]="isEditing() ? i18n.editor().editTitle : i18n.editor().createTitle"
+  [closable]="!saving()"
+  [closeOnEscape]="!saving()"
+  [dismissableMask]="!saving()"
+  [draggable]="false"
+  (visibleChange)="onVisibleChange($event)"
+>
+  <form
+    class="flex-col-start-stretch gap-md w-100"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate
+  >
+    @if (constant() && !constant()?.canChangeIdentity) {
+      <p class="m-0">{{ i18n.editor().identityLocked }}</p>
+    }
+
+    <p-iftalabel class="w-100">
+      <input
+        class="w-100"
+        pInputText
+        id="commercial-constant-token"
+        formControlName="token"
+        autocomplete="off"
+      />
+      <label for="commercial-constant-token">
+        {{ i18n.editor().token }}
+      </label>
+    </p-iftalabel>
+
+    <small class="m-0">{{ i18n.editor().tokenHint }}</small>
+    @if (form.controls.token.touched && form.controls.token.invalid) {
+      <small class="mg-contact-error">{{ i18n.validation().token }}</small>
+    }
+
+    <p-iftalabel class="w-100">
+      <input
+        class="w-100"
+        pInputText
+        id="commercial-constant-label"
+        formControlName="label"
+        autocomplete="off"
+      />
+      <label for="commercial-constant-label">
+        {{ i18n.editor().label }}
+      </label>
+    </p-iftalabel>
+
+    @if (form.controls.label.touched && form.controls.label.invalid) {
+      <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+    }
+
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        inputId="commercial-constant-type"
+        [options]="valueTypeOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        formControlName="valueType"
+        (onChange)="changeValueType()"
+      />
+      <label for="commercial-constant-type">
+        {{ i18n.editor().type }}
+      </label>
+    </p-iftalabel>
+
+    @switch (form.controls.valueType.getRawValue()) {
+      @case ('duration') {
+        <div class="flex-col-start-stretch gap-sm w-100">
+          <span>{{ i18n.editor().durationUnit }}</span>
+          <div class="flex-row-start-center gap-xs">
+            <p-button
+              type="button"
+              [severity]="
+                form.controls.durationUnit.value === 'hours'
+                  ? 'primary'
+                  : 'secondary'
+              "
+              [outlined]="form.controls.durationUnit.value !== 'hours'"
+              [label]="i18n.durationUnit().hours"
+              (onClick)="setDurationUnit('hours')"
+            />
+            <p-button
+              type="button"
+              [severity]="
+                form.controls.durationUnit.value === 'minutes'
+                  ? 'primary'
+                  : 'secondary'
+              "
+              [outlined]="form.controls.durationUnit.value !== 'minutes'"
+              [label]="i18n.durationUnit().minutes"
+              (onClick)="setDurationUnit('minutes')"
+            />
+          </div>
+        </div>
+
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="commercial-constant-duration-value"
+            formControlName="numericValue"
+            [min]="form.controls.durationUnit.value === 'hours' ? 1 / 60 : 1"
+            [maxFractionDigits]="
+              form.controls.durationUnit.value === 'hours' ? 4 : 0
+            "
+            [useGrouping]="false"
+          />
+          <label for="commercial-constant-duration-value">
+            {{ i18n.editor().value }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form.controls.numericValue.touched &&
+          form.controls.numericValue.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n.validation().duration }}
+          </small>
+        }
+      }
+      @case ('integer') {
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            inputId="commercial-constant-integer-value"
+            formControlName="numericValue"
+            [min]="0"
+            [maxFractionDigits]="0"
+            [useGrouping]="false"
+          />
+          <label for="commercial-constant-integer-value">
+            {{ i18n.editor().value }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form.controls.numericValue.touched &&
+          form.controls.numericValue.invalid
+        ) {
+          <small class="mg-contact-error">
+            {{ i18n.validation().integer }}
+          </small>
+        }
+      }
+      @case ('text') {
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="commercial-constant-text-value"
+            formControlName="textValue"
+            autocomplete="off"
+          />
+          <label for="commercial-constant-text-value">
+            {{ i18n.editor().value }}
+          </label>
+        </p-iftalabel>
+
+        @if (
+          form.controls.textValue.touched && form.controls.textValue.invalid
+        ) {
+          <small class="mg-contact-error">{{ i18n.validation().text }}</small>
+        }
+      }
+    }
+
+    <div class="p-dialog-footer flex-row-end-center gap-sm w-100 p-md">
+      <p-button
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-times"
+        [label]="i18n.commonActions().cancel"
+        [disabled]="saving()"
+        (onClick)="onVisibleChange(false)"
+      />
+      <p-button
+        type="submit"
+        severity="success"
+        icon="pi pi-save"
+        [label]="i18n.commonActions().save"
+        [loading]="saving()"
+      />
+    </div>
+  </form>
+</p-dialog>

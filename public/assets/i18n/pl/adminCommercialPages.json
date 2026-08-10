@@ -5,7 +5,8 @@
       "subtitle": "[PH] Zarządzaj wersjami roboczymi pięciu stałych stron ofertowych.",
       "emptyTitle": "[PH] Brak stron ofertowych",
       "emptyDescription": "[PH] Nie znaleziono stron dostępnych do edycji.",
-      "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych"
+      "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych",
+      "manageConstants": "[PH] Stałe globalne"
     },
     "table": {
       "navigationLabel": "[PH] Nazwa w nawigacji",
@@ -21,6 +22,94 @@
     "toast": {
       "loadFailedSummary": "[PH] Nie udało się załadować stron ofertowych",
       "loadFailedDetail": "[PH] Lista stron ofertowych nie została pobrana."
+    }
+  },
+  "constants": {
+    "page": {
+      "title": "[PH] Stałe globalne",
+      "subtitle": "[PH] Zarządzaj wspólnymi wartościami używanymi w treściach stron ofertowych.",
+      "backToPages": "[PH] Wróć do stron ofertowych",
+      "create": "[PH] Dodaj stałą",
+      "publishAll": "[PH] Opublikuj wszystkie zmiany",
+      "emptyTitle": "[PH] Brak stałych globalnych",
+      "emptyDescription": "[PH] Dodaj pierwszą stałą globalną.",
+      "loadErrorTitle": "[PH] Nie udało się załadować stałych"
+    },
+    "table": {
+      "constant": "[PH] Stała",
+      "type": "[PH] Typ",
+      "draft": "[PH] Wersja robocza",
+      "published": "[PH] Wersja opublikowana",
+      "status": "[PH] Status",
+      "usage": "[PH] Użycie",
+      "draftUsage": "[PH] Drafty stron",
+      "publishedUsage": "[PH] Opublikowane strony",
+      "updatedAt": "[PH] Zaktualizowano",
+      "updatedBy": "[PH] Zaktualizował",
+      "publishedAt": "[PH] Opublikowano",
+      "publishedBy": "[PH] Opublikował"
+    },
+    "editor": {
+      "createTitle": "[PH] Nowa stała globalna",
+      "editTitle": "[PH] Edycja stałej globalnej",
+      "token": "[PH] Token",
+      "tokenHint": "[PH] Wpisz nazwę bez nawiasów, np. czas-sesji. Gotowy token otrzyma postać [czas-sesji].",
+      "label": "[PH] Etykieta",
+      "type": "[PH] Typ wartości",
+      "value": "[PH] Wartość draftu",
+      "durationUnit": "[PH] Jednostka edycji czasu",
+      "identityLocked": "[PH] Tokenu i typu nie można zmienić, ponieważ stała jest już używana."
+    },
+    "actions": {
+      "publish": "[PH] Opublikuj",
+      "copyToken": "[PH] Kopiuj token",
+      "deleteUnavailable": "[PH] Używanej stałej nie można usunąć."
+    },
+    "status": {
+      "published": "[PH] Opublikowana",
+      "unpublished": "[PH] Nieopublikowana",
+      "draftChanged": "[PH] Draft zmieniony",
+      "draftCurrent": "[PH] Draft zgodny z publikacją"
+    },
+    "toast": {
+      "loadFailedSummary": "[PH] Nie udało się załadować stałych",
+      "loadFailedDetail": "[PH] Lista stałych globalnych nie została pobrana.",
+      "saveSuccessSummary": "[PH] Zapisano draft stałej",
+      "saveSuccessDetail": "[PH] Wersja robocza stałej została zapisana.",
+      "saveFailedSummary": "[PH] Nie udało się zapisać stałej",
+      "saveFailedDetail": "[PH] Wersja robocza stałej nie została zapisana.",
+      "publishSuccessSummary": "[PH] Opublikowano stałe",
+      "publishSuccessDetail": "[PH] Wybrane wersje robocze stałych zostały opublikowane.",
+      "publishFailedSummary": "[PH] Nie udało się opublikować stałych",
+      "publishFailedDetail": "[PH] Wersje robocze stałych nie zostały opublikowane.",
+      "deleteSuccessSummary": "[PH] Usunięto stałą",
+      "deleteSuccessDetail": "[PH] Nieużywana stała została usunięta.",
+      "deleteFailedSummary": "[PH] Nie udało się usunąć stałej",
+      "deleteFailedDetail": "[PH] Stała nie została usunięta.",
+      "copySuccessSummary": "[PH] Skopiowano token",
+      "copySuccessDetail": "[PH] Token {{token}} jest w schowku.",
+      "copyFailedSummary": "[PH] Nie udało się skopiować tokenu",
+      "copyFailedDetail": "[PH] Przeglądarka nie udostępniła schowka."
+    },
+    "confirmation": {
+      "delete": "[PH] Usunąć stałą {{token}}? Tej operacji nie można cofnąć."
+    },
+    "validation": {
+      "token": "[PH] Token musi zaczynać się małą literą i może zawierać małe litery, cyfry oraz segmenty rozdzielone myślnikami.",
+      "duration": "[PH] Podaj dodatni czas odpowiadający pełnej liczbie minut.",
+      "integer": "[PH] Podaj nieujemną liczbę całkowitą.",
+      "text": "[PH] Podaj niepusty tekst bez zagnieżdżonych tokenów."
+    },
+    "valueType": {
+      "duration": "[PH] Czas trwania",
+      "integer": "[PH] Liczba całkowita",
+      "text": "[PH] Tekst"
+    },
+    "durationUnit": {
+      "hours": "[PH] Godziny",
+      "minutes": "[PH] Minuty",
+      "hoursShort": "[PH] godz.",
+      "minutesShort": "[PH] min"
     }
   },
   "editor": {

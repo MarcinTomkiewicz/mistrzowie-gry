@@ -8,6 +8,16 @@
       </p>
     </header>
 
+    <div class="flex-row-end-center w-100">
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-sliders-h"
+        [label]="i18n.listPage().manageConstants"
+        routerLink="/admin/offers/constants"
+      />
+    </div>
+
     <app-loading-overlay
       [visible]="isLoading()"
       [label]="i18n.commonStatus().loading"
