@@ -18,7 +18,15 @@ export const COMMERCIAL_PAGE_RPC = {
   saveAdminDraft: 'save_admin_commercial_page_draft',
   validateAdminDraft: 'validate_admin_commercial_page_draft',
   getAdminPreview: 'get_admin_commercial_page_preview',
+  getAdminUnsavedPreview: 'get_admin_commercial_page_unsaved_preview',
   publishAdmin: 'publish_admin_commercial_page',
+} as const;
+
+export const COMMERCIAL_CONSTANT_RPC = {
+  getAdminList: 'get_admin_commercial_constant_list',
+  saveAdmin: 'save_admin_commercial_constant',
+  deleteAdmin: 'delete_admin_commercial_constant',
+  publishAdmin: 'publish_admin_commercial_constants',
 } as const;
 
 export const COMMERCIAL_ACTION_APPEARANCES = [

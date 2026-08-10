@@ -8,6 +8,7 @@ import type {
   StoredCommercialPageDocument,
   StoredCommercialSection,
 } from './commercial-page';
+import type { CommercialPageEditorDocument } from './commercial-page-builder';
 
 export type CommercialPageAdminSharedCardGridSection =
   CommercialCardGridSection & {
@@ -65,19 +66,34 @@ export type CommercialPageAdminSavePayload = {
   p_document: CommercialPageAdminDocument;
 };
 
+export type CommercialPageAdminUnsavedPreviewPayload = {
+  p_page_id: string;
+  p_locale: string;
+  p_document: CommercialPageEditorDocument;
+};
+
 export type CommercialPagePublicationIssueCode =
   | 'required'
-  | 'invalid_section_type'
   | 'duplicate_section_position'
+  | 'duplicate_block_position'
+  | 'duplicate_product_position'
   | 'duplicate_item_position'
+  | 'invalid_section_presentation'
+  | 'invalid_block_type'
+  | 'invalid_rich_content'
   | 'invalid_action'
   | 'invalid_action_route'
+  | 'invalid_icon'
   | 'invalid_price'
   | 'invalid_price_range'
   | 'invalid_percentage'
-  | 'invalid_capacity'
-  | 'invalid_schedule'
-  | 'shared_source_missing'
+  | 'invalid_duration'
+  | 'invalid_participants'
+  | 'invalid_product_reference'
+  | 'invalid_product_collection'
+  | 'invalid_table'
+  | 'unknown_token'
+  | 'constant_unpublished'
   | 'placeholder_present'
   | 'preview_required';
 

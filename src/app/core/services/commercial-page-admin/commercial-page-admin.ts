@@ -9,11 +9,16 @@ import type {
   CommercialPageAdminDetail,
   CommercialPageAdminDocument,
   CommercialPageAdminListItem,
+  CommercialPageAdminSavePayload,
+  CommercialPageAdminUnsavedPreviewPayload,
   CommercialPagePublicationIssue,
   CommercialPagePublishResult,
-  CommercialPageAdminSavePayload,
 } from '../../types/commercial-page-admin';
 import type { CommercialPageDocument } from '../../types/commercial-page';
+import type {
+  CommercialPageBuilderDocument,
+  CommercialPageEditorDocument,
+} from '../../types/commercial-page-builder';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -70,6 +75,23 @@ export class CommercialPageAdmin {
     return this.backend.rpc<CommercialPageDocument>(
       COMMERCIAL_PAGE_RPC.getAdminPreview,
       { p_page_id: pageId, p_locale: locale },
+    );
+  }
+
+  getUnsavedPreview(
+    pageId: string,
+    document: CommercialPageEditorDocument,
+    locale = COMMERCIAL_PAGE_DEFAULT_LOCALE,
+  ): Observable<CommercialPageBuilderDocument> {
+    const payload = {
+      p_page_id: pageId,
+      p_locale: locale,
+      p_document: document,
+    } satisfies CommercialPageAdminUnsavedPreviewPayload;
+
+    return this.backend.rpc<CommercialPageBuilderDocument>(
+      COMMERCIAL_PAGE_RPC.getAdminUnsavedPreview,
+      payload,
     );
   }
 
