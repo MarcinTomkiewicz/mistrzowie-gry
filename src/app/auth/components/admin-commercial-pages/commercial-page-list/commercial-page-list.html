@@ -37,19 +37,19 @@
         />
       </section>
     } @else if (rowVms().length) {
-      <div class="w-100 overflow-x-auto">
-        <p-table [value]="rowVms()" class="w-100 min-w-900">
+      <div class="w-100">
+        <p-table
+          [value]="rowVms()"
+          responsiveLayout="stack"
+          breakpoint="768px"
+          class="w-100"
+        >
           <ng-template #header>
             <tr>
-              <th class="small-caps">{{ i18n.listTable().navigationLabel }}</th>
-              <th class="small-caps">{{ i18n.listTable().heading }}</th>
-              <th class="small-caps">{{ i18n.listTable().slug }}</th>
-              <th class="small-caps">{{ i18n.listTable().locale }}</th>
+              <th class="small-caps">{{ i18n.listTable().page }}</th>
               <th class="small-caps">{{ i18n.listTable().draftStatus }}</th>
               <th class="small-caps">{{ i18n.listTable().draftUpdatedAt }}</th>
-              <th class="small-caps">{{ i18n.listTable().publishedAt }}</th>
-              <th class="small-caps">{{ i18n.listTable().publishedBy }}</th>
-              <th class="small-caps">{{ i18n.listTable().effectiveFrom }}</th>
+              <th class="small-caps">{{ i18n.listTable().publication }}</th>
               <th class="small-caps text-right">
                 {{ i18n.commonTable().actions }}
               </th>
@@ -58,20 +58,49 @@
 
           <ng-template #body let-row>
             <tr>
-              <td><strong>{{ row.page.navigationLabel }}</strong></td>
-              <td>{{ row.page.heading }}</td>
-              <td>{{ row.page.slug }}</td>
-              <td>{{ row.page.locale }}</td>
               <td>
+                <span class="p-datatable-column-title small-caps">
+                  {{ i18n.listTable().page }}
+                </span>
+                <div class="flex-col-start-start gap-xs">
+                  <strong>{{ row.page.navigationLabel }}</strong>
+                  <small>{{ row.page.heading }}</small>
+                </div>
+              </td>
+              <td>
+                <span class="p-datatable-column-title small-caps">
+                  {{ i18n.listTable().draftStatus }}
+                </span>
                 <span [class]="row.draftStatusClass">
                   {{ row.draftStatusLabel }}
                 </span>
               </td>
-              <td>{{ row.draftUpdatedAtLabel }}</td>
-              <td>{{ row.publishedAtLabel }}</td>
-              <td>{{ row.publishedByLabel }}</td>
-              <td>{{ row.effectiveFromLabel }}</td>
-              <td class="text-right">
+              <td>
+                <span class="p-datatable-column-title small-caps">
+                  {{ i18n.listTable().draftUpdatedAt }}
+                </span>
+                <span>{{ row.draftUpdatedAtLabel }}</span>
+              </td>
+              <td>
+                <span class="p-datatable-column-title small-caps">
+                  {{ i18n.listTable().publication }}
+                </span>
+                <div class="flex-col-start-start gap-xs">
+                  <span>{{ row.publishedAtLabel }}</span>
+                  <small>
+                    {{ i18n.listTable().effectiveFrom }}:
+                    {{ row.effectiveFromLabel }}
+                  </small>
+                  <small>
+                    {{ i18n.listTable().publishedBy }}:
+                    {{ row.publishedByLabel }}
+                  </small>
+                </div>
+              </td>
+              <td>
+                <span class="p-datatable-column-title small-caps">
+                  {{ i18n.commonTable().actions }}
+                </span>
                 <div class="flex-row-end-center flex-wrap gap-xs">
                   <p-button
                     size="small"

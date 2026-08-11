@@ -21,14 +21,28 @@
     <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="button">
       <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.buttons.length" (moveUp)="moveButton(index, -1)" (moveDown)="moveButton(index, 1)" (remove)="removeButton(index)" />
       <div class="mg-grid-2 gap-md w-100">
-        <p-iftalabel class="w-100">
-          <input pInputText class="w-100" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />
-          <label [for]="controlId() + '-' + index + '-label'">{{ i18n.buttons().label }}</label>
-        </p-iftalabel>
-        <p-iftalabel class="w-100">
-          <input pInputText class="w-100" [id]="controlId() + '-' + index + '-route'" formControlName="route" autocomplete="off" />
-          <label [for]="controlId() + '-' + index + '-route'">{{ i18n.buttons().route }}</label>
-        </p-iftalabel>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <input pInputText class="w-100" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />
+            <label [for]="controlId() + '-' + index + '-label'">{{ i18n.buttons().label }}</label>
+          </p-iftalabel>
+          @if (button.controls.label.touched && button.controls.label.invalid) {
+            <small class="error-text">{{ i18n.commonForm().required }}</small>
+          }
+        </div>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <input pInputText class="w-100" [id]="controlId() + '-' + index + '-route'" formControlName="route" autocomplete="off" />
+            <label [for]="controlId() + '-' + index + '-route'">{{ i18n.buttons().route }}</label>
+          </p-iftalabel>
+          @if (button.controls.route.touched) {
+            @if (button.controls.route.hasError('commercialInternalRoute')) {
+              <small class="error-text">{{ i18n.validation().invalidRoute }}</small>
+            } @else if (button.controls.route.invalid) {
+              <small class="error-text">{{ i18n.commonForm().required }}</small>
+            }
+          }
+        </div>
         <p-iftalabel class="w-100">
           <p-select class="w-100" [inputId]="controlId() + '-' + index + '-appearance'" formControlName="appearance" [options]="appearanceOptions()" optionLabel="label" optionValue="value" appendTo="body" />
           <label [for]="controlId() + '-' + index + '-appearance'">{{ i18n.buttons().appearance }}</label>
@@ -55,9 +69,6 @@
           </div>
         </div>
       </div>
-      @if (button.controls.route.touched && button.controls.route.hasError('commercialInternalRoute')) {
-        <small class="error-text">{{ i18n.validation().invalidRoute }}</small>
-      }
     </div>
   }
 </div>

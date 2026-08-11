@@ -9,13 +9,10 @@
       "manageConstants": "[PH] Stałe globalne"
     },
     "table": {
-      "navigationLabel": "[PH] Nazwa w nawigacji",
-      "heading": "[PH] Nagłówek",
-      "slug": "[PH] Slug",
-      "locale": "[PH] Język",
+      "page": "[PH] [adminCommercialPages-page] Strona",
       "draftStatus": "[PH] Stan draftu",
       "draftUpdatedAt": "[PH] Aktualizacja draftu",
-      "publishedAt": "[PH] Publikacja",
+      "publication": "[PH] [adminCommercialPages-publication] Publikacja",
       "publishedBy": "[PH] Opublikował",
       "effectiveFrom": "[PH] Obowiązuje od"
     },

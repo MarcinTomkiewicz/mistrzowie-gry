@@ -34,13 +34,10 @@ export type AdminCommercialPagesListPageTranslations = {
 };
 
 export type AdminCommercialPagesListTableTranslations = {
-  navigationLabel: string;
-  heading: string;
-  slug: string;
-  locale: string;
+  page: string;
   draftStatus: string;
   draftUpdatedAt: string;
-  publishedAt: string;
+  publication: string;
   publishedBy: string;
   effectiveFrom: string;
 };

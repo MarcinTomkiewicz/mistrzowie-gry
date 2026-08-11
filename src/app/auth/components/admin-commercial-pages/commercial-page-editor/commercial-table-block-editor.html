@@ -9,6 +9,9 @@
       <app-commercial-rich-content-editor [control]="column.controls.heading" [controlId]="controlId() + '-column-' + columnIndex" [label]="i18n.table().columnHeading" [tokens]="tokens()" />
     </div>
   }
+  @if (!form().controls.columns.length) {
+    <small class="error-text">{{ i18n.commonForm().required }}</small>
+  }
 
   <div class="flex-row-between-center gap-sm">
     <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.table().rows }}</h5>
@@ -21,5 +24,8 @@
         <app-commercial-rich-content-editor [control]="cell.controls.content" [controlId]="controlId() + '-row-' + rowIndex + '-cell-' + cellIndex" [label]="i18n.table().cell + ' ' + (cellIndex + 1)" [tokens]="tokens()" />
       }
     </div>
+  }
+  @if (!form().controls.rows.length) {
+    <small class="error-text">{{ i18n.commonForm().required }}</small>
   }
 </div>
