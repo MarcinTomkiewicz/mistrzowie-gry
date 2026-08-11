@@ -13,7 +13,6 @@ import type {
   CommercialPagePublicationIssue,
   CommercialPagePublishResult,
 } from '../../types/commercial-page-admin';
-import type { CommercialPageDocument } from '../../types/commercial-page';
 import type {
   CommercialPageBuilderDocument,
   CommercialPageEditorDocument,
@@ -70,8 +69,8 @@ export class CommercialPageAdmin {
   getPreview(
     pageId: string,
     locale = COMMERCIAL_PAGE_DEFAULT_LOCALE,
-  ): Observable<CommercialPageDocument> {
-    return this.backend.rpc<CommercialPageDocument>(
+  ): Observable<CommercialPageBuilderDocument> {
+    return this.backend.rpc<CommercialPageBuilderDocument>(
       COMMERCIAL_PAGE_RPC.getAdminPreview,
       { p_page_id: pageId, p_locale: locale },
     );

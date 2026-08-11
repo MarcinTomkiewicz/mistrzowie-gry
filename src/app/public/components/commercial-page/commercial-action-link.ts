@@ -2,7 +2,12 @@ import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
-import type { CommercialAction } from '../../../core/types/commercial-page';
+import {
+  COMMERCIAL_ICON_CLASSES,
+} from '../../../core/configs/commercial-pages.config';
+import type {
+  CommercialButton,
+} from '../../../core/types/commercial-page-builder';
 
 @Component({
   selector: 'app-commercial-action-link',
@@ -12,9 +17,15 @@ import type { CommercialAction } from '../../../core/types/commercial-page';
       [label]="action().label"
       [routerLink]="action().route"
       [severity]="action().appearance"
+      [icon]="iconClass()"
     />
   `,
 })
 export class CommercialActionLink {
-  readonly action = input.required<CommercialAction>();
+  readonly action = input.required<CommercialButton>();
+
+  protected iconClass(): string | undefined {
+    const iconKey = this.action().iconKey;
+    return iconKey ? COMMERCIAL_ICON_CLASSES[iconKey] : undefined;
+  }
 }

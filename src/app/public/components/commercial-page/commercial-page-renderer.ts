@@ -3,7 +3,9 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { createCommonCtaI18n } from '../../../core/translations/common.i18n';
 import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
-import type { CommercialPageDocument } from '../../../core/types/commercial-page';
+import type {
+  CommercialPageBuilderDocument,
+} from '../../../core/types/commercial-page-builder';
 import { formatDateLabel } from '../../../core/utils/date';
 import { Breadcrumbs } from '../../common/breadcrumbs/breadcrumbs';
 import { CommercialPageSection } from './commercial-page-section';
@@ -18,7 +20,7 @@ import { createCommercialPageI18n } from './commercial-page.i18n';
   ],
 })
 export class CommercialPageRenderer {
-  readonly document = input.required<CommercialPageDocument>();
+  readonly document = input.required<CommercialPageBuilderDocument>();
 
   protected readonly i18n = createCommercialPageI18n();
   private readonly commonCta = createCommonCtaI18n();

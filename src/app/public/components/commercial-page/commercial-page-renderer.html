@@ -14,7 +14,7 @@
 
       @if (effectiveFrom(); as date) {
         <p class="mg-section__subtitle mt-md">
-          <strong>{{ i18n.page().effectiveFrom }}</strong>
+          <strong>{{ i18n.page().effectiveFrom }}</strong>&nbsp;
           <time [attr.datetime]="page.effectiveFrom">{{ date }}</time>
         </p>
       }
@@ -24,6 +24,7 @@
       <app-commercial-page-section
         [class.mt-xl]="!$first"
         [section]="section"
+        [products]="data.products"
         [locale]="page.locale"
         [pricingFootnote]="pricingFootnote()"
       />

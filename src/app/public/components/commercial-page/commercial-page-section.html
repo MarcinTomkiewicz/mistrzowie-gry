@@ -1,135 +1,26 @@
 @let data = section();
 
-@switch (data.type) {
-  @case ('hero') {
-    <section class="mg-card" [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
+<section
+  class="w-100"
+  [attr.id]="data.id"
+  [class.mg-card]="data.presentation.surface === 'card'"
+  [class.text-left]="data.presentation.textAlign === 'left'"
+  [class.text-center]="data.presentation.textAlign === 'center'"
+  [class.text-right]="data.presentation.textAlign === 'right'"
+>
+  <app-commercial-section-header
+    [heading]="data.heading"
+    [lead]="data.lead"
+    [textAlign]="data.presentation.textAlign"
+  />
 
-      @if (data.body) {
-        <app-rich-content [content]="data.body" />
-      }
-
-      @if (data.action; as action) {
-        <div class="flex-row-center-center mt-lg">
-          <app-commercial-action-link [action]="action" />
-        </div>
-      }
-    </section>
+  @for (block of data.blocks; track block.id) {
+    <app-commercial-page-block
+      [class.mt-lg]="!$first"
+      [block]="block"
+      [products]="products()"
+      [locale]="locale()"
+      [pricingFootnote]="pricingFootnote()"
+    />
   }
-
-  @case ('rich_text') {
-    <section class="mg-card" [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-      <app-rich-content [content]="data.body" />
-    </section>
-  }
-
-  @case ('card_grid') {
-    <section [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-      <app-commercial-card-items [items]="data.items" [locale]="locale()" />
-
-      @if (hasCardPrices() && pricingFootnote()) {
-        <p class="mg-section__subtitle mt-md">
-          {{ pricingFootnote() }}
-        </p>
-      }
-    </section>
-  }
-
-  @case ('pricing_table') {
-    <section class="mg-card" [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-      <app-commercial-pricing-table
-        [items]="data.items"
-        [locale]="locale()"
-      />
-
-      @if (pricingFootnote()) {
-        <p class="mg-section__subtitle mt-md">
-          {{ pricingFootnote() }}
-        </p>
-      }
-    </section>
-  }
-
-  @case ('process') {
-    <section [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-
-      <div class="mg-grid-2 gap-lg mt-md">
-        @for (item of data.items; track item.id) {
-          <article class="mg-card">
-            <h3 class="mg-section__title mg-section__title--sm">
-              {{ item.title }}
-            </h3>
-            <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full pre-line">
-              {{ item.body }}
-            </p>
-          </article>
-        }
-      </div>
-    </section>
-  }
-
-  @case ('faq') {
-    <section class="mg-card" [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-
-      @if (faqItems().length) {
-        <app-faq-accordion [items]="faqItems()" />
-      }
-    </section>
-  }
-
-  @case ('cta') {
-    <section class="mg-card" [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-
-      @if (data.body) {
-        <app-rich-content [content]="data.body" />
-      }
-
-      <div class="flex-row-center-center mt-lg">
-        <app-commercial-action-link [action]="data.action" />
-      </div>
-    </section>
-  }
-
-  @case ('logistics_fees') {
-    <section [attr.id]="data.id">
-      <app-commercial-section-header
-        [heading]="data.heading"
-        [lead]="data.lead"
-      />
-      <app-commercial-card-items [items]="data.items" [locale]="locale()" />
-
-      @if (pricingFootnote()) {
-        <p class="mg-section__subtitle mt-md">
-          {{ pricingFootnote() }}
-        </p>
-      }
-    </section>
-  }
-}
+</section>

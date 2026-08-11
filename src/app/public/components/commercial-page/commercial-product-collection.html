@@ -1,0 +1,31 @@
+@let data = block();
+
+@switch (data.presentation) {
+  @case ('cards') {
+    <app-commercial-product-collection-cards
+      [block]="data"
+      [products]="selectedProducts()"
+      [locale]="locale()"
+    />
+  }
+  @case ('table') {
+    <app-commercial-product-collection-table
+      [block]="data"
+      [products]="selectedProducts()"
+      [locale]="locale()"
+    />
+  }
+  @case ('comparison_table') {
+    <app-commercial-product-comparison-table
+      [block]="data"
+      [products]="selectedProducts()"
+      [locale]="locale()"
+    />
+  }
+}
+
+@if (hasPriceField() && pricingFootnote()) {
+  <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mt-md">
+    {{ pricingFootnote() }}
+  </p>
+}

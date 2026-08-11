@@ -19,8 +19,10 @@ import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import type { CommercialPageDocument } from '../../../../core/types/commercial-page';
 import type { CommercialPagePublicationIssue } from '../../../../core/types/commercial-page-admin';
+import type {
+  CommercialPageBuilderDocument,
+} from '../../../../core/types/commercial-page-builder';
 import { parseIsoDate, toIsoDate } from '../../../../core/utils/date';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 
@@ -40,7 +42,7 @@ export class CommercialPagePublication {
   readonly autoValidate = input(false);
 
   readonly busyChange = output<boolean>();
-  readonly published = output<CommercialPageDocument>();
+  readonly published = output<CommercialPageBuilderDocument>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly effectiveFromControl = new FormControl<Date | null>(null, {

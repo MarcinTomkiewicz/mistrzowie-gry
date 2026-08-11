@@ -13,15 +13,18 @@ export type CommercialPricingTranslations = {
   percentageBases: Record<CommercialPercentageBasis, string>;
 };
 
-export type CommercialItemDetailsTranslations = {
+export type CommercialProductValueTranslations = {
   from: string;
   to: string;
-  participants: string;
-  participantsPerFacilitator: string;
-  facilitators: string;
-  tables: string;
-  durationMinutes: string;
-  sessions: string;
-  sessionsPerMonth: string;
-  meetings: string;
+  duration: {
+    hours: CommercialDurationUnitTranslations;
+    minutes: CommercialDurationUnitTranslations;
+  };
+};
+
+type CommercialDurationUnitTranslations = {
+  one: string;
+  few: string;
+  many: string;
+  other: string;
 };

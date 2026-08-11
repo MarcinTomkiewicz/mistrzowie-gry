@@ -16,7 +16,9 @@ import type {
   PlaceStructuredDataOptions,
 } from '../interfaces/i-seo';
 import type { BreadcrumbItem } from '../types/breadcrumb';
-import type { CommercialPageDocument } from '../types/commercial-page';
+import type {
+  CommercialPageBuilderDocument,
+} from '../types/commercial-page-builder';
 
 function compactNode<T extends ISeoStructuredDataNode>(node: T): T {
   return Object.fromEntries(
@@ -108,7 +110,7 @@ export function createPageStructuredData(
 }
 
 export function createCommercialPageStructuredData(
-  document: CommercialPageDocument,
+  document: CommercialPageBuilderDocument,
   canonicalUrl: string,
 ): ISeoStructuredDataNode {
   return createPageStructuredData({

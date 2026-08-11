@@ -5,38 +5,44 @@
   "pricing": {
     "from": "od",
     "units": {
-      "session": "[PH] sesję",
-      "hour": "[PH] godzinę",
-      "month": "[PH] miesiąc",
-      "event": "[PH] wydarzenie",
-      "package": "[PH] pakiet",
-      "table": "[PH] stół",
-      "table_hour": "[PH] stół za godzinę",
-      "facilitator": "[PH] osobę prowadzącą",
-      "participant": "[PH] uczestnika",
-      "piece": "[PH] sztukę",
-      "day": "[PH] dzień",
-      "half_day": "[PH] pół dnia",
-      "night": "[PH] noc",
-      "kilometer": "[PH] kilometr"
+      "session": "[PH] [commercialPages-session] sesję",
+      "hour": "[PH] [commercialPages-hour] godzinę",
+      "month": "[PH] [commercialPages-month] miesiąc",
+      "event": "[PH] [commercialPages-event] wydarzenie",
+      "package": "[PH] [commercialPages-package] pakiet",
+      "table": "[PH] [commercialPages-table] stół",
+      "table_hour": "[PH] [commercialPages-table_hour] stół za godzinę",
+      "facilitator": "[PH] [commercialPages-facilitator] osobę prowadzącą",
+      "participant": "[PH] [commercialPages-participant] uczestnika",
+      "piece": "[PH] [commercialPages-piece] sztukę",
+      "day": "[PH] [commercialPages-day] dzień",
+      "half_day": "[PH] [commercialPages-half_day] pół dnia",
+      "night": "[PH] [commercialPages-night] noc",
+      "kilometer": "[PH] [commercialPages-kilometer] kilometr"
     },
     "percentageBases": {
-      "base_service": "[PH] wartości usługi podstawowej",
-      "package": "[PH] wartości pakietu",
-      "table": "[PH] wartości stołu",
-      "facilitator": "[PH] wartości osoby prowadzącej"
+      "base_service": "[PH] [commercialPages-base_service] wartości usługi podstawowej",
+      "package": "[PH] [commercialPages-package] wartości pakietu",
+      "table": "[PH] [commercialPages-table] wartości stołu",
+      "facilitator": "[PH] [commercialPages-facilitator] wartości osoby prowadzącej"
     }
   },
-  "itemDetails": {
-    "from": "[PH] od",
-    "to": "[PH] do",
-    "participants": "[PH] Liczba uczestników",
-    "participantsPerFacilitator": "[PH] Uczestnicy na osobę prowadzącą",
-    "facilitators": "[PH] Liczba osób prowadzących",
-    "tables": "[PH] Liczba stołów",
-    "durationMinutes": "[PH] Czas trwania w minutach",
-    "sessions": "[PH] Liczba sesji",
-    "sessionsPerMonth": "[PH] Sesje w miesiącu",
-    "meetings": "[PH] Liczba spotkań"
+  "productValues": {
+    "from": "[PH] [commercialPages-from] od",
+    "to": "[PH] [commercialPages-to] do",
+    "duration": {
+      "hours": {
+        "one": "[PH] [commercialPages-one] godzina",
+        "few": "[PH] [commercialPages-few] godziny",
+        "many": "[PH] [commercialPages-many] godzin",
+        "other": "[PH] [commercialPages-other] godziny"
+      },
+      "minutes": {
+        "one": "[PH] [commercialPages-one] minuta",
+        "few": "[PH] [commercialPages-few] minuty",
+        "many": "[PH] [commercialPages-many] minut",
+        "other": "[PH] [commercialPages-other] minuty"
+      }
+    }
   }
 }

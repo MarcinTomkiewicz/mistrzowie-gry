@@ -6,11 +6,15 @@
       </p-accordion-header>
 
       <p-accordion-content>
-        <p
-          class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
-        >
-          <app-internal-link-text [text]="item.a" />
-        </p>
+        @if (isStructuredAnswer(item.a)) {
+          <app-rich-content [content]="item.a" />
+        } @else {
+          <p
+            class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+          >
+            <app-internal-link-text [text]="item.a" />
+          </p>
+        }
       </p-accordion-content>
     </p-accordion-panel>
   }

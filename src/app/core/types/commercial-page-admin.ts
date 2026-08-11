@@ -1,8 +1,8 @@
+import type { CommercialPageIdentity } from './commercial-page';
 import type {
-  CommercialPageDocument,
-  CommercialPageIdentity,
-} from './commercial-page';
-import type { CommercialPageEditorDocument } from './commercial-page-builder';
+  CommercialPageBuilderDocument,
+  CommercialPageEditorDocument,
+} from './commercial-page-builder';
 
 export type CommercialPageAdminListItem = CommercialPageIdentity & {
   heading: string;
@@ -75,7 +75,7 @@ export type CommercialPagePublishResult =
   | {
       published: true;
       issues: [];
-      document: CommercialPageDocument;
+      document: CommercialPageBuilderDocument;
     }
   | {
       published: false;

@@ -1,30 +1,25 @@
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import type {
-  CommercialItemDetailsTranslations,
   CommercialPageLabelsTranslations,
   CommercialPricingTranslations,
+  CommercialProductValueTranslations,
 } from '../../../core/types/i18n/commercial-pages';
-import type {
-  OfferFootnotesTranslations,
-  OfferPricingHeadersTranslations,
-} from '../../../core/types/i18n/offers';
+import type { OfferFootnotesTranslations } from '../../../core/types/i18n/offers';
 
 export function createCommercialPageI18n() {
   const commercial = createScopedSectionsI18n<{
     page: CommercialPageLabelsTranslations;
     pricing: CommercialPricingTranslations;
-    itemDetails: CommercialItemDetailsTranslations;
+    productValues: CommercialProductValueTranslations;
   }>('commercialPages', {
     page: 'page',
     pricing: 'pricing',
-    itemDetails: 'itemDetails',
+    productValues: 'productValues',
   });
 
   const offers = createScopedSectionsI18n<{
-    pricingHeaders: OfferPricingHeadersTranslations;
     footnotes: OfferFootnotesTranslations;
   }>('offers', {
-    pricingHeaders: 'pricingTable.headers',
     footnotes: 'footnotes',
   });
 

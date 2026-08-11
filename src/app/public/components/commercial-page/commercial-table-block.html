@@ -1,0 +1,23 @@
+<div class="overflow-x-auto w-100">
+  <p-table [value]="block().rows" class="w-100 min-w-500">
+    <ng-template #header>
+      <tr>
+        @for (column of block().columns; track column.id) {
+          <th scope="col">
+            <app-rich-content [content]="column.heading" />
+          </th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-row>
+      <tr>
+        @for (column of block().columns; track column.id) {
+          <td>
+            <app-rich-content [content]="cellContent(row, column.id)" />
+          </td>
+        }
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

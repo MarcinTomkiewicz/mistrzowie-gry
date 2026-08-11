@@ -1,0 +1,83 @@
+<div class="hide-down-sm overflow-x-auto w-100">
+  <p-table [value]="comparisonFields()" class="w-100 min-w-500">
+    <ng-template #header>
+      <tr>
+        <th scope="col"></th>
+        @for (product of products(); track product.id) {
+          <th scope="col">
+            @for (field of nameFieldsFor(product); track field.id) {
+              <span class="small-caps d-block mb-xs">
+                {{ labelFor(field, product) }}
+              </span>
+              <app-commercial-product-field-value
+                [product]="product"
+                [field]="field"
+                [locale]="locale()"
+              />
+            }
+          </th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-field>
+      <tr>
+        <th scope="row" class="small-caps">{{ field.label }}</th>
+        @for (product of products(); track product.id) {
+          <td>
+            @if (isVisible(field, product)) {
+              @if (labelFor(field, product) !== field.label) {
+                <span class="small-caps d-block mb-xs">
+                  {{ labelFor(field, product) }}
+                </span>
+              }
+              <app-commercial-product-field-value
+                [product]="product"
+                [field]="field"
+                [locale]="locale()"
+              />
+            } @else {
+              <span aria-hidden="true">—</span>
+            }
+          </td>
+        }
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<div class="show-down-sm w-100">
+  <div class="flex-col-start-stretch gap-md w-100">
+    @for (product of products(); track product.id) {
+      <article class="mg-card flex-col-start-stretch gap-sm w-100">
+        @for (field of nameFieldsFor(product); track field.id) {
+          <div class="flex-col-start-stretch gap-xs">
+            <span class="small-caps">{{ labelFor(field, product) }}</span>
+            <h3 class="mg-section__title mg-section__title--sm m-0">
+              <app-commercial-product-field-value
+                [product]="product"
+                [field]="field"
+                [locale]="locale()"
+              />
+            </h3>
+          </div>
+        }
+
+        <dl class="flex-col-start-stretch gap-sm m-0 w-100">
+          @for (field of fieldsFor(product); track field.id) {
+            <div class="flex-col-start-stretch gap-xs">
+              <dt><strong>{{ labelFor(field, product) }}</strong></dt>
+              <dd class="m-0">
+                <app-commercial-product-field-value
+                  [product]="product"
+                  [field]="field"
+                  [locale]="locale()"
+                />
+              </dd>
+            </div>
+          }
+        </dl>
+      </article>
+    }
+  </div>
+</div>

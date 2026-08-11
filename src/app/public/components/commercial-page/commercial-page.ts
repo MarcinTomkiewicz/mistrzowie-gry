@@ -23,7 +23,9 @@ import {
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
-import type { CommercialPageDocument } from '../../../core/types/commercial-page';
+import type {
+  CommercialPageBuilderDocument,
+} from '../../../core/types/commercial-page-builder';
 import {
   createBreadcrumbStructuredData,
   createCommercialPageStructuredData,
@@ -57,7 +59,9 @@ export class CommercialPage implements OnInit {
   protected readonly slug = signal(
     this.route.snapshot.paramMap.get('slug') ?? '',
   );
-  protected readonly document = signal<CommercialPageDocument | null>(null);
+  protected readonly document = signal<CommercialPageBuilderDocument | null>(
+    null,
+  );
   protected readonly isLoading = signal(true);
   protected readonly hasLoadError = signal(false);
   protected readonly isNotFound = signal(false);

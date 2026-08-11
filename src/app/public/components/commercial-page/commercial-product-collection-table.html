@@ -1,0 +1,32 @@
+<div class="overflow-x-auto w-100">
+  <p-table [value]="products()" class="w-100 min-w-500">
+    <ng-template #header>
+      <tr>
+        @for (field of block().fields; track field.id) {
+          <th scope="col" class="small-caps">{{ field.label }}</th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-product>
+      <tr>
+        @for (field of block().fields; track field.id) {
+          <td>
+            @if (isVisible(field, product)) {
+              @if (overrideLabel(field, product); as label) {
+                <span class="small-caps d-block mb-xs">{{ label }}</span>
+              }
+              <app-commercial-product-field-value
+                [product]="product"
+                [field]="field"
+                [locale]="locale()"
+              />
+            } @else {
+              <span aria-hidden="true">—</span>
+            }
+          </td>
+        }
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

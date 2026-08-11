@@ -74,6 +74,20 @@ export class CommercialProductCollectionBlockEditor {
     );
   }
 
+  protected productLabel(productId: string): string {
+    const option = this.productOptions().find(
+      (candidate) => candidate.value === productId,
+    );
+
+    if (!option) {
+      throw new TypeError(
+        `Missing page-local commercial product: ${productId}`,
+      );
+    }
+
+    return option.label;
+  }
+
   protected availableOverrideOptions(
     field: CommercialProductFieldEditorForm,
     currentProductId: string | null = null,
@@ -102,6 +116,27 @@ export class CommercialProductCollectionBlockEditor {
 
   protected syncCollection(): void {
     syncCommercialProductCollectionReferences(this.form());
+  }
+
+  protected removeProduct(index: number): void {
+    const control = this.form().controls.productIds;
+    const productIds = [...control.getRawValue()];
+    productIds.splice(index, 1);
+    control.setValue(productIds);
+    control.markAsDirty();
+    this.syncCollection();
+  }
+
+  protected moveProduct(index: number, offset: -1 | 1): void {
+    const control = this.form().controls.productIds;
+    const productIds = [...control.getRawValue()];
+    const [productId] = productIds.splice(index, 1);
+
+    if (productId === undefined) return;
+
+    productIds.splice(index + offset, 0, productId);
+    control.setValue(productIds);
+    control.markAsDirty();
   }
 
   protected syncField(field: CommercialProductFieldEditorForm): void {

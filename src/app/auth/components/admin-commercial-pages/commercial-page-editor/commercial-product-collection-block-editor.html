@@ -4,6 +4,19 @@
     <label [for]="controlId() + '-products'">{{ i18n.productCollection().products }}</label>
   </p-iftalabel>
 
+  @for (productId of form().controls.productIds.value; track productId; let index = $index) {
+    <div class="mg-card flex-row-between-center gap-sm p-sm w-100">
+      <span>{{ productLabel(productId) }}</span>
+      <app-commercial-item-editor-actions
+        [index]="index"
+        [itemCount]="form().controls.productIds.value.length"
+        (moveUp)="moveProduct(index, -1)"
+        (moveDown)="moveProduct(index, 1)"
+        (remove)="removeProduct(index)"
+      />
+    </div>
+  }
+
   <div class="mg-grid-2 gap-md w-100">
     <p-iftalabel class="w-100">
       <p-select class="w-100" [inputId]="controlId() + '-presentation'" formControlName="presentation" [options]="presentationOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="syncPresentation()" />

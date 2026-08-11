@@ -8,7 +8,9 @@ import { finalize } from 'rxjs';
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { Seo } from '../../../../core/services/seo/seo';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import type { CommercialPageDocument } from '../../../../core/types/commercial-page';
+import type {
+  CommercialPageBuilderDocument,
+} from '../../../../core/types/commercial-page-builder';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { CommercialPageRenderer } from '../../../../public/components/commercial-page/commercial-page-renderer';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
@@ -34,7 +36,9 @@ export class CommercialPagePreview {
   protected readonly pageId =
     inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
   protected readonly i18n = createAdminCommercialPagesI18n();
-  protected readonly document = signal<CommercialPageDocument | null>(null);
+  protected readonly document = signal<CommercialPageBuilderDocument | null>(
+    null,
+  );
   protected readonly isLoading = signal(true);
   protected readonly hasLoadError = signal(false);
 

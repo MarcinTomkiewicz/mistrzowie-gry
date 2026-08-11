@@ -1,0 +1,5 @@
+<div class="gap-sm" [ngClass]="layoutClass()">
+  @for (button of block().buttons; track button.id) {
+    <app-commercial-action-link [action]="button" />
+  }
+</div>
