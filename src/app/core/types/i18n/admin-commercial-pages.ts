@@ -93,6 +93,8 @@ export type AdminCommercialPagesEditorToastTranslations = {
 export type AdminCommercialPagesPreviewPageTranslations = {
   seoTitle: string;
   badge: string;
+  persistedBadge: string;
+  persistedReady: string;
   loadErrorTitle: string;
   loadErrorDescription: string;
   backToEditor: string;

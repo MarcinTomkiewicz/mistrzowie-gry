@@ -16,11 +16,16 @@ import { CommercialConstantAdmin } from '../../../../core/services/commercial-co
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { CommercialPageAdminDetail } from '../../../../core/types/commercial-page-admin';
+import type {
+  CommercialPageBuilderDocument,
+  CommercialPageEditorDocument,
+} from '../../../../core/types/commercial-page-builder';
 import {
   formatDateLabel,
   formatTimestampLabel,
 } from '../../../../core/utils/date';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { CommercialPageRenderer } from '../../../../public/components/commercial-page/commercial-page-renderer';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor';
 import { CommercialPageSectionsEditor } from './commercial-page-sections-editor';
@@ -33,6 +38,7 @@ import { CommercialProductsEditor } from './commercial-products-editor';
     ReactiveFormsModule,
     ButtonModule,
     LoadingOverlay,
+    CommercialPageRenderer,
     CommercialPageMetadataEditor,
     CommercialPageSectionsEditor,
     CommercialPageSeoEditor,
@@ -55,7 +61,11 @@ export class CommercialPageEditor {
   protected readonly constantTokens = signal<readonly string[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
+  protected readonly isPreviewing = signal(false);
   protected readonly hasLoadError = signal(false);
+  protected readonly previewDocument = signal<CommercialPageBuilderDocument | null>(
+    null,
+  );
 
   protected readonly draftStatusLabel = computed(() => {
     const status = this.i18n.draftStatus();
@@ -125,22 +135,11 @@ export class CommercialPageEditor {
   }
 
   protected saveDraft(): void {
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-      const formCopy = this.i18n.commonForm();
-
-      this.toast.danger({
-        summary: formCopy.invalidSummary,
-        detail: formCopy.invalid,
-      });
-      return;
-    }
-
+    const document = this.getValidDocument();
+    if (!document) return;
     const detail = this.detail();
     if (!detail) return;
 
-    const document = mapCommercialPageEditorFormToDocument(this.form);
     const toast = this.i18n.editorToast();
 
     this.isSaving.set(true);
@@ -173,19 +172,63 @@ export class CommercialPageEditor {
   }
 
   protected goBack(): void {
-    if (this.isSaving()) return;
+    if (this.isSaving() || this.isPreviewing()) return;
 
     void this.router.navigate(['/admin/offers']);
   }
 
   protected previewDraft(): void {
-    if (this.isSaving() || this.form.dirty) return;
+    if (this.isSaving() || this.isPreviewing()) return;
 
-    void this.router.navigate(['/admin/offers', this.pageId, 'preview']);
+    if (this.form.pristine) {
+      void this.router.navigate(['/admin/offers', this.pageId, 'preview']);
+      return;
+    }
+
+    const document = this.getValidDocument();
+    const detail = this.detail();
+    if (!document || !detail) return;
+
+    this.isPreviewing.set(true);
+
+    this.pages
+      .getUnsavedPreview(detail.page.id, document, detail.page.locale)
+      .pipe(finalize(() => this.isPreviewing.set(false)))
+      .subscribe({
+        next: (previewDocument) => this.previewDocument.set(previewDocument),
+        error: () => {
+          const preview = this.i18n.previewPage();
+
+          this.toast.danger({
+            summary: preview.loadErrorTitle,
+            detail: preview.loadErrorDescription,
+          });
+        },
+      });
+  }
+
+  protected closePreview(): void {
+    this.previewDocument.set(null);
   }
 
   private applyDetail(detail: CommercialPageAdminDetail): void {
     this.detail.set(detail);
     resetCommercialPageEditorForm(this.form, detail.draft);
+  }
+
+  private getValidDocument(): CommercialPageEditorDocument | null {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      const formCopy = this.i18n.commonForm();
+
+      this.toast.danger({
+        summary: formCopy.invalidSummary,
+        detail: formCopy.invalid,
+      });
+      return null;
+    }
+
+    return mapCommercialPageEditorFormToDocument(this.form);
   }
 }

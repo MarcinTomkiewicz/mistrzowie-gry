@@ -1,4 +1,29 @@
-<section class="mg-section mg-section--full">
+@if (previewDocument(); as pageDocument) {
+  <div class="mg-container mt-xl">
+    <div
+      class="mg-card flex-row-between-center flex-col-start-stretch-sm gap-sm p-md w-100"
+    >
+      <span class="tag-badge tag-badge--warn">
+        {{ i18n.previewPage().badge }}
+      </span>
+
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        [label]="i18n.previewPage().backToEditor"
+        icon="pi pi-arrow-left"
+        (onClick)="closePreview()"
+      />
+    </div>
+  </div>
+
+  <app-commercial-page-renderer [document]="pageDocument" />
+}
+
+<section
+  class="mg-section mg-section--full"
+  [class.d-none]="previewDocument() !== null"
+>
   <div class="mg-container position-relative flex-col-start-stretch gap-md">
     <header class="mg-section__header w-100">
       <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm w-100">
@@ -17,7 +42,7 @@
     </header>
 
     <app-loading-overlay
-      [visible]="isLoading() || isSaving()"
+      [visible]="isLoading() || isSaving() || isPreviewing()"
       [label]="
         isSaving()
           ? i18n.commonStatus().saving
@@ -174,7 +199,7 @@
             [label]="i18n.commonActions().save"
             icon="pi pi-save"
             [loading]="isSaving()"
-            [disabled]="isLoading() || form.pristine"
+            [disabled]="isLoading() || isPreviewing() || form.pristine"
           />
 
           <p-button
@@ -183,7 +208,8 @@
             [outlined]="true"
             [label]="i18n.publication().preview"
             icon="pi pi-eye"
-            [disabled]="isSaving() || form.dirty"
+            [loading]="isPreviewing()"
+            [disabled]="isSaving() || isPreviewing()"
             (onClick)="previewDraft()"
           />
 
@@ -193,7 +219,7 @@
             [outlined]="true"
             [label]="i18n.commonActions().cancel"
             icon="pi pi-arrow-left"
-            [disabled]="isSaving()"
+            [disabled]="isSaving() || isPreviewing()"
             (onClick)="goBack()"
           />
         </div>

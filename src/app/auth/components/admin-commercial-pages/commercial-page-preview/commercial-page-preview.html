@@ -39,9 +39,13 @@
 } @else if (document(); as pageDocument) {
   <div class="mg-container mt-xl">
     <div class="mg-card flex-row-between-center flex-col-start-stretch-sm gap-sm p-md w-100">
-      <span class="tag-badge tag-badge--warn">
-        {{ i18n.previewPage().badge }}
-      </span>
+      <div class="flex-col-start-start gap-xs">
+        <span class="tag-badge tag-badge--success">
+          {{ i18n.previewPage().persistedBadge }}
+        </span>
+
+        <p class="m-0">{{ i18n.previewPage().persistedReady }}</p>
+      </div>
 
       <p-button
         severity="secondary"

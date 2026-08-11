@@ -306,6 +306,8 @@
     "page": {
       "seoTitle": "[PH] Podgląd wersji roboczej strony ofertowej",
       "badge": "Podgląd wersji roboczej",
+      "persistedBadge": "[PH] [adminCommercialPages-persistedBadge] Podgląd zapisanej wersji",
+      "persistedReady": "[PH] [adminCommercialPages-persistedReady] Bieżąca zapisana wersja została sprawdzona w podglądzie i może zostać użyta do publikacji.",
       "loadErrorTitle": "[PH] Nie udało się załadować podglądu",
       "loadErrorDescription": "[PH] Podgląd wersji roboczej nie został pobrany.",
       "backToEditor": "[PH] Wróć do edytora"
@@ -326,8 +328,8 @@
     },
     "metadata": {
       "sectionTitle": "[PH] Stan publikacji",
-      "draftRevision": "[PH] Rewizja draftu",
-      "previewedRevision": "[PH] Rewizja podglądu",
+      "draftRevision": "[PH] [adminCommercialPages-draftRevision] Wersja draftu",
+      "previewedRevision": "[PH] [adminCommercialPages-previewedRevision] Wersja sprawdzona w podglądzie",
       "draftUpdatedAt": "[PH] Aktualizacja draftu",
       "draftUpdatedBy": "[PH] Draft zaktualizował",
       "publishedAt": "[PH] Data publikacji",
