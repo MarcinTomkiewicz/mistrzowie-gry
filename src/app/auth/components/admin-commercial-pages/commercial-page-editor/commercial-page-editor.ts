@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import {
   createCommercialPageEditorForm,
@@ -12,6 +12,7 @@ import {
   resetCommercialPageEditorForm,
   syncCommercialPageEditorOptionalControls,
 } from '../../../../core/factories/commercial-page-editor-form.factory';
+import { CommercialConstantAdmin } from '../../../../core/services/commercial-constant-admin/commercial-constant-admin';
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { CommercialPageAdminDetail } from '../../../../core/types/commercial-page-admin';
@@ -24,6 +25,7 @@ import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor';
 import { CommercialPageSectionsEditor } from './commercial-page-sections-editor';
 import { CommercialPageSeoEditor } from './commercial-page-seo-editor';
+import { CommercialProductsEditor } from './commercial-products-editor';
 
 @Component({
   selector: 'app-commercial-page-editor',
@@ -34,11 +36,13 @@ import { CommercialPageSeoEditor } from './commercial-page-seo-editor';
     CommercialPageMetadataEditor,
     CommercialPageSectionsEditor,
     CommercialPageSeoEditor,
+    CommercialProductsEditor,
   ],
   templateUrl: './commercial-page-editor.html',
   providers: [provideTranslocoScope('adminCommercialPages', 'common')],
 })
 export class CommercialPageEditor {
+  private readonly constants = inject(CommercialConstantAdmin);
   private readonly pages = inject(CommercialPageAdmin);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
@@ -48,6 +52,7 @@ export class CommercialPageEditor {
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly form = createCommercialPageEditorForm();
   protected readonly detail = signal<CommercialPageAdminDetail | null>(null);
+  protected readonly constantTokens = signal<readonly string[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
   protected readonly hasLoadError = signal(false);
@@ -97,11 +102,16 @@ export class CommercialPageEditor {
     this.isLoading.set(true);
     this.hasLoadError.set(false);
 
-    this.pages
-      .getDetail(this.pageId)
+    forkJoin({
+      detail: this.pages.getDetail(this.pageId),
+      constants: this.constants.getList(),
+    })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (detail) => this.applyDetail(detail),
+        next: ({ detail, constants }) => {
+          this.constantTokens.set(constants.map((constant) => constant.syntax));
+          this.applyDetail(detail);
+        },
         error: () => {
           const toast = this.i18n.editorToast();
 
@@ -130,10 +140,7 @@ export class CommercialPageEditor {
     const detail = this.detail();
     if (!detail) return;
 
-    const document = mapCommercialPageEditorFormToDocument(
-      this.form,
-      detail.draft,
-    );
+    const document = mapCommercialPageEditorFormToDocument(this.form);
     const toast = this.i18n.editorToast();
 
     this.isSaving.set(true);

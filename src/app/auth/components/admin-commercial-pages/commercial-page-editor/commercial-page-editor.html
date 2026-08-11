@@ -155,11 +155,16 @@
           [requiredMessage]="i18n.commonForm().required"
         />
 
+        <app-commercial-products-editor
+          [products]="form.controls.products"
+          [sections]="form.controls.sections"
+          [tokens]="constantTokens()"
+        />
+
         <app-commercial-page-sections-editor
           [sections]="form.controls.sections"
-          [allowedSectionTypes]="pageDetail.allowedSectionTypes"
-          [pageKey]="pageDetail.page.key"
-          [locale]="pageDetail.page.locale"
+          [products]="form.controls.products"
+          [tokens]="constantTokens()"
         />
 
         <div class="flex-row-center-center flex-wrap gap-sm w-100">

@@ -1,0 +1,16 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <div class="flex-row-end-center">
+    <p-button type="button" severity="secondary" [label]="i18n.faq().add" icon="pi pi-plus" (onClick)="addItem()" />
+  </div>
+  @if (!form().controls.items.length) { <p class="m-0">{{ i18n.faq().empty }}</p> }
+  @for (item of form().controls.items.controls; track item; let index = $index) {
+    <div class="mg-card flex-col-start-stretch gap-md p-sm w-100" [formGroup]="item">
+      <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.items.length" (moveUp)="moveItem(index, -1)" (moveDown)="moveItem(index, 1)" (remove)="removeItem(index)" />
+      <p-iftalabel class="w-100">
+        <input pInputText class="w-100" [id]="controlId() + '-' + index + '-question'" formControlName="question" autocomplete="off" />
+        <label [for]="controlId() + '-' + index + '-question'">{{ i18n.faq().question }}</label>
+      </p-iftalabel>
+      <app-commercial-rich-content-editor [control]="item.controls.answer" [controlId]="controlId() + '-' + index + '-answer'" [label]="i18n.faq().answer" [tokens]="tokens()" />
+    </div>
+  }
+</div>

@@ -7,7 +7,6 @@ import {
 } from '../../configs/commercial-pages.config';
 import type {
   CommercialPageAdminDetail,
-  CommercialPageAdminDocument,
   CommercialPageAdminListItem,
   CommercialPageAdminSavePayload,
   CommercialPageAdminUnsavedPreviewPayload,
@@ -43,7 +42,7 @@ export class CommercialPageAdmin {
 
   saveDraft(
     pageId: string,
-    document: CommercialPageAdminDocument,
+    document: CommercialPageEditorDocument,
     locale = COMMERCIAL_PAGE_DEFAULT_LOCALE,
   ): Observable<CommercialPageAdminDetail> {
     const payload = {

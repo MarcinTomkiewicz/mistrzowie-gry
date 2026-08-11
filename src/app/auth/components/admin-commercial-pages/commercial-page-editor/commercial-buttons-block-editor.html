@@ -1,0 +1,63 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <div class="mg-grid-2 gap-md w-100">
+    <p-iftalabel class="w-100">
+      <p-select class="w-100" [inputId]="controlId() + '-layout'" formControlName="layout" [options]="layoutOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+      <label [for]="controlId() + '-layout'">{{ i18n.buttons().layout }}</label>
+    </p-iftalabel>
+    <p-iftalabel class="w-100">
+      <p-select class="w-100" [inputId]="controlId() + '-align'" formControlName="align" [options]="alignOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+      <label [for]="controlId() + '-align'">{{ i18n.buttons().align }}</label>
+    </p-iftalabel>
+  </div>
+
+  <div class="flex-row-end-center">
+    <p-button type="button" severity="secondary" [label]="i18n.buttons().add" icon="pi pi-plus" (onClick)="addButton()" />
+  </div>
+  @if (!form().controls.buttons.length) {
+    <p class="m-0 error-text">{{ i18n.buttons().empty }}</p>
+  }
+
+  @for (button of form().controls.buttons.controls; track button; let index = $index) {
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="button">
+      <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.buttons.length" (moveUp)="moveButton(index, -1)" (moveDown)="moveButton(index, 1)" (remove)="removeButton(index)" />
+      <div class="mg-grid-2 gap-md w-100">
+        <p-iftalabel class="w-100">
+          <input pInputText class="w-100" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />
+          <label [for]="controlId() + '-' + index + '-label'">{{ i18n.buttons().label }}</label>
+        </p-iftalabel>
+        <p-iftalabel class="w-100">
+          <input pInputText class="w-100" [id]="controlId() + '-' + index + '-route'" formControlName="route" autocomplete="off" />
+          <label [for]="controlId() + '-' + index + '-route'">{{ i18n.buttons().route }}</label>
+        </p-iftalabel>
+        <p-iftalabel class="w-100">
+          <p-select class="w-100" [inputId]="controlId() + '-' + index + '-appearance'" formControlName="appearance" [options]="appearanceOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+          <label [for]="controlId() + '-' + index + '-appearance'">{{ i18n.buttons().appearance }}</label>
+        </p-iftalabel>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <span class="small-caps">{{ i18n.buttons().iconKey }}</span>
+          <div class="flex-row-start-center flex-wrap gap-xs">
+            @for (option of iconOptions(); track option.value) {
+              <button
+                pButton
+                class="square-9 cursor-pointer"
+                type="button"
+                size="small"
+                [severity]="button.controls.iconKey.value === option.value ? 'success' : 'secondary'"
+                [outlined]="button.controls.iconKey.value !== option.value"
+                [attr.aria-pressed]="button.controls.iconKey.value === option.value"
+                [attr.aria-label]="option.label"
+                [attr.title]="option.label"
+                (click)="selectIcon(button, option.value)"
+              >
+                <i [class]="option.icon" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+      @if (button.controls.route.touched && button.controls.route.hasError('commercialInternalRoute')) {
+        <small class="error-text">{{ i18n.validation().invalidRoute }}</small>
+      }
+    </div>
+  }
+</div>

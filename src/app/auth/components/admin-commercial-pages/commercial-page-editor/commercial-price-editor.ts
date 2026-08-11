@@ -13,7 +13,7 @@ import {
   COMMERCIAL_PERCENTAGE_BASES,
   COMMERCIAL_PRICE_TYPES,
 } from '../../../../core/configs/commercial-pages.config';
-import type { CommercialPriceEditorForm } from '../../../../core/types/commercial-page-editor-form';
+import type { CommercialPriceEditorForm } from '../../../../core/types/commercial-price-editor-form';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 
 @Component({

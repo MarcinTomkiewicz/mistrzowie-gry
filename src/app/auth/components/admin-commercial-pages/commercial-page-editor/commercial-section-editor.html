@@ -1,49 +1,58 @@
-@if (sharedReferenceForm(); as shared) {
-  <div class="flex-col-start-stretch gap-xs w-100">
-    <span class="small-caps">{{ i18n.sections().sharedSource }}</span>
-    <strong>
-      {{ i18n.sharedSource()[shared.controls.sharedSource.value.key] }}
-    </strong>
-  </div>
-} @else if (heroForm(); as hero) {
-  <app-commercial-hero-section-editor
-    [form]="hero"
-    [controlId]="controlId()"
-  />
-} @else if (richTextForm(); as richText) {
-  <app-commercial-rich-text-section-editor
-    [form]="richText"
-    [controlId]="controlId()"
-  />
-} @else if (pricedForm(); as priced) {
-  <div class="flex-col-start-stretch gap-md w-100">
-    @if (sharedSource(); as source) {
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <span class="small-caps">{{ i18n.sections().sharedSource }}</span>
-        <strong>{{ i18n.sharedSource()[source.key] }}</strong>
-        <p class="m-0 text-muted">{{ i18n.sections().sharedNotice }}</p>
-      </div>
-    }
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <div class="mg-grid-2 gap-md w-100">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        [id]="controlId() + '-heading'"
+        formControlName="heading"
+        autocomplete="off"
+      />
+      <label [for]="controlId() + '-heading'">{{ i18n.section().heading }}</label>
+    </p-iftalabel>
 
-    <app-commercial-priced-section-editor
-      [form]="priced"
-      [controlId]="controlId()"
-      [priceRequired]="priceRequired()"
-    />
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        class="w-100"
+        [id]="controlId() + '-lead'"
+        formControlName="lead"
+        rows="3"
+      ></textarea>
+      <label [for]="controlId() + '-lead'">{{ i18n.section().lead }}</label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        [inputId]="controlId() + '-surface'"
+        formControlName="surface"
+        [options]="surfaceOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+      <label [for]="controlId() + '-surface'">{{ i18n.section().surface }}</label>
+    </p-iftalabel>
+
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        [inputId]="controlId() + '-text-align'"
+        formControlName="textAlign"
+        [options]="textAlignOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+      <label [for]="controlId() + '-text-align'">{{ i18n.section().textAlign }}</label>
+    </p-iftalabel>
   </div>
-} @else if (processForm(); as process) {
-  <app-commercial-process-section-editor
-    [form]="process"
-    [controlId]="controlId()"
+
+  <app-commercial-blocks-editor
+    [blocks]="form().controls.blocks"
+    [products]="products()"
+    [controlId]="controlId() + '-blocks'"
+    [tokens]="tokens()"
   />
-} @else if (faqForm(); as faq) {
-  <app-commercial-faq-section-editor
-    [form]="faq"
-    [controlId]="controlId()"
-  />
-} @else if (ctaForm(); as cta) {
-  <app-commercial-cta-section-editor
-    [form]="cta"
-    [controlId]="controlId()"
-  />
-}
+</div>

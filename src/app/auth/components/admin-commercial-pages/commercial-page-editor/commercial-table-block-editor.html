@@ -1,0 +1,25 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <div class="flex-row-between-center gap-sm">
+    <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.table().columns }}</h5>
+    <p-button type="button" severity="secondary" [label]="i18n.table().addColumn" icon="pi pi-plus" (onClick)="addColumn()" />
+  </div>
+  @for (column of form().controls.columns.controls; track column; let columnIndex = $index) {
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+      <app-commercial-item-editor-actions [index]="columnIndex" [itemCount]="form().controls.columns.length" (moveUp)="moveColumn(columnIndex, -1)" (moveDown)="moveColumn(columnIndex, 1)" (remove)="removeColumn(columnIndex)" />
+      <app-commercial-rich-content-editor [control]="column.controls.heading" [controlId]="controlId() + '-column-' + columnIndex" [label]="i18n.table().columnHeading" [tokens]="tokens()" />
+    </div>
+  }
+
+  <div class="flex-row-between-center gap-sm">
+    <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.table().rows }}</h5>
+    <p-button type="button" severity="secondary" [label]="i18n.table().addRow" icon="pi pi-plus" [disabled]="!form().controls.columns.length" (onClick)="addRow()" />
+  </div>
+  @for (row of form().controls.rows.controls; track row; let rowIndex = $index) {
+    <div class="mg-card flex-col-start-stretch gap-md p-sm w-100">
+      <app-commercial-item-editor-actions [index]="rowIndex" [itemCount]="form().controls.rows.length" (moveUp)="moveRow(rowIndex, -1)" (moveDown)="moveRow(rowIndex, 1)" (remove)="removeRow(rowIndex)" />
+      @for (cell of row.controls.cells.controls; track cell; let cellIndex = $index) {
+        <app-commercial-rich-content-editor [control]="cell.controls.content" [controlId]="controlId() + '-row-' + rowIndex + '-cell-' + cellIndex" [label]="i18n.table().cell + ' ' + (cellIndex + 1)" [tokens]="tokens()" />
+      }
+    </div>
+  }
+</div>

@@ -115,7 +115,7 @@
   "editor": {
     "page": {
       "title": "[PH] Edycja strony ofertowej",
-      "subtitle": "[PH] Zmień metadane i ustawienia SEO wersji roboczej.",
+      "subtitle": "[PH] Edytuj metadane, produkty i sekcje wersji roboczej.",
       "loadErrorTitle": "[PH] Nie udało się załadować strony ofertowej"
     },
     "identity": {
@@ -140,35 +140,130 @@
       "ogDescription": "[PH] Opis Open Graph",
       "canonicalUrl": "[PH] Canonical URL"
     },
+    "products": {
+      "sectionTitle": "[PH] Produkty strony",
+      "empty": "[PH] Strona nie zawiera żadnych produktów.",
+      "addProduct": "[PH] Dodaj produkt",
+      "product": "[PH] Produkt"
+    },
+    "product": {
+      "name": "[PH] Nazwa produktu",
+      "description": "[PH] Opis produktu",
+      "durationSection": "[PH] Czas trwania",
+      "durationMode": "[PH] Tryb czasu trwania",
+      "durationMinutes": "[PH] Czas trwania w minutach",
+      "participantsSection": "[PH] Uczestnicy",
+      "participantsMode": "[PH] Tryb liczby uczestników",
+      "participantsMin": "[PH] Minimalna liczba uczestników",
+      "participantsMax": "[PH] Maksymalna liczba uczestników",
+      "participantsPerFacilitatorMax": "[PH] Maksymalnie uczestników na prowadzącego",
+      "structureSection": "[PH] Pozostałe dane produktu",
+      "sessions": "[PH] Liczba sesji",
+      "sessionsPerMonth": "[PH] Liczba sesji w miesiącu",
+      "meetingCountMin": "[PH] Minimalna liczba spotkań",
+      "meetingCountMax": "[PH] Maksymalna liczba spotkań",
+      "facilitatorCount": "[PH] Liczba prowadzących",
+      "tableCount": "[PH] Liczba stołów"
+    },
     "sections": {
       "sectionTitle": "[PH] Sekcje strony",
       "empty": "[PH] Dokument nie zawiera żadnych sekcji.",
       "addSection": "[PH] Dodaj sekcję",
-      "sharedNotice": "Zmiana wspólna dla wszystkich ofert.",
-      "sharedSource": "[PH] Współdzielone źródło"
+      "section": "[PH] Sekcja"
     },
-    "sectionBase": {
+    "section": {
       "heading": "[PH] Nagłówek sekcji",
-      "lead": "[PH] Lead sekcji"
+      "lead": "[PH] Lead sekcji",
+      "surface": "[PH] Powierzchnia sekcji",
+      "textAlign": "[PH] Wyrównanie tekstu",
+      "blocks": "[PH] Bloki",
+      "emptyBlocks": "[PH] Sekcja nie zawiera żadnych bloków.",
+      "addBlock": "[PH] Dodaj blok"
     },
-    "items": {
-      "empty": "[PH] Sekcja nie zawiera żadnych elementów.",
-      "addItem": "[PH] Dodaj element",
-      "title": "[PH] Tytuł",
-      "body": "[PH] Treść",
+    "richContent": {
+      "label": "[PH] Treść sformatowana",
+      "hint": "[PH] Buduj treść z sekcji, akapitów, list, wyróżnień i linków.",
+      "invalid": "[PH] Wymagana treść musi zawierać widoczny tekst.",
+      "invalidLink": "[PH] Każdy link musi mieć niepusty adres.",
+      "tokens": "[PH] Stałe globalne",
+      "tokensHint": "[PH] Ustaw kursor w polu tekstowym i wybierz token, aby go wstawić.",
+      "empty": "[PH] Treść nie zawiera żadnej sekcji.",
+      "addSection": "[PH] Dodaj sekcję treści",
+      "section": "[PH] Sekcja treści",
+      "sectionTitle": "[PH] Tytuł sekcji (opcjonalny)",
+      "paragraph": "[PH] Akapit",
+      "ordered-list": "[PH] Lista numerowana",
+      "unordered-list": "[PH] Lista punktowana",
+      "addParagraph": "[PH] Dodaj akapit",
+      "addOrderedList": "[PH] Dodaj listę numerowaną",
+      "addUnorderedList": "[PH] Dodaj listę punktowaną",
+      "addItem": "[PH] Dodaj pozycję",
+      "item": "[PH] Pozycja",
+      "nestedBlocks": "[PH] Treść zagnieżdżona",
+      "textNode": "[PH] Tekst",
+      "strongNode": "[PH] Wyróżnienie",
+      "linkNode": "[PH] Link",
+      "nodeText": "[PH] Treść",
+      "href": "[PH] Adres linku",
+      "external": "[PH] Link zewnętrzny",
+      "addText": "[PH] Dodaj tekst",
+      "addStrong": "[PH] Dodaj wyróżnienie",
+      "addLink": "[PH] Dodaj link"
+    },
+    "buttons": {
+      "layout": "[PH] Układ przycisków",
+      "align": "[PH] Wyrównanie przycisków",
+      "empty": "[PH] Blok nie zawiera żadnych przycisków.",
+      "add": "[PH] Dodaj przycisk",
+      "label": "[PH] Etykieta",
+      "route": "[PH] Ścieżka wewnętrzna",
+      "appearance": "[PH] Wygląd",
+      "iconKey": "[PH] Ikona",
+      "noIcon": "[PH] Bez ikony"
+    },
+    "cards": {
+      "orientation": "[PH] Orientacja kart",
+      "columns": "[PH] Liczba kolumn",
+      "empty": "[PH] Blok nie zawiera żadnych kart.",
+      "add": "[PH] Dodaj kartę",
+      "title": "[PH] Tytuł karty",
+      "body": "[PH] Treść karty",
+      "hasPrice": "[PH] Dodaj cenę"
+    },
+    "productCollection": {
+      "products": "[PH] Produkty w kolekcji",
+      "presentation": "[PH] Sposób prezentacji",
+      "cardOrientation": "[PH] Orientacja kart",
+      "columns": "[PH] Liczba kolumn",
+      "fields": "[PH] Pola produktów",
+      "emptyFields": "[PH] Kolekcja nie zawiera żadnych pól.",
+      "addField": "[PH] Dodaj pole",
+      "fieldKey": "[PH] Pole danych",
+      "fieldLabel": "[PH] Domyślna etykieta",
+      "visibleProducts": "[PH] Produkty pokazujące pole",
+      "labelOverrides": "[PH] Etykiety per produkt",
+      "addLabelOverride": "[PH] Dodaj etykietę produktu",
+      "overrideProduct": "[PH] Produkt",
+      "overrideLabel": "[PH] Etykieta produktu",
+      "duplicateLabelOverride": "[PH] Produkt może mieć najwyżej jedną własną etykietę w danym polu.",
+      "staleProductReference": "[PH] Widoczność pól i etykiety muszą wskazywać produkty należące do kolekcji."
+    },
+    "table": {
+      "columns": "[PH] Kolumny",
+      "addColumn": "[PH] Dodaj kolumnę",
+      "columnHeading": "[PH] Nagłówek kolumny",
+      "rows": "[PH] Wiersze",
+      "addRow": "[PH] Dodaj wiersz",
+      "cell": "[PH] Komórka"
+    },
+    "faq": {
+      "empty": "[PH] Blok nie zawiera żadnych pytań.",
+      "add": "[PH] Dodaj pytanie",
       "question": "[PH] Pytanie",
       "answer": "[PH] Odpowiedź"
     },
-    "action": {
-      "sectionTitle": "[PH] Przycisk CTA",
-      "enabled": "[PH] Pokaż przycisk CTA",
-      "label": "[PH] Etykieta przycisku",
-      "route": "[PH] Wewnętrzna ścieżka",
-      "appearance": "[PH] Wygląd przycisku"
-    },
     "price": {
       "sectionTitle": "[PH] Cena",
-      "enabled": "[PH] Dodaj cenę",
       "type": "[PH] Rodzaj ceny",
       "amount": "[PH] Kwota",
       "minAmount": "[PH] Kwota minimalna",
@@ -179,25 +274,6 @@
       "unit": "[PH] Jednostka rozliczeniowa",
       "basis": "[PH] Podstawa rozliczenia",
       "note": "[PH] Nota cenowa"
-    },
-    "capacity": {
-      "sectionTitle": "[PH] Pojemność",
-      "enabled": "[PH] Dodaj informacje o pojemności",
-      "participantsMin": "[PH] Minimalna liczba uczestników",
-      "participantsMax": "[PH] Maksymalna liczba uczestników",
-      "participantsPerFacilitatorMax": "[PH] Maksymalnie uczestników na prowadzącego",
-      "facilitatorCount": "[PH] Liczba prowadzących",
-      "tableCount": "[PH] Liczba stołów"
-    },
-    "schedule": {
-      "sectionTitle": "[PH] Harmonogram",
-      "enabled": "[PH] Dodaj harmonogram",
-      "durationMode": "[PH] Sposób określenia czasu",
-      "durationMinutes": "[PH] Czas trwania w minutach",
-      "sessionCount": "[PH] Liczba sesji",
-      "sessionsPerMonth": "[PH] Liczba sesji w miesiącu",
-      "meetingCountMin": "[PH] Minimalna liczba spotkań",
-      "meetingCountMax": "[PH] Maksymalna liczba spotkań"
     },
     "actions": {
       "moveSectionUp": "[PH] Przesuń sekcję wyżej",
@@ -212,8 +288,9 @@
       "invalidPriceRange": "[PH] Minimalna kwota nie może być większa od maksymalnej.",
       "invalidPercentage": "[PH] Podaj jedną wartość procentową albo pełny zakres.",
       "priceNoteRequired": "[PH] Nota jest wymagana dla tego rodzaju ceny.",
-      "invalidCapacity": "[PH] Uzupełnij pojemność poprawnymi nieujemnymi liczbami całkowitymi i zakresem.",
-      "invalidSchedule": "[PH] Uzupełnij poprawny czas i zakres harmonogramu.",
+      "invalidDuration": "[PH] Własny czas trwania wymaga dodatniej liczby minut.",
+      "invalidParticipants": "[PH] Własny zakres uczestników wymaga poprawnych liczb i kolejności minimum–maksimum.",
+      "invalidMeetingRange": "[PH] Minimalna liczba spotkań nie może być większa od maksymalnej.",
       "invalidRoute": "[PH] Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku „/”."
     },
     "toast": {
@@ -284,20 +361,6 @@
     "audience_dependent": "[PH] Zależnie od odbiorcy",
     "none": "[PH] Bez informacji podatkowej"
   },
-  "sectionType": {
-    "hero": "[PH] Hero",
-    "rich_text": "[PH] Treść tekstowa",
-    "card_grid": "[PH] Karty",
-    "pricing_table": "[PH] Cennik",
-    "process": "[PH] Proces",
-    "faq": "[PH] FAQ",
-    "cta": "[PH] CTA",
-    "logistics_fees": "[PH] Opłaty logistyczne"
-  },
-  "sharedSource": {
-    "standards": "[PH] Standardy",
-    "logistics": "[PH] Logistyka"
-  },
   "actionAppearance": {
     "primary": "[PH] Główny",
     "success": "[PH] Sukces",
@@ -339,8 +402,61 @@
     "documented_expense": "[PH] Udokumentowany wydatek",
     "other": "[PH] Inny koszt"
   },
+  "blockType": {
+    "rich_text": "[PH] Rich text",
+    "buttons": "[PH] Przyciski",
+    "cards": "[PH] Karty",
+    "product_collection": "[PH] Kolekcja produktów",
+    "table": "[PH] Tabela",
+    "faq": "[PH] FAQ"
+  },
+  "sectionSurface": {
+    "plain": "[PH] Zwykła",
+    "card": "[PH] Karta"
+  },
+  "textAlign": {
+    "left": "[PH] Do lewej",
+    "center": "[PH] Do środka",
+    "right": "[PH] Do prawej"
+  },
+  "buttonLayout": {
+    "horizontal": "[PH] Poziomy",
+    "vertical": "[PH] Pionowy"
+  },
+  "cardOrientation": {
+    "vertical": "[PH] Pionowa",
+    "horizontal": "[PH] Pozioma"
+  },
+  "collectionPresentation": {
+    "cards": "[PH] Karty",
+    "table": "[PH] Tabela",
+    "comparison_table": "[PH] Tabela porównawcza"
+  },
+  "productFieldKey": {
+    "name": "[PH] Nazwa",
+    "description": "[PH] Opis",
+    "price": "[PH] Cena",
+    "duration": "[PH] Czas trwania",
+    "participants": "[PH] Uczestnicy",
+    "participantsPerFacilitatorMax": "[PH] Uczestnicy na prowadzącego",
+    "sessions": "[PH] Sesje",
+    "sessionsPerMonth": "[PH] Sesje w miesiącu",
+    "meetingCount": "[PH] Liczba spotkań",
+    "facilitatorCount": "[PH] Liczba prowadzących",
+    "tableCount": "[PH] Liczba stołów"
+  },
+  "iconKey": {
+    "message": "[PH] Wiadomość",
+    "users": "[PH] Użytkownicy"
+  },
   "durationMode": {
-    "standard_session": "[PH] Standardowa sesja",
-    "custom": "[PH] Własny czas"
+    "standard": "[PH] Standardowy",
+    "custom": "[PH] Własny",
+    "not_applicable": "[PH] Nie dotyczy"
+  },
+  "participantsMode": {
+    "standard": "[PH] Standardowi",
+    "custom": "[PH] Własny zakres",
+    "not_applicable": "[PH] Nie dotyczy"
   }
 }

@@ -1,32 +1,9 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 
-import type {
-  CommercialCapacity,
-  CommercialSchedule,
-} from '../types/commercial-page';
 import type { CommercialPrice } from '../types/commercial-price';
-import type {
-  CommercialCapacityEditorForm,
-  CommercialPriceEditorForm,
-  CommercialScheduleEditorForm,
-} from '../types/commercial-page-editor-form';
-import { setControlEnabled } from '../utils/form-controls';
+import type { CommercialPriceEditorForm } from '../types/commercial-price-editor-form';
 import { normalizeText } from '../utils/normalize-text';
-import {
-  commercialCapacityValidator,
-  commercialPriceValidator,
-  commercialScheduleValidator,
-} from '../validators/commercial-page-editor.validator';
-import { integerValidator } from '../validators/form-value.validator';
-
-const optionalNonNegativeIntegerValidators = [
-  integerValidator(),
-  Validators.min(0),
-];
-const optionalPositiveIntegerValidators = [
-  integerValidator(),
-  Validators.min(1),
-];
+import { commercialPriceValidator } from '../validators/commercial-page-editor.validator';
 
 export function createCommercialPriceEditorForm(
   price: CommercialPrice | null = null,
@@ -52,73 +29,6 @@ export function createCommercialPriceEditorForm(
       note: new FormControl(values.note, { nonNullable: true }),
     },
     { validators: [commercialPriceValidator] },
-  );
-}
-
-export function createCommercialCapacityEditorForm(
-  capacity: CommercialCapacity | null = null,
-): CommercialCapacityEditorForm {
-  return new FormGroup(
-    {
-      participantsMin: new FormControl(capacity?.participantsMin ?? null, {
-        validators: optionalNonNegativeIntegerValidators,
-      }),
-      participantsMax: new FormControl(capacity?.participantsMax ?? null, {
-        validators: optionalNonNegativeIntegerValidators,
-      }),
-      participantsPerFacilitatorMax: new FormControl(
-        capacity?.participantsPerFacilitatorMax ?? null,
-        { validators: optionalNonNegativeIntegerValidators },
-      ),
-      facilitatorCount: new FormControl(capacity?.facilitatorCount ?? null, {
-        validators: optionalNonNegativeIntegerValidators,
-      }),
-      tableCount: new FormControl(capacity?.tableCount ?? null, {
-        validators: optionalNonNegativeIntegerValidators,
-      }),
-    },
-    { validators: [commercialCapacityValidator] },
-  );
-}
-
-export function createCommercialScheduleEditorForm(
-  schedule: CommercialSchedule | null = null,
-): CommercialScheduleEditorForm {
-  const form = new FormGroup(
-    {
-      durationMode: new FormControl(schedule?.durationMode ?? 'custom', {
-        nonNullable: true,
-      }),
-      durationMinutes: new FormControl(schedule?.durationMinutes ?? null, {
-        validators: optionalPositiveIntegerValidators,
-      }),
-      sessionCount: new FormControl(schedule?.sessionCount ?? null, {
-        validators: optionalPositiveIntegerValidators,
-      }),
-      sessionsPerMonth: new FormControl(schedule?.sessionsPerMonth ?? null, {
-        validators: optionalPositiveIntegerValidators,
-      }),
-      meetingCountMin: new FormControl(schedule?.meetingCountMin ?? null, {
-        validators: optionalPositiveIntegerValidators,
-      }),
-      meetingCountMax: new FormControl(schedule?.meetingCountMax ?? null, {
-        validators: optionalPositiveIntegerValidators,
-      }),
-    },
-    { validators: [commercialScheduleValidator] },
-  );
-
-  syncCommercialScheduleDurationControl(form);
-
-  return form;
-}
-
-export function syncCommercialScheduleDurationControl(
-  form: CommercialScheduleEditorForm,
-): void {
-  setControlEnabled(
-    form.controls.durationMinutes,
-    form.controls.durationMode.getRawValue() === 'custom',
   );
 }
 
@@ -171,24 +81,6 @@ export function mapCommercialPriceEditorForm(
     case 'custom_quote':
       return { type: value.type, note: value.note.trim() };
   }
-}
-
-export function mapCommercialCapacityEditorForm(
-  form: CommercialCapacityEditorForm,
-): CommercialCapacity {
-  return form.getRawValue();
-}
-
-export function mapCommercialScheduleEditorForm(
-  form: CommercialScheduleEditorForm,
-): CommercialSchedule {
-  const value = form.getRawValue();
-
-  return {
-    ...value,
-    durationMinutes:
-      value.durationMode === 'standard_session' ? null : value.durationMinutes,
-  };
 }
 
 function getCommercialPriceEditorValues(price: CommercialPrice | null) {

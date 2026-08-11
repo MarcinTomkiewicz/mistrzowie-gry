@@ -1,9 +1,22 @@
 import type {
   CommercialActionAppearance,
-  CommercialDurationMode,
   CommercialPageKey,
 } from '../types/commercial-page';
 import type { CommercialConstantValueType } from '../types/commercial-constant-admin';
+import type {
+  CommercialBlockType,
+  CommercialButtonLayout,
+  CommercialCardOrientation,
+  CommercialCardsBlock,
+  CommercialEditorDuration,
+  CommercialEditorParticipants,
+  CommercialIconKey,
+  CommercialProductCollectionBlock,
+  CommercialProductCollectionCardsBlock,
+  CommercialProductFieldKey,
+  CommercialSectionSurface,
+  CommercialTextAlign,
+} from '../types/commercial-page-builder';
 import type { CommonNavTranslations } from '../types/i18n/common';
 import type {
   CommercialActualCostBasis,
@@ -92,7 +105,87 @@ export const COMMERCIAL_ACTUAL_COST_BASES = [
   'other',
 ] as const satisfies readonly CommercialActualCostBasis[];
 
-export const COMMERCIAL_DURATION_MODES = [
-  'standard_session',
+export const COMMERCIAL_BUILDER_BLOCK_TYPES = [
+  'rich_text',
+  'buttons',
+  'cards',
+  'product_collection',
+  'table',
+  'faq',
+] as const satisfies readonly CommercialBlockType[];
+
+export const COMMERCIAL_SECTION_SURFACES = [
+  'plain',
+  'card',
+] as const satisfies readonly CommercialSectionSurface[];
+
+export const COMMERCIAL_TEXT_ALIGNS = [
+  'left',
+  'center',
+  'right',
+] as const satisfies readonly CommercialTextAlign[];
+
+export const COMMERCIAL_BUTTON_LAYOUTS = [
+  'horizontal',
+  'vertical',
+] as const satisfies readonly CommercialButtonLayout[];
+
+export const COMMERCIAL_CARD_ORIENTATIONS = [
+  'vertical',
+  'horizontal',
+] as const satisfies readonly CommercialCardOrientation[];
+
+export const COMMERCIAL_MANUAL_CARD_COLUMNS = [
+  1,
+  2,
+  3,
+  4,
+] as const satisfies readonly CommercialCardsBlock['columns'][];
+
+export const COMMERCIAL_PRODUCT_CARD_COLUMNS = [
+  1,
+  2,
+  3,
+] as const satisfies readonly CommercialProductCollectionCardsBlock['columns'][];
+
+export const COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS = [
+  'cards',
+  'table',
+  'comparison_table',
+] as const satisfies readonly CommercialProductCollectionBlock['presentation'][];
+
+export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
+  'name',
+  'description',
+  'price',
+  'duration',
+  'participants',
+  'participantsPerFacilitatorMax',
+  'sessions',
+  'sessionsPerMonth',
+  'meetingCount',
+  'facilitatorCount',
+  'tableCount',
+] as const satisfies readonly CommercialProductFieldKey[];
+
+export const COMMERCIAL_ICON_KEYS = [
+  'message',
+  'users',
+] as const satisfies readonly CommercialIconKey[];
+
+export const COMMERCIAL_ICON_CLASSES = {
+  message: 'pi pi-comments',
+  users: 'pi pi-users',
+} as const satisfies Record<CommercialIconKey, string>;
+
+export const COMMERCIAL_EDITOR_DURATION_MODES = [
+  'standard',
   'custom',
-] as const satisfies readonly CommercialDurationMode[];
+  'not_applicable',
+] as const satisfies readonly CommercialEditorDuration['mode'][];
+
+export const COMMERCIAL_EDITOR_PARTICIPANTS_MODES = [
+  'standard',
+  'custom',
+  'not_applicable',
+] as const satisfies readonly CommercialEditorParticipants['mode'][];

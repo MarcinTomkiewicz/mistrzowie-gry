@@ -1,39 +1,8 @@
 import type {
-  CommercialCardGridSection,
-  CommercialLogisticsFeesSection,
   CommercialPageDocument,
   CommercialPageIdentity,
-  CommercialSectionType,
-  CommercialSharedSource,
-  StoredCommercialPageDocument,
-  StoredCommercialSection,
 } from './commercial-page';
 import type { CommercialPageEditorDocument } from './commercial-page-builder';
-
-export type CommercialPageAdminSharedCardGridSection =
-  CommercialCardGridSection & {
-    sharedSource: Extract<CommercialSharedSource, { sectionType: 'card_grid' }>;
-  };
-
-export type CommercialPageAdminSharedLogisticsSection =
-  CommercialLogisticsFeesSection & {
-    sharedSource: Extract<
-      CommercialSharedSource,
-      { sectionType: 'logistics_fees' }
-    >;
-  };
-
-export type CommercialPageAdminSection =
-  | StoredCommercialSection
-  | CommercialPageAdminSharedCardGridSection
-  | CommercialPageAdminSharedLogisticsSection;
-
-export type CommercialPageAdminDocument = Omit<
-  StoredCommercialPageDocument,
-  'sections'
-> & {
-  sections: CommercialPageAdminSection[];
-};
 
 export type CommercialPageAdminListItem = CommercialPageIdentity & {
   heading: string;
@@ -48,7 +17,7 @@ export type CommercialPageAdminListItem = CommercialPageIdentity & {
 
 export type CommercialPageAdminDetail = {
   page: CommercialPageIdentity;
-  draft: CommercialPageAdminDocument;
+  draft: CommercialPageEditorDocument;
   draftRevision: number;
   previewedRevision: number | null;
   hasDraftChanges: boolean;
@@ -57,13 +26,12 @@ export type CommercialPageAdminDetail = {
   publishedAt: string | null;
   publishedBy: string | null;
   effectiveFrom: string | null;
-  allowedSectionTypes: CommercialSectionType[];
 };
 
 export type CommercialPageAdminSavePayload = {
   p_page_id: string;
   p_locale: string;
-  p_document: CommercialPageAdminDocument;
+  p_document: CommercialPageEditorDocument;
 };
 
 export type CommercialPageAdminUnsavedPreviewPayload = {

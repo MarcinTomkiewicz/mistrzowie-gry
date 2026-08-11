@@ -1,17 +1,28 @@
 import type {
   CommercialActionAppearance,
-  CommercialDurationMode,
   CommercialPageKind,
-  CommercialSectionType,
-  CommercialSharedSource,
   CommercialTaxDisplayMode,
 } from '../commercial-page';
+import type {
+  CommercialBlockType,
+  CommercialButtonLayout,
+  CommercialCardOrientation,
+  CommercialEditorDuration,
+  CommercialEditorParticipants,
+  CommercialIconKey,
+  CommercialProductCollectionBlock,
+  CommercialProductFieldKey,
+  CommercialSectionSurface,
+  CommercialTextAlign,
+} from '../commercial-page-builder';
 import type {
   CommercialActualCostBasis,
   CommercialBillingUnit,
   CommercialPercentageBasis,
   CommercialPriceType,
 } from '../commercial-price';
+
+export type { AdminCommercialPagesRichContentTranslations } from './admin-commercial-rich-content';
 
 export type AdminCommercialPagesListPageTranslations = {
   title: string;
@@ -124,39 +135,109 @@ export type AdminCommercialPagesPublicationToastTranslations = {
   publishFailedDetail: string;
 };
 
+export type AdminCommercialPagesProductsTranslations = {
+  sectionTitle: string;
+  empty: string;
+  addProduct: string;
+  product: string;
+};
+
+export type AdminCommercialPagesProductTranslations = {
+  name: string;
+  description: string;
+  durationSection: string;
+  durationMode: string;
+  durationMinutes: string;
+  participantsSection: string;
+  participantsMode: string;
+  participantsMin: string;
+  participantsMax: string;
+  participantsPerFacilitatorMax: string;
+  structureSection: string;
+  sessions: string;
+  sessionsPerMonth: string;
+  meetingCountMin: string;
+  meetingCountMax: string;
+  facilitatorCount: string;
+  tableCount: string;
+};
+
 export type AdminCommercialPagesSectionsTranslations = {
   sectionTitle: string;
   empty: string;
   addSection: string;
-  sharedNotice: string;
-  sharedSource: string;
+  section: string;
 };
 
-export type AdminCommercialPagesSectionBaseTranslations = {
+export type AdminCommercialPagesSectionTranslations = {
   heading: string;
   lead: string;
+  surface: string;
+  textAlign: string;
+  blocks: string;
+  emptyBlocks: string;
+  addBlock: string;
 };
 
-export type AdminCommercialPagesItemsTranslations = {
+export type AdminCommercialPagesButtonsTranslations = {
+  layout: string;
+  align: string;
   empty: string;
-  addItem: string;
+  add: string;
+  label: string;
+  route: string;
+  appearance: string;
+  iconKey: string;
+  noIcon: string;
+};
+
+export type AdminCommercialPagesCardsTranslations = {
+  orientation: string;
+  columns: string;
+  empty: string;
+  add: string;
   title: string;
   body: string;
+  hasPrice: string;
+};
+
+export type AdminCommercialPagesProductCollectionTranslations = {
+  products: string;
+  presentation: string;
+  cardOrientation: string;
+  columns: string;
+  fields: string;
+  emptyFields: string;
+  addField: string;
+  fieldKey: string;
+  fieldLabel: string;
+  visibleProducts: string;
+  labelOverrides: string;
+  addLabelOverride: string;
+  overrideProduct: string;
+  overrideLabel: string;
+  duplicateLabelOverride: string;
+  staleProductReference: string;
+};
+
+export type AdminCommercialPagesTableTranslations = {
+  columns: string;
+  addColumn: string;
+  columnHeading: string;
+  rows: string;
+  addRow: string;
+  cell: string;
+};
+
+export type AdminCommercialPagesFaqTranslations = {
+  empty: string;
+  add: string;
   question: string;
   answer: string;
 };
 
-export type AdminCommercialPagesActionTranslations = {
-  sectionTitle: string;
-  enabled: string;
-  label: string;
-  route: string;
-  appearance: string;
-};
-
 export type AdminCommercialPagesPriceTranslations = {
   sectionTitle: string;
-  enabled: string;
   type: string;
   amount: string;
   minAmount: string;
@@ -167,27 +248,6 @@ export type AdminCommercialPagesPriceTranslations = {
   unit: string;
   basis: string;
   note: string;
-};
-
-export type AdminCommercialPagesCapacityTranslations = {
-  sectionTitle: string;
-  enabled: string;
-  participantsMin: string;
-  participantsMax: string;
-  participantsPerFacilitatorMax: string;
-  facilitatorCount: string;
-  tableCount: string;
-};
-
-export type AdminCommercialPagesScheduleTranslations = {
-  sectionTitle: string;
-  enabled: string;
-  durationMode: string;
-  durationMinutes: string;
-  sessionCount: string;
-  sessionsPerMonth: string;
-  meetingCountMin: string;
-  meetingCountMax: string;
 };
 
 export type AdminCommercialPagesEditorActionsTranslations = {
@@ -204,8 +264,9 @@ export type AdminCommercialPagesValidationTranslations = {
   invalidPriceRange: string;
   invalidPercentage: string;
   priceNoteRequired: string;
-  invalidCapacity: string;
-  invalidSchedule: string;
+  invalidDuration: string;
+  invalidParticipants: string;
+  invalidMeetingRange: string;
   invalidRoute: string;
 };
 
@@ -214,52 +275,20 @@ export type AdminCommercialPagesDraftStatusTranslations = {
   clean: string;
 };
 
-export type AdminCommercialPagesKindTranslations = Record<
-  CommercialPageKind,
-  string
->;
-
-export type AdminCommercialPagesTaxDisplayModeTranslations = Record<
-  CommercialTaxDisplayMode,
-  string
->;
-
-export type AdminCommercialPagesSectionTypeTranslations = Record<
-  CommercialSectionType,
-  string
->;
-
-export type AdminCommercialPagesSharedSourceTranslations = Record<
-  CommercialSharedSource['key'],
-  string
->;
-
-export type AdminCommercialPagesActionAppearanceTranslations = Record<
-  CommercialActionAppearance,
-  string
->;
-
-export type AdminCommercialPagesPriceTypeTranslations = Record<
-  CommercialPriceType,
-  string
->;
-
-export type AdminCommercialPagesBillingUnitTranslations = Record<
-  CommercialBillingUnit,
-  string
->;
-
-export type AdminCommercialPagesPercentageBasisTranslations = Record<
-  CommercialPercentageBasis,
-  string
->;
-
-export type AdminCommercialPagesActualCostBasisTranslations = Record<
-  CommercialActualCostBasis,
-  string
->;
-
-export type AdminCommercialPagesDurationModeTranslations = Record<
-  CommercialDurationMode,
-  string
->;
+export type AdminCommercialPagesKindTranslations = Record<CommercialPageKind, string>;
+export type AdminCommercialPagesTaxDisplayModeTranslations = Record<CommercialTaxDisplayMode, string>;
+export type AdminCommercialPagesBlockTypeTranslations = Record<CommercialBlockType, string>;
+export type AdminCommercialPagesSectionSurfaceTranslations = Record<CommercialSectionSurface, string>;
+export type AdminCommercialPagesTextAlignTranslations = Record<CommercialTextAlign, string>;
+export type AdminCommercialPagesButtonLayoutTranslations = Record<CommercialButtonLayout, string>;
+export type AdminCommercialPagesCardOrientationTranslations = Record<CommercialCardOrientation, string>;
+export type AdminCommercialPagesCollectionPresentationTranslations = Record<CommercialProductCollectionBlock['presentation'], string>;
+export type AdminCommercialPagesProductFieldKeyTranslations = Record<CommercialProductFieldKey, string>;
+export type AdminCommercialPagesIconKeyTranslations = Record<CommercialIconKey, string>;
+export type AdminCommercialPagesDurationModeTranslations = Record<CommercialEditorDuration['mode'], string>;
+export type AdminCommercialPagesParticipantsModeTranslations = Record<CommercialEditorParticipants['mode'], string>;
+export type AdminCommercialPagesActionAppearanceTranslations = Record<CommercialActionAppearance, string>;
+export type AdminCommercialPagesPriceTypeTranslations = Record<CommercialPriceType, string>;
+export type AdminCommercialPagesBillingUnitTranslations = Record<CommercialBillingUnit, string>;
+export type AdminCommercialPagesPercentageBasisTranslations = Record<CommercialPercentageBasis, string>;
+export type AdminCommercialPagesActualCostBasisTranslations = Record<CommercialActualCostBasis, string>;

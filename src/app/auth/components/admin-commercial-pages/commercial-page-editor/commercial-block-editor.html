@@ -1,0 +1,37 @@
+@if (richTextForm(); as richText) {
+  <app-commercial-rich-content-editor
+    [control]="richText.controls.content"
+    [controlId]="controlId() + '-content'"
+    [label]="i18n.richContent().label"
+    [tokens]="tokens()"
+  />
+} @else if (buttonsForm(); as buttons) {
+  <app-commercial-buttons-block-editor
+    [form]="buttons"
+    [controlId]="controlId()"
+  />
+} @else if (cardsForm(); as cards) {
+  <app-commercial-cards-block-editor
+    [form]="cards"
+    [controlId]="controlId()"
+    [tokens]="tokens()"
+  />
+} @else if (productCollectionForm(); as collection) {
+  <app-commercial-product-collection-block-editor
+    [form]="collection"
+    [products]="products()"
+    [controlId]="controlId()"
+  />
+} @else if (tableForm(); as table) {
+  <app-commercial-table-block-editor
+    [form]="table"
+    [controlId]="controlId()"
+    [tokens]="tokens()"
+  />
+} @else if (faqForm(); as faq) {
+  <app-commercial-faq-block-editor
+    [form]="faq"
+    [controlId]="controlId()"
+    [tokens]="tokens()"
+  />
+}

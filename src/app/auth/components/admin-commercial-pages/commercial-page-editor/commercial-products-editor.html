@@ -1,0 +1,40 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.products().sectionTitle }}
+    </h2>
+
+    <p-button
+      type="button"
+      severity="secondary"
+      [label]="i18n.products().addProduct"
+      icon="pi pi-plus"
+      (onClick)="addProduct()"
+    />
+  </div>
+
+  @if (!products().length) {
+    <p class="m-0">{{ i18n.products().empty }}</p>
+  }
+
+  @for (product of products().controls; track product; let index = $index) {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+        <strong>{{ i18n.products().product }} {{ index + 1 }}</strong>
+        <app-commercial-item-editor-actions
+          [index]="index"
+          [itemCount]="products().length"
+          (moveUp)="moveProduct(index, -1)"
+          (moveDown)="moveProduct(index, 1)"
+          (remove)="removeProduct(index)"
+        />
+      </div>
+
+      <app-commercial-product-editor
+        [form]="product"
+        [controlId]="'commercial-product-' + index"
+        [tokens]="tokens()"
+      />
+    </section>
+  }
+</section>

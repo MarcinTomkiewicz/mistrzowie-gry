@@ -30,18 +30,6 @@ export type CommercialActionAppearance =
   | 'success'
   | 'secondary';
 
-export type CommercialSharedSource =
-  | {
-      key: 'standards';
-      locale: string;
-      sectionType: 'card_grid';
-    }
-  | {
-      key: 'logistics';
-      locale: string;
-      sectionType: 'logistics_fees';
-    };
-
 export type CommercialPageSeo = {
   title: string;
   description: string;
@@ -182,36 +170,3 @@ export type CommercialPageSection =
   | CommercialFaqSection
   | CommercialCtaSection
   | CommercialLogisticsFeesSection;
-
-export type StoredCommercialSharedSection<
-  TType extends 'card_grid' | 'logistics_fees',
-> = Pick<CommercialSectionBase<TType>, 'id' | 'type' | 'position'> & {
-  heading?: never;
-  lead?: never;
-  items?: never;
-  sharedSource: Extract<CommercialSharedSource, { sectionType: TType }>;
-};
-
-export type StoredCommercialCardGridSection =
-  | (CommercialCardGridSection & { sharedSource?: never })
-  | StoredCommercialSharedSection<'card_grid'>;
-
-export type StoredCommercialLogisticsFeesSection =
-  StoredCommercialSharedSection<'logistics_fees'>;
-
-export type StoredCommercialSection =
-  | CommercialHeroSection
-  | CommercialRichTextSection
-  | StoredCommercialCardGridSection
-  | CommercialPricingTableSection
-  | CommercialProcessSection
-  | CommercialFaqSection
-  | CommercialCtaSection
-  | StoredCommercialLogisticsFeesSection;
-
-export type StoredCommercialPageDocument = {
-  heading: string;
-  lead: string | null;
-  seo: CommercialPageSeo;
-  sections: StoredCommercialSection[];
-};

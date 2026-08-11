@@ -51,37 +51,6 @@ export const commercialPriceValidator: ValidatorFn = (
   }
 };
 
-export const commercialCapacityValidator: ValidatorFn = (
-  control: AbstractControl,
-): ValidationErrors | null =>
-  hasValidRange(
-    valueOf(control, 'participantsMin'),
-    valueOf(control, 'participantsMax'),
-  )
-    ? null
-    : { commercialCapacityRange: true };
-
-export const commercialScheduleValidator: ValidatorFn = (
-  control: AbstractControl,
-): ValidationErrors | null => {
-  const durationMode = valueOf(control, 'durationMode');
-  const durationMinutes = valueOf(control, 'durationMinutes');
-
-  if (
-    durationMode !== 'standard_session' &&
-    (durationMode !== 'custom' || !isPositiveInteger(durationMinutes))
-  ) {
-    return { commercialSchedule: true };
-  }
-
-  return hasValidRange(
-    valueOf(control, 'meetingCountMin'),
-    valueOf(control, 'meetingCountMax'),
-  )
-    ? null
-    : { commercialScheduleRange: true };
-};
-
 function hasValidPercentage(control: AbstractControl): boolean {
   const value = valueOf(control, 'value');
   const min = valueOf(control, 'minValue');
@@ -96,20 +65,8 @@ function hasValidPercentage(control: AbstractControl): boolean {
   return hasSingleValue || hasRange;
 }
 
-function hasValidRange(min: unknown, max: unknown): boolean {
-  return min === null || max === null || (
-    typeof min === 'number' &&
-    typeof max === 'number' &&
-    min <= max
-  );
-}
-
 function isNonNegativeNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0;
-}
-
-function isPositiveInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value > 0;
 }
 
 function hasText(value: unknown): boolean {

@@ -6,108 +6,75 @@ import {
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
-import type {
-  AdminCommercialPagesActionAppearanceTranslations,
-  AdminCommercialPagesActionTranslations,
-  AdminCommercialPagesActualCostBasisTranslations,
-  AdminCommercialPagesBillingUnitTranslations,
-  AdminCommercialPagesCapacityTranslations,
-  AdminCommercialPagesDraftStatusTranslations,
-  AdminCommercialPagesDurationModeTranslations,
-  AdminCommercialPagesEditorActionsTranslations,
-  AdminCommercialPagesEditorPageTranslations,
-  AdminCommercialPagesEditorToastTranslations,
-  AdminCommercialPagesIdentityTranslations,
-  AdminCommercialPagesItemsTranslations,
-  AdminCommercialPagesKindTranslations,
-  AdminCommercialPagesListPageTranslations,
-  AdminCommercialPagesListTableTranslations,
-  AdminCommercialPagesListToastTranslations,
-  AdminCommercialPagesMetadataTranslations,
-  AdminCommercialPagesPercentageBasisTranslations,
-  AdminCommercialPagesPreviewPageTranslations,
-  AdminCommercialPagesPriceTranslations,
-  AdminCommercialPagesPriceTypeTranslations,
-  AdminCommercialPagesPublicationMetadataTranslations,
-  AdminCommercialPagesPublicationToastTranslations,
-  AdminCommercialPagesPublicationTranslations,
-  AdminCommercialPagesScheduleTranslations,
-  AdminCommercialPagesSectionBaseTranslations,
-  AdminCommercialPagesSectionsTranslations,
-  AdminCommercialPagesSectionTypeTranslations,
-  AdminCommercialPagesSeoTranslations,
-  AdminCommercialPagesSharedSourceTranslations,
-  AdminCommercialPagesTaxDisplayModeTranslations,
-  AdminCommercialPagesValidationTranslations,
-} from '../../../core/types/i18n/admin-commercial-pages';
+import type * as Copy from '../../../core/types/i18n/admin-commercial-pages';
 
 export function createAdminCommercialPagesI18n() {
   const translations = createScopedSectionsI18n<{
-    listPage: AdminCommercialPagesListPageTranslations;
-    listTable: AdminCommercialPagesListTableTranslations;
-    listToast: AdminCommercialPagesListToastTranslations;
-    editorPage: AdminCommercialPagesEditorPageTranslations;
-    editorToast: AdminCommercialPagesEditorToastTranslations;
-    previewPage: AdminCommercialPagesPreviewPageTranslations;
-    publication: AdminCommercialPagesPublicationTranslations;
-    publicationMetadata: AdminCommercialPagesPublicationMetadataTranslations;
-    publicationToast: AdminCommercialPagesPublicationToastTranslations;
-    identity: AdminCommercialPagesIdentityTranslations;
-    metadata: AdminCommercialPagesMetadataTranslations;
-    seo: AdminCommercialPagesSeoTranslations;
-    sections: AdminCommercialPagesSectionsTranslations;
-    sectionBase: AdminCommercialPagesSectionBaseTranslations;
-    items: AdminCommercialPagesItemsTranslations;
-    action: AdminCommercialPagesActionTranslations;
-    price: AdminCommercialPagesPriceTranslations;
-    capacity: AdminCommercialPagesCapacityTranslations;
-    schedule: AdminCommercialPagesScheduleTranslations;
-    editorActions: AdminCommercialPagesEditorActionsTranslations;
-    validation: AdminCommercialPagesValidationTranslations;
-    draftStatus: AdminCommercialPagesDraftStatusTranslations;
-    kind: AdminCommercialPagesKindTranslations;
-    taxDisplayMode: AdminCommercialPagesTaxDisplayModeTranslations;
-    sectionType: AdminCommercialPagesSectionTypeTranslations;
-    sharedSource: AdminCommercialPagesSharedSourceTranslations;
-    actionAppearance: AdminCommercialPagesActionAppearanceTranslations;
-    priceType: AdminCommercialPagesPriceTypeTranslations;
-    billingUnit: AdminCommercialPagesBillingUnitTranslations;
-    percentageBasis: AdminCommercialPagesPercentageBasisTranslations;
-    actualCostBasis: AdminCommercialPagesActualCostBasisTranslations;
-    durationMode: AdminCommercialPagesDurationModeTranslations;
+    listPage: Copy.AdminCommercialPagesListPageTranslations;
+    listTable: Copy.AdminCommercialPagesListTableTranslations;
+    listToast: Copy.AdminCommercialPagesListToastTranslations;
+    editorPage: Copy.AdminCommercialPagesEditorPageTranslations;
+    editorToast: Copy.AdminCommercialPagesEditorToastTranslations;
+    previewPage: Copy.AdminCommercialPagesPreviewPageTranslations;
+    publication: Copy.AdminCommercialPagesPublicationTranslations;
+    publicationMetadata: Copy.AdminCommercialPagesPublicationMetadataTranslations;
+    publicationToast: Copy.AdminCommercialPagesPublicationToastTranslations;
+    identity: Copy.AdminCommercialPagesIdentityTranslations;
+    metadata: Copy.AdminCommercialPagesMetadataTranslations;
+    seo: Copy.AdminCommercialPagesSeoTranslations;
+    products: Copy.AdminCommercialPagesProductsTranslations;
+    product: Copy.AdminCommercialPagesProductTranslations;
+    sections: Copy.AdminCommercialPagesSectionsTranslations;
+    section: Copy.AdminCommercialPagesSectionTranslations;
+    richContent: Copy.AdminCommercialPagesRichContentTranslations;
+    buttons: Copy.AdminCommercialPagesButtonsTranslations;
+    cards: Copy.AdminCommercialPagesCardsTranslations;
+    productCollection: Copy.AdminCommercialPagesProductCollectionTranslations;
+    table: Copy.AdminCommercialPagesTableTranslations;
+    faq: Copy.AdminCommercialPagesFaqTranslations;
+    price: Copy.AdminCommercialPagesPriceTranslations;
+    editorActions: Copy.AdminCommercialPagesEditorActionsTranslations;
+    validation: Copy.AdminCommercialPagesValidationTranslations;
+    draftStatus: Copy.AdminCommercialPagesDraftStatusTranslations;
+    kind: Copy.AdminCommercialPagesKindTranslations;
+    taxDisplayMode: Copy.AdminCommercialPagesTaxDisplayModeTranslations;
+    blockType: Copy.AdminCommercialPagesBlockTypeTranslations;
+    sectionSurface: Copy.AdminCommercialPagesSectionSurfaceTranslations;
+    textAlign: Copy.AdminCommercialPagesTextAlignTranslations;
+    buttonLayout: Copy.AdminCommercialPagesButtonLayoutTranslations;
+    cardOrientation: Copy.AdminCommercialPagesCardOrientationTranslations;
+    collectionPresentation: Copy.AdminCommercialPagesCollectionPresentationTranslations;
+    productFieldKey: Copy.AdminCommercialPagesProductFieldKeyTranslations;
+    iconKey: Copy.AdminCommercialPagesIconKeyTranslations;
+    durationMode: Copy.AdminCommercialPagesDurationModeTranslations;
+    participantsMode: Copy.AdminCommercialPagesParticipantsModeTranslations;
+    actionAppearance: Copy.AdminCommercialPagesActionAppearanceTranslations;
+    priceType: Copy.AdminCommercialPagesPriceTypeTranslations;
+    billingUnit: Copy.AdminCommercialPagesBillingUnitTranslations;
+    percentageBasis: Copy.AdminCommercialPagesPercentageBasisTranslations;
+    actualCostBasis: Copy.AdminCommercialPagesActualCostBasisTranslations;
   }>('adminCommercialPages', {
-    listPage: 'list.page',
-    listTable: 'list.table',
-    listToast: 'list.toast',
-    editorPage: 'editor.page',
-    editorToast: 'editor.toast',
-    previewPage: 'preview.page',
-    publication: 'publication.panel',
-    publicationMetadata: 'publication.metadata',
-    publicationToast: 'publication.toast',
-    identity: 'editor.identity',
-    metadata: 'editor.metadata',
-    seo: 'editor.seo',
-    sections: 'editor.sections',
-    sectionBase: 'editor.sectionBase',
-    items: 'editor.items',
-    action: 'editor.action',
-    price: 'editor.price',
-    capacity: 'editor.capacity',
-    schedule: 'editor.schedule',
-    editorActions: 'editor.actions',
-    validation: 'editor.validation',
-    draftStatus: 'draftStatus',
-    kind: 'kind',
-    taxDisplayMode: 'taxDisplayMode',
-    sectionType: 'sectionType',
-    sharedSource: 'sharedSource',
-    actionAppearance: 'actionAppearance',
-    priceType: 'priceType',
-    billingUnit: 'billingUnit',
-    percentageBasis: 'percentageBasis',
+    listPage: 'list.page', listTable: 'list.table', listToast: 'list.toast',
+    editorPage: 'editor.page', editorToast: 'editor.toast',
+    previewPage: 'preview.page', publication: 'publication.panel',
+    publicationMetadata: 'publication.metadata', publicationToast: 'publication.toast',
+    identity: 'editor.identity', metadata: 'editor.metadata', seo: 'editor.seo',
+    products: 'editor.products', product: 'editor.product',
+    sections: 'editor.sections', section: 'editor.section',
+    richContent: 'editor.richContent', buttons: 'editor.buttons',
+    cards: 'editor.cards', productCollection: 'editor.productCollection',
+    table: 'editor.table', faq: 'editor.faq', price: 'editor.price',
+    editorActions: 'editor.actions', validation: 'editor.validation',
+    draftStatus: 'draftStatus', kind: 'kind', taxDisplayMode: 'taxDisplayMode',
+    blockType: 'blockType', sectionSurface: 'sectionSurface',
+    textAlign: 'textAlign', buttonLayout: 'buttonLayout',
+    cardOrientation: 'cardOrientation',
+    collectionPresentation: 'collectionPresentation',
+    productFieldKey: 'productFieldKey', iconKey: 'iconKey',
+    durationMode: 'durationMode', participantsMode: 'participantsMode',
+    actionAppearance: 'actionAppearance', priceType: 'priceType',
+    billingUnit: 'billingUnit', percentageBasis: 'percentageBasis',
     actualCostBasis: 'actualCostBasis',
-    durationMode: 'durationMode',
   });
 
   return {

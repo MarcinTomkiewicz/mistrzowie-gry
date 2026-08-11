@@ -1,0 +1,236 @@
+<section class="flex-col-start-stretch gap-sm w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <strong class="small-caps">{{ label() }}</strong>
+
+    <p-button
+      type="button"
+      size="small"
+      severity="secondary"
+      icon="pi pi-plus"
+      [label]="i18n.richContent().addSection"
+      (onClick)="addSection()"
+    />
+  </div>
+
+  <small class="text-muted">{{ i18n.richContent().hint }}</small>
+
+  @if (tokens().length) {
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <span class="small-caps">{{ i18n.richContent().tokens }}</span>
+      <small class="text-muted">{{ i18n.richContent().tokensHint }}</small>
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        @for (token of tokens(); track token) {
+          <p-button
+            type="button"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [label]="token"
+            (onClick)="insertToken(token)"
+          />
+        }
+      </div>
+    </div>
+  }
+
+  @if (!sections().length) {
+    <p class="m-0">{{ i18n.richContent().empty }}</p>
+  }
+
+  @for (section of sections(); track section; let sectionIndex = $index) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+      <div class="flex-row-between-center gap-sm">
+        <strong>
+          {{ i18n.richContent().section }} {{ sectionIndex + 1 }}
+        </strong>
+        <app-commercial-item-editor-actions
+          [index]="sectionIndex"
+          [itemCount]="sections().length"
+          (moveUp)="moveItem(sections(), sectionIndex, -1)"
+          (moveDown)="moveItem(sections(), sectionIndex, 1)"
+          (remove)="removeItem(sections(), sectionIndex)"
+        />
+      </div>
+
+      <label class="small-caps" [for]="controlId() + '-section-' + sectionIndex + '-title'">
+        {{ i18n.richContent().sectionTitle }}
+      </label>
+      <input
+        #sectionTitle
+        pInputText
+        class="w-100"
+        [id]="controlId() + '-section-' + sectionIndex + '-title'"
+        [value]="section.title ?? ''"
+        autocomplete="off"
+        (input)="updateSectionTitle(section, sectionTitle.value)"
+      />
+
+      <ng-container
+        [ngTemplateOutlet]="blocksTemplate"
+        [ngTemplateOutletContext]="{
+          $implicit: section.blocks,
+          path: controlId() + '-section-' + sectionIndex
+        }"
+      />
+    </section>
+  }
+
+  @if (control().touched && control().hasError('richContentLink')) {
+    <small class="error-text">{{ i18n.richContent().invalidLink }}</small>
+  } @else if (control().touched && control().invalid) {
+    <small class="error-text">{{ i18n.richContent().invalid }}</small>
+  }
+</section>
+
+<ng-template #blocksTemplate let-blocks let-path="path">
+  <div class="flex-col-start-stretch gap-sm w-100">
+    <div class="flex-row-start-center flex-wrap gap-xs">
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n.richContent().addParagraph" (onClick)="addBlock(blocks, 'paragraph')" />
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n.richContent().addOrderedList" (onClick)="addBlock(blocks, 'ordered-list')" />
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n.richContent().addUnorderedList" (onClick)="addBlock(blocks, 'unordered-list')" />
+    </div>
+
+    @for (block of blocks; track block; let blockIndex = $index) {
+      <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+        <div class="flex-row-between-center gap-sm">
+          <strong>{{ blockLabel(block.type) }}</strong>
+          <app-commercial-item-editor-actions
+            [index]="blockIndex"
+            [itemCount]="blocks.length"
+            (moveUp)="moveItem(blocks, blockIndex, -1)"
+            (moveDown)="moveItem(blocks, blockIndex, 1)"
+            (remove)="removeItem(blocks, blockIndex)"
+          />
+        </div>
+
+        @if (block.type === 'paragraph') {
+          <ng-container
+            [ngTemplateOutlet]="nodesTemplate"
+            [ngTemplateOutletContext]="{
+              $implicit: block.content ?? [],
+              path: path + '-block-' + blockIndex
+            }"
+          />
+        } @else {
+          <div class="flex-row-end-center">
+            <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n.richContent().addItem" (onClick)="addListItem(block.items)" />
+          </div>
+
+          @for (item of block.items; track item; let itemIndex = $index) {
+            <div class="flex-col-start-stretch gap-sm border-1 border-round p-sm w-100">
+              <div class="flex-row-between-center gap-sm">
+                <span>{{ i18n.richContent().item }} {{ itemIndex + 1 }}</span>
+                <app-commercial-item-editor-actions
+                  [index]="itemIndex"
+                  [itemCount]="block.items.length"
+                  (moveUp)="moveItem(block.items, itemIndex, -1)"
+                  (moveDown)="moveItem(block.items, itemIndex, 1)"
+                  (remove)="removeItem(block.items, itemIndex)"
+                />
+              </div>
+
+              <ng-container
+                [ngTemplateOutlet]="nodesTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: item.content ?? [],
+                  path: path + '-block-' + blockIndex + '-item-' + itemIndex
+                }"
+              />
+
+              @if (item.blocks?.length) {
+                <span class="small-caps">{{ i18n.richContent().nestedBlocks }}</span>
+              }
+              <ng-container
+                [ngTemplateOutlet]="blocksTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: nestedBlocks(item),
+                  path: path + '-block-' + blockIndex + '-item-' + itemIndex
+                }"
+              />
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #nodesTemplate let-nodes let-path="path">
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <div class="flex-row-start-center flex-wrap gap-xs">
+      <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-plus" [label]="i18n.richContent().addText" (onClick)="addNode(nodes, 'text')" />
+      <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-plus" [label]="i18n.richContent().addStrong" (onClick)="addNode(nodes, 'strong')" />
+      <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-plus" [label]="i18n.richContent().addLink" (onClick)="addNode(nodes, 'link')" />
+    </div>
+
+    @for (node of nodes; track node; let nodeIndex = $index) {
+      <div class="mg-grid-2 gap-sm w-100">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-select
+            class="w-100"
+            [inputId]="path + '-node-' + nodeIndex + '-type'"
+            [options]="inlineTypeOptions()"
+            [ngModel]="node.type"
+            [ngModelOptions]="{ standalone: true }"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            (onChange)="changeNodeType(nodes, nodeIndex, $event.value)"
+          />
+          <textarea
+            #nodeText
+            pTextarea
+            class="w-100"
+            rows="3"
+            [id]="path + '-node-' + nodeIndex + '-text'"
+            [value]="node.text"
+            [attr.aria-label]="i18n.richContent().nodeText"
+            (focus)="focusNode(node, nodeText.selectionStart, nodeText.selectionEnd)"
+            (click)="focusNode(node, nodeText.selectionStart, nodeText.selectionEnd)"
+            (keyup)="focusNode(node, nodeText.selectionStart, nodeText.selectionEnd)"
+            (select)="focusNode(node, nodeText.selectionStart, nodeText.selectionEnd)"
+            (input)="updateNodeText(node, nodeText.value, nodeText.selectionStart, nodeText.selectionEnd)"
+          ></textarea>
+        </div>
+
+        <div class="flex-col-start-stretch gap-xs w-100">
+          @if (node.type === 'link') {
+            <label class="small-caps" [for]="path + '-node-' + nodeIndex + '-href'">
+              {{ i18n.richContent().href }}
+            </label>
+            <input
+              #linkHref
+              pInputText
+              class="w-100"
+              [id]="path + '-node-' + nodeIndex + '-href'"
+              [value]="node.href"
+              autocomplete="off"
+              (input)="updateLinkHref(node, linkHref.value)"
+              (blur)="control().markAsTouched()"
+            />
+            <div class="flex-row-start-center gap-xs">
+              <p-checkbox
+                [inputId]="path + '-node-' + nodeIndex + '-external'"
+                [binary]="true"
+                [ngModel]="node.external ?? false"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="updateLinkExternal(node, $event)"
+              />
+              <label [for]="path + '-node-' + nodeIndex + '-external'">
+                {{ i18n.richContent().external }}
+              </label>
+            </div>
+          }
+
+          <app-commercial-item-editor-actions
+            [index]="nodeIndex"
+            [itemCount]="nodes.length"
+            (moveUp)="moveItem(nodes, nodeIndex, -1)"
+            (moveDown)="moveItem(nodes, nodeIndex, 1)"
+            (remove)="removeItem(nodes, nodeIndex)"
+          />
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>

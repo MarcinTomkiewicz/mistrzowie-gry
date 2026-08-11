@@ -1,0 +1,52 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <h4 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.section().blocks }}
+    </h4>
+    <div class="flex-row-end-center flex-col-start-stretch-sm gap-xs">
+      <p-select
+        class="w-100"
+        [inputId]="controlId() + '-new-type'"
+        [formControl]="selectedType"
+        [options]="blockTypeOptions()"
+        [placeholder]="i18n.section().addBlock"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+      <p-button
+        type="button"
+        severity="secondary"
+        [label]="i18n.section().addBlock"
+        icon="pi pi-plus"
+        [disabled]="!selectedType.value"
+        (onClick)="addBlock()"
+      />
+    </div>
+  </div>
+
+  @if (!blocks().length) {
+    <p class="m-0">{{ i18n.section().emptyBlocks }}</p>
+  }
+
+  @for (block of blocks().controls; track block; let index = $index) {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+        <strong>{{ i18n.blockType()[block.controls.type.value] }}</strong>
+        <app-commercial-item-editor-actions
+          [index]="index"
+          [itemCount]="blocks().length"
+          (moveUp)="moveBlock(index, -1)"
+          (moveDown)="moveBlock(index, 1)"
+          (remove)="removeBlock(index)"
+        />
+      </div>
+      <app-commercial-block-editor
+        [form]="block"
+        [products]="products()"
+        [controlId]="controlId() + '-' + index"
+        [tokens]="tokens()"
+      />
+    </section>
+  }
+</section>

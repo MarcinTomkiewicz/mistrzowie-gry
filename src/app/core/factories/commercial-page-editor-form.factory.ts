@@ -1,17 +1,32 @@
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import type { CommercialPageAdminDocument } from '../types/commercial-page-admin';
+import type { CommercialPageEditorDocument } from '../types/commercial-page-builder';
 import type {
   CommercialPageEditorForm,
+  CommercialProductEditorForm,
   CommercialSectionEditorForm,
 } from '../types/commercial-page-editor-form';
 import { normalizeText } from '../utils/normalize-text';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
-import { createCommercialSectionEditorForm } from './commercial-section-editor-form.factory';
 import {
+  createCommercialProductEditorForm,
+  mapCommercialProductEditorForm,
+  syncCommercialProductEditorControls,
+} from './commercial-product-editor-form.factory';
+import {
+  createCommercialSectionEditorForm,
   mapCommercialSectionEditorForm,
-  syncCommercialSectionEditorOptionalControls,
-} from './commercial-section-editor-form.mapper';
+} from './commercial-section-editor-form.factory';
+import {
+  isCommercialCardsBlockEditorForm,
+  isCommercialProductCollectionBlockEditorForm,
+} from './commercial-block-editor-form.mapper';
+import {
+  syncCommercialCardPriceControl,
+} from './commercial-block-item-editor-form.factory';
+import {
+  syncCommercialProductCollectionPresentationControls,
+} from './commercial-block-editor-form.factory';
 
 const requiredTextValidators = [
   Validators.required,
@@ -40,13 +55,14 @@ export function createCommercialPageEditorForm(): CommercialPageEditorForm {
       ogDescription: new FormControl('', { nonNullable: true }),
       canonicalUrl: new FormControl('', { nonNullable: true }),
     }),
+    products: new FormArray<CommercialProductEditorForm>([]),
     sections: new FormArray<CommercialSectionEditorForm>([]),
   });
 }
 
 export function resetCommercialPageEditorForm(
   form: CommercialPageEditorForm,
-  document: CommercialPageAdminDocument,
+  document: CommercialPageEditorDocument,
 ): void {
   form.reset(
     {
@@ -65,27 +81,31 @@ export function resetCommercialPageEditorForm(
     { emitEvent: false },
   );
 
+  form.controls.products.clear({ emitEvent: false });
+  for (const product of [...document.products].sort(byPosition)) {
+    form.controls.products.push(createCommercialProductEditorForm(product), {
+      emitEvent: false,
+    });
+  }
+
   form.controls.sections.clear({ emitEvent: false });
-  for (const section of [...document.sections].sort(
-    (left, right) => left.position - right.position,
-  )) {
-    form.controls.sections.push(
-      createCommercialSectionEditorForm(section),
-      { emitEvent: false },
-    );
+  for (const section of [...document.sections].sort(byPosition)) {
+    form.controls.sections.push(createCommercialSectionEditorForm(section), {
+      emitEvent: false,
+    });
   }
 
   syncCommercialPageEditorOptionalControls(form);
+  form.markAsPristine();
+  form.markAsUntouched();
 }
 
 export function mapCommercialPageEditorFormToDocument(
   form: CommercialPageEditorForm,
-  document: CommercialPageAdminDocument,
-): CommercialPageAdminDocument {
+): CommercialPageEditorDocument {
   const value = form.getRawValue();
 
   return {
-    ...document,
     heading: value.metadata.heading.trim(),
     lead: normalizeText(value.metadata.lead),
     seo: {
@@ -95,6 +115,9 @@ export function mapCommercialPageEditorFormToDocument(
       ogDescription: normalizeText(value.seo.ogDescription),
       canonicalUrl: normalizeText(value.seo.canonicalUrl),
     },
+    products: form.controls.products.controls.map((product, index) =>
+      mapCommercialProductEditorForm(product, (index + 1) * 10),
+    ),
     sections: form.controls.sections.controls.map((section, index) =>
       mapCommercialSectionEditorForm(section, (index + 1) * 10),
     ),
@@ -104,7 +127,26 @@ export function mapCommercialPageEditorFormToDocument(
 export function syncCommercialPageEditorOptionalControls(
   form: CommercialPageEditorForm,
 ): void {
-  for (const section of form.controls.sections.controls) {
-    syncCommercialSectionEditorOptionalControls(section);
+  for (const product of form.controls.products.controls) {
+    syncCommercialProductEditorControls(product);
   }
+
+  for (const section of form.controls.sections.controls) {
+    for (const block of section.controls.blocks.controls) {
+      if (isCommercialCardsBlockEditorForm(block)) {
+        for (const card of block.controls.cards.controls) {
+          syncCommercialCardPriceControl(card);
+        }
+      } else if (isCommercialProductCollectionBlockEditorForm(block)) {
+        syncCommercialProductCollectionPresentationControls(block);
+      }
+    }
+  }
+}
+
+function byPosition(
+  left: { position: number },
+  right: { position: number },
+): number {
+  return left.position - right.position;
 }
