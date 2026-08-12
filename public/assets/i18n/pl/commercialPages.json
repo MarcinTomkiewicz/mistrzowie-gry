@@ -43,6 +43,15 @@
         "many": "[PH] [commercialPages-many] minut",
         "other": "[PH] [commercialPages-other] minuty"
       }
+    },
+    "sessions": {
+      "count": {
+        "one": "[PH] [commercialPages-one] sesja",
+        "few": "[PH] [commercialPages-few] sesje",
+        "many": "[PH] [commercialPages-many] sesji",
+        "other": "[PH] [commercialPages-other] sesji"
+      },
+      "perMonth": "[PH] [commercialPages-perMonth] / miesiąc"
     }
   },
   "productFieldKey": {

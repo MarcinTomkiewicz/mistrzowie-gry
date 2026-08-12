@@ -55,7 +55,14 @@ export function formatCommercialProductField(
     case 'sessions':
       return product.sessions.mode === 'not_applicable'
         ? null
-        : optionalNumber(product.sessions.count, locale);
+        : text(
+            formatCommercialSessions(
+              product.sessions.mode,
+              product.sessions.count,
+              translations,
+              locale,
+            ),
+          );
     case 'meetingCount':
       return optionalText(
         formatCommercialOptionalNumberRange(
@@ -91,7 +98,7 @@ export function formatCommercialDuration(
 
   if (hours) {
     parts.push(
-      formatDurationUnit(
+      formatPluralUnit(
         hours,
         translations.duration.hours,
         numberFormat,
@@ -102,7 +109,7 @@ export function formatCommercialDuration(
 
   if (remainingMinutes || !hours) {
     parts.push(
-      formatDurationUnit(
+      formatPluralUnit(
         remainingMinutes,
         translations.duration.minutes,
         numberFormat,
@@ -114,7 +121,25 @@ export function formatCommercialDuration(
   return parts.join(' ');
 }
 
-function formatDurationUnit(
+function formatCommercialSessions(
+  mode: 'total' | 'per_month',
+  count: number,
+  translations: CommercialProductValueTranslations,
+  locale: string,
+): string {
+  const value = formatPluralUnit(
+    count,
+    translations.sessions.count,
+    new Intl.NumberFormat(locale),
+    new Intl.PluralRules(locale),
+  );
+
+  return mode === 'per_month'
+    ? `${value} ${translations.sessions.perMonth}`
+    : value;
+}
+
+function formatPluralUnit(
   value: number,
   translations: CommercialProductValueTranslations['duration']['hours'],
   numberFormat: Intl.NumberFormat,

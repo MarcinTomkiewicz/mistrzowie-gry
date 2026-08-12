@@ -37,9 +37,13 @@ import {
   syncCommercialProductCollectionReferences,
   syncCommercialProductFieldReferences,
 } from '../../../../core/utils/commercial-product-collection-editor';
-import { moveFormArrayControl } from '../../../../core/utils/form-controls';
+import {
+  moveFormArrayControl,
+  moveFormControlArrayItem,
+} from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialItemEditorActions } from './commercial-item-editor-actions';
+import { CommercialProductComparisonEditor } from './commercial-product-comparison-editor';
 
 type CommercialProductOption = ISelectOption<string> & {
   kind: CommercialProductKind;
@@ -55,6 +59,7 @@ type CommercialProductOption = ISelectOption<string> & {
     MultiSelectModule,
     SelectModule,
     CommercialItemEditorActions,
+    CommercialProductComparisonEditor,
   ],
   templateUrl: './commercial-product-collection-block-editor.html',
 })
@@ -180,15 +185,11 @@ export class CommercialProductCollectionBlockEditor {
   }
 
   protected moveProduct(index: number, offset: -1 | 1): void {
-    const control = this.form().controls.productIds;
-    const productIds = [...control.getRawValue()];
-    const [productId] = productIds.splice(index, 1);
-
-    if (productId === undefined) return;
-
-    productIds.splice(index + offset, 0, productId);
-    control.setValue(productIds);
-    control.markAsDirty();
+    moveFormControlArrayItem(
+      this.form().controls.productIds,
+      index,
+      index + offset,
+    );
   }
 
   protected syncField(field: CommercialProductFieldEditorForm): void {

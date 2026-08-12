@@ -18,8 +18,12 @@ export type CommercialProductValueTranslations = {
   from: string;
   to: string;
   duration: {
-    hours: CommercialDurationUnitTranslations;
-    minutes: CommercialDurationUnitTranslations;
+    hours: CommercialPluralUnitTranslations;
+    minutes: CommercialPluralUnitTranslations;
+  };
+  sessions: {
+    count: CommercialPluralUnitTranslations;
+    perMonth: string;
   };
 };
 
@@ -28,7 +32,7 @@ export type CommercialProductFieldLabelsTranslations = Record<
   string
 >;
 
-type CommercialDurationUnitTranslations = {
+type CommercialPluralUnitTranslations = {
   one: string;
   few: string;
   many: string;

@@ -150,4 +150,11 @@
   @if (form().touched && form().hasError('commercialStaleProductReference')) {
     <small class="error-text">{{ i18n.productCollection().staleProductReference }}</small>
   }
+
+  @if (form().controls.presentation.controls.type.value === 'comparison_table') {
+    <app-commercial-product-comparison-editor
+      [form]="form()"
+      [controlId]="controlId()"
+    />
+  }
 </div>

@@ -1,0 +1,149 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <div class="flex-col-start-stretch gap-xs">
+      <h5 class="mg-section__title mg-section__title--xs m-0">
+        {{ i18n.productCollection().comparison }}
+      </h5>
+      <small>{{ i18n.productCollection().comparisonHint }}</small>
+    </div>
+
+    <p-button
+      type="button"
+      severity="secondary"
+      [label]="i18n.productCollection().addComparisonSection"
+      icon="pi pi-plus"
+      (onClick)="addSection()"
+    />
+  </div>
+
+  @let sections = form().controls.presentation.controls.sections;
+  @if (!sections.length) {
+    <p class="m-0">{{ i18n.productCollection().emptyComparisonSections }}</p>
+  }
+
+  @for (section of sections.controls; track section; let sectionIndex = $index) {
+    <section
+      class="mg-card flex-col-start-stretch gap-md p-md w-100"
+      [formGroup]="section"
+    >
+      <app-commercial-item-editor-actions
+        [index]="sectionIndex"
+        [itemCount]="sections.length"
+        (moveUp)="moveSection(sectionIndex, -1)"
+        (moveDown)="moveSection(sectionIndex, 1)"
+        (remove)="removeSection(sectionIndex)"
+      />
+
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          [id]="controlId() + '-comparison-' + sectionIndex + '-heading'"
+          formControlName="heading"
+          autocomplete="off"
+        />
+        <label [for]="controlId() + '-comparison-' + sectionIndex + '-heading'">
+          {{ i18n.productCollection().comparisonSectionHeading }}
+        </label>
+      </p-iftalabel>
+
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+        <strong>{{ i18n.productCollection().comparisonRows }}</strong>
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          [label]="i18n.productCollection().addComparisonRow"
+          icon="pi pi-plus"
+          (onClick)="addRow(section)"
+        />
+      </div>
+
+      @if (!section.controls.rows.length) {
+        <p class="m-0">{{ i18n.productCollection().emptyComparisonRows }}</p>
+      }
+
+      @for (
+        row of section.controls.rows.controls;
+        track row;
+        let rowIndex = $index
+      ) {
+        <div
+          class="mg-card flex-col-start-stretch gap-md p-sm w-100"
+          [formGroup]="row"
+        >
+          <app-commercial-item-editor-actions
+            [index]="rowIndex"
+            [itemCount]="section.controls.rows.length"
+            (moveUp)="moveRow(section, rowIndex, -1)"
+            (moveDown)="moveRow(section, rowIndex, 1)"
+            (remove)="removeRow(section, rowIndex)"
+          />
+
+          <p-iftalabel class="w-100">
+            <input
+              pInputText
+              class="w-100"
+              [id]="controlId() + '-comparison-' + sectionIndex + '-row-' + rowIndex + '-label'"
+              formControlName="label"
+              autocomplete="off"
+            />
+            <label
+              [for]="controlId() + '-comparison-' + sectionIndex + '-row-' + rowIndex + '-label'"
+            >
+              {{ i18n.productCollection().comparisonRowLabel }}
+            </label>
+          </p-iftalabel>
+
+          <p-iftalabel class="w-100">
+            <p-multiselect
+              class="w-100"
+              [inputId]="controlId() + '-comparison-' + sectionIndex + '-row-' + rowIndex + '-fields'"
+              formControlName="fieldIds"
+              [options]="fieldOptions()"
+              optionLabel="label"
+              optionValue="value"
+              [maxSelectedLabels]="0"
+              [selectedItemsLabel]="i18n.productCollection().selectedCount"
+              appendTo="body"
+            />
+            <label
+              [for]="controlId() + '-comparison-' + sectionIndex + '-row-' + rowIndex + '-fields'"
+            >
+              {{ i18n.productCollection().comparisonRowFields }}
+            </label>
+          </p-iftalabel>
+
+          @for (
+            field of selectedFieldOptions(row);
+            track field.value;
+            let fieldIndex = $index
+          ) {
+            <div class="mg-card flex-row-between-center gap-sm p-sm w-100">
+              <span>{{ field.label }}</span>
+              <app-commercial-item-editor-actions
+                [index]="fieldIndex"
+                [itemCount]="row.controls.fieldIds.value.length"
+                (moveUp)="moveRowField(row, fieldIndex, -1)"
+                (moveDown)="moveRowField(row, fieldIndex, 1)"
+                (remove)="removeRowField(row, fieldIndex)"
+              />
+            </div>
+          }
+
+          @if (row.touched && row.invalid) {
+            <small class="error-text">
+              {{ i18n.productCollection().incompleteComparison }}
+            </small>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  @if (form().touched && form().hasError('commercialComparison')) {
+    <small class="error-text">
+      {{ i18n.productCollection().incompleteComparison }}
+    </small>
+  }
+</section>

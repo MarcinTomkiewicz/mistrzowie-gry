@@ -1,0 +1,18 @@
+@if (visibleFields().length) {
+  <div class="flex-col-start-stretch gap-sm w-100">
+    @for (field of visibleFields(); track field.id) {
+      <div class="flex-col-start-stretch gap-xs w-100">
+        @if (composite()) {
+          <span class="small-caps">{{ label(field) }}</span>
+        }
+        <app-commercial-product-field-value
+          [product]="product()"
+          [field]="field"
+          [locale]="locale()"
+        />
+      </div>
+    }
+  </div>
+} @else {
+  <span aria-hidden="true">—</span>
+}

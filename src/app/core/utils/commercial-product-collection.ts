@@ -24,6 +24,25 @@ export function selectCommercialProducts(
   });
 }
 
+export function selectCommercialProductFields(
+  fieldIds: readonly string[],
+  fields: readonly CommercialProductField[],
+): CommercialProductField[] {
+  const fieldsById = new Map(
+    fields.map((field) => [field.id, field] as const),
+  );
+
+  return fieldIds.map((fieldId) => {
+    const field = fieldsById.get(fieldId);
+
+    if (!field) {
+      throw new TypeError(`Missing commercial product field: ${fieldId}`);
+    }
+
+    return field;
+  });
+}
+
 export function commercialFieldsForProduct(
   fields: readonly CommercialProductField[],
   productId: string,

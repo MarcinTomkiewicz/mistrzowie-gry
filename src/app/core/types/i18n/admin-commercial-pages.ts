@@ -210,6 +210,17 @@ export type AdminCommercialPagesProductCollectionTranslations = {
   customizeField: string;
   hideCustomization: string;
   incompleteField: string;
+  comparison: string;
+  comparisonHint: string;
+  emptyComparisonSections: string;
+  addComparisonSection: string;
+  comparisonSectionHeading: string;
+  comparisonRows: string;
+  emptyComparisonRows: string;
+  addComparisonRow: string;
+  comparisonRowLabel: string;
+  comparisonRowFields: string;
+  incompleteComparison: string;
 };
 
 export type AdminCommercialPagesTableTranslations = {

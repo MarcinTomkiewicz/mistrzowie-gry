@@ -250,7 +250,18 @@
       "selectedCount": "[PH] [adminCommercialPages-selectedCount] Wybrano: {0}",
       "customizeField": "[PH] [adminCommercialPages-customizeField] Dostosuj widoczność i etykiety",
       "hideCustomization": "[PH] [adminCommercialPages-hideCustomization] Ukryj ustawienia dodatkowe",
-      "incompleteField": "[PH] [adminCommercialPages-incompleteField] Uzupełnij domyślną etykietę i wybierz pozycje, dla których dane mają być widoczne."
+      "incompleteField": "[PH] [adminCommercialPages-incompleteField] Uzupełnij domyślną etykietę i wybierz pozycje, dla których dane mają być widoczne.",
+      "comparison": "[PH] [adminCommercialPages-comparison] Układ tabeli porównawczej",
+      "comparisonHint": "[PH] [adminCommercialPages-comparisonHint] Nagłówki kolumn są pobierane automatycznie z nazw wybranych produktów i dodatków.",
+      "emptyComparisonSections": "[PH] [adminCommercialPages-emptyComparisonSections] Tabela nie zawiera żadnej sekcji porównania.",
+      "addComparisonSection": "[PH] [adminCommercialPages-addComparisonSection] Dodaj sekcję porównania",
+      "comparisonSectionHeading": "[PH] [adminCommercialPages-comparisonSectionHeading] Nagłówek sekcji (opcjonalny)",
+      "comparisonRows": "[PH] [adminCommercialPages-comparisonRows] Wiersze porównania",
+      "emptyComparisonRows": "[PH] [adminCommercialPages-emptyComparisonRows] Sekcja nie zawiera żadnych wierszy.",
+      "addComparisonRow": "[PH] [adminCommercialPages-addComparisonRow] Dodaj wiersz",
+      "comparisonRowLabel": "[PH] [adminCommercialPages-comparisonRowLabel] Etykieta wiersza",
+      "comparisonRowFields": "[PH] [adminCommercialPages-comparisonRowFields] Dane w wierszu",
+      "incompleteComparison": "[PH] [adminCommercialPages-incompleteComparison] Każdy wiersz wymaga etykiety i co najmniej jednego istniejącego pola danych."
     },
     "table": {
       "columns": "[PH] Kolumny",
