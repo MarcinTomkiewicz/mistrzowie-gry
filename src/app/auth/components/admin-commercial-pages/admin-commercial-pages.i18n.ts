@@ -44,6 +44,8 @@ export function createAdminCommercialPagesI18n() {
     iconKey: Copy.AdminCommercialPagesIconKeyTranslations;
     durationMode: Copy.AdminCommercialPagesDurationModeTranslations;
     participantsMode: Copy.AdminCommercialPagesParticipantsModeTranslations;
+    productKind: Copy.AdminCommercialPagesProductKindTranslations;
+    sessionMode: Copy.AdminCommercialPagesSessionModeTranslations;
     actionAppearance: Copy.AdminCommercialPagesActionAppearanceTranslations;
     priceType: Copy.AdminCommercialPagesPriceTypeTranslations;
     billingUnit: Copy.AdminCommercialPagesBillingUnitTranslations;
@@ -68,6 +70,7 @@ export function createAdminCommercialPagesI18n() {
     collectionPresentation: 'collectionPresentation',
     iconKey: 'iconKey',
     durationMode: 'durationMode', participantsMode: 'participantsMode',
+    productKind: 'productKind', sessionMode: 'sessionMode',
     actionAppearance: 'actionAppearance', priceType: 'priceType',
     billingUnit: 'billingUnit', percentageBasis: 'percentageBasis',
     actualCostBasis: 'actualCostBasis',

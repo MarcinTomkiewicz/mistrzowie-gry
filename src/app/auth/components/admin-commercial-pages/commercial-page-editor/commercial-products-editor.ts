@@ -4,17 +4,23 @@ import { FormArray } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
+import { COMMERCIAL_PRODUCT_KINDS } from '../../../../core/configs/commercial-pages.config';
 import { mapCommercialPriceEditorForm } from '../../../../core/factories/commercial-price-editor-form.factory';
 import {
   createCommercialProductEditorForm,
   mapCommercialProductEditorForm,
 } from '../../../../core/factories/commercial-product-editor-form.factory';
+import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type { CommercialConstantAdminItem } from '../../../../core/types/commercial-constant-admin';
+import type { CommercialProductKind } from '../../../../core/types/commercial-page-builder';
 import type {
   CommercialProductEditorForm,
   CommercialSectionEditorForm,
 } from '../../../../core/types/commercial-page-editor-form';
-import { removeCommercialProductReferences } from '../../../../core/utils/commercial-product-collection-editor';
+import {
+  removeCommercialIncludedAddonReferences,
+  removeCommercialProductReferences,
+} from '../../../../core/utils/commercial-product-collection-editor';
 import {
   formatCommercialDuration,
   formatCommercialOptionalNumberRange,
@@ -66,14 +72,20 @@ export class CommercialProductsEditor {
     const products = this.products();
     const editingIndex = this.editingIndex();
     const position = ((editingIndex ?? products.length) + 1) * 10;
-    const product = createCommercialProductEditorForm(
-      mapCommercialProductEditorForm(editorForm, position),
-    );
+    const value = mapCommercialProductEditorForm(editorForm, position);
+    const previousKind = editingIndex === null
+      ? null
+      : products.at(editingIndex).controls.kind.getRawValue();
+    const product = createCommercialProductEditorForm(value);
 
     if (editingIndex === null) {
       products.push(product);
     } else {
       products.setControl(editingIndex, product);
+    }
+
+    if (previousKind === 'addon' && value.kind === 'product') {
+      removeCommercialIncludedAddonReferences(products, value.id);
     }
 
     products.markAsDirty();
@@ -100,6 +112,41 @@ export class CommercialProductsEditor {
 
   protected onDialogVisibleChange(visible: boolean): void {
     if (!visible) this.closeEditor();
+  }
+
+  protected productGroups() {
+    const labels = this.i18n.products();
+    const groupLabels: Record<CommercialProductKind, string> = {
+      product: labels.products,
+      addon: labels.addons,
+    };
+
+    return COMMERCIAL_PRODUCT_KINDS.map((kind) => ({
+      kind,
+      label: groupLabels[kind],
+      items: this.products().controls.flatMap((form, index) =>
+        form.controls.kind.getRawValue() === kind ? [{ form, index }] : [],
+      ),
+    }));
+  }
+
+  protected addonOptions(): ISelectOption<string>[] {
+    const editedProductId = this.editorForm()?.controls.id.getRawValue();
+
+    return this.products().controls.flatMap((product) => {
+      const id = product.controls.id.getRawValue();
+      if (
+        product.controls.kind.getRawValue() !== 'addon' ||
+        id === editedProductId
+      ) {
+        return [];
+      }
+
+      return [{
+        value: id,
+        label: product.controls.name.getRawValue() || id,
+      }];
+    });
   }
 
   protected productPrice(product: CommercialProductEditorForm) {
@@ -149,6 +196,40 @@ export class CommercialProductsEditor {
       product.controls.participantsPerFacilitatorMax.getRawValue();
 
     return this.formatParticipants(min, max, perFacilitatorMax);
+  }
+
+  protected productSessions(product: CommercialProductEditorForm): string {
+    const mode = product.controls.sessionsMode.getRawValue();
+    if (mode === 'not_applicable') return this.i18n.sessionMode()[mode];
+
+    const count = product.controls.sessionsCount.getRawValue();
+    if (count === null) return this.i18n.commonValues().notAvailable;
+
+    return `${this.i18n.sessionMode()[mode]}: ${
+      new Intl.NumberFormat(this.locale()).format(count)
+    }`;
+  }
+
+  protected productIncludedAddons(
+    product: CommercialProductEditorForm,
+  ): string | null {
+    if (product.controls.kind.getRawValue() === 'addon') return null;
+
+    const addonIds = product.controls.includedAddonIds.getRawValue();
+    if (!addonIds.length) return null;
+
+    return addonIds.map((addonId) => {
+      const addon = this.products().controls.find((candidate) =>
+        candidate.controls.id.getRawValue() === addonId &&
+        candidate.controls.kind.getRawValue() === 'addon'
+      );
+
+      if (!addon) {
+        throw new TypeError(`Missing page-local commercial addon: ${addonId}`);
+      }
+
+      return addon.controls.name.getRawValue();
+    }).join(', ');
   }
 
   private formatParticipants(

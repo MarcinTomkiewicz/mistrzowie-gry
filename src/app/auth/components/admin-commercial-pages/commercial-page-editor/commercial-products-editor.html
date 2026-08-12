@@ -17,48 +17,65 @@
     <p class="m-0">{{ i18n.products().empty }}</p>
   }
 
-  @for (product of products().controls; track product; let index = $index) {
-    @let price = productPrice(product);
-    <article class="mg-card flex-col-start-stretch gap-sm p-md w-100">
-      <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
-        <div class="flex-col-start-stretch gap-xs">
-          <strong>{{ product.controls.name.value }}</strong>
-          <span>{{ price.value }}</span>
-          @if (price.note) {
-            <small>{{ price.note }}</small>
-          }
-          <span>
-            {{ i18n.product().durationSection }}:
-            {{ productDuration(product) }}
-          </span>
-          <span>
-            {{ i18n.product().participantsSection }}:
-            {{ productParticipants(product) }}
-          </span>
-        </div>
+  @for (group of productGroups(); track group.kind) {
+    @if (group.items.length) {
+      <section class="flex-col-start-stretch gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ group.label }}
+        </h3>
 
-        <div class="flex-row-end-center flex-wrap gap-xs">
-          <p-button
-            type="button"
-            severity="secondary"
-            size="small"
-            [outlined]="true"
-            [label]="i18n.commonActions().edit"
-            icon="pi pi-pencil"
-            (onClick)="editProduct(index)"
-          />
-          <p-button
-            type="button"
-            severity="danger"
-            size="small"
-            [text]="true"
-            [label]="i18n.commonActions().delete"
-            icon="pi pi-trash"
-            (onClick)="removeProduct(index)"
-          />
-        </div>
-      </div>
-    </article>
+        @for (item of group.items; track item.form) {
+          @let price = productPrice(item.form);
+          @let includedAddons = productIncludedAddons(item.form);
+          <article class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+            <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
+              <div class="flex-col-start-stretch gap-xs">
+                <strong>{{ item.form.controls.name.value }}</strong>
+                <span>{{ price.value }}</span>
+                @if (price.note) {
+                  <small>{{ price.note }}</small>
+                }
+                <span>
+                  {{ i18n.product().durationSection }}:
+                  {{ productDuration(item.form) }}
+                </span>
+                <span>
+                  {{ i18n.product().participantsSection }}:
+                  {{ productParticipants(item.form) }}
+                </span>
+                <span>{{ productSessions(item.form) }}</span>
+                @if (includedAddons) {
+                  <span>
+                    {{ i18n.product().includedAddons }}: {{ includedAddons }}
+                  </span>
+                }
+              </div>
+
+              <div class="flex-row-end-center flex-wrap gap-xs">
+                <p-button
+                  type="button"
+                  severity="secondary"
+                  size="small"
+                  [outlined]="true"
+                  [label]="i18n.commonActions().edit"
+                  icon="pi pi-pencil"
+                  (onClick)="editProduct(item.index)"
+                />
+                <p-button
+                  type="button"
+                  severity="danger"
+                  size="small"
+                  [text]="true"
+                  [label]="i18n.commonActions().delete"
+                  icon="pi pi-trash"
+                  (onClick)="removeProduct(item.index)"
+                />
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+    }
   }
 </section>
 
@@ -76,6 +93,7 @@
         [form]="productForm"
         controlId="commercial-product-dialog"
         [tokens]="tokens()"
+        [addonOptions]="addonOptions()"
       />
 
       <div class="p-dialog-footer flex-row-end-center gap-sm w-100 p-md">

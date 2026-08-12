@@ -1,4 +1,18 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <p-iftalabel class="w-100">
+    <p-select
+      class="w-100"
+      [inputId]="controlId() + '-kind'"
+      formControlName="kind"
+      [options]="kindOptions()"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      (onChange)="syncKind()"
+    />
+    <label [for]="controlId() + '-kind'">{{ i18n.product().kind }}</label>
+  </p-iftalabel>
+
   <div class="w-100">
     <p-iftalabel class="w-100">
       <input
@@ -26,6 +40,32 @@
     [form]="form().controls.price"
     [controlId]="controlId() + '-price'"
   />
+
+  @if (form().controls.kind.value === 'product') {
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-multiselect
+          class="w-100"
+          [inputId]="controlId() + '-included-addons'"
+          formControlName="includedAddonIds"
+          [options]="addonOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [maxSelectedLabels]="0"
+          [selectedItemsLabel]="i18n.productCollection().selectedCount"
+          appendTo="body"
+        />
+        <label [for]="controlId() + '-included-addons'">
+          {{ i18n.product().includedAddons }}
+        </label>
+      </p-iftalabel>
+      @if (form().touched && form().hasError('commercialIncludedAddons')) {
+        <small class="error-text">
+          {{ i18n.validation().invalidIncludedAddons }}
+        </small>
+      }
+    </div>
+  }
 
   <section class="flex-col-start-stretch gap-sm w-100">
     <h4 class="mg-section__title mg-section__title--xs m-0">
@@ -119,6 +159,21 @@
       {{ i18n.product().structureSection }}
     </h4>
     <div class="mg-grid-2 gap-md w-100">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          [inputId]="controlId() + '-sessions-mode'"
+          formControlName="sessionsMode"
+          [options]="sessionModeOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (onChange)="syncModes()"
+        />
+        <label [for]="controlId() + '-sessions-mode'">
+          {{ i18n.product().sessionsMode }}
+        </label>
+      </p-iftalabel>
       @if (form().controls.sessionsMode.value !== 'not_applicable') {
         <p-iftalabel class="w-100">
           <p-inputnumber
@@ -152,6 +207,9 @@
         </p-iftalabel>
       }
     </div>
+    @if (form().touched && form().hasError('commercialSessions')) {
+      <small class="error-text">{{ i18n.validation().invalidSessions }}</small>
+    }
     @if (form().touched && form().hasError('commercialMeetingRange')) {
       <small class="error-text">{{ i18n.validation().invalidMeetingRange }}</small>
     }

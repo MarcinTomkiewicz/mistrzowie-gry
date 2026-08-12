@@ -168,6 +168,25 @@ export function syncCommercialProductEditorControls(
   const hasSessions =
     form.controls.sessionsMode.getRawValue() !== 'not_applicable';
   setControlEnabled(form.controls.sessionsCount, hasSessions);
+
+  setControlEnabled(
+    form.controls.includedAddonIds,
+    form.controls.kind.getRawValue() === 'product',
+  );
+}
+
+export function syncCommercialProductKind(
+  form: CommercialProductEditorForm,
+): void {
+  if (
+    form.controls.kind.getRawValue() === 'addon' &&
+    form.controls.includedAddonIds.getRawValue().length
+  ) {
+    form.controls.includedAddonIds.setValue([]);
+    form.controls.includedAddonIds.markAsDirty();
+  }
+
+  syncCommercialProductEditorControls(form);
 }
 
 function optionalPositiveIntegerControl(value: number | null) {

@@ -6,7 +6,9 @@ import type {
   CommercialEditorDuration,
   CommercialEditorParticipants,
   CommercialIconKey,
+  CommercialProductKind,
   CommercialProductCollectionBlock,
+  CommercialSessionCount,
   CommercialSectionSurface,
   CommercialTextAlign,
 } from '../commercial-page-builder';
@@ -121,9 +123,12 @@ export type AdminCommercialPagesProductsTranslations = {
   addProduct: string;
   product: string;
   saveProduct: string;
+  products: string;
+  addons: string;
 };
 
 export type AdminCommercialPagesProductTranslations = {
+  kind: string;
   name: string;
   description: string;
   durationSection: string;
@@ -135,7 +140,9 @@ export type AdminCommercialPagesProductTranslations = {
   participantsMax: string;
   participantsPerFacilitatorMax: string;
   structureSection: string;
+  sessionsMode: string;
   sessions: string;
+  includedAddons: string;
   meetingCountMin: string;
   meetingCountMax: string;
   facilitatorCount: string;
@@ -252,6 +259,8 @@ export type AdminCommercialPagesValidationTranslations = {
   priceNoteRequired: string;
   invalidDuration: string;
   invalidParticipants: string;
+  invalidSessions: string;
+  invalidIncludedAddons: string;
   invalidMeetingRange: string;
   invalidRoute: string;
 };
@@ -270,6 +279,8 @@ export type AdminCommercialPagesCollectionPresentationTranslations = Record<Comm
 export type AdminCommercialPagesIconKeyTranslations = Record<CommercialIconKey, string>;
 export type AdminCommercialPagesDurationModeTranslations = Record<CommercialEditorDuration['mode'], string>;
 export type AdminCommercialPagesParticipantsModeTranslations = Record<CommercialEditorParticipants['mode'], string>;
+export type AdminCommercialPagesProductKindTranslations = Record<CommercialProductKind, string>;
+export type AdminCommercialPagesSessionModeTranslations = Record<CommercialSessionCount['mode'], string>;
 export type AdminCommercialPagesActionAppearanceTranslations = Record<CommercialActionAppearance, string>;
 export type AdminCommercialPagesPriceTypeTranslations = Record<CommercialPriceType, string>;
 export type AdminCommercialPagesBillingUnitTranslations = Record<CommercialBillingUnit, string>;

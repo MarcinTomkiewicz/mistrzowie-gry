@@ -12,6 +12,7 @@ import {
   COMMERCIAL_PRODUCT_CARD_COLUMNS,
   COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS,
   COMMERCIAL_PRODUCT_FIELD_KEYS,
+  COMMERCIAL_PRODUCT_KINDS,
 } from '../../../../core/configs/commercial-pages.config';
 import {
   syncCommercialProductCollectionPresentationControls,
@@ -20,11 +21,15 @@ import {
   createCommercialProductFieldEditorForm,
   createCommercialProductLabelOverrideEditorForm,
 } from '../../../../core/factories/commercial-block-item-editor-form.factory';
+import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type {
   CommercialProductCollectionBlockEditorForm,
   CommercialProductFieldEditorForm,
 } from '../../../../core/types/commercial-builder-block-editor-form';
-import type { CommercialProductFieldKey } from '../../../../core/types/commercial-page-builder';
+import type {
+  CommercialProductFieldKey,
+  CommercialProductKind,
+} from '../../../../core/types/commercial-page-builder';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
 import type { CommercialProductFieldLabelsTranslations } from '../../../../core/types/i18n/commercial-pages';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
@@ -36,9 +41,21 @@ import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialItemEditorActions } from './commercial-item-editor-actions';
 
+type CommercialProductOption = ISelectOption<string> & {
+  kind: CommercialProductKind;
+};
+
 @Component({
   selector: 'app-commercial-product-collection-block-editor',
-  imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, MultiSelectModule, SelectModule, CommercialItemEditorActions],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    IftaLabelModule,
+    InputTextModule,
+    MultiSelectModule,
+    SelectModule,
+    CommercialItemEditorActions,
+  ],
   templateUrl: './commercial-product-collection-block-editor.html',
 })
 export class CommercialProductCollectionBlockEditor {
@@ -56,23 +73,41 @@ export class CommercialProductCollectionBlockEditor {
   );
   protected readonly presentationOptions = computed(() => {
     const labels = this.i18n.collectionPresentation();
-    return COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS.map((value) => ({ value, label: labels[value] }));
+    return COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS.map((value) => ({
+      value,
+      label: labels[value],
+    }));
   });
   protected readonly orientationOptions = computed(() => {
     const labels = this.i18n.cardOrientation();
-    return COMMERCIAL_CARD_ORIENTATIONS.map((value) => ({ value, label: labels[value] }));
+    return COMMERCIAL_CARD_ORIENTATIONS.map((value) => ({
+      value,
+      label: labels[value],
+    }));
   });
   protected readonly fieldKeyOptions = computed(() => {
     const labels = this.productFieldLabels();
-    return COMMERCIAL_PRODUCT_FIELD_KEYS.map((value) => ({ value, label: labels[value] }));
+    return COMMERCIAL_PRODUCT_FIELD_KEYS.map((value) => ({
+      value,
+      label: labels[value],
+    }));
   });
-  protected readonly columnOptions = COMMERCIAL_PRODUCT_CARD_COLUMNS.map((value) => ({ value, label: String(value) }));
+  protected readonly columnOptions = COMMERCIAL_PRODUCT_CARD_COLUMNS.map(
+    (value) => ({ value, label: String(value) }),
+  );
 
-  protected productOptions() {
+  protected productOptions(): CommercialProductOption[] {
     return this.products().controls.map((product) => ({
       value: product.controls.id.getRawValue(),
-      label: product.controls.name.getRawValue() || product.controls.id.getRawValue(),
+      label:
+        product.controls.name.getRawValue() ||
+        product.controls.id.getRawValue(),
+      kind: product.controls.kind.getRawValue(),
     }));
+  }
+
+  protected productOptionGroups() {
+    return this.groupProductOptions(this.productOptions());
   }
 
   protected collectionProductOptions() {
@@ -82,6 +117,10 @@ export class CommercialProductCollectionBlockEditor {
     return this.productOptions().filter((option) =>
       collectionIds.has(option.value),
     );
+  }
+
+  protected collectionProductOptionGroups() {
+    return this.groupProductOptions(this.collectionProductOptions());
   }
 
   protected productLabel(productId: string): string {
@@ -227,5 +266,19 @@ export class CommercialProductCollectionBlockEditor {
 
   private defaultFieldLabel(key: CommercialProductFieldKey): string {
     return this.productFieldLabels()[key];
+  }
+
+  private groupProductOptions(options: CommercialProductOption[]) {
+    const labels = this.i18n.products();
+
+    const groupLabels: Record<CommercialProductKind, string> = {
+      product: labels.products,
+      addon: labels.addons,
+    };
+
+    return COMMERCIAL_PRODUCT_KINDS.map((kind) => ({
+      label: groupLabels[kind],
+      items: options.filter((option) => option.kind === kind),
+    })).filter((group) => group.items.length > 0);
   }
 }

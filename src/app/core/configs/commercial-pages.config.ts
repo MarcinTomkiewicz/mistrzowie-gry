@@ -11,10 +11,12 @@ import type {
   CommercialEditorDuration,
   CommercialEditorParticipants,
   CommercialIconKey,
+  CommercialProductKind,
   CommercialProductCollectionBlock,
   CommercialProductCollectionCardsBlock,
   CommercialProductFieldKey,
   CommercialSectionSurface,
+  CommercialSessionCount,
   CommercialTextAlign,
 } from '../types/commercial-page-builder';
 import type { CommonNavTranslations } from '../types/i18n/common';
@@ -166,6 +168,17 @@ export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
   'tableCount',
   'includedAddons',
 ] as const satisfies readonly CommercialProductFieldKey[];
+
+export const COMMERCIAL_PRODUCT_KINDS = [
+  'product',
+  'addon',
+] as const satisfies readonly CommercialProductKind[];
+
+export const COMMERCIAL_SESSION_MODES = [
+  'not_applicable',
+  'total',
+  'per_month',
+] as const satisfies readonly CommercialSessionCount['mode'][];
 
 export const COMMERCIAL_ICON_KEYS = [
   'send-message',

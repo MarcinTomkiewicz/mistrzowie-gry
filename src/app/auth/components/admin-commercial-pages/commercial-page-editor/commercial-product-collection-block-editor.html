@@ -1,6 +1,20 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
   <p-iftalabel class="w-100">
-    <p-multiselect class="w-100" [inputId]="controlId() + '-products'" formControlName="productIds" [options]="productOptions()" optionLabel="label" optionValue="value" [maxSelectedLabels]="0" [selectedItemsLabel]="i18n.productCollection().selectedCount" appendTo="body" (onChange)="syncCollection()" />
+    <p-multiselect
+      class="w-100"
+      [inputId]="controlId() + '-products'"
+      formControlName="productIds"
+      [options]="productOptionGroups()"
+      [group]="true"
+      optionGroupLabel="label"
+      optionGroupChildren="items"
+      optionLabel="label"
+      optionValue="value"
+      [maxSelectedLabels]="0"
+      [selectedItemsLabel]="i18n.productCollection().selectedCount"
+      appendTo="body"
+      (onChange)="syncCollection()"
+    />
     <label [for]="controlId() + '-products'">{{ i18n.productCollection().products }}</label>
   </p-iftalabel>
   @if (form().controls.productIds.touched && form().controls.productIds.invalid) {
@@ -78,7 +92,21 @@
           </div>
 
           <p-iftalabel class="w-100">
-            <p-multiselect class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-products'" formControlName="productIds" [options]="collectionProductOptions()" optionLabel="label" optionValue="value" [maxSelectedLabels]="0" [selectedItemsLabel]="i18n.productCollection().selectedCount" appendTo="body" (onChange)="syncField(field)" />
+            <p-multiselect
+              class="w-100"
+              [inputId]="controlId() + '-field-' + fieldIndex + '-products'"
+              formControlName="productIds"
+              [options]="collectionProductOptionGroups()"
+              [group]="true"
+              optionGroupLabel="label"
+              optionGroupChildren="items"
+              optionLabel="label"
+              optionValue="value"
+              [maxSelectedLabels]="0"
+              [selectedItemsLabel]="i18n.productCollection().selectedCount"
+              appendTo="body"
+              (onChange)="syncField(field)"
+            />
             <label [for]="controlId() + '-field-' + fieldIndex + '-products'">{{ i18n.productCollection().visibleProducts }}</label>
           </p-iftalabel>
           <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">

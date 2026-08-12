@@ -15,15 +15,7 @@ export function removeCommercialProductReferences(
   sections: FormArray<CommercialSectionEditorForm>,
   productId: string,
 ): void {
-  for (const product of products.controls) {
-    const includedAddonIds = product.controls.includedAddonIds.getRawValue();
-    if (!includedAddonIds.includes(productId)) continue;
-
-    product.controls.includedAddonIds.setValue(
-      includedAddonIds.filter((candidate) => candidate !== productId),
-    );
-    product.controls.includedAddonIds.markAsDirty();
-  }
+  removeCommercialIncludedAddonReferences(products, productId);
 
   for (const section of sections.controls) {
     for (const block of section.controls.blocks.controls) {
@@ -39,6 +31,21 @@ export function removeCommercialProductReferences(
 
       syncCommercialProductCollectionReferences(block);
     }
+  }
+}
+
+export function removeCommercialIncludedAddonReferences(
+  products: FormArray<CommercialProductEditorForm>,
+  addonId: string,
+): void {
+  for (const product of products.controls) {
+    const includedAddonIds = product.controls.includedAddonIds.getRawValue();
+    if (!includedAddonIds.includes(addonId)) continue;
+
+    product.controls.includedAddonIds.setValue(
+      includedAddonIds.filter((candidate) => candidate !== addonId),
+    );
+    product.controls.includedAddonIds.markAsDirty();
   }
 }
 
