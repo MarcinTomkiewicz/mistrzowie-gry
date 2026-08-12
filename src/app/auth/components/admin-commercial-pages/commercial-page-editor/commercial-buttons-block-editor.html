@@ -47,26 +47,27 @@
           <p-select class="w-100" [inputId]="controlId() + '-' + index + '-appearance'" formControlName="appearance" [options]="appearanceOptions()" optionLabel="label" optionValue="value" appendTo="body" />
           <label [for]="controlId() + '-' + index + '-appearance'">{{ i18n.buttons().appearance }}</label>
         </p-iftalabel>
-        <div class="flex-col-start-stretch gap-xs w-100">
-          <span class="small-caps">{{ i18n.buttons().iconKey }}</span>
-          <div class="flex-row-start-center flex-wrap gap-xs">
-            @for (option of iconOptions(); track option.value) {
-              <button
-                pButton
-                class="square-9 cursor-pointer"
-                type="button"
-                size="small"
-                [severity]="button.controls.iconKey.value === option.value ? 'success' : 'secondary'"
-                [outlined]="button.controls.iconKey.value !== option.value"
-                [attr.aria-pressed]="button.controls.iconKey.value === option.value"
-                [attr.aria-label]="option.label"
-                [attr.title]="option.label"
-                (click)="selectIcon(button, option.value)"
-              >
-                <i [class]="option.icon" aria-hidden="true"></i>
-              </button>
-            }
-          </div>
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <span class="small-caps">{{ i18n.buttons().iconKey }}</span>
+        <div class="flex-row-start-center flex-wrap gap-xs w-100">
+          @for (option of iconOptions(); track option.value) {
+            <button
+              pButton
+              class="square-9 cursor-pointer"
+              type="button"
+              size="small"
+              [severity]="button.controls.iconKey.value === option.value ? 'success' : 'secondary'"
+              [outlined]="button.controls.iconKey.value !== option.value"
+              [attr.aria-pressed]="button.controls.iconKey.value === option.value"
+              [attr.aria-label]="option.label"
+              [attr.title]="option.label"
+              (click)="selectIcon(button, option.value)"
+            >
+              <i [class]="option.icon" aria-hidden="true"></i>
+            </button>
+          }
         </div>
       </div>
     </div>

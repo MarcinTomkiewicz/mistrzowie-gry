@@ -41,7 +41,6 @@ export function createAdminCommercialPagesI18n() {
     buttonLayout: Copy.AdminCommercialPagesButtonLayoutTranslations;
     cardOrientation: Copy.AdminCommercialPagesCardOrientationTranslations;
     collectionPresentation: Copy.AdminCommercialPagesCollectionPresentationTranslations;
-    iconKey: Copy.AdminCommercialPagesIconKeyTranslations;
     durationMode: Copy.AdminCommercialPagesDurationModeTranslations;
     participantsMode: Copy.AdminCommercialPagesParticipantsModeTranslations;
     productKind: Copy.AdminCommercialPagesProductKindTranslations;
@@ -68,7 +67,6 @@ export function createAdminCommercialPagesI18n() {
     textAlign: 'textAlign', buttonLayout: 'buttonLayout',
     cardOrientation: 'cardOrientation',
     collectionPresentation: 'collectionPresentation',
-    iconKey: 'iconKey',
     durationMode: 'durationMode', participantsMode: 'participantsMode',
     productKind: 'productKind', sessionMode: 'sessionMode',
     actionAppearance: 'actionAppearance', priceType: 'priceType',

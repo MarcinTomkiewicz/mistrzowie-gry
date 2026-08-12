@@ -5,7 +5,6 @@ import type {
   CommercialCardOrientation,
   CommercialEditorDuration,
   CommercialEditorParticipants,
-  CommercialIconKey,
   CommercialProductKind,
   CommercialProductCollectionBlock,
   CommercialSessionCount,
@@ -287,7 +286,6 @@ export type AdminCommercialPagesTextAlignTranslations = Record<CommercialTextAli
 export type AdminCommercialPagesButtonLayoutTranslations = Record<CommercialButtonLayout, string>;
 export type AdminCommercialPagesCardOrientationTranslations = Record<CommercialCardOrientation, string>;
 export type AdminCommercialPagesCollectionPresentationTranslations = Record<CommercialProductCollectionBlock['presentation']['type'], string>;
-export type AdminCommercialPagesIconKeyTranslations = Record<CommercialIconKey, string>;
 export type AdminCommercialPagesDurationModeTranslations = Record<CommercialEditorDuration['mode'], string>;
 export type AdminCommercialPagesParticipantsModeTranslations = Record<CommercialEditorParticipants['mode'], string>;
 export type AdminCommercialPagesProductKindTranslations = Record<CommercialProductKind, string>;

@@ -9,9 +9,8 @@ import { SelectModule } from 'primeng/select';
 import {
   COMMERCIAL_ACTION_APPEARANCES,
   COMMERCIAL_BUTTON_LAYOUTS,
-  COMMERCIAL_ICON_KEYS,
+  COMMERCIAL_ICON_OPTIONS,
   COMMERCIAL_TEXT_ALIGNS,
-  commercialIconClass,
 } from '../../../../core/configs/commercial-pages.config';
 import { createCommercialButtonEditorForm } from '../../../../core/factories/commercial-block-item-editor-form.factory';
 import type {
@@ -19,7 +18,10 @@ import type {
   CommercialButtonsBlockEditorForm,
 } from '../../../../core/types/commercial-builder-block-editor-form';
 import type { CommercialIconKey } from '../../../../core/types/commercial-page-builder';
-import { moveFormArrayControl } from '../../../../core/utils/form-controls';
+import {
+  moveFormArrayControl,
+  setControlValue,
+} from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialItemEditorActions } from './commercial-item-editor-actions';
 
@@ -58,20 +60,14 @@ export class CommercialButtonsBlockEditor {
       label: this.i18n.buttons().noIcon,
       icon: 'pi pi-ban',
     },
-    ...COMMERCIAL_ICON_KEYS.map((value) => ({
-      value,
-      label: this.i18n.iconKey()[value],
-      icon: commercialIconClass(value),
-    })),
+    ...COMMERCIAL_ICON_OPTIONS,
   ]);
 
   protected selectIcon(
     button: CommercialButtonEditorForm,
     iconKey: CommercialIconKey | null,
   ): void {
-    button.controls.iconKey.setValue(iconKey);
-    button.controls.iconKey.markAsDirty();
-    button.controls.iconKey.markAsTouched();
+    setControlValue(button.controls.iconKey, iconKey);
   }
 
   protected addButton(): void {

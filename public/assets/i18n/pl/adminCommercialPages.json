@@ -432,10 +432,6 @@
     "table": "[PH] Tabela",
     "comparison_table": "[PH] Tabela porównawcza"
   },
-  "iconKey": {
-    "send-message": "[PH] [adminCommercialPages-send-message] Wyślij wiadomość",
-    "workforce": "[PH] [adminCommercialPages-workforce] Zespół"
-  },
   "durationMode": {
     "standard": "[PH] Standardowy",
     "custom": "[PH] Własny",
