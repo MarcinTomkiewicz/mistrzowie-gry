@@ -53,9 +53,9 @@
     "participants": "[PH] [commercialPages-participants] Uczestnicy",
     "participantsPerFacilitatorMax": "[PH] [commercialPages-participantsPerFacilitatorMax] Uczestnicy na prowadzącego",
     "sessions": "[PH] [commercialPages-sessions] Sesje",
-    "sessionsPerMonth": "[PH] [commercialPages-sessionsPerMonth] Sesje w miesiącu",
     "meetingCount": "[PH] [commercialPages-meetingCount] Liczba spotkań",
     "facilitatorCount": "[PH] [commercialPages-facilitatorCount] Liczba prowadzących",
-    "tableCount": "[PH] [commercialPages-tableCount] Liczba stołów"
+    "tableCount": "[PH] [commercialPages-tableCount] Liczba stołów",
+    "includedAddons": "[PH] [commercialPages-includedAddons] Dodatki w cenie"
   }
 }

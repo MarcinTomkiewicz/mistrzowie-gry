@@ -161,21 +161,20 @@ export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
   'participants',
   'participantsPerFacilitatorMax',
   'sessions',
-  'sessionsPerMonth',
   'meetingCount',
   'facilitatorCount',
   'tableCount',
+  'includedAddons',
 ] as const satisfies readonly CommercialProductFieldKey[];
 
 export const COMMERCIAL_ICON_KEYS = [
-  'message',
-  'users',
+  'send-message',
+  'workforce',
 ] as const satisfies readonly CommercialIconKey[];
 
-export const COMMERCIAL_ICON_CLASSES = {
-  message: 'pi pi-comments',
-  users: 'pi pi-users',
-} as const satisfies Record<CommercialIconKey, string>;
+export function commercialIconClass(iconKey: CommercialIconKey): string {
+  return `pi pi-${iconKey}`;
+}
 
 export const COMMERCIAL_EDITOR_DURATION_MODES = [
   'standard',

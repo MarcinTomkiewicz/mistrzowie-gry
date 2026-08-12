@@ -42,6 +42,18 @@ export type CommercialProductFieldEditorForm = FormGroup<{
   labelOverrides: FormArray<CommercialProductLabelOverrideEditorForm>;
 }>;
 
+export type CommercialComparisonRowEditorForm = FormGroup<{
+  id: FormControl<string>;
+  label: FormControl<string>;
+  fieldIds: FormControl<string[]>;
+}>;
+
+export type CommercialComparisonSectionEditorForm = FormGroup<{
+  id: FormControl<string>;
+  heading: FormControl<string>;
+  rows: FormArray<CommercialComparisonRowEditorForm>;
+}>;
+
 export type CommercialTableColumnEditorForm = FormGroup<{
   id: FormControl<string>;
   label: FormControl<string>;
@@ -102,6 +114,7 @@ export type CommercialProductCollectionBlockEditorForm = FormGroup<
       type: FormControl<'cards' | 'table' | 'comparison_table'>;
       orientation: FormControl<CommercialCardOrientation>;
       columns: FormControl<1 | 2 | 3>;
+      sections: FormArray<CommercialComparisonSectionEditorForm>;
     }>;
   }
 >;

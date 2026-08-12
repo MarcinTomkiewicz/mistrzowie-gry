@@ -74,6 +74,30 @@ export const commercialProductValidator: ValidatorFn = (
     return { commercialParticipants: true };
   }
 
+  const sessionsMode = valueOf(control, 'sessionsMode');
+  const sessionsCount = valueOf(control, 'sessionsCount');
+  const invalidSessions =
+    sessionsMode === 'total' || sessionsMode === 'per_month'
+      ? !isPositiveInteger(sessionsCount)
+      : sessionsMode !== 'not_applicable';
+
+  if (invalidSessions) return { commercialSessions: true };
+
+  const id = valueOf(control, 'id');
+  const kind = valueOf(control, 'kind');
+  const includedAddonIds = stringArrayValue(
+    valueOf(control, 'includedAddonIds'),
+  );
+  const invalidIncludedAddons =
+    (kind !== 'product' && kind !== 'addon') ||
+    (kind === 'addon' && includedAddonIds.length > 0) ||
+    (typeof id === 'string' && includedAddonIds.includes(id)) ||
+    new Set(includedAddonIds).size !== includedAddonIds.length;
+
+  if (invalidIncludedAddons) {
+    return { commercialIncludedAddons: true };
+  }
+
   const meetingMin = valueOf(control, 'meetingCountMin');
   const meetingMax = valueOf(control, 'meetingCountMax');
 
@@ -84,6 +108,39 @@ export const commercialProductValidator: ValidatorFn = (
       meetingMin > meetingMax
     ? { commercialMeetingRange: true }
     : null;
+};
+
+export const commercialProductsValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
+  const products: unknown = control.getRawValue();
+  if (!Array.isArray(products)) return { commercialProducts: true };
+
+  const productKinds = new Map<string, unknown>();
+
+  for (const product of products) {
+    if (!isRecord(product)) return { commercialProducts: true };
+
+    const id = product['id'];
+    if (typeof id !== 'string' || productKinds.has(id)) {
+      return { commercialProducts: true };
+    }
+
+    productKinds.set(id, product['kind']);
+  }
+
+  for (const product of products) {
+    if (!isRecord(product)) return { commercialProducts: true };
+
+    const includedAddonIds = stringArrayValue(product['includedAddonIds']);
+    if (
+      includedAddonIds.some((addonId) => productKinds.get(addonId) !== 'addon')
+    ) {
+      return { commercialIncludedAddons: true };
+    }
+  }
+
+  return null;
 };
 
 export const commercialProductFieldValidator: ValidatorFn = (
@@ -137,9 +194,35 @@ export const commercialProductCollectionValidator: ValidatorFn = (
     );
   });
 
-  return hasStaleReference
-    ? { commercialStaleProductReference: true }
-    : null;
+  const presentationType = control.get('presentation.type')?.value;
+  const comparisonSections: unknown = control.get(
+    'presentation.sections',
+  )?.value;
+  const fieldIds = new Set(
+    fields.flatMap((field: unknown) =>
+      isRecord(field) && typeof field['id'] === 'string'
+        ? [field['id']]
+        : []
+    ),
+  );
+  const hasInvalidComparison =
+    presentationType === 'comparison_table' &&
+    (!Array.isArray(comparisonSections) ||
+      comparisonSections.some((section: unknown) =>
+        !isRecord(section) ||
+        !Array.isArray(section['rows']) ||
+        section['rows'].some((row: unknown) => {
+          if (!isRecord(row)) return true;
+
+          const rowFieldIds = stringArrayValue(row['fieldIds']);
+          return rowFieldIds.length === 0 ||
+            new Set(rowFieldIds).size !== rowFieldIds.length ||
+            rowFieldIds.some((fieldId) => !fieldIds.has(fieldId));
+        })
+      ));
+
+  if (hasStaleReference) return { commercialStaleProductReference: true };
+  return hasInvalidComparison ? { commercialComparison: true } : null;
 };
 
 function isPositiveInteger(value: unknown): value is number {
@@ -154,6 +237,10 @@ function stringArrayValue(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
     : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
 function isRichContent(value: unknown): value is RichContent {

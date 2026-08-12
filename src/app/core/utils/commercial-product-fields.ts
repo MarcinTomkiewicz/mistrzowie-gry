@@ -53,9 +53,9 @@ export function formatCommercialProductField(
         locale,
       );
     case 'sessions':
-      return optionalNumber(product.sessions, locale);
-    case 'sessionsPerMonth':
-      return optionalNumber(product.sessionsPerMonth, locale);
+      return product.sessions.mode === 'not_applicable'
+        ? null
+        : optionalNumber(product.sessions.count, locale);
     case 'meetingCount':
       return optionalText(
         formatCommercialOptionalNumberRange(
@@ -69,6 +69,12 @@ export function formatCommercialProductField(
       return optionalNumber(product.facilitatorCount, locale);
     case 'tableCount':
       return optionalNumber(product.tableCount, locale);
+    case 'includedAddons':
+      return optionalText(
+        product.includedAddons.length
+          ? product.includedAddons.map((addon) => addon.name).join(', ')
+          : null,
+      );
   }
 }
 

@@ -5,12 +5,26 @@ import type {
   CommercialProductCollectionBlockEditorForm,
   CommercialProductFieldEditorForm,
 } from '../types/commercial-builder-block-editor-form';
-import type { CommercialSectionEditorForm } from '../types/commercial-page-editor-form';
+import type {
+  CommercialProductEditorForm,
+  CommercialSectionEditorForm,
+} from '../types/commercial-page-editor-form';
 
 export function removeCommercialProductReferences(
+  products: FormArray<CommercialProductEditorForm>,
   sections: FormArray<CommercialSectionEditorForm>,
   productId: string,
 ): void {
+  for (const product of products.controls) {
+    const includedAddonIds = product.controls.includedAddonIds.getRawValue();
+    if (!includedAddonIds.includes(productId)) continue;
+
+    product.controls.includedAddonIds.setValue(
+      includedAddonIds.filter((candidate) => candidate !== productId),
+    );
+    product.controls.includedAddonIds.markAsDirty();
+  }
+
   for (const section of sections.controls) {
     for (const block of section.controls.blocks.controls) {
       if (!isCommercialProductCollectionBlockEditorForm(block)) continue;
@@ -51,6 +65,8 @@ export function syncCommercialProductCollectionReferences(
       form.controls.productIds.getRawValue(),
     );
   }
+
+  syncCommercialComparisonFieldReferences(form);
 }
 
 export function syncCommercialProductFieldReferences(
@@ -68,5 +84,38 @@ export function syncCommercialProductFieldReferences(
 
     overrides.removeAt(index);
     overrides.markAsDirty();
+  }
+}
+
+function syncCommercialComparisonFieldReferences(
+  form: CommercialProductCollectionBlockEditorForm,
+): void {
+  const availableFieldIds = new Set(
+    form.controls.fields.controls.map((field) =>
+      field.controls.id.getRawValue()
+    ),
+  );
+
+  for (const section of form.controls.presentation.controls.sections.controls) {
+    const rows = section.controls.rows;
+
+    for (let index = rows.length - 1; index >= 0; index -= 1) {
+      const row = rows.at(index);
+      const fieldIds = row.controls.fieldIds.getRawValue();
+      const nextFieldIds = fieldIds.filter((fieldId) =>
+        availableFieldIds.has(fieldId)
+      );
+
+      if (nextFieldIds.length === fieldIds.length) continue;
+
+      if (nextFieldIds.length === 0) {
+        rows.removeAt(index);
+        rows.markAsDirty();
+        continue;
+      }
+
+      row.controls.fieldIds.setValue(nextFieldIds);
+      row.controls.fieldIds.markAsDirty();
+    }
   }
 }

@@ -3,8 +3,6 @@ import type {
   CommercialCardsBlock,
   CommercialFaqBlock,
   CommercialPageBlock,
-  CommercialProductCollectionBlock,
-  CommercialProductField,
   CommercialRichTextBlock,
   CommercialTableBlock,
 } from '../types/commercial-page-builder';
@@ -14,17 +12,16 @@ import type {
   CommercialFaqBlockEditorForm,
   CommercialPageBlockEditorForm,
   CommercialProductCollectionBlockEditorForm,
-  CommercialProductFieldEditorForm,
   CommercialRichTextBlockEditorForm,
   CommercialTableBlockEditorForm,
 } from '../types/commercial-builder-block-editor-form';
-import { normalizeText } from '../utils/normalize-text';
 import {
   mapCommercialPriceEditorForm,
 } from './commercial-price-editor-form.factory';
 import {
   mapCommercialRichContentEditorControl,
 } from './commercial-rich-content-editor-form.factory';
+import { mapCommercialProductCollectionBlockEditorForm } from './commercial-product-collection-editor-form.mapper';
 
 export function mapCommercialPageBlockEditorForm(
   form: CommercialPageBlockEditorForm,
@@ -45,7 +42,7 @@ export function mapCommercialPageBlockEditorForm(
   }
 
   if (isCommercialProductCollectionBlockEditorForm(form)) {
-    return mapProductCollectionBlock(form, position);
+    return mapCommercialProductCollectionBlockEditorForm(form, position);
   }
 
   if (isCommercialTableBlockEditorForm(form)) {
@@ -169,78 +166,6 @@ function mapCardsBlock(
       };
     }),
   };
-}
-
-function mapProductCollectionBlock(
-  form: CommercialProductCollectionBlockEditorForm,
-  position: number,
-): CommercialProductCollectionBlock {
-  const value = form.getRawValue();
-  const type: CommercialProductCollectionBlock['type'] =
-    'product_collection';
-  const base = {
-    ...blockBase(form, position),
-    type,
-    productIds: value.productIds,
-    fields: form.controls.fields.controls.map((field, index) =>
-      mapProductField(field, index),
-    ),
-  };
-
-  switch (value.presentation.type) {
-    case 'cards':
-      return {
-        ...base,
-        presentation: {
-          type: value.presentation.type,
-          orientation: value.presentation.orientation,
-          columns: value.presentation.columns,
-        },
-      };
-    case 'table':
-      return { ...base, presentation: { type: value.presentation.type } };
-    case 'comparison_table':
-      return { ...base, presentation: { type: value.presentation.type } };
-    default:
-      throw new TypeError(
-        `Unsupported commercial product collection presentation: ${String(value.presentation.type)}`,
-      );
-  }
-}
-
-function mapProductField(
-  form: CommercialProductFieldEditorForm,
-  index: number,
-): CommercialProductField {
-  const value = form.getRawValue();
-
-  return {
-    id: value.id,
-    position: positionFor(index),
-    key: value.key,
-    label: normalizeText(value.label),
-    productIds: value.productIds,
-    labelOverrides: mapLabelOverrides(value.labelOverrides),
-  };
-}
-
-function mapLabelOverrides(
-  overrides: Array<{ productId: string; label: string }>,
-): CommercialProductField['labelOverrides'] {
-  const productIds = new Set<string>();
-
-  for (const override of overrides) {
-    if (productIds.has(override.productId)) {
-      throw new TypeError('Each product can have at most one label override.');
-    }
-
-    productIds.add(override.productId);
-  }
-
-  return overrides.map((override) => ({
-    productId: override.productId,
-    label: override.label.trim(),
-  }));
 }
 
 function mapTableBlock(

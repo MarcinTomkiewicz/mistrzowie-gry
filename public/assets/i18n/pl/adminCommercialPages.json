@@ -154,7 +154,6 @@
       "participantsPerFacilitatorMax": "[PH] Maksymalnie uczestników na prowadzącego",
       "structureSection": "[PH] Pozostałe dane produktu",
       "sessions": "[PH] Liczba sesji",
-      "sessionsPerMonth": "[PH] Liczba sesji w miesiącu",
       "meetingCountMin": "[PH] Minimalna liczba spotkań",
       "meetingCountMax": "[PH] Maksymalna liczba spotkań",
       "facilitatorCount": "[PH] Liczba prowadzących",
@@ -416,8 +415,8 @@
     "comparison_table": "[PH] Tabela porównawcza"
   },
   "iconKey": {
-    "message": "[PH] Wiadomość",
-    "users": "[PH] Użytkownicy"
+    "send-message": "[PH] [adminCommercialPages-send-message] Wyślij wiadomość",
+    "workforce": "[PH] [adminCommercialPages-workforce] Zespół"
   },
   "durationMode": {
     "standard": "[PH] Standardowy",

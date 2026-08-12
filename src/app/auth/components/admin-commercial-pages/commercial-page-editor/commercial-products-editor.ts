@@ -84,7 +84,11 @@ export class CommercialProductsEditor {
     const products = this.products();
     const productId = products.at(index).controls.id.getRawValue();
 
-    removeCommercialProductReferences(this.sections(), productId);
+    removeCommercialProductReferences(
+      this.products(),
+      this.sections(),
+      productId,
+    );
     products.removeAt(index);
     products.markAsDirty();
   }

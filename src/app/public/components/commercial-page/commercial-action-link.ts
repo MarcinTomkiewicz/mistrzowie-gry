@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 import {
-  COMMERCIAL_ICON_CLASSES,
+  commercialIconClass,
 } from '../../../core/configs/commercial-pages.config';
 import type {
   CommercialButton,
@@ -26,6 +26,6 @@ export class CommercialActionLink {
 
   protected iconClass(): string | undefined {
     const iconKey = this.action().iconKey;
-    return iconKey ? COMMERCIAL_ICON_CLASSES[iconKey] : undefined;
+    return iconKey ? commercialIconClass(iconKey) : undefined;
   }
 }

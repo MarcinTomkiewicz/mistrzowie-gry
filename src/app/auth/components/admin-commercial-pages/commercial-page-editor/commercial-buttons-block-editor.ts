@@ -9,9 +9,9 @@ import { SelectModule } from 'primeng/select';
 import {
   COMMERCIAL_ACTION_APPEARANCES,
   COMMERCIAL_BUTTON_LAYOUTS,
-  COMMERCIAL_ICON_CLASSES,
   COMMERCIAL_ICON_KEYS,
   COMMERCIAL_TEXT_ALIGNS,
+  commercialIconClass,
 } from '../../../../core/configs/commercial-pages.config';
 import { createCommercialButtonEditorForm } from '../../../../core/factories/commercial-block-item-editor-form.factory';
 import type {
@@ -61,7 +61,7 @@ export class CommercialButtonsBlockEditor {
     ...COMMERCIAL_ICON_KEYS.map((value) => ({
       value,
       label: this.i18n.iconKey()[value],
-      icon: COMMERCIAL_ICON_CLASSES[value],
+      icon: commercialIconClass(value),
     })),
   ]);
 

@@ -3,6 +3,8 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import type {
   CommercialButton,
   CommercialCard,
+  CommercialComparisonRow,
+  CommercialComparisonSection,
   CommercialFaqEntry,
   CommercialProductField,
   CommercialTableColumn,
@@ -11,6 +13,8 @@ import type {
 import type {
   CommercialButtonEditorForm,
   CommercialCardEditorForm,
+  CommercialComparisonRowEditorForm,
+  CommercialComparisonSectionEditorForm,
   CommercialFaqEntryEditorForm,
   CommercialProductFieldEditorForm,
   CommercialProductLabelOverrideEditorForm,
@@ -103,6 +107,35 @@ export function createCommercialProductLabelOverrideEditorForm(
   });
 }
 
+export function createCommercialComparisonSectionEditorForm(
+  section: CommercialComparisonSection | null = null,
+): CommercialComparisonSectionEditorForm {
+  return new FormGroup({
+    id: idControl(section?.id),
+    heading: new FormControl(section?.heading ?? '', { nonNullable: true }),
+    rows: new FormArray(
+      section
+        ? [...section.rows]
+            .sort(byPosition)
+            .map(createCommercialComparisonRowEditorForm)
+        : [],
+    ),
+  });
+}
+
+export function createCommercialComparisonRowEditorForm(
+  row: CommercialComparisonRow | null = null,
+): CommercialComparisonRowEditorForm {
+  return new FormGroup({
+    id: idControl(row?.id),
+    label: requiredTextControl(row?.label),
+    fieldIds: new FormControl(row?.fieldIds ?? [], {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
+}
+
 export function createCommercialTableColumnEditorForm(
   column: CommercialTableColumn | null = null,
 ): CommercialTableColumnEditorForm {
@@ -161,4 +194,11 @@ function requiredTextControl(value?: string) {
     nonNullable: true,
     validators: requiredTextValidators,
   });
+}
+
+function byPosition(
+  left: { position: number },
+  right: { position: number },
+): number {
+  return left.position - right.position;
 }

@@ -119,10 +119,21 @@
       {{ i18n.product().structureSection }}
     </h4>
     <div class="mg-grid-2 gap-md w-100">
+      @if (form().controls.sessionsMode.value !== 'not_applicable') {
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            [inputId]="controlId() + '-sessions-count'"
+            formControlName="sessionsCount"
+            [min]="1"
+          />
+          <label [for]="controlId() + '-sessions-count'">
+            {{ i18n.product().sessions }}
+          </label>
+        </p-iftalabel>
+      }
       @for (
         field of [
-          { key: 'sessions', label: i18n.product().sessions },
-          { key: 'sessionsPerMonth', label: i18n.product().sessionsPerMonth },
           { key: 'meetingCountMin', label: i18n.product().meetingCountMin },
           { key: 'meetingCountMax', label: i18n.product().meetingCountMax },
           { key: 'facilitatorCount', label: i18n.product().facilitatorCount },

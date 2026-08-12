@@ -136,7 +136,6 @@ export type AdminCommercialPagesProductTranslations = {
   participantsPerFacilitatorMax: string;
   structureSection: string;
   sessions: string;
-  sessionsPerMonth: string;
   meetingCountMin: string;
   meetingCountMax: string;
   facilitatorCount: string;

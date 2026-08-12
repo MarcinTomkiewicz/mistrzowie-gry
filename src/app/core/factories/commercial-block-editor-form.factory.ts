@@ -18,6 +18,7 @@ import { commercialProductCollectionValidator } from '../validators/commercial-b
 import {
   createCommercialButtonEditorForm,
   createCommercialCardEditorForm,
+  createCommercialComparisonSectionEditorForm,
   createCommercialFaqEntryEditorForm,
   createCommercialProductFieldEditorForm,
   createCommercialTableColumnEditorForm,
@@ -141,8 +142,11 @@ export function syncCommercialProductCollectionPresentationControls(
 ): void {
   const presentation = form.controls.presentation;
   const cards = presentation.controls.type.getRawValue() === 'cards';
+  const comparison =
+    presentation.controls.type.getRawValue() === 'comparison_table';
   setControlEnabled(presentation.controls.orientation, cards);
   setControlEnabled(presentation.controls.columns, cards);
+  setControlEnabled(presentation.controls.sections, comparison);
 }
 
 function createProductCollectionEditorForm(
@@ -173,6 +177,13 @@ function createProductCollectionEditorForm(
           block?.presentation.type === 'cards'
             ? block.presentation.columns
             : 3,
+        ),
+        sections: new FormArray(
+          block?.presentation.type === 'comparison_table'
+            ? [...block.presentation.sections]
+                .sort(byPosition)
+                .map(createCommercialComparisonSectionEditorForm)
+            : [],
         ),
       }),
     },

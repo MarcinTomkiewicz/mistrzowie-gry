@@ -3,8 +3,11 @@ import type {
   CommercialPage,
   CommercialPageSeo,
 } from './commercial-page';
+import type { CommercialIconKey } from './commercial-icon';
 import type { CommercialPrice } from './commercial-price';
 import type { RichContent } from './rich-content';
+
+export type { CommercialIconKey } from './commercial-icon';
 
 export type CommercialSectionSurface = 'plain' | 'card';
 export type CommercialTextAlign = 'left' | 'center' | 'right';
@@ -18,6 +21,11 @@ export type CommercialBlockType =
 
 export type CommercialButtonLayout = 'horizontal' | 'vertical';
 export type CommercialCardOrientation = 'vertical' | 'horizontal';
+export type CommercialProductKind = 'product' | 'addon';
+export type CommercialSessionCount =
+  | { mode: 'not_applicable'; count: null }
+  | { mode: 'total'; count: number }
+  | { mode: 'per_month'; count: number };
 export type CommercialProductFieldKey =
   | 'name'
   | 'description'
@@ -26,12 +34,10 @@ export type CommercialProductFieldKey =
   | 'participants'
   | 'participantsPerFacilitatorMax'
   | 'sessions'
-  | 'sessionsPerMonth'
   | 'meetingCount'
   | 'facilitatorCount'
-  | 'tableCount';
-export type CommercialIconKey = 'message' | 'users';
-
+  | 'tableCount'
+  | 'includedAddons';
 export type CommercialSectionPresentation = {
   surface: CommercialSectionSurface;
   textAlign: CommercialTextAlign;
@@ -131,9 +137,22 @@ export type CommercialProductCollectionTableBlock =
     presentation: { type: 'table' };
   };
 
+export type CommercialComparisonSection = CommercialPositionedItem & {
+  heading: string | null;
+  rows: CommercialComparisonRow[];
+};
+
+export type CommercialComparisonRow = CommercialPositionedItem & {
+  label: string;
+  fieldIds: string[];
+};
+
 export type CommercialProductCollectionComparisonTableBlock =
   CommercialProductCollectionBlockBase & {
-    presentation: { type: 'comparison_table' };
+    presentation: {
+      type: 'comparison_table';
+      sections: CommercialComparisonSection[];
+    };
   };
 
 export type CommercialProductCollectionBlock =
@@ -221,17 +240,18 @@ type CommercialProductBase<
     | CommercialEditorParticipants
     | CommercialRenderParticipants,
 > = CommercialPositionedItem & {
+  kind: CommercialProductKind;
   name: string;
   description: RichContent | null;
   price: CommercialPrice;
   duration: TDuration;
   participants: TParticipants;
-  sessions: number | null;
-  sessionsPerMonth: number | null;
+  sessions: CommercialSessionCount;
   meetingCountMin: number | null;
   meetingCountMax: number | null;
   facilitatorCount: number | null;
   tableCount: number | null;
+  includedAddonIds: string[];
 };
 
 export type CommercialEditorProduct = CommercialProductBase<
@@ -239,10 +259,17 @@ export type CommercialEditorProduct = CommercialProductBase<
   CommercialEditorParticipants
 >;
 
+export type CommercialIncludedAddon = {
+  id: string;
+  name: string;
+};
+
 export type CommercialRenderProduct = CommercialProductBase<
   CommercialRenderDuration,
   CommercialRenderParticipants
->;
+> & {
+  includedAddons: CommercialIncludedAddon[];
+};
 
 export type CommercialPageEditorDocument = {
   heading: string;

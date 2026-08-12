@@ -170,6 +170,7 @@ export class CommercialProductCollectionBlockEditor {
     const fields = this.form().controls.fields;
     fields.removeAt(index);
     fields.markAsDirty();
+    this.syncCollection();
   }
   protected moveField(index: number, offset: -1 | 1): void {
     moveFormArrayControl(this.form().controls.fields, index, index + offset);

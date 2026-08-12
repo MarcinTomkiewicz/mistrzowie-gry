@@ -7,6 +7,7 @@ import type {
   CommercialSectionEditorForm,
 } from '../types/commercial-page-editor-form';
 import { normalizeText } from '../utils/normalize-text';
+import { commercialProductsValidator } from '../validators/commercial-builder-editor.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 import {
   createCommercialProductEditorForm,
@@ -55,7 +56,9 @@ export function createCommercialPageEditorForm(): CommercialPageEditorForm {
       ogDescription: new FormControl('', { nonNullable: true }),
       canonicalUrl: new FormControl('', { nonNullable: true }),
     }),
-    products: new FormArray<CommercialProductEditorForm>([]),
+    products: new FormArray<CommercialProductEditorForm>([], {
+      validators: [commercialProductsValidator],
+    }),
     sections: new FormArray<CommercialSectionEditorForm>([]),
   });
 }

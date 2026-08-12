@@ -2,6 +2,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import type {
   CommercialEditorProduct,
+  CommercialSessionCount,
 } from '../types/commercial-page-builder';
 import type { CommercialProductEditorForm } from '../types/commercial-page-editor-form';
 import { setControlEnabled } from '../utils/form-controls';
@@ -27,6 +28,9 @@ export function createCommercialProductEditorForm(
   const form = new FormGroup(
     {
       id: new FormControl(product?.id ?? crypto.randomUUID(), {
+        nonNullable: true,
+      }),
+      kind: new FormControl(product?.kind ?? 'product', {
         nonNullable: true,
       }),
       name: new FormControl(product?.name ?? '', {
@@ -70,9 +74,12 @@ export function createCommercialProductEditorForm(
           : null,
         { validators: positiveIntegerValidators },
       ),
-      sessions: optionalPositiveIntegerControl(product?.sessions ?? null),
-      sessionsPerMonth: optionalPositiveIntegerControl(
-        product?.sessionsPerMonth ?? null,
+      sessionsMode: new FormControl(
+        product?.sessions.mode ?? 'not_applicable',
+        { nonNullable: true },
+      ),
+      sessionsCount: optionalPositiveIntegerControl(
+        product?.sessions.count ?? null,
       ),
       meetingCountMin: optionalPositiveIntegerControl(
         product?.meetingCountMin ?? null,
@@ -84,6 +91,9 @@ export function createCommercialProductEditorForm(
         product?.facilitatorCount ?? null,
       ),
       tableCount: optionalPositiveIntegerControl(product?.tableCount ?? null),
+      includedAddonIds: new FormControl(product?.includedAddonIds ?? [], {
+        nonNullable: true,
+      }),
     },
     { validators: [commercialProductValidator] },
   );
@@ -101,6 +111,7 @@ export function mapCommercialProductEditorForm(
   return {
     id: value.id,
     position,
+    kind: value.kind,
     name: value.name.trim(),
     description: mapCommercialRichContentEditorControl(
       form.controls.description,
@@ -125,12 +136,15 @@ export function mapCommercialProductEditorForm(
             max: null,
             perFacilitatorMax: null,
           },
-    sessions: value.sessions,
-    sessionsPerMonth: value.sessionsPerMonth,
+    sessions: mapCommercialSessionCount(
+      value.sessionsMode,
+      value.sessionsCount,
+    ),
     meetingCountMin: value.meetingCountMin,
     meetingCountMax: value.meetingCountMax,
     facilitatorCount: value.facilitatorCount,
     tableCount: value.tableCount,
+    includedAddonIds: value.includedAddonIds,
   };
 }
 
@@ -150,6 +164,10 @@ export function syncCommercialProductEditorControls(
     form.controls.participantsPerFacilitatorMax,
     customParticipants,
   );
+
+  const hasSessions =
+    form.controls.sessionsMode.getRawValue() !== 'not_applicable';
+  setControlEnabled(form.controls.sessionsCount, hasSessions);
 }
 
 function optionalPositiveIntegerControl(value: number | null) {
@@ -162,4 +180,23 @@ function requireNumber(value: number | null): number {
   }
 
   return value;
+}
+
+function mapCommercialSessionCount(
+  mode: CommercialSessionCount['mode'],
+  count: number | null,
+): CommercialSessionCount {
+  switch (mode) {
+    case 'not_applicable':
+      return { mode, count: null };
+    case 'total':
+    case 'per_month':
+      return { mode, count: requireNumber(count) };
+    default:
+      return unsupportedCommercialSessionMode(mode);
+  }
+}
+
+function unsupportedCommercialSessionMode(mode: never): never {
+  throw new TypeError(`Unsupported commercial session mode: ${String(mode)}`);
 }
