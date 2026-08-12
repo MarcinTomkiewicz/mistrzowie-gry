@@ -20,7 +20,7 @@
   @for (button of form().controls.buttons.controls; track button; let index = $index) {
     <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="button">
       <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.buttons.length" (moveUp)="moveButton(index, -1)" (moveDown)="moveButton(index, 1)" (remove)="removeButton(index)" />
-      <div class="mg-grid-2 gap-md w-100">
+      <div class="mg-grid-3 gap-md w-100">
         <div class="flex-col-start-stretch gap-xs w-100">
           <p-iftalabel class="w-100">
             <input pInputText class="w-100" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />

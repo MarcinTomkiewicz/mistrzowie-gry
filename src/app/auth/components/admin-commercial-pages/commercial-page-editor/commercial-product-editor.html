@@ -128,7 +128,7 @@
     </p-iftalabel>
 
     @if (form().controls.participantsMode.value === 'custom') {
-      <div class="mg-grid-2 gap-md w-100">
+      <div class="mg-grid-3 gap-md w-100">
         @for (
           field of [
             { key: 'participantsMin', label: i18n.product().participantsMin },
@@ -158,7 +158,7 @@
     <h4 class="mg-section__title mg-section__title--xs m-0">
       {{ i18n.product().structureSection }}
     </h4>
-    <div class="mg-grid-2 gap-md w-100">
+    <div class="mg-grid-3 gap-md w-100">
       <p-iftalabel class="w-100">
         <p-select
           class="w-100"

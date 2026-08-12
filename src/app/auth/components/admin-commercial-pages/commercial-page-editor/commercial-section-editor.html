@@ -1,27 +1,27 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <p-iftalabel class="w-100">
+    <input
+      pInputText
+      class="w-100"
+      [id]="controlId() + '-heading'"
+      formControlName="heading"
+      autocomplete="off"
+    />
+    <label [for]="controlId() + '-heading'">{{ i18n.section().heading }}</label>
+  </p-iftalabel>
+
+  <p-iftalabel class="w-100">
+    <textarea
+      pTextarea
+      class="w-100"
+      [id]="controlId() + '-lead'"
+      formControlName="lead"
+      rows="3"
+    ></textarea>
+    <label [for]="controlId() + '-lead'">{{ i18n.section().lead }}</label>
+  </p-iftalabel>
+
   <div class="mg-grid-2 gap-md w-100">
-    <p-iftalabel class="w-100">
-      <input
-        pInputText
-        class="w-100"
-        [id]="controlId() + '-heading'"
-        formControlName="heading"
-        autocomplete="off"
-      />
-      <label [for]="controlId() + '-heading'">{{ i18n.section().heading }}</label>
-    </p-iftalabel>
-
-    <p-iftalabel class="w-100">
-      <textarea
-        pTextarea
-        class="w-100"
-        [id]="controlId() + '-lead'"
-        formControlName="lead"
-        rows="3"
-      ></textarea>
-      <label [for]="controlId() + '-lead'">{{ i18n.section().lead }}</label>
-    </p-iftalabel>
-
     <p-iftalabel class="w-100">
       <p-select
         class="w-100"
