@@ -2,6 +2,7 @@ import type {
   CommercialBillingUnit,
   CommercialPercentageBasis,
 } from '../commercial-price';
+import type { CommercialProductFieldKey } from '../commercial-page-builder';
 
 export type CommercialPageLabelsTranslations = {
   effectiveFrom: string;
@@ -21,6 +22,11 @@ export type CommercialProductValueTranslations = {
     minutes: CommercialDurationUnitTranslations;
   };
 };
+
+export type CommercialProductFieldLabelsTranslations = Record<
+  CommercialProductFieldKey,
+  string
+>;
 
 type CommercialDurationUnitTranslations = {
   one: string;

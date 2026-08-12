@@ -134,7 +134,7 @@ export function syncCommercialPageEditorOptionalControls(
   for (const section of form.controls.sections.controls) {
     for (const block of section.controls.blocks.controls) {
       if (isCommercialCardsBlockEditorForm(block)) {
-        for (const card of block.controls.cards.controls) {
+        for (const card of block.controls.items.controls) {
           syncCommercialCardPriceControl(card);
         }
       } else if (isCommercialProductCollectionBlockEditorForm(block)) {

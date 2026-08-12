@@ -1,5 +1,5 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
-  <div class="mg-grid-2 gap-md w-100">
+  <div class="mg-grid-2 gap-md w-100" [formGroup]="form().controls.presentation">
     <p-iftalabel class="w-100">
       <p-select class="w-100" [inputId]="controlId() + '-orientation'" formControlName="orientation" [options]="orientationOptions()" optionLabel="label" optionValue="value" appendTo="body" />
       <label [for]="controlId() + '-orientation'">{{ i18n.cards().orientation }}</label>
@@ -12,11 +12,11 @@
   <div class="flex-row-end-center">
     <p-button type="button" severity="secondary" [label]="i18n.cards().add" icon="pi pi-plus" (onClick)="addCard()" />
   </div>
-  @if (!form().controls.cards.length) { <p class="m-0 error-text">{{ i18n.cards().empty }}</p> }
+  @if (!form().controls.items.length) { <p class="m-0 error-text">{{ i18n.cards().empty }}</p> }
 
-  @for (card of form().controls.cards.controls; track card; let index = $index) {
+  @for (card of form().controls.items.controls; track card; let index = $index) {
     <div class="mg-card flex-col-start-stretch gap-md p-sm w-100" [formGroup]="card">
-      <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.cards.length" (moveUp)="moveCard(index, -1)" (moveDown)="moveCard(index, 1)" (remove)="removeCard(index)" />
+      <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.items.length" (moveUp)="moveCard(index, -1)" (moveDown)="moveCard(index, 1)" (remove)="removeCard(index)" />
       <div class="flex-col-start-stretch gap-xs w-100">
         <p-iftalabel class="w-100">
           <input pInputText class="w-100" [id]="controlId() + '-' + index + '-title'" formControlName="title" autocomplete="off" />

@@ -41,8 +41,10 @@ export function createCommercialBlockEditorForm(
       return new FormGroup({
         id,
         type: literalControl('buttons'),
-        layout: literalControl(block.layout),
-        align: literalControl(block.align),
+        presentation: new FormGroup({
+          layout: literalControl(block.presentation.layout),
+          align: literalControl(block.presentation.align),
+        }),
         buttons: requiredArray(
           [...block.buttons].sort(byPosition),
           createCommercialButtonEditorForm,
@@ -52,10 +54,12 @@ export function createCommercialBlockEditorForm(
       return new FormGroup({
         id,
         type: literalControl('cards'),
-        orientation: literalControl(block.orientation),
-        columns: literalControl(block.columns),
-        cards: requiredArray(
-          [...block.cards].sort(byPosition),
+        presentation: new FormGroup({
+          orientation: literalControl(block.presentation.orientation),
+          columns: literalControl(block.presentation.columns),
+        }),
+        items: requiredArray(
+          [...block.items].sort(byPosition),
           createCommercialCardEditorForm,
         ),
       });
@@ -76,6 +80,8 @@ export function createCommercialBlockEditorForm(
           createCommercialFaqEntryEditorForm,
         ),
       });
+    default:
+      return unsupportedCommercialBlock(block);
   }
 }
 
@@ -95,17 +101,21 @@ export function createNewCommercialBlockEditorForm(
       return new FormGroup({
         id,
         type: literalControl('buttons'),
-        layout: literalControl<CommercialButtonLayout>('horizontal'),
-        align: literalControl<CommercialTextAlign>('left'),
+        presentation: new FormGroup({
+          layout: literalControl<CommercialButtonLayout>('horizontal'),
+          align: literalControl<CommercialTextAlign>('left'),
+        }),
         buttons: requiredArray([null], createCommercialButtonEditorForm),
       });
     case 'cards':
       return new FormGroup({
         id,
         type: literalControl('cards'),
-        orientation: literalControl<CommercialCardOrientation>('vertical'),
-        columns: literalControl<1 | 2 | 3 | 4>(3),
-        cards: requiredArray([null], createCommercialCardEditorForm),
+        presentation: new FormGroup({
+          orientation: literalControl<CommercialCardOrientation>('vertical'),
+          columns: literalControl<1 | 2 | 3>(3),
+        }),
+        items: requiredArray([null], createCommercialCardEditorForm),
       });
     case 'product_collection':
       return createProductCollectionEditorForm(
@@ -121,15 +131,18 @@ export function createNewCommercialBlockEditorForm(
         type: literalControl('faq'),
         items: requiredArray([null], createCommercialFaqEntryEditorForm),
       });
+    default:
+      return unsupportedCommercialBlockType(type);
   }
 }
 
 export function syncCommercialProductCollectionPresentationControls(
   form: CommercialProductCollectionBlockEditorForm,
 ): void {
-  const cards = form.controls.presentation.getRawValue() === 'cards';
-  setControlEnabled(form.controls.cardOrientation, cards);
-  setControlEnabled(form.controls.columns, cards);
+  const presentation = form.controls.presentation;
+  const cards = presentation.controls.type.getRawValue() === 'cards';
+  setControlEnabled(presentation.controls.orientation, cards);
+  setControlEnabled(presentation.controls.columns, cards);
 }
 
 function createProductCollectionEditorForm(
@@ -149,13 +162,19 @@ function createProductCollectionEditorForm(
         block ? [...block.fields].sort(byPosition) : [null],
         createCommercialProductFieldEditorForm,
       ),
-      presentation: literalControl(block?.presentation ?? 'cards'),
-      cardOrientation: literalControl(
-        block?.presentation === 'cards' ? block.cardOrientation : 'vertical',
-      ),
-      columns: literalControl(
-        block?.presentation === 'cards' ? block.columns : 3,
-      ),
+      presentation: new FormGroup({
+        type: literalControl(block?.presentation.type ?? 'cards'),
+        orientation: literalControl(
+          block?.presentation.type === 'cards'
+            ? block.presentation.orientation
+            : 'vertical',
+        ),
+        columns: literalControl(
+          block?.presentation.type === 'cards'
+            ? block.presentation.columns
+            : 3,
+        ),
+      }),
     },
     { validators: [commercialProductCollectionValidator] },
   );
@@ -207,4 +226,12 @@ function byPosition(
   right: { position: number },
 ): number {
   return left.position - right.position;
+}
+
+function unsupportedCommercialBlock(block: never): never {
+  throw new TypeError(`Unsupported commercial block: ${JSON.stringify(block)}`);
+}
+
+function unsupportedCommercialBlockType(type: never): never {
+  throw new TypeError(`Unsupported commercial block type: ${String(type)}`);
 }

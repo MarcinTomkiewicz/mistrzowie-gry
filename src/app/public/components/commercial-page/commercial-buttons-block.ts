@@ -22,10 +22,10 @@ export class CommercialButtonsBlock {
   readonly block = input.required<CommercialButtonsBlockModel>();
 
   protected readonly layoutClass = computed(() => {
-    const block = this.block();
-    const align = flexAlign[block.align];
+    const presentation = this.block().presentation;
+    const align = flexAlign[presentation.align];
 
-    return block.layout === 'horizontal'
+    return presentation.layout === 'horizontal'
       ? `flex-row-${align}-center flex-wrap`
       : `flex-col-start-${align}`;
   });

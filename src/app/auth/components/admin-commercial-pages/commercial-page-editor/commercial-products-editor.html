@@ -18,23 +18,83 @@
   }
 
   @for (product of products().controls; track product; let index = $index) {
-    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
-        <strong>{{ i18n.products().product }} {{ index + 1 }}</strong>
-        <app-commercial-item-editor-actions
-          [index]="index"
-          [itemCount]="products().length"
-          (moveUp)="moveProduct(index, -1)"
-          (moveDown)="moveProduct(index, 1)"
-          (remove)="removeProduct(index)"
-        />
-      </div>
+    @let price = productPrice(product);
+    <article class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+      <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>{{ product.controls.name.value }}</strong>
+          <span>{{ price.value }}</span>
+          @if (price.note) {
+            <small>{{ price.note }}</small>
+          }
+          <span>
+            {{ i18n.product().durationSection }}:
+            {{ productDuration(product) }}
+          </span>
+          <span>
+            {{ i18n.product().participantsSection }}:
+            {{ productParticipants(product) }}
+          </span>
+        </div>
 
-      <app-commercial-product-editor
-        [form]="product"
-        [controlId]="'commercial-product-' + index"
-        [tokens]="tokens()"
-      />
-    </section>
+        <div class="flex-row-end-center flex-wrap gap-xs">
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            [label]="i18n.commonActions().edit"
+            icon="pi pi-pencil"
+            (onClick)="editProduct(index)"
+          />
+          <p-button
+            type="button"
+            severity="danger"
+            size="small"
+            [text]="true"
+            [label]="i18n.commonActions().delete"
+            icon="pi pi-trash"
+            (onClick)="removeProduct(index)"
+          />
+        </div>
+      </div>
+    </article>
   }
 </section>
+
+<p-dialog
+  styleClass="mg-dialog mg-dialog--lg"
+  [modal]="true"
+  [visible]="editorForm() !== null"
+  [header]="i18n.products().product"
+  [draggable]="false"
+  (visibleChange)="onDialogVisibleChange($event)"
+>
+  @if (editorForm(); as productForm) {
+    <div class="flex-col-start-stretch gap-md w-100">
+      <app-commercial-product-editor
+        [form]="productForm"
+        controlId="commercial-product-dialog"
+        [tokens]="tokens()"
+      />
+
+      <div class="p-dialog-footer flex-row-end-center gap-sm w-100 p-md">
+        <p-button
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          [label]="i18n.commonActions().cancel"
+          icon="pi pi-times"
+          (onClick)="closeEditor()"
+        />
+        <p-button
+          type="button"
+          severity="success"
+          [label]="i18n.products().saveProduct"
+          icon="pi pi-save"
+          (onClick)="saveProduct()"
+        />
+      </div>
+    </div>
+  }
+</p-dialog>

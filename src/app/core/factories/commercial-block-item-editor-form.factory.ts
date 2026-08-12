@@ -77,14 +77,11 @@ export function createCommercialProductFieldEditorForm(
     {
       id: idControl(field?.id),
       key: new FormControl(field?.key ?? 'name', { nonNullable: true }),
-      label: requiredTextControl(field?.label),
-      productIds: new FormControl(field?.productIds ?? [], {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
+      label: new FormControl(field?.label ?? null),
+      productIds: new FormControl(field?.productIds ?? null),
       labelOverrides: new FormArray(
-        Object.entries(field?.labelOverrides ?? {}).map(
-          ([productId, label]) =>
+        (field?.labelOverrides ?? []).map(
+          ({ productId, label }) =>
             createCommercialProductLabelOverrideEditorForm(productId, label),
         ),
       ),
@@ -111,10 +108,7 @@ export function createCommercialTableColumnEditorForm(
 ): CommercialTableColumnEditorForm {
   return new FormGroup({
     id: idControl(column?.id),
-    heading: createCommercialRichContentEditorControl(
-      column?.heading ?? null,
-      true,
-    ),
+    label: requiredTextControl(column?.label),
   });
 }
 
@@ -154,10 +148,7 @@ export function createCommercialFaqEntryEditorForm(
   return new FormGroup({
     id: idControl(item?.id),
     question: requiredTextControl(item?.question),
-    answer: createCommercialRichContentEditorControl(
-      item?.answer ?? null,
-      true,
-    ),
+    answer: requiredTextControl(item?.answer),
   });
 }
 

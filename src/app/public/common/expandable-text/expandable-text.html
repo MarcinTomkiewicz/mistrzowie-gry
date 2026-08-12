@@ -1,14 +1,24 @@
 @let labels = cta();
 
 <div class="flex-col-start-start">
-  <p
-    class="lh-18 m-0"
-    [class.truncate-3]="collapsed()"
-    [class.mg-section__subtitle]="muted()"
-    [class.mg-section__subtitle--full]="muted()"
-  >
-    {{ text() }}
-  </p>
+  @if (richContent(); as content) {
+    <div
+      [class.truncate-3]="collapsed()"
+      [class.mg-section__subtitle]="muted()"
+      [class.mg-section__subtitle--full]="muted()"
+    >
+      <app-rich-content [content]="content" />
+    </div>
+  } @else {
+    <p
+      class="lh-18 m-0"
+      [class.truncate-3]="collapsed()"
+      [class.mg-section__subtitle]="muted()"
+      [class.mg-section__subtitle--full]="muted()"
+    >
+      {{ text() }}
+    </p>
+  }
 
   @if (expandable()) {
     <p-button

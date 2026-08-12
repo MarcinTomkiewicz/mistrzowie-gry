@@ -44,5 +44,18 @@
         "other": "[PH] [commercialPages-other] minuty"
       }
     }
+  },
+  "productFieldKey": {
+    "name": "[PH] [commercialPages-name] Nazwa",
+    "description": "[PH] [commercialPages-description] Opis",
+    "price": "[PH] [commercialPages-price] Cena",
+    "duration": "[PH] [commercialPages-duration] Czas trwania",
+    "participants": "[PH] [commercialPages-participants] Uczestnicy",
+    "participantsPerFacilitatorMax": "[PH] [commercialPages-participantsPerFacilitatorMax] Uczestnicy na prowadzącego",
+    "sessions": "[PH] [commercialPages-sessions] Sesje",
+    "sessionsPerMonth": "[PH] [commercialPages-sessionsPerMonth] Sesje w miesiącu",
+    "meetingCount": "[PH] [commercialPages-meetingCount] Liczba spotkań",
+    "facilitatorCount": "[PH] [commercialPages-facilitatorCount] Liczba prowadzących",
+    "tableCount": "[PH] [commercialPages-tableCount] Liczba stołów"
   }
 }

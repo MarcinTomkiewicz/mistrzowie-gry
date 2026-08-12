@@ -18,11 +18,32 @@
   }
 
   @for (section of sections().controls; track section; let index = $index) {
-    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
-        <strong>{{ i18n.sections().section }} {{ index + 1 }}</strong>
+        <div class="flex-col-start-stretch gap-xs">
+          <strong>
+            {{
+              section.controls.heading.value ||
+                i18n.sections().section + ' ' + (index + 1)
+            }}
+          </strong>
+          <small>
+            {{ i18n.sectionSurface()[section.controls.surface.value] }} ·
+            {{ i18n.textAlign()[section.controls.textAlign.value] }} ·
+            {{ i18n.section().blocks }}: {{ section.controls.blocks.length }}
+          </small>
+        </div>
 
         <div class="flex-row-end-center flex-wrap gap-xs">
+          <p-button
+            type="button"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            [label]="i18n.commonActions().edit"
+            icon="pi pi-pencil"
+            (onClick)="editSection(index)"
+          />
           <p-button
             type="button"
             severity="secondary"
@@ -55,12 +76,27 @@
         </div>
       </div>
 
-      <app-commercial-section-editor
-        [form]="section"
-        [products]="products()"
-        [controlId]="'commercial-page-section-' + index"
-        [tokens]="tokens()"
-      />
+      @if (activeSectionId() === section.controls.id.value) {
+        <div class="flex-col-start-stretch gap-md w-100">
+          <app-commercial-section-editor
+            [form]="section"
+            [products]="products()"
+            [controlId]="'commercial-page-section-' + index"
+            [tokens]="tokens()"
+            [(activeBlockId)]="activeBlockId"
+          />
+          <div class="flex-row-end-center">
+            <p-button
+              type="button"
+              severity="secondary"
+              [outlined]="true"
+              [label]="i18n.commonActions().close"
+              icon="pi pi-times"
+              (onClick)="closeSection()"
+            />
+          </div>
+        </div>
+      }
     </section>
   }
 </section>

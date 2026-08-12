@@ -139,20 +139,19 @@ export const COMMERCIAL_MANUAL_CARD_COLUMNS = [
   1,
   2,
   3,
-  4,
-] as const satisfies readonly CommercialCardsBlock['columns'][];
+] as const satisfies readonly CommercialCardsBlock['presentation']['columns'][];
 
 export const COMMERCIAL_PRODUCT_CARD_COLUMNS = [
   1,
   2,
   3,
-] as const satisfies readonly CommercialProductCollectionCardsBlock['columns'][];
+] as const satisfies readonly CommercialProductCollectionCardsBlock['presentation']['columns'][];
 
 export const COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS = [
   'cards',
   'table',
   'comparison_table',
-] as const satisfies readonly CommercialProductCollectionBlock['presentation'][];
+] as const satisfies readonly CommercialProductCollectionBlock['presentation']['type'][];
 
 export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
   'name',

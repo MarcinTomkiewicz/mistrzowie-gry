@@ -40,20 +40,20 @@ export class CommercialCardsBlockEditor {
   protected readonly columnOptions = COMMERCIAL_MANUAL_CARD_COLUMNS.map((value) => ({ value, label: String(value) }));
 
   protected addCard(): void {
-    const cards = this.form().controls.cards;
+    const cards = this.form().controls.items;
     cards.push(createCommercialCardEditorForm());
     cards.markAsDirty();
   }
   protected removeCard(index: number): void {
-    const cards = this.form().controls.cards;
+    const cards = this.form().controls.items;
     cards.removeAt(index);
     cards.markAsDirty();
   }
   protected moveCard(index: number, offset: -1 | 1): void {
-    moveFormArrayControl(this.form().controls.cards, index, index + offset);
+    moveFormArrayControl(this.form().controls.items, index, index + offset);
   }
   protected syncPrice(index: number): void {
-    const card = this.form().controls.cards.at(index);
+    const card = this.form().controls.items.at(index);
     syncCommercialCardPriceControl(card);
   }
 }

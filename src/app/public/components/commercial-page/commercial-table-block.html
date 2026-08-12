@@ -4,7 +4,7 @@
       <tr>
         @for (column of block().columns; track column.id) {
           <th scope="col">
-            <app-rich-content [content]="column.heading" />
+            {{ column.label }}
           </th>
         }
       </tr>

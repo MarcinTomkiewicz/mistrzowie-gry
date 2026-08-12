@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, model } from '@angular/core';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
 
 import { IftaLabelModule } from 'primeng/iftalabel';
@@ -34,6 +34,7 @@ export class CommercialSectionEditor {
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
+  readonly activeBlockId = model<string | null>(null);
 
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly surfaceOptions = computed(() => {

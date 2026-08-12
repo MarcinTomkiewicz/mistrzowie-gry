@@ -1,27 +1,21 @@
-@let data = block();
-
-@switch (data.presentation) {
-  @case ('cards') {
-    <app-commercial-product-collection-cards
-      [block]="data"
-      [products]="selectedProducts()"
-      [locale]="locale()"
-    />
-  }
-  @case ('table') {
-    <app-commercial-product-collection-table
-      [block]="data"
-      [products]="selectedProducts()"
-      [locale]="locale()"
-    />
-  }
-  @case ('comparison_table') {
-    <app-commercial-product-comparison-table
-      [block]="data"
-      [products]="selectedProducts()"
-      [locale]="locale()"
-    />
-  }
+@if (cardsBlock(); as cards) {
+  <app-commercial-product-collection-cards
+    [block]="cards"
+    [products]="selectedProducts()"
+    [locale]="locale()"
+  />
+} @else if (tableBlock(); as table) {
+  <app-commercial-product-collection-table
+    [block]="table"
+    [products]="selectedProducts()"
+    [locale]="locale()"
+  />
+} @else if (comparisonTableBlock(); as comparisonTable) {
+  <app-commercial-product-comparison-table
+    [block]="comparisonTable"
+    [products]="selectedProducts()"
+    [locale]="locale()"
+  />
 }
 
 @if (hasPriceField() && pricingFootnote()) {

@@ -1,5 +1,41 @@
 @use "../abstracts/variables" as v;
 
+.p-checkbox .p-checkbox-box {
+  background: var(--mg-form-bg);
+  border-color: var(--mg-form-border);
+}
+
+.p-checkbox:not(.p-disabled):has(.p-checkbox-input:hover) .p-checkbox-box {
+  background: var(--mg-form-bg-hover);
+  border-color: var(--mg-form-border-hover);
+}
+
+.p-checkbox-checked .p-checkbox-box,
+.p-checkbox-checked:not(.p-disabled):has(.p-checkbox-input:hover) .p-checkbox-box {
+  background: var(--mg-form-border-focus);
+  border-color: var(--mg-form-border-focus);
+}
+
+.p-checkbox-checked .p-checkbox-icon,
+.p-checkbox-checked:not(.p-disabled):has(.p-checkbox-input:hover) .p-checkbox-icon {
+  color: var(--mg-form-bg);
+}
+
+.p-checkbox:not(.p-disabled):has(.p-checkbox-input:focus-visible) .p-checkbox-box {
+  outline: none;
+  border-color: var(--mg-form-border-focus);
+  box-shadow: 0 0 0 3px var(--mg-form-ring);
+}
+
+.p-checkbox.p-disabled .p-checkbox-box {
+  background: var(--mg-form-disabled-bg);
+  border-color: var(--mg-form-border);
+}
+
+.p-checkbox.p-disabled .p-checkbox-icon {
+  color: var(--mg-form-disabled-text);
+}
+
 :where(.mg-form, form, .mg-card form) {
   p-checkbox + label,
   .p-checkbox + label {

@@ -1,29 +1,4 @@
-@if (previewDocument(); as pageDocument) {
-  <div class="mg-container mt-xl">
-    <div
-      class="mg-card flex-row-between-center flex-col-start-stretch-sm gap-sm p-md w-100"
-    >
-      <span class="tag-badge tag-badge--warn">
-        {{ i18n.previewPage().badge }}
-      </span>
-
-      <p-button
-        severity="secondary"
-        [outlined]="true"
-        [label]="i18n.previewPage().backToEditor"
-        icon="pi pi-arrow-left"
-        (onClick)="closePreview()"
-      />
-    </div>
-  </div>
-
-  <app-commercial-page-renderer [document]="pageDocument" />
-}
-
-<section
-  class="mg-section mg-section--full"
-  [class.d-none]="previewDocument() !== null"
->
+<section class="mg-section mg-section--full">
   <div class="mg-container position-relative flex-col-start-stretch gap-md">
     <header class="mg-section__header w-100">
       <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm w-100">
@@ -42,7 +17,7 @@
     </header>
 
     <app-loading-overlay
-      [visible]="isLoading() || isSaving() || isPreviewing()"
+      [visible]="isLoading() || isSaving()"
       [label]="
         isSaving()
           ? i18n.commonStatus().saving
@@ -74,156 +49,259 @@
         </div>
       </section>
     } @else if (detail(); as pageDetail) {
-      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-        <h2 class="mg-section__title mg-section__title--md m-0">
-          {{ i18n.identity().sectionTitle }}
-        </h2>
-
-        <dl class="mg-grid-2 gap-md m-0">
-          <div>
-            <dt class="small-caps">{{ i18n.identity().key }}</dt>
-            <dd class="m-0">{{ pageDetail.page.key }}</dd>
-          </div>
-          <div>
-            <dt class="small-caps">{{ i18n.identity().navigationLabel }}</dt>
-            <dd class="m-0">{{ pageDetail.page.navigationLabel }}</dd>
-          </div>
-          <div>
-            <dt class="small-caps">{{ i18n.identity().slug }}</dt>
-            <dd class="m-0">{{ pageDetail.page.slug }}</dd>
-          </div>
-          <div>
-            <dt class="small-caps">{{ i18n.identity().locale }}</dt>
-            <dd class="m-0">{{ pageDetail.page.locale }}</dd>
-          </div>
-          <div>
-            <dt class="small-caps">{{ i18n.identity().kind }}</dt>
-            <dd class="m-0">{{ i18n.kind()[pageDetail.page.kind] }}</dd>
-          </div>
-          <div>
-            <dt class="small-caps">{{ i18n.identity().taxDisplayMode }}</dt>
-            <dd class="m-0">
-              {{ i18n.taxDisplayMode()[pageDetail.page.taxDisplayMode] }}
-            </dd>
-          </div>
-        </dl>
-      </section>
-
-      @if (publicationMetadata(); as metadata) {
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-          <h2 class="mg-section__title mg-section__title--md m-0">
-            {{ i18n.publicationMetadata().sectionTitle }}
-          </h2>
-
-          <dl class="mg-grid-2 gap-md m-0">
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().draftRevision }}
-              </dt>
-              <dd class="m-0">{{ metadata.draftRevision }}</dd>
-            </div>
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().previewedRevision }}
-              </dt>
-              <dd class="m-0">{{ metadata.previewedRevision }}</dd>
-            </div>
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().draftUpdatedAt }}
-              </dt>
-              <dd class="m-0">{{ metadata.draftUpdatedAt }}</dd>
-            </div>
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().draftUpdatedBy }}
-              </dt>
-              <dd class="m-0">{{ metadata.draftUpdatedBy }}</dd>
-            </div>
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().publishedAt }}
-              </dt>
-              <dd class="m-0">{{ metadata.publishedAt }}</dd>
-            </div>
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().publishedBy }}
-              </dt>
-              <dd class="m-0">{{ metadata.publishedBy }}</dd>
-            </div>
-            <div>
-              <dt class="small-caps">
-                {{ i18n.publicationMetadata().effectiveFrom }}
-              </dt>
-              <dd class="m-0">{{ metadata.effectiveFrom }}</dd>
-            </div>
-          </dl>
-        </section>
-      }
-
       <form
         class="mg-form flex-col-start-stretch gap-md w-100"
         [formGroup]="form"
-        (ngSubmit)="saveDraft()"
         novalidate
       >
-        <app-commercial-page-metadata-editor
-          [form]="form.controls.metadata"
-          [copy]="i18n.metadata()"
-          [requiredMessage]="i18n.commonForm().required"
-        />
+        <ng-template
+          #stepActions
+          let-activateCallback="activateCallback"
+          let-step="step"
+        >
+          <div class="flex-row-between-center flex-col-sm gap-sm w-100">
+            <div class="flex-row-start-center flex-wrap gap-sm">
+              <p-button
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [label]="i18n.commonActions().previous"
+                [disabled]="step === 1 || isSaving()"
+                (onClick)="activateCallback(step - 1)"
+              />
+              @if (step < 4) {
+                <p-button
+                  type="button"
+                  severity="success"
+                  [label]="i18n.commonActions().next"
+                  [disabled]="isSaving()"
+                  (onClick)="activateCallback(step + 1)"
+                />
+              }
+            </div>
 
-        <app-commercial-page-seo-editor
-          [form]="form.controls.seo"
-          [copy]="i18n.seo()"
-          [requiredMessage]="i18n.commonForm().required"
-        />
+            <div class="flex-row-end-center flex-wrap gap-sm">
+              @if (step < 4) {
+                <p-button
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="i18n.publication().preview"
+                  icon="pi pi-eye"
+                  [loading]="isPreviewing()"
+                  [disabled]="isSaving() || isPreviewing()"
+                  (onClick)="openQuickPreview()"
+                />
+              }
 
-        <app-commercial-products-editor
-          [products]="form.controls.products"
-          [sections]="form.controls.sections"
-          [tokens]="constantTokens()"
-        />
+              <p-button
+                type="button"
+                severity="success"
+                [label]="i18n.editorActions().saveDraft"
+                icon="pi pi-save"
+                [loading]="isSaving()"
+                [disabled]="isLoading() || isPreviewing() || form.pristine"
+                (onClick)="saveDraft()"
+              />
 
-        <app-commercial-page-sections-editor
-          [sections]="form.controls.sections"
-          [products]="form.controls.products"
-          [tokens]="constantTokens()"
-        />
+              <p-button
+                type="button"
+                severity="warn"
+                [outlined]="true"
+                [label]="i18n.commonActions().cancel"
+                icon="pi pi-arrow-left"
+                [disabled]="isSaving()"
+                (onClick)="goBack()"
+              />
+            </div>
+          </div>
+        </ng-template>
 
-        <div class="flex-row-center-center flex-wrap gap-sm w-100">
-          <p-button
-            type="submit"
-            severity="success"
-            [label]="i18n.commonActions().save"
-            icon="pi pi-save"
-            [loading]="isSaving()"
-            [disabled]="isLoading() || isPreviewing() || form.pristine"
-          />
+        <p-stepper
+          class="d-block w-100"
+          [(value)]="activeStep"
+          [linear]="false"
+          (valueChange)="handleStepActivation($event)"
+        >
+          <p-step-list class="w-100">
+            <p-step class="min-w-0" [value]="1">
+              {{ i18n.steps().contentSeo }}
+            </p-step>
+            <p-step class="min-w-0" [value]="2">
+              {{ i18n.steps().products }}
+            </p-step>
+            <p-step class="min-w-0" [value]="3">
+              {{ i18n.steps().layout }}
+            </p-step>
+            <p-step class="min-w-0" [value]="4">
+              {{ i18n.steps().previewSave }}
+            </p-step>
+          </p-step-list>
 
-          <p-button
-            type="button"
-            severity="secondary"
-            [outlined]="true"
-            [label]="i18n.publication().preview"
-            icon="pi pi-eye"
-            [loading]="isPreviewing()"
-            [disabled]="isSaving() || isPreviewing()"
-            (onClick)="previewDraft()"
-          />
+          <p-step-panels>
+            <p-step-panel [value]="1">
+              <ng-template #content let-activateCallback="activateCallback">
+                @if (activeStep() === 1) {
+                  <div class="flex-col-start-stretch gap-lg w-100">
+                    <app-commercial-page-metadata-editor
+                      [form]="form.controls.metadata"
+                      [copy]="i18n.metadata()"
+                      [requiredMessage]="i18n.commonForm().required"
+                    />
+                    <app-commercial-page-seo-editor
+                      [form]="form.controls.seo"
+                      [copy]="i18n.seo()"
+                      [requiredMessage]="i18n.commonForm().required"
+                    />
+                    <ng-container
+                      [ngTemplateOutlet]="stepActions"
+                      [ngTemplateOutletContext]="{
+                        activateCallback: activateCallback,
+                        step: 1,
+                      }"
+                    />
+                  </div>
+                }
+              </ng-template>
+            </p-step-panel>
 
-          <p-button
-            type="button"
-            severity="warn"
-            [outlined]="true"
-            [label]="i18n.commonActions().cancel"
-            icon="pi pi-arrow-left"
-            [disabled]="isSaving() || isPreviewing()"
-            (onClick)="goBack()"
-          />
-        </div>
+            <p-step-panel [value]="2">
+              <ng-template #content let-activateCallback="activateCallback">
+                @if (activeStep() === 2) {
+                  <div class="flex-col-start-stretch gap-md w-100">
+                    <app-commercial-products-editor
+                      [products]="form.controls.products"
+                      [sections]="form.controls.sections"
+                      [tokens]="constantTokens()"
+                      [constants]="commercialConstants()"
+                      [locale]="pageDetail.page.locale"
+                    />
+                    <ng-container
+                      [ngTemplateOutlet]="stepActions"
+                      [ngTemplateOutletContext]="{
+                        activateCallback: activateCallback,
+                        step: 2,
+                      }"
+                    />
+                  </div>
+                }
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="3">
+              <ng-template #content let-activateCallback="activateCallback">
+                @if (activeStep() === 3) {
+                  <div class="flex-col-start-stretch gap-md w-100">
+                    <app-commercial-page-sections-editor
+                      [sections]="form.controls.sections"
+                      [products]="form.controls.products"
+                      [tokens]="constantTokens()"
+                      [(activeSectionId)]="activeSectionId"
+                      [(activeBlockId)]="activeBlockId"
+                    />
+                    <ng-container
+                      [ngTemplateOutlet]="stepActions"
+                      [ngTemplateOutletContext]="{
+                        activateCallback: activateCallback,
+                        step: 3,
+                      }"
+                    />
+                  </div>
+                }
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="4">
+              <ng-template #content let-activateCallback="activateCallback">
+                @if (activeStep() === 4) {
+                  <section
+                    class="flex-col-start-stretch gap-md w-100"
+                    [attr.aria-busy]="isPreviewing()"
+                  >
+                    <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+                      <span class="tag-badge tag-badge--warn">
+                        {{ i18n.previewPage().badge }}
+                      </span>
+                      <p-button
+                        type="button"
+                        severity="secondary"
+                        [outlined]="true"
+                        [label]="i18n.commonActions().refresh"
+                        icon="pi pi-refresh"
+                        [loading]="isPreviewing()"
+                        [disabled]="isSaving() || isPreviewing()"
+                        (onClick)="refreshWorkingPreview()"
+                      />
+                    </div>
+
+                    <ng-container [ngTemplateOutlet]="workingPreview" />
+                    <ng-container
+                      [ngTemplateOutlet]="stepActions"
+                      [ngTemplateOutletContext]="{
+                        activateCallback: activateCallback,
+                        step: 4,
+                      }"
+                    />
+                  </section>
+                }
+              </ng-template>
+            </p-step-panel>
+          </p-step-panels>
+        </p-stepper>
       </form>
     }
   </div>
 </section>
+
+<ng-template #workingPreview>
+  @if (isPreviewing()) {
+    <div
+      class="mg-card flex-row-center-center gap-sm p-md w-100"
+      role="status"
+      aria-live="polite"
+    >
+      <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+      <span>{{ i18n.commonStatus().loading }}</span>
+    </div>
+  }
+
+  @if (previewDocument(); as pageDocument) {
+    <app-commercial-page-renderer [document]="pageDocument" />
+  } @else if (!isPreviewing()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+      <h2 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.previewPage().loadErrorTitle }}
+      </h2>
+      <p class="m-0">{{ i18n.previewPage().loadErrorDescription }}</p>
+    </section>
+  }
+</ng-template>
+
+@if (isQuickPreviewOpen()) {
+  <p-dialog
+    styleClass="mg-dialog mg-dialog--xl"
+    [modal]="true"
+    [visible]="true"
+    [header]="i18n.previewPage().badge"
+    [draggable]="false"
+    (visibleChange)="handleQuickPreviewVisibleChange($event)"
+  >
+    <div
+      class="flex-col-start-stretch gap-md w-100"
+      [attr.aria-busy]="isPreviewing()"
+    >
+      <ng-container [ngTemplateOutlet]="workingPreview" />
+
+      <div class="p-dialog-footer flex-row-end-center w-100 p-md">
+        <p-button
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          [label]="i18n.previewPage().backToEditor"
+          icon="pi pi-times"
+          (onClick)="closeQuickPreview()"
+        />
+      </div>
+    </div>
+  </p-dialog>
+}

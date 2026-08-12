@@ -5,13 +5,13 @@ import type {
   CommercialRenderProduct,
 } from '../../../core/types/commercial-page-builder';
 import { formatCommercialProductField } from '../../../core/utils/commercial-product-fields';
-import { RichContent } from '../../common/rich-content/rich-content';
+import { ExpandableText } from '../../common/expandable-text/expandable-text';
 import { CommercialPriceValue } from './commercial-price-value';
 import { createCommercialPageI18n } from './commercial-page.i18n';
 
 @Component({
   selector: 'app-commercial-product-field-value',
-  imports: [RichContent, CommercialPriceValue],
+  imports: [ExpandableText, CommercialPriceValue],
   host: { class: 'd-block' },
   templateUrl: './commercial-product-field-value.html',
 })

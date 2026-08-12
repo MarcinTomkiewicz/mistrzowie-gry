@@ -3,7 +3,7 @@
     <ng-template #header>
       <tr>
         @for (field of block().fields; track field.id) {
-          <th scope="col" class="small-caps">{{ field.label }}</th>
+          <th scope="col" class="small-caps">{{ label(field) }}</th>
         }
       </tr>
     </ng-template>

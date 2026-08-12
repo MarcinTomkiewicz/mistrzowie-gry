@@ -18,6 +18,6 @@ export class CommercialCardsBlock {
   readonly pricingFootnote = input.required<string | null>();
 
   protected readonly hasPrices = computed(() =>
-    this.block().cards.some((card) => card.price !== null),
+    this.block().items.some((card) => card.price !== null),
   );
 }

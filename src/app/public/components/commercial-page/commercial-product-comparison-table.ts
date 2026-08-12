@@ -13,6 +13,7 @@ import {
   isCommercialProductFieldVisible,
 } from '../../../core/utils/commercial-product-collection';
 import { CommercialProductFieldValue } from './commercial-product-field-value';
+import { createCommercialPageI18n } from './commercial-page.i18n';
 
 @Component({
   selector: 'app-commercial-product-comparison-table',
@@ -25,6 +26,7 @@ export class CommercialProductComparisonTable {
     input.required<CommercialProductComparisonTableBlockModel>();
   readonly products = input.required<readonly CommercialRenderProduct[]>();
   readonly locale = input.required<string>();
+  private readonly i18n = createCommercialPageI18n();
 
   protected readonly comparisonFields = computed(() =>
     this.block().fields.filter((field) => field.key !== 'name'),
@@ -57,6 +59,14 @@ export class CommercialProductComparisonTable {
     field: CommercialProductField,
     product: CommercialRenderProduct,
   ): string {
-    return commercialProductFieldLabel(field, product.id);
+    return commercialProductFieldLabel(
+      field,
+      product.id,
+      this.defaultLabel(field),
+    );
+  }
+
+  protected defaultLabel(field: CommercialProductField): string {
+    return field.label ?? this.i18n.productFieldKey()[field.key];
   }
 }

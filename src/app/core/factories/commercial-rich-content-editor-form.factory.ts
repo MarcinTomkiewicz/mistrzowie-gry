@@ -1,20 +1,24 @@
 import { FormControl } from '@angular/forms';
 
 import type { CommercialRichContentEditorControl } from '../types/commercial-rich-content-editor-form';
-import type { RichContent } from '../types/rich-content';
+import type { RichContent, RichContentInput } from '../types/rich-content';
+import { resolveRichContent } from '../utils/rich-content';
 import {
   commercialRichContentValidator,
   hasCommercialRichContent,
 } from '../validators/commercial-builder-editor.validator';
 
 export function createCommercialRichContentEditorControl(
-  content: RichContent | null,
+  content: RichContentInput,
   required: boolean,
 ): CommercialRichContentEditorControl {
-  return new FormControl(normalizeRichContent(content), {
-    nonNullable: true,
-    validators: [commercialRichContentValidator(required)],
-  });
+  return new FormControl(
+    normalizeRichContent(resolveEditorContent(content), required),
+    {
+      nonNullable: true,
+      validators: [commercialRichContentValidator(required)],
+    },
+  );
 }
 
 export function mapCommercialRichContentEditorControl(
@@ -29,23 +33,35 @@ export function mapCommercialRichContentEditorControl(
   control: CommercialRichContentEditorControl,
   required: boolean,
 ): RichContent | null {
-  const content = normalizeRichContent(control.getRawValue());
+  const content = normalizeRichContent(control.getRawValue(), required);
 
-  if (!hasCommercialRichContent(content)) {
-    if (required) {
-      throw new TypeError('RichContent must contain visible text.');
-    }
-
-    return null;
-  }
+  if (!hasCommercialRichContent(content) && !required) return null;
 
   return content;
 }
 
-function normalizeRichContent(content: RichContent | null): RichContent {
-  const value = content ?? {
-    sections: [{ blocks: [{ type: 'paragraph', content: [] }] }],
-  } satisfies RichContent;
+function resolveEditorContent(content: RichContentInput): RichContent | null {
+  if (
+    content !== null &&
+    typeof content === 'object' &&
+    !Array.isArray(content.sections)
+  ) {
+    throw new Error('Invalid RichContent: sections must be an array');
+  }
+
+  return resolveRichContent(content);
+}
+
+function normalizeRichContent(
+  content: RichContent | null,
+  required: boolean,
+): RichContent {
+  const value: RichContent = content ??
+    (required
+      ? {
+          sections: [{ blocks: [{ type: 'paragraph', content: [] }] }],
+        }
+      : { sections: [] });
 
   return {
     sections: value.sections.map((section) => ({

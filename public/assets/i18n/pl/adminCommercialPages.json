@@ -115,14 +115,11 @@
       "subtitle": "[PH] Edytuj metadane, produkty i sekcje wersji roboczej.",
       "loadErrorTitle": "[PH] Nie udało się załadować strony ofertowej"
     },
-    "identity": {
-      "sectionTitle": "[PH] Dane strony",
-      "key": "[PH] Klucz",
-      "navigationLabel": "[PH] Nazwa w nawigacji",
-      "slug": "[PH] Slug",
-      "locale": "[PH] Język",
-      "kind": "[PH] Rodzaj strony",
-      "taxDisplayMode": "[PH] Sposób prezentacji podatku"
+    "steps": {
+      "contentSeo": "[PH] [adminCommercialPages-contentSeo] Treść i SEO",
+      "products": "[PH] [adminCommercialPages-products] Produkty",
+      "layout": "[PH] [adminCommercialPages-layout] Układ strony",
+      "previewSave": "[PH] [adminCommercialPages-previewSave] Podgląd i zapis"
     },
     "metadata": {
       "sectionTitle": "[PH] Treść strony",
@@ -141,7 +138,8 @@
       "sectionTitle": "[PH] Produkty strony",
       "empty": "[PH] Strona nie zawiera żadnych produktów.",
       "addProduct": "[PH] Dodaj produkt",
-      "product": "[PH] Produkt"
+      "product": "[PH] Produkt",
+      "saveProduct": "[PH] [adminCommercialPages-saveProduct] Zapisz produkt"
     },
     "product": {
       "name": "[PH] Nazwa produktu",
@@ -198,13 +196,13 @@
       "item": "[PH] Pozycja",
       "nestedBlocks": "[PH] Treść zagnieżdżona",
       "textNode": "[PH] Tekst",
-      "strongNode": "[PH] Wyróżnienie",
+      "strongNode": "[PH] [adminCommercialPages-strongNode] Pogrubienie",
       "linkNode": "[PH] Link",
       "nodeText": "[PH] Treść",
       "href": "[PH] Adres linku",
       "external": "[PH] Link zewnętrzny",
       "addText": "[PH] Dodaj tekst",
-      "addStrong": "[PH] Dodaj wyróżnienie",
+      "addStrong": "[PH] [adminCommercialPages-addStrong] Dodaj pogrubienie",
       "addLink": "[PH] Dodaj link"
     },
     "buttons": {
@@ -232,7 +230,8 @@
       "presentation": "[PH] Sposób prezentacji",
       "cardOrientation": "[PH] Orientacja kart",
       "columns": "[PH] Liczba kolumn",
-      "fields": "[PH] Pola produktów",
+      "fields": "[PH] [adminCommercialPages-fields] Dane wyświetlane w kolekcji",
+      "fieldsHint": "[PH] [adminCommercialPages-fieldsHint] Każdy wpis określa, które dane produktu kolekcja wyświetla i dla których produktów.",
       "emptyFields": "[PH] Kolekcja nie zawiera żadnych pól.",
       "addField": "[PH] Dodaj pole",
       "fieldKey": "[PH] Pole danych",
@@ -243,7 +242,11 @@
       "overrideProduct": "[PH] Produkt",
       "overrideLabel": "[PH] Etykieta produktu",
       "duplicateLabelOverride": "[PH] Produkt może mieć najwyżej jedną własną etykietę w danym polu.",
-      "staleProductReference": "[PH] Widoczność pól i etykiety muszą wskazywać produkty należące do kolekcji."
+      "staleProductReference": "[PH] Widoczność pól i etykiety muszą wskazywać produkty należące do kolekcji.",
+      "selectedCount": "[PH] [adminCommercialPages-selectedCount] Wybrano: {0}",
+      "customizeField": "[PH] [adminCommercialPages-customizeField] Dostosuj widoczność i etykiety",
+      "hideCustomization": "[PH] [adminCommercialPages-hideCustomization] Ukryj ustawienia dodatkowe",
+      "incompleteField": "[PH] [adminCommercialPages-incompleteField] Uzupełnij domyślną etykietę i wybierz produkty, dla których dane mają być widoczne."
     },
     "table": {
       "columns": "[PH] Kolumny",
@@ -273,6 +276,7 @@
       "note": "[PH] Nota cenowa"
     },
     "actions": {
+      "saveDraft": "[PH] [adminCommercialPages-saveDraft] Zapisz wersję roboczą",
       "moveSectionUp": "[PH] Przesuń sekcję wyżej",
       "moveSectionDown": "[PH] Przesuń sekcję niżej",
       "removeSection": "[PH] Usuń sekcję",
@@ -286,7 +290,7 @@
       "invalidPercentage": "[PH] Podaj jedną wartość procentową albo pełny zakres.",
       "priceNoteRequired": "[PH] Nota jest wymagana dla tego rodzaju ceny.",
       "invalidDuration": "[PH] Własny czas trwania wymaga dodatniej liczby minut.",
-      "invalidParticipants": "[PH] Własny zakres uczestników wymaga poprawnych liczb i kolejności minimum–maksimum.",
+      "invalidParticipants": "[PH] [adminCommercialPages-invalidParticipants] Podaj co najmniej jedną wartość: minimum, maksimum lub maksimum na prowadzącego. Każda podana wartość musi być dodatnią liczbą całkowitą; jeśli podajesz minimum i maksimum, minimum nie może przekraczać maksimum.",
       "invalidMeetingRange": "[PH] Minimalna liczba spotkań nie może być większa od maksymalnej.",
       "invalidRoute": "[PH] Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku „/”."
     },
@@ -323,16 +327,6 @@
       "validationIssues": "[PH] Problemy blokujące publikację",
       "issuePath": "[PH] Ścieżka"
     },
-    "metadata": {
-      "sectionTitle": "[PH] Stan publikacji",
-      "draftRevision": "[PH] [adminCommercialPages-draftRevision] Wersja draftu",
-      "previewedRevision": "[PH] [adminCommercialPages-previewedRevision] Wersja sprawdzona w podglądzie",
-      "draftUpdatedAt": "[PH] Aktualizacja draftu",
-      "draftUpdatedBy": "[PH] Draft zaktualizował",
-      "publishedAt": "[PH] Data publikacji",
-      "publishedBy": "[PH] Opublikował",
-      "effectiveFrom": "[PH] Obowiązuje od"
-    },
     "toast": {
       "validationReadySummary": "[PH] Draft gotowy do publikacji",
       "validationReadyDetail": "[PH] Walidacja serwerowa nie wykryła problemów.",
@@ -349,16 +343,6 @@
   "draftStatus": {
     "dirty": "[PH] Zmieniony draft",
     "clean": "[PH] Zgodny z publikacją"
-  },
-  "kind": {
-    "offer": "[PH] Oferta",
-    "information": "[PH] Strona informacyjna"
-  },
-  "taxDisplayMode": {
-    "gross": "[PH] Ceny brutto",
-    "net": "[PH] Ceny netto",
-    "audience_dependent": "[PH] Zależnie od odbiorcy",
-    "none": "[PH] Bez informacji podatkowej"
   },
   "actionAppearance": {
     "primary": "[PH] Główny",
@@ -402,7 +386,7 @@
     "other": "[PH] Inny koszt"
   },
   "blockType": {
-    "rich_text": "[PH] Rich text",
+    "rich_text": "[PH] [adminCommercialPages-rich_text] Treść sformatowana",
     "buttons": "[PH] Przyciski",
     "cards": "[PH] Karty",
     "product_collection": "[PH] Kolekcja produktów",
@@ -430,19 +414,6 @@
     "cards": "[PH] Karty",
     "table": "[PH] Tabela",
     "comparison_table": "[PH] Tabela porównawcza"
-  },
-  "productFieldKey": {
-    "name": "[PH] Nazwa",
-    "description": "[PH] Opis",
-    "price": "[PH] Cena",
-    "duration": "[PH] Czas trwania",
-    "participants": "[PH] Uczestnicy",
-    "participantsPerFacilitatorMax": "[PH] Uczestnicy na prowadzącego",
-    "sessions": "[PH] Sesje",
-    "sessionsPerMonth": "[PH] Sesje w miesiącu",
-    "meetingCount": "[PH] Liczba spotkań",
-    "facilitatorCount": "[PH] Liczba prowadzących",
-    "tableCount": "[PH] Liczba stołów"
   },
   "iconKey": {
     "message": "[PH] Wiadomość",

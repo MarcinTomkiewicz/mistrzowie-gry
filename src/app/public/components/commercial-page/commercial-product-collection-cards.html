@@ -2,18 +2,18 @@
 
 <div
   class="mg-grid grid-cols-1-sm gap-lg w-100"
-  [class.grid-cols-1]="data.columns === 1"
-  [class.grid-cols-2]="data.columns === 2"
-  [class.grid-cols-3]="data.columns === 3"
+  [class.grid-cols-1]="data.presentation.columns === 1"
+  [class.grid-cols-2]="data.presentation.columns === 2"
+  [class.grid-cols-3]="data.presentation.columns === 3"
 >
   @for (product of products(); track product.id) {
     <article class="mg-card">
       <dl
         class="gap-sm m-0 w-100"
-        [class.flex-col-start-stretch]="data.cardOrientation === 'vertical'"
-        [class.mg-grid]="data.cardOrientation === 'horizontal'"
-        [class.grid-cols-2]="data.cardOrientation === 'horizontal'"
-        [class.grid-cols-1-sm]="data.cardOrientation === 'horizontal'"
+        [class.flex-col-start-stretch]="data.presentation.orientation === 'vertical'"
+        [class.mg-grid]="data.presentation.orientation === 'horizontal'"
+        [class.grid-cols-2]="data.presentation.orientation === 'horizontal'"
+        [class.grid-cols-1-sm]="data.presentation.orientation === 'horizontal'"
       >
         @for (field of fieldsFor(product); track field.id) {
           <div class="flex-col-start-stretch gap-xs">

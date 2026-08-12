@@ -6,7 +6,7 @@ import type { CommercialProductValueTranslations } from '../types/i18n/commercia
 import type { CommercialPrice } from '../types/commercial-price';
 import type { RichContent } from '../types/rich-content';
 
-export type CommercialProductFieldPresentation =
+type CommercialProductFieldPresentation =
   | { type: 'text'; value: string }
   | { type: 'rich_content'; value: RichContent }
   | { type: 'price'; value: CommercialPrice };
@@ -29,14 +29,21 @@ export function formatCommercialProductField(
     case 'duration':
       return product.duration.mode === 'not_applicable'
         ? null
-        : text(formatDuration(product.duration.minutes, translations, locale));
+        : text(
+            formatCommercialDuration(
+              product.duration.minutes,
+              translations,
+              locale,
+            ),
+          );
     case 'participants':
       return product.participants.mode === 'not_applicable'
         ? null
-        : text(
-            formatRange(
+        : optionalText(
+            formatCommercialOptionalNumberRange(
               product.participants.min,
               product.participants.max,
+              translations,
               locale,
             ),
           );
@@ -51,7 +58,7 @@ export function formatCommercialProductField(
       return optionalNumber(product.sessionsPerMonth, locale);
     case 'meetingCount':
       return optionalText(
-        formatOptionalRange(
+        formatCommercialOptionalNumberRange(
           product.meetingCountMin,
           product.meetingCountMax,
           translations,
@@ -65,7 +72,7 @@ export function formatCommercialProductField(
   }
 }
 
-function formatDuration(
+export function formatCommercialDuration(
   minutes: number,
   translations: CommercialProductValueTranslations,
   locale: string,
@@ -127,26 +134,30 @@ function formatDurationUnit(
   return `${numberFormat.format(value)} ${unit}`;
 }
 
-function formatOptionalRange(
+export function formatCommercialOptionalNumberRange(
   min: number | null,
   max: number | null,
   translations: CommercialProductValueTranslations,
   locale: string,
 ): string | null {
-  if (min === null && max === null) return null;
-
   if (min === null) {
-    return `${translations.to} ${formatNumber(requireNumber(max), locale)}`;
+    if (max === null) return null;
+
+    return `${translations.to} ${formatNumber(max, locale)}`;
   }
 
   if (max === null) {
     return `${translations.from} ${formatNumber(min, locale)}`;
   }
 
-  return formatRange(min, max, locale);
+  return formatCommercialNumberRange(min, max, locale);
 }
 
-function formatRange(min: number, max: number, locale: string): string {
+function formatCommercialNumberRange(
+  min: number,
+  max: number,
+  locale: string,
+): string {
   if (min === max) return formatNumber(min, locale);
 
   return `${formatNumber(min, locale)}–${formatNumber(max, locale)}`;
@@ -171,12 +182,4 @@ function text(value: string): CommercialProductFieldPresentation {
 
 function formatNumber(value: number, locale: string): string {
   return new Intl.NumberFormat(locale).format(value);
-}
-
-function requireNumber(value: number | null): number {
-  if (value === null) {
-    throw new TypeError('Expected a commercial product range boundary.');
-  }
-
-  return value;
 }

@@ -28,19 +28,24 @@ export function commercialFieldsForProduct(
   fields: readonly CommercialProductField[],
   productId: string,
 ): CommercialProductField[] {
-  return fields.filter((field) => field.productIds.includes(productId));
+  return fields.filter((field) =>
+    field.productIds === null || field.productIds.includes(productId)
+  );
 }
 
 export function commercialProductFieldLabel(
   field: CommercialProductField,
   productId: string,
+  defaultLabel: string,
 ): string {
-  return field.labelOverrides[productId] ?? field.label;
+  return field.labelOverrides.find(
+    (override) => override.productId === productId,
+  )?.label ?? field.label ?? defaultLabel;
 }
 
 export function isCommercialProductFieldVisible(
   field: CommercialProductField,
   productId: string,
 ): boolean {
-  return field.productIds.includes(productId);
+  return field.productIds === null || field.productIds.includes(productId);
 }

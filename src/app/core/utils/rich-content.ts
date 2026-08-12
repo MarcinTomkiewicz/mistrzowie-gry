@@ -106,7 +106,9 @@ function parseOrderedList(chunk: string): RichContentOrderedListBlock | null {
   return {
     type: 'ordered-list',
     items: lines.map((line) => ({
-      text: line.replace(orderedPattern, '').trim(),
+      content: parseInternalLinkText(
+        line.replace(orderedPattern, '').trim(),
+      ),
     })),
   };
 }
@@ -122,7 +124,9 @@ function parseUnorderedList(chunk: string): RichContentUnorderedListBlock | null
   return {
     type: 'unordered-list',
     items: lines.map((line) => ({
-      text: line.replace(unorderedPattern, '').trim(),
+      content: parseInternalLinkText(
+        line.replace(unorderedPattern, '').trim(),
+      ),
     })),
   };
 }
@@ -130,7 +134,7 @@ function parseUnorderedList(chunk: string): RichContentUnorderedListBlock | null
 function parseParagraph(chunk: string): RichContentBlock {
   return {
     type: 'paragraph',
-    text: splitLines(chunk).join('\n'),
+    content: parseInternalLinkText(splitLines(chunk).join('\n')),
   };
 }
 

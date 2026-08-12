@@ -37,14 +37,14 @@ export type CommercialProductLabelOverrideEditorForm = FormGroup<{
 export type CommercialProductFieldEditorForm = FormGroup<{
   id: FormControl<string>;
   key: FormControl<CommercialProductFieldKey>;
-  label: FormControl<string>;
-  productIds: FormControl<string[]>;
+  label: FormControl<string | null>;
+  productIds: FormControl<string[] | null>;
   labelOverrides: FormArray<CommercialProductLabelOverrideEditorForm>;
 }>;
 
 export type CommercialTableColumnEditorForm = FormGroup<{
   id: FormControl<string>;
-  heading: CommercialRichContentEditorControl;
+  label: FormControl<string>;
 }>;
 
 export type CommercialTableCellEditorForm = FormGroup<{
@@ -60,7 +60,7 @@ export type CommercialTableRowEditorForm = FormGroup<{
 export type CommercialFaqEntryEditorForm = FormGroup<{
   id: FormControl<string>;
   question: FormControl<string>;
-  answer: CommercialRichContentEditorControl;
+  answer: FormControl<string>;
 }>;
 
 type CommercialBlockBaseEditorControls<TType extends string> = {
@@ -76,17 +76,21 @@ export type CommercialRichTextBlockEditorForm = FormGroup<
 
 export type CommercialButtonsBlockEditorForm = FormGroup<
   CommercialBlockBaseEditorControls<'buttons'> & {
-    layout: FormControl<CommercialButtonLayout>;
-    align: FormControl<CommercialTextAlign>;
+    presentation: FormGroup<{
+      layout: FormControl<CommercialButtonLayout>;
+      align: FormControl<CommercialTextAlign>;
+    }>;
     buttons: FormArray<CommercialButtonEditorForm>;
   }
 >;
 
 export type CommercialCardsBlockEditorForm = FormGroup<
   CommercialBlockBaseEditorControls<'cards'> & {
-    orientation: FormControl<CommercialCardOrientation>;
-    columns: FormControl<1 | 2 | 3 | 4>;
-    cards: FormArray<CommercialCardEditorForm>;
+    presentation: FormGroup<{
+      orientation: FormControl<CommercialCardOrientation>;
+      columns: FormControl<1 | 2 | 3>;
+    }>;
+    items: FormArray<CommercialCardEditorForm>;
   }
 >;
 
@@ -94,9 +98,11 @@ export type CommercialProductCollectionBlockEditorForm = FormGroup<
   CommercialBlockBaseEditorControls<'product_collection'> & {
     productIds: FormControl<string[]>;
     fields: FormArray<CommercialProductFieldEditorForm>;
-    presentation: FormControl<'cards' | 'table' | 'comparison_table'>;
-    cardOrientation: FormControl<CommercialCardOrientation>;
-    columns: FormControl<1 | 2 | 3>;
+    presentation: FormGroup<{
+      type: FormControl<'cards' | 'table' | 'comparison_table'>;
+      orientation: FormControl<CommercialCardOrientation>;
+      columns: FormControl<1 | 2 | 3>;
+    }>;
   }
 >;
 

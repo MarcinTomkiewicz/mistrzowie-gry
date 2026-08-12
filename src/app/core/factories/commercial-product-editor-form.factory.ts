@@ -20,10 +20,6 @@ import {
 } from './commercial-rich-content-editor-form.factory';
 
 const positiveIntegerValidators = [integerValidator(), Validators.min(1)];
-const nonNegativeIntegerValidators = [
-  integerValidator(),
-  Validators.min(0),
-];
 
 export function createCommercialProductEditorForm(
   product: CommercialEditorProduct | null = null,
@@ -60,19 +56,19 @@ export function createCommercialProductEditorForm(
         product?.participants.mode === 'custom'
           ? product.participants.min
           : null,
-        { validators: nonNegativeIntegerValidators },
+        { validators: positiveIntegerValidators },
       ),
       participantsMax: new FormControl(
         product?.participants.mode === 'custom'
           ? product.participants.max
           : null,
-        { validators: nonNegativeIntegerValidators },
+        { validators: positiveIntegerValidators },
       ),
       participantsPerFacilitatorMax: new FormControl(
         product?.participants.mode === 'custom'
           ? product.participants.perFacilitatorMax
           : null,
-        { validators: nonNegativeIntegerValidators },
+        { validators: positiveIntegerValidators },
       ),
       sessions: optionalPositiveIntegerControl(product?.sessions ?? null),
       sessionsPerMonth: optionalPositiveIntegerControl(
@@ -119,8 +115,8 @@ export function mapCommercialProductEditorForm(
       value.participantsMode === 'custom'
         ? {
             mode: 'custom',
-            min: requireNumber(value.participantsMin),
-            max: requireNumber(value.participantsMax),
+            min: value.participantsMin,
+            max: value.participantsMax,
             perFacilitatorMax: value.participantsPerFacilitatorMax,
           }
         : {

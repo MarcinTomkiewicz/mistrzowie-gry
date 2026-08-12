@@ -10,6 +10,7 @@ import {
   commercialProductFieldLabel,
 } from '../../../core/utils/commercial-product-collection';
 import { CommercialProductFieldValue } from './commercial-product-field-value';
+import { createCommercialPageI18n } from './commercial-page.i18n';
 
 @Component({
   selector: 'app-commercial-product-collection-cards',
@@ -22,6 +23,7 @@ export class CommercialProductCollectionCards {
     input.required<CommercialProductCollectionCardsBlockModel>();
   readonly products = input.required<readonly CommercialRenderProduct[]>();
   readonly locale = input.required<string>();
+  private readonly i18n = createCommercialPageI18n();
 
   protected fieldsFor(
     product: CommercialRenderProduct,
@@ -33,6 +35,10 @@ export class CommercialProductCollectionCards {
     field: CommercialProductField,
     product: CommercialRenderProduct,
   ): string {
-    return commercialProductFieldLabel(field, product.id);
+    return commercialProductFieldLabel(
+      field,
+      product.id,
+      this.i18n.productFieldKey()[field.key],
+    );
   }
 }

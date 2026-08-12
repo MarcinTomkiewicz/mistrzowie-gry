@@ -37,24 +37,28 @@ export function syncCommercialProductCollectionReferences(
 
   for (const field of form.controls.fields.controls) {
     const productIds = field.controls.productIds.getRawValue();
-    const nextProductIds = productIds.filter((productId) =>
-      collectionProductIds.has(productId),
-    );
+    const nextProductIds = productIds?.filter((productId) =>
+      collectionProductIds.has(productId)
+    ) ?? null;
 
-    if (nextProductIds.length !== productIds.length) {
+    if (productIds && nextProductIds?.length !== productIds.length) {
       field.controls.productIds.setValue(nextProductIds);
       field.controls.productIds.markAsDirty();
     }
 
-    syncCommercialProductFieldReferences(field);
+    syncCommercialProductFieldReferences(
+      field,
+      form.controls.productIds.getRawValue(),
+    );
   }
 }
 
 export function syncCommercialProductFieldReferences(
   field: CommercialProductFieldEditorForm,
+  collectionProductIds: readonly string[],
 ): void {
   const visibleProductIds = new Set(
-    field.controls.productIds.getRawValue(),
+    field.controls.productIds.getRawValue() ?? collectionProductIds,
   );
   const overrides = field.controls.labelOverrides;
 

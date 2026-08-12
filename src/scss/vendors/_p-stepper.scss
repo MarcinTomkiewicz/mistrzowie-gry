@@ -40,6 +40,10 @@
 
 .p-steppanels {
   background: transparent;
-  color: var(--mg-color-text);
   padding: map.get(v.$spacings, "lg") 0 0;
+}
+
+.p-steppanel {
+  background: transparent;
+  color: var(--mg-color-text);
 }

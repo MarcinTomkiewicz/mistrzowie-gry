@@ -18,6 +18,7 @@ import type {
   CommercialRichTextBlockEditorForm,
   CommercialTableBlockEditorForm,
 } from '../types/commercial-builder-block-editor-form';
+import { normalizeText } from '../utils/normalize-text';
 import {
   mapCommercialPriceEditorForm,
 } from './commercial-price-editor-form.factory';
@@ -29,6 +30,8 @@ export function mapCommercialPageBlockEditorForm(
   form: CommercialPageBlockEditorForm,
   position: number,
 ): CommercialPageBlock {
+  const blockType: unknown = form.controls.type.getRawValue();
+
   if (isCommercialRichTextBlockEditorForm(form)) {
     return mapRichTextBlock(form, position);
   }
@@ -49,7 +52,13 @@ export function mapCommercialPageBlockEditorForm(
     return mapTableBlock(form, position);
   }
 
-  return mapFaqBlock(form, position);
+  if (isCommercialFaqBlockEditorForm(form)) {
+    return mapFaqBlock(form, position);
+  }
+
+  throw new TypeError(
+    `Unsupported commercial block editor type: ${String(blockType)}`,
+  );
 }
 
 export function isCommercialRichTextBlockEditorForm(
@@ -111,8 +120,10 @@ function mapButtonsBlock(
   return {
     ...blockBase(form, position),
     type: 'buttons',
-    layout: value.layout,
-    align: value.align,
+    presentation: {
+      layout: value.presentation.layout,
+      align: value.presentation.align,
+    },
     buttons: form.controls.buttons.controls.map((button, index) => {
       const buttonValue = button.getRawValue();
 
@@ -137,9 +148,11 @@ function mapCardsBlock(
   return {
     ...blockBase(form, position),
     type: 'cards',
-    orientation: value.orientation,
-    columns: value.columns,
-    cards: form.controls.cards.controls.map((card, index) => {
+    presentation: {
+      orientation: value.presentation.orientation,
+      columns: value.presentation.columns,
+    },
+    items: form.controls.items.controls.map((card, index) => {
       const cardValue = card.getRawValue();
 
       return {
@@ -163,27 +176,35 @@ function mapProductCollectionBlock(
   position: number,
 ): CommercialProductCollectionBlock {
   const value = form.getRawValue();
+  const type: CommercialProductCollectionBlock['type'] =
+    'product_collection';
   const base = {
     ...blockBase(form, position),
-    type: 'product_collection' as const,
+    type,
     productIds: value.productIds,
     fields: form.controls.fields.controls.map((field, index) =>
       mapProductField(field, index),
     ),
   };
 
-  switch (value.presentation) {
+  switch (value.presentation.type) {
     case 'cards':
       return {
         ...base,
-        presentation: value.presentation,
-        cardOrientation: value.cardOrientation,
-        columns: value.columns,
+        presentation: {
+          type: value.presentation.type,
+          orientation: value.presentation.orientation,
+          columns: value.presentation.columns,
+        },
       };
     case 'table':
-      return { ...base, presentation: value.presentation };
+      return { ...base, presentation: { type: value.presentation.type } };
     case 'comparison_table':
-      return { ...base, presentation: value.presentation };
+      return { ...base, presentation: { type: value.presentation.type } };
+    default:
+      throw new TypeError(
+        `Unsupported commercial product collection presentation: ${String(value.presentation.type)}`,
+      );
   }
 }
 
@@ -197,7 +218,7 @@ function mapProductField(
     id: value.id,
     position: positionFor(index),
     key: value.key,
-    label: value.label.trim(),
+    label: normalizeText(value.label),
     productIds: value.productIds,
     labelOverrides: mapLabelOverrides(value.labelOverrides),
   };
@@ -205,18 +226,21 @@ function mapProductField(
 
 function mapLabelOverrides(
   overrides: Array<{ productId: string; label: string }>,
-): Record<string, string> {
-  const labelOverrides: Record<string, string> = {};
+): CommercialProductField['labelOverrides'] {
+  const productIds = new Set<string>();
 
   for (const override of overrides) {
-    if (Object.hasOwn(labelOverrides, override.productId)) {
+    if (productIds.has(override.productId)) {
       throw new TypeError('Each product can have at most one label override.');
     }
 
-    labelOverrides[override.productId] = override.label.trim();
+    productIds.add(override.productId);
   }
 
-  return labelOverrides;
+  return overrides.map((override) => ({
+    productId: override.productId,
+    label: override.label.trim(),
+  }));
 }
 
 function mapTableBlock(
@@ -229,10 +253,7 @@ function mapTableBlock(
     columns: form.controls.columns.controls.map((column, index) => ({
       id: column.controls.id.getRawValue(),
       position: positionFor(index),
-      heading: mapCommercialRichContentEditorControl(
-        column.controls.heading,
-        true,
-      ),
+      label: column.controls.label.getRawValue().trim(),
     })),
     rows: form.controls.rows.controls.map((row, index) => ({
       id: row.controls.id.getRawValue(),
@@ -259,10 +280,7 @@ function mapFaqBlock(
       id: item.controls.id.getRawValue(),
       position: positionFor(index),
       question: item.controls.question.getRawValue().trim(),
-      answer: mapCommercialRichContentEditorControl(
-        item.controls.answer,
-        true,
-      ),
+      answer: item.controls.answer.getRawValue().trim(),
     })),
   };
 }

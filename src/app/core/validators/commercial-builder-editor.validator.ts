@@ -49,14 +49,27 @@ export const commercialProductValidator: ValidatorFn = (
     control,
     'participantsPerFacilitatorMax',
   );
+  const participantLimits = [
+    participantsMin,
+    participantsMax,
+    perFacilitatorMax,
+  ];
+  const missingParticipantLimit = participantLimits.every(
+    (value) => value === null,
+  );
+  const invalidParticipantLimit = participantLimits.some(
+    (value) => value !== null && !isPositiveInteger(value),
+  );
+  const invalidParticipantRange =
+    isPositiveInteger(participantsMin) &&
+    isPositiveInteger(participantsMax) &&
+    participantsMin > participantsMax;
 
   if (
     participantsMode === 'custom' &&
-    (!isNonNegativeInteger(participantsMin) ||
-      !isNonNegativeInteger(participantsMax) ||
-      participantsMin > participantsMax ||
-      perFacilitatorMax !== null &&
-        !isNonNegativeInteger(perFacilitatorMax))
+    (missingParticipantLimit ||
+      invalidParticipantLimit ||
+      invalidParticipantRange)
   ) {
     return { commercialParticipants: true };
   }
@@ -108,7 +121,11 @@ export const commercialProductCollectionValidator: ValidatorFn = (
     const fieldProductIds = stringArrayValue(
       'productIds' in field ? field.productIds : null,
     );
-    const visibleProductIds = new Set(fieldProductIds);
+    const visibleProductIds = new Set(
+      'productIds' in field && field.productIds === null
+        ? productIds
+        : fieldProductIds,
+    );
     const overrides = 'labelOverrides' in field ? field.labelOverrides : null;
 
     return fieldProductIds.some((productId) =>
@@ -127,10 +144,6 @@ export const commercialProductCollectionValidator: ValidatorFn = (
 
 function isPositiveInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value > 0;
-}
-
-function isNonNegativeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
 }
 
 function valueOf(control: AbstractControl, name: string): unknown {

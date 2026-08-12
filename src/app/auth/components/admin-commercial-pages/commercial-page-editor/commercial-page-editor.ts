@@ -1,11 +1,20 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { provideTranslocoScope } from '@jsverse/transloco';
+import {
+  provideTranslocoScope,
+  TranslocoService,
+} from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { finalize, forkJoin } from 'rxjs';
+import { DialogModule } from 'primeng/dialog';
+import { StepperModule } from 'primeng/stepper';
+import { finalize, forkJoin, tap } from 'rxjs';
 
+import {
+  COMMERCIAL_PAGE_DEFAULT_LOCALE,
+} from '../../../../core/configs/commercial-pages.config';
 import {
   createCommercialPageEditorForm,
   mapCommercialPageEditorFormToDocument,
@@ -16,14 +25,12 @@ import { CommercialConstantAdmin } from '../../../../core/services/commercial-co
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { CommercialPageAdminDetail } from '../../../../core/types/commercial-page-admin';
+import type { CommercialConstantAdminItem } from '../../../../core/types/commercial-constant-admin';
 import type {
   CommercialPageBuilderDocument,
   CommercialPageEditorDocument,
 } from '../../../../core/types/commercial-page-builder';
-import {
-  formatDateLabel,
-  formatTimestampLabel,
-} from '../../../../core/utils/date';
+import { assertCommercialPricingTranslations } from '../../../../core/utils/commercial-pricing';
 import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
 import { CommercialPageRenderer } from '../../../../public/components/commercial-page/commercial-page-renderer';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
@@ -35,8 +42,11 @@ import { CommercialProductsEditor } from './commercial-products-editor';
 @Component({
   selector: 'app-commercial-page-editor',
   imports: [
+    NgTemplateOutlet,
     ReactiveFormsModule,
     ButtonModule,
+    DialogModule,
+    StepperModule,
     LoadingOverlay,
     CommercialPageRenderer,
     CommercialPageMetadataEditor,
@@ -45,23 +55,39 @@ import { CommercialProductsEditor } from './commercial-products-editor';
     CommercialProductsEditor,
   ],
   templateUrl: './commercial-page-editor.html',
-  providers: [provideTranslocoScope('adminCommercialPages', 'common')],
+  providers: [
+    provideTranslocoScope(
+      'adminCommercialPages',
+      'commercialPages',
+      'common',
+    ),
+  ],
 })
 export class CommercialPageEditor {
   private readonly constants = inject(CommercialConstantAdmin);
   private readonly pages = inject(CommercialPageAdmin);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
+  private readonly transloco = inject(TranslocoService);
 
   protected readonly pageId =
     inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly form = createCommercialPageEditorForm();
   protected readonly detail = signal<CommercialPageAdminDetail | null>(null);
-  protected readonly constantTokens = signal<readonly string[]>([]);
+  protected readonly commercialConstants = signal<
+    readonly CommercialConstantAdminItem[]
+  >([]);
+  protected readonly constantTokens = computed(() =>
+    this.commercialConstants().map((constant) => constant.syntax),
+  );
+  protected readonly activeStep = signal(1);
+  protected readonly activeSectionId = signal<string | null>(null);
+  protected readonly activeBlockId = signal<string | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
   protected readonly isPreviewing = signal(false);
+  protected readonly isQuickPreviewOpen = signal(false);
   protected readonly hasLoadError = signal(false);
   protected readonly previewDocument = signal<CommercialPageBuilderDocument | null>(
     null,
@@ -79,30 +105,6 @@ export class CommercialPageEditor {
       : 'tag-badge tag-badge--success',
   );
 
-  protected readonly publicationMetadata = computed(() => {
-    const detail = this.detail();
-    if (!detail) return null;
-
-    const values = this.i18n.commonValues();
-
-    return {
-      draftRevision: String(detail.draftRevision),
-      previewedRevision:
-        detail.previewedRevision?.toString() ?? values.notAvailable,
-      draftUpdatedAt:
-        formatTimestampLabel(detail.draftUpdatedAt, detail.page.locale) ??
-        values.notAvailable,
-      draftUpdatedBy: detail.draftUpdatedBy ?? values.notAvailable,
-      publishedAt:
-        formatTimestampLabel(detail.publishedAt, detail.page.locale) ??
-        values.notAvailable,
-      publishedBy: detail.publishedBy ?? values.notAvailable,
-      effectiveFrom: detail.effectiveFrom
-        ? formatDateLabel(detail.effectiveFrom, detail.page.locale)
-        : values.notAvailable,
-    };
-  });
-
   constructor() {
     this.loadPage();
   }
@@ -115,11 +117,18 @@ export class CommercialPageEditor {
     forkJoin({
       detail: this.pages.getDetail(this.pageId),
       constants: this.constants.getList(),
+      commercialPages: this.transloco
+        .load(`commercialPages/${COMMERCIAL_PAGE_DEFAULT_LOCALE}`)
+        .pipe(
+          tap((translations) =>
+            assertCommercialPricingTranslations(translations['pricing']),
+          ),
+        ),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: ({ detail, constants }) => {
-          this.constantTokens.set(constants.map((constant) => constant.syntax));
+          this.commercialConstants.set(constants);
           this.applyDetail(detail);
         },
         error: () => {
@@ -135,10 +144,12 @@ export class CommercialPageEditor {
   }
 
   protected saveDraft(): void {
-    const document = this.getValidDocument();
-    if (!document) return;
+    if (this.isSaving() || this.isPreviewing()) return;
+
     const detail = this.detail();
     if (!detail) return;
+    const document = this.mapCurrentDocument(() => this.showSaveError());
+    if (!document) return;
 
     const toast = this.i18n.editorToast();
 
@@ -162,32 +173,47 @@ export class CommercialPageEditor {
             detail: toast.saveSuccessDetail,
           });
         },
-        error: () => {
-          this.toast.danger({
-            summary: toast.saveFailedSummary,
-            detail: toast.saveFailedDetail,
-          });
-        },
+        error: () => this.showSaveError(),
       });
   }
 
   protected goBack(): void {
-    if (this.isSaving() || this.isPreviewing()) return;
+    if (this.isSaving()) return;
 
     void this.router.navigate(['/admin/offers']);
   }
 
-  protected previewDraft(): void {
+  protected openQuickPreview(): void {
     if (this.isSaving() || this.isPreviewing()) return;
 
-    if (this.form.pristine) {
-      void this.router.navigate(['/admin/offers', this.pageId, 'preview']);
-      return;
-    }
+    this.isQuickPreviewOpen.set(true);
+    this.loadWorkingPreview();
+  }
 
-    const document = this.getValidDocument();
+  protected closeQuickPreview(): void {
+    this.isQuickPreviewOpen.set(false);
+  }
+
+  protected handleQuickPreviewVisibleChange(visible: boolean): void {
+    if (!visible) this.closeQuickPreview();
+  }
+
+  protected handleStepActivation(step: number | undefined): void {
+    if (step === 4) this.loadWorkingPreview();
+  }
+
+  protected refreshWorkingPreview(): void {
+    this.loadWorkingPreview();
+  }
+
+  private loadWorkingPreview(): void {
+    if (this.isSaving() || this.isPreviewing()) return;
+
     const detail = this.detail();
-    if (!document || !detail) return;
+    if (!detail) return;
+
+    const document = this.mapCurrentDocument(() => this.showPreviewError());
+    if (!document) return;
 
     this.isPreviewing.set(true);
 
@@ -196,19 +222,8 @@ export class CommercialPageEditor {
       .pipe(finalize(() => this.isPreviewing.set(false)))
       .subscribe({
         next: (previewDocument) => this.previewDocument.set(previewDocument),
-        error: () => {
-          const preview = this.i18n.previewPage();
-
-          this.toast.danger({
-            summary: preview.loadErrorTitle,
-            detail: preview.loadErrorDescription,
-          });
-        },
+        error: () => this.showPreviewError(),
       });
-  }
-
-  protected closePreview(): void {
-    this.previewDocument.set(null);
   }
 
   private applyDetail(detail: CommercialPageAdminDetail): void {
@@ -216,19 +231,32 @@ export class CommercialPageEditor {
     resetCommercialPageEditorForm(this.form, detail.draft);
   }
 
-  private getValidDocument(): CommercialPageEditorDocument | null {
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-      const formCopy = this.i18n.commonForm();
-
-      this.toast.danger({
-        summary: formCopy.invalidSummary,
-        detail: formCopy.invalid,
-      });
+  private mapCurrentDocument(
+    handleError: () => void,
+  ): CommercialPageEditorDocument | null {
+    try {
+      return mapCommercialPageEditorFormToDocument(this.form);
+    } catch {
+      handleError();
       return null;
     }
+  }
 
-    return mapCommercialPageEditorFormToDocument(this.form);
+  private showSaveError(): void {
+    const toast = this.i18n.editorToast();
+
+    this.toast.danger({
+      summary: toast.saveFailedSummary,
+      detail: toast.saveFailedDetail,
+    });
+  }
+
+  private showPreviewError(): void {
+    const preview = this.i18n.previewPage();
+
+    this.toast.danger({
+      summary: preview.loadErrorTitle,
+      detail: preview.loadErrorDescription,
+    });
   }
 }

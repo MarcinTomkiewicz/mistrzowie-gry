@@ -1,3 +1,7 @@
+import {
+  COMMERCIAL_BILLING_UNITS,
+  COMMERCIAL_PERCENTAGE_BASES,
+} from '../configs/commercial-pages.config';
 import type { CommercialPricingTranslations } from '../types/i18n/commercial-pages';
 import type { CommercialPrice } from '../types/commercial-price';
 
@@ -5,6 +9,29 @@ type CommercialPricePresentation = {
   value: string;
   note: string | null;
 };
+
+export function assertCommercialPricingTranslations(
+  value: unknown,
+): asserts value is CommercialPricingTranslations {
+  const translations = isObject(value)
+    ? new Map(Object.entries(value))
+    : null;
+
+  if (
+    !translations ||
+    typeof translations.get('from') !== 'string' ||
+    !hasStringTranslations(
+      translations.get('units'),
+      COMMERCIAL_BILLING_UNITS,
+    ) ||
+    !hasStringTranslations(
+      translations.get('percentageBases'),
+      COMMERCIAL_PERCENTAGE_BASES,
+    )
+  ) {
+    throw new Error('Invalid commercialPages.pricing translations');
+  }
+}
 
 export function formatCommercialPrice(
   price: CommercialPrice,
@@ -90,4 +117,18 @@ function formatPercentage(
 
 function formatPercentageValue(value: number, locale: string): string {
   return `+${new Intl.NumberFormat(locale).format(value)}%`;
+}
+
+function hasStringTranslations(
+  value: unknown,
+  keys: readonly string[],
+): boolean {
+  if (!isObject(value)) return false;
+
+  const translations = new Map(Object.entries(value));
+  return keys.every((key) => typeof translations.get(key) === 'string');
+}
+
+function isObject(value: unknown): value is object {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

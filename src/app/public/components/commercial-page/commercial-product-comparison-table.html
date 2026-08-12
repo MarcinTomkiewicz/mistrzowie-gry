@@ -22,11 +22,11 @@
 
     <ng-template #body let-field>
       <tr>
-        <th scope="row" class="small-caps">{{ field.label }}</th>
+        <th scope="row" class="small-caps">{{ defaultLabel(field) }}</th>
         @for (product of products(); track product.id) {
           <td>
             @if (isVisible(field, product)) {
-              @if (labelFor(field, product) !== field.label) {
+              @if (labelFor(field, product) !== defaultLabel(field)) {
                 <span class="small-caps d-block mb-xs">
                   {{ labelFor(field, product) }}
                 </span>

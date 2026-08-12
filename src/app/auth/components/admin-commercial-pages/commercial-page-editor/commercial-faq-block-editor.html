@@ -15,7 +15,23 @@
           <small class="error-text">{{ i18n.commonForm().required }}</small>
         }
       </div>
-      <app-commercial-rich-content-editor [control]="item.controls.answer" [controlId]="controlId() + '-' + index + '-answer'" [label]="i18n.faq().answer" [tokens]="tokens()" />
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-iftalabel class="w-100">
+          <textarea
+            pTextarea
+            class="w-100"
+            [id]="controlId() + '-' + index + '-answer'"
+            formControlName="answer"
+            rows="5"
+          ></textarea>
+          <label [for]="controlId() + '-' + index + '-answer'">
+            {{ i18n.faq().answer }}
+          </label>
+        </p-iftalabel>
+        @if (item.controls.answer.touched && item.controls.answer.invalid) {
+          <small class="error-text">{{ i18n.commonForm().required }}</small>
+        }
+      </div>
     </div>
   }
 </div>

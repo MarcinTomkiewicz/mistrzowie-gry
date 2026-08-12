@@ -12,6 +12,7 @@ import {
   isCommercialProductFieldVisible,
 } from '../../../core/utils/commercial-product-collection';
 import { CommercialProductFieldValue } from './commercial-product-field-value';
+import { createCommercialPageI18n } from './commercial-page.i18n';
 
 @Component({
   selector: 'app-commercial-product-collection-table',
@@ -24,6 +25,13 @@ export class CommercialProductCollectionTable {
     input.required<CommercialProductCollectionTableBlockModel>();
   readonly products = input.required<CommercialRenderProduct[]>();
   readonly locale = input.required<string>();
+  private readonly i18n = createCommercialPageI18n();
+
+  protected label(
+    field: CommercialProductField,
+  ): string {
+    return field.label ?? this.i18n.productFieldKey()[field.key];
+  }
 
   protected isVisible(
     field: CommercialProductField,
@@ -36,7 +44,12 @@ export class CommercialProductCollectionTable {
     field: CommercialProductField,
     product: CommercialRenderProduct,
   ): string | null {
-    const label = commercialProductFieldLabel(field, product.id);
-    return label === field.label ? null : label;
+    const defaultLabel = this.label(field);
+    const label = commercialProductFieldLabel(
+      field,
+      product.id,
+      defaultLabel,
+    );
+    return label === defaultLabel ? null : label;
   }
 }

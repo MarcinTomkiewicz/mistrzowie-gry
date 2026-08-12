@@ -1,6 +1,6 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
   <p-iftalabel class="w-100">
-    <p-multiselect class="w-100" [inputId]="controlId() + '-products'" formControlName="productIds" [options]="productOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="syncCollection()" />
+    <p-multiselect class="w-100" [inputId]="controlId() + '-products'" formControlName="productIds" [options]="productOptions()" optionLabel="label" optionValue="value" [maxSelectedLabels]="0" [selectedItemsLabel]="i18n.productCollection().selectedCount" appendTo="body" (onChange)="syncCollection()" />
     <label [for]="controlId() + '-products'">{{ i18n.productCollection().products }}</label>
   </p-iftalabel>
   @if (form().controls.productIds.touched && form().controls.productIds.invalid) {
@@ -20,14 +20,14 @@
     </div>
   }
 
-  <div class="mg-grid-2 gap-md w-100">
+  <div class="mg-grid-2 gap-md w-100" [formGroup]="form().controls.presentation">
     <p-iftalabel class="w-100">
-      <p-select class="w-100" [inputId]="controlId() + '-presentation'" formControlName="presentation" [options]="presentationOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="syncPresentation()" />
+      <p-select class="w-100" [inputId]="controlId() + '-presentation'" formControlName="type" [options]="presentationOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="syncPresentation()" />
       <label [for]="controlId() + '-presentation'">{{ i18n.productCollection().presentation }}</label>
     </p-iftalabel>
-    @if (form().controls.presentation.value === 'cards') {
+    @if (form().controls.presentation.controls.type.value === 'cards') {
       <p-iftalabel class="w-100">
-        <p-select class="w-100" [inputId]="controlId() + '-orientation'" formControlName="cardOrientation" [options]="orientationOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+        <p-select class="w-100" [inputId]="controlId() + '-orientation'" formControlName="orientation" [options]="orientationOptions()" optionLabel="label" optionValue="value" appendTo="body" />
         <label [for]="controlId() + '-orientation'">{{ i18n.productCollection().cardOrientation }}</label>
       </p-iftalabel>
       <p-iftalabel class="w-100">
@@ -38,7 +38,10 @@
   </div>
 
   <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
-    <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.productCollection().fields }}</h5>
+    <div class="flex-col-start-stretch gap-xs">
+      <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.productCollection().fields }}</h5>
+      <small>{{ i18n.productCollection().fieldsHint }}</small>
+    </div>
     <p-button type="button" severity="secondary" [label]="i18n.productCollection().addField" icon="pi pi-plus" (onClick)="addField()" />
   </div>
   @if (!form().controls.fields.length) { <p class="m-0 error-text">{{ i18n.productCollection().emptyFields }}</p> }
@@ -46,60 +49,73 @@
   @for (field of form().controls.fields.controls; track field; let fieldIndex = $index) {
     <div class="mg-card flex-col-start-stretch gap-md p-sm w-100" [formGroup]="field">
       <app-commercial-item-editor-actions [index]="fieldIndex" [itemCount]="form().controls.fields.length" (moveUp)="moveField(fieldIndex, -1)" (moveDown)="moveField(fieldIndex, 1)" (remove)="removeField(fieldIndex)" />
-      <div class="mg-grid-2 gap-md w-100">
+      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm w-100">
         <p-iftalabel class="w-100">
-          <p-select class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-key'" formControlName="key" [options]="fieldKeyOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+          <p-select class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-key'" formControlName="key" [options]="fieldKeyOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="applyDefaultFieldLabel(field)" />
           <label [for]="controlId() + '-field-' + fieldIndex + '-key'">{{ i18n.productCollection().fieldKey }}</label>
         </p-iftalabel>
-        <div class="flex-col-start-stretch gap-xs w-100">
-          <p-iftalabel class="w-100">
-            <input pInputText class="w-100" [id]="controlId() + '-field-' + fieldIndex + '-label'" formControlName="label" autocomplete="off" />
-            <label [for]="controlId() + '-field-' + fieldIndex + '-label'">{{ i18n.productCollection().fieldLabel }}</label>
-          </p-iftalabel>
-          @if (field.controls.label.touched && field.controls.label.invalid) {
-            <small class="error-text">{{ i18n.commonForm().required }}</small>
-          }
-        </div>
-      </div>
-      <p-iftalabel class="w-100">
-        <p-multiselect class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-products'" formControlName="productIds" [options]="collectionProductOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="syncField(field)" />
-        <label [for]="controlId() + '-field-' + fieldIndex + '-products'">{{ i18n.productCollection().visibleProducts }}</label>
-      </p-iftalabel>
-      @if (field.controls.productIds.touched && field.controls.productIds.invalid) {
-        <small class="error-text">{{ i18n.commonForm().required }}</small>
-      }
 
-      <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
-        <strong>{{ i18n.productCollection().labelOverrides }}</strong>
-        <p-button type="button" size="small" severity="secondary" [label]="i18n.productCollection().addLabelOverride" icon="pi pi-plus" [disabled]="!canAddLabelOverride(field)" (onClick)="addLabelOverride(field)" />
+        <p-button
+          type="button"
+          severity="secondary"
+          size="small"
+          [outlined]="true"
+          [label]="isFieldCustomized(field) ? i18n.productCollection().hideCustomization : i18n.productCollection().customizeField"
+          [icon]="isFieldCustomized(field) ? 'pi pi-chevron-up' : 'pi pi-sliders-h'"
+          (onClick)="toggleFieldCustomization(field)"
+        />
       </div>
-      @for (override of field.controls.labelOverrides.controls; track override; let overrideIndex = $index) {
-        <div class="mg-grid-2 gap-md w-100" [formGroup]="override">
+
+      <small>{{ i18n.productCollection().fieldLabel }}: {{ fieldLabel(field) }}</small>
+
+      @if (isFieldCustomized(field)) {
+        <div class="flex-col-start-stretch gap-md w-100">
           <div class="flex-col-start-stretch gap-xs w-100">
             <p-iftalabel class="w-100">
-              <p-select class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'" formControlName="productId" [options]="availableOverrideOptions(field, override.controls.productId.value)" optionLabel="label" optionValue="value" appendTo="body" />
-              <label [for]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'">{{ i18n.productCollection().overrideProduct }}</label>
+              <input pInputText class="w-100" [id]="controlId() + '-field-' + fieldIndex + '-label'" formControlName="label" autocomplete="off" />
+              <label [for]="controlId() + '-field-' + fieldIndex + '-label'">{{ i18n.productCollection().fieldLabel }}</label>
             </p-iftalabel>
-            @if (override.controls.productId.touched && override.controls.productId.invalid) {
-              <small class="error-text">{{ i18n.commonForm().required }}</small>
-            }
           </div>
-          <div class="flex-row-start-center gap-xs w-100">
-            <div class="flex-col-start-stretch gap-xs w-100">
-              <p-iftalabel class="w-100">
-                <input pInputText class="w-100" [id]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-label'" formControlName="label" autocomplete="off" />
-                <label [for]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-label'">{{ i18n.productCollection().overrideLabel }}</label>
-              </p-iftalabel>
-              @if (override.controls.label.touched && override.controls.label.invalid) {
-                <small class="error-text">{{ i18n.commonForm().required }}</small>
-              }
+
+          <p-iftalabel class="w-100">
+            <p-multiselect class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-products'" formControlName="productIds" [options]="collectionProductOptions()" optionLabel="label" optionValue="value" [maxSelectedLabels]="0" [selectedItemsLabel]="i18n.productCollection().selectedCount" appendTo="body" (onChange)="syncField(field)" />
+            <label [for]="controlId() + '-field-' + fieldIndex + '-products'">{{ i18n.productCollection().visibleProducts }}</label>
+          </p-iftalabel>
+          <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+            <strong>{{ i18n.productCollection().labelOverrides }}</strong>
+            <p-button type="button" size="small" severity="secondary" [label]="i18n.productCollection().addLabelOverride" icon="pi pi-plus" [disabled]="!canAddLabelOverride(field)" (onClick)="addLabelOverride(field)" />
+          </div>
+          @for (override of field.controls.labelOverrides.controls; track override; let overrideIndex = $index) {
+            <div class="mg-grid-2 gap-md w-100" [formGroup]="override">
+              <div class="flex-col-start-stretch gap-xs w-100">
+                <p-iftalabel class="w-100">
+                  <p-select class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'" formControlName="productId" [options]="availableOverrideOptions(field, override.controls.productId.value)" optionLabel="label" optionValue="value" appendTo="body" />
+                  <label [for]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'">{{ i18n.productCollection().overrideProduct }}</label>
+                </p-iftalabel>
+                @if (override.controls.productId.touched && override.controls.productId.invalid) {
+                  <small class="error-text">{{ i18n.commonForm().required }}</small>
+                }
+              </div>
+              <div class="flex-row-start-center gap-xs w-100">
+                <div class="flex-col-start-stretch gap-xs w-100">
+                  <p-iftalabel class="w-100">
+                    <input pInputText class="w-100" [id]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-label'" formControlName="label" autocomplete="off" />
+                    <label [for]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-label'">{{ i18n.productCollection().overrideLabel }}</label>
+                  </p-iftalabel>
+                  @if (override.controls.label.touched && override.controls.label.invalid) {
+                    <small class="error-text">{{ i18n.commonForm().required }}</small>
+                  }
+                </div>
+                <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="i18n.editorActions().removeItem" (onClick)="removeLabelOverride(field, overrideIndex)" />
+              </div>
             </div>
-            <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="i18n.editorActions().removeItem" (onClick)="removeLabelOverride(field, overrideIndex)" />
-          </div>
+          }
+          @if (field.touched && field.hasError('commercialDuplicateLabelOverride')) {
+            <small class="error-text">{{ i18n.productCollection().duplicateLabelOverride }}</small>
+          }
         </div>
-      }
-      @if (field.touched && field.hasError('commercialDuplicateLabelOverride')) {
-        <small class="error-text">{{ i18n.productCollection().duplicateLabelOverride }}</small>
+      } @else if (field.touched && field.invalid) {
+        <small class="error-text">{{ i18n.productCollection().incompleteField }}</small>
       }
     </div>
   }

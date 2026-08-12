@@ -4,9 +4,15 @@
     <p-button type="button" severity="secondary" [label]="i18n.table().addColumn" icon="pi pi-plus" (onClick)="addColumn()" />
   </div>
   @for (column of form().controls.columns.controls; track column; let columnIndex = $index) {
-    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="column">
       <app-commercial-item-editor-actions [index]="columnIndex" [itemCount]="form().controls.columns.length" (moveUp)="moveColumn(columnIndex, -1)" (moveDown)="moveColumn(columnIndex, 1)" (remove)="removeColumn(columnIndex)" />
-      <app-commercial-rich-content-editor [control]="column.controls.heading" [controlId]="controlId() + '-column-' + columnIndex" [label]="i18n.table().columnHeading" [tokens]="tokens()" />
+      <p-iftalabel class="w-100">
+        <input pInputText class="w-100" [id]="controlId() + '-column-' + columnIndex" formControlName="label" autocomplete="off" />
+        <label [for]="controlId() + '-column-' + columnIndex">{{ i18n.table().columnHeading }}</label>
+      </p-iftalabel>
+      @if (column.controls.label.touched && column.controls.label.invalid) {
+        <small class="error-text">{{ i18n.commonForm().required }}</small>
+      }
     </div>
   }
   @if (!form().controls.columns.length) {

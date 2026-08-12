@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, model } from '@angular/core';
 import { FormArray, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -30,6 +30,7 @@ export class CommercialBlocksEditor {
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
+  readonly activeBlockId = model<string | null>(null);
 
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly selectedType = new FormControl<CommercialBlockType | null>(null);
@@ -49,15 +50,33 @@ export class CommercialBlocksEditor {
     blocks.push(createNewCommercialBlockEditorForm(type));
     blocks.markAsDirty();
     this.selectedType.setValue(null);
+    this.activeBlockId.set(
+      blocks.at(blocks.length - 1).controls.id.getRawValue(),
+    );
   }
 
   protected removeBlock(index: number): void {
     const blocks = this.blocks();
+    const blockId = blocks.at(index).controls.id.getRawValue();
     blocks.removeAt(index);
     blocks.markAsDirty();
+
+    if (this.activeBlockId() === blockId) {
+      this.activeBlockId.set(null);
+    }
   }
 
   protected moveBlock(index: number, offset: -1 | 1): void {
     moveFormArrayControl(this.blocks(), index, index + offset);
+  }
+
+  protected editBlock(index: number): void {
+    this.activeBlockId.set(
+      this.blocks().at(index).controls.id.getRawValue(),
+    );
+  }
+
+  protected closeBlock(): void {
+    this.activeBlockId.set(null);
   }
 }

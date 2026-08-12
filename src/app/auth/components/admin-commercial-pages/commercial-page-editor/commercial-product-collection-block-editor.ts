@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -24,7 +24,10 @@ import type {
   CommercialProductCollectionBlockEditorForm,
   CommercialProductFieldEditorForm,
 } from '../../../../core/types/commercial-builder-block-editor-form';
+import type { CommercialProductFieldKey } from '../../../../core/types/commercial-page-builder';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
+import type { CommercialProductFieldLabelsTranslations } from '../../../../core/types/i18n/commercial-pages';
+import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
   syncCommercialProductCollectionReferences,
   syncCommercialProductFieldReferences,
@@ -44,6 +47,13 @@ export class CommercialProductCollectionBlockEditor {
   readonly controlId = input.required<string>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
+  protected readonly productFieldLabels = createScopedSectionsI18n<{
+    productFieldKey: CommercialProductFieldLabelsTranslations;
+  }>('commercialPages', { productFieldKey: 'productFieldKey' })
+    .productFieldKey;
+  protected readonly customizedFieldIds = signal<ReadonlySet<string>>(
+    new Set(),
+  );
   protected readonly presentationOptions = computed(() => {
     const labels = this.i18n.collectionPresentation();
     return COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS.map((value) => ({ value, label: labels[value] }));
@@ -53,7 +63,7 @@ export class CommercialProductCollectionBlockEditor {
     return COMMERCIAL_CARD_ORIENTATIONS.map((value) => ({ value, label: labels[value] }));
   });
   protected readonly fieldKeyOptions = computed(() => {
-    const labels = this.i18n.productFieldKey();
+    const labels = this.productFieldLabels();
     return COMMERCIAL_PRODUCT_FIELD_KEYS.map((value) => ({ value, label: labels[value] }));
   });
   protected readonly columnOptions = COMMERCIAL_PRODUCT_CARD_COLUMNS.map((value) => ({ value, label: String(value) }));
@@ -92,7 +102,10 @@ export class CommercialProductCollectionBlockEditor {
     field: CommercialProductFieldEditorForm,
     currentProductId: string | null = null,
   ) {
-    const visibleIds = new Set(field.controls.productIds.getRawValue());
+    const visibleIds = new Set(
+      field.controls.productIds.getRawValue() ??
+        this.form().controls.productIds.getRawValue(),
+    );
     const usedIds = new Set(
       field.controls.labelOverrides.controls
         .map((override) => override.controls.productId.getRawValue())
@@ -140,12 +153,17 @@ export class CommercialProductCollectionBlockEditor {
   }
 
   protected syncField(field: CommercialProductFieldEditorForm): void {
-    syncCommercialProductFieldReferences(field);
+    syncCommercialProductFieldReferences(
+      field,
+      this.form().controls.productIds.getRawValue(),
+    );
   }
 
   protected addField(): void {
     const fields = this.form().controls.fields;
-    fields.push(createCommercialProductFieldEditorForm());
+    const field = createCommercialProductFieldEditorForm();
+
+    fields.push(field);
     fields.markAsDirty();
   }
   protected removeField(index: number): void {
@@ -171,5 +189,42 @@ export class CommercialProductCollectionBlockEditor {
   ): void {
     field.controls.labelOverrides.removeAt(index);
     field.controls.labelOverrides.markAsDirty();
+  }
+
+  protected applyDefaultFieldLabel(
+    field: CommercialProductFieldEditorForm,
+  ): void {
+    field.controls.label.setValue(null);
+    field.controls.label.markAsDirty();
+  }
+
+  protected fieldLabel(field: CommercialProductFieldEditorForm): string {
+    return field.controls.label.getRawValue() ??
+      this.defaultFieldLabel(field.controls.key.getRawValue());
+  }
+
+  protected isFieldCustomized(
+    field: CommercialProductFieldEditorForm,
+  ): boolean {
+    return this.customizedFieldIds().has(field.controls.id.getRawValue());
+  }
+
+  protected toggleFieldCustomization(
+    field: CommercialProductFieldEditorForm,
+  ): void {
+    const id = field.controls.id.getRawValue();
+    const nextIds = new Set(this.customizedFieldIds());
+
+    if (nextIds.has(id)) {
+      nextIds.delete(id);
+    } else {
+      nextIds.add(id);
+    }
+
+    this.customizedFieldIds.set(nextIds);
+  }
+
+  private defaultFieldLabel(key: CommercialProductFieldKey): string {
+    return this.productFieldLabels()[key];
   }
 }

@@ -1,8 +1,4 @@
-import type {
-  CommercialActionAppearance,
-  CommercialPageKind,
-  CommercialTaxDisplayMode,
-} from '../commercial-page';
+import type { CommercialActionAppearance } from '../commercial-page';
 import type {
   CommercialBlockType,
   CommercialButtonLayout,
@@ -11,7 +7,6 @@ import type {
   CommercialEditorParticipants,
   CommercialIconKey,
   CommercialProductCollectionBlock,
-  CommercialProductFieldKey,
   CommercialSectionSurface,
   CommercialTextAlign,
 } from '../commercial-page-builder';
@@ -53,14 +48,11 @@ export type AdminCommercialPagesEditorPageTranslations = {
   loadErrorTitle: string;
 };
 
-export type AdminCommercialPagesIdentityTranslations = {
-  sectionTitle: string;
-  key: string;
-  navigationLabel: string;
-  slug: string;
-  locale: string;
-  kind: string;
-  taxDisplayMode: string;
+export type AdminCommercialPagesEditorStepsTranslations = {
+  contentSeo: string;
+  products: string;
+  layout: string;
+  previewSave: string;
 };
 
 export type AdminCommercialPagesMetadataTranslations = {
@@ -110,17 +102,6 @@ export type AdminCommercialPagesPublicationTranslations = {
   issuePath: string;
 };
 
-export type AdminCommercialPagesPublicationMetadataTranslations = {
-  sectionTitle: string;
-  draftRevision: string;
-  previewedRevision: string;
-  draftUpdatedAt: string;
-  draftUpdatedBy: string;
-  publishedAt: string;
-  publishedBy: string;
-  effectiveFrom: string;
-};
-
 export type AdminCommercialPagesPublicationToastTranslations = {
   validationReadySummary: string;
   validationReadyDetail: string;
@@ -139,6 +120,7 @@ export type AdminCommercialPagesProductsTranslations = {
   empty: string;
   addProduct: string;
   product: string;
+  saveProduct: string;
 };
 
 export type AdminCommercialPagesProductTranslations = {
@@ -206,6 +188,7 @@ export type AdminCommercialPagesProductCollectionTranslations = {
   cardOrientation: string;
   columns: string;
   fields: string;
+  fieldsHint: string;
   emptyFields: string;
   addField: string;
   fieldKey: string;
@@ -217,6 +200,10 @@ export type AdminCommercialPagesProductCollectionTranslations = {
   overrideLabel: string;
   duplicateLabelOverride: string;
   staleProductReference: string;
+  selectedCount: string;
+  customizeField: string;
+  hideCustomization: string;
+  incompleteField: string;
 };
 
 export type AdminCommercialPagesTableTranslations = {
@@ -250,6 +237,7 @@ export type AdminCommercialPagesPriceTranslations = {
 };
 
 export type AdminCommercialPagesEditorActionsTranslations = {
+  saveDraft: string;
   moveSectionUp: string;
   moveSectionDown: string;
   removeSection: string;
@@ -274,15 +262,12 @@ export type AdminCommercialPagesDraftStatusTranslations = {
   clean: string;
 };
 
-export type AdminCommercialPagesKindTranslations = Record<CommercialPageKind, string>;
-export type AdminCommercialPagesTaxDisplayModeTranslations = Record<CommercialTaxDisplayMode, string>;
 export type AdminCommercialPagesBlockTypeTranslations = Record<CommercialBlockType, string>;
 export type AdminCommercialPagesSectionSurfaceTranslations = Record<CommercialSectionSurface, string>;
 export type AdminCommercialPagesTextAlignTranslations = Record<CommercialTextAlign, string>;
 export type AdminCommercialPagesButtonLayoutTranslations = Record<CommercialButtonLayout, string>;
 export type AdminCommercialPagesCardOrientationTranslations = Record<CommercialCardOrientation, string>;
-export type AdminCommercialPagesCollectionPresentationTranslations = Record<CommercialProductCollectionBlock['presentation'], string>;
-export type AdminCommercialPagesProductFieldKeyTranslations = Record<CommercialProductFieldKey, string>;
+export type AdminCommercialPagesCollectionPresentationTranslations = Record<CommercialProductCollectionBlock['presentation']['type'], string>;
 export type AdminCommercialPagesIconKeyTranslations = Record<CommercialIconKey, string>;
 export type AdminCommercialPagesDurationModeTranslations = Record<CommercialEditorDuration['mode'], string>;
 export type AdminCommercialPagesParticipantsModeTranslations = Record<CommercialEditorParticipants['mode'], string>;

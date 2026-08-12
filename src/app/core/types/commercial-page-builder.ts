@@ -1,9 +1,9 @@
-import type { CommercialPrice } from './commercial-price';
 import type {
   CommercialActionAppearance,
   CommercialPage,
   CommercialPageSeo,
 } from './commercial-page';
+import type { CommercialPrice } from './commercial-price';
 import type { RichContent } from './rich-content';
 
 export type CommercialSectionSurface = 'plain' | 'card';
@@ -60,15 +60,20 @@ export type CommercialCard = CommercialPositionedItem & {
   price: CommercialPrice | null;
 };
 
+export type CommercialProductLabelOverride = {
+  productId: string;
+  label: string;
+};
+
 export type CommercialProductField = CommercialPositionedItem & {
   key: CommercialProductFieldKey;
-  label: string;
-  productIds: string[];
-  labelOverrides: Record<string, string>;
+  label: string | null;
+  productIds: string[] | null;
+  labelOverrides: CommercialProductLabelOverride[];
 };
 
 export type CommercialTableColumn = CommercialPositionedItem & {
-  heading: RichContent;
+  label: string;
 };
 
 export type CommercialTableCell = {
@@ -82,7 +87,7 @@ export type CommercialTableRow = CommercialPositionedItem & {
 
 export type CommercialFaqEntry = CommercialPositionedItem & {
   question: string;
-  answer: RichContent;
+  answer: string;
 };
 
 export type CommercialRichTextBlock =
@@ -91,15 +96,19 @@ export type CommercialRichTextBlock =
   };
 
 export type CommercialButtonsBlock = CommercialBlockBase<'buttons'> & {
-  layout: CommercialButtonLayout;
-  align: CommercialTextAlign;
+  presentation: {
+    layout: CommercialButtonLayout;
+    align: CommercialTextAlign;
+  };
   buttons: CommercialButton[];
 };
 
 export type CommercialCardsBlock = CommercialBlockBase<'cards'> & {
-  orientation: CommercialCardOrientation;
-  columns: 1 | 2 | 3 | 4;
-  cards: CommercialCard[];
+  presentation: {
+    orientation: CommercialCardOrientation;
+    columns: 1 | 2 | 3;
+  };
+  items: CommercialCard[];
 };
 
 type CommercialProductCollectionBlockBase =
@@ -110,19 +119,21 @@ type CommercialProductCollectionBlockBase =
 
 export type CommercialProductCollectionCardsBlock =
   CommercialProductCollectionBlockBase & {
-    presentation: 'cards';
-    cardOrientation: CommercialCardOrientation;
-    columns: 1 | 2 | 3;
+    presentation: {
+      type: 'cards';
+      orientation: CommercialCardOrientation;
+      columns: 1 | 2 | 3;
+    };
   };
 
 export type CommercialProductCollectionTableBlock =
   CommercialProductCollectionBlockBase & {
-    presentation: 'table';
+    presentation: { type: 'table' };
   };
 
 export type CommercialProductCollectionComparisonTableBlock =
   CommercialProductCollectionBlockBase & {
-    presentation: 'comparison_table';
+    presentation: { type: 'comparison_table' };
   };
 
 export type CommercialProductCollectionBlock =
@@ -173,8 +184,8 @@ export type CommercialEditorParticipants =
     }
   | {
       mode: 'custom';
-      min: number;
-      max: number;
+      min: number | null;
+      max: number | null;
       perFacilitatorMax: number | null;
     }
   | {
@@ -187,14 +198,14 @@ export type CommercialEditorParticipants =
 export type CommercialRenderParticipants =
   | {
       mode: 'standard';
-      min: number;
+      min: null;
       max: number;
       perFacilitatorMax: null;
     }
   | {
       mode: 'custom';
-      min: number;
-      max: number;
+      min: number | null;
+      max: number | null;
       perFacilitatorMax: number | null;
     }
   | {
@@ -241,9 +252,20 @@ export type CommercialPageEditorDocument = {
   sections: CommercialBuilderSection[];
 };
 
-export type CommercialMaterializedConstants = Readonly<
-  Record<string, string | number>
->;
+type CommercialMaterializedConstant =
+  | {
+      token: string;
+      valueType: 'duration' | 'integer';
+      value: number;
+    }
+  | {
+      token: string;
+      valueType: 'text';
+      value: string;
+    };
+
+export type CommercialMaterializedConstants =
+  readonly CommercialMaterializedConstant[];
 
 export type CommercialPageBuilderDocument = {
   page: CommercialPage;

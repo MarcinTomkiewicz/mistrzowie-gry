@@ -14,12 +14,11 @@ export function createAdminCommercialPagesI18n() {
     listTable: Copy.AdminCommercialPagesListTableTranslations;
     listToast: Copy.AdminCommercialPagesListToastTranslations;
     editorPage: Copy.AdminCommercialPagesEditorPageTranslations;
+    steps: Copy.AdminCommercialPagesEditorStepsTranslations;
     editorToast: Copy.AdminCommercialPagesEditorToastTranslations;
     previewPage: Copy.AdminCommercialPagesPreviewPageTranslations;
     publication: Copy.AdminCommercialPagesPublicationTranslations;
-    publicationMetadata: Copy.AdminCommercialPagesPublicationMetadataTranslations;
     publicationToast: Copy.AdminCommercialPagesPublicationToastTranslations;
-    identity: Copy.AdminCommercialPagesIdentityTranslations;
     metadata: Copy.AdminCommercialPagesMetadataTranslations;
     seo: Copy.AdminCommercialPagesSeoTranslations;
     products: Copy.AdminCommercialPagesProductsTranslations;
@@ -36,15 +35,12 @@ export function createAdminCommercialPagesI18n() {
     editorActions: Copy.AdminCommercialPagesEditorActionsTranslations;
     validation: Copy.AdminCommercialPagesValidationTranslations;
     draftStatus: Copy.AdminCommercialPagesDraftStatusTranslations;
-    kind: Copy.AdminCommercialPagesKindTranslations;
-    taxDisplayMode: Copy.AdminCommercialPagesTaxDisplayModeTranslations;
     blockType: Copy.AdminCommercialPagesBlockTypeTranslations;
     sectionSurface: Copy.AdminCommercialPagesSectionSurfaceTranslations;
     textAlign: Copy.AdminCommercialPagesTextAlignTranslations;
     buttonLayout: Copy.AdminCommercialPagesButtonLayoutTranslations;
     cardOrientation: Copy.AdminCommercialPagesCardOrientationTranslations;
     collectionPresentation: Copy.AdminCommercialPagesCollectionPresentationTranslations;
-    productFieldKey: Copy.AdminCommercialPagesProductFieldKeyTranslations;
     iconKey: Copy.AdminCommercialPagesIconKeyTranslations;
     durationMode: Copy.AdminCommercialPagesDurationModeTranslations;
     participantsMode: Copy.AdminCommercialPagesParticipantsModeTranslations;
@@ -55,28 +51,27 @@ export function createAdminCommercialPagesI18n() {
     actualCostBasis: Copy.AdminCommercialPagesActualCostBasisTranslations;
   }>('adminCommercialPages', {
     listPage: 'list.page', listTable: 'list.table', listToast: 'list.toast',
-    editorPage: 'editor.page', editorToast: 'editor.toast',
+    editorPage: 'editor.page', steps: 'editor.steps', editorToast: 'editor.toast',
     previewPage: 'preview.page', publication: 'publication.panel',
-    publicationMetadata: 'publication.metadata', publicationToast: 'publication.toast',
-    identity: 'editor.identity', metadata: 'editor.metadata', seo: 'editor.seo',
+    publicationToast: 'publication.toast',
+    metadata: 'editor.metadata', seo: 'editor.seo',
     products: 'editor.products', product: 'editor.product',
     sections: 'editor.sections', section: 'editor.section',
     richContent: 'editor.richContent', buttons: 'editor.buttons',
     cards: 'editor.cards', productCollection: 'editor.productCollection',
     table: 'editor.table', faq: 'editor.faq', price: 'editor.price',
     editorActions: 'editor.actions', validation: 'editor.validation',
-    draftStatus: 'draftStatus', kind: 'kind', taxDisplayMode: 'taxDisplayMode',
+    draftStatus: 'draftStatus',
     blockType: 'blockType', sectionSurface: 'sectionSurface',
     textAlign: 'textAlign', buttonLayout: 'buttonLayout',
     cardOrientation: 'cardOrientation',
     collectionPresentation: 'collectionPresentation',
-    productFieldKey: 'productFieldKey', iconKey: 'iconKey',
+    iconKey: 'iconKey',
     durationMode: 'durationMode', participantsMode: 'participantsMode',
     actionAppearance: 'actionAppearance', priceType: 'priceType',
     billingUnit: 'billingUnit', percentageBasis: 'percentageBasis',
     actualCostBasis: 'actualCostBasis',
   });
-
   return {
     ...translations,
     commonActions: createCommonActionsI18n(),

@@ -2,6 +2,8 @@ import { Component, input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
+import { IftaLabelModule } from 'primeng/iftalabel';
+import { InputTextModule } from 'primeng/inputtext';
 
 import {
   createCommercialTableCellEditorForm,
@@ -16,7 +18,7 @@ import { CommercialRichContentEditor } from './commercial-rich-content-editor';
 
 @Component({
   selector: 'app-commercial-table-block-editor',
-  imports: [ReactiveFormsModule, ButtonModule, CommercialItemEditorActions, CommercialRichContentEditor],
+  imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, CommercialItemEditorActions, CommercialRichContentEditor],
   templateUrl: './commercial-table-block-editor.html',
 })
 export class CommercialTableBlockEditor {
