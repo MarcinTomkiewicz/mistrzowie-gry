@@ -12,7 +12,7 @@ import type { CommercialProductEditorForm } from '../../../../core/types/commerc
 import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialBlockEditor } from './commercial-block-editor';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 
 @Component({
   selector: 'app-commercial-blocks-editor',
@@ -21,7 +21,7 @@ import { CommercialItemEditorActions } from './commercial-item-editor-actions';
     ButtonModule,
     SelectModule,
     CommercialBlockEditor,
-    CommercialItemEditorActions,
+    ItemEditorActions,
   ],
   templateUrl: './commercial-blocks-editor.html',
 })

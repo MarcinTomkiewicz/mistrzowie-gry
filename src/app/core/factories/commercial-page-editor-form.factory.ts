@@ -6,6 +6,7 @@ import type {
   CommercialProductEditorForm,
   CommercialSectionEditorForm,
 } from '../types/commercial-page-editor-form';
+import { compareByPosition } from '../utils/compare-by-position';
 import { normalizeText } from '../utils/normalize-text';
 import { commercialProductsValidator } from '../validators/commercial-builder-editor.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
@@ -29,29 +30,15 @@ import {
   syncCommercialProductCollectionPresentationControls,
 } from './commercial-block-editor-form.factory';
 
-const requiredTextValidators = [
-  Validators.required,
-  requiredTrimmedValidator(),
-];
-
 export function createCommercialPageEditorForm(): CommercialPageEditorForm {
   return new FormGroup({
     metadata: new FormGroup({
-      heading: new FormControl('', {
-        nonNullable: true,
-        validators: requiredTextValidators,
-      }),
+      heading: requiredTextControl(),
       lead: new FormControl('', { nonNullable: true }),
     }),
     seo: new FormGroup({
-      title: new FormControl('', {
-        nonNullable: true,
-        validators: requiredTextValidators,
-      }),
-      description: new FormControl('', {
-        nonNullable: true,
-        validators: requiredTextValidators,
-      }),
+      title: requiredTextControl(),
+      description: requiredTextControl(),
       ogTitle: new FormControl('', { nonNullable: true }),
       ogDescription: new FormControl('', { nonNullable: true }),
       canonicalUrl: new FormControl('', { nonNullable: true }),
@@ -85,14 +72,14 @@ export function resetCommercialPageEditorForm(
   );
 
   form.controls.products.clear({ emitEvent: false });
-  for (const product of [...document.products].sort(byPosition)) {
+  for (const product of [...document.products].sort(compareByPosition)) {
     form.controls.products.push(createCommercialProductEditorForm(product), {
       emitEvent: false,
     });
   }
 
   form.controls.sections.clear({ emitEvent: false });
-  for (const section of [...document.sections].sort(byPosition)) {
+  for (const section of [...document.sections].sort(compareByPosition)) {
     form.controls.sections.push(createCommercialSectionEditorForm(section), {
       emitEvent: false,
     });
@@ -147,9 +134,9 @@ export function syncCommercialPageEditorOptionalControls(
   }
 }
 
-function byPosition(
-  left: { position: number },
-  right: { position: number },
-): number {
-  return left.position - right.position;
+function requiredTextControl(): FormControl<string> {
+  return new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, requiredTrimmedValidator()],
+  });
 }

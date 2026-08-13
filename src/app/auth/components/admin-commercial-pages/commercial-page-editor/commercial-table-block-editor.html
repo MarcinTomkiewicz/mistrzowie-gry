@@ -5,7 +5,7 @@
   </div>
   @for (column of form().controls.columns.controls; track column; let columnIndex = $index) {
     <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="column">
-      <app-commercial-item-editor-actions [index]="columnIndex" [itemCount]="form().controls.columns.length" (moveUp)="moveColumn(columnIndex, -1)" (moveDown)="moveColumn(columnIndex, 1)" (remove)="removeColumn(columnIndex)" />
+      <app-item-editor-actions [index]="columnIndex" [itemCount]="form().controls.columns.length" (moveUp)="moveColumn(columnIndex, -1)" (moveDown)="moveColumn(columnIndex, 1)" (remove)="removeColumn(columnIndex)" />
       <p-iftalabel class="w-100">
         <input pInputText class="w-100" [id]="controlId() + '-column-' + columnIndex" formControlName="label" autocomplete="off" />
         <label [for]="controlId() + '-column-' + columnIndex">{{ i18n.table().columnHeading }}</label>
@@ -25,9 +25,9 @@
   </div>
   @for (row of form().controls.rows.controls; track row; let rowIndex = $index) {
     <div class="mg-card flex-col-start-stretch gap-md p-sm w-100">
-      <app-commercial-item-editor-actions [index]="rowIndex" [itemCount]="form().controls.rows.length" (moveUp)="moveRow(rowIndex, -1)" (moveDown)="moveRow(rowIndex, 1)" (remove)="removeRow(rowIndex)" />
+      <app-item-editor-actions [index]="rowIndex" [itemCount]="form().controls.rows.length" (moveUp)="moveRow(rowIndex, -1)" (moveDown)="moveRow(rowIndex, 1)" (remove)="removeRow(rowIndex)" />
       @for (cell of row.controls.cells.controls; track cell; let cellIndex = $index) {
-        <app-commercial-rich-content-editor [control]="cell.controls.content" [controlId]="controlId() + '-row-' + rowIndex + '-cell-' + cellIndex" [label]="i18n.table().cell + ' ' + (cellIndex + 1)" [tokens]="tokens()" />
+        <app-rich-content-editor [control]="cell.controls.content" [controlId]="controlId() + '-row-' + rowIndex + '-cell-' + cellIndex" [label]="i18n.table().cell + ' ' + (cellIndex + 1)" [tokens]="tokens()" />
       }
     </div>
   }

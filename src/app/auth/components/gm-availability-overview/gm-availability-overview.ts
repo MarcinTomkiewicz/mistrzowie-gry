@@ -31,8 +31,8 @@ import {
 } from '../../../core/domain/gm-availability/mapping';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
 import { getUserDisplayName } from '../../../core/utils/user-display';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
-import { UniversalCalendar } from '../../../public/common/universal-calendar/universal-calendar';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
+import { UniversalCalendar } from '../../../common/universal-calendar/universal-calendar';
 import {
   createGmAvailabilityOverviewI18n,
   GM_AVAILABILITY_OVERVIEW_SCOPE,

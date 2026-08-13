@@ -1,39 +1,18 @@
 import type {
   AbstractControl,
   ValidationErrors,
-  ValidatorFn,
 } from '@angular/forms';
 
-import type {
-  RichContent,
-  RichContentBlock,
-  RichContentInlineNode,
-} from '../types/rich-content';
+import { isRecord } from '../utils/is-record';
 
-export function commercialRichContentValidator(required: boolean): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value: unknown = control.value;
-
-    if (!isRichContent(value)) return { richContent: true };
-    if (hasInvalidRichContentLink(value)) return { richContentLink: true };
-
-    return required && !hasCommercialRichContent(value)
-      ? { richContent: true }
-      : null;
-  };
-}
-
-export function hasCommercialRichContent(content: RichContent): boolean {
-  return content.sections.some((section) =>
-    !!section.title?.trim() || section.blocks.some(hasBlockContent),
-  );
-}
-
-export const commercialProductValidator: ValidatorFn = (
+export function commercialProductValidator(
   control: AbstractControl,
-): ValidationErrors | null => {
-  const durationMode = valueOf(control, 'durationMode');
-  const durationMinutes = valueOf(control, 'durationMinutes');
+): ValidationErrors | null {
+  const value: unknown = control.getRawValue();
+  if (!isRecord(value)) return { commercialSessions: true };
+
+  const durationMode = value['durationMode'];
+  const durationMinutes = value['durationMinutes'];
 
   if (
     durationMode === 'custom' &&
@@ -42,13 +21,10 @@ export const commercialProductValidator: ValidatorFn = (
     return { commercialDuration: true };
   }
 
-  const participantsMode = valueOf(control, 'participantsMode');
-  const participantsMin = valueOf(control, 'participantsMin');
-  const participantsMax = valueOf(control, 'participantsMax');
-  const perFacilitatorMax = valueOf(
-    control,
-    'participantsPerFacilitatorMax',
-  );
+  const participantsMode = value['participantsMode'];
+  const participantsMin = value['participantsMin'];
+  const participantsMax = value['participantsMax'];
+  const perFacilitatorMax = value['participantsPerFacilitatorMax'];
   const participantLimits = [
     participantsMin,
     participantsMax,
@@ -74,8 +50,8 @@ export const commercialProductValidator: ValidatorFn = (
     return { commercialParticipants: true };
   }
 
-  const sessionsMode = valueOf(control, 'sessionsMode');
-  const sessionsCount = valueOf(control, 'sessionsCount');
+  const sessionsMode = value['sessionsMode'];
+  const sessionsCount = value['sessionsCount'];
   const invalidSessions =
     sessionsMode === 'total' || sessionsMode === 'per_month'
       ? !isPositiveInteger(sessionsCount)
@@ -83,11 +59,9 @@ export const commercialProductValidator: ValidatorFn = (
 
   if (invalidSessions) return { commercialSessions: true };
 
-  const id = valueOf(control, 'id');
-  const kind = valueOf(control, 'kind');
-  const includedAddonIds = stringArrayValue(
-    valueOf(control, 'includedAddonIds'),
-  );
+  const id = value['id'];
+  const kind = value['kind'];
+  const includedAddonIds = stringArrayValue(value['includedAddonIds']);
   const invalidIncludedAddons =
     (kind !== 'product' && kind !== 'addon') ||
     (kind === 'addon' && includedAddonIds.length > 0) ||
@@ -98,8 +72,8 @@ export const commercialProductValidator: ValidatorFn = (
     return { commercialIncludedAddons: true };
   }
 
-  const meetingMin = valueOf(control, 'meetingCountMin');
-  const meetingMax = valueOf(control, 'meetingCountMax');
+  const meetingMin = value['meetingCountMin'];
+  const meetingMax = value['meetingCountMax'];
 
   return meetingMin !== null &&
       meetingMax !== null &&
@@ -108,11 +82,11 @@ export const commercialProductValidator: ValidatorFn = (
       meetingMin > meetingMax
     ? { commercialMeetingRange: true }
     : null;
-};
+}
 
-export const commercialProductsValidator: ValidatorFn = (
+export function commercialProductsValidator(
   control: AbstractControl,
-): ValidationErrors | null => {
+): ValidationErrors | null {
   const products: unknown = control.getRawValue();
   if (!Array.isArray(products)) return { commercialProducts: true };
 
@@ -141,19 +115,18 @@ export const commercialProductsValidator: ValidatorFn = (
   }
 
   return null;
-};
+}
 
-export const commercialProductFieldValidator: ValidatorFn = (
+export function commercialProductFieldValidator(
   control: AbstractControl,
-): ValidationErrors | null => {
-  const overrides = control.get('labelOverrides');
-  if (!overrides || !Array.isArray(overrides.value)) return null;
+): ValidationErrors | null {
+  const value: unknown = control.getRawValue();
+  if (!isRecord(value) || !Array.isArray(value['labelOverrides'])) return null;
 
-  const productIds = overrides.value
+  const productIds = value['labelOverrides']
     .map((override: unknown) =>
-      typeof override === 'object' && override !== null &&
-        'productId' in override && typeof override.productId === 'string'
-        ? override.productId
+      isRecord(override) && typeof override['productId'] === 'string'
+        ? override['productId']
         : null,
     )
     .filter((productId): productId is string => productId !== null);
@@ -161,43 +134,47 @@ export const commercialProductFieldValidator: ValidatorFn = (
   return new Set(productIds).size === productIds.length
     ? null
     : { commercialDuplicateLabelOverride: true };
-};
+}
 
-export const commercialProductCollectionValidator: ValidatorFn = (
+export function commercialProductCollectionValidator(
   control: AbstractControl,
-): ValidationErrors | null => {
-  const productIds = stringArrayValue(control.get('productIds')?.value);
+): ValidationErrors | null {
+  const value: unknown = control.getRawValue();
+  if (!isRecord(value)) return null;
+
+  const productIds = stringArrayValue(value['productIds']);
   const collectionProductIds = new Set(productIds);
-  const fields: unknown = control.get('fields')?.value;
+  const fields = value['fields'];
 
   if (!Array.isArray(fields)) return null;
 
   const hasStaleReference = fields.some((field: unknown) => {
-    if (typeof field !== 'object' || field === null) return false;
+    if (!isRecord(field)) return false;
 
-    const fieldProductIds = stringArrayValue(
-      'productIds' in field ? field.productIds : null,
-    );
+    const fieldProductIds = stringArrayValue(field['productIds']);
     const visibleProductIds = new Set(
-      'productIds' in field && field.productIds === null
+      field['productIds'] === null
         ? productIds
         : fieldProductIds,
     );
-    const overrides = 'labelOverrides' in field ? field.labelOverrides : null;
+    const overrides = field['labelOverrides'];
 
     return fieldProductIds.some((productId) =>
       !collectionProductIds.has(productId)
     ) || Array.isArray(overrides) && overrides.some((override: unknown) =>
-      typeof override === 'object' && override !== null &&
-      'productId' in override && typeof override.productId === 'string' &&
-      !visibleProductIds.has(override.productId)
+      isRecord(override) &&
+      typeof override['productId'] === 'string' &&
+      !visibleProductIds.has(override['productId'])
     );
   });
 
-  const presentationType = control.get('presentation.type')?.value;
-  const comparisonSections: unknown = control.get(
-    'presentation.sections',
-  )?.value;
+  const presentation = value['presentation'];
+  const presentationType = isRecord(presentation)
+    ? presentation['type']
+    : null;
+  const comparisonSections = isRecord(presentation)
+    ? presentation['sections']
+    : null;
   const fieldIds = new Set(
     fields.flatMap((field: unknown) =>
       isRecord(field) && typeof field['id'] === 'string'
@@ -223,70 +200,14 @@ export const commercialProductCollectionValidator: ValidatorFn = (
 
   if (hasStaleReference) return { commercialStaleProductReference: true };
   return hasInvalidComparison ? { commercialComparison: true } : null;
-};
+}
 
 function isPositiveInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value > 0;
-}
-
-function valueOf(control: AbstractControl, name: string): unknown {
-  return control.get(name)?.value;
 }
 
 function stringArrayValue(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
     : [];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function isRichContent(value: unknown): value is RichContent {
-  return typeof value === 'object' &&
-    value !== null &&
-    'sections' in value &&
-    Array.isArray(value.sections);
-}
-
-function hasBlockContent(block: RichContentBlock): boolean {
-  if (block.type === 'paragraph') {
-    return !!block.text?.trim() || hasInlineContent(block.content);
-  }
-
-  return block.items.some((item) =>
-    !!item.text?.trim() ||
-    hasInlineContent(item.content) ||
-    item.blocks?.some(hasBlockContent),
-  );
-}
-
-function hasInvalidRichContentLink(content: RichContent): boolean {
-  return content.sections.some((section) =>
-    section.blocks.some(hasInvalidBlockLink),
-  );
-}
-
-function hasInvalidBlockLink(block: RichContentBlock): boolean {
-  if (block.type === 'paragraph') {
-    return hasInvalidInlineLink(block.content);
-  }
-
-  return block.items.some((item) =>
-    hasInvalidInlineLink(item.content) ||
-    item.blocks?.some(hasInvalidBlockLink),
-  );
-}
-
-function hasInvalidInlineLink(
-  nodes: RichContentInlineNode[] | undefined,
-): boolean {
-  return nodes?.some((node) =>
-    node.type === 'link' && !node.href.trim()
-  ) ?? false;
-}
-
-function hasInlineContent(nodes: RichContentInlineNode[] | undefined): boolean {
-  return nodes?.some((node) => !!node.text.trim()) ?? false;
 }

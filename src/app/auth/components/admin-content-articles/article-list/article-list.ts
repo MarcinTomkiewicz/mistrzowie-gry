@@ -16,7 +16,7 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { ContentArticlePublicationIssue } from '../../../../core/types/content-article';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import {
   getContentArticlePublicationIssues,
   getContentArticleStatusBadgeClass,

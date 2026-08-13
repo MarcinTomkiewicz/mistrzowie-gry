@@ -22,26 +22,26 @@ import type {
   CommercialTableColumnEditorForm,
   CommercialTableRowEditorForm,
 } from '../types/commercial-builder-block-editor-form';
+import { compareByPosition } from '../utils/compare-by-position';
 import { setControlEnabled } from '../utils/form-controls';
 import { commercialProductFieldValidator } from '../validators/commercial-builder-editor.validator';
-import { commercialInternalRouteValidator } from '../validators/commercial-page-editor.validator';
+import { internalRouteValidator } from '../validators/internal-route.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
-import { createCommercialPriceEditorForm } from './commercial-price-editor-form.factory';
-import { createCommercialRichContentEditorControl } from './commercial-rich-content-editor-form.factory';
-
-const requiredTextValidators = [requiredTrimmedValidator()];
+import { createPriceEditorForm } from './price-editor-form.factory';
+import { createRichContentEditorControl } from './rich-content-editor-form.factory';
+import { createUuidFormControl } from './form-control.factory';
 
 export function createCommercialButtonEditorForm(
   button: CommercialButton | null = null,
 ): CommercialButtonEditorForm {
   return new FormGroup({
-    id: idControl(button?.id),
+    id: createUuidFormControl(button?.id),
     label: requiredTextControl(button?.label),
     route: new FormControl(button?.route ?? '', {
       nonNullable: true,
       validators: [
         requiredTrimmedValidator(),
-        commercialInternalRouteValidator,
+        internalRouteValidator,
       ],
     }),
     appearance: new FormControl(button?.appearance ?? 'primary', {
@@ -55,14 +55,14 @@ export function createCommercialCardEditorForm(
   card: CommercialCard | null = null,
 ): CommercialCardEditorForm {
   const hasPrice = card?.price !== null && !!card;
-  const price = createCommercialPriceEditorForm(card?.price ?? null);
+  const price = createPriceEditorForm(card?.price ?? null);
 
   if (!hasPrice) price.disable({ emitEvent: false });
 
   return new FormGroup({
-    id: idControl(card?.id),
+    id: createUuidFormControl(card?.id),
     title: requiredTextControl(card?.title),
-    body: createCommercialRichContentEditorControl(card?.body ?? null, false),
+    body: createRichContentEditorControl(card?.body ?? null, false),
     hasPrice: new FormControl(hasPrice, { nonNullable: true }),
     price,
   });
@@ -79,7 +79,7 @@ export function createCommercialProductFieldEditorForm(
 ): CommercialProductFieldEditorForm {
   return new FormGroup(
     {
-      id: idControl(field?.id),
+      id: createUuidFormControl(field?.id),
       key: new FormControl(field?.key ?? 'name', { nonNullable: true }),
       label: new FormControl(field?.label ?? null),
       productIds: new FormControl(field?.productIds ?? null),
@@ -111,12 +111,12 @@ export function createCommercialComparisonSectionEditorForm(
   section: CommercialComparisonSection | null = null,
 ): CommercialComparisonSectionEditorForm {
   return new FormGroup({
-    id: idControl(section?.id),
+    id: createUuidFormControl(section?.id),
     heading: new FormControl(section?.heading ?? '', { nonNullable: true }),
     rows: new FormArray(
       section
         ? [...section.rows]
-            .sort(byPosition)
+            .sort(compareByPosition)
             .map(createCommercialComparisonRowEditorForm)
         : [],
     ),
@@ -127,7 +127,7 @@ export function createCommercialComparisonRowEditorForm(
   row: CommercialComparisonRow | null = null,
 ): CommercialComparisonRowEditorForm {
   return new FormGroup({
-    id: idControl(row?.id),
+    id: createUuidFormControl(row?.id),
     label: requiredTextControl(row?.label),
     fieldIds: new FormControl(row?.fieldIds ?? [], {
       nonNullable: true,
@@ -140,7 +140,7 @@ export function createCommercialTableColumnEditorForm(
   column: CommercialTableColumn | null = null,
 ): CommercialTableColumnEditorForm {
   return new FormGroup({
-    id: idControl(column?.id),
+    id: createUuidFormControl(column?.id),
     label: requiredTextControl(column?.label),
   });
 }
@@ -153,7 +153,7 @@ export function createCommercialTableCellEditorForm(
 
   return new FormGroup({
     columnId: new FormControl(columnId, { nonNullable: true }),
-    content: createCommercialRichContentEditorControl(
+    content: createRichContentEditorControl(
       cell?.content ?? null,
       true,
     ),
@@ -165,7 +165,7 @@ export function createCommercialTableRowEditorForm(
   row: CommercialTableRow | null = null,
 ): CommercialTableRowEditorForm {
   return new FormGroup({
-    id: idControl(row?.id),
+    id: createUuidFormControl(row?.id),
     cells: new FormArray(
       columnIds.map((columnId) =>
         createCommercialTableCellEditorForm(columnId, row),
@@ -179,26 +179,15 @@ export function createCommercialFaqEntryEditorForm(
   item: CommercialFaqEntry | null = null,
 ): CommercialFaqEntryEditorForm {
   return new FormGroup({
-    id: idControl(item?.id),
+    id: createUuidFormControl(item?.id),
     question: requiredTextControl(item?.question),
     answer: requiredTextControl(item?.answer),
   });
 }
 
-function idControl(id?: string) {
-  return new FormControl(id ?? crypto.randomUUID(), { nonNullable: true });
-}
-
 function requiredTextControl(value?: string) {
   return new FormControl(value ?? '', {
     nonNullable: true,
-    validators: requiredTextValidators,
+    validators: [requiredTrimmedValidator()],
   });
-}
-
-function byPosition(
-  left: { position: number },
-  right: { position: number },
-): number {
-  return left.position - right.position;
 }

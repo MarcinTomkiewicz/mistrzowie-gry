@@ -20,7 +20,7 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { CoworkerQuestionnaireForm } from '../../../../core/types/coworker-questionnaire-form';
 import { EdgeFunctionError } from '../../../../core/types/edge-function-error';
 import { formatTimestampLabel } from '../../../../core/utils/date';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { QuestionnaireAddresses } from './questionnaire-addresses/questionnaire-addresses';
 import { createQuestionnaireCompletionError } from './questionnaire-completion-error';
 import {

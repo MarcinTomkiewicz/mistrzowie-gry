@@ -16,7 +16,7 @@ import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-o
 import type { IAdminPrivateDocumentUpload } from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import { createCoworkerOnboardingI18n } from '../../../../core/translations/coworker-onboarding.i18n';
 import type { PrivateDocumentRowForm } from '../../../../core/types/private-document-row-form';
-import { FileUpload } from '../../../../public/common/file-upload/file-upload';
+import { FileUpload } from '../../../../common/file-upload/file-upload';
 
 @Component({
   selector: 'app-private-document-batch',

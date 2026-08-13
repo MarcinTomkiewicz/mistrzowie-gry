@@ -25,7 +25,7 @@ import {
   createPlaceStructuredData,
 } from '../../../core/utils/structured-data';
 import { formatTimeLabel } from '../../../core/utils/time-format';
-import { FaqAccordion } from '../../common/faq-accordion/faq-accordion';
+import { FaqAccordion } from '../../../common/faq-accordion/faq-accordion';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { SessionDialog } from '../session-dialog/session-dialog';
 import {

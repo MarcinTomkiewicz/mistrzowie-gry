@@ -1,0 +1,196 @@
+<section
+  class="flex-col-start-stretch gap-md w-100"
+  [formGroup]="form()"
+>
+  <h4 class="mg-section__title mg-section__title--xs m-0">
+    {{ i18n().editor.fields.sectionTitle }}
+  </h4>
+
+  <p-iftalabel class="w-100">
+    <p-select
+      class="w-100"
+      [inputId]="controlId() + '-type'"
+      formControlName="type"
+      [options]="priceTypeOptions()"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+    />
+    <label [for]="controlId() + '-type'">{{ i18n().editor.fields.type }}</label>
+  </p-iftalabel>
+
+  @switch (form().controls.type.value) {
+    @case ('fixed') {
+      <div class="mg-grid-2 gap-md w-100">
+        <ng-container
+          *ngTemplateOutlet="amount; context: { label: i18n().editor.fields.amount }"
+        />
+        <ng-container *ngTemplateOutlet="billingUnit" />
+      </div>
+    }
+    @case ('range') {
+      <div class="mg-grid-3 gap-md w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            [inputId]="controlId() + '-min-amount'"
+            formControlName="minAmount"
+            [min]="0"
+            [maxFractionDigits]="2"
+          />
+          <label [for]="controlId() + '-min-amount'">
+            {{ i18n().editor.fields.minAmount }}
+          </label>
+        </p-iftalabel>
+
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            [inputId]="controlId() + '-max-amount'"
+            formControlName="maxAmount"
+            [min]="0"
+            [maxFractionDigits]="2"
+          />
+          <label [for]="controlId() + '-max-amount'">
+            {{ i18n().editor.fields.maxAmount }}
+          </label>
+        </p-iftalabel>
+
+        <ng-container *ngTemplateOutlet="billingUnit" />
+      </div>
+    }
+    @case ('from') {
+      <div class="mg-grid-2 gap-md w-100">
+        <ng-container
+          *ngTemplateOutlet="amount; context: { label: i18n().editor.fields.amount }"
+        />
+        <ng-container *ngTemplateOutlet="billingUnit" />
+      </div>
+    }
+    @case ('percentage') {
+      <div class="mg-grid-2 gap-md w-100">
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            suffix="%"
+            [inputId]="controlId() + '-value'"
+            formControlName="value"
+            [min]="0"
+            [maxFractionDigits]="2"
+          />
+          <label [for]="controlId() + '-value'">
+            {{ i18n().editor.fields.value }}
+          </label>
+        </p-iftalabel>
+
+        <p-iftalabel class="w-100">
+          <p-select
+            class="w-100"
+            [inputId]="controlId() + '-percentage-basis'"
+            formControlName="percentageBasis"
+            [options]="percentageBasisOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+          <label [for]="controlId() + '-percentage-basis'">
+            {{ i18n().editor.fields.basis }}
+          </label>
+        </p-iftalabel>
+
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            suffix="%"
+            [inputId]="controlId() + '-min-value'"
+            formControlName="minValue"
+            [min]="0"
+            [maxFractionDigits]="2"
+          />
+          <label [for]="controlId() + '-min-value'">
+            {{ i18n().editor.fields.minValue }}
+          </label>
+        </p-iftalabel>
+
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            suffix="%"
+            [inputId]="controlId() + '-max-value'"
+            formControlName="maxValue"
+            [min]="0"
+            [maxFractionDigits]="2"
+          />
+          <label [for]="controlId() + '-max-value'">
+            {{ i18n().editor.fields.maxValue }}
+          </label>
+        </p-iftalabel>
+      </div>
+    }
+    @case ('actual_cost') {
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          [inputId]="controlId() + '-actual-cost-basis'"
+          formControlName="actualCostBasis"
+          [options]="actualCostBasisOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label [for]="controlId() + '-actual-cost-basis'">
+          {{ i18n().editor.fields.basis }}
+        </label>
+      </p-iftalabel>
+    }
+  }
+
+  <p-iftalabel class="w-100">
+    <input
+      pInputText
+      class="w-100"
+      [id]="controlId() + '-note'"
+      formControlName="note"
+      autocomplete="off"
+    />
+    <label [for]="controlId() + '-note'">{{ i18n().editor.fields.note }}</label>
+  </p-iftalabel>
+
+  @if (form().touched && form().hasError('priceRange')) {
+    <small class="error-text">{{ i18n().editor.validation.invalidRange }}</small>
+  } @else if (form().touched && form().hasError('percentage')) {
+    <small class="error-text">{{ i18n().editor.validation.invalidPercentage }}</small>
+  } @else if (form().touched && form().hasError('priceNote')) {
+    <small class="error-text">{{ i18n().editor.validation.noteRequired }}</small>
+  } @else if (form().touched && form().invalid) {
+    <small class="error-text">{{ i18n().editor.validation.invalid }}</small>
+  }
+
+  <ng-template #amount let-label="label">
+    <p-iftalabel class="w-100">
+      <p-inputnumber
+        class="w-100"
+        [inputId]="controlId() + '-amount'"
+        formControlName="amount"
+        [min]="0"
+        [maxFractionDigits]="2"
+      />
+      <label [for]="controlId() + '-amount'">{{ label }}</label>
+    </p-iftalabel>
+  </ng-template>
+
+  <ng-template #billingUnit>
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        [inputId]="controlId() + '-unit'"
+        formControlName="unit"
+        [options]="billingUnitOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+      <label [for]="controlId() + '-unit'">{{ i18n().editor.fields.unit }}</label>
+    </p-iftalabel>
+  </ng-template>
+</section>

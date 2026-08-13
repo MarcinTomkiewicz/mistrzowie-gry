@@ -10,7 +10,7 @@ import { createCommercialFaqEntryEditorForm } from '../../../../core/factories/c
 import type { CommercialFaqBlockEditorForm } from '../../../../core/types/commercial-builder-block-editor-form';
 import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 
 @Component({
   selector: 'app-commercial-faq-block-editor',
@@ -20,7 +20,7 @@ import { CommercialItemEditorActions } from './commercial-item-editor-actions';
     IftaLabelModule,
     InputTextModule,
     TextareaModule,
-    CommercialItemEditorActions,
+    ItemEditorActions,
   ],
   templateUrl: './commercial-faq-block-editor.html',
 })

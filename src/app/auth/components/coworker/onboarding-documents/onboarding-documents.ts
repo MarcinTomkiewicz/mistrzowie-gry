@@ -23,9 +23,9 @@ import {
 } from '../../../../core/translations/coworker-onboarding.i18n';
 import type { CoworkerDocumentDownloadTarget } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
-import { FileUpload } from '../../../../public/common/file-upload/file-upload';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import { PdfViewerDialog } from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { FileUpload } from '../../../../common/file-upload/file-upload';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
 
 @Component({
   selector: 'app-coworker-onboarding-documents',

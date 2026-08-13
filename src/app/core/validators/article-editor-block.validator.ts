@@ -1,5 +1,7 @@
 import type { ArticleEditorBlockForm } from '../types/article-editor-form';
-import { hasInvalidInternalLinkSyntax } from '../utils/rich-content';
+import {
+  hasInvalidInternalLinkSyntax,
+} from '../domain/internal-link/internal-link-markup';
 import { normalizeText } from '../utils/normalize-text';
 
 export function hasArticleEditorHeadingWithoutBody(

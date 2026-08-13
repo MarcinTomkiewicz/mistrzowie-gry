@@ -13,6 +13,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { catchError, distinctUntilChanged, finalize, map, of, switchMap } from 'rxjs';
 
 import { buildSiteUrl } from '../../../core/config/site';
+import { createCommercialPageStructuredData } from '../../../core/domain/commercial-pages/commercial-page-structured-data';
 import { CommercialPageRead } from '../../../core/services/commercial-page-read/commercial-page-read';
 import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
@@ -26,12 +27,9 @@ import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
 import type {
   CommercialPageBuilderDocument,
 } from '../../../core/types/commercial-page-builder';
-import {
-  createBreadcrumbStructuredData,
-  createCommercialPageStructuredData,
-} from '../../../core/utils/structured-data';
-import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
-import { CommercialPageRenderer } from './commercial-page-renderer';
+import { createBreadcrumbStructuredData } from '../../../core/utils/structured-data';
+import { CommercialPageRenderer } from '../../../common/commercial-page/commercial-page-renderer';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 
 @Component({
   selector: 'app-commercial-page',

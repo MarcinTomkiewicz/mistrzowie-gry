@@ -1,0 +1,82 @@
+@if (sections().length) {
+  <div>
+    @for (section of sections(); track $index) {
+      <section class="mt-lg">
+        @if (section.title) {
+          <h3 class="mg-section__title mg-section__title--sm m-0">
+            {{ section.title }}
+          </h3>
+        }
+
+        <div [class.mt-sm]="!!section.title">
+          @for (block of section.blocks; track $index) {
+            <div [class.mt-sm]="!!$index">
+              <ng-container
+                [ngTemplateOutlet]="renderBlock"
+                [ngTemplateOutletContext]="{ $implicit: block }"
+              />
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}
+
+<ng-template #renderBlock let-block>
+  @switch (block.type) {
+    @case ('paragraph') {
+      <p class="m-0 lh-18">
+        @if (block.content?.length) {
+          <app-rich-content-inline [nodes]="block.content ?? []" />
+        }
+      </p>
+    }
+
+    @case ('ordered-list') {
+      <ol class="m-0 lh-18">
+        @for (item of block.items; track $index) {
+          <li [class.mt-xs]="!!$index">
+            <ng-container
+              [ngTemplateOutlet]="renderListItem"
+              [ngTemplateOutletContext]="{ $implicit: item }"
+            />
+          </li>
+        }
+      </ol>
+    }
+
+    @case ('unordered-list') {
+      <ul class="m-0 lh-16">
+        @for (item of block.items; track $index) {
+          <li [class.mt-xs]="!!$index">
+            <ng-container
+              [ngTemplateOutlet]="renderListItem"
+              [ngTemplateOutletContext]="{ $implicit: item }"
+            />
+          </li>
+        }
+      </ul>
+    }
+  }
+</ng-template>
+
+<ng-template #renderListItem let-item>
+  @if (item.content?.length) {
+    <app-rich-content-inline [nodes]="item.content ?? []" />
+  }
+
+  @if (item.blocks?.length) {
+    <div class="mt-sm">
+      @for (nestedBlock of item.blocks; track $index) {
+        <div [class.mt-sm]="!!$index">
+          <ng-container
+            [ngTemplateOutlet]="renderBlock"
+            [ngTemplateOutletContext]="{ $implicit: nestedBlock }"
+          />
+        </div>
+      }
+    </div>
+  }
+</ng-template>
+

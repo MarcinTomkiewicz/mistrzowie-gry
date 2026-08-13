@@ -1,0 +1,168 @@
+<section class="flex-col-start-stretch gap-sm w-100">
+  <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
+    <strong class="small-caps">{{ label() }}</strong>
+
+    <p-button
+      type="button"
+      size="small"
+      severity="secondary"
+      icon="pi pi-plus"
+      [label]="i18n().addSection"
+      (onClick)="addSection()"
+    />
+  </div>
+
+  <small class="text-muted">{{ i18n().hint }}</small>
+
+  @if (tokens().length) {
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <span class="small-caps">{{ i18n().tokens }}</span>
+      <small class="text-muted">{{ i18n().tokensHint }}</small>
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        @for (token of tokens(); track token) {
+          <p-button
+            type="button"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [label]="token"
+            (onClick)="insertToken(token)"
+          />
+        }
+      </div>
+    </div>
+  }
+
+  @if (!sections().length) {
+    <p class="m-0">{{ i18n().empty }}</p>
+  }
+
+  @for (section of sections(); track section; let sectionIndex = $index) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+      <div class="flex-row-between-center gap-sm">
+        <strong>
+          {{ i18n().section }} {{ sectionIndex + 1 }}
+        </strong>
+        <app-item-editor-actions
+          [index]="sectionIndex"
+          [itemCount]="sections().length"
+          (moveUp)="moveItem(sections(), sectionIndex, -1)"
+          (moveDown)="moveItem(sections(), sectionIndex, 1)"
+          (remove)="removeItem(sections(), sectionIndex)"
+        />
+      </div>
+
+      <label class="small-caps" [for]="controlId() + '-section-' + sectionIndex + '-title'">
+        {{ i18n().sectionTitle }}
+      </label>
+      <input
+        #sectionTitle
+        pInputText
+        class="w-100"
+        [id]="controlId() + '-section-' + sectionIndex + '-title'"
+        [value]="section.title ?? ''"
+        autocomplete="off"
+        (input)="updateSectionTitle(section, sectionTitle.value)"
+      />
+
+      <ng-container
+        [ngTemplateOutlet]="blocksTemplate"
+        [ngTemplateOutletContext]="{
+          $implicit: section.blocks,
+          path: controlId() + '-section-' + sectionIndex
+        }"
+      />
+    </section>
+  }
+
+  @if (control().touched && control().hasError('richContentLink')) {
+    <small class="error-text">{{ i18n().invalidLink }}</small>
+  } @else if (control().touched && control().invalid) {
+    <small class="error-text">{{ i18n().invalid }}</small>
+  }
+</section>
+
+<ng-template #blocksTemplate let-blocks let-path="path" let-listItem="listItem">
+  <div class="flex-col-start-stretch gap-sm w-100">
+    <div class="flex-row-start-center flex-wrap gap-xs">
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n().addParagraph" (onClick)="addBlock(blocks, 'paragraph', listItem)" />
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n().addOrderedList" (onClick)="addBlock(blocks, 'ordered-list', listItem)" />
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n().addUnorderedList" (onClick)="addBlock(blocks, 'unordered-list', listItem)" />
+    </div>
+
+    @for (block of blocks; track block; let blockIndex = $index) {
+      <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+        <div class="flex-row-between-center gap-sm">
+          <strong>{{ blockLabel(block.type) }}</strong>
+          <app-item-editor-actions
+            [index]="blockIndex"
+            [itemCount]="blocks.length"
+            (moveUp)="moveItem(blocks, blockIndex, -1)"
+            (moveDown)="moveItem(blocks, blockIndex, 1)"
+            (remove)="removeItem(blocks, blockIndex)"
+          />
+        </div>
+
+        @if (block.type === 'paragraph') {
+          <ng-container
+            [ngTemplateOutlet]="nodesTemplate"
+            [ngTemplateOutletContext]="{
+              $implicit: block.content ?? [],
+              path: path + '-block-' + blockIndex
+            }"
+          />
+        } @else {
+          <div class="flex-row-end-center">
+            <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n().addItem" (onClick)="addListItem(block.items)" />
+          </div>
+
+          @for (item of block.items; track item; let itemIndex = $index) {
+            <div class="flex-col-start-stretch gap-sm border-1 border-round p-sm w-100">
+              <div class="flex-row-between-center gap-sm">
+                <span>{{ i18n().item }} {{ itemIndex + 1 }}</span>
+                <app-item-editor-actions
+                  [index]="itemIndex"
+                  [itemCount]="block.items.length"
+                  (moveUp)="moveItem(block.items, itemIndex, -1)"
+                  (moveDown)="moveItem(block.items, itemIndex, 1)"
+                  (remove)="removeItem(block.items, itemIndex)"
+                />
+              </div>
+
+              <ng-container
+                [ngTemplateOutlet]="nodesTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: item.content ?? [],
+                  path: path + '-block-' + blockIndex + '-item-' + itemIndex
+                }"
+              />
+
+              @if (item.blocks?.length) {
+                <span class="small-caps">{{ i18n().nestedBlocks }}</span>
+              }
+              <ng-container
+                [ngTemplateOutlet]="blocksTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: item.blocks ?? [],
+                  path: path + '-block-' + blockIndex + '-item-' + itemIndex,
+                  listItem: item
+                }"
+              />
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #nodesTemplate let-nodes let-path="path">
+  <app-rich-content-inline-editor
+    class="w-100"
+    [nodes]="nodes"
+    [controlId]="path"
+    (activated)="activateInlineEditor($event)"
+    (changed)="commit()"
+    (blurred)="control().markAsTouched()"
+  />
+</ng-template>

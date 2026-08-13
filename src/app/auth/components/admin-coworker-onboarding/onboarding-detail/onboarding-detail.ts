@@ -26,8 +26,8 @@ import {
 import type { CoworkerDocumentReviewDecision } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import { PdfViewerDialog } from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { PrivateDocumentBatch } from '../private-document-batch/private-document-batch';
 
 @Component({

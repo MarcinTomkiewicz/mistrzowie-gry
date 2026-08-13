@@ -12,24 +12,21 @@ import {
 import { integerValidator } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 import {
-  createCommercialPriceEditorForm,
-  mapCommercialPriceEditorForm,
-} from './commercial-price-editor-form.factory';
+  createPriceEditorForm,
+  mapPriceEditorForm,
+} from './price-editor-form.factory';
 import {
-  createCommercialRichContentEditorControl,
-  mapCommercialRichContentEditorControl,
-} from './commercial-rich-content-editor-form.factory';
-
-const positiveIntegerValidators = [integerValidator(), Validators.min(1)];
+  createRichContentEditorControl,
+  mapRichContentEditorControl,
+} from './rich-content-editor-form.factory';
+import { createUuidFormControl } from './form-control.factory';
 
 export function createCommercialProductEditorForm(
   product: CommercialEditorProduct | null = null,
 ): CommercialProductEditorForm {
   const form = new FormGroup(
     {
-      id: new FormControl(product?.id ?? crypto.randomUUID(), {
-        nonNullable: true,
-      }),
+      id: createUuidFormControl(product?.id),
       kind: new FormControl(product?.kind ?? 'product', {
         nonNullable: true,
       }),
@@ -37,60 +34,56 @@ export function createCommercialProductEditorForm(
         nonNullable: true,
         validators: [requiredTrimmedValidator()],
       }),
-      description: createCommercialRichContentEditorControl(
+      description: createRichContentEditorControl(
         product?.description ?? null,
         false,
       ),
-      price: createCommercialPriceEditorForm(product?.price ?? null),
+      price: createPriceEditorForm(product?.price ?? null),
       durationMode: new FormControl(
         product?.duration.mode ?? 'not_applicable',
         { nonNullable: true },
       ),
-      durationMinutes: new FormControl(
+      durationMinutes: positiveIntegerControl(
         product?.duration.mode === 'custom'
           ? product.duration.minutes
           : null,
-        { validators: positiveIntegerValidators },
       ),
       participantsMode: new FormControl(
         product?.participants.mode ?? 'not_applicable',
         { nonNullable: true },
       ),
-      participantsMin: new FormControl(
+      participantsMin: positiveIntegerControl(
         product?.participants.mode === 'custom'
           ? product.participants.min
           : null,
-        { validators: positiveIntegerValidators },
       ),
-      participantsMax: new FormControl(
+      participantsMax: positiveIntegerControl(
         product?.participants.mode === 'custom'
           ? product.participants.max
           : null,
-        { validators: positiveIntegerValidators },
       ),
-      participantsPerFacilitatorMax: new FormControl(
+      participantsPerFacilitatorMax: positiveIntegerControl(
         product?.participants.mode === 'custom'
           ? product.participants.perFacilitatorMax
           : null,
-        { validators: positiveIntegerValidators },
       ),
       sessionsMode: new FormControl(
         product?.sessions.mode ?? 'not_applicable',
         { nonNullable: true },
       ),
-      sessionsCount: optionalPositiveIntegerControl(
+      sessionsCount: positiveIntegerControl(
         product?.sessions.count ?? null,
       ),
-      meetingCountMin: optionalPositiveIntegerControl(
+      meetingCountMin: positiveIntegerControl(
         product?.meetingCountMin ?? null,
       ),
-      meetingCountMax: optionalPositiveIntegerControl(
+      meetingCountMax: positiveIntegerControl(
         product?.meetingCountMax ?? null,
       ),
-      facilitatorCount: optionalPositiveIntegerControl(
+      facilitatorCount: positiveIntegerControl(
         product?.facilitatorCount ?? null,
       ),
-      tableCount: optionalPositiveIntegerControl(product?.tableCount ?? null),
+      tableCount: positiveIntegerControl(product?.tableCount ?? null),
       includedAddonIds: new FormControl(product?.includedAddonIds ?? [], {
         nonNullable: true,
       }),
@@ -113,11 +106,11 @@ export function mapCommercialProductEditorForm(
     position,
     kind: value.kind,
     name: value.name.trim(),
-    description: mapCommercialRichContentEditorControl(
+    description: mapRichContentEditorControl(
       form.controls.description,
       false,
     ),
-    price: mapCommercialPriceEditorForm(form.controls.price),
+    price: mapPriceEditorForm(form.controls.price),
     duration:
       value.durationMode === 'custom'
         ? { mode: 'custom', minutes: requireNumber(value.durationMinutes) }
@@ -189,8 +182,10 @@ export function syncCommercialProductKind(
   syncCommercialProductEditorControls(form);
 }
 
-function optionalPositiveIntegerControl(value: number | null) {
-  return new FormControl(value, { validators: positiveIntegerValidators });
+function positiveIntegerControl(value: number | null) {
+  return new FormControl(value, {
+    validators: [integerValidator(), Validators.min(1)],
+  });
 }
 
 function requireNumber(value: number | null): number {

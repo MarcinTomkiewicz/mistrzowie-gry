@@ -2,31 +2,6 @@
   "page": {
     "effectiveFrom": "Oferta obowiązuje od:"
   },
-  "pricing": {
-    "from": "od",
-    "units": {
-      "session": "[PH] [commercialPages-session] sesję",
-      "hour": "[PH] [commercialPages-hour] godzinę",
-      "month": "[PH] [commercialPages-month] miesiąc",
-      "event": "[PH] [commercialPages-event] wydarzenie",
-      "package": "[PH] [commercialPages-package] pakiet",
-      "table": "[PH] [commercialPages-table] stół",
-      "table_hour": "[PH] [commercialPages-table_hour] stół za godzinę",
-      "facilitator": "[PH] [commercialPages-facilitator] osobę prowadzącą",
-      "participant": "[PH] [commercialPages-participant] uczestnika",
-      "piece": "[PH] [commercialPages-piece] sztukę",
-      "day": "[PH] [commercialPages-day] dzień",
-      "half_day": "[PH] [commercialPages-half_day] pół dnia",
-      "night": "[PH] [commercialPages-night] noc",
-      "kilometer": "[PH] [commercialPages-kilometer] kilometr"
-    },
-    "percentageBases": {
-      "base_service": "[PH] [commercialPages-base_service] wartości usługi podstawowej",
-      "package": "[PH] [commercialPages-package] wartości pakietu",
-      "table": "[PH] [commercialPages-table] wartości stołu",
-      "facilitator": "[PH] [commercialPages-facilitator] wartości osoby prowadzącej"
-    }
-  },
   "productValues": {
     "from": "[PH] [commercialPages-from] od",
     "to": "[PH] [commercialPages-to] do",

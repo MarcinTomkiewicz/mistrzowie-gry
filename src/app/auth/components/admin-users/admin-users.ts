@@ -22,7 +22,7 @@ import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { IAdminGmProfileStatusPatch } from '../../../core/types/admin-users';
 import { getAppRoleLabel } from '../../../core/utils/app-role-labels';
 import { getUserDisplayName } from '../../../core/utils/user-display';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { AdminUserDialog } from './admin-user-dialog/admin-user-dialog';
 import { AdminUserProfileStatusToggleComponent } from './admin-user-profile-status-toggle/admin-user-profile-status-toggle';
 import { createAdminUsersI18n } from './admin-users.i18n';

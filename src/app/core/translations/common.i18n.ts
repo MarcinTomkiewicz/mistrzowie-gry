@@ -16,6 +16,8 @@ import {
   CommonTableTranslations,
   CommonValuesTranslations,
 } from '../types/i18n/common';
+import type { RichContentEditorTranslations } from '../types/i18n/rich-content-editor';
+import type { PriceTranslations } from '../types/i18n/price';
 import { AppRoleLabels } from '../types/app-role';
 import { createScopedObjectI18n } from './scoped.i18n';
 
@@ -69,6 +71,16 @@ export function createCommonNavI18n() {
 
 export function createCommonQuestionsI18n() {
   return createCommonScopeSignal<CommonQuestionsTranslations>('questions');
+}
+
+export function createCommonPriceI18n() {
+  return createCommonScopeSignal<PriceTranslations>('price');
+}
+
+export function createCommonRichContentEditorI18n() {
+  return createCommonScopeSignal<RichContentEditorTranslations>(
+    'richContentEditor',
+  );
 }
 
 export function createCommonSeoI18n() {

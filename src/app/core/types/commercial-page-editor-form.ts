@@ -9,8 +9,8 @@ import type {
   CommercialSessionCount,
   CommercialTextAlign,
 } from './commercial-page-builder';
-import type { CommercialPriceEditorForm } from './commercial-price-editor-form';
-import type { CommercialRichContentEditorControl } from './commercial-rich-content-editor-form';
+import type { PriceEditorForm } from './price-editor-form';
+import type { RichContentEditorControl } from './rich-content-editor';
 
 export type CommercialPageMetadataEditorForm = FormGroup<{
   heading: FormControl<string>;
@@ -29,8 +29,8 @@ export type CommercialProductEditorForm = FormGroup<{
   id: FormControl<string>;
   kind: FormControl<CommercialProductKind>;
   name: FormControl<string>;
-  description: CommercialRichContentEditorControl;
-  price: CommercialPriceEditorForm;
+  description: RichContentEditorControl;
+  price: PriceEditorForm;
   durationMode: FormControl<CommercialEditorDuration['mode']>;
   durationMinutes: FormControl<number | null>;
   participantsMode: FormControl<CommercialEditorParticipants['mode']>;

@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
 import { COMMERCIAL_PRODUCT_KINDS } from '../../../../core/configs/commercial-pages.config';
-import { mapCommercialPriceEditorForm } from '../../../../core/factories/commercial-price-editor-form.factory';
+import { mapPriceEditorForm } from '../../../../core/factories/price-editor-form.factory';
 import {
   createCommercialProductEditorForm,
   mapCommercialProductEditorForm,
@@ -17,17 +17,19 @@ import type {
   CommercialProductEditorForm,
   CommercialSectionEditorForm,
 } from '../../../../core/types/commercial-page-editor-form';
+import { formatDuration } from '../../../../core/utils/duration-format';
+import {
+  formatNumber,
+  formatOptionalNumberRange,
+} from '../../../../core/utils/number-format';
+import { formatPrice } from '../../../../core/utils/price-format';
+import { createCommonPriceI18n } from '../../../../core/translations/common.i18n';
+import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
+import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import {
   removeCommercialIncludedAddonReferences,
   removeCommercialProductReferences,
-} from '../../../../core/utils/commercial-product-collection-editor';
-import {
-  formatCommercialDuration,
-  formatCommercialOptionalNumberRange,
-} from '../../../../core/utils/commercial-product-fields';
-import { formatCommercialPrice } from '../../../../core/utils/commercial-pricing';
-import { createCommercialPageI18n } from '../../../../public/components/commercial-page/commercial-page.i18n';
-import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
+} from './commercial-product-references';
 import { CommercialProductEditor } from './commercial-product-editor';
 
 @Component({
@@ -44,6 +46,7 @@ export class CommercialProductsEditor {
 
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly commercialI18n = createCommercialPageI18n();
+  protected readonly priceI18n = createCommonPriceI18n();
   protected readonly editorForm = signal<CommercialProductEditorForm | null>(
     null,
   );
@@ -150,9 +153,9 @@ export class CommercialProductsEditor {
   }
 
   protected productPrice(product: CommercialProductEditorForm) {
-    return formatCommercialPrice(
-      mapCommercialPriceEditorForm(product.controls.price),
-      this.commercialI18n.pricing(),
+    return formatPrice(
+      mapPriceEditorForm(product.controls.price),
+      this.priceI18n().presentation,
       this.locale(),
     );
   }
@@ -169,9 +172,9 @@ export class CommercialProductsEditor {
 
     return minutes === null
       ? this.i18n.commonValues().notAvailable
-      : formatCommercialDuration(
+      : formatDuration(
           minutes,
-          this.commercialI18n.productValues(),
+          this.commercialI18n.productValues().duration,
           this.locale(),
         );
   }
@@ -206,7 +209,7 @@ export class CommercialProductsEditor {
     if (count === null) return this.i18n.commonValues().notAvailable;
 
     return `${this.i18n.sessionMode()[mode]}: ${
-      new Intl.NumberFormat(this.locale()).format(count)
+      formatNumber(count, this.locale())
     }`;
   }
 
@@ -237,14 +240,14 @@ export class CommercialProductsEditor {
     max: number | null,
     perFacilitatorMax: number | null = null,
   ): string {
-    const range = formatCommercialOptionalNumberRange(
+    const range = formatOptionalNumberRange(
       min,
       max,
       this.commercialI18n.productValues(),
       this.locale(),
     );
 
-    const perFacilitator = formatCommercialOptionalNumberRange(
+    const perFacilitator = formatOptionalNumberRange(
       perFacilitatorMax,
       perFacilitatorMax,
       this.commercialI18n.productValues(),

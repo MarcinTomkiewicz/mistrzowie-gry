@@ -10,7 +10,7 @@ import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createEventCoreListI18n } from './core-list.i18n';
 
 @Component({

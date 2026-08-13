@@ -1,0 +1,18 @@
+@if (presentation(); as data) {
+  @switch (data.type) {
+    @case ('text') {
+      <span>{{ data.value }}</span>
+    }
+    @case ('rich_content') {
+      <app-expandable-text [richContent]="data.value" />
+    }
+    @case ('price') {
+      <app-price-value
+        [price]="data.value"
+        [locale]="locale()"
+      />
+    }
+  }
+} @else {
+  <span aria-hidden="true">—</span>
+}

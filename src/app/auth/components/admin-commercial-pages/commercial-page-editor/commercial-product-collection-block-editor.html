@@ -24,7 +24,7 @@
   @for (productId of form().controls.productIds.value; track productId; let index = $index) {
     <div class="mg-card flex-row-between-center gap-sm p-sm w-100">
       <span>{{ productLabel(productId) }}</span>
-      <app-commercial-item-editor-actions
+      <app-item-editor-actions
         [index]="index"
         [itemCount]="form().controls.productIds.value.length"
         (moveUp)="moveProduct(index, -1)"
@@ -66,7 +66,7 @@
 
   @for (field of form().controls.fields.controls; track field; let fieldIndex = $index) {
     <div class="mg-card flex-col-start-stretch gap-md p-sm w-100" [formGroup]="field">
-      <app-commercial-item-editor-actions [index]="fieldIndex" [itemCount]="form().controls.fields.length" (moveUp)="moveField(fieldIndex, -1)" (moveDown)="moveField(fieldIndex, 1)" (remove)="removeField(fieldIndex)" />
+      <app-item-editor-actions [index]="fieldIndex" [itemCount]="form().controls.fields.length" (moveUp)="moveField(fieldIndex, -1)" (moveDown)="moveField(fieldIndex, 1)" (remove)="removeField(fieldIndex)" />
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm w-100">
         <p-iftalabel class="w-100">
           <p-select class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-key'" formControlName="key" [options]="fieldKeyOptions()" optionLabel="label" optionValue="value" appendTo="body" (onChange)="applyDefaultFieldLabel(field)" />
@@ -138,7 +138,7 @@
                     <small class="error-text">{{ i18n.commonForm().required }}</small>
                   }
                 </div>
-                <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="i18n.editorActions().removeItem" (onClick)="removeLabelOverride(field, overrideIndex)" />
+                <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="i18n.commonActions().remove" (onClick)="removeLabelOverride(field, overrideIndex)" />
               </div>
             </div>
           }

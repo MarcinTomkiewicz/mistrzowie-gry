@@ -5,12 +5,6 @@ export type OfferPricingHeadersTranslations = {
   description: string;
 };
 
-export type OfferFootnotesTranslations = {
-  net: string;
-  gross: string;
-  both: string;
-};
-
 export type StandardsAndLogisticsFaqItem = {
   h: string;
   a: string;

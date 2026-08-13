@@ -10,7 +10,7 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { StepperModule } from 'primeng/stepper';
-import { finalize, forkJoin, tap } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import {
   COMMERCIAL_PAGE_DEFAULT_LOCALE,
@@ -30,9 +30,8 @@ import type {
   CommercialPageBuilderDocument,
   CommercialPageEditorDocument,
 } from '../../../../core/types/commercial-page-builder';
-import { assertCommercialPricingTranslations } from '../../../../core/utils/commercial-pricing';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import { CommercialPageRenderer } from '../../../../public/components/commercial-page/commercial-page-renderer';
+import { CommercialPageRenderer } from '../../../../common/commercial-page/commercial-page-renderer';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor';
 import { CommercialPageSectionsEditor } from './commercial-page-sections-editor';
@@ -118,12 +117,10 @@ export class CommercialPageEditor {
       detail: this.pages.getDetail(this.pageId),
       constants: this.constants.getList(),
       commercialPages: this.transloco
-        .load(`commercialPages/${COMMERCIAL_PAGE_DEFAULT_LOCALE}`)
-        .pipe(
-          tap((translations) =>
-            assertCommercialPricingTranslations(translations['pricing']),
-          ),
-        ),
+        .load(`commercialPages/${COMMERCIAL_PAGE_DEFAULT_LOCALE}`),
+      common: this.transloco.load(
+        `common/${COMMERCIAL_PAGE_DEFAULT_LOCALE}`,
+      ),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
@@ -148,8 +145,24 @@ export class CommercialPageEditor {
 
     const detail = this.detail();
     if (!detail) return;
-    const document = this.mapCurrentDocument(() => this.showSaveError());
-    if (!document) return;
+
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      const formTranslations = this.i18n.commonForm();
+      this.toast.danger({
+        summary: formTranslations.invalidSummary,
+        detail: formTranslations.invalid,
+      });
+      return;
+    }
+
+    let document: CommercialPageEditorDocument;
+    try {
+      document = mapCommercialPageEditorFormToDocument(this.form);
+    } catch {
+      this.showSaveError();
+      return;
+    }
 
     const toast = this.i18n.editorToast();
 
@@ -212,8 +225,13 @@ export class CommercialPageEditor {
     const detail = this.detail();
     if (!detail) return;
 
-    const document = this.mapCurrentDocument(() => this.showPreviewError());
-    if (!document) return;
+    let document: CommercialPageEditorDocument;
+    try {
+      document = mapCommercialPageEditorFormToDocument(this.form);
+    } catch {
+      this.showPreviewError();
+      return;
+    }
 
     this.isPreviewing.set(true);
 
@@ -229,17 +247,6 @@ export class CommercialPageEditor {
   private applyDetail(detail: CommercialPageAdminDetail): void {
     this.detail.set(detail);
     resetCommercialPageEditorForm(this.form, detail.draft);
-  }
-
-  private mapCurrentDocument(
-    handleError: () => void,
-  ): CommercialPageEditorDocument | null {
-    try {
-      return mapCommercialPageEditorFormToDocument(this.form);
-    } catch {
-      handleError();
-      return null;
-    }
   }
 
   private showSaveError(): void {

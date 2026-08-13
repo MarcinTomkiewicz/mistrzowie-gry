@@ -26,7 +26,7 @@
       class="mg-card flex-col-start-stretch gap-md p-md w-100"
       [formGroup]="section"
     >
-      <app-commercial-item-editor-actions
+      <app-item-editor-actions
         [index]="sectionIndex"
         [itemCount]="sections.length"
         (moveUp)="moveSection(sectionIndex, -1)"
@@ -72,7 +72,7 @@
           class="mg-card flex-col-start-stretch gap-md p-sm w-100"
           [formGroup]="row"
         >
-          <app-commercial-item-editor-actions
+          <app-item-editor-actions
             [index]="rowIndex"
             [itemCount]="section.controls.rows.length"
             (moveUp)="moveRow(section, rowIndex, -1)"
@@ -121,7 +121,7 @@
           ) {
             <div class="mg-card flex-row-between-center gap-sm p-sm w-100">
               <span>{{ field.label }}</span>
-              <app-commercial-item-editor-actions
+              <app-item-editor-actions
                 [index]="fieldIndex"
                 [itemCount]="row.controls.fieldIds.value.length"
                 (moveUp)="moveRowField(row, fieldIndex, -1)"

@@ -179,36 +179,6 @@
       "emptyBlocks": "[PH] Sekcja nie zawiera żadnych bloków.",
       "addBlock": "[PH] Dodaj blok"
     },
-    "richContent": {
-      "label": "[PH] Treść sformatowana",
-      "hint": "[PH] Buduj treść z sekcji, akapitów, list, wyróżnień i linków.",
-      "invalid": "[PH] Wymagana treść musi zawierać widoczny tekst.",
-      "invalidLink": "[PH] Każdy link musi mieć niepusty adres.",
-      "tokens": "[PH] Stałe globalne",
-      "tokensHint": "[PH] Ustaw kursor w polu tekstowym i wybierz token, aby go wstawić.",
-      "empty": "[PH] Treść nie zawiera żadnej sekcji.",
-      "addSection": "[PH] Dodaj sekcję treści",
-      "section": "[PH] Sekcja treści",
-      "sectionTitle": "[PH] Tytuł sekcji (opcjonalny)",
-      "paragraph": "[PH] Akapit",
-      "ordered-list": "[PH] Lista numerowana",
-      "unordered-list": "[PH] Lista punktowana",
-      "addParagraph": "[PH] Dodaj akapit",
-      "addOrderedList": "[PH] Dodaj listę numerowaną",
-      "addUnorderedList": "[PH] Dodaj listę punktowaną",
-      "addItem": "[PH] Dodaj pozycję",
-      "item": "[PH] Pozycja",
-      "nestedBlocks": "[PH] Treść zagnieżdżona",
-      "textNode": "[PH] Tekst",
-      "strongNode": "[PH] [adminCommercialPages-strongNode] Pogrubienie",
-      "linkNode": "[PH] Link",
-      "nodeText": "[PH] Treść",
-      "href": "[PH] Adres linku",
-      "external": "[PH] Link zewnętrzny",
-      "addText": "[PH] Dodaj tekst",
-      "addStrong": "[PH] [adminCommercialPages-addStrong] Dodaj pogrubienie",
-      "addLink": "[PH] Dodaj link"
-    },
     "buttons": {
       "layout": "[PH] Układ przycisków",
       "align": "[PH] Wyrównanie przycisków",
@@ -277,33 +247,13 @@
       "question": "[PH] Pytanie",
       "answer": "[PH] Odpowiedź"
     },
-    "price": {
-      "sectionTitle": "[PH] Cena",
-      "type": "[PH] Rodzaj ceny",
-      "amount": "[PH] Kwota",
-      "minAmount": "[PH] Kwota minimalna",
-      "maxAmount": "[PH] Kwota maksymalna",
-      "value": "[PH] Wartość procentowa",
-      "minValue": "[PH] Minimalna wartość procentowa",
-      "maxValue": "[PH] Maksymalna wartość procentowa",
-      "unit": "[PH] Jednostka rozliczeniowa",
-      "basis": "[PH] Podstawa rozliczenia",
-      "note": "[PH] Nota cenowa"
-    },
     "actions": {
       "saveDraft": "[PH] [adminCommercialPages-saveDraft] Zapisz wersję roboczą",
       "moveSectionUp": "[PH] Przesuń sekcję wyżej",
       "moveSectionDown": "[PH] Przesuń sekcję niżej",
-      "removeSection": "[PH] Usuń sekcję",
-      "moveItemUp": "[PH] Przesuń element wyżej",
-      "moveItemDown": "[PH] Przesuń element niżej",
-      "removeItem": "[PH] Usuń element"
+      "removeSection": "[PH] Usuń sekcję"
     },
     "validation": {
-      "invalidPrice": "[PH] Uzupełnij wymagane dane ceny.",
-      "invalidPriceRange": "[PH] Minimalna kwota nie może być większa od maksymalnej.",
-      "invalidPercentage": "[PH] Podaj jedną wartość procentową albo pełny zakres.",
-      "priceNoteRequired": "[PH] Nota jest wymagana dla tego rodzaju ceny.",
       "invalidDuration": "[PH] Własny czas trwania wymaga dodatniej liczby minut.",
       "invalidParticipants": "[PH] [adminCommercialPages-invalidParticipants] Podaj co najmniej jedną wartość: minimum, maksimum lub maksimum na prowadzącego. Każda podana wartość musi być dodatnią liczbą całkowitą; jeśli podajesz minimum i maksimum, minimum nie może przekraczać maksimum.",
       "invalidSessions": "[PH] [adminCommercialPages-invalidSessions] Dla łącznej liczby sesji lub sesji na miesiąc podaj dodatnią liczbę całkowitą.",
@@ -365,42 +315,6 @@
     "primary": "[PH] Główny",
     "success": "[PH] Sukces",
     "secondary": "[PH] Drugorzędny"
-  },
-  "priceType": {
-    "fixed": "[PH] Stała kwota",
-    "range": "[PH] Zakres kwot",
-    "from": "[PH] Cena od",
-    "percentage": "[PH] Procent",
-    "actual_cost": "[PH] Koszt rzeczywisty",
-    "custom_quote": "[PH] Wycena indywidualna"
-  },
-  "billingUnit": {
-    "session": "[PH] Sesja",
-    "hour": "[PH] Godzina",
-    "month": "[PH] Miesiąc",
-    "event": "[PH] Wydarzenie",
-    "package": "[PH] Pakiet",
-    "table": "[PH] Stół",
-    "table_hour": "[PH] Stół za godzinę",
-    "facilitator": "[PH] Prowadzący",
-    "participant": "[PH] Uczestnik",
-    "piece": "[PH] Sztuka",
-    "day": "[PH] Dzień",
-    "half_day": "[PH] Pół dnia",
-    "night": "[PH] Noc",
-    "kilometer": "[PH] Kilometr"
-  },
-  "percentageBasis": {
-    "base_service": "[PH] Usługa bazowa",
-    "package": "[PH] Pakiet",
-    "table": "[PH] Stół",
-    "facilitator": "[PH] Prowadzący"
-  },
-  "actualCostBasis": {
-    "ticket": "[PH] Bilet",
-    "accommodation": "[PH] Nocleg",
-    "documented_expense": "[PH] Udokumentowany wydatek",
-    "other": "[PH] Inny koszt"
   },
   "blockType": {
     "rich_text": "[PH] [adminCommercialPages-rich_text] Treść sformatowana",

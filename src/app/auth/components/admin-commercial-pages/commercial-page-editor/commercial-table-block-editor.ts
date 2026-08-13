@@ -13,12 +13,12 @@ import {
 import type { CommercialTableBlockEditorForm } from '../../../../core/types/commercial-builder-block-editor-form';
 import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
-import { CommercialRichContentEditor } from './commercial-rich-content-editor';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
+import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
 
 @Component({
   selector: 'app-commercial-table-block-editor',
-  imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, CommercialItemEditorActions, CommercialRichContentEditor],
+  imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, ItemEditorActions, RichContentEditor],
   templateUrl: './commercial-table-block-editor.html',
 })
 export class CommercialTableBlockEditor {

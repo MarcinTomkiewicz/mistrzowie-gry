@@ -32,9 +32,9 @@ import {
   createArticleStructuredData,
   createBreadcrumbStructuredData,
 } from '../../../../core/utils/structured-data';
-import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
-import { InternalLinkText } from '../../../common/internal-link-text/internal-link-text';
-import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
+import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
+import { InternalLinkText } from '../../../../common/internal-link-text/internal-link-text';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createContentArticlesI18n } from '../content-articles.i18n';
 
 @Component({

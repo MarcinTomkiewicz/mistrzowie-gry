@@ -11,8 +11,8 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type {
   CommercialPageBuilderDocument,
 } from '../../../../core/types/commercial-page-builder';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import { CommercialPageRenderer } from '../../../../public/components/commercial-page/commercial-page-renderer';
+import { CommercialPageRenderer } from '../../../../common/commercial-page/commercial-page-renderer';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPagePublication } from '../commercial-page-publication/commercial-page-publication';
 

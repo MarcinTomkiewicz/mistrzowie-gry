@@ -3,7 +3,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
-import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { SessionReservationAddonsPanel } from './session-reservation-addons-panel';
 import { SessionReservationChoicePanel } from './session-reservation-choice-panel';
 import { SessionReservationDetailsPanel } from './session-reservation-details-panel';

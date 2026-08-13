@@ -40,7 +40,10 @@
     "previousProfile": "Poprzedni profil",
     "submit": "Wyślij",
     "ok": "OK",
-    "logout": "Wyloguj się"
+    "logout": "Wyloguj się",
+    "moveItemUp": "[PH] Przesuń element wyżej",
+    "moveItemDown": "[PH] Przesuń element niżej",
+    "removeItem": "[PH] Usuń element"
   },
 
   "values": {
@@ -145,6 +148,126 @@
     "unauthorized": "Wymagane logowanie.",
     "timeout": "Przekroczono czas oczekiwania. Spróbuj ponownie.",
     "server": "Błąd serwera. Spróbuj później."
+  },
+
+  "price": {
+    "footnotes": {
+      "net": "Podane ceny są cenami netto. Należy doliczyć do nich podatek VAT 23%.",
+      "gross": "Podane ceny są cenami brutto i zawierają podatek VAT w wysokości 23%.",
+      "both": "Podane ceny dla klienta indywidualnego zawierają podatek VAT w wysokości 23%. Dla klienta biznesowego i instytucjonalnego są cenami netto i należy doliczyć do nich 23% VAT."
+    },
+    "presentation": {
+      "from": "od",
+      "units": {
+        "session": "[PH] [commercialPages-session] sesję",
+        "hour": "[PH] [commercialPages-hour] godzinę",
+        "month": "[PH] [commercialPages-month] miesiąc",
+        "event": "[PH] [commercialPages-event] wydarzenie",
+        "package": "[PH] [commercialPages-package] pakiet",
+        "table": "[PH] [commercialPages-table] stół",
+        "table_hour": "[PH] [commercialPages-table_hour] stół za godzinę",
+        "facilitator": "[PH] [commercialPages-facilitator] osobę prowadzącą",
+        "participant": "[PH] [commercialPages-participant] uczestnika",
+        "piece": "[PH] [commercialPages-piece] sztukę",
+        "day": "[PH] [commercialPages-day] dzień",
+        "half_day": "[PH] [commercialPages-half_day] pół dnia",
+        "night": "[PH] [commercialPages-night] noc",
+        "kilometer": "[PH] [commercialPages-kilometer] kilometr"
+      },
+      "percentageBases": {
+        "base_service": "[PH] [commercialPages-base_service] wartości usługi podstawowej",
+        "package": "[PH] [commercialPages-package] wartości pakietu",
+        "table": "[PH] [commercialPages-table] wartości stołu",
+        "facilitator": "[PH] [commercialPages-facilitator] wartości osoby prowadzącej"
+      }
+    },
+    "editor": {
+      "fields": {
+        "sectionTitle": "[PH] Cena",
+        "type": "[PH] Rodzaj ceny",
+        "amount": "[PH] Kwota",
+        "minAmount": "[PH] Kwota minimalna",
+        "maxAmount": "[PH] Kwota maksymalna",
+        "value": "[PH] Wartość procentowa",
+        "minValue": "[PH] Minimalna wartość procentowa",
+        "maxValue": "[PH] Maksymalna wartość procentowa",
+        "unit": "[PH] Jednostka rozliczeniowa",
+        "basis": "[PH] Podstawa rozliczenia",
+        "note": "[PH] Nota cenowa"
+      },
+      "validation": {
+        "invalid": "[PH] Uzupełnij wymagane dane ceny.",
+        "invalidRange": "[PH] Minimalna kwota nie może być większa od maksymalnej.",
+        "invalidPercentage": "[PH] Podaj jedną wartość procentową albo pełny zakres.",
+        "noteRequired": "[PH] Nota jest wymagana dla tego rodzaju ceny."
+      },
+      "types": {
+        "fixed": "[PH] Stała kwota",
+        "range": "[PH] Zakres kwot",
+        "from": "[PH] Cena od",
+        "percentage": "[PH] Procent",
+        "actual_cost": "[PH] Koszt rzeczywisty",
+        "custom_quote": "[PH] Wycena indywidualna"
+      },
+      "billingUnits": {
+        "session": "[PH] Sesja",
+        "hour": "[PH] Godzina",
+        "month": "[PH] Miesiąc",
+        "event": "[PH] Wydarzenie",
+        "package": "[PH] Pakiet",
+        "table": "[PH] Stół",
+        "table_hour": "[PH] Stół za godzinę",
+        "facilitator": "[PH] Prowadzący",
+        "participant": "[PH] Uczestnik",
+        "piece": "[PH] Sztuka",
+        "day": "[PH] Dzień",
+        "half_day": "[PH] Pół dnia",
+        "night": "[PH] Noc",
+        "kilometer": "[PH] Kilometr"
+      },
+      "percentageBases": {
+        "base_service": "[PH] Usługa bazowa",
+        "package": "[PH] Pakiet",
+        "table": "[PH] Stół",
+        "facilitator": "[PH] Prowadzący"
+      },
+      "actualCostBases": {
+        "ticket": "[PH] Bilet",
+        "accommodation": "[PH] Nocleg",
+        "documented_expense": "[PH] Udokumentowany wydatek",
+        "other": "[PH] Inny koszt"
+      }
+    }
+  },
+
+  "richContentEditor": {
+    "hint": "[PH] Buduj treść z sekcji, akapitów, list, wyróżnień i linków.",
+    "invalid": "[PH] Wymagana treść musi zawierać widoczny tekst.",
+    "invalidLink": "[PH] Każdy link musi mieć niepusty adres.",
+    "tokens": "[PH] [common-tokens] Elementy do wstawienia",
+    "tokensHint": "[PH] [common-tokensHint] Ustaw kursor w polu tekstowym i wybierz element, aby go wstawić.",
+    "empty": "[PH] Treść nie zawiera żadnej sekcji.",
+    "addSection": "[PH] Dodaj sekcję treści",
+    "section": "[PH] Sekcja treści",
+    "sectionTitle": "[PH] Tytuł sekcji (opcjonalny)",
+    "paragraph": "[PH] Akapit",
+    "ordered-list": "[PH] Lista numerowana",
+    "unordered-list": "[PH] Lista punktowana",
+    "addParagraph": "[PH] Dodaj akapit",
+    "addOrderedList": "[PH] Dodaj listę numerowaną",
+    "addUnorderedList": "[PH] Dodaj listę punktowaną",
+    "addItem": "[PH] Dodaj pozycję",
+    "item": "[PH] Pozycja",
+    "nestedBlocks": "[PH] Treść zagnieżdżona",
+    "strongNode": "[PH] [adminCommercialPages-strongNode] Pogrubienie",
+    "linkNode": "[PH] Link",
+    "selectionHint": "[PH] [adminCommercialPages-selectionHint] Zaznacz tekst, aby zastosować formatowanie.",
+    "editingSurface": "[PH] [adminCommercialPages-editingSurface] Treść akapitu lub pozycji listy",
+    "formattingPreview": "[PH] [adminCommercialPages-formattingPreview] Podgląd formatowania",
+    "links": "[PH] [adminCommercialPages-links] Linki w treści",
+    "href": "[PH] Adres linku",
+    "external": "[PH] Link zewnętrzny",
+    "removeLink": "[PH] [adminCommercialPages-removeLink] Usuń link"
   },
 
   "commercial": {

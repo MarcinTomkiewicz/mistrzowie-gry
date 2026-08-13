@@ -5,7 +5,7 @@
   @if (!form().controls.items.length) { <p class="m-0 error-text">{{ i18n.faq().empty }}</p> }
   @for (item of form().controls.items.controls; track item; let index = $index) {
     <div class="mg-card flex-col-start-stretch gap-md p-sm w-100" [formGroup]="item">
-      <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.items.length" (moveUp)="moveItem(index, -1)" (moveDown)="moveItem(index, 1)" (remove)="removeItem(index)" />
+      <app-item-editor-actions [index]="index" [itemCount]="form().controls.items.length" (moveUp)="moveItem(index, -1)" (moveDown)="moveItem(index, 1)" (remove)="removeItem(index)" />
       <div class="flex-col-start-stretch gap-xs w-100">
         <p-iftalabel class="w-100">
           <input pInputText class="w-100" [id]="controlId() + '-' + index + '-question'" formControlName="question" autocomplete="off" />

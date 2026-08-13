@@ -23,7 +23,7 @@ import {
   setControlValue,
 } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 
 @Component({
   selector: 'app-commercial-buttons-block-editor',
@@ -33,7 +33,7 @@ import { CommercialItemEditorActions } from './commercial-item-editor-actions';
     IftaLabelModule,
     InputTextModule,
     SelectModule,
-    CommercialItemEditorActions,
+    ItemEditorActions,
   ],
   templateUrl: './commercial-buttons-block-editor.html',
 })

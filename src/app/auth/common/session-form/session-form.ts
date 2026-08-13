@@ -49,11 +49,11 @@ import {
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { setControlValue } from '../../../core/utils/form-controls';
-import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
-import { FileUpload } from '../../../public/common/file-upload/file-upload';
-import { PdfThumbnail } from '../../../public/common/pdf-thumbnail/pdf-thumbnail';
-import { PdfViewerDialog } from '../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
-import { SystemAutocomplete } from '../../../public/common/system-autocomplete/system-autocomplete';
+import { ChipPicker } from '../../../common/chip-picker/chip-picker';
+import { FileUpload } from '../../../common/file-upload/file-upload';
+import { PdfThumbnail } from '../../../common/pdf-thumbnail/pdf-thumbnail';
+import { PdfViewerDialog } from '../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { SystemAutocomplete } from '../../../common/system-autocomplete/system-autocomplete';
 import { createSessionFormI18n } from './session-form.i18n';
 
 @Component({

@@ -9,7 +9,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { buildSiteUrl } from '../../../core/config/site';
 import { Seo } from '../../../core/services/seo/seo';
 import { createPageStructuredData } from '../../../core/utils/structured-data';
-import { InternalLinkText } from '../../common/internal-link-text/internal-link-text';
+import { InternalLinkText } from '../../../common/internal-link-text/internal-link-text';
 import { createAboutI18n } from './about.i18n';
 
 @Component({

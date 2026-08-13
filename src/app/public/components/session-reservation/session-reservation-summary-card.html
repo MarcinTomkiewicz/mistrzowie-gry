@@ -3,7 +3,7 @@
     {{ data().sections.summary }}
   </h2>
 
-  @if (summary(); as preview) {
+  @if (data().summary; as preview) {
     @let gm = data().selectedGm;
 
     <dl class="m-0 flex-col-start-stretch gap-sm">
@@ -79,7 +79,7 @@
       <div class="flex-row-between-center gap-sm">
         <dt>{{ data().labels.grossTotal }}</dt>
         <dd class="m-0">
-          {{ grossTotalLabel(preview.grossTotalPln) }}
+          {{ priceLabel(preview.grossTotalPln) }}
         </dd>
       </div>
     </dl>
@@ -97,7 +97,7 @@
                 <span class="muted-text">x {{ item.quantity }}</span>
               }
             </span>
-            <strong>{{ lineItemTotalLabel(item.grossTotalPln) }}</strong>
+            <strong>{{ priceLabel(item.grossTotalPln) }}</strong>
           </div>
         }
       </div>

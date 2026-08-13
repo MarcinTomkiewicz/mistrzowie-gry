@@ -13,6 +13,7 @@ import type {
   CommercialPageBlockEditorForm,
   CommercialProductCollectionBlockEditorForm,
 } from '../types/commercial-builder-block-editor-form';
+import { compareByPosition } from '../utils/compare-by-position';
 import { setControlEnabled } from '../utils/form-controls';
 import { commercialProductCollectionValidator } from '../validators/commercial-builder-editor.validator';
 import {
@@ -24,19 +25,20 @@ import {
   createCommercialTableColumnEditorForm,
   createCommercialTableRowEditorForm,
 } from './commercial-block-item-editor-form.factory';
-import { createCommercialRichContentEditorControl } from './commercial-rich-content-editor-form.factory';
+import { createRichContentEditorControl } from './rich-content-editor-form.factory';
+import { createUuidFormControl } from './form-control.factory';
 
 export function createCommercialBlockEditorForm(
   block: CommercialPageBlock,
 ): CommercialPageBlockEditorForm {
-  const id = idControl(block.id);
+  const id = createUuidFormControl(block.id);
 
   switch (block.type) {
     case 'rich_text':
       return new FormGroup({
         id,
         type: literalControl('rich_text'),
-        content: createCommercialRichContentEditorControl(block.content, true),
+        content: createRichContentEditorControl(block.content, true),
       });
     case 'buttons':
       return new FormGroup({
@@ -47,7 +49,7 @@ export function createCommercialBlockEditorForm(
           align: literalControl(block.presentation.align),
         }),
         buttons: requiredArray(
-          [...block.buttons].sort(byPosition),
+          [...block.buttons].sort(compareByPosition),
           createCommercialButtonEditorForm,
         ),
       });
@@ -60,7 +62,7 @@ export function createCommercialBlockEditorForm(
           columns: literalControl(block.presentation.columns),
         }),
         items: requiredArray(
-          [...block.items].sort(byPosition),
+          [...block.items].sort(compareByPosition),
           createCommercialCardEditorForm,
         ),
       });
@@ -77,7 +79,7 @@ export function createCommercialBlockEditorForm(
         id,
         type: literalControl('faq'),
         items: requiredArray(
-          [...block.items].sort(byPosition),
+          [...block.items].sort(compareByPosition),
           createCommercialFaqEntryEditorForm,
         ),
       });
@@ -89,14 +91,14 @@ export function createCommercialBlockEditorForm(
 export function createNewCommercialBlockEditorForm(
   type: CommercialBlockType,
 ): CommercialPageBlockEditorForm {
-  const id = idControl();
+  const id = createUuidFormControl();
 
   switch (type) {
     case 'rich_text':
       return new FormGroup({
         id,
         type: literalControl('rich_text'),
-        content: createCommercialRichContentEditorControl(null, true),
+        content: createRichContentEditorControl(null, true),
       });
     case 'buttons':
       return new FormGroup({
@@ -151,7 +153,7 @@ export function syncCommercialProductCollectionPresentationControls(
 
 function createProductCollectionEditorForm(
   block: CommercialProductCollectionBlock | null,
-  id: ReturnType<typeof idControl>,
+  id: FormControl<string>,
   type: FormControl<'product_collection'>,
 ): CommercialProductCollectionBlockEditorForm {
   const form = new FormGroup(
@@ -163,7 +165,7 @@ function createProductCollectionEditorForm(
         validators: [Validators.required],
       }),
       fields: requiredArray(
-        block ? [...block.fields].sort(byPosition) : [null],
+        block ? [...block.fields].sort(compareByPosition) : [null],
         createCommercialProductFieldEditorForm,
       ),
       presentation: new FormGroup({
@@ -181,7 +183,7 @@ function createProductCollectionEditorForm(
         sections: new FormArray(
           block?.presentation.type === 'comparison_table'
             ? [...block.presentation.sections]
-                .sort(byPosition)
+                .sort(compareByPosition)
                 .map(createCommercialComparisonSectionEditorForm)
             : [],
         ),
@@ -196,11 +198,13 @@ function createProductCollectionEditorForm(
 
 function createTableEditorForm(
   block: CommercialTableBlock | null,
-  id: ReturnType<typeof idControl>,
+  id: FormControl<string>,
   type: FormControl<'table'>,
 ) {
   const columns = block
-    ? [...block.columns].sort(byPosition).map(createCommercialTableColumnEditorForm)
+    ? [...block.columns]
+        .sort(compareByPosition)
+        .map(createCommercialTableColumnEditorForm)
     : [createCommercialTableColumnEditorForm()];
   const columnIds = columns.map((column) => column.controls.id.getRawValue());
 
@@ -209,7 +213,7 @@ function createTableEditorForm(
     type,
     columns: new FormArray(columns, { validators: [Validators.required] }),
     rows: requiredArray(
-      block ? [...block.rows].sort(byPosition) : [null],
+      block ? [...block.rows].sort(compareByPosition) : [null],
       (row) => createCommercialTableRowEditorForm(columnIds, row),
     ),
   });
@@ -226,17 +230,6 @@ function requiredArray<TValue, TControl extends FormGroup>(
 
 function literalControl<TValue extends string | number>(value: TValue) {
   return new FormControl(value, { nonNullable: true });
-}
-
-function idControl(id: string = crypto.randomUUID()): FormControl<string> {
-  return new FormControl(id, { nonNullable: true });
-}
-
-function byPosition(
-  left: { position: number },
-  right: { position: number },
-): number {
-  return left.position - right.position;
 }
 
 function unsupportedCommercialBlock(block: never): never {

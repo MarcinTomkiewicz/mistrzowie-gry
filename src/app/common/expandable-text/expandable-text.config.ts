@@ -1,0 +1,1 @@
+export const EXPANDABLE_TEXT_THRESHOLD = 180;

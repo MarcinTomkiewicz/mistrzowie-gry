@@ -1,0 +1,13 @@
+<div
+  #viewport
+  class="pdf-viewer-dialog__viewport w-100 overflow-auto p-md touch-action-none"
+  [class.cursor-grab]="canPan() && !isPanning()"
+  [class.cursor-grabbing]="isPanning()"
+  [class.user-select-none]="isPanning()"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerUp($event)"
+>
+  <canvas #canvas class="mx-auto shadow-sm"></canvas>
+</div>

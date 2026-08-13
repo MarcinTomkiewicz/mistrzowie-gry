@@ -25,13 +25,11 @@ export function createAdminCommercialPagesI18n() {
     product: Copy.AdminCommercialPagesProductTranslations;
     sections: Copy.AdminCommercialPagesSectionsTranslations;
     section: Copy.AdminCommercialPagesSectionTranslations;
-    richContent: Copy.AdminCommercialPagesRichContentTranslations;
     buttons: Copy.AdminCommercialPagesButtonsTranslations;
     cards: Copy.AdminCommercialPagesCardsTranslations;
     productCollection: Copy.AdminCommercialPagesProductCollectionTranslations;
     table: Copy.AdminCommercialPagesTableTranslations;
     faq: Copy.AdminCommercialPagesFaqTranslations;
-    price: Copy.AdminCommercialPagesPriceTranslations;
     editorActions: Copy.AdminCommercialPagesEditorActionsTranslations;
     validation: Copy.AdminCommercialPagesValidationTranslations;
     draftStatus: Copy.AdminCommercialPagesDraftStatusTranslations;
@@ -46,10 +44,6 @@ export function createAdminCommercialPagesI18n() {
     productKind: Copy.AdminCommercialPagesProductKindTranslations;
     sessionMode: Copy.AdminCommercialPagesSessionModeTranslations;
     actionAppearance: Copy.AdminCommercialPagesActionAppearanceTranslations;
-    priceType: Copy.AdminCommercialPagesPriceTypeTranslations;
-    billingUnit: Copy.AdminCommercialPagesBillingUnitTranslations;
-    percentageBasis: Copy.AdminCommercialPagesPercentageBasisTranslations;
-    actualCostBasis: Copy.AdminCommercialPagesActualCostBasisTranslations;
   }>('adminCommercialPages', {
     listPage: 'list.page', listTable: 'list.table', listToast: 'list.toast',
     editorPage: 'editor.page', steps: 'editor.steps', editorToast: 'editor.toast',
@@ -58,9 +52,9 @@ export function createAdminCommercialPagesI18n() {
     metadata: 'editor.metadata', seo: 'editor.seo',
     products: 'editor.products', product: 'editor.product',
     sections: 'editor.sections', section: 'editor.section',
-    richContent: 'editor.richContent', buttons: 'editor.buttons',
+    buttons: 'editor.buttons',
     cards: 'editor.cards', productCollection: 'editor.productCollection',
-    table: 'editor.table', faq: 'editor.faq', price: 'editor.price',
+    table: 'editor.table', faq: 'editor.faq',
     editorActions: 'editor.actions', validation: 'editor.validation',
     draftStatus: 'draftStatus',
     blockType: 'blockType', sectionSurface: 'sectionSurface',
@@ -69,9 +63,7 @@ export function createAdminCommercialPagesI18n() {
     collectionPresentation: 'collectionPresentation',
     durationMode: 'durationMode', participantsMode: 'participantsMode',
     productKind: 'productKind', sessionMode: 'sessionMode',
-    actionAppearance: 'actionAppearance', priceType: 'priceType',
-    billingUnit: 'billingUnit', percentageBasis: 'percentageBasis',
-    actualCostBasis: 'actualCostBasis',
+    actionAppearance: 'actionAppearance',
   });
   return {
     ...translations,

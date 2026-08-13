@@ -28,7 +28,7 @@ import {
   hasArticleEditorImageWithoutPath,
   hasInvalidArticleLinkSyntax,
 } from '../../../../core/validators/article-editor-block.validator';
-import { ImageUpload } from '../../../../public/common/image-upload/image-upload';
+import { ImageUpload } from '../../../../common/image-upload/image-upload';
 import { createArticleEditorBlockForm } from '../article-editor/article-editor-form';
 import { createAdminContentArticleEditorI18n } from '../article-editor/article-editor.i18n';
 

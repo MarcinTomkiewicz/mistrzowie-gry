@@ -3,7 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import type { OfferSectionWithItems } from '../../../../core/types/offers';
-import { FaqAccordion } from '../../../common/faq-accordion/faq-accordion';
+import { FaqAccordion } from '../../../../common/faq-accordion/faq-accordion';
 import { OfferItemCards } from '../offer-item-cards';
 import { createOffersI18n } from '../offers.i18n';
 

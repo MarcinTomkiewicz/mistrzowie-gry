@@ -2,17 +2,17 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import type { CommercialBuilderSection } from '../types/commercial-page-builder';
 import type { CommercialSectionEditorForm } from '../types/commercial-page-editor-form';
+import { compareByPosition } from '../utils/compare-by-position';
 import { normalizeText } from '../utils/normalize-text';
 import { createCommercialBlockEditorForm } from './commercial-block-editor-form.factory';
 import { mapCommercialPageBlockEditorForm } from './commercial-block-editor-form.mapper';
+import { createUuidFormControl } from './form-control.factory';
 
 export function createCommercialSectionEditorForm(
   section: CommercialBuilderSection | null = null,
 ): CommercialSectionEditorForm {
   return new FormGroup({
-    id: new FormControl(section?.id ?? crypto.randomUUID(), {
-      nonNullable: true,
-    }),
+    id: createUuidFormControl(section?.id),
     heading: new FormControl(section?.heading ?? '', { nonNullable: true }),
     lead: new FormControl(section?.lead ?? '', { nonNullable: true }),
     surface: new FormControl(section?.presentation.surface ?? 'plain', {
@@ -24,7 +24,7 @@ export function createCommercialSectionEditorForm(
     blocks: new FormArray(
       section
         ? [...section.blocks]
-            .sort(byPosition)
+            .sort(compareByPosition)
             .map(createCommercialBlockEditorForm)
         : [],
     ),
@@ -50,11 +50,4 @@ export function mapCommercialSectionEditorForm(
       mapCommercialPageBlockEditorForm(block, (index + 1) * 10),
     ),
   };
-}
-
-function byPosition(
-  left: { position: number },
-  right: { position: number },
-): number {
-  return left.position - right.position;
 }

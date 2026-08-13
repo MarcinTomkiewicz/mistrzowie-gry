@@ -15,10 +15,12 @@ export function formatSessionBookingProductPriceLabel(
   if (product.requiresManualQuote) return manualQuoteRequired;
   if (product.pricePercent !== null) return `+${product.pricePercent}%`;
 
-  return (
-    formatMoney(product.grossPricePln, SESSION_RESERVATION_CONFIG.currency) ??
-    manualQuoteRequired
-  );
+  return product.grossPricePln === null
+    ? manualQuoteRequired
+    : formatMoney(
+        product.grossPricePln,
+        SESSION_RESERVATION_CONFIG.currency,
+      );
 }
 
 export function formatSessionReservationSlotDateLabel(

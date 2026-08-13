@@ -10,8 +10,8 @@ import type {
   CommercialProductFieldKey,
   CommercialTextAlign,
 } from './commercial-page-builder';
-import type { CommercialPriceEditorForm } from './commercial-price-editor-form';
-import type { CommercialRichContentEditorControl } from './commercial-rich-content-editor-form';
+import type { PriceEditorForm } from './price-editor-form';
+import type { RichContentEditorControl } from './rich-content-editor';
 
 export type CommercialButtonEditorForm = FormGroup<{
   id: FormControl<string>;
@@ -24,9 +24,9 @@ export type CommercialButtonEditorForm = FormGroup<{
 export type CommercialCardEditorForm = FormGroup<{
   id: FormControl<string>;
   title: FormControl<string>;
-  body: CommercialRichContentEditorControl;
+  body: RichContentEditorControl;
   hasPrice: FormControl<boolean>;
-  price: CommercialPriceEditorForm;
+  price: PriceEditorForm;
 }>;
 
 export type CommercialProductLabelOverrideEditorForm = FormGroup<{
@@ -61,7 +61,7 @@ export type CommercialTableColumnEditorForm = FormGroup<{
 
 export type CommercialTableCellEditorForm = FormGroup<{
   columnId: FormControl<string>;
-  content: CommercialRichContentEditorControl;
+  content: RichContentEditorControl;
 }>;
 
 export type CommercialTableRowEditorForm = FormGroup<{
@@ -82,7 +82,7 @@ type CommercialBlockBaseEditorControls<TType extends string> = {
 
 export type CommercialRichTextBlockEditorForm = FormGroup<
   CommercialBlockBaseEditorControls<'rich_text'> & {
-    content: CommercialRichContentEditorControl;
+    content: RichContentEditorControl;
   }
 >;
 

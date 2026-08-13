@@ -1,0 +1,37 @@
+@let data = block();
+
+<div
+  class="mg-grid grid-cols-1-sm gap-lg w-100"
+  [class.grid-cols-1]="data.presentation.columns === 1"
+  [class.grid-cols-2]="data.presentation.columns === 2"
+  [class.grid-cols-3]="data.presentation.columns === 3"
+>
+  @for (card of data.items; track card.id) {
+    <article
+      class="mg-card gap-md"
+      [class.flex-col-start-stretch]="data.presentation.orientation === 'vertical'"
+      [class.flex-row-between-start]="data.presentation.orientation === 'horizontal'"
+      [class.flex-col-start-stretch-sm]="data.presentation.orientation === 'horizontal'"
+    >
+      <div class="flex-col-start-stretch gap-sm flex-1">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ card.title }}
+        </h3>
+
+        @if (card.body) {
+          <app-rich-content [content]="card.body" />
+        }
+      </div>
+
+      @if (card.price; as price) {
+        <app-price-value [price]="price" [locale]="locale()" />
+      }
+    </article>
+  }
+</div>
+
+@if (hasPrices() && pricingFootnote()) {
+  <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mt-md">
+    {{ pricingFootnote() }}
+  </p>
+}

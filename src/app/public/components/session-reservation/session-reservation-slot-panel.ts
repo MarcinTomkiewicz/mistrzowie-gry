@@ -40,7 +40,7 @@ import {
 } from './session-reservation-labels';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
-import { UniversalCalendar } from '../../common/universal-calendar/universal-calendar';
+import { UniversalCalendar } from '../../../common/universal-calendar/universal-calendar';
 
 @Component({
   selector: 'app-session-reservation-slot-panel',

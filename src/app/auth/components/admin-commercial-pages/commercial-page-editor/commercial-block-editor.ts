@@ -16,7 +16,7 @@ import { CommercialButtonsBlockEditor } from './commercial-buttons-block-editor'
 import { CommercialCardsBlockEditor } from './commercial-cards-block-editor';
 import { CommercialFaqBlockEditor } from './commercial-faq-block-editor';
 import { CommercialProductCollectionBlockEditor } from './commercial-product-collection-block-editor';
-import { CommercialRichContentEditor } from './commercial-rich-content-editor';
+import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
 import { CommercialTableBlockEditor } from './commercial-table-block-editor';
 
 @Component({
@@ -26,7 +26,7 @@ import { CommercialTableBlockEditor } from './commercial-table-block-editor';
     CommercialCardsBlockEditor,
     CommercialFaqBlockEditor,
     CommercialProductCollectionBlockEditor,
-    CommercialRichContentEditor,
+    RichContentEditor,
     CommercialTableBlockEditor,
   ],
   templateUrl: './commercial-block-editor.html',

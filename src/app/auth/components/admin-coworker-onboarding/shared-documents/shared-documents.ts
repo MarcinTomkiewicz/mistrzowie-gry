@@ -32,10 +32,10 @@ import {
 import type { CoworkerDocumentAssignmentStatus } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
-import { FileUpload } from '../../../../public/common/file-upload/file-upload';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
-import { PdfThumbnail } from '../../../../public/common/pdf-thumbnail/pdf-thumbnail';
-import { PdfViewerDialog } from '../../../../public/common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { FileUpload } from '../../../../common/file-upload/file-upload';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { PdfThumbnail } from '../../../../common/pdf-thumbnail/pdf-thumbnail';
+import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
 
 @Component({
   selector: 'app-admin-shared-documents',

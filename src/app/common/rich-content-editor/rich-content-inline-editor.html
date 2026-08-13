@@ -1,0 +1,135 @@
+<div class="flex-col-start-stretch gap-xs w-100">
+  <div class="flex-row-start-center flex-wrap gap-xs">
+    <p-button
+      type="button"
+      size="small"
+      severity="secondary"
+      [outlined]="!strongActive()"
+      [label]="i18n().strongNode"
+      [disabled]="strongDisabled()"
+      (onClick)="toggleStrong()"
+    />
+    <p-button
+      type="button"
+      size="small"
+      severity="secondary"
+      icon="pi pi-link"
+      [outlined]="true"
+      [label]="i18n().linkNode"
+      [disabled]="linkDisabled()"
+      (onClick)="openLinkEditor()"
+    />
+    <small class="text-muted">
+      {{ i18n().selectionHint }}
+    </small>
+  </div>
+
+  <textarea
+    #textSurface
+    pTextarea
+    class="w-100"
+    rows="4"
+    [id]="controlId() + '-text'"
+    [value]="text()"
+    [attr.aria-label]="i18n().editingSurface"
+    (focus)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (click)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (keyup)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (select)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (beforeinput)="prepareTextInput($event, textSurface)"
+    (input)="updateText(textSurface)"
+    (blur)="blurred.emit()"
+  ></textarea>
+
+  @if (text()) {
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <span class="small-caps">
+        {{ i18n().formattingPreview }}
+      </span>
+      <p class="m-0 text-pre-line" inert>
+        <app-rich-content-inline [nodes]="nodes()" />
+      </p>
+    </div>
+  }
+
+  @let availableLinks = links();
+  @if (availableLinks.length) {
+    <div class="flex-row-start-center flex-wrap gap-xs">
+      <span class="small-caps">{{ i18n().links }}</span>
+      @for (link of availableLinks; track link.start) {
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          icon="pi pi-pencil"
+          [text]="true"
+          [label]="link.text + ' — ' + link.href"
+          (onClick)="editLink(link)"
+        />
+      }
+    </div>
+  }
+
+  @if (linkDraft(); as draft) {
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+      <label class="small-caps" [for]="controlId() + '-link-href'">
+        {{ i18n().href }}
+      </label>
+      <input
+        #linkHref
+        pInputText
+        class="w-100"
+        [id]="controlId() + '-link-href'"
+        [value]="draft.href"
+        autocomplete="off"
+        (input)="updateLinkHref(linkHref.value)"
+        (blur)="blurred.emit()"
+      />
+      @if (linkSaveAttempted() && !draft.href.trim()) {
+        <small class="error-text">{{ i18n().invalidLink }}</small>
+      }
+
+      <div class="flex-row-start-center gap-xs">
+        <p-checkbox
+          [inputId]="controlId() + '-link-external'"
+          [binary]="true"
+          [ngModel]="draft.external"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="updateLinkExternal($event)"
+        />
+        <label [for]="controlId() + '-link-external'">
+          {{ i18n().external }}
+        </label>
+      </div>
+
+      <div class="flex-row-end-center flex-wrap gap-xs">
+        @if (draft.existing) {
+          <p-button
+            type="button"
+            size="small"
+            severity="danger"
+            icon="pi pi-times"
+            [text]="true"
+            [label]="i18n().removeLink"
+            (onClick)="removeLink()"
+          />
+        }
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          [text]="true"
+          [label]="actions().cancel"
+          (onClick)="closeLinkEditor()"
+        />
+        <p-button
+          type="button"
+          size="small"
+          icon="pi pi-check"
+          [label]="actions().save"
+          (onClick)="saveLink()"
+        />
+      </div>
+    </div>
+  }
+</div>

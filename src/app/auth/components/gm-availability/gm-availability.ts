@@ -58,9 +58,9 @@ import {
   getGmAvailabilityMutationError,
 } from '../../../core/domain/gm-availability/rules';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
-import { InfoDialog } from '../../../public/common/info-dialog/info-dialog';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
-import { UniversalCalendar } from '../../../public/common/universal-calendar/universal-calendar';
+import { InfoDialog } from '../../../common/info-dialog/info-dialog';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
+import { UniversalCalendar } from '../../../common/universal-calendar/universal-calendar';
 import { createGmAvailabilityI18n, GM_AVAILABILITY_SCOPE } from './gm-availability.i18n';
 
 @Component({

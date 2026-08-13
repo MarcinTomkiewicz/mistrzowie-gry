@@ -4,7 +4,7 @@ import type {
   CommercialPageSeo,
 } from './commercial-page';
 import type { CommercialIconKey } from './commercial-icon';
-import type { CommercialPrice } from './commercial-price';
+import type { Price } from './price';
 import type { RichContent } from './rich-content';
 
 export type { CommercialIconKey } from './commercial-icon';
@@ -63,7 +63,7 @@ export type CommercialButton = CommercialPositionedItem & {
 export type CommercialCard = CommercialPositionedItem & {
   title: string;
   body: RichContent | null;
-  price: CommercialPrice | null;
+  price: Price | null;
 };
 
 export type CommercialProductLabelOverride = {
@@ -243,7 +243,7 @@ type CommercialProductBase<
   kind: CommercialProductKind;
   name: string;
   description: RichContent | null;
-  price: CommercialPrice;
+  price: Price;
   duration: TDuration;
   participants: TParticipants;
   sessions: CommercialSessionCount;

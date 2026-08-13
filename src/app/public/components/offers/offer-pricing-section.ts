@@ -4,7 +4,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { TableModule } from 'primeng/table';
 
 import type { OfferSectionWithItems } from '../../../core/types/offers';
-import { ExpandableText } from '../../common/expandable-text/expandable-text';
+import { ExpandableText } from '../../../common/expandable-text/expandable-text';
 import { formatPricing } from './offer-pricing';
 import { createOffersI18n } from './offers.i18n';
 

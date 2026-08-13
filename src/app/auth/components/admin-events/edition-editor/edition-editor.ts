@@ -31,7 +31,7 @@ import {
   resolveParticipantSignupKindLabel,
 } from '../participant-signup-kind-options';
 import { stringToSlug } from '../../../../core/utils/normalize-text';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';
 import { EventEditionSettingsEditor } from './event-edition-settings-editor';

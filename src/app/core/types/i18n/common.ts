@@ -43,6 +43,9 @@ export type CommonActionsTranslations = {
   submit: string;
   ok: string;
   logout: string;
+  moveItemUp: string;
+  moveItemDown: string;
+  removeItem: string;
 };
 
 export type CommonValuesTranslations = {

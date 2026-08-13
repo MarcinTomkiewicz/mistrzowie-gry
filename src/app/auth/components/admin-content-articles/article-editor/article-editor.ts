@@ -27,8 +27,8 @@ import {
   hasInvalidArticleLinkSyntax,
 } from '../../../../core/validators/article-editor-block.validator';
 import { normalizeText, stringToSlug } from '../../../../core/utils/normalize-text';
-import { ImageUpload } from '../../../../public/common/image-upload/image-upload';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { ImageUpload } from '../../../../common/image-upload/image-upload';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { ArticleBlocksEditor } from '../article-blocks-editor/article-blocks-editor';
 import { getContentArticleStatusBadgeClass } from '../content-article-publication';
 import { createArticleEditorBlockForm, mapArticleEditorFormToPayload } from './article-editor-form';

@@ -18,8 +18,8 @@ import {
   createBreadcrumbStructuredData,
   createPageStructuredData,
 } from '../../../../core/utils/structured-data';
-import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
-import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
+import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createContentArticlesI18n } from '../content-articles.i18n';
 
 @Component({

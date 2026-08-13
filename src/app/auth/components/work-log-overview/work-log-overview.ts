@@ -38,7 +38,7 @@ import {
 import { formatDateLabel } from '../../../core/utils/date';
 import { getUserDisplayName } from '../../../core/utils/user-display';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import {
   createWorkLogOverviewI18n,
   WORK_LOG_OVERVIEW_SCOPE,

@@ -31,9 +31,9 @@ import {
   SessionDifficultyLevel,
 } from '../../../core/types/sessions';
 import {
-  ISessionListAction,
   SessionList,
-} from '../../../public/common/session-list/session-list';
+} from '../../../common/session-list/session-list';
+import type { ISessionListAction } from '../../../core/types/session-list';
 import { SessionForm } from '../../common/session-form/session-form';
 import { EventSignupFormFacade } from './event-signup-form.facade';
 import { createEventSignupFormI18n } from './event-signup-form.i18n';

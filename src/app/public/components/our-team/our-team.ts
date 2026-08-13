@@ -17,7 +17,7 @@ import {
 } from '../../../core/utils/structured-data';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { GmProfiles } from '../../common/gm-profiles/gm-profiles';
-import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createOurTeamI18n } from './our-team.i18n';
 

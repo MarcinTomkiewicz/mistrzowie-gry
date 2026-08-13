@@ -1,8 +1,8 @@
 @if (richTextForm(); as richText) {
-  <app-commercial-rich-content-editor
+  <app-rich-content-editor
     [control]="richText.controls.content"
     [controlId]="controlId() + '-content'"
-    [label]="i18n.richContent().label"
+    [label]="i18n.blockType().rich_text"
     [tokens]="tokens()"
   />
 } @else if (buttonsForm(); as buttons) {

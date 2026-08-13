@@ -8,7 +8,7 @@ import {
   UiSeoTextColumn,
   UiSeoTextSection,
 } from '../../../../core/types/i18n/home';
-import { InternalLinkText } from '../../../common/internal-link-text/internal-link-text';
+import { InternalLinkText } from '../../../../common/internal-link-text/internal-link-text';
 import { createSeoRichTextI18n } from './seo-rich-text.i18n';
 
 @Component({

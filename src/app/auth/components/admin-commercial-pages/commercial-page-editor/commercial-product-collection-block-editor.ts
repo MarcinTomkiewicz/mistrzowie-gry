@@ -21,33 +21,26 @@ import {
   createCommercialProductFieldEditorForm,
   createCommercialProductLabelOverrideEditorForm,
 } from '../../../../core/factories/commercial-block-item-editor-form.factory';
-import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type {
   CommercialProductCollectionBlockEditorForm,
   CommercialProductFieldEditorForm,
 } from '../../../../core/types/commercial-builder-block-editor-form';
-import type {
-  CommercialProductFieldKey,
-  CommercialProductKind,
-} from '../../../../core/types/commercial-page-builder';
+import type { CommercialProductKind } from '../../../../core/types/commercial-page-builder';
+import type { CommercialProductOption } from '../../../../core/types/commercial-page-editor';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
 import type { CommercialProductFieldLabelsTranslations } from '../../../../core/types/i18n/commercial-pages';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
-import {
-  syncCommercialProductCollectionReferences,
-  syncCommercialProductFieldReferences,
-} from '../../../../core/utils/commercial-product-collection-editor';
 import {
   moveFormArrayControl,
   moveFormControlArrayItem,
 } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
+import {
+  syncCommercialProductCollectionReferences,
+  syncCommercialProductFieldReferences,
+} from './commercial-product-references';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 import { CommercialProductComparisonEditor } from './commercial-product-comparison-editor';
-
-type CommercialProductOption = ISelectOption<string> & {
-  kind: CommercialProductKind;
-};
 
 @Component({
   selector: 'app-commercial-product-collection-block-editor',
@@ -58,7 +51,7 @@ type CommercialProductOption = ISelectOption<string> & {
     InputTextModule,
     MultiSelectModule,
     SelectModule,
-    CommercialItemEditorActions,
+    ItemEditorActions,
     CommercialProductComparisonEditor,
   ],
   templateUrl: './commercial-product-collection-block-editor.html',
@@ -241,7 +234,7 @@ export class CommercialProductCollectionBlockEditor {
 
   protected fieldLabel(field: CommercialProductFieldEditorForm): string {
     return field.controls.label.getRawValue() ??
-      this.defaultFieldLabel(field.controls.key.getRawValue());
+      this.productFieldLabels()[field.controls.key.getRawValue()];
   }
 
   protected isFieldCustomized(
@@ -263,10 +256,6 @@ export class CommercialProductCollectionBlockEditor {
     }
 
     this.customizedFieldIds.set(nextIds);
-  }
-
-  private defaultFieldLabel(key: CommercialProductFieldKey): string {
-    return this.productFieldLabels()[key];
   }
 
   private groupProductOptions(options: CommercialProductOption[]) {

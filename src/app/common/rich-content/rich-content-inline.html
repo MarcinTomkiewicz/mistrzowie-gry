@@ -1,0 +1,22 @@
+@for (node of nodes(); track $index) {
+  @switch (node.type) {
+    @case ('text') {
+      <span class="text-pre-line">{{ node.text }}</span>
+    }
+
+    @case ('strong') {
+      <strong class="text-pre-line">{{ node.text }}</strong>
+    }
+
+    @case ('link') {
+      <a
+        class="text-pre-line"
+        [href]="node.href"
+        [target]="node.external ? '_blank' : null"
+        [rel]="node.external ? 'noopener noreferrer' : null"
+      >
+        {{ node.text }}
+      </a>
+    }
+  }
+}

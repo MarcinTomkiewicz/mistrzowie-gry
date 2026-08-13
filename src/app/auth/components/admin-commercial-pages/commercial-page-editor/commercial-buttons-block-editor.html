@@ -19,7 +19,7 @@
 
   @for (button of form().controls.buttons.controls; track button; let index = $index) {
     <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="button">
-      <app-commercial-item-editor-actions [index]="index" [itemCount]="form().controls.buttons.length" (moveUp)="moveButton(index, -1)" (moveDown)="moveButton(index, 1)" (remove)="removeButton(index)" />
+      <app-item-editor-actions [index]="index" [itemCount]="form().controls.buttons.length" (moveUp)="moveButton(index, -1)" (moveDown)="moveButton(index, 1)" (remove)="removeButton(index)" />
       <div class="mg-grid-3 gap-md w-100">
         <div class="flex-col-start-stretch gap-xs w-100">
           <p-iftalabel class="w-100">
@@ -36,7 +36,7 @@
             <label [for]="controlId() + '-' + index + '-route'">{{ i18n.buttons().route }}</label>
           </p-iftalabel>
           @if (button.controls.route.touched) {
-            @if (button.controls.route.hasError('commercialInternalRoute')) {
+            @if (button.controls.route.hasError('internalRoute')) {
               <small class="error-text">{{ i18n.validation().invalidRoute }}</small>
             } @else if (button.controls.route.invalid) {
               <small class="error-text">{{ i18n.commonForm().required }}</small>

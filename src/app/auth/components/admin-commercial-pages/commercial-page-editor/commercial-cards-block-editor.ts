@@ -18,13 +18,13 @@ import {
 import type { CommercialCardsBlockEditorForm } from '../../../../core/types/commercial-builder-block-editor-form';
 import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
-import { CommercialPriceEditor } from './commercial-price-editor';
-import { CommercialRichContentEditor } from './commercial-rich-content-editor';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
+import { PriceEditor } from '../../../../common/price-editor/price-editor';
+import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
 
 @Component({
   selector: 'app-commercial-cards-block-editor',
-  imports: [ReactiveFormsModule, ButtonModule, CheckboxModule, IftaLabelModule, InputTextModule, SelectModule, CommercialItemEditorActions, CommercialPriceEditor, CommercialRichContentEditor],
+  imports: [ReactiveFormsModule, ButtonModule, CheckboxModule, IftaLabelModule, InputTextModule, SelectModule, ItemEditorActions, PriceEditor, RichContentEditor],
   templateUrl: './commercial-cards-block-editor.html',
 })
 export class CommercialCardsBlockEditor {

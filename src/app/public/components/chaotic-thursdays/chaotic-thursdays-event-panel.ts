@@ -25,8 +25,8 @@ import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
 import { formatTimeRangeLabel } from '../../../core/utils/time-format';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { EventSlots } from '../../common/event-slots/event-slots';
-import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
-import { OccurrenceSwitcher } from '../../common/occurrence-switcher/occurrence-switcher';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
+import { OccurrenceSwitcher } from '../../../common/occurrence-switcher/occurrence-switcher';
 import { ChaoticThursdaysFacade } from './chaotic-thursdays.facade';
 import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 

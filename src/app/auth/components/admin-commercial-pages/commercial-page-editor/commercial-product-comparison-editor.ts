@@ -16,7 +16,6 @@ import type {
   CommercialComparisonSectionEditorForm,
   CommercialProductCollectionBlockEditorForm,
 } from '../../../../core/types/commercial-builder-block-editor-form';
-import type { CommercialProductFieldKey } from '../../../../core/types/commercial-page-builder';
 import type { CommercialProductFieldLabelsTranslations } from '../../../../core/types/i18n/commercial-pages';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
@@ -24,7 +23,7 @@ import {
   moveFormControlArrayItem,
 } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { CommercialItemEditorActions } from './commercial-item-editor-actions';
+import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 
 @Component({
   selector: 'app-commercial-product-comparison-editor',
@@ -34,7 +33,7 @@ import { CommercialItemEditorActions } from './commercial-item-editor-actions';
     IftaLabelModule,
     InputTextModule,
     MultiSelectModule,
-    CommercialItemEditorActions,
+    ItemEditorActions,
   ],
   templateUrl: './commercial-product-comparison-editor.html',
 })
@@ -52,7 +51,7 @@ export class CommercialProductComparisonEditor {
     return this.form().controls.fields.controls.map((field) => ({
       value: field.controls.id.getRawValue(),
       label: field.controls.label.getRawValue() ??
-        this.defaultFieldLabel(field.controls.key.getRawValue()),
+        this.productFieldLabels()[field.controls.key.getRawValue()],
     }));
   }
 
@@ -131,9 +130,5 @@ export class CommercialProductComparisonEditor {
     offset: -1 | 1,
   ): void {
     moveFormControlArrayItem(row.controls.fieldIds, index, index + offset);
-  }
-
-  private defaultFieldLabel(key: CommercialProductFieldKey): string {
-    return this.productFieldLabels()[key];
   }
 }

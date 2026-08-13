@@ -51,8 +51,8 @@ import {
   getWorkLogMutationError,
   getWorkLogTotalHours,
 } from '../../../core/domain/work-log/rules';
-import { InfoDialog } from '../../../public/common/info-dialog/info-dialog';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { InfoDialog } from '../../../common/info-dialog/info-dialog';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { createMyWorkLogI18n, MY_WORK_LOG_SCOPE } from './my-work-log.i18n';
 
 @Component({

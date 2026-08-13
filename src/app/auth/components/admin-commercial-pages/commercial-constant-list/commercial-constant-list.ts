@@ -18,7 +18,7 @@ import type {
 } from '../../../../core/types/commercial-constant-admin';
 import type { CommercialConstantEditorSave } from '../../../../core/types/commercial-constant-editor-form';
 import { formatTimestampLabel } from '../../../../core/utils/date';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createAdminCommercialConstantsI18n } from '../admin-commercial-constants.i18n';
 import { CommercialConstantEditor } from '../commercial-constant-editor/commercial-constant-editor';
 

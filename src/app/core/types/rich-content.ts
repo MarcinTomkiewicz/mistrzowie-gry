@@ -37,23 +37,12 @@ export interface RichContentListItem {
 }
 
 export type RichContentInlineNode =
-  | RichContentTextNode
-  | RichContentStrongNode
-  | RichContentLinkNode;
-
-export interface RichContentTextNode {
-  type: 'text';
-  text: string;
-}
+  | InternalLinkMarkupNode
+  | RichContentStrongNode;
 
 export interface RichContentStrongNode {
   type: 'strong';
   text: string;
 }
 
-export interface RichContentLinkNode {
-  type: 'link';
-  text: string;
-  href: string;
-  external?: boolean;
-}
+import type { InternalLinkMarkupNode } from './internal-link';

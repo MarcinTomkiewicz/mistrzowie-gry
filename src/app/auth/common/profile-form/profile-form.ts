@@ -33,7 +33,7 @@ import { Auth } from '../../../core/services/auth/auth';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { AppAuthError, AuthErrorCode } from '../../../core/types/auth-error';
 import { ProfileFormMode } from '../../../core/types/profile-form';
-import { CharacterCounter } from '../../../public/common/character-counter/character-counter';
+import { CharacterCounter } from '../../../common/character-counter/character-counter';
 import { createProfileFormI18n } from './profile-form.i18n';
 
 @Component({

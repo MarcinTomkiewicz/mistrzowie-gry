@@ -29,8 +29,8 @@ import {
   createBreadcrumbStructuredData,
   createPageStructuredData,
 } from '../../../core/utils/structured-data';
-import { Breadcrumbs } from '../../common/breadcrumbs/breadcrumbs';
-import { LoadingOverlay } from '../../common/loading-overlay/loading-overlay';
+import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { OfferAddonsSection } from './offer-addons-section';
 import { OfferFaqSection } from './offer-faq-section';
 import { OfferMaterialsSection } from './offer-materials-section';

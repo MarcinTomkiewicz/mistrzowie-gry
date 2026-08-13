@@ -16,11 +16,9 @@ import type {
   CommercialTableBlockEditorForm,
 } from '../types/commercial-builder-block-editor-form';
 import {
-  mapCommercialPriceEditorForm,
-} from './commercial-price-editor-form.factory';
-import {
-  mapCommercialRichContentEditorControl,
-} from './commercial-rich-content-editor-form.factory';
+  mapPriceEditorForm,
+} from './price-editor-form.factory';
+import { mapRichContentEditorControl } from './rich-content-editor-form.factory';
 import { mapCommercialProductCollectionBlockEditorForm } from './commercial-product-collection-editor-form.mapper';
 
 export function mapCommercialPageBlockEditorForm(
@@ -101,7 +99,7 @@ function mapRichTextBlock(
   return {
     ...blockBase(form, position),
     type: 'rich_text',
-    content: mapCommercialRichContentEditorControl(
+    content: mapRichContentEditorControl(
       form.controls.content,
       true,
     ),
@@ -156,12 +154,12 @@ function mapCardsBlock(
         id: cardValue.id,
         position: positionFor(index),
         title: cardValue.title.trim(),
-        body: mapCommercialRichContentEditorControl(
+        body: mapRichContentEditorControl(
           card.controls.body,
           false,
         ),
         price: cardValue.hasPrice
-          ? mapCommercialPriceEditorForm(card.controls.price)
+          ? mapPriceEditorForm(card.controls.price)
           : null,
       };
     }),
@@ -185,7 +183,7 @@ function mapTableBlock(
       position: positionFor(index),
       cells: row.controls.cells.controls.map((cell) => ({
         columnId: cell.controls.columnId.getRawValue(),
-        content: mapCommercialRichContentEditorControl(
+        content: mapRichContentEditorControl(
           cell.controls.content,
           true,
         ),

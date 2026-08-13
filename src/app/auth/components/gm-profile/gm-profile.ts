@@ -29,10 +29,10 @@ import {
 import { setControlValue } from '../../../core/utils/form-controls';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
-import { CharacterCounter } from '../../../public/common/character-counter/character-counter';
-import { ChipPicker } from '../../../public/common/chip-picker/chip-picker';
-import { FileUpload } from '../../../public/common/file-upload/file-upload';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { CharacterCounter } from '../../../common/character-counter/character-counter';
+import { ChipPicker } from '../../../common/chip-picker/chip-picker';
+import { FileUpload } from '../../../common/file-upload/file-upload';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { createGmProfileI18n } from './gm-profile.i18n';
 
 @Component({

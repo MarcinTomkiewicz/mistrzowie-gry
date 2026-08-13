@@ -1,0 +1,33 @@
+<div class="flex-row-end-center flex-wrap gap-xs">
+  <p-button
+    type="button"
+    severity="secondary"
+    size="small"
+    [text]="true"
+    [label]="actions().moveItemUp"
+    icon="pi pi-arrow-up"
+    [disabled]="index() === 0"
+    (onClick)="moveUp.emit()"
+  />
+
+  <p-button
+    type="button"
+    severity="secondary"
+    size="small"
+    [text]="true"
+    [label]="actions().moveItemDown"
+    icon="pi pi-arrow-down"
+    [disabled]="index() === itemCount() - 1"
+    (onClick)="moveDown.emit()"
+  />
+
+  <p-button
+    type="button"
+    severity="danger"
+    size="small"
+    [text]="true"
+    [label]="actions().removeItem"
+    icon="pi pi-trash"
+    (onClick)="remove.emit()"
+  />
+</div>

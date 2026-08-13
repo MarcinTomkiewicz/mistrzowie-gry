@@ -7,10 +7,10 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { Theme } from '../../../core/services/theme/theme';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
-import { resolveAltDifficultyLevel } from '../session-difficulty/session-difficulty';
+import { resolveAltDifficultyLevel } from '../../../common/session-difficulty/session-difficulty';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { createEventSlotsI18n } from './event-slots.i18n';
-import { SystemChip } from '../system-chip/system-chip';
+import { SystemChip } from '../../../common/system-chip/system-chip';
 
 @Component({
   selector: 'app-event-slots',

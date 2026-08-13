@@ -26,11 +26,11 @@ import { Storage } from '../../../core/services/storage/storage';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
-import { SessionList } from '../../common/session-list/session-list';
+import { SessionList } from '../../../common/session-list/session-list';
 import { createGmProfileDialogI18n } from './gm-profile-dialog.i18n';
 import { ISessionListLabels } from '../../../core/interfaces/i-session';
 import { ISystem } from '../../../core/interfaces/i-system';
-import { SystemChip } from '../../common/system-chip/system-chip';
+import { SystemChip } from '../../../common/system-chip/system-chip';
 
 interface IGmProfileDialogTabOption {
   value: GmProfileDialogTabId;

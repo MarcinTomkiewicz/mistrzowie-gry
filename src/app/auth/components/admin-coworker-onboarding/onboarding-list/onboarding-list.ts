@@ -22,7 +22,7 @@ import {
 import type { CoworkerOnboardingLifecycleStatus } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 
 @Component({
   selector: 'app-coworker-onboarding-list',

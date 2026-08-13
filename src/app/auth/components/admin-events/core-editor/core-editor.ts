@@ -27,7 +27,7 @@ import { normalizeText, stringToSlug } from '../../../../core/utils/normalize-te
 import {
   requiredTrimmedValidator,
 } from '../../../../core/validators/required-trimmed.validator';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 
 @Component({

@@ -21,7 +21,7 @@ import { GmRead } from '../../../core/reads/gm/gm-read';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
-import { SessionDetails } from '../../common/session-details/session-details';
+import { SessionDetails } from '../../../common/session-details/session-details';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createSessionDialogI18n } from './session-dialog.i18n';
 

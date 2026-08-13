@@ -5,7 +5,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { createCommonEmptyI18n } from '../../../core/translations/common.i18n';
 import type { DisplayFaqItem } from '../../../core/types/faq-items';
 import type { OfferSectionWithItems } from '../../../core/types/offers';
-import { FaqAccordion } from '../../common/faq-accordion/faq-accordion';
+import { FaqAccordion } from '../../../common/faq-accordion/faq-accordion';
 
 @Component({
   selector: 'app-offer-faq-section',

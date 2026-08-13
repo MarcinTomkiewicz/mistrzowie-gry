@@ -11,14 +11,6 @@ import type {
   CommercialSectionSurface,
   CommercialTextAlign,
 } from '../commercial-page-builder';
-import type {
-  CommercialActualCostBasis,
-  CommercialBillingUnit,
-  CommercialPercentageBasis,
-  CommercialPriceType,
-} from '../commercial-price';
-
-export type { AdminCommercialPagesRichContentTranslations } from './admin-commercial-rich-content';
 
 export type AdminCommercialPagesListPageTranslations = {
   title: string;
@@ -238,35 +230,14 @@ export type AdminCommercialPagesFaqTranslations = {
   answer: string;
 };
 
-export type AdminCommercialPagesPriceTranslations = {
-  sectionTitle: string;
-  type: string;
-  amount: string;
-  minAmount: string;
-  maxAmount: string;
-  value: string;
-  minValue: string;
-  maxValue: string;
-  unit: string;
-  basis: string;
-  note: string;
-};
-
 export type AdminCommercialPagesEditorActionsTranslations = {
   saveDraft: string;
   moveSectionUp: string;
   moveSectionDown: string;
   removeSection: string;
-  moveItemUp: string;
-  moveItemDown: string;
-  removeItem: string;
 };
 
 export type AdminCommercialPagesValidationTranslations = {
-  invalidPrice: string;
-  invalidPriceRange: string;
-  invalidPercentage: string;
-  priceNoteRequired: string;
   invalidDuration: string;
   invalidParticipants: string;
   invalidSessions: string;
@@ -291,7 +262,3 @@ export type AdminCommercialPagesParticipantsModeTranslations = Record<Commercial
 export type AdminCommercialPagesProductKindTranslations = Record<CommercialProductKind, string>;
 export type AdminCommercialPagesSessionModeTranslations = Record<CommercialSessionCount['mode'], string>;
 export type AdminCommercialPagesActionAppearanceTranslations = Record<CommercialActionAppearance, string>;
-export type AdminCommercialPagesPriceTypeTranslations = Record<CommercialPriceType, string>;
-export type AdminCommercialPagesBillingUnitTranslations = Record<CommercialBillingUnit, string>;
-export type AdminCommercialPagesPercentageBasisTranslations = Record<CommercialPercentageBasis, string>;
-export type AdminCommercialPagesActualCostBasisTranslations = Record<CommercialActualCostBasis, string>;

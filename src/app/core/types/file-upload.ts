@@ -40,3 +40,9 @@ export interface FileUploadCropConfig {
   resizeToHeight: number;
   previewShapes: FileUploadPreviewShape[];
 }
+
+export interface FileUploadSelectedImageState {
+  file: File | null;
+  objectUrl: string | null;
+  displayedFiles: File[];
+}

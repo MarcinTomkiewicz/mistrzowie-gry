@@ -14,7 +14,7 @@ import {
   formatDateLabel,
   formatTimestampLabel,
 } from '../../../../core/utils/date';
-import { LoadingOverlay } from '../../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPagePublication } from '../commercial-page-publication/commercial-page-publication';
 

@@ -16,9 +16,6 @@ import type {
   PlaceStructuredDataOptions,
 } from '../interfaces/i-seo';
 import type { BreadcrumbItem } from '../types/breadcrumb';
-import type {
-  CommercialPageBuilderDocument,
-} from '../types/commercial-page-builder';
 
 function compactNode<T extends ISeoStructuredDataNode>(node: T): T {
   return Object.fromEntries(
@@ -106,19 +103,6 @@ export function createPageStructuredData(
     isPartOf: createWebsiteRef(),
     about: createOrganizationRef(),
     mainEntity: options.mainEntity,
-  });
-}
-
-export function createCommercialPageStructuredData(
-  document: CommercialPageBuilderDocument,
-  canonicalUrl: string,
-): ISeoStructuredDataNode {
-  return createPageStructuredData({
-    type: document.page.kind === 'offer' ? 'CollectionPage' : 'WebPage',
-    id: `${canonicalUrl}#webpage`,
-    url: canonicalUrl,
-    name: document.page.seo.title,
-    description: document.page.seo.description,
   });
 }
 

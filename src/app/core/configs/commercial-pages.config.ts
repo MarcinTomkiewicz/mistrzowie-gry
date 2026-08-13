@@ -20,12 +20,6 @@ import type {
   CommercialTextAlign,
 } from '../types/commercial-page-builder';
 import type { CommonNavTranslations } from '../types/i18n/common';
-import type {
-  CommercialActualCostBasis,
-  CommercialBillingUnit,
-  CommercialPercentageBasis,
-  CommercialPriceType,
-} from '../types/commercial-price';
 
 export const COMMERCIAL_PAGE_DEFAULT_LOCALE = 'pl';
 
@@ -66,46 +60,6 @@ export const COMMERCIAL_ACTION_APPEARANCES = [
   'success',
   'secondary',
 ] as const satisfies readonly CommercialActionAppearance[];
-
-export const COMMERCIAL_PRICE_TYPES = [
-  'fixed',
-  'range',
-  'from',
-  'percentage',
-  'actual_cost',
-  'custom_quote',
-] as const satisfies readonly CommercialPriceType[];
-
-export const COMMERCIAL_BILLING_UNITS = [
-  'session',
-  'hour',
-  'month',
-  'event',
-  'package',
-  'table',
-  'table_hour',
-  'facilitator',
-  'participant',
-  'piece',
-  'day',
-  'half_day',
-  'night',
-  'kilometer',
-] as const satisfies readonly CommercialBillingUnit[];
-
-export const COMMERCIAL_PERCENTAGE_BASES = [
-  'base_service',
-  'package',
-  'table',
-  'facilitator',
-] as const satisfies readonly CommercialPercentageBasis[];
-
-export const COMMERCIAL_ACTUAL_COST_BASES = [
-  'ticket',
-  'accommodation',
-  'documented_expense',
-  'other',
-] as const satisfies readonly CommercialActualCostBasis[];
 
 export const COMMERCIAL_BUILDER_BLOCK_TYPES = [
   'rich_text',
@@ -266,14 +220,10 @@ const COMMERCIAL_ICON_KEYS = [
   'report-draw',
 ] as const satisfies readonly CommercialIconKey[];
 
-export function commercialIconClass(iconKey: CommercialIconKey): string {
-  return `pi pi-${iconKey}`;
-}
-
 export const COMMERCIAL_ICON_OPTIONS = COMMERCIAL_ICON_KEYS.map((value) => ({
   value,
   label: value,
-  icon: commercialIconClass(value),
+  icon: `pi pi-${value}`,
 }));
 
 export const COMMERCIAL_EDITOR_DURATION_MODES = [

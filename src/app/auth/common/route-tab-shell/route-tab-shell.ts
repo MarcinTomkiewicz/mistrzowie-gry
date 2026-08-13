@@ -2,7 +2,7 @@ import { Component, effect, inject, input } from '@angular/core';
 
 import { Seo } from '../../../core/services/seo/seo';
 import type { RouteTabDefinition } from '../../../core/types/route-tab';
-import { RouteTabs } from '../../../public/common/route-tabs/route-tabs';
+import { RouteTabs } from '../../../common/route-tabs/route-tabs';
 
 @Component({
   selector: 'app-route-tab-shell',

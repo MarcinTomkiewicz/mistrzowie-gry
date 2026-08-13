@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 
 import { OfferItemKindEnum } from '../../../core/enums/offers';
 import type { OfferItem } from '../../../core/types/offers';
-import { ExpandableText } from '../../common/expandable-text/expandable-text';
+import { ExpandableText } from '../../../common/expandable-text/expandable-text';
 import { formatAddonPricing, formatPricingDetailed } from './offer-pricing';
 
 @Component({

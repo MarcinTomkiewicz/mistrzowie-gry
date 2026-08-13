@@ -3,7 +3,7 @@ import { Component, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 
 import { RichContentInput } from '../../../core/types/rich-content';
-import { RichContent } from '../rich-content/rich-content';
+import { RichContent } from '../../../common/rich-content/rich-content';
 
 @Component({
   selector: 'app-legal-dialog',

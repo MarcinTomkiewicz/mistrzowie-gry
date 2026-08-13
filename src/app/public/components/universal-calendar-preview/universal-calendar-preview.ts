@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 
-import { UniversalCalendar } from '../../common/universal-calendar/universal-calendar';
+import { UniversalCalendar } from '../../../common/universal-calendar/universal-calendar';
 import { IUniversalCalendarDay } from '../../../core/interfaces/i-universal-calendar';
 
 function createAvailabilityDays(): IUniversalCalendarDay[] {

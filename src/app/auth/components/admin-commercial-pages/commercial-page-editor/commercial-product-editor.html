@@ -29,14 +29,14 @@
     }
   </div>
 
-  <app-commercial-rich-content-editor
+  <app-rich-content-editor
     [control]="form().controls.description"
     [controlId]="controlId() + '-description'"
     [label]="i18n.product().description"
     [tokens]="tokens()"
   />
 
-  <app-commercial-price-editor
+  <app-price-editor
     [form]="form().controls.price"
     [controlId]="controlId() + '-price'"
   />

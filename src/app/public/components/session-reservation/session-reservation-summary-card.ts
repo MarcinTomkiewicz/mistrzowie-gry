@@ -22,15 +22,10 @@ export class SessionReservationSummaryCard {
   readonly state = input.required<ISessionReservationFlowState>();
   readonly gmName = getGmPublicProfileDisplayName;
 
-  summary() {
-    return this.data().summary;
-  }
-
-  grossTotalLabel(value: number | null): string {
-    return (
-      formatMoney(value, SESSION_RESERVATION_CONFIG.currency) ??
-      this.data().states.manualQuoteRequired
-    );
+  priceLabel(value: number | null): string {
+    return value === null
+      ? this.data().states.manualQuoteRequired
+      : formatMoney(value, SESSION_RESERVATION_CONFIG.currency);
   }
 
   selectedSlotLabel(): string {
@@ -52,10 +47,4 @@ export class SessionReservationSummaryCard {
     )}`;
   }
 
-  lineItemTotalLabel(value: number | null): string {
-    return (
-      formatMoney(value, SESSION_RESERVATION_CONFIG.currency) ??
-      this.data().states.manualQuoteRequired
-    );
-  }
 }

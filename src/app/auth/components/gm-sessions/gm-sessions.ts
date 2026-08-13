@@ -30,11 +30,11 @@ import { normalizeText } from '../../../core/utils/normalize-text';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
 import { SessionForm } from '../../common/session-form/session-form';
 import { createGmSessionsI18n, GM_SESSIONS_SCOPE } from './gm-sessions.i18n';
-import { LoadingOverlay } from '../../../public/common/loading-overlay/loading-overlay';
+import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import {
-  ISessionListAction,
   SessionList,
-} from '../../../public/common/session-list/session-list';
+} from '../../../common/session-list/session-list';
+import type { ISessionListAction } from '../../../core/types/session-list';
 
 interface ISessionSystemOption {
   id: string | null;
