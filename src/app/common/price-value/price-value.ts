@@ -12,6 +12,7 @@ import { formatPrice } from '../../core/utils/price-format';
 export class PriceValue {
   readonly price = input.required<Price>();
   readonly locale = input.required<string>();
+  readonly accent = input(false);
 
   private readonly i18n = createCommonPriceI18n();
 

@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 import type {
   CommercialProductCollectionCardsBlock as CommercialProductCollectionCardsBlockModel,
@@ -25,11 +25,32 @@ export class CommercialProductCollectionCards {
   readonly locale = input.required<string>();
   private readonly i18n = createCommercialPageI18n();
 
-  protected fieldsFor(
-    product: CommercialRenderProduct,
-  ): CommercialProductField[] {
-    return commercialFieldsForProduct(this.block().fields, product.id);
-  }
+  protected readonly cards = computed(() =>
+    this.products().map((product) => {
+      const fields = commercialFieldsForProduct(
+        this.block().fields,
+        product.id,
+      );
+      const priceField = fields.find((field) => field.key === 'price') ?? null;
+      const descriptionField =
+        fields.find((field) => field.key === 'description') ?? null;
+      const nameVisible = fields.some((field) => field.key === 'name');
+
+      return {
+        product,
+        nameVisible,
+        priceField,
+        descriptionField,
+        hasPrimaryContent: nameVisible || !!priceField || !!descriptionField,
+        metadataFields: fields.filter(
+          (field) =>
+            field.key !== 'name' &&
+            field.key !== 'price' &&
+            field.key !== 'description',
+        ),
+      };
+    }),
+  );
 
   protected labelFor(
     field: CommercialProductField,

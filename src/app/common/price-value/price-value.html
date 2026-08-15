@@ -1,7 +1,7 @@
 @let data = formatted();
 
 @if (data.value) {
-  <strong>{{ data.value }}</strong>
+  <strong [class.heading-color]="accent()">{{ data.value }}</strong>
 }
 
 @if (data.note) {

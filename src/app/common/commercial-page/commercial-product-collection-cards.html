@@ -6,28 +6,60 @@
   [class.grid-cols-2]="data.presentation.columns === 2"
   [class.grid-cols-3]="data.presentation.columns === 3"
 >
-  @for (product of products(); track product.id) {
-    <article class="mg-card">
-      <dl
-        class="gap-sm m-0 w-100"
-        [class.flex-col-start-stretch]="data.presentation.orientation === 'vertical'"
-        [class.mg-grid]="data.presentation.orientation === 'horizontal'"
-        [class.grid-cols-2]="data.presentation.orientation === 'horizontal'"
-        [class.grid-cols-1-sm]="data.presentation.orientation === 'horizontal'"
-      >
-        @for (field of fieldsFor(product); track field.id) {
-          <div class="flex-col-start-stretch gap-xs">
-            <dt><strong>{{ labelFor(field, product) }}</strong></dt>
-            <dd class="m-0">
-              <app-commercial-product-field-value
-                [product]="product"
-                [field]="field"
-                [locale]="locale()"
-              />
-            </dd>
-          </div>
-        }
-      </dl>
+  @for (card of cards(); track card.product.id) {
+    <article
+      class="mg-card gap-lg w-100"
+      [class.flex-col-start-stretch]="data.presentation.orientation === 'vertical'"
+      [class.flex-row-between-start]="data.presentation.orientation === 'horizontal'"
+      [class.flex-col-start-stretch-sm]="data.presentation.orientation === 'horizontal'"
+    >
+      @if (card.hasPrimaryContent) {
+        <div class="flex-col-start-stretch gap-sm flex-1">
+          @if (card.nameVisible) {
+            <h3 class="mg-section__title mg-section__title--sm m-0">
+              {{ card.product.name }}
+            </h3>
+          }
+
+          @if (card.priceField; as field) {
+            <app-commercial-product-field-value
+              [product]="card.product"
+              [field]="field"
+              [locale]="locale()"
+              [priceAccent]="true"
+            />
+          }
+
+          @if (card.descriptionField; as field) {
+            <app-commercial-product-field-value
+              [product]="card.product"
+              [field]="field"
+              [locale]="locale()"
+            />
+          }
+        </div>
+      }
+
+      @if (card.metadataFields.length) {
+        <dl
+          class="flex-col-start-stretch gap-sm m-0"
+          [class.w-100]="data.presentation.orientation === 'vertical'"
+          [class.flex-1]="data.presentation.orientation === 'horizontal'"
+        >
+          @for (field of card.metadataFields; track field.id) {
+            <div class="flex-col-start-stretch gap-xs">
+              <dt><strong>{{ labelFor(field, card.product) }}</strong></dt>
+              <dd class="m-0">
+                <app-commercial-product-field-value
+                  [product]="card.product"
+                  [field]="field"
+                  [locale]="locale()"
+                />
+              </dd>
+            </div>
+          }
+        </dl>
+      }
     </article>
   }
 </div>

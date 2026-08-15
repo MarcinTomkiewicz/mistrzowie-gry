@@ -24,7 +24,11 @@
       </div>
 
       @if (card.price; as price) {
-        <app-price-value [price]="price" [locale]="locale()" />
+        <app-price-value
+          [price]="price"
+          [locale]="locale()"
+          [accent]="true"
+        />
       }
     </article>
   }
