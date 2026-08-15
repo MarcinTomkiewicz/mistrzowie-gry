@@ -1,31 +1,31 @@
 {
   "page": {
     "title": "KWESTIONARIUSZ OSOBOWY ZLECENIOBIORCY",
-    "subtitle": "[PH] Zapisuj wersję roboczą w dowolnym momencie. Ukończenie kwestionariusza wymaga uzupełnienia wszystkich danych wskazanych przez formularz."
+    "subtitle": "Możesz zapisać wersję roboczą w dowolnym momencie i wrócić do niej później. Po ukończeniu kwestionariusza zostanie wygenerowany dokument PDF, który będzie dostępny w zakładce z dokumentami prywatnymi."
   },
   "sections": {
     "personalTitle": "1. DANE DOTYCZĄCE OSOBY ZGŁASZANEJ DO ZUS",
-    "personalDescription": "[PH] Podaj dane identyfikacyjne i kontaktowe zgodne z dokumentami.",
+    "personalDescription": "Podaj dane identyfikacyjne i kontaktowe zgodne z dokumentami.",
     "registeredAddressTitle": "Adres zameldowania",
-    "registeredAddressDescription": "[PH] Podaj podstawowy adres używany w dokumentacji.",
+    "registeredAddressDescription": "Podaj podstawowy adres używany w dokumentacji.",
     "correspondenceAddressTitle": "Adres zamieszkania oraz adres do korespondencji jeżeli jest inny niż adres zameldowania",
-    "correspondenceAddressDescription": "[PH] Uzupełnij tylko wtedy, gdy korespondencja ma trafiać pod inny adres.",
+    "correspondenceAddressDescription": "Uzupełnij tylko wtedy, gdy korespondencja ma trafiać pod inny adres.",
     "institutionsTitle": "2. DANE DO ROZLICZEŃ PUBLICZNO – PRAWNYCH",
-    "institutionsDescription": "[PH] Wskaż właściwy urząd skarbowy i oddział NFZ.",
+    "institutionsDescription": "Wskaż właściwy urząd skarbowy i oddział NFZ.",
     "insuranceTitle": "3. UBEZPIECZENIA SPOŁECZNE",
-    "insuranceDescription": "[PH] Odpowiedz zgodnie ze swoją aktualną sytuacją ubezpieczeniową.",
+    "insuranceDescription": "Odpowiedz zgodnie ze swoją aktualną sytuacją ubezpieczeniową.",
     "insuranceEmploymentTitle": "3.1. Podstawa wyłączenia z obowiązkowych ubezpieczeń społecznych:",
-    "insuranceEmploymentDescription": "[PH] Podaj informacje o innym zatrudnieniu oraz statusie ucznia lub studenta.",
-    "insuranceContractsTitle": "[PH] Inne umowy zlecenia",
-    "insuranceContractsDescription": "[PH] Podaj informacje o pozostałych umowach zlecenia i związanych z nimi składkach.",
+    "insuranceEmploymentDescription": "Podaj informacje o innym zatrudnieniu oraz statusie ucznia lub studenta.",
+    "insuranceContractsTitle": "Inne umowy zlecenia",
+    "insuranceContractsDescription": "Podaj informacje o pozostałych umowach zlecenia i związanych z nimi składkach.",
     "insuranceElectionsTitle": "3.2. Obowiązkowe Ubezpieczenia Społeczne",
-    "insuranceElectionsDescription": "[PH] Wskaż obowiązkowe ubezpieczenia oraz decyzje dotyczące ubezpieczeń dobrowolnych.",
-    "insuranceStatusTitle": "[PH] Świadczenia i urząd pracy",
-    "insuranceStatusDescription": "[PH] Podaj informacje o prawie do świadczeń, niepełnosprawności i rejestracji w urzędzie pracy.",
-    "paymentTitle": "[PH] Dane do płatności",
-    "paymentDescription": "[PH] Podaj bank i rachunek, na który mają trafiać rozliczenia.",
-    "declarationTitle": "4. OŚWIADCZENIE ZLECENIOBIORCY",
-    "declarationDescription": "[PH] Przed ukończeniem przeczytaj aktualne oświadczenie i zaakceptuj je świadomie."
+    "insuranceElectionsDescription": "Wskaż obowiązkowe ubezpieczenia oraz decyzje dotyczące ubezpieczeń dobrowolnych.",
+    "insuranceStatusTitle": "4. Świadczenia i urząd pracy",
+    "insuranceStatusDescription": "Podaj informacje o prawie do świadczeń, niepełnosprawności i rejestracji w urzędzie pracy.",
+    "paymentTitle": "5. Dane do płatności",
+    "paymentDescription": "Podaj bank i rachunek, na który mają trafiać rozliczenia.",
+    "declarationTitle": "6. OŚWIADCZENIE ZLECENIOBIORCY",
+    "declarationDescription": "Przed ukończeniem przeczytaj aktualne oświadczenie i potwierdź, że je rozumiesz."
   },
   "fields": {
     "maidenNameLabel": "Nazwisko rodowe",
@@ -89,17 +89,17 @@
   "actions": {
     "completeLabel": "Ukończ kwestionariusz",
     "reloadLabel": "Pobierz aktualne dane",
-    "goToPrivateDocumentsLabel": "[PH] Przejdź do Dokumentów prywatnych"
+    "goToPrivateDocumentsLabel": "Przejdź do Dokumentów prywatnych"
   },
   "status": {
-    "savingDraft": "[PH] Zapisywanie wersji roboczej…",
-    "completing": "[PH] Kończenie kwestionariusza…",
-    "completeTitle": "[PH] Kwestionariusz został ukończony",
-    "completeDescription": "[PH] PDF został utworzony i jest dostępny w Dokumentach prywatnych. Dokument nie pobierze się automatycznie.",
-    "legacyCountryNotice": "[PH] Zapisany kraj wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
-    "legacyCitizenshipNotice": "[PH] Zapisane obywatelstwo wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
-    "legacyInstitutionNotice": "[PH] Zapisana wartość wymaga świadomego wybrania pozycji z aktualnego katalogu przed ukończeniem.",
-    "declarationAcceptedAtLabel": "[PH] Ostatnia akceptacja"
+    "savingDraft": "Zapisywanie wersji roboczej...",
+    "completing": "Kończenie kwestionariusza...",
+    "completeTitle": "Kwestionariusz został zapisany!",
+    "completeDescription": "PDF został utworzony i jest dostępny w Dokumentach prywatnych. Dokument nie pobierze się automatycznie.",
+    "legacyCountryNotice": "Zapisany kraj wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
+    "legacyCitizenshipNotice": "Zapisane obywatelstwo wymaga wybrania aktualnej wartości z katalogu przed ukończeniem.",
+    "legacyInstitutionNotice": "Zapisana wartość wymaga wybrania pozycji z aktualnego katalogu przed ukończeniem.",
+    "declarationAcceptedAtLabel": "Ostatnia akceptacja"
   },
   "errors": {
     "loadTitle": "Nie udało się załadować kwestionariusza",
@@ -115,7 +115,7 @@
     "statementChangedDescription": "Treść aktualnego oświadczenia uległa zmianie. Pobierz aktualne dane, przeczytaj oświadczenie ponownie i zaakceptuj je przed ukończeniem kwestionariusza.",
     "peselConflictDescription": "Podany PESEL jest już przypisany do innego kwestionariusza.",
     "peselConflictField": "Ten PESEL jest już przypisany do innego kwestionariusza.",
-    "citizenshipCatalogRequired": "[PH] Wybierz obywatelstwo z listy przed ukończeniem kwestionariusza.",
+    "citizenshipCatalogRequired": "Wybierz obywatelstwo z listy przed ukończeniem kwestionariusza.",
     "finalDeclarationAccepted": "Zaakceptuj aktualne oświadczenie przed ukończeniem kwestionariusza.",
     "fatalTitle": "Usługa kwestionariusza jest niedostępna",
     "unexpectedDescription": "Wystąpił nieoczekiwany błąd podczas obsługi kwestionariusza.",
@@ -124,7 +124,7 @@
     "fieldErrorsTitle": "Pola wymagające poprawy"
   },
   "toast": {
-    "draftSavedSummary": "[PH] Zapisano wersję roboczą",
-    "draftSavedDetail": "[PH] Możesz wrócić do kwestionariusza i dokończyć go później."
+    "draftSavedSummary": "Zapisano wersję roboczą!",
+    "draftSavedDetail": "Możesz wrócić do kwestionariusza i dokończyć go później."
   }
 }

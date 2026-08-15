@@ -126,18 +126,12 @@
                 <div class="flex-col-start-start gap-xs">
                   <small>
                     {{ i18n.table().draftUsage }}:
-                    {{ row.constant.usage.draftPages.length }}
+                    {{ row.constant.usage.draftPageCount }}
                   </small>
-                  @if (row.constant.usage.draftPages.length) {
-                    <small>{{ row.draftUsageLabels }}</small>
-                  }
                   <small>
                     {{ i18n.table().publishedUsage }}:
-                    {{ row.constant.usage.publishedPages.length }}
+                    {{ row.constant.usage.publishedPageCount }}
                   </small>
-                  @if (row.constant.usage.publishedPages.length) {
-                    <small>{{ row.publishedUsageLabels }}</small>
-                  }
                 </div>
               </td>
               <td class="text-right">

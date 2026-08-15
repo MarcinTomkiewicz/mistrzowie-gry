@@ -7,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { finalize } from 'rxjs';
 
-import { COMMERCIAL_PAGE_NAVIGATION_LABEL_KEYS } from '../../../../core/configs/commercial-pages.config';
 import { CommercialConstantAdmin } from '../../../../core/services/commercial-constant-admin/commercial-constant-admin';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -59,7 +58,6 @@ export class CommercialConstantList {
   );
   protected readonly rowVms = computed(() => {
     const values = this.i18n.commonValues();
-    const navigationLabels = this.i18n.commonNav();
     const status = this.i18n.status();
     const units = this.i18n.durationUnit();
 
@@ -101,18 +99,6 @@ export class CommercialConstantList {
       publishedAtLabel:
         formatTimestampLabel(constant.publishedAt) ?? values.notAvailable,
       publishedByLabel: constant.publishedBy ?? values.notAvailable,
-      draftUsageLabels: constant.usage.draftPages
-        .map(
-          (pageKey) =>
-            navigationLabels[COMMERCIAL_PAGE_NAVIGATION_LABEL_KEYS[pageKey]],
-        )
-        .join(', '),
-      publishedUsageLabels: constant.usage.publishedPages
-        .map(
-          (pageKey) =>
-            navigationLabels[COMMERCIAL_PAGE_NAVIGATION_LABEL_KEYS[pageKey]],
-        )
-        .join(', '),
     }));
   });
 

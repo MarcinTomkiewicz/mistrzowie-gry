@@ -1,11 +1,10 @@
-import type { CommercialPageKey } from './commercial-page';
-
 export type CommercialConstantValueType = 'duration' | 'integer' | 'text';
 export type CommercialConstantValue = string | number;
 
 export type CommercialConstantUsage = {
-  draftPages: CommercialPageKey[];
-  publishedPages: CommercialPageKey[];
+  used: boolean;
+  draftPageCount: number;
+  publishedPageCount: number;
 };
 
 type CommercialConstantAdminItemBase<
