@@ -23,7 +23,7 @@
         autocapitalize="none"
         spellcheck="false"
       />
-      <label for="login-email">{{ i18n.form().emailLabel }}</label>
+      <label for="login-email">{{ i18n.commonLabels().emailAddress }}</label>
     </p-iftalabel>
 
     @if (showEmailError()) {
@@ -51,7 +51,7 @@
         </ng-template>
       </p-password>
 
-      <label for="login-password">{{ i18n.form().passwordLabel }}</label>
+      <label for="login-password">{{ i18n.commonLabels().password }}</label>
     </p-iftalabel>
 
     @if (showPasswordError()) {

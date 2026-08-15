@@ -1,5 +1,8 @@
 import {
   createCommonActionsI18n,
+  createCommonErrorsI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
   createCommonValuesI18n,
@@ -40,6 +43,9 @@ export function createEventCoreListI18n() {
     status,
     rpcErrors,
     commonActions: createCommonActionsI18n(),
+    commonErrors: createCommonErrorsI18n(),
+    commonLabels: createCommonLabelsI18n(),
+    commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
     commonValues: createCommonValuesI18n(),

@@ -28,6 +28,8 @@ export class CommercialProductFieldValue {
       this.product(),
       this.field().key,
       this.i18n.productValues(),
+      this.i18n.commonLabels().fromLowercase,
+      this.i18n.commonLabels().toLowercase,
       this.locale(),
     ),
   );

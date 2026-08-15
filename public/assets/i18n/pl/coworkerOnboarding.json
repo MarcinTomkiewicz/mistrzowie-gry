@@ -2,7 +2,6 @@
   "adminList": {
     "title": "Onboarding współpracowników [PH]",
     "subtitle": "Rozpoczynaj onboarding i sprawdzaj postęp dokumentów współpracowników. [PH]",
-    "startTitle": "Rozpocznij onboarding [PH]",
     "startDescription": "Wybierz współpracownika z rolą Mistrz Gry lub wyższą, który nie ma aktywnego onboardingu. [PH]",
     "noCandidates": "Brak współpracowników z rolą Mistrz Gry lub wyższą dostępnych do rozpoczęcia onboardingu. [PH]",
     "empty": "Nie rozpoczęto jeszcze żadnego onboardingu. [PH]",
@@ -11,18 +10,14 @@
   "adminDetail": {
     "title": "Szczegóły onboardingu [PH]",
     "subtitle": "Zarządzaj dokumentami prywatnymi i zakończeniem onboardingu. [PH]",
-    "userSection": "Współpracownik [PH]",
-    "documentsSection": "Dokumenty prywatne [PH]",
     "uploadSection": "Dodaj dokumenty prywatne [PH]",
     "completeSection": "Zakończenie onboardingu [PH]",
     "completeDescription": "Zakończ onboarding po rozpatrzeniu wymaganych dokumentów. [PH]",
     "emptyDocuments": "Brak dokumentów prywatnych w tym onboardingu. [PH]",
     "loadError": "Nie udało się pobrać szczegółów onboardingu. [PH]",
-    "questionnaireBadge": "Kwestionariusz [PH]",
-    "rejectionReason": "Powód odrzucenia [PH]"
+    "questionnaireBadge": "Kwestionariusz [PH]"
   },
   "adminShared": {
-    "title": "Dokumenty wspólne [PH]",
     "subtitle": "Dodawaj, zastępuj i archiwizuj dokumenty wspólne. [PH]",
     "formTitleNew": "Dodaj dokument wspólny [PH]",
     "formTitleReplace": "Zastąp plik dokumentu wspólnego [PH]",
@@ -33,31 +28,24 @@
     "loadError": "Nie udało się pobrać dokumentów wspólnych. [PH]"
   },
   "coworkerPrivate": {
-    "title": "Dokumenty prywatne [PH]",
     "subtitle": "Pobierz dokumenty i prześlij podpisane kopie, gdy są wymagane. [PH]",
     "noOnboarding": "Nie masz aktywnego onboardingu. [PH]",
     "questionnaireRequired": "Najpierw uzupełnij i zakończ kwestionariusz osobowy. [PH]",
     "empty": "Nie masz jeszcze dokumentów prywatnych. [PH]",
     "declaration": "Oświadczam, że załączam podpisany dokument",
-    "rejectionReason": "Powód odrzucenia [PH]",
     "loadError": "Nie udało się pobrać dokumentów prywatnych. [PH]"
   },
   "coworkerShared": {
-    "title": "Dokumenty wspólne [PH]",
     "subtitle": "Zapoznaj się z przydzielonymi dokumentami i potwierdź ich przeczytanie. [PH]",
     "onboardingRequired": "Dokumenty wspólne będą dostępne po zakończeniu onboardingu. [PH]",
     "empty": "Nie masz przydzielonych dokumentów wspólnych. [PH]",
-    "acknowledgedAt": "Potwierdzono [PH]",
-    "loadError": "Nie udało się pobrać dokumentów wspólnych. [PH]"
+    "acknowledgedAt": "Potwierdzono [PH]"
   },
   "fields": {
-    "user": "Współpracownik [PH]",
-    "status": "Status [PH]",
     "startedAt": "Rozpoczęto [PH]",
     "completedAt": "Zakończono [PH]",
     "documents": "Dokumenty [PH]",
     "pendingActions": "Oczekujące działania [PH]",
-    "title": "Tytuł [PH]",
     "preset": "Preset [PH]",
     "noPreset": "Bez presetu [PH]",
     "requiresSignedUpload": "Wymaga podpisanej kopii [PH]",
@@ -66,13 +54,11 @@
     "pendingAssignments": "Oczekujące [PH]",
     "acknowledgedAssignments": "Potwierdzone [PH]",
     "autoAssign": "Przydzielaj po zakończeniu onboardingu [PH]",
-    "rejectionReason": "Powód odrzucenia [PH]",
     "acknowledgement": "Potwierdzam zapoznanie się z dokumentem. [PH]"
   },
   "actions": {
     "start": "Rozpocznij onboarding [PH]",
     "open": "Otwórz [PH]",
-    "preview": "Podgląd [PH]",
     "download": "Pobierz [PH]",
     "previewSigned": "Podgląd podpisanej kopii [PH]",
     "downloadSigned": "Pobierz podpisaną kopię [PH]",
@@ -80,12 +66,10 @@
     "reject": "Odrzuć [PH]",
     "removeDocument": "Usuń dokument [PH]",
     "complete": "Zakończ onboarding",
-    "addRow": "Dodaj pozycję [PH]",
     "uploadDocuments": "Prześlij dokumenty [PH]",
     "uploadSigned": "Załącz dokument",
     "saveShared": "Dodaj dokument [PH]",
     "replaceShared": "Zastąp plik [PH]",
-    "archive": "Archiwizuj [PH]",
     "showConfirmations": "Pokaż potwierdzenia [PH]",
     "acknowledge": "Zapisz potwierdzenia",
     "goToQuestionnaire": "Przejdź do kwestionariusza [PH]"
@@ -109,7 +93,6 @@
   },
   "toast": {
     "mutationSuccessSummary": "Zapisano [PH]",
-    "mutationSuccessDetail": "Zmiany zostały zapisane. [PH]",
     "mutationFailedSummary": "Nie udało się zapisać [PH]",
     "mutationFailedDetail": "Sprawdź dane i spróbuj ponownie. [PH]",
     "downloadFailedSummary": "Nie udało się przygotować pliku [PH]",
@@ -120,10 +103,6 @@
       "in_progress": "W toku [PH]",
       "completed": "Zakończony [PH]",
       "cancelled": "Anulowany [PH]"
-    },
-    "document": {
-      "active": "Aktywny [PH]",
-      "archived": "Zarchiwizowany [PH]"
     },
     "assignment": {
       "available": "Dostępny [PH]",

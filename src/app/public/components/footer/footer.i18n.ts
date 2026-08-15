@@ -14,6 +14,7 @@ import {
 import { ILegalLink } from '../../../core/interfaces/i-legal';
 import {
   createCommonLegalI18n,
+  createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonSocialI18n,
 } from '../../../core/translations/common.i18n';
@@ -24,6 +25,7 @@ export function createFooterI18n() {
   const nav = createCommonNavI18n();
   const social = createCommonSocialI18n();
   const legal = createCommonLegalI18n();
+  const labels = createCommonLabelsI18n();
 
   const resolveNavLabel = (labelKey: string): string => {
     const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
@@ -66,6 +68,9 @@ export function createFooterI18n() {
 
   return {
     footer,
+    legal,
+    labels,
+    nav,
     resolveFooterMenu,
     resolveSocialLinks,
     resolveLegalLinks,

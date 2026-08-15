@@ -1,6 +1,10 @@
 import { computed } from '@angular/core';
 
 import {
+  createCommonCtaI18n,
+  createCommonNavI18n,
+} from '../../../../core/translations/common.i18n';
+import {
   HeroCarouselAria,
   HeroSlideCopy,
 } from '../../../../core/types/i18n/home';
@@ -19,9 +23,13 @@ export function createHeroCarouselI18n() {
   const slidesCopy = computed<HeroSlideCopy[]>(() =>
     recordValuesSortedBy(slidesDict(), (item) => item.id),
   );
+  const commonCta = createCommonCtaI18n();
+  const commonNav = createCommonNavI18n();
 
   return {
     aria,
     slidesCopy,
+    commonCta,
+    commonNav,
   };
 }

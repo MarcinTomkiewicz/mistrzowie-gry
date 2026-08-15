@@ -2,11 +2,6 @@ import { Signal } from '@angular/core';
 import { IMenu } from '../../interfaces/i-menu';
 
 export type CommonCtaTranslations = {
-  contactUs: string;
-  joinProgram: string;
-  offerIndividual: string;
-  offerBusiness: string;
-  chaoticThursdays: string;
   checkDetails: string;
   seeProgram: string;
   learnMore: string;
@@ -34,7 +29,6 @@ export type CommonActionsTranslations = {
   refresh: string;
   retry: string;
   add: string;
-  remove: string;
   clear: string;
   next: string;
   previous: string;
@@ -43,6 +37,14 @@ export type CommonActionsTranslations = {
   submit: string;
   ok: string;
   logout: string;
+  publish: string;
+  archive: string;
+  select: string;
+  saveDraft: string;
+  addItem: string;
+  addSection: string;
+  preview: string;
+  clearDay: string;
   moveItemUp: string;
   moveItemDown: string;
   removeItem: string;
@@ -53,6 +55,84 @@ export type CommonValuesTranslations = {
   no: string;
   notProvided: string;
   notAvailable: string;
+  notApplicable: string;
+  active: string;
+  published: string;
+  archived: string;
+};
+
+export type CommonLabelsTranslations = {
+  name: string;
+  city: string;
+  status: string;
+  title: string;
+  slug: string;
+  price: string;
+  description: string;
+  date: string;
+  comment: string;
+  role: string;
+  public: string;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  phoneNumber: string;
+  street: string;
+  postalCode: string;
+  languages: string;
+  facilitationStyles: string;
+  totalHours: string;
+  hourRanges: string;
+  previousMonth: string;
+  currentMonth: string;
+  key: string;
+  shortDescription: string;
+  displayOrder: string;
+  order: string;
+  emailAddress: string;
+  password: string;
+  useNickname: string;
+  age: string;
+  publication: string;
+  label: string;
+  products: string;
+  cards: string;
+  table: string;
+  duration: string;
+  participants: string;
+  facilitatorCount: string;
+  tableCount: string;
+  participantCount: string;
+  event: string;
+  forBeginners: string;
+  amount: string;
+  lead: string;
+  sectionHeading: string;
+  seo: string;
+  seoTitle: string;
+  seoDescription: string;
+  publishedBy: string;
+  publishedAt: string;
+  gmProfile: string;
+  rejectionReason: string;
+  coworker: string;
+  locality: string;
+  pesel: string;
+  basicInfo: string;
+  additionalInfo: string;
+  chaoticThursday: string;
+  inBrief: string;
+  brandName: string;
+  contactDetails: string;
+  rpgSystem: string;
+  phone: string;
+  email: string;
+  from: string;
+  to: string;
+  fromLowercase: string;
+  toLowercase: string;
+  hours: string;
+  item: string;
 };
 
 export type CommonTableTranslations = {
@@ -77,6 +157,16 @@ export type CommonNavTranslations = {
   articles: string;
   blog: string;
   standardsAndLogistics: string;
+  editProfile: string;
+  coworkerRecords: string;
+  eventSignup: string;
+  gmSessions: string;
+  contentManagement: string;
+  eventsManagement: string;
+  adminCoworkerRecords: string;
+  usersManagement: string;
+  sharedDocuments: string;
+  privateDocuments: string;
 };
 
 export type CommonSocialTranslations = {
@@ -105,11 +195,13 @@ export type CommonStatusTranslations = {
   sending: string;
   success: string;
   done: string;
+  changesSaved: string;
 };
 
 export type CommonEmptyTranslations = {
   title: string;
   description: string;
+  articles: string;
 };
 
 export type CommonInfoTranslations = {
@@ -124,6 +216,12 @@ export type CommonErrorsTranslations = {
   unauthorized: string;
   timeout: string;
   server: string;
+  articleLoadFailed: string;
+  articlesLoadFailed: string;
+  articleNotFound: string;
+  eventsLoadFailed: string;
+  concurrentModification: string;
+  changesNotSaved: string;
 };
 
 export type CommonSeoTranslations = {
@@ -138,7 +236,6 @@ export type CommonFormConsentTranslations = {
 
 export type CommonLegalNoticeTranslations = {
   prefix: string;
-  privacyPolicyLabel: string;
 };
 export type CommonFormFileUploadTranslations = {
   chooseImage: string;

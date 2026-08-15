@@ -18,9 +18,9 @@
         <p-button
           severity="secondary"
           [outlined]="monthOffset() !== -1"
-          [label]="isCompactView() ? undefined : i18n.actions().previousMonthLabel"
+          [label]="isCompactView() ? undefined : i18n.commonLabels().previousMonth"
           [icon]="isCompactView() ? 'pi pi-point-left' : undefined"
-          [ariaLabel]="i18n.actions().previousMonthLabel"
+          [ariaLabel]="i18n.commonLabels().previousMonth"
           (onClick)="switchMonth(-1)"
         />
 
@@ -33,9 +33,9 @@
         <p-button
           severity="secondary"
           [outlined]="monthOffset() !== 0"
-          [label]="isCompactView() ? undefined : i18n.actions().currentMonthLabel"
+          [label]="isCompactView() ? undefined : i18n.commonLabels().currentMonth"
           [icon]="isCompactView() ? 'pi pi-point-right' : undefined"
-          [ariaLabel]="i18n.actions().currentMonthLabel"
+          [ariaLabel]="i18n.commonLabels().currentMonth"
           (onClick)="switchMonth(0)"
         />
       </div>
@@ -48,7 +48,7 @@
 
       <div class="flex-row-end-center flex-wrap gap-sm w-100">
         <span class="tag-badge tag-badge--success">
-          {{ i18n.myWorkLog().totalHoursLabel }}:
+          {{ i18n.commonLabels().totalHours }}:
           {{ formatHours(totalHours()) }} h
         </span>
       </div>
@@ -65,13 +65,13 @@
       <p-table [value]="rows()" dataKey="date" class="w-100">
         <ng-template #header>
           <tr>
-            <th class="small-caps text-center">{{ i18n.form().dateLabel }}</th>
-            <th class="small-caps text-center">{{ i18n.form().rangesLabel }}</th>
-            <th class="small-caps text-center">{{ i18n.form().commentLabel }}</th>
+            <th class="small-caps text-center">{{ i18n.commonLabels().date }}</th>
+            <th class="small-caps text-center">{{ i18n.commonLabels().hourRanges }}</th>
+            <th class="small-caps text-center">{{ i18n.commonLabels().comment }}</th>
             <th class="small-caps text-center">
-              {{ i18n.form().chaoticThursdayLabel }}
+              {{ i18n.commonLabels().chaoticThursday }}
             </th>
-            <th class="small-caps text-right">{{ i18n.form().totalHoursLabel }}</th>
+            <th class="small-caps text-right">{{ i18n.commonLabels().totalHours }}</th>
           </tr>
         </ng-template>
 
@@ -99,7 +99,7 @@
                         (ngModelChange)="updateRangeStart(row.date, range.id, $event)"
                       />
 
-                      <span>{{ i18n.form().toLabel }}</span>
+                      <span>{{ i18n.commonLabels().toLowercase }}</span>
 
                       <p-select
                         [options]="getEndHourOptions(range)"
@@ -139,7 +139,7 @@
                     severity="danger"
                     [outlined]="true"
                     size="small"
-                    [label]="i18n.actions().clearDayLabel"
+                    [label]="i18n.commonActions().clearDay"
                     [disabled]="!monthScope().isEditable"
                     icon="pi pi-demolish"
                     (onClick)="clearDay(row.date)"
@@ -155,7 +155,7 @@
                 rows="2"
                 [ngModel]="row.day?.comment ?? ''"
                 [disabled]="!monthScope().isEditable"
-                [attr.aria-label]="i18n.form().commentLabel"
+                [attr.aria-label]="i18n.commonLabels().comment"
                 (ngModelChange)="updateComment(row.date, $event)"
               ></textarea>
             </td>
@@ -205,7 +205,7 @@
                 </div>
 
                 <div class="flex-row-between-center gap-sm w-100">
-                  <span>{{ i18n.form().chaoticThursdayLabel }}</span>
+                  <span>{{ i18n.commonLabels().chaoticThursday }}</span>
 
                   <p-checkbox
                     [binary]="true"
@@ -264,7 +264,7 @@
 
                 <div class="flex-col-start-stretch gap-xs w-100">
                   <label [for]="'work-log-comment-' + row.date">
-                    {{ i18n.form().commentLabel }}
+                    {{ i18n.commonLabels().comment }}
                   </label>
 
                   <textarea
@@ -292,7 +292,7 @@
                     severity="danger"
                     [outlined]="true"
                     size="small"
-                    [label]="i18n.actions().clearDayLabel"
+                    [label]="i18n.commonActions().clearDay"
                     [disabled]="!monthScope().isEditable"
                     icon="pi pi-demolish"
                     (onClick)="clearDay(row.date)"

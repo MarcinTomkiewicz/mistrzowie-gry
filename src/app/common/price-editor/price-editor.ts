@@ -13,7 +13,10 @@ import {
   PERCENTAGE_BASES,
   PRICE_TYPES,
 } from '../../core/configs/price.config';
-import { createCommonPriceI18n } from '../../core/translations/common.i18n';
+import {
+  createCommonLabelsI18n,
+  createCommonPriceI18n,
+} from '../../core/translations/common.i18n';
 import type { PriceEditorForm } from '../../core/types/price-editor-form';
 
 @Component({
@@ -33,6 +36,7 @@ export class PriceEditor {
   readonly controlId = input.required<string>();
 
   protected readonly i18n = createCommonPriceI18n();
+  protected readonly labels = createCommonLabelsI18n();
   protected readonly priceTypeOptions = computed(() => {
     const labels = this.i18n().editor.types;
 
@@ -46,15 +50,17 @@ export class PriceEditor {
 
     return BILLING_UNITS.map((value) => ({
       value,
-      label: labels[value],
+      label: value === 'event' ? this.labels().event : labels[value],
     }));
   });
   protected readonly percentageBasisOptions = computed(() => {
-    const labels = this.i18n().editor.percentageBases;
+    const editor = this.i18n().editor;
 
     return PERCENTAGE_BASES.map((value) => ({
       value,
-      label: labels[value],
+      label: value === 'base_service'
+        ? editor.percentageBases.base_service
+        : editor.billingUnits[value],
     }));
   });
   protected readonly actualCostBasisOptions = computed(() => {

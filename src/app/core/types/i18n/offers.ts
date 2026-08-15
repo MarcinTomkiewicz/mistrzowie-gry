@@ -1,8 +1,10 @@
+export type OfferCtaTranslations = {
+  contactUs: string;
+};
+
 export type OfferPricingHeadersTranslations = {
   variant: string;
   variantLabel: string;
-  price: string;
-  description: string;
 };
 
 export type StandardsAndLogisticsFaqItem = {

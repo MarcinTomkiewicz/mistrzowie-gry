@@ -1,11 +1,18 @@
 import { IHeroSlide } from '../../interfaces/home/i-hero-slide';
 
-export type HeroSlideCopy = {
+type HeroSlideCopyBase = {
   id: number;
   heading: string;
   text: string;
-  ctaLabel: string;
 };
+
+export type HeroSlideCopy = HeroSlideCopyBase & ({
+  id: 1 | 4;
+  ctaLabel: string;
+  imageAlt: string;
+} | {
+  id: 2 | 3;
+});
 
 export type HeroCarouselAria = {
   sectionLabel: string;
@@ -19,7 +26,6 @@ export type HeroSlideTech = {
   id: number;
   ctaPath: string;
   imageSrc: string;
-  imageAlt: string;
 };
 
 export type UiHeroSlide = IHeroSlide & { id: number };
@@ -91,6 +97,5 @@ export type UiSeoTextColumn = {
 };
 
 export type SeoTextHeader = {
-  title: string;
   subtitle: string;
 };

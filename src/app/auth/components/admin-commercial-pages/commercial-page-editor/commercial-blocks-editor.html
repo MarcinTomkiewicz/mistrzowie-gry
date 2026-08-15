@@ -32,7 +32,7 @@
   @for (block of blocks().controls; track block; let index = $index) {
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
-        <strong>{{ i18n.blockType()[block.controls.type.value] }}</strong>
+        <strong>{{ blockTypeLabel(block.controls.type.value) }}</strong>
         <div class="flex-row-end-center flex-wrap gap-xs">
           <p-button
             type="button"

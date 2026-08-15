@@ -31,8 +31,8 @@ export class QuestionnaireInsurance {
   protected readonly yesNoOptions = computed<
     ISelectOption<Exclude<QuestionnaireYesNo, null>>[]
   >(() => [
-    { value: 'yes', label: this.i18n.options().yes },
-    { value: 'no', label: this.i18n.options().no },
+    { value: 'yes', label: this.i18n.commonValues().yes },
+    { value: 'no', label: this.i18n.commonValues().no },
   ]);
   protected readonly insuranceChoiceOptions = computed<
     ISelectOption<Exclude<QuestionnaireJoinDeclineAnswer, null>>[]
@@ -43,7 +43,7 @@ export class QuestionnaireInsurance {
   protected readonly disabilityDegreeOptions = computed<
     ISelectOption<Exclude<QuestionnaireDisabilityDegree, null>>[]
   >(() => [
-    { value: 'none', label: this.i18n.options().disabilityNone },
+    { value: 'none', label: this.i18n.commonValues().notAvailable },
     { value: 'light', label: this.i18n.options().disabilityLight },
     { value: 'moderate', label: this.i18n.options().disabilityModerate },
     { value: 'severe', label: this.i18n.options().disabilitySevere },

@@ -47,7 +47,7 @@ export class ContentArticleList implements OnInit {
       path: '/',
     },
     {
-      label: this.i18n.hero().title,
+      label: this.i18n.commonNav().articles,
     },
   ]);
 
@@ -60,6 +60,9 @@ export class ContentArticleList implements OnInit {
     items: this.items(),
     isLoading: this.isLoading(),
     error: this.error(),
+    title: this.i18n.commonNav().articles,
+    emptyTitle: this.i18n.commonEmpty().articles,
+    errorTitle: this.i18n.commonErrors().articlesLoadFailed,
   }));
 
   private readonly applySeoEffect = effect(() => {
@@ -68,7 +71,7 @@ export class ContentArticleList implements OnInit {
 
     if (this.isLoading()) {
       this.seo.apply({
-        title: seo.listTitle,
+        title: this.i18n.commonNav().articles,
         description: seo.listDescription,
         canonicalUrl: this.pageUrl,
       });
@@ -78,7 +81,7 @@ export class ContentArticleList implements OnInit {
     if (error) {
       this.responseStatus.set(503);
       this.seo.apply({
-        title: this.i18n.errors().listTitle,
+        title: this.i18n.commonErrors().articlesLoadFailed,
         description: error,
         canonicalUrl: this.pageUrl,
         robots: 'noindex,nofollow',
@@ -89,7 +92,7 @@ export class ContentArticleList implements OnInit {
     this.responseStatus.set(200);
 
     this.seo.apply({
-      title: seo.listTitle,
+      title: this.i18n.commonNav().articles,
       description: seo.listDescription,
       canonicalUrl: this.pageUrl,
       structuredData: [
@@ -97,7 +100,7 @@ export class ContentArticleList implements OnInit {
           type: 'CollectionPage',
           id: `${this.pageUrl}#webpage`,
           url: this.pageUrl,
-          name: seo.listTitle,
+          name: this.i18n.commonNav().articles,
           description: seo.listDescription,
         }),
         createBreadcrumbStructuredData(this.breadcrumbs()),

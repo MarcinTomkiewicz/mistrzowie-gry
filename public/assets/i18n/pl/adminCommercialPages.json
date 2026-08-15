@@ -5,19 +5,15 @@
       "subtitle": "[PH] Zarządzaj wersjami roboczymi pięciu stałych stron ofertowych.",
       "emptyTitle": "[PH] Brak stron ofertowych",
       "emptyDescription": "[PH] Nie znaleziono stron dostępnych do edycji.",
-      "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych",
-      "manageConstants": "[PH] Stałe globalne"
+      "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych"
     },
     "table": {
       "page": "[PH] [adminCommercialPages-page] Strona",
       "draftStatus": "[PH] Stan draftu",
       "draftUpdatedAt": "[PH] Aktualizacja draftu",
-      "publication": "[PH] [adminCommercialPages-publication] Publikacja",
-      "publishedBy": "[PH] Opublikował",
       "effectiveFrom": "[PH] Obowiązuje od"
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować stron ofertowych",
       "loadFailedDetail": "[PH] Lista stron ofertowych nie została pobrana."
     }
   },
@@ -37,28 +33,23 @@
       "type": "[PH] Typ",
       "draft": "[PH] Wersja robocza",
       "published": "[PH] Wersja opublikowana",
-      "status": "[PH] Status",
       "usage": "[PH] Użycie",
       "draftUsage": "[PH] Drafty stron",
       "publishedUsage": "[PH] Opublikowane strony",
       "updatedAt": "[PH] Zaktualizowano",
-      "updatedBy": "[PH] Zaktualizował",
-      "publishedAt": "[PH] Opublikowano",
-      "publishedBy": "[PH] Opublikował"
+      "updatedBy": "[PH] Zaktualizował"
     },
     "editor": {
       "createTitle": "[PH] Nowa stała globalna",
       "editTitle": "[PH] Edycja stałej globalnej",
       "token": "[PH] Token",
       "tokenHint": "[PH] Wpisz nazwę bez nawiasów, np. czas-sesji. Gotowy token otrzyma postać [czas-sesji].",
-      "label": "[PH] Etykieta",
       "type": "[PH] Typ wartości",
       "value": "[PH] Wartość draftu",
       "durationUnit": "[PH] Jednostka edycji czasu",
       "identityLocked": "[PH] Tokenu i typu nie można zmienić, ponieważ stała jest już używana."
     },
     "actions": {
-      "publish": "[PH] Opublikuj",
       "copyToken": "[PH] Kopiuj token",
       "deleteUnavailable": "[PH] Używanej stałej nie można usunąć."
     },
@@ -69,7 +60,6 @@
       "draftCurrent": "[PH] Draft zgodny z publikacją"
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować stałych",
       "loadFailedDetail": "[PH] Lista stałych globalnych nie została pobrana.",
       "saveSuccessSummary": "[PH] Zapisano draft stałej",
       "saveSuccessDetail": "[PH] Wersja robocza stałej została zapisana.",
@@ -98,12 +88,10 @@
       "text": "[PH] Podaj niepusty tekst bez zagnieżdżonych tokenów."
     },
     "valueType": {
-      "duration": "[PH] Czas trwania",
       "integer": "[PH] Liczba całkowita",
       "text": "[PH] Tekst"
     },
     "durationUnit": {
-      "hours": "[PH] Godziny",
       "minutes": "[PH] Minuty",
       "hoursShort": "[PH] godz.",
       "minutesShort": "[PH] min"
@@ -117,19 +105,14 @@
     },
     "steps": {
       "contentSeo": "[PH] [adminCommercialPages-contentSeo] Treść i SEO",
-      "products": "[PH] [adminCommercialPages-products] Produkty",
       "layout": "[PH] [adminCommercialPages-layout] Układ strony",
       "previewSave": "[PH] [adminCommercialPages-previewSave] Podgląd i zapis"
     },
     "metadata": {
       "sectionTitle": "[PH] Treść strony",
-      "heading": "[PH] Nagłówek strony",
-      "lead": "[PH] Lead"
+      "heading": "[PH] Nagłówek strony"
     },
     "seo": {
-      "sectionTitle": "[PH] SEO",
-      "title": "[PH] Tytuł SEO",
-      "description": "[PH] Opis SEO",
       "ogTitle": "[PH] Tytuł Open Graph",
       "ogDescription": "[PH] Opis Open Graph",
       "canonicalUrl": "[PH] Canonical URL"
@@ -137,20 +120,16 @@
     "products": {
       "sectionTitle": "[PH] [adminCommercialPages-sectionTitle] Produkty i dodatki strony",
       "empty": "[PH] [adminCommercialPages-empty] Strona nie zawiera produktów ani dodatków.",
-      "addProduct": "[PH] [adminCommercialPages-addProduct] Dodaj pozycję",
       "product": "[PH] [adminCommercialPages-product] Produkt lub dodatek",
       "saveProduct": "[PH] [adminCommercialPages-saveProduct] Zapisz pozycję",
-      "products": "[PH] [adminCommercialPages-products] Produkty",
       "addons": "[PH] [adminCommercialPages-addons] Dodatki"
     },
     "product": {
       "kind": "[PH] [adminCommercialPages-kind] Rodzaj pozycji",
       "name": "[PH] [adminCommercialPages-name] Nazwa pozycji",
       "description": "[PH] [adminCommercialPages-description] Opis pozycji",
-      "durationSection": "[PH] Czas trwania",
       "durationMode": "[PH] Tryb czasu trwania",
       "durationMinutes": "[PH] Czas trwania w minutach",
-      "participantsSection": "[PH] Uczestnicy",
       "participantsMode": "[PH] Tryb liczby uczestników",
       "participantsMin": "[PH] Minimalna liczba uczestników",
       "participantsMax": "[PH] Maksymalna liczba uczestników",
@@ -160,18 +139,14 @@
       "sessions": "[PH] Liczba sesji",
       "includedAddons": "[PH] [adminCommercialPages-includedAddons] Dodatki zawarte w cenie",
       "meetingCountMin": "[PH] Minimalna liczba spotkań",
-      "meetingCountMax": "[PH] Maksymalna liczba spotkań",
-      "facilitatorCount": "[PH] Liczba prowadzących",
-      "tableCount": "[PH] Liczba stołów"
+      "meetingCountMax": "[PH] Maksymalna liczba spotkań"
     },
     "sections": {
       "sectionTitle": "[PH] Sekcje strony",
       "empty": "[PH] Dokument nie zawiera żadnych sekcji.",
-      "addSection": "[PH] Dodaj sekcję",
       "section": "[PH] Sekcja"
     },
     "section": {
-      "heading": "[PH] Nagłówek sekcji",
       "lead": "[PH] Lead sekcji",
       "surface": "[PH] Powierzchnia sekcji",
       "textAlign": "[PH] Wyrównanie tekstu",
@@ -184,15 +159,14 @@
       "align": "[PH] Wyrównanie przycisków",
       "empty": "[PH] Blok nie zawiera żadnych przycisków.",
       "add": "[PH] Dodaj przycisk",
-      "label": "[PH] Etykieta",
       "route": "[PH] Ścieżka wewnętrzna",
       "appearance": "[PH] Wygląd",
       "iconKey": "[PH] Ikona",
       "noIcon": "[PH] Bez ikony"
     },
     "cards": {
-      "orientation": "[PH] Orientacja kart",
-      "columns": "[PH] Liczba kolumn",
+      "cardOrientation": "[PH] Orientacja kart",
+      "columnCount": "[PH] Liczba kolumn",
       "empty": "[PH] Blok nie zawiera żadnych kart.",
       "add": "[PH] Dodaj kartę",
       "title": "[PH] Tytuł karty",
@@ -202,8 +176,6 @@
     "productCollection": {
       "products": "[PH] [adminCommercialPages-products] Pozycje w kolekcji",
       "presentation": "[PH] Sposób prezentacji",
-      "cardOrientation": "[PH] Orientacja kart",
-      "columns": "[PH] Liczba kolumn",
       "fields": "[PH] [adminCommercialPages-fields] Dane wyświetlane w kolekcji",
       "fieldsHint": "[PH] [adminCommercialPages-fieldsHint] Każdy wpis określa, które dane pozycji kolekcja wyświetla i dla których pozycji.",
       "emptyFields": "[PH] Kolekcja nie zawiera żadnych pól.",
@@ -213,7 +185,6 @@
       "visibleProducts": "[PH] [adminCommercialPages-visibleProducts] Pozycje pokazujące pole",
       "labelOverrides": "[PH] [adminCommercialPages-labelOverrides] Etykiety per pozycja",
       "addLabelOverride": "[PH] [adminCommercialPages-addLabelOverride] Dodaj etykietę pozycji",
-      "overrideProduct": "[PH] [adminCommercialPages-overrideProduct] Pozycja",
       "overrideLabel": "[PH] [adminCommercialPages-overrideLabel] Etykieta pozycji",
       "duplicateLabelOverride": "[PH] [adminCommercialPages-duplicateLabelOverride] Pozycja może mieć najwyżej jedną własną etykietę w danym polu.",
       "staleProductReference": "[PH] [adminCommercialPages-staleProductReference] Widoczność pól i etykiety muszą wskazywać pozycje należące do kolekcji.",
@@ -228,7 +199,6 @@
       "comparisonSectionHeading": "[PH] [adminCommercialPages-comparisonSectionHeading] Nagłówek sekcji (opcjonalny)",
       "comparisonRows": "[PH] [adminCommercialPages-comparisonRows] Wiersze porównania",
       "emptyComparisonRows": "[PH] [adminCommercialPages-emptyComparisonRows] Sekcja nie zawiera żadnych wierszy.",
-      "addComparisonRow": "[PH] [adminCommercialPages-addComparisonRow] Dodaj wiersz",
       "comparisonRowLabel": "[PH] [adminCommercialPages-comparisonRowLabel] Etykieta wiersza",
       "comparisonRowFields": "[PH] [adminCommercialPages-comparisonRowFields] Dane w wierszu",
       "incompleteComparison": "[PH] [adminCommercialPages-incompleteComparison] Każdy wiersz wymaga etykiety i co najmniej jednego istniejącego pola danych."
@@ -248,7 +218,6 @@
       "answer": "[PH] Odpowiedź"
     },
     "actions": {
-      "saveDraft": "[PH] [adminCommercialPages-saveDraft] Zapisz wersję roboczą",
       "moveSectionUp": "[PH] Przesuń sekcję wyżej",
       "moveSectionDown": "[PH] Przesuń sekcję niżej",
       "removeSection": "[PH] Usuń sekcję"
@@ -262,7 +231,6 @@
       "invalidRoute": "[PH] Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku „/”."
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować strony ofertowej",
       "loadFailedDetail": "[PH] Dane strony ofertowej nie zostały pobrane.",
       "saveSuccessSummary": "[PH] Zapisano draft strony ofertowej",
       "saveSuccessDetail": "[PH] Zmiany wersji roboczej zostały zapisane.",
@@ -283,13 +251,9 @@
   },
   "publication": {
     "panel": {
-      "sectionTitle": "[PH] Publikacja",
       "dialogTitle": "[PH] Publikuj stronę ofertową",
       "description": "[PH] Sprawdź draft na serwerze, wybierz datę obowiązywania i opublikuj bieżącą wersję.",
-      "effectiveFrom": "[PH] Oferta obowiązuje od",
       "validate": "[PH] Sprawdź gotowość",
-      "preview": "[PH] Podgląd",
-      "publish": "[PH] Opublikuj",
       "validationReady": "[PH] Draft jest gotowy do publikacji.",
       "validationIssues": "[PH] Problemy blokujące publikację",
       "issuePath": "[PH] Ścieżka"
@@ -319,10 +283,7 @@
   "blockType": {
     "rich_text": "[PH] [adminCommercialPages-rich_text] Treść sformatowana",
     "buttons": "[PH] Przyciski",
-    "cards": "[PH] Karty",
-    "product_collection": "[PH] Kolekcja produktów",
-    "table": "[PH] Tabela",
-    "faq": "[PH] FAQ"
+    "product_collection": "[PH] Kolekcja produktów"
   },
   "sectionSurface": {
     "plain": "[PH] Zwykła",
@@ -342,26 +303,21 @@
     "horizontal": "[PH] Pozioma"
   },
   "collectionPresentation": {
-    "cards": "[PH] Karty",
-    "table": "[PH] Tabela",
     "comparison_table": "[PH] Tabela porównawcza"
   },
   "durationMode": {
     "standard": "[PH] Standardowy",
-    "custom": "[PH] Własny",
-    "not_applicable": "[PH] Nie dotyczy"
+    "custom": "[PH] Własny"
   },
   "participantsMode": {
     "standard": "[PH] Standardowi",
-    "custom": "[PH] Własny zakres",
-    "not_applicable": "[PH] Nie dotyczy"
+    "custom": "[PH] Własny zakres"
   },
   "productKind": {
     "product": "[PH] [adminCommercialPages-product] Produkt",
     "addon": "[PH] [adminCommercialPages-addon] Dodatek"
   },
   "sessionMode": {
-    "not_applicable": "[PH] [adminCommercialPages-not_applicable] Nie dotyczy",
     "total": "[PH] [adminCommercialPages-total] Łączna liczba sesji",
     "per_month": "[PH] [adminCommercialPages-per_month] Sesje na miesiąc"
   }

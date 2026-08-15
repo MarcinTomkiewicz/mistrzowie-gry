@@ -86,6 +86,8 @@ export class SessionReservationPageController {
     labels: this.i18n.labels(),
     states: this.i18n.states(),
     commonActions: this.i18n.commonActions(),
+    commonAppRoles: this.i18n.commonAppRoles(),
+    commonLabels: this.i18n.commonLabels(),
     commonStatus: this.i18n.commonStatus(),
     addonProducts: this.addonProducts(),
     gmOptions: this.gmOptions(),

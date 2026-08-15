@@ -134,15 +134,17 @@ export class Contact {
       !!this.legalDialogError(),
   );
 
-  readonly legalDialogTitle = computed(
-    () =>
-      this.activeLegalDialogContent()?.title ??
-      (this.isLegalDialogLoading()
-        ? 'Ladowanie...'
-        : this.legalDialogError()
-          ? 'Nie udalo sie zaladowac tresci'
-          : ''),
-  );
+  readonly legalDialogTitle = computed(() => {
+    const dialog = this.activeLegalDialogContent();
+    if (dialog?.title) return dialog.title;
+    if (dialog) return this.i18n.commonLegal().privacyPolicy;
+
+    return this.isLegalDialogLoading()
+      ? 'Ladowanie...'
+      : this.legalDialogError()
+        ? 'Nie udalo sie zaladowac tresci'
+        : '';
+  });
 
   readonly legalDialogSubtitle = computed(
     () => this.activeLegalDialogContent()?.subtitle ?? '',
@@ -167,14 +169,14 @@ export class Contact {
     const seo = this.i18n.seo();
 
     this.seo.apply({
-      title: seo.title || 'Kontakt',
+      title: this.i18n.commonNav().contact,
       description: seo.description || '',
       canonicalUrl: this.pageUrl,
       structuredData: createPageStructuredData({
         type: 'ContactPage',
         id: `${this.pageUrl}#webpage`,
         url: this.pageUrl,
-        name: seo.title || 'Kontakt',
+        name: this.i18n.commonNav().contact,
         description: seo.description || '',
       }),
     });

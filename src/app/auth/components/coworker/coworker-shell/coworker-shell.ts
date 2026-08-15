@@ -89,7 +89,7 @@ export class CoworkerShell {
     if (this.privateDocumentsAvailable()) {
       tabs.push({
         id: 'private-documents',
-        label: labels.privateDocuments,
+        label: this.i18n.commonNav().privateDocuments,
         icon: 'pi pi-lock',
         path: '/auth/coworker/documents',
       });
@@ -101,7 +101,7 @@ export class CoworkerShell {
     ) {
       tabs.push({
         id: 'shared-documents',
-        label: labels.sharedDocuments,
+        label: this.i18n.commonNav().sharedDocuments,
         icon: 'pi pi-book',
         path: '/auth/coworker/shared-documents',
       });

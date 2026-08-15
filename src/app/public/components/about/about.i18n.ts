@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 
-import { createCommonCtaI18n } from '../../../core/translations/common.i18n';
+import { createCommonNavI18n } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
   AboutCard,
@@ -16,7 +16,7 @@ import {
 } from '../../../core/utils/record-values';
 
 export function createAboutI18n() {
-  const commonCta = createCommonCtaI18n();
+  const commonNav = createCommonNavI18n();
   const { hero, seo, sectionsDict, cardsDict } = createScopedSectionsI18n<{
     hero: AboutHero;
     seo: AboutSeo;
@@ -56,6 +56,6 @@ export function createAboutI18n() {
     hero,
     sections,
     cards,
-    commonCta,
+    commonNav,
   };
 }

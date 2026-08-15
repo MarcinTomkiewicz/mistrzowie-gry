@@ -82,7 +82,7 @@ export class ContentArticleDetail implements OnInit {
         path: '/',
       },
       {
-        label: this.i18n.hero().title,
+        label: this.i18n.commonNav().articles,
         path: '/artykuly',
       },
       {
@@ -100,6 +100,8 @@ export class ContentArticleDetail implements OnInit {
     isLoading: this.isLoading(),
     error: this.error(),
     isNotFound: this.isNotFound(),
+    loadErrorTitle: this.i18n.commonErrors().articleLoadFailed,
+    notFoundTitle: this.i18n.commonErrors().articleNotFound,
   }));
 
   private readonly applySeoEffect = effect(() => {
@@ -155,7 +157,7 @@ export class ContentArticleDetail implements OnInit {
 
     if (this.isLoading()) {
       this.seo.apply({
-        title: routeSeo.listTitle,
+        title: this.i18n.commonNav().articles,
         description: routeSeo.listDescription,
         canonicalUrl: requestedCanonicalUrl,
       });
@@ -170,9 +172,11 @@ export class ContentArticleDetail implements OnInit {
     const isLoadError = !!this.error();
 
     this.seo.apply({
-      title: isLoadError ? errors.detailLoadTitle : errors.detailNotFoundTitle,
+      title: isLoadError
+        ? this.i18n.commonErrors().articleLoadFailed
+        : this.i18n.commonErrors().articleNotFound,
       description: isLoadError
-        ? errors.detailLoadDescription
+        ? errors.listDescription
         : errors.detailNotFoundDescription,
       canonicalUrl: requestedCanonicalUrl,
       robots: 'noindex,nofollow',
@@ -230,7 +234,7 @@ export class ContentArticleDetail implements OnInit {
     return this.articles.getPublicArticleBySlug(slug).pipe(
       catchError((error: unknown) => {
         console.error('[content articles] detail load error', error);
-        this.error.set(this.i18n.errors().detailLoadDescription);
+        this.error.set(this.i18n.errors().listDescription);
         this.responseStatus.set(503);
         return of(null);
       }),

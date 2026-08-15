@@ -1,5 +1,8 @@
 import {
   createCommonCtaI18n,
+  createCommonEmptyI18n,
+  createCommonErrorsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -28,6 +31,9 @@ export function createContentArticlesI18n() {
 
   const status = createCommonStatusI18n();
   const commonCta = createCommonCtaI18n();
+  const commonEmpty = createCommonEmptyI18n();
+  const commonErrors = createCommonErrorsI18n();
+  const commonNav = createCommonNavI18n();
 
   return {
     hero,
@@ -37,5 +43,8 @@ export function createContentArticlesI18n() {
     errors,
     status,
     commonCta,
+    commonEmpty,
+    commonErrors,
+    commonNav,
   };
 }

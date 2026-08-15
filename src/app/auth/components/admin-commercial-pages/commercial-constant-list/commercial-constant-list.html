@@ -63,7 +63,7 @@
               <th class="small-caps">{{ i18n.table().type }}</th>
               <th class="small-caps">{{ i18n.table().draft }}</th>
               <th class="small-caps">{{ i18n.table().published }}</th>
-              <th class="small-caps">{{ i18n.table().status }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().status }}</th>
               <th class="small-caps">{{ i18n.table().usage }}</th>
               <th class="small-caps text-right">
                 {{ i18n.commonTable().actions }}
@@ -105,11 +105,11 @@
                 <div class="flex-col-start-start gap-xs">
                   <strong>{{ row.publishedValueLabel }}</strong>
                   <small>
-                    {{ i18n.table().publishedAt }}:
+                    {{ i18n.commonLabels().publishedAt }}:
                     {{ row.publishedAtLabel }}
                   </small>
                   <small>
-                    {{ i18n.table().publishedBy }}:
+                    {{ i18n.commonLabels().publishedBy }}:
                     {{ row.publishedByLabel }}
                   </small>
                 </div>
@@ -154,7 +154,7 @@
                     size="small"
                     severity="success"
                     icon="pi pi-send"
-                    [label]="i18n.actions().publish"
+                    [label]="i18n.commonActions().publish"
                     [disabled]="!row.constant.hasDraftChanges || isBusy()"
                     [loading]="activeAction() === 'publish:' + row.constant.id"
                     (onClick)="publishOne(row.constant)"

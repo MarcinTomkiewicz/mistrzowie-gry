@@ -15,6 +15,8 @@ export function formatCommercialProductField(
   product: CommercialRenderProduct,
   key: CommercialProductFieldKey,
   translations: CommercialProductValueTranslations,
+  fromLabel: string,
+  toLabel: string,
   locale: string,
 ): CommercialProductFieldPresentation | null {
   switch (key) {
@@ -43,7 +45,8 @@ export function formatCommercialProductField(
             formatOptionalNumberRange(
               product.participants.min,
               product.participants.max,
-              translations,
+              fromLabel,
+              toLabel,
               locale,
             ),
           );
@@ -68,7 +71,8 @@ export function formatCommercialProductField(
         formatOptionalNumberRange(
           product.meetingCountMin,
           product.meetingCountMax,
-          translations,
+          fromLabel,
+          toLabel,
           locale,
         ),
       );

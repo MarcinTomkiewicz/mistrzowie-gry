@@ -18,9 +18,9 @@
         <p-button
           severity="secondary"
           [outlined]="monthOffset() !== -1"
-          [label]="isCompactView() ? undefined : i18n.actions().previousMonthLabel"
+          [label]="isCompactView() ? undefined : i18n.commonLabels().previousMonth"
           [icon]="isCompactView() ? 'pi pi-point-left' : undefined"
-          [ariaLabel]="i18n.actions().previousMonthLabel"
+          [ariaLabel]="i18n.commonLabels().previousMonth"
           (onClick)="switchMonth(-1)"
         />
 
@@ -33,16 +33,16 @@
         <p-button
           severity="secondary"
           [outlined]="monthOffset() !== 0"
-          [label]="isCompactView() ? undefined : i18n.actions().currentMonthLabel"
+          [label]="isCompactView() ? undefined : i18n.commonLabels().currentMonth"
           [icon]="isCompactView() ? 'pi pi-point-right' : undefined"
-          [ariaLabel]="i18n.actions().currentMonthLabel"
+          [ariaLabel]="i18n.commonLabels().currentMonth"
           (onClick)="switchMonth(0)"
         />
       </div>
 
       <div class="flex-row-end-center flex-wrap gap-sm w-100">
         <span class="tag-badge tag-badge--success">
-          {{ i18n.workLogOverview().totalHoursLabel }}: {{ totalHours() }} h
+          {{ i18n.commonLabels().totalHours }}: {{ totalHours() }} h
         </span>
       </div>
 
@@ -81,14 +81,14 @@
                     >
                     <ng-template #header>
                       <tr>
-                        <th class="small-caps">{{ i18n.form().dateLabel }}</th>
-                        <th class="small-caps">{{ i18n.form().rangesLabel }}</th>
-                        <th class="small-caps">{{ i18n.form().commentLabel }}</th>
+                        <th class="small-caps">{{ i18n.commonLabels().date }}</th>
+                        <th class="small-caps">{{ i18n.commonLabels().hourRanges }}</th>
+                        <th class="small-caps">{{ i18n.commonLabels().comment }}</th>
                         <th class="small-caps text-center">
-                          {{ i18n.form().chaoticThursdayLabel }}
+                          {{ i18n.commonLabels().chaoticThursday }}
                         </th>
                         <th class="small-caps text-right">
-                          {{ i18n.form().totalHoursLabel }}
+                          {{ i18n.commonLabels().totalHours }}
                         </th>
                       </tr>
                     </ng-template>
@@ -109,8 +109,8 @@
                         <td class="text-center">
                           {{
                             day.isChaoticThursday
-                              ? i18n.form().chaoticThursdayYes
-                              : i18n.form().chaoticThursdayNo
+                              ? i18n.commonValues().yes
+                              : i18n.commonValues().no
                           }}
                         </td>
                         <td class="text-right">

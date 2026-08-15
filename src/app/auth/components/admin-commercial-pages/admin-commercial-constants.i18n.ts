@@ -1,6 +1,7 @@
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
+  createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
@@ -49,6 +50,7 @@ export function createAdminCommercialConstantsI18n() {
     ...translations,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
+    commonLabels: createCommonLabelsI18n(),
     commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),

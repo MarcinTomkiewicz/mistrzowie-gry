@@ -3,14 +3,11 @@ import { IMenu } from '../../interfaces/i-menu';
 import { ISocialLink } from '../../interfaces/i-socials';
 
 export type FooterTranslations = {
-  brandAlt: string;
   description: string;
   socialAriaLabel: string;
   shortcutTitle: string;
-  contactTitle: string;
   legalAriaLabel: string;
   copyrightSuffix: string;
-  phoneLabel: string;
   phoneValue: string;
   phoneHref: string;
   emailLabel: string;

@@ -8,14 +8,11 @@
   "actions": {
     "addRangeLabel": "Dodaj przedział",
     "removeRangeLabel": "Usuń przedział",
-    "clearDayLabel": "Wyczyść dzień",
     "previousDayLabel": "Poprzedni dzień",
     "nextDayLabel": "Następny dzień",
     "saveLabel": "Zapisz dyspozycyjność"
   },
   "form": {
-    "fromLabel": "Od",
-    "toLabel": "Do",
     "rangeSummaryLabel": "Przedział",
     "emptyTitle": "Brak przedziałów dla tego dnia",
     "emptyDescription": "Dodaj zakres godzin."

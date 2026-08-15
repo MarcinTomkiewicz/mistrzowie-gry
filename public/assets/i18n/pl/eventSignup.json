@@ -1,21 +1,16 @@
 {
   "page": {
     "seo": {
-      "title": "Poprowadź wydarzenie",
       "description": "Wybierz wydarzenie i termin, dla którego chcesz zgłosić swoją sesję RPG jako Mistrz Gry."
     },
     "page": {
-      "title": "Poprowadź wydarzenie",
       "subtitle": "[PH][subtitle] Wybierz wydarzenie, lokalną edycję i termin, na który chcesz zgłosić swoją sesję lub inny punkt programu."
     },
     "selectors": {
-      "coreLabel": "[PH][coreLabel] Wydarzenie",
       "editionLabel": "[PH][editionLabel] Lokalna edycja"
     },
     "details": {
-      "cityLabel": "[PH][cityLabel] Miasto",
-      "timeLabel": "Godziny wydarzenia",
-      "beginnersLabel": "Dla początkujących"
+      "timeLabel": "Godziny wydarzenia"
     },
     "occurrences": {
       "title": "Wybierz termin zgłoszenia",
@@ -30,7 +25,6 @@
       "description": "Dla tego wydarzenia nie ma obecnie otwartych terminów w tym i następnym miesiącu."
     },
     "error": {
-      "title": "[PH][title] Nie udało się załadować wydarzeń",
       "description": "[PH][description] Nie udało się pobrać danych panelu zgłoszeń. Spróbuj ponownie."
     }
   },
@@ -44,8 +38,7 @@
     },
     "actions": {
       "submitLabel": "Zgłoś sesję",
-      "backToSelectionLabel": "Wróć do wyboru terminu",
-      "selectLabel": "Wybierz"
+      "backToSelectionLabel": "Wróć do wyboru terminu"
     },
     "confirmation": {
       "withdrawMessage": "Czy na pewno anulować zgłoszenie?"
@@ -72,7 +65,6 @@
       "previousSessionsLabel": "Twoje poprzednie sesje jednorazowe"
     },
     "sections": {
-      "pageTitlePrefix": "Zgłoś sesję",
       "pageSubtitle": "Poniżej widzisz formularz zgłoszenia dla wybranego terminu. Jeśli masz już zgłoszoną sesję lub punkt programu na ten termin, zobaczysz to poniżej. Jeśli nie, możesz wybrać jedną ze swoich sesji standardowych albo zgłosić sesję jednorazową.",
       "submittedSessionTitle": "Zgłoszona sesja"
     },

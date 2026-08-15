@@ -1,6 +1,5 @@
 {
   "seo": {
-    "title": "Kontakt",
     "description": "Nawiąż kontakt z Mistrzami Gry. Dowiedz się więcej o sesjach RPG dla początkujących graczy. Poznaj szczegóły oferty dla firm i instytucji."
   },
   "hero": {
@@ -8,10 +7,7 @@
     "subtitle": "Jeśli potrzebujesz więcej informacji na temat naszej propozycji albo chcesz zorganizować swoje doświadczenie RPG, użyj formularza poniżej, a my odpowiemy tak szybko jak to możliwe."
   },
   "info": {
-    "title": "Dane kontaktowe",
     "subtitle": "Mistrzowie Gry są usługą działającą mobilnie, wirtualnie i w chmurze. Nie mamy swojej siedziby ani adresu, pod którym możesz nas odwiedzić. Dlatego zachęcamy do kontaktu przez e-mail albo telefonicznie.",
-    "emailLabel": "Adres e-mail:",
-    "phoneLabel": "Nr telefonu:",
     "emailValue": "kontakt@mistrzowie-gry.pl",
     "phoneValue": "+48 533 616 491"
   },
@@ -20,10 +16,7 @@
     "hint": "Podaj nam swoje oczekiwania, liczbę uczestników Twojego doświadczenia RPG, datę i jak najwięcej szczegółów. Przygotujemy wtedy dla Ciebie najlepsze rozwiązanie i dobierzemy najlepszych prowadzących.",
     "topicLabel": "Wybierz temat",
     "topicCustomLabel": "Twój temat wiadomości",
-    "firstNameLabel": "Imię*",
-    "lastNameLabel": "Nazwisko*",
     "companyLabel": "Nazwa firmy",
-    "emailLabel": "Adres e-mail*",
     "phoneLabel": "Nr telefonu",
     "messageLabel": "Treść wiadomości*",
     "messagePlaceholder": "Podaj jak najwięcej szczegółów Twojego zapytania. Pozwoli nam to precyzyjnie odpowiedzieć na Twoje pytania i przygotować najlepsze rozwiązanie."
@@ -46,8 +39,8 @@
     "topic-2": { "id": 2, "value": "institution", "label": "W imieniu instytucji" },
     "topic-3": { "id": 3, "value": "party", "label": "Chcę zorganizować imprezę" },
     "topic-4": { "id": 4, "value": "individual", "label": "Grupa prywatna" },
-    "topic-5": { "id": 5, "value": "join", "label": "Dołącz do Drużyny" },
-    "topic-6": { "id": 6, "value": "chaotic", "label": "Chaotyczne Czwartki" },
+    "topic-5": { "id": 5, "value": "join" },
+    "topic-6": { "id": 6, "value": "chaotic" },
     "topic-7": { "id": 7, "value": "pricing", "label": "Ceny i oferta" },
     "topic-8": { "id": 8, "value": "other", "label": "Inny temat (podaj poniżej)" }
   }

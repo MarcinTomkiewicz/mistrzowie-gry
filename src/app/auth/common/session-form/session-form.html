@@ -14,7 +14,7 @@
     class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md"
   >
     <h3 class="mg-section__title mg-section__title--md m-0">
-      {{ formTexts.basicInfoTitle }}
+      {{ i18n.commonLabels().basicInfo }}
     </h3>
 
     <div class="w-100">
@@ -45,7 +45,7 @@
           (systemSelected)="onSystemSelect($event)"
           (systemCleared)="onSystemClear()"
         />
-        <label for="session-system-id">{{ formTexts.systemLabel }}</label>
+        <label for="session-system-id">{{ i18n.commonLabels().rpgSystem }}</label>
       </p-iftalabel>
 
       @if (showControlError("systemId", ["required"])) {
@@ -204,7 +204,7 @@
     class="mg-card mg-card--legend w-80 w-100-sm flex-col-start-stretch gap-md"
   >
     <h3 class="mg-section__title mg-section__title--md m-0">
-      {{ formTexts.additionalInfoTitle }}
+      {{ i18n.commonLabels().additionalInfo }}
     </h3>
 
     <div class="flex-col-start-stretch gap-xs">
@@ -342,7 +342,7 @@
     }
 
     <div class="flex-col-start-stretch gap-xs">
-      <label for="session-language-ids">{{ formTexts.languagesLabel }}</label>
+      <label for="session-language-ids">{{ i18n.commonLabels().languages }}</label>
 
       <app-chip-picker
         [options]="languageOptions()"

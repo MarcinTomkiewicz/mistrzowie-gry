@@ -49,7 +49,6 @@ export class ArticleList {
   );
   protected readonly rowVms = computed(() => {
     const table = this.i18n.table();
-    const statusLabels = this.i18n.statusLabels();
     const values = this.i18n.commonValues();
 
     return this.rows().map((article) => {
@@ -66,7 +65,10 @@ export class ArticleList {
         thumbnailAlt:
           article.heroImageAlt || article.title || table.thumbnailAlt,
         statusBadgeClass: getContentArticleStatusBadgeClass(article.status),
-        statusLabel: statusLabels[article.status],
+        statusLabel:
+          article.status === 'draft'
+            ? this.i18n.statusLabels().draft
+            : values[article.status],
         publishedAtLabel:
           formatTimestampLabel(article.publishedAt, 'pl-PL') ??
           values.notAvailable,
@@ -96,7 +98,7 @@ export class ArticleList {
           this.rows.set([]);
           this.hasLoadError.set(true);
           this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
+            summary: this.i18n.commonErrors().articlesLoadFailed,
             detail: this.i18n.toast().loadFailedDetail,
           });
         },

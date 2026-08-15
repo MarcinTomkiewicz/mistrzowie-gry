@@ -13,13 +13,13 @@
       novalidate
     >
       <div class="flex-col-start-stretch gap-xs w-80">
-        <label>{{ i18n.dialog().emailLabel }}</label>
+        <label>{{ i18n.commonLabels().email }}</label>
         <strong>{{ row.user.email }}</strong>
       </div>
 
       @if (isAdminRow()) {
         <div class="flex-col-start-stretch gap-xs w-80">
-          <label>{{ i18n.dialog().appRoleLabel }}</label>
+          <label>{{ i18n.commonLabels().role }}</label>
           <span>{{ getCurrentRoleLabel() }}</span>
         </div>
       } @else {

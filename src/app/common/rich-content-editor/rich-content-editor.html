@@ -113,13 +113,13 @@
           />
         } @else {
           <div class="flex-row-end-center">
-            <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n().addItem" (onClick)="addListItem(block.items)" />
+            <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="actions().addItem" (onClick)="addListItem(block.items)" />
           </div>
 
           @for (item of block.items; track item; let itemIndex = $index) {
             <div class="flex-col-start-stretch gap-sm border-1 border-round p-sm w-100">
               <div class="flex-row-between-center gap-sm">
-                <span>{{ i18n().item }} {{ itemIndex + 1 }}</span>
+                <span>{{ labels().item }} {{ itemIndex + 1 }}</span>
                 <app-item-editor-actions
                   [index]="itemIndex"
                   [itemCount]="block.items.length"

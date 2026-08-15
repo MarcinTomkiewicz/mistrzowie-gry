@@ -5,6 +5,7 @@ import { formatNumber } from './number-format';
 export function formatPrice(
   price: Price,
   translations: PricePresentationTranslations,
+  fromLabel: string,
   locale: string,
 ): PricePresentation {
   switch (price.type) {
@@ -27,7 +28,7 @@ export function formatPrice(
     case 'from':
       return {
         value: formatUnitPrice(
-          `${translations.from} ${formatCurrency(price.amount, price.currency, locale)}`,
+          `${fromLabel} ${formatCurrency(price.amount, price.currency, locale)}`,
           translations.units[price.unit],
         ),
         note: price.note,

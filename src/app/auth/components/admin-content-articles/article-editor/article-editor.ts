@@ -20,6 +20,7 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
   ArticleEditorForm,
   ArticleEditorFormFieldInputAction,
+  ArticleEditorVisibleFormControlName,
 } from '../../../../core/types/article-editor-form';
 import {
   hasArticleEditorHeadingWithoutBody,
@@ -88,6 +89,19 @@ export class ArticleEditor {
   protected readonly seoFieldRows = ARTICLE_EDITOR_SEO_FORM_FIELD_ROWS;
   protected readonly getStatusBadgeClass = getContentArticleStatusBadgeClass;
   protected readonly textBlocks = this.form.controls.blocks;
+
+  protected getFieldLabel(controlName: ArticleEditorVisibleFormControlName): string {
+    if (controlName === 'excerpt') return this.i18n.commonLabels().lead;
+    if (controlName === 'heroImageAlt') return this.i18n.fields().heroImageAlt;
+
+    return this.i18n.commonLabels()[controlName];
+  }
+
+  protected getStatusLabel(status: IAdminContentArticleDetail['status']): string {
+    return status === 'draft'
+      ? this.i18n.statusLabels().draft
+      : this.i18n.commonValues()[status];
+  }
   constructor() {
     this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
@@ -128,7 +142,7 @@ export class ArticleEditor {
           this.article.set(null);
           this.hasLoadError.set(true);
           this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
+            summary: this.i18n.commonErrors().articleLoadFailed,
             detail: this.i18n.toast().loadFailedDetail,
           });
         },
@@ -201,14 +215,14 @@ export class ArticleEditor {
         next: () => {
           this.toast.success({
             summary: toast.saveSuccessSummary,
-            detail: toast.saveSuccessDetail,
+            detail: this.i18n.commonStatus().changesSaved,
           });
           void this.router.navigate(['/admin/content']);
         },
         error: () => {
           this.toast.danger({
             summary: toast.saveFailedSummary,
-            detail: toast.saveFailedDetail,
+            detail: this.i18n.commonErrors().changesNotSaved,
           });
         },
       });

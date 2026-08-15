@@ -4,22 +4,26 @@ import {
   createCommonCtaI18n,
   createCommonEmptyI18n,
   createCommonErrorsI18n,
+  createCommonLabelsI18n,
   createCommonPriceI18n,
   createCommonSeoI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
+  OfferCtaTranslations,
   OfferPricingHeadersTranslations,
   StandardsAndLogisticsDict,
 } from '../../../core/types/i18n/offers';
 
 export function createOffersI18n() {
-  const { pricingHeaders, standardsAndLogisticsDict } =
+  const { cta, pricingHeaders, standardsAndLogisticsDict } =
     createScopedSectionsI18n<{
+      cta: OfferCtaTranslations;
       pricingHeaders: OfferPricingHeadersTranslations;
       standardsAndLogisticsDict: StandardsAndLogisticsDict;
     }>('offers', {
+      cta: 'cta',
       pricingHeaders: 'pricingTable.headers',
       standardsAndLogisticsDict: 'standardsAndLogistics',
     });
@@ -28,6 +32,7 @@ export function createOffersI18n() {
   const commonStatus = createCommonStatusI18n();
   const commonEmpty = createCommonEmptyI18n();
   const commonErrors = createCommonErrorsI18n();
+  const commonLabels = createCommonLabelsI18n();
   const commonSeo = createCommonSeoI18n();
   const commonPrice = createCommonPriceI18n();
   const commonFootnotes = computed(() => commonPrice().footnotes);
@@ -54,11 +59,13 @@ export function createOffersI18n() {
   });
 
   return {
+    cta,
     pricingHeaders,
     commonCta,
     commonStatus,
     commonEmpty,
     commonErrors,
+    commonLabels,
     commonSeo,
     commonFootnotes,
     standardsAndLogistics,

@@ -24,7 +24,7 @@
         <div class="flex-col-start-stretch gap-xs w-100">
           <p-iftalabel class="w-100">
             <input pInputText class="w-100" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />
-            <label [for]="controlId() + '-' + index + '-label'">{{ i18n.buttons().label }}</label>
+            <label [for]="controlId() + '-' + index + '-label'">{{ i18n.commonLabels().label }}</label>
           </p-iftalabel>
           @if (button.controls.label.touched && button.controls.label.invalid) {
             <small class="error-text">{{ i18n.commonForm().required }}</small>

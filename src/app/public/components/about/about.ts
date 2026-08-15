@@ -53,7 +53,7 @@ export class About {
   readonly hero = this.i18n.hero;
   readonly sections = this.i18n.sections;
   readonly cards = this.i18n.cards;
-  readonly commonCta = this.i18n.commonCta;
+  readonly commonNav = this.i18n.commonNav;
 
   trackByIndex = (i: number): number => i;
 }

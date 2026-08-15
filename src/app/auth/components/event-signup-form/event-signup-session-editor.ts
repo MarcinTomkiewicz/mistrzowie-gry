@@ -165,7 +165,9 @@ export class EventSignupSessionEditor {
       return Object.fromEntries(
         SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => [
           option.value,
-          difficulty[option.i18nKey],
+          option.value === 'beginner'
+            ? this.i18n().commonLabels().forBeginners
+            : difficulty[option.i18nKey],
         ]),
       ) as Record<SessionDifficultyLevel, string>;
     },
@@ -175,11 +177,11 @@ export class EventSignupSessionEditor {
     const i18n = this.i18n();
 
     return {
-      systemLabel: i18n.sessionForm().systemLabel,
+      systemLabel: i18n.commonLabels().rpgSystem,
       titleLabel: i18n.sessionForm().titleLabel,
       difficultyLabel: i18n.sessionForm().difficultyLabel,
       playersLabel: i18n.list().playersHeaderLabel,
-      minAgeLabel: i18n.list().minAgeHeaderLabel,
+      minAgeLabel: i18n.commonLabels().age,
       editLabel: i18n.commonActions().edit,
       deleteLabel: i18n.commonActions().delete,
     };

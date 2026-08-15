@@ -26,7 +26,7 @@ export class Problems {
 
   readonly items = computed<UiProblemCard[]>(() => {
     const copyList = this.i18n.cardsCopy();
-    const cta = this.i18n.cta();
+    const nav = this.i18n.nav();
 
     return copyList
       .map((copy) => {
@@ -37,7 +37,13 @@ export class Problems {
           id: copy.id,
           title: copy.title,
           text: copy.text,
-          ctaLabel: cta[tech.ctaKey] ?? '',
+          ctaLabel: tech.ctaKey === 'joinProgram'
+            ? nav.join
+            : tech.ctaKey === 'offerIndividual'
+              ? nav.individualOffer
+              : tech.ctaKey === 'chaoticThursdays'
+                ? nav.chaoticThursdays
+                : nav.businessOffer,
           ctaPath: tech.ctaPath,
           icon: tech.icon,
         } satisfies UiProblemCard;

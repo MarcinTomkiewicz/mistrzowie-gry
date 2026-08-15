@@ -1,5 +1,6 @@
 import { computed } from '@angular/core';
 
+import { createCommonLabelsI18n } from '../../../../core/translations/common.i18n';
 import {
   SeoTextColumnCopy,
   SeoTextHeader,
@@ -40,9 +41,11 @@ export function createSeoRichTextI18n() {
       };
     }),
   );
+  const commonLabels = createCommonLabelsI18n();
 
   return {
     header,
+    commonLabels,
     columns,
   };
 }

@@ -135,7 +135,7 @@ export class ProfileForm {
       this.form.markAllAsTouched();
 
       this.toast.warn({
-        summary: this.i18n.toast().invalidFormSummary,
+        summary: this.i18n.commonForm().invalidSummary,
         detail: this.i18n.commonForm().invalid,
       });
 

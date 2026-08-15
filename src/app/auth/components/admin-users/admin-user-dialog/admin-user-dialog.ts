@@ -110,16 +110,18 @@ export class AdminUserDialog {
     return createAppRoleOptions(this.i18n.appRoles(), field.options);
   }
 
-  protected getSelectLabel(field: AdminUserDialogSelectField): string {
-    return this.i18n.dialog()[field.labelKey];
+  protected getSelectLabel(_field: AdminUserDialogSelectField): string {
+    return this.i18n.commonLabels().role;
   }
 
   protected getTextLabel(field: AdminUserDialogTextField): string {
-    return this.i18n.dialog()[field.labelKey];
+    return this.i18n.commonLabels()[field.controlName];
   }
 
   protected getToggleLabel(field: AdminUserDialogToggleField): string {
-    return this.i18n.dialog()[field.labelKey];
+    return field.controlName === 'useNickname'
+      ? this.i18n.commonLabels().useNickname
+      : this.i18n.dialog().isTestUserLabel;
   }
 
   protected hasTextControlError(field: AdminUserDialogTextField): boolean {

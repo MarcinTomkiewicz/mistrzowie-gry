@@ -1,6 +1,8 @@
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
+  createCommonErrorsI18n,
+  createCommonLabelsI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
   createCommonValuesI18n,
@@ -102,6 +104,8 @@ export function createEventEditionEditorI18n() {
     occurrenceRpcErrors,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
+    commonErrors: createCommonErrorsI18n(),
+    commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
     commonValues: createCommonValuesI18n(),
@@ -128,5 +132,6 @@ export function createEventScheduleEditorI18n() {
     validation,
     info,
     commonActions: createCommonActionsI18n(),
+    commonLabels: createCommonLabelsI18n(),
   };
 }

@@ -64,7 +64,7 @@
               severity="danger"
               [outlined]="true"
               icon="pi pi-demolish"
-              [label]="i18n.actions().clearDayLabel"
+              [label]="i18n.commonActions().clearDay"
               (onClick)="clearSelectedDate()"
             />
 
@@ -120,7 +120,7 @@
             size="small"
             [outlined]="true"
             icon="pi pi-demolish"
-            [label]="i18n.actions().clearDayLabel"
+            [label]="i18n.commonActions().clearDay"
             (onClick)="clearSelectedDate()"
           />
 
@@ -146,7 +146,7 @@
               class="mg-grid grid-3-cols grid-1-cols-sm gap-sm grid-items-end"
             >
               <div class="flex-col-start-stretch gap-xs">
-                <label>{{ i18n.form().fromLabel }}</label>
+                <label>{{ i18n.commonLabels().from }}</label>
                 <p-select
                   [options]="startHourOptions"
                   optionLabel="label"
@@ -159,7 +159,7 @@
               </div>
 
               <div class="flex-col-start-stretch gap-xs">
-                <label>{{ i18n.form().toLabel }}</label>
+                <label>{{ i18n.commonLabels().to }}</label>
                 <p-select
                   [options]="getEndHourOptions(rangeGroup)"
                   optionLabel="label"

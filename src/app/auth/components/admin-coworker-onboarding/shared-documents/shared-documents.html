@@ -1,7 +1,7 @@
 <div class="flex-col-start-stretch gap-lg w-100 position-relative">
   <header class="mg-section__header w-100">
     <h2 class="mg-section__title mg-section__title--md">
-      {{ i18n.adminShared().title }}
+      {{ i18n.commonNav().sharedDocuments }}
     </h2>
     <p class="mg-section__subtitle mg-section__subtitle--full">
       {{ i18n.adminShared().subtitle }}
@@ -31,7 +31,7 @@
     <form class="flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="save()">
       <p-iftalabel class="w-100">
         <input pInputText class="w-100" id="shared-document-title" formControlName="title" />
-        <label for="shared-document-title">{{ i18n.fields().title }}</label>
+        <label for="shared-document-title">{{ i18n.commonLabels().title }}</label>
       </p-iftalabel>
 
       <div class="flex-row-start-center gap-sm">
@@ -95,7 +95,7 @@
             <div class="flex-col-start-start gap-xs">
               <strong>{{ document.title }}</strong>
               <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]">
-                {{ i18n.statuses().document[document.status] }}
+                {{ document.status === 'active' ? i18n.commonValues().active : i18n.commonValues().archived }}
               </span>
             </div>
             <div class="flex-row-start-center flex-wrap gap-md">
@@ -112,7 +112,7 @@
                 size="small"
                 severity="secondary"
                 icon="pi pi-eye"
-                [label]="i18n.actions().preview"
+                [label]="i18n.commonActions().preview"
                 (onClick)="previewDocument(document)"
               />
               <p-button
@@ -145,7 +145,7 @@
                 severity="danger"
                 [text]="true"
                 icon="pi pi-box"
-                [label]="i18n.actions().archive"
+                [label]="i18n.commonActions().archive"
                 (onClick)="confirmArchive($event, document.document_id)"
               />
             }
@@ -179,8 +179,8 @@
       <p-table [value]="assignments()" dataKey="assignment_id" class="w-100 min-w-500">
         <ng-template #header>
           <tr>
-            <th>{{ i18n.fields().user }}</th>
-            <th>{{ i18n.fields().status }}</th>
+            <th>{{ i18n.commonLabels().coworker }}</th>
+            <th>{{ i18n.commonLabels().status }}</th>
             <th>{{ i18n.coworkerShared().acknowledgedAt }}</th>
           </tr>
         </ng-template>

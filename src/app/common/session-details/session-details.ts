@@ -21,7 +21,7 @@ import { SystemChip } from '../system-chip/system-chip';
   imports: [ButtonModule, ImageModule, PdfThumbnail, PdfViewerDialog, SystemChip],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
-  providers: [provideTranslocoScope('sessions')],
+  providers: [provideTranslocoScope('sessions', 'common')],
 })
 export class SessionDetails {
   private readonly storage = inject(Storage);
@@ -50,14 +50,14 @@ export class SessionDetails {
   readonly systemName = computed(
     () =>
       normalizeText(this.session().system?.name) ??
-      this.i18n.commonFallbacks().missingData,
+      this.i18n.commonEmpty().title,
   );
 
   readonly difficultyLabel = computed(() => {
     const difficultyVm = resolveAltDifficultyLevel(
       this.session().difficultyLevel,
       this.i18n.difficulty(),
-      this.i18n.commonFallbacks().missingData,
+      this.i18n.commonEmpty().title,
     );
 
     return difficultyVm.label;
@@ -67,7 +67,7 @@ export class SessionDetails {
     const difficultyVm = resolveAltDifficultyLevel(
       this.session().difficultyLevel,
       this.i18n.difficulty(),
-      this.i18n.commonFallbacks().missingData,
+      this.i18n.commonEmpty().title,
     );
 
     return difficultyVm.badgeClass;
@@ -77,7 +77,7 @@ export class SessionDetails {
     const { minPlayers, maxPlayers } = this.session();
 
     if (minPlayers == null && maxPlayers == null) {
-      return this.i18n.commonFallbacks().missingData;
+      return this.i18n.commonEmpty().title;
     }
 
     if (minPlayers === maxPlayers) {
@@ -95,7 +95,7 @@ export class SessionDetails {
     const minAge = this.session().minAge;
 
     if (minAge == null) {
-      return this.i18n.commonFallbacks().missingData;
+      return this.i18n.commonEmpty().title;
     }
 
     return `${minAge}+`;
@@ -112,7 +112,7 @@ export class SessionDetails {
       return '...';
     }
 
-    return this.i18n.commonFallbacks().missingData;
+    return this.i18n.commonEmpty().title;
   });
 
   onGmProfileSelect(): void {

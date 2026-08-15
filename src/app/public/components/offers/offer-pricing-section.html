@@ -27,10 +27,10 @@
           {{ pricingHeaders.variant }}
         </th>
         <th scope="col" class="small-caps w-20">
-          {{ pricingHeaders.price }}
+          {{ i18n.commonLabels().price }}
         </th>
         <th scope="col" class="small-caps">
-          {{ pricingHeaders.description }}
+          {{ i18n.commonLabels().description }}
         </th>
       </tr>
     </ng-template>
@@ -42,7 +42,7 @@
         </th>
         <td class="mg-responsive-table__cell">
           <span class="mg-responsive-table__label small-caps font-bold">
-            {{ pricingHeaders.price }}
+            {{ i18n.commonLabels().price }}
           </span>
           <div class="mg-responsive-table__value">
             {{ formatPricing(item.pricing) }}
@@ -50,7 +50,7 @@
         </td>
         <td class="mg-responsive-table__cell">
           <span class="mg-responsive-table__label small-caps font-bold">
-            {{ pricingHeaders.description }}
+            {{ i18n.commonLabels().description }}
           </span>
           <div class="mg-responsive-table__value">
             <app-expandable-text [text]="item.lead" />

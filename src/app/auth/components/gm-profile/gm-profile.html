@@ -1,6 +1,6 @@
 <header class="mg-section__header w-100 m-sm">
   <h2 class="mg-section__title mg-section__title--md">
-    <span>{{ i18n.gmProfile().title }}</span>
+    <span>{{ i18n.gmProfileTitle().gmProfile }}</span>
   </h2>
 </header>
 
@@ -79,7 +79,7 @@
           rows="6"
           autocomplete="off"
         ></textarea>
-        <label for="gm-description">{{ i18n.form().descriptionLabel }}</label>
+        <label for="gm-description">{{ i18n.commonLabels().description }}</label>
       </p-iftalabel>
     </div>
 
@@ -93,7 +93,7 @@
     </div>
 
     <div class="w-80 w-100-xs flex-col-start-stretch gap-xs">
-      <label for="gm-language-ids">{{ i18n.form().languagesLabel }}</label>
+      <label for="gm-language-ids">{{ i18n.commonLabels().languages }}</label>
 
       <app-chip-picker
         [options]="languageOptions()"
@@ -104,7 +104,7 @@
     </div>
 
     <div class="w-80 w-100-xs flex-col-start-stretch gap-xs">
-      <label for="gm-style-ids">{{ i18n.form().stylesLabel }}</label>
+      <label for="gm-style-ids">{{ i18n.commonLabels().facilitationStyles }}</label>
 
       <app-chip-picker
         [options]="styleOptions()"

@@ -1,3 +1,4 @@
+import { createCommonNavI18n } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type {
   AdminCoworkerShellTabsTranslations,
@@ -18,5 +19,6 @@ export function createAdminCoworkerShellI18n() {
   return {
     shell,
     tabs,
+    commonNav: createCommonNavI18n(),
   };
 }

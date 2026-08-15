@@ -18,16 +18,12 @@
       "slide-2": {
         "id": 2,
         "heading": "Chaotyczne Czwartki - wypróbuj nas",
-        "text": "Chaotyczne Czwartki pozwalają sprawdzić naszych Mistrzów Gry. To wydarzenie, w którym losujesz Mistrza Gry, sesję i możesz poznać różne style prowadzenia.",
-        "ctaLabel": "Dowiedz się więcej",
-        "imageAlt": "Chaotyczne Czwartki"
+        "text": "Chaotyczne Czwartki pozwalają sprawdzić naszych Mistrzów Gry. To wydarzenie, w którym losujesz Mistrza Gry, sesję i możesz poznać różne style prowadzenia."
       },
       "slide-3": {
         "id": 3,
         "heading": "Dołącz do Drużyny - drzwi do przygody",
-        "text": "Nie musisz mieć drużyny, żeby zacząć grać w RPG. W Dołącz do Drużyny to my szukamy graczy, z którymi będziesz grać.",
-        "ctaLabel": "Dołącz do Drużyny",
-        "imageAlt": "Dołącz do Drużyny"
+        "text": "Nie musisz mieć drużyny, żeby zacząć grać w RPG. W Dołącz do Drużyny to my szukamy graczy, z którymi będziesz grać."
       },
       "slide-4": {
         "id": 4,
@@ -40,9 +36,6 @@
   },
 
   "problems": {
-    "aria": {
-      "sectionLabel": "Problemy, które rozwiązujemy"
-    },
     "header": {
       "title": "Problemy, które rozwiązujemy",
       "subtitle": "Nasza filozofia opiera się na rozwiązywaniu problemów, które często utrudniają rozpoczęcie grania w RPG. Nie skupiamy się na \"Mistrzach Gry na godziny\", tylko na standardach, bezpieczeństwie i odpowiedzialności za Twoje doświadczenie RPG."
@@ -108,7 +101,6 @@
   },
   "seoText": {
     "header": {
-      "title": "Mistrzowie Gry",
       "subtitle": "Jesteśmy organizacją, która powstała po to, żeby odpowiadać na potrzeby osób grających lub chcących grać w gry fabularne. Zajmujemy się organizacją i prowadzeniem kompletnych doświadczeń RPG - od organizacji sesji po kontynuację gry."
     },
     "columns": {

@@ -2,11 +2,11 @@
   <div class="mg-grid-2 gap-md w-100" [formGroup]="form().controls.presentation">
     <p-iftalabel class="w-100">
       <p-select class="w-100" [inputId]="controlId() + '-orientation'" formControlName="orientation" [options]="orientationOptions()" optionLabel="label" optionValue="value" appendTo="body" />
-      <label [for]="controlId() + '-orientation'">{{ i18n.cards().orientation }}</label>
+      <label [for]="controlId() + '-orientation'">{{ i18n.cards().cardOrientation }}</label>
     </p-iftalabel>
     <p-iftalabel class="w-100">
       <p-select class="w-100" [inputId]="controlId() + '-columns'" formControlName="columns" [options]="columnOptions" optionLabel="label" optionValue="value" appendTo="body" />
-      <label [for]="controlId() + '-columns'">{{ i18n.cards().columns }}</label>
+      <label [for]="controlId() + '-columns'">{{ i18n.cards().columnCount }}</label>
     </p-iftalabel>
   </div>
   <div class="flex-row-end-center">

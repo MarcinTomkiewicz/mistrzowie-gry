@@ -1,8 +1,10 @@
 import {
   CommonActionsTranslations,
   CommonErrorsTranslations,
+  CommonLabelsTranslations,
   CommonStatusTranslations,
 } from '../types/i18n/common';
+import { AppRoleLabels } from '../types/app-role';
 
 export interface ISessionReservationI18nSections extends Record<string, unknown> {
   seo: {
@@ -15,22 +17,17 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
   };
   sections: {
     offer: string;
-    gm: string;
     system: string;
     slot: string;
-    contact: string;
     addons: string;
     summary: string;
   };
   labels: {
     flowMode: string;
     gmFirstFlowMode: string;
-    systemFirstFlowMode: string;
     reservationKind: string;
     showSelectedGmProfile: string;
     customerName: string;
-    customerEmail: string;
-    customerPhone: string;
     playersCount: string;
     message: string;
     createCharactersAtTable: string;
@@ -45,11 +42,8 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     grossTotal: string;
     lineItems: string;
     additionalTime: string;
-    duration: string;
     hourShort: string;
     selectedSlot: string;
-    startTime: string;
-    endTime: string;
     selectFallbackSlot: string;
   };
   states: {
@@ -93,5 +87,7 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
 export interface ISessionReservationCommonI18n {
   commonActions: CommonActionsTranslations;
   commonErrors: CommonErrorsTranslations;
+  commonLabels: CommonLabelsTranslations;
   commonStatus: CommonStatusTranslations;
+  commonAppRoles: AppRoleLabels;
 }

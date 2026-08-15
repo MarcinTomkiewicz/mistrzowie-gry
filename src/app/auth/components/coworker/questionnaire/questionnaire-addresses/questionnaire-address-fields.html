@@ -15,7 +15,7 @@
         [attr.aria-describedby]="errorId('postal-code')"
       />
       <label [for]="fieldId('postal-code')">
-        {{ i18n.fields().postalCodeLabel }}
+        {{ i18n.commonLabels().postalCode }}
       </label>
     </p-iftalabel>
     <app-questionnaire-field-errors
@@ -36,7 +36,7 @@
         [attr.data-questionnaire-field]="fieldPath('city')"
         [attr.aria-describedby]="errorId('city')"
       />
-      <label [for]="fieldId('city')">{{ i18n.fields().cityLabel }}</label>
+      <label [for]="fieldId('city')">{{ i18n.commonLabels().locality }}</label>
     </p-iftalabel>
     <app-questionnaire-field-errors
       [control]="form().controls.city"
@@ -56,7 +56,7 @@
         [attr.data-questionnaire-field]="fieldPath('street')"
         [attr.aria-describedby]="errorId('street')"
       />
-      <label [for]="fieldId('street')">{{ i18n.fields().streetLabel }}</label>
+      <label [for]="fieldId('street')">{{ i18n.commonLabels().street }}</label>
     </p-iftalabel>
     <app-questionnaire-field-errors
       [control]="form().controls.street"
@@ -115,7 +115,7 @@
         formControlName="countryCode"
         [inputId]="fieldId('country-code')"
         [options]="countryOptions"
-        [placeholder]="i18n.options().selectPlaceholder"
+        [placeholder]="i18n.commonActions().select"
         autocomplete="country-name"
         [attr.data-questionnaire-field]="fieldPath('countryCode')"
         [attr.aria-describedby]="errorId('country-code')"

@@ -46,11 +46,11 @@
     @if (form().controls.presentation.controls.type.value === 'cards') {
       <p-iftalabel class="w-100">
         <p-select class="w-100" [inputId]="controlId() + '-orientation'" formControlName="orientation" [options]="orientationOptions()" optionLabel="label" optionValue="value" appendTo="body" />
-        <label [for]="controlId() + '-orientation'">{{ i18n.productCollection().cardOrientation }}</label>
+        <label [for]="controlId() + '-orientation'">{{ i18n.cards().cardOrientation }}</label>
       </p-iftalabel>
       <p-iftalabel class="w-100">
         <p-select class="w-100" [inputId]="controlId() + '-columns'" formControlName="columns" [options]="columnOptions" optionLabel="label" optionValue="value" appendTo="body" />
-        <label [for]="controlId() + '-columns'">{{ i18n.productCollection().columns }}</label>
+        <label [for]="controlId() + '-columns'">{{ i18n.cards().columnCount }}</label>
       </p-iftalabel>
     }
   </div>
@@ -122,7 +122,7 @@
               <div class="flex-col-start-stretch gap-xs w-100">
                 <p-iftalabel class="w-100">
                   <p-select class="w-100" [inputId]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'" formControlName="productId" [options]="availableOverrideOptions(field, override.controls.productId.value)" optionLabel="label" optionValue="value" appendTo="body" />
-                  <label [for]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'">{{ i18n.productCollection().overrideProduct }}</label>
+                  <label [for]="controlId() + '-field-' + fieldIndex + '-override-' + overrideIndex + '-product'">{{ i18n.commonLabels().item }}</label>
                 </p-iftalabel>
                 @if (override.controls.productId.touched && override.controls.productId.invalid) {
                   <small class="error-text">{{ i18n.commonForm().required }}</small>
@@ -138,7 +138,7 @@
                     <small class="error-text">{{ i18n.commonForm().required }}</small>
                   }
                 </div>
-                <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="i18n.commonActions().remove" (onClick)="removeLabelOverride(field, overrideIndex)" />
+                <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="i18n.commonActions().delete" (onClick)="removeLabelOverride(field, overrideIndex)" />
               </div>
             </div>
           }

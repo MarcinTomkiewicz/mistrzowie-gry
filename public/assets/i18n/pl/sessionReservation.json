@@ -9,22 +9,17 @@
   },
   "sections": {
     "offer": "Rodzaj rezerwacji",
-    "gm": "Mistrz Gry",
     "system": "System",
     "slot": "Termin",
-    "contact": "Dane kontaktowe",
     "addons": "Opcjonalne dodatki do rezerwacji",
     "summary": "Podsumowanie"
   },
   "labels": {
     "flowMode": "Co chcesz wybrać najpierw?",
     "gmFirstFlowMode": "Mistrza Gry",
-    "systemFirstFlowMode": "System RPG",
     "reservationKind": "Rezerwuję sesję RPG",
     "showSelectedGmProfile": "Pokaż profil wybranego MG",
     "customerName": "Imię i nazwisko",
-    "customerEmail": "E-mail",
-    "customerPhone": "Telefon",
     "playersCount": "Liczba graczy",
     "message": "Wiadomość dla Mistrza Gry",
     "createCharactersAtTable": "Chcemy tworzyć postacie przy stole",
@@ -39,11 +34,8 @@
     "grossTotal": "Suma brutto",
     "lineItems": "Pozycje wyceny",
     "additionalTime": "Dodatkowy czas",
-    "duration": "Czas trwania",
     "hourShort": "h",
     "selectedSlot": "Wybrany termin",
-    "startTime": "Od",
-    "endTime": "Do",
     "selectFallbackSlot": "Wybierz ten termin"
   },
   "states": {

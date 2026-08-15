@@ -1,20 +1,14 @@
 import { EventOccurrenceStatus } from '../../enums/event';
 
 export type ListPageCopy = {
-  title: string;
   subtitle: string;
   emptyTitle: string;
   emptyDescription: string;
-  loadErrorTitle: string;
 };
 
 export type CoreTableCopy = {
-  name: string;
-  key: string;
-  shortDescription: string;
   active: string;
   publicPage: string;
-  displayOrder: string;
   editionCount: string;
   activeEditionCount: string;
   updatedAt: string;
@@ -27,7 +21,6 @@ export type ListActionsCopy = {
 };
 
 export type ListToastCopy = {
-  loadFailedSummary: string;
   activateSuccessSummary: string;
   activateSuccessDetail: string;
   deactivateSuccessSummary: string;
@@ -46,13 +39,8 @@ export type EditorPageCopy = {
 
 export type EditorFieldsCopy = {
   coreSectionTitle: string;
-  key: string;
-  name: string;
-  shortDescription: string;
   longDescription: string;
-  isActive: string;
   hasPublicPage: string;
-  displayOrder: string;
 };
 
 export type EditorValidationCopy = {
@@ -67,13 +55,8 @@ export type EditionsCopy = {
 };
 
 export type EditionTableCopy = {
-  city: string;
-  slug: string;
   active: string;
   defaultPublic: string;
-  displayOrder: string;
-  occurrenceCount: string;
-  programItemCount: string;
 };
 
 export type EditorActionsCopy = {
@@ -81,14 +64,12 @@ export type EditorActionsCopy = {
 };
 
 export type EditorToastCopy = {
-  loadFailedSummary: string;
   saveSuccessSummary: string;
   saveSuccessDetail: string;
   saveFailedSummary: string;
 };
 
 export type StatusCopy = {
-  active: string;
   inactive: string;
 };
 
@@ -98,7 +79,6 @@ export type CoreRpcErrorsCopy = {
   invalid: string;
   duplicateKey: string;
   constraint: string;
-  conflict: string;
   unknown: string;
 };
 
@@ -111,12 +91,9 @@ export type EditionSectionsCopy = {
 };
 
 export type EditionFieldsCopy = {
-  eventCore: string;
   slug: string;
-  city: string;
   venueName: string;
   venueAddress: string;
-  priceAmount: string;
   priceCurrency: string;
   priceLabel: string;
   coverImagePath: string;
@@ -124,8 +101,6 @@ export type EditionFieldsCopy = {
   facebookLink: string;
   isActive: string;
   isDefaultPublic: string;
-  displayOrder: string;
-  isForBeginners: string;
   timezone: string;
   startTime: string;
   endTime: string;
@@ -163,14 +138,9 @@ export type OccurrencesCopy = {
 };
 
 export type OccurrenceTableCopy = {
-  date: string;
-  status: string;
   slotCapacity: string;
-  participantCapacity: string;
-  participantSignupKind: string;
   hostSignupWindow: string;
   participantSignupWindow: string;
-  publishedAt: string;
   programItemCount: string;
   activeParticipantCount: string;
 };
@@ -181,9 +151,7 @@ export type OccurrenceDialogCopy = {
 
 export type OccurrenceFieldsCopy = {
   date: string;
-  status: string;
   slotCapacity: string;
-  participantCapacity: string;
   participantSignupKind: string;
   hostSignupWindow: string;
   hostSignupOpensAt: string;
@@ -199,7 +167,10 @@ export type OccurrenceValidationCopy = {
   participantSignupRange: string;
 };
 
-export type OccurrenceStatusCopy = Record<EventOccurrenceStatus, string>;
+export type OccurrenceStatusCopy = Record<
+  Exclude<EventOccurrenceStatus, 'published' | 'archived'>,
+  string
+>;
 
 export type OccurrenceToastCopy = {
   saveSuccessSummary: string;
@@ -227,7 +198,6 @@ export type EditionRpcErrorsCopy = {
   defaultPublicConflict: string;
   uniqueConflict: string;
   constraint: string;
-  conflict: string;
   unknown: string;
 };
 

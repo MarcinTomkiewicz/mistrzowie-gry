@@ -2,10 +2,10 @@
 
 <ul class="flex-col m-0 px-md">
   <li class="text-start">{{ details.orgMeetingFree }}</li>
-  <li>{{ details.orgMeetingPrice }}</li>
+  <li>{{ shared().orgMeetingPrice }}</li>
   <li>{{ details.orgMeetingSchedule }}</li>
   <li>
-    <span>{{ details.orgMeetingPlaceLabel }} </span>
+    <span>{{ shared().orgMeetingPlaceLabel }} </span>
     @if (placeHref(); as href) {
       <a [href]="href" target="_blank" rel="noopener noreferrer">
         {{ details.orgMeetingPlace }}
@@ -14,5 +14,5 @@
       <span>{{ details.orgMeetingPlace }}</span>
     }
   </li>
-  <li>{{ details.sessionPrice }}</li>
+  <li>{{ shared().sessionPrice }}</li>
 </ul>

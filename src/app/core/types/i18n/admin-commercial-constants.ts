@@ -17,14 +17,11 @@ export type AdminCommercialConstantsTableTranslations = {
   type: string;
   draft: string;
   published: string;
-  status: string;
   usage: string;
   draftUsage: string;
   publishedUsage: string;
   updatedAt: string;
   updatedBy: string;
-  publishedAt: string;
-  publishedBy: string;
 };
 
 export type AdminCommercialConstantsEditorTranslations = {
@@ -32,7 +29,6 @@ export type AdminCommercialConstantsEditorTranslations = {
   editTitle: string;
   token: string;
   tokenHint: string;
-  label: string;
   type: string;
   value: string;
   durationUnit: string;
@@ -40,7 +36,6 @@ export type AdminCommercialConstantsEditorTranslations = {
 };
 
 export type AdminCommercialConstantsActionTranslations = {
-  publish: string;
   copyToken: string;
   deleteUnavailable: string;
 };
@@ -53,7 +48,6 @@ export type AdminCommercialConstantsStatusTranslations = {
 };
 
 export type AdminCommercialConstantsToastTranslations = {
-  loadFailedSummary: string;
   loadFailedDetail: string;
   saveSuccessSummary: string;
   saveSuccessDetail: string;
@@ -85,12 +79,12 @@ export type AdminCommercialConstantsValidationTranslations = {
 };
 
 export type AdminCommercialConstantsValueTypeTranslations = Record<
-  CommercialConstantValueType,
+  Exclude<CommercialConstantValueType, 'duration'>,
   string
 >;
 
 export type AdminCommercialConstantsDurationUnitTranslations = Record<
-  CommercialConstantDurationUnit,
+  Exclude<CommercialConstantDurationUnit, 'hours'>,
   string
 > & {
   hoursShort: string;

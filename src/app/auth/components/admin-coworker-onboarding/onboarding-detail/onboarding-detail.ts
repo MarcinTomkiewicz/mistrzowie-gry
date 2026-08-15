@@ -150,7 +150,7 @@ export class CoworkerOnboardingDetail {
   protected confirmRemove(event: Event, documentId: string): void {
     this.confirm.dangerDecision(event, {
       message: this.i18n.dialogs().removeMessage,
-      acceptLabel: this.i18n.commonActions().remove,
+      acceptLabel: this.i18n.commonActions().delete,
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => this.remove(documentId),
     });
@@ -227,7 +227,7 @@ export class CoworkerOnboardingDetail {
   private showMutationSuccess(): void {
     this.toast.success({
       summary: this.i18n.toast().mutationSuccessSummary,
-      detail: this.i18n.toast().mutationSuccessDetail,
+      detail: this.i18n.commonStatus().changesSaved,
     });
   }
 

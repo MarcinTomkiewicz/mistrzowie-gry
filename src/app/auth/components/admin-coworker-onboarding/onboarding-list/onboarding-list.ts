@@ -126,7 +126,7 @@ export class CoworkerOnboardingList {
   private showSuccess(): void {
     this.toast.success({
       summary: this.i18n.toast().mutationSuccessSummary,
-      detail: this.i18n.toast().mutationSuccessDetail,
+      detail: this.i18n.commonStatus().changesSaved,
     });
   }
 

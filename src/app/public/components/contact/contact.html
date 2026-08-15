@@ -67,7 +67,7 @@
               [attr.aria-invalid]="showRequiredError('firstName')"
               autocomplete="given-name"
             />
-            <label for="firstName">{{ data.formText.firstNameLabel }}</label>
+            <label for="firstName">{{ i18n.commonLabels().firstName }}*</label>
           </p-iftalabel>
 
           @if (showRequiredError("firstName")) {
@@ -86,7 +86,7 @@
               autocomplete="family-name"
               [attr.aria-invalid]="showRequiredError('lastName')"
             />
-            <label for="lastName">{{ data.formText.lastNameLabel }}</label>
+            <label for="lastName">{{ i18n.commonLabels().lastName }}*</label>
           </p-iftalabel>
 
           @if (showRequiredError("lastName")) {
@@ -129,7 +129,7 @@
               autocomplete="email"
               [attr.aria-invalid]="showEmailError()"
             />
-            <label for="email">{{ data.formText.emailLabel }}</label>
+            <label for="email">{{ i18n.commonLabels().emailAddress }}*</label>
           </p-iftalabel>
 
           @if (showEmailError()) {
@@ -186,7 +186,7 @@
               class="link-like-inline"
               (click)="openPrivacyPolicyDialog()"
             >
-              {{ data.legalNotice.privacyPolicyLabel }}
+              {{ i18n.commonLegal().privacyPolicy }}
             </button>
           </small>
           <div class="flex-row-end-center flex-col-sm gap-sm">
@@ -208,7 +208,7 @@
 
       <div class="mg-card">
         <h2 class="mg-section__title mg-section__title--sm">
-          {{ data.info.title }}
+        {{ i18n.commonLabels().contactDetails }}
         </h2>
 
         <p class="mg-section__subtitle mg-section__subtitle--no-margin">
@@ -218,7 +218,7 @@
         <div class="flex-col-start-start gap-sm mt-md">
           <div class="flex-row-start-center gap-sm">
             <i class="pi pi-send-message" aria-hidden="true"></i>
-            {{ data.info.emailLabel }}
+            {{ i18n.commonLabels().emailAddress }}:
             <a
               [href]="'mailto:' + data.info.emailValue"
               [attr.aria-label]="
@@ -232,7 +232,7 @@
           <div class="flex-row-start-center gap-sm">
             <i class="pi pi-call-me" aria-hidden="true"></i>
             <span>
-              {{ data.info.phoneLabel }}
+              {{ data.formText.phoneLabel }}:
               <a
                 [href]="'tel:' + data.info.phoneValue"
                 [attr.aria-label]="

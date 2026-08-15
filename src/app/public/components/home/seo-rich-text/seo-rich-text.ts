@@ -16,12 +16,13 @@ import { createSeoRichTextI18n } from './seo-rich-text.i18n';
   standalone: true,
   imports: [AnimateOnScrollModule, InternalLinkText],
   templateUrl: './seo-rich-text.html',
-  providers: [provideTranslocoScope('home')],
+  providers: [provideTranslocoScope('home', 'common')],
 })
 export class SeoRichText {
   readonly i18n = createSeoRichTextI18n();
 
   readonly header = this.i18n.header;
+  readonly commonLabels = this.i18n.commonLabels;
   readonly columns = this.i18n.columns;
 
   trackByColId = (_: number, col: UiSeoTextColumn): number => col.id;

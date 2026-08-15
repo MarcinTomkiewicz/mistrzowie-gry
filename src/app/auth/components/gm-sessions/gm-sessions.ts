@@ -150,18 +150,20 @@ export class GmSessions {
       return Object.fromEntries(
         SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => [
           option.value,
-          difficulty[option.i18nKey],
+          option.value === 'beginner'
+            ? this.i18n.commonLabels().forBeginners
+            : difficulty[option.i18nKey],
         ]),
       ) as Record<SessionDifficultyLevel, string>;
     },
   );
 
   readonly sessionListLabels = computed<ISessionListLabels>(() => ({
-    systemLabel: this.i18n.sessionForm().systemLabel,
+    systemLabel: this.i18n.commonLabels().rpgSystem,
     titleLabel: this.i18n.sessionForm().titleLabel,
     difficultyLabel: this.i18n.sessionForm().difficultyLabel,
     playersLabel: this.i18n.list().playersHeaderLabel,
-    minAgeLabel: this.i18n.list().minAgeHeaderLabel,
+    minAgeLabel: this.i18n.commonLabels().age,
     editLabel: this.i18n.commonActions().edit,
     deleteLabel: this.i18n.commonActions().delete,
   }));

@@ -9,6 +9,7 @@ import { joinTextParts } from '../../../core/utils/normalize-text';
 export function resolveEventCoreAdminErrorMessage(
   error: unknown,
   copy: CoreRpcErrorsCopy,
+  conflictMessage: string,
 ): string {
   if (!(error instanceof RpcError)) {
     return copy.unknown;
@@ -27,7 +28,7 @@ export function resolveEventCoreAdminErrorMessage(
     case '23514':
       return copy.constraint;
     case '40001':
-      return copy.conflict;
+      return conflictMessage;
     default:
       return copy.unknown;
   }
@@ -36,6 +37,7 @@ export function resolveEventCoreAdminErrorMessage(
 export function resolveEventEditionAdminErrorMessage(
   error: unknown,
   copy: EditionRpcErrorsCopy,
+  conflictMessage: string,
 ): string {
   if (!(error instanceof RpcError)) {
     return copy.unknown;
@@ -57,7 +59,7 @@ export function resolveEventEditionAdminErrorMessage(
     case '23514':
       return copy.constraint;
     case '40001':
-      return copy.conflict;
+      return conflictMessage;
     default:
       return copy.unknown;
   }

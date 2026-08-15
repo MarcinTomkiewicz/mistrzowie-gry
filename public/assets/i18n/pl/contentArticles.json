@@ -1,10 +1,8 @@
 {
   "hero": {
-    "title": "Artykuły",
     "subtitle": "Poradniki, inspiracje i teksty o sesjach RPG przygotowane przez Mistrzów Gry."
   },
   "seo": {
-    "listTitle": "Artykuły",
     "listDescription": "Poradniki i artykuły Mistrzów Gry o grach fabularnych, sesjach RPG, prowadzeniu przygód i dobrym starcie przy stole."
   },
   "cta": {
@@ -12,15 +10,10 @@
     "backToList": "Wróć do artykułów"
   },
   "empty": {
-    "title": "Brak artykułów",
     "description": "Nie ma jeszcze opublikowanych artykułów."
   },
   "errors": {
-    "listTitle": "Nie udało się załadować artykułów",
     "listDescription": "Spróbuj odświeżyć stronę za chwilę.",
-    "detailLoadTitle": "Nie udało się załadować artykułu",
-    "detailLoadDescription": "Spróbuj odświeżyć stronę za chwilę.",
-    "detailNotFoundTitle": "Nie znaleziono artykułu",
     "detailNotFoundDescription": "Ten artykuł nie istnieje albo nie jest już opublikowany."
   }
 }

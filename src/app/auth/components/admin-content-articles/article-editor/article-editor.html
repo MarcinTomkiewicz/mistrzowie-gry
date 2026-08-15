@@ -12,7 +12,7 @@
 
         @if (article(); as loadedArticle) {
           <span [class]="getStatusBadgeClass(loadedArticle.status)">
-            {{ i18n.statusLabels()[loadedArticle.status] }}
+            {{ getStatusLabel(loadedArticle.status) }}
           </span>
         }
       </div>
@@ -26,7 +26,7 @@
     @if (hasLoadError() && !isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
         <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
-          {{ i18n.page().loadErrorTitle }}
+          {{ i18n.commonErrors().articleLoadFailed }}
         </h2>
 
         <div class="flex-row-start-center flex-wrap gap-sm">
@@ -49,7 +49,7 @@
     } @else if (isNotFound() && !isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
         <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
-          {{ i18n.page().notFoundTitle }}
+          {{ i18n.commonErrors().articleNotFound }}
         </h2>
 
         <p-button
@@ -98,7 +98,7 @@
                       />
                     }
                     <label [for]="field.inputId">
-                      {{ i18n.fields()[field.labelKey] }}
+                      {{ getFieldLabel(field.controlName) }}
                     </label>
                   </p-iftalabel>
                 </div>
@@ -116,7 +116,7 @@
 
         <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
           <h2 class="mg-section__title mg-section__title--md m-0">
-            {{ i18n.fields().seoSectionTitle }}
+            {{ i18n.commonLabels().seo }}
           </h2>
 
           @for (row of seoFieldRows; track $index) {
@@ -145,7 +145,7 @@
                       />
                     }
                     <label [for]="field.inputId">
-                      {{ i18n.fields()[field.labelKey] }}
+                      {{ getFieldLabel(field.controlName) }}
                     </label>
                   </p-iftalabel>
                 </div>

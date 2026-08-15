@@ -22,8 +22,8 @@ export class Register {
 
   private readonly applySeoEffect = effect(() => {
     this.seo.apply({
-      title: this.i18n.seo().title,
-      description: this.i18n.seo().description,
+      title: this.i18n.profileTitle().register,
+      description: this.i18n.register().seoDescription,
       canonicalUrl: this.pageUrl,
       robots: 'noindex,nofollow',
     });

@@ -42,7 +42,7 @@ export class EventCoreList {
     return this.rows().map((core) => ({
       core,
       shortDescriptionLabel: core.shortDescription ?? commonValues.notAvailable,
-      activeLabel: core.isActive ? status.active : status.inactive,
+      activeLabel: core.isActive ? commonValues.active : status.inactive,
       activeBadgeClass: core.isActive
         ? 'tag-badge tag-badge--success'
         : 'tag-badge tag-badge--muted',
@@ -75,12 +75,13 @@ export class EventCoreList {
           const detail = resolveEventCoreAdminErrorMessage(
             error,
             this.i18n.rpcErrors(),
+            this.i18n.commonErrors().concurrentModification,
           );
 
           this.rows.set([]);
           this.loadErrorMessage.set(detail);
           this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
+            summary: this.i18n.commonErrors().eventsLoadFailed,
             detail,
           });
         },
@@ -120,6 +121,7 @@ export class EventCoreList {
             detail: resolveEventCoreAdminErrorMessage(
               error,
               this.i18n.rpcErrors(),
+              this.i18n.commonErrors().concurrentModification,
             ),
           });
         },

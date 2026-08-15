@@ -3,7 +3,7 @@
   [formGroup]="form()"
 >
   <h2 class="mg-section__title mg-section__title--md m-0">
-    {{ copy().sectionTitle }}
+    {{ commonLabels().seo }}
   </h2>
 
   <div class="w-100">
@@ -15,7 +15,7 @@
         formControlName="title"
         autocomplete="off"
       />
-      <label for="commercial-page-seo-title">{{ copy().title }}</label>
+      <label for="commercial-page-seo-title">{{ commonLabels().seoTitle }}</label>
     </p-iftalabel>
 
     @if (form().controls.title.touched && form().controls.title.invalid) {
@@ -33,7 +33,7 @@
         rows="4"
       ></textarea>
       <label for="commercial-page-seo-description">
-        {{ copy().description }}
+        {{ commonLabels().seoDescription }}
       </label>
     </p-iftalabel>
 

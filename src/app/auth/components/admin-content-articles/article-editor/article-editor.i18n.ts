@@ -1,6 +1,9 @@
 import {
   createCommonActionsI18n,
+  createCommonErrorsI18n,
+  createCommonLabelsI18n,
   createCommonStatusI18n,
+  createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
@@ -49,6 +52,9 @@ export function createAdminContentArticleEditorI18n() {
     toast,
     statusLabels,
     commonActions: createCommonActionsI18n(),
+    commonErrors: createCommonErrorsI18n(),
+    commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }

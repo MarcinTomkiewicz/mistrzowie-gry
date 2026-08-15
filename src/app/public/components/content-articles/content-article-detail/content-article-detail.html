@@ -7,7 +7,7 @@
     @if (data.error) {
       <div class="mg-card text-center">
         <h1 class="mg-section__title mg-section__title--sm">
-          {{ data.errors.detailLoadTitle }}
+          {{ data.loadErrorTitle }}
         </h1>
         <p class="mg-section__subtitle mg-section__subtitle--no-margin">
           {{ data.error }}
@@ -16,7 +16,7 @@
     } @else if (data.isNotFound) {
       <div class="mg-card text-center">
         <h1 class="mg-section__title mg-section__title--sm">
-          {{ data.errors.detailNotFoundTitle }}
+          {{ data.notFoundTitle }}
         </h1>
         <p class="mg-section__subtitle mg-section__subtitle--full">
           {{ data.errors.detailNotFoundDescription }}

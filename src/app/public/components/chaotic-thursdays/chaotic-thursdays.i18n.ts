@@ -20,6 +20,8 @@ import {
   createCommonActionsI18n,
   createCommonCtaI18n,
   createCommonErrorsI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -89,6 +91,8 @@ export function createChaoticThursdaysI18n(
   const actions = createCommonActionsI18n();
   const commonErrors = createCommonErrorsI18n();
   const commonCta = createCommonCtaI18n();
+  const commonNav = createCommonNavI18n();
+  const commonLabels = createCommonLabelsI18n();
   const commonStatus = createCommonStatusI18n();
 
   const highlights = computed(() => {
@@ -134,6 +138,8 @@ export function createChaoticThursdaysI18n(
     standards,
     faq,
     commonCta,
+    commonNav,
+    commonLabels,
     commonStatus,
     highlights,
     steps,

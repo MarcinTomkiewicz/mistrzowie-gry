@@ -75,7 +75,9 @@ export class OurTeam {
     const profiles = this.profiles();
 
     const title =
-      seo.title?.trim() || commonSeo.defaultTitle?.trim() || 'Mistrzowie Gry';
+      this.i18n.page().title?.trim() ||
+      commonSeo.defaultTitle?.trim() ||
+      this.i18n.commonLabels().brandName;
 
     const description =
       seo.description?.trim() || commonSeo.defaultDescription?.trim() || '';
@@ -158,10 +160,12 @@ export class OurTeam {
       return {
         '@type': 'Person',
         '@id': `${this.pageUrl}#person-${profileId}`,
-        name: getGmPublicProfileDisplayName(profile) || 'Mistrz Gry',
+        name:
+          getGmPublicProfileDisplayName(profile) ||
+          this.i18n.commonAppRoles().gm,
         description: profileDescription,
         image: image ?? undefined,
-        jobTitle: 'Mistrz Gry',
+        jobTitle: this.i18n.commonAppRoles().gm,
         worksFor: createOrganizationRef(),
         knowsLanguage:
           profile.profile.languages.map((language) => language.label).filter(Boolean),

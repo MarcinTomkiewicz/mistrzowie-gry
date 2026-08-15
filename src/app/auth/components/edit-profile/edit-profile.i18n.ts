@@ -1,3 +1,4 @@
+import { createCommonNavI18n } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
   EditProfileHeroTranslations,
@@ -20,5 +21,6 @@ export function createEditProfileI18n() {
     seo,
     hero,
     tabs,
+    commonNav: createCommonNavI18n(),
   };
 }

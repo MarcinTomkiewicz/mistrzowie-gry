@@ -1,6 +1,5 @@
 {
   "page": {
-    "title": "Zarządzanie użytkownikami",
     "subtitle": "Wewnętrzny panel do obsługi ról, danych operacyjnych użytkowników oraz statusów profili Mistrzów Gry.",
     "emptyTitle": "Brak użytkowników do wyświetlenia",
     "emptyDescription": "Zmień filtry albo odśwież listę.",
@@ -9,15 +8,11 @@
   },
   "filters": {
     "searchLabel": "Szukaj",
-    "roleLabel": "Rola",
     "roleAll": "Wszystkie role",
-    "profileLabel": "Profil MG",
     "profileAll": "Wszyscy",
     "profileWith": "Tylko z profilem MG",
     "profileWithout": "Tylko bez profilu MG",
-    "publicLabel": "Publiczny",
     "publicAll": "Wszystkie",
-    "publicOnly": "Publiczny",
     "publicHidden": "Niepubliczny",
     "showArchivedLabel": "Pokaż archiwalne",
     "sortLabel": "Sortuj po",
@@ -28,26 +23,14 @@
     "sortAsc": "Najstarsze pierwsze"
   },
   "table": {
-    "user": "Użytkownik",
-    "role": "Rola",
     "testUser": "Testowy",
-    "hasGmProfile": "Profil MG",
-    "isPublic": "Publiczny",
     "isArchived": "Archiwalny"
   },
   "dialog": {
     "title": "Edycja użytkownika",
-    "emailLabel": "E-mail",
-    "firstNameLabel": "Imię",
-    "nicknameLabel": "Nick",
-    "useNicknameLabel": "Wyświetlaj nick zamiast imienia",
-    "phoneNumberLabel": "Numer telefonu",
-    "cityLabel": "Miasto",
-    "isTestUserLabel": "Użytkownik testowy",
-    "appRoleLabel": "Rola"
+    "isTestUserLabel": "Użytkownik testowy"
   },
   "actions": {
-    "createGmProfile": "Profil MG",
     "saveUser": "Zapisz użytkownika"
   },
   "toast": {
@@ -56,7 +39,6 @@
     "saveSuccessSummary": "Zapisano użytkownika",
     "saveSuccessDetail": "Dane użytkownika zostały zaktualizowane.",
     "saveFailedSummary": "Nie udało się zapisać użytkownika",
-    "saveFailedDetail": "Zmiany nie zostały zapisane.",
     "profileCreateSuccessSummary": "Utworzono profil MG",
     "profileCreateSuccessDetail": "Nowy profil jest niepubliczny i aktywny.",
     "profileCreateFailedSummary": "Nie udało się utworzyć profilu MG",

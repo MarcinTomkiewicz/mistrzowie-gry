@@ -3,7 +3,7 @@
   [formGroup]="form()"
 >
   <h4 class="mg-section__title mg-section__title--xs m-0">
-    {{ i18n().editor.fields.sectionTitle }}
+    {{ labels().price }}
   </h4>
 
   <p-iftalabel class="w-100">
@@ -23,7 +23,7 @@
     @case ('fixed') {
       <div class="mg-grid-2 gap-md w-100">
         <ng-container
-          *ngTemplateOutlet="amount; context: { label: i18n().editor.fields.amount }"
+          *ngTemplateOutlet="amount; context: { label: labels().amount }"
         />
         <ng-container *ngTemplateOutlet="billingUnit" />
       </div>
@@ -62,7 +62,7 @@
     @case ('from') {
       <div class="mg-grid-2 gap-md w-100">
         <ng-container
-          *ngTemplateOutlet="amount; context: { label: i18n().editor.fields.amount }"
+          *ngTemplateOutlet="amount; context: { label: labels().amount }"
         />
         <ng-container *ngTemplateOutlet="billingUnit" />
       </div>

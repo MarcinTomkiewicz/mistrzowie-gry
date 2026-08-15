@@ -166,7 +166,7 @@
             type="button"
             severity="secondary"
             icon="pi pi-save"
-            [label]="i18n.actions().saveDraftLabel"
+            [label]="i18n.commonActions().saveDraft"
             [disabled]="isBusy() || requiresReload()"
             [loading]="isSaving()"
             (onClick)="saveDraft()"

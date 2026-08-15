@@ -1,10 +1,8 @@
-import { computed } from '@angular/core';
-
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
 import {
-  RegisterHeroTranslations,
+  ProfileFormActionsTranslations,
+  ProfileFormTitleTranslations,
   RegisterRootTranslations,
-  RegisterSeoTranslations,
 } from '../../../core/types/i18n/auth';
 
 export function createRegisterI18n() {
@@ -12,16 +10,18 @@ export function createRegisterI18n() {
     'auth',
     'register',
   );
-
-  const seo = computed<RegisterSeoTranslations>(() => ({
-    title: register().seoTitle,
-    description: register().seoDescription,
-  }));
-
-  const hero = computed<RegisterHeroTranslations>(() => register().hero);
+  const profileTitle = createScopedObjectI18n<ProfileFormTitleTranslations>(
+    'auth',
+    'profileForm.title',
+  );
+  const profileActions = createScopedObjectI18n<ProfileFormActionsTranslations>(
+    'auth',
+    'profileForm.actions',
+  );
 
   return {
-    seo,
-    hero,
+    register,
+    profileTitle,
+    profileActions,
   };
 }

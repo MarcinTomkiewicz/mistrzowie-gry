@@ -106,7 +106,7 @@
                   @if (gm.profile.experience != null) {
                     {{ i18n.yearsLabel(gm.profile.experience) }}
                   } @else {
-                    {{ i18n.dialog().noData }}
+                    {{ i18n.commonValues().notProvided }}
                   }
                 </div>
 
@@ -115,7 +115,7 @@
                   @if (gm.profile.quote?.trim()) {
                     <em>{{ gm.profile.quote }}</em>
                   } @else {
-                    {{ i18n.dialog().noData }}
+                    {{ i18n.commonValues().notProvided }}
                   }
                 </div>
 
@@ -134,14 +134,14 @@
                     <p
                       class="mg-section__subtitle mg-section__subtitle--no-margin"
                     >
-                      {{ i18n.dialog().noData }}
+                      {{ i18n.commonValues().notProvided }}
                     </p>
                   }
                 </div>
 
                 <div class="flex-col-start-stretch gap-xs">
                   <div class="mg-section__title mg-section__title--xs">
-                    {{ i18n.dialog().stylesLabel }}
+                    {{ i18n.commonLabels().facilitationStyles }}
                   </div>
 
                   @if (gm.profile.styles.length) {
@@ -156,7 +156,7 @@
                     <p
                       class="mg-section__subtitle mg-section__subtitle--no-margin"
                     >
-                      {{ i18n.dialog().noData }}
+                      {{ i18n.commonValues().notProvided }}
                     </p>
                   }
                 </div>
@@ -165,13 +165,13 @@
 
             <div class="mg-card">
               <div class="mg-section__title mg-section__title--xs">
-                {{ i18n.dialog().descriptionLabel }}
+                {{ i18n.commonLabels().description }}
               </div>
 
               <p
                 class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full mt-sm pre-line"
               >
-                {{ gm.profile.description || i18n.dialog().noData }}
+                {{ gm.profile.description || i18n.commonValues().notProvided }}
               </p>
             </div>
           </div>

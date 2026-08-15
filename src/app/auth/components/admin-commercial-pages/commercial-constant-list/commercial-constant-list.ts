@@ -65,7 +65,10 @@ export class CommercialConstantList {
 
     return this.rows().map((constant) => ({
       constant,
-      typeLabel: this.i18n.valueType()[constant.valueType],
+      typeLabel:
+        constant.valueType === 'duration'
+          ? this.i18n.commonLabels().duration
+          : this.i18n.valueType()[constant.valueType],
       draftValueLabel: formatValue(
         constant.draftValue,
         constant.valueType,
@@ -131,7 +134,7 @@ export class CommercialConstantList {
           this.rows.set([]);
           this.hasLoadError.set(true);
           this.toast.danger({
-            summary: toast.loadFailedSummary,
+            summary: this.i18n.page().loadErrorTitle,
             detail: toast.loadFailedDetail,
           });
         },

@@ -18,20 +18,16 @@ export type AdminCommercialPagesListPageTranslations = {
   emptyTitle: string;
   emptyDescription: string;
   loadErrorTitle: string;
-  manageConstants: string;
 };
 
 export type AdminCommercialPagesListTableTranslations = {
   page: string;
   draftStatus: string;
   draftUpdatedAt: string;
-  publication: string;
-  publishedBy: string;
   effectiveFrom: string;
 };
 
 export type AdminCommercialPagesListToastTranslations = {
-  loadFailedSummary: string;
   loadFailedDetail: string;
 };
 
@@ -51,20 +47,15 @@ export type AdminCommercialPagesEditorStepsTranslations = {
 export type AdminCommercialPagesMetadataTranslations = {
   sectionTitle: string;
   heading: string;
-  lead: string;
 };
 
 export type AdminCommercialPagesSeoTranslations = {
-  sectionTitle: string;
-  title: string;
-  description: string;
   ogTitle: string;
   ogDescription: string;
   canonicalUrl: string;
 };
 
 export type AdminCommercialPagesEditorToastTranslations = {
-  loadFailedSummary: string;
   loadFailedDetail: string;
   saveSuccessSummary: string;
   saveSuccessDetail: string;
@@ -83,13 +74,9 @@ export type AdminCommercialPagesPreviewPageTranslations = {
 };
 
 export type AdminCommercialPagesPublicationTranslations = {
-  sectionTitle: string;
   dialogTitle: string;
   description: string;
-  effectiveFrom: string;
   validate: string;
-  preview: string;
-  publish: string;
   validationReady: string;
   validationIssues: string;
   issuePath: string;
@@ -111,10 +98,8 @@ export type AdminCommercialPagesPublicationToastTranslations = {
 export type AdminCommercialPagesProductsTranslations = {
   sectionTitle: string;
   empty: string;
-  addProduct: string;
   product: string;
   saveProduct: string;
-  products: string;
   addons: string;
 };
 
@@ -122,10 +107,8 @@ export type AdminCommercialPagesProductTranslations = {
   kind: string;
   name: string;
   description: string;
-  durationSection: string;
   durationMode: string;
   durationMinutes: string;
-  participantsSection: string;
   participantsMode: string;
   participantsMin: string;
   participantsMax: string;
@@ -136,19 +119,15 @@ export type AdminCommercialPagesProductTranslations = {
   includedAddons: string;
   meetingCountMin: string;
   meetingCountMax: string;
-  facilitatorCount: string;
-  tableCount: string;
 };
 
 export type AdminCommercialPagesSectionsTranslations = {
   sectionTitle: string;
   empty: string;
-  addSection: string;
   section: string;
 };
 
 export type AdminCommercialPagesSectionTranslations = {
-  heading: string;
   lead: string;
   surface: string;
   textAlign: string;
@@ -162,7 +141,6 @@ export type AdminCommercialPagesButtonsTranslations = {
   align: string;
   empty: string;
   add: string;
-  label: string;
   route: string;
   appearance: string;
   iconKey: string;
@@ -170,8 +148,8 @@ export type AdminCommercialPagesButtonsTranslations = {
 };
 
 export type AdminCommercialPagesCardsTranslations = {
-  orientation: string;
-  columns: string;
+  cardOrientation: string;
+  columnCount: string;
   empty: string;
   add: string;
   title: string;
@@ -182,8 +160,6 @@ export type AdminCommercialPagesCardsTranslations = {
 export type AdminCommercialPagesProductCollectionTranslations = {
   products: string;
   presentation: string;
-  cardOrientation: string;
-  columns: string;
   fields: string;
   fieldsHint: string;
   emptyFields: string;
@@ -193,7 +169,6 @@ export type AdminCommercialPagesProductCollectionTranslations = {
   visibleProducts: string;
   labelOverrides: string;
   addLabelOverride: string;
-  overrideProduct: string;
   overrideLabel: string;
   duplicateLabelOverride: string;
   staleProductReference: string;
@@ -208,7 +183,6 @@ export type AdminCommercialPagesProductCollectionTranslations = {
   comparisonSectionHeading: string;
   comparisonRows: string;
   emptyComparisonRows: string;
-  addComparisonRow: string;
   comparisonRowLabel: string;
   comparisonRowFields: string;
   incompleteComparison: string;
@@ -231,7 +205,6 @@ export type AdminCommercialPagesFaqTranslations = {
 };
 
 export type AdminCommercialPagesEditorActionsTranslations = {
-  saveDraft: string;
   moveSectionUp: string;
   moveSectionDown: string;
   removeSection: string;
@@ -251,14 +224,29 @@ export type AdminCommercialPagesDraftStatusTranslations = {
   clean: string;
 };
 
-export type AdminCommercialPagesBlockTypeTranslations = Record<CommercialBlockType, string>;
+export type AdminCommercialPagesBlockTypeTranslations = Record<
+  Exclude<CommercialBlockType, 'cards' | 'table' | 'faq'>,
+  string
+>;
 export type AdminCommercialPagesSectionSurfaceTranslations = Record<CommercialSectionSurface, string>;
 export type AdminCommercialPagesTextAlignTranslations = Record<CommercialTextAlign, string>;
 export type AdminCommercialPagesButtonLayoutTranslations = Record<CommercialButtonLayout, string>;
 export type AdminCommercialPagesCardOrientationTranslations = Record<CommercialCardOrientation, string>;
-export type AdminCommercialPagesCollectionPresentationTranslations = Record<CommercialProductCollectionBlock['presentation']['type'], string>;
-export type AdminCommercialPagesDurationModeTranslations = Record<CommercialEditorDuration['mode'], string>;
-export type AdminCommercialPagesParticipantsModeTranslations = Record<CommercialEditorParticipants['mode'], string>;
+export type AdminCommercialPagesCollectionPresentationTranslations = Record<
+  Exclude<CommercialProductCollectionBlock['presentation']['type'], 'cards' | 'table'>,
+  string
+>;
+export type AdminCommercialPagesDurationModeTranslations = Record<
+  Exclude<CommercialEditorDuration['mode'], 'not_applicable'>,
+  string
+>;
+export type AdminCommercialPagesParticipantsModeTranslations = Record<
+  Exclude<CommercialEditorParticipants['mode'], 'not_applicable'>,
+  string
+>;
 export type AdminCommercialPagesProductKindTranslations = Record<CommercialProductKind, string>;
-export type AdminCommercialPagesSessionModeTranslations = Record<CommercialSessionCount['mode'], string>;
+export type AdminCommercialPagesSessionModeTranslations = Record<
+  Exclude<CommercialSessionCount['mode'], 'not_applicable'>,
+  string
+>;
 export type AdminCommercialPagesActionAppearanceTranslations = Record<CommercialActionAppearance, string>;

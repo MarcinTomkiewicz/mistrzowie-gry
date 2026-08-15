@@ -7,7 +7,7 @@
   @if (loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
       <p class="m-0 error-text">
-        {{ sharedView ? i18n.coworkerShared().loadError : i18n.coworkerPrivate().loadError }}
+        {{ sharedView ? i18n.adminShared().loadError : i18n.coworkerPrivate().loadError }}
       </p>
       <p-button
         severity="secondary"
@@ -21,7 +21,7 @@
       <section class="flex-col-start-stretch gap-md w-100">
       <header class="mg-section__header w-100">
         <h2 class="mg-section__title mg-section__title--md">
-          {{ i18n.coworkerPrivate().title }}
+          {{ i18n.commonNav().privateDocuments }}
         </h2>
         <p class="mg-section__subtitle mg-section__subtitle--full">
           {{ i18n.coworkerPrivate().subtitle }}
@@ -58,7 +58,7 @@
 
             @if (document.rejection_reason) {
               <p class="m-0 error-text">
-                {{ i18n.coworkerPrivate().rejectionReason }}: {{ document.rejection_reason }}
+                {{ i18n.commonLabels().rejectionReason }}: {{ document.rejection_reason }}
               </p>
             }
 
@@ -67,7 +67,7 @@
                 size="small"
                 severity="secondary"
                 icon="pi pi-eye"
-                [label]="i18n.actions().preview"
+                [label]="i18n.commonActions().preview"
                 (onClick)="previewDocument(document, 'source')"
               />
               <p-button
@@ -166,7 +166,7 @@
       <section class="flex-col-start-stretch gap-md w-100">
       <header class="mg-section__header w-100">
         <h2 class="mg-section__title mg-section__title--md">
-          {{ i18n.coworkerShared().title }}
+          {{ i18n.commonNav().sharedDocuments }}
         </h2>
         <p class="mg-section__subtitle mg-section__subtitle--full">
           {{ i18n.coworkerShared().subtitle }}
@@ -195,7 +195,7 @@
                 size="small"
                 severity="secondary"
                 icon="pi pi-eye"
-                [label]="i18n.actions().preview"
+                [label]="i18n.commonActions().preview"
                 (onClick)="previewDocument(document, 'source')"
               />
               <p-button

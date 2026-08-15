@@ -9,6 +9,7 @@ import {
   createCommonAccessibilityI18n,
   createCommonActionsI18n,
   createCommonInfoI18n,
+  createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
@@ -18,6 +19,7 @@ export function createNavbarI18n() {
   const accessibility = createCommonAccessibilityI18n();
   const actions = createCommonActionsI18n();
   const info = createCommonInfoI18n();
+  const labels = createCommonLabelsI18n();
   const status = createCommonStatusI18n();
 
   const resolveLabel = (labelKey: string): string => {
@@ -37,6 +39,7 @@ export function createNavbarI18n() {
     accessibility,
     actions,
     info,
+    labels,
     status,
     resolveLabel,
     resolveMenu,

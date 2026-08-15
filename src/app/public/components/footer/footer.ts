@@ -87,15 +87,19 @@ export class Footer {
         !!this.legalDialogError()),
   );
 
-  readonly legalDialogTitle = computed(
-    () =>
-      this.activeLegalDialogContent()?.title ??
-      (this.isLegalDialogLoading()
-        ? 'Ladowanie...'
-        : this.legalDialogError()
-          ? 'Nie udalo sie zaladowac tresci'
-          : ''),
-  );
+  readonly legalDialogTitle = computed(() => {
+    const dialog = this.activeLegalDialogContent();
+    if (dialog?.title) return dialog.title;
+    if (dialog && this.activeLegalDialog() === 'privacy-policy') {
+      return this.i18n.legal().privacyPolicy;
+    }
+
+    return this.isLegalDialogLoading()
+      ? 'Ladowanie...'
+      : this.legalDialogError()
+        ? 'Nie udalo sie zaladowac tresci'
+        : '';
+  });
 
   readonly legalDialogSubtitle = computed(
     () => this.activeLegalDialogContent()?.subtitle ?? '',

@@ -7,7 +7,7 @@
     <p-button
       type="button"
       severity="secondary"
-      [label]="i18n.products().addProduct"
+      [label]="i18n.commonActions().addItem"
       icon="pi pi-plus"
       (onClick)="addProduct()"
     />
@@ -36,11 +36,11 @@
                   <small>{{ price.note }}</small>
                 }
                 <span>
-                  {{ i18n.product().durationSection }}:
+                  {{ i18n.commonLabels().duration }}:
                   {{ productDuration(item.form) }}
                 </span>
                 <span>
-                  {{ i18n.product().participantsSection }}:
+                  {{ i18n.commonLabels().participants }}:
                   {{ productParticipants(item.form) }}
                 </span>
                 <span>{{ productSessions(item.form) }}</span>

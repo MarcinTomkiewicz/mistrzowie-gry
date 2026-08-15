@@ -14,8 +14,6 @@ export type RichContentEditorTranslations = {
   addParagraph: string;
   addOrderedList: string;
   addUnorderedList: string;
-  addItem: string;
-  item: string;
   nestedBlocks: string;
   strongNode: string;
   linkNode: string;

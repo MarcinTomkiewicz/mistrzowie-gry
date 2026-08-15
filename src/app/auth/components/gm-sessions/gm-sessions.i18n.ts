@@ -7,6 +7,8 @@ import {
 } from '../../../core/types/i18n/auth';
 import {
   createCommonActionsI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -44,6 +46,8 @@ export function createGmSessionsI18n() {
   });
   const commonActions = createCommonActionsI18n();
   const commonStatus = createCommonStatusI18n();
+  const commonLabels = createCommonLabelsI18n();
+  const commonNav = createCommonNavI18n();
 
   return {
     gmSessions,
@@ -56,6 +60,8 @@ export function createGmSessionsI18n() {
     list,
     commonActions,
     commonStatus,
+    commonLabels,
+    commonNav,
     playersLabel: (minPlayers: number, maxPlayers: number) =>
       `${minPlayers}-${maxPlayers}`,
     minAgeLabel: (minAge: number) => `${minAge}+`,

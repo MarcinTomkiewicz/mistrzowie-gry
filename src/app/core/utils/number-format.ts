@@ -1,5 +1,4 @@
 import type {
-  NumberRangeTranslations,
   PluralNumberTranslations,
 } from '../types/number-format';
 
@@ -37,16 +36,17 @@ function formatNumberRange(
 export function formatOptionalNumberRange(
   min: number | null,
   max: number | null,
-  translations: NumberRangeTranslations,
+  fromLabel: string,
+  toLabel: string,
   locale: string,
 ): string | null {
   if (min === null) {
     return max === null
       ? null
-      : `${translations.to} ${formatNumber(max, locale)}`;
+      : `${toLabel} ${formatNumber(max, locale)}`;
   }
 
   return max === null
-    ? `${translations.from} ${formatNumber(min, locale)}`
+    ? `${fromLabel} ${formatNumber(min, locale)}`
     : formatNumberRange(min, max, locale);
 }

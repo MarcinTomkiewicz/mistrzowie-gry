@@ -177,7 +177,7 @@ export class AdminSharedDocuments {
   protected confirmArchive(event: Event, documentId: string): void {
     this.confirm.dangerDecision(event, {
       message: this.i18n.dialogs().archiveMessage,
-      acceptLabel: this.i18n.actions().archive,
+      acceptLabel: this.i18n.commonActions().archive,
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => this.archive(documentId),
     });
@@ -247,7 +247,7 @@ export class AdminSharedDocuments {
   private showMutationSuccess(): void {
     this.toast.success({
       summary: this.i18n.toast().mutationSuccessSummary,
-      detail: this.i18n.toast().mutationSuccessDetail,
+      detail: this.i18n.commonStatus().changesSaved,
     });
   }
 

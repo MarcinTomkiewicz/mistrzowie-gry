@@ -7,6 +7,7 @@ import {
   CommonFormTranslations,
   CommonLegalNoticeTranslations,
   CommonInfoTranslations,
+  CommonLabelsTranslations,
   CommonLegalTranslations,
   CommonNavTranslations,
   CommonQuestionsTranslations,
@@ -71,6 +72,10 @@ export function createCommonNavI18n() {
 
 export function createCommonQuestionsI18n() {
   return createCommonScopeSignal<CommonQuestionsTranslations>('questions');
+}
+
+export function createCommonLabelsI18n() {
+  return createCommonScopeSignal<CommonLabelsTranslations>('labels');
 }
 
 export function createCommonPriceI18n() {

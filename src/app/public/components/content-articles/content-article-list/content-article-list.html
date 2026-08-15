@@ -1,20 +1,20 @@
 @let data = vm();
 
-<section class="mg-section mg-section--full" [attr.aria-label]="data.hero.title">
+<section class="mg-section mg-section--full" [attr.aria-label]="data.title">
   <div class="mg-container position-relative">
     <app-loading-overlay [visible]="data.isLoading" [label]="data.status.loading" />
 
     <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
 
     <header class="mg-section__header">
-      <h1 class="mg-section__title">{{ data.hero.title }}</h1>
+      <h1 class="mg-section__title">{{ data.title }}</h1>
       <p class="mg-section__subtitle">{{ data.hero.subtitle }}</p>
     </header>
 
     @if (data.error) {
       <div class="mg-card">
         <h2 class="mg-section__title mg-section__title--sm">
-          {{ data.errors.listTitle }}
+          {{ data.errorTitle }}
         </h2>
         <p class="mg-section__subtitle mg-section__subtitle--full">
           {{ data.error }}
@@ -23,7 +23,7 @@
     } @else if (!data.isLoading && !data.items.length) {
       <div class="mg-card">
         <h2 class="mg-section__title mg-section__title--sm">
-          {{ data.empty.title }}
+          {{ data.emptyTitle }}
         </h2>
         <p class="mg-section__subtitle mg-section__subtitle--full">
           {{ data.empty.description }}

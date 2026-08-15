@@ -1,34 +1,23 @@
 {
   "page": {
-    "title": "Zarządzanie treścią",
     "subtitle": "Lista artykułów SEO i marketingowych. Z tego widoku utworzysz draft, opublikujesz albo zarchiwizujesz artykuł.",
-    "emptyTitle": "Brak artykułów",
     "emptyDescription": "Utwórz pierwszy draft artykułu.",
     "errorTitle": "Nie udało się załadować listy artykułów"
   },
   "editorPage": {
     "title": "Edycja artykułu",
-    "subtitle": "Uzupełnij pola główne, SEO i tekstowe sekcje artykułu.",
-    "loadErrorTitle": "Nie udało się załadować artykułu",
-    "notFoundTitle": "Nie znaleziono artykułu"
+    "subtitle": "Uzupełnij pola główne, SEO i tekstowe sekcje artykułu."
   },
   "table": {
     "thumbnail": "Miniatura",
-    "title": "Tytuł",
-    "slug": "Slug",
-    "status": "Status",
-    "publishedAt": "Publikacja",
     "updatedAt": "Aktualizacja",
     "untitledDraft": "Szkic bez tytułu",
     "thumbnailAlt": "Miniatura artykułu"
   },
   "actions": {
-    "createArticle": "Utwórz artykuł",
-    "publishArticle": "Opublikuj",
-    "archiveArticle": "Archiwizuj"
+    "createArticle": "Utwórz artykuł"
   },
   "editorActions": {
-    "addTextSection": "Dodaj sekcję",
     "addImageBlock": "Dodaj obrazek",
     "removeBlock": "Usuń blok",
     "moveSectionUp": "Przesuń wyżej",
@@ -36,15 +25,8 @@
   },
   "editorFields": {
     "mainSectionTitle": "Pola główne",
-    "seoSectionTitle": "SEO",
     "bodySectionTitle": "Treść artykułu",
-    "title": "Tytuł",
-    "slug": "Slug",
-    "excerpt": "Lead",
     "heroImageAlt": "Opis alternatywny obrazu głównego",
-    "seoTitle": "Tytuł SEO",
-    "seoDescription": "Opis SEO",
-    "heading": "Nagłówek sekcji",
     "body": "Treść sekcji",
     "imageAlt": "Opis alternatywny obrazu",
     "caption": "Podpis obrazu",
@@ -62,12 +44,9 @@
     "cropHint": "Ustaw kadr obrazu artykułu."
   },
   "statusLabels": {
-    "draft": "Szkic",
-    "published": "Opublikowany",
-    "archived": "Zarchiwizowany"
+    "draft": "Szkic"
   },
   "toast": {
-    "loadFailedSummary": "Nie udało się załadować artykułów",
     "loadFailedDetail": "Nie udało się pobrać listy artykułów.",
     "createFailedSummary": "Nie udało się utworzyć artykułu",
     "createFailedDetail": "Draft artykułu nie został utworzony.",
@@ -92,12 +71,9 @@
     "imageAlt": "opisy alternatywne obrazów"
   },
   "editorToast": {
-    "loadFailedSummary": "Nie udało się załadować artykułu",
     "loadFailedDetail": "Nie udało się pobrać danych artykułu.",
     "saveSuccessSummary": "Zapisano artykuł",
-    "saveSuccessDetail": "Zmiany zostały zapisane.",
     "saveFailedSummary": "Nie udało się zapisać artykułu",
-    "saveFailedDetail": "Zmiany nie zostały zapisane.",
     "invalidSummary": "Nieprawidłowa treść artykułu",
     "invalidDetail": "Popraw sekcje tekstowe przed zapisem.",
     "uploadFailedSummary": "Nie udało się przesłać obrazu",

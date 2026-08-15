@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 
-import { createCommonCtaI18n } from '../../../../core/translations/common.i18n';
+import { createCommonNavI18n } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
   ProblemCardCopy,
@@ -16,7 +16,7 @@ export function createProblemsI18n() {
     header: 'problems.header',
     cardsDict: 'problems.cards',
   });
-  const cta = createCommonCtaI18n();
+  const nav = createCommonNavI18n();
 
   const cardsCopy = computed<ProblemCardCopy[]>(() =>
     recordValuesSortedBy(cardsDict(), (item) => item.id),
@@ -24,7 +24,7 @@ export function createProblemsI18n() {
 
   return {
     header,
-    cta,
+    nav,
     cardsCopy,
   };
 }

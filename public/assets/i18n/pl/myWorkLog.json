@@ -3,25 +3,15 @@
     "title": "Czas pracy Mistrza Gry",
     "subtitle": "Poniżej uzupełnisz swoje przedziały czasu pracy dla bieżącego i poprzedniego miesiąca. Możesz dodać więcej niż jeden zakres na dzień, także na przełomie dni.",
     "monthHint": "Możesz przełączać się między bieżącym i poprzednim miesiącem.",
-    "totalHoursLabel": "Suma godzin",
     "lockedPreviousMonthTitle": "Poprzedni miesiąc jest już zablokowany do edycji!",
     "lockedPreviousMonthDescription": "Podgląd poprzedniego miesiąca pozostaje dostępny, ale po 5. dniu bieżącego miesiąca nie można już zapisywać zmian."
   },
   "actions": {
-    "previousMonthLabel": "Poprzedni miesiąc",
-    "currentMonthLabel": "Bieżący miesiąc",
     "addRangeLabel": "Dodaj zakres",
-    "clearDayLabel": "Wyczyść dzień",
     "resetChangesLabel": "Przywróć zmiany"
   },
   "form": {
-    "dateLabel": "Data",
-    "rangesLabel": "Zakresy godzin",
-    "commentLabel": "Komentarz",
-    "chaoticThursdayLabel": "Chaotyczny Czwartek",
     "chaoticThursdayTooltip": "Udział w Chaotycznym Czwartku nie wlicza się do ewidencji godzin i jest rozliczany osobnym trybem.",
-    "totalHoursLabel": "Suma godzin",
-    "toLabel": "do",
     "emptyDayDescription": "Brak zakresów godzin dla tego dnia."
   },
   "dialog": {

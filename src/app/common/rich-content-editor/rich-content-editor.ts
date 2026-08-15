@@ -15,7 +15,11 @@ import type {
   RichContentListItem,
   RichContentSection,
 } from '../../core/types/rich-content';
-import { createCommonRichContentEditorI18n } from '../../core/translations/common.i18n';
+import {
+  createCommonActionsI18n,
+  createCommonLabelsI18n,
+  createCommonRichContentEditorI18n,
+} from '../../core/translations/common.i18n';
 import { ItemEditorActions } from '../item-editor-actions/item-editor-actions';
 import { RichContentInlineEditor } from './rich-content-inline-editor';
 
@@ -37,6 +41,8 @@ export class RichContentEditor {
   readonly tokens = input<readonly string[]>([]);
 
   protected readonly i18n = createCommonRichContentEditorI18n();
+  protected readonly actions = createCommonActionsI18n();
+  protected readonly labels = createCommonLabelsI18n();
   private readonly inlineEditors = viewChildren(
     RichContentInlineEditor,
   );

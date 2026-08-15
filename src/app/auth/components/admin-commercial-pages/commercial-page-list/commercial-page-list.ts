@@ -88,7 +88,7 @@ export class CommercialPageList {
           this.rows.set([]);
           this.hasLoadError.set(true);
           this.toast.danger({
-            summary: toast.loadFailedSummary,
+            summary: this.i18n.listPage().loadErrorTitle,
             detail: toast.loadFailedDetail,
           });
         },

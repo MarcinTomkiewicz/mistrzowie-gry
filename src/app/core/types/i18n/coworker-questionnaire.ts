@@ -1,12 +1,9 @@
 export type CoworkerShellTranslations = {
-  title: string;
   subtitle: string;
 };
 
 export type CoworkerShellTabsTranslations = {
   questionnaire: string;
-  privateDocuments: string;
-  sharedDocuments: string;
 };
 
 export type QuestionnairePageTranslations = {
@@ -40,24 +37,17 @@ export type QuestionnaireSectionsTranslations = {
 };
 
 export type QuestionnaireFieldsTranslations = {
-  firstNameLabel: string;
-  lastNameLabel: string;
   maidenNameLabel: string;
   middleNameLabel: string;
   birthDateLabel: string;
-  birthPlaceLabel: string;
   identificationBasisLabel: string;
-  peselLabel: string;
   nipLabel: string;
   identityDocumentKindLabel: string;
   identityDocumentNumberLabel: string;
   citizenshipLabel: string;
   phoneLabel: string;
-  streetLabel: string;
   houseNumberLabel: string;
   apartmentNumberLabel: string;
-  postalCodeLabel: string;
-  cityLabel: string;
   voivodeshipLabel: string;
   countyLabel: string;
   municipalityLabel: string;
@@ -88,17 +78,12 @@ export type QuestionnaireFieldsTranslations = {
 };
 
 export type QuestionnaireOptionsTranslations = {
-  selectPlaceholder: string;
-  yes: string;
-  no: string;
-  pesel: string;
   identityDocument: string;
   idCard: string;
   passport: string;
   otherDocument: string;
   join: string;
   decline: string;
-  disabilityNone: string;
   disabilityLight: string;
   disabilityModerate: string;
   disabilitySevere: string;
@@ -114,7 +99,6 @@ export type QuestionnaireSensitiveTranslations = {
 };
 
 export type QuestionnaireActionsTranslations = {
-  saveDraftLabel: string;
   completeLabel: string;
   reloadLabel: string;
   goToPrivateDocumentsLabel: string;
@@ -157,6 +141,4 @@ export type QuestionnaireErrorsTranslations = {
 export type QuestionnaireToastTranslations = {
   draftSavedSummary: string;
   draftSavedDetail: string;
-  completeSummary: string;
-  completeDetail: string;
 };

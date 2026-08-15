@@ -46,7 +46,7 @@
         autocomplete="off"
       />
       <label for="commercial-constant-label">
-        {{ i18n.editor().label }}
+        {{ i18n.commonLabels().label }}
       </label>
     </p-iftalabel>
 
@@ -83,7 +83,7 @@
                   : 'secondary'
               "
               [outlined]="form.controls.durationUnit.value !== 'hours'"
-              [label]="i18n.durationUnit().hours"
+              [label]="i18n.commonLabels().hours"
               (onClick)="setDurationUnit('hours')"
             />
             <p-button

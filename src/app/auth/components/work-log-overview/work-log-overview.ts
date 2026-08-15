@@ -14,7 +14,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 
-import { WorkLogExportComponent } from '../../common/work-log-export/work-log-export';
+import { WorkLogExport } from '../../common/work-log-export/work-log-export';
 import {
   IUserWorkLogDay,
   IUserWorkLogExportRow,
@@ -53,7 +53,7 @@ import {
     ButtonModule,
     TableModule,
     LoadingOverlay,
-    WorkLogExportComponent,
+    WorkLogExport,
   ],
   templateUrl: './work-log-overview.html',
   providers: [provideTranslocoScope(WORK_LOG_OVERVIEW_SCOPE, 'common')],

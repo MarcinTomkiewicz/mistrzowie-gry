@@ -69,7 +69,7 @@
 
   <section class="flex-col-start-stretch gap-sm w-100">
     <h4 class="mg-section__title mg-section__title--xs m-0">
-      {{ i18n.product().durationSection }}
+      {{ i18n.commonLabels().duration }}
     </h4>
     <div class="mg-grid-2 gap-md w-100">
       <p-iftalabel class="w-100">
@@ -109,7 +109,7 @@
 
   <section class="flex-col-start-stretch gap-sm w-100">
     <h4 class="mg-section__title mg-section__title--xs m-0">
-      {{ i18n.product().participantsSection }}
+      {{ i18n.commonLabels().participants }}
     </h4>
     <p-iftalabel class="w-100">
       <p-select
@@ -191,8 +191,8 @@
         field of [
           { key: 'meetingCountMin', label: i18n.product().meetingCountMin },
           { key: 'meetingCountMax', label: i18n.product().meetingCountMax },
-          { key: 'facilitatorCount', label: i18n.product().facilitatorCount },
-          { key: 'tableCount', label: i18n.product().tableCount }
+          { key: 'facilitatorCount', label: i18n.commonLabels().facilitatorCount },
+          { key: 'tableCount', label: i18n.commonLabels().tableCount }
         ];
         track field.key
       ) {

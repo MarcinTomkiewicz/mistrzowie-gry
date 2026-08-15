@@ -29,38 +29,34 @@ import {
   AppRoleLabels,
 } from '../../../core/types/app-role';
 import { AdminUsersFiltersTranslations } from '../../../core/types/i18n/admin-users';
+import { CommonLabelsTranslations } from '../../../core/types/i18n/common';
 import { getAppRoleLabel } from '../../../core/utils/app-role-labels';
 
 export const ADMIN_USERS_FILTER_SELECT_FIELDS: readonly AdminUsersFilterSelectField[] = [
   {
     controlName: 'role',
     inputId: 'admin-users-role',
-    labelKey: 'roleLabel',
     options: ['all', ...APP_ROLES],
   },
   {
     controlName: 'profile',
     inputId: 'admin-users-profile',
-    labelKey: 'profileLabel',
     options: ['all', 'with', 'without'],
   },
   {
     controlName: 'public',
     inputId: 'admin-users-public',
-    labelKey: 'publicLabel',
     options: ['all', 'public', 'not_public'],
   },
   {
     controlName: 'sortBy',
     inputId: 'admin-users-sort-by',
-    labelKey: 'sortLabel',
     options: ['createdAt', 'updatedAt'],
     reloadOnChange: true,
   },
   {
     controlName: 'sortOrder',
     inputId: 'admin-users-sort-order',
-    labelKey: 'sortOrderLabel',
     options: ['desc', 'asc'],
     reloadOnChange: true,
   },
@@ -70,7 +66,6 @@ export const ADMIN_USER_DIALOG_SELECT_FIELDS: readonly AdminUserDialogSelectFiel
   {
     controlName: 'appRole',
     inputId: 'admin-user-role',
-    labelKey: 'appRoleLabel',
     options: APP_ROLES,
   },
 ];
@@ -79,7 +74,6 @@ export const ADMIN_USER_DIALOG_TEXT_FIELDS: readonly AdminUserDialogTextField[] 
   {
     controlName: 'firstName',
     inputId: 'admin-user-first-name',
-    labelKey: 'firstNameLabel',
     type: 'text',
     autocomplete: 'given-name',
     maxLength: 100,
@@ -87,7 +81,6 @@ export const ADMIN_USER_DIALOG_TEXT_FIELDS: readonly AdminUserDialogTextField[] 
   {
     controlName: 'nickname',
     inputId: 'admin-user-nickname',
-    labelKey: 'nicknameLabel',
     type: 'text',
     autocomplete: 'nickname',
     maxLength: 100,
@@ -95,7 +88,6 @@ export const ADMIN_USER_DIALOG_TEXT_FIELDS: readonly AdminUserDialogTextField[] 
   {
     controlName: 'phoneNumber',
     inputId: 'admin-user-phone',
-    labelKey: 'phoneNumberLabel',
     type: 'tel',
     autocomplete: 'tel',
     maxLength: 50,
@@ -103,7 +95,6 @@ export const ADMIN_USER_DIALOG_TEXT_FIELDS: readonly AdminUserDialogTextField[] 
   {
     controlName: 'city',
     inputId: 'admin-user-city',
-    labelKey: 'cityLabel',
     type: 'text',
     autocomplete: 'address-level2',
     maxLength: 100,
@@ -114,12 +105,10 @@ export const ADMIN_USER_DIALOG_TOGGLE_FIELDS: readonly AdminUserDialogToggleFiel
   {
     controlName: 'useNickname',
     inputId: 'admin-user-use-nickname',
-    labelKey: 'useNicknameLabel',
   },
   {
     controlName: 'isTestUser',
     inputId: 'admin-user-test',
-    labelKey: 'isTestUserLabel',
   },
 ];
 
@@ -177,24 +166,44 @@ export function getAdminUserDialogValue(
 
 export function createAdminUsersFilterSelectFieldVms(
   filters: AdminUsersFiltersTranslations,
+  labels: CommonLabelsTranslations,
   roleLabels: AppRoleLabels,
 ): AdminUsersFilterSelectFieldVm[] {
   return ADMIN_USERS_FILTER_SELECT_FIELDS.map((field) => ({
     controlName: field.controlName,
     inputId: field.inputId,
     reloadOnChange: field.reloadOnChange,
-    label: filters[field.labelKey],
+    label: getAdminUsersFilterLabel(field.controlName, filters, labels),
     options: field.options.map((value) => ({
       value,
-      label: getAdminUsersFilterOptionLabel(field.controlName, value, filters, roleLabels),
+      label: getAdminUsersFilterOptionLabel(
+        field.controlName,
+        value,
+        filters,
+        labels,
+        roleLabels,
+      ),
     })),
   }));
+}
+
+function getAdminUsersFilterLabel(
+  controlName: AdminUsersFilterSelectControlName,
+  filters: AdminUsersFiltersTranslations,
+  labels: CommonLabelsTranslations,
+): string {
+  if (controlName === 'role') return labels.role;
+  if (controlName === 'profile') return labels.gmProfile;
+  if (controlName === 'public') return labels.public;
+  if (controlName === 'sortBy') return filters.sortLabel;
+  return filters.sortOrderLabel;
 }
 
 function getAdminUsersFilterOptionLabel(
   controlName: AdminUsersFilterSelectControlName,
   value: string,
   filters: AdminUsersFiltersTranslations,
+  labels: CommonLabelsTranslations,
   roleLabels: AppRoleLabels,
 ): string {
   switch (controlName) {
@@ -211,7 +220,7 @@ function getAdminUsersFilterOptionLabel(
       break;
     case 'public':
       if (value === 'all') return filters.publicAll;
-      if (value === 'public') return filters.publicOnly;
+      if (value === 'public') return labels.public;
       if (value === 'not_public') return filters.publicHidden;
       break;
     case 'sortBy':

@@ -3,6 +3,8 @@ import {
   createCommonCtaI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -35,6 +37,8 @@ export function createProfileFormI18n() {
   const commonCta = createCommonCtaI18n();
   const commonErrors = createCommonErrorsI18n();
   const commonForm = createCommonFormI18n();
+  const commonLabels = createCommonLabelsI18n();
+  const commonNav = createCommonNavI18n();
 
   return {
     title,
@@ -47,5 +51,7 @@ export function createProfileFormI18n() {
     commonCta,
     commonErrors,
     commonForm,
+    commonLabels,
+    commonNav,
   };
 }

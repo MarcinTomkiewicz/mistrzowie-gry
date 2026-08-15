@@ -1,11 +1,15 @@
+import {
+  createCommonAppRolesI18n,
+  createCommonEmptyI18n,
+  createCommonLabelsI18n,
+  createCommonValuesI18n,
+} from '../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../core/translations/scoped.i18n';
 import {
-  SessionDetailsLabelsTranslations,
   SessionFormTranslations,
   SessionListLabelsTranslations,
   SessionSlotDifficultyTranslations,
   SessionSlotFallbacksTranslations,
-  SessionSlotLabelsTranslations,
 } from '../../core/types/i18n/sessions';
 
 export function createSessionDetailsI18n() {
@@ -13,31 +17,27 @@ export function createSessionDetailsI18n() {
     sessionForm,
     difficulty,
     list,
-    eventSlotsLabels,
     commonFallbacks,
-    detailsLabels,
   } = createScopedSectionsI18n<{
     sessionForm: SessionFormTranslations;
     difficulty: SessionSlotDifficultyTranslations;
     list: SessionListLabelsTranslations;
-    eventSlotsLabels: SessionSlotLabelsTranslations;
     commonFallbacks: SessionSlotFallbacksTranslations;
-    detailsLabels: SessionDetailsLabelsTranslations;
   }>('sessions', {
     sessionForm: 'form',
     difficulty: 'slots.difficulty',
     list: 'list',
-    eventSlotsLabels: 'slots.labels',
     commonFallbacks: 'slots.fallbacks',
-    detailsLabels: 'details.labels',
   });
 
   return {
-    detailsLabels,
     sessionForm,
     difficulty,
     list,
-    eventSlotsLabels,
     commonFallbacks,
+    commonAppRoles: createCommonAppRolesI18n(),
+    commonEmpty: createCommonEmptyI18n(),
+    commonLabels: createCommonLabelsI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }

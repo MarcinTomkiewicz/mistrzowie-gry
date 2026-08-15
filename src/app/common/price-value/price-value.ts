@@ -1,6 +1,9 @@
 import { Component, computed, input } from '@angular/core';
 
-import { createCommonPriceI18n } from '../../core/translations/common.i18n';
+import {
+  createCommonLabelsI18n,
+  createCommonPriceI18n,
+} from '../../core/translations/common.i18n';
 import type { Price } from '../../core/types/price';
 import { formatPrice } from '../../core/utils/price-format';
 
@@ -15,11 +18,13 @@ export class PriceValue {
   readonly accent = input(false);
 
   private readonly i18n = createCommonPriceI18n();
+  private readonly labels = createCommonLabelsI18n();
 
   protected readonly formatted = computed(() =>
     formatPrice(
       this.price(),
       this.i18n().presentation,
+      this.labels().fromLowercase,
       this.locale(),
     ),
   );

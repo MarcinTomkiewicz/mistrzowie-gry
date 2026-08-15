@@ -70,6 +70,7 @@ export class AdminUsers {
   protected readonly filterSelectFields = computed(() =>
     createAdminUsersFilterSelectFieldVms(
       this.i18n.filters(),
+      this.i18n.commonLabels(),
       this.i18n.appRoles(),
     ),
   );
@@ -157,7 +158,7 @@ export class AdminUsers {
         error: () => {
           this.toast.danger({
             summary: this.i18n.toast().saveFailedSummary,
-            detail: this.i18n.toast().saveFailedDetail,
+            detail: this.i18n.commonErrors().changesNotSaved,
           });
         },
       });

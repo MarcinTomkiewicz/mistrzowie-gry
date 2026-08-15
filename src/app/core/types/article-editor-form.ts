@@ -17,9 +17,6 @@ export type ArticleEditorVisibleFormControlName = Exclude<
 
 export type ArticleEditorFormFieldKind = 'text' | 'textarea';
 
-export type ArticleEditorFormFieldLabelKey =
-  ArticleEditorVisibleFormControlName;
-
 export type ArticleEditorFormFieldInputAction =
   | 'slugManualEdit'
   | 'seoTitleManualEdit';
@@ -28,7 +25,6 @@ export type ArticleEditorTextFormField = {
   controlName: ArticleEditorVisibleFormControlName;
   inputId: string;
   kind: 'text';
-  labelKey: ArticleEditorFormFieldLabelKey;
   inputAction?: ArticleEditorFormFieldInputAction;
 };
 
@@ -36,7 +32,6 @@ export type ArticleEditorTextareaFormField = {
   controlName: ArticleEditorVisibleFormControlName;
   inputId: string;
   kind: 'textarea';
-  labelKey: ArticleEditorFormFieldLabelKey;
   rows: number;
 };
 

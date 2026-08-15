@@ -4,7 +4,6 @@
     "subtitle": "Mistrzowie Gry to osoby, które organizują Twoje doświadczenie RPG w ramach projektu. To do nich należy przygotowanie sesji, rozpisanie kart postaci, stworzenie wciągającej fabuły. Kliknij na kartę, aby dowiedzieć się więcej."
   },
   "seo": {
-    "title": "Poznaj naszych Mistrzów Gry",
     "description": "Do naszych Mistrzów Gry należy przygotowanie sesji RPG i odpowiedź na pytanie jak zacząć grać. Tworzą scenariusze do sesji, postacie i dbają o Twój komfort."
   },
   "card": {
@@ -15,11 +14,7 @@
     "sessionsTabLabel": "Sesje standardowe",
     "experienceLabel": "Doświadczenie",
     "quoteLabel": "Motto",
-    "descriptionLabel": "Opis",
     "systemsLabel": "Prowadzone systemy",
-    "stylesLabel": "Style prowadzenia",
-    "languagesLabel": "Języki",
-    "yearsSuffix": "lat",
-    "noData": "Nie podano"
+    "yearsSuffix": "lat"
   }
 }

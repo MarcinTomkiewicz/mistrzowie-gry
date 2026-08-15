@@ -16,8 +16,7 @@ import type {
   CommercialComparisonSectionEditorForm,
   CommercialProductCollectionBlockEditorForm,
 } from '../../../../core/types/commercial-builder-block-editor-form';
-import type { CommercialProductFieldLabelsTranslations } from '../../../../core/types/i18n/commercial-pages';
-import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import {
   moveFormArrayControl,
   moveFormControlArrayItem,
@@ -42,16 +41,13 @@ export class CommercialProductComparisonEditor {
   readonly controlId = input.required<string>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
-  private readonly productFieldLabels = createScopedSectionsI18n<{
-    productFieldKey: CommercialProductFieldLabelsTranslations;
-  }>('commercialPages', { productFieldKey: 'productFieldKey' })
-    .productFieldKey;
+  private readonly commercialI18n = createCommercialPageI18n();
 
   protected fieldOptions(): ISelectOption<string>[] {
     return this.form().controls.fields.controls.map((field) => ({
       value: field.controls.id.getRawValue(),
       label: field.controls.label.getRawValue() ??
-        this.productFieldLabels()[field.controls.key.getRawValue()],
+        this.commercialI18n.productFieldLabel(field.controls.key.getRawValue()),
     }));
   }
 

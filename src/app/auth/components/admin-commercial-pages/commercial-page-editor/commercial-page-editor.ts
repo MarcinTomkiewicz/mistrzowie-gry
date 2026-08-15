@@ -133,7 +133,7 @@ export class CommercialPageEditor {
 
           this.hasLoadError.set(true);
           this.toast.danger({
-            summary: toast.loadFailedSummary,
+            summary: this.i18n.editorPage().loadErrorTitle,
             detail: toast.loadFailedDetail,
           });
         },

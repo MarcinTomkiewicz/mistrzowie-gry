@@ -59,7 +59,7 @@ export class CommercialProductCollectionCards {
     return commercialProductFieldLabel(
       field,
       product.id,
-      this.i18n.productFieldKey()[field.key],
+      this.i18n.productFieldLabel(field.key),
     );
   }
 }

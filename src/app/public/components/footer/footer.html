@@ -7,7 +7,7 @@
           [ngSrc]="footerImgSrc()"
           width="100"
           height="100"
-          [alt]="i18n.footer().brandAlt"
+          [alt]="i18n.labels().brandName"
           loading="lazy"
           decoding="async"
         />
@@ -57,12 +57,12 @@
 
       <section>
         <h3 class="mg-section__title mg-section__title--sm">
-          {{ i18n.footer().contactTitle }}
+          {{ i18n.nav().contact }}
         </h3>
 
         <ul class="flex-col-center-center-md m-0 p-0">
           <li class="w-30-md w-50-sm w-70-xs">
-            <strong>{{ i18n.footer().phoneLabel }}:</strong>
+            <strong>{{ i18n.labels().phone }}:</strong>
             <a [href]="i18n.footer().phoneHref">
               {{ i18n.footer().phoneValue }}
             </a>
@@ -82,7 +82,7 @@
       class="mg-footer__bottom flex-row-between-center flex-col-sm mt-xl pt-lg gap-md"
     >
       <div class="mg-footer__copy">
-        &copy; {{ year() }} Mistrzowie Gry. {{ i18n.footer().copyrightSuffix }}
+        &copy; {{ year() }} {{ i18n.labels().brandName }}. {{ i18n.footer().copyrightSuffix }}
       </div>
 
       <nav

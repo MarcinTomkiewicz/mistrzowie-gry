@@ -78,7 +78,7 @@
       <div class="mg-card flex-col-start-stretch gap-sm w-100">
         <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-sm">
           <div class="flex-col-start-stretch gap-xs">
-            <label for="reservation-start-time" class="color-text">{{ data().labels.startTime }}</label>
+            <label for="reservation-start-time" class="color-text">{{ data().commonLabels.from }}</label>
             <p-select
               inputId="reservation-start-time"
               [options]="startHourOptions()"
@@ -92,7 +92,7 @@
           </div>
 
           <div class="flex-col-start-stretch gap-xs">
-            <label for="reservation-end-time" class="color-text">{{ data().labels.endTime }}</label>
+            <label for="reservation-end-time" class="color-text">{{ data().commonLabels.to }}</label>
             <p-select
               inputId="reservation-end-time"
               [options]="endOffsetOptions()"

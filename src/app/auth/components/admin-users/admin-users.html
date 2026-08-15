@@ -1,7 +1,7 @@
 <section class="mg-section">
   <div class="mg-container flex-col-start-stretch gap-md">
     <header class="mg-section__header w-100">
-      <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+      <h1 class="mg-section__title">{{ i18n.commonNav().usersManagement }}</h1>
 
       <p class="mg-section__subtitle mg-section__subtitle--full">
         {{ i18n.page().subtitle }}
@@ -83,11 +83,11 @@
         >
           <ng-template #header>
             <tr>
-              <th class="small-caps">{{ i18n.table().user }}</th>
-              <th class="small-caps">{{ i18n.table().role }}</th>
+              <th class="small-caps">{{ i18n.appRoles().user }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().role }}</th>
               <th class="small-caps text-center">{{ i18n.table().testUser }}</th>
-              <th class="small-caps text-center">{{ i18n.table().hasGmProfile }}</th>
-              <th class="small-caps text-center">{{ i18n.table().isPublic }}</th>
+              <th class="small-caps text-center">{{ i18n.commonLabels().gmProfile }}</th>
+              <th class="small-caps text-center">{{ i18n.commonLabels().public }}</th>
               <th class="small-caps text-center">{{ i18n.table().isArchived }}</th>
               <th class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
             </tr>
@@ -146,7 +146,7 @@
                     <p-button
                       severity="secondary"
                       size="small"
-                      [label]="i18n.actions().createGmProfile"
+                      [label]="i18n.commonLabels().gmProfile"
                       icon="pi pi-plus"
                       [loading]="savingProfileUserId() === row.user.id"
                       (onClick)="createGmProfile(row)"

@@ -1,18 +1,22 @@
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import type * as Copy from '../../../core/types/i18n/admin-commercial-pages';
+import type { AdminCommercialConstantsPageTranslations } from '../../../core/types/i18n/admin-commercial-constants';
 
 export function createAdminCommercialPagesI18n() {
   const translations = createScopedSectionsI18n<{
     listPage: Copy.AdminCommercialPagesListPageTranslations;
     listTable: Copy.AdminCommercialPagesListTableTranslations;
     listToast: Copy.AdminCommercialPagesListToastTranslations;
+    constantsPage: AdminCommercialConstantsPageTranslations;
     editorPage: Copy.AdminCommercialPagesEditorPageTranslations;
     steps: Copy.AdminCommercialPagesEditorStepsTranslations;
     editorToast: Copy.AdminCommercialPagesEditorToastTranslations;
@@ -46,6 +50,7 @@ export function createAdminCommercialPagesI18n() {
     actionAppearance: Copy.AdminCommercialPagesActionAppearanceTranslations;
   }>('adminCommercialPages', {
     listPage: 'list.page', listTable: 'list.table', listToast: 'list.toast',
+    constantsPage: 'constants.page',
     editorPage: 'editor.page', steps: 'editor.steps', editorToast: 'editor.toast',
     previewPage: 'preview.page', publication: 'publication.panel',
     publicationToast: 'publication.toast',
@@ -69,6 +74,8 @@ export function createAdminCommercialPagesI18n() {
     ...translations,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
+    commonLabels: createCommonLabelsI18n(),
+    commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
     commonValues: createCommonValuesI18n(),

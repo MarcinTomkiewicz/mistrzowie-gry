@@ -264,8 +264,8 @@ export class Questionnaire {
           this.toast.success(
             response.complete
               ? {
-                  summary: toast.completeSummary,
-                  detail: toast.completeDetail,
+                  summary: this.i18n.status().completeTitle,
+                  detail: this.i18n.status().completeDescription,
                 }
               : {
                   summary: toast.draftSavedSummary,

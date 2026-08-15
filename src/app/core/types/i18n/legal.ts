@@ -3,7 +3,7 @@ import { RichContent } from '../rich-content';
 export type ActiveLegalDialog = 'terms' | 'privacy-policy' | null;
 
 export interface LegalDialogContent {
-  title: string;
+  title?: string;
   subtitle?: string;
   content: RichContent;
 }

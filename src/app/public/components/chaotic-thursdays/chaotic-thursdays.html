@@ -1,12 +1,12 @@
 <section
   class="mg-section mg-chaotic-hero pb-sm"
-  [attr.aria-label]="i18n.hero().title"
+  [attr.aria-label]="i18n.commonNav().chaoticThursdays"
 >
   <div class="mg-container">
     <header class="mg-section__header">
       <div class="mg-chaotic-hero__badge mb-xl">{{ i18n.hero().badge }}</div>
 
-      <h1 class="mg-section__title">{{ i18n.hero().title }}</h1>
+      <h1 class="mg-section__title">{{ i18n.commonNav().chaoticThursdays }}</h1>
 
       <p class="mg-section__subtitle">
         {{ i18n.hero().subtitleLead }}
@@ -177,14 +177,14 @@
 
     <div class="flex-row-end-center flex-col-center-center-sm mt-md gap-md">
       <p-button
-        [label]="i18n.commonCta().joinProgram"
+        [label]="i18n.commonNav().join"
         icon="pi pi-uprising"
         severity="primary"
         size="small"
         routerLink="/join-the-party"
       />
       <p-button
-        [label]="i18n.commonCta().offerIndividual"
+        [label]="i18n.commonNav().individualOffer"
         icon="pi pi-read"
         severity="secondary"
         size="small"

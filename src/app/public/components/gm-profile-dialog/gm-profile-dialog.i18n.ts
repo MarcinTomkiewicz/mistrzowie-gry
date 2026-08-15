@@ -11,6 +11,8 @@ import {
 import {
   createCommonActionsI18n,
   createCommonEmptyI18n,
+  createCommonLabelsI18n,
+  createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import {
   createScopedObjectI18n,
@@ -33,11 +35,15 @@ export function createGmProfileDialogI18n() {
   });
   const commonActions = createCommonActionsI18n();
   const commonEmpty = createCommonEmptyI18n();
+  const commonLabels = createCommonLabelsI18n();
+  const commonValues = createCommonValuesI18n();
 
   return {
     dialog,
     commonActions,
     commonEmpty,
+    commonLabels,
+    commonValues,
     list,
     sessionForm,
     difficulty,

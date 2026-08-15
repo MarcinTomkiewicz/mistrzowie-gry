@@ -15,7 +15,7 @@ import {
   standalone: true,
   imports: [RouterOutlet, RouteTabShell],
   templateUrl: './admin-coworker-shell.html',
-  providers: [provideTranslocoScope(ADMIN_COWORKER_SHELL_SCOPE)],
+  providers: [provideTranslocoScope(ADMIN_COWORKER_SHELL_SCOPE, 'common')],
 })
 export class AdminCoworkerShell {
   protected readonly pageUrl = buildSiteUrl('/admin/coworkers');
@@ -33,7 +33,7 @@ export class AdminCoworkerShell {
       },
       {
         id: 'shared-documents',
-        label: labels.sharedDocuments,
+        label: this.i18n.commonNav().sharedDocuments,
         icon: 'pi pi-book',
         path: '/admin/coworkers/shared-documents',
       },

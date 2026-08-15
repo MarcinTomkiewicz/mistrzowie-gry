@@ -119,19 +119,19 @@
                   <thead class="p-datatable-thead">
                     <tr>
                       <th class="small-caps" scope="col">
-                        {{ i18n.occurrenceTable().date }}
+                        {{ i18n.commonLabels().date }}
                       </th>
                       <th class="small-caps" scope="col">
-                        {{ i18n.occurrenceTable().status }}
+                        {{ i18n.commonLabels().status }}
                       </th>
                       <th class="small-caps text-center" scope="col">
                         {{ i18n.occurrenceTable().slotCapacity }}
                       </th>
                       <th class="small-caps text-center" scope="col">
-                        {{ i18n.occurrenceTable().participantCapacity }}
+                        {{ i18n.commonLabels().participantCount }}
                       </th>
                       <th class="small-caps" scope="col">
-                        {{ i18n.occurrenceTable().participantSignupKind }}
+                        {{ i18n.fields().participantSignupKind }}
                       </th>
                       <th class="small-caps" scope="col">
                         {{ i18n.occurrenceTable().hostSignupWindow }}
@@ -140,7 +140,7 @@
                         {{ i18n.occurrenceTable().participantSignupWindow }}
                       </th>
                       <th class="small-caps" scope="col">
-                        {{ i18n.occurrenceTable().publishedAt }}
+                        {{ i18n.commonLabels().publishedAt }}
                       </th>
                       <th class="small-caps text-center" scope="col">
                         {{ i18n.occurrenceTable().programItemCount }}
@@ -167,7 +167,7 @@
                         </td>
                         <td>
                           <span class="tag-badge tag-badge--muted">
-                            {{ i18n.occurrenceStatuses()[occurrence.status] }}
+                            {{ occurrenceStatusLabel(occurrence.status) }}
                           </span>
                         </td>
                         <td class="text-center">

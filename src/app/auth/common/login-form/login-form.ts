@@ -56,7 +56,7 @@ export class LoginForm {
       this.form.markAllAsTouched();
 
       this.toast.warn({
-        summary: 'Nieprawidłowy formularz',
+        summary: this.i18n.commonForm().invalidSummary,
         detail: this.i18n.commonForm().invalid,
       });
 

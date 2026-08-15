@@ -16,7 +16,7 @@
   <section class="mg-card flex-col-start-stretch gap-md w-100">
     <div class="flex-col-start-stretch gap-xs">
       <h3 class="mg-section__title mg-section__title--sm m-0">
-        {{ i18n.adminList().startTitle }}
+        {{ i18n.actions().start }}
       </h3>
       <p class="m-0 muted-text">{{ i18n.adminList().startDescription }}</p>
     </div>
@@ -33,7 +33,7 @@
             optionValue="value"
             appendTo="body"
           />
-          <label for="coworker-onboarding-user">{{ i18n.fields().user }}</label>
+          <label for="coworker-onboarding-user">{{ i18n.commonLabels().coworker }}</label>
         </p-iftalabel>
 
         <p-button
@@ -63,8 +63,8 @@
       <p-table [value]="onboardings()" dataKey="onboarding_id" class="w-100 min-w-500">
         <ng-template #header>
           <tr>
-            <th>{{ i18n.fields().user }}</th>
-            <th>{{ i18n.fields().status }}</th>
+            <th>{{ i18n.commonLabels().coworker }}</th>
+            <th>{{ i18n.commonLabels().status }}</th>
             <th>{{ i18n.fields().startedAt }}</th>
             <th>{{ i18n.fields().completedAt }}</th>
             <th class="text-center">{{ i18n.fields().documents }}</th>

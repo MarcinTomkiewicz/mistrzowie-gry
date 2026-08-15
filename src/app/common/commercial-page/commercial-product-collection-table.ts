@@ -30,7 +30,7 @@ export class CommercialProductCollectionTable {
   protected label(
     field: CommercialProductField,
   ): string {
-    return field.label ?? this.i18n.productFieldKey()[field.key];
+    return field.label ?? this.i18n.productFieldLabel(field.key);
   }
 
   protected isVisible(

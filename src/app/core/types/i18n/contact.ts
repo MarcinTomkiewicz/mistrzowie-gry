@@ -1,5 +1,4 @@
 export type ContactSeoTranslations = {
-  title: string;
   description: string;
 };
 
@@ -13,10 +12,7 @@ export type ContactFormTranslations = {
   hint: string;
   topicLabel: string;
   topicCustomLabel: string;
-  firstNameLabel: string;
-  lastNameLabel: string;
   companyLabel: string;
-  emailLabel: string;
   phoneLabel: string;
   messageLabel: string;
   messagePlaceholder: string;
@@ -39,10 +35,22 @@ export type ContactToastTranslations = {
 };
 
 export type ContactInfoTranslations = {
-  title: string;
   subtitle: string;
-  emailLabel: string;
-  phoneLabel: string;
   emailValue: string;
   phoneValue: string;
 };
+
+export type ContactTopicTranslation =
+  | { id: number; value: 'join' }
+  | { id: number; value: 'chaotic' }
+  | {
+      id: number;
+      value:
+        | 'business'
+        | 'institution'
+        | 'party'
+        | 'individual'
+        | 'pricing'
+        | 'other';
+      label: string;
+    };

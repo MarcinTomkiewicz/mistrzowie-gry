@@ -952,7 +952,6 @@
   },
 
   "privacyPolicyDialog": {
-    "title": "Polityka Prywatności",
     "content": {
       "sections": [
         {

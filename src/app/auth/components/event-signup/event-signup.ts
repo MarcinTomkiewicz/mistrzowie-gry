@@ -83,7 +83,7 @@ export class EventSignup {
 
   private readonly applySeoEffect = effect(() => {
     this.seo.apply({
-      title: this.i18n.seo().title,
+      title: this.i18n.commonNav().eventSignup,
       description: this.i18n.seo().description,
       canonicalUrl: this.pageUrl,
       robots: 'noindex,nofollow',

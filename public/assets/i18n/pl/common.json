@@ -1,10 +1,5 @@
 {
   "cta": {
-    "contactUs": "Kontakt",
-    "joinProgram": "Dołącz do Drużyny",
-    "offerIndividual": "Oferta indywidualna",
-    "offerBusiness": "Oferta dla firm",
-    "chaoticThursdays": "Chaotyczne Czwartki",
     "checkDetails": "Sprawdź szczegóły",
     "seeProgram": "Zobacz program",
     "learnMore": "Dowiedz się więcej",
@@ -32,7 +27,6 @@
     "refresh": "Odśwież",
     "retry": "Spróbuj ponownie",
     "add": "Dodaj",
-    "remove": "Usuń",
     "clear": "Wyczyść",
     "next": "Dalej",
     "previous": "Wstecz",
@@ -41,6 +35,14 @@
     "submit": "Wyślij",
     "ok": "OK",
     "logout": "Wyloguj się",
+    "publish": "[PH] Opublikuj",
+    "archive": "Archiwizuj [PH]",
+    "select": "Wybierz",
+    "saveDraft": "[PH] [adminCommercialPages-saveDraft] Zapisz wersję roboczą",
+    "addItem": "[PH] Dodaj pozycję",
+    "addSection": "[PH] Dodaj sekcję",
+    "preview": "[PH] Podgląd",
+    "clearDay": "Wyczyść dzień",
     "moveItemUp": "[PH] Przesuń element wyżej",
     "moveItemDown": "[PH] Przesuń element niżej",
     "removeItem": "[PH] Usuń element"
@@ -50,7 +52,85 @@
     "yes": "Tak",
     "no": "Nie",
     "notProvided": "Nie podano",
-    "notAvailable": "Brak"
+    "notAvailable": "Brak",
+    "notApplicable": "[PH] Nie dotyczy",
+    "active": "Aktywny [PH]",
+    "published": "[PH][published] Opublikowany",
+    "archived": "Zarchiwizowany [PH]"
+  },
+
+  "labels": {
+    "name": "[PH] [commercialPages-name] Nazwa",
+    "city": "[PH][cityLabel] Miasto",
+    "status": "[PH] Status",
+    "title": "Tytuł [PH]",
+    "slug": "Slug",
+    "price": "[PH] [commercialPages-price] Cena",
+    "description": "[PH] [commercialPages-description] Opis",
+    "date": "Data",
+    "comment": "Komentarz",
+    "role": "Rola",
+    "public": "Publiczny",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "nickname": "Nick",
+    "phoneNumber": "Numer telefonu",
+    "street": "Ulica",
+    "postalCode": "Kod pocztowy",
+    "languages": "Języki",
+    "facilitationStyles": "Style prowadzenia",
+    "totalHours": "Suma godzin",
+    "hourRanges": "Zakresy godzin",
+    "previousMonth": "Poprzedni miesiąc",
+    "currentMonth": "Bieżący miesiąc",
+    "key": "Klucz",
+    "shortDescription": "Krótki opis",
+    "displayOrder": "Kolejność wyświetlania",
+    "order": "Kolejność",
+    "emailAddress": "Adres e-mail",
+    "password": "Hasło",
+    "useNickname": "Wyświetlaj nick zamiast imienia",
+    "age": "Wiek",
+    "publication": "[PH] [adminCommercialPages-publication] Publikacja",
+    "label": "[PH] Etykieta",
+    "products": "[PH] [adminCommercialPages-products] Produkty",
+    "cards": "[PH] Karty",
+    "table": "[PH] Tabela",
+    "duration": "[PH] [commercialPages-duration] Czas trwania",
+    "participants": "[PH] [commercialPages-participants] Uczestnicy",
+    "facilitatorCount": "[PH] [commercialPages-facilitatorCount] Liczba prowadzących",
+    "tableCount": "[PH] [commercialPages-tableCount] Liczba stołów",
+    "participantCount": "[PH][participantCapacity] Liczba uczestników",
+    "event": "[PH][coreLabel] Wydarzenie",
+    "forBeginners": "Dla początkujących",
+    "amount": "[PH] Kwota",
+    "lead": "[PH] Lead",
+    "sectionHeading": "[PH] Nagłówek sekcji",
+    "seo": "[PH] SEO",
+    "seoTitle": "[PH] Tytuł SEO",
+    "seoDescription": "[PH] Opis SEO",
+    "publishedBy": "[PH] Opublikował",
+    "publishedAt": "[PH] Opublikowano",
+    "gmProfile": "Profil MG",
+    "rejectionReason": "Powód odrzucenia [PH]",
+    "coworker": "Współpracownik [PH]",
+    "locality": "Miejscowość",
+    "pesel": "PESEL",
+    "basicInfo": "Informacje podstawowe",
+    "additionalInfo": "Informacje dodatkowe",
+    "chaoticThursday": "Chaotyczny Czwartek",
+    "inBrief": "W skrócie",
+    "brandName": "Mistrzowie Gry",
+    "contactDetails": "Dane kontaktowe",
+    "rpgSystem": "System RPG",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "from": "Od",
+    "to": "Do",
+    "fromLowercase": "[PH] [commercialPages-from] od",
+    "toLowercase": "[PH] [commercialPages-to] do",
+    "hours": "[PH] Godziny",
+    "item": "[PH] Pozycja"
   },
 
   "table": {
@@ -84,11 +164,21 @@
     "join": "Dołącz do Drużyny",
     "chaoticThursdays": "Chaotyczne Czwartki",
     "contact": "Kontakt",
-    "faq": "FAQ",
+    "faq": "[PH] FAQ",
     "pricing": "Cennik",
     "articles": "Artykuły",
     "blog": "Blog",
-    "standardsAndLogistics": "Standardy i logistyka"
+    "standardsAndLogistics": "Standardy i logistyka",
+    "editProfile": "Edytuj profil",
+    "coworkerRecords": "Akta współpracownika",
+    "eventSignup": "Poprowadź wydarzenie",
+    "gmSessions": "Sesje RPG",
+    "contentManagement": "Zarządzanie treścią",
+    "eventsManagement": "Zarządzanie wydarzeniami",
+    "adminCoworkerRecords": "Akta współpracowników",
+    "usersManagement": "Zarządzanie użytkownikami",
+    "sharedDocuments": "Dokumenty wspólne [PH]",
+    "privateDocuments": "Dokumenty prywatne [PH]"
   },
 
   "social": {
@@ -102,7 +192,8 @@
     "saving": "Zapisywanie…",
     "sending": "Wysyłanie…",
     "success": "Gotowe.",
-    "done": "Zrobione."
+    "done": "Zrobione.",
+    "changesSaved": "Zmiany zostały zapisane. [PH]"
   },
 
   "form": {
@@ -137,7 +228,8 @@
 
   "empty": {
     "title": "Brak danych",
-    "description": "Nie ma tu jeszcze nic do wyświetlenia."
+    "description": "Nie ma tu jeszcze nic do wyświetlenia.",
+    "articles": "Brak artykułów"
   },
 
   "errors": {
@@ -147,7 +239,13 @@
     "forbidden": "Brak dostępu.",
     "unauthorized": "Wymagane logowanie.",
     "timeout": "Przekroczono czas oczekiwania. Spróbuj ponownie.",
-    "server": "Błąd serwera. Spróbuj później."
+    "server": "Błąd serwera. Spróbuj później.",
+    "articleLoadFailed": "Nie udało się załadować artykułu",
+    "articlesLoadFailed": "Nie udało się załadować artykułów",
+    "articleNotFound": "Nie znaleziono artykułu",
+    "eventsLoadFailed": "[PH][title] Nie udało się załadować wydarzeń",
+    "concurrentModification": "[PH][conflict] Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
+    "changesNotSaved": "Zmiany nie zostały zapisane."
   },
 
   "price": {
@@ -157,7 +255,6 @@
       "both": "Podane ceny dla klienta indywidualnego zawierają podatek VAT w wysokości 23%. Dla klienta biznesowego i instytucjonalnego są cenami netto i należy doliczyć do nich 23% VAT."
     },
     "presentation": {
-      "from": "od",
       "units": {
         "session": "[PH] [commercialPages-session] sesję",
         "hour": "[PH] [commercialPages-hour] godzinę",
@@ -183,9 +280,7 @@
     },
     "editor": {
       "fields": {
-        "sectionTitle": "[PH] Cena",
         "type": "[PH] Rodzaj ceny",
-        "amount": "[PH] Kwota",
         "minAmount": "[PH] Kwota minimalna",
         "maxAmount": "[PH] Kwota maksymalna",
         "value": "[PH] Wartość procentowa",
@@ -213,7 +308,6 @@
         "session": "[PH] Sesja",
         "hour": "[PH] Godzina",
         "month": "[PH] Miesiąc",
-        "event": "[PH] Wydarzenie",
         "package": "[PH] Pakiet",
         "table": "[PH] Stół",
         "table_hour": "[PH] Stół za godzinę",
@@ -226,10 +320,7 @@
         "kilometer": "[PH] Kilometr"
       },
       "percentageBases": {
-        "base_service": "[PH] Usługa bazowa",
-        "package": "[PH] Pakiet",
-        "table": "[PH] Stół",
-        "facilitator": "[PH] Prowadzący"
+        "base_service": "[PH] Usługa bazowa"
       },
       "actualCostBases": {
         "ticket": "[PH] Bilet",
@@ -256,8 +347,6 @@
     "addParagraph": "[PH] Dodaj akapit",
     "addOrderedList": "[PH] Dodaj listę numerowaną",
     "addUnorderedList": "[PH] Dodaj listę punktowaną",
-    "addItem": "[PH] Dodaj pozycję",
-    "item": "[PH] Pozycja",
     "nestedBlocks": "[PH] Treść zagnieżdżona",
     "strongNode": "[PH] [adminCommercialPages-strongNode] Pogrubienie",
     "linkNode": "[PH] Link",
@@ -299,8 +388,7 @@
   },
 
   "contactLegalNotice": {
-    "prefix": "Wysy\u0142aj\u0105c wiadomo\u015b\u0107 z formularza potwierdzasz, \u017ce jest Ci znana",
-    "privacyPolicyLabel": "Polityka Prywatno\u015bci"
+    "prefix": "Wysy\u0142aj\u0105c wiadomo\u015b\u0107 z formularza potwierdzasz, \u017ce jest Ci znana"
   },
 
   "seo": {

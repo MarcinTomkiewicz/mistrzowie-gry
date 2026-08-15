@@ -26,7 +26,7 @@ import {
   imports: [RouterModule, ButtonModule, NgOptimizedImage],
   templateUrl: './hero-carousel.html',
   styleUrl: './hero-carousel.scss',
-  providers: [provideTranslocoScope('home')],
+  providers: [provideTranslocoScope('home', 'common')],
 })
 export class HeroCarousel {
   private readonly platform = inject(Platform);
@@ -52,22 +52,41 @@ export class HeroCarousel {
     const copyList = this.i18n.slidesCopy();
     const techById = HERO_SLIDES_TECH_BY_ID;
 
-    return copyList
-      .map((copy) => {
-        const tech = techById.get(copy.id);
-        if (!tech) return null;
+    return copyList.flatMap((copy): UiHeroSlide[] => {
+      const tech = techById.get(copy.id);
+      if (!tech) return [];
 
-        return {
-          id: copy.id,
-          heading: copy.heading,
-          text: copy.text,
-          ctaLabel: copy.ctaLabel,
-          ctaPath: tech.ctaPath,
-          imageSrc: tech.imageSrc,
-          imageAlt: tech.imageAlt,
-        } satisfies UiHeroSlide;
-      })
-      .filter((slide): slide is UiHeroSlide => !!slide);
+      switch (copy.id) {
+        case 2:
+          return [
+            {
+              ...copy,
+              ctaLabel: this.i18n.commonCta().learnMore,
+              ctaPath: tech.ctaPath,
+              imageSrc: tech.imageSrc,
+              imageAlt: this.i18n.commonNav().chaoticThursdays,
+            },
+          ];
+        case 3:
+          return [
+            {
+              ...copy,
+              ctaLabel: this.i18n.commonNav().join,
+              ctaPath: tech.ctaPath,
+              imageSrc: tech.imageSrc,
+              imageAlt: this.i18n.commonNav().join,
+            },
+          ];
+        default:
+          return [
+            {
+              ...copy,
+              ctaPath: tech.ctaPath,
+              imageSrc: tech.imageSrc,
+            },
+          ];
+      }
+    });
   });
 
   readonly activeSlide = computed<UiHeroSlide | null>(() => {

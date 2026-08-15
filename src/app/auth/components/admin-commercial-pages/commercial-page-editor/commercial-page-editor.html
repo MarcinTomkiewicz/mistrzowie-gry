@@ -86,7 +86,7 @@
                   type="button"
                   severity="secondary"
                   [outlined]="true"
-                  [label]="i18n.publication().preview"
+                  [label]="i18n.commonActions().preview"
                   icon="pi pi-eye"
                   [loading]="isPreviewing()"
                   [disabled]="isSaving() || isPreviewing()"
@@ -97,7 +97,7 @@
               <p-button
                 type="button"
                 severity="success"
-                [label]="i18n.editorActions().saveDraft"
+                [label]="i18n.commonActions().saveDraft"
                 icon="pi pi-save"
                 [loading]="isSaving()"
                 [disabled]="isLoading() || isPreviewing() || form.pristine"
@@ -128,7 +128,7 @@
               {{ i18n.steps().contentSeo }}
             </p-step>
             <p-step class="min-w-0" [value]="2">
-              {{ i18n.steps().products }}
+              {{ i18n.commonLabels().products }}
             </p-step>
             <p-step class="min-w-0" [value]="3">
               {{ i18n.steps().layout }}

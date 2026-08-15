@@ -13,6 +13,7 @@ import {
 } from '../../../core/types/i18n/event-signup';
 import {
   createCommonActionsI18n,
+  createCommonLabelsI18n,
   createCommonQuestionsI18n,
   createCommonStatusI18n,
   createCommonValuesI18n,
@@ -76,6 +77,7 @@ export function createEventSignupFormI18n() {
   const commonQuestions = createCommonQuestionsI18n();
   const commonStatus = createCommonStatusI18n();
   const commonValues = createCommonValuesI18n();
+  const commonLabels = createCommonLabelsI18n();
 
   return {
     seo,
@@ -96,6 +98,7 @@ export function createEventSignupFormI18n() {
     commonQuestions,
     commonStatus,
     commonValues,
+    commonLabels,
     playersLabel: (minPlayers: number, maxPlayers: number) =>
       `${minPlayers}-${maxPlayers}`,
     minAgeLabel: (minAge: number) => `${minAge}+`,

@@ -3,8 +3,11 @@ import { computed } from '@angular/core';
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
+  createCommonValuesI18n,
 } from './common.i18n';
 import { createScopedSectionsI18n } from './scoped.i18n';
 import type {
@@ -61,7 +64,10 @@ export function createCoworkerOnboardingI18n() {
     fileUploadTexts,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
+    commonLabels: createCommonLabelsI18n(),
+    commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }

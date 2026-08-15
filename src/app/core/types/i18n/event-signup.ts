@@ -9,14 +9,11 @@ export type TitleSubtitleCopy = {
 };
 
 export type SelectorsCopy = {
-  coreLabel: string;
   editionLabel: string;
 };
 
 export type DetailsCopy = {
-  cityLabel: string;
   timeLabel: string;
-  beginnersLabel: string;
 };
 
 export type FormCopy = {
@@ -26,7 +23,6 @@ export type FormCopy = {
 export type ActionsCopy = {
   submitLabel: string;
   backToSelectionLabel: string;
-  selectLabel: string;
 };
 
 export type StatesCopy = {
@@ -55,7 +51,6 @@ export type CustomCopy = {
 };
 
 export type SectionsCopy = {
-  pageTitlePrefix: string;
   pageSubtitle: string;
   submittedSessionTitle: string;
 };

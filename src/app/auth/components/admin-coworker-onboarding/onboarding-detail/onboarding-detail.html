@@ -26,11 +26,11 @@
   } @else if (detail(); as data) {
     <section class="mg-card flex-col-start-stretch gap-md w-100">
       <h3 class="mg-section__title mg-section__title--sm m-0">
-        {{ i18n.adminDetail().userSection }}
+        {{ i18n.commonLabels().coworker }}
       </h3>
       <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
         <div class="flex-col-start-start gap-xs">
-          <small>{{ i18n.fields().user }}</small>
+          <small>{{ i18n.commonLabels().coworker }}</small>
           <strong>
             {{
               getUserDisplayName({
@@ -43,7 +43,7 @@
           <span>{{ data.onboarding.email }}</span>
         </div>
         <div class="flex-col-start-start gap-xs">
-          <small>{{ i18n.fields().status }}</small>
+          <small>{{ i18n.commonLabels().status }}</small>
           <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[data.onboarding.status]">
             {{ i18n.statuses().onboarding[data.onboarding.status] }}
           </span>
@@ -57,7 +57,7 @@
 
     <section class="flex-col-start-stretch gap-md w-100">
       <h3 class="mg-section__title mg-section__title--sm m-0">
-        {{ i18n.adminDetail().documentsSection }}
+        {{ i18n.commonNav().privateDocuments }}
       </h3>
 
       @for (document of data.documents; track document.document_id) {
@@ -85,7 +85,7 @@
 
           @if (document.rejection_reason) {
             <p class="m-0 error-text">
-              {{ i18n.adminDetail().rejectionReason }}: {{ document.rejection_reason }}
+              {{ i18n.commonLabels().rejectionReason }}: {{ document.rejection_reason }}
             </p>
           }
 
@@ -95,7 +95,7 @@
                 size="small"
                 severity="secondary"
                 icon="pi pi-eye"
-                [label]="i18n.actions().preview"
+                [label]="i18n.commonActions().preview"
                 (onClick)="previewSource(document)"
               />
               <p-button
@@ -209,7 +209,7 @@
         [formControl]="rejectionReason"
       ></textarea>
       <label for="coworker-document-rejection-reason">
-        {{ i18n.fields().rejectionReason }}
+        {{ i18n.commonLabels().rejectionReason }}
       </label>
     </p-iftalabel>
     @if (rejectionReason.touched && rejectionReason.invalid) {

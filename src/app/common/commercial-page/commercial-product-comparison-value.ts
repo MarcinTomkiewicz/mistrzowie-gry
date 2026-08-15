@@ -35,7 +35,7 @@ export class CommercialProductComparisonValue {
     return commercialProductFieldLabel(
       field,
       this.product().id,
-      field.label ?? this.i18n.productFieldKey()[field.key],
+      field.label ?? this.i18n.productFieldLabel(field.key),
     );
   }
 }

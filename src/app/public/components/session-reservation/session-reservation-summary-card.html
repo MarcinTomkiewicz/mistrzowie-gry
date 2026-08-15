@@ -12,7 +12,7 @@
         <dd class="m-0">{{ preview.baseProduct.name }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ data().sections.gm }}</dt>
+        <dt>{{ data().commonAppRoles.gm }}</dt>
         <dd class="m-0">
           {{ gm ? gmName(gm) : "" }}
         </dd>
@@ -28,7 +28,7 @@
         </dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ data().labels.duration }}</dt>
+        <dt>{{ data().commonLabels.duration }}</dt>
         <dd class="m-0">
           {{ state().selectedDurationHours }} {{ data().labels.hourShort }}
         </dd>
@@ -44,11 +44,11 @@
         <dd class="m-0">{{ state().contact.customerName }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ data().labels.customerEmail }}</dt>
+        <dt>{{ data().commonLabels.email }}</dt>
         <dd class="m-0">{{ state().contact.customerEmail }}</dd>
       </div>
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ data().labels.customerPhone }}</dt>
+        <dt>{{ data().commonLabels.phone }}</dt>
         <dd class="m-0">{{ state().contact.customerPhone || "" }}</dd>
       </div>
       @if (preview.additionalDurationHours) {

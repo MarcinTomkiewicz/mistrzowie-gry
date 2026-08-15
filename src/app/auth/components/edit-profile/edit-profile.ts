@@ -48,7 +48,7 @@ export class EditProfile {
         },
         {
           id: 'gm-sessions',
-          label: labels.gmSessions,
+          label: this.i18n.commonNav().gmSessions,
           icon: 'pi pi-evil-book',
           path: '/auth/edit-profile/gm-sessions',
         },

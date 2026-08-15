@@ -13,7 +13,7 @@
         severity="secondary"
         [outlined]="true"
         icon="pi pi-sliders-h"
-        [label]="i18n.listPage().manageConstants"
+        [label]="i18n.constantsPage().title"
         routerLink="/admin/offers/constants"
       />
     </div>
@@ -49,7 +49,7 @@
               <th class="small-caps">{{ i18n.listTable().page }}</th>
               <th class="small-caps">{{ i18n.listTable().draftStatus }}</th>
               <th class="small-caps">{{ i18n.listTable().draftUpdatedAt }}</th>
-              <th class="small-caps">{{ i18n.listTable().publication }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().publication }}</th>
               <th class="small-caps text-right">
                 {{ i18n.commonTable().actions }}
               </th>
@@ -83,7 +83,7 @@
               </td>
               <td>
                 <span class="p-datatable-column-title small-caps">
-                  {{ i18n.listTable().publication }}
+                  {{ i18n.commonLabels().publication }}
                 </span>
                 <div class="flex-col-start-start gap-xs">
                   <span>{{ row.publishedAtLabel }}</span>
@@ -92,7 +92,7 @@
                     {{ row.effectiveFromLabel }}
                   </small>
                   <small>
-                    {{ i18n.listTable().publishedBy }}:
+                    {{ i18n.commonLabels().publishedBy }}:
                     {{ row.publishedByLabel }}
                   </small>
                 </div>
@@ -114,7 +114,7 @@
                     size="small"
                     severity="secondary"
                     [outlined]="true"
-                    [label]="i18n.publication().preview"
+                    [label]="i18n.commonActions().preview"
                     icon="pi pi-eye"
                     (onClick)="previewPage(row.page)"
                   />
@@ -122,7 +122,7 @@
                   <p-button
                     size="small"
                     severity="success"
-                    [label]="i18n.publication().publish"
+                    [label]="i18n.commonActions().publish"
                     icon="pi pi-send"
                     (onClick)="openPublication(row.page)"
                   />

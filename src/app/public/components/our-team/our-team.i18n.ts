@@ -5,7 +5,9 @@ import {
 } from '../../../core/types/i18n/our-team';
 import {
   createCommonEmptyI18n,
+  createCommonAppRolesI18n,
   createCommonErrorsI18n,
+  createCommonLabelsI18n,
   createCommonSeoI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
@@ -25,6 +27,8 @@ export function createOurTeamI18n() {
   const commonErrors = createCommonErrorsI18n();
   const commonStatus = createCommonStatusI18n();
   const commonSeo = createCommonSeoI18n();
+  const commonLabels = createCommonLabelsI18n();
+  const commonAppRoles = createCommonAppRolesI18n();
 
   return {
     page,
@@ -34,6 +38,8 @@ export function createOurTeamI18n() {
     commonErrors,
     commonStatus,
     commonSeo,
+    commonLabels,
+    commonAppRoles,
     imageAltLabel: (displayName: string) =>
       [card().imageAltPrefix, displayName].filter(Boolean).join(' ').trim(),
   };

@@ -19,6 +19,7 @@ import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import type { CommercialPagePublicationIssue } from '../../../../core/types/commercial-page-admin';
 import type {
   CommercialPageBuilderDocument,
@@ -45,6 +46,7 @@ export class CommercialPagePublication {
   readonly published = output<CommercialPageBuilderDocument>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
+  protected readonly commercialI18n = createCommercialPageI18n();
   protected readonly effectiveFromControl = new FormControl<Date | null>(null, {
     validators: [Validators.required],
   });

@@ -1,19 +1,13 @@
 {
   "list": {
     "page": {
-      "title": "Zarządzanie wydarzeniami",
       "subtitle": "Tworzenie i zarządzanie wydarzeniami oraz zarządzanie ich dostępnością.",
       "emptyTitle": "Brak wydarzeń",
-      "emptyDescription": "Nie utworzono jeszcze żadnych wydarzeń. Kliknij przycisk \"Dodaj wydarzenie\", aby rozpocząć.",
-      "loadErrorTitle": "Nie udało się załadować wydarzeń"
+      "emptyDescription": "Nie utworzono jeszcze żadnych wydarzeń. Kliknij przycisk \"Dodaj wydarzenie\", aby rozpocząć."
     },
     "table": {
-      "name": "Nazwa",
-      "key": "Klucz",
-      "shortDescription": "Krótki opis",
       "active": "Aktywność",
       "publicPage": "Strona publiczna",
-      "displayOrder": "Kolejność",
       "editionCount": "Edycje",
       "activeEditionCount": "Aktywne edycje",
       "updatedAt": "Ostatnia zmiana"
@@ -24,7 +18,6 @@
       "deactivateCore": "Dezaktywuj"
     },
     "toast": {
-      "loadFailedSummary": "Nie udało się załadować wydarzeń",
       "activateSuccessSummary": "Wydarzenie aktywowane",
       "activateSuccessDetail": "Wydarzenie zostało aktywowane.",
       "deactivateSuccessSummary": "Wydarzenie dezaktywowane",
@@ -43,13 +36,8 @@
     },
     "fields": {
       "coreSectionTitle": "Dane wydarzenia",
-      "key": "Klucz",
-      "name": "Nazwa",
-      "shortDescription": "Krótki opis",
       "longDescription": "Pełny opis",
-      "isActive": "Aktywny",
-      "hasPublicPage": "Ma stronę publiczną",
-      "displayOrder": "Kolejność wyświetlania"
+      "hasPublicPage": "Ma stronę publiczną"
     },
     "validation": {
       "keyPattern": "Klucz może zawierać wyłącznie małe litery, cyfry i myślniki.",
@@ -61,19 +49,13 @@
       "emptyDescription": "To wydarzenie nie ma jeszcze lokalnych edycji."
     },
     "editionTable": {
-      "city": "Miasto",
-      "slug": "Slug",
       "active": "Aktywne",
-      "defaultPublic": "Domyślna lokalizacja",
-      "displayOrder": "Kolejność",
-      "occurrenceCount": "Terminy",
-      "programItemCount": "Elementy programu"
+      "defaultPublic": "Domyślna lokalizacja"
     },
     "actions": {
       "addEdition": "Dodaj nową lokalizację"
     },
     "toast": {
-      "loadFailedSummary": "Nie udało się załadować wydarzenia",
       "saveSuccessSummary": "Wydarzenie zapisane",
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
@@ -96,12 +78,9 @@
       "cover": "Okładka"
     },
     "fields": {
-      "eventCore": "Wydarzenie",
       "slug": "Slug lokalizacji",
-      "city": "Miasto",
       "venueName": "Nazwa miejsca",
       "venueAddress": "Adres miejsca",
-      "priceAmount": "Kwota",
       "priceCurrency": "Waluta",
       "priceLabel": "Opis ceny",
       "coverImagePath": "Ścieżka do obrazka okładki",
@@ -109,8 +88,6 @@
       "facebookLink": "Link do Facebooka",
       "isActive": "Aktywna",
       "isDefaultPublic": "Domyślna edycja publiczna",
-      "displayOrder": "Kolejność wyświetlania",
-      "isForBeginners": "Dla początkujących",
       "timezone": "Strefa czasowa",
       "startTime": "Godzina rozpoczęcia",
       "endTime": "Godzina zakończenia",
@@ -149,14 +126,9 @@
       "emptyDescription": "Ta lokalizacja nie ma jeszcze terminów."
     },
     "occurrenceTable": {
-      "date": "Data",
-      "status": "Status",
       "slotCapacity": "Liczba Mistrzów Gry",
-      "participantCapacity": "Liczba uczestników",
-      "participantSignupKind": "Sposób zapisów uczestników",
       "hostSignupWindow": "Okno zapisów Mistrzów Gry",
       "participantSignupWindow": "Okno zapisów uczestników",
-      "publishedAt": "Opublikowano",
       "programItemCount": "Elementy programu",
       "activeParticipantCount": "Aktywni uczestnicy"
     }
@@ -167,9 +139,7 @@
     },
     "fields": {
       "date": "[PH][date] Data terminu",
-      "status": "[PH][status] Status",
       "slotCapacity": "[PH][slotCapacity] Liczba slotów MG",
-      "participantCapacity": "[PH][participantCapacity] Liczba uczestników",
       "participantSignupKind": "[PH][participantSignupKind] Rodzaj zapisów uczestników",
       "hostSignupWindow": "[PH][hostSignupWindow] Zapisy MG",
       "hostSignupOpensAt": "[PH][hostSignupOpensAt] Otwarcie zapisów MG",
@@ -187,10 +157,8 @@
       "planned": "[PH][planned] Planowany",
       "host_signup_open": "[PH][host_signup_open] Zapisy MG otwarte",
       "host_signup_closed": "[PH][host_signup_closed] Zapisy MG zamknięte",
-      "published": "[PH][published] Opublikowany",
       "participant_signup_open": "[PH][participant_signup_open] Zapisy uczestników otwarte",
-      "participant_signup_closed": "[PH][participant_signup_closed] Zapisy uczestników zamknięte",
-      "archived": "[PH][archived] Zarchiwizowany"
+      "participant_signup_closed": "[PH][participant_signup_closed] Zapisy uczestników zamknięte"
     },
     "toast": {
       "saveSuccessSummary": "[PH][saveSuccessSummary] Termin zapisany",
@@ -262,11 +230,9 @@
     "defaultPublicConflict": "[PH][defaultPublicConflict] Ten Event Core ma już inną domyślną edycję publiczną.",
     "uniqueConflict": "[PH][uniqueConflict] Dane lokalnej edycji powodują konflikt unikalności.",
     "constraint": "[PH][constraint] Operacja narusza regułę publicznego Event Core lub aktywnej domyślnej edycji.",
-    "conflict": "[PH][conflict] Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
     "unknown": "[PH][unknown] Wystąpił nieoczekiwany błąd podczas operacji na lokalnej edycji."
   },
   "status": {
-    "active": "[PH][active] Aktywny",
     "inactive": "[PH][inactive] Nieaktywny"
   },
   "rpcErrors": {
@@ -275,7 +241,6 @@
     "invalid": "[PH][invalid] Dane Event Core są nieprawidłowe.",
     "duplicateKey": "[PH][duplicateKey] Event Core o takim kluczu już istnieje.",
     "constraint": "[PH][constraint] Operacja narusza reguły aktywacji lub publikacji Event Core.",
-    "conflict": "[PH][conflict] Dane zostały równolegle zmienione. Odśwież widok i spróbuj ponownie.",
     "unknown": "[PH][unknown] Wystąpił nieoczekiwany błąd podczas operacji na Event Core."
   }
 }

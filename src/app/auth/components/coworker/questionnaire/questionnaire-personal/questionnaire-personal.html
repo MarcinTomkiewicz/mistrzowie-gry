@@ -19,7 +19,7 @@
           data-questionnaire-field="data.personal.firstName"
           aria-describedby="questionnaire-first-name-error"
         />
-        <label for="questionnaire-first-name">{{ i18n.fields().firstNameLabel }}</label>
+        <label for="questionnaire-first-name">{{ i18n.commonLabels().firstName }}</label>
       </p-iftalabel>
       <app-questionnaire-field-errors
         [control]="form().controls.firstName"
@@ -59,7 +59,7 @@
           data-questionnaire-field="data.personal.lastName"
           aria-describedby="questionnaire-last-name-error"
         />
-        <label for="questionnaire-last-name">{{ i18n.fields().lastNameLabel }}</label>
+        <label for="questionnaire-last-name">{{ i18n.commonLabels().lastName }}</label>
       </p-iftalabel>
       <app-questionnaire-field-errors
         [control]="form().controls.lastName"
@@ -119,7 +119,7 @@
           data-questionnaire-field="data.personal.birthPlace"
           aria-describedby="questionnaire-birth-place-error"
         />
-        <label for="questionnaire-birth-place">{{ i18n.fields().birthPlaceLabel }}</label>
+        <label for="questionnaire-birth-place">{{ i18n.commonLabels().locality }}</label>
       </p-iftalabel>
       <app-questionnaire-field-errors
         [control]="form().controls.birthPlace"
@@ -164,7 +164,7 @@
     <app-questionnaire-sensitive-field
       [control]="form().controls.pesel"
       [metadata]="sensitive().pesel"
-      [label]="i18n.fields().peselLabel"
+      [label]="i18n.commonLabels().pesel"
       inputId="questionnaire-pesel"
       fieldPath="data.personal.pesel"
       autocomplete="off"
@@ -200,7 +200,7 @@
           autocomplete="off"
           inputId="questionnaire-citizenship"
           [options]="citizenshipOptions"
-          [placeholder]="i18n.options().selectPlaceholder"
+          [placeholder]="i18n.commonActions().select"
           [emptyValue]="''"
           data-questionnaire-field="data.personal.citizenship"
           aria-describedby="questionnaire-citizenship-error"

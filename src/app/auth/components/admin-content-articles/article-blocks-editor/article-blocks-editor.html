@@ -10,7 +10,7 @@
       <p-button
         type="button"
         severity="secondary"
-        [label]="i18n.editorActions().addTextSection"
+        [label]="i18n.commonActions().addSection"
         icon="pi pi-plus"
         [disabled]="disabled() || isUploading()"
         (onClick)="addTextSectionAfter(null)"
@@ -44,7 +44,7 @@
             severity="secondary"
             size="small"
             [text]="true"
-            [label]="i18n.editorActions().addTextSection"
+            [label]="i18n.commonActions().addSection"
             icon="pi pi-plus"
             [disabled]="disabled() || isUploading()"
             (onClick)="addTextSectionAfter(index)"
@@ -107,7 +107,7 @@
               autocomplete="off"
             />
             <label [for]="'content-article-block-heading-' + index">
-              {{ i18n.fields().heading }}
+              {{ i18n.commonLabels().sectionHeading }}
             </label>
           </p-iftalabel>
         </div>

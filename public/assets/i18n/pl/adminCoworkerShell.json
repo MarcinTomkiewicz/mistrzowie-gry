@@ -1,10 +1,8 @@
 {
   "shell": {
-    "title": "Akta współpracowników",
     "subtitle": "Zarządzaj prywatnymi i wspólnymi dokumentami współpracowników."
   },
   "tabs": {
-    "onboarding": "Onboarding [PH]",
-    "sharedDocuments": "Dokumenty wspólne"
+    "onboarding": "Onboarding [PH]"
   }
 }

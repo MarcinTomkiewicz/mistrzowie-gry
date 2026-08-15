@@ -6,7 +6,10 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { finalize, forkJoin, of } from 'rxjs';
 
-import { ParticipantSignupKind } from '../../../../core/enums/event';
+import {
+  EventOccurrenceStatus,
+  ParticipantSignupKind,
+} from '../../../../core/enums/event';
 import {
   createEventEditionForm,
   mapEventEditionFormToPayload,
@@ -148,13 +151,14 @@ export class EventEditionEditor {
           const detail = resolveEventEditionAdminErrorMessage(
             error,
             this.i18n.rpcErrors(),
+            this.i18n.commonErrors().concurrentModification,
           );
 
           this.core.set(null);
           this.edition.set(null);
           this.loadErrorMessage.set(detail);
           this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
+            summary: this.i18n.page().loadErrorTitle,
             detail,
           });
         },
@@ -185,6 +189,18 @@ export class EventEditionEditor {
       kind,
       this.i18n.participantKinds(),
     );
+  }
+
+  protected occurrenceStatusLabel(status: EventOccurrenceStatus): string {
+    if (status === EventOccurrenceStatus.Published) {
+      return this.i18n.commonValues().published;
+    }
+
+    if (status === EventOccurrenceStatus.Archived) {
+      return this.i18n.commonValues().archived;
+    }
+
+    return this.i18n.occurrenceStatuses()[status];
   }
 
   protected saveEdition(): void {
@@ -249,6 +265,7 @@ export class EventEditionEditor {
             detail: resolveEventEditionAdminErrorMessage(
               error,
               this.i18n.rpcErrors(),
+              this.i18n.commonErrors().concurrentModification,
             ),
           });
         },

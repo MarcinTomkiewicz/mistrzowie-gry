@@ -5,7 +5,11 @@ import {
   recordValuesSortedBy,
 } from '../../../core/utils/record-values';
 import { withIcons } from '../../common/icon-items/icon-items';
-import { createCommonCtaI18n } from '../../../core/translations/common.i18n';
+import {
+  createCommonCtaI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
+} from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
   BulletGroupCopy,
@@ -66,6 +70,8 @@ export function createJoinThePartyI18n(
     orgMeetingBulletsBlock: 'orgMeeting.bullets',
   });
   const cta = createCommonCtaI18n();
+  const nav = createCommonNavI18n();
+  const labels = createCommonLabelsI18n();
 
   const rulesTitle = computed(() => rulesBlock().title);
   const continuationBulletsTitle = computed(
@@ -97,6 +103,8 @@ export function createJoinThePartyI18n(
     meetingFormat,
     heroInfo,
     cta,
+    nav,
+    labels,
     intro,
     structure,
     continuation,

@@ -1,5 +1,8 @@
 import {
   createCommonActionsI18n,
+  createCommonErrorsI18n,
+  createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
@@ -23,14 +26,14 @@ export function createEventSignupI18n() {
     error,
   } =
     createScopedSectionsI18n<{
-      seo: TitleDescriptionCopy;
-      page: TitleSubtitleCopy;
+      seo: Omit<TitleDescriptionCopy, 'title'>;
+      page: Omit<TitleSubtitleCopy, 'title'>;
       selectors: SelectorsCopy;
       details: DetailsCopy;
       occurrences: TitleSubtitleCopy;
       emptyCatalog: TitleDescriptionCopy;
       emptyOccurrences: TitleDescriptionCopy;
-      error: TitleDescriptionCopy;
+      error: Omit<TitleDescriptionCopy, 'title'>;
     }>('eventSignup', {
       seo: 'page.seo',
       page: 'page.page',
@@ -42,6 +45,9 @@ export function createEventSignupI18n() {
       error: 'page.error',
     });
   const commonActions = createCommonActionsI18n();
+  const commonErrors = createCommonErrorsI18n();
+  const commonLabels = createCommonLabelsI18n();
+  const commonNav = createCommonNavI18n();
   const commonStatus = createCommonStatusI18n();
   const commonValues = createCommonValuesI18n();
 
@@ -55,6 +61,9 @@ export function createEventSignupI18n() {
     emptyOccurrences,
     error,
     commonActions,
+    commonErrors,
+    commonLabels,
+    commonNav,
     commonStatus,
     commonValues,
   };

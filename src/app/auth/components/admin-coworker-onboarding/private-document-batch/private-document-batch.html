@@ -32,7 +32,7 @@
               formControlName="title"
             />
             <label [for]="'private-document-title-' + index">
-              {{ i18n.fields().title }}
+              {{ i18n.commonLabels().title }}
             </label>
           </p-iftalabel>
         </div>
@@ -68,7 +68,7 @@
               severity="danger"
               [outlined]="true"
               icon="pi pi-trash"
-              [label]="i18n.commonActions().remove"
+              [label]="i18n.commonActions().delete"
               [disabled]="busy()"
               (onClick)="removeRow(index)"
             />
@@ -84,7 +84,7 @@
       severity="secondary"
       [outlined]="true"
       icon="pi pi-plus"
-      [label]="i18n.actions().addRow"
+      [label]="i18n.commonActions().addItem"
       [disabled]="busy()"
       (onClick)="addRow()"
     />

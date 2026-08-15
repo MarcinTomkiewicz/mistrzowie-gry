@@ -1,7 +1,7 @@
 <section class="mg-section mg-section--full">
   <div class="mg-container position-relative flex-col-start-stretch gap-md">
     <header class="mg-section__header w-100">
-      <h1 class="mg-section__title">{{ i18n.page().title }}</h1>
+      <h1 class="mg-section__title">{{ i18n.commonNav().contentManagement }}</h1>
 
       <p class="mg-section__subtitle mg-section__subtitle--full">
         {{ i18n.page().subtitle }}
@@ -45,10 +45,10 @@
           <ng-template #header>
             <tr>
               <th class="small-caps">{{ i18n.table().thumbnail }}</th>
-              <th class="small-caps">{{ i18n.table().title }}</th>
-              <th class="small-caps">{{ i18n.table().slug }}</th>
-              <th class="small-caps">{{ i18n.table().status }}</th>
-              <th class="small-caps">{{ i18n.table().publishedAt }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().title }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().slug }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().status }}</th>
+              <th class="small-caps">{{ i18n.commonLabels().publication }}</th>
               <th class="small-caps">{{ i18n.table().updatedAt }}</th>
               <th class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
             </tr>
@@ -94,7 +94,7 @@
 
                   <p-button
                     size="small"
-                    [label]="i18n.actions().publishArticle"
+                    [label]="i18n.commonActions().publish"
                     icon="pi pi-send"
                     [loading]="isActionLoading(row.article.id, 'publish')"
                     (onClick)="publishArticle(row.article)"
@@ -104,7 +104,7 @@
                     size="small"
                     severity="danger"
                     [outlined]="true"
-                    [label]="i18n.actions().archiveArticle"
+                    [label]="i18n.commonActions().archive"
                     icon="pi pi-inbox"
                     [loading]="isActionLoading(row.article.id, 'archive')"
                     (onClick)="archiveArticle(row.article)"
@@ -118,7 +118,7 @@
     } @else if (!isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
         <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
-          {{ i18n.page().emptyTitle }}
+          {{ i18n.commonEmpty().articles }}
         </h2>
 
         <p class="m-0">{{ i18n.page().emptyDescription }}</p>

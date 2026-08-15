@@ -120,7 +120,7 @@ export class CommercialProductsEditor {
   protected productGroups() {
     const labels = this.i18n.products();
     const groupLabels: Record<CommercialProductKind, string> = {
-      product: labels.products,
+      product: this.i18n.commonLabels().products,
       addon: labels.addons,
     };
 
@@ -156,6 +156,7 @@ export class CommercialProductsEditor {
     return formatPrice(
       mapPriceEditorForm(product.controls.price),
       this.priceI18n().presentation,
+      this.i18n.commonLabels().fromLowercase,
       this.locale(),
     );
   }
@@ -163,7 +164,7 @@ export class CommercialProductsEditor {
   protected productDuration(product: CommercialProductEditorForm): string {
     const mode = product.controls.durationMode.getRawValue();
 
-    if (mode === 'not_applicable') return this.i18n.durationMode()[mode];
+    if (mode === 'not_applicable') return this.i18n.commonValues().notApplicable;
 
     const minutes =
       mode === 'standard'
@@ -184,7 +185,7 @@ export class CommercialProductsEditor {
   ): string {
     const mode = product.controls.participantsMode.getRawValue();
 
-    if (mode === 'not_applicable') return this.i18n.participantsMode()[mode];
+    if (mode === 'not_applicable') return this.i18n.commonValues().notApplicable;
 
     if (mode === 'standard') {
       const value = this.numericConstant('participants', 'integer');
@@ -203,7 +204,7 @@ export class CommercialProductsEditor {
 
   protected productSessions(product: CommercialProductEditorForm): string {
     const mode = product.controls.sessionsMode.getRawValue();
-    if (mode === 'not_applicable') return this.i18n.sessionMode()[mode];
+    if (mode === 'not_applicable') return this.i18n.commonValues().notApplicable;
 
     const count = product.controls.sessionsCount.getRawValue();
     if (count === null) return this.i18n.commonValues().notAvailable;
@@ -243,14 +244,16 @@ export class CommercialProductsEditor {
     const range = formatOptionalNumberRange(
       min,
       max,
-      this.commercialI18n.productValues(),
+      this.i18n.commonLabels().fromLowercase,
+      this.i18n.commonLabels().toLowercase,
       this.locale(),
     );
 
     const perFacilitator = formatOptionalNumberRange(
       perFacilitatorMax,
       perFacilitatorMax,
-      this.commercialI18n.productValues(),
+      this.i18n.commonLabels().fromLowercase,
+      this.i18n.commonLabels().toLowercase,
       this.locale(),
     );
 

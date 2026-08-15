@@ -95,7 +95,7 @@
                 <span
                   class="mg-section__subtitle mg-section__subtitle--no-margin"
                 >
-                  {{ i18n.labels().gm }}
+                  {{ i18n.commonAppRoles().gm }}
                 </span>
 
                 @if (item.canOpenGmProfile && item.gmDisplayName) {
@@ -110,7 +110,7 @@
                   <span
                     class="mg-section__title mg-section__title--xs mg-section__title--no-margin"
                   >
-                    {{ item.gmDisplayName || i18n.commonFallbacks().none }}
+                    {{ item.gmDisplayName || i18n.commonValues().notAvailable }}
                   </span>
                 }
               </div>
@@ -122,7 +122,7 @@
                 />
               } @else {
                 <span class="tag-badge tag-badge--muted">
-                  {{ i18n.commonFallbacks().none }}
+                  {{ i18n.commonValues().notAvailable }}
                 </span>
               }
             </div>

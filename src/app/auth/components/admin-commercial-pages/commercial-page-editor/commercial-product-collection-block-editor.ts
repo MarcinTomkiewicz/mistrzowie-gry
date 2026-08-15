@@ -28,8 +28,7 @@ import type {
 import type { CommercialProductKind } from '../../../../core/types/commercial-page-builder';
 import type { CommercialProductOption } from '../../../../core/types/commercial-page-editor';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
-import type { CommercialProductFieldLabelsTranslations } from '../../../../core/types/i18n/commercial-pages';
-import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import {
   moveFormArrayControl,
   moveFormControlArrayItem,
@@ -62,10 +61,7 @@ export class CommercialProductCollectionBlockEditor {
   readonly controlId = input.required<string>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
-  protected readonly productFieldLabels = createScopedSectionsI18n<{
-    productFieldKey: CommercialProductFieldLabelsTranslations;
-  }>('commercialPages', { productFieldKey: 'productFieldKey' })
-    .productFieldKey;
+  private readonly commercialI18n = createCommercialPageI18n();
   protected readonly customizedFieldIds = signal<ReadonlySet<string>>(
     new Set(),
   );
@@ -73,7 +69,12 @@ export class CommercialProductCollectionBlockEditor {
     const labels = this.i18n.collectionPresentation();
     return COMMERCIAL_PRODUCT_COLLECTION_PRESENTATIONS.map((value) => ({
       value,
-      label: labels[value],
+      label:
+        value === 'cards'
+          ? this.i18n.commonLabels().cards
+          : value === 'table'
+            ? this.i18n.commonLabels().table
+            : labels[value],
     }));
   });
   protected readonly orientationOptions = computed(() => {
@@ -84,10 +85,9 @@ export class CommercialProductCollectionBlockEditor {
     }));
   });
   protected readonly fieldKeyOptions = computed(() => {
-    const labels = this.productFieldLabels();
     return COMMERCIAL_PRODUCT_FIELD_KEYS.map((value) => ({
       value,
-      label: labels[value],
+      label: this.commercialI18n.productFieldLabel(value),
     }));
   });
   protected readonly columnOptions = COMMERCIAL_PRODUCT_CARD_COLUMNS.map(
@@ -234,7 +234,7 @@ export class CommercialProductCollectionBlockEditor {
 
   protected fieldLabel(field: CommercialProductFieldEditorForm): string {
     return field.controls.label.getRawValue() ??
-      this.productFieldLabels()[field.controls.key.getRawValue()];
+      this.commercialI18n.productFieldLabel(field.controls.key.getRawValue());
   }
 
   protected isFieldCustomized(
@@ -262,7 +262,7 @@ export class CommercialProductCollectionBlockEditor {
     const labels = this.i18n.products();
 
     const groupLabels: Record<CommercialProductKind, string> = {
-      product: labels.products,
+      product: this.i18n.commonLabels().products,
       addon: labels.addons,
     };
 

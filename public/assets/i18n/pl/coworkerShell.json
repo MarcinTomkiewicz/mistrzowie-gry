@@ -1,11 +1,8 @@
 {
   "shell": {
-    "title": "Akta współpracownika",
     "subtitle": "W tym miejscu uzupełnisz dane potrzebne do współpracy i rozliczeń."
   },
   "tabs": {
-    "questionnaire": "Kwestionariusz osobowy",
-    "privateDocuments": "Dokumenty prywatne",
-    "sharedDocuments": "Dokumenty wspólne"
+    "questionnaire": "Kwestionariusz osobowy"
   }
 }

@@ -120,12 +120,13 @@ export class EventCoreEditor {
           const detail = resolveEventCoreAdminErrorMessage(
             error,
             this.i18n.rpcErrors(),
+            this.i18n.commonErrors().concurrentModification,
           );
 
           this.core.set(null);
           this.loadErrorMessage.set(detail);
           this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
+            summary: this.i18n.page().loadErrorTitle,
             detail,
           });
         },
@@ -190,6 +191,7 @@ export class EventCoreEditor {
             detail: resolveEventCoreAdminErrorMessage(
               error,
               this.i18n.rpcErrors(),
+              this.i18n.commonErrors().concurrentModification,
             ),
           });
         },

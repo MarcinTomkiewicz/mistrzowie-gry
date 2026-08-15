@@ -9,8 +9,6 @@ export type SectionCopy = {
 };
 
 export type HeroCopy = {
-  badge: string;
-  title: string;
   subtitle: string;
 };
 
@@ -22,15 +20,16 @@ export type MeetingFormatLabels = {
 
 export type SummaryCopy = {
   orgMeetingFree: string;
-  orgMeetingPrice: string;
   orgMeetingSchedule: string;
-  orgMeetingPlaceLabel: string;
   orgMeetingPlace: string;
-  sessionPrice: string;
 };
 
 export type SummaryByFormat = {
-  title: string;
+  shared: {
+    orgMeetingPrice: string;
+    orgMeetingPlaceLabel: string;
+    sessionPrice: string;
+  };
 } & Record<MeetingFormat, SummaryCopy>;
 
 export type BulletGroupCopy = {

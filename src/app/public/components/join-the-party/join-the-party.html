@@ -1,13 +1,13 @@
 @let heroInfo = i18n.heroInfo();
 
-<section class="mg-section mg-join-hero" [attr.aria-label]="i18n.hero().title">
+<section class="mg-section mg-join-hero" [attr.aria-label]="i18n.nav().join">
   <div class="mg-container">
     <header class="mg-section__header">
       <div class="mg-join-hero__badge shadow-soft mb-md">
-        {{ i18n.hero().badge }}
+        {{ i18n.labels().forBeginners }}
       </div>
 
-      <h1 class="mg-section__title">{{ i18n.hero().title }}</h1>
+      <h1 class="mg-section__title">{{ i18n.nav().join }}</h1>
 
       <p class="mg-section__subtitle">
         {{ i18n.hero().subtitle }}
@@ -17,7 +17,7 @@
         <p
           class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-xs"
         >
-          {{ heroInfo.title }}
+          {{ i18n.labels().inBrief }}
         </p>
 
         <p-tabs [(value)]="meetingFormat" lazy class="w-100">
@@ -48,7 +48,10 @@
           <p-tabpanels>
             <p-tabpanel value="inPerson">
               @if (heroInfo.inPerson; as inPerson) {
-                <app-join-the-party-summary [copy]="inPerson" />
+                <app-join-the-party-summary
+                  [copy]="inPerson"
+                  [shared]="heroInfo.shared"
+                />
               }
             </p-tabpanel>
 
@@ -56,6 +59,7 @@
               @if (heroInfo.online; as online) {
                 <app-join-the-party-summary
                   [copy]="online"
+                  [shared]="heroInfo.shared"
                   [placeHref]="discordHref()"
                 />
               }
@@ -66,7 +70,7 @@
 
       <div class="flex-row-center-center flex-col-sm mt-md gap-md">
         <p-button
-          [label]="i18n.cta().contactUs"
+          [label]="i18n.nav().contact"
           icon="pi pi-message-away"
           severity="primary"
           size="small"
@@ -205,7 +209,7 @@
 
       <div class="flex-row-end-center flex-col-sm mt-md gap-sm">
         <p-button
-          [label]="i18n.cta().contactUs"
+          [label]="i18n.nav().contact"
           icon="pi pi-message-away"
           severity="primary"
           size="small"

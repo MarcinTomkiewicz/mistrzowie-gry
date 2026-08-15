@@ -18,6 +18,8 @@ export interface ISessionReservationViewModel {
   labels: ISessionReservationI18nSections['labels'];
   states: ISessionReservationI18nSections['states'];
   commonActions: ISessionReservationCommonI18n['commonActions'];
+  commonLabels: ISessionReservationCommonI18n['commonLabels'];
+  commonAppRoles: ISessionReservationCommonI18n['commonAppRoles'];
   commonStatus: ISessionReservationCommonI18n['commonStatus'];
   addonProducts: readonly ISessionAddonBookingProduct[];
   gmOptions: readonly IGmPublicProfile[];

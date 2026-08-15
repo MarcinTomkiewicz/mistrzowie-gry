@@ -1,6 +1,8 @@
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
+  createCommonErrorsI18n,
+  createCommonLabelsI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
   createCommonValuesI18n,
@@ -15,6 +17,7 @@ import {
   EditorPageCopy,
   EditorToastCopy,
   EditorValidationCopy,
+  OccurrenceTableCopy,
   StatusCopy,
 } from '../../../../core/types/i18n/admin-events';
 
@@ -25,6 +28,7 @@ export function createEventCoreEditorI18n() {
     validation,
     editions,
     editionTable,
+    occurrenceTable,
     actions,
     toast,
     status,
@@ -35,6 +39,7 @@ export function createEventCoreEditorI18n() {
     validation: EditorValidationCopy;
     editions: EditionsCopy;
     editionTable: EditionTableCopy;
+    occurrenceTable: OccurrenceTableCopy;
     actions: EditorActionsCopy;
     toast: EditorToastCopy;
     status: StatusCopy;
@@ -45,6 +50,7 @@ export function createEventCoreEditorI18n() {
     validation: 'editor.validation',
     editions: 'editor.editions',
     editionTable: 'editor.editionTable',
+    occurrenceTable: 'editionEditor.occurrenceTable',
     actions: 'editor.actions',
     toast: 'editor.toast',
     status: 'status',
@@ -57,12 +63,15 @@ export function createEventCoreEditorI18n() {
     validation,
     editions,
     editionTable,
+    occurrenceTable,
     actions,
     toast,
     status,
     rpcErrors,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
+    commonErrors: createCommonErrorsI18n(),
+    commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
     commonValues: createCommonValuesI18n(),

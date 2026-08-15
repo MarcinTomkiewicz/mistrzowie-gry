@@ -144,7 +144,9 @@ export class SessionForm {
       return Object.fromEntries(
         SESSION_DIFFICULTY_LEVEL_OPTIONS.map((option) => [
           option.value,
-          difficulty[option.i18nKey],
+          option.value === 'beginner'
+            ? this.i18n.commonLabels().forBeginners
+            : difficulty[option.i18nKey],
         ]),
       ) as Record<SessionDifficultyLevel, string>;
     },

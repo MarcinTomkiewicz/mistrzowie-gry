@@ -48,7 +48,7 @@ export class QuestionnairePersonal {
   protected readonly identificationBasisOptions = computed<
     ISelectOption<Exclude<QuestionnaireIdentificationBasis, null>>[]
   >(() => [
-    { value: 'pesel', label: this.i18n.options().pesel },
+    { value: 'pesel', label: this.i18n.commonLabels().pesel },
     {
       value: 'identity_document',
       label: this.i18n.options().identityDocument,

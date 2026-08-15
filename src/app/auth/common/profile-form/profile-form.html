@@ -1,6 +1,6 @@
 <header class="mg-section__header w-100 m-sm">
   <h2 class="mg-section__title mg-section__title--md">
-    {{ isRegisterMode() ? i18n.title().register : i18n.title().edit }}
+    {{ isRegisterMode() ? i18n.title().register : i18n.commonNav().editProfile }}
   </h2>
 </header>
 
@@ -24,7 +24,7 @@
           autocapitalize="none"
           spellcheck="false"
         />
-        <label for="email">{{ i18n.form().emailLabel }}</label>
+        <label for="email">{{ i18n.commonLabels().emailAddress }}</label>
       </p-iftalabel>
 
       @if (showEmailError()) {
@@ -52,7 +52,7 @@
           </ng-template>
         </p-password>
 
-        <label for="login-password">{{ i18n.form().passwordLabel }}</label>
+        <label for="login-password">{{ i18n.commonLabels().password }}</label>
       </p-iftalabel>
 
       @if (showPasswordError()) {
@@ -61,7 +61,7 @@
     </div>
   } @else {
     <div class="w-80 w-100-xs px-sm">
-      <div>{{ i18n.form().emailLabel }}</div>
+      <div>{{ i18n.commonLabels().emailAddress }}</div>
       <div class="w-100 flex-row-start-center">
         {{ displayEmail() }}
       </div>
@@ -78,7 +78,7 @@
         formControlName="firstName"
         autocomplete="given-name"
       />
-      <label for="firstName">{{ i18n.form().firstNameLabel }}</label>
+      <label for="firstName">{{ i18n.commonLabels().firstName }}</label>
     </p-iftalabel>
   </div>
 
@@ -92,7 +92,7 @@
         formControlName="nickname"
         autocomplete="nickname"
       />
-      <label for="nickname">{{ i18n.form().nicknameLabel }}</label>
+      <label for="nickname">{{ i18n.commonLabels().nickname }}</label>
     </p-iftalabel>
   </div>
 
@@ -102,7 +102,7 @@
       formControlName="useNickname"
     />
     <label for="useNickname" class="w-70">
-      {{ i18n.form().useNicknameLabel }}
+      {{ i18n.commonLabels().useNickname }}
     </label>
   </div>
 
@@ -130,7 +130,7 @@
           type="tel"
           autocomplete="tel"
         />
-        <label for="phoneNumber">{{ i18n.form().phoneNumberLabel }}</label>
+        <label for="phoneNumber">{{ i18n.commonLabels().phoneNumber }}</label>
       </p-iftalabel>
     </div>
 
@@ -144,7 +144,7 @@
           formControlName="city"
           autocomplete="address-level2"
         />
-        <label for="city">{{ i18n.form().cityLabel }}</label>
+        <label for="city">{{ i18n.commonLabels().city }}</label>
       </p-iftalabel>
     </div>
 
@@ -158,7 +158,7 @@
           formControlName="street"
           autocomplete="address-line1"
         />
-        <label for="street">{{ i18n.form().streetLabel }}</label>
+        <label for="street">{{ i18n.commonLabels().street }}</label>
       </p-iftalabel>
     </div>
 
@@ -202,7 +202,7 @@
           formControlName="postalCode"
           autocomplete="postal-code"
         />
-        <label for="postalCode">{{ i18n.form().postalCodeLabel }}</label>
+        <label for="postalCode">{{ i18n.commonLabels().postalCode }}</label>
       </p-iftalabel>
     </div>
 
@@ -215,7 +215,7 @@
           [min]="0"
           [max]="120"
         />
-        <label for="age">{{ i18n.form().ageLabel }}</label>
+        <label for="age">{{ i18n.commonLabels().age }}</label>
       </p-iftalabel>
     </div>
 
@@ -231,7 +231,7 @@
           autocomplete="off"
         ></textarea>
         <label for="shortDescription">
-          {{ i18n.form().shortDescriptionLabel }}
+          {{ i18n.commonLabels().shortDescription }}
         </label>
       </p-iftalabel>
 

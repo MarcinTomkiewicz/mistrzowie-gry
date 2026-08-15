@@ -75,7 +75,12 @@ export class OccurrenceEditor {
   >(() =>
     Object.values(EventOccurrenceStatus).map((value) => ({
       value,
-      label: this.i18n().occurrenceStatuses()[value],
+      label:
+        value === EventOccurrenceStatus.Published
+          ? this.i18n().commonValues().published
+          : value === EventOccurrenceStatus.Archived
+            ? this.i18n().commonValues().archived
+            : this.i18n().occurrenceStatuses()[value],
     })),
   );
   protected readonly participantSignupKindOptions = computed(() =>
@@ -162,6 +167,7 @@ export class OccurrenceEditor {
               ? resolveEventEditionAdminErrorMessage(
                   error,
                   this.i18n().rpcErrors(),
+                  this.i18n().commonErrors().concurrentModification,
                 )
               : resolveEventOccurrenceAdminErrorMessage(
                   error,

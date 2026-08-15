@@ -28,24 +28,17 @@
     "declarationDescription": "[PH] Przed ukończeniem przeczytaj aktualne oświadczenie i zaakceptuj je świadomie."
   },
   "fields": {
-    "firstNameLabel": "Imię",
-    "lastNameLabel": "Nazwisko",
     "maidenNameLabel": "Nazwisko rodowe",
     "middleNameLabel": "Imię drugie",
     "birthDateLabel": "Data urodzenia",
-    "birthPlaceLabel": "Miejscowość",
     "identificationBasisLabel": "Podstawa identyfikacji",
-    "peselLabel": "PESEL",
     "nipLabel": "NIP",
     "identityDocumentKindLabel": "Rodzaj dokumentu tożsamości",
     "identityDocumentNumberLabel": "Numer dokumentu tożsamości",
     "citizenshipLabel": "Obywatelstwo",
     "phoneLabel": "Tel. kont.",
-    "streetLabel": "Ulica",
     "houseNumberLabel": "Nr domu",
     "apartmentNumberLabel": "Nr lokalu",
-    "postalCodeLabel": "Kod pocztowy",
-    "cityLabel": "Miejscowość",
     "voivodeshipLabel": "Województwo",
     "countyLabel": "Powiat",
     "municipalityLabel": "Gmina",
@@ -75,17 +68,12 @@
     "finalDeclarationAcceptedLabel": "Akceptuję powyższe oświadczenie"
   },
   "options": {
-    "selectPlaceholder": "Wybierz",
-    "yes": "Tak",
-    "no": "Nie",
-    "pesel": "PESEL",
     "identityDocument": "Dokument tożsamości",
     "idCard": "Dowód osobisty",
     "passport": "Paszport",
     "otherDocument": "Inny dokument",
     "join": "Przystępuję",
     "decline": "Nie przystępuję",
-    "disabilityNone": "Brak",
     "disabilityLight": "Lekki",
     "disabilityModerate": "Umiarkowany",
     "disabilitySevere": "Znaczny"
@@ -99,7 +87,6 @@
     "replacementHint": "Pole nie pokazuje poprzedniej wartości. Puste pole zachowuje zapisane dane, a wpisanie nowej wartości je zastępuje."
   },
   "actions": {
-    "saveDraftLabel": "Zapisz wersję roboczą",
     "completeLabel": "Ukończ kwestionariusz",
     "reloadLabel": "Pobierz aktualne dane",
     "goToPrivateDocumentsLabel": "[PH] Przejdź do Dokumentów prywatnych"
@@ -138,8 +125,6 @@
   },
   "toast": {
     "draftSavedSummary": "[PH] Zapisano wersję roboczą",
-    "draftSavedDetail": "[PH] Możesz wrócić do kwestionariusza i dokończyć go później.",
-    "completeSummary": "[PH] Kwestionariusz został ukończony",
-    "completeDetail": "[PH] PDF został utworzony i jest dostępny w Dokumentach prywatnych. Dokument nie pobierze się automatycznie."
+    "draftSavedDetail": "[PH] Możesz wrócić do kwestionariusza i dokończyć go później."
   }
 }

@@ -1,7 +1,7 @@
 <div class="mg-form flex-col-start-stretch gap-lg">
   <section class="mg-card flex-col-start-stretch gap-md w-100">
     <h2 class="mg-section__title mg-section__title--sm m-0">
-      {{ data().sections.contact }}
+      {{ data().commonLabels.contactDetails }}
     </h2>
 
     <form
@@ -29,7 +29,7 @@
           formControlName="customerEmail"
           autocomplete="email"
         />
-        <label for="customerEmail">{{ data().labels.customerEmail }}</label>
+        <label for="customerEmail">{{ data().commonLabels.email }}</label>
       </p-iftalabel>
 
       <p-iftalabel class="w-100">
@@ -41,7 +41,7 @@
           formControlName="customerPhone"
           autocomplete="tel"
         />
-        <label for="customerPhone">{{ data().labels.customerPhone }}</label>
+        <label for="customerPhone">{{ data().commonLabels.phone }}</label>
       </p-iftalabel>
 
       <p-iftalabel class="w-100">

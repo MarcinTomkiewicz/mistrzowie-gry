@@ -5,23 +5,18 @@ export type SeoCopy = {
 
 export type HeroCopy = {
   badge: string;
-  title: string;
   subtitleLead: string;
   subtitleStrong: string;
   upcomingSessions: string;
 };
 
 export type HeroInfoCopy = {
-  title: string;
-  cityLabel: string;
   cityMissing: string;
   placeLabel: string;
   placeMissing: string;
   addressLabel: string;
   addressMissing: string;
-  scheduleLabel: string;
   scheduleMissing: string;
-  priceLabel: string;
   priceMissing: string;
 };
 

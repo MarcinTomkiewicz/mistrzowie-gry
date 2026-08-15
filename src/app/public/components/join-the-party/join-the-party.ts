@@ -99,7 +99,7 @@ export class JoinTheParty {
       structuredData: createEventStructuredData({
         id: `${this.pageUrl}#event`,
         url: this.pageUrl,
-        name: this.i18n.hero().title,
+        name: this.i18n.nav().join,
         description: seo.description,
         eventSchedule: {
           '@type': 'Schedule',

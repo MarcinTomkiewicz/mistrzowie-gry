@@ -18,7 +18,7 @@ import { SystemChip } from '../../../common/system-chip/system-chip';
   imports: [ButtonModule, SkeletonModule, SystemChip],
   templateUrl: './event-slots.html',
   styleUrl: './event-slots.scss',
-  providers: [provideTranslocoScope('sessions')],
+  providers: [provideTranslocoScope('sessions', 'common')],
 })
 export class EventSlots {
   private readonly theme = inject(Theme);
@@ -102,7 +102,7 @@ export class EventSlots {
     return resolveAltDifficultyLevel(
       difficulty,
       this.i18n.difficulty(),
-      this.i18n.commonFallbacks().missingData,
+      this.i18n.commonEmpty().title,
     ).badgeClass;
   }
 
@@ -112,7 +112,7 @@ export class EventSlots {
     return resolveAltDifficultyLevel(
       difficulty,
       this.i18n.difficulty(),
-      this.i18n.commonFallbacks().missingData,
+      this.i18n.commonEmpty().title,
     ).label;
   }
 
@@ -130,7 +130,7 @@ export class EventSlots {
       gmProfileId: null,
       title: fallback.emptySession,
       imageUrl: null,
-      gmDisplayName: fallback.none,
+      gmDisplayName: this.i18n.commonValues().notAvailable,
       difficultyLevel: null,
       system: null,
       languages: [],

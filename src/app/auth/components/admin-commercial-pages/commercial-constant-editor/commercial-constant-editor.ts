@@ -52,7 +52,10 @@ export class CommercialConstantEditor {
 
     return COMMERCIAL_CONSTANT_VALUE_TYPES.map((value) => ({
       value,
-      label: labels[value],
+      label:
+        value === 'duration'
+          ? this.i18n.commonLabels().duration
+          : labels[value],
     }));
   });
 

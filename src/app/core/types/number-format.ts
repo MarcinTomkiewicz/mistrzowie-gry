@@ -4,8 +4,3 @@ export type PluralNumberTranslations = {
   many: string;
   other: string;
 };
-
-export type NumberRangeTranslations = {
-  from: string;
-  to: string;
-};

@@ -1,28 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 
 import { IUserWorkLogExportRow } from '../../../core/interfaces/i-work-log';
+import { createCommonLabelsI18n } from '../../../core/translations/common.i18n';
 
 @Component({
   selector: 'app-work-log-export',
   standalone: true,
   imports: [CommonModule, ButtonModule],
   templateUrl: './work-log-export.html',
+  providers: [provideTranslocoScope('common')],
 })
-export class WorkLogExportComponent {
+export class WorkLogExport {
   readonly rows = input.required<readonly IUserWorkLogExportRow[]>();
   readonly fileBaseName = input.required<string>();
   readonly csvLabel = input.required<string>();
   readonly xlsLabel = input.required<string>();
+  private readonly labels = createCommonLabelsI18n();
 
   exportCsv(): void {
     const header = [
       'User ID',
       'Imie MG',
       'Nazwisko MG',
-      'Suma godzin',
+      this.labels().totalHours,
       'Daty Chaotycznych Czwartkow',
     ];
     const data = this.rows().map((row) => [
@@ -54,7 +58,7 @@ export class WorkLogExportComponent {
         'User ID',
         'Imie MG',
         'Nazwisko MG',
-        'Suma godzin',
+        this.labels().totalHours,
         'Daty Chaotycznych Czwartkow',
       ],
       ...this.rows().map((row) => [

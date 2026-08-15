@@ -1,6 +1,9 @@
 import { Component, input } from '@angular/core';
 
-import { SummaryCopy } from '../../../core/types/i18n/join-the-party';
+import type {
+  SummaryByFormat,
+  SummaryCopy,
+} from '../../../core/types/i18n/join-the-party';
 
 @Component({
   selector: 'app-join-the-party-summary',
@@ -9,5 +12,6 @@ import { SummaryCopy } from '../../../core/types/i18n/join-the-party';
 })
 export class JoinThePartySummary {
   readonly copy = input.required<SummaryCopy>();
+  readonly shared = input.required<SummaryByFormat['shared']>();
   readonly placeHref = input<string | null>(null);
 }

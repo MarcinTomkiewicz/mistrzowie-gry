@@ -1,18 +1,13 @@
 {
   "form": {
-    "basicInfoTitle": "Informacje podstawowe",
-    "additionalInfoTitle": "Informacje dodatkowe",
     "titleLabel": "Tytuł sesji",
-    "systemLabel": "System RPG",
     "descriptionLabel": "Opis sesji",
     "difficultyLabel": "Poziom trudności",
     "minPlayersLabel": "Min. graczy",
     "maxPlayersLabel": "Max. graczy",
     "minAgeLabel": "Min. wiek",
-    "sortOrderLabel": "Kolejność",
     "stylesLabel": "Style sesji",
     "triggersLabel": "Triggery",
-    "languagesLabel": "Języki",
     "allowsScenarioCustomizationLabel": "Personalizacja scenariusza",
     "hasReadyCharacterSheetsLabel": "Gotowe karty postaci",
     "characterSheetsLabel": "Karty postaci",
@@ -21,11 +16,9 @@
     "characterSheetsRequirementHint": "Liczba kart musi być co najmniej równa maksymalnej liczbie graczy.",
     "removeCharacterSheetsLabel": "Usuń wszystkie karty",
     "playersRangeLabel": "Podaj wartość od 1 do 5.",
-    "minAgeRangeLabel": "Podaj wartość od 0 wzwyż.",
-    "sortOrderRangeLabel": "Podaj wartość od 0 wzwyż."
+    "minAgeRangeLabel": "Podaj wartość od 0 wzwyż."
   },
   "difficulty": {
-    "beginner": "Dla początkujących",
     "intermediate": "Dla średniozaawansowanych",
     "advanced": "Dla doświadczonych"
   },
@@ -34,32 +27,19 @@
     "invalidCharacterSheetsCount": "Liczba kart postaci musi być co najmniej równa maksymalnej liczbie graczy."
   },
   "list": {
-    "playersHeaderLabel": "Gracze",
-    "minAgeHeaderLabel": "Wiek"
-  },
-  "details": {
-    "labels": {
-      "primaryInfo": "Informacje podstawowe",
-      "additionalInfo": "Informacje dodatkowe"
-    }
+    "playersHeaderLabel": "Gracze"
   },
   "slots": {
-    "labels": {
-      "gm": "Mistrz Gry"
-    },
     "difficulty": {
       "beginner": "Łatwa",
       "intermediate": "Średnia",
       "advanced": "Trudna"
     },
     "fallbacks": {
-      "none": "Brak",
-      "nonePlural": "Brak",
       "noStyles": "Brak stylów",
       "noTriggers": "Brak triggerów",
       "noLanguages": "Brak języków",
       "noCharacterSheets": "Brak kart postaci",
-      "missingData": "Brak danych",
       "emptySession": "Brak sesji"
     }
   },

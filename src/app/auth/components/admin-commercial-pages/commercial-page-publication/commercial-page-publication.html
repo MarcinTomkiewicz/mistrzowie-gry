@@ -1,7 +1,7 @@
 <section class="flex-col-start-stretch gap-md w-100">
   <div class="flex-col-start-stretch gap-xs w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ i18n.publication().sectionTitle }}
+      {{ i18n.commonLabels().publication }}
     </h2>
 
     <p class="m-0">{{ i18n.publication().description }}</p>
@@ -14,7 +14,7 @@
   >
     <div class="flex-col-start-stretch gap-xs w-100">
       <label class="small-caps" for="commercial-page-effective-from">
-        {{ i18n.publication().effectiveFrom }}
+        {{ commercialI18n.page().effectiveFrom }}
       </label>
 
       <p-datepicker
@@ -77,7 +77,7 @@
       <p-button
         type="submit"
         severity="success"
-        [label]="i18n.publication().publish"
+        [label]="i18n.commonActions().publish"
         icon="pi pi-send"
         [loading]="isPublishing()"
         [disabled]="!canPublish()"

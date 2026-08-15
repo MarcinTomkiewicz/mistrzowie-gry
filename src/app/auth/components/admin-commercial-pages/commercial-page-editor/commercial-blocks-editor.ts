@@ -38,9 +38,17 @@ export class CommercialBlocksEditor {
     const labels = this.i18n.blockType();
     return COMMERCIAL_BUILDER_BLOCK_TYPES.map((value) => ({
       value,
-      label: labels[value],
+      label: this.blockTypeLabel(value),
     }));
   });
+
+  protected blockTypeLabel(value: CommercialBlockType): string {
+    if (value === 'cards') return this.i18n.commonLabels().cards;
+    if (value === 'table') return this.i18n.commonLabels().table;
+    if (value === 'faq') return this.i18n.commonNav().faq;
+
+    return this.i18n.blockType()[value];
+  }
 
   protected addBlock(): void {
     const type = this.selectedType.getRawValue();

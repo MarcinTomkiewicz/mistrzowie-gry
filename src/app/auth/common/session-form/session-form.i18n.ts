@@ -1,6 +1,7 @@
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
+  createCommonLabelsI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
@@ -12,6 +13,7 @@ import {
 export function createSessionFormI18n() {
   const commonActions = createCommonActionsI18n();
   const commonForm = createCommonFormI18n();
+  const commonLabels = createCommonLabelsI18n();
   const { form, difficulty, errors } = createScopedSectionsI18n<{
     form: SessionFormTranslations;
     difficulty: SessionDifficultyTranslations;
@@ -25,6 +27,7 @@ export function createSessionFormI18n() {
   return {
     commonActions,
     commonForm,
+    commonLabels,
     form,
     difficulty,
     errors,

@@ -89,7 +89,7 @@
                   "
                   (input)="onKeyInput()"
                 />
-                <label for="event-core-key">{{ i18n.fields().key }}</label>
+                <label for="event-core-key">{{ i18n.commonLabels().key }}</label>
               </p-iftalabel>
 
               @if (
@@ -122,7 +122,7 @@
                     form.controls.name.touched && form.controls.name.invalid
                   "
                 />
-                <label for="event-core-name">{{ i18n.fields().name }}</label>
+                <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
               </p-iftalabel>
 
               @if (
@@ -147,7 +147,7 @@
                 rows="4"
               ></textarea>
               <label for="event-core-short-description">
-                {{ i18n.fields().shortDescription }}
+                {{ i18n.commonLabels().shortDescription }}
               </label>
             </p-iftalabel>
 
@@ -176,7 +176,7 @@
                   [min]="0"
                 />
                 <label for="event-core-display-order">
-                  {{ i18n.fields().displayOrder }}
+                  {{ i18n.commonLabels().displayOrder }}
                 </label>
               </p-iftalabel>
 
@@ -203,7 +203,7 @@
                 formControlName="isActive"
               />
               <label for="event-core-is-active">
-                {{ i18n.fields().isActive }}
+                {{ i18n.commonValues().active }}
               </label>
             </div>
 
@@ -268,10 +268,10 @@
                   <thead class="p-datatable-thead">
                     <tr>
                       <th class="small-caps" scope="col">
-                        {{ i18n.editionTable().city }}
+                        {{ i18n.commonLabels().city }}
                       </th>
                       <th class="small-caps" scope="col">
-                        {{ i18n.editionTable().slug }}
+                        {{ i18n.commonLabels().slug }}
                       </th>
                       <th class="small-caps text-center" scope="col">
                         {{ i18n.editionTable().active }}
@@ -280,13 +280,13 @@
                         {{ i18n.editionTable().defaultPublic }}
                       </th>
                       <th class="small-caps text-center" scope="col">
-                        {{ i18n.editionTable().displayOrder }}
+                        {{ i18n.commonLabels().order }}
                       </th>
                       <th class="small-caps text-center" scope="col">
-                        {{ i18n.editionTable().occurrenceCount }}
+                        {{ i18n.editions().sectionTitle }}
                       </th>
                       <th class="small-caps text-center" scope="col">
-                        {{ i18n.editionTable().programItemCount }}
+                        {{ i18n.occurrenceTable().programItemCount }}
                       </th>
                       <th class="small-caps text-right" scope="col">
                         {{ i18n.commonTable().actions }}
@@ -309,7 +309,7 @@
                           >
                             {{
                               edition.isActive
-                                ? i18n.status().active
+                                ? i18n.commonValues().active
                                 : i18n.status().inactive
                             }}
                           </span>

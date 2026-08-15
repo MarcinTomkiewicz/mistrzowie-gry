@@ -55,21 +55,29 @@ export class CommercialProductEditor {
     const labels = this.i18n.durationMode();
     return COMMERCIAL_EDITOR_DURATION_MODES.map((value) => ({
       value,
-      label: labels[value],
+      label:
+        value === 'not_applicable'
+          ? this.i18n.commonValues().notApplicable
+          : labels[value],
     }));
   });
   protected readonly participantsModeOptions = computed(() => {
     const labels = this.i18n.participantsMode();
     return COMMERCIAL_EDITOR_PARTICIPANTS_MODES.map((value) => ({
       value,
-      label: labels[value],
+      label:
+        value === 'not_applicable'
+          ? this.i18n.commonValues().notApplicable
+          : labels[value],
     }));
   });
   protected readonly sessionModeOptions = computed(() => {
     const labels = this.i18n.sessionMode();
     return COMMERCIAL_SESSION_MODES.map((value) => ({
       value,
-      label: labels[value],
+      label: value === 'not_applicable'
+        ? this.i18n.commonValues().notApplicable
+        : labels[value],
     }));
   });
 
