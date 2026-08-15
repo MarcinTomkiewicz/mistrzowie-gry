@@ -58,6 +58,15 @@
   align-items: center;
 }
 
+/* Surface shells */
+@mixin card-surface {
+  padding: map.get(v.$spacings, "md");
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  background: v.$color-bg-surface;
+  box-shadow: v.$shadow-soft;
+}
+
 /* Grid helpers */
 @mixin grid($columns, $gap: map.get(v.$spacings, "md"), $align: center) {
   display: grid;

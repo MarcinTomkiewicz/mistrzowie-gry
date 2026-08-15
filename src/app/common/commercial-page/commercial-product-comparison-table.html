@@ -1,81 +1,53 @@
-<div class="hide-down-sm overflow-x-auto w-100">
-  <p-table
-    [value]="block().presentation.sections"
-    class="w-100 min-w-500"
-  >
-    <ng-template #header>
-      <tr>
-        <th scope="col"></th>
-        @for (product of products(); track product.id) {
-          <th scope="col">{{ product.name }}</th>
-        }
-      </tr>
-    </ng-template>
-
-    <ng-template #body let-section>
-      @if (section.heading) {
-        <tr>
-          <th
-            scope="rowgroup"
-            class="small-caps"
-            [attr.colspan]="products().length + 1"
-          >
-            {{ section.heading }}
-          </th>
-        </tr>
+<p-table
+  [value]="block().presentation.sections"
+  class="w-100"
+  tableStyleClass="mg-responsive-table"
+>
+  <ng-template #header>
+    <tr class="hide-down-sm">
+      <th scope="col"></th>
+      @for (product of products(); track product.id) {
+        <th scope="col">{{ product.name }}</th>
       }
+    </tr>
+  </ng-template>
 
-      @for (row of section.rows; track row.id) {
-        <tr>
-          <th scope="row" class="small-caps">{{ row.label }}</th>
-          @for (product of products(); track product.id) {
-            <td>
+  <ng-template #body let-section>
+    @if (section.heading) {
+      <tr class="mg-responsive-table__group-row">
+        <th
+          scope="rowgroup"
+          class="mg-responsive-table__row-heading mg-responsive-table__group-heading small-caps"
+          [attr.colspan]="products().length + 1"
+        >
+          {{ section.heading }}
+        </th>
+      </tr>
+    }
+
+    @for (row of section.rows; track row.id) {
+      <tr class="mg-responsive-table__row">
+        <th
+          scope="row"
+          class="mg-responsive-table__row-heading small-caps"
+        >
+          {{ row.label }}
+        </th>
+        @for (product of products(); track product.id) {
+          <td class="mg-responsive-table__cell">
+            <span class="mg-responsive-table__label small-caps font-bold">
+              {{ product.name }}
+            </span>
+            <div class="mg-responsive-table__value">
               <app-commercial-product-comparison-value
                 [product]="product"
                 [fields]="fieldsForRow(row)"
                 [locale]="locale()"
               />
-            </td>
-          }
-        </tr>
-      }
-    </ng-template>
-  </p-table>
-</div>
-
-<div class="show-down-sm w-100">
-  <div class="flex-col-start-stretch gap-md w-100">
-    @for (product of products(); track product.id) {
-      <article class="mg-card flex-col-start-stretch gap-md w-100">
-        <h3 class="mg-section__title mg-section__title--sm m-0">
-          {{ product.name }}
-        </h3>
-
-        @for (section of block().presentation.sections; track section.id) {
-          <section class="flex-col-start-stretch gap-sm w-100">
-            @if (section.heading) {
-              <h4 class="mg-section__title mg-section__title--xs m-0">
-                {{ section.heading }}
-              </h4>
-            }
-
-            <dl class="flex-col-start-stretch gap-sm m-0 w-100">
-              @for (row of section.rows; track row.id) {
-                <div class="flex-col-start-stretch gap-xs">
-                  <dt><strong>{{ row.label }}</strong></dt>
-                  <dd class="m-0">
-                    <app-commercial-product-comparison-value
-                      [product]="product"
-                      [fields]="fieldsForRow(row)"
-                      [locale]="locale()"
-                    />
-                  </dd>
-                </div>
-              }
-            </dl>
-          </section>
+            </div>
+          </td>
         }
-      </article>
+      </tr>
     }
-  </div>
-</div>
+  </ng-template>
+</p-table>

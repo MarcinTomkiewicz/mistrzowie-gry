@@ -1,23 +1,30 @@
-<div class="overflow-x-auto w-100">
-  <p-table [value]="block().rows" class="w-100 min-w-500">
-    <ng-template #header>
-      <tr>
-        @for (column of block().columns; track column.id) {
-          <th scope="col">
-            {{ column.label }}
-          </th>
-        }
-      </tr>
-    </ng-template>
+<p-table
+  [value]="block().rows"
+  class="w-100"
+  tableStyleClass="mg-responsive-table"
+>
+  <ng-template #header>
+    <tr class="hide-down-sm">
+      @for (column of block().columns; track column.id) {
+        <th scope="col">
+          {{ column.label }}
+        </th>
+      }
+    </tr>
+  </ng-template>
 
-    <ng-template #body let-row>
-      <tr>
-        @for (column of block().columns; track column.id) {
-          <td>
+  <ng-template #body let-row>
+    <tr class="mg-responsive-table__row">
+      @for (column of block().columns; track column.id) {
+        <td class="mg-responsive-table__cell">
+          <span class="mg-responsive-table__label small-caps font-bold">
+            {{ column.label }}
+          </span>
+          <div class="mg-responsive-table__value">
             <app-rich-content [content]="cellContent(row, column.id)" />
-          </td>
-        }
-      </tr>
-    </ng-template>
-  </p-table>
-</div>
+          </div>
+        </td>
+      }
+    </tr>
+  </ng-template>
+</p-table>

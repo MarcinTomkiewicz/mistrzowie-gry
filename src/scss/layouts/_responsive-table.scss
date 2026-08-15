@@ -1,0 +1,74 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
+.mg-responsive-table__label {
+  display: none;
+}
+
+.mg-responsive-table__value {
+  min-width: 0;
+}
+
+.mg-responsive-table__row-heading {
+  padding: var(--p-datatable-body-cell-padding);
+  border-bottom: 1px solid v.$color-border;
+  font-weight: 400;
+  text-align: start;
+}
+
+@include m.down("sm") {
+  .mg-responsive-table {
+    display: block;
+  }
+
+  .mg-responsive-table > tbody {
+    @include m.flex(
+      column,
+      flex-start,
+      stretch,
+      map.get(v.$spacings, "md")
+    );
+  }
+
+  .mg-responsive-table__row {
+    @include m.card-surface;
+    @include m.flex(column, flex-start, stretch);
+  }
+
+  .mg-responsive-table__group-row {
+    display: block;
+    background: transparent;
+  }
+
+  .mg-responsive-table__row-heading {
+    display: block;
+    padding: 0 0 map.get(v.$spacings, "sm");
+    border: 0;
+    color: v.$heading-color;
+    font-weight: 700;
+    text-align: start;
+  }
+
+  .mg-responsive-table__group-heading {
+    padding: map.get(v.$spacings, "sm") 0 0;
+  }
+
+  .mg-responsive-table__cell {
+    @include m.grid(
+      minmax(0, 2fr) minmax(0, 3fr),
+      map.get(v.$spacings, "sm"),
+      start
+    );
+    padding: map.get(v.$spacings, "sm") 0;
+    border: 0;
+    border-top: 1px solid v.$color-border;
+    text-align: start;
+  }
+
+  .mg-responsive-table__label {
+    display: block;
+    min-width: 0;
+    color: v.$color-text-muted;
+  }
+}

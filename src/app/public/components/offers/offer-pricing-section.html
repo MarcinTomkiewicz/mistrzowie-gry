@@ -16,34 +16,49 @@
     </p>
   }
 
-  <div class="w-100 overflow-x-auto">
-    <p-table
-      [value]="data.items"
-      class="w-100 min-w-500"
-    >
-      <ng-template #header>
-        <tr>
-          <th scope="col" class="small-caps w-20">
-            {{ pricingHeaders.variant }}
-          </th>
-          <th scope="col" class="small-caps w-20">
-            {{ pricingHeaders.price }}
-          </th>
-          <th scope="col" class="small-caps">
-            {{ pricingHeaders.description }}
-          </th>
-        </tr>
-      </ng-template>
+  <p-table
+    [value]="data.items"
+    class="w-100"
+    tableStyleClass="mg-responsive-table"
+  >
+    <ng-template #header>
+      <tr class="hide-down-sm">
+        <th scope="col" class="small-caps w-20">
+          {{ pricingHeaders.variant }}
+        </th>
+        <th scope="col" class="small-caps w-20">
+          {{ pricingHeaders.price }}
+        </th>
+        <th scope="col" class="small-caps">
+          {{ pricingHeaders.description }}
+        </th>
+      </tr>
+    </ng-template>
 
-      <ng-template #body let-item>
-        <tr>
-          <td>{{ item.title }}</td>
-          <td>{{ formatPricing(item.pricing) }}</td>
-          <td><app-expandable-text [text]="item.lead" /></td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+    <ng-template #body let-item>
+      <tr class="mg-responsive-table__row">
+        <th scope="row" class="mg-responsive-table__row-heading">
+          {{ item.title }}
+        </th>
+        <td class="mg-responsive-table__cell">
+          <span class="mg-responsive-table__label small-caps font-bold">
+            {{ pricingHeaders.price }}
+          </span>
+          <div class="mg-responsive-table__value">
+            {{ formatPricing(item.pricing) }}
+          </div>
+        </td>
+        <td class="mg-responsive-table__cell">
+          <span class="mg-responsive-table__label small-caps font-bold">
+            {{ pricingHeaders.description }}
+          </span>
+          <div class="mg-responsive-table__value">
+            <app-expandable-text [text]="item.lead" />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 
   @if (pricingFootnote()) {
     <p class="mg-section__subtitle mg-section__subtitle--no-margin mt-md">

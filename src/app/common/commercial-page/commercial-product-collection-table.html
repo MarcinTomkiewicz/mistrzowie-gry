@@ -1,20 +1,32 @@
-<div class="overflow-x-auto w-100">
-  <p-table [value]="products()" class="w-100 min-w-500">
-    <ng-template #header>
-      <tr>
-        @for (field of block().fields; track field.id) {
-          <th scope="col" class="small-caps">{{ label(field) }}</th>
-        }
-      </tr>
-    </ng-template>
+<p-table
+  [value]="products()"
+  class="w-100"
+  tableStyleClass="mg-responsive-table"
+>
+  <ng-template #header>
+    <tr class="hide-down-sm">
+      @for (field of block().fields; track field.id) {
+        <th scope="col" class="small-caps">{{ label(field) }}</th>
+      }
+    </tr>
+  </ng-template>
 
-    <ng-template #body let-product>
-      <tr>
-        @for (field of block().fields; track field.id) {
-          <td>
-            @if (isVisible(field, product)) {
-              @if (overrideLabel(field, product); as label) {
-                <span class="small-caps d-block mb-xs">{{ label }}</span>
+  <ng-template #body let-product>
+    <tr class="mg-responsive-table__row">
+      @for (field of block().fields; track field.id) {
+        @let visible = isVisible(field, product);
+        @let productLabel = overrideLabel(field, product);
+
+        <td class="mg-responsive-table__cell">
+          <span class="mg-responsive-table__label small-caps font-bold">
+            {{ productLabel ?? label(field) }}
+          </span>
+          <div class="mg-responsive-table__value">
+            @if (visible) {
+              @if (productLabel) {
+                <span class="small-caps d-block mb-xs hide-down-sm">
+                  {{ productLabel }}
+                </span>
               }
               <app-commercial-product-field-value
                 [product]="product"
@@ -24,9 +36,9 @@
             } @else {
               <span aria-hidden="true">—</span>
             }
-          </td>
-        }
-      </tr>
-    </ng-template>
-  </p-table>
-</div>
+          </div>
+        </td>
+      }
+    </tr>
+  </ng-template>
+</p-table>
