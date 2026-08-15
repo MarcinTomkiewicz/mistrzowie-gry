@@ -40,52 +40,53 @@
       <div class="w-100">
         <p-table
           [value]="rowVms()"
-          responsiveLayout="stack"
-          breakpoint="768px"
           class="w-100"
+          tableStyleClass="mg-responsive-table"
         >
           <ng-template #header>
-            <tr>
-              <th class="small-caps">{{ i18n.listTable().page }}</th>
-              <th class="small-caps">{{ i18n.listTable().draftStatus }}</th>
-              <th class="small-caps">{{ i18n.listTable().draftUpdatedAt }}</th>
-              <th class="small-caps">{{ i18n.commonLabels().publication }}</th>
-              <th class="small-caps text-right">
+            <tr class="hide-down-sm">
+              <th scope="col" class="small-caps">{{ i18n.listTable().page }}</th>
+              <th scope="col" class="small-caps">{{ i18n.listTable().draftStatus }}</th>
+              <th scope="col" class="small-caps">
+                {{ i18n.listTable().draftUpdatedAt }}
+              </th>
+              <th scope="col" class="small-caps">
+                {{ i18n.commonLabels().publication }}
+              </th>
+              <th scope="col" class="small-caps text-right min-w-250">
                 {{ i18n.commonTable().actions }}
               </th>
             </tr>
           </ng-template>
 
           <ng-template #body let-row>
-            <tr>
-              <td>
-                <span class="p-datatable-column-title small-caps">
-                  {{ i18n.listTable().page }}
-                </span>
-                <div class="flex-col-start-start gap-xs">
-                  <strong>{{ row.page.navigationLabel }}</strong>
-                  <small>{{ row.page.heading }}</small>
-                </div>
-              </td>
-              <td>
-                <span class="p-datatable-column-title small-caps">
+            <tr class="mg-responsive-table__row">
+              <th scope="row" class="mg-responsive-table__row-heading">
+                {{ row.page.navigationLabel }}
+              </th>
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">
                   {{ i18n.listTable().draftStatus }}
                 </span>
-                <span [class]="row.draftStatusClass">
-                  {{ row.draftStatusLabel }}
+                <span class="mg-responsive-table__value">
+                  <span [class]="row.draftStatusClass">
+                    {{ row.draftStatusLabel }}
+                  </span>
                 </span>
               </td>
-              <td>
-                <span class="p-datatable-column-title small-caps">
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">
                   {{ i18n.listTable().draftUpdatedAt }}
                 </span>
-                <span>{{ row.draftUpdatedAtLabel }}</span>
+                <span class="mg-responsive-table__value">
+                  {{ row.draftUpdatedAtLabel }}
+                </span>
               </td>
-              <td>
-                <span class="p-datatable-column-title small-caps">
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">
                   {{ i18n.commonLabels().publication }}
                 </span>
-                <div class="flex-col-start-start gap-xs">
+                <div class="mg-responsive-table__value flex-col-start-start gap-xs">
                   <span>{{ row.publishedAtLabel }}</span>
                   <small>
                     {{ i18n.listTable().effectiveFrom }}:
@@ -97,14 +98,17 @@
                   </small>
                 </div>
               </td>
-              <td>
-                <span class="p-datatable-column-title small-caps">
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">
                   {{ i18n.commonTable().actions }}
                 </span>
-                <div class="flex-row-end-center flex-wrap gap-xs">
+                <div
+                  class="mg-responsive-table__value flex-row-end-center flex-nowrap flex-col-start-stretch-sm gap-xs"
+                >
                   <p-button
                     size="small"
                     severity="secondary"
+                    styleClass="w-100-sm"
                     [label]="i18n.commonActions().edit"
                     icon="pi pi-pencil"
                     (onClick)="editPage(row.page)"
@@ -114,6 +118,7 @@
                     size="small"
                     severity="secondary"
                     [outlined]="true"
+                    styleClass="w-100-sm"
                     [label]="i18n.commonActions().preview"
                     icon="pi pi-eye"
                     (onClick)="previewPage(row.page)"
@@ -122,6 +127,7 @@
                   <p-button
                     size="small"
                     severity="success"
+                    styleClass="w-100-sm"
                     [label]="i18n.commonActions().publish"
                     icon="pi pi-send"
                     (onClick)="openPublication(row.page)"
