@@ -9,6 +9,10 @@ export interface AdminContentArticleEditorPageTranslations {
   subtitle: string;
 }
 
+export interface AdminContentArticlesFiltersTranslations {
+  showArchivedLabel: string;
+}
+
 export interface AdminContentArticlesTableTranslations {
   thumbnail: string;
   updatedAt: string;

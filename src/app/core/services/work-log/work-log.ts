@@ -6,6 +6,7 @@ import { IUser } from '../../interfaces/i-user';
 import {
   IWorkLogOverviewData,
   IUserWorkLogDay,
+  IUserWorkLogMonthData,
   IUserWorkLogRecord,
 } from '../../interfaces/i-work-log';
 import { WorkLogMonthOffset } from '../../types/work-log';
@@ -15,6 +16,7 @@ import {
   mapWorkLogRecordsToDays,
 } from '../../domain/work-log/mapping';
 import { getWorkLogMonthScope } from '../../domain/work-log/rules';
+import { addDays, parseIsoDate, toIsoDate } from '../../utils/date';
 import { getRolesAtOrAbove } from '../../utils/roles';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
@@ -24,11 +26,13 @@ export class WorkLog {
   private readonly auth = inject(Auth);
   private readonly backend = inject(Backend);
 
-  getMyMonth(monthOffset: WorkLogMonthOffset): Observable<IUserWorkLogDay[]> {
+  getMyMonth(
+    monthOffset: WorkLogMonthOffset,
+  ): Observable<IUserWorkLogMonthData> {
     const userId = this.auth.userId();
 
     if (!userId) {
-      return of([]);
+      return of({ days: [], adjacentDays: [] });
     }
 
     return this.getMonthForUser(userId, monthOffset);
@@ -37,8 +41,14 @@ export class WorkLog {
   private getMonthForUser(
     userId: string,
     monthOffset: WorkLogMonthOffset,
-  ): Observable<IUserWorkLogDay[]> {
+  ): Observable<IUserWorkLogMonthData> {
     const scope = getWorkLogMonthScope(monthOffset);
+    const contextStartDate = toIsoDate(
+      addDays(parseIsoDate(scope.startDate)!, -1),
+    );
+    const contextEndDate = toIsoDate(
+      addDays(parseIsoDate(scope.endDate)!, 1),
+    );
 
     return this.backend
       .getAll<IUserWorkLogRecord>({
@@ -55,17 +65,32 @@ export class WorkLog {
             workDate: [
               {
                 operator: FilterOperator.GTE,
-                value: scope.startDate,
+                value: contextStartDate,
               },
               {
                 operator: FilterOperator.LTE,
-                value: scope.endDate,
+                value: contextEndDate,
               },
             ],
           },
         },
       })
-      .pipe(map((records) => mapWorkLogRecordsToDays(records)));
+      .pipe(
+        map((records) => {
+          const contextDays = mapWorkLogRecordsToDays(records);
+
+          return {
+            days: contextDays.filter(
+              (day) =>
+                day.date >= scope.startDate && day.date <= scope.endDate,
+            ),
+            adjacentDays: contextDays.filter(
+              (day) =>
+                day.date === contextStartDate || day.date === contextEndDate,
+            ),
+          };
+        }),
+      );
   }
 
   private getWorkLogUsers(): Observable<IUser[]> {

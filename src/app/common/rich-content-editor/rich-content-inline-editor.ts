@@ -6,7 +6,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -31,11 +31,12 @@ import {
 import { resolveRichContentTextInput } from '../../core/domain/rich-content/rich-content-text-input';
 import type { NumericInterval } from '../../core/types/interval';
 import type {
-  RichContentLinkDraft,
+  RichContentLinkEditTarget,
   RichContentLinkRange,
   RichContentTextInput,
 } from '../../core/types/rich-content-editor';
 import type { RichContentInlineNode } from '../../core/types/rich-content';
+import { requiredTrimmedValidator } from '../../core/validators/required-trimmed.validator';
 import {
   createCommonActionsI18n,
   createCommonRichContentEditorI18n,
@@ -45,7 +46,7 @@ import { RichContentInline } from '../rich-content/rich-content-inline';
 @Component({
   selector: 'app-rich-content-inline-editor',
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     ButtonModule,
     CheckboxModule,
     InputTextModule,
@@ -64,8 +65,15 @@ export class RichContentInlineEditor {
   protected readonly i18n = createCommonRichContentEditorI18n();
   protected readonly actions = createCommonActionsI18n();
   protected readonly selection = signal<NumericInterval>({ start: 0, end: 0 });
-  protected readonly linkDraft = signal<RichContentLinkDraft | null>(null);
-  protected readonly linkSaveAttempted = signal(false);
+  protected readonly linkEditTarget =
+    signal<RichContentLinkEditTarget | null>(null);
+  protected readonly linkHrefControl = new FormControl('', {
+    nonNullable: true,
+    validators: [requiredTrimmedValidator()],
+  });
+  protected readonly linkExternalControl = new FormControl(false, {
+    nonNullable: true,
+  });
 
   private readonly textSurface = viewChild<ElementRef<HTMLTextAreaElement>>(
     'textSurface',
@@ -159,17 +167,8 @@ export class RichContentInlineEditor {
       start: snapshot.start,
       end: snapshot.end,
     });
-    this.replaceNodes(nextNodes);
-    this.closeLinkEditor();
+    this.commitNodes(nextNodes);
     this.setSelection(textarea.selectionStart, textarea.selectionEnd);
-    this.changed.emit();
-  }
-
-  protected captureSelection(
-    start: number | null,
-    end: number | null,
-  ): void {
-    this.setSelection(start, end);
   }
 
   protected toggleStrong(): void {
@@ -178,9 +177,7 @@ export class RichContentInlineEditor {
     const { start, end } = this.selection();
     const nextNodes = toggleRichContentStrong(this.nodes(), start, end);
     this.recordHistory({ start, end });
-    this.replaceNodes(nextNodes);
-    this.closeLinkEditor();
-    this.changed.emit();
+    this.commitNodes(nextNodes);
     this.restoreSelection(start, end);
   }
 
@@ -193,80 +190,81 @@ export class RichContentInlineEditor {
       start,
       end,
     );
-    const text = this.text();
-
-    this.linkDraft.set(existingLink
-      ? { ...existingLink, existing: true }
+    const target: RichContentLinkEditTarget = existingLink
+      ? {
+          start: existingLink.start,
+          end: existingLink.end,
+          existing: true,
+        }
       : {
           start,
           end,
-          text: text.slice(start, end),
-          href: '',
-          external: false,
           existing: false,
-        });
-    this.linkSaveAttempted.set(false);
+        };
+
+    this.linkEditTarget.set(target);
+    this.linkHrefControl.reset(existingLink?.href ?? '', {
+      emitEvent: false,
+    });
+    this.linkExternalControl.reset(existingLink?.external ?? false, {
+      emitEvent: false,
+    });
   }
 
   protected editLink(link: RichContentLinkRange): void {
-    this.linkDraft.set({ ...link, existing: true });
-    this.linkSaveAttempted.set(false);
+    this.linkEditTarget.set({
+      start: link.start,
+      end: link.end,
+      existing: true,
+    });
+    this.linkHrefControl.reset(link.href, { emitEvent: false });
+    this.linkExternalControl.reset(link.external, { emitEvent: false });
     this.setSelection(link.start, link.end);
     this.restoreSelection(link.start, link.end);
   }
 
-  protected updateLinkHref(href: string): void {
-    this.linkDraft.update((draft) => draft ? { ...draft, href } : null);
-  }
-
-  protected updateLinkExternal(external: boolean): void {
-    this.linkDraft.update((draft) => draft ? { ...draft, external } : null);
-  }
-
   protected saveLink(): void {
-    this.linkSaveAttempted.set(true);
-    const draft = this.linkDraft();
-    if (!draft?.href.trim()) return;
+    this.linkHrefControl.markAsTouched();
+    const target = this.linkEditTarget();
+
+    if (!target || this.linkHrefControl.invalid) return;
 
     const nextNodes = applyRichContentLink(
       this.nodes(),
-      draft.start,
-      draft.end,
-      draft.href,
-      draft.external,
+      target.start,
+      target.end,
+      this.linkHrefControl.getRawValue(),
+      this.linkExternalControl.value,
     );
     this.recordHistory({
-      start: draft.start,
-      end: draft.end,
+      start: target.start,
+      end: target.end,
     });
-    this.replaceNodes(nextNodes);
-    this.closeLinkEditor();
-    this.changed.emit();
-    this.restoreSelection(draft.start, draft.end);
+    this.commitNodes(nextNodes);
+    this.restoreSelection(target.start, target.end);
   }
 
   protected removeLink(): void {
-    const draft = this.linkDraft();
-    if (!draft?.existing) return;
+    const target = this.linkEditTarget();
+    if (!target?.existing) return;
 
     const nextNodes = removeRichContentLink(
       this.nodes(),
-      draft.start,
-      draft.end,
+      target.start,
+      target.end,
     );
     this.recordHistory({
-      start: draft.start,
-      end: draft.end,
+      start: target.start,
+      end: target.end,
     });
-    this.replaceNodes(nextNodes);
-    this.closeLinkEditor();
-    this.changed.emit();
-    this.restoreSelection(draft.start, draft.end);
+    this.commitNodes(nextNodes);
+    this.restoreSelection(target.start, target.end);
   }
 
   protected closeLinkEditor(): void {
-    this.linkDraft.set(null);
-    this.linkSaveAttempted.set(false);
+    this.linkEditTarget.set(null);
+    this.linkHrefControl.reset('', { emitEvent: false });
+    this.linkExternalControl.reset(false, { emitEvent: false });
   }
 
   insertText(text: string, atEnd = false): void {
@@ -282,14 +280,12 @@ export class RichContentInlineEditor {
     );
 
     this.recordHistory({ start, end });
-    this.replaceNodes(nextNodes);
-    this.closeLinkEditor();
-    this.changed.emit();
+    this.commitNodes(nextNodes);
     this.setSelection(caret, caret);
     this.restoreSelection(caret, caret);
   }
 
-  private setSelection(start: number | null, end: number | null): void {
+  protected setSelection(start: number | null, end: number | null): void {
     const textLength = this.text().length;
     const normalizedStart = start ?? textLength;
     const normalizedEnd = end ?? normalizedStart;
@@ -306,8 +302,10 @@ export class RichContentInlineEditor {
     textarea.setSelectionRange(start, end);
   }
 
-  private replaceNodes(nodes: readonly RichContentInlineNode[]): void {
+  private commitNodes(nodes: readonly RichContentInlineNode[]): void {
     this.nodes().splice(0, this.nodes().length, ...nodes);
+    this.closeLinkEditor();
+    this.changed.emit();
   }
 
   private recordHistory(selection: NumericInterval): void {
@@ -330,10 +328,8 @@ export class RichContentInlineEditor {
       return;
     }
 
-    this.replaceNodes(state.nodes);
-    this.closeLinkEditor();
+    this.commitNodes(state.nodes);
     this.setSelection(state.selection.start, state.selection.end);
-    this.changed.emit();
     this.restoreSelection(state.selection.start, state.selection.end);
   }
 }

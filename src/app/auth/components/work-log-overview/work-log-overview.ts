@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   DestroyRef,
@@ -48,7 +47,6 @@ import {
   selector: 'app-work-log-overview',
   standalone: true,
   imports: [
-    CommonModule,
     AccordionModule,
     ButtonModule,
     TableModule,
@@ -74,7 +72,6 @@ export class WorkLogOverview {
   private readonly users = signal<readonly IUserWorkLogOverviewVm['user'][]>([]);
   private readonly coworkerProfiles = signal<readonly ICoworkerProfile[]>([]);
   private readonly records = signal<readonly IUserWorkLogRecord[]>([]);
-  private readonly loadedKey = signal<string | null>(null);
   private readonly coworkerProfileByUserId = computed(
     () =>
       new Map(
@@ -136,29 +133,57 @@ export class WorkLogOverview {
     this.destroyRef.onDestroy(disposeResize);
     syncViewport();
 
-    effect(() => {
+    effect((onCleanup) => {
       if (!this.auth.isReady()) {
         return;
       }
 
       const userId = this.auth.userId();
       const monthOffset = this.monthOffset();
-      const loadKey = userId ? `${userId}-${monthOffset}` : null;
 
-      if (!loadKey) {
-        this.loadedKey.set(null);
+      if (!userId) {
         this.users.set([]);
         this.records.set([]);
+        this.coworkerProfiles.set([]);
         this.isLoading.set(false);
         return;
       }
 
-      if (this.loadedKey() === loadKey) {
-        return;
-      }
+      this.isLoading.set(true);
+      const subscription = this.workLog
+        .getOverview(monthOffset)
+        .pipe(
+          switchMap(({ users, records }) =>
+            this.coworkerProfile
+              .getProfilesByUserIds(users.map((user) => user.id))
+              .pipe(
+                map((coworkerProfiles) => ({
+                  users,
+                  records,
+                  coworkerProfiles,
+                })),
+              ),
+          ),
+          finalize(() => this.isLoading.set(false)),
+        )
+        .subscribe({
+          next: ({ users, records, coworkerProfiles }) => {
+            this.users.set(users);
+            this.records.set(records);
+            this.coworkerProfiles.set(coworkerProfiles);
+          },
+          error: () => {
+            this.users.set([]);
+            this.records.set([]);
+            this.coworkerProfiles.set([]);
+            this.toast.danger({
+              summary: this.i18n.toast().loadFailedSummary,
+              detail: this.i18n.toast().loadFailedDetail,
+            });
+          },
+        });
 
-      this.loadedKey.set(loadKey);
-      this.loadOverview();
+      onCleanup(() => subscription.unsubscribe());
     });
   }
 
@@ -176,42 +201,6 @@ export class WorkLogOverview {
 
   protected getDayHours(day: Pick<IUserWorkLogDay, 'ranges'>): string {
     return formatWorkLogHours(getWorkLogDayHours(day));
-  }
-
-  private loadOverview(): void {
-    this.isLoading.set(true);
-    this.workLog
-      .getOverview(this.monthOffset())
-      .pipe(
-        switchMap(({ users, records }) =>
-          this.coworkerProfile
-            .getProfilesByUserIds(users.map((user) => user.id))
-            .pipe(
-              map((coworkerProfiles) => ({
-                users,
-                records,
-                coworkerProfiles,
-              })),
-            ),
-        ),
-        finalize(() => this.isLoading.set(false)),
-      )
-      .subscribe({
-        next: ({ users, records, coworkerProfiles }) => {
-          this.users.set(users);
-          this.records.set(records);
-          this.coworkerProfiles.set(coworkerProfiles);
-        },
-        error: () => {
-          this.users.set([]);
-          this.records.set([]);
-          this.coworkerProfiles.set([]);
-          this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
-            detail: this.i18n.toast().loadFailedDetail,
-          });
-        },
-      });
   }
 
   protected getOverviewUserLabel(user: IUserWorkLogOverviewVm['user']): string {

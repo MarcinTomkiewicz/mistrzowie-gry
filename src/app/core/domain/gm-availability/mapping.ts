@@ -1,9 +1,9 @@
 import {
-  IGmAvailabilityCalendarDay,
   IGmAvailabilityDay,
   IGmAvailabilityRange,
   IGmAvailabilitySlotRecord,
 } from '../../interfaces/i-gm-availability';
+import { IUniversalCalendarDay } from '../../interfaces/i-universal-calendar';
 import { HourOffsetValue } from '../../types/hour-offset';
 import { toIsoDate, toLocalDateTime } from '../../utils/date';
 import { getHourOffsetFromDateTime } from '../../utils/hour-offset';
@@ -31,7 +31,6 @@ export function mapGmAvailabilityRecordsToDays(
     const ranges = byDate.get(date) ?? [];
 
     ranges.push({
-      id: record.id ?? `${record.startsAt}-${record.endsAt}`,
       startOffset,
       endOffset,
     });
@@ -83,7 +82,6 @@ export function mapGmAvailabilityRecordsToCoveredDays(
 
       if (endOffset > startOffset) {
         ranges.push({
-          id: `${record.id ?? record.gmProfileId}-${date}-${startOffset}-${endOffset}`,
           startOffset,
           endOffset,
         });
@@ -108,7 +106,6 @@ export function mapGmAvailabilityDaysToRecords(
 ): IGmAvailabilitySlotRecord[] {
   return days.flatMap((day) =>
     day.ranges.map((range) => ({
-      id: range.id.startsWith('draft-') ? undefined : range.id,
       gmProfileId,
       startsAt: toLocalDateTime(day.date, range.startOffset).toISOString(),
       endsAt: toLocalDateTime(day.date, range.endOffset).toISOString(),
@@ -118,7 +115,7 @@ export function mapGmAvailabilityDaysToRecords(
 
 export function mapGmAvailabilityDaysToCalendarDays(
   days: readonly IGmAvailabilityDay[],
-): IGmAvailabilityCalendarDay[] {
+): IUniversalCalendarDay[] {
   const availabilityMap = new Map<string, boolean[]>();
 
   for (const day of days) {
@@ -166,7 +163,6 @@ function mergeGmAvailabilityRanges(
     }
 
     mergedRanges.push({
-      id: range.id,
       startOffset: range.startOffset,
       endOffset: range.endOffset,
     });

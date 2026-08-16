@@ -25,6 +25,6 @@ export type RichContentInlineHistoryState = {
   selection: NumericInterval;
 };
 
-export type RichContentLinkDraft = RichContentLinkRange & {
+export type RichContentLinkEditTarget = NumericInterval & {
   existing: boolean;
 };

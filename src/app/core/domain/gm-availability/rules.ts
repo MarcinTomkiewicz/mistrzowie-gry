@@ -7,50 +7,19 @@ import {
   GmAvailabilityMutationError,
 } from '../../types/gm-availability';
 import { HourOffsetValue } from '../../types/hour-offset';
-import { toLocalDateTime } from '../../utils/date';
 import {
   createDefaultHourOffsetRange,
+  getHourOffsetMutationError,
 } from '../../utils/hour-offset';
-import { hasOverlappingIntervals } from '../../utils/intervals';
-
-export function createGmAvailabilityEditorRanges(
-  ranges: readonly IGmAvailabilityRange[],
-): IGmAvailabilityRange[] {
-  if (ranges.length) return [...ranges];
-
-  const range = createDefaultGmAvailabilityRange([]);
-  return range ? [range] : [];
-}
 
 export function createDefaultGmAvailabilityRange(
   ranges: readonly IGmAvailabilityRange[],
 ): IGmAvailabilityRange | null {
-  const candidate = createDefaultHourOffsetRange(ranges, {
+  return createDefaultHourOffsetRange(ranges, {
     defaultStartOffset: HourOffsetValue.DefaultDayStartOffset,
     minDuration: GmAvailabilityHourValue.MinDurationHours,
     totalHours: HourOffsetValue.DayTotalHours,
   });
-
-  if (!candidate) return null;
-
-  return {
-    id: createGmAvailabilityTempId(),
-    startOffset: candidate.startOffset,
-    endOffset: candidate.endOffset,
-  };
-}
-
-function hasOverlappingGmAvailabilityDays(
-  days: readonly IGmAvailabilityDay[],
-): boolean {
-  return hasOverlappingIntervals(
-    days.flatMap((day) =>
-      day.ranges.map((range) => ({
-        start: toLocalDateTime(day.date, range.startOffset).getTime(),
-        end: toLocalDateTime(day.date, range.endOffset).getTime(),
-      })),
-    ),
-  );
 }
 
 export function getGmAvailabilityMutationError(
@@ -58,21 +27,11 @@ export function getGmAvailabilityMutationError(
   date: string,
   ranges: readonly IGmAvailabilityRange[],
 ): GmAvailabilityMutationError | null {
-  const hasInvalidDuration = ranges.some(
-    (range) =>
-      range.endOffset - range.startOffset <
-      GmAvailabilityHourValue.MinDurationHours,
+  return getHourOffsetMutationError(
+    upsertGmAvailabilityDay(days, date, ranges),
+    GmAvailabilityHourValue.MinDurationHours,
+    HourOffsetValue.DayTotalHours,
   );
-
-  if (hasInvalidDuration) return 'invalid_duration';
-
-  if (
-    hasOverlappingGmAvailabilityDays(upsertGmAvailabilityDay(days, date, ranges))
-  ) {
-    return 'overlap';
-  }
-
-  return null;
 }
 
 export function upsertGmAvailabilityDay(
@@ -95,8 +54,4 @@ export function upsertGmAvailabilityDay(
         : [],
     )
     .sort((left, right) => left.date.localeCompare(right.date));
-}
-
-function createGmAvailabilityTempId(): string {
-  return `draft-${crypto.randomUUID()}`;
 }

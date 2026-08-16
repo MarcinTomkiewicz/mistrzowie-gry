@@ -13,7 +13,6 @@
     "saveLabel": "Zapisz dyspozycyjność"
   },
   "form": {
-    "rangeSummaryLabel": "Przedział",
     "emptyTitle": "Brak przedziałów dla tego dnia",
     "emptyDescription": "Dodaj zakres godzin."
   },

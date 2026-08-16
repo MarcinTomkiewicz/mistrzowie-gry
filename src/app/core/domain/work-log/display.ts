@@ -26,7 +26,6 @@ export function createWorkLogRows(
       dateLabel: formatDateLabel(date, 'pl-PL'),
       weekdayLabel: formatWeekdayLabel(date, 'pl-PL'),
       isChaoticThursdayDay: isChaoticThursdayDate(date),
-      day,
       totalHours: getWorkLogDayHours(day),
     };
   });

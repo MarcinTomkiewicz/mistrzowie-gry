@@ -338,7 +338,6 @@
     "tokens": "Elementy",
     "tokensHint": "Ustaw kursor w polu tekstowym i wybierz element, aby go wstawić.",
     "empty": "Treść nie zawiera żadnej sekcji.",
-    "addSection": "Dodaj sekcję",
     "section": "Sekcja",
     "sectionTitle": "Tytuł sekcji (opcjonalny)",
     "paragraph": "Akapit",
@@ -411,7 +410,9 @@
     "closeMenu": "Zamknij menu",
     "skipToContent": "Przejdź do treści",
     "sendMail": "Wyślij maila do",
-    "callMe": "Zadzwoń na numer"
+    "callMe": "Zadzwoń na numer",
+    "toggleTheme": "Przełącz motyw jasny/ciemny",
+    "selectTab": "[PH] Wybierz zakładkę"
   },
   "statusPages": {
     "notFound": {

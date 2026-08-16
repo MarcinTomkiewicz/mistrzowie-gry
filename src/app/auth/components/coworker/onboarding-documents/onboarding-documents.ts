@@ -1,10 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormRecord, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { finalize } from 'rxjs';
+import { finalize, map } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
@@ -32,7 +33,7 @@ import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer
   standalone: true,
   imports: [
     RouterLink,
-    FormsModule,
+    ReactiveFormsModule,
     ButtonModule,
     CheckboxModule,
     FileUpload,
@@ -55,17 +56,25 @@ export class CoworkerOnboardingDocuments {
   protected readonly portal = signal<ICoworkerDocumentPortal | null>(null);
   protected readonly loading = signal(true);
   protected readonly loadFailed = signal(false);
-  protected readonly activeAssignmentId = signal<string | null>(null);
+  protected readonly activeMutationKey = signal<string | null>(null);
   protected readonly selectedFiles =
     signal<ReadonlyMap<string, File>>(new Map());
-  protected readonly declaredAssignmentIds =
-    signal<ReadonlySet<string>>(new Set());
-  protected readonly acknowledgedAssignmentIds =
-    signal<ReadonlySet<string>>(new Set());
+  protected readonly declarationControls =
+    new FormRecord<FormControl<boolean>>({});
+  protected readonly acknowledgementControls =
+    new FormRecord<FormControl<boolean>>({});
+  protected readonly acknowledgedAssignmentIds = toSignal(
+    this.acknowledgementControls.valueChanges.pipe(
+      map((values) =>
+        Object.keys(values).filter((assignmentId) => values[assignmentId]),
+      ),
+    ),
+    { initialValue: [] },
+  );
   protected readonly preview = signal<IPdfPreview | null>(null);
   protected readonly uploadOptions = computed(() => ({
     ...COWORKER_PDF_UPLOAD_OPTIONS,
-    disabled: this.activeAssignmentId() !== null,
+    disabled: this.activeMutationKey() !== null,
   }));
 
   constructor() {
@@ -79,7 +88,10 @@ export class CoworkerOnboardingDocuments {
       .getPortal()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (portal) => this.portal.set(portal),
+        next: (portal) => {
+          this.syncSelectionControls(portal);
+          this.portal.set(portal);
+        },
         error: () => this.loadFailed.set(true),
       });
   }
@@ -97,25 +109,21 @@ export class CoworkerOnboardingDocuments {
     });
   }
 
-  protected setDeclared(assignmentId: string, checked: boolean): void {
-    this.declaredAssignmentIds.update((current) => {
-      const next = new Set(current);
-      if (checked) next.add(assignmentId);
-      else next.delete(assignmentId);
-      return next;
-    });
-  }
-
   protected uploadSigned(document: ICoworkerPrivateDocument): void {
+    if (this.activeMutationKey() !== null) return;
+
     const file = this.selectedFiles().get(document.assignment_id);
-    if (!file || !this.declaredAssignmentIds().has(document.assignment_id)) {
+    if (
+      !file ||
+      !this.declarationControls.controls[document.assignment_id].value
+    ) {
       return;
     }
 
-    this.activeAssignmentId.set(document.assignment_id);
+    this.activeMutationKey.set(document.assignment_id);
     this.api
       .uploadSignedDocument(document.assignment_id, file)
-      .pipe(finalize(() => this.activeAssignmentId.set(null)))
+      .pipe(finalize(() => this.activeMutationKey.set(null)))
       .subscribe({
         next: () => {
           this.selectedFiles.update((current) => {
@@ -123,11 +131,7 @@ export class CoworkerOnboardingDocuments {
             next.delete(document.assignment_id);
             return next;
           });
-          this.declaredAssignmentIds.update((current) => {
-            const next = new Set(current);
-            next.delete(document.assignment_id);
-            return next;
-          });
+          this.declarationControls.controls[document.assignment_id].reset();
           this.showMutationSuccess();
           this.load();
         },
@@ -135,26 +139,19 @@ export class CoworkerOnboardingDocuments {
       });
   }
 
-  protected setAcknowledged(assignmentId: string, checked: boolean): void {
-    this.acknowledgedAssignmentIds.update((current) => {
-      const next = new Set(current);
-      if (checked) next.add(assignmentId);
-      else next.delete(assignmentId);
-      return next;
-    });
-  }
-
   protected acknowledge(): void {
-    const assignmentIds = [...this.acknowledgedAssignmentIds()];
+    if (this.activeMutationKey() !== null) return;
+
+    const assignmentIds = this.acknowledgedAssignmentIds();
     if (!assignmentIds.length) return;
 
-    this.activeAssignmentId.set('acknowledge');
+    this.activeMutationKey.set('acknowledge');
     this.api
       .acknowledgeDocuments(assignmentIds)
-      .pipe(finalize(() => this.activeAssignmentId.set(null)))
+      .pipe(finalize(() => this.activeMutationKey.set(null)))
       .subscribe({
         next: () => {
-          this.acknowledgedAssignmentIds.set(new Set());
+          this.acknowledgementControls.reset();
           this.showMutationSuccess();
           this.load();
         },
@@ -174,6 +171,58 @@ export class CoworkerOnboardingDocuments {
     target: CoworkerDocumentDownloadTarget,
   ): void {
     this.prepareDownload(document.assignment_id, target, false);
+  }
+
+  private syncSelectionControls(portal: ICoworkerDocumentPortal): void {
+    this.syncSelectionRecord(
+      this.declarationControls,
+      portal.private_assignments
+        .filter(
+          (document) =>
+            document.required_action === 'upload_signed' &&
+            (document.assignment_status === 'pending' ||
+              document.assignment_status === 'rejected'),
+        )
+        .map((document) => document.assignment_id),
+    );
+    this.syncSelectionRecord(
+      this.acknowledgementControls,
+      [
+        ...portal.private_assignments.filter(
+          (document) =>
+            document.required_action === 'acknowledge' &&
+            document.assignment_status === 'pending',
+        ),
+        ...portal.shared_assignments.filter(
+          (document) => document.assignment_status === 'pending',
+        ),
+      ].map((document) => document.assignment_id),
+    );
+  }
+
+  private syncSelectionRecord(
+    form: FormRecord<FormControl<boolean>>,
+    assignmentIds: readonly string[],
+  ): void {
+    const currentAssignmentIds = new Set(assignmentIds);
+
+    for (const assignmentId of Object.keys(form.controls)) {
+      if (!currentAssignmentIds.has(assignmentId)) {
+        form.removeControl(assignmentId, { emitEvent: false });
+      }
+    }
+
+    for (const assignmentId of assignmentIds) {
+      if (!form.controls[assignmentId]) {
+        form.addControl(
+          assignmentId,
+          new FormControl(false, { nonNullable: true }),
+          { emitEvent: false },
+        );
+      }
+    }
+
+    form.updateValueAndValidity();
   }
 
   private prepareDownload(

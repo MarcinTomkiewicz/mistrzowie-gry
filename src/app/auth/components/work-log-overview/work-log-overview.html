@@ -73,7 +73,7 @@
 
               <p-accordion-content>
                 @if (item.days.length) {
-                  <div class="w-100" style="overflow-x: auto">
+                  <div class="w-100 overflow-x-auto">
                     <p-table
                       [value]="[...item.days]"
                       dataKey="date"
@@ -81,13 +81,13 @@
                     >
                     <ng-template #header>
                       <tr>
-                        <th class="small-caps">{{ i18n.commonLabels().date }}</th>
-                        <th class="small-caps">{{ i18n.commonLabels().hourRanges }}</th>
-                        <th class="small-caps">{{ i18n.commonLabels().comment }}</th>
-                        <th class="small-caps text-center">
+                        <th scope="col" class="small-caps">{{ i18n.commonLabels().date }}</th>
+                        <th scope="col" class="small-caps">{{ i18n.commonLabels().hourRanges }}</th>
+                        <th scope="col" class="small-caps">{{ i18n.commonLabels().comment }}</th>
+                        <th scope="col" class="small-caps text-center">
                           {{ i18n.commonLabels().chaoticThursday }}
                         </th>
-                        <th class="small-caps text-right">
+                        <th scope="col" class="small-caps text-right">
                           {{ i18n.commonLabels().totalHours }}
                         </th>
                       </tr>
@@ -95,10 +95,12 @@
 
                     <ng-template #body let-day>
                       <tr>
-                        <td>{{ formatDateLabel(day.date, 'pl-PL') }}</td>
+                        <th scope="row">
+                          {{ formatDateLabel(day.date, 'pl-PL') }}
+                        </th>
                         <td>
                           <div class="flex-row-start-center flex-wrap gap-xs">
-                            @for (range of day.ranges; track range.id || $index) {
+                            @for (range of day.ranges; track $index) {
                               <span class="tag-badge">
                                 {{ formatRangeLabel(range.startOffset, range.endOffset) }}
                               </span>

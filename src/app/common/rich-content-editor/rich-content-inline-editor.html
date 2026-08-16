@@ -32,10 +32,10 @@
     [id]="controlId() + '-text'"
     [value]="text()"
     [attr.aria-label]="i18n().editingSurface"
-    (focus)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
-    (click)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
-    (keyup)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
-    (select)="captureSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (focus)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (click)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (keyup)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
+    (select)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
     (beforeinput)="prepareTextInput($event, textSurface)"
     (input)="updateText(textSurface)"
     (blur)="blurred.emit()"
@@ -70,22 +70,20 @@
     </div>
   }
 
-  @if (linkDraft(); as draft) {
+  @if (linkEditTarget(); as target) {
     <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
       <label class="small-caps" [for]="controlId() + '-link-href'">
         {{ i18n().href }}
       </label>
       <input
-        #linkHref
         pInputText
         class="w-100"
         [id]="controlId() + '-link-href'"
-        [value]="draft.href"
+        [formControl]="linkHrefControl"
         autocomplete="off"
-        (input)="updateLinkHref(linkHref.value)"
         (blur)="blurred.emit()"
       />
-      @if (linkSaveAttempted() && !draft.href.trim()) {
+      @if (linkHrefControl.touched && linkHrefControl.invalid) {
         <small class="error-text">{{ i18n().invalidLink }}</small>
       }
 
@@ -93,9 +91,7 @@
         <p-checkbox
           [inputId]="controlId() + '-link-external'"
           [binary]="true"
-          [ngModel]="draft.external"
-          [ngModelOptions]="{ standalone: true }"
-          (ngModelChange)="updateLinkExternal($event)"
+          [formControl]="linkExternalControl"
         />
         <label [for]="controlId() + '-link-external'">
           {{ i18n().external }}
@@ -103,7 +99,7 @@
       </div>
 
       <div class="flex-row-end-center flex-wrap gap-xs">
-        @if (draft.existing) {
+        @if (target.existing) {
           <p-button
             type="button"
             size="small"

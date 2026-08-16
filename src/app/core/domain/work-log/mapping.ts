@@ -16,7 +16,6 @@ export function mapWorkLogRecordsToDays(
 
       const ranges = [...(record.userWorkLogRanges ?? [])]
         .map((range) => ({
-          id: range.id ?? `${range.startsAt}-${range.endsAt}`,
           startOffset: getHourOffsetFromDateTime(baseTime, range.startsAt),
           endOffset: getHourOffsetFromDateTime(baseTime, range.endsAt),
         }))
@@ -89,7 +88,7 @@ function normalizeWorkLogDay(day: IUserWorkLogDay): IUserWorkLogDay {
 }
 
 function isMeaningfulWorkLogDay(day: IUserWorkLogDay): boolean {
-  return !!day.ranges.length || !!day.isChaoticThursday || !!day.comment?.trim();
+  return !!day.ranges.length || !!day.isChaoticThursday || !!day.comment;
 }
 
 function toWorkLogDateTime(dateIso: string, hourOffset: number): string {

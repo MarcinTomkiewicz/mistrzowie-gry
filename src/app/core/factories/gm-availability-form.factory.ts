@@ -7,7 +7,6 @@ export function createGmAvailabilityRangeFormGroup(
   range: IGmAvailabilityRange,
 ): GmAvailabilityRangeFormGroup {
   return new FormGroup({
-    id: new FormControl(range.id, { nonNullable: true }),
     startOffset: new FormControl(range.startOffset, { nonNullable: true }),
     endOffset: new FormControl(range.endOffset, { nonNullable: true }),
   });
@@ -16,14 +15,12 @@ export function createGmAvailabilityRangeFormGroup(
 export function replaceGmAvailabilityRangeFormGroups(
   formArray: FormArray<GmAvailabilityRangeFormGroup>,
   ranges: readonly IGmAvailabilityRange[],
-): GmAvailabilityRangeFormGroup[] {
+): void {
   formArray.clear();
 
   for (const range of ranges) {
     formArray.push(createGmAvailabilityRangeFormGroup(range));
   }
-
-  return [...formArray.controls];
 }
 
 export function mapGmAvailabilityRangeFormGroupsToRanges(
@@ -31,9 +28,8 @@ export function mapGmAvailabilityRangeFormGroupsToRanges(
 ): IGmAvailabilityRange[] {
   return [...rangeGroups]
     .map((rangeGroup) => ({
-      id: rangeGroup.controls.id.getRawValue(),
-      startOffset: Number(rangeGroup.controls.startOffset.getRawValue()),
-      endOffset: Number(rangeGroup.controls.endOffset.getRawValue()),
+      startOffset: rangeGroup.controls.startOffset.getRawValue(),
+      endOffset: rangeGroup.controls.endOffset.getRawValue(),
     }))
     .sort((left, right) => left.startOffset - right.startOffset);
 }

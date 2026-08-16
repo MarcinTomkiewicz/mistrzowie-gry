@@ -6,13 +6,14 @@ export enum HourOffsetValue {
   DefaultDayStartOffset = 12,
 }
 
-export type HourOffsetRange = {
-  id: string;
+export type HourOffsetRangeValue = {
   startOffset: number;
   endOffset: number;
 };
 
-export type HourOffsetDay<TRange extends HourOffsetRange = HourOffsetRange> = {
+export type HourOffsetDay<
+  TRange extends HourOffsetRangeValue = HourOffsetRangeValue,
+> = {
   date: string;
   ranges: readonly TRange[];
 };

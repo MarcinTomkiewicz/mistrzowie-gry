@@ -1,19 +1,18 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { EMPTY, finalize, Observable, switchMap, tap } from 'rxjs';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { EMPTY, finalize, switchMap, tap } from 'rxjs';
 
-import {
-  IAdminContentArticleDetail,
-  IAdminContentArticleListItem,
-} from '../../../../core/interfaces/i-content-article';
+import { IAdminContentArticleListItem } from '../../../../core/interfaces/i-content-article';
 import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { ContentArticlePublicationIssue } from '../../../../core/types/content-article';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
@@ -26,7 +25,13 @@ import { createAdminContentArticleListI18n } from './article-list.i18n';
 @Component({
   selector: 'app-article-list',
   standalone: true,
-  imports: [ButtonModule, TableModule, LoadingOverlay],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    TableModule,
+    ToggleSwitchModule,
+    LoadingOverlay,
+  ],
   templateUrl: './article-list.html',
   providers: [provideTranslocoScope('adminContentArticles', 'common')],
 })
@@ -39,10 +44,17 @@ export class ArticleList {
   protected readonly i18n = createAdminContentArticleListI18n();
 
   protected readonly rows = signal<IAdminContentArticleListItem[]>([]);
+  protected readonly showArchived = new FormControl(false, {
+    nonNullable: true,
+  });
   protected readonly isLoading = signal(true);
   protected readonly hasLoadError = signal(false);
   protected readonly isCreating = signal(false);
   protected readonly activeActionKey = signal<string | null>(null);
+  private readonly showArchivedValue = toSignal(
+    this.showArchived.valueChanges,
+    { initialValue: this.showArchived.value },
+  );
 
   protected readonly isBusy = computed(
     () => this.isLoading() || this.isCreating() || !!this.activeActionKey(),
@@ -50,8 +62,12 @@ export class ArticleList {
   protected readonly rowVms = computed(() => {
     const table = this.i18n.table();
     const values = this.i18n.commonValues();
+    const rows = this.rows();
+    const visibleRows = this.showArchivedValue()
+      ? rows
+      : rows.filter((article) => article.status !== 'archived');
 
-    return this.rows().map((article) => {
+    return visibleRows.map((article) => {
       const thumbnailUrl = resolvePublicStorageUrl(
         this.storage,
         article.heroImagePath,
@@ -152,7 +168,7 @@ export class ArticleList {
             this.toast.danger({
               summary: validation.summary,
               detail: `${validation.missingPrefix} ${issues
-                .map((issue) => this.getPublicationIssueLabel(issue))
+                .map((issue) => validation[issue])
                 .join(', ')}.`,
             });
             return EMPTY;
@@ -181,53 +197,31 @@ export class ArticleList {
   }
 
   protected archiveArticle(article: IAdminContentArticleListItem): void {
-    this.runArticleAction(
-      article,
-      'archive',
-      () => this.articles.archiveAdminArticle(article.id),
-      this.i18n.toast().archiveSuccessSummary,
-      this.i18n.toast().archiveSuccessDetail,
-      this.i18n.toast().archiveFailedSummary,
-      this.i18n.toast().archiveFailedDetail,
-    );
-  }
+    const toast = this.i18n.toast();
 
-  protected isActionLoading(articleId: string, action: string): boolean {
-    return this.activeActionKey() === this.buildActionKey(articleId, action);
-  }
-
-  private runArticleAction(
-    article: IAdminContentArticleListItem,
-    action: string,
-    request: () => Observable<IAdminContentArticleDetail>,
-    successSummary: string,
-    successDetail: string,
-    failedSummary: string,
-    failedDetail: string,
-  ): void {
-    this.activeActionKey.set(this.buildActionKey(article.id, action));
-
-    request()
+    this.activeActionKey.set(this.buildActionKey(article.id, 'archive'));
+    this.articles
+      .archiveAdminArticle(article.id)
       .pipe(finalize(() => this.activeActionKey.set(null)))
       .subscribe({
         next: () => {
           this.toast.success({
-            summary: successSummary,
-            detail: successDetail,
+            summary: toast.archiveSuccessSummary,
+            detail: toast.archiveSuccessDetail,
           });
           this.loadArticles();
         },
         error: () => {
           this.toast.danger({
-            summary: failedSummary,
-            detail: failedDetail,
+            summary: toast.archiveFailedSummary,
+            detail: toast.archiveFailedDetail,
           });
         },
       });
   }
 
-  private getPublicationIssueLabel(issue: ContentArticlePublicationIssue): string {
-    return this.i18n.publicationValidation()[issue];
+  protected isActionLoading(articleId: string, action: string): boolean {
+    return this.activeActionKey() === this.buildActionKey(articleId, action);
   }
 
   private buildActionKey(articleId: string, action: string): string {

@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -8,7 +8,6 @@ import { SelectModule } from 'primeng/select';
 
 import {
   IGmAvailabilityDay,
-  IGmAvailabilityRange,
   IGmAvailabilitySlotRecord,
 } from '../../../core/interfaces/i-gm-availability';
 import { ISelectOption } from '../../../core/interfaces/i-select-option';
@@ -42,8 +41,7 @@ import {
   selector: 'app-gm-availability-overview',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     SelectModule,
     UniversalCalendar,
     LoadingOverlay,
@@ -61,16 +59,19 @@ export class GmAvailabilityOverview {
   protected readonly i18n = createGmAvailabilityOverviewI18n();
   protected readonly isLoading = signal(true);
   protected readonly selectedDate = signal<string | null>(null);
-  protected readonly selectedGmId = signal<string | null>(null);
-  protected readonly gmUsers = signal<readonly IUser[]>([]);
+  protected readonly selectedGmControl = new FormControl<string | null>(null);
+  private readonly selectedGmId = toSignal(
+    this.selectedGmControl.valueChanges,
+    { initialValue: this.selectedGmControl.value },
+  );
+  private readonly gmUsers = signal<readonly IUser[]>([]);
   private readonly availabilityRecords = signal<readonly IGmAvailabilitySlotRecord[]>([]);
-  private readonly loadedUserId = signal<string | null>(null);
 
   protected readonly minDate = getStartOfCurrentMonthIso();
   protected readonly maxDate = getEndOfNextMonthIso();
   private readonly rangeStartIso = toLocalDayStartIso(this.minDate);
   private readonly rangeEndExclusiveIso = toLocalDayStartIso(
-    toIsoDate(addDays(parseIsoDate(this.maxDate) ?? new Date(), 1)),
+    toIsoDate(addDays(parseIsoDate(this.maxDate)!, 1)),
   );
   protected readonly gmDisplayNameById = computed(
     () =>
@@ -90,7 +91,7 @@ export class GmAvailabilityOverview {
       })),
   );
 
-  protected readonly filteredRecords = computed(() =>
+  private readonly filteredRecords = computed(() =>
     this.selectedGmId()
       ? this.availabilityRecords().filter(
           (record) => record.gmProfileId === this.selectedGmId(),
@@ -135,8 +136,7 @@ export class GmAvailabilityOverview {
     return [...this.allDaysByGmId().entries()]
       .filter(([gmProfileId]) => !selectedGmId || gmProfileId === selectedGmId)
       .map(([gmProfileId, days]) => {
-        const day = days
-          ?.find((entry) => entry.date === selectedDate);
+        const day = days.find((entry) => entry.date === selectedDate);
 
         return day
           ? ([gmProfileId, day] as const)
@@ -164,64 +164,47 @@ export class GmAvailabilityOverview {
   protected readonly formatHourOffsetRangeLabel = formatHourOffsetRangeLabel;
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       if (!this.auth.isReady()) {
         return;
       }
 
-      const user = this.auth.user();
-      const userId = user?.id ?? null;
+      const userId = this.auth.userId();
+      this.gmUsers.set([]);
+      this.availabilityRecords.set([]);
+      this.selectedDate.set(null);
+      this.selectedGmControl.setValue(null);
 
       if (!userId) {
-        this.loadedUserId.set(null);
-        this.gmUsers.set([]);
-        this.availabilityRecords.set([]);
-        this.selectedDate.set(null);
-        this.selectedGmId.set(null);
         this.isLoading.set(false);
         return;
       }
 
-      if (this.loadedUserId() === userId) {
-        return;
-      }
+      this.isLoading.set(true);
+      const subscription = this.gmAvailability
+        .getAvailabilityOverview(
+          this.rangeStartIso,
+          this.rangeEndExclusiveIso,
+        )
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: ({ gmUsers, records }) => {
+            this.gmUsers.set(gmUsers);
+            this.availabilityRecords.set(records);
+          },
+          error: () => {
+            this.toast.danger({
+              summary: this.i18n.toast().loadFailedSummary,
+              detail: this.i18n.toast().loadFailedDetail,
+            });
+          },
+        });
 
-      this.loadedUserId.set(userId);
-      this.loadOverview();
+      onCleanup(() => subscription.unsubscribe());
     });
   }
 
   protected onDateSelected(date: string | null): void {
     this.selectedDate.set(date);
-  }
-
-  protected onGmSelected(gmProfileId: string | null | undefined): void {
-    this.selectedGmId.set(gmProfileId || null);
-  }
-
-  private loadOverview(): void {
-    this.isLoading.set(true);
-    this.gmAvailability
-      .getAvailabilityOverview(this.rangeStartIso, this.rangeEndExclusiveIso)
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: ({ gmUsers, records }) => {
-          this.gmUsers.set(gmUsers);
-          this.availabilityRecords.set(records);
-
-          if (
-            this.selectedGmId() &&
-            !gmUsers.some((user) => user.id === this.selectedGmId())
-          ) {
-            this.selectedGmId.set(null);
-          }
-        },
-        error: () => {
-          this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
-            detail: this.i18n.toast().loadFailedDetail,
-          });
-        },
-      });
   }
 }

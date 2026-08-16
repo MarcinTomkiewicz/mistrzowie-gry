@@ -15,12 +15,13 @@
   <div class="show-down-sm mb-md">
     <p-select
       [options]="selectOptions()"
-      [ngModel]="activeTab()?.path"
+      [formControl]="activePathControl"
       optionLabel="label"
       optionValue="path"
       appendTo="body"
       class="w-100"
-      (onChange)="onMobileTabChange($event.value)"
+      [ariaLabel]="accessibility().selectTab"
+      (onChange)="onActivePathChange($event.value)"
     >
       <ng-template #selectedItem let-option>
         @if (option) {

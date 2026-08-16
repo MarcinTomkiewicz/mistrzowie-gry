@@ -27,15 +27,15 @@ export interface IWorkLogOverviewData {
   records: IUserWorkLogRecord[];
 }
 
-export interface IWorkLogEditorError {
-  title: string;
-  body: string;
-}
-
 export interface IUserWorkLogDay extends HourOffsetDay<WorkLogRangeDraft> {
   id?: string;
   isChaoticThursday: boolean;
   comment?: string | null;
+}
+
+export interface IUserWorkLogMonthData {
+  days: readonly IUserWorkLogDay[];
+  adjacentDays: readonly IUserWorkLogDay[];
 }
 
 export interface IUserWorkLogMonthScope {
@@ -52,7 +52,6 @@ export interface IUserWorkLogRowVm {
   dateLabel: string;
   weekdayLabel: string;
   isChaoticThursdayDay: boolean;
-  day: IUserWorkLogDay | null;
   totalHours: number;
 }
 

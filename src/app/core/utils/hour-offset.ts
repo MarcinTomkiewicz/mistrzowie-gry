@@ -1,9 +1,12 @@
 import { ISelectOption } from '../interfaces/i-select-option';
 import {
   HOUR_IN_MS,
-  HourOffsetRange,
+  HourOffsetDay,
+  HourOffsetMutationError,
+  HourOffsetRangeValue,
   HourOffsetValue,
 } from '../types/hour-offset';
+import { toLocalDateTime } from './date';
 import { hasOverlappingIntervals } from './intervals';
 
 export function formatHourOffsetLabel(
@@ -51,11 +54,15 @@ export function createEndHourOffsetOptions(
   );
 }
 
-export function normalizeEndHourOffset(
+export function clampEndHourOffset(
   startOffset: number,
+  endOffset: number,
   minDuration: number,
 ): number {
-  return startOffset + minDuration;
+  return Math.min(
+    Math.max(endOffset, startOffset + minDuration),
+    startOffset + HourOffsetValue.DayTotalHours,
+  );
 }
 
 export function getHourOffsetDuration(
@@ -66,13 +73,13 @@ export function getHourOffsetDuration(
 }
 
 export function createDefaultHourOffsetRange(
-  ranges: readonly HourOffsetRange[],
+  ranges: readonly HourOffsetRangeValue[],
   opts: {
     defaultStartOffset?: number;
     minDuration?: number;
     totalHours?: number;
   } = {},
-): Omit<HourOffsetRange, 'id'> | null {
+): HourOffsetRangeValue | null {
   const defaultStartOffset =
     opts.defaultStartOffset ?? HourOffsetValue.DefaultDayStartOffset;
   const minDuration = opts.minDuration ?? 1;
@@ -80,7 +87,7 @@ export function createDefaultHourOffsetRange(
 
   for (
     let hour = defaultStartOffset;
-    hour <= totalHours - minDuration;
+    hour < totalHours;
     hour += 1
   ) {
     const candidate = {
@@ -109,9 +116,47 @@ export function getHourOffsetFromDateTime(
   return (date.getTime() - baseTime) / HOUR_IN_MS;
 }
 
+export function getHourOffsetMutationError(
+  days: readonly HourOffsetDay<HourOffsetRangeValue>[],
+  minDuration: number,
+  maxDuration: number,
+): HourOffsetMutationError | null {
+  if (
+    days.some((day) =>
+      day.ranges.some(
+        (range) => {
+          const duration = getHourOffsetDuration(
+            range.startOffset,
+            range.endOffset,
+          );
+
+          return duration < minDuration || duration > maxDuration;
+        },
+      ),
+    )
+  ) {
+    return 'invalid_duration';
+  }
+
+  if (
+    hasOverlappingIntervals(
+      days.flatMap((day) =>
+        day.ranges.map((range) => ({
+          start: toLocalDateTime(day.date, range.startOffset).getTime(),
+          end: toLocalDateTime(day.date, range.endOffset).getTime(),
+        })),
+      ),
+    )
+  ) {
+    return 'overlap';
+  }
+
+  return null;
+}
+
 function hasHourOffsetOverlap(
-  ranges: readonly HourOffsetRange[],
-  candidate: Omit<HourOffsetRange, 'id'>,
+  ranges: readonly HourOffsetRangeValue[],
+  candidate: HourOffsetRangeValue,
 ): boolean {
   return hasOverlappingIntervals(
     [...ranges, candidate].map((range) => ({

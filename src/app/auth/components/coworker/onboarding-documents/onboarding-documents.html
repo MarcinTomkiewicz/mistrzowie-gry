@@ -116,8 +116,7 @@
                   <p-checkbox
                     [binary]="true"
                     [inputId]="'signed-declaration-' + document.assignment_id"
-                    [ngModel]="declaredAssignmentIds().has(document.assignment_id)"
-                    (ngModelChange)="setDeclared(document.assignment_id, $event)"
+                    [formControl]="declarationControls.controls[document.assignment_id]"
                   />
                   <label [for]="'signed-declaration-' + document.assignment_id">
                     {{ i18n.coworkerPrivate().declaration }}
@@ -127,10 +126,11 @@
                   <p-button
                     icon="pi pi-upload"
                     [label]="i18n.actions().uploadSigned"
-                    [loading]="activeAssignmentId() === document.assignment_id"
+                    [loading]="activeMutationKey() === document.assignment_id"
                     [disabled]="
+                      activeMutationKey() !== null ||
                       !selectedFiles().has(document.assignment_id) ||
-                      !declaredAssignmentIds().has(document.assignment_id)
+                      !declarationControls.controls[document.assignment_id].value
                     "
                     (onClick)="uploadSigned(document)"
                   />
@@ -146,8 +146,8 @@
                 <p-checkbox
                   [binary]="true"
                   [inputId]="'private-acknowledgement-' + document.assignment_id"
-                  [ngModel]="acknowledgedAssignmentIds().has(document.assignment_id)"
-                  (ngModelChange)="setAcknowledged(document.assignment_id, $event)"
+                  [formControl]="acknowledgementControls.controls[document.assignment_id]"
+                  [disabled]="activeMutationKey() !== null"
                 />
                 <label [for]="'private-acknowledgement-' + document.assignment_id">
                   {{ i18n.fields().acknowledgement }}
@@ -213,8 +213,8 @@
                 <p-checkbox
                   [binary]="true"
                   [inputId]="'shared-acknowledgement-' + document.assignment_id"
-                  [ngModel]="acknowledgedAssignmentIds().has(document.assignment_id)"
-                  (ngModelChange)="setAcknowledged(document.assignment_id, $event)"
+                  [formControl]="acknowledgementControls.controls[document.assignment_id]"
+                  [disabled]="activeMutationKey() !== null"
                 />
                 <label [for]="'shared-acknowledgement-' + document.assignment_id">
                   {{ i18n.fields().acknowledgement }}
@@ -236,12 +236,13 @@
       </section>
     }
 
-    @if (acknowledgedAssignmentIds().size) {
+    @if (acknowledgedAssignmentIds().length) {
       <div class="flex-row-end-center">
         <p-button
           icon="pi pi-check"
           [label]="i18n.actions().acknowledge"
-          [loading]="activeAssignmentId() === 'acknowledge'"
+          [loading]="activeMutationKey() === 'acknowledge'"
+          [disabled]="activeMutationKey() !== null"
           (onClick)="acknowledge()"
         />
       </div>

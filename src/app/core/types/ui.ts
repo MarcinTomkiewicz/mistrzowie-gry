@@ -10,3 +10,8 @@ export const UI_SEMANTIC_VARIANTS = [
   'arcane',
 ] as const;
 export type UiSemanticVariant = (typeof UI_SEMANTIC_VARIANTS)[number];
+
+export type UiDialogMessage = {
+  title: string;
+  body: string;
+};

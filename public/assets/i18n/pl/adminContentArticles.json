@@ -8,6 +8,9 @@
     "title": "Edycja artykułu",
     "subtitle": "Uzupełnij pola główne, SEO i tekstowe sekcje artykułu."
   },
+  "filters": {
+    "showArchivedLabel": "Pokaż zarchiwizowane"
+  },
   "table": {
     "thumbnail": "Miniatura",
     "updatedAt": "Aktualizacja",

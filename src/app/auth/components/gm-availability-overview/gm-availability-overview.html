@@ -19,23 +19,25 @@
       <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
         <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
           <div class="flex-col-start-stretch gap-xs">
-            <label>{{ i18n.gmAvailabilityOverview().selectLabel }}</label>
+            <label for="gm-availability-overview-gm">
+              {{ i18n.gmAvailabilityOverview().selectLabel }}
+            </label>
             <p-select
+              inputId="gm-availability-overview-gm"
               class="w-100"
               [options]="gmOptions()"
               [showClear]="true"
               [placeholder]="i18n.gmAvailabilityOverview().selectPlaceholder"
-              [ngModel]="selectedGmId()"
+              [formControl]="selectedGmControl"
               optionLabel="label"
               optionValue="value"
               appendTo="body"
-              (ngModelChange)="onGmSelected($event)"
             />
           </div>
 
           <div class="flex-col-evenly-stretch gap-xs">
             <strong>
-              @if (selectedUser(); as selectedUser) {
+              @if (selectedUser()) {
                 {{ selectedUserLabel() }}
               } @else {
                 {{ i18n.gmAvailabilityOverview().dayDetailsTitle }}
@@ -63,7 +65,7 @@
         (dateSelected)="onDateSelected($event)"
       />
 
-      @if (selectedDate()) {
+      @if (selectedDate(); as selectedDate) {
         <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
           <div class="flex-col-start-stretch gap-xs">
             <h2
@@ -73,7 +75,7 @@
             </h2>
 
             <p class="mg-section__subtitle m-0">
-              {{ formatDateLabel(selectedDate()!, "pl-PL", true) }}
+              {{ formatDateLabel(selectedDate, "pl-PL", true) }}
             </p>
           </div>
 
@@ -84,7 +86,7 @@
                   <strong>{{ gmDisplayNameById().get(entry[0]) || entry[0] }}</strong>
 
                   <div class="flex-row-start-center flex-wrap gap-xs">
-                    @for (range of entry[1].ranges; track range.id || $index) {
+                    @for (range of entry[1].ranges; track $index) {
                       <span class="tag-badge tag-badge--success">
                         {{
                           formatHourOffsetRangeLabel(

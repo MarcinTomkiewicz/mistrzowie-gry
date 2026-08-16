@@ -187,6 +187,8 @@ export type CommonAccessibilityTranslations = {
   skipToContent: string;
   sendMail: string;
   callMe: string;
+  toggleTheme: string;
+  selectTab: string;
 };
 
 export type CommonStatusTranslations = {

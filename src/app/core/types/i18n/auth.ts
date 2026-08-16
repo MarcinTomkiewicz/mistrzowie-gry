@@ -147,12 +147,11 @@ export interface GmAvailabilityActionsTranslations {
 }
 
 export interface GmAvailabilityFormTranslations {
-  rangeSummaryLabel: string;
   emptyTitle: string;
   emptyDescription: string;
 }
 
-export interface GmAvailabilityDialogTranslations {
+export interface HourOffsetMutationDialogTranslations {
   invalidDurationTitle: string;
   invalidDurationBody: string;
   overlapTitle: string;
@@ -160,6 +159,9 @@ export interface GmAvailabilityDialogTranslations {
   noSpaceTitle: string;
   noSpaceBody: string;
 }
+
+export type GmAvailabilityDialogTranslations =
+  HourOffsetMutationDialogTranslations;
 
 export interface GmAvailabilityToastTranslations {
   loadFailedSummary: string;
@@ -207,14 +209,8 @@ export interface MyWorkLogFormTranslations {
   emptyDayDescription: string;
 }
 
-export interface MyWorkLogDialogTranslations {
-  invalidDurationTitle: string;
-  invalidDurationBody: string;
-  overlapTitle: string;
-  overlapBody: string;
-  noSpaceTitle: string;
-  noSpaceBody: string;
-}
+export type MyWorkLogDialogTranslations =
+  HourOffsetMutationDialogTranslations;
 
 export interface MyWorkLogToastTranslations {
   loadFailedSummary: string;

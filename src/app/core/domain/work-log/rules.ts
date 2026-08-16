@@ -21,8 +21,8 @@ import {
 import {
   createDefaultHourOffsetRange,
   getHourOffsetDuration,
+  getHourOffsetMutationError,
 } from '../../utils/hour-offset';
-import { hasOverlappingIntervals } from '../../utils/intervals';
 
 export function getWorkLogMonthScope(
   monthOffset: WorkLogMonthOffset,
@@ -57,48 +57,21 @@ export function isChaoticThursdayDate(dateIso: string): boolean {
 export function createDefaultWorkLogRange(
   ranges: readonly WorkLogRangeDraft[],
 ): WorkLogRangeDraft | null {
-  const candidate = createDefaultHourOffsetRange(ranges, {
+  return createDefaultHourOffsetRange(ranges, {
     defaultStartOffset: HourOffsetValue.DefaultDayStartOffset,
     minDuration: WorkLogHourValue.MinDurationHours,
     totalHours: HourOffsetValue.DayTotalHours,
   });
-
-  if (!candidate) {
-    return null;
-  }
-
-  return {
-    id: createWorkLogTempId(),
-    startOffset: candidate.startOffset,
-    endOffset: candidate.endOffset,
-  };
 }
 
 export function getWorkLogMutationError(
-  ranges: readonly WorkLogRangeDraft[],
+  days: readonly Pick<IUserWorkLogDay, 'date' | 'ranges'>[],
 ): WorkLogMutationError | null {
-  if (
-    ranges.some(
-      (range) =>
-        getHourOffsetDuration(range.startOffset, range.endOffset) <
-        WorkLogHourValue.MinDurationHours,
-    )
-  ) {
-    return 'invalid_duration';
-  }
-
-  if (
-    hasOverlappingIntervals(
-      ranges.map((range) => ({
-        start: range.startOffset,
-        end: range.endOffset,
-      })),
-    )
-  ) {
-    return 'overlap';
-  }
-
-  return null;
+  return getHourOffsetMutationError(
+    days,
+    WorkLogHourValue.MinDurationHours,
+    HourOffsetValue.DayTotalHours,
+  );
 }
 
 export function getWorkLogDayHours(
@@ -126,8 +99,4 @@ function canEditWorkLogMonth(
   baseDate: Date = new Date(),
 ): boolean {
   return monthOffset === 0 || baseDate.getDate() <= 5;
-}
-
-function createWorkLogTempId(): string {
-  return `draft-${crypto.randomUUID()}`;
 }

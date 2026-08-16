@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   DestroyRef,
@@ -7,11 +6,11 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormRecord, ReactiveFormsModule } from '@angular/forms';
+import { finalize, map } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { SelectModule } from 'primeng/select';
@@ -20,10 +19,16 @@ import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
-  IWorkLogEditorError,
   IUserWorkLogDay,
   IUserWorkLogRowVm,
 } from '../../../core/interfaces/i-work-log';
+import {
+  createWorkLogRangeFormGroup,
+  mapWorkLogFormToDays,
+  placeWorkLogRangeFormGroupChronologically,
+  replaceWorkLogFormDays,
+  resetWorkLogDayForm,
+} from '../../../core/factories/work-log-form.factory';
 import { Auth } from '../../../core/services/auth/auth';
 import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
@@ -33,18 +38,22 @@ import {
   WorkLogHourValue,
   WorkLogMonthOffset,
   WorkLogMutationError,
-  WorkLogRangeDraft,
 } from '../../../core/types/work-log';
 import {
+  WorkLogDayFormGroup,
+  WorkLogFormRecord,
+  WorkLogRangeFormGroup,
+} from '../../../core/types/work-log-form';
+import { UiDialogMessage } from '../../../core/types/ui';
+import {
+  clampEndHourOffset,
   createEndHourOffsetOptions,
   createHourOffsetOptions,
-  normalizeEndHourOffset,
 } from '../../../core/utils/hour-offset';
 import {
   createWorkLogRows,
   formatWorkLogHours,
 } from '../../../core/domain/work-log/display';
-import { upsertWorkLogDay } from '../../../core/domain/work-log/mapping';
 import {
   createDefaultWorkLogRange,
   getWorkLogMonthScope,
@@ -59,9 +68,7 @@ import { createMyWorkLogI18n, MY_WORK_LOG_SCOPE } from './my-work-log.i18n';
   selector: 'app-my-work-log',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    AccordionModule,
+    ReactiveFormsModule,
     ButtonModule,
     CheckboxModule,
     SelectModule,
@@ -87,13 +94,29 @@ export class MyWorkLog {
   protected readonly isSaving = signal(false);
   protected readonly monthOffset = signal<WorkLogMonthOffset>(0);
   protected readonly infoDialogVisible = signal(false);
-  protected readonly infoDialogContent = signal<IWorkLogEditorError | null>(
+  protected readonly infoDialogContent = signal<UiDialogMessage | null>(
     null,
   );
 
-  private readonly initialDays = signal<readonly IUserWorkLogDay[]>([]);
-  private readonly draftDays = signal<readonly IUserWorkLogDay[]>([]);
-  private readonly loadedKey = signal<string | null>(null);
+  private initialDays: readonly IUserWorkLogDay[] = [];
+  private readonly adjacentDays = signal<readonly IUserWorkLogDay[]>([]);
+  private readonly form: WorkLogFormRecord =
+    new FormRecord<WorkLogDayFormGroup>({});
+  private readonly draftDays = toSignal(
+    this.form.valueChanges.pipe(
+      map(() => mapWorkLogFormToDays(this.form)),
+    ),
+    { initialValue: mapWorkLogFormToDays(this.form) },
+  );
+  private readonly initialDraftValue = signal(
+    JSON.stringify(this.draftDays()),
+  );
+  private readonly mutationError = computed(() =>
+    getWorkLogMutationError([
+      ...this.adjacentDays(),
+      ...this.draftDays(),
+    ]),
+  );
 
   protected readonly startHourOptions = createHourOffsetOptions(
     0,
@@ -110,7 +133,7 @@ export class MyWorkLog {
   );
   protected readonly hasChanges = computed(
     () =>
-      JSON.stringify(this.initialDays()) !== JSON.stringify(this.draftDays()),
+      this.initialDraftValue() !== JSON.stringify(this.draftDays()),
   );
   protected readonly formatHours = formatWorkLogHours;
 
@@ -123,35 +146,51 @@ export class MyWorkLog {
     const disposeResize = this.platform.onWindow('resize', syncViewport);
     this.destroyRef.onDestroy(disposeResize);
     syncViewport();
+    this.replaceFormDays([]);
 
-    effect(() => {
+    effect((onCleanup) => {
       if (!this.auth.isReady()) {
         return;
       }
 
       const userId = this.auth.userId();
       const monthOffset = this.monthOffset();
-      const loadKey = userId ? `${userId}-${monthOffset}` : null;
+      this.initialDays = [];
+      this.adjacentDays.set([]);
+      this.replaceFormDays([]);
 
-      if (!loadKey) {
-        this.loadedKey.set(null);
-        this.initialDays.set([]);
-        this.draftDays.set([]);
+      if (!userId) {
         this.isLoading.set(false);
         return;
       }
 
-      if (this.loadedKey() === loadKey) {
-        return;
-      }
+      this.isLoading.set(true);
+      const subscription = this.workLog
+        .getMyMonth(monthOffset)
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: ({ days, adjacentDays }) => {
+            this.initialDays = days;
+            this.adjacentDays.set(adjacentDays);
+            this.replaceFormDays(days);
+          },
+          error: () => {
+            this.initialDays = [];
+            this.adjacentDays.set([]);
+            this.replaceFormDays([]);
+            this.toast.danger({
+              summary: this.i18n.toast().loadFailedSummary,
+              detail: this.i18n.toast().loadFailedDetail,
+            });
+          },
+        });
 
-      this.loadedKey.set(loadKey);
-      this.loadMonth();
+      onCleanup(() => subscription.unsubscribe());
     });
   }
 
   protected switchMonth(monthOffset: WorkLogMonthOffset): void {
-    if (this.monthOffset() === monthOffset) {
+    if (this.isSaving() || this.monthOffset() === monthOffset) {
       return;
     }
 
@@ -159,141 +198,105 @@ export class MyWorkLog {
   }
 
   protected getEndHourOptions(
-    range: Pick<WorkLogRangeDraft, 'startOffset'>,
+    rangeGroup: WorkLogRangeFormGroup,
   ) {
     return createEndHourOffsetOptions(
-      range.startOffset,
+      rangeGroup.controls.startOffset.getRawValue(),
       WorkLogHourValue.MinDurationHours,
       HourOffsetValue.DayTotalHours,
     );
   }
 
   protected addRange(date: string): void {
-    if (!this.monthScope().isEditable) {
+    if (this.isSaving() || !this.monthScope().isEditable) {
       return;
     }
 
-    const day = this.getDay(date);
-    const range = createDefaultWorkLogRange(day.ranges);
+    const dayForm = this.getDayForm(date);
+    const range = createDefaultWorkLogRange(
+      dayForm.controls.ranges.getRawValue(),
+    );
 
     if (!range) {
       this.handleMutationError('no_space');
       return;
     }
 
-    this.saveDraftDay({
-      ...day,
-      ranges: [...day.ranges, range],
-    });
+    const rangeGroup = createWorkLogRangeFormGroup(range, false);
+    placeWorkLogRangeFormGroupChronologically(
+      dayForm,
+      rangeGroup,
+    );
+    this.showCurrentMutationError();
   }
 
-  protected removeRange(date: string, rangeId: string): void {
-    const day = this.getDay(date);
+  protected removeRange(date: string, rangeIndex: number): void {
+    if (this.isSaving()) return;
 
-    this.saveDraftDay({
-      ...day,
-      ranges: day.ranges.filter((range) => range.id !== rangeId),
-    });
-  }
-
-  protected updateRangeStart(
-    date: string,
-    rangeId: string,
-    startOffset: number,
-  ): void {
-    const day = this.getDay(date);
-
-    this.saveDraftDay({
-      ...day,
-      ranges: day.ranges.map((range) =>
-        range.id !== rangeId
-          ? range
-          : {
-              ...range,
-              startOffset,
-              endOffset:
-                range.endOffset <
-                normalizeEndHourOffset(
-                  startOffset,
-                  WorkLogHourValue.MinDurationHours,
-                )
-                  ? normalizeEndHourOffset(
-                      startOffset,
-                      WorkLogHourValue.MinDurationHours,
-                    )
-                  : range.endOffset,
-            },
-      ),
-    });
-  }
-
-  protected updateRangeEnd(
-    date: string,
-    rangeId: string,
-    endOffset: number,
-  ): void {
-    const day = this.getDay(date);
-
-    this.saveDraftDay({
-      ...day,
-      ranges: day.ranges.map((range) =>
-        range.id !== rangeId ? range : { ...range, endOffset },
-      ),
-    });
-  }
-
-  protected updateChaoticThursday(date: string, checked: boolean): void {
-    const day = this.getDay(date);
-
-    this.saveDraftDay({
-      ...day,
-      isChaoticThursday: checked,
-    });
-  }
-
-  protected updateComment(date: string, comment: string): void {
-    const day = this.getDay(date);
-
-    this.saveDraftDay({
-      ...day,
-      comment,
-    });
+    const ranges = this.getDayForm(date).controls.ranges;
+    ranges.removeAt(rangeIndex);
   }
 
   protected clearDay(date: string): void {
-    const day = this.getDay(date);
+    if (this.isSaving()) return;
 
-    this.saveDraftDay({
-      ...day,
-      ranges: [],
-      isChaoticThursday: false,
-      comment: null,
-    });
+    resetWorkLogDayForm(this.getDayForm(date));
   }
 
   protected resetChanges(): void {
-    this.draftDays.set(this.initialDays());
+    if (this.isSaving()) return;
+
+    this.replaceFormDays(this.initialDays);
   }
 
   protected save(): void {
-    if (!this.monthScope().isEditable) {
+    if (!this.monthScope().isEditable || this.isSaving()) {
+      return;
+    }
+
+    const mutationError = this.mutationError();
+
+    if (mutationError) {
+      this.handleMutationError(mutationError);
+      return;
+    }
+
+    const userId = this.auth.userId();
+    const monthOffset = this.monthOffset();
+    const days = this.draftDays();
+
+    if (!userId) {
       return;
     }
 
     this.isSaving.set(true);
     this.workLog
-      .replaceMyMonth(this.draftDays(), this.monthOffset())
+      .replaceMyMonth(days, monthOffset)
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (days) => {
-          this.initialDays.set(days);
-          this.draftDays.set(days);
+          if (
+            this.auth.userId() !== userId ||
+            this.monthOffset() !== monthOffset
+          ) {
+            return;
+          }
+
+          this.initialDays = days;
+          this.replaceFormDays(days);
           this.toast.success({
             summary: this.i18n.toast().saveSuccessSummary,
             detail: this.i18n.toast().saveSuccessDetail,
           });
         },
         error: () => {
+          if (
+            this.auth.userId() !== userId ||
+            this.monthOffset() !== monthOffset
+          ) {
+            return;
+          }
+
           this.toast.danger({
             summary: this.i18n.toast().saveFailedSummary,
             detail: this.i18n.toast().saveFailedDetail,
@@ -302,76 +305,78 @@ export class MyWorkLog {
       });
   }
 
-  protected isPreviousMonth(): boolean {
-    return this.monthOffset() === -1;
-  }
+  protected onRangeStartChange(
+    date: string,
+    rangeGroup: WorkLogRangeFormGroup,
+  ): void {
+    if (this.isSaving()) return;
 
-  private loadMonth(): void {
-    this.isLoading.set(true);
-    this.workLog
-      .getMyMonth(this.monthOffset())
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (days) => {
-          this.initialDays.set(days);
-          this.draftDays.set(days);
-        },
-        error: () => {
-          this.initialDays.set([]);
-          this.draftDays.set([]);
-          this.toast.danger({
-            summary: this.i18n.toast().loadFailedSummary,
-            detail: this.i18n.toast().loadFailedDetail,
-          });
-        },
-      });
-  }
-
-  private getDay(date: string): IUserWorkLogDay {
-    return (
-      this.draftDays().find((day) => day.date === date) ?? {
-        date,
-        ranges: [],
-        isChaoticThursday: false,
-        comment: null,
-      }
+    const startOffset = rangeGroup.controls.startOffset.getRawValue();
+    const endControl = rangeGroup.controls.endOffset;
+    const endOffset = clampEndHourOffset(
+      startOffset,
+      endControl.getRawValue(),
+      WorkLogHourValue.MinDurationHours,
     );
+
+    if (endControl.getRawValue() !== endOffset) {
+      endControl.setValue(endOffset);
+    }
+
+    placeWorkLogRangeFormGroupChronologically(
+      this.getDayForm(date),
+      rangeGroup,
+    );
+    this.showCurrentMutationError();
   }
 
-  private saveDraftDay(day: IUserWorkLogDay): void {
-    const error = getWorkLogMutationError(day.ranges);
+  protected onRangeEndChange(): void {
+    if (this.isSaving()) return;
+
+    this.showCurrentMutationError();
+  }
+
+  protected getDayForm(date: string): WorkLogDayFormGroup {
+    return this.form.controls[date];
+  }
+
+  private replaceFormDays(days: readonly IUserWorkLogDay[]): void {
+    const monthScope = this.monthScope();
+    replaceWorkLogFormDays(
+      this.form,
+      monthScope.days,
+      days,
+      monthScope.isEditable,
+    );
+    this.initialDraftValue.set(JSON.stringify(mapWorkLogFormToDays(this.form)));
+  }
+
+  private showCurrentMutationError(): void {
+    const error = this.mutationError();
 
     if (error) {
       this.handleMutationError(error);
-      return;
     }
-
-    this.draftDays.set(upsertWorkLogDay(this.draftDays(), day));
   }
 
   private handleMutationError(error: WorkLogMutationError): void {
     const dialog = this.i18n.dialog();
+    const content: Record<WorkLogMutationError, UiDialogMessage> = {
+      invalid_duration: {
+        title: dialog.invalidDurationTitle,
+        body: dialog.invalidDurationBody,
+      },
+      overlap: {
+        title: dialog.overlapTitle,
+        body: dialog.overlapBody,
+      },
+      no_space: {
+        title: dialog.noSpaceTitle,
+        body: dialog.noSpaceBody,
+      },
+    };
 
-    switch (error) {
-      case 'invalid_duration':
-        this.infoDialogContent.set({
-          title: dialog.invalidDurationTitle,
-          body: dialog.invalidDurationBody,
-        });
-        break;
-      case 'overlap':
-        this.infoDialogContent.set({
-          title: dialog.overlapTitle,
-          body: dialog.overlapBody,
-        });
-        break;
-      case 'no_space':
-        this.infoDialogContent.set({
-          title: dialog.noSpaceTitle,
-          body: dialog.noSpaceBody,
-        });
-        break;
-    }
+    this.infoDialogContent.set(content[error]);
 
     this.infoDialogVisible.set(true);
   }

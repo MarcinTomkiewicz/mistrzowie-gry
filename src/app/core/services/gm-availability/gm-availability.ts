@@ -1,10 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, of, switchMap, throwError, map } from 'rxjs';
 
-import { IGmAvailabilitySlotRecord } from '../../interfaces/i-gm-availability';
+import {
+  IGmAvailabilitySlotRecord,
+  IGmAvailabilityWindowData,
+} from '../../interfaces/i-gm-availability';
 import { IGmProfile } from '../../interfaces/i-gm-profile';
 import { IUser } from '../../interfaces/i-user';
 import { FilterOperator } from '../../enums/filter-operators';
+import { addDays } from '../../utils/date';
 import { Auth } from '../auth/auth';
 import { Backend } from '../backend/backend';
 
@@ -16,36 +20,42 @@ export class GmAvailability {
   getMyAvailability(
     fromIso: string,
     toIsoExclusive: string,
-  ): Observable<IGmAvailabilitySlotRecord[]> {
+  ): Observable<IGmAvailabilityWindowData> {
     const userId = this.auth.userId();
 
     if (!userId) {
-      return of([]);
+      return of({ editableRecords: [], adjacentRecords: [] });
     }
 
-    return this.backend.getAll<IGmAvailabilitySlotRecord>({
-      table: 'gm_availability_slots',
-      sortBy: 'startsAt',
-      sortOrder: 'asc',
-      pagination: {
-        filters: {
-          gmProfileId: {
-            operator: FilterOperator.EQ,
-            value: userId,
-          },
-          startsAt: [
-            {
-              operator: FilterOperator.GTE,
-              value: fromIso,
-            },
-            {
-              operator: FilterOperator.LT,
-              value: toIsoExclusive,
-            },
-          ],
-        },
-      },
-    });
+    const fromTimestamp = Date.parse(fromIso);
+    const toTimestamp = Date.parse(toIsoExclusive);
+    const contextFromIso = addDays(new Date(fromIso), -1).toISOString();
+    const contextToIsoExclusive = addDays(
+      new Date(toIsoExclusive),
+      1,
+    ).toISOString();
+
+    return this.getAvailabilityForGmsOverlapping(
+      [userId],
+      contextFromIso,
+      contextToIsoExclusive,
+    ).pipe(
+      map((records) => {
+        const editableRecords: IGmAvailabilitySlotRecord[] = [];
+        const adjacentRecords: IGmAvailabilitySlotRecord[] = [];
+
+        for (const record of records) {
+          const startsAt = Date.parse(record.startsAt);
+          const target =
+            startsAt >= fromTimestamp && startsAt < toTimestamp
+              ? editableRecords
+              : adjacentRecords;
+          target.push(record);
+        }
+
+        return { editableRecords, adjacentRecords };
+      }),
+    );
   }
 
   getGmUsers(): Observable<IUser[]> {
@@ -65,55 +75,15 @@ export class GmAvailability {
       })
       .pipe(
         switchMap((profiles) => {
-          const gmProfileIds = [
-            ...new Set(profiles.map((profile) => profile.id).filter(Boolean)),
-          ];
+          const gmProfileIds = profiles.map((profile) => profile.id);
 
           if (!gmProfileIds.length) {
-            return of([] as IUser[]);
+            return of([]);
           }
 
           return this.backend.getByIds<IUser>('users', gmProfileIds);
         }),
       );
-  }
-
-  getAvailabilityForGms(
-    gmProfileIds: readonly string[],
-    fromIso: string,
-    toIsoExclusive: string,
-  ): Observable<IGmAvailabilitySlotRecord[]> {
-    if (!gmProfileIds.length) {
-      return of([]);
-    }
-
-    return this.backend.getAll<IGmAvailabilitySlotRecord>({
-      table: 'gm_availability_slots',
-      sortBy: 'startsAt',
-      sortOrder: 'asc',
-      pagination: {
-        filters: {
-          gmProfileId: {
-            operator: FilterOperator.IN,
-            value: [...gmProfileIds],
-          },
-          startsAt: [
-            {
-              operator: FilterOperator.GTE,
-              value: fromIso,
-            },
-            {
-              operator: FilterOperator.LT,
-              value: toIsoExclusive,
-            },
-          ],
-        },
-      },
-    }).pipe(
-      map((records) =>
-        [...records].sort((left, right) => left.startsAt.localeCompare(right.startsAt)),
-      ),
-    );
   }
 
   getAvailabilityOverview(
@@ -128,11 +98,11 @@ export class GmAvailability {
         if (!gmUsers.length) {
           return of({
             gmUsers,
-            records: [] as IGmAvailabilitySlotRecord[],
+            records: [],
           });
         }
 
-        return this.getAvailabilityForGms(
+        return this.getAvailabilityForGmsOverlapping(
           gmUsers.map((user) => user.id),
           fromIso,
           toIsoExclusive,
@@ -175,11 +145,7 @@ export class GmAvailability {
           },
         },
       },
-    }).pipe(
-      map((records) =>
-        [...records].sort((left, right) => left.startsAt.localeCompare(right.startsAt)),
-      ),
-    );
+    });
   }
 
   replaceMyAvailability(
@@ -193,7 +159,7 @@ export class GmAvailability {
       return throwError(() => new Error('Unauthorized.'));
     }
 
-    return this.ensureMyGmProfile().pipe(
+    return this.ensureMyGmProfile(userId).pipe(
       switchMap(() =>
         this.backend.delete('gm_availability_slots', {
           gmProfileId: {
@@ -239,13 +205,7 @@ export class GmAvailability {
     );
   }
 
-  private ensureMyGmProfile(): Observable<void> {
-    const userId = this.auth.userId();
-
-    if (!userId) {
-      return throwError(() => new Error('Unauthorized.'));
-    }
-
+  private ensureMyGmProfile(userId: string): Observable<void> {
     return this.backend.getById<IGmProfile>('gm_profiles', userId).pipe(
       switchMap((profile) => {
         if (profile) {

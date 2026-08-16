@@ -5,7 +5,6 @@ export type RichContentEditorTranslations = {
   tokens: string;
   tokensHint: string;
   empty: string;
-  addSection: string;
   section: string;
   sectionTitle: string;
   paragraph: string;

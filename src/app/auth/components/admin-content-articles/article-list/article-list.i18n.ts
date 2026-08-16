@@ -11,7 +11,7 @@ import {
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
   AdminContentArticlesActionsTranslations,
-  AdminContentArticleEditorFieldsTranslations,
+  AdminContentArticlesFiltersTranslations,
   AdminContentArticlePublicationValidationTranslations,
   AdminContentArticleStatusLabelTranslations,
   AdminContentArticlesPageTranslations,
@@ -22,26 +22,26 @@ import {
 export function createAdminContentArticleListI18n() {
   const {
     page,
+    filters,
     table,
     actions,
-    fields,
     publicationValidation,
     toast,
     statusLabels,
   } =
     createScopedSectionsI18n<{
       page: AdminContentArticlesPageTranslations;
+      filters: AdminContentArticlesFiltersTranslations;
       table: AdminContentArticlesTableTranslations;
       actions: AdminContentArticlesActionsTranslations;
-      fields: AdminContentArticleEditorFieldsTranslations;
       publicationValidation: AdminContentArticlePublicationValidationTranslations;
       toast: AdminContentArticlesToastTranslations;
       statusLabels: AdminContentArticleStatusLabelTranslations;
     }>('adminContentArticles', {
       page: 'page',
+      filters: 'filters',
       table: 'table',
       actions: 'actions',
-      fields: 'editorFields',
       publicationValidation: 'publicationValidation',
       toast: 'toast',
       statusLabels: 'statusLabels',
@@ -49,9 +49,9 @@ export function createAdminContentArticleListI18n() {
 
   return {
     page,
+    filters,
     table,
     actions,
-    fields,
     publicationValidation,
     toast,
     statusLabels,

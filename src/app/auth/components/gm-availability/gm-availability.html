@@ -24,7 +24,7 @@
     (dateSelected)="onDateSelected($event)"
   />
 
-  @if (selectedDate()) {
+  @if (selectedDate(); as selectedDate) {
     <section
       #editorPanel
       class="mg-card flex-col-start-stretch gap-md p-md w-100"
@@ -39,7 +39,7 @@
             </h3>
 
             <p class="mg-section__subtitle m-0">
-              {{ formatDateLabel(selectedDate()!, "pl-PL", true) }}
+              {{ formatDateLabel(selectedDate, "pl-PL", true) }}
             </p>
           </div>
 
@@ -48,7 +48,7 @@
               severity="secondary"
               [outlined]="true"
               [label]="i18n.actions().previousDayLabel"
-              [disabled]="!canMoveSelectedDate(-1)"
+              [disabled]="isSaving() || !canMoveSelectedDate(-1)"
               (onClick)="moveSelectedDate(-1)"
             />
 
@@ -56,7 +56,7 @@
               severity="secondary"
               [outlined]="true"
               [label]="i18n.actions().nextDayLabel"
-              [disabled]="!canMoveSelectedDate(1)"
+              [disabled]="isSaving() || !canMoveSelectedDate(1)"
               (onClick)="moveSelectedDate(1)"
             />
 
@@ -65,12 +65,14 @@
               [outlined]="true"
               icon="pi pi-demolish"
               [label]="i18n.commonActions().clearDay"
+              [disabled]="isSaving()"
               (onClick)="clearSelectedDate()"
             />
 
             <p-button
               severity="success"
               [label]="i18n.commonActions().confirm"
+              [disabled]="isSaving()"
               (onClick)="confirmSelectedDate()"
               icon="pi pi-done-it"
               iconPos="left"
@@ -86,7 +88,8 @@
             severity="secondary"
             size="small"
             [outlined]="true"
-            [disabled]="!canMoveSelectedDate(-1)"
+            [ariaLabel]="i18n.actions().previousDayLabel"
+            [disabled]="isSaving() || !canMoveSelectedDate(-1)"
             (onClick)="moveSelectedDate(-1)"
           />
 
@@ -98,7 +101,7 @@
             </h3>
 
             <p class="mg-section__subtitle m-0">
-              {{ formatDateLabel(selectedDate()!, "pl-PL", true) }}
+              {{ formatDateLabel(selectedDate, "pl-PL", true) }}
             </p>
           </div>
 
@@ -107,7 +110,8 @@
             severity="secondary"
             size="small"
             [outlined]="true"
-            [disabled]="!canMoveSelectedDate(1)"
+            [ariaLabel]="i18n.actions().nextDayLabel"
+            [disabled]="isSaving() || !canMoveSelectedDate(1)"
             (onClick)="moveSelectedDate(1)"
           />
         </div>
@@ -121,6 +125,7 @@
             [outlined]="true"
             icon="pi pi-demolish"
             [label]="i18n.commonActions().clearDay"
+            [disabled]="isSaving()"
             (onClick)="clearSelectedDate()"
           />
 
@@ -130,24 +135,28 @@
             iconPos="left"
             size="small"
             [label]="i18n.commonActions().confirm"
+            [disabled]="isSaving()"
             (onClick)="confirmSelectedDate()"
           />
         </div>
       </div>
 
-      @if (rangeGroups().length) {
+      @if (ranges.length) {
         <div class="flex-col-start-stretch gap-sm">
           @for (
-            rangeGroup of rangeGroups();
-            track trackRange($index, rangeGroup);
+            rangeGroup of ranges.controls;
+            track rangeGroup;
             let index = $index
           ) {
             <div
               class="mg-grid grid-3-cols grid-1-cols-sm gap-sm grid-items-end"
             >
               <div class="flex-col-start-stretch gap-xs">
-                <label>{{ i18n.commonLabels().from }}</label>
+                <label [for]="'gm-availability-from-' + index">
+                  {{ i18n.commonLabels().from }}
+                </label>
                 <p-select
+                  [inputId]="'gm-availability-from-' + index"
                   [options]="startHourOptions"
                   optionLabel="label"
                   optionValue="value"
@@ -159,8 +168,11 @@
               </div>
 
               <div class="flex-col-start-stretch gap-xs">
-                <label>{{ i18n.commonLabels().to }}</label>
+                <label [for]="'gm-availability-to-' + index">
+                  {{ i18n.commonLabels().to }}
+                </label>
                 <p-select
+                  [inputId]="'gm-availability-to-' + index"
                   [options]="getEndHourOptions(rangeGroup)"
                   optionLabel="label"
                   optionValue="value"
@@ -176,6 +188,7 @@
                   [outlined]="true"
                   icon="pi pi-demolish"
                   [label]="i18n.actions().removeRangeLabel"
+                  [disabled]="isSaving()"
                   (onClick)="removeRange(index)"
                 />
               </div>
@@ -199,6 +212,7 @@
             severity="success"
             icon="pi pi-add-plus"
             [label]="i18n.actions().addRangeLabel"
+            [disabled]="isSaving()"
             (onClick)="addRange()"
           />
         </div>
@@ -210,7 +224,7 @@
     <p-button
       severity="success"
       [label]="i18n.actions().saveLabel"
-      [disabled]="(!hasChanges() && !editorForm.dirty) || isSaving()"
+      [disabled]="(!hasChanges() && !ranges.dirty) || isSaving()"
       [loading]="isSaving()"
       (onClick)="saveAvailability()"
       loadingIcon="pi pi-d20"
