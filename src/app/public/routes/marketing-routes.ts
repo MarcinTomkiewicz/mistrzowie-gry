@@ -1,13 +1,4 @@
-import { inject } from '@angular/core';
-import type { ResolveFn, Routes } from '@angular/router';
-
-import { TranslocoService } from '@jsverse/transloco';
-
-const loadHomeTranslations: ResolveFn<unknown> = () => {
-  const transloco = inject(TranslocoService);
-
-  return transloco.load(`home/${transloco.getActiveLang()}`);
-};
+import type { Routes } from '@angular/router';
 
 const loaders = {
   home: () => import('../components/home/home').then((m) => m.Home),
@@ -25,12 +16,7 @@ const loaders = {
 } as const;
 
 export const marketingRoutes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    loadComponent: loaders.home,
-    resolve: { homeTranslations: loadHomeTranslations },
-  },
+  { path: '', pathMatch: 'full', loadComponent: loaders.home },
   { path: 'about', loadComponent: loaders.about },
   { path: 'our-team', loadComponent: loaders.ourTeam },
   { path: 'offer/:slug', loadComponent: loaders.offer },
