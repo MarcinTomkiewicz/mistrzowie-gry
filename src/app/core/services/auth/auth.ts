@@ -7,7 +7,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { AuthChangeEvent, Session } from '@supabase/supabase-js';
+import {
+  AuthChangeEvent,
+  isAuthSessionMissingError,
+  Session,
+} from '@supabase/supabase-js';
 import {
   catchError,
   finalize,
@@ -15,6 +19,7 @@ import {
   map,
   Observable,
   of,
+  shareReplay,
   switchMap,
   tap,
   throwError,
@@ -47,6 +52,9 @@ export class Auth {
 
   private readonly _user = signal<IUser | null>(null);
   private readonly _isReady = signal(false);
+  private principalId: string | null | undefined;
+  private principalSyncOwner: object = {};
+  private principalSync$: Observable<IUser | null> | null = null;
 
   readonly user = computed(() => this._user());
   readonly isReady = computed(() => this._isReady());
@@ -65,34 +73,7 @@ export class Auth {
   }
 
   loadUser(): Observable<IUser | null> {
-    this._isReady.set(false);
-
-    return from(this.supabase.auth.getUser()).pipe(
-      switchMap(({ data, error }) => {
-        if (error) {
-          throw mapAuthError(error);
-        }
-
-        const id = data.user?.id;
-
-        if (!id) {
-          this._user.set(null);
-          this.authSession.setHasSessionCookie(false);
-          return of(null);
-        }
-
-        this.authSession.setHasSessionCookie(true);
-        return this.loadProfile(id);
-      }),
-      catchError(() => {
-        this._user.set(null);
-        this.authSession.refresh();
-        return of(null);
-      }),
-      finalize(() => {
-        this._isReady.set(true);
-      }),
-    );
+    return this.synchronizePrincipal();
   }
 
   login(payload: ILoginPayload): Observable<IUser> {
@@ -114,8 +95,12 @@ export class Auth {
         }
 
         this.authSession.setHasSessionCookie(true);
-        return this.loadProfileRequired(id).pipe(
-          tap(() => this._isReady.set(true)),
+        return this.synchronizePrincipal(id).pipe(
+          switchMap((user) =>
+            user
+              ? of(user)
+              : throwError(() => new AppAuthError('profile_not_found')),
+          ),
         );
       }),
       catchError((error) => this.toErrorObservable(error)),
@@ -168,13 +153,11 @@ export class Auth {
         return this.backend.upsert<IUser>('users', userPayload).pipe(
           map((user) => {
             if (hasSession) {
-              this._user.set(user);
-              this._isReady.set(true);
+              this.setAuthenticatedUser(user);
               return user;
             }
 
-            this._user.set(null);
-            this._isReady.set(true);
+            this.clearPrincipal();
             return null;
           }),
         );
@@ -191,10 +174,7 @@ export class Auth {
     }
 
     return this.backend.update<IUser>('users', user.id, payload).pipe(
-      tap((nextUser) => {
-        this._user.set(nextUser);
-        this._isReady.set(true);
-      }),
+      tap((nextUser) => this.setAuthenticatedUser(nextUser)),
       catchError((error) => this.toErrorObservable(error)),
     );
   }
@@ -206,9 +186,7 @@ export class Auth {
           throw mapAuthError(error);
         }
 
-        this._user.set(null);
-        this.authSession.setHasSessionCookie(false);
-        this._isReady.set(true);
+        this.clearPrincipal();
 
         return from(this.router.navigateByUrl(redirectTo)).pipe(
           map(() => void 0),
@@ -223,39 +201,154 @@ export class Auth {
   }
 
   private initializeAuth(): void {
-    this.loadUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      error: () => undefined,
+    });
 
     if (!this.platform.isBrowser) {
       return;
     }
 
-    this.supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, _session: Session | null) => {
-        this.loadUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    const { data: { subscription } } = this.supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null) => {
+        const principalId = session?.user.id ?? null;
+
+        switch (event) {
+          case 'SIGNED_IN':
+          case 'USER_UPDATED':
+            if (
+              !principalId ||
+              principalId === this._user()?.id ||
+              (this.principalSync$ !== null && principalId === this.principalId)
+            ) {
+              break;
+            }
+
+            this.synchronizePrincipal(principalId)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({ error: () => undefined });
+            break;
+          case 'SIGNED_OUT':
+            this.clearPrincipal();
+            break;
+        }
       },
     );
+
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   private loadProfile(id: string): Observable<IUser | null> {
-    return this.backend.getById<IUser>('users', id).pipe(
-      tap((user) => this._user.set(user)),
-      catchError(() => {
-        this._user.set(null);
-        return of(null);
-      }),
-    );
+    return this.backend.getById<IUser>('users', id);
   }
 
-  private loadProfileRequired(id: string): Observable<IUser> {
-    return this.loadProfile(id).pipe(
-      switchMap((user) => {
-        if (!user) {
-          return throwError(() => new AppAuthError('profile_not_found'));
+  private synchronizePrincipal(
+    principalId?: string,
+  ): Observable<IUser | null> {
+    if (
+      this.principalSync$ !== null &&
+      (principalId === undefined || principalId === this.principalId)
+    ) {
+      return this.principalSync$;
+    }
+
+    const owner = {};
+    this.principalSyncOwner = owner;
+    this.principalSync$ = null;
+    this._isReady.set(false);
+
+    if (principalId !== undefined) {
+      if (principalId !== this.principalId) {
+        this._user.set(null);
+      }
+
+      this.principalId = principalId;
+      this.authSession.setHasSessionCookie(true);
+    }
+
+    const principal$ = principalId === undefined
+      ? from(this.supabase.auth.getUser()).pipe(
+          map(({ data, error }) => {
+            if (isAuthSessionMissingError(error)) {
+              return null;
+            }
+
+            if (error) {
+              throw mapAuthError(error);
+            }
+
+            return data.user?.id ?? null;
+          }),
+        )
+      : of(principalId);
+
+    const sync$ = principal$.pipe(
+      switchMap((nextPrincipalId) => {
+        if (this.principalSyncOwner !== owner) {
+          return of(this._user());
         }
 
-        return of(user);
+        if (nextPrincipalId !== this.principalId) {
+          this._user.set(null);
+        }
+
+        this.principalId = nextPrincipalId;
+        this.authSession.setHasSessionCookie(nextPrincipalId !== null);
+
+        return nextPrincipalId === null
+          ? of(null)
+          : this.loadProfile(nextPrincipalId);
       }),
+      map((user) =>
+        this.principalSyncOwner === owner ? user : this._user(),
+      ),
+      tap((user) => {
+        if (this.principalSyncOwner === owner) {
+          this._user.set(user);
+          this._isReady.set(true);
+        }
+      }),
+      catchError((error) => {
+        if (this.principalSyncOwner !== owner) {
+          return of(this._user());
+        }
+
+        const authError = error instanceof AppAuthError
+          ? error
+          : mapAuthError(error);
+
+        this._user.set(null);
+        this.authSession.refresh();
+        return throwError(() => authError);
+      }),
+      finalize(() => {
+        if (this.principalSyncOwner === owner) {
+          this.principalSync$ = null;
+        }
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
     );
+
+    this.principalSync$ = sync$;
+    return sync$;
+  }
+
+  private setAuthenticatedUser(user: IUser): void {
+    this.principalSyncOwner = {};
+    this.principalSync$ = null;
+    this.principalId = user.id;
+    this._user.set(user);
+    this.authSession.setHasSessionCookie(true);
+    this._isReady.set(true);
+  }
+
+  private clearPrincipal(): void {
+    this.principalSyncOwner = {};
+    this.principalSync$ = null;
+    this.principalId = null;
+    this._user.set(null);
+    this.authSession.setHasSessionCookie(false);
+    this._isReady.set(true);
   }
 
   private toErrorObservable(error: unknown): Observable<never> {

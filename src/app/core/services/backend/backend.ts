@@ -179,7 +179,7 @@ export class Backend {
     table: string,
     data: TPayload,
   ): Observable<TResult> {
-    const snake = toSnakeCase(data);
+    const snake = toSnakeCase<Record<string, unknown>>(data);
     return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).insert(snake).select('*').single(),
     ).pipe(
@@ -189,7 +189,7 @@ export class Backend {
 
   createMany<T extends object>(table: string, data: T[]): Observable<T[]> {
     if (!data.length) return of([]);
-    const snake = toSnakeCase(data);
+    const snake = toSnakeCase<Record<string, unknown>[]>(data);
     return this.trackedRequest<PostgrestResponse<unknown>>(() =>
       this.supabase.from(table).insert(snake).select('*'),
     ).pipe(
@@ -198,7 +198,7 @@ export class Backend {
   }
 
   update<T extends object>(table: string, id: string | number, patch: Partial<T>): Observable<T> {
-    const snake = toSnakeCase(patch);
+    const snake = toSnakeCase<Record<string, unknown>>(patch);
     return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).update(snake).eq('id', id).select('*').single(),
     ).pipe(
@@ -207,7 +207,7 @@ export class Backend {
   }
 
   upsert<T extends object>(table: string, data: T, conflictTarget: string = 'id'): Observable<T> {
-    const snake = toSnakeCase(data);
+    const snake = toSnakeCase<Record<string, unknown>>(data);
     return this.trackedRequest<PostgrestSingleResponse<unknown>>(() =>
       this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*').single(),
     ).pipe(
@@ -217,7 +217,7 @@ export class Backend {
 
   upsertMany<T extends object>(table: string, data: T[], conflictTarget: string = 'id'): Observable<T[]> {
     if (!data.length) return of([]);
-    const snake = toSnakeCase(data);
+    const snake = toSnakeCase<Record<string, unknown>[]>(data);
     return this.trackedRequest<PostgrestResponse<unknown>>(() =>
       this.supabase.from(table).upsert(snake, { onConflict: conflictTarget }).select('*'),
     ).pipe(

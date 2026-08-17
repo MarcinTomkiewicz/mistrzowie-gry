@@ -2,6 +2,7 @@
   "page": {
     "title": "Przegląd czasu pracy Mistrzów Gry",
     "subtitle": "Ten widok pokazuje ewidencję czasu pracy wszystkich osób z rolą GM i wyższą dla wybranego miesiąca wraz z możliwością eksportu danych.",
+    "payrollExportIncomplete": "[PH] Część osób została pominięta w eksporcie z powodu braku kompletnych danych imienia i nazwiska lub błędu ich odczytu.",
     "emptyStateTitle": "Brak danych do wyświetlenia",
     "emptyStateDescription": "Nie znaleziono jeszcze żadnych work logów ani użytkowników do pokazania w tym widoku.",
     "emptyUserTitle": "Brak wpisów dla tego użytkownika",

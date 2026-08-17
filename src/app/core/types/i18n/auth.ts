@@ -224,6 +224,7 @@ export interface MyWorkLogToastTranslations {
 export interface WorkLogOverviewTranslations {
   title: string;
   subtitle: string;
+  payrollExportIncomplete: string;
   emptyStateTitle: string;
   emptyStateDescription: string;
   emptyUserTitle: string;

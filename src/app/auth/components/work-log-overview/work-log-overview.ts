@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { finalize, map, switchMap } from 'rxjs';
+import { finalize } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { AccordionModule } from 'primeng/accordion';
@@ -20,9 +20,9 @@ import {
   IUserWorkLogOverviewVm,
   IUserWorkLogRecord,
 } from '../../../core/interfaces/i-work-log';
-import { ICoworkerProfile } from '../../../core/interfaces/i-coworker-profile';
+import { IPayrollIdentity } from '../../../core/interfaces/i-payroll-identity';
 import { Auth } from '../../../core/services/auth/auth';
-import { CoworkerProfile } from '../../../core/services/coworker-profile/coworker-profile';
+import { PayrollIdentity } from '../../../core/services/payroll-identity/payroll-identity';
 import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { WorkLog } from '../../../core/services/work-log/work-log';
@@ -58,24 +58,29 @@ import {
 })
 export class WorkLogOverview {
   private readonly auth = inject(Auth);
-  private readonly coworkerProfile = inject(CoworkerProfile);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly payrollIdentity = inject(PayrollIdentity);
   private readonly platform = inject(Platform);
   private readonly toast = inject(UiToast);
   private readonly workLog = inject(WorkLog);
 
   protected readonly i18n = createWorkLogOverviewI18n();
   protected readonly isLoading = signal(true);
+  protected readonly loadFailed = signal(false);
+  protected readonly isPayrollIdentityLoading = signal(true);
   protected readonly isCompactView = signal(false);
   protected readonly monthOffset = signal<WorkLogMonthOffset>(0);
+  protected readonly isAdmin = computed(() => this.auth.hasRole('admin'));
 
   private readonly users = signal<readonly IUserWorkLogOverviewVm['user'][]>([]);
-  private readonly coworkerProfiles = signal<readonly ICoworkerProfile[]>([]);
+  private readonly payrollIdentities = signal<readonly IPayrollIdentity[]>([]);
   private readonly records = signal<readonly IUserWorkLogRecord[]>([]);
-  private readonly coworkerProfileByUserId = computed(
+  private readonly payrollIdentityByUserId = computed(
     () =>
       new Map(
-        this.coworkerProfiles().map((profile) => [profile.userId, profile] as const),
+        this.payrollIdentities().map(
+          (identity) => [identity.userId, identity] as const,
+        ),
       ),
   );
 
@@ -96,23 +101,43 @@ export class WorkLogOverview {
         };
       })
       .sort((left, right) =>
-        this.getOverviewUserLabel(left.user).localeCompare(
-          this.getOverviewUserLabel(right.user),
+        getUserDisplayName(left.user).localeCompare(
+          getUserDisplayName(right.user),
           'pl',
         ),
       ),
   );
-  protected readonly exportRows = computed<IUserWorkLogExportRow[]>(() =>
-    this.overview().map((item) => ({
-      userId: item.user.id,
-      firstName: this.getExportFirstName(item.user.id, item.user.firstName),
-      lastName: this.getExportLastName(item.user.id),
-      totalHours: item.totalHours,
-      chaoticThursdayDatesLabel: item.days
-        .filter((day) => day.isChaoticThursday)
-        .map((day) => formatDateLabel(day.date, 'pl-PL'))
-        .join(', '),
-    })),
+  protected readonly payrollCandidates = computed(() =>
+    this.overview().filter((item) => item.days.length > 0),
+  );
+  protected readonly exportRows = computed<IUserWorkLogExportRow[]>(() => {
+    const rows: IUserWorkLogExportRow[] = [];
+
+    for (const item of this.payrollCandidates()) {
+      const identity = this.payrollIdentityByUserId().get(item.user.id);
+
+      if (!identity) {
+        continue;
+      }
+
+      rows.push({
+        userId: item.user.id,
+        firstName: identity.firstName,
+        lastName: identity.lastName,
+        totalHours: item.totalHours,
+        chaoticThursdayDatesLabel: item.days
+          .filter((day) => day.isChaoticThursday)
+          .map((day) => formatDateLabel(day.date, 'pl-PL'))
+          .join(', '),
+      });
+    }
+
+    return rows;
+  });
+  protected readonly hasIncompletePayrollExport = computed(() =>
+    this.payrollCandidates().some(
+      (item) => !this.payrollIdentityByUserId().has(item.user.id),
+    ),
   );
   protected readonly totalHours = computed(() =>
     formatWorkLogHours(
@@ -122,6 +147,7 @@ export class WorkLogOverview {
   protected readonly formatHours = formatWorkLogHours;
   protected readonly formatRangeLabel = formatHourOffsetRangeLabel;
   protected readonly formatDateLabel = formatDateLabel;
+  protected readonly getUserDisplayName = getUserDisplayName;
 
   constructor() {
     const syncViewport = () => {
@@ -135,6 +161,9 @@ export class WorkLogOverview {
 
     effect((onCleanup) => {
       if (!this.auth.isReady()) {
+        this.users.set([]);
+        this.records.set([]);
+        this.isLoading.set(true);
         return;
       }
 
@@ -144,44 +173,49 @@ export class WorkLogOverview {
       if (!userId) {
         this.users.set([]);
         this.records.set([]);
-        this.coworkerProfiles.set([]);
         this.isLoading.set(false);
         return;
       }
 
       this.isLoading.set(true);
+      this.loadFailed.set(false);
       const subscription = this.workLog
         .getOverview(monthOffset)
-        .pipe(
-          switchMap(({ users, records }) =>
-            this.coworkerProfile
-              .getProfilesByUserIds(users.map((user) => user.id))
-              .pipe(
-                map((coworkerProfiles) => ({
-                  users,
-                  records,
-                  coworkerProfiles,
-                })),
-              ),
-          ),
-          finalize(() => this.isLoading.set(false)),
-        )
+        .pipe(finalize(() => this.isLoading.set(false)))
         .subscribe({
-          next: ({ users, records, coworkerProfiles }) => {
+          next: ({ users, records }) => {
             this.users.set(users);
             this.records.set(records);
-            this.coworkerProfiles.set(coworkerProfiles);
           },
           error: () => {
             this.users.set([]);
             this.records.set([]);
-            this.coworkerProfiles.set([]);
+            this.loadFailed.set(true);
             this.toast.danger({
               summary: this.i18n.toast().loadFailedSummary,
               detail: this.i18n.toast().loadFailedDetail,
             });
           },
         });
+
+      onCleanup(() => subscription.unsubscribe());
+    });
+
+    effect((onCleanup) => {
+      const candidates = this.payrollCandidates();
+
+      this.payrollIdentities.set([]);
+
+      if (!candidates.length || !this.isAdmin()) {
+        this.isPayrollIdentityLoading.set(false);
+        return;
+      }
+
+      this.isPayrollIdentityLoading.set(true);
+      const subscription = this.payrollIdentity
+        .getByUserIds(candidates.map((item) => item.user.id))
+        .pipe(finalize(() => this.isPayrollIdentityLoading.set(false)))
+        .subscribe((identities) => this.payrollIdentities.set(identities));
 
       onCleanup(() => subscription.unsubscribe());
     });
@@ -201,26 +235,5 @@ export class WorkLogOverview {
 
   protected getDayHours(day: Pick<IUserWorkLogDay, 'ranges'>): string {
     return formatWorkLogHours(getWorkLogDayHours(day));
-  }
-
-  protected getOverviewUserLabel(user: IUserWorkLogOverviewVm['user']): string {
-    const profile = this.coworkerProfileByUserId().get(user.id);
-    const officialName = [profile?.firstName?.trim(), profile?.lastName?.trim()]
-      .filter(Boolean)
-      .join(' ');
-
-    return officialName || getUserDisplayName(user);
-  }
-
-  private getExportFirstName(userId: string, fallbackFirstName: string | null): string {
-    return (
-      this.coworkerProfileByUserId().get(userId)?.firstName?.trim() ||
-      fallbackFirstName?.trim() ||
-      ''
-    );
-  }
-
-  private getExportLastName(userId: string): string {
-    return this.coworkerProfileByUserId().get(userId)?.lastName?.trim() || '';
   }
 }

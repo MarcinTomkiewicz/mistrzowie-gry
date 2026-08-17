@@ -3,7 +3,7 @@
 @use "../abstracts/mixins" as m;
 
 /* =========================================================
-   PrimeNG >=16 - Accordion (NEW API)
+   PrimeNG 21 - Accordion
    Cel: tylko kolory, spacing, typografia
    ========================================================= */
 
@@ -22,12 +22,11 @@
 /* prawdziwy clickable element */
 .p-accordionheader {
   width: 100%;
-  background: transparent;
+  background: v.$color-bg-surface;
   border: 0;
   margin: 0;
 
   color: v.$color-text;
-
 
   display: flex;
   align-items: center;
@@ -41,7 +40,7 @@
 /* focus-visible - spójne z resztą UI */
 .p-accordionheader:focus-visible {
   outline: 0;
-  background: v.$color-text;
+  box-shadow: inset 0 0 0 3px v.$color-form-ring;
 }
 
 /* treść */
@@ -49,9 +48,6 @@
   border-top: 1px solid v.$color-border;
   background: transparent;
   color: v.$color-text;
-}
-
-.p-accordioncontent-content {
   padding: map.get(v.$spacings, "sm") map.get(v.$spacings, "md");
 
   p {
@@ -60,18 +56,14 @@
   }
 }
 
-.p-accordionheader-toggle-icon .p-icon {
-    color: v.$color-text;
-}
-
-.p-accordionpanel:not(.p-disabled).p-accordionpanel-active > .p-accordionheader .p-accordionheader-toggle-icon {
-    color: v.$color-text;
+.p-accordionheader-toggle-icon {
+  color: v.$color-text;
 }
 
 /* ciaśniej na mobile */
 @include m.down("sm") {
-  .p-accordion-header-action,
-  .p-accordion-content-body {
+  .p-accordionheader,
+  .p-accordioncontent-content {
     padding: map.get(v.$spacings, "sm");
   }
 }
