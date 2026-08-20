@@ -33,6 +33,11 @@ export function buildCoworkerQuestionnairePayload(
   const usesPesel = value.personal.identificationBasis === 'pesel';
   const usesDocument = value.personal.identificationBasis === 'identity_document';
   const sameAsRegistered = value.correspondenceAddress.sameAsRegistered;
+  const sicknessInsuranceActive =
+    value.insurance.subjectToCompulsorySocialInsurance === 'yes';
+  const pensionDisabilityInsuranceActive =
+    value.insurance.studentUnder26 !== 'yes' &&
+    value.insurance.subjectToCompulsorySocialInsurance === 'no';
 
   return {
     personal: {
@@ -118,13 +123,18 @@ export function buildCoworkerQuestionnairePayload(
           : null,
       subjectToCompulsorySocialInsurance:
         value.insurance.subjectToCompulsorySocialInsurance,
-      voluntarySicknessInsurance: value.insurance.voluntarySicknessInsurance,
+      voluntarySicknessInsurance: sicknessInsuranceActive
+        ? value.insurance.voluntarySicknessInsurance
+        : null,
       voluntarySicknessInsuranceJoinConfirmed:
-        value.insurance.voluntarySicknessInsurance === 'join'
+        sicknessInsuranceActive &&
+          value.insurance.voluntarySicknessInsurance === 'join'
           ? value.insurance.voluntarySicknessInsuranceJoinConfirmed
           : null,
       voluntaryPensionDisabilityInsurance:
-        value.insurance.voluntaryPensionDisabilityInsurance,
+        pensionDisabilityInsuranceActive
+          ? value.insurance.voluntaryPensionDisabilityInsurance
+          : null,
       hasPensionOrDisabilityPensionRight:
         value.insurance.hasPensionOrDisabilityPensionRight,
       disabilityDegree: value.insurance.disabilityDegree,

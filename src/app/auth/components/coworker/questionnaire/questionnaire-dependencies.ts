@@ -1,5 +1,5 @@
 import { FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { merge, Subscription } from 'rxjs';
 
 import {
   CoworkerCorrespondenceAddressForm,
@@ -151,23 +151,73 @@ function bindInsurance(
     ),
   );
 
-  const applySicknessChoice = (): void => {
-    const joins = form.controls.voluntarySicknessInsurance.value === 'join';
-    if (!joins) {
+  let compulsoryAnswerWasAutomatic = false;
+  const applyInsuranceElections = (): void => {
+    const isStudentUnder26 = form.controls.studentUnder26.value === 'yes';
+    const compulsoryAnswerIsAutomatic = isStudentUnder26 ||
+      (form.controls.otherEmployment.value === 'yes' &&
+        form.controls.otherEmploymentAtLeastMinimumWage.value === 'yes');
+
+    if (compulsoryAnswerIsAutomatic) {
+      form.controls.subjectToCompulsorySocialInsurance.setValue('no', {
+        emitEvent: false,
+      });
+    } else if (compulsoryAnswerWasAutomatic) {
+      form.controls.subjectToCompulsorySocialInsurance.setValue(null, {
+        emitEvent: false,
+      });
+    }
+    compulsoryAnswerWasAutomatic = compulsoryAnswerIsAutomatic;
+    setControlEnabled(
+      form.controls.subjectToCompulsorySocialInsurance,
+      !compulsoryAnswerIsAutomatic,
+    );
+
+    const sicknessInsuranceActive = !isStudentUnder26 &&
+      form.controls.subjectToCompulsorySocialInsurance.value === 'yes';
+    if (!sicknessInsuranceActive) {
+      form.controls.voluntarySicknessInsurance.setValue(null, {
+        emitEvent: false,
+      });
+    }
+    setControlEnabled(
+      form.controls.voluntarySicknessInsurance,
+      sicknessInsuranceActive,
+    );
+
+    const sicknessConfirmationActive = sicknessInsuranceActive &&
+      form.controls.voluntarySicknessInsurance.value === 'join';
+    if (!sicknessConfirmationActive) {
       form.controls.voluntarySicknessInsuranceJoinConfirmed.setValue(null, {
         emitEvent: false,
       });
     }
     setControlEnabled(
       form.controls.voluntarySicknessInsuranceJoinConfirmed,
-      joins,
+      sicknessConfirmationActive,
+    );
+
+    const pensionDisabilityInsuranceActive = !isStudentUnder26 &&
+      form.controls.subjectToCompulsorySocialInsurance.value === 'no';
+    if (!pensionDisabilityInsuranceActive) {
+      form.controls.voluntaryPensionDisabilityInsurance.setValue(null, {
+        emitEvent: false,
+      });
+    }
+    setControlEnabled(
+      form.controls.voluntaryPensionDisabilityInsurance,
+      pensionDisabilityInsuranceActive,
     );
   };
-  applySicknessChoice();
+  applyInsuranceElections();
   binding.add(
-    form.controls.voluntarySicknessInsurance.valueChanges.subscribe(
-      applySicknessChoice,
-    ),
+    merge(
+      form.controls.studentUnder26.valueChanges,
+      form.controls.otherEmployment.valueChanges,
+      form.controls.otherEmploymentAtLeastMinimumWage.valueChanges,
+      form.controls.subjectToCompulsorySocialInsurance.valueChanges,
+      form.controls.voluntarySicknessInsurance.valueChanges,
+    ).subscribe(applyInsuranceElections),
   );
   return binding;
 }

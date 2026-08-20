@@ -17,15 +17,24 @@
       inputId="questionnaire-compulsory-social-insurance"
     />
 
-    <app-questionnaire-choice-field
-      [control]="form().controls.voluntarySicknessInsurance"
-      [label]="i18n.fields().voluntarySicknessInsuranceLabel"
-      [options]="insuranceChoiceOptions()"
-      fieldPath="data.insurance.voluntarySicknessInsurance"
-      inputId="questionnaire-voluntary-sickness-insurance"
-    />
+    @if (
+      form().controls.studentUnder26.value !== 'yes' &&
+      form().controls.subjectToCompulsorySocialInsurance.value === 'yes'
+    ) {
+      <app-questionnaire-choice-field
+        [control]="form().controls.voluntarySicknessInsurance"
+        [label]="i18n.fields().voluntarySicknessInsuranceLabel"
+        [options]="insuranceChoiceOptions()"
+        fieldPath="data.insurance.voluntarySicknessInsurance"
+        inputId="questionnaire-voluntary-sickness-insurance"
+      />
+    }
 
-    @if (form().controls.voluntarySicknessInsurance.value === 'join') {
+    @if (
+      form().controls.studentUnder26.value !== 'yes' &&
+      form().controls.subjectToCompulsorySocialInsurance.value === 'yes' &&
+      form().controls.voluntarySicknessInsurance.value === 'join'
+    ) {
       <div class="flex-col-start-stretch gap-xs">
         <div class="flex-row-start-center gap-sm">
           <p-checkbox
@@ -46,7 +55,10 @@
       </div>
     }
 
-    @if (form().controls.subjectToCompulsorySocialInsurance.value === 'no') {
+    @if (
+      form().controls.studentUnder26.value !== 'yes' &&
+      form().controls.subjectToCompulsorySocialInsurance.value === 'no'
+    ) {
       <app-questionnaire-choice-field
         [control]="form().controls.voluntaryPensionDisabilityInsurance"
         [label]="i18n.fields().voluntaryPensionDisabilityInsuranceLabel"

@@ -158,8 +158,6 @@ function validateInsurance(
     "studentUnder26",
     "otherMandateContract",
     "subjectToCompulsorySocialInsurance",
-    "voluntarySicknessInsurance",
-    "voluntaryPensionDisabilityInsurance",
     "hasPensionOrDisabilityPensionRight",
     "disabilityDegree",
     "registeredAtEmploymentOffice",
@@ -208,6 +206,24 @@ function validateInsurance(
     );
   }
   if (
+    insurance.studentUnder26 !== "yes" &&
+    insurance.subjectToCompulsorySocialInsurance === "yes" &&
+    insurance.voluntarySicknessInsurance === null
+  ) {
+    errors["data.insurance.voluntarySicknessInsurance"] =
+      "Answer is required.";
+  }
+  if (
+    insurance.studentUnder26 !== "yes" &&
+    insurance.subjectToCompulsorySocialInsurance === "no" &&
+    insurance.voluntaryPensionDisabilityInsurance === null
+  ) {
+    errors["data.insurance.voluntaryPensionDisabilityInsurance"] =
+      "Answer is required.";
+  }
+  if (
+    insurance.studentUnder26 !== "yes" &&
+    insurance.subjectToCompulsorySocialInsurance === "yes" &&
     insurance.voluntarySicknessInsurance === "join" &&
     insurance.voluntarySicknessInsuranceJoinConfirmed !== true
   ) {

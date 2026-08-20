@@ -97,12 +97,51 @@ export function validateInsuranceRules(
     errors,
   );
 
+  const isStudentUnder26 = insurance.studentUnder26 === "yes";
+  const compulsoryInsuranceExcluded = isStudentUnder26 ||
+    (insurance.otherEmployment === "yes" &&
+      insurance.otherEmploymentAtLeastMinimumWage === "yes");
   if (
+    compulsoryInsuranceExcluded &&
+    insurance.subjectToCompulsorySocialInsurance !== "no"
+  ) {
+    errors["data.insurance.subjectToCompulsorySocialInsurance"] =
+      "Value must be no when compulsory social insurance is excluded.";
+  }
+
+  const sicknessInsuranceActive = !isStudentUnder26 &&
+    insurance.subjectToCompulsorySocialInsurance === "yes";
+  if (
+    !sicknessInsuranceActive &&
+    insurance.voluntarySicknessInsurance !== null
+  ) {
+    errors["data.insurance.voluntarySicknessInsurance"] =
+      "Value must be null when sickness insurance is inactive.";
+  }
+  if (
+    !sicknessInsuranceActive &&
+    insurance.voluntarySicknessInsuranceJoinConfirmed !== null
+  ) {
+    errors["data.insurance.voluntarySicknessInsuranceJoinConfirmed"] =
+      "Value must be null when sickness insurance is inactive.";
+  }
+  if (
+    sicknessInsuranceActive &&
     insurance.voluntarySicknessInsurance !== "join" &&
     insurance.voluntarySicknessInsuranceJoinConfirmed !== null
   ) {
     errors["data.insurance.voluntarySicknessInsuranceJoinConfirmed"] =
       "Value must be null when sickness insurance is not joined.";
+  }
+
+  const pensionDisabilityInsuranceActive = !isStudentUnder26 &&
+    insurance.subjectToCompulsorySocialInsurance === "no";
+  if (
+    !pensionDisabilityInsuranceActive &&
+    insurance.voluntaryPensionDisabilityInsurance !== null
+  ) {
+    errors["data.insurance.voluntaryPensionDisabilityInsurance"] =
+      "Value must be null when pension and disability insurance is inactive.";
   }
 }
 
