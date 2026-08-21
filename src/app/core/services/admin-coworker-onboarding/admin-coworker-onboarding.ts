@@ -139,15 +139,26 @@ export class AdminCoworkerOnboarding {
     });
   }
 
-  getSourceDownload(
+  getPrivateSourceDownload(
+    versionId: string,
+    onboardingId: string,
+  ): Observable<ICoworkerDocumentDownload> {
+    return this.invoke({
+      action: 'getDownloadUrl',
+      target: 'source',
+      version_id: versionId,
+      onboarding_id: onboardingId,
+    });
+  }
+
+  getSharedSourceDownload(
     documentId: string,
-    onboardingId: string | null,
   ): Observable<ICoworkerDocumentDownload> {
     return this.invoke({
       action: 'getDownloadUrl',
       target: 'source',
       document_id: documentId,
-      onboarding_id: onboardingId,
+      onboarding_id: null,
     });
   }
 

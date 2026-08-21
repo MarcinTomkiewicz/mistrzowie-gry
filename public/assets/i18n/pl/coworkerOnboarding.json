@@ -50,6 +50,7 @@
     "noPreset": "Bez presetu [PH]",
     "requiresSignedUpload": "Wymaga podpisanej kopii [PH]",
     "version": "Wersja [PH]",
+    "historicalVersion": "[PH] Wersja historyczna",
     "assignments": "Przydziały [PH]",
     "pendingAssignments": "Oczekujące [PH]",
     "acknowledgedAssignments": "Potwierdzone [PH]",

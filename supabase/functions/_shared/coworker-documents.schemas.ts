@@ -144,11 +144,20 @@ function parseAdminDownloadRequest(source: Record<string, unknown>) {
     COWORKER_DOCUMENT_DOWNLOAD_TARGETS,
   );
   if (target === "source") {
+    const onboardingId = readNullableUuid(source["onboarding_id"]);
+    if (onboardingId !== null) {
+      return {
+        action: "getDownloadUrl",
+        target,
+        version_id: readUuid(source["version_id"]),
+        onboarding_id: onboardingId,
+      } as const;
+    }
     return {
       action: "getDownloadUrl",
       target,
       document_id: readUuid(source["document_id"]),
-      onboarding_id: readNullableUuid(source["onboarding_id"]),
+      onboarding_id: null,
     } as const;
   }
   return {

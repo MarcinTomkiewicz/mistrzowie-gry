@@ -59,6 +59,7 @@ export interface CoworkerOnboardingFieldsTranslations {
   noPreset: string;
   requiresSignedUpload: string;
   version: string;
+  historicalVersion: string;
   assignments: string;
   pendingAssignments: string;
   acknowledgedAssignments: string;

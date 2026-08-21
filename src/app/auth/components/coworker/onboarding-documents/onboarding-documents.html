@@ -44,12 +44,24 @@
           </div>
         </section>
       } @else {
-        @for (document of data.private_assignments; track document.assignment_id) {
+        @for (document of privateDocuments(); track document.assignment_id) {
+          @let historicalVersion = isHistoricalPrivateDocument(document);
           <article class="mg-card flex-col-start-stretch gap-md w-100">
             <div class="flex-row-between-start flex-wrap gap-sm w-100">
               <div class="flex-col-start-start gap-xs">
                 <strong>{{ document.title }}</strong>
-                <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.assignment_status]">
+                @if (historicalVersion) {
+                  <span class="tag-badge tag-badge--muted">
+                    {{ i18n.fields().historicalVersion }}
+                  </span>
+                }
+                <span
+                  [class]="
+                    historicalVersion
+                      ? 'tag-badge tag-badge--muted'
+                      : 'tag-badge ' + STATUS_BADGE_CLASS[document.assignment_status]
+                  "
+                >
                   {{ i18n.statuses().assignment[document.assignment_status] }}
                 </span>
               </div>
@@ -98,6 +110,7 @@
             </div>
 
             @if (
+              !historicalVersion &&
               document.required_action === 'upload_signed' &&
               (document.assignment_status === 'pending' || document.assignment_status === 'rejected')
             ) {
@@ -139,6 +152,7 @@
             }
 
             @if (
+              !historicalVersion &&
               document.required_action === 'acknowledge' &&
               document.assignment_status === 'pending'
             ) {

@@ -60,7 +60,11 @@
         {{ i18n.commonNav().privateDocuments }}
       </h3>
 
-      @for (document of data.documents; track document.document_id) {
+      @for (
+        document of documents();
+        track document.assignment_id ?? document.source_version_id ?? document.current_version_id ?? document.document_id
+      ) {
+        @let currentVersion = isCurrentDocumentVersion(document);
         <article class="mg-card flex-col-start-stretch gap-md w-100">
           <div class="flex-row-between-start flex-wrap gap-sm w-100">
             <div class="flex-col-start-start gap-xs">
@@ -71,8 +75,19 @@
                     {{ i18n.adminDetail().questionnaireBadge }}
                   </span>
                 }
+                @if (!currentVersion) {
+                  <span class="tag-badge tag-badge--muted">
+                    {{ i18n.fields().historicalVersion }}
+                  </span>
+                }
                 @if (document.assignment_status; as status) {
-                  <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[status]">
+                  <span
+                    [class]="
+                      currentVersion
+                        ? 'tag-badge ' + STATUS_BADGE_CLASS[status]
+                        : 'tag-badge tag-badge--muted'
+                    "
+                  >
                     {{ i18n.statuses().assignment[status] }}
                   </span>
                 }
@@ -124,7 +139,7 @@
                 (onClick)="downloadSigned(document)"
               />
             }
-            @if (document.assignment_status === 'submitted') {
+            @if (currentVersion && document.assignment_status === 'submitted') {
               <p-button
                 size="small"
                 severity="success"
@@ -142,6 +157,7 @@
               />
             }
             @if (
+              currentVersion &&
               document.source === 'uploaded' &&
               data.onboarding.status === 'in_progress'
             ) {

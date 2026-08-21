@@ -24,6 +24,7 @@ import {
 } from '../../../../core/translations/coworker-onboarding.i18n';
 import type { CoworkerDocumentDownloadTarget } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
+import { stablePartition } from '../../../../core/utils/stable-partition';
 import { FileUpload } from '../../../../common/file-upload/file-upload';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
@@ -76,6 +77,25 @@ export class CoworkerOnboardingDocuments {
     ...COWORKER_PDF_UPLOAD_OPTIONS,
     disabled: this.activeMutationKey() !== null,
   }));
+  private readonly latestPrivateVersionByDocumentId = computed(() => {
+    const latestVersions = new Map<string, number>();
+    for (const document of this.portal()?.private_assignments ?? []) {
+      latestVersions.set(
+        document.document_id,
+        Math.max(
+          latestVersions.get(document.document_id) ?? 0,
+          document.version_number,
+        ),
+      );
+    }
+    return latestVersions;
+  });
+  protected readonly privateDocuments = computed(() =>
+    stablePartition(
+      this.portal()?.private_assignments ?? [],
+      (document) => !this.isHistoricalPrivateDocument(document),
+    ),
+  );
 
   constructor() {
     this.load();
@@ -89,8 +109,8 @@ export class CoworkerOnboardingDocuments {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (portal) => {
-          this.syncSelectionControls(portal);
           this.portal.set(portal);
+          this.syncSelectionControls(portal);
         },
         error: () => this.loadFailed.set(true),
       });
@@ -110,7 +130,12 @@ export class CoworkerOnboardingDocuments {
   }
 
   protected uploadSigned(document: ICoworkerPrivateDocument): void {
-    if (this.activeMutationKey() !== null) return;
+    if (
+      this.activeMutationKey() !== null ||
+      this.isHistoricalPrivateDocument(document)
+    ) {
+      return;
+    }
 
     const file = this.selectedFiles().get(document.assignment_id);
     if (
@@ -173,12 +198,23 @@ export class CoworkerOnboardingDocuments {
     this.prepareDownload(document.assignment_id, target, false);
   }
 
+  protected isHistoricalPrivateDocument(
+    document: ICoworkerPrivateDocument,
+  ): boolean {
+    return (
+      document.version_number <
+      (this.latestPrivateVersionByDocumentId().get(document.document_id) ??
+        document.version_number)
+    );
+  }
+
   private syncSelectionControls(portal: ICoworkerDocumentPortal): void {
     this.syncSelectionRecord(
       this.declarationControls,
       portal.private_assignments
         .filter(
           (document) =>
+            !this.isHistoricalPrivateDocument(document) &&
             document.required_action === 'upload_signed' &&
             (document.assignment_status === 'pending' ||
               document.assignment_status === 'rejected'),
@@ -190,6 +226,7 @@ export class CoworkerOnboardingDocuments {
       [
         ...portal.private_assignments.filter(
           (document) =>
+            !this.isHistoricalPrivateDocument(document) &&
             document.required_action === 'acknowledge' &&
             document.assignment_status === 'pending',
         ),

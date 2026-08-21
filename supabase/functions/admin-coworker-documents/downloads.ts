@@ -63,11 +63,30 @@ async function findSourceTarget(
     { action: "getDownloadUrl"; target: "source" }
   >,
 ): Promise<{ path: string; filename: string } | null> {
-  const documents = request.onboarding_id === null
-    ? await listAdminSharedDocuments(client)
-    : await listAdminOnboardingDocuments(client, request.onboarding_id);
+  if (request.onboarding_id === null) {
+    const documents = await listAdminSharedDocuments(client);
+    const document = documents.find((row) =>
+      row.document_id === request.document_id
+    );
+    if (
+      document?.storage_path === undefined ||
+      document.storage_path === null ||
+      document.original_filename === null
+    ) {
+      return null;
+    }
+    return {
+      path: document.storage_path,
+      filename: document.original_filename,
+    };
+  }
+
+  const documents = await listAdminOnboardingDocuments(
+    client,
+    request.onboarding_id,
+  );
   const document = documents.find((row) =>
-    row.document_id === request.document_id
+    (row.source_version_id ?? row.current_version_id) === request.version_id
   );
   if (
     document?.storage_path === undefined ||

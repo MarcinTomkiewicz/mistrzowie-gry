@@ -117,7 +117,7 @@ export class AdminSharedDocuments {
       assign_after_onboarding: document.assign_after_onboarding,
       file: null,
     });
-    this.api.getSourceDownload(document.document_id, null).subscribe({
+    this.api.getSharedSourceDownload(document.document_id).subscribe({
       next: (preview) =>
         this.replacementThumbnail.set({
           url: preview.url,
@@ -228,7 +228,7 @@ export class AdminSharedDocuments {
     document: IAdminSharedDocument,
     showPreview: boolean,
   ): void {
-    this.api.getSourceDownload(document.document_id, null).subscribe({
+    this.api.getSharedSourceDownload(document.document_id).subscribe({
       next: ({ url, filename }) => {
         if (showPreview) {
           this.preview.set({ url, title: filename });

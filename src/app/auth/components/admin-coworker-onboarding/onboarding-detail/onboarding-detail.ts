@@ -1,4 +1,4 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -25,6 +25,7 @@ import {
 } from '../../../../core/translations/coworker-onboarding.i18n';
 import type { CoworkerDocumentReviewDecision } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
+import { stablePartition } from '../../../../core/utils/stable-partition';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
@@ -68,6 +69,12 @@ export class CoworkerOnboardingDetail {
     nonNullable: true,
     validators: [Validators.required, Validators.maxLength(1000)],
   });
+  protected readonly documents = computed(() =>
+    stablePartition(
+      this.detail()?.documents ?? [],
+      (document) => this.isCurrentDocumentVersion(document),
+    ),
+  );
 
   constructor() {
     this.load();
@@ -92,17 +99,19 @@ export class CoworkerOnboardingDetail {
   }
 
   protected previewSource(document: IAdminCoworkerOnboardingDocument): void {
-    if (!this.onboardingId) return;
+    const versionId = this.getDocumentVersionId(document);
+    if (!this.onboardingId || !versionId) return;
     this.prepareDownload(
-      this.api.getSourceDownload(document.document_id, this.onboardingId),
+      this.api.getPrivateSourceDownload(versionId, this.onboardingId),
       true,
     );
   }
 
   protected downloadSource(document: IAdminCoworkerOnboardingDocument): void {
-    if (!this.onboardingId) return;
+    const versionId = this.getDocumentVersionId(document);
+    if (!this.onboardingId || !versionId) return;
     this.prepareDownload(
-      this.api.getSourceDownload(document.document_id, this.onboardingId),
+      this.api.getPrivateSourceDownload(versionId, this.onboardingId),
       false,
     );
   }
@@ -124,14 +133,25 @@ export class CoworkerOnboardingDetail {
   }
 
   protected accept(document: IAdminCoworkerOnboardingDocument): void {
-    if (!document.assignment_id) return;
+    if (!document.assignment_id || !this.isCurrentDocumentVersion(document)) {
+      return;
+    }
     this.review(document.assignment_id, 'accepted', null);
   }
 
   protected openRejection(document: IAdminCoworkerOnboardingDocument): void {
-    if (!document.assignment_id) return;
+    if (!document.assignment_id || !this.isCurrentDocumentVersion(document)) {
+      return;
+    }
     this.rejectionReason.reset();
     this.rejectionAssignmentId.set(document.assignment_id);
+  }
+
+  protected isCurrentDocumentVersion(
+    document: IAdminCoworkerOnboardingDocument,
+  ): boolean {
+    const versionId = this.getDocumentVersionId(document);
+    return versionId !== null && versionId === document.current_version_id;
   }
 
   protected closeRejection(): void {
@@ -193,6 +213,12 @@ export class CoworkerOnboardingDetail {
     this.runMutation(this.api.completeOnboarding(this.onboardingId));
   }
 
+  private getDocumentVersionId(
+    document: IAdminCoworkerOnboardingDocument,
+  ): string | null {
+    return document.source_version_id ?? document.current_version_id;
+  }
+
   private runMutation(request: Observable<unknown>, after?: () => void): void {
     this.busy.set(true);
     request.pipe(finalize(() => this.busy.set(false))).subscribe({
@@ -206,7 +232,7 @@ export class CoworkerOnboardingDetail {
   }
 
   private prepareDownload(
-    request: ReturnType<AdminCoworkerOnboarding['getSourceDownload']>,
+    request: ReturnType<AdminCoworkerOnboarding['getPrivateSourceDownload']>,
     showPreview: boolean,
   ): void {
     request.subscribe({
