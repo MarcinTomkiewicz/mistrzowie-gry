@@ -95,6 +95,8 @@ export async function ensureQuestionnaireDocument(
       p_original_filename: originalFilename,
       p_mime_type: COWORKER_DOCUMENT_PDF_MIME_TYPE,
       p_size_bytes: pdfBytes.byteLength,
+      p_questionnaire_revision:
+        questionnaire.currentDeclaration.questionnaireRevision,
     });
   } catch (error) {
     try {
@@ -149,7 +151,9 @@ export async function reconcileQuestionnaireDocument(
     onboarding.status !== "in_progress" ||
     privateDocuments.some((document) =>
       document.onboarding_id === onboarding.onboarding_id &&
-      document.source === "generated"
+      document.title === QUESTIONNAIRE_TITLE &&
+      document.source === "generated" &&
+      document.questionnaire_revision === questionnaire.revision
     )
   ) {
     return;

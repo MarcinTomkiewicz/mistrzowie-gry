@@ -12,7 +12,6 @@ import {
 } from "./errors.ts";
 import { parseStoredQuestionnairePayload } from "./parse-questionnaire.ts";
 import type { RpcName } from "./rpc-names.ts";
-import { validateQuestionnairePayload } from "./validation.ts";
 
 export async function readStoredQuestionnairePayload(
   envelope: QuestionnaireEnvelope,
@@ -28,8 +27,7 @@ export async function readStoredQuestionnairePayload(
   );
 
   try {
-    const parsed = parseStoredQuestionnairePayload(decrypted);
-    return validateQuestionnairePayload(parsed, envelope.isComplete);
+    return parseStoredQuestionnairePayload(decrypted);
   } catch (error) {
     if (error instanceof QuestionnaireValidationError) {
       throw new BackendContractError(rpcName);

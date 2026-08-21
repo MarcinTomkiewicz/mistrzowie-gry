@@ -35,6 +35,7 @@ export interface ICoworkerPrivateDocumentRow {
   readonly mime_type: string;
   readonly size_bytes: number;
   readonly source: CoworkerDocumentSource;
+  readonly questionnaire_revision: number | null;
   readonly signed_storage_path: string | null;
   readonly signed_original_filename: string | null;
   readonly signed_mime_type: string | null;
@@ -70,7 +71,7 @@ export interface ICoworkerSharedDocumentRow {
 export interface ICoworkerPrivateDocument
   extends Omit<
     ICoworkerPrivateDocumentRow,
-    'storage_path' | 'signed_storage_path'
+    'storage_path' | 'signed_storage_path' | 'questionnaire_revision'
   > {}
 
 export interface ICoworkerSharedDocument

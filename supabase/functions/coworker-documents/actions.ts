@@ -79,6 +79,7 @@ function withoutPrivateStoragePaths(row: ICoworkerPrivateDocumentRow) {
   const {
     storage_path: _storagePath,
     signed_storage_path: _signedStoragePath,
+    questionnaire_revision: _questionnaireRevision,
     ...assignment
   } = row;
   return assignment;
