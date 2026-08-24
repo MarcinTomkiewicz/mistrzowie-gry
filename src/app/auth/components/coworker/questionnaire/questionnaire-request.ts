@@ -1,30 +1,6 @@
-import {
-  ICoworkerQuestionnairePayload,
-  ICoworkerQuestionnaireSaveRequest,
-  ICoworkerQuestionnaireStatement,
-} from '../../../../core/interfaces/i-coworker-questionnaire';
+import { ICoworkerQuestionnairePayload } from '../../../../core/interfaces/i-coworker-questionnaire';
 import { CoworkerQuestionnaireForm } from '../../../../core/types/coworker-questionnaire-form';
 import { normalizeBankAccount } from '../../../../core/utils/bank-account';
-
-export function buildCoworkerQuestionnaireSaveRequest(
-  form: CoworkerQuestionnaireForm,
-  expectedRevision: number | null,
-  complete: boolean,
-  statement: ICoworkerQuestionnaireStatement,
-): ICoworkerQuestionnaireSaveRequest {
-  return {
-    data: buildCoworkerQuestionnairePayload(form),
-    complete,
-    expectedRevision,
-    finalDeclaration: complete && form.controls.finalDeclarationAccepted.value
-      ? {
-          statementKey: statement.statementKey,
-          statementVersion: statement.statementVersion,
-          accepted: true,
-        }
-      : null,
-  };
-}
 
 export function buildCoworkerQuestionnairePayload(
   form: CoworkerQuestionnaireForm,
