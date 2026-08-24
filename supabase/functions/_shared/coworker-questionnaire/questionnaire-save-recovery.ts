@@ -24,7 +24,7 @@ export async function saveQuestionnaireWithRecovery(
   } catch (error) {
     if (
       !(error instanceof RpcCallError) ||
-      error.sqlState !== "40001" ||
+      error.sqlState !== "PT409" ||
       !input.isComplete ||
       input.finalDeclaration === null
     ) {

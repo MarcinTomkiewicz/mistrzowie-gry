@@ -119,7 +119,7 @@ function rpcErrorResponse(
         error,
         requestId,
       );
-    case "40001":
+    case "PT409":
       return rpcError(
         409,
         "CONCURRENT_MODIFICATION",
