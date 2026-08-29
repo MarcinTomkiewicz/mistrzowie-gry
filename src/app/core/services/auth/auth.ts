@@ -112,6 +112,7 @@ export class Auth {
       this.supabase.auth.signUp({
         email: payload.email,
         password: payload.password,
+        options: { data: payload.profile },
       }),
     ).pipe(
       switchMap(({ data, error }) => {
@@ -125,41 +126,17 @@ export class Auth {
           throw new AppAuthError('user_not_found');
         }
 
-        const hasSession = !!data.session?.user?.id;
-        this.authSession.setHasSessionCookie(hasSession);
+        if (data.session === null) {
+          this.clearPrincipal();
+          return of(null);
+        }
 
-        const userPayload: IUser = {
-          id,
-          email: payload.email,
-          appRole: 'user',
-          firstName: payload.profile.firstName,
-          phoneNumber: payload.profile.phoneNumber,
-          city: payload.profile.city,
-          street: payload.profile.street,
-          houseNumber: payload.profile.houseNumber,
-          apartmentNumber: payload.profile.apartmentNumber,
-          postalCode: payload.profile.postalCode,
-          age: payload.profile.age,
-          shortDescription: payload.profile.shortDescription,
-          longDescription: payload.profile.longDescription,
-          extendedDescription: payload.profile.extendedDescription,
-          nickname: payload.profile.nickname,
-          useNickname: payload.profile.useNickname,
-          isTestUser: false,
-          createdAt: null,
-          updatedAt: null,
-        };
-
-        return this.backend.upsert<IUser>('users', userPayload).pipe(
-          map((user) => {
-            if (hasSession) {
-              this.setAuthenticatedUser(user);
-              return user;
-            }
-
-            this.clearPrincipal();
-            return null;
-          }),
+        return this.synchronizePrincipal(id).pipe(
+          switchMap((user) =>
+            user
+              ? of(user)
+              : throwError(() => new AppAuthError('profile_not_found')),
+          ),
         );
       }),
       catchError((error) => this.toErrorObservable(error)),
