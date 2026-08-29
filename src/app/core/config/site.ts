@@ -12,7 +12,7 @@ export const THEME_DARK_BRAND_IMAGE = 'theme/dark/brand.avif';
 export const THEME_LIGHT_FOOTER_IMAGE = 'theme/light/footer.avif';
 export const THEME_DARK_FOOTER_IMAGE = 'theme/dark/footer.avif';
 
-export const VENUE_NAME = 'Pub Pod Dwoma Miotlami';
+export const VENUE_NAME = 'Shept';
 export const VENUE_STREET_ADDRESS = 'Wroniecka 21';
 export const VENUE_LOCALITY = 'Poznan';
 export const VENUE_COUNTRY = 'PL';
