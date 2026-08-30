@@ -5,8 +5,7 @@ export type ContactTopicOption = {
 };
 
 export type ContactPayload = {
-  topic: string;
-  topicCustom?: string;
+  subject: string;
   firstName: string;
   lastName: string;
   companyName?: string;

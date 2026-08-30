@@ -2,6 +2,8 @@ import { ISeoStructuredDataNode } from '../interfaces/i-seo';
 
 export const SITE_URL = 'https://mistrzowie-gry.pl';
 export const SITE_NAME = 'Mistrzowie Gry';
+export const PUBLIC_CONTACT_EMAIL = 'kontakt@mistrzowie-gry.pl';
+export const PUBLIC_CONTACT_PHONE = '+48 533 616 491';
 export const SOCIAL_SHARE_IMAGE =
   'https://ik.imagekit.io/ialsnkfw5g/logo/logoMG.png?tr=w-1200,q-75,f-jpg';
 
@@ -37,8 +39,8 @@ export function createOrganizationStructuredData(): ISeoStructuredDataNode {
       width: 1200,
       height: 1200,
     },
-    email: 'kontakt@mistrzowie-gry.pl',
-    telephone: '+48 533 616 491',
+    email: PUBLIC_CONTACT_EMAIL,
+    telephone: PUBLIC_CONTACT_PHONE,
     sameAs: [
       'https://facebook.com/mistrzowie.gry',
       'https://instagram.com/mistrzowie.gry',

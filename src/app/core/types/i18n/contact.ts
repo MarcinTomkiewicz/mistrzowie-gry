@@ -13,14 +13,11 @@ export type ContactFormTranslations = {
   topicLabel: string;
   topicCustomLabel: string;
   companyLabel: string;
-  phoneLabel: string;
   messageLabel: string;
   messagePlaceholder: string;
 };
 
 export type ContactFormErrorsTranslations = {
-  required: string;
-  email: string;
   minMessage: string;
 };
 
@@ -29,15 +26,12 @@ export type ContactSuccessTranslations = {
 };
 
 export type ContactToastTranslations = {
-  invalidFormSummary: string;
   mailSentSummary: string;
   sendFailedSummary: string;
 };
 
 export type ContactInfoTranslations = {
   subtitle: string;
-  emailValue: string;
-  phoneValue: string;
 };
 
 export type ContactTopicTranslation =

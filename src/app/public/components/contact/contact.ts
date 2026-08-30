@@ -1,19 +1,13 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
-  ComponentRef,
   DestroyRef,
-  OutputEmitterRef,
-  Type,
   computed,
   effect,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -24,51 +18,42 @@ import { TextareaModule } from 'primeng/textarea';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { buildSiteUrl } from '../../../core/config/site';
-import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
+import {
+  PUBLIC_CONTACT_EMAIL,
+  PUBLIC_CONTACT_PHONE,
+  buildSiteUrl,
+} from '../../../core/config/site';
+import { CONTACT_FORM_CONFIG } from '../../../core/configs/contact-form.config';
 import { LegalDialogs } from '../../../core/services/legal-dialogs/legal-dialogs';
-import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Seo } from '../../../core/services/seo/seo';
+import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { ContactPayload } from '../../../core/types/contact';
 import { LegalDialogContent } from '../../../core/types/i18n/legal';
 import { createPageStructuredData } from '../../../core/utils/structured-data';
+import { LegalDialog } from '../../common/legal-dialog/legal-dialog';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
-import { SubmitState, SubmitStateEnum } from '../../../core/types/submit-state';
-import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-
-interface LazyLegalDialogComponent {
-  visible: unknown;
-  dialogTitle: unknown;
-  dialogSubtitle: unknown;
-  dialogContent: unknown;
-  closeLabel: unknown;
-  visibleChange: OutputEmitterRef<boolean>;
-}
 
 @Component({
   selector: 'app-contact',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterModule,
     ReactiveFormsModule,
     ButtonModule,
     IftaLabelModule,
     SelectModule,
     InputTextModule,
     TextareaModule,
-    LazyMountHost,
+    LegalDialog,
   ],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
   providers: [provideTranslocoScope('contact', 'common')],
 })
 export class Contact {
-  private readonly lazyComponentLoader = inject(LazyComponentLoader);
   private readonly legalDialogs = inject(LegalDialogs);
   private readonly seo = inject(Seo);
-  private readonly fb = inject(FormBuilder);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly contactApi = inject(ContactApi);
   private readonly destroyRef = inject(DestroyRef);
   private readonly toast = inject(UiToast);
@@ -76,96 +61,26 @@ export class Contact {
 
   readonly i18n = createContactI18n();
 
-  readonly submitState = signal<SubmitState>(SubmitStateEnum.Idle);
-  readonly submitError = signal<string | null>(null);
-  readonly activeLegalDialogContent = signal<LegalDialogContent | null>(null);
-  readonly isLegalDialogLoading = signal(false);
-  readonly legalDialogError = signal('');
-  private readonly legalDialogHost = viewChild(LazyMountHost);
-  private readonly loadLegalDialog = () =>
-    import('../../common/legal-dialog/legal-dialog').then(
-      ({ LegalDialog }) => LegalDialog as Type<LazyLegalDialogComponent>,
-    );
-  private readonly legalDialogRef =
-    signal<ComponentRef<LazyLegalDialogComponent> | null>(null);
+  readonly form = this.formBuilder.nonNullable.group(CONTACT_FORM_CONFIG);
+  private readonly isSubmitting = signal(false);
+  private readonly isPrivacyPolicyDialogVisible = signal(false);
+  private readonly privacyPolicyContent =
+    signal<LegalDialogContent | null>(null);
+  private readonly isPrivacyPolicyLoading = signal(false);
+  private readonly privacyPolicyError = signal('');
 
-  readonly form = this.fb.nonNullable.group({
-    topic: this.fb.nonNullable.control(''),
-    topicCustom: this.fb.nonNullable.control(''),
-
-    firstName: this.fb.nonNullable.control('', {
-      validators: [Validators.required],
-    }),
-    lastName: this.fb.nonNullable.control('', {
-      validators: [Validators.required],
-    }),
-
-    companyName: this.fb.nonNullable.control(''),
-
-    email: this.fb.nonNullable.control('', {
-      validators: [Validators.required, Validators.email],
-    }),
-    phone: this.fb.nonNullable.control(''),
-
-    message: this.fb.nonNullable.control('', {
-      validators: [Validators.required, Validators.minLength(20)],
-    }),
-
-    website: this.fb.nonNullable.control(''), // honeypot
-  });
-
-  private readonly topicValue = toSignal(
+  private readonly selectedTopic = toSignal(
     this.form.controls.topic.valueChanges,
     {
       initialValue: this.form.controls.topic.value,
     },
   );
 
-  readonly isOtherTopicSelected = computed(() => this.topicValue() === 'other');
-
-  readonly isSubmitting = computed(
-    () => this.submitState() === SubmitStateEnum.Submitting,
+  private readonly isOtherTopicSelected = computed(
+    () => this.selectedTopic() === 'other',
   );
 
-  readonly isLegalDialogVisible = computed(
-    () =>
-      this.isLegalDialogLoading() ||
-      !!this.activeLegalDialogContent() ||
-      !!this.legalDialogError(),
-  );
-
-  readonly legalDialogTitle = computed(() => {
-    const dialog = this.activeLegalDialogContent();
-    if (dialog?.title) return dialog.title;
-    if (dialog) return this.i18n.commonLegal().privacyPolicy;
-
-    return this.isLegalDialogLoading()
-      ? 'Ladowanie...'
-      : this.legalDialogError()
-        ? 'Nie udalo sie zaladowac tresci'
-        : '';
-  });
-
-  readonly legalDialogSubtitle = computed(
-    () => this.activeLegalDialogContent()?.subtitle ?? '',
-  );
-
-  readonly legalDialogContent = computed(() => {
-    const content = this.activeLegalDialogContent()?.content;
-    if (content) return content;
-
-    if (this.isLegalDialogLoading()) {
-      return 'Ladowanie tresci dokumentu...';
-    }
-
-    if (this.legalDialogError()) {
-      return this.legalDialogError();
-    }
-
-    return null;
-  });
-
-  private readonly applySeoEffect = effect(() => {
+  private readonly syncSeo = effect(() => {
     const seo = this.i18n.seo();
 
     this.seo.apply({
@@ -182,114 +97,92 @@ export class Contact {
     });
   });
 
-  private readonly syncLegalDialogInputs = effect(() => {
-    const dialogRef = this.legalDialogRef();
-    if (!dialogRef) {
-      return;
-    }
-
-    dialogRef.setInput('visible', this.isLegalDialogVisible());
-    dialogRef.setInput('dialogTitle', this.legalDialogTitle());
-    dialogRef.setInput('dialogSubtitle', this.legalDialogSubtitle());
-    dialogRef.setInput('dialogContent', this.legalDialogContent());
-  });
-
-  private readonly initDefaultTopicEffect = effect(() => {
-    const options = this.i18n.topics();
-    if (!options.length) return;
-
-    const current = this.form.controls.topic.value;
-    if (current) return;
-
-    this.form.controls.topic.setValue(options[0].value);
-  });
-
-  private readonly syncTopicCustomValidatorEffect = effect(() => {
+  private readonly clearInactiveCustomTopic = effect(() => {
     const control = this.form.controls.topicCustom;
 
-    if (this.isOtherTopicSelected()) {
-      control.addValidators([Validators.required]);
-    } else {
-      control.clearValidators();
+    if (!this.isOtherTopicSelected() && control.value) {
       control.setValue('');
     }
-
-    control.updateValueAndValidity({ emitEvent: false });
   });
 
-  readonly vm = computed(() => ({
-    hero: this.i18n.hero(),
-    formText: this.i18n.formText(),
-    formErrors: this.i18n.formErrors(),
-    toast: this.i18n.toast(),
-    success: this.i18n.success(),
-    status: this.i18n.status(),
-    commonForm: this.i18n.commonForm(),
-    legalNotice: this.i18n.legalNotice(),
-    commonErrors: this.i18n.commonErrors(),
-    cta: this.i18n.cta(),
-    topics: this.i18n.topics(),
-    isOtherTopicSelected: this.isOtherTopicSelected(),
-    info: this.i18n.info(),
-    accessibility: this.i18n.accessibility(),
-    isSubmitting: this.isSubmitting(),
-  }));
+  readonly viewModel = computed(() => {
+    const content = this.privacyPolicyContent();
+    const loading = this.isPrivacyPolicyLoading();
+    const error = this.privacyPolicyError();
+    const isSubmitting = this.isSubmitting();
+
+    return {
+      hero: this.i18n.hero(),
+      form: {
+        text: this.i18n.formText(),
+        errors: this.i18n.formErrors(),
+        topics: this.i18n.topics(),
+        legalNotice: this.i18n.legalNotice(),
+        isOtherTopicSelected: this.isOtherTopicSelected(),
+        isSubmitting,
+        submitLabel: isSubmitting
+          ? this.i18n.status().sending
+          : this.i18n.cta().sendMessage,
+      },
+      contact: {
+        info: this.i18n.info(),
+        accessibility: this.i18n.accessibility(),
+        email: PUBLIC_CONTACT_EMAIL,
+        phone: PUBLIC_CONTACT_PHONE,
+      },
+      privacyPolicyDialog: {
+        visible: this.isPrivacyPolicyDialogVisible(),
+        title: content?.title || this.i18n.commonLegal().privacyPolicy,
+        subtitle: content?.subtitle ?? '',
+        content: content?.content ??
+          (loading ? this.i18n.status().loading : error || null),
+        closeLabel: this.i18n.commonActions().close,
+      },
+    };
+  });
 
   onSubmit(): void {
     if (this.isSubmitting()) return;
 
-    if (this.form.invalid) {
-      this.submitState.set(SubmitStateEnum.Idle);
-      this.submitError.set(null);
+    const payload = this.buildPayload();
+
+    if (this.form.invalid || !payload) {
       this.form.markAllAsTouched();
 
       this.toast.warn({
-        summary: this.vm().toast.invalidFormSummary,
-        detail: this.vm().commonForm.invalid,
+        summary: this.i18n.commonForm().invalidSummary,
+        detail: this.i18n.commonForm().invalid,
       });
 
       return;
     }
 
-    const payload = this.buildPayload();
-
-    this.submitState.set(SubmitStateEnum.Submitting);
-    this.submitError.set(null);
+    this.isSubmitting.set(true);
 
     this.contactApi
       .send(payload)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => {
-          if (this.submitState() === SubmitStateEnum.Submitting) {
-            this.submitState.set(SubmitStateEnum.Idle);
-          }
-        }),
+        finalize(() => this.isSubmitting.set(false)),
       )
       .subscribe({
         next: () => {
-          this.resetForm();
-          this.submitState.set(SubmitStateEnum.Success);
+          this.form.reset();
 
           this.toast.success({
-            summary: this.vm().toast.mailSentSummary,
-            detail: this.vm().success.mailSent,
+            summary: this.i18n.toast().mailSentSummary,
+            detail: this.i18n.success().mailSent,
           });
         },
         error: (err) => {
           console.error('[contact] submit error', err);
 
-          this.submitState.set(SubmitStateEnum.Error);
-
           const detail =
             err?.error?.error ||
-            this.vm().commonErrors.generic ||
-            'Nie udało się wysłać wiadomości.';
-
-          this.submitError.set(detail);
+            this.i18n.commonErrors().generic;
 
           this.toast.danger({
-            summary: this.vm().toast.sendFailedSummary,
+            summary: this.i18n.toast().sendFailedSummary,
             detail,
           });
         },
@@ -297,34 +190,37 @@ export class Contact {
   }
 
   async openPrivacyPolicyDialog(): Promise<void> {
-    this.ensureLegalDialogMounted();
-    this.legalDialogError.set('');
-    this.activeLegalDialogContent.set(null);
-    this.isLegalDialogLoading.set(true);
+    this.isPrivacyPolicyDialogVisible.set(true);
+    this.privacyPolicyError.set('');
+    this.privacyPolicyContent.set(null);
+    this.isPrivacyPolicyLoading.set(true);
 
     try {
       const dialog = await this.legalDialogs.load('privacy-policy');
-      this.activeLegalDialogContent.set(dialog ?? null);
+      this.privacyPolicyContent.set(dialog ?? null);
 
       if (!dialog) {
-        this.legalDialogError.set('Nie znaleziono tresci dokumentu.');
+        this.privacyPolicyError.set(this.i18n.commonErrors().notFound);
       }
     } catch {
-      this.legalDialogError.set(
-        'Nie udalo sie zaladowac tresci dokumentu. Sprobuj ponownie za chwile.',
-      );
+      this.privacyPolicyError.set(this.i18n.commonErrors().generic);
     } finally {
-      this.isLegalDialogLoading.set(false);
+      this.isPrivacyPolicyLoading.set(false);
     }
   }
 
-  private buildPayload(): ContactPayload {
+  private buildPayload(): ContactPayload | null {
     const value = this.form.getRawValue();
+    const topic = this.i18n.topics().find(
+      (option) => option.value === value.topic,
+    );
+
+    if (!topic) return null;
 
     return {
-      topic: value.topic,
-      topicCustom:
-        value.topic === 'other' ? value.topicCustom.trim() : undefined,
+      subject: value.topic === 'other'
+        ? value.topicCustom.trim()
+        : topic.label,
       firstName: value.firstName.trim(),
       lastName: value.lastName.trim(),
       companyName: value.companyName.trim() || undefined,
@@ -333,23 +229,6 @@ export class Contact {
       message: value.message.trim(),
       website: value.website.trim() || undefined,
     };
-  }
-
-  private resetForm(): void {
-    this.form.reset({
-      topic: this.i18n.topics()[0]?.value ?? '',
-      topicCustom: '',
-      firstName: '',
-      lastName: '',
-      companyName: '',
-      email: '',
-      phone: '',
-      message: '',
-      website: '',
-    });
-
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
   }
 
   showRequiredError(name: keyof Contact['form']['controls']): boolean {
@@ -370,35 +249,7 @@ export class Contact {
     return control.touched && !!control.errors?.['minlength'];
   }
 
-  onLegalDialogVisibleChange(visible: boolean): void {
-    if (!visible) {
-      this.activeLegalDialogContent.set(null);
-      this.isLegalDialogLoading.set(false);
-      this.legalDialogError.set('');
-    }
-  }
-
-  private ensureLegalDialogMounted(): void {
-    if (this.legalDialogRef()) {
-      return;
-    }
-
-    const host = this.legalDialogHost()?.viewContainerRef;
-    if (!host) {
-      return;
-    }
-
-    this.lazyComponentLoader
-      .mount({
-        host,
-        load: this.loadLegalDialog,
-        onMount: (componentRef) => {
-          this.legalDialogRef.set(componentRef);
-          componentRef.instance.visibleChange.subscribe((visible) => {
-            this.onLegalDialogVisibleChange(visible);
-          });
-        },
-      })
-      .subscribe();
+  closePrivacyPolicyDialog(): void {
+    this.isPrivacyPolicyDialogVisible.set(false);
   }
 }

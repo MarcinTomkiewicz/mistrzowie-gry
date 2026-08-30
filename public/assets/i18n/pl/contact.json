@@ -7,9 +7,7 @@
     "subtitle": "Jeśli potrzebujesz więcej informacji na temat naszej propozycji albo chcesz zorganizować swoje doświadczenie RPG, użyj formularza poniżej, a my odpowiemy tak szybko jak to możliwe."
   },
   "info": {
-    "subtitle": "Mistrzowie Gry są usługą działającą mobilnie, wirtualnie i w chmurze. Nie mamy swojej siedziby ani adresu, pod którym możesz nas odwiedzić. Dlatego zachęcamy do kontaktu przez e-mail albo telefonicznie.",
-    "emailValue": "kontakt@mistrzowie-gry.pl",
-    "phoneValue": "+48 533 616 491"
+    "subtitle": "Mistrzowie Gry są usługą działającą mobilnie, wirtualnie i w chmurze. Nie mamy swojej siedziby ani adresu, pod którym możesz nas odwiedzić. Dlatego zachęcamy do kontaktu przez e-mail albo telefonicznie."
   },
   "form": {
     "title": "Napisz bezpośrednio",
@@ -17,20 +15,16 @@
     "topicLabel": "Wybierz temat",
     "topicCustomLabel": "Twój temat wiadomości",
     "companyLabel": "Nazwa firmy",
-    "phoneLabel": "Nr telefonu",
     "messageLabel": "Treść wiadomości*",
     "messagePlaceholder": "Podaj jak najwięcej szczegółów Twojego zapytania. Pozwoli nam to precyzyjnie odpowiedzieć na Twoje pytania i przygotować najlepsze rozwiązanie."
   },
   "errors": {
-    "required": "Pole wymagane!",
-    "email": "Błędny adres e-mail!",
     "minMessage": "Wiadomość jest za krótka!"
   },
   "success": {
     "mailSent": "Wiadomość wysłana poprawnie! Postaramy się odpowiedzieć na nią jak najszybciej."
   },
   "toast": {
-    "invalidFormSummary": "Popraw błędy w formularzu!",
     "mailSentSummary": "Dziękujemy za wysłanie wiadomości",
     "sendFailedSummary": "Nie udało się wysłać wiadomości!"
   },

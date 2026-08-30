@@ -1,4 +1,4 @@
-@let data = vm();
+@let data = viewModel();
 
 <section class="mg-section" [attr.aria-label]="data.hero.title">
   <div class="mg-container">
@@ -10,11 +10,11 @@
     <div class="mg-grid grid-cols-2 grid-cols-1-md gap-lg">
       <div class="mg-card flex-col-center gap-md">
         <h2 class="mg-section__title mg-section__title--sm align-self-start">
-          {{ data.formText.title }}
+          {{ data.form.text.title }}
         </h2>
 
         <p class="mg-section__subtitle align-self-start mb-md">
-          {{ data.formText.hint }}
+          {{ data.form.text.hint }}
         </p>
 
         <form
@@ -27,15 +27,15 @@
               class="w-100"
               inputId="topic"
               id="topic"
-              [options]="data.topics"
+              [options]="data.form.topics"
               optionLabel="label"
               optionValue="value"
               formControlName="topic"
             />
-            <label for="topic">{{ data.formText.topicLabel }}</label>
+            <label for="topic">{{ data.form.text.topicLabel }}</label>
           </p-iftalabel>
 
-          @if (data.isOtherTopicSelected) {
+          @if (data.form.isOtherTopicSelected) {
             <p-iftalabel class="w-80">
               <input
                 class="w-100"
@@ -43,16 +43,17 @@
                 id="topicCustom"
                 type="text"
                 formControlName="topicCustom"
+                required
                 [attr.aria-invalid]="showRequiredError('topicCustom')"
               />
               <label for="topicCustom">
-                {{ data.formText.topicCustomLabel }}
+                {{ data.form.text.topicCustomLabel }}
               </label>
             </p-iftalabel>
 
             @if (showRequiredError("topicCustom")) {
               <small class="mg-contact-error">
-                {{ data.formErrors.required }}
+                {{ i18n.commonForm().required }}
               </small>
             }
           }
@@ -72,7 +73,7 @@
 
           @if (showRequiredError("firstName")) {
             <small class="mg-contact-error">
-              {{ data.formErrors.required }}
+              {{ i18n.commonForm().required }}
             </small>
           }
 
@@ -91,7 +92,7 @@
 
           @if (showRequiredError("lastName")) {
             <small class="mg-contact-error">
-              {{ data.formErrors.required }}
+              {{ i18n.commonForm().required }}
             </small>
           }
 
@@ -104,7 +105,7 @@
               formControlName="companyName"
               autocomplete="organization"
             />
-            <label for="companyName">{{ data.formText.companyLabel }}</label>
+            <label for="companyName">{{ data.form.text.companyLabel }}</label>
           </p-iftalabel>
 
           <p-iftalabel class="w-80">
@@ -116,7 +117,7 @@
               formControlName="phone"
               autocomplete="tel"
             />
-            <label for="phone">{{ data.formText.phoneLabel }}</label>
+            <label for="phone">{{ i18n.commonLabels().phoneNumber }}</label>
           </p-iftalabel>
 
           <p-iftalabel class="w-80">
@@ -135,9 +136,9 @@
           @if (showEmailError()) {
             <small class="mg-contact-error">
               @if (form.controls.email.errors?.["email"]) {
-                {{ data.formErrors.email }}
+                {{ i18n.commonForm().invalidEmail }}
               } @else {
-                {{ data.formErrors.required }}
+                {{ i18n.commonForm().required }}
               }
             </small>
           }
@@ -150,21 +151,21 @@
               formControlName="message"
               [rows]="6"
               [autoResize]="true"
-              [placeholder]="data.formText.messagePlaceholder"
+              [placeholder]="data.form.text.messagePlaceholder"
               [attr.aria-invalid]="
                 showRequiredError('message') || showMinMessageError()
               "
             ></textarea>
-            <label for="message">{{ data.formText.messageLabel }}</label>
+            <label for="message">{{ data.form.text.messageLabel }}</label>
           </p-iftalabel>
 
           @if (showRequiredError("message")) {
             <small class="mg-contact-error">
-              {{ data.formErrors.required }}
+              {{ i18n.commonForm().required }}
             </small>
           } @else if (showMinMessageError()) {
             <small class="mg-contact-error">
-              {{ data.formErrors.minMessage }}
+              {{ data.form.errors.minMessage }}
             </small>
           }
 
@@ -180,7 +181,7 @@
           </div>
 
           <small class="muted-text lh-15 text-center w-100 m-0">
-            {{ data.legalNotice.prefix }}
+            {{ data.form.legalNotice.prefix }}
             <button
               type="button"
               class="link-like-inline"
@@ -193,13 +194,13 @@
             <p-button
               type="submit"
               [label]="
-                data.isSubmitting ? data.status.sending : data.cta.sendMessage
+                data.form.submitLabel
               "
               [icon]="'pi pi-message-away'"
-              [loading]="data.isSubmitting"
+              [loading]="data.form.isSubmitting"
               loadingIcon="pi pi-d20"
               severity="success"
-              [disabled]="data.isSubmitting"
+              [disabled]="data.form.isSubmitting"
             />
           </div>
 
@@ -212,7 +213,7 @@
         </h2>
 
         <p class="mg-section__subtitle mg-section__subtitle--no-margin">
-          {{ data.info.subtitle }}
+          {{ data.contact.info.subtitle }}
         </p>
 
         <div class="flex-col-start-start gap-sm mt-md">
@@ -220,26 +221,26 @@
             <i class="pi pi-send-message" aria-hidden="true"></i>
             {{ i18n.commonLabels().emailAddress }}:
             <a
-              [href]="'mailto:' + data.info.emailValue"
+              [href]="'mailto:' + data.contact.email"
               [attr.aria-label]="
-                data.accessibility.sendMail + data.info.emailValue
+                data.contact.accessibility.sendMail + ' ' + data.contact.email
               "
             >
-              {{ data.info.emailValue }}
+              {{ data.contact.email }}
             </a>
           </div>
 
           <div class="flex-row-start-center gap-sm">
             <i class="pi pi-call-me" aria-hidden="true"></i>
             <span>
-              {{ data.formText.phoneLabel }}:
+              {{ i18n.commonLabels().phone }}:
               <a
-                [href]="'tel:' + data.info.phoneValue"
+                [href]="'tel:' + data.contact.phone"
                 [attr.aria-label]="
-                  data.accessibility.callMe + data.info.phoneValue
+                  data.contact.accessibility.callMe + ' ' + data.contact.phone
                 "
               >
-                {{ data.info.phoneValue }}
+                {{ data.contact.phone }}
               </a>
             </span>
           </div>
@@ -249,4 +250,13 @@
   </div>
 </section>
 
-<ng-template mgLazyMountHost></ng-template>
+@defer (when data.privacyPolicyDialog.visible) {
+  <app-legal-dialog
+    [visible]="data.privacyPolicyDialog.visible"
+    [dialogTitle]="data.privacyPolicyDialog.title"
+    [dialogSubtitle]="data.privacyPolicyDialog.subtitle"
+    [dialogContent]="data.privacyPolicyDialog.content"
+    [closeLabel]="data.privacyPolicyDialog.closeLabel"
+    (visibleChange)="closePrivacyPolicyDialog()"
+  />
+}

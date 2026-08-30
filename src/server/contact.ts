@@ -4,8 +4,7 @@ import nodemailer from 'nodemailer';
 import { buildContactEmailHtml } from './contact-email';
 
 type ContactPayload = {
-  topic?: string;
-  topicCustom?: string;
+  subject?: string;
   firstName?: string;
   lastName?: string;
   companyName?: string;
@@ -51,8 +50,7 @@ export function registerContactRoute(app: express.Express): void {
   app.post('/api/contact', async (req, res) => {
     const body = (req.body ?? {}) as ContactPayload;
 
-    const topic = body.topic?.trim() || '';
-    const topicCustom = body.topicCustom?.trim() || '';
+    const subject = body.subject?.trim() || '';
     const firstName = body.firstName?.trim() || '';
     const lastName = body.lastName?.trim() || '';
     const companyName = body.companyName?.trim() || '';
@@ -65,14 +63,7 @@ export function registerContactRoute(app: express.Express): void {
       return res.status(200).json({ ok: true });
     }
 
-    if (!firstName || !lastName || !email || !message) {
-      return res.status(400).json({
-        ok: false,
-        error: 'Brak wymaganych pól.',
-      });
-    }
-
-    if (topic === 'other' && !topicCustom) {
+    if (!subject || !firstName || !lastName || !email || !message) {
       return res.status(400).json({
         ok: false,
         error: 'Brak wymaganych pól.',
@@ -92,8 +83,8 @@ export function registerContactRoute(app: express.Express): void {
       companyName.length > 200 ||
       email.length > 320 ||
       phone.length > 50 ||
-      topic.length > 100 ||
-      topicCustom.length > 200 ||
+      subject.length > 200 ||
+      message.length < 20 ||
       message.length > 5000
     ) {
       return res.status(400).json({
@@ -112,18 +103,15 @@ export function registerContactRoute(app: express.Express): void {
       const siteName = process.env['MAIL_FROM_NAME']?.trim() || 'Mistrzowie Gry';
 
       const fullName = `${firstName} ${lastName}`.trim();
-      const resolvedTopic =
-        topic === 'other' ? topicCustom || 'Inny temat' : topic || 'Bez tematu';
-
       await transporter.sendMail({
         from: `"${siteName} – formularz kontaktowy" <${from}>`,
         to,
         replyTo: `"${fullName}" <${email}>`,
-        subject: `[Kontakt] ${resolvedTopic}`,
+        subject: `[Kontakt] ${subject}`,
         text: [
           'Nowa wiadomość z formularza kontaktowego',
           '',
-          `Temat: ${resolvedTopic}`,
+          `Temat: ${subject}`,
           `Imię i nazwisko: ${fullName}`,
           `Email: ${email}`,
           `Telefon: ${phone || '-'}`,
@@ -133,7 +121,7 @@ export function registerContactRoute(app: express.Express): void {
           message,
         ].join('\n'),
         html: buildContactEmailHtml({
-          resolvedTopic,
+          subject,
           fullName,
           email,
           phone,

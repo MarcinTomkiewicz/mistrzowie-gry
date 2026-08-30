@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 
 import {
   createCommonAccessibilityI18n,
+  createCommonActionsI18n,
   createCommonCtaI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
@@ -26,7 +27,16 @@ import {
 import { recordValuesSortedBy } from '../../../core/utils/record-values';
 
 export function createContactI18n() {
-  const { seo, hero, formText, formErrors, success, toast, topicsDict, info } =
+  const {
+    seo,
+    hero,
+    formText,
+    formErrors,
+    success,
+    toast,
+    topicsDict,
+    info,
+  } =
     createScopedSectionsI18n<{
       seo: ContactSeoTranslations;
       hero: ContactHeroTranslations;
@@ -48,6 +58,7 @@ export function createContactI18n() {
     });
 
   const status = createCommonStatusI18n();
+  const commonActions = createCommonActionsI18n();
   const cta = createCommonCtaI18n();
   const commonErrors = createCommonErrorsI18n();
   const commonForm = createCommonFormI18n();
@@ -76,6 +87,7 @@ export function createContactI18n() {
     formErrors,
     success,
     toast,
+    commonActions,
     commonForm,
     commonLegal,
     legalNotice,

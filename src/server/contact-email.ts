@@ -12,7 +12,7 @@ const mailTheme = {
 } as const;
 
 export function buildContactEmailHtml(data: {
-  resolvedTopic: string;
+  subject: string;
   fullName: string;
   email: string;
   phone: string;
@@ -35,7 +35,7 @@ export function buildContactEmailHtml(data: {
           <table style="width:100%;border-collapse:collapse;">
             <tr>
               <td style="padding:10px 0;font-weight:700;width:180px;color:${mailTheme.ink};">Temat</td>
-              <td style="padding:10px 0;color:${mailTheme.ink};">${escapeHtml(data.resolvedTopic)}</td>
+              <td style="padding:10px 0;color:${mailTheme.ink};">${escapeHtml(data.subject)}</td>
             </tr>
             <tr>
               <td style="padding:10px 0;font-weight:700;color:${mailTheme.ink};">Imię i nazwisko</td>
