@@ -5,6 +5,7 @@ export interface LoginFormTitleTranslations {
 export interface LoginFormActionsTranslations {
   submitLabel: string;
   requestPasswordResetLabel: string;
+  resendSignupConfirmationLabel: string;
 }
 
 export interface LoginFormErrorsTranslations {
@@ -18,6 +19,7 @@ export interface LoginFormToastTranslations {
   resetRequestedSummary: string;
   resetRequestedDetail: string;
   resetRequestFailedSummary: string;
+  confirmationResentDetail: string;
 }
 
 export interface ResetPasswordTranslations {

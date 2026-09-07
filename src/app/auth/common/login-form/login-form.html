@@ -58,7 +58,22 @@
       <small>{{ i18n.commonForm().minLength.replace('{{min}}', passwordMinLength.toString()) }}</small>
     }
 
-    <div class="flex-row-end-center mt-sm">
+    <div class="flex-row-end-center flex-wrap gap-sm mt-sm">
+      <p-button
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [label]="
+          isConfirmationResendPending()
+            ? i18n.commonStatus().sending
+            : i18n.actions().resendSignupConfirmationLabel
+        "
+        [loading]="isConfirmationResendPending()"
+        loadingIcon="pi pi-d20"
+        [disabled]="hasPendingAction()"
+        (onClick)="resendSignupConfirmation()"
+      />
+
       <p-button
         type="button"
         severity="secondary"

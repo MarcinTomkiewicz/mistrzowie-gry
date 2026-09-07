@@ -41,6 +41,10 @@ export class AuthRecovery {
     );
   }
 
+  resendSignupConfirmation(email: string): Observable<void> {
+    return this.complete(this.supabase.auth.resend({ type: 'signup', email }));
+  }
+
   updatePassword(password: string): Observable<void> {
     if (!this.isRecoveryFlowActive) {
       return throwError(() => new AppAuthError('session_not_found'));

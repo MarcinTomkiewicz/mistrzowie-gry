@@ -21,7 +21,11 @@ import { AuthErrorCode } from '../../../core/types/auth-error';
 import { normalizeAuthError, resolveCommonAuthErrorMessage } from '../../../core/utils/auth-error';
 import { createLoginFormI18n } from './login-form.i18n';
 
-type PendingAction = 'login' | 'password-reset' | null;
+type PendingAction =
+  | 'login'
+  | 'password-reset'
+  | 'confirmation-resend'
+  | null;
 
 @Component({
   selector: 'app-login-form',
@@ -60,6 +64,9 @@ export class LoginForm {
   readonly isLoginPending = computed(() => this.pendingAction() === 'login');
   readonly isResetPending = computed(
     () => this.pendingAction() === 'password-reset',
+  );
+  readonly isConfirmationResendPending = computed(
+    () => this.pendingAction() === 'confirmation-resend',
   );
 
   onSubmit(): void {
@@ -114,17 +121,16 @@ export class LoginForm {
       return;
     }
 
-    const emailControl = this.form.controls.email;
+    const email = this.getValidEmail();
 
-    if (emailControl.invalid) {
-      emailControl.markAsTouched();
+    if (email === null) {
       return;
     }
 
     this.pendingAction.set('password-reset');
 
     this.authRecovery
-      .requestPasswordReset(emailControl.getRawValue()?.trim() ?? '')
+      .requestPasswordReset(email)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.pendingAction.set(null)),
@@ -134,6 +140,44 @@ export class LoginForm {
           this.toast.success({
             summary: this.i18n.toast().resetRequestedSummary,
             detail: this.i18n.toast().resetRequestedDetail,
+          });
+        },
+        error: (error) => {
+          this.toast.danger({
+            summary: this.i18n.toast().resetRequestFailedSummary,
+            detail: resolveCommonAuthErrorMessage(
+              normalizeAuthError(error).code,
+              this.i18n.commonErrors(),
+            ),
+          });
+        },
+      });
+  }
+
+  resendSignupConfirmation(): void {
+    if (this.hasPendingAction()) {
+      return;
+    }
+
+    const email = this.getValidEmail();
+
+    if (email === null) {
+      return;
+    }
+
+    this.pendingAction.set('confirmation-resend');
+
+    this.authRecovery
+      .resendSignupConfirmation(email)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.pendingAction.set(null)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success({
+            summary: this.i18n.commonStatus().success,
+            detail: this.i18n.toast().confirmationResentDetail,
           });
         },
         error: (error) => {
@@ -166,12 +210,23 @@ export class LoginForm {
     );
   }
 
+  private getValidEmail(): string | null {
+    const control = this.form.controls.email;
+
+    if (control.invalid) {
+      control.markAsTouched();
+      return null;
+    }
+
+    return control.getRawValue()?.trim() ?? '';
+  }
+
   private resolveAuthErrorMessage(code: AuthErrorCode): string {
     switch (code) {
       case 'invalid_credentials':
         return this.i18n.errors().invalidCredentials;
       case 'email_not_confirmed':
-        return this.i18n.commonErrors().unauthorized;
+        return this.i18n.profileErrors().emailNotConfirmed;
       default:
         return resolveCommonAuthErrorMessage(code, this.i18n.commonErrors());
     }

@@ -10,20 +10,24 @@ import {
   LoginFormErrorsTranslations,
   LoginFormTitleTranslations,
   LoginFormToastTranslations,
+  ProfileFormErrorsTranslations,
 } from '../../../core/types/i18n/auth';
 
 export function createLoginFormI18n() {
-  const { title, actions, errors, toast } = createScopedSectionsI18n<{
-    title: LoginFormTitleTranslations;
-    actions: LoginFormActionsTranslations;
-    errors: LoginFormErrorsTranslations;
-    toast: LoginFormToastTranslations;
-  }>('auth', {
-    title: 'loginForm.title',
-    actions: 'loginForm.actions',
-    errors: 'loginForm.errors',
-    toast: 'loginForm.toast',
-  });
+  const { title, actions, errors, profileErrors, toast } =
+    createScopedSectionsI18n<{
+      title: LoginFormTitleTranslations;
+      actions: LoginFormActionsTranslations;
+      errors: LoginFormErrorsTranslations;
+      profileErrors: ProfileFormErrorsTranslations;
+      toast: LoginFormToastTranslations;
+    }>('auth', {
+      title: 'loginForm.title',
+      actions: 'loginForm.actions',
+      errors: 'loginForm.errors',
+      profileErrors: 'profileForm.errors',
+      toast: 'loginForm.toast',
+    });
   const commonErrors = createCommonErrorsI18n();
   const commonForm = createCommonFormI18n();
   const commonLabels = createCommonLabelsI18n();
@@ -32,6 +36,7 @@ export function createLoginFormI18n() {
     title,
     actions,
     errors,
+    profileErrors,
     toast,
     commonErrors,
     commonForm,
