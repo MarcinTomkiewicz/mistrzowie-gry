@@ -55,17 +55,40 @@
     </p-iftalabel>
 
     @if (showPasswordError()) {
-      <small>{{ i18n.commonForm().minLength.replace('{{min}}', '8') }}</small>
+      <small>{{ i18n.commonForm().minLength.replace('{{min}}', passwordMinLength.toString()) }}</small>
     }
+
+    <div class="flex-row-end-center mt-sm">
+      <p-button
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [label]="
+          isResetPending()
+            ? i18n.commonStatus().sending
+            : i18n.actions().requestPasswordResetLabel
+        "
+        [loading]="isResetPending()"
+        loadingIcon="pi pi-d20"
+        [disabled]="hasPendingAction()"
+        (onClick)="requestPasswordReset()"
+      />
+    </div>
   </div>
 
   <div class="w-100 flex-row-center-center">
     <p-button
       severity="success"
-      [label]="i18n.actions().submitLabel"
+      [label]="
+        isLoginPending()
+          ? i18n.commonStatus().loading
+          : i18n.actions().submitLabel
+      "
       type="submit"
       loadingIcon="pi pi-d20"
       [icon]="'pi pi-teleport'"
+      [loading]="isLoginPending()"
+      [disabled]="hasPendingAction()"
     />
   </div>
 </form>

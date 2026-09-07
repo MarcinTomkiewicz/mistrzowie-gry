@@ -1,8 +1,46 @@
+import {
+  isAuthError,
+  isAuthSessionMissingError,
+} from '@supabase/supabase-js';
+
 import { AppAuthError } from '../types/auth-error';
+import type { CommonErrorsTranslations } from '../types/i18n/common';
+
+export function normalizeAuthError(error: unknown): AppAuthError {
+  return error instanceof AppAuthError
+    ? error
+    : new AppAuthError('unknown', undefined, error);
+}
+
+export function resolveCommonAuthErrorMessage(
+  code: AppAuthError['code'],
+  errors: CommonErrorsTranslations,
+): string {
+  return code === 'network_error'
+    ? errors.network
+    : code === 'unauthorized'
+      ? errors.unauthorized
+      : errors.generic;
+}
 
 export function mapAuthError(error: unknown): AppAuthError {
+  if (
+    isAuthSessionMissingError(error) ||
+    (isAuthError(error) &&
+      [
+        'session_not_found',
+        'session_expired',
+        'refresh_token_not_found',
+        'refresh_token_already_used',
+      ].includes(error.code ?? ''))
+  ) {
+    return new AppAuthError('session_not_found', undefined, error);
+  }
+
   const message =
-    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    error instanceof Error
+      ? error.message.toLowerCase()
+      : String(error).toLowerCase();
 
   if (message.includes('invalid login credentials')) {
     return new AppAuthError('invalid_credentials', undefined, error);

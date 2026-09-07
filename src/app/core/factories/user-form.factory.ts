@@ -4,6 +4,7 @@ import {
   Validators
 } from '@angular/forms';
 
+import { AUTH_PASSWORD_MIN_LENGTH } from '../configs/auth.config';
 import { PROFILE_TEXT_LIMITS } from '../configs/profile.config';
 import { IUserProfileFormData } from '../interfaces/i-auth-payloads';
 import { IUserFormFactoryOptions, UserFormGroup } from '../interfaces/i-user-form';
@@ -29,7 +30,7 @@ export function createUserForm(
       }),
       password: fb.control<string | null>(initial?.password ?? null, {
         validators: includePassword
-          ? [Validators.required, Validators.minLength(8)]
+          ? [Validators.required, Validators.minLength(AUTH_PASSWORD_MIN_LENGTH)]
           : [],
       }),
 

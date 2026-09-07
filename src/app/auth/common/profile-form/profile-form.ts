@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -20,6 +20,7 @@ import { PasswordModule } from 'primeng/password';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
+import { AUTH_PASSWORD_MIN_LENGTH } from '../../../core/configs/auth.config';
 import { PROFILE_TEXT_LIMITS } from '../../../core/configs/profile.config';
 import {
   createUserForm,
@@ -31,8 +32,9 @@ import {
 import { IUser } from '../../../core/interfaces/i-user';
 import { Auth } from '../../../core/services/auth/auth';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import { AppAuthError, AuthErrorCode } from '../../../core/types/auth-error';
+import { AuthErrorCode } from '../../../core/types/auth-error';
 import { ProfileFormMode } from '../../../core/types/profile-form';
+import { normalizeAuthError, resolveCommonAuthErrorMessage } from '../../../core/utils/auth-error';
 import { CharacterCounter } from '../../../common/character-counter/character-counter';
 import { createProfileFormI18n } from './profile-form.i18n';
 
@@ -65,6 +67,7 @@ export class ProfileForm {
 
   readonly i18n = createProfileFormI18n();
   readonly limits = PROFILE_TEXT_LIMITS;
+  readonly passwordMinLength = AUTH_PASSWORD_MIN_LENGTH;
 
   readonly form = createUserForm(this.fb, {
     includeEmail: true,
@@ -82,35 +85,25 @@ export class ProfileForm {
     () => !this.isRegisterMode() || this.isExpanded(),
   );
 
-  private readonly syncModeEffect = effect(() => {
+  private readonly syncMode = effect(() => {
     const isRegisterMode = this.isRegisterMode();
     const emailControl = this.form.controls.email;
     const passwordControl = this.form.controls.password;
 
     if (isRegisterMode) {
-      emailControl.setValidators([Validators.required, Validators.email]);
-      passwordControl.setValidators([Validators.required, Validators.minLength(8)]);
       emailControl.enable({ emitEvent: false });
       passwordControl.enable({ emitEvent: false });
-      emailControl.updateValueAndValidity({ emitEvent: false });
-      passwordControl.updateValueAndValidity({ emitEvent: false });
       return;
     }
-
-    emailControl.clearValidators();
-    passwordControl.clearValidators();
 
     emailControl.disable({ emitEvent: false });
     passwordControl.disable({ emitEvent: false });
 
     passwordControl.setValue(null, { emitEvent: false });
     this.isExpanded.set(false);
-
-    emailControl.updateValueAndValidity({ emitEvent: false });
-    passwordControl.updateValueAndValidity({ emitEvent: false });
   });
 
-  private readonly hydrateEditFormEffect = effect(() => {
+  private readonly hydrateEditForm = effect(() => {
     if (!this.isEditMode()) {
       this.hydratedUserId.set(null);
       return;
@@ -235,14 +228,9 @@ export class ProfileForm {
           });
         },
         error: (error) => {
-          const authError =
-            error instanceof AppAuthError
-              ? error
-              : new AppAuthError('unknown', undefined, error);
-
           this.toast.danger({
             summary: this.i18n.toast().registerFailedSummary,
-            detail: this.resolveAuthErrorMessage(authError.code),
+            detail: this.resolveAuthErrorMessage(normalizeAuthError(error).code),
           });
         },
       });
@@ -263,14 +251,9 @@ export class ProfileForm {
           });
         },
         error: (error) => {
-          const authError =
-            error instanceof AppAuthError
-              ? error
-              : new AppAuthError('unknown', undefined, error);
-
           this.toast.danger({
             summary: this.i18n.toast().updateFailedSummary,
-            detail: this.resolveAuthErrorMessage(authError.code),
+            detail: this.resolveAuthErrorMessage(normalizeAuthError(error).code),
           });
         },
       });
@@ -339,12 +322,8 @@ export class ProfileForm {
         return this.i18n.errors().weakPassword;
       case 'profile_not_found':
         return this.i18n.errors().profileNotFound;
-      case 'network_error':
-        return this.i18n.commonErrors().network;
-      case 'unauthorized':
-        return this.i18n.commonErrors().unauthorized;
       default:
-        return this.i18n.commonErrors().generic;
+        return resolveCommonAuthErrorMessage(code, this.i18n.commonErrors());
     }
   }
 }

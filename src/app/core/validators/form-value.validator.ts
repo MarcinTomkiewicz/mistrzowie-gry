@@ -49,6 +49,18 @@ export function futureDateValidator(): ValidatorFn {
   };
 }
 
+export function matchingControlsValidator(
+  firstControlName: string,
+  secondControlName: string,
+  errorKey: string,
+): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null =>
+    control.get(firstControlName)?.value ===
+    control.get(secondControlName)?.value
+      ? null
+      : { [errorKey]: true };
+}
+
 export function dateTimeRangeValidator(
   startControlName: string,
   endControlName: string,

@@ -4,10 +4,33 @@ export interface LoginFormTitleTranslations {
 
 export interface LoginFormActionsTranslations {
   submitLabel: string;
+  requestPasswordResetLabel: string;
 }
 
 export interface LoginFormErrorsTranslations {
   invalidCredentials: string;
+}
+
+export interface LoginFormToastTranslations {
+  loginSuccessSummary: string;
+  loginSuccessDetail: string;
+  loginFailedSummary: string;
+  resetRequestedSummary: string;
+  resetRequestedDetail: string;
+  resetRequestFailedSummary: string;
+}
+
+export interface ResetPasswordTranslations {
+  title: string;
+  subtitle: string;
+  passwordConfirmationLabel: string;
+  passwordMismatch: string;
+  invalidLink: string;
+}
+
+export interface ResetPasswordToastTranslations {
+  updateFailedSummary: string;
+  updateSuccessDetail: string;
 }
 
 export interface ProfileFormTitleTranslations {

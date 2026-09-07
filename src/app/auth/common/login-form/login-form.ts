@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,18 +11,22 @@ import { PasswordModule } from 'primeng/password';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
+import { AUTH_PASSWORD_MIN_LENGTH } from '../../../core/configs/auth.config';
 import { ILoginPayload } from '../../../core/interfaces/i-auth-payloads';
 import { createUserForm } from '../../../core/factories/user-form.factory';
+import { AuthRecovery } from '../../../core/services/auth-recovery/auth-recovery';
 import { Auth } from '../../../core/services/auth/auth';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import { AppAuthError, AuthErrorCode } from '../../../core/types/auth-error';
+import { AuthErrorCode } from '../../../core/types/auth-error';
+import { normalizeAuthError, resolveCommonAuthErrorMessage } from '../../../core/utils/auth-error';
 import { createLoginFormI18n } from './login-form.i18n';
+
+type PendingAction = 'login' | 'password-reset' | null;
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ButtonModule,
     IftaLabelModule,
@@ -36,12 +39,14 @@ import { createLoginFormI18n } from './login-form.i18n';
 })
 export class LoginForm {
   private readonly auth = inject(Auth);
+  private readonly authRecovery = inject(AuthRecovery);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
 
   readonly i18n = createLoginFormI18n();
+  readonly passwordMinLength = AUTH_PASSWORD_MIN_LENGTH;
 
   readonly form = createUserForm(this.fb, {
     includeEmail: true,
@@ -49,9 +54,19 @@ export class LoginForm {
     includeProfile: false,
   });
 
-  readonly isSubmitting = computed(() => false);
+  private readonly pendingAction = signal<PendingAction>(null);
+
+  readonly hasPendingAction = computed(() => this.pendingAction() !== null);
+  readonly isLoginPending = computed(() => this.pendingAction() === 'login');
+  readonly isResetPending = computed(
+    () => this.pendingAction() === 'password-reset',
+  );
 
   onSubmit(): void {
+    if (this.hasPendingAction()) {
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
 
@@ -68,30 +83,66 @@ export class LoginForm {
       password: this.form.controls.password.getRawValue() ?? '',
     };
 
+    this.pendingAction.set('login');
+
     this.auth
       .login(payload)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => undefined),
+        finalize(() => this.pendingAction.set(null)),
       )
       .subscribe({
         next: () => {
           this.toast.success({
-            summary: 'Zalogowano',
-            detail: 'Logowanie zakończyło się powodzeniem.',
+            summary: this.i18n.toast().loginSuccessSummary,
+            detail: this.i18n.toast().loginSuccessDetail,
           });
 
           void this.router.navigateByUrl('/');
         },
         error: (error) => {
-          const authError =
-            error instanceof AppAuthError
-              ? error
-              : new AppAuthError('unknown', undefined, error);
-
           this.toast.danger({
-            summary: 'Nie udało się zalogować',
-            detail: this.resolveAuthErrorMessage(authError.code),
+            summary: this.i18n.toast().loginFailedSummary,
+            detail: this.resolveAuthErrorMessage(normalizeAuthError(error).code),
+          });
+        },
+      });
+  }
+
+  requestPasswordReset(): void {
+    if (this.hasPendingAction()) {
+      return;
+    }
+
+    const emailControl = this.form.controls.email;
+
+    if (emailControl.invalid) {
+      emailControl.markAsTouched();
+      return;
+    }
+
+    this.pendingAction.set('password-reset');
+
+    this.authRecovery
+      .requestPasswordReset(emailControl.getRawValue()?.trim() ?? '')
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.pendingAction.set(null)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success({
+            summary: this.i18n.toast().resetRequestedSummary,
+            detail: this.i18n.toast().resetRequestedDetail,
+          });
+        },
+        error: (error) => {
+          this.toast.danger({
+            summary: this.i18n.toast().resetRequestFailedSummary,
+            detail: resolveCommonAuthErrorMessage(
+              normalizeAuthError(error).code,
+              this.i18n.commonErrors(),
+            ),
           });
         },
       });
@@ -121,12 +172,8 @@ export class LoginForm {
         return this.i18n.errors().invalidCredentials;
       case 'email_not_confirmed':
         return this.i18n.commonErrors().unauthorized;
-      case 'network_error':
-        return this.i18n.commonErrors().network;
-      case 'unauthorized':
-        return this.i18n.commonErrors().unauthorized;
       default:
-        return this.i18n.commonErrors().generic;
+        return resolveCommonAuthErrorMessage(code, this.i18n.commonErrors());
     }
   }
 }

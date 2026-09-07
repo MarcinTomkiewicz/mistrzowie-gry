@@ -56,7 +56,7 @@
       </p-iftalabel>
 
       @if (showPasswordError()) {
-        <small>{{ i18n.commonForm().minLength.replace('{{min}}', '8') }}</small>
+        <small>{{ i18n.commonForm().minLength.replace('{{min}}', passwordMinLength.toString()) }}</small>
       }
     </div>
   } @else {

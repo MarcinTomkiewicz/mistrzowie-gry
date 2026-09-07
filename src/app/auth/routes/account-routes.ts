@@ -6,6 +6,10 @@ import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
 const loaders = {
   register: () =>
     import('../components/register/register').then((m) => m.Register),
+  resetPassword: () =>
+    import('../components/reset-password/reset-password').then(
+      (m) => m.ResetPassword,
+    ),
   editProfile: () =>
     import('../components/edit-profile/edit-profile').then(
       (m) => m.EditProfile,
@@ -28,6 +32,7 @@ const gmGuard = [minimumRoleGuard('gm')];
 
 export const accountRoutes: Routes = [
   { path: 'secret-register', loadComponent: loaders.register },
+  { path: 'reset-password', loadComponent: loaders.resetPassword },
   {
     path: 'edit-profile',
     loadComponent: loaders.editProfile,
