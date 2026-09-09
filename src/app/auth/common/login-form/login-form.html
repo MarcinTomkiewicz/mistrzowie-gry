@@ -34,7 +34,7 @@
   <div class="w-80 w-100-xs">
     <p-iftalabel class="w-100">
       <p-password
-        styleClass="w-100"
+        class="w-100"
         inputStyleClass="w-100"
         inputId="login-password"
         formControlName="password"
@@ -63,6 +63,7 @@
         type="button"
         severity="secondary"
         [text]="true"
+        size="small"
         [label]="
           isConfirmationResendPending()
             ? i18n.commonStatus().sending
@@ -78,6 +79,7 @@
         type="button"
         severity="secondary"
         [text]="true"
+        size="small"
         [label]="
           isResetPending()
             ? i18n.commonStatus().sending
