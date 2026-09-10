@@ -17,7 +17,9 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 export function app(): express.Express {
   const app = express();
-  const angularApp = new AngularNodeAppEngine();
+  const angularApp = new AngularNodeAppEngine({
+    trustProxyHeaders: ['x-forwarded-for', 'x-forwarded-proto'],
+  });
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '200kb' }));
@@ -87,9 +89,10 @@ export function app(): express.Express {
   return app;
 }
 
+const server = app();
+
 function run(): void {
   const port = Number(process.env['PORT'] || 4100);
-  const server = app();
 
   server.listen(port, '127.0.0.1', () => {
     console.log(`Node Express server listening on http://127.0.0.1:${port}`);
@@ -98,4 +101,4 @@ function run(): void {
 
 run();
 
-export const reqHandler = createNodeRequestHandler(app());
+export const reqHandler = createNodeRequestHandler(server);

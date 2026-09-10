@@ -9,7 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
 import { DrawerModule } from 'primeng/drawer';
@@ -35,7 +35,7 @@ interface CloseableOverlayComponent {
   standalone: true,
   imports: [
     NgOptimizedImage,
-    RouterModule,
+    RouterLink,
     PopoverModule,
     DrawerModule,
     ThemeSwitch,
@@ -48,15 +48,13 @@ export class Navbar {
   private readonly authSession = inject(AuthSession);
   private readonly lazyComponentLoader = inject(LazyComponentLoader);
   private readonly nav = inject(Navigation);
+  private readonly theme = inject(Theme);
   private readonly uiConfirm = inject(UiConfirm);
 
-  readonly theme = inject(Theme);
   readonly i18n = createNavbarI18n();
 
   readonly menu = computed(() => this.i18n.resolveMenu(this.nav.navbar()));
-  readonly hasSessionCookie = computed(() =>
-    this.authSession.hasSessionCookie(),
-  );
+  readonly hasSessionCookie = this.authSession.hasSessionCookie;
 
   readonly mobileOpen = signal(false);
   readonly activeDropdown = signal<CommonNavMenuItem | null>(null);

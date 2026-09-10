@@ -112,7 +112,7 @@ const adminChildren: Routes = [
 
 export const adminRoutes: Routes = [
   {
-    path: 'admin',
+    path: '',
     canActivate: adminGuards,
     children: adminChildren,
   },

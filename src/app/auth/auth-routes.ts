@@ -2,7 +2,7 @@ import type { Routes } from '@angular/router';
 
 import { accountRoutes } from './routes/account-routes';
 
-const authChildren: Routes = [
+export const authRoutes: Routes = [
   ...accountRoutes,
   {
     path: 'event-signup',
@@ -23,12 +23,5 @@ const authChildren: Routes = [
     path: 'admin',
     loadChildren: () =>
       import('./routes/admin-routes').then((m) => m.authAdminRoutes),
-  },
-];
-
-export const authRoutes: Routes = [
-  {
-    path: 'auth',
-    children: authChildren,
   },
 ];

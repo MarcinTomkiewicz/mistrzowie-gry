@@ -1,7 +1,5 @@
 import type { Routes } from '@angular/router';
 
-import { authGuard } from '../../core/guards/auth.guard';
-
 const loaders = {
   calendarPreview: () =>
     import(
@@ -10,10 +8,6 @@ const loaders = {
   chaoticThursdays: () =>
     import('../components/chaotic-thursdays/chaotic-thursdays').then(
       (m) => m.ChaoticThursdays,
-    ),
-  sessionReservation: () =>
-    import('../components/session-reservation/session-reservation').then(
-      (m) => m.SessionReservation,
     ),
 } as const;
 
@@ -33,7 +27,9 @@ export const eventRoutes: Routes = [
   },
   {
     path: 'rezerwacja-sesji',
-    loadComponent: loaders.sessionReservation,
-    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./session-reservation-routes').then(
+        (m) => m.sessionReservationRoutes,
+      ),
   },
 ];
