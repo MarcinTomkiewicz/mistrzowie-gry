@@ -50,12 +50,12 @@ export const MENU_CONFIG: IMenu[] = [
 
   {
     labelKey: 'nav.chaoticThursdays',
-    path: '/chaotic-thursdays',
+    path: '/chaotyczne-czwartki',
     footer: true,
   },
   {
     labelKey: 'nav.join',
-    path: '/join-the-party',
+    path: '/dolacz-do-druzyny',
     footer: true,
   },
   {

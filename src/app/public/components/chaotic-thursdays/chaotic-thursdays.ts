@@ -63,7 +63,7 @@ export class ChaoticThursdays {
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
-  private readonly pageUrl = buildSiteUrl('/chaotic-thursdays');
+  private readonly pageUrl = buildSiteUrl('/chaotyczne-czwartki');
 
   readonly i18n = createChaoticThursdaysI18n(
     CHAOTIC_HIGHLIGHT_ICONS,

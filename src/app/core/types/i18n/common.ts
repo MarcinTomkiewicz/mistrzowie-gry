@@ -178,6 +178,8 @@ export type CommonSocialTranslations = {
 export type CommonLegalTranslations = {
   privacyPolicy: string;
   terms: string;
+  minorProtectionStandards: string;
+  minorProtectionStandardsForMinors: string;
   cookies: string;
 };
 

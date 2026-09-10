@@ -4,6 +4,11 @@ export const SITE_URL = 'https://mistrzowie-gry.pl';
 export const SITE_NAME = 'Mistrzowie Gry';
 export const PUBLIC_CONTACT_EMAIL = 'kontakt@mistrzowie-gry.pl';
 export const PUBLIC_CONTACT_PHONE = '+48 533 616 491';
+export const PUBLIC_SOCIAL_URLS = {
+  facebook: 'https://facebook.com/mistrzowie.gry',
+  instagram: 'https://instagram.com/mistrzowie.gry',
+  discord: 'https://discord.gg/cJVxdmRvUY',
+} as const;
 export const SOCIAL_SHARE_IMAGE =
   'https://ik.imagekit.io/ialsnkfw5g/logo/logoMG.png?tr=w-1200,q-75,f-jpg';
 
@@ -41,10 +46,7 @@ export function createOrganizationStructuredData(): ISeoStructuredDataNode {
     },
     email: PUBLIC_CONTACT_EMAIL,
     telephone: PUBLIC_CONTACT_PHONE,
-    sameAs: [
-      'https://facebook.com/mistrzowie.gry',
-      'https://instagram.com/mistrzowie.gry',
-    ],
+    sameAs: [PUBLIC_SOCIAL_URLS.facebook, PUBLIC_SOCIAL_URLS.instagram],
   };
 }
 

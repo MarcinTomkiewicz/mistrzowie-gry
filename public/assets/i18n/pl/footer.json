@@ -2,13 +2,8 @@
   "footer": {
     "description": "Jesteśmy Mistrzami Gry. Organizujemy Twoje doświadczenia RPGowe - planujemy, realizujemy, dostarczamy sesje gier fabularnych na najwyższym poziomie.",
     "shortcutTitle": "Na skróty",
-    "socialAriaLabel": "Social media",
-    "legalAriaLabel": "Informacje prawne",
-    "phoneValue": "+48 533 616 491",
-    "phoneHref": "tel:+48533616491",
-    "emailLabel": "Email",
-    "emailValue": "kontakt@mistrzowie-gry.pl",
-    "emailHref": "mailto:kontakt@mistrzowie-gry.pl",
+    "legalInformationTitle": "Informacje prawne",
+    "socialAriaLabel": "Media społecznościowe",
     "copyrightSuffix": "Wszystkie prawa zastrzeżone."
   }
 }

@@ -11,8 +11,8 @@
 - https://mistrzowie-gry.pl/
 - https://mistrzowie-gry.pl/about
 - https://mistrzowie-gry.pl/our-team
-- https://mistrzowie-gry.pl/chaotic-thursdays
-- https://mistrzowie-gry.pl/join-the-party
+- https://mistrzowie-gry.pl/chaotyczne-czwartki
+- https://mistrzowie-gry.pl/dolacz-do-druzyny
 - https://mistrzowie-gry.pl/contact
 
 ## Notes for language models

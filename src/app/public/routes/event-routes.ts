@@ -24,6 +24,11 @@ export const eventRoutes: Routes = [
   },
   {
     path: 'chaotic-thursdays',
+    pathMatch: 'full',
+    redirectTo: 'chaotyczne-czwartki',
+  },
+  {
+    path: 'chaotyczne-czwartki',
     loadComponent: loaders.chaoticThursdays,
   },
   {

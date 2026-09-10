@@ -10,8 +10,10 @@ import { DividerModule } from 'primeng/divider';
 import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
-import { buildSiteUrl } from '../../../core/config/site';
-import { Navigation } from '../../../core/services/navigation/navigation';
+import {
+  PUBLIC_SOCIAL_URLS,
+  buildSiteUrl,
+} from '../../../core/config/site';
 import { Seo } from '../../../core/services/seo/seo';
 import { MeetingFormat } from '../../../core/types/i18n/join-the-party';
 import {
@@ -43,9 +45,8 @@ import { JoinThePartySummary } from './join-the-party-summary';
   providers: [provideTranslocoScope('joinTheParty', 'common')],
 })
 export class JoinTheParty {
-  private readonly navigation = inject(Navigation);
   private readonly seo = inject(Seo);
-  private readonly pageUrl = buildSiteUrl('/join-the-party');
+  private readonly pageUrl = buildSiteUrl('/dolacz-do-druzyny');
 
   readonly i18n = createJoinThePartyI18n(
     JOIN_THE_PARTY_BENEFIT_ICONS,
@@ -67,19 +68,7 @@ export class JoinTheParty {
     new FormControl<MeetingFormat>(this.meetingFormat(), {
       nonNullable: true,
     });
-  readonly discordHref = computed(() => {
-    const discord = this.navigation
-      .social()
-      .find(({ labelKey }) => labelKey === 'Discord');
-
-    if (!discord) {
-      throw new Error(
-        '[JOIN_THE_PARTY] Discord entry is missing from Navigation.social().',
-      );
-    }
-
-    return discord.href;
-  });
+  readonly discordHref = PUBLIC_SOCIAL_URLS.discord;
 
   private readonly syncMobileMeetingFormatEffect = effect(() => {
     const format = this.meetingFormat();

@@ -1,0 +1,517 @@
+{
+  "content": {
+    "sections": [
+      {
+        "title": "1. Kto jest administratorem danych osobowych",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Administratorem Twoich danych osobowych jest:"
+          },
+          {
+            "type": "paragraph",
+            "text": "MISTRZOWIE GRY sp. z o.o.\nul. Augustyna Szamarzewskiego 21/2\n60-514 Poznań\nKRS: 0001246935\nNIP: 7812112460\nREGON: 544979988\ne-mail: [kontakt@mistrzowie-gry.pl](mailto:kontakt@mistrzowie-gry.pl)\ntel.: +48 533 616 491"
+          },
+          {
+            "type": "paragraph",
+            "text": "W sprawach związanych z przetwarzaniem danych osobowych możesz skontaktować się z Administratorem pod adresem e-mail: [kontakt@mistrzowie-gry.pl](mailto:kontakt@mistrzowie-gry.pl)."
+          }
+        ]
+      },
+      {
+        "title": "2. Czego dotyczy ta Polityka Prywatności",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Niniejsza Polityka Prywatności opisuje zasady przetwarzania danych osobowych w związku z:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "korzystaniem ze strony internetowej Mistrzowie Gry,"
+              },
+              {
+                "text": "kontaktem z Administratorem,"
+              },
+              {
+                "text": "składaniem zapytań o ofertę,"
+              },
+              {
+                "text": "zawieraniem i realizacją umów,"
+              },
+              {
+                "text": "obsługą reklamacji i innych zgłoszeń,"
+              },
+              {
+                "text": "korzystaniem z formularza kontaktowego,"
+              },
+              {
+                "text": "ewentualnym korzystaniem z usług elektronicznych dostępnych na stronie,"
+              },
+              {
+                "text": "przyszłymi funkcjami logowania i kont użytkowników, jeśli zostaną uruchomione."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "3. Kim jest projekt Mistrzowie Gry z perspektywy danych osobowych",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Mistrzowie Gry to projekt organizacyjny oferujący prowadzone sesje RPG jako usługę. Projekt nie działa jako marketplace ani tablica ogłoszeń dla niezależnych Mistrzów Gry, lecz jako organizator usługi, który odpowiada za jej ramy organizacyjne, standard, bezpieczeństwo i realizację."
+          },
+          {
+            "type": "paragraph",
+            "text": "Oznacza to, że w zakresie niezbędnym do organizacji i wykonania usługi Administrator przetwarza dane klientów, uczestników i współpracowników w ramach własnej odpowiedzialności organizacyjnej. Projekt buduje relacje długoterminowe, powtarzalne doświadczenie i bierze odpowiedzialność za przebieg usług."
+          }
+        ]
+      },
+      {
+        "title": "4. Jakie dane możemy przetwarzać",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "W zależności od sytuacji możemy przetwarzać w szczególności:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "imię i nazwisko,"
+              },
+              {
+                "text": "adres e-mail,"
+              },
+              {
+                "text": "numer telefonu,"
+              },
+              {
+                "text": "dane podane w treści wiadomości lub formularza,"
+              },
+              {
+                "text": "dane niezbędne do przygotowania oferty i organizacji usługi,"
+              },
+              {
+                "text": "dane rozliczeniowe i fakturowe,"
+              },
+              {
+                "text": "dane dotyczące ustaleń organizacyjnych związanych z usługą,"
+              },
+              {
+                "text": "dane techniczne związane z korzystaniem ze strony, jeśli są zbierane przez narzędzia techniczne lub systemy bezpieczeństwa."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "Co do zasady nie prosimy o podawanie szczególnych kategorii danych osobowych, chyba że jest to wyjątkowo niezbędne i ma wyraźną podstawę organizacyjną lub prawną."
+          }
+        ]
+      },
+      {
+        "title": "5. W jakich celach przetwarzamy dane i na jakiej podstawie prawnej",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Twoje dane osobowe możemy przetwarzać w następujących celach:"
+          },
+          {
+            "type": "paragraph",
+            "text": "Udzielenie odpowiedzi na wiadomość, zapytanie lub formularz kontaktowy. Podstawa prawna: art. 6 ust. 1 lit. b RODO – podjęcie działań przed zawarciem umowy, lub art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na obsłudze kontaktu i komunikacji."
+          },
+          {
+            "type": "paragraph",
+            "text": "Przygotowanie oferty, ustalenie warunków współpracy i organizacja usługi. Podstawa prawna: art. 6 ust. 1 lit. b RODO – niezbędność do zawarcia i wykonania umowy."
+          },
+          {
+            "type": "paragraph",
+            "text": "Wykonanie zawartej umowy, w tym koordynacja realizacji sesji, wydarzenia lub programu. Podstawa prawna: art. 6 ust. 1 lit. b RODO – wykonanie umowy."
+          },
+          {
+            "type": "paragraph",
+            "text": "Rozliczenia, księgowość i realizacja obowiązków podatkowych. Podstawa prawna: art. 6 ust. 1 lit. c RODO – obowiązek prawny ciążący na Administratorze."
+          },
+          {
+            "type": "paragraph",
+            "text": "Dochodzenie roszczeń, obrona przed roszczeniami oraz ochrona bezpieczeństwa organizacyjnego. Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na ochronie swoich praw, zapewnieniu bezpieczeństwa i dokumentowaniu przebiegu współpracy."
+          },
+          {
+            "type": "paragraph",
+            "text": "Rozpatrywanie reklamacji, uwag, incydentów i innych zgłoszeń. Podstawa prawna: art. 6 ust. 1 lit. b, c lub f RODO – zależnie od charakteru zgłoszenia."
+          },
+          {
+            "type": "paragraph",
+            "text": "Zapewnienie bezpieczeństwa strony internetowej i jej działania technicznego. Podstawa prawna: art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora polegający na zapewnieniu bezpieczeństwa, stabilności i ochronie przed nadużyciami."
+          }
+        ]
+      },
+      {
+        "title": "6. Czy podanie danych jest obowiązkowe",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Podanie danych jest dobrowolne, ale w wielu przypadkach niezbędne do:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "uzyskania odpowiedzi na wiadomość,"
+              },
+              {
+                "text": "przygotowania oferty,"
+              },
+              {
+                "text": "zawarcia umowy,"
+              },
+              {
+                "text": "realizacji usługi,"
+              },
+              {
+                "text": "wystawienia faktury,"
+              },
+              {
+                "text": "rozpatrzenia reklamacji lub zgłoszenia."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "Brak podania danych może uniemożliwić kontakt, przygotowanie oferty lub realizację usługi."
+          }
+        ]
+      },
+      {
+        "title": "7. Skąd mamy dane",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Co do zasady dane otrzymujemy bezpośrednio od Ciebie, na przykład:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "przez formularz kontaktowy,"
+              },
+              {
+                "text": "przez e-mail,"
+              },
+              {
+                "text": "telefonicznie,"
+              },
+              {
+                "text": "w toku ustaleń dotyczących usługi,"
+              },
+              {
+                "text": "podczas współpracy organizacyjnej."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "W niektórych przypadkach dane mogą zostać przekazane przez podmiot zamawiający usługę dla grupy, firmy lub instytucji, jeśli jest to niezbędne do organizacji wydarzenia."
+          },
+          {
+            "type": "paragraph",
+            "text": "W zakresie wymaganym przez przepisy prawa informacja o przetwarzaniu danych może być przekazywana również osobom, których dane zostały przekazane Administratorowi przez podmiot zamawiający usługę."
+          }
+        ]
+      },
+      {
+        "title": "8. Komu możemy ujawniać dane",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Dane mogą być przekazywane podmiotom, które wspierają Administratora w prowadzeniu działalności, wyłącznie w zakresie niezbędnym do danego celu, w szczególności:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "dostawcy hostingu,"
+              },
+              {
+                "text": "dostawcy poczty elektronicznej,"
+              },
+              {
+                "text": "biuru rachunkowemu lub podmiotom księgowym,"
+              },
+              {
+                "text": "dostawcom narzędzi IT i wsparcia technicznego,"
+              },
+              {
+                "text": "operatorom płatności – jeśli zostaną wdrożeni,"
+              },
+              {
+                "text": "podmiotom świadczącym usługi prawne lub doradcze,"
+              },
+              {
+                "text": "Mistrzom Gry współpracującym z projektem – wyłącznie w zakresie niezbędnym do przygotowania, organizacji i realizacji konkretnej usługi."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "Ponieważ projekt działa jako organizator usługi, a nie jedynie pośrednik, część danych organizacyjnych może być przekazywana osobie prowadzącej sesję tylko wtedy, gdy jest to konieczne do wykonania konkretnej usługi, zachowania standardu i bezpieczeństwa realizacji."
+          }
+        ]
+      },
+      {
+        "title": "9. Czy przekazujemy dane poza Europejski Obszar Gospodarczy",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Co do zasady dane nie są przekazywane poza Europejski Obszar Gospodarczy, chyba że korzystanie z konkretnych narzędzi technologicznych będzie to powodowało. Jeśli takie przekazanie będzie miało miejsce, odbędzie się zgodnie z obowiązującymi przepisami prawa, w szczególności przy zastosowaniu odpowiednich zabezpieczeń wymaganych przez RODO."
+          }
+        ]
+      },
+      {
+        "title": "10. Jak długo przechowujemy dane",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Dane przechowujemy przez okres nie dłuższy niż jest to potrzebne do celu, w jakim zostały zebrane, a następnie przez okres wymagany przepisami prawa albo potrzebny do ochrony przed roszczeniami."
+          },
+          {
+            "type": "paragraph",
+            "text": "W praktyce oznacza to, że:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "dane z korespondencji i formularzy kontaktowych przechowujemy przez okres potrzebny do obsługi zapytania oraz dalszego kontaktu, a następnie przez okres uzasadniony archiwizacyjnie lub związany z obroną przed roszczeniami,"
+              },
+              {
+                "text": "dane związane z umową i realizacją usługi przechowujemy przez czas jej wykonywania, a następnie przez okres wymagany przepisami księgowymi, podatkowymi oraz związany z przedawnieniem roszczeń,"
+              },
+              {
+                "text": "dane z reklamacji i zgłoszeń przechowujemy przez czas potrzebny do ich obsługi oraz ewentualnej obrony przed roszczeniami,"
+              },
+              {
+                "text": "dane techniczne – przez okres niezbędny do zapewnienia bezpieczeństwa i prawidłowego działania strony."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "11. Jakie prawa Ci przysługują",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Masz prawo do:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "dostępu do swoich danych,"
+              },
+              {
+                "text": "sprostowania danych,"
+              },
+              {
+                "text": "usunięcia danych, w przypadkach przewidzianych prawem,"
+              },
+              {
+                "text": "ograniczenia przetwarzania,"
+              },
+              {
+                "text": "przenoszenia danych, jeśli podstawą przetwarzania jest umowa lub zgoda i przetwarzanie odbywa się w sposób zautomatyzowany,"
+              },
+              {
+                "text": "wniesienia sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie Administratora,"
+              },
+              {
+                "text": "cofnięcia zgody w dowolnym momencie, jeśli przetwarzanie odbywa się na podstawie zgody; cofnięcie zgody nie wpływa na zgodność z prawem przetwarzania dokonanego wcześniej,"
+              },
+              {
+                "text": "wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "W celu skorzystania z tych praw możesz napisać na adres: [kontakt@mistrzowie-gry.pl](mailto:kontakt@mistrzowie-gry.pl)."
+          }
+        ]
+      },
+      {
+        "title": "12. Czy podejmujemy zautomatyzowane decyzje lub profilujemy",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Na moment publikacji niniejszej Polityki Prywatności Administrator nie podejmuje wobec użytkowników zautomatyzowanych decyzji wywołujących wobec nich skutki prawne ani nie stosuje profilowania w rozumieniu RODO."
+          },
+          {
+            "type": "paragraph",
+            "text": "Jeżeli w przyszłości wdrożone zostaną rozwiązania, które tego wymagają, Polityka Prywatności zostanie odpowiednio zaktualizowana."
+          }
+        ]
+      },
+      {
+        "title": "13. Formularz kontaktowy",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Jeżeli korzystasz z formularza kontaktowego na stronie, przetwarzamy dane podane w formularzu w celu:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "odpowiedzi na wiadomość,"
+              },
+              {
+                "text": "obsługi zapytania,"
+              },
+              {
+                "text": "przygotowania oferty albo ustalenia, czy i w jaki sposób możemy zrealizować usługę."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "Samo wysłanie formularza kontaktowego nie powoduje automatycznie zawarcia umowy ani rezerwacji terminu."
+          }
+        ]
+      },
+      {
+        "title": "14. Logowanie i konta użytkowników",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Na moment publikacji niniejszej Polityki Prywatności logowanie użytkowników może być niewdrożone albo ograniczone do określonych funkcji wewnętrznych projektu."
+          },
+          {
+            "type": "paragraph",
+            "text": "Jeżeli zostanie uruchomione logowanie, w szczególności dla Mistrzów Gry lub innych współpracowników, Polityka Prywatności zostanie rozszerzona o informacje dotyczące:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "zakresu danych konta,"
+              },
+              {
+                "text": "celu przetwarzania danych logowania,"
+              },
+              {
+                "text": "okresów przechowywania,"
+              },
+              {
+                "text": "bezpieczeństwa dostępu,"
+              },
+              {
+                "text": "ewentualnych logów systemowych."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "15. Cookies i technologie podobne",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Strona może korzystać z plików cookies oraz podobnych technologii w celu:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "zapewnienia prawidłowego działania strony,"
+              },
+              {
+                "text": "utrzymania bezpieczeństwa,"
+              },
+              {
+                "text": "zapamiętywania preferencji użytkownika,"
+              },
+              {
+                "text": "obsługi przyszłych funkcji logowania."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "Na moment publikacji niniejszej Polityki Prywatności Administrator nie korzysta z analityki ani newslettera. Jeżeli w przyszłości zostaną wdrożone dodatkowe narzędzia, w szczególności analityczne, marketingowe lub związane z komunikacją, Polityka Prywatności zostanie odpowiednio zaktualizowana."
+          }
+        ]
+      },
+      {
+        "title": "16. Bezpieczeństwo danych",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Administrator stosuje środki organizacyjne i techniczne odpowiednie do charakteru przetwarzanych danych oraz ryzyk związanych z ich przetwarzaniem."
+          },
+          {
+            "type": "paragraph",
+            "text": "Podejście projektu do bezpieczeństwa ma charakter systemowy i obejmuje nie tylko kwestie techniczne, ale również organizacyjne: identyfikowalność stron, reagowanie na incydenty, ograniczanie ryzyka i wyraźny podział odpowiedzialności."
+          }
+        ]
+      },
+      {
+        "title": "17. Dane dzieci i osób niepełnoletnich",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Usługi projektu mogą w określonych przypadkach być realizowane z udziałem osób niepełnoletnich, w szczególności w kontekście oferty instytucjonalnej albo innych zorganizowanych form udziału."
+          },
+          {
+            "type": "paragraph",
+            "text": "W takich przypadkach dane osobowe są przetwarzane wyłącznie w zakresie niezbędnym do organizacji i bezpiecznej realizacji usługi, a projekt może wymagać dodatkowych zgód opiekunów albo innych warunków organizacyjnych wynikających z charakteru wydarzenia."
+          }
+        ]
+      },
+      {
+        "title": "18. Zmiany Polityki Prywatności",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Polityka Prywatności może być aktualizowana w szczególności w przypadku:"
+          },
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "zmiany przepisów prawa,"
+              },
+              {
+                "text": "zmiany sposobu działania strony internetowej,"
+              },
+              {
+                "text": "wdrożenia nowych narzędzi technologicznych,"
+              },
+              {
+                "text": "uruchomienia nowych funkcji, takich jak logowanie lub sprzedaż online,"
+              },
+              {
+                "text": "zmian organizacyjnych w projekcie."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "text": "Aktualna wersja Polityki Prywatności jest publikowana na stronie internetowej."
+          }
+        ]
+      },
+      {
+        "title": "19. Data obowiązywania",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Niniejsza Polityka Prywatności obowiązuje od dnia: 19.06.2026."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -20,6 +20,11 @@ export const marketingRoutes: Routes = [
   { path: 'about', loadComponent: loaders.about },
   { path: 'our-team', loadComponent: loaders.ourTeam },
   { path: 'offer/:slug', loadComponent: loaders.offer },
-  { path: 'join-the-party', loadComponent: loaders.joinTheParty },
+  {
+    path: 'join-the-party',
+    pathMatch: 'full',
+    redirectTo: 'dolacz-do-druzyny',
+  },
+  { path: 'dolacz-do-druzyny', loadComponent: loaders.joinTheParty },
   { path: 'contact', loadComponent: loaders.contact },
 ];

@@ -1,247 +1,117 @@
 import { NgOptimizedImage } from '@angular/common';
-import {
-  Component,
-  ComponentRef,
-  OutputEmitterRef,
-  Type,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
+import {
+  PUBLIC_CONTACT_EMAIL,
+  PUBLIC_CONTACT_PHONE,
+} from '../../../core/config/site';
 import { LegalDialogs } from '../../../core/services/legal-dialogs/legal-dialogs';
-import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Navigation } from '../../../core/services/navigation/navigation';
 import { Theme } from '../../../core/services/theme/theme';
 import {
-  ActiveLegalDialog,
   LegalDialogContent,
-  LegalDialogsPayload,
+  LegalDialogId,
 } from '../../../core/types/i18n/legal';
-import { UILegalLink } from '../../../core/types/i18n/footer';
+import { LegalDialog } from '../../common/legal-dialog/legal-dialog';
 import { createFooterI18n } from './footer.i18n';
-
-interface LazyLegalDialogComponent {
-  visible: unknown;
-  dialogTitle: unknown;
-  dialogSubtitle: unknown;
-  dialogContent: unknown;
-  closeLabel: unknown;
-  visibleChange: OutputEmitterRef<boolean>;
-}
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, NgOptimizedImage, LazyMountHost],
+  imports: [RouterLink, NgOptimizedImage, LegalDialog],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
-  providers: [provideTranslocoScope('common'), provideTranslocoScope('footer')],
+  providers: [provideTranslocoScope('common', 'footer')],
 })
 export class Footer {
-  private readonly lazyComponentLoader = inject(LazyComponentLoader);
-  readonly nav = inject(Navigation);
-  readonly theme = inject(Theme);
+  private readonly nav = inject(Navigation);
+  private readonly theme = inject(Theme);
   readonly i18n = createFooterI18n();
   private readonly legalDialogs = inject(LegalDialogs);
 
-  readonly activeLegalDialog = signal<ActiveLegalDialog>(null);
-  readonly activeLegalDialogContent = signal<LegalDialogContent | null>(null);
-  readonly isLegalDialogLoading = signal(false);
-  readonly legalDialogError = signal('');
-  private readonly legalDialogHost = viewChild(LazyMountHost);
-  private readonly loadLegalDialog = () =>
-    import('../../common/legal-dialog/legal-dialog').then(
-      ({ LegalDialog }) => LegalDialog as Type<LazyLegalDialogComponent>,
-    );
-  private readonly legalDialogRef =
-    signal<ComponentRef<LazyLegalDialogComponent> | null>(null);
+  private readonly activeLegalDialog = signal<LegalDialogId | null>(null);
+  private readonly activeLegalDialogContent =
+    signal<LegalDialogContent | null>(null);
+  private readonly isLegalDialogLoading = signal(false);
+  private readonly legalDialogError = signal<string | null>(null);
 
-  readonly year = computed(() => new Date().getFullYear());
+  readonly year = new Date().getFullYear();
+  readonly contact = {
+    phone: PUBLIC_CONTACT_PHONE,
+    phoneHref: `tel:${PUBLIC_CONTACT_PHONE.replace(/\s/g, '')}`,
+    email: PUBLIC_CONTACT_EMAIL,
+    emailHref: `mailto:${PUBLIC_CONTACT_EMAIL}`,
+  };
 
-  readonly footerLinks = computed(() =>
-    this.i18n.resolveFooterMenu(this.nav.footer()),
-  );
+  readonly links = computed(() => {
+    const legal = this.i18n.resolveLegalLinks(this.nav.legal());
 
-  readonly socialLinks = computed(() =>
-    this.i18n.resolveSocialLinks(this.nav.social()),
-  );
-
-  readonly legalLinks = computed(() =>
-    this.i18n.resolveLegalLinks(this.nav.legal()),
-  );
+    return {
+      shortcuts: this.i18n.resolveFooterMenu(this.nav.footer()),
+      social: this.i18n.resolveSocialLinks(this.nav.social()),
+      legal: legal.filter((link) => link.placement === 'bottom'),
+      legalInformation: legal.filter(
+        (link) => link.placement === 'legal-information',
+      ),
+    };
+  });
 
   readonly footerImgSrc = this.theme.footerImageSrc;
 
-  readonly isLegalDialogVisible = computed(
-    () =>
-      this.activeLegalDialog() !== null &&
-      (this.isLegalDialogLoading() ||
-        !!this.activeLegalDialogContent() ||
-        !!this.legalDialogError()),
-  );
-
-  readonly legalDialogTitle = computed(() => {
+  readonly legalDialogViewModel = computed(() => {
+    const activeDialog = this.activeLegalDialog();
     const dialog = this.activeLegalDialogContent();
-    if (dialog?.title) return dialog.title;
-    if (dialog && this.activeLegalDialog() === 'privacy-policy') {
-      return this.i18n.legal().privacyPolicy;
-    }
+    const links = this.links();
+    const fallbackTitle =
+      links.legal.find((link) => link.dialog === activeDialog)?.label ??
+      links.legalInformation.find((link) => link.dialog === activeDialog)
+        ?.label ??
+      '';
+    const error = this.legalDialogError();
+    const loading = this.isLegalDialogLoading();
 
-    return this.isLegalDialogLoading()
-      ? 'Ladowanie...'
-      : this.legalDialogError()
-        ? 'Nie udalo sie zaladowac tresci'
-        : '';
+    return {
+      visible: activeDialog !== null,
+      title: dialog?.title ?? fallbackTitle,
+      subtitle: dialog?.subtitle ?? '',
+      content:
+        dialog?.content ??
+        (loading ? this.i18n.commonStatus().loading : error),
+      closeLabel: this.i18n.commonActions().close,
+    };
   });
 
-  readonly legalDialogSubtitle = computed(
-    () => this.activeLegalDialogContent()?.subtitle ?? '',
-  );
-
-  readonly legalDialogContent = computed(() => {
-    const content = this.activeLegalDialogContent()?.content;
-    if (content) return content;
-
-    if (this.isLegalDialogLoading()) {
-      return 'Ladowanie tresci dokumentu...';
-    }
-
-    if (this.legalDialogError()) {
-      return this.legalDialogError();
-    }
-
-    return null;
-  });
-
-  private readonly syncLegalDialogInputs = effect(() => {
-    const dialogRef = this.legalDialogRef();
-    if (!dialogRef) {
-      return;
-    }
-
-    dialogRef.setInput('visible', this.isLegalDialogVisible());
-    dialogRef.setInput('dialogTitle', this.legalDialogTitle());
-    dialogRef.setInput('dialogSubtitle', this.legalDialogSubtitle());
-    dialogRef.setInput('dialogContent', this.legalDialogContent());
-  });
-
-  track(_label: string): void {}
-
-  protected isLegalDialogLink(link: UILegalLink): boolean {
-    return this.resolveLegalDialog(link) !== null;
-  }
-
-  async onLegalClick(link: UILegalLink): Promise<void> {
-    const targetDialog = this.resolveLegalDialog(link);
-
-    if (!targetDialog) {
-      this.track(link.label);
-      return;
-    }
-
-    this.track(link.label);
-    this.ensureLegalDialogMounted();
+  async onLegalClick(targetDialog: LegalDialogId): Promise<void> {
     this.activeLegalDialog.set(targetDialog);
 
-    this.legalDialogError.set('');
+    this.legalDialogError.set(null);
     this.activeLegalDialogContent.set(null);
     this.isLegalDialogLoading.set(true);
 
     try {
-      const dialogs = await this.loadLegalDialogs();
-      this.activeLegalDialogContent.set(dialogs[targetDialog] ?? null);
+      const dialog = await this.legalDialogs.load(targetDialog);
 
-      if (!dialogs[targetDialog]) {
-        this.legalDialogError.set('Nie znaleziono tresci dokumentu.');
+      if (this.activeLegalDialog() === targetDialog) {
+        this.activeLegalDialogContent.set(dialog);
       }
     } catch {
-      this.legalDialogError.set(
-        'Nie udalo sie zaladowac tresci dokumentu. Sprobuj ponownie za chwile.',
-      );
+      if (this.activeLegalDialog() === targetDialog) {
+        this.legalDialogError.set(this.i18n.commonErrors().generic);
+      }
     } finally {
-      this.isLegalDialogLoading.set(false);
+      if (this.activeLegalDialog() === targetDialog) {
+        this.isLegalDialogLoading.set(false);
+      }
     }
   }
 
-  resolveLegalLinkPath(link: UILegalLink): string | null {
-    if (this.resolveLegalDialog(link)) {
-      return null;
-    }
-
-    return link.path;
-  }
-
-  private ensureLegalDialogMounted(): void {
-    if (this.legalDialogRef()) {
-      return;
-    }
-
-    const host = this.legalDialogHost()?.viewContainerRef;
-    if (!host) {
-      return;
-    }
-
-    this.lazyComponentLoader
-      .mount({
-        host,
-        load: this.loadLegalDialog,
-        onMount: (componentRef) => {
-          this.legalDialogRef.set(componentRef);
-          componentRef.instance.visibleChange.subscribe((visible) => {
-            this.onLegalDialogVisibleChange(visible);
-          });
-        },
-      })
-      .subscribe();
-  }
-
-  onLegalDialogVisibleChange(visible: boolean): void {
-    if (!visible) {
-      this.activeLegalDialog.set(null);
-      this.activeLegalDialogContent.set(null);
-      this.isLegalDialogLoading.set(false);
-      this.legalDialogError.set('');
-    }
-  }
-
-  private resolveLegalDialog(link: UILegalLink): ActiveLegalDialog {
-    if (this.isTermsLink(link)) {
-      return 'terms';
-    }
-
-    if (this.isPrivacyPolicyLink(link)) {
-      return 'privacy-policy';
-    }
-
-    return null;
-  }
-
-  private isTermsLink(link: UILegalLink): boolean {
-    return (
-      link.labelKey === 'legal.terms' ||
-      link.path === '/legal/terms' ||
-      link.path === 'legal/terms'
-    );
-  }
-
-  private isPrivacyPolicyLink(link: UILegalLink): boolean {
-    return (
-      link.labelKey === 'legal.privacyPolicy' ||
-      link.path === '/legal/privacy-policy' ||
-      link.path === 'legal/privacy-policy' ||
-      link.path === '/privacy-policy' ||
-      link.path === 'privacy-policy'
-    );
-  }
-
-  private async loadLegalDialogs(): Promise<LegalDialogsPayload> {
-    return this.legalDialogs.loadAll();
+  closeLegalDialog(): void {
+    this.activeLegalDialog.set(null);
+    this.activeLegalDialogContent.set(null);
+    this.isLegalDialogLoading.set(false);
+    this.legalDialogError.set(null);
   }
 }

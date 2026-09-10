@@ -1,0 +1,312 @@
+{
+  "title": "Standardy ochrony małoletnich",
+  "content": {
+    "sections": [
+      {
+        "title": "Zakres i podstawowe pojęcia",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Niniejsze Standardy ochrony małoletnich określają zasady ochrony osób małoletnich przy działalności organizowanej przez Mistrzowie Gry sp. z o.o., w szczególności przy sesjach RPG, warsztatach, zajęciach, wydarzeniach i innych formach działalności związanej z rozwijaniem zainteresowań przez małoletnich."
+          },
+          {
+            "type": "paragraph",
+            "text": "Standardy stosuje się przy każdej realizacji z udziałem osób małoletnich, niezależnie od produktu, miejsca realizacji, modelu współpracy z klientem lub instytucją oraz sposobu rozliczenia."
+          },
+          {
+            "type": "paragraph",
+            "text": "Przez personel rozumie się Mistrzów Gry, hostów, koordynatorów oraz inne osoby zatrudnione przez Spółkę, współpracujące ze Spółką albo kierowane przez Spółkę do realizacji, jeżeli w związku z powierzonym zadaniem mają lub mogą mieć kontakt z osobami małoletnimi."
+          },
+          {
+            "type": "paragraph",
+            "text": "Przez osobę odpowiedzialną za ochronę małoletnich rozumie się osobę wyznaczoną przez Zarząd Spółki do przyjmowania zgłoszeń, koordynowania działań ochronnych, udzielania wsparcia organizacyjnego oraz przygotowania personelu do stosowania Standardów. Aktualne dane tej osoby oraz kanał zgłoszeń są publikowane razem ze Standardami. Niezależnie od wskazanego kanału zgłoszenie można przekazać na adres kontakt@mistrzowie-gry.pl z oznaczeniem \"Ochrona małoletnich\"."
+          },
+          {
+            "type": "paragraph",
+            "text": "Jeżeli realizacja odbywa się w placówce lub przy współpracy z instytucją posiadającą własne standardy lub procedury ochrony małoletnich, personel stosuje również zasady przekazane dla tej realizacji. W przypadku niezgodności albo wątpliwości pierwszeństwo mają obowiązujące przepisy prawa i niezwłoczne zabezpieczenie dobra małoletniego, a dalszy sposób postępowania uzgadniają osoby odpowiedzialne po stronie Spółki i instytucji."
+          }
+        ]
+      },
+      {
+        "title": "1. Weryfikacja i przygotowanie personelu",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Przed dopuszczeniem osoby do działalności objętej ustawowym obowiązkiem weryfikacji Spółka wykonuje obowiązki wymagane przez aktualne przepisy prawa, w tym sprawdzenia w odpowiednich rejestrach oraz pozyskanie od tej osoby dokumentów i oświadczeń wymaganych w jej sytuacji."
+              },
+              {
+                "text": "Osoba, wobec której wymagane prawem sprawdzenia nie zostały zakończone albo której nie można zgodnie z prawem dopuścić do działalności z udziałem małoletnich, nie jest kierowana do takiej realizacji."
+              },
+              {
+                "text": "Przed pierwszą realizacją z udziałem małoletnich członek personelu zapoznaje się z niniejszymi Standardami oraz zasadami właściwymi dla konkretnej realizacji. Mistrz Gry zapoznaje się dodatkowo z Protokołem bezpieczeństwa w zakresie wynikającym z jego umowy."
+              },
+              {
+                "text": "Osoba odpowiedzialna za ochronę małoletnich przygotowuje personel do stosowania Standardów, w szczególności przedstawia zasady bezpiecznych relacji, komunikacji, reagowania na podejrzenie krzywdzenia, dokumentowania zdarzeń oraz korzystania z procedur obowiązujących w miejscu realizacji."
+              },
+              {
+                "text": "Przygotowanie odbywa się przed pierwszym dopuszczeniem do pracy z małoletnimi oraz ponownie po istotnej aktualizacji Standardów lub gdy wynika to z potrzeb danej realizacji. Może mieć formę szkolenia, instruktażu, materiału do samodzielnego zapoznania się albo połączenia tych form."
+              },
+              {
+                "text": "Spółka dokumentuje przygotowanie personelu co najmniej przez zapis imienia i nazwiska osoby, daty, wersji Standardów, zakresu przygotowania oraz potwierdzenia zapoznania się z wymaganymi dokumentami."
+              },
+              {
+                "text": "Przed konkretną realizacją personel otrzymuje w zakresie potrzebnym do prawidłowego działania informacje o wieku grupy, istotnych potrzebach organizacyjnych, zasadach miejsca realizacji oraz osobie dorosłej właściwej do kontaktu na miejscu, jeżeli została wskazana."
+              },
+              {
+                "text": "W przypadku małoletnich z niepełnosprawnościami lub szczególnymi potrzebami organizację, sposób komunikacji i materiały dostosowuje się w zakresie potrzebnym do bezpiecznego i rzeczywistego udziału w usłudze."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "2. Bezpieczne relacje personelu z małoletnimi",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Personel traktuje małoletnich z szacunkiem, uwzględnia ich godność, granice i prawo do bezpiecznego udziału w zajęciach."
+              },
+              {
+                "text": "Niedopuszczalne jest poniżanie, ośmieszanie, zastraszanie, obrażanie, dyskryminowanie, stosowanie przemocy fizycznej lub kar cielesnych, grożenie, wykorzystywanie przewagi wynikającej z wieku lub roli, a także zachowania seksualne lub seksualizujące wobec małoletniego."
+              },
+              {
+                "text": "Niedopuszczalne jest nawiązywanie z małoletnim relacji romantycznej lub seksualnej, proponowanie prywatnych spotkań, zapraszanie do prywatnych przestrzeni albo wykorzystywanie realizowanej usługi do budowania prywatnej relacji zależności."
+              },
+              {
+                "text": "Kontakt fizyczny jest ograniczony do sytuacji uzasadnionych bezpieczeństwem, udzieleniem pomocy albo zwykłą i odpowiednią do sytuacji formą kontaktu. Personel uwzględnia granice małoletniego i unika kontaktu intymnego, przymusowego lub niejednoznacznego."
+              },
+              {
+                "text": "W miarę możliwości personel nie pozostaje z małoletnim sam na sam w odizolowanym miejscu. Jeżeli indywidualna rozmowa jest potrzebna, powinna odbywać się w warunkach zapewniających odpowiednią prywatność, ale możliwie dostępnych lub widocznych dla innych osób dorosłych, z uwzględnieniem zasad konkretnego miejsca realizacji."
+              },
+              {
+                "text": "Personel nie przewozi małoletniego prywatnie ani nie organizuje z nim aktywności poza zakresem realizacji, chyba że takie działanie zostało odrębnie zorganizowane i uzgodnione przez Spółkę z rodzicem, opiekunem albo właściwą instytucją."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "3. Komunikacja, dane i wizerunek",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "W czasie formalnie realizowanej usługi personel może komunikować się bezpośrednio z małoletnimi w zakresie potrzebnym do prawidłowej realizacji zajęć."
+              },
+              {
+                "text": "Poza formalnie realizowaną usługą personel nie prowadzi prywatnej i bezpośredniej komunikacji z małoletnim w związku z realizacją usługi, w szczególności przez prywatne wiadomości, SMS, rozmowy telefoniczne, komunikatory lub media społecznościowe."
+              },
+              {
+                "text": "Komunikacja organizacyjna dotycząca małoletniego odbywa się za pośrednictwem rodzica lub opiekuna prawnego, wskazanego przedstawiciela instytucji albo kanału zaakceptowanego dla danej realizacji i obejmującego osoby dorosłe."
+              },
+              {
+                "text": "Personel nie wykorzystuje danych kontaktowych małoletniego do celów prywatnych ani niezwiązanych z realizacją usługi."
+              },
+              {
+                "text": "Zdjęcia i nagrania pozwalające rozpoznać małoletniego mogą być wykonywane, publikowane lub przekazywane wyłącznie wtedy, gdy Spółka wcześniej potwierdziła podstawę prawną, zakres i sposób takiego wykorzystania."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "4. Bezpieczne relacje między małoletnimi i treści zajęć",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Każdy uczestnik ma prawo do udziału bez przemocy, nękania, upokarzania, dyskryminacji, przymuszania i celowego izolowania."
+              },
+              {
+                "text": "Niedopuszczalne są w szczególności przemoc fizyczna, groźby, uporczywe wyśmiewanie, poniżanie, dyskryminacja, nękanie, zachowania seksualizujące, wymuszanie zachowań lub treści, celowe wykluczanie oraz inne działania naruszające bezpieczeństwo lub godność małoletniego."
+              },
+              {
+                "text": "Fikcyjny konflikt pomiędzy postaciami, element fabuły albo mechanika gry nie usprawiedliwiają przemocy, upokarzania, nękania ani przekraczania granic pomiędzy uczestnikami."
+              },
+              {
+                "text": "Personel reaguje na zachowania naruszające bezpieczeństwo lub godność małoletniego oraz, zależnie od sytuacji, zatrzymuje działanie, rozdziela uczestników, przerywa odpowiednią część zajęć albo stosuje procedurę interwencji."
+              },
+              {
+                "text": "Charakter, ton i potencjalnie trudne elementy treści określa się z wyprzedzeniem w zakresie potrzebnym do świadomego wyboru usługi. Treści dobiera się do wieku i potrzeb uczestników, odpowiednio ograniczając treści kontrowersyjne, brutalne, drastyczne i seksualne."
+              },
+              {
+                "text": "Personel może pytać o prywatne informacje, doświadczenia rodzinne, zdrowotne, seksualne lub inne dane wrażliwe wyłącznie w zakresie potrzebnym do bezpiecznej realizacji usługi. Nie prowadzi przymusowego wypytywania ani nie wywiera presji na małoletniego w celu uzyskania takich informacji."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "5. Urządzenia elektroniczne, Internet i zagrożenia w sieci",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Standardowa realizacja nie wymaga od małoletniego zakładania prywatnego konta w serwisie społecznościowym ani udostępniania personelowi prywatnego profilu, hasła lub danych logowania."
+              },
+              {
+                "text": "Jeżeli realizacja wymaga korzystania z urządzeń lub narzędzi internetowych, stosuje się rozwiązania wskazane albo zaakceptowane przez Spółkę lub instytucję oraz zasady bezpieczeństwa i ochrony danych właściwe dla danej realizacji."
+              },
+              {
+                "text": "Jeżeli urządzenie, sieć lub konto są zapewniane przez instytucję, personel przestrzega jej zasad korzystania z urządzeń i sieci oraz nie obchodzi stosowanych zabezpieczeń."
+              },
+              {
+                "text": "Personel nie udostępnia małoletnim treści pornograficznych, drastycznych lub innych materiałów nieodpowiednich dla ich wieku i nie korzysta z prywatnych kanałów komunikacji do przesyłania materiałów związanych z realizacją."
+              },
+              {
+                "text": "W przypadku ujawnienia treści szkodliwych, cyberprzemocy, nękania, podszywania się, nieuprawnionego rozpowszechniania wizerunku lub materiałów intymnych, prób seksualnego kontaktu z małoletnim, wyłudzania danych albo innego zagrożenia internetowego personel w pierwszej kolejności ogranicza dalszą ekspozycję małoletniego na zagrożenie i zapewnia mu wsparcie."
+              },
+              {
+                "text": "Jeżeli jest to bezpieczne i potrzebne do dalszej interwencji, personel zapisuje podstawowe informacje pozwalające ustalić zdarzenie, takie jak adres strony, nazwa konta, data i godzina. Personel nie wykonuje dodatkowych kopii ani zrzutów ekranu treści intymnych lub innych materiałów, których utrwalanie mogłoby pogłębiać naruszenie dobra małoletniego."
+              },
+              {
+                "text": "Zdarzenie internetowe zgłasza się osobie odpowiedzialnej za ochronę małoletnich. Rodzic lub opiekun jest informowany, chyba że jego poinformowanie mogłoby zwiększyć zagrożenie dla małoletniego. Przy realizacji w instytucji stosuje się także jej procedurę."
+              },
+              {
+                "text": "Jeżeli zdarzenie może stanowić przestępstwo albo powoduje bezpośrednie zagrożenie życia lub zdrowia, stosuje się procedurę interwencji i zawiadomień określoną w niniejszych Standardach. Mistrz Gry stosuje dodatkowo Protokół bezpieczeństwa w zakresie wynikającym z jego umowy."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "6. Podejrzenie krzywdzenia i interwencja",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Każdy członek personelu reaguje na podejrzenie krzywdzenia małoletniego albo informację o krzywdzeniu uzyskaną w związku z wykonywaniem zadań dla Spółki."
+              },
+              {
+                "text": "Jeżeli istnieje bezpośrednie zagrożenie życia lub zdrowia małoletniego, personel w pierwszej kolejności zabezpiecza sytuację i w razie potrzeby wzywa właściwe służby. Natychmiastowe działanie nie wymaga wcześniejszej zgody Spółki."
+              },
+              {
+                "text": "Jeżeli małoletni przekazuje informację o krzywdzeniu, osoba przyjmująca informację wysłuchuje go spokojnie, nie przesłuchuje, nie naciska na podawanie szczegółów, nie podważa wypowiedzi i nie obiecuje zachowania sprawy w tajemnicy."
+              },
+              {
+                "text": "Personel nie prowadzi samodzielnego postępowania wyjaśniającego i nie konfrontuje osoby, której może dotyczyć podejrzenie. Należy zabezpieczyć małoletniego, zapisać fakty i przekazać zgłoszenie osobie odpowiedzialnej za ochronę małoletnich."
+              },
+              {
+                "text": "Przy realizacji w instytucji personel stosuje także procedurę zgłoszeniową tej instytucji. Zgłoszenie do Spółki i zgłoszenie zgodne z procedurą instytucji są wykonywane niezależnie, o ile obowiązujące zasady nie wskazują wyraźnie wspólnego sposobu postępowania."
+              },
+              {
+                "text": "Opis zgłoszenia obejmuje fakty, zaobserwowane zachowania, wypowiedzi małoletniego i podjęte działania. Niepotwierdzone oceny, diagnozy ani przypuszczenia nie są przedstawiane jako fakty."
+              },
+              {
+                "text": "Jeżeli podejrzenie dotyczy rodzica lub opiekuna małoletniego, personel nie informuje tej osoby samodzielnie o zgłoszeniu, jeżeli mogłoby to zwiększyć ryzyko dla dziecka. Dalszą komunikację ustala osoba odpowiedzialna za ochronę małoletnich."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "7. Odpowiedzialność za zgłoszenia zewnętrzne i dalsze działania",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Osoba odpowiedzialna za ochronę małoletnich przyjmuje zgłoszenie, dokonuje wstępnej oceny sytuacji, koordynuje ochronę i wsparcie małoletniego oraz przekazuje sprawę do osoby odpowiedzialnej za zawiadomienia, jeżeli zachodzi lub może zachodzić potrzeba działania organu państwowego."
+              },
+              {
+                "text": "Za przygotowanie i złożenie w imieniu Spółki zawiadomienia o podejrzeniu popełnienia przestępstwa na szkodę małoletniego do Policji lub prokuratury oraz zawiadomienia sądu opiekuńczego odpowiada Zarząd Spółki, osoba odpowiedzialna za konkretną realizację albo inna osoba wyznaczona przez Zarząd."
+              },
+              {
+                "text": "Brak możliwości natychmiastowego kontaktu z osobą odpowiedzialną za zawiadomienia nie może opóźniać wezwania służb w sytuacji bezpośredniego zagrożenia ani wykonania indywidualnego obowiązku zawiadomienia wynikającego z przepisów prawa."
+              },
+              {
+                "text": "Jeżeli w konkretnej realizacji uczestniczy instytucja uprawniona do wszczęcia procedury \"Niebieskie Karty\", osoba odpowiedzialna za ochronę małoletnich przekazuje jej informacje potrzebne do oceny potrzeby uruchomienia tej procedury. Nie zastępuje to innych zawiadomień wymaganych przez prawo."
+              },
+              {
+                "text": "Po ujawnieniu krzywdzenia osoba odpowiedzialna za ochronę małoletnich ustala, w zakresie działalności Spółki, plan dalszego wsparcia i bezpiecznego udziału małoletniego. Plan może obejmować zmianę organizacji udziału, prowadzącego lub grupy, wskazanie bezpiecznej osoby dorosłej do kontaktu, czasowe wstrzymanie udziału albo inne rozwiązanie adekwatne do sytuacji."
+              },
+              {
+                "text": "Plan wsparcia uwzględnia rodzica lub opiekuna, chyba że podejrzenie dotyczy tej osoby albo jej udział mógłby zwiększyć ryzyko dla małoletniego."
+              },
+              {
+                "text": "Personel nie prowadzi terapii, diagnozy ani samodzielnego postępowania wyjaśniającego. Udziela zwykłego wsparcia w zakresie swojej roli i wykonuje dalsze ustalenia przekazane przez osoby odpowiedzialne za interwencję."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "8. Dokumentowanie i przechowywanie informacji",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Zgłoszenia, incydenty i zdarzenia zagrażające dobru małoletniego dokumentuje się w sposób pozwalający ustalić przebieg zdarzenia, działania podjęte na miejscu, dokonane zgłoszenia oraz dalsze decyzje."
+              },
+              {
+                "text": "Dokumentacja jest przechowywana przez Spółkę z ograniczeniem dostępu do osób, które potrzebują jej do wykonania obowiązków związanych z ochroną małoletnich, obsługą prawną albo wyjaśnieniem zdarzenia."
+              },
+              {
+                "text": "Personel nie tworzy ani nie przechowuje na prywatnych urządzeniach dodatkowych kopii dokumentacji dotyczącej krzywdzenia lub incydentu, jeżeli nie jest to potrzebne do wykonania polecenia Spółki lub obowiązku prawnego."
+              },
+              {
+                "text": "Informacji o zdarzeniu nie publikuje się w mediach społecznościowych ani nie przekazuje osobom nieuprawnionym. Komunikację dotyczącą incydentu prowadzi się zgodnie z niniejszymi Standardami i obowiązującymi przepisami. Mistrz Gry stosuje dodatkowo Protokół bezpieczeństwa w zakresie wynikającym z jego umowy."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "9. Udostępnianie Standardów",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Pełna wersja Standardów oraz wersja skrócona przeznaczona dla małoletnich są publikowane na stronie internetowej Spółki w sposób umożliwiający swobodne zapoznanie się z nimi."
+              },
+              {
+                "text": "Jeżeli Spółka dysponuje własnym lokalem, obie wersje udostępnia się tam również w widocznym miejscu."
+              },
+              {
+                "text": "Przy realizacjach prowadzonych w innych miejscach Spółka zapewnia dostęp do obu wersji w formie elektronicznej albo papierowej, odpowiednio do charakteru realizacji i uzgodnień z organizatorem miejsca."
+              },
+              {
+                "text": "Rodzice, opiekunowie i małoletni mają możliwość zapoznania się ze Standardami przed rozpoczęciem albo przy rozpoczęciu udziału w realizacji."
+              },
+              {
+                "text": "Wersja skrócona jest napisana językiem odpowiednim dla małoletnich i zawiera przede wszystkim zasady bezpieczeństwa, zachowania niedozwolone, sposoby zgłoszenia problemu oraz informacje o uzyskaniu pomocy."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "10. Przegląd i aktualizacja",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Spółka dokonuje oceny Standardów co najmniej raz na dwa lata od dnia ich przyjęcia oraz wcześniej, jeżeli wymaga tego zmiana prawa, istotne doświadczenie z realizacji usług albo analiza incydentu."
+              },
+              {
+                "text": "Wnioski z oceny dokumentuje się pisemnie."
+              },
+              {
+                "text": "Osoba odpowiedzialna za ochronę małoletnich przygotowuje propozycje zmian, a Zarząd Spółki zatwierdza nową wersję."
+              },
+              {
+                "text": "Po aktualizacji Spółka publikuje nową wersję pełną i skróconą oraz przekazuje aktualizację personelowi, który musi się z nią zapoznać przed dalszym wykonywaniem zadań z udziałem małoletnich."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -398,6 +398,8 @@
   "legal": {
     "privacyPolicy": "Polityka prywatności",
     "terms": "Regulamin",
+    "minorProtectionStandards": "Standardy ochrony małoletnich",
+    "minorProtectionStandardsForMinors": "Standardy dla małoletnich",
     "cookies": "Cookies"
   },
 

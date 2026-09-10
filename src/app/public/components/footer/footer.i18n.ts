@@ -1,35 +1,42 @@
-import { IMenu } from '../../../core/interfaces/i-menu';
-import { ISocialLink } from '../../../core/interfaces/i-socials';
+import {
+  ILegalLink,
+  IResolvedLegalLink,
+} from '../../../core/interfaces/i-legal';
+import { IMenu, IResolvedMenu } from '../../../core/interfaces/i-menu';
+import {
+  IResolvedSocialLink,
+  ISocialLink,
+} from '../../../core/interfaces/i-socials';
 import {
   CommonLegalTranslations,
   CommonNavTranslations,
   CommonSocialTranslations,
 } from '../../../core/types/i18n/common';
+import { FooterTranslations } from '../../../core/types/i18n/footer';
 import {
-  FooterTranslations,
-  UIFooterMenu,
-  UILegalLink,
-  UISocialLink,
-} from '../../../core/types/i18n/footer';
-import { ILegalLink } from '../../../core/interfaces/i-legal';
-import {
+  createCommonActionsI18n,
+  createCommonErrorsI18n,
   createCommonLegalI18n,
   createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonSocialI18n,
+  createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
 
 export function createFooterI18n() {
   const footer = createScopedObjectI18n<FooterTranslations>('footer', 'footer');
-  const nav = createCommonNavI18n();
-  const social = createCommonSocialI18n();
-  const legal = createCommonLegalI18n();
-  const labels = createCommonLabelsI18n();
+  const commonActions = createCommonActionsI18n();
+  const commonErrors = createCommonErrorsI18n();
+  const commonLabels = createCommonLabelsI18n();
+  const commonLegal = createCommonLegalI18n();
+  const commonNav = createCommonNavI18n();
+  const commonSocial = createCommonSocialI18n();
+  const commonStatus = createCommonStatusI18n();
 
   const resolveNavLabel = (labelKey: string): string => {
     const key = labelKey.replace(/^nav\./, '') as keyof CommonNavTranslations;
-    return nav()[key] ?? labelKey;
+    return commonNav()[key] ?? labelKey;
   };
 
   const resolveSocialLabel = (labelKey: string): string => {
@@ -37,7 +44,7 @@ export function createFooterI18n() {
       /^social\./,
       '',
     ) as keyof CommonSocialTranslations;
-    return social()[key] ?? labelKey;
+    return commonSocial()[key] ?? labelKey;
   };
 
   const resolveLegalLabel = (labelKey: string): string => {
@@ -45,22 +52,22 @@ export function createFooterI18n() {
       /^legal\./,
       '',
     ) as keyof CommonLegalTranslations;
-    return legal()[key] ?? labelKey;
+    return commonLegal()[key] ?? labelKey;
   };
 
-  const resolveFooterMenu = (items: IMenu[]): UIFooterMenu[] =>
-    items.map((item) => ({
+  const resolveFooterMenu = (items: IMenu[]): IResolvedMenu[] =>
+    items.map(({ children: _children, badgeKey: _badgeKey, ...item }) => ({
       ...item,
       label: resolveNavLabel(item.labelKey),
     }));
 
-  const resolveSocialLinks = (items: ISocialLink[]): UISocialLink[] =>
+  const resolveSocialLinks = (items: ISocialLink[]): IResolvedSocialLink[] =>
     items.map((item) => ({
       ...item,
       label: resolveSocialLabel(item.labelKey),
     }));
 
-  const resolveLegalLinks = (items: ILegalLink[]): UILegalLink[] =>
+  const resolveLegalLinks = (items: ILegalLink[]): IResolvedLegalLink[] =>
     items.map((item) => ({
       ...item,
       label: resolveLegalLabel(item.labelKey),
@@ -68,9 +75,11 @@ export function createFooterI18n() {
 
   return {
     footer,
-    legal,
-    labels,
-    nav,
+    commonActions,
+    commonErrors,
+    commonLabels,
+    commonNav,
+    commonStatus,
     resolveFooterMenu,
     resolveSocialLinks,
     resolveLegalLinks,

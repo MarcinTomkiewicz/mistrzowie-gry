@@ -8,12 +8,12 @@ export const HERO_SLIDES_TECH: readonly HeroSlideTech[] = [
   },
   {
     id: 2,
-    ctaPath: '/chaotic-thursdays',
+    ctaPath: '/chaotyczne-czwartki',
     imageSrc: 'hero-2.avif',
   },
   {
     id: 3,
-    ctaPath: '/join-the-party',
+    ctaPath: '/dolacz-do-druzyny',
     imageSrc: 'hero-3.avif',
   },
   {

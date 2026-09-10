@@ -1,53 +1,52 @@
+@let footerLinks = links();
+@let footerCopy = i18n.footer();
+@let commonLabels = i18n.commonLabels();
+
 <footer class="mg-section mg-footer mt-xxl">
   <div class="mg-container">
     <div class="mg-footer__grid">
-      <section class="flex-col-center-center">
+      <div class="flex-col-center-center">
         <img
           class="mg-footer__logo mb-md"
           [ngSrc]="footerImgSrc()"
           width="100"
           height="100"
-          [alt]="i18n.labels().brandName"
+          [alt]="commonLabels.brandName"
           loading="lazy"
           decoding="async"
         />
 
         <p class="mg-footer__desc m-0 mb-md">
-          {{ i18n.footer().description }}
+          {{ footerCopy.description }}
         </p>
 
         <nav
           class="flex-row-start-center gap-sm flex-wrap mg-footer__social"
-          [attr.aria-label]="i18n.footer().socialAriaLabel"
+          [attr.aria-label]="footerCopy.socialAriaLabel"
         >
-          @for (s of socialLinks(); track $index) {
+          @for (s of footerLinks.social; track s.href) {
             <a
               class="mg-social-btn flex-row-center-center"
               [href]="s.href"
               target="_blank"
               rel="noopener noreferrer"
               [attr.aria-label]="s.label"
-              (click)="track(s.label)"
             >
               <i class="{{ s.icon }}" aria-hidden="true"></i>
             </a>
           }
         </nav>
-      </section>
+      </div>
 
       <section>
         <h3 class="mg-section__title mg-section__title--sm">
-          {{ i18n.footer().shortcutTitle }}
+          {{ footerCopy.shortcutTitle }}
         </h3>
 
         <ul class="flex-col-center-center-md m-0 p-0">
-          @for (l of footerLinks(); track $index) {
+          @for (l of footerLinks.shortcuts; track l.labelKey) {
             <li class="w-30-md w-50-sm w-70-xs">
-              <a
-                [routerLink]="l.path"
-                [class.is-disabled]="l.disabled"
-                (click)="l.disabled && $event.preventDefault(); track(l.label)"
-              >
+              <a [routerLink]="l.path">
                 {{ l.label }}
               </a>
             </li>
@@ -55,62 +54,86 @@
         </ul>
       </section>
 
-      <section>
-        <h3 class="mg-section__title mg-section__title--sm">
-          {{ i18n.nav().contact }}
-        </h3>
+      <div>
+        <section>
+          <h3 class="mg-section__title mg-section__title--sm">
+            {{ i18n.commonNav().contact }}
+          </h3>
 
-        <ul class="flex-col-center-center-md m-0 p-0">
-          <li class="w-30-md w-50-sm w-70-xs">
-            <strong>{{ i18n.labels().phone }}:</strong>
-            <a [href]="i18n.footer().phoneHref">
-              {{ i18n.footer().phoneValue }}
-            </a>
-          </li>
+          <ul class="flex-col-center-center-md m-0 p-0">
+            <li class="w-30-md w-50-sm w-70-xs">
+              <strong>{{ commonLabels.phone }}:</strong>
+              <a [href]="contact.phoneHref">
+                {{ contact.phone }}
+              </a>
+            </li>
 
-          <li class="w-30-md w-50-sm w-70-xs">
-            <strong>{{ i18n.footer().emailLabel }}:</strong>
-            <a [href]="i18n.footer().emailHref">
-              {{ i18n.footer().emailValue }}
-            </a>
-          </li>
-        </ul>
-      </section>
+            <li class="w-30-md w-50-sm w-70-xs">
+              <strong>{{ commonLabels.email }}:</strong>
+              <a [href]="contact.emailHref">
+                {{ contact.email }}
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3 class="mg-section__title mg-section__title--sm mt-lg">
+            {{ footerCopy.legalInformationTitle }}
+          </h3>
+
+          <ul class="flex-col-center-center-md m-0 p-0">
+            @for (l of footerLinks.legalInformation; track l.dialog) {
+              <li class="w-30-md w-50-sm w-70-xs">
+                <button
+                  type="button"
+                  class="link-like-inline"
+                  aria-haspopup="dialog"
+                  (click)="onLegalClick(l.dialog)"
+                >
+                  {{ l.label }}
+                </button>
+              </li>
+            }
+          </ul>
+        </section>
+      </div>
     </div>
 
     <div
       class="mg-footer__bottom flex-row-between-center flex-col-sm mt-xl pt-lg gap-md"
     >
       <div class="mg-footer__copy">
-        &copy; {{ year() }} {{ i18n.labels().brandName }}. {{ i18n.footer().copyrightSuffix }}
+        &copy; {{ year }} {{ commonLabels.brandName }}. {{ footerCopy.copyrightSuffix }}
       </div>
 
       <nav
         class="mg-footer__legal flex-row-start-center gap-md flex-wrap cursor-pointer"
-        [attr.aria-label]="i18n.footer().legalAriaLabel"
+        [attr.aria-label]="footerCopy.legalInformationTitle"
       >
-        @for (l of legalLinks(); track $index) {
-          @if (isLegalDialogLink(l)) {
-            <button
-              type="button"
-              class="link-like-inline"
-              (click)="onLegalClick(l)"
-            >
-              {{ l.label }}
-            </button>
-          } @else {
-            <a
-              [routerLink]="resolveLegalLinkPath(l)"
-              [attr.href]="resolveLegalLinkPath(l)"
-              (click)="track(l.label)"
-            >
-              {{ l.label }}
-            </a>
-          }
+        @for (l of footerLinks.legal; track l.dialog) {
+          <button
+            type="button"
+            class="link-like-inline"
+            aria-haspopup="dialog"
+            (click)="onLegalClick(l.dialog)"
+          >
+            {{ l.label }}
+          </button>
         }
       </nav>
     </div>
   </div>
 </footer>
 
-<ng-template mgLazyMountHost></ng-template>
+@defer (when legalDialogViewModel().visible) {
+  @let dialog = legalDialogViewModel();
+  <app-legal-dialog
+    [visible]="dialog.visible"
+    [dialogTitle]="dialog.title"
+    [dialogSubtitle]="dialog.subtitle"
+    [dialogContent]="dialog.content"
+    [closeLabel]="dialog.closeLabel"
+    (visibleChange)="closeLegalDialog()"
+  />
+}

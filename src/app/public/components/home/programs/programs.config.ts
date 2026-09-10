@@ -7,8 +7,8 @@ export type ProgramsCardTech = {
 };
 
 const PROGRAMS_TECH: readonly ProgramsCardTech[] = [
-  { id: 1, ctaPath: '/chaotic-thursdays', ctaKey: 'checkDetails' },
-  { id: 2, ctaPath: '/join-the-party', ctaKey: 'seeProgram' },
+  { id: 1, ctaPath: '/chaotyczne-czwartki', ctaKey: 'checkDetails' },
+  { id: 2, ctaPath: '/dolacz-do-druzyny', ctaKey: 'seeProgram' },
 ] as const;
 
 export const PROGRAMS_TECH_BY_ID = new Map<number, ProgramsCardTech>(

@@ -10,7 +10,7 @@ export type ProblemCardTech = {
 const PROBLEMS_TECH: readonly ProblemCardTech[] = [
   {
     id: 1,
-    ctaPath: '/join-the-party',
+    ctaPath: '/dolacz-do-druzyny',
     icon: 'pi pi-uprising',
     ctaKey: 'joinProgram',
   },
@@ -22,7 +22,7 @@ const PROBLEMS_TECH: readonly ProblemCardTech[] = [
   },
   {
     id: 3,
-    ctaPath: '/chaotic-thursdays',
+    ctaPath: '/chaotyczne-czwartki',
     icon: 'pi pi-evil-book',
     ctaKey: 'chaoticThursdays',
   },

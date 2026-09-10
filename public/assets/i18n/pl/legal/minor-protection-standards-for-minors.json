@@ -1,0 +1,174 @@
+{
+  "title": "Standardy dla małoletnich",
+  "content": {
+    "sections": [
+      {
+        "title": "Po co są te zasady",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Chcemy, żeby podczas sesji RPG, warsztatów, zajęć i wydarzeń organizowanych przez Mistrzowie Gry każda osoba małoletnia mogła czuć się bezpiecznie i była traktowana z szacunkiem."
+          },
+          {
+            "type": "paragraph",
+            "text": "Te zasady dotyczą wszystkich dorosłych działających przy naszych realizacjach, między innymi Mistrzów Gry, hostów i koordynatorów. Dotyczą też zachowania uczestników wobec siebie."
+          }
+        ]
+      },
+      {
+        "title": "1. Masz prawo do bezpieczeństwa i szacunku",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Masz prawo być traktowany z szacunkiem, niezależnie od wieku, wyglądu, pochodzenia, sprawności, płci, zainteresowań, doświadczenia w RPG albo innych cech."
+              },
+              {
+                "text": "Nikt nie może Cię bić, poniżać, wyśmiewać, straszyć, obrażać, nękać, dyskryminować, zmuszać do zachowań naruszających Twoje bezpieczeństwo, godność lub granice ani celowo wykluczać z grupy."
+              },
+              {
+                "text": "Dorośli pracujący przy zajęciach nie mogą zachowywać się wobec Ciebie w sposób seksualny lub seksualizujący, nawiązywać z Tobą relacji romantycznej ani proponować prywatnych spotkań niezwiązanych z zajęciami. Nie mogą też dotykać Cię w sposób intymny, przymusowy ani niejednoznaczny; kontakt fizyczny musi szanować Twoje granice i być odpowiedni do sytuacji."
+              },
+              {
+                "text": "Masz prawo powiedzieć, że coś jest dla Ciebie nie w porządku, poprosić o przerwanie sytuacji albo zwrócić się o pomoc do osoby dorosłej."
+              },
+              {
+                "text": "To, że coś dzieje się w fabule gry albo między postaciami, nie oznacza, że uczestnicy mogą krzywdzić, poniżać lub nękać siebie nawzajem."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "2. Kontakt z dorosłymi poza zajęciami",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Podczas zajęć osoby z personelu mogą rozmawiać z Tobą bezpośrednio we wszystkich sprawach potrzebnych do prowadzenia zajęć."
+              },
+              {
+                "text": "Poza zajęciami osoby z personelu nie kontaktują się z Tobą prywatnie przez wiadomości, SMS-y, komunikatory, telefon ani media społecznościowe w sprawach związanych z zajęciami."
+              },
+              {
+                "text": "Sprawy organizacyjne są ustalane przez rodzica lub opiekuna, przedstawiciela instytucji albo inny uzgodniony kanał, w którym uczestniczy osoba dorosła."
+              },
+              {
+                "text": "Nie podawaj osobom prowadzącym swoich haseł ani danych logowania. Do udziału w standardowych zajęciach nie potrzebujesz udostępniać prywatnego profilu w mediach społecznościowych."
+              },
+              {
+                "text": "Twoje zdjęcie lub nagranie z Twoim wizerunkiem może być wykonywane, publikowane lub wykorzystywane tylko wtedy, gdy Mistrzowie Gry sprawdzą, że jest to zgodne z prawem, i uzyskają wymagane zgody."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "3. Internet i zagrożenia w sieci",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Jeżeli podczas realizacji korzystamy z Internetu lub urządzeń elektronicznych, używamy ich zgodnie z zasadami Mistrzowie Gry albo miejsca, w którym odbywają się zajęcia."
+              },
+              {
+                "text": "Jeżeli zobaczysz treści, które są dla Ciebie nieodpowiednie lub niepokojące, ktoś nęka Cię w Internecie, podszywa się pod Ciebie, rozpowszechnia Twój wizerunek lub materiały intymne bez zgody, próbuje nawiązać kontakt seksualny albo wyłudza dane, powiedz o tym zaufanej osobie dorosłej."
+              },
+              {
+                "text": "Nie musisz samodzielnie rozwiązywać takiej sytuacji ani kontaktować się z osobą, która Ci zagraża."
+              },
+              {
+                "text": "Jeżeli jest to bezpieczne, możesz zapamiętać lub zapisać nazwę konta, adres strony albo datę zdarzenia. Nie kopiuj ani nie rozpowszechniaj dalej materiałów intymnych lub innych szkodliwych treści."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "4. Jeśli ktoś Cię krzywdzi albo coś Cię niepokoi",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Możesz powiedzieć o problemie dowolnej osobie z personelu Mistrzowie Gry, rodzicowi lub opiekunowi, pracownikowi szkoły lub innej instytucji albo innej dorosłej osobie, której ufasz."
+              },
+              {
+                "text": "Możesz również napisać na kontakt@mistrzowie-gry.pl. W tytule wiadomości możesz wpisać \"Ochrona małoletnich\"."
+              },
+              {
+                "text": "Jeżeli opowiadasz osobie z personelu o krzywdzeniu, wysłuchuje Cię spokojnie. Nie zmusza Cię do opowiadania wszystkich szczegółów ani nie obiecuje, że nikomu nie przekaże informacji, jeżeli potrzebna jest pomoc."
+              },
+              {
+                "text": "Jeżeli problem dotyczy Twojego rodzica lub opiekuna, możesz powiedzieć o tym innej zaufanej osobie dorosłej. Nie będziemy automatycznie informować osoby, której dotyczy podejrzenie, jeżeli mogłoby to zwiększyć zagrożenie dla Ciebie."
+              },
+              {
+                "text": "Jeżeli Ty albo ktoś obok znajduje się w bezpośrednim zagrożeniu życia lub zdrowia, zadzwoń pod numer 112 albo poproś osobę dorosłą o wezwanie pomocy."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "5. Co dzieje się po zgłoszeniu",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Osoba odpowiedzialna za ochronę małoletnich w Mistrzowie Gry sprawdza, co trzeba zrobić, aby zapewnić Ci bezpieczeństwo i potrzebne wsparcie."
+              },
+              {
+                "text": "Jeżeli będzie to potrzebne do zapewnienia Ci bezpieczeństwa, możemy między innymi zmienić sposób organizacji zajęć, grupę lub osobę prowadzącą, wskazać bezpieczną osobę dorosłą do kontaktu albo czasowo przerwać Twój udział w zajęciach. Takie zmiany służą Twojej ochronie i wsparciu, a nie karaniu Cię za zgłoszenie problemu."
+              },
+              {
+                "text": "Jeżeli sytuacja wymaga zawiadomienia Policji, prokuratury albo sądu opiekuńczego, Mistrzowie Gry przekazują sprawę zgodnie z obowiązującymi zasadami i prawem."
+              },
+              {
+                "text": "Jeżeli zajęcia odbywają się w szkole albo innej instytucji, stosujemy także jej procedury ochrony małoletnich."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "6. Treści zajęć",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "Treści sesji, warsztatów i ćwiczeń są dostosowane do wieku i potrzeb uczestników."
+              },
+              {
+                "text": "Personel może zapytać Cię o prywatne doświadczenia rodzinne, zdrowotne, seksualne albo inne wrażliwe sprawy tylko w zakresie potrzebnym do zapewnienia Ci bezpieczeństwa. Nie może zmuszać Cię do odpowiadania ani wywierać na Ciebie presji."
+              },
+              {
+                "text": "Jeżeli temat, scena albo ćwiczenie powodują problem, możesz powiedzieć o tym prowadzącemu lub innej zaufanej osobie dorosłej."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "7. Gdzie znaleźć pełne zasady",
+        "blocks": [
+          {
+            "type": "unordered-list",
+            "items": [
+              {
+                "text": "To jest skrócona wersja Standardów ochrony małoletnich. Pełna wersja opisuje również zasady obowiązujące personel, sposób weryfikacji osób pracujących z małoletnimi, procedury interwencji, dokumentowania i zawiadamiania odpowiednich instytucji."
+              },
+              {
+                "text": "Pełna i skrócona wersja Standardów są udostępniane na stronie internetowej Mistrzowie Gry oraz w sposób odpowiedni dla miejsca, w którym odbywają się zajęcia."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

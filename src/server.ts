@@ -24,6 +24,22 @@ export function app(): express.Express {
 
   registerPublicSeoRoutes(app);
 
+  app.get('/join-the-party', (req, res) => {
+    const query = req.originalUrl.includes('?')
+      ? req.originalUrl.slice(req.originalUrl.indexOf('?'))
+      : '';
+
+    res.redirect(301, `/dolacz-do-druzyny${query}`);
+  });
+
+  app.get('/chaotic-thursdays', (req, res) => {
+    const query = req.originalUrl.includes('?')
+      ? req.originalUrl.slice(req.originalUrl.indexOf('?'))
+      : '';
+
+    res.redirect(301, `/chaotyczne-czwartki${query}`);
+  });
+
   app.use(
     express.static(browserDistFolder, {
       maxAge: '1y',
