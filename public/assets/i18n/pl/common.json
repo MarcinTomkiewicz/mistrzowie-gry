@@ -362,6 +362,7 @@
   "commercial": {
     "validation": {
       "required": "Brakuje wymaganej wartości.",
+      "invalidSlug": "[PH] Slug jest niepoprawny.",
       "duplicateSectionPosition": "Sekcje mają powtórzoną pozycję.",
       "duplicateBlockPosition": "Bloki mają powtórzoną pozycję.",
       "duplicateProductPosition": "Produkty mają powtórzoną pozycję.",
@@ -375,6 +376,7 @@
       "invalidPrice": "Cena jest niepoprawna.",
       "invalidPriceRange": "Zakres ceny jest niepoprawny.",
       "invalidPercentage": "Wartość procentowa jest niepoprawna.",
+      "invalidSettlement": "[PH] Rozliczenie jest niepoprawne.",
       "invalidDuration": "Czas trwania jest niepoprawny.",
       "invalidParticipants": "Liczba uczestników jest niepoprawna.",
       "invalidProductReference": "Odwołanie do produktu jest niepoprawne.",

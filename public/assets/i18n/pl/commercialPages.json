@@ -28,6 +28,7 @@
     }
   },
   "productFieldKey": {
+    "settlement": "[PH] Rozliczenie",
     "participantsPerFacilitatorMax": "Uczestnicy na prowadzącego",
     "sessions": "Sesje",
     "meetingCount": "Liczba spotkań",

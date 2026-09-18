@@ -10,9 +10,21 @@
           </p>
         </div>
 
-        @if (detail()) {
-          <span [class]="draftStatusClass()">{{ draftStatusLabel() }}</span>
-        }
+        <div class="flex-row-end-center flex-wrap gap-sm">
+          @if (detail()) {
+            <span [class]="draftStatusClass()">{{ draftStatusLabel() }}</span>
+          }
+
+          <p-button
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            [label]="i18n.editorPage().backToPages"
+            icon="pi pi-arrow-left"
+            [disabled]="isSaving()"
+            (onClick)="goBack()"
+          />
+        </div>
       </div>
     </header>
 
@@ -31,22 +43,12 @@
           {{ i18n.editorPage().loadErrorTitle }}
         </h2>
 
-        <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-button
-            severity="secondary"
-            [label]="i18n.commonActions().retry"
-            icon="pi pi-refresh"
-            (onClick)="loadPage()"
-          />
-
-          <p-button
-            severity="warn"
-            [outlined]="true"
-            [label]="i18n.commonActions().cancel"
-            icon="pi pi-arrow-left"
-            (onClick)="goBack()"
-          />
-        </div>
+        <p-button
+          severity="secondary"
+          [label]="i18n.commonActions().retry"
+          icon="pi pi-refresh"
+          (onClick)="loadPage()"
+        />
       </section>
     } @else if (detail(); as pageDetail) {
       <form
@@ -103,16 +105,6 @@
                 [disabled]="isLoading() || isPreviewing() || form.pristine"
                 (onClick)="saveDraft()"
               />
-
-              <p-button
-                type="button"
-                severity="warn"
-                [outlined]="true"
-                [label]="i18n.commonActions().cancel"
-                icon="pi pi-arrow-left"
-                [disabled]="isSaving()"
-                (onClick)="goBack()"
-              />
             </div>
           </div>
         </ng-template>
@@ -146,6 +138,7 @@
                     <app-commercial-page-metadata-editor
                       [form]="form.controls.metadata"
                       [copy]="i18n.metadata()"
+                      [publishedSlug]="pageDetail.page.publishedSlug"
                       [requiredMessage]="i18n.commonForm().required"
                     />
                     <app-commercial-page-seo-editor

@@ -8,13 +8,14 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { catchError, distinctUntilChanged, finalize, map, of, switchMap } from 'rxjs';
 
 import { buildSiteUrl } from '../../../core/config/site';
 import { createCommercialPageStructuredData } from '../../../core/domain/commercial-pages/commercial-page-structured-data';
 import { CommercialPageRead } from '../../../core/services/commercial-page-read/commercial-page-read';
+import { Platform } from '../../../core/services/platform/platform';
 import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
 import {
@@ -40,7 +41,9 @@ import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay'
 export class CommercialPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly read = inject(CommercialPageRead);
+  private readonly platform = inject(Platform);
   private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
 
@@ -111,8 +114,7 @@ export class CommercialPage implements OnInit {
     if (!document) return;
 
     const pageSeo = document.page.seo;
-    const canonicalUrl =
-      pageSeo.canonicalUrl ?? buildSiteUrl(`/offer/${document.page.slug}`);
+    const canonicalUrl = buildSiteUrl(pageSeo.canonicalUrl);
 
     this.seo.apply({
       title: pageSeo.title,
@@ -157,8 +159,29 @@ export class CommercialPage implements OnInit {
         if (this.hasLoadError()) return;
 
         this.isNotFound.set(!document);
-        this.responseStatus.set(document ? 200 : 404);
+        if (!document) {
+          this.responseStatus.set(404);
+          return;
+        }
+
+        if (document.page.resolvedFromAlias) {
+          this.redirectToPublishedSlug(document.page.slug);
+          return;
+        }
+
+        this.responseStatus.set(200);
       });
+  }
+
+  private redirectToPublishedSlug(slug: string): void {
+    const location = `/offer/${slug}`;
+
+    if (this.platform.isBrowser) {
+      void this.router.navigateByUrl(location, { replaceUrl: true });
+      return;
+    }
+
+    this.responseStatus.permanentRedirect(location);
   }
 
   private startLoading(slug: string): void {

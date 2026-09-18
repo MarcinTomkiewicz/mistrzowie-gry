@@ -11,4 +11,16 @@ export class ResponseStatus {
 
     this.responseInit.status = status;
   }
+
+  permanentRedirect(location: string): void {
+    if (!this.responseInit) {
+      return;
+    }
+
+    const headers = new Headers(this.responseInit.headers ?? {});
+    headers.set('Location', location);
+
+    this.responseInit.status = 301;
+    this.responseInit.headers = headers;
+  }
 }

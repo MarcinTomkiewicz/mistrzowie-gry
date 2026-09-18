@@ -1,7 +1,6 @@
 import type {
   CommercialActionAppearance,
   CommercialPage,
-  CommercialPageSeo,
 } from './commercial-page';
 import type { CommercialIconKey } from './commercial-icon';
 import type { Price } from './price';
@@ -30,6 +29,7 @@ export type CommercialProductFieldKey =
   | 'name'
   | 'description'
   | 'price'
+  | 'settlement'
   | 'duration'
   | 'participants'
   | 'participantsPerFacilitatorMax'
@@ -244,6 +244,7 @@ type CommercialProductBase<
   name: string;
   description: RichContent | null;
   price: Price;
+  settlement: string | null;
   duration: TDuration;
   participants: TParticipants;
   sessions: CommercialSessionCount;
@@ -269,14 +270,6 @@ export type CommercialRenderProduct = CommercialProductBase<
   CommercialRenderParticipants
 > & {
   includedAddons: CommercialIncludedAddon[];
-};
-
-export type CommercialPageEditorDocument = {
-  heading: string;
-  lead: string | null;
-  seo: CommercialPageSeo;
-  products: CommercialEditorProduct[];
-  sections: CommercialBuilderSection[];
 };
 
 type CommercialMaterializedConstant =

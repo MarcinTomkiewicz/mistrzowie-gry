@@ -28,8 +28,8 @@ import type { CommercialPageAdminDetail } from '../../../../core/types/commercia
 import type { CommercialConstantAdminItem } from '../../../../core/types/commercial-constant-admin';
 import type {
   CommercialPageBuilderDocument,
-  CommercialPageEditorDocument,
 } from '../../../../core/types/commercial-page-builder';
+import type { CommercialPageEditorDocument } from '../../../../core/types/commercial-page-editor';
 import { CommercialPageRenderer } from '../../../../common/commercial-page/commercial-page-renderer';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';

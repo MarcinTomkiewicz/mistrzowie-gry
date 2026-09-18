@@ -28,6 +28,8 @@ export function formatCommercialProductField(
         : null;
     case 'price':
       return { type: 'price', value: product.price };
+    case 'settlement':
+      return optionalText(product.settlement);
     case 'duration':
       return product.duration.mode === 'not_applicable'
         ? null

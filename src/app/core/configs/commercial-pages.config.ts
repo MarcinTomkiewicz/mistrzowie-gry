@@ -113,6 +113,7 @@ export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
   'name',
   'description',
   'price',
+  'settlement',
   'duration',
   'participants',
   'participantsPerFacilitatorMax',

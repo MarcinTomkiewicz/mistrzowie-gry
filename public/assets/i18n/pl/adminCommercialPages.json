@@ -8,10 +8,10 @@
       "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych"
     },
     "table": {
-      "page": "[PH] [adminCommercialPages-page] Strona",
-      "draftStatus": "[PH] Stan draftu",
-      "draftUpdatedAt": "[PH] Aktualizacja draftu",
-      "effectiveFrom": "[PH] Obowiązuje od"
+      "page": "Strona",
+      "draftStatus": "Status",
+      "draftUpdatedAt": "Data aktualizacji",
+      "effectiveFrom": "Obowiązuje od"
     },
     "toast": {
       "loadFailedDetail": "[PH] Lista stron ofertowych nie została pobrana."
@@ -101,33 +101,37 @@
     "page": {
       "title": "[PH] Edycja strony ofertowej",
       "subtitle": "[PH] Edytuj metadane, produkty i sekcje wersji roboczej.",
+      "backToPages": "[PH] Wróć do stron ofertowych",
       "loadErrorTitle": "[PH] Nie udało się załadować strony ofertowej"
     },
     "steps": {
-      "contentSeo": "[PH] [adminCommercialPages-contentSeo] Treść i SEO",
-      "layout": "[PH] [adminCommercialPages-layout] Układ strony",
-      "previewSave": "[PH] [adminCommercialPages-previewSave] Podgląd i zapis"
+      "contentSeo": "Treść i SEO",
+      "layout": "Układ strony",
+      "previewSave": "Podgląd i zapis"
     },
     "metadata": {
       "sectionTitle": "[PH] Treść strony",
+      "draftSlug": "[PH] Slug draftu",
+      "publishedSlug": "[PH] Opublikowany slug",
+      "slugPattern": "[PH] Slug może zawierać małe litery i cyfry rozdzielone pojedynczymi myślnikami.",
       "heading": "[PH] Nagłówek strony"
     },
     "seo": {
       "ogTitle": "[PH] Tytuł Open Graph",
-      "ogDescription": "[PH] Opis Open Graph",
-      "canonicalUrl": "[PH] Canonical URL"
+      "ogDescription": "[PH] Opis Open Graph"
     },
     "products": {
-      "sectionTitle": "[PH] [adminCommercialPages-sectionTitle] Produkty i dodatki strony",
-      "empty": "[PH] [adminCommercialPages-empty] Strona nie zawiera produktów ani dodatków.",
-      "product": "[PH] [adminCommercialPages-product] Produkt lub dodatek",
-      "saveProduct": "[PH] [adminCommercialPages-saveProduct] Zapisz pozycję",
-      "addons": "[PH] [adminCommercialPages-addons] Dodatki"
+      "sectionTitle": "Produkty i dodatki",
+      "empty": "Strona nie zawiera produktów ani dodatków.",
+      "product": "Produkt lub dodatek",
+      "saveProduct": "Zapisz pozycję",
+      "addons": "Dodatki"
     },
     "product": {
       "kind": "[PH] [adminCommercialPages-kind] Rodzaj pozycji",
       "name": "[PH] [adminCommercialPages-name] Nazwa pozycji",
       "description": "[PH] [adminCommercialPages-description] Opis pozycji",
+      "settlement": "[PH] Rozliczenie",
       "durationMode": "[PH] Tryb czasu trwania",
       "durationMinutes": "[PH] Czas trwania w minutach",
       "participantsMode": "[PH] Tryb liczby uczestników",

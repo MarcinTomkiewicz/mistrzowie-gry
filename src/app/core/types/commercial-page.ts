@@ -18,18 +18,20 @@ export type CommercialActionAppearance =
   | 'success'
   | 'secondary';
 
-export type CommercialPageSeo = {
+export type CommercialPageEditorSeo = {
   title: string;
   description: string;
   ogTitle: string | null;
   ogDescription: string | null;
-  canonicalUrl: string | null;
+};
+
+export type CommercialPageSeo = CommercialPageEditorSeo & {
+  canonicalUrl: string;
 };
 
 export type CommercialPageIdentity = {
   id: string;
   key: CommercialPageKey;
-  slug: string;
   locale: string;
   kind: CommercialPageKind;
   navigationLabel: string;
@@ -37,6 +39,9 @@ export type CommercialPageIdentity = {
 };
 
 export type CommercialPage = CommercialPageIdentity & {
+  slug: string;
+  requestedSlug: string;
+  resolvedFromAlias: boolean;
   heading: string;
   lead: string | null;
   seo: CommercialPageSeo;

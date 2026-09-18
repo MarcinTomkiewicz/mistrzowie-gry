@@ -41,6 +41,19 @@
     [controlId]="controlId() + '-price'"
   />
 
+  <p-iftalabel class="w-100">
+    <input
+      pInputText
+      class="w-100"
+      [id]="controlId() + '-settlement'"
+      formControlName="settlement"
+      autocomplete="off"
+    />
+    <label [for]="controlId() + '-settlement'">
+      {{ i18n.product().settlement }}
+    </label>
+  </p-iftalabel>
+
   @if (form().controls.kind.value === 'product') {
     <div class="flex-col-start-stretch gap-xs w-100">
       <p-iftalabel class="w-100">

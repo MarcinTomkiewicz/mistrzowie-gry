@@ -6,6 +6,7 @@ import type {
 } from '../types/commercial-page-builder';
 import type { CommercialProductEditorForm } from '../types/commercial-page-editor-form';
 import { setControlEnabled } from '../utils/form-controls';
+import { normalizeText } from '../utils/normalize-text';
 import {
   commercialProductValidator,
 } from '../validators/commercial-builder-editor.validator';
@@ -39,6 +40,9 @@ export function createCommercialProductEditorForm(
         false,
       ),
       price: createPriceEditorForm(product?.price ?? null),
+      settlement: new FormControl(product?.settlement ?? '', {
+        nonNullable: true,
+      }),
       durationMode: new FormControl(
         product?.duration.mode ?? 'not_applicable',
         { nonNullable: true },
@@ -111,6 +115,7 @@ export function mapCommercialProductEditorForm(
       false,
     ),
     price: mapPriceEditorForm(form.controls.price),
+    settlement: normalizeText(value.settlement),
     duration:
       value.durationMode === 'custom'
         ? { mode: 'custom', minutes: requireNumber(value.durationMinutes) }

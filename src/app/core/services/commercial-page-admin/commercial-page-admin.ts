@@ -15,8 +15,8 @@ import type {
 } from '../../types/commercial-page-admin';
 import type {
   CommercialPageBuilderDocument,
-  CommercialPageEditorDocument,
 } from '../../types/commercial-page-builder';
+import type { CommercialPageEditorDocument } from '../../types/commercial-page-editor';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })

@@ -13,6 +13,7 @@ import type { PriceEditorForm } from './price-editor-form';
 import type { RichContentEditorControl } from './rich-content-editor';
 
 export type CommercialPageMetadataEditorForm = FormGroup<{
+  slug: FormControl<string>;
   heading: FormControl<string>;
   lead: FormControl<string>;
 }>;
@@ -22,7 +23,6 @@ export type CommercialPageSeoEditorForm = FormGroup<{
   description: FormControl<string>;
   ogTitle: FormControl<string>;
   ogDescription: FormControl<string>;
-  canonicalUrl: FormControl<string>;
 }>;
 
 export type CommercialProductEditorForm = FormGroup<{
@@ -31,6 +31,7 @@ export type CommercialProductEditorForm = FormGroup<{
   name: FormControl<string>;
   description: RichContentEditorControl;
   price: PriceEditorForm;
+  settlement: FormControl<string>;
   durationMode: FormControl<CommercialEditorDuration['mode']>;
   durationMinutes: FormControl<number | null>;
   participantsMode: FormControl<CommercialEditorParticipants['mode']>;

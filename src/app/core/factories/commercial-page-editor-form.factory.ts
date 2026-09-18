@@ -1,6 +1,6 @@
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import type { CommercialPageEditorDocument } from '../types/commercial-page-builder';
+import type { CommercialPageEditorDocument } from '../types/commercial-page-editor';
 import type {
   CommercialPageEditorForm,
   CommercialProductEditorForm,
@@ -33,6 +33,14 @@ import {
 export function createCommercialPageEditorForm(): CommercialPageEditorForm {
   return new FormGroup({
     metadata: new FormGroup({
+      slug: new FormControl('', {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          requiredTrimmedValidator(),
+          Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+        ],
+      }),
       heading: requiredTextControl(),
       lead: new FormControl('', { nonNullable: true }),
     }),
@@ -41,7 +49,6 @@ export function createCommercialPageEditorForm(): CommercialPageEditorForm {
       description: requiredTextControl(),
       ogTitle: new FormControl('', { nonNullable: true }),
       ogDescription: new FormControl('', { nonNullable: true }),
-      canonicalUrl: new FormControl('', { nonNullable: true }),
     }),
     products: new FormArray<CommercialProductEditorForm>([], {
       validators: [commercialProductsValidator],
@@ -57,6 +64,7 @@ export function resetCommercialPageEditorForm(
   form.reset(
     {
       metadata: {
+        slug: document.slug,
         heading: document.heading,
         lead: document.lead ?? '',
       },
@@ -65,7 +73,6 @@ export function resetCommercialPageEditorForm(
         description: document.seo.description,
         ogTitle: document.seo.ogTitle ?? '',
         ogDescription: document.seo.ogDescription ?? '',
-        canonicalUrl: document.seo.canonicalUrl ?? '',
       },
     },
     { emitEvent: false },
@@ -96,6 +103,7 @@ export function mapCommercialPageEditorFormToDocument(
   const value = form.getRawValue();
 
   return {
+    slug: value.metadata.slug.trim(),
     heading: value.metadata.heading.trim(),
     lead: normalizeText(value.metadata.lead),
     seo: {
@@ -103,7 +111,6 @@ export function mapCommercialPageEditorFormToDocument(
       description: value.seo.description.trim(),
       ogTitle: normalizeText(value.seo.ogTitle),
       ogDescription: normalizeText(value.seo.ogDescription),
-      canonicalUrl: normalizeText(value.seo.canonicalUrl),
     },
     products: form.controls.products.controls.map((product, index) =>
       mapCommercialProductEditorForm(product, (index + 1) * 10),

@@ -6,6 +6,46 @@
     {{ copy().sectionTitle }}
   </h2>
 
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          id="commercial-page-slug"
+          class="w-100"
+          formControlName="slug"
+          autocomplete="off"
+        />
+        <label for="commercial-page-slug">{{ copy().draftSlug }}</label>
+      </p-iftalabel>
+
+      @if (
+        form().controls.slug.touched &&
+        (form().controls.slug.hasError("required") ||
+          form().controls.slug.hasError("requiredTrimmed"))
+      ) {
+        <small class="error-text">{{ requiredMessage() }}</small>
+      } @else if (
+        form().controls.slug.touched && form().controls.slug.hasError("pattern")
+      ) {
+        <small class="error-text">{{ copy().slugPattern }}</small>
+      }
+    </div>
+
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        id="commercial-page-published-slug"
+        class="w-100"
+        [value]="publishedSlug()"
+        readonly
+      />
+      <label for="commercial-page-published-slug">
+        {{ copy().publishedSlug }}
+      </label>
+    </p-iftalabel>
+  </div>
+
   <div class="w-100">
     <p-iftalabel class="w-100">
       <input

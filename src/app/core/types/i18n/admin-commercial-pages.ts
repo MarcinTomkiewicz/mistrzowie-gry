@@ -34,6 +34,7 @@ export type AdminCommercialPagesListToastTranslations = {
 export type AdminCommercialPagesEditorPageTranslations = {
   title: string;
   subtitle: string;
+  backToPages: string;
   loadErrorTitle: string;
 };
 
@@ -46,13 +47,15 @@ export type AdminCommercialPagesEditorStepsTranslations = {
 
 export type AdminCommercialPagesMetadataTranslations = {
   sectionTitle: string;
+  draftSlug: string;
+  publishedSlug: string;
+  slugPattern: string;
   heading: string;
 };
 
 export type AdminCommercialPagesSeoTranslations = {
   ogTitle: string;
   ogDescription: string;
-  canonicalUrl: string;
 };
 
 export type AdminCommercialPagesEditorToastTranslations = {
@@ -107,6 +110,7 @@ export type AdminCommercialPagesProductTranslations = {
   kind: string;
   name: string;
   description: string;
+  settlement: string;
   durationMode: string;
   durationMinutes: string;
   participantsMode: string;

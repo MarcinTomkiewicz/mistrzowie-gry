@@ -23,5 +23,6 @@ export class CommercialPageMetadataEditor {
   protected readonly commonLabels = createCommonLabelsI18n();
   readonly form = input.required<CommercialPageMetadataEditorForm>();
   readonly copy = input.required<AdminCommercialPagesMetadataTranslations>();
+  readonly publishedSlug = input.required<string>();
   readonly requiredMessage = input.required<string>();
 }

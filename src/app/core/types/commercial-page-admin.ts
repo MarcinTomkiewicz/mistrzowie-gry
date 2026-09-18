@@ -1,10 +1,15 @@
 import type { CommercialPageIdentity } from './commercial-page';
 import type {
   CommercialPageBuilderDocument,
-  CommercialPageEditorDocument,
 } from './commercial-page-builder';
+import type { CommercialPageEditorDocument } from './commercial-page-editor';
 
-export type CommercialPageAdminListItem = CommercialPageIdentity & {
+type CommercialPageAdminPage = CommercialPageIdentity & {
+  slug: string;
+  publishedSlug: string;
+};
+
+export type CommercialPageAdminListItem = CommercialPageAdminPage & {
   heading: string;
   hasDraftChanges: boolean;
   draftRevision: number;
@@ -16,7 +21,7 @@ export type CommercialPageAdminListItem = CommercialPageIdentity & {
 };
 
 export type CommercialPageAdminDetail = {
-  page: CommercialPageIdentity;
+  page: CommercialPageAdminPage;
   draft: CommercialPageEditorDocument;
   draftRevision: number;
   previewedRevision: number | null;
@@ -42,6 +47,7 @@ export type CommercialPageAdminUnsavedPreviewPayload = {
 
 export type CommercialPagePublicationIssueCode =
   | 'required'
+  | 'invalid_slug'
   | 'duplicate_section_position'
   | 'duplicate_block_position'
   | 'duplicate_product_position'
@@ -55,6 +61,7 @@ export type CommercialPagePublicationIssueCode =
   | 'invalid_price'
   | 'invalid_price_range'
   | 'invalid_percentage'
+  | 'invalid_settlement'
   | 'invalid_duration'
   | 'invalid_participants'
   | 'invalid_product_reference'
