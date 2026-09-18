@@ -3,14 +3,18 @@ import type {
   CommercialBlockType,
   CommercialButtonLayout,
   CommercialCardOrientation,
-  CommercialEditorDuration,
-  CommercialEditorParticipants,
-  CommercialProductKind,
   CommercialProductCollectionBlock,
-  CommercialSessionCount,
   CommercialSectionSurface,
   CommercialTextAlign,
 } from '../commercial-page-builder';
+import type {
+  CommercialCooperationLength,
+  CommercialEditorDuration,
+  CommercialEditorParticipants,
+  CommercialFrequency,
+  CommercialProductKind,
+  CommercialSessionCount,
+} from '../commercial-product';
 
 export type AdminCommercialPagesListPageTranslations = {
   title: string;
@@ -110,6 +114,11 @@ export type AdminCommercialPagesProductTranslations = {
   kind: string;
   name: string;
   description: string;
+  prices: string;
+  emptyPrices: string;
+  addPrice: string;
+  priceLabel: string;
+  primaryPrice: string;
   settlement: string;
   durationMode: string;
   durationMinutes: string;
@@ -120,6 +129,12 @@ export type AdminCommercialPagesProductTranslations = {
   structureSection: string;
   sessionsMode: string;
   sessions: string;
+  frequency: string;
+  frequencyMode: string;
+  frequencyCount: string;
+  cooperationLength: string;
+  cooperationLengthMode: string;
+  cooperationLengthSemesters: string;
   includedAddons: string;
   meetingCountMin: string;
   meetingCountMax: string;
@@ -215,9 +230,12 @@ export type AdminCommercialPagesEditorActionsTranslations = {
 };
 
 export type AdminCommercialPagesValidationTranslations = {
+  invalidPrimaryPrice: string;
   invalidDuration: string;
   invalidParticipants: string;
   invalidSessions: string;
+  invalidFrequency: string;
+  invalidCooperationLength: string;
   invalidIncludedAddons: string;
   invalidMeetingRange: string;
   invalidRoute: string;
@@ -251,6 +269,14 @@ export type AdminCommercialPagesParticipantsModeTranslations = Record<
 export type AdminCommercialPagesProductKindTranslations = Record<CommercialProductKind, string>;
 export type AdminCommercialPagesSessionModeTranslations = Record<
   Exclude<CommercialSessionCount['mode'], 'not_applicable'>,
+  string
+>;
+export type AdminCommercialPagesFrequencyModeTranslations = Record<
+  Exclude<CommercialFrequency['mode'], 'not_applicable'>,
+  string
+>;
+export type AdminCommercialPagesCooperationLengthModeTranslations = Record<
+  Exclude<CommercialCooperationLength['mode'], 'not_applicable'>,
   string
 >;
 export type AdminCommercialPagesActionAppearanceTranslations = Record<CommercialActionAppearance, string>;

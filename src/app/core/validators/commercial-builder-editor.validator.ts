@@ -59,6 +59,31 @@ export function commercialProductValidator(
 
   if (invalidSessions) return { commercialSessions: true };
 
+  const frequencyMode = value['frequencyMode'];
+  const frequencyCount = value['frequencyCount'];
+  const invalidFrequency =
+    frequencyMode === 'weekly' || frequencyMode === 'monthly'
+      ? !isPositiveInteger(frequencyCount)
+      : frequencyMode !== 'one_time' && frequencyMode !== 'not_applicable';
+
+  if (invalidFrequency) return { commercialFrequency: true };
+
+  const cooperationLengthMode = value['cooperationLengthMode'];
+  const cooperationLengthSemesters = value['cooperationLengthSemesters'];
+  const invalidCooperationLength =
+    cooperationLengthMode === 'exact' || cooperationLengthMode === 'minimum'
+      ? !isPositiveInteger(cooperationLengthSemesters)
+      : cooperationLengthMode !== 'one_time' &&
+        cooperationLengthMode !== 'not_applicable';
+
+  if (invalidCooperationLength) {
+    return { commercialCooperationLength: true };
+  }
+
+  if (hasDuplicatePrimaryPriceUnit(value['prices'])) {
+    return { commercialPrimaryPrice: true };
+  }
+
   const id = value['id'];
   const kind = value['kind'];
   const includedAddonIds = stringArrayValue(value['includedAddonIds']);
@@ -204,6 +229,30 @@ export function commercialProductCollectionValidator(
 
 function isPositiveInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value > 0;
+}
+
+function hasDuplicatePrimaryPriceUnit(value: unknown): boolean {
+  if (!Array.isArray(value)) return true;
+
+  const primaryUnits = new Set<string>();
+
+  for (const entry of value) {
+    if (!isRecord(entry) || entry['primary'] !== true) continue;
+
+    const price = entry['price'];
+    if (!isRecord(price)) continue;
+
+    const type = price['type'];
+    if (type !== 'fixed' && type !== 'range' && type !== 'from') continue;
+
+    const unit = price['unit'];
+    if (typeof unit !== 'string') continue;
+    if (primaryUnits.has(unit)) return true;
+
+    primaryUnits.add(unit);
+  }
+
+  return false;
 }
 
 function stringArrayValue(value: unknown): string[] {

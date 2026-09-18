@@ -379,6 +379,8 @@
       "invalidSettlement": "[PH] Rozliczenie jest niepoprawne.",
       "invalidDuration": "Czas trwania jest niepoprawny.",
       "invalidParticipants": "Liczba uczestników jest niepoprawna.",
+      "invalidFrequency": "[PH] Częstotliwość jest niepoprawna.",
+      "invalidCooperationLength": "[PH] Długość współpracy jest niepoprawna.",
       "invalidProductReference": "Odwołanie do produktu jest niepoprawne.",
       "invalidProductCollection": "Konfiguracja kolekcji produktów jest niepoprawna.",
       "invalidTable": "Konfiguracja tabeli jest niepoprawna.",

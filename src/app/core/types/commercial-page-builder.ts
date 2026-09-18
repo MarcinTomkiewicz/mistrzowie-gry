@@ -3,10 +3,29 @@ import type {
   CommercialPage,
 } from './commercial-page';
 import type { CommercialIconKey } from './commercial-icon';
+import type {
+  CommercialProductFieldKey,
+  CommercialRenderProduct,
+} from './commercial-product';
 import type { Price } from './price';
 import type { RichContent } from './rich-content';
 
 export type { CommercialIconKey } from './commercial-icon';
+export type {
+  CommercialCooperationLength,
+  CommercialEditorDuration,
+  CommercialEditorParticipants,
+  CommercialEditorProduct,
+  CommercialFrequency,
+  CommercialIncludedAddon,
+  CommercialProductFieldKey,
+  CommercialProductKind,
+  CommercialProductPrice,
+  CommercialRenderDuration,
+  CommercialRenderParticipants,
+  CommercialRenderProduct,
+  CommercialSessionCount,
+} from './commercial-product';
 
 export type CommercialSectionSurface = 'plain' | 'card';
 export type CommercialTextAlign = 'left' | 'center' | 'right';
@@ -20,24 +39,6 @@ export type CommercialBlockType =
 
 export type CommercialButtonLayout = 'horizontal' | 'vertical';
 export type CommercialCardOrientation = 'vertical' | 'horizontal';
-export type CommercialProductKind = 'product' | 'addon';
-export type CommercialSessionCount =
-  | { mode: 'not_applicable'; count: null }
-  | { mode: 'total'; count: number }
-  | { mode: 'per_month'; count: number };
-export type CommercialProductFieldKey =
-  | 'name'
-  | 'description'
-  | 'price'
-  | 'settlement'
-  | 'duration'
-  | 'participants'
-  | 'participantsPerFacilitatorMax'
-  | 'sessions'
-  | 'meetingCount'
-  | 'facilitatorCount'
-  | 'tableCount'
-  | 'includedAddons';
 export type CommercialSectionPresentation = {
   surface: CommercialSectionSurface;
   textAlign: CommercialTextAlign;
@@ -182,94 +183,6 @@ export type CommercialBuilderSection = CommercialPositionedItem & {
   lead: string | null;
   presentation: CommercialSectionPresentation;
   blocks: CommercialPageBlock[];
-};
-
-export type CommercialEditorDuration =
-  | { mode: 'standard'; minutes: null }
-  | { mode: 'custom'; minutes: number }
-  | { mode: 'not_applicable'; minutes: null };
-
-export type CommercialRenderDuration =
-  | { mode: 'standard'; minutes: number }
-  | { mode: 'custom'; minutes: number }
-  | { mode: 'not_applicable'; minutes: null };
-
-export type CommercialEditorParticipants =
-  | {
-      mode: 'standard';
-      min: null;
-      max: null;
-      perFacilitatorMax: null;
-    }
-  | {
-      mode: 'custom';
-      min: number | null;
-      max: number | null;
-      perFacilitatorMax: number | null;
-    }
-  | {
-      mode: 'not_applicable';
-      min: null;
-      max: null;
-      perFacilitatorMax: null;
-    };
-
-export type CommercialRenderParticipants =
-  | {
-      mode: 'standard';
-      min: null;
-      max: number;
-      perFacilitatorMax: null;
-    }
-  | {
-      mode: 'custom';
-      min: number | null;
-      max: number | null;
-      perFacilitatorMax: number | null;
-    }
-  | {
-      mode: 'not_applicable';
-      min: null;
-      max: null;
-      perFacilitatorMax: null;
-    };
-
-type CommercialProductBase<
-  TDuration extends CommercialEditorDuration | CommercialRenderDuration,
-  TParticipants extends
-    | CommercialEditorParticipants
-    | CommercialRenderParticipants,
-> = CommercialPositionedItem & {
-  kind: CommercialProductKind;
-  name: string;
-  description: RichContent | null;
-  price: Price;
-  settlement: string | null;
-  duration: TDuration;
-  participants: TParticipants;
-  sessions: CommercialSessionCount;
-  meetingCountMin: number | null;
-  meetingCountMax: number | null;
-  facilitatorCount: number | null;
-  tableCount: number | null;
-  includedAddonIds: string[];
-};
-
-export type CommercialEditorProduct = CommercialProductBase<
-  CommercialEditorDuration,
-  CommercialEditorParticipants
->;
-
-export type CommercialIncludedAddon = {
-  id: string;
-  name: string;
-};
-
-export type CommercialRenderProduct = CommercialProductBase<
-  CommercialRenderDuration,
-  CommercialRenderParticipants
-> & {
-  includedAddons: CommercialIncludedAddon[];
 };
 
 type CommercialMaterializedConstant =

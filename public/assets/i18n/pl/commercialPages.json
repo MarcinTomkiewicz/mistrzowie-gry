@@ -25,13 +25,36 @@
         "other": "sesji"
       },
       "perMonth": " / miesiąc"
+    },
+    "frequency": {
+      "oneTime": "jednorazowo",
+      "weeklyOnce": "raz w tygodniu",
+      "weeklyMany": "razy w tygodniu",
+      "monthlyOnce": "raz w miesiącu",
+      "monthlyMany": "razy w miesiącu"
+    },
+    "cooperationLength": {
+      "oneTime": "jednorazowo",
+      "minimum": "minimum",
+      "semesters": {
+        "one": "semestr",
+        "few": "semestry",
+        "many": "semestrów",
+        "other": "semestru"
+      }
     }
   },
   "productFieldKey": {
     "settlement": "[PH] Rozliczenie",
+    "participantsMin": "Minimalna liczba uczestników",
+    "participantsMax": "Maksymalna liczba uczestników",
     "participantsPerFacilitatorMax": "Uczestnicy na prowadzącego",
     "sessions": "Sesje",
+    "frequency": "Częstotliwość",
+    "cooperationLength": "Długość współpracy",
     "meetingCount": "Liczba spotkań",
-    "includedAddons": "Dodatki w cenie"
+    "includedAddons": "Dodatki w cenie",
+    "participantPrice": "Cena za uczestnika",
+    "facilitatorPrice": "Cena za jednego Mistrza Gry"
   }
 }

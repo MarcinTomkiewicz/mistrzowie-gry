@@ -1,7 +1,9 @@
 import type {
+  CommercialCooperationLength,
+  CommercialFrequency,
   CommercialProductFieldKey,
   CommercialRenderProduct,
-} from '../../types/commercial-page-builder';
+} from '../../types/commercial-product';
 import type { CommercialProductValueTranslations } from '../../types/i18n/commercial-pages';
 import type { CommercialProductFieldPresentation } from '../../types/commercial-page-presentation';
 import { formatDuration } from '../../utils/duration-format';
@@ -17,6 +19,7 @@ export function formatCommercialProductField(
   translations: CommercialProductValueTranslations,
   fromLabel: string,
   toLabel: string,
+  notApplicableLabel: string,
   locale: string,
 ): CommercialProductFieldPresentation | null {
   switch (key) {
@@ -27,9 +30,9 @@ export function formatCommercialProductField(
         ? { type: 'rich_content', value: product.description }
         : null;
     case 'price':
-      return { type: 'price', value: product.price };
-    case 'settlement':
-      return optionalText(product.settlement);
+      return product.prices.length
+        ? { type: 'prices', value: product.prices }
+        : null;
     case 'duration':
       return product.duration.mode === 'not_applicable'
         ? null
@@ -57,6 +60,10 @@ export function formatCommercialProductField(
         product.participants.perFacilitatorMax,
         locale,
       );
+    case 'participantsMin':
+      return optionalNumber(product.participantsMin, locale);
+    case 'participantsMax':
+      return optionalNumber(product.participantsMax, locale);
     case 'sessions':
       return product.sessions.mode === 'not_applicable'
         ? null
@@ -68,6 +75,24 @@ export function formatCommercialProductField(
               locale,
             ),
           );
+    case 'frequency':
+      return text(
+        formatCommercialFrequency(
+          product.frequency,
+          translations,
+          notApplicableLabel,
+          locale,
+        ),
+      );
+    case 'cooperationLength':
+      return text(
+        formatCommercialCooperationLength(
+          product.cooperationLength,
+          translations,
+          notApplicableLabel,
+          locale,
+        ),
+      );
     case 'meetingCount':
       return optionalText(
         formatOptionalNumberRange(
@@ -88,6 +113,64 @@ export function formatCommercialProductField(
           ? product.includedAddons.map((addon) => addon.name).join(', ')
           : null,
       );
+    case 'settlement':
+      return optionalText(product.settlement);
+    case 'participantPrice':
+      return optionalPrice(product.participantPrice);
+    case 'facilitatorPrice':
+      return optionalPrice(product.facilitatorPrice);
+  }
+}
+
+export function formatCommercialFrequency(
+  frequency: CommercialFrequency,
+  translations: CommercialProductValueTranslations,
+  notApplicableLabel: string,
+  locale: string,
+): string {
+  const copy = translations.frequency;
+
+  switch (frequency.mode) {
+    case 'not_applicable':
+      return notApplicableLabel;
+    case 'one_time':
+      return copy.oneTime;
+    case 'weekly':
+      return frequency.count === 1
+        ? copy.weeklyOnce
+        : `${formatNumber(frequency.count, locale)} ${copy.weeklyMany}`;
+    case 'monthly':
+      return frequency.count === 1
+        ? copy.monthlyOnce
+        : `${formatNumber(frequency.count, locale)} ${copy.monthlyMany}`;
+  }
+}
+
+export function formatCommercialCooperationLength(
+  cooperationLength: CommercialCooperationLength,
+  translations: CommercialProductValueTranslations,
+  notApplicableLabel: string,
+  locale: string,
+): string {
+  const copy = translations.cooperationLength;
+
+  switch (cooperationLength.mode) {
+    case 'not_applicable':
+      return notApplicableLabel;
+    case 'one_time':
+      return copy.oneTime;
+    case 'exact':
+      return formatPluralNumber(
+        cooperationLength.semesters,
+        copy.semesters,
+        locale,
+      );
+    case 'minimum':
+      return `${copy.minimum} ${formatPluralNumber(
+        cooperationLength.semesters,
+        copy.semesters,
+        locale,
+      )}`;
   }
 }
 
@@ -113,6 +196,12 @@ function optionalNumber(
   locale: string,
 ): CommercialProductFieldPresentation | null {
   return value === null ? null : text(formatNumber(value, locale));
+}
+
+function optionalPrice(
+  value: CommercialRenderProduct['participantPrice'],
+): CommercialProductFieldPresentation | null {
+  return value === null ? null : { type: 'price', value };
 }
 
 function optionalText(

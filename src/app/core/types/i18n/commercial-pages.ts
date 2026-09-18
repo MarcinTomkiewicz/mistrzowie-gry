@@ -1,4 +1,4 @@
-import type { CommercialProductFieldKey } from '../commercial-page-builder';
+import type { CommercialProductFieldKey } from '../commercial-product';
 import type { DurationTranslations } from '../duration-format';
 import type { PluralNumberTranslations } from '../number-format';
 
@@ -11,6 +11,18 @@ export type CommercialProductValueTranslations = {
   sessions: {
     count: PluralNumberTranslations;
     perMonth: string;
+  };
+  frequency: {
+    oneTime: string;
+    weeklyOnce: string;
+    weeklyMany: string;
+    monthlyOnce: string;
+    monthlyMany: string;
+  };
+  cooperationLength: {
+    oneTime: string;
+    minimum: string;
+    semesters: PluralNumberTranslations;
   };
 };
 

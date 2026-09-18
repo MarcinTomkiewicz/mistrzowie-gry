@@ -13,6 +13,22 @@
         [accent]="priceAccent()"
       />
     }
+    @case ('prices') {
+      <div class="flex-col-start-stretch gap-sm w-100">
+        @for (entry of data.value; track $index) {
+          <div class="flex-col-start-stretch gap-xs w-100">
+            @if (entry.label) {
+              <span class="small-caps">{{ entry.label }}</span>
+            }
+            <app-price-value
+              [price]="entry.price"
+              [locale]="locale()"
+              [accent]="priceAccent()"
+            />
+          </div>
+        }
+      </div>
+    }
   }
 } @else {
   <span aria-hidden="true">—</span>

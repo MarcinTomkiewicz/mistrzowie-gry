@@ -20,8 +20,9 @@ import {
 import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
-import { PriceEditor } from '../../../../common/price-editor/price-editor';
 import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
+import { CommercialProductCooperationEditor } from './commercial-product-cooperation-editor';
+import { CommercialProductPricesEditor } from './commercial-product-prices-editor';
 
 @Component({
   selector: 'app-commercial-product-editor',
@@ -32,7 +33,8 @@ import { RichContentEditor } from '../../../../common/rich-content-editor/rich-c
     InputTextModule,
     MultiSelectModule,
     SelectModule,
-    PriceEditor,
+    CommercialProductCooperationEditor,
+    CommercialProductPricesEditor,
     RichContentEditor,
   ],
   templateUrl: './commercial-product-editor.html',

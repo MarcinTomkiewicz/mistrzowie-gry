@@ -92,9 +92,9 @@
       "text": "[PH] Tekst"
     },
     "durationUnit": {
-      "minutes": "[PH] Minuty",
-      "hoursShort": "[PH] godz.",
-      "minutesShort": "[PH] min"
+      "minutes": "minuty",
+      "hoursShort": "godz.",
+      "minutesShort": "min"
     }
   },
   "editor": {
@@ -110,15 +110,15 @@
       "previewSave": "Podgląd i zapis"
     },
     "metadata": {
-      "sectionTitle": "[PH] Treść strony",
-      "draftSlug": "[PH] Slug draftu",
-      "publishedSlug": "[PH] Opublikowany slug",
+      "sectionTitle": "Treść strony",
+      "draftSlug": "Slug draftu",
+      "publishedSlug": "Slug",
       "slugPattern": "[PH] Slug może zawierać małe litery i cyfry rozdzielone pojedynczymi myślnikami.",
-      "heading": "[PH] Nagłówek strony"
+      "heading": "Nagłówek strony"
     },
     "seo": {
-      "ogTitle": "[PH] Tytuł Open Graph",
-      "ogDescription": "[PH] Opis Open Graph"
+      "ogTitle": "Tytuł Open Graph",
+      "ogDescription": "Opis Open Graph"
     },
     "products": {
       "sectionTitle": "Produkty i dodatki",
@@ -131,6 +131,11 @@
       "kind": "[PH] [adminCommercialPages-kind] Rodzaj pozycji",
       "name": "[PH] [adminCommercialPages-name] Nazwa pozycji",
       "description": "[PH] [adminCommercialPages-description] Opis pozycji",
+      "prices": "[PH] Ceny",
+      "emptyPrices": "[PH] Brak pozycji cenowych.",
+      "addPrice": "[PH] Dodaj cenę",
+      "priceLabel": "[PH] Etykieta ceny",
+      "primaryPrice": "[PH] Cena główna dla jednostki rozliczeniowej",
       "settlement": "[PH] Rozliczenie",
       "durationMode": "[PH] Tryb czasu trwania",
       "durationMinutes": "[PH] Czas trwania w minutach",
@@ -141,6 +146,12 @@
       "structureSection": "[PH] [adminCommercialPages-structureSection] Pozostałe dane pozycji",
       "sessionsMode": "[PH] [adminCommercialPages-sessionsMode] Sposób podania liczby sesji",
       "sessions": "[PH] Liczba sesji",
+      "frequency": "[PH] Częstotliwość",
+      "frequencyMode": "[PH] Tryb częstotliwości",
+      "frequencyCount": "[PH] Liczba wystąpień",
+      "cooperationLength": "[PH] Długość współpracy",
+      "cooperationLengthMode": "[PH] Tryb długości współpracy",
+      "cooperationLengthSemesters": "[PH] Liczba semestrów",
       "includedAddons": "[PH] [adminCommercialPages-includedAddons] Dodatki zawarte w cenie",
       "meetingCountMin": "[PH] Minimalna liczba spotkań",
       "meetingCountMax": "[PH] Maksymalna liczba spotkań"
@@ -227,9 +238,12 @@
       "removeSection": "[PH] Usuń sekcję"
     },
     "validation": {
+      "invalidPrimaryPrice": "[PH] Dla jednej jednostki rozliczeniowej może istnieć najwyżej jedna cena główna.",
       "invalidDuration": "[PH] Własny czas trwania wymaga dodatniej liczby minut.",
       "invalidParticipants": "[PH] [adminCommercialPages-invalidParticipants] Podaj co najmniej jedną wartość: minimum, maksimum lub maksimum na prowadzącego. Każda podana wartość musi być dodatnią liczbą całkowitą; jeśli podajesz minimum i maksimum, minimum nie może przekraczać maksimum.",
       "invalidSessions": "[PH] [adminCommercialPages-invalidSessions] Dla łącznej liczby sesji lub sesji na miesiąc podaj dodatnią liczbę całkowitą.",
+      "invalidFrequency": "[PH] Częstotliwość tygodniowa lub miesięczna wymaga dodatniej liczby całkowitej.",
+      "invalidCooperationLength": "[PH] Dokładna lub minimalna długość współpracy wymaga dodatniej liczby semestrów.",
       "invalidIncludedAddons": "[PH] [adminCommercialPages-invalidIncludedAddons] Wybierz wyłącznie dodatki z bieżącego katalogu, bez powtórzeń.",
       "invalidMeetingRange": "[PH] Minimalna liczba spotkań nie może być większa od maksymalnej.",
       "invalidRoute": "[PH] Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku „/”."
@@ -324,5 +338,15 @@
   "sessionMode": {
     "total": "[PH] [adminCommercialPages-total] Łączna liczba sesji",
     "per_month": "[PH] [adminCommercialPages-per_month] Sesje na miesiąc"
+  },
+  "frequencyMode": {
+    "one_time": "[PH] Jednorazowo",
+    "weekly": "[PH] Co tydzień",
+    "monthly": "[PH] Co miesiąc"
+  },
+  "cooperationLengthMode": {
+    "one_time": "[PH] Jednorazowo",
+    "exact": "[PH] Dokładna liczba semestrów",
+    "minimum": "[PH] Minimalna liczba semestrów"
   }
 }

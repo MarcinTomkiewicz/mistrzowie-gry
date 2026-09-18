@@ -1,0 +1,89 @@
+<div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  <section class="flex-col-start-stretch gap-sm w-100">
+    <h4 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.product().frequency }}
+    </h4>
+    <div class="mg-grid-2 gap-md w-100">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          [inputId]="controlId() + '-frequency-mode'"
+          formControlName="frequencyMode"
+          [options]="frequencyModeOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (onChange)="syncModes()"
+        />
+        <label [for]="controlId() + '-frequency-mode'">
+          {{ i18n.product().frequencyMode }}
+        </label>
+      </p-iftalabel>
+
+      @if (
+        form().controls.frequencyMode.value === 'weekly' ||
+        form().controls.frequencyMode.value === 'monthly'
+      ) {
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            [inputId]="controlId() + '-frequency-count'"
+            formControlName="frequencyCount"
+            [min]="1"
+          />
+          <label [for]="controlId() + '-frequency-count'">
+            {{ i18n.product().frequencyCount }}
+          </label>
+        </p-iftalabel>
+      }
+    </div>
+    @if (form().touched && form().hasError('commercialFrequency')) {
+      <small class="error-text">{{ i18n.validation().invalidFrequency }}</small>
+    }
+  </section>
+
+  <section class="flex-col-start-stretch gap-sm w-100">
+    <h4 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.product().cooperationLength }}
+    </h4>
+    <div class="mg-grid-2 gap-md w-100">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          [inputId]="controlId() + '-cooperation-length-mode'"
+          formControlName="cooperationLengthMode"
+          [options]="cooperationLengthModeOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (onChange)="syncModes()"
+        />
+        <label [for]="controlId() + '-cooperation-length-mode'">
+          {{ i18n.product().cooperationLengthMode }}
+        </label>
+      </p-iftalabel>
+
+      @if (
+        form().controls.cooperationLengthMode.value === 'exact' ||
+        form().controls.cooperationLengthMode.value === 'minimum'
+      ) {
+        <p-iftalabel class="w-100">
+          <p-inputnumber
+            class="w-100"
+            [inputId]="controlId() + '-cooperation-length-semesters'"
+            formControlName="cooperationLengthSemesters"
+            [min]="1"
+          />
+          <label [for]="controlId() + '-cooperation-length-semesters'">
+            {{ i18n.product().cooperationLengthSemesters }}
+          </label>
+        </p-iftalabel>
+      }
+    </div>
+    @if (form().touched && form().hasError('commercialCooperationLength')) {
+      <small class="error-text">
+        {{ i18n.validation().invalidCooperationLength }}
+      </small>
+    }
+  </section>
+</div>

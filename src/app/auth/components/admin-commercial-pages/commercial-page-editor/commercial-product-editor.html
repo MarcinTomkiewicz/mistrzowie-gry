@@ -36,9 +36,9 @@
     [tokens]="tokens()"
   />
 
-  <app-price-editor
-    [form]="form().controls.price"
-    [controlId]="controlId() + '-price'"
+  <app-commercial-product-prices-editor
+    [form]="form()"
+    [controlId]="controlId()"
   />
 
   <p-iftalabel class="w-100">
@@ -227,4 +227,9 @@
       <small class="error-text">{{ i18n.validation().invalidMeetingRange }}</small>
     }
   </section>
+
+  <app-commercial-product-cooperation-editor
+    [form]="form()"
+    [controlId]="controlId()"
+  />
 </div>

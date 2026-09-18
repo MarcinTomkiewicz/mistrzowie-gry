@@ -3,8 +3,11 @@ import type {
   CommercialProductFieldLabelsTranslations,
   CommercialProductValueTranslations,
 } from '../types/i18n/commercial-pages';
-import type { CommercialProductFieldKey } from '../types/commercial-page-builder';
-import { createCommonLabelsI18n } from './common.i18n';
+import type { CommercialProductFieldKey } from '../types/commercial-product';
+import {
+  createCommonLabelsI18n,
+  createCommonValuesI18n,
+} from './common.i18n';
 import { createScopedSectionsI18n } from './scoped.i18n';
 
 export function createCommercialPageI18n() {
@@ -18,10 +21,12 @@ export function createCommercialPageI18n() {
     productValues: 'productValues',
   });
   const commonLabels = createCommonLabelsI18n();
+  const commonValues = createCommonValuesI18n();
 
   return {
     ...sections,
     commonLabels,
+    commonValues,
     productFieldLabel: (key: CommercialProductFieldKey): string => {
       const labels = commonLabels();
 

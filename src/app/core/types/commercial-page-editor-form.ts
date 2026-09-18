@@ -2,13 +2,17 @@ import type { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import type { CommercialPageBlockEditorForm } from './commercial-builder-block-editor-form';
 import type {
-  CommercialEditorDuration,
-  CommercialEditorParticipants,
-  CommercialProductKind,
   CommercialSectionSurface,
-  CommercialSessionCount,
   CommercialTextAlign,
 } from './commercial-page-builder';
+import type {
+  CommercialCooperationLength,
+  CommercialEditorDuration,
+  CommercialEditorParticipants,
+  CommercialFrequency,
+  CommercialProductKind,
+  CommercialSessionCount,
+} from './commercial-product';
 import type { PriceEditorForm } from './price-editor-form';
 import type { RichContentEditorControl } from './rich-content-editor';
 
@@ -25,12 +29,18 @@ export type CommercialPageSeoEditorForm = FormGroup<{
   ogDescription: FormControl<string>;
 }>;
 
+export type CommercialProductPriceEditorForm = FormGroup<{
+  price: PriceEditorForm;
+  label: FormControl<string>;
+  primary: FormControl<boolean>;
+}>;
+
 export type CommercialProductEditorForm = FormGroup<{
   id: FormControl<string>;
   kind: FormControl<CommercialProductKind>;
   name: FormControl<string>;
   description: RichContentEditorControl;
-  price: PriceEditorForm;
+  prices: FormArray<CommercialProductPriceEditorForm>;
   settlement: FormControl<string>;
   durationMode: FormControl<CommercialEditorDuration['mode']>;
   durationMinutes: FormControl<number | null>;
@@ -40,6 +50,10 @@ export type CommercialProductEditorForm = FormGroup<{
   participantsPerFacilitatorMax: FormControl<number | null>;
   sessionsMode: FormControl<CommercialSessionCount['mode']>;
   sessionsCount: FormControl<number | null>;
+  frequencyMode: FormControl<CommercialFrequency['mode']>;
+  frequencyCount: FormControl<number | null>;
+  cooperationLengthMode: FormControl<CommercialCooperationLength['mode']>;
+  cooperationLengthSemesters: FormControl<number | null>;
   meetingCountMin: FormControl<number | null>;
   meetingCountMax: FormControl<number | null>;
   facilitatorCount: FormControl<number | null>;

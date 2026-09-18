@@ -1,0 +1,73 @@
+<section class="flex-col-start-stretch gap-sm w-100">
+  <div class="flex-row-between-center gap-sm w-100">
+    <h4 class="mg-section__title mg-section__title--xs m-0">
+      {{ i18n.product().prices }}
+    </h4>
+    <p-button
+      type="button"
+      severity="secondary"
+      size="small"
+      [label]="i18n.product().addPrice"
+      icon="pi pi-plus"
+      (onClick)="addPrice()"
+    />
+  </div>
+
+  @if (!form().controls.prices.length) {
+    <p class="m-0">{{ i18n.product().emptyPrices }}</p>
+  }
+
+  @for (
+    entry of form().controls.prices.controls;
+    track entry;
+    let index = $index
+  ) {
+    <div
+      class="mg-card flex-col-start-stretch gap-md p-sm w-100"
+      [formGroup]="entry"
+    >
+      <app-item-editor-actions
+        [index]="index"
+        [itemCount]="form().controls.prices.length"
+        (moveUp)="movePrice(index, -1)"
+        (moveDown)="movePrice(index, 1)"
+        (remove)="removePrice(index)"
+      />
+
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          class="w-100"
+          [id]="controlId() + '-price-' + index + '-label'"
+          formControlName="label"
+          autocomplete="off"
+        />
+        <label [for]="controlId() + '-price-' + index + '-label'">
+          {{ i18n.product().priceLabel }}
+        </label>
+      </p-iftalabel>
+
+      <div class="flex-row-start-center gap-xs">
+        <p-checkbox
+          [inputId]="controlId() + '-price-' + index + '-primary'"
+          formControlName="primary"
+          [binary]="true"
+        />
+        <label [for]="controlId() + '-price-' + index + '-primary'">
+          {{ i18n.product().primaryPrice }}
+        </label>
+      </div>
+
+      <app-price-editor
+        [form]="entry.controls.price"
+        [controlId]="controlId() + '-price-' + index"
+      />
+    </div>
+  }
+
+  @if (form().touched && form().hasError('commercialPrimaryPrice')) {
+    <small class="error-text">
+      {{ i18n.validation().invalidPrimaryPrice }}
+    </small>
+  }
+</section>

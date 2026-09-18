@@ -1,9 +1,11 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import type {
+  CommercialCooperationLength,
   CommercialEditorProduct,
+  CommercialFrequency,
   CommercialSessionCount,
-} from '../types/commercial-page-builder';
+} from '../types/commercial-product';
 import type { CommercialProductEditorForm } from '../types/commercial-page-editor-form';
 import { setControlEnabled } from '../utils/form-controls';
 import { normalizeText } from '../utils/normalize-text';
@@ -13,9 +15,9 @@ import {
 import { integerValidator } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 import {
-  createPriceEditorForm,
-  mapPriceEditorForm,
-} from './price-editor-form.factory';
+  createCommercialProductPriceEditorForm,
+  mapCommercialProductPriceEditorForm,
+} from './commercial-product-price-editor-form.factory';
 import {
   createRichContentEditorControl,
   mapRichContentEditorControl,
@@ -39,7 +41,13 @@ export function createCommercialProductEditorForm(
         product?.description ?? null,
         false,
       ),
-      price: createPriceEditorForm(product?.price ?? null),
+      prices: new FormArray(
+        product
+          ? product.prices.map((price) =>
+              createCommercialProductPriceEditorForm(price)
+            )
+          : [createCommercialProductPriceEditorForm(null, true)],
+      ),
       settlement: new FormControl(product?.settlement ?? '', {
         nonNullable: true,
       }),
@@ -78,6 +86,20 @@ export function createCommercialProductEditorForm(
       sessionsCount: positiveIntegerControl(
         product?.sessions.count ?? null,
       ),
+      frequencyMode: new FormControl(
+        product?.frequency.mode ?? 'not_applicable',
+        { nonNullable: true },
+      ),
+      frequencyCount: positiveIntegerControl(
+        product?.frequency.count ?? null,
+      ),
+      cooperationLengthMode: new FormControl(
+        product?.cooperationLength.mode ?? 'not_applicable',
+        { nonNullable: true },
+      ),
+      cooperationLengthSemesters: positiveIntegerControl(
+        product?.cooperationLength.semesters ?? null,
+      ),
       meetingCountMin: positiveIntegerControl(
         product?.meetingCountMin ?? null,
       ),
@@ -114,7 +136,9 @@ export function mapCommercialProductEditorForm(
       form.controls.description,
       false,
     ),
-    price: mapPriceEditorForm(form.controls.price),
+    prices: form.controls.prices.controls.map(
+      mapCommercialProductPriceEditorForm,
+    ),
     settlement: normalizeText(value.settlement),
     duration:
       value.durationMode === 'custom'
@@ -137,6 +161,14 @@ export function mapCommercialProductEditorForm(
     sessions: mapCommercialSessionCount(
       value.sessionsMode,
       value.sessionsCount,
+    ),
+    frequency: mapCommercialFrequency(
+      value.frequencyMode,
+      value.frequencyCount,
+    ),
+    cooperationLength: mapCommercialCooperationLength(
+      value.cooperationLengthMode,
+      value.cooperationLengthSemesters,
     ),
     meetingCountMin: value.meetingCountMin,
     meetingCountMax: value.meetingCountMax,
@@ -166,6 +198,19 @@ export function syncCommercialProductEditorControls(
   const hasSessions =
     form.controls.sessionsMode.getRawValue() !== 'not_applicable';
   setControlEnabled(form.controls.sessionsCount, hasSessions);
+
+  const frequencyMode = form.controls.frequencyMode.getRawValue();
+  setControlEnabled(
+    form.controls.frequencyCount,
+    frequencyMode === 'weekly' || frequencyMode === 'monthly',
+  );
+
+  const cooperationLengthMode =
+    form.controls.cooperationLengthMode.getRawValue();
+  setControlEnabled(
+    form.controls.cooperationLengthSemesters,
+    cooperationLengthMode === 'exact' || cooperationLengthMode === 'minimum',
+  );
 
   setControlEnabled(
     form.controls.includedAddonIds,
@@ -213,6 +258,34 @@ function mapCommercialSessionCount(
       return { mode, count: requireNumber(count) };
     default:
       return unsupportedCommercialSessionMode(mode);
+  }
+}
+
+function mapCommercialFrequency(
+  mode: CommercialFrequency['mode'],
+  count: number | null,
+): CommercialFrequency {
+  switch (mode) {
+    case 'not_applicable':
+    case 'one_time':
+      return { mode, count: null };
+    case 'weekly':
+    case 'monthly':
+      return { mode, count: requireNumber(count) };
+  }
+}
+
+function mapCommercialCooperationLength(
+  mode: CommercialCooperationLength['mode'],
+  semesters: number | null,
+): CommercialCooperationLength {
+  switch (mode) {
+    case 'not_applicable':
+    case 'one_time':
+      return { mode, semesters: null };
+    case 'exact':
+    case 'minimum':
+      return { mode, semesters: requireNumber(semesters) };
   }
 }
 

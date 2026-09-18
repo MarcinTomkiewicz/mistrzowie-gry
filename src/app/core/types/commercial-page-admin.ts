@@ -64,6 +64,8 @@ export type CommercialPagePublicationIssueCode =
   | 'invalid_settlement'
   | 'invalid_duration'
   | 'invalid_participants'
+  | 'invalid_frequency'
+  | 'invalid_cooperation_length'
   | 'invalid_product_reference'
   | 'invalid_product_collection'
   | 'invalid_table'

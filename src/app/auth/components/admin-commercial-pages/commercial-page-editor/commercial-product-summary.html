@@ -1,0 +1,42 @@
+@let value = productValue();
+@let includedAddons = productIncludedAddons();
+
+<div class="flex-col-start-stretch gap-xs">
+  <strong>{{ value.name }}</strong>
+
+  @if (value.prices.length) {
+    <div class="flex-col-start-stretch gap-sm w-100">
+      @for (entry of value.prices; track $index) {
+        <div class="flex-col-start-stretch gap-xs w-100">
+          @if (entry.label) {
+            <span class="small-caps">{{ entry.label }}</span>
+          }
+          <app-price-value [price]="entry.price" [locale]="locale()" />
+        </div>
+      }
+    </div>
+  } @else {
+    <span>{{ i18n.commonValues().notAvailable }}</span>
+  }
+
+  <span>
+    {{ i18n.commonLabels().duration }}: {{ productDuration() }}
+  </span>
+  <span>
+    {{ i18n.commonLabels().participants }}: {{ productParticipants() }}
+  </span>
+  <span>{{ productSessions() }}</span>
+  <span>
+    {{ i18n.product().frequency }}: {{ productFrequency(value) }}
+  </span>
+  <span>
+    {{ i18n.product().cooperationLength }}:
+    {{ productCooperationLength(value) }}
+  </span>
+
+  @if (includedAddons) {
+    <span>
+      {{ i18n.product().includedAddons }}: {{ includedAddons }}
+    </span>
+  }
+</div>

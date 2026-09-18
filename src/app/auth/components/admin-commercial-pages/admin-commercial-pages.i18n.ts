@@ -47,6 +47,8 @@ export function createAdminCommercialPagesI18n() {
     participantsMode: Copy.AdminCommercialPagesParticipantsModeTranslations;
     productKind: Copy.AdminCommercialPagesProductKindTranslations;
     sessionMode: Copy.AdminCommercialPagesSessionModeTranslations;
+    frequencyMode: Copy.AdminCommercialPagesFrequencyModeTranslations;
+    cooperationLengthMode: Copy.AdminCommercialPagesCooperationLengthModeTranslations;
     actionAppearance: Copy.AdminCommercialPagesActionAppearanceTranslations;
   }>('adminCommercialPages', {
     listPage: 'list.page', listTable: 'list.table', listToast: 'list.toast',
@@ -68,6 +70,8 @@ export function createAdminCommercialPagesI18n() {
     collectionPresentation: 'collectionPresentation',
     durationMode: 'durationMode', participantsMode: 'participantsMode',
     productKind: 'productKind', sessionMode: 'sessionMode',
+    frequencyMode: 'frequencyMode',
+    cooperationLengthMode: 'cooperationLengthMode',
     actionAppearance: 'actionAppearance',
   });
   return {

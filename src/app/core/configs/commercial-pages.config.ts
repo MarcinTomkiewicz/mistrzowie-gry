@@ -8,17 +8,21 @@ import type {
   CommercialButtonLayout,
   CommercialCardOrientation,
   CommercialCardsBlock,
-  CommercialEditorDuration,
-  CommercialEditorParticipants,
   CommercialIconKey,
-  CommercialProductKind,
   CommercialProductCollectionBlock,
   CommercialProductCollectionCardsBlock,
-  CommercialProductFieldKey,
   CommercialSectionSurface,
-  CommercialSessionCount,
   CommercialTextAlign,
 } from '../types/commercial-page-builder';
+import type {
+  CommercialCooperationLength,
+  CommercialEditorDuration,
+  CommercialEditorParticipants,
+  CommercialFrequency,
+  CommercialProductFieldKey,
+  CommercialProductKind,
+  CommercialSessionCount,
+} from '../types/commercial-product';
 import type { CommonNavTranslations } from '../types/i18n/common';
 
 export const COMMERCIAL_PAGE_DEFAULT_LOCALE = 'pl';
@@ -113,15 +117,21 @@ export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
   'name',
   'description',
   'price',
-  'settlement',
   'duration',
   'participants',
+  'participantsMin',
+  'participantsMax',
   'participantsPerFacilitatorMax',
   'sessions',
+  'frequency',
+  'cooperationLength',
   'meetingCount',
   'facilitatorCount',
   'tableCount',
   'includedAddons',
+  'settlement',
+  'participantPrice',
+  'facilitatorPrice',
 ] as const satisfies readonly CommercialProductFieldKey[];
 
 export const COMMERCIAL_PRODUCT_KINDS = [
@@ -134,6 +144,20 @@ export const COMMERCIAL_SESSION_MODES = [
   'total',
   'per_month',
 ] as const satisfies readonly CommercialSessionCount['mode'][];
+
+export const COMMERCIAL_FREQUENCY_MODES = [
+  'not_applicable',
+  'one_time',
+  'weekly',
+  'monthly',
+] as const satisfies readonly CommercialFrequency['mode'][];
+
+export const COMMERCIAL_COOPERATION_LENGTH_MODES = [
+  'not_applicable',
+  'one_time',
+  'exact',
+  'minimum',
+] as const satisfies readonly CommercialCooperationLength['mode'][];
 
 const COMMERCIAL_ICON_KEYS = [
   'overlord',
