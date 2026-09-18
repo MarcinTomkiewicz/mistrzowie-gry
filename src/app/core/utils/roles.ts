@@ -4,6 +4,7 @@ import { IUser } from '../interfaces/i-user';
 const ROLE_ACCESS_LEVEL: Record<AppRole, number> = {
   user: 0,
   gm: 10,
+  sales_representative: 10,
   marketing_manager: 20,
   customer_manager: 20,
   lead_coordinator: 30,

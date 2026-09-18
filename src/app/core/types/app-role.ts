@@ -1,6 +1,7 @@
 export const APP_ROLES = [
   'user',
   'gm',
+  'sales_representative',
   'marketing_manager',
   'customer_manager',
   'lead_coordinator',

@@ -140,6 +140,7 @@
   "appRoles": {
     "user": "Użytkownik",
     "gm": "Mistrz Gry",
+    "sales_representative": "Przedstawiciel handlowy",
     "marketing_manager": "Manager marketingu",
     "customer_manager": "Manager klienta",
     "lead_coordinator": "Koordynator leadów",
