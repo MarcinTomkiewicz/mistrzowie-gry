@@ -1,108 +1,102 @@
 {
   "list": {
     "page": {
-      "title": "[PH] Strony ofertowe",
+      "title": "Strony ofertowe",
       "subtitle": "[PH] Zarządzaj wersjami roboczymi pięciu stałych stron ofertowych.",
-      "emptyTitle": "[PH] Brak stron ofertowych",
-      "emptyDescription": "[PH] Nie znaleziono stron dostępnych do edycji.",
-      "loadErrorTitle": "[PH] Nie udało się załadować stron ofertowych"
+      "emptyTitle": "Brak stron ofertowych",
+      "emptyDescription": "Nie znaleziono stron dostępnych do edycji.",
+      "loadErrorTitle": "Nie udało się załadować stron ofertowych"
     },
     "table": {
       "page": "Strona",
-      "draftStatus": "Status",
       "draftUpdatedAt": "Data aktualizacji",
       "effectiveFrom": "Obowiązuje od"
     },
     "toast": {
-      "loadFailedDetail": "[PH] Lista stron ofertowych nie została pobrana."
+      "loadFailedDetail": "Lista stron ofertowych nie została pobrana."
     }
+  },
+  "navigation": {
+    "backToPages": "Wróć do stron ofertowych"
   },
   "constants": {
     "page": {
-      "title": "[PH] Stałe globalne",
+      "title": "Stałe globalne",
       "subtitle": "[PH] Zarządzaj wspólnymi wartościami używanymi w treściach stron ofertowych.",
-      "backToPages": "[PH] Wróć do stron ofertowych",
-      "create": "[PH] Dodaj stałą",
-      "publishAll": "[PH] Opublikuj wszystkie zmiany",
-      "emptyTitle": "[PH] Brak stałych globalnych",
-      "emptyDescription": "[PH] Dodaj pierwszą stałą globalną.",
-      "loadErrorTitle": "[PH] Nie udało się załadować stałych"
+      "create": "Dodaj stałą",
+      "publishAll": "Opublikuj wszystkie zmiany",
+      "emptyTitle": "Brak stałych globalnych",
+      "emptyDescription": "Dodaj pierwszą stałą globalną.",
+      "loadErrorTitle": "Nie udało się załadować stałych"
     },
     "table": {
-      "constant": "[PH] Stała",
-      "type": "[PH] Typ",
-      "draft": "[PH] Wersja robocza",
-      "published": "[PH] Wersja opublikowana",
-      "usage": "[PH] Użycie",
-      "draftUsage": "[PH] Drafty stron",
-      "publishedUsage": "[PH] Opublikowane strony",
-      "updatedAt": "[PH] Zaktualizowano",
-      "updatedBy": "[PH] Zaktualizował"
+      "constant": "Stała",
+      "type": "Typ",
+      "draft": "Wersja robocza",
+      "published": "Wersja opublikowana",
+      "usage": "Użycie",
+      "draftUsage": "Drafty stron",
+      "publishedUsage": "Opublikowane strony",
+      "updatedAt": "Zaktualizowano",
+      "updatedBy": "Zaktualizował"
     },
     "editor": {
-      "createTitle": "[PH] Nowa stała globalna",
-      "editTitle": "[PH] Edycja stałej globalnej",
-      "token": "[PH] Token",
+      "createTitle": "Nowa stała globalna",
+      "editTitle": "Edycja stałej globalnej",
+      "token": "Token",
       "tokenHint": "[PH] Wpisz nazwę bez nawiasów, np. czas-sesji. Gotowy token otrzyma postać [czas-sesji].",
-      "type": "[PH] Typ wartości",
-      "value": "[PH] Wartość draftu",
-      "durationUnit": "[PH] Jednostka edycji czasu",
+      "type": "Typ wartości",
+      "value": "Wartość draftu",
+      "durationUnit": "Jednostka edycji czasu",
       "identityLocked": "[PH] Tokenu i typu nie można zmienić, ponieważ stała jest już używana."
     },
     "actions": {
-      "copyToken": "[PH] Kopiuj token",
-      "deleteUnavailable": "[PH] Używanej stałej nie można usunąć."
+      "copyToken": "Kopiuj token",
+      "deleteUnavailable": "Używanej stałej nie można usunąć."
     },
     "status": {
-      "published": "[PH] Opublikowana",
-      "unpublished": "[PH] Nieopublikowana",
-      "draftChanged": "[PH] Draft zmieniony",
-      "draftCurrent": "[PH] Draft zgodny z publikacją"
+      "published": "Opublikowana",
+      "unpublished": "Nieopublikowana",
+      "draftChanged": "Draft zmieniony",
+      "draftCurrent": "Draft zgodny z publikacją"
     },
     "toast": {
-      "loadFailedDetail": "[PH] Lista stałych globalnych nie została pobrana.",
-      "saveSuccessSummary": "[PH] Zapisano draft stałej",
-      "saveSuccessDetail": "[PH] Wersja robocza stałej została zapisana.",
-      "saveFailedSummary": "[PH] Nie udało się zapisać stałej",
-      "saveFailedDetail": "[PH] Wersja robocza stałej nie została zapisana.",
-      "publishSuccessSummary": "[PH] Opublikowano stałe",
-      "publishSuccessDetail": "[PH] Wybrane wersje robocze stałych zostały opublikowane.",
-      "publishFailedSummary": "[PH] Nie udało się opublikować stałych",
-      "publishFailedDetail": "[PH] Wersje robocze stałych nie zostały opublikowane.",
-      "deleteSuccessSummary": "[PH] Usunięto stałą",
-      "deleteSuccessDetail": "[PH] Nieużywana stała została usunięta.",
-      "deleteFailedSummary": "[PH] Nie udało się usunąć stałej",
-      "deleteFailedDetail": "[PH] Stała nie została usunięta.",
-      "copySuccessSummary": "[PH] Skopiowano token",
-      "copySuccessDetail": "[PH] Token {{token}} jest w schowku.",
-      "copyFailedSummary": "[PH] Nie udało się skopiować tokenu",
-      "copyFailedDetail": "[PH] Przeglądarka nie udostępniła schowka."
+      "loadFailedDetail": "Lista stałych globalnych nie została pobrana.",
+      "saveSuccessSummary": "Zapisano draft stałej",
+      "saveSuccessDetail": "Wersja robocza stałej została zapisana.",
+      "saveFailedSummary": "Nie udało się zapisać stałej",
+      "saveFailedDetail": "Wersja robocza stałej nie została zapisana.",
+      "publishSuccessSummary": "Opublikowano stałe",
+      "publishSuccessDetail": "Wybrane wersje robocze stałych zostały opublikowane.",
+      "publishFailedSummary": "Nie udało się opublikować stałych",
+      "publishFailedDetail": "Wersje robocze stałych nie zostały opublikowane.",
+      "deleteSuccessSummary": "Usunięto stałą",
+      "deleteSuccessDetail": "Nieużywana stała została usunięta.",
+      "deleteFailedSummary": "Nie udało się usunąć stałej",
+      "deleteFailedDetail": "Stała nie została usunięta.",
+      "copySuccessSummary": "Skopiowano token",
+      "copySuccessDetail": "Token {{token}} jest w schowku.",
+      "copyFailedSummary": "Nie udało się skopiować tokenu",
+      "copyFailedDetail": "Przeglądarka nie udostępniła schowka."
     },
     "confirmation": {
-      "delete": "[PH] Usunąć stałą {{token}}? Tej operacji nie można cofnąć."
+      "delete": "Usunąć stałą {{token}}? Tej operacji nie można cofnąć."
     },
     "validation": {
       "token": "[PH] Token musi zaczynać się małą literą i może zawierać małe litery, cyfry oraz segmenty rozdzielone myślnikami.",
       "duration": "[PH] Podaj dodatni czas odpowiadający pełnej liczbie minut.",
-      "integer": "[PH] Podaj nieujemną liczbę całkowitą.",
       "text": "[PH] Podaj niepusty tekst bez zagnieżdżonych tokenów."
     },
     "valueType": {
-      "integer": "[PH] Liczba całkowita",
-      "text": "[PH] Tekst"
-    },
-    "durationUnit": {
-      "minutes": "minuty",
-      "hoursShort": "godz.",
-      "minutesShort": "min"
+      "integer": "Liczba całkowita",
+      "text": "Tekst"
     }
   },
   "editor": {
     "page": {
-      "title": "[PH] Edycja strony ofertowej",
+      "title": "Edycja strony ofertowej",
       "subtitle": "[PH] Edytuj metadane, produkty i sekcje wersji roboczej.",
-      "backToPages": "[PH] Wróć do stron ofertowych",
-      "loadErrorTitle": "[PH] Nie udało się załadować strony ofertowej"
+      "loadErrorTitle": "Nie udało się załadować strony ofertowej"
     },
     "steps": {
       "contentSeo": "Treść i SEO",
@@ -112,8 +106,7 @@
     "metadata": {
       "sectionTitle": "Treść strony",
       "draftSlug": "Slug draftu",
-      "publishedSlug": "Slug",
-      "slugPattern": "[PH] Slug może zawierać małe litery i cyfry rozdzielone pojedynczymi myślnikami.",
+      "slugPattern": "Slug może zawierać małe litery i cyfry rozdzielone pojedynczymi myślnikami.",
       "heading": "Nagłówek strony"
     },
     "seo": {
@@ -128,225 +121,210 @@
       "addons": "Dodatki"
     },
     "product": {
-      "kind": "[PH] [adminCommercialPages-kind] Rodzaj pozycji",
-      "name": "[PH] [adminCommercialPages-name] Nazwa pozycji",
-      "description": "[PH] [adminCommercialPages-description] Opis pozycji",
-      "prices": "[PH] Ceny",
-      "emptyPrices": "[PH] Brak pozycji cenowych.",
-      "addPrice": "[PH] Dodaj cenę",
-      "priceLabel": "[PH] Etykieta ceny",
-      "primaryPrice": "[PH] Cena główna dla jednostki rozliczeniowej",
-      "settlement": "[PH] Rozliczenie",
-      "durationMode": "[PH] Tryb czasu trwania",
-      "durationMinutes": "[PH] Czas trwania w minutach",
-      "participantsMode": "[PH] Tryb liczby uczestników",
-      "participantsMin": "[PH] Minimalna liczba uczestników",
-      "participantsMax": "[PH] Maksymalna liczba uczestników",
+      "kind": "Rodzaj pozycji",
+      "name": "Nazwa pozycji",
+      "description": "Opis pozycji",
+      "prices": "Ceny",
+      "emptyPrices": "Brak pozycji cenowych.",
+      "priceLabel": "Etykieta ceny",
+      "primaryPrice": "Cena główna dla jednostki rozliczeniowej",
+      "durationMode": "Tryb czasu trwania",
+      "durationMinutes": "Czas trwania w minutach",
+      "participantsMode": "Tryb liczby uczestników",
       "participantsPerFacilitatorMax": "[PH] Maksymalnie uczestników na prowadzącego",
-      "structureSection": "[PH] [adminCommercialPages-structureSection] Pozostałe dane pozycji",
-      "sessionsMode": "[PH] [adminCommercialPages-sessionsMode] Sposób podania liczby sesji",
-      "sessions": "[PH] Liczba sesji",
-      "frequency": "[PH] Częstotliwość",
-      "frequencyMode": "[PH] Tryb częstotliwości",
-      "frequencyCount": "[PH] Liczba wystąpień",
-      "cooperationLength": "[PH] Długość współpracy",
-      "cooperationLengthMode": "[PH] Tryb długości współpracy",
-      "cooperationLengthSemesters": "[PH] Liczba semestrów",
-      "includedAddons": "[PH] [adminCommercialPages-includedAddons] Dodatki zawarte w cenie",
-      "meetingCountMin": "[PH] Minimalna liczba spotkań",
-      "meetingCountMax": "[PH] Maksymalna liczba spotkań"
+      "structureSection": "[PH] Pozostałe dane pozycji",
+      "sessionsMode": "Sposób podania liczby sesji",
+      "sessions": "Liczba sesji",
+      "frequencyMode": "Tryb częstotliwości",
+      "frequencyCount": "Liczba wystąpień",
+      "cooperationLengthMode": "Tryb długości współpracy",
+      "cooperationLengthSemesters": "Liczba semestrów",
+      "meetingCountMin": "Minimalna liczba spotkań",
+      "meetingCountMax": "Maksymalna liczba spotkań"
     },
     "sections": {
-      "sectionTitle": "[PH] Sekcje strony",
-      "empty": "[PH] Dokument nie zawiera żadnych sekcji.",
-      "section": "[PH] Sekcja"
+      "sectionTitle": "Sekcje strony",
+      "empty": "Dokument nie zawiera żadnych sekcji."
     },
     "section": {
-      "lead": "[PH] Lead sekcji",
+      "lead": "Lead sekcji",
       "surface": "[PH] Powierzchnia sekcji",
-      "textAlign": "[PH] Wyrównanie tekstu",
-      "blocks": "[PH] Bloki",
-      "emptyBlocks": "[PH] Sekcja nie zawiera żadnych bloków.",
-      "addBlock": "[PH] Dodaj blok"
+      "textAlign": "Wyrównanie tekstu",
+      "blocks": "Bloki",
+      "emptyBlocks": "Sekcja nie zawiera żadnych bloków.",
+      "addBlock": "Dodaj blok"
     },
     "buttons": {
-      "layout": "[PH] Układ przycisków",
-      "align": "[PH] Wyrównanie przycisków",
-      "empty": "[PH] Blok nie zawiera żadnych przycisków.",
-      "add": "[PH] Dodaj przycisk",
-      "route": "[PH] Ścieżka wewnętrzna",
-      "appearance": "[PH] Wygląd",
-      "iconKey": "[PH] Ikona",
-      "noIcon": "[PH] Bez ikony"
+      "layout": "Układ przycisków",
+      "align": "Wyrównanie przycisków",
+      "empty": "Blok nie zawiera żadnych przycisków.",
+      "add": "Dodaj przycisk",
+      "route": "Ścieżka wewnętrzna",
+      "appearance": "Wygląd",
+      "iconKey": "Ikona",
+      "noIcon": "Bez ikony"
     },
     "cards": {
-      "cardOrientation": "[PH] Orientacja kart",
-      "columnCount": "[PH] Liczba kolumn",
-      "empty": "[PH] Blok nie zawiera żadnych kart.",
-      "add": "[PH] Dodaj kartę",
-      "title": "[PH] Tytuł karty",
-      "body": "[PH] Treść karty",
-      "hasPrice": "[PH] Dodaj cenę"
+      "cardOrientation": "Orientacja kart",
+      "columnCount": "Liczba kolumn",
+      "empty": "Blok nie zawiera żadnych kart.",
+      "add": "Dodaj kartę",
+      "title": "Tytuł karty",
+      "body": "Treść karty"
     },
     "productCollection": {
-      "products": "[PH] [adminCommercialPages-products] Pozycje w kolekcji",
-      "presentation": "[PH] Sposób prezentacji",
-      "fields": "[PH] [adminCommercialPages-fields] Dane wyświetlane w kolekcji",
-      "fieldsHint": "[PH] [adminCommercialPages-fieldsHint] Każdy wpis określa, które dane pozycji kolekcja wyświetla i dla których pozycji.",
-      "emptyFields": "[PH] Kolekcja nie zawiera żadnych pól.",
-      "addField": "[PH] Dodaj pole",
-      "fieldKey": "[PH] Pole danych",
-      "fieldLabel": "[PH] Domyślna etykieta",
-      "visibleProducts": "[PH] [adminCommercialPages-visibleProducts] Pozycje pokazujące pole",
-      "labelOverrides": "[PH] [adminCommercialPages-labelOverrides] Etykiety per pozycja",
-      "addLabelOverride": "[PH] [adminCommercialPages-addLabelOverride] Dodaj etykietę pozycji",
-      "overrideLabel": "[PH] [adminCommercialPages-overrideLabel] Etykieta pozycji",
-      "duplicateLabelOverride": "[PH] [adminCommercialPages-duplicateLabelOverride] Pozycja może mieć najwyżej jedną własną etykietę w danym polu.",
-      "staleProductReference": "[PH] [adminCommercialPages-staleProductReference] Widoczność pól i etykiety muszą wskazywać pozycje należące do kolekcji.",
-      "selectedCount": "[PH] [adminCommercialPages-selectedCount] Wybrano: {0}",
-      "customizeField": "[PH] [adminCommercialPages-customizeField] Dostosuj widoczność i etykiety",
-      "hideCustomization": "[PH] [adminCommercialPages-hideCustomization] Ukryj ustawienia dodatkowe",
-      "incompleteField": "[PH] [adminCommercialPages-incompleteField] Uzupełnij domyślną etykietę i wybierz pozycje, dla których dane mają być widoczne.",
-      "comparison": "[PH] [adminCommercialPages-comparison] Układ tabeli porównawczej",
-      "comparisonHint": "[PH] [adminCommercialPages-comparisonHint] Nagłówki kolumn są pobierane automatycznie z nazw wybranych produktów i dodatków.",
-      "emptyComparisonSections": "[PH] [adminCommercialPages-emptyComparisonSections] Tabela nie zawiera żadnej sekcji porównania.",
-      "addComparisonSection": "[PH] [adminCommercialPages-addComparisonSection] Dodaj sekcję porównania",
-      "comparisonSectionHeading": "[PH] [adminCommercialPages-comparisonSectionHeading] Nagłówek sekcji (opcjonalny)",
-      "comparisonRows": "[PH] [adminCommercialPages-comparisonRows] Wiersze porównania",
-      "emptyComparisonRows": "[PH] [adminCommercialPages-emptyComparisonRows] Sekcja nie zawiera żadnych wierszy.",
-      "comparisonRowLabel": "[PH] [adminCommercialPages-comparisonRowLabel] Etykieta wiersza",
-      "comparisonRowFields": "[PH] [adminCommercialPages-comparisonRowFields] Dane w wierszu",
-      "incompleteComparison": "[PH] [adminCommercialPages-incompleteComparison] Każdy wiersz wymaga etykiety i co najmniej jednego istniejącego pola danych."
+      "products": "Pozycje w kolekcji",
+      "presentation": "Sposób prezentacji",
+      "fields": "Dane wyświetlane w kolekcji",
+      "fieldsHint": "[PH] Każdy wpis określa, które dane pozycji kolekcja wyświetla i dla których pozycji.",
+      "emptyFields": "Kolekcja nie zawiera żadnych pól.",
+      "addField": "Dodaj pole",
+      "fieldKey": "Pole danych",
+      "fieldLabel": "Domyślna etykieta",
+      "visibleProducts": "[PH] Pozycje pokazujące pole",
+      "labelOverrides": "[PH] Etykiety per pozycja",
+      "addLabelOverride": "Dodaj etykietę pozycji",
+      "overrideLabel": "Etykieta pozycji",
+      "duplicateLabelOverride": "[PH] Pozycja może mieć najwyżej jedną własną etykietę w danym polu.",
+      "staleProductReference": "[PH] Widoczność pól i etykiety muszą wskazywać pozycje należące do kolekcji.",
+      "selectedCount": "Wybrano: {0}",
+      "customizeField": "Dostosuj widoczność i etykiety",
+      "hideCustomization": "Ukryj ustawienia dodatkowe",
+      "incompleteField": "[PH] Uzupełnij domyślną etykietę i wybierz pozycje, dla których dane mają być widoczne.",
+      "comparison": "Układ tabeli porównawczej",
+      "comparisonHint": "[PH] Nagłówki kolumn są pobierane automatycznie z nazw wybranych produktów i dodatków.",
+      "emptyComparisonSections": "Tabela nie zawiera żadnej sekcji porównania.",
+      "addComparisonSection": "Dodaj sekcję porównania",
+      "comparisonSectionHeading": "Nagłówek sekcji (opcjonalny)",
+      "comparisonRows": "Wiersze porównania",
+      "emptyComparisonRows": "Sekcja nie zawiera żadnych wierszy.",
+      "comparisonRowLabel": "Etykieta wiersza",
+      "comparisonRowFields": "Dane w wierszu",
+      "incompleteComparison": "[PH] Każdy wiersz wymaga etykiety i co najmniej jednego istniejącego pola danych."
     },
     "table": {
-      "columns": "[PH] Kolumny",
-      "addColumn": "[PH] Dodaj kolumnę",
-      "columnHeading": "[PH] Nagłówek kolumny",
-      "rows": "[PH] Wiersze",
-      "addRow": "[PH] Dodaj wiersz",
-      "cell": "[PH] Komórka"
+      "columns": "Kolumny",
+      "addColumn": "Dodaj kolumnę",
+      "columnHeading": "Nagłówek kolumny",
+      "rows": "Wiersze",
+      "addRow": "Dodaj wiersz",
+      "cell": "Komórka"
     },
     "faq": {
-      "empty": "[PH] Blok nie zawiera żadnych pytań.",
-      "add": "[PH] Dodaj pytanie",
-      "question": "[PH] Pytanie",
-      "answer": "[PH] Odpowiedź"
+      "empty": "Blok nie zawiera żadnych pytań.",
+      "add": "Dodaj pytanie",
+      "question": "Pytanie",
+      "answer": "Odpowiedź"
     },
     "actions": {
-      "moveSectionUp": "[PH] Przesuń sekcję wyżej",
-      "moveSectionDown": "[PH] Przesuń sekcję niżej",
-      "removeSection": "[PH] Usuń sekcję"
+      "moveSectionUp": "Przesuń sekcję wyżej",
+      "moveSectionDown": "Przesuń sekcję niżej",
+      "removeSection": "Usuń sekcję"
     },
     "validation": {
-      "invalidPrimaryPrice": "[PH] Dla jednej jednostki rozliczeniowej może istnieć najwyżej jedna cena główna.",
-      "invalidDuration": "[PH] Własny czas trwania wymaga dodatniej liczby minut.",
-      "invalidParticipants": "[PH] [adminCommercialPages-invalidParticipants] Podaj co najmniej jedną wartość: minimum, maksimum lub maksimum na prowadzącego. Każda podana wartość musi być dodatnią liczbą całkowitą; jeśli podajesz minimum i maksimum, minimum nie może przekraczać maksimum.",
-      "invalidSessions": "[PH] [adminCommercialPages-invalidSessions] Dla łącznej liczby sesji lub sesji na miesiąc podaj dodatnią liczbę całkowitą.",
-      "invalidFrequency": "[PH] Częstotliwość tygodniowa lub miesięczna wymaga dodatniej liczby całkowitej.",
-      "invalidCooperationLength": "[PH] Dokładna lub minimalna długość współpracy wymaga dodatniej liczby semestrów.",
-      "invalidIncludedAddons": "[PH] [adminCommercialPages-invalidIncludedAddons] Wybierz wyłącznie dodatki z bieżącego katalogu, bez powtórzeń.",
-      "invalidMeetingRange": "[PH] Minimalna liczba spotkań nie może być większa od maksymalnej.",
-      "invalidRoute": "[PH] Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku „/”."
+      "invalidPrimaryPrice": "Dla jednej jednostki rozliczeniowej może istnieć najwyżej jedna cena główna.",
+      "invalidDuration": "Własny czas trwania wymaga dodatniej liczby minut.",
+      "invalidParticipants": "[PH] Podaj co najmniej jedną wartość: minimum, maksimum lub maksimum na prowadzącego. Każda podana wartość musi być dodatnią liczbą całkowitą; jeśli podajesz minimum i maksimum, minimum nie może przekraczać maksimum.",
+      "invalidSessions": "Dla łącznej liczby sesji lub sesji na miesiąc podaj dodatnią liczbę całkowitą.",
+      "invalidFrequency": "Częstotliwość tygodniowa lub miesięczna wymaga dodatniej liczby całkowitej.",
+      "invalidCooperationLength": "Dokładna lub minimalna długość współpracy wymaga dodatniej liczby semestrów.",
+      "invalidIncludedAddons": "[PH] Wybierz wyłącznie dodatki z bieżącego katalogu, bez powtórzeń.",
+      "invalidMeetingRange": "Minimalna liczba spotkań nie może być większa od maksymalnej.",
+      "invalidRoute": "Podaj wewnętrzną ścieżkę zaczynającą się od pojedynczego znaku \"/\"."
     },
     "toast": {
-      "loadFailedDetail": "[PH] Dane strony ofertowej nie zostały pobrane.",
-      "saveSuccessSummary": "[PH] Zapisano draft strony ofertowej",
-      "saveSuccessDetail": "[PH] Zmiany wersji roboczej zostały zapisane.",
-      "saveFailedSummary": "[PH] Nie udało się zapisać draftu strony ofertowej",
-      "saveFailedDetail": "[PH] Zmiany wersji roboczej nie zostały zapisane."
+      "loadFailedDetail": "Dane strony ofertowej nie zostały pobrane.",
+      "saveSuccessSummary": "Zapisano draft strony ofertowej",
+      "saveSuccessDetail": "Zmiany wersji roboczej zostały zapisane.",
+      "saveFailedSummary": "Nie udało się zapisać draftu strony ofertowej",
+      "saveFailedDetail": "Zmiany wersji roboczej nie zostały zapisane."
     }
   },
   "preview": {
     "page": {
-      "seoTitle": "[PH] Podgląd wersji roboczej strony ofertowej",
+      "seoTitle": "Podgląd wersji roboczej strony ofertowej",
       "badge": "Podgląd wersji roboczej",
-      "persistedBadge": "[PH] [adminCommercialPages-persistedBadge] Podgląd zapisanej wersji",
-      "persistedReady": "[PH] [adminCommercialPages-persistedReady] Bieżąca zapisana wersja została sprawdzona w podglądzie i może zostać użyta do publikacji.",
-      "loadErrorTitle": "[PH] Nie udało się załadować podglądu",
-      "loadErrorDescription": "[PH] Podgląd wersji roboczej nie został pobrany.",
-      "backToEditor": "[PH] Wróć do edytora"
+      "persistedBadge": "Podgląd zapisanej wersji",
+      "persistedReady": "[PH] Bieżąca zapisana wersja została sprawdzona w podglądzie i może zostać użyta do publikacji.",
+      "loadErrorTitle": "Nie udało się załadować podglądu",
+      "loadErrorDescription": "Podgląd wersji roboczej nie został pobrany.",
+      "backToEditor": "Wróć do edytora"
     }
   },
   "publication": {
     "panel": {
-      "dialogTitle": "[PH] Publikuj stronę ofertową",
+      "dialogTitle": "Publikuj stronę ofertową",
       "description": "[PH] Sprawdź draft na serwerze, wybierz datę obowiązywania i opublikuj bieżącą wersję.",
-      "validate": "[PH] Sprawdź gotowość",
-      "validationReady": "[PH] Draft jest gotowy do publikacji.",
-      "validationIssues": "[PH] Problemy blokujące publikację",
-      "issuePath": "[PH] Ścieżka"
+      "validate": "Sprawdź gotowość",
+      "validationReady": "Draft jest gotowy do publikacji.",
+      "validationIssues": "Problemy blokujące publikację",
+      "issuePath": "Ścieżka"
     },
     "toast": {
-      "validationReadySummary": "[PH] Draft gotowy do publikacji",
-      "validationReadyDetail": "[PH] Walidacja serwerowa nie wykryła problemów.",
-      "validationBlockedSummary": "[PH] Publikacja zablokowana",
-      "validationBlockedDetail": "[PH] Usuń problemy wskazane przez walidację serwerową.",
-      "validationFailedSummary": "[PH] Nie udało się sprawdzić draftu",
-      "validationFailedDetail": "[PH] Walidacja serwerowa nie została wykonana.",
-      "publishSuccessSummary": "[PH] Opublikowano stronę ofertową",
-      "publishSuccessDetail": "[PH] Strona ofertowa została opublikowana.",
-      "publishFailedSummary": "[PH] Nie udało się opublikować strony",
-      "publishFailedDetail": "[PH] Publikacja nie została wykonana."
+      "validationReadySummary": "Draft gotowy do publikacji",
+      "validationReadyDetail": "Walidacja serwerowa nie wykryła problemów.",
+      "validationBlockedSummary": "Publikacja zablokowana",
+      "validationBlockedDetail": "Usuń problemy wskazane przez walidację serwerową.",
+      "validationFailedSummary": "Nie udało się sprawdzić draftu",
+      "validationFailedDetail": "Walidacja serwerowa nie została wykonana.",
+      "publishSuccessSummary": "Opublikowano stronę ofertową",
+      "publishSuccessDetail": "Strona ofertowa została opublikowana.",
+      "publishFailedSummary": "Nie udało się opublikować strony",
+      "publishFailedDetail": "Publikacja nie została wykonana."
     }
   },
   "draftStatus": {
-    "dirty": "[PH] Zmieniony draft",
-    "clean": "[PH] Zgodny z publikacją"
+    "dirty": "Zmieniony draft",
+    "clean": "Zgodny z publikacją"
   },
   "actionAppearance": {
-    "primary": "[PH] Główny",
-    "success": "[PH] Sukces",
-    "secondary": "[PH] Drugorzędny"
+    "primary": "Główny",
+    "success": "Sukces",
+    "secondary": "Drugorzędny"
   },
   "blockType": {
-    "rich_text": "[PH] [adminCommercialPages-rich_text] Treść sformatowana",
-    "buttons": "[PH] Przyciski",
-    "product_collection": "[PH] Kolekcja produktów"
+    "rich_text": "Treść sformatowana",
+    "buttons": "Przyciski",
+    "product_collection": "Kolekcja produktów"
   },
   "sectionSurface": {
-    "plain": "[PH] Zwykła",
-    "card": "[PH] Karta"
+    "plain": "Zwykła",
+    "card": "Karta"
   },
   "textAlign": {
-    "left": "[PH] Do lewej",
-    "center": "[PH] Do środka",
-    "right": "[PH] Do prawej"
+    "left": "Do lewej",
+    "center": "Do środka",
+    "right": "Do prawej"
   },
   "buttonLayout": {
-    "horizontal": "[PH] Poziomy",
-    "vertical": "[PH] Pionowy"
+    "horizontal": "Poziomy",
+    "vertical": "Pionowy"
   },
   "cardOrientation": {
-    "vertical": "[PH] Pionowa",
-    "horizontal": "[PH] Pozioma"
+    "vertical": "Pionowa",
+    "horizontal": "Pozioma"
   },
   "collectionPresentation": {
-    "comparison_table": "[PH] Tabela porównawcza"
+    "comparison_table": "Tabela porównawcza"
   },
   "durationMode": {
-    "standard": "[PH] Standardowy",
-    "custom": "[PH] Własny"
+    "standard": "Standardowy",
+    "custom": "Własny"
   },
   "participantsMode": {
     "standard": "[PH] Standardowi",
-    "custom": "[PH] Własny zakres"
+    "custom": "Własny zakres"
   },
   "productKind": {
-    "product": "[PH] [adminCommercialPages-product] Produkt",
-    "addon": "[PH] [adminCommercialPages-addon] Dodatek"
+    "product": "Produkt",
+    "addon": "Dodatek"
   },
   "sessionMode": {
-    "total": "[PH] [adminCommercialPages-total] Łączna liczba sesji",
-    "per_month": "[PH] [adminCommercialPages-per_month] Sesje na miesiąc"
-  },
-  "frequencyMode": {
-    "one_time": "[PH] Jednorazowo",
-    "weekly": "[PH] Co tydzień",
-    "monthly": "[PH] Co miesiąc"
+    "total": "Łączna liczba sesji",
+    "per_month": "Sesje na miesiąc"
   },
   "cooperationLengthMode": {
-    "one_time": "[PH] Jednorazowo",
-    "exact": "[PH] Dokładna liczba semestrów",
-    "minimum": "[PH] Minimalna liczba semestrów"
+    "exact": "Dokładna liczba semestrów",
+    "minimum": "Minimalna liczba semestrów"
   }
 }

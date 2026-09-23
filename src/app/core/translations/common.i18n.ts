@@ -2,10 +2,10 @@ import {
   CommonAccessibilityTranslations,
   CommonActionsTranslations,
   CommonCtaTranslations,
+  CommonDurationUnitTranslations,
   CommonEmptyTranslations,
   CommonErrorsTranslations,
   CommonFormTranslations,
-  CommonLegalNoticeTranslations,
   CommonInfoTranslations,
   CommonLabelsTranslations,
   CommonLegalTranslations,
@@ -42,6 +42,12 @@ export function createCommonCtaI18n() {
   return createCommonScopeSignal<CommonCtaTranslations>('cta');
 }
 
+export function createCommonDurationUnitI18n() {
+  return createCommonScopeSignal<CommonDurationUnitTranslations>(
+    'durationUnit',
+  );
+}
+
 export function createCommonEmptyI18n() {
   return createCommonScopeSignal<CommonEmptyTranslations>('empty');
 }
@@ -52,10 +58,6 @@ export function createCommonErrorsI18n() {
 
 export function createCommonFormI18n() {
   return createCommonScopeSignal<CommonFormTranslations>('form');
-}
-
-export function createCommonLegalNoticeI18n() {
-  return createCommonScopeSignal<CommonLegalNoticeTranslations>('contactLegalNotice');
 }
 
 export function createCommonInfoI18n() {

@@ -7,7 +7,6 @@ import {
   createCommonErrorsI18n,
   createCommonFormI18n,
   createCommonLegalI18n,
-  createCommonLegalNoticeI18n,
   createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
@@ -19,6 +18,7 @@ import {
   ContactFormTranslations,
   ContactHeroTranslations,
   ContactInfoTranslations,
+  ContactLegalNoticeTranslations,
   ContactSeoTranslations,
   ContactSuccessTranslations,
   ContactToastTranslations,
@@ -36,6 +36,7 @@ export function createContactI18n() {
     toast,
     topicsDict,
     info,
+    legalNotice,
   } =
     createScopedSectionsI18n<{
       seo: ContactSeoTranslations;
@@ -46,6 +47,7 @@ export function createContactI18n() {
       toast: ContactToastTranslations;
       topicsDict: Record<string, ContactTopicTranslation>;
       info: ContactInfoTranslations;
+      legalNotice: ContactLegalNoticeTranslations;
     }>('contact', {
       seo: 'seo',
       hero: 'hero',
@@ -55,6 +57,7 @@ export function createContactI18n() {
       toast: 'toast',
       topicsDict: 'topics',
       info: 'info',
+      legalNotice: 'legalNotice',
     });
 
   const status = createCommonStatusI18n();
@@ -63,7 +66,6 @@ export function createContactI18n() {
   const commonErrors = createCommonErrorsI18n();
   const commonForm = createCommonFormI18n();
   const commonLegal = createCommonLegalI18n();
-  const legalNotice = createCommonLegalNoticeI18n();
   const accessibility = createCommonAccessibilityI18n();
   const commonLabels = createCommonLabelsI18n();
   const commonNav = createCommonNavI18n();

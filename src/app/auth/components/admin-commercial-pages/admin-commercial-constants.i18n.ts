@@ -1,5 +1,6 @@
 import {
   createCommonActionsI18n,
+  createCommonDurationUnitI18n,
   createCommonFormI18n,
   createCommonLabelsI18n,
   createCommonStatusI18n,
@@ -10,7 +11,6 @@ import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n
 import type {
   AdminCommercialConstantsActionTranslations,
   AdminCommercialConstantsConfirmationTranslations,
-  AdminCommercialConstantsDurationUnitTranslations,
   AdminCommercialConstantsEditorTranslations,
   AdminCommercialConstantsPageTranslations,
   AdminCommercialConstantsStatusTranslations,
@@ -19,6 +19,7 @@ import type {
   AdminCommercialConstantsValidationTranslations,
   AdminCommercialConstantsValueTypeTranslations,
 } from '../../../core/types/i18n/admin-commercial-constants';
+import { createAdminCommercialPagesNavigationI18n } from './admin-commercial-pages.i18n';
 
 export function createAdminCommercialConstantsI18n() {
   const translations = createScopedSectionsI18n<{
@@ -31,7 +32,6 @@ export function createAdminCommercialConstantsI18n() {
     confirmation: AdminCommercialConstantsConfirmationTranslations;
     validation: AdminCommercialConstantsValidationTranslations;
     valueType: AdminCommercialConstantsValueTypeTranslations;
-    durationUnit: AdminCommercialConstantsDurationUnitTranslations;
   }>('adminCommercialPages', {
     page: 'constants.page',
     table: 'constants.table',
@@ -42,12 +42,13 @@ export function createAdminCommercialConstantsI18n() {
     confirmation: 'constants.confirmation',
     validation: 'constants.validation',
     valueType: 'constants.valueType',
-    durationUnit: 'constants.durationUnit',
   });
 
   return {
     ...translations,
+    navigation: createAdminCommercialPagesNavigationI18n(),
     commonActions: createCommonActionsI18n(),
+    durationUnit: createCommonDurationUnitI18n(),
     commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),

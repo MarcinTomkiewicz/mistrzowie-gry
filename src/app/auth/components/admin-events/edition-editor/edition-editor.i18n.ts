@@ -133,5 +133,6 @@ export function createEventScheduleEditorI18n() {
     info,
     commonActions: createCommonActionsI18n(),
     commonLabels: createCommonLabelsI18n(),
+    commonValues: createCommonValuesI18n(),
   };
 }

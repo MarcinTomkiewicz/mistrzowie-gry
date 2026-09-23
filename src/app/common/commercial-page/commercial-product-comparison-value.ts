@@ -22,7 +22,7 @@ export class CommercialProductComparisonValue {
   readonly fields = input.required<readonly CommercialProductField[]>();
   readonly locale = input.required<string>();
 
-  private readonly i18n = createCommercialPageI18n();
+  protected readonly i18n = createCommercialPageI18n();
 
   protected readonly visibleFields = computed(() =>
     this.fields().filter((field) =>

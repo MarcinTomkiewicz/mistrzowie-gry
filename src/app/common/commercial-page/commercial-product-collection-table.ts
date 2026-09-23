@@ -25,7 +25,7 @@ export class CommercialProductCollectionTable {
     input.required<CommercialProductCollectionTableBlockModel>();
   readonly products = input.required<CommercialRenderProduct[]>();
   readonly locale = input.required<string>();
-  private readonly i18n = createCommercialPageI18n();
+  protected readonly i18n = createCommercialPageI18n();
 
   protected label(
     field: CommercialProductField,

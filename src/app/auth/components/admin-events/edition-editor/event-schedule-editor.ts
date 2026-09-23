@@ -63,7 +63,7 @@ export class EventScheduleEditor implements OnInit {
   >(() => [
     {
       value: 'WEEKLY',
-      label: this.i18n.options().weekly,
+      label: this.i18n.commonValues().weekly,
     },
     {
       value: 'MONTHLY_NTH_WEEKDAY',

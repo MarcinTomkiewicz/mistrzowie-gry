@@ -194,7 +194,6 @@
     "options": {
       "single": "Wydarzenie jednorazowe",
       "recurring": "Wydarzenie cykliczne",
-      "weekly": "Co tydzień",
       "monthlyNthWeekday": "Miesięcznie - wybrany dzień tygodnia",
       "monthlyDayOfMonth": "Miesięcznie - wybrany dzień miesiąca",
       "first": "Pierwszy",

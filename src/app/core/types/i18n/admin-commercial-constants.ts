@@ -1,10 +1,8 @@
 import type { CommercialConstantValueType } from '../commercial-constant-admin';
-import type { CommercialConstantDurationUnit } from '../commercial-constant-editor-form';
 
 export type AdminCommercialConstantsPageTranslations = {
   title: string;
   subtitle: string;
-  backToPages: string;
   create: string;
   publishAll: string;
   emptyTitle: string;
@@ -74,7 +72,6 @@ export type AdminCommercialConstantsConfirmationTranslations = {
 export type AdminCommercialConstantsValidationTranslations = {
   token: string;
   duration: string;
-  integer: string;
   text: string;
 };
 
@@ -82,11 +79,3 @@ export type AdminCommercialConstantsValueTypeTranslations = Record<
   Exclude<CommercialConstantValueType, 'duration'>,
   string
 >;
-
-export type AdminCommercialConstantsDurationUnitTranslations = Record<
-  Exclude<CommercialConstantDurationUnit, 'hours'>,
-  string
-> & {
-  hoursShort: string;
-  minutesShort: string;
-};

@@ -3,6 +3,7 @@
     "effectiveFrom": "Oferta obowiązuje od"
   },
   "productValues": {
+    "notAvailable": "N/D",
     "duration": {
       "hours": {
         "one": "godzina",
@@ -45,7 +46,9 @@
     }
   },
   "productFieldKey": {
-    "settlement": "[PH] Rozliczenie",
+    "primaryPrices": "Cena podstawowa",
+    "variantPrices": "Warianty",
+    "settlement": "Rozliczenie",
     "participantsMin": "Minimalna liczba uczestników",
     "participantsMax": "Maksymalna liczba uczestników",
     "participantsPerFacilitatorMax": "Uczestnicy na prowadzącego",

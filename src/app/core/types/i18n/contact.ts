@@ -21,6 +21,10 @@ export type ContactFormErrorsTranslations = {
   minMessage: string;
 };
 
+export type ContactLegalNoticeTranslations = {
+  prefix: string;
+};
+
 export type ContactSuccessTranslations = {
   mailSent: string;
 };

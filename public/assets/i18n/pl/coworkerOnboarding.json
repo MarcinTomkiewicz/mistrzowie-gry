@@ -1,118 +1,118 @@
 {
   "adminList": {
-    "title": "Onboarding współpracowników [PH]",
+    "title": "Onboarding współpracowników",
     "subtitle": "Rozpoczynaj onboarding i sprawdzaj postęp dokumentów współpracowników. [PH]",
     "startDescription": "Wybierz współpracownika z rolą Mistrz Gry lub wyższą, który nie ma aktywnego onboardingu. [PH]",
     "noCandidates": "Brak współpracowników z rolą Mistrz Gry lub wyższą dostępnych do rozpoczęcia onboardingu. [PH]",
-    "empty": "Nie rozpoczęto jeszcze żadnego onboardingu. [PH]",
-    "loadError": "Nie udało się pobrać listy onboardingów. [PH]"
+    "empty": "Nie rozpoczęto jeszcze żadnego onboardingu.",
+    "loadError": "Nie udało się pobrać listy onboardingów."
   },
   "adminDetail": {
-    "title": "Szczegóły onboardingu [PH]",
+    "title": "Szczegóły onboardingu",
     "subtitle": "Zarządzaj dokumentami prywatnymi i zakończeniem onboardingu. [PH]",
-    "uploadSection": "Dodaj dokumenty prywatne [PH]",
-    "completeSection": "Zakończenie onboardingu [PH]",
+    "uploadSection": "Dodaj dokumenty prywatne",
+    "completeSection": "Zakończenie onboardingu",
     "completeDescription": "Zakończ onboarding po rozpatrzeniu wymaganych dokumentów. [PH]",
-    "emptyDocuments": "Brak dokumentów prywatnych w tym onboardingu. [PH]",
-    "loadError": "Nie udało się pobrać szczegółów onboardingu. [PH]",
-    "questionnaireBadge": "Kwestionariusz [PH]"
+    "emptyDocuments": "Brak dokumentów prywatnych w tym onboardingu.",
+    "loadError": "Nie udało się pobrać szczegółów onboardingu.",
+    "questionnaireBadge": "Kwestionariusz"
   },
   "adminShared": {
     "subtitle": "Dodawaj, zastępuj i archiwizuj dokumenty wspólne. [PH]",
-    "formTitleNew": "Dodaj dokument wspólny [PH]",
-    "formTitleReplace": "Zastąp plik dokumentu wspólnego [PH]",
-    "listTitle": "Biblioteka dokumentów [PH]",
-    "confirmationsTitle": "Potwierdzenia dokumentu [PH]",
-    "empty": "Brak dokumentów wspólnych. [PH]",
-    "emptyConfirmations": "Brak przydziałów dla tego dokumentu. [PH]",
-    "loadError": "Nie udało się pobrać dokumentów wspólnych. [PH]"
+    "formTitleNew": "Dodaj dokument wspólny",
+    "formTitleReplace": "Zastąp plik dokumentu wspólnego",
+    "listTitle": "Biblioteka dokumentów",
+    "confirmationsTitle": "Potwierdzenia dokumentu",
+    "empty": "Brak dokumentów wspólnych.",
+    "emptyConfirmations": "Brak przydziałów dla tego dokumentu.",
+    "loadError": "Nie udało się pobrać dokumentów wspólnych."
   },
   "coworkerPrivate": {
     "subtitle": "Pobierz dokumenty i prześlij podpisane kopie, gdy są wymagane. [PH]",
-    "noOnboarding": "Nie masz aktywnego onboardingu. [PH]",
+    "noOnboarding": "Nie masz aktywnego onboardingu.",
     "questionnaireRequired": "Najpierw uzupełnij i zakończ kwestionariusz osobowy. [PH]",
-    "empty": "Nie masz jeszcze dokumentów prywatnych. [PH]",
+    "empty": "Nie masz jeszcze dokumentów prywatnych.",
     "declaration": "Oświadczam, że załączam podpisany dokument",
-    "loadError": "Nie udało się pobrać dokumentów prywatnych. [PH]"
+    "loadError": "Nie udało się pobrać dokumentów prywatnych."
   },
   "coworkerShared": {
     "subtitle": "Zapoznaj się z przydzielonymi dokumentami i potwierdź ich przeczytanie. [PH]",
     "onboardingRequired": "Dokumenty wspólne będą dostępne po zakończeniu onboardingu. [PH]",
-    "empty": "Nie masz przydzielonych dokumentów wspólnych. [PH]",
-    "acknowledgedAt": "Potwierdzono [PH]"
+    "empty": "Nie masz przydzielonych dokumentów wspólnych.",
+    "acknowledgedAt": "Potwierdzono"
   },
   "fields": {
-    "startedAt": "Rozpoczęto [PH]",
-    "completedAt": "Zakończono [PH]",
-    "documents": "Dokumenty [PH]",
-    "pendingActions": "Oczekujące działania [PH]",
-    "preset": "Preset [PH]",
-    "noPreset": "Bez presetu [PH]",
-    "requiresSignedUpload": "Wymaga podpisanej kopii [PH]",
-    "version": "Wersja [PH]",
-    "historicalVersion": "[PH] Wersja historyczna",
-    "assignments": "Przydziały [PH]",
-    "pendingAssignments": "Oczekujące [PH]",
-    "acknowledgedAssignments": "Potwierdzone [PH]",
-    "autoAssign": "Przydzielaj po zakończeniu onboardingu [PH]",
-    "acknowledgement": "Potwierdzam zapoznanie się z dokumentem. [PH]"
+    "startedAt": "Rozpoczęto",
+    "completedAt": "Zakończono",
+    "documents": "Dokumenty",
+    "pendingActions": "Oczekujące działania",
+    "preset": "Preset",
+    "noPreset": "Bez presetu",
+    "requiresSignedUpload": "Wymaga podpisanej kopii",
+    "version": "Wersja",
+    "historicalVersion": "Wersja historyczna",
+    "assignments": "Przydziały",
+    "pendingAssignments": "Oczekujące",
+    "acknowledgedAssignments": "Potwierdzone",
+    "autoAssign": "Przydzielaj po zakończeniu onboardingu",
+    "acknowledgement": "Potwierdzam zapoznanie się z dokumentem."
   },
   "actions": {
-    "start": "Rozpocznij onboarding [PH]",
-    "open": "Otwórz [PH]",
-    "download": "Pobierz [PH]",
-    "previewSigned": "Podgląd podpisanej kopii [PH]",
-    "downloadSigned": "Pobierz podpisaną kopię [PH]",
-    "accept": "Akceptuj [PH]",
-    "reject": "Odrzuć [PH]",
-    "removeDocument": "Usuń dokument [PH]",
+    "start": "Rozpocznij onboarding",
+    "open": "Otwórz",
+    "download": "Pobierz",
+    "previewSigned": "Podgląd podpisanej kopii",
+    "downloadSigned": "Pobierz podpisaną kopię",
+    "accept": "Akceptuj",
+    "reject": "Odrzuć",
+    "removeDocument": "Usuń dokument",
     "complete": "Zakończ onboarding",
-    "uploadDocuments": "Prześlij dokumenty [PH]",
+    "uploadDocuments": "Prześlij dokumenty",
     "uploadSigned": "Załącz dokument",
-    "saveShared": "Dodaj dokument [PH]",
-    "replaceShared": "Zastąp plik [PH]",
-    "showConfirmations": "Pokaż potwierdzenia [PH]",
+    "saveShared": "Dodaj dokument",
+    "replaceShared": "Zastąp plik",
+    "showConfirmations": "Pokaż potwierdzenia",
     "acknowledge": "Zapisz potwierdzenia",
-    "goToQuestionnaire": "Przejdź do kwestionariusza [PH]"
+    "goToQuestionnaire": "Przejdź do kwestionariusza"
   },
   "upload": {
-    "choose": "Wybierz PDF [PH]",
-    "drop": "Przeciągnij PDF tutaj albo wybierz plik. [PH]",
-    "formats": "PDF, maksymalnie 25 MiB. [PH]",
-    "selected": "Wybrano [PH]",
-    "missingFile": "Wybierz plik PDF. [PH]",
-    "contractPreset": "Umowa [PH]",
-    "annexPreset": "Załącznik [PH]",
-    "protocolPreset": "Protokół [PH]"
+    "choose": "Wybierz PDF",
+    "drop": "Przeciągnij PDF tutaj albo wybierz plik.",
+    "formats": "PDF, maksymalnie 25 MiB.",
+    "selected": "Wybrano",
+    "missingFile": "Wybierz plik PDF.",
+    "contractPreset": "Umowa",
+    "annexPreset": "Załącznik",
+    "protocolPreset": "Protokół"
   },
   "dialogs": {
-    "rejectionTitle": "Odrzuć podpisaną kopię [PH]",
-    "rejectionDescription": "Podaj krótki powód odrzucenia. [PH]",
-    "removeMessage": "Usunąć dokument i jego pliki? [PH]",
-    "completeMessage": "Zakończyć ten onboarding? [PH]",
-    "archiveMessage": "Zarchiwizować dokument wspólny? [PH]"
+    "rejectionTitle": "Odrzuć podpisaną kopię",
+    "rejectionDescription": "Podaj krótki powód odrzucenia.",
+    "removeMessage": "Usunąć dokument i jego pliki?",
+    "completeMessage": "Zakończyć ten onboarding?",
+    "archiveMessage": "Zarchiwizować dokument wspólny?"
   },
   "toast": {
-    "mutationSuccessSummary": "Zapisano [PH]",
-    "mutationFailedSummary": "Nie udało się zapisać [PH]",
-    "mutationFailedDetail": "Sprawdź dane i spróbuj ponownie. [PH]",
-    "downloadFailedSummary": "Nie udało się przygotować pliku [PH]",
-    "downloadFailedDetail": "Spróbuj pobrać dokument ponownie. [PH]"
+    "mutationSuccessSummary": "Zapisano",
+    "mutationFailedSummary": "Nie udało się zapisać",
+    "mutationFailedDetail": "Sprawdź dane i spróbuj ponownie.",
+    "downloadFailedSummary": "Nie udało się przygotować pliku",
+    "downloadFailedDetail": "Spróbuj pobrać dokument ponownie."
   },
   "statuses": {
     "onboarding": {
-      "in_progress": "W toku [PH]",
-      "completed": "Zakończony [PH]",
-      "cancelled": "Anulowany [PH]"
+      "in_progress": "W toku",
+      "completed": "Zakończony",
+      "cancelled": "Anulowany"
     },
     "assignment": {
-      "available": "Dostępny [PH]",
-      "pending": "Oczekuje [PH]",
-      "submitted": "Przesłany [PH]",
-      "accepted": "Zaakceptowany [PH]",
-      "rejected": "Odrzucony [PH]",
-      "acknowledged": "Potwierdzony [PH]",
-      "revoked": "Wycofany [PH]"
+      "available": "Dostępny",
+      "pending": "Oczekuje",
+      "submitted": "Przesłany",
+      "accepted": "Zaakceptowany",
+      "rejected": "Odrzucony",
+      "acknowledged": "Potwierdzony",
+      "revoked": "Wycofany"
     }
   }
 }

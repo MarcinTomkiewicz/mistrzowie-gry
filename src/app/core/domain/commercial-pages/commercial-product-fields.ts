@@ -33,6 +33,14 @@ export function formatCommercialProductField(
       return product.prices.length
         ? { type: 'prices', value: product.prices }
         : null;
+    case 'primaryPrices': {
+      const prices = product.prices.filter((entry) => entry.primary);
+      return prices.length ? { type: 'prices', value: prices } : null;
+    }
+    case 'variantPrices': {
+      const prices = product.prices.filter((entry) => !entry.primary);
+      return prices.length ? { type: 'prices', value: prices } : null;
+    }
     case 'duration':
       return product.duration.mode === 'not_applicable'
         ? null

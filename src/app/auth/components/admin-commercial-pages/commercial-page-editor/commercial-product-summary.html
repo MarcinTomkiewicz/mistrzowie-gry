@@ -27,16 +27,18 @@
   </span>
   <span>{{ productSessions() }}</span>
   <span>
-    {{ i18n.product().frequency }}: {{ productFrequency(value) }}
+    {{ commercialI18n.productFieldLabel('frequency') }}:
+    {{ productFrequency(value) }}
   </span>
   <span>
-    {{ i18n.product().cooperationLength }}:
+    {{ commercialI18n.productFieldLabel('cooperationLength') }}:
     {{ productCooperationLength(value) }}
   </span>
 
   @if (includedAddons) {
     <span>
-      {{ i18n.product().includedAddons }}: {{ includedAddons }}
+      {{ commercialI18n.productFieldLabel('includedAddons') }}:
+      {{ includedAddons }}
     </span>
   }
 </div>

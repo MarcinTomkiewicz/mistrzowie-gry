@@ -117,6 +117,8 @@ export const COMMERCIAL_PRODUCT_FIELD_KEYS = [
   'name',
   'description',
   'price',
+  'primaryPrices',
+  'variantPrices',
   'duration',
   'participants',
   'participantsMin',

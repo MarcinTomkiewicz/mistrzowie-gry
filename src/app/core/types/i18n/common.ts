@@ -48,6 +48,7 @@ export type CommonActionsTranslations = {
   moveItemUp: string;
   moveItemDown: string;
   removeItem: string;
+  addPrice: string;
 };
 
 export type CommonValuesTranslations = {
@@ -59,6 +60,9 @@ export type CommonValuesTranslations = {
   active: string;
   published: string;
   archived: string;
+  oneTime: string;
+  weekly: string;
+  monthly: string;
 };
 
 export type CommonLabelsTranslations = {
@@ -133,6 +137,14 @@ export type CommonLabelsTranslations = {
   toLowercase: string;
   hours: string;
   item: string;
+  section: string;
+};
+
+export type CommonDurationUnitTranslations = {
+  hours: string;
+  minutes: string;
+  hoursShort: string;
+  minutesShort: string;
 };
 
 export type CommonTableTranslations = {
@@ -238,9 +250,6 @@ export type CommonFormConsentTranslations = {
   required: string;
 };
 
-export type CommonLegalNoticeTranslations = {
-  prefix: string;
-};
 export type CommonFormFileUploadTranslations = {
   chooseImage: string;
   dropImage: string;
@@ -255,8 +264,6 @@ export type CommonFormFileUploadTranslations = {
   cropPreviewLandscapeLabel: string;
   cropPreviewCircleLabel: string;
   cropPreviewSquareLabel: string;
-  gmCropHint: string;
-  sessionCropHint: string;
 };
 
 export type CommonFormTranslations = {
@@ -266,6 +273,7 @@ export type CommonFormTranslations = {
   maxLength: string;
   invalid: string;
   invalidSummary: string;
+  nonNegativeInteger: string;
   consent: CommonFormConsentTranslations;
   fileUpload: CommonFormFileUploadTranslations;
 };

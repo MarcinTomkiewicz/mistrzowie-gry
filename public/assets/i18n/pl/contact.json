@@ -18,6 +18,9 @@
     "messageLabel": "Treść wiadomości*",
     "messagePlaceholder": "Podaj jak najwięcej szczegółów Twojego zapytania. Pozwoli nam to precyzyjnie odpowiedzieć na Twoje pytania i przygotować najlepsze rozwiązanie."
   },
+  "legalNotice": {
+    "prefix": "Wysyłając wiadomość z formularza potwierdzasz, że jest Ci znana"
+  },
   "errors": {
     "minMessage": "Wiadomość jest za krótka!"
   },

@@ -19,6 +19,7 @@ import {
 } from '../../../../core/factories/commercial-product-editor-form.factory';
 import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
+import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
 import { CommercialProductCooperationEditor } from './commercial-product-cooperation-editor';
@@ -46,6 +47,7 @@ export class CommercialProductEditor {
   readonly addonOptions = input<ISelectOption<string>[]>([]);
 
   protected readonly i18n = createAdminCommercialPagesI18n();
+  protected readonly commercialI18n = createCommercialPageI18n();
   protected readonly kindOptions = computed(() => {
     const labels = this.i18n.productKind();
     return COMMERCIAL_PRODUCT_KINDS.map((value) => ({

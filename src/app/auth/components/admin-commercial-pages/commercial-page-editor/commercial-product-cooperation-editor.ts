@@ -12,6 +12,7 @@ import {
 import {
   syncCommercialProductEditorControls,
 } from '../../../../core/factories/commercial-product-editor-form.factory';
+import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 
@@ -30,24 +31,30 @@ export class CommercialProductCooperationEditor {
   readonly controlId = input.required<string>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
+  protected readonly commercialI18n = createCommercialPageI18n();
   protected readonly frequencyModeOptions = computed(() => {
-    const labels = this.i18n.frequencyMode();
+    const values = this.i18n.commonValues();
 
     return COMMERCIAL_FREQUENCY_MODES.map((value) => ({
       value,
       label: value === 'not_applicable'
-        ? this.i18n.commonValues().notApplicable
-        : labels[value],
+        ? values.notApplicable
+        : value === 'one_time'
+          ? values.oneTime
+          : values[value],
     }));
   });
   protected readonly cooperationLengthModeOptions = computed(() => {
     const labels = this.i18n.cooperationLengthMode();
+    const values = this.i18n.commonValues();
 
     return COMMERCIAL_COOPERATION_LENGTH_MODES.map((value) => ({
       value,
       label: value === 'not_applicable'
-        ? this.i18n.commonValues().notApplicable
-        : labels[value],
+        ? values.notApplicable
+        : value === 'one_time'
+          ? values.oneTime
+          : labels[value],
     }));
   });
 

@@ -26,6 +26,8 @@ export type CommercialProductFieldKey =
   | 'name'
   | 'description'
   | 'price'
+  | 'primaryPrices'
+  | 'variantPrices'
   | 'duration'
   | 'participants'
   | 'participantsMin'

@@ -1,5 +1,6 @@
 {
   "form": {
+    "imageCropHint": "Ustaw kadr pod główny obrazek sesji w układzie poziomym.",
     "titleLabel": "Tytuł sesji",
     "descriptionLabel": "Opis sesji",
     "difficultyLabel": "Poziom trudności",

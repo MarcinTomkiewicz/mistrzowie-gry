@@ -21,7 +21,7 @@ export class CommercialProductFieldValue {
   readonly locale = input.required<string>();
   readonly priceAccent = input(false);
 
-  private readonly i18n = createCommercialPageI18n();
+  protected readonly i18n = createCommercialPageI18n();
 
   protected readonly presentation = computed(() =>
     formatCommercialProductField(

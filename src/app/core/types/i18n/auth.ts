@@ -103,6 +103,7 @@ export interface GmProfileFormTranslations {
   experienceLabel: string;
   experienceRangeLabel: string;
   quoteLabel: string;
+  imageCropHint: string;
 }
 
 export interface GmProfileErrorsTranslations {

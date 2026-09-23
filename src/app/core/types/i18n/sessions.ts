@@ -1,4 +1,5 @@
 export interface SessionFormTranslations {
+  imageCropHint: string;
   titleLabel: string;
   descriptionLabel: string;
   difficultyLabel: string;

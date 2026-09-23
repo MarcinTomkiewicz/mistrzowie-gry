@@ -7,9 +7,19 @@ import {
   createCommonTableI18n,
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
-import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
+import {
+  createScopedObjectI18n,
+  createScopedSectionsI18n,
+} from '../../../core/translations/scoped.i18n';
 import type * as Copy from '../../../core/types/i18n/admin-commercial-pages';
 import type { AdminCommercialConstantsPageTranslations } from '../../../core/types/i18n/admin-commercial-constants';
+
+export function createAdminCommercialPagesNavigationI18n() {
+  return createScopedObjectI18n<Copy.AdminCommercialPagesNavigationTranslations>(
+    'adminCommercialPages',
+    'navigation',
+  );
+}
 
 export function createAdminCommercialPagesI18n() {
   const translations = createScopedSectionsI18n<{
@@ -47,7 +57,6 @@ export function createAdminCommercialPagesI18n() {
     participantsMode: Copy.AdminCommercialPagesParticipantsModeTranslations;
     productKind: Copy.AdminCommercialPagesProductKindTranslations;
     sessionMode: Copy.AdminCommercialPagesSessionModeTranslations;
-    frequencyMode: Copy.AdminCommercialPagesFrequencyModeTranslations;
     cooperationLengthMode: Copy.AdminCommercialPagesCooperationLengthModeTranslations;
     actionAppearance: Copy.AdminCommercialPagesActionAppearanceTranslations;
   }>('adminCommercialPages', {
@@ -70,12 +79,12 @@ export function createAdminCommercialPagesI18n() {
     collectionPresentation: 'collectionPresentation',
     durationMode: 'durationMode', participantsMode: 'participantsMode',
     productKind: 'productKind', sessionMode: 'sessionMode',
-    frequencyMode: 'frequencyMode',
     cooperationLengthMode: 'cooperationLengthMode',
     actionAppearance: 'actionAppearance',
   });
   return {
     ...translations,
+    navigation: createAdminCommercialPagesNavigationI18n(),
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),

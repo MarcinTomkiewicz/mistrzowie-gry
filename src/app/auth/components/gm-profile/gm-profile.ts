@@ -104,7 +104,7 @@ export class GmProfile {
     formatsLabel: this.i18n.commonForm().fileUpload.imageFormats,
     previewAlt: this.i18n.commonForm().fileUpload.imagePreviewAlt,
     cropTitle: this.i18n.commonForm().fileUpload.cropTitle,
-    cropHint: this.i18n.commonForm().fileUpload.gmCropHint,
+    cropHint: this.i18n.form().imageCropHint,
     cropFrameAriaLabel: this.i18n.commonForm().fileUpload.cropFrameAriaLabel,
     cropConfirmLabel: this.i18n.commonForm().fileUpload.cropConfirm,
     cropCancelLabel: this.i18n.commonActions().cancel,

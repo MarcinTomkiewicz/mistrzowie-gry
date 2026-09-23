@@ -29,7 +29,9 @@
       <app-rich-content-editor [control]="card.controls.body" [controlId]="controlId() + '-' + index + '-body'" [label]="i18n.cards().body" [tokens]="tokens()" />
       <div class="flex-row-start-center gap-xs">
         <p-checkbox [inputId]="controlId() + '-' + index + '-price-enabled'" formControlName="hasPrice" [binary]="true" (onChange)="syncPrice(index)" />
-        <label [for]="controlId() + '-' + index + '-price-enabled'">{{ i18n.cards().hasPrice }}</label>
+        <label [for]="controlId() + '-' + index + '-price-enabled'">
+          {{ i18n.commonActions().addPrice }}
+        </label>
       </div>
       @if (card.controls.hasPrice.value) {
         <app-price-editor [form]="card.controls.price" [controlId]="controlId() + '-' + index + '-price'" />

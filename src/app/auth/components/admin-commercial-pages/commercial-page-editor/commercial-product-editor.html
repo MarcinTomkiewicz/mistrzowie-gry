@@ -50,7 +50,7 @@
       autocomplete="off"
     />
     <label [for]="controlId() + '-settlement'">
-      {{ i18n.product().settlement }}
+      {{ commercialI18n.productFieldLabel('settlement') }}
     </label>
   </p-iftalabel>
 
@@ -69,7 +69,7 @@
           appendTo="body"
         />
         <label [for]="controlId() + '-included-addons'">
-          {{ i18n.product().includedAddons }}
+          {{ commercialI18n.productFieldLabel('includedAddons') }}
         </label>
       </p-iftalabel>
       @if (form().touched && form().hasError('commercialIncludedAddons')) {
@@ -144,8 +144,8 @@
       <div class="mg-grid-3 gap-md w-100">
         @for (
           field of [
-            { key: 'participantsMin', label: i18n.product().participantsMin },
-            { key: 'participantsMax', label: i18n.product().participantsMax },
+            { key: 'participantsMin', label: commercialI18n.productFieldLabel('participantsMin') },
+            { key: 'participantsMax', label: commercialI18n.productFieldLabel('participantsMax') },
             { key: 'participantsPerFacilitatorMax', label: i18n.product().participantsPerFacilitatorMax }
           ];
           track field.key

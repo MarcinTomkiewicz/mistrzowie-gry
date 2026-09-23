@@ -220,7 +220,6 @@ export type ScheduleFieldsCopy = {
 export type ScheduleOptionsCopy = {
   single: string;
   recurring: string;
-  weekly: string;
   monthlyNthWeekday: string;
   monthlyDayOfMonth: string;
   first: string;

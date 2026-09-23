@@ -7,6 +7,7 @@ export type CommercialPageLabelsTranslations = {
 };
 
 export type CommercialProductValueTranslations = {
+  notAvailable: string;
   duration: DurationTranslations;
   sessions: {
     count: PluralNumberTranslations;

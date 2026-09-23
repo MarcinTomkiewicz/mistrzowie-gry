@@ -11,7 +11,6 @@ import type {
   CommercialCooperationLength,
   CommercialEditorDuration,
   CommercialEditorParticipants,
-  CommercialFrequency,
   CommercialProductKind,
   CommercialSessionCount,
 } from '../commercial-product';
@@ -26,7 +25,6 @@ export type AdminCommercialPagesListPageTranslations = {
 
 export type AdminCommercialPagesListTableTranslations = {
   page: string;
-  draftStatus: string;
   draftUpdatedAt: string;
   effectiveFrom: string;
 };
@@ -35,10 +33,13 @@ export type AdminCommercialPagesListToastTranslations = {
   loadFailedDetail: string;
 };
 
+export type AdminCommercialPagesNavigationTranslations = {
+  backToPages: string;
+};
+
 export type AdminCommercialPagesEditorPageTranslations = {
   title: string;
   subtitle: string;
-  backToPages: string;
   loadErrorTitle: string;
 };
 
@@ -52,7 +53,6 @@ export type AdminCommercialPagesEditorStepsTranslations = {
 export type AdminCommercialPagesMetadataTranslations = {
   sectionTitle: string;
   draftSlug: string;
-  publishedSlug: string;
   slugPattern: string;
   heading: string;
 };
@@ -116,26 +116,19 @@ export type AdminCommercialPagesProductTranslations = {
   description: string;
   prices: string;
   emptyPrices: string;
-  addPrice: string;
   priceLabel: string;
   primaryPrice: string;
-  settlement: string;
   durationMode: string;
   durationMinutes: string;
   participantsMode: string;
-  participantsMin: string;
-  participantsMax: string;
   participantsPerFacilitatorMax: string;
   structureSection: string;
   sessionsMode: string;
   sessions: string;
-  frequency: string;
   frequencyMode: string;
   frequencyCount: string;
-  cooperationLength: string;
   cooperationLengthMode: string;
   cooperationLengthSemesters: string;
-  includedAddons: string;
   meetingCountMin: string;
   meetingCountMax: string;
 };
@@ -143,7 +136,6 @@ export type AdminCommercialPagesProductTranslations = {
 export type AdminCommercialPagesSectionsTranslations = {
   sectionTitle: string;
   empty: string;
-  section: string;
 };
 
 export type AdminCommercialPagesSectionTranslations = {
@@ -173,7 +165,6 @@ export type AdminCommercialPagesCardsTranslations = {
   add: string;
   title: string;
   body: string;
-  hasPrice: string;
 };
 
 export type AdminCommercialPagesProductCollectionTranslations = {
@@ -271,12 +262,11 @@ export type AdminCommercialPagesSessionModeTranslations = Record<
   Exclude<CommercialSessionCount['mode'], 'not_applicable'>,
   string
 >;
-export type AdminCommercialPagesFrequencyModeTranslations = Record<
-  Exclude<CommercialFrequency['mode'], 'not_applicable'>,
-  string
->;
 export type AdminCommercialPagesCooperationLengthModeTranslations = Record<
-  Exclude<CommercialCooperationLength['mode'], 'not_applicable'>,
+  Exclude<
+    CommercialCooperationLength['mode'],
+    'not_applicable' | 'one_time'
+  >,
   string
 >;
 export type AdminCommercialPagesActionAppearanceTranslations = Record<CommercialActionAppearance, string>;

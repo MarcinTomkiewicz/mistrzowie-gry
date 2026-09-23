@@ -45,7 +45,8 @@
     "clearDay": "Wyczyść dzień",
     "moveItemUp": "Przesuń element wyżej",
     "moveItemDown": "Przesuń element niżej",
-    "removeItem": "Usuń element"
+    "removeItem": "Usuń element",
+    "addPrice": "Dodaj cenę"
   },
 
   "values": {
@@ -56,7 +57,10 @@
     "notApplicable": "Nie dotyczy",
     "active": "Aktywny",
     "published": "Opublikowano",
-    "archived": "Zarchiwizowano"
+    "archived": "Zarchiwizowano",
+    "oneTime": "Jednorazowo",
+    "weekly": "Co tydzień",
+    "monthly": "Co miesiąc"
   },
 
   "labels": {
@@ -130,7 +134,15 @@
     "fromLowercase": "od",
     "toLowercase": "do",
     "hours": "Godziny",
-    "item": "Pozycja"
+    "item": "Pozycja",
+    "section": "Sekcja"
+  },
+
+  "durationUnit": {
+    "hours": "Godziny",
+    "minutes": "minuty",
+    "hoursShort": "godz.",
+    "minutesShort": "min"
   },
 
   "table": {
@@ -204,6 +216,7 @@
     "minLength": "Wpisz co najmniej {{min}} znaków.",
     "maxLength": "Wpisz maksymalnie {{max}} znaków.",
     "invalid": "Sprawdź poprawność pól formularza.",
+    "nonNegativeInteger": "Podaj nieujemną liczbę całkowitą.",
     "fileUpload": {
       "chooseImage": "Wybierz obrazek",
       "dropImage": "Przeciągnij obrazek tutaj albo wybierz plik",
@@ -217,9 +230,7 @@
       "cropPreviewLabel": "Podgląd wyniku",
       "cropPreviewLandscapeLabel": "Kadr poziomy",
       "cropPreviewCircleLabel": "W kółku",
-      "cropPreviewSquareLabel": "W kwadracie",
-      "gmCropHint": "Ustaw kadr pod okrągły podgląd profilu.",
-      "sessionCropHint": "Ustaw kadr pod główny obrazek sesji w układzie poziomym."
+      "cropPreviewSquareLabel": "W kwadracie"
     },
     "consent": {
       "label": "Wyrażam zgodę na kontakt w sprawie zapytania.",
@@ -339,7 +350,6 @@
     "tokens": "Elementy",
     "tokensHint": "Ustaw kursor w polu tekstowym i wybierz element, aby go wstawić.",
     "empty": "Treść nie zawiera żadnej sekcji.",
-    "section": "Sekcja",
     "sectionTitle": "Tytuł sekcji (opcjonalny)",
     "paragraph": "Akapit",
     "ordered-list": "Lista numerowana",
@@ -362,7 +372,7 @@
   "commercial": {
     "validation": {
       "required": "Brakuje wymaganej wartości.",
-      "invalidSlug": "[PH] Slug jest niepoprawny.",
+      "invalidSlug": "Slug jest niepoprawny.",
       "duplicateSectionPosition": "Sekcje mają powtórzoną pozycję.",
       "duplicateBlockPosition": "Bloki mają powtórzoną pozycję.",
       "duplicateProductPosition": "Produkty mają powtórzoną pozycję.",
@@ -376,11 +386,11 @@
       "invalidPrice": "Cena jest niepoprawna.",
       "invalidPriceRange": "Zakres ceny jest niepoprawny.",
       "invalidPercentage": "Wartość procentowa jest niepoprawna.",
-      "invalidSettlement": "[PH] Rozliczenie jest niepoprawne.",
+      "invalidSettlement": "Rozliczenie jest niepoprawne.",
       "invalidDuration": "Czas trwania jest niepoprawny.",
       "invalidParticipants": "Liczba uczestników jest niepoprawna.",
-      "invalidFrequency": "[PH] Częstotliwość jest niepoprawna.",
-      "invalidCooperationLength": "[PH] Długość współpracy jest niepoprawna.",
+      "invalidFrequency": "Częstotliwość jest niepoprawna.",
+      "invalidCooperationLength": "Długość współpracy jest niepoprawna.",
       "invalidProductReference": "Odwołanie do produktu jest niepoprawne.",
       "invalidProductCollection": "Konfiguracja kolekcji produktów jest niepoprawna.",
       "invalidTable": "Konfiguracja tabeli jest niepoprawna.",
@@ -389,10 +399,6 @@
       "placeholderPresent": "Treść zawiera marker [PH].",
       "previewRequired": "Bieżąca rewizja draftu wymaga ponownego podglądu."
     }
-  },
-
-  "contactLegalNotice": {
-    "prefix": "Wysy\u0142aj\u0105c wiadomo\u015b\u0107 z formularza potwierdzasz, \u017ce jest Ci znana"
   },
 
   "seo": {
@@ -419,7 +425,7 @@
     "sendMail": "Wyślij maila do",
     "callMe": "Zadzwoń na numer",
     "toggleTheme": "Przełącz motyw jasny/ciemny",
-    "selectTab": "[PH] Wybierz zakładkę"
+    "selectTab": "Wybierz zakładkę"
   },
   "statusPages": {
     "notFound": {
