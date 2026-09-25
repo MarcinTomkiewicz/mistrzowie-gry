@@ -20,6 +20,7 @@ export class CommercialProductFieldValue {
   readonly field = input.required<CommercialProductField>();
   readonly locale = input.required<string>();
   readonly priceAccent = input(false);
+  readonly richContentSectionSpacing = input(true);
 
   protected readonly i18n = createCommercialPageI18n();
 

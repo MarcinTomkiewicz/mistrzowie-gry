@@ -9,13 +9,15 @@ import type {
   template: `
     @if (heading() || lead()) {
       <header
-        class="mg-section__header w-100"
+        class="mg-section__header w-100 mb-md"
         [class.text-left]="textAlign() === 'left'"
         [class.text-center]="textAlign() === 'center'"
         [class.text-right]="textAlign() === 'right'"
       >
         @if (heading()) {
-          <h2 class="mg-section__title">{{ heading() }}</h2>
+          <h2 class="mg-section__title mg-section__title--sm text-wrap-balance truncate-2">
+            {{ heading() }}
+          </h2>
         }
 
         @if (lead()) {

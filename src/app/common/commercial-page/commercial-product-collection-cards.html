@@ -8,15 +8,15 @@
 >
   @for (card of cards(); track card.product.id) {
     <article
-      class="mg-card gap-lg w-100"
+      class="mg-card gap-md w-100"
       [class.flex-col-start-stretch]="data.presentation.orientation === 'vertical'"
-      [class.flex-row-between-start]="data.presentation.orientation === 'horizontal'"
+      [class.flex-row-start-start]="data.presentation.orientation === 'horizontal'"
       [class.flex-col-start-stretch-sm]="data.presentation.orientation === 'horizontal'"
     >
       @if (card.hasPrimaryContent) {
         <div class="flex-col-start-stretch gap-sm flex-1">
           @if (card.nameVisible) {
-            <h3 class="mg-section__title mg-section__title--sm m-0">
+            <h3 class="mg-section__title mg-section__title--xs text-wrap-balance truncate-2 m-0">
               {{ card.product.name }}
             </h3>
           }

@@ -10,11 +10,11 @@
     <article
       class="mg-card gap-md"
       [class.flex-col-start-stretch]="data.presentation.orientation === 'vertical'"
-      [class.flex-row-between-start]="data.presentation.orientation === 'horizontal'"
+      [class.flex-row-start-start]="data.presentation.orientation === 'horizontal'"
       [class.flex-col-start-stretch-sm]="data.presentation.orientation === 'horizontal'"
     >
       <div class="flex-col-start-stretch gap-sm flex-1">
-        <h3 class="mg-section__title mg-section__title--sm m-0">
+        <h3 class="mg-section__title mg-section__title--xs text-wrap-balance truncate-2 m-0">
           {{ card.title }}
         </h3>
 

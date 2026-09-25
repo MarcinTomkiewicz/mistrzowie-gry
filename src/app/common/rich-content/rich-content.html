@@ -1,7 +1,7 @@
 @if (sections().length) {
   <div>
     @for (section of sections(); track $index) {
-      <section class="mt-lg">
+      <section [class.mt-lg]="sectionSpacing()">
         @if (section.title) {
           <h3 class="mg-section__title mg-section__title--sm m-0">
             {{ section.title }}

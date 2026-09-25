@@ -16,7 +16,7 @@
 
   @for (block of data.blocks; track block.id) {
     <app-commercial-page-block
-      [class.mt-lg]="!$first"
+      [class.mt-md]="!$first"
       [block]="block"
       [products]="products()"
       [locale]="locale()"

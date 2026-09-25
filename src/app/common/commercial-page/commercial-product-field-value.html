@@ -4,7 +4,10 @@
       <span>{{ data.value }}</span>
     }
     @case ('rich_content') {
-      <app-expandable-text [richContent]="data.value" />
+      <app-expandable-text
+        [richContent]="data.value"
+        [richContentSectionSpacing]="richContentSectionSpacing()"
+      />
     }
     @case ('price') {
       <app-price-value

@@ -13,6 +13,7 @@ import { RichContentInline } from './rich-content-inline';
 })
 export class RichContent {
   readonly content = input<RichContentInput>(null);
+  readonly sectionSpacing = input(true);
 
   protected readonly sections = computed(
     () => resolveRichContent(this.content())?.sections ?? [],

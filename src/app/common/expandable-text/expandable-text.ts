@@ -21,6 +21,7 @@ import { RichContent } from '../rich-content/rich-content';
 export class ExpandableText {
   readonly text = input<string | null | undefined>(null);
   readonly richContent = input<RichContentModel | null>(null);
+  readonly richContentSectionSpacing = input(true);
   readonly muted = input(false);
   readonly icon = input<string | undefined>('pi pi-lever');
 

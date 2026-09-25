@@ -6,7 +6,9 @@
     <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
 
     <header class="mg-section__header">
-      <h1 class="mg-section__title">{{ page.heading }}</h1>
+      <h1 class="mg-section__title mg-section__title--md text-wrap-balance truncate-2">
+        {{ page.heading }}
+      </h1>
 
       @if (page.lead) {
         <p class="mg-section__subtitle">{{ page.lead }}</p>
@@ -22,7 +24,7 @@
 
     @for (section of data.sections; track section.id) {
       <app-commercial-page-section
-        [class.mt-xl]="!$first"
+        [class.mt-lg]="!$first"
         [section]="section"
         [products]="data.products"
         [locale]="page.locale"
