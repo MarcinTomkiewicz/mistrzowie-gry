@@ -71,10 +71,13 @@ export class NotificationFacade {
     );
   }
 
-  markOneRead(notificationId: string): void {
+  markOneRead(notificationId: string, onSuccess?: () => void): void {
     this.runRequest(
       this.data.markRead(notificationId),
-      () => this.refreshAfterRead(),
+      () => {
+        this.refreshAfterRead();
+        onSuccess?.();
+      },
       true,
     );
   }

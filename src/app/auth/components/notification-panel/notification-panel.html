@@ -1,0 +1,34 @@
+<section class="flex-col-start-stretch gap-sm w-px-350 w-px-250-sm max-w-full" [attr.aria-busy]="notifications.loading()">
+  <h2 class="mg-section__title mg-section__title--xs m-0">{{ i18n.ui().title }}</h2>
+  <p-button
+    type="button" size="small" severity="secondary" [outlined]="true"
+    [label]="i18n.ui().markAllRead"
+    [disabled]="notifications.loading() || notifications.unreadCount() === 0"
+    (onClick)="notifications.markAllRead()"
+  />
+
+  @if (notifications.loading()) {
+    <p class="m-0" role="status">{{ status().loading }}</p>
+  } @else if (!notifications.notifications().length) {
+    <p class="m-0">{{ i18n.ui().empty }}</p>
+  } @else {
+    <ul class="m-0 p-xs flex-col-start-stretch gap-sm max-h-400 overflow-y-auto">
+      @for (notification of notifications.notifications(); track notification.id) {
+        <li class="li--unset mg-card flex-col-start-stretch gap-xs p-sm">
+          <span [class.font-bold]="notification.readAt === null">
+            {{ presentation[notification.eventType].translationKey | transloco }}
+          </span>
+          <time class="text-muted" [attr.datetime]="notification.createdAt">
+            {{ formatTimestamp(notification.createdAt) }}
+          </time>
+          <div class="flex-row-between-center gap-xs">
+            <small class="tag-badge" [class.tag-badge--primary]="notification.readAt === null" [class.tag-badge--muted]="notification.readAt !== null">
+              {{ notification.readAt === null ? i18n.ui().unread : i18n.ui().read }}
+            </small>
+            <p-button type="button" size="small" [text]="true" [label]="i18n.ui().goTo" (onClick)="goTo(notification)" />
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

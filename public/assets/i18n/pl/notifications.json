@@ -1,4 +1,13 @@
 {
+  "ui": {
+    "title": "Powiadomienia",
+    "markAllRead": "Oznacz wszystkie jako przeczytane",
+    "empty": "Brak powiadomień",
+    "goTo": "Przejdź",
+    "buttonLabel": "Otwórz powiadomienia",
+    "read": "Przeczytane",
+    "unread": "Nieprzeczytane"
+  },
   "events": {
     "onboarding_started": "Rozpoczęto onboarding",
     "questionnaire_ready_for_signature": "Kwestionariusz jest gotowy do podpisu",

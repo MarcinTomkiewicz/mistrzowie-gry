@@ -7,7 +7,7 @@
         height="50"
         [alt]="i18n.labels().brandName"
         decoding="async"
-        class="mg-navbar__logo ml-sm"
+        class="mg-navbar__logo ml-sm w-px-100-sm object-fit-contain"
       />
     </a>
 
@@ -50,6 +50,24 @@
       </div>
 
       <div class="flex-row-start-center gap-xs pl-sm">
+        @if (isAuthenticated()) {
+          <button
+            type="button"
+            class="mg-icon-btn position-relative"
+            [attr.aria-label]="notificationI18n.ui().buttonLabel"
+            [attr.aria-describedby]="notifications.unreadCount() > 0 ? 'navbar-notification-count' : null"
+            [attr.aria-expanded]="notificationOpen()"
+            aria-haspopup="dialog"
+            (click)="openNotifications($event)"
+          >
+            <i class="pi pi-notification-icon" aria-hidden="true"></i>
+            @if (notifications.unreadCount() > 0) {
+              <span id="navbar-notification-count" class="notification-badge left-auto right-0">
+                {{ notifications.unreadCount() > 99 ? '99+' : notifications.unreadCount() }}
+              </span>
+            }
+          </button>
+        }
         @if (hasSessionCookie()) {
           <button
             type="button"
@@ -117,6 +135,13 @@
   }
 
   <ng-container #userMenuHost />
+</p-popover>
+
+<p-popover #notificationPopover styleClass="mg-popover" [ariaLabel]="notificationI18n.ui().title" (onShow)="onNotificationsShow()" (onHide)="closeNotifications()">
+  @if (isNotificationPanelLoading()) {
+    <div class="p-sm">{{ i18n.status().loading }}</div>
+  }
+  <ng-container #notificationHost />
 </p-popover>
 
 <p-drawer
