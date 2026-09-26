@@ -1,36 +1,39 @@
-import notificationTranslations from '../../public/assets/i18n/pl/notifications.json';
 import { buildSiteUrl, SITE_NAME } from '../app/core/config/site';
 import { NOTIFICATION_PRESENTATION } from '../app/core/configs/notifications.config';
-import type { NotificationEventTranslations } from '../app/core/types/i18n/notifications';
 import { escapeHtml } from './email-html';
+import { buildBrandedEmailHtml, MAIL_THEME } from './email-layout';
 import emailTranslations from './i18n/pl/notification-email.json';
-import type { NotificationEmailClaim } from './notification-email-types';
+import type { NotificationEmailClaim, NotificationEmailTranslations } from './notification-email-types';
 
-const eventLabels: NotificationEventTranslations = notificationTranslations.events;
+const emailCopy: NotificationEmailTranslations = emailTranslations;
 
 export function buildNotificationEmail(
   notification: Pick<NotificationEmailClaim, 'event_type' | 'payload'>,
 ) {
-  const label = eventLabels[notification.event_type];
+  const copy = emailCopy[notification.event_type];
   const route = NOTIFICATION_PRESENTATION[notification.event_type]
     .resolveRoute(notification.payload);
   const url = buildSiteUrl(route);
 
   return {
-    subject: `${SITE_NAME} - ${label}`,
+    subject: `${SITE_NAME} - ${copy.subjectLabel}`,
     text: [
-      label,
+      copy.heading,
       '',
-      emailTranslations.body,
+      copy.body,
       '',
-      `${emailTranslations.goToApplication}: ${url}`,
+      `${copy.ctaLabel}: ${url}`,
     ].join('\n'),
-    html: `
-      <div lang="pl">
-        <h1>${escapeHtml(label)}</h1>
-        <p>${escapeHtml(emailTranslations.body)}</p>
-        <p><a href="${escapeHtml(url)}">${escapeHtml(emailTranslations.goToApplication)}</a></p>
-      </div>
-    `,
+    html: buildBrandedEmailHtml({
+      heading: copy.heading,
+      contentHtml: `
+        <p style="margin:0;line-height:1.7;">${escapeHtml(copy.body)}</p>
+        <p style="margin:24px 0 0;">
+          <a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 20px;background:${MAIL_THEME.crimson};color:${MAIL_THEME.white};border-radius:10px;font-weight:700;text-decoration:none;">
+            ${escapeHtml(copy.ctaLabel)}
+          </a>
+        </p>
+      `,
+    }),
   };
 }

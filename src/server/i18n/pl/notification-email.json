@@ -1,4 +1,56 @@
 {
-  "body": "Na Twoim koncie Mistrzowie Gry pojawiło się nowe powiadomienie.",
-  "goToApplication": "Przejdź do aplikacji"
+  "onboarding_started": {
+    "subjectLabel": "Rozpoczęto onboarding",
+    "heading": "Rozpoczęliśmy Twój onboarding",
+    "body": "Uzupełnij kwestionariusz osobowy, aby przejść do kolejnego etapu.",
+    "ctaLabel": "Uzupełnij kwestionariusz"
+  },
+  "questionnaire_ready_for_signature": {
+    "subjectLabel": "Kwestionariusz jest gotowy do podpisu",
+    "heading": "Twój kwestionariusz jest gotowy do podpisu",
+    "body": "Przejdź do dokumentów, podpisz przygotowany plik i prześlij go zgodnie z instrukcją.",
+    "ctaLabel": "Przejdź do dokumentów"
+  },
+  "private_documents_added": {
+    "subjectLabel": "Dodano dokumenty prywatne",
+    "heading": "Dodano nowe dokumenty prywatne",
+    "body": "W Twoim onboardingu pojawiły się nowe dokumenty prywatne. Przejdź do dokumentów i sprawdź, jakie działania są wymagane.",
+    "ctaLabel": "Zobacz dokumenty"
+  },
+  "signed_document_submitted": {
+    "subjectLabel": "Przesłano podpisany dokument",
+    "heading": "Przesłano podpisany dokument",
+    "body": "Współpracownik przesłał podpisany dokument. Dokument oczekuje na weryfikację w panelu onboardingu.",
+    "ctaLabel": "Otwórz onboarding"
+  },
+  "signed_document_rejected": {
+    "subjectLabel": "Podpisany dokument został odrzucony",
+    "heading": "Podpisany dokument został odrzucony",
+    "body": "Przesłany przez Ciebie dokument został odrzucony. Przejdź do dokumentów i prześlij poprawioną wersję.",
+    "ctaLabel": "Przejdź do dokumentów"
+  },
+  "signed_document_accepted": {
+    "subjectLabel": "Podpisany dokument został zaakceptowany",
+    "heading": "Podpisany dokument został zaakceptowany",
+    "body": "Przesłany przez Ciebie dokument został zaakceptowany. Aktualny status dokumentów możesz sprawdzić w swoim panelu.",
+    "ctaLabel": "Przejdź do dokumentów"
+  },
+  "onboarding_completed": {
+    "subjectLabel": "Onboarding został zakończony",
+    "heading": "Twój onboarding został zakończony",
+    "body": "Twój onboarding został zakończony. Możesz teraz przejść do dokumentów związanych z dalszą współpracą.",
+    "ctaLabel": "Przejdź do dokumentów wspólnych"
+  },
+  "shared_documents_assigned": {
+    "subjectLabel": "Przydzielono dokumenty wspólne",
+    "heading": "Przypisano Ci nowe dokumenty wspólne",
+    "body": "Zapoznaj się z przypisanymi dokumentami i wykonaj wymagane potwierdzenia.",
+    "ctaLabel": "Zobacz dokumenty wspólne"
+  },
+  "shared_documents_acknowledged": {
+    "subjectLabel": "Potwierdzono zapoznanie z dokumentem wspólnym",
+    "heading": "Potwierdzono zapoznanie z dokumentem wspólnym",
+    "body": "Współpracownik potwierdził zapoznanie się z dokumentem wspólnym. Szczegóły znajdziesz w panelu współpracowników.",
+    "ctaLabel": "Otwórz onboarding"
+  }
 }

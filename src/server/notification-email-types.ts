@@ -8,3 +8,10 @@ export type NotificationEmailClaim = {
   payload: Record<string, unknown>;
   attempt_count: number;
 };
+
+export type NotificationEmailTranslations = Record<NotificationEventType, {
+  subjectLabel: string;
+  heading: string;
+  body: string;
+  ctaLabel: string;
+}>;
