@@ -50,6 +50,10 @@ export type AdminCommercialPagesEditorStepsTranslations = {
   previewSave: string;
 };
 
+export type AdminCommercialPagesDiagnosticsTranslations = {
+  issues: string;
+};
+
 export type AdminCommercialPagesMetadataTranslations = {
   sectionTitle: string;
   draftSlug: string;

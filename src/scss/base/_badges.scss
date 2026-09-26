@@ -3,7 +3,7 @@
 @use "../abstracts/mixins" as m;
 
 /* =========================================================
-   BADGES – BASE
+   BADGES - BASE
    ========================================================= */
 
 .tag-badges {
@@ -43,11 +43,11 @@
 
 .tag-badge--golden { @include m.badge-golden; }
 
-/* alias “golden” (utilities) też ma działać */
+/* alias "golden" (utilities) też ma działać */
 .tag-badge.golden { @include m.badge-golden; }
 
 /* =========================================================
-   LEGACY / ALIASES (STARE KLASY – BEZ @extend)
+   LEGACY / ALIASES (STARE KLASY - BEZ @extend)
    ========================================================= */
 
 /* join == success */
@@ -69,12 +69,12 @@
   @include m.badge-variant(v.$color-secondary, 0.14, 12%);
 }
 
-/* member -> SECONDARY (bardziej “pełne”) */
+/* member -> SECONDARY (bardziej "pełne") */
 .tag-badge.member {
   @include m.badge-variant(v.$color-secondary, 0.15, 12%);
 }
 
-/* club -> tylko kolor, bez “glow”/tła */
+/* club -> tylko kolor, bez "glow"/tła */
 .tag-badge.club {
   color: v.$color-primary;
   border-color: v.$color-border;

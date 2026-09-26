@@ -26,4 +26,13 @@
     background: var(--mg-form-bg-focus);
     border-color: var(--mg-form-border-focus);
   }
+
+  .p-inputnumber.p-invalid .p-inputtext,
+  .p-inputnumber.p-invalid .p-inputnumber-button {
+    border-color: var(--mg-form-error);
+  }
+
+  .p-inputnumber.p-invalid:focus-within .p-inputtext {
+    box-shadow: 0 0 0 3px var(--mg-form-error-ring);
+  }
 }

@@ -182,7 +182,7 @@
   }
 }
 
-/* Bronze gradient text – wersja pod CSS vars (bez sass:color) */
+/* Bronze gradient text - wersja pod CSS vars (bez sass:color) */
 @mixin bronze-gradient-text {
   background: linear-gradient(
     90deg,
@@ -195,7 +195,7 @@
 }
 
 /* =========================================================
-   GOLDEN – LEGACY (FIXED COLORS, INTENTIONAL EXCEPTION)
+   GOLDEN - LEGACY (FIXED COLORS, INTENTIONAL EXCEPTION)
    ========================================================= */
 @mixin gold-gradient-text {
   background: linear-gradient(
@@ -215,14 +215,14 @@
   text-shadow: 0 0 5px rgba(232, 188, 90, 0.15);
 }
 
-/* Badge: golden – bez sassowych operacji na var() */
+/* Badge: golden - bez sassowych operacji na var() */
 @mixin badge-golden {
   @include gold-gradient-text;
   border-color: color-mix(in srgb, v.$color-bronze 80%, white);
   box-shadow: 0 0 8px color-mix(in srgb, v.$color-secondary 35%, transparent);
 }
 
-/* Form control – OK (nie ma color.scale) */
+/* Form control - OK (nie ma color.scale) */
 @mixin form-control(
   $bg: v.$color-bg,
   $border: v.$color-border,
@@ -259,7 +259,7 @@
   }
 }
 
-/* Badge variant helper – bez color.scale */
+/* Badge variant helper - bez color.scale */
 @mixin badge-variant($c, $bg-alpha: 0.12, $border-lightness: 10%) {
   color: color-mix(in srgb, $c 85%, white);
   border-color: color-mix(in srgb, $c 75%, white);

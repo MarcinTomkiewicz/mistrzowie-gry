@@ -7,6 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -31,6 +32,7 @@ import {
 import { resolveRichContentTextInput } from '../../core/domain/rich-content/rich-content-text-input';
 import type { NumericInterval } from '../../core/types/interval';
 import type {
+  RichContentEditorIssue,
   RichContentLinkEditTarget,
   RichContentLinkRange,
   RichContentTextInput,
@@ -47,6 +49,7 @@ import { RichContentInline } from '../rich-content/rich-content-inline';
   selector: 'app-rich-content-inline-editor',
   imports: [
     ReactiveFormsModule,
+    TranslocoPipe,
     ButtonModule,
     CheckboxModule,
     InputTextModule,
@@ -58,6 +61,7 @@ import { RichContentInline } from '../rich-content/rich-content-inline';
 export class RichContentInlineEditor {
   readonly nodes = input.required<RichContentInlineNode[]>();
   readonly controlId = input.required<string>();
+  readonly issues = input<readonly RichContentEditorIssue[]>([]);
   readonly changed = output<void>();
   readonly blurred = output<void>();
   readonly activated = output<RichContentInlineEditor>();

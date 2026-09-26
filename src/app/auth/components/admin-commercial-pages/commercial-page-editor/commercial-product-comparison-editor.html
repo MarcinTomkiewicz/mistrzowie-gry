@@ -1,4 +1,5 @@
 <section class="flex-col-start-stretch gap-md w-100">
+  @let blockId = form().controls.id.value;
   <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
     <div class="flex-col-start-stretch gap-xs">
       <h5 class="mg-section__title mg-section__title--xs m-0">
@@ -22,8 +23,10 @@
   }
 
   @for (section of sections.controls; track section; let sectionIndex = $index) {
+    @let sectionItemId = section.controls.id.value;
     <section
       class="mg-card flex-col-start-stretch gap-md p-md w-100"
+      [class.border-danger]="diagnostics().issuesWithin({ itemId: sectionItemId }).length"
       [formGroup]="section"
     >
       <app-item-editor-actions
@@ -38,6 +41,7 @@
         <input
           pInputText
           class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ itemId: sectionItemId, field: 'heading' }).length"
           [id]="controlId() + '-comparison-' + sectionIndex + '-heading'"
           formControlName="heading"
           autocomplete="off"
@@ -46,6 +50,7 @@
           {{ i18n.productCollection().comparisonSectionHeading }}
         </label>
       </p-iftalabel>
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId: sectionItemId, field: 'heading' })" />
 
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
         <strong>{{ i18n.productCollection().comparisonRows }}</strong>
@@ -62,14 +67,17 @@
       @if (!section.controls.rows.length) {
         <p class="m-0">{{ i18n.productCollection().emptyComparisonRows }}</p>
       }
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId: sectionItemId, field: 'rows' })" />
 
       @for (
         row of section.controls.rows.controls;
         track row;
         let rowIndex = $index
       ) {
+        @let rowItemId = row.controls.id.value;
         <div
           class="mg-card flex-col-start-stretch gap-md p-sm w-100"
+          [class.border-danger]="diagnostics().issuesWithin({ itemId: rowItemId }).length"
           [formGroup]="row"
         >
           <app-item-editor-actions
@@ -84,6 +92,7 @@
             <input
               pInputText
               class="w-100"
+              [class.p-invalid]="diagnostics().issuesAt({ itemId: rowItemId, field: 'label' }).length"
               [id]="controlId() + '-comparison-' + sectionIndex + '-row-' + rowIndex + '-label'"
               formControlName="label"
               autocomplete="off"
@@ -94,10 +103,12 @@
               {{ i18n.productCollection().comparisonRowLabel }}
             </label>
           </p-iftalabel>
+          <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId: rowItemId, field: 'label' })" />
 
           <p-iftalabel class="w-100">
             <p-multiselect
               class="w-100"
+              [class.p-invalid]="diagnostics().issuesWithin({ itemId: rowItemId, field: 'fieldIds' }).length"
               [inputId]="controlId() + '-comparison-' + sectionIndex + '-row-' + rowIndex + '-fields'"
               formControlName="fieldIds"
               [options]="fieldOptions()"
@@ -113,6 +124,7 @@
               {{ i18n.productCollection().comparisonRowFields }}
             </label>
           </p-iftalabel>
+          <app-commercial-publication-issue-messages [issues]="diagnostics().issuesWithin({ itemId: rowItemId, field: 'fieldIds' })" />
 
           @for (
             field of selectedFieldOptions(row);
@@ -136,8 +148,10 @@
               {{ i18n.productCollection().incompleteComparison }}
             </small>
           }
+          <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId: rowItemId })" />
         </div>
       }
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId: sectionItemId })" />
     </section>
   }
 
@@ -146,4 +160,5 @@
       {{ i18n.productCollection().incompleteComparison }}
     </small>
   }
+  <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'presentation.sections' })" />
 </section>

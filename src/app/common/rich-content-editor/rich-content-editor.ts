@@ -1,5 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, input, viewChildren } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -8,7 +9,10 @@ import {
   richContentInlineText,
   updateRichContentInlineText,
 } from '../../core/domain/rich-content/rich-content-inline-operations';
-import type { RichContentEditorControl } from '../../core/types/rich-content-editor';
+import type {
+  RichContentEditorControl,
+  RichContentEditorIssue,
+} from '../../core/types/rich-content-editor';
 import type {
   RichContentBlock,
   RichContentInlineNode,
@@ -27,6 +31,7 @@ import { RichContentInlineEditor } from './rich-content-inline-editor';
   selector: 'app-rich-content-editor',
   imports: [
     NgTemplateOutlet,
+    TranslocoPipe,
     ButtonModule,
     InputTextModule,
     ItemEditorActions,
@@ -39,6 +44,7 @@ export class RichContentEditor {
   readonly controlId = input.required<string>();
   readonly label = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
+  readonly issues = input<readonly RichContentEditorIssue[]>([]);
 
   protected readonly i18n = createCommonRichContentEditorI18n();
   protected readonly actions = createCommonActionsI18n();
@@ -54,6 +60,26 @@ export class RichContentEditor {
 
   protected blockLabel(type: RichContentBlock['type']): string {
     return this.i18n()[type];
+  }
+
+  protected issuesAt(path: readonly string[]): readonly RichContentEditorIssue[] {
+    return this.issues().filter((issue) =>
+      issue.path.length === path.length &&
+      path.every((segment, index) => issue.path[index] === segment)
+    );
+  }
+
+  protected issuesWithin(path: readonly string[]): readonly RichContentEditorIssue[] {
+    return this.issues().filter((issue) =>
+      path.every((segment, index) => issue.path[index] === segment)
+    );
+  }
+
+  protected inlineIssues(path: readonly string[]): readonly RichContentEditorIssue[] {
+    return [
+      ...this.issuesWithin([...path, 'content']),
+      ...this.issuesWithin([...path, 'text']),
+    ];
   }
 
   protected addSection(): void {

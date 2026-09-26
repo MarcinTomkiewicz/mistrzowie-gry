@@ -1,14 +1,22 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  @let blockId = form().controls.id.value;
   <div class="mg-grid-2 gap-md w-100" [formGroup]="form().controls.presentation">
-    <p-iftalabel class="w-100">
-      <p-select class="w-100" [inputId]="controlId() + '-layout'" formControlName="layout" [options]="layoutOptions()" optionLabel="label" optionValue="value" appendTo="body" />
-      <label [for]="controlId() + '-layout'">{{ i18n.buttons().layout }}</label>
-    </p-iftalabel>
-    <p-iftalabel class="w-100">
-      <p-select class="w-100" [inputId]="controlId() + '-align'" formControlName="align" [options]="alignOptions()" optionLabel="label" optionValue="value" appendTo="body" />
-      <label [for]="controlId() + '-align'">{{ i18n.buttons().align }}</label>
-    </p-iftalabel>
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-select class="w-100" [class.p-invalid]="diagnostics().issuesAt({ blockId, field: 'presentation.layout' }).length" [inputId]="controlId() + '-layout'" formControlName="layout" [options]="layoutOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+        <label [for]="controlId() + '-layout'">{{ i18n.buttons().layout }}</label>
+      </p-iftalabel>
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'presentation.layout' })" />
+    </div>
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-select class="w-100" [class.p-invalid]="diagnostics().issuesAt({ blockId, field: 'presentation.align' }).length" [inputId]="controlId() + '-align'" formControlName="align" [options]="alignOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+        <label [for]="controlId() + '-align'">{{ i18n.buttons().align }}</label>
+      </p-iftalabel>
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'presentation.align' })" />
+    </div>
   </div>
+  <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'presentation' })" />
 
   <div class="flex-row-end-center">
     <p-button type="button" severity="secondary" [label]="i18n.buttons().add" icon="pi pi-plus" (onClick)="addButton()" />
@@ -18,21 +26,23 @@
   }
 
   @for (button of form().controls.buttons.controls; track button; let index = $index) {
-    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="button">
+    @let itemId = button.controls.id.value;
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [class.border-danger]="diagnostics().issuesWithin({ itemId }).length" [formGroup]="button">
       <app-item-editor-actions [index]="index" [itemCount]="form().controls.buttons.length" (moveUp)="moveButton(index, -1)" (moveDown)="moveButton(index, 1)" (remove)="removeButton(index)" />
       <div class="mg-grid-3 gap-md w-100">
         <div class="flex-col-start-stretch gap-xs w-100">
           <p-iftalabel class="w-100">
-            <input pInputText class="w-100" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />
+            <input pInputText class="w-100" [class.p-invalid]="diagnostics().issuesAt({ itemId, field: 'label' }).length" [id]="controlId() + '-' + index + '-label'" formControlName="label" autocomplete="off" />
             <label [for]="controlId() + '-' + index + '-label'">{{ i18n.commonLabels().label }}</label>
           </p-iftalabel>
           @if (button.controls.label.touched && button.controls.label.invalid) {
             <small class="error-text">{{ i18n.commonForm().required }}</small>
           }
+          <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId, field: 'label' })" />
         </div>
         <div class="flex-col-start-stretch gap-xs w-100">
           <p-iftalabel class="w-100">
-            <input pInputText class="w-100" [id]="controlId() + '-' + index + '-route'" formControlName="route" autocomplete="off" />
+            <input pInputText class="w-100" [class.p-invalid]="diagnostics().issuesAt({ itemId, field: 'route' }).length" [id]="controlId() + '-' + index + '-route'" formControlName="route" autocomplete="off" />
             <label [for]="controlId() + '-' + index + '-route'">{{ i18n.buttons().route }}</label>
           </p-iftalabel>
           @if (button.controls.route.touched) {
@@ -42,14 +52,18 @@
               <small class="error-text">{{ i18n.commonForm().required }}</small>
             }
           }
+          <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId, field: 'route' })" />
         </div>
-        <p-iftalabel class="w-100">
-          <p-select class="w-100" [inputId]="controlId() + '-' + index + '-appearance'" formControlName="appearance" [options]="appearanceOptions()" optionLabel="label" optionValue="value" appendTo="body" />
-          <label [for]="controlId() + '-' + index + '-appearance'">{{ i18n.buttons().appearance }}</label>
-        </p-iftalabel>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-select class="w-100" [class.p-invalid]="diagnostics().issuesAt({ itemId, field: 'appearance' }).length" [inputId]="controlId() + '-' + index + '-appearance'" formControlName="appearance" [options]="appearanceOptions()" optionLabel="label" optionValue="value" appendTo="body" />
+            <label [for]="controlId() + '-' + index + '-appearance'">{{ i18n.buttons().appearance }}</label>
+          </p-iftalabel>
+          <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId, field: 'appearance' })" />
+        </div>
       </div>
 
-      <div class="flex-col-start-stretch gap-xs w-100">
+      <div class="flex-col-start-stretch gap-xs w-100" [class.border-bottom]="diagnostics().issuesAt({ itemId, field: 'iconKey' }).length" [class.border-danger]="diagnostics().issuesAt({ itemId, field: 'iconKey' }).length">
         <span class="small-caps">{{ i18n.buttons().iconKey }}</span>
         <div class="flex-row-start-center flex-wrap gap-xs w-100">
           @for (option of iconOptions(); track option.value) {
@@ -69,7 +83,10 @@
             </button>
           }
         </div>
+        <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId, field: 'iconKey' })" />
       </div>
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId })" />
     </div>
   }
+  <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'buttons' })" />
 </div>

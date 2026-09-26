@@ -3,7 +3,7 @@
     "title": "Dyspozycyjność Mistrza Gry",
     "subtitle": "Poniżej możesz ustawić swoje przedziały dostępności do prowadzenia sesji RPG. Przedział musi trwać minimum 4 godziny i możesz w ciągu danego dnia mieć więcej niż jeden przedział. System umożliwia wybranie przedziału na przełomie dni - czyli przed i po północy.",
     "editorTitle": "Przedziały dla wybranego dnia",
-    "hint": "Każdy przedział musi trwać minimum 4 godziny. Po uzupełnieniu wszystkich dni, kliknij przycisk „Zapisz dyspozycyjność” na dole strony."
+    "hint": "Każdy przedział musi trwać minimum 4 godziny. Po uzupełnieniu wszystkich dni, kliknij przycisk \"Zapisz dyspozycyjność\" na dole strony."
   },
   "actions": {
     "addRangeLabel": "Dodaj przedział",

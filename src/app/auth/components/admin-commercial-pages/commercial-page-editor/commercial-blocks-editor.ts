@@ -4,6 +4,7 @@ import { FormArray, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import { COMMERCIAL_BUILDER_BLOCK_TYPES } from '../../../../core/configs/commercial-pages.config';
 import { createNewCommercialBlockEditorForm } from '../../../../core/factories/commercial-block-editor-form.factory';
 import type { CommercialPageBlockEditorForm } from '../../../../core/types/commercial-builder-block-editor-form';
@@ -13,6 +14,7 @@ import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialBlockEditor } from './commercial-block-editor';
 import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-blocks-editor',
@@ -22,11 +24,14 @@ import { ItemEditorActions } from '../../../../common/item-editor-actions/item-e
     SelectModule,
     CommercialBlockEditor,
     ItemEditorActions,
+    CommercialPublicationIssueMessages,
   ],
   templateUrl: './commercial-blocks-editor.html',
 })
 export class CommercialBlocksEditor {
   readonly blocks = input.required<FormArray<CommercialPageBlockEditorForm>>();
+  readonly sectionId = input.required<string>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);

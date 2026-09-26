@@ -28,11 +28,26 @@
   @if (!blocks().length) {
     <p class="m-0">{{ i18n.section().emptyBlocks }}</p>
   }
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ sectionId: sectionId(), field: 'blocks' })"
+  />
 
   @for (block of blocks().controls; track block; let index = $index) {
-    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    @let blockId = block.controls.id.value;
+    @let issueCount = diagnostics().blockIssueCount(blockId);
+    <section
+      class="mg-card flex-col-start-stretch gap-md p-md w-100"
+      [class.border-danger]="issueCount"
+    >
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
-        <strong>{{ blockTypeLabel(block.controls.type.value) }}</strong>
+        <div class="flex-row-start-center flex-wrap gap-xs">
+          <strong>{{ blockTypeLabel(block.controls.type.value) }}</strong>
+          @if (issueCount) {
+            <small class="error-text">
+              · {{ i18n.diagnostics().issues }}: {{ issueCount }}
+            </small>
+          }
+        </div>
         <div class="flex-row-end-center flex-wrap gap-xs">
           <p-button
             type="button"
@@ -52,6 +67,9 @@
           />
         </div>
       </div>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ blockId })"
+      />
       @if (activeBlockId() === block.controls.id.value) {
         <div class="flex-col-start-stretch gap-md w-100">
           <app-commercial-block-editor
@@ -59,6 +77,7 @@
             [products]="products()"
             [controlId]="controlId() + '-' + index"
             [tokens]="tokens()"
+            [diagnostics]="diagnostics()"
           />
           <div class="flex-row-end-center">
             <p-button

@@ -20,7 +20,7 @@ export function formatPrice(
     case 'range':
       return {
         value: formatUnitPrice(
-          `${formatCurrency(price.minAmount, price.currency, locale)} – ${formatCurrency(price.maxAmount, price.currency, locale)}`,
+          `${formatCurrency(price.minAmount, price.currency, locale)} - ${formatCurrency(price.maxAmount, price.currency, locale)}`,
           translations.units[price.unit],
         ),
         note: price.note,
@@ -73,7 +73,7 @@ function formatPercentage(
       ? `${formatPercentageValue(
           price.minValue,
           locale,
-        )} – ${formatPercentageValue(price.maxValue, locale)}`
+        )} - ${formatPercentageValue(price.maxValue, locale)}`
       : '';
 
   return percentage

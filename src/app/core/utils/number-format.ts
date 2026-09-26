@@ -30,7 +30,7 @@ function formatNumberRange(
 ): string {
   if (min === max) return formatNumber(min, locale);
 
-  return `${formatNumber(min, locale)}–${formatNumber(max, locale)}`;
+  return `${formatNumber(min, locale)}-${formatNumber(max, locale)}`;
 }
 
 export function formatOptionalNumberRange(

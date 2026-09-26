@@ -9,6 +9,7 @@ import {
   isCommercialRichTextBlockEditorForm,
   isCommercialTableBlockEditorForm,
 } from '../../../../core/factories/commercial-block-editor-form.mapper';
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import type { CommercialPageBlockEditorForm } from '../../../../core/types/commercial-builder-block-editor-form';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
@@ -34,6 +35,7 @@ import { CommercialTableBlockEditor } from './commercial-table-block-editor';
 export class CommercialBlockEditor {
   readonly form = input.required<CommercialPageBlockEditorForm>();
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
 

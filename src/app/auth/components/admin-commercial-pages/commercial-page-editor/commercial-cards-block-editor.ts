@@ -11,6 +11,7 @@ import {
   COMMERCIAL_CARD_ORIENTATIONS,
   COMMERCIAL_MANUAL_CARD_COLUMNS,
 } from '../../../../core/configs/commercial-pages.config';
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import {
   createCommercialCardEditorForm,
   syncCommercialCardPriceControl,
@@ -21,14 +22,16 @@ import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 import { PriceEditor } from '../../../../common/price-editor/price-editor';
 import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-cards-block-editor',
-  imports: [ReactiveFormsModule, ButtonModule, CheckboxModule, IftaLabelModule, InputTextModule, SelectModule, ItemEditorActions, PriceEditor, RichContentEditor],
+  imports: [ReactiveFormsModule, ButtonModule, CheckboxModule, IftaLabelModule, InputTextModule, SelectModule, ItemEditorActions, PriceEditor, RichContentEditor, CommercialPublicationIssueMessages],
   templateUrl: './commercial-cards-block-editor.html',
 })
 export class CommercialCardsBlockEditor {
   readonly form = input.required<CommercialCardsBlockEditorForm>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
 

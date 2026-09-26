@@ -10,12 +10,14 @@ import {
   COMMERCIAL_SECTION_SURFACES,
   COMMERCIAL_TEXT_ALIGNS,
 } from '../../../../core/configs/commercial-pages.config';
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import type {
   CommercialProductEditorForm,
   CommercialSectionEditorForm,
 } from '../../../../core/types/commercial-page-editor-form';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialBlocksEditor } from './commercial-blocks-editor';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-section-editor',
@@ -26,12 +28,14 @@ import { CommercialBlocksEditor } from './commercial-blocks-editor';
     SelectModule,
     TextareaModule,
     CommercialBlocksEditor,
+    CommercialPublicationIssueMessages,
   ],
   templateUrl: './commercial-section-editor.html',
 })
 export class CommercialSectionEditor {
   readonly form = input.required<CommercialSectionEditorForm>();
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
   readonly activeBlockId = model<string | null>(null);

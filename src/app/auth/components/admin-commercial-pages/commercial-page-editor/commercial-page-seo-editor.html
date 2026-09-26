@@ -5,6 +5,9 @@
   <h2 class="mg-section__title mg-section__title--md m-0">
     {{ commonLabels().seo }}
   </h2>
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ field: 'seo' })"
+  />
 
   <div class="w-100">
     <p-iftalabel class="w-100">
@@ -12,6 +15,7 @@
         pInputText
         id="commercial-page-seo-title"
         class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ field: 'seo.title' }).length"
         formControlName="title"
         autocomplete="off"
       />
@@ -21,6 +25,9 @@
     @if (form().controls.title.touched && form().controls.title.invalid) {
       <small class="error-text">{{ requiredMessage() }}</small>
     }
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ field: 'seo.title' })"
+    />
   </div>
 
   <div class="w-100">
@@ -29,6 +36,7 @@
         pTextarea
         id="commercial-page-seo-description"
         class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ field: 'seo.description' }).length"
         formControlName="description"
         rows="4"
       ></textarea>
@@ -43,31 +51,46 @@
     ) {
       <small class="error-text">{{ requiredMessage() }}</small>
     }
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ field: 'seo.description' })"
+    />
   </div>
 
   <div class="flex-col-start-stretch gap-md w-100">
-    <p-iftalabel class="w-100">
-      <input
-        pInputText
-        id="commercial-page-og-title"
-        class="w-100"
-        formControlName="ogTitle"
-        autocomplete="off"
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <input
+          pInputText
+          id="commercial-page-og-title"
+          class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ field: 'seo.ogTitle' }).length"
+          formControlName="ogTitle"
+          autocomplete="off"
+        />
+        <label for="commercial-page-og-title">{{ copy().ogTitle }}</label>
+      </p-iftalabel>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ field: 'seo.ogTitle' })"
       />
-      <label for="commercial-page-og-title">{{ copy().ogTitle }}</label>
-    </p-iftalabel>
+    </div>
 
-    <p-iftalabel class="w-100">
-      <textarea
-        pTextarea
-        id="commercial-page-og-description"
-        class="w-100"
-        formControlName="ogDescription"
-        rows="3"
-      ></textarea>
-      <label for="commercial-page-og-description">
-        {{ copy().ogDescription }}
-      </label>
-    </p-iftalabel>
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <textarea
+          pTextarea
+          id="commercial-page-og-description"
+          class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ field: 'seo.ogDescription' }).length"
+          formControlName="ogDescription"
+          rows="3"
+        ></textarea>
+        <label for="commercial-page-og-description">
+          {{ copy().ogDescription }}
+        </label>
+      </p-iftalabel>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ field: 'seo.ogDescription' })"
+      />
+    </div>
   </div>
 </section>

@@ -5,7 +5,7 @@ export const QUESTIONNAIRE_PDF_COPY = {
     registeredAddress: "Adres zameldowania",
     correspondenceAddress:
       "Adres zamieszkania oraz adres do korespondencji jeżeli jest inny niż adres zameldowania",
-    institutions: "2. DANE DO ROZLICZEŃ PUBLICZNO – PRAWNYCH",
+    institutions: "2. DANE DO ROZLICZEŃ PUBLICZNO - PRAWNYCH",
     insurance: "3. UBEZPIECZENIA SPOŁECZNE",
     insuranceExclusions:
       "3.1. Podstawa wyłączenia z obowiązkowych ubezpieczeń społecznych:",

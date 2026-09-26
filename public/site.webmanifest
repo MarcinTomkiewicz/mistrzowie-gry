@@ -1,7 +1,7 @@
 {
   "name": "Mistrzowie Gry",
   "short_name": "MG",
-  "description": "Mistrzowie Gry – centrum gier fabularnych, wydarzeń i drużyn RPG.",
+  "description": "Mistrzowie Gry - centrum gier fabularnych, wydarzeń i drużyn RPG.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -28,6 +28,7 @@
     #textSurface
     pTextarea
     class="w-100"
+    [class.p-invalid]="issues().length"
     rows="4"
     [id]="controlId() + '-text'"
     [value]="text()"
@@ -40,6 +41,9 @@
     (input)="updateText(textSurface)"
     (blur)="blurred.emit()"
   ></textarea>
+  @for (issue of issues(); track $index) {
+    <small class="error-text">{{ ('common.' + issue.messageKey) | transloco }}</small>
+  }
 
   @if (text()) {
     <div class="flex-col-start-stretch gap-xs w-100">
@@ -63,7 +67,7 @@
           severity="secondary"
           icon="pi pi-pencil"
           [text]="true"
-          [label]="link.text + ' — ' + link.href"
+          [label]="link.text + ' - ' + link.href"
           (onClick)="editLink(link)"
         />
       }

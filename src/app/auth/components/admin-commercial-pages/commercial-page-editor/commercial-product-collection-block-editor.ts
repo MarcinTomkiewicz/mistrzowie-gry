@@ -14,6 +14,7 @@ import {
   COMMERCIAL_PRODUCT_FIELD_KEYS,
   COMMERCIAL_PRODUCT_KINDS,
 } from '../../../../core/configs/commercial-pages.config';
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import {
   syncCommercialProductCollectionPresentationControls,
 } from '../../../../core/factories/commercial-block-editor-form.factory';
@@ -40,6 +41,7 @@ import {
 } from './commercial-product-references';
 import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 import { CommercialProductComparisonEditor } from './commercial-product-comparison-editor';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-product-collection-block-editor',
@@ -52,11 +54,13 @@ import { CommercialProductComparisonEditor } from './commercial-product-comparis
     SelectModule,
     ItemEditorActions,
     CommercialProductComparisonEditor,
+    CommercialPublicationIssueMessages,
   ],
   templateUrl: './commercial-product-collection-block-editor.html',
 })
 export class CommercialProductCollectionBlockEditor {
   readonly form = input.required<CommercialProductCollectionBlockEditorForm>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
   readonly controlId = input.required<string>();
 

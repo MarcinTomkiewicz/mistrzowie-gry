@@ -1,4 +1,4 @@
-<section class="flex-col-start-stretch gap-sm w-100">
+<section class="flex-col-start-stretch gap-sm w-100" [class.border-bottom]="issuesAt([]).length || issuesAt(['sections']).length" [class.border-danger]="issuesAt([]).length || issuesAt(['sections']).length">
   <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
     <strong class="small-caps">{{ label() }}</strong>
 
@@ -36,9 +36,12 @@
   @if (!sections().length) {
     <p class="m-0">{{ i18n().empty }}</p>
   }
+  <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt([]) }" />
+  <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(['sections']) }" />
 
   @for (section of sections(); track section; let sectionIndex = $index) {
-    <section class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+    @let sectionIssuePath = ['sections', '' + sectionIndex];
+    <section class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [class.border-danger]="issuesWithin(sectionIssuePath).length">
       <div class="flex-row-between-center gap-sm">
         <strong>
           {{ labels().section }} {{ sectionIndex + 1 }}
@@ -61,17 +64,22 @@
         class="w-100"
         [id]="controlId() + '-section-' + sectionIndex + '-title'"
         [value]="section.title ?? ''"
+        [class.p-invalid]="issuesAt(sectionIssuePath.concat('title')).length"
         autocomplete="off"
         (input)="updateSectionTitle(section, sectionTitle.value)"
       />
+      <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(sectionIssuePath.concat('title')) }" />
 
       <ng-container
         [ngTemplateOutlet]="blocksTemplate"
         [ngTemplateOutletContext]="{
           $implicit: section.blocks,
-          path: controlId() + '-section-' + sectionIndex
+          path: controlId() + '-section-' + sectionIndex,
+          issuePath: sectionIssuePath.concat('blocks')
         }"
       />
+      <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(sectionIssuePath.concat('blocks')) }" />
+      <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(sectionIssuePath) }" />
     </section>
   }
 
@@ -82,7 +90,7 @@
   }
 </section>
 
-<ng-template #blocksTemplate let-blocks let-path="path" let-listItem="listItem">
+<ng-template #blocksTemplate let-blocks let-path="path" let-issuePath="issuePath" let-listItem="listItem">
   <div class="flex-col-start-stretch gap-sm w-100">
     <div class="flex-row-start-center flex-wrap gap-xs">
       <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="i18n().addParagraph" (onClick)="addBlock(blocks, 'paragraph', listItem)" />
@@ -91,7 +99,8 @@
     </div>
 
     @for (block of blocks; track block; let blockIndex = $index) {
-      <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
+      @let blockIssuePath = issuePath.concat('' + blockIndex);
+      <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [class.border-danger]="issuesWithin(blockIssuePath).length">
         <div class="flex-row-between-center gap-sm">
           <strong>{{ blockLabel(block.type) }}</strong>
           <app-item-editor-actions
@@ -108,16 +117,19 @@
             [ngTemplateOutlet]="nodesTemplate"
             [ngTemplateOutletContext]="{
               $implicit: block.content ?? [],
-              path: path + '-block-' + blockIndex
+              path: path + '-block-' + blockIndex,
+              issuePath: blockIssuePath
             }"
           />
         } @else {
           <div class="flex-row-end-center">
             <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="actions().addItem" (onClick)="addListItem(block.items)" />
           </div>
+          <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(blockIssuePath.concat('items')) }" />
 
           @for (item of block.items; track item; let itemIndex = $index) {
-            <div class="flex-col-start-stretch gap-sm border-1 border-round p-sm w-100">
+            @let itemIssuePath = blockIssuePath.concat('items', '' + itemIndex);
+            <div class="flex-col-start-stretch gap-sm border-1 border-round p-sm w-100" [class.border-bottom]="issuesWithin(itemIssuePath).length" [class.border-danger]="issuesWithin(itemIssuePath).length">
               <div class="flex-row-between-center gap-sm">
                 <span>{{ labels().item }} {{ itemIndex + 1 }}</span>
                 <app-item-editor-actions
@@ -133,7 +145,8 @@
                 [ngTemplateOutlet]="nodesTemplate"
                 [ngTemplateOutletContext]="{
                   $implicit: item.content ?? [],
-                  path: path + '-block-' + blockIndex + '-item-' + itemIndex
+                  path: path + '-block-' + blockIndex + '-item-' + itemIndex,
+                  issuePath: itemIssuePath
                 }"
               />
 
@@ -145,24 +158,35 @@
                 [ngTemplateOutletContext]="{
                   $implicit: item.blocks ?? [],
                   path: path + '-block-' + blockIndex + '-item-' + itemIndex,
+                  issuePath: itemIssuePath.concat('blocks'),
                   listItem: item
                 }"
               />
+              <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(itemIssuePath.concat('blocks')) }" />
+              <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(itemIssuePath) }" />
             </div>
           }
         }
+        <ng-container [ngTemplateOutlet]="issueMessages" [ngTemplateOutletContext]="{ $implicit: issuesAt(blockIssuePath) }" />
       </div>
     }
   </div>
 </ng-template>
 
-<ng-template #nodesTemplate let-nodes let-path="path">
+<ng-template #nodesTemplate let-nodes let-path="path" let-issuePath="issuePath">
   <app-rich-content-inline-editor
     class="w-100"
     [nodes]="nodes"
     [controlId]="path"
+    [issues]="inlineIssues(issuePath)"
     (activated)="activateInlineEditor($event)"
     (changed)="commit()"
     (blurred)="control().markAsTouched()"
   />
+</ng-template>
+
+<ng-template #issueMessages let-messages>
+  @for (issue of messages; track $index) {
+    <small class="error-text">{{ ('common.' + issue.messageKey) | transloco }}</small>
+  }
 </ng-template>

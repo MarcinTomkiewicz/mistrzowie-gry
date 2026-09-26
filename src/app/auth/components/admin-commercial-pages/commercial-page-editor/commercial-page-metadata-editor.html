@@ -13,6 +13,7 @@
           pInputText
           id="commercial-page-slug"
           class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ field: 'slug' }).length"
           formControlName="slug"
           autocomplete="off"
         />
@@ -30,6 +31,9 @@
       ) {
         <small class="error-text">{{ copy().slugPattern }}</small>
       }
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ field: 'slug' })"
+      />
     </div>
 
     <p-iftalabel class="w-100">
@@ -52,6 +56,7 @@
         pInputText
         id="commercial-page-heading"
         class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ field: 'heading' }).length"
         formControlName="heading"
         autocomplete="off"
       />
@@ -61,16 +66,25 @@
     @if (form().controls.heading.touched && form().controls.heading.invalid) {
       <small class="error-text">{{ requiredMessage() }}</small>
     }
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ field: 'heading' })"
+    />
   </div>
 
-  <p-iftalabel class="w-100">
-    <textarea
-      pTextarea
-      id="commercial-page-lead"
-      class="w-100"
-      formControlName="lead"
-      rows="4"
-    ></textarea>
-    <label for="commercial-page-lead">{{ commonLabels().lead }}</label>
-  </p-iftalabel>
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        id="commercial-page-lead"
+        class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ field: 'lead' }).length"
+        formControlName="lead"
+        rows="4"
+      ></textarea>
+      <label for="commercial-page-lead">{{ commonLabels().lead }}</label>
+    </p-iftalabel>
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ field: 'lead' })"
+    />
+  </div>
 </section>

@@ -181,7 +181,7 @@ export const MgPrimePreset = definePreset(Aura, {
       },
     },
 
-    // Zostawiamy też na top-level jako “belt & suspenders”.
+    // Zostawiamy też na top-level jako "belt & suspenders".
     // Jeśli Aura nie definiuje któregoś semantyka w colorScheme, to i tak zadziała.
     info: { color: mg.info },
     success: { color: mg.success },

@@ -19,8 +19,8 @@ i nadpisuje jeden plik:
 Nie obejmuje pozostałych jednostek KAS ani wyspecjalizowanych urzędów
 skarbowych (`WUS`). Pliku wynikowego nie wolno edytować ręcznie.
 
-1. Pobierz aktualny XLSX „Dane teleadresowe jednostek Krajowej Administracji
-   Skarbowej” z oficjalnej strony KAS i zapisz go lokalnie.
+1. Pobierz aktualny XLSX "Dane teleadresowe jednostek Krajowej Administracji
+   Skarbowej" z oficjalnej strony KAS i zapisz go lokalnie.
 2. Uruchom generator, przekazując lokalną ścieżkę oraz datę pliku źródłowego:
 
    ```text

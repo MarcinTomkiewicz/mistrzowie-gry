@@ -16,6 +16,10 @@ import {
   COMMERCIAL_PAGE_DEFAULT_LOCALE,
 } from '../../../../core/configs/commercial-pages.config';
 import {
+  EMPTY_COMMERCIAL_PAGE_PUBLICATION_ISSUE_INDEX,
+  resolveCommercialPagePublicationIssues,
+} from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
+import {
   createCommercialPageEditorForm,
   mapCommercialPageEditorFormToDocument,
   resetCommercialPageEditorForm,
@@ -37,6 +41,7 @@ import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor'
 import { CommercialPageSectionsEditor } from './commercial-page-sections-editor';
 import { CommercialPageSeoEditor } from './commercial-page-seo-editor';
 import { CommercialProductsEditor } from './commercial-products-editor';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-page-editor',
@@ -52,6 +57,7 @@ import { CommercialProductsEditor } from './commercial-products-editor';
     CommercialPageSectionsEditor,
     CommercialPageSeoEditor,
     CommercialProductsEditor,
+    CommercialPublicationIssueMessages,
   ],
   templateUrl: './commercial-page-editor.html',
   providers: [
@@ -68,12 +74,16 @@ export class CommercialPageEditor {
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
   private readonly transloco = inject(TranslocoService);
+  private validationRequestId = 0;
 
   protected readonly pageId =
     inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly form = createCommercialPageEditorForm();
   protected readonly detail = signal<CommercialPageAdminDetail | null>(null);
+  protected readonly publicationDiagnostics = signal(
+    EMPTY_COMMERCIAL_PAGE_PUBLICATION_ISSUE_INDEX,
+  );
   protected readonly commercialConstants = signal<
     readonly CommercialConstantAdminItem[]
   >([]);
@@ -110,6 +120,10 @@ export class CommercialPageEditor {
 
   protected loadPage(): void {
     this.detail.set(null);
+    this.publicationDiagnostics.set(
+      EMPTY_COMMERCIAL_PAGE_PUBLICATION_ISSUE_INDEX,
+    );
+    this.validationRequestId += 1;
     this.isLoading.set(true);
     this.hasLoadError.set(false);
 
@@ -247,6 +261,31 @@ export class CommercialPageEditor {
   private applyDetail(detail: CommercialPageAdminDetail): void {
     this.detail.set(detail);
     resetCommercialPageEditorForm(this.form, detail.draft);
+    this.loadPublicationDiagnostics(detail);
+  }
+
+  private loadPublicationDiagnostics(detail: CommercialPageAdminDetail): void {
+    const requestId = ++this.validationRequestId;
+
+    this.pages.validateDraft(detail.page.id, detail.page.locale).subscribe({
+      next: (issues) => {
+        if (requestId !== this.validationRequestId) return;
+        this.publicationDiagnostics.set(
+          resolveCommercialPagePublicationIssues(issues, detail.draft),
+        );
+      },
+      error: () => {
+        if (requestId !== this.validationRequestId) return;
+        const toast = this.i18n.publicationToast();
+        this.publicationDiagnostics.set(
+          EMPTY_COMMERCIAL_PAGE_PUBLICATION_ISSUE_INDEX,
+        );
+        this.toast.danger({
+          summary: toast.validationFailedSummary,
+          detail: toast.validationFailedDetail,
+        });
+      },
+    });
   }
 
   private showSaveError(): void {

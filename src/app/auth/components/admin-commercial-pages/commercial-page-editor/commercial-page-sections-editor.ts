@@ -3,6 +3,7 @@ import { FormArray } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import { createCommercialSectionEditorForm } from '../../../../core/factories/commercial-section-editor-form.factory';
 import type {
   CommercialProductEditorForm,
@@ -11,14 +12,20 @@ import type {
 import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialSectionEditor } from './commercial-section-editor';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-page-sections-editor',
-  imports: [ButtonModule, CommercialSectionEditor],
+  imports: [
+    ButtonModule,
+    CommercialSectionEditor,
+    CommercialPublicationIssueMessages,
+  ],
   templateUrl: './commercial-page-sections-editor.html',
 })
 export class CommercialPageSectionsEditor {
   readonly sections = input.required<FormArray<CommercialSectionEditorForm>>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
   readonly tokens = input<readonly string[]>([]);
   readonly activeSectionId = model<string | null>(null);

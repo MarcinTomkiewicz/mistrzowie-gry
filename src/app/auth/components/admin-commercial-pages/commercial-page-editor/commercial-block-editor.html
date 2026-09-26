@@ -1,36 +1,43 @@
 @if (richTextForm(); as richText) {
+  @let blockId = richText.controls.id.value;
   <app-rich-content-editor
     [control]="richText.controls.content"
     [controlId]="controlId() + '-content'"
     [label]="i18n.blockType().rich_text"
     [tokens]="tokens()"
+    [issues]="diagnostics().richContentIssues({ blockId, field: 'content' })"
   />
 } @else if (buttonsForm(); as buttons) {
   <app-commercial-buttons-block-editor
     [form]="buttons"
     [controlId]="controlId()"
+    [diagnostics]="diagnostics()"
   />
 } @else if (cardsForm(); as cards) {
   <app-commercial-cards-block-editor
     [form]="cards"
     [controlId]="controlId()"
     [tokens]="tokens()"
+    [diagnostics]="diagnostics()"
   />
 } @else if (productCollectionForm(); as collection) {
   <app-commercial-product-collection-block-editor
     [form]="collection"
     [products]="products()"
     [controlId]="controlId()"
+    [diagnostics]="diagnostics()"
   />
 } @else if (tableForm(); as table) {
   <app-commercial-table-block-editor
     [form]="table"
     [controlId]="controlId()"
     [tokens]="tokens()"
+    [diagnostics]="diagnostics()"
   />
 } @else if (faqForm(); as faq) {
   <app-commercial-faq-block-editor
     [form]="faq"
     [controlId]="controlId()"
+    [diagnostics]="diagnostics()"
   />
 }

@@ -1,23 +1,35 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
-  <p-iftalabel class="w-100">
-    <p-select
-      class="w-100"
-      [inputId]="controlId() + '-kind'"
-      formControlName="kind"
-      [options]="kindOptions()"
-      optionLabel="label"
-      optionValue="value"
-      appendTo="body"
-      (onChange)="syncKind()"
+  @let productId = form().controls.id.value;
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ productId })"
+  />
+
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <p-iftalabel class="w-100">
+      <p-select
+        class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ productId, field: 'kind' }).length"
+        [inputId]="controlId() + '-kind'"
+        formControlName="kind"
+        [options]="kindOptions()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        (onChange)="syncKind()"
+      />
+      <label [for]="controlId() + '-kind'">{{ i18n.product().kind }}</label>
+    </p-iftalabel>
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ productId, field: 'kind' })"
     />
-    <label [for]="controlId() + '-kind'">{{ i18n.product().kind }}</label>
-  </p-iftalabel>
+  </div>
 
   <div class="w-100">
     <p-iftalabel class="w-100">
       <input
         pInputText
         class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ productId, field: 'name' }).length"
         [id]="controlId() + '-name'"
         formControlName="name"
         autocomplete="off"
@@ -27,6 +39,9 @@
     @if (form().controls.name.touched && form().controls.name.invalid) {
       <small class="error-text">{{ i18n.commonForm().required }}</small>
     }
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ productId, field: 'name' })"
+    />
   </div>
 
   <app-rich-content-editor
@@ -34,31 +49,40 @@
     [controlId]="controlId() + '-description'"
     [label]="i18n.product().description"
     [tokens]="tokens()"
+    [issues]="diagnostics().richContentIssues({ productId, field: 'description' })"
   />
 
   <app-commercial-product-prices-editor
     [form]="form()"
     [controlId]="controlId()"
+    [diagnostics]="diagnostics()"
   />
 
-  <p-iftalabel class="w-100">
-    <input
-      pInputText
-      class="w-100"
-      [id]="controlId() + '-settlement'"
-      formControlName="settlement"
-      autocomplete="off"
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ productId, field: 'settlement' }).length"
+        [id]="controlId() + '-settlement'"
+        formControlName="settlement"
+        autocomplete="off"
+      />
+      <label [for]="controlId() + '-settlement'">
+        {{ commercialI18n.productFieldLabel('settlement') }}
+      </label>
+    </p-iftalabel>
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ productId, field: 'settlement' })"
     />
-    <label [for]="controlId() + '-settlement'">
-      {{ commercialI18n.productFieldLabel('settlement') }}
-    </label>
-  </p-iftalabel>
+  </div>
 
   @if (form().controls.kind.value === 'product') {
     <div class="flex-col-start-stretch gap-xs w-100">
       <p-iftalabel class="w-100">
         <p-multiselect
           class="w-100"
+          [class.p-invalid]="diagnostics().issuesWithin({ productId, field: 'includedAddonIds' }).length"
           [inputId]="controlId() + '-included-addons'"
           formControlName="includedAddonIds"
           [options]="addonOptions()"
@@ -77,159 +101,20 @@
           {{ i18n.validation().invalidIncludedAddons }}
         </small>
       }
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesWithin({ productId, field: 'includedAddonIds' })"
+      />
     </div>
   }
 
-  <section class="flex-col-start-stretch gap-sm w-100">
-    <h4 class="mg-section__title mg-section__title--xs m-0">
-      {{ i18n.commonLabels().duration }}
-    </h4>
-    <div class="mg-grid-2 gap-md w-100">
-      <p-iftalabel class="w-100">
-        <p-select
-          class="w-100"
-          [inputId]="controlId() + '-duration-mode'"
-          formControlName="durationMode"
-          [options]="durationModeOptions()"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          (onChange)="syncModes()"
-        />
-        <label [for]="controlId() + '-duration-mode'">
-          {{ i18n.product().durationMode }}
-        </label>
-      </p-iftalabel>
-
-      @if (form().controls.durationMode.value === 'custom') {
-        <p-iftalabel class="w-100">
-          <p-inputnumber
-            class="w-100"
-            [inputId]="controlId() + '-duration-minutes'"
-            formControlName="durationMinutes"
-            [min]="1"
-          />
-          <label [for]="controlId() + '-duration-minutes'">
-            {{ i18n.product().durationMinutes }}
-          </label>
-        </p-iftalabel>
-      }
-    </div>
-    @if (form().touched && form().hasError('commercialDuration')) {
-      <small class="error-text">{{ i18n.validation().invalidDuration }}</small>
-    }
-  </section>
-
-  <section class="flex-col-start-stretch gap-sm w-100">
-    <h4 class="mg-section__title mg-section__title--xs m-0">
-      {{ i18n.commonLabels().participants }}
-    </h4>
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        [inputId]="controlId() + '-participants-mode'"
-        formControlName="participantsMode"
-        [options]="participantsModeOptions()"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        (onChange)="syncModes()"
-      />
-      <label [for]="controlId() + '-participants-mode'">
-        {{ i18n.product().participantsMode }}
-      </label>
-    </p-iftalabel>
-
-    @if (form().controls.participantsMode.value === 'custom') {
-      <div class="mg-grid-3 gap-md w-100">
-        @for (
-          field of [
-            { key: 'participantsMin', label: commercialI18n.productFieldLabel('participantsMin') },
-            { key: 'participantsMax', label: commercialI18n.productFieldLabel('participantsMax') },
-            { key: 'participantsPerFacilitatorMax', label: i18n.product().participantsPerFacilitatorMax }
-          ];
-          track field.key
-        ) {
-          <p-iftalabel class="w-100">
-            <p-inputnumber
-              class="w-100"
-              [inputId]="controlId() + '-' + field.key"
-              [formControlName]="field.key"
-              [min]="1"
-            />
-            <label [for]="controlId() + '-' + field.key">{{ field.label }}</label>
-          </p-iftalabel>
-        }
-      </div>
-    }
-    @if (form().touched && form().hasError('commercialParticipants')) {
-      <small class="error-text">{{ i18n.validation().invalidParticipants }}</small>
-    }
-  </section>
-
-  <section class="flex-col-start-stretch gap-sm w-100">
-    <h4 class="mg-section__title mg-section__title--xs m-0">
-      {{ i18n.product().structureSection }}
-    </h4>
-    <div class="mg-grid-3 gap-md w-100">
-      <p-iftalabel class="w-100">
-        <p-select
-          class="w-100"
-          [inputId]="controlId() + '-sessions-mode'"
-          formControlName="sessionsMode"
-          [options]="sessionModeOptions()"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          (onChange)="syncModes()"
-        />
-        <label [for]="controlId() + '-sessions-mode'">
-          {{ i18n.product().sessionsMode }}
-        </label>
-      </p-iftalabel>
-      @if (form().controls.sessionsMode.value !== 'not_applicable') {
-        <p-iftalabel class="w-100">
-          <p-inputnumber
-            class="w-100"
-            [inputId]="controlId() + '-sessions-count'"
-            formControlName="sessionsCount"
-            [min]="1"
-          />
-          <label [for]="controlId() + '-sessions-count'">
-            {{ i18n.product().sessions }}
-          </label>
-        </p-iftalabel>
-      }
-      @for (
-        field of [
-          { key: 'meetingCountMin', label: i18n.product().meetingCountMin },
-          { key: 'meetingCountMax', label: i18n.product().meetingCountMax },
-          { key: 'facilitatorCount', label: i18n.commonLabels().facilitatorCount },
-          { key: 'tableCount', label: i18n.commonLabels().tableCount }
-        ];
-        track field.key
-      ) {
-        <p-iftalabel class="w-100">
-          <p-inputnumber
-            class="w-100"
-            [inputId]="controlId() + '-' + field.key"
-            [formControlName]="field.key"
-            [min]="1"
-          />
-          <label [for]="controlId() + '-' + field.key">{{ field.label }}</label>
-        </p-iftalabel>
-      }
-    </div>
-    @if (form().touched && form().hasError('commercialSessions')) {
-      <small class="error-text">{{ i18n.validation().invalidSessions }}</small>
-    }
-    @if (form().touched && form().hasError('commercialMeetingRange')) {
-      <small class="error-text">{{ i18n.validation().invalidMeetingRange }}</small>
-    }
-  </section>
-
+  <app-commercial-product-details-editor
+    [form]="form()"
+    [controlId]="controlId()"
+    [diagnostics]="diagnostics()"
+  />
   <app-commercial-product-cooperation-editor
     [form]="form()"
     [controlId]="controlId()"
+    [diagnostics]="diagnostics()"
   />
 </div>

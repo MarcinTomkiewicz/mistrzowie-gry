@@ -29,6 +29,7 @@ export function createAdminCommercialPagesI18n() {
     constantsPage: AdminCommercialConstantsPageTranslations;
     editorPage: Copy.AdminCommercialPagesEditorPageTranslations;
     steps: Copy.AdminCommercialPagesEditorStepsTranslations;
+    diagnostics: Copy.AdminCommercialPagesDiagnosticsTranslations;
     editorToast: Copy.AdminCommercialPagesEditorToastTranslations;
     previewPage: Copy.AdminCommercialPagesPreviewPageTranslations;
     publication: Copy.AdminCommercialPagesPublicationTranslations;
@@ -62,7 +63,8 @@ export function createAdminCommercialPagesI18n() {
   }>('adminCommercialPages', {
     listPage: 'list.page', listTable: 'list.table', listToast: 'list.toast',
     constantsPage: 'constants.page',
-    editorPage: 'editor.page', steps: 'editor.steps', editorToast: 'editor.toast',
+    editorPage: 'editor.page', steps: 'editor.steps',
+    diagnostics: 'editor.diagnostics', editorToast: 'editor.toast',
     previewPage: 'preview.page', publication: 'publication.panel',
     publicationToast: 'publication.toast',
     metadata: 'editor.metadata', seo: 'editor.seo',

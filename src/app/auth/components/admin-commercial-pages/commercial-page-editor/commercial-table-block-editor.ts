@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import {
   createCommercialTableCellEditorForm,
   createCommercialTableColumnEditorForm,
@@ -15,14 +16,16 @@ import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
 import { RichContentEditor } from '../../../../common/rich-content-editor/rich-content-editor';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-table-block-editor',
-  imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, ItemEditorActions, RichContentEditor],
+  imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, ItemEditorActions, RichContentEditor, CommercialPublicationIssueMessages],
   templateUrl: './commercial-table-block-editor.html',
 })
 export class CommercialTableBlockEditor {
   readonly form = input.required<CommercialTableBlockEditorForm>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly controlId = input.required<string>();
   readonly tokens = input<readonly string[]>([]);
 

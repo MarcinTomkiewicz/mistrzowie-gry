@@ -16,9 +16,17 @@
   @if (!sections().length) {
     <p class="m-0">{{ i18n.sections().empty }}</p>
   }
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ field: 'sections' })"
+  />
 
   @for (section of sections().controls; track section; let index = $index) {
-    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+    @let sectionId = section.controls.id.value;
+    @let issueCount = diagnostics().sectionIssueCount(sectionId);
+    <section
+      class="mg-card flex-col-start-stretch gap-sm p-md w-100"
+      [class.border-danger]="issueCount"
+    >
       <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
         <div class="flex-col-start-stretch gap-xs">
           <strong>
@@ -31,6 +39,11 @@
             {{ i18n.sectionSurface()[section.controls.surface.value] }} ·
             {{ i18n.textAlign()[section.controls.textAlign.value] }} ·
             {{ i18n.section().blocks }}: {{ section.controls.blocks.length }}
+            @if (issueCount) {
+              <span class="error-text">
+                · {{ i18n.diagnostics().issues }}: {{ issueCount }}
+              </span>
+            }
           </small>
         </div>
 
@@ -76,6 +89,10 @@
         </div>
       </div>
 
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ sectionId })"
+      />
+
       @if (activeSectionId() === section.controls.id.value) {
         <div class="flex-col-start-stretch gap-md w-100">
           <app-commercial-section-editor
@@ -83,6 +100,7 @@
             [products]="products()"
             [controlId]="'commercial-page-section-' + index"
             [tokens]="tokens()"
+            [diagnostics]="diagnostics()"
             [(activeBlockId)]="activeBlockId"
           />
           <div class="flex-row-end-center">

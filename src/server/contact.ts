@@ -104,7 +104,7 @@ export function registerContactRoute(app: express.Express): void {
 
       const fullName = `${firstName} ${lastName}`.trim();
       await transporter.sendMail({
-        from: `"${siteName} – formularz kontaktowy" <${from}>`,
+        from: `"${siteName} - formularz kontaktowy" <${from}>`,
         to,
         replyTo: `"${fullName}" <${email}>`,
         subject: `[Kontakt] ${subject}`,

@@ -1,37 +1,49 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
+  @let blockId = form().controls.id.value;
   <div class="flex-row-between-center gap-sm">
     <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.table().columns }}</h5>
     <p-button type="button" severity="secondary" [label]="i18n.table().addColumn" icon="pi pi-plus" (onClick)="addColumn()" />
   </div>
   @for (column of form().controls.columns.controls; track column; let columnIndex = $index) {
-    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [formGroup]="column">
+    @let itemId = column.controls.id.value;
+    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100" [class.border-danger]="diagnostics().issuesWithin({ itemId }).length" [formGroup]="column">
       <app-item-editor-actions [index]="columnIndex" [itemCount]="form().controls.columns.length" (moveUp)="moveColumn(columnIndex, -1)" (moveDown)="moveColumn(columnIndex, 1)" (remove)="removeColumn(columnIndex)" />
       <p-iftalabel class="w-100">
-        <input pInputText class="w-100" [id]="controlId() + '-column-' + columnIndex" formControlName="label" autocomplete="off" />
+        <input pInputText class="w-100" [class.p-invalid]="diagnostics().issuesAt({ itemId, field: 'label' }).length" [id]="controlId() + '-column-' + columnIndex" formControlName="label" autocomplete="off" />
         <label [for]="controlId() + '-column-' + columnIndex">{{ i18n.table().columnHeading }}</label>
       </p-iftalabel>
       @if (column.controls.label.touched && column.controls.label.invalid) {
         <small class="error-text">{{ i18n.commonForm().required }}</small>
       }
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId, field: 'label' })" />
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId })" />
     </div>
   }
   @if (!form().controls.columns.length) {
     <small class="error-text">{{ i18n.commonForm().required }}</small>
   }
+  <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'columns' })" />
 
   <div class="flex-row-between-center gap-sm">
     <h5 class="mg-section__title mg-section__title--xs m-0">{{ i18n.table().rows }}</h5>
     <p-button type="button" severity="secondary" [label]="i18n.table().addRow" icon="pi pi-plus" [disabled]="!form().controls.columns.length" (onClick)="addRow()" />
   </div>
   @for (row of form().controls.rows.controls; track row; let rowIndex = $index) {
-    <div class="mg-card flex-col-start-stretch gap-md p-sm w-100">
+    @let itemId = row.controls.id.value;
+    <div class="mg-card flex-col-start-stretch gap-md p-sm w-100" [class.border-danger]="diagnostics().issuesWithin({ itemId }).length">
       <app-item-editor-actions [index]="rowIndex" [itemCount]="form().controls.rows.length" (moveUp)="moveRow(rowIndex, -1)" (moveDown)="moveRow(rowIndex, 1)" (remove)="removeRow(rowIndex)" />
       @for (cell of row.controls.cells.controls; track cell; let cellIndex = $index) {
-        <app-rich-content-editor [control]="cell.controls.content" [controlId]="controlId() + '-row-' + rowIndex + '-cell-' + cellIndex" [label]="i18n.table().cell + ' ' + (cellIndex + 1)" [tokens]="tokens()" />
+        @let cellIssues = diagnostics().issuesAt({ itemId, field: 'cells.' + cellIndex });
+        <div class="flex-col-start-stretch gap-xs w-100" [class.border-bottom]="cellIssues.length" [class.border-danger]="cellIssues.length">
+          <app-rich-content-editor [control]="cell.controls.content" [controlId]="controlId() + '-row-' + rowIndex + '-cell-' + cellIndex" [label]="i18n.table().cell + ' ' + (cellIndex + 1)" [tokens]="tokens()" [issues]="diagnostics().richContentIssues({ itemId, field: 'cells.' + cellIndex + '.content' })" />
+          <app-commercial-publication-issue-messages [issues]="cellIssues" />
+        </div>
       }
+      <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ itemId })" />
     </div>
   }
   @if (!form().controls.rows.length) {
     <small class="error-text">{{ i18n.commonForm().required }}</small>
   }
+  <app-commercial-publication-issue-messages [issues]="diagnostics().issuesAt({ blockId, field: 'rows' })" />
 </div>

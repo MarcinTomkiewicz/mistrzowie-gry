@@ -5,6 +5,11 @@ import type { RichContent, RichContentInlineNode } from './rich-content';
 
 export type RichContentEditorControl = FormControl<RichContent>;
 
+export type RichContentEditorIssue = {
+  messageKey: string;
+  path: readonly string[];
+};
+
 export type RichContentTextInput = NumericInterval & {
   inputType: string;
   value: string;

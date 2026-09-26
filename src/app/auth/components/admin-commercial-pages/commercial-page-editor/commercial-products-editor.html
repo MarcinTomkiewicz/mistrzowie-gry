@@ -16,6 +16,9 @@
   @if (!products().length) {
     <p class="m-0">{{ i18n.products().empty }}</p>
   }
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ field: 'products' })"
+  />
 
   @for (group of productGroups(); track group.kind) {
     @if (group.items.length) {
@@ -25,7 +28,10 @@
         </h3>
 
         @for (item of group.items; track item.form) {
-          <article class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+          <article
+            class="mg-card flex-col-start-stretch gap-sm p-md w-100"
+            [class.border-danger]="diagnostics().issuesWithin({ productId: item.form.controls.id.value }).length"
+          >
             <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
               <app-commercial-product-summary
                 [product]="item.form"
@@ -77,6 +83,7 @@
         controlId="commercial-product-dialog"
         [tokens]="tokens()"
         [addonOptions]="addonOptions()"
+        [diagnostics]="diagnostics()"
       />
 
       <div class="p-dialog-footer flex-row-end-center gap-sm w-100 p-md">

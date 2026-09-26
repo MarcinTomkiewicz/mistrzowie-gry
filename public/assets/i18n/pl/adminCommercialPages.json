@@ -103,6 +103,9 @@
       "layout": "Układ strony",
       "previewSave": "Podgląd i zapis"
     },
+    "diagnostics": {
+      "issues": "Błędy"
+    },
     "metadata": {
       "sectionTitle": "Treść strony",
       "draftSlug": "Slug draftu",

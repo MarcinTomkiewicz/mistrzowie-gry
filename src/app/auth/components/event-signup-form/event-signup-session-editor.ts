@@ -338,7 +338,7 @@ export class EventSignupSessionEditor {
   }
 
   resolveDifficultyLabel(value: SessionDifficultyLevel): string {
-    return this.difficultyLabels()[value] ?? '\u2014';
+    return this.difficultyLabels()[value] ?? '-';
   }
 
   private syncFormWithSignup(): void {

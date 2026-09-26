@@ -1,4 +1,5 @@
 <section class="flex-col-start-stretch gap-sm w-100">
+  @let productId = form().controls.id.value;
   <div class="flex-row-between-center gap-sm w-100">
     <h4 class="mg-section__title mg-section__title--xs m-0">
       {{ i18n.product().prices }}
@@ -24,6 +25,7 @@
   ) {
     <div
       class="mg-card flex-col-start-stretch gap-md p-sm w-100"
+      [class.border-danger]="diagnostics().issuesWithin({ productId, field: 'prices.' + index }).length"
       [formGroup]="entry"
     >
       <app-item-editor-actions
@@ -38,6 +40,7 @@
         <input
           pInputText
           class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ productId, field: 'prices.' + index + '.label' }).length"
           [id]="controlId() + '-price-' + index + '-label'"
           formControlName="label"
           autocomplete="off"
@@ -46,8 +49,15 @@
           {{ i18n.product().priceLabel }}
         </label>
       </p-iftalabel>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ productId, field: 'prices.' + index + '.label' })"
+      />
 
-      <div class="flex-row-start-center gap-xs">
+      <div
+        class="flex-row-start-center gap-xs"
+        [class.border-bottom]="diagnostics().issuesAt({ productId, field: 'prices.' + index + '.primary' }).length"
+        [class.border-danger]="diagnostics().issuesAt({ productId, field: 'prices.' + index + '.primary' }).length"
+      >
         <p-checkbox
           [inputId]="controlId() + '-price-' + index + '-primary'"
           formControlName="primary"
@@ -57,10 +67,25 @@
           {{ i18n.product().primaryPrice }}
         </label>
       </div>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ productId, field: 'prices.' + index + '.primary' })"
+      />
 
-      <app-price-editor
-        [form]="entry.controls.price"
-        [controlId]="controlId() + '-price-' + index"
+      @let priceIssues = diagnostics().issuesWithin({ productId, field: 'prices.' + index + '.price' });
+      <div
+        class="flex-col-start-stretch gap-xs w-100"
+        [class.border-bottom]="priceIssues.length"
+        [class.border-danger]="priceIssues.length"
+      >
+        <app-price-editor
+          [form]="entry.controls.price"
+          [controlId]="controlId() + '-price-' + index"
+        />
+        <app-commercial-publication-issue-messages [issues]="priceIssues" />
+      </div>
+
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ productId, field: 'prices.' + index })"
       />
     </div>
   }
@@ -70,4 +95,7 @@
       {{ i18n.validation().invalidPrimaryPrice }}
     </small>
   }
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ productId, field: 'prices' })"
+  />
 </section>

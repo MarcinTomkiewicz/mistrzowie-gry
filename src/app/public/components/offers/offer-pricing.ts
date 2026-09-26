@@ -31,7 +31,7 @@ function resolvePricing(
     const min = formatLegacyMoney(minValue);
     const max = formatLegacyMoney(maxValue);
     if (!min || !max) return null;
-    const value = `${min} – ${max}`;
+    const value = `${min} - ${max}`;
     return {
       value: suffix ? `${value} ${suffix}` : value,
       note,
@@ -83,7 +83,7 @@ function resolvePricing(
   const percentMax = toLegacyNumber(pricing.percentMax);
   if (percentMin !== null && percentMax !== null) {
     return {
-      value: `+${percentMin}% – +${percentMax}%`,
+      value: `+${percentMin}% - +${percentMax}%`,
       note,
       relative: true,
     };

@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
 import { COMMERCIAL_PRODUCT_KINDS } from '../../../../core/configs/commercial-pages.config';
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import {
   createCommercialProductEditorForm,
   mapCommercialProductEditorForm,
@@ -23,6 +24,7 @@ import {
 } from './commercial-product-references';
 import { CommercialProductEditor } from './commercial-product-editor';
 import { CommercialProductSummary } from './commercial-product-summary';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-products-editor',
@@ -31,11 +33,13 @@ import { CommercialProductSummary } from './commercial-product-summary';
     DialogModule,
     CommercialProductEditor,
     CommercialProductSummary,
+    CommercialPublicationIssueMessages,
   ],
   templateUrl: './commercial-products-editor.html',
 })
 export class CommercialProductsEditor {
   readonly products = input.required<FormArray<CommercialProductEditorForm>>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly sections = input.required<FormArray<CommercialSectionEditorForm>>();
   readonly tokens = input<readonly string[]>([]);
   readonly constants = input<readonly CommercialConstantAdminItem[]>([]);

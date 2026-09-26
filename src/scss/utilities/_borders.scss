@@ -23,6 +23,10 @@ $radius-values: (
   border-color: v.$color-secondary !important;
 }
 
+.border-danger {
+  border-color: v.$color-danger !important;
+}
+
 .border-dashed {
   border-style: dashed !important;
 }

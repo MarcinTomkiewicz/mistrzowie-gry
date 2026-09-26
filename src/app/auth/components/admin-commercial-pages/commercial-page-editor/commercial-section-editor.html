@@ -1,59 +1,89 @@
 <div class="flex-col-start-stretch gap-md w-100" [formGroup]="form()">
-  <p-iftalabel class="w-100">
-    <input
-      pInputText
-      class="w-100"
-      [id]="controlId() + '-heading'"
-      formControlName="heading"
-      autocomplete="off"
+  @let sectionId = form().controls.id.value;
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <p-iftalabel class="w-100">
+      <input
+        pInputText
+        class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ sectionId, field: 'heading' }).length"
+        [id]="controlId() + '-heading'"
+        formControlName="heading"
+        autocomplete="off"
+      />
+      <label [for]="controlId() + '-heading'">{{ i18n.commonLabels().sectionHeading }}</label>
+    </p-iftalabel>
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ sectionId, field: 'heading' })"
     />
-    <label [for]="controlId() + '-heading'">{{ i18n.commonLabels().sectionHeading }}</label>
-  </p-iftalabel>
+  </div>
 
-  <p-iftalabel class="w-100">
-    <textarea
-      pTextarea
-      class="w-100"
-      [id]="controlId() + '-lead'"
-      formControlName="lead"
-      rows="3"
-    ></textarea>
-    <label [for]="controlId() + '-lead'">{{ i18n.section().lead }}</label>
-  </p-iftalabel>
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <p-iftalabel class="w-100">
+      <textarea
+        pTextarea
+        class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ sectionId, field: 'lead' }).length"
+        [id]="controlId() + '-lead'"
+        formControlName="lead"
+        rows="3"
+      ></textarea>
+      <label [for]="controlId() + '-lead'">{{ i18n.section().lead }}</label>
+    </p-iftalabel>
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ sectionId, field: 'lead' })"
+    />
+  </div>
 
   <div class="mg-grid-2 gap-md w-100">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        [inputId]="controlId() + '-surface'"
-        formControlName="surface"
-        [options]="surfaceOptions()"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ sectionId, field: 'presentation.surface' }).length"
+          [inputId]="controlId() + '-surface'"
+          formControlName="surface"
+          [options]="surfaceOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label [for]="controlId() + '-surface'">{{ i18n.section().surface }}</label>
+      </p-iftalabel>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ sectionId, field: 'presentation.surface' })"
       />
-      <label [for]="controlId() + '-surface'">{{ i18n.section().surface }}</label>
-    </p-iftalabel>
+    </div>
 
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        [inputId]="controlId() + '-text-align'"
-        formControlName="textAlign"
-        [options]="textAlignOptions()"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-iftalabel class="w-100">
+        <p-select
+          class="w-100"
+          [class.p-invalid]="diagnostics().issuesAt({ sectionId, field: 'presentation.textAlign' }).length"
+          [inputId]="controlId() + '-text-align'"
+          formControlName="textAlign"
+          [options]="textAlignOptions()"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+        <label [for]="controlId() + '-text-align'">{{ i18n.section().textAlign }}</label>
+      </p-iftalabel>
+      <app-commercial-publication-issue-messages
+        [issues]="diagnostics().issuesAt({ sectionId, field: 'presentation.textAlign' })"
       />
-      <label [for]="controlId() + '-text-align'">{{ i18n.section().textAlign }}</label>
-    </p-iftalabel>
+    </div>
   </div>
+  <app-commercial-publication-issue-messages
+    [issues]="diagnostics().issuesAt({ sectionId, field: 'presentation' })"
+  />
 
   <app-commercial-blocks-editor
     [blocks]="form().controls.blocks"
+    [sectionId]="sectionId"
     [products]="products()"
     [controlId]="controlId() + '-blocks'"
     [tokens]="tokens()"
+    [diagnostics]="diagnostics()"
     [(activeBlockId)]="activeBlockId"
   />
 </div>

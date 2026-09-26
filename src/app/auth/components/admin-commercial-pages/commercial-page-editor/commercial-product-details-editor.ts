@@ -6,20 +6,19 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 
 import {
-  COMMERCIAL_COOPERATION_LENGTH_MODES,
-  COMMERCIAL_FREQUENCY_MODES,
+  COMMERCIAL_EDITOR_DURATION_MODES,
+  COMMERCIAL_EDITOR_PARTICIPANTS_MODES,
+  COMMERCIAL_SESSION_MODES,
 } from '../../../../core/configs/commercial-pages.config';
 import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
-import {
-  syncCommercialProductEditorControls,
-} from '../../../../core/factories/commercial-product-editor-form.factory';
+import { syncCommercialProductEditorControls } from '../../../../core/factories/commercial-product-editor-form.factory';
 import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import type { CommercialProductEditorForm } from '../../../../core/types/commercial-page-editor-form';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
-  selector: 'app-commercial-product-cooperation-editor',
+  selector: 'app-commercial-product-details-editor',
   imports: [
     ReactiveFormsModule,
     IftaLabelModule,
@@ -27,38 +26,40 @@ import { CommercialPublicationIssueMessages } from './commercial-publication-iss
     SelectModule,
     CommercialPublicationIssueMessages,
   ],
-  templateUrl: './commercial-product-cooperation-editor.html',
+  templateUrl: './commercial-product-details-editor.html',
 })
-export class CommercialProductCooperationEditor {
+export class CommercialProductDetailsEditor {
   readonly form = input.required<CommercialProductEditorForm>();
-  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly controlId = input.required<string>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
 
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly commercialI18n = createCommercialPageI18n();
-  protected readonly frequencyModeOptions = computed(() => {
-    const values = this.i18n.commonValues();
-
-    return COMMERCIAL_FREQUENCY_MODES.map((value) => ({
+  protected readonly durationModeOptions = computed(() => {
+    const labels = this.i18n.durationMode();
+    return COMMERCIAL_EDITOR_DURATION_MODES.map((value) => ({
       value,
       label: value === 'not_applicable'
-        ? values.notApplicable
-        : value === 'one_time'
-          ? values.oneTime
-          : values[value],
+        ? this.i18n.commonValues().notApplicable
+        : labels[value],
     }));
   });
-  protected readonly cooperationLengthModeOptions = computed(() => {
-    const labels = this.i18n.cooperationLengthMode();
-    const values = this.i18n.commonValues();
-
-    return COMMERCIAL_COOPERATION_LENGTH_MODES.map((value) => ({
+  protected readonly participantsModeOptions = computed(() => {
+    const labels = this.i18n.participantsMode();
+    return COMMERCIAL_EDITOR_PARTICIPANTS_MODES.map((value) => ({
       value,
       label: value === 'not_applicable'
-        ? values.notApplicable
-        : value === 'one_time'
-          ? values.oneTime
-          : labels[value],
+        ? this.i18n.commonValues().notApplicable
+        : labels[value],
+    }));
+  });
+  protected readonly sessionModeOptions = computed(() => {
+    const labels = this.i18n.sessionMode();
+    return COMMERCIAL_SESSION_MODES.map((value) => ({
+      value,
+      label: value === 'not_applicable'
+        ? this.i18n.commonValues().notApplicable
+        : labels[value],
     }));
   });
 

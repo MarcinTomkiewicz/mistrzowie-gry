@@ -6,11 +6,13 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
+import type { CommercialPagePublicationIssueIndex } from '../../../../core/domain/commercial-pages/commercial-page-publication-issues';
 import { createCommercialFaqEntryEditorForm } from '../../../../core/factories/commercial-block-item-editor-form.factory';
 import type { CommercialFaqBlockEditorForm } from '../../../../core/types/commercial-builder-block-editor-form';
 import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 import { ItemEditorActions } from '../../../../common/item-editor-actions/item-editor-actions';
+import { CommercialPublicationIssueMessages } from './commercial-publication-issue-messages';
 
 @Component({
   selector: 'app-commercial-faq-block-editor',
@@ -21,11 +23,13 @@ import { ItemEditorActions } from '../../../../common/item-editor-actions/item-e
     InputTextModule,
     TextareaModule,
     ItemEditorActions,
+    CommercialPublicationIssueMessages,
   ],
   templateUrl: './commercial-faq-block-editor.html',
 })
 export class CommercialFaqBlockEditor {
   readonly form = input.required<CommercialFaqBlockEditorForm>();
+  readonly diagnostics = input.required<CommercialPagePublicationIssueIndex>();
   readonly controlId = input.required<string>();
   protected readonly i18n = createAdminCommercialPagesI18n();
 

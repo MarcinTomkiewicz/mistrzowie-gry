@@ -56,6 +56,17 @@
         [formGroup]="form"
         novalidate
       >
+        <app-commercial-publication-issue-messages
+          [issues]="publicationDiagnostics().rootIssues"
+        />
+        @for (unresolved of publicationDiagnostics().unresolvedIssues; track $index) {
+          <div class="flex-col-start-stretch gap-xs w-100">
+            <app-commercial-publication-issue-messages [issues]="[unresolved.issue]" />
+            <small class="error-text">
+              {{ i18n.publication().issuePath }}: <code>{{ unresolved.rawPath }}</code>
+            </small>
+          </div>
+        }
         <ng-template
           #stepActions
           let-activateCallback="activateCallback"
@@ -137,12 +148,14 @@
                   <div class="flex-col-start-stretch gap-lg w-100">
                     <app-commercial-page-metadata-editor
                       [form]="form.controls.metadata"
+                      [diagnostics]="publicationDiagnostics()"
                       [copy]="i18n.metadata()"
                       [publishedSlug]="pageDetail.page.publishedSlug"
                       [requiredMessage]="i18n.commonForm().required"
                     />
                     <app-commercial-page-seo-editor
                       [form]="form.controls.seo"
+                      [diagnostics]="publicationDiagnostics()"
                       [copy]="i18n.seo()"
                       [requiredMessage]="i18n.commonForm().required"
                     />
@@ -164,6 +177,7 @@
                   <div class="flex-col-start-stretch gap-md w-100">
                     <app-commercial-products-editor
                       [products]="form.controls.products"
+                      [diagnostics]="publicationDiagnostics()"
                       [sections]="form.controls.sections"
                       [tokens]="constantTokens()"
                       [constants]="commercialConstants()"
@@ -187,6 +201,7 @@
                   <div class="flex-col-start-stretch gap-md w-100">
                     <app-commercial-page-sections-editor
                       [sections]="form.controls.sections"
+                      [diagnostics]="publicationDiagnostics()"
                       [products]="form.controls.products"
                       [tokens]="constantTokens()"
                       [(activeSectionId)]="activeSectionId"
