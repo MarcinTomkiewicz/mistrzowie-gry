@@ -2,6 +2,10 @@ export type RichContentEditorTranslations = {
   hint: string;
   invalid: string;
   invalidLink: string;
+  incompleteMarkup: string;
+  invalidMarkup: string;
+  invalidDialog: string;
+  sourceHint: string;
   tokens: string;
   tokensHint: string;
   empty: string;
@@ -15,6 +19,10 @@ export type RichContentEditorTranslations = {
   nestedBlocks: string;
   strongNode: string;
   linkNode: string;
+  dialogNode: string;
+  dialogDocument: string;
+  dialogs: string;
+  removeDialog: string;
   selectionHint: string;
   editingSurface: string;
   formattingPreview: string;

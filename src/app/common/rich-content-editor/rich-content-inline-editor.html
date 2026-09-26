@@ -16,8 +16,18 @@
       icon="pi pi-link"
       [outlined]="true"
       [label]="i18n().linkNode"
-      [disabled]="linkDisabled()"
-      (onClick)="openLinkEditor()"
+      [disabled]="targetDisabled('link')"
+      (onClick)="openTargetEditor('link')"
+    />
+    <p-button
+      type="button"
+      size="small"
+      severity="secondary"
+      icon="pi pi-window-maximize"
+      [outlined]="true"
+      [label]="i18n().dialogNode"
+      [disabled]="targetDisabled('dialog')"
+      (onClick)="openTargetEditor('dialog')"
     />
     <small class="text-muted">
       {{ i18n().selectionHint }}
@@ -28,10 +38,10 @@
     #textSurface
     pTextarea
     class="w-100"
-    [class.p-invalid]="issues().length"
+    [class.p-invalid]="sourceInvalid() || issues().length"
     rows="4"
     [id]="controlId() + '-text'"
-    [value]="text()"
+    [value]="source()"
     [attr.aria-label]="i18n().editingSurface"
     (focus)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
     (click)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
@@ -39,97 +49,48 @@
     (select)="setSelection(textSurface.selectionStart, textSurface.selectionEnd)"
     (beforeinput)="prepareTextInput($event, textSurface)"
     (input)="updateText(textSurface)"
+    (keydown)="handleHistoryKey($event, textSurface)"
     (blur)="blurred.emit()"
   ></textarea>
+  <small class="text-muted">{{ i18n().sourceHint }}</small>
+  @if (dialogTarget()) {
+    <div class="flex-col-start-stretch gap-xs">
+      <span class="small-caps">{{ i18n().dialogDocument }}</span>
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        @for (document of dialogOptions; track document.dialog) {
+          <p-button
+            type="button" size="small" severity="secondary" [text]="true"
+            [label]="(('common.' + document.labelKey) | transloco) + ' - ' + document.dialog"
+            (onClick)="completeDialogTarget(document.dialog)"
+          />
+        }
+      </div>
+    </div>
+  }
+  @for (issue of markup().issues; track $index) {
+    <small class="error-text">{{ i18n()[issue.messageKey] }}</small>
+  }
   @for (issue of issues(); track $index) {
     <small class="error-text">{{ ('common.' + issue.messageKey) | transloco }}</small>
   }
 
-  @if (text()) {
+  @if (source()) {
     <div class="flex-col-start-stretch gap-xs w-100">
       <span class="small-caps">
         {{ i18n().formattingPreview }}
       </span>
       <p class="m-0 text-pre-line" inert>
-        <app-rich-content-inline [nodes]="nodes()" />
+        <app-rich-content-inline [nodes]="markup().nodes" />
       </p>
     </div>
   }
 
-  @let availableLinks = links();
-  @if (availableLinks.length) {
-    <div class="flex-row-start-center flex-wrap gap-xs">
-      <span class="small-caps">{{ i18n().links }}</span>
-      @for (link of availableLinks; track link.start) {
-        <p-button
-          type="button"
-          size="small"
-          severity="secondary"
-          icon="pi pi-pencil"
-          [text]="true"
-          [label]="link.text + ' - ' + link.href"
-          (onClick)="editLink(link)"
-        />
-      }
-    </div>
-  }
-
-  @if (linkEditTarget(); as target) {
-    <div class="mg-card flex-col-start-stretch gap-sm p-sm w-100">
-      <label class="small-caps" [for]="controlId() + '-link-href'">
-        {{ i18n().href }}
-      </label>
-      <input
-        pInputText
-        class="w-100"
-        [id]="controlId() + '-link-href'"
-        [formControl]="linkHrefControl"
-        autocomplete="off"
-        (blur)="blurred.emit()"
-      />
-      @if (linkHrefControl.touched && linkHrefControl.invalid) {
-        <small class="error-text">{{ i18n().invalidLink }}</small>
-      }
-
-      <div class="flex-row-start-center gap-xs">
-        <p-checkbox
-          [inputId]="controlId() + '-link-external'"
-          [binary]="true"
-          [formControl]="linkExternalControl"
-        />
-        <label [for]="controlId() + '-link-external'">
-          {{ i18n().external }}
-        </label>
-      </div>
-
-      <div class="flex-row-end-center flex-wrap gap-xs">
-        @if (target.existing) {
-          <p-button
-            type="button"
-            size="small"
-            severity="danger"
-            icon="pi pi-times"
-            [text]="true"
-            [label]="i18n().removeLink"
-            (onClick)="removeLink()"
-          />
-        }
-        <p-button
-          type="button"
-          size="small"
-          severity="secondary"
-          [text]="true"
-          [label]="actions().cancel"
-          (onClick)="closeLinkEditor()"
-        />
-        <p-button
-          type="button"
-          size="small"
-          icon="pi pi-check"
-          [label]="actions().save"
-          (onClick)="saveLink()"
-        />
-      </div>
-    </div>
-  }
+  <app-rich-content-inline-target-editor
+    [nodes]="markup().nodes"
+    [disabled]="sourceInvalid()"
+    [controlId]="controlId()"
+    (selected)="selectTarget($event)"
+    (applied)="applyTarget($event)"
+    (blurred)="blurred.emit()"
+  />
 </div>

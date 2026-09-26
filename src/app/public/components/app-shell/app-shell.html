@@ -8,3 +8,16 @@
   <ng-template #confirmPopupHost mgLazyMountHost></ng-template>
   <ng-template #toastHost mgLazyMountHost></ng-template>
 </div>
+
+@defer (when legalDialogs.activeDialog() !== null) {
+  @let dialog = legalDialogs.content();
+  @let titleKey = legalDialogLabelKey();
+  <app-legal-dialog
+    [visible]="legalDialogs.activeDialog() !== null"
+    [dialogTitle]="dialog?.title ?? (titleKey ? (('common.' + titleKey) | transloco) : '')"
+    [dialogSubtitle]="dialog?.subtitle ?? ''"
+    [dialogContent]="dialog?.content ?? (legalDialogs.loading() ? commonStatus().loading : legalDialogs.error() ? commonErrors().generic : null)"
+    [closeLabel]="commonActions().close"
+    (visibleChange)="legalDialogs.close()"
+  />
+}

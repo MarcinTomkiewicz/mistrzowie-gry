@@ -1,31 +1,14 @@
-import type { RichContentInlineNode } from '../../types/rich-content';
+import type {
+  RichContentInlineNode,
+  RichContentInlineTargetType,
+} from '../../types/rich-content';
+import type { LegalDialogId } from '../../types/legal-dialog';
+import { isValidRichContentLinkHref } from './rich-content-link-target';
 
 export function richContentInlineText(
   nodes: readonly RichContentInlineNode[],
 ): string {
   return nodes.map((node) => node.text).join('');
-}
-
-export function updateRichContentInlineText(
-  nodes: readonly RichContentInlineNode[],
-  start: number,
-  end: number,
-  text: string,
-): RichContentInlineNode[] {
-  assertRichContentInlineRange(nodes, start, end);
-
-  const source = text ? sourceNodeForEdit(nodes, start, end) : null;
-  const replacement: RichContentInlineNode[] = source
-    ? [cloneNodeWithText(source, text)]
-    : text
-      ? [{ type: 'text', text }]
-      : [];
-
-  return normalizeNodes([
-    ...sliceNodes(nodes, 0, start),
-    ...replacement,
-    ...sliceNodes(nodes, end, richContentInlineText(nodes).length),
-  ]);
 }
 
 export function toggleRichContentStrong(
@@ -36,8 +19,8 @@ export function toggleRichContentStrong(
   assertNonEmptyRange(nodes, start, end);
   const selectedNodes = sliceNodes(nodes, start, end);
 
-  if (selectedNodes.some((node) => node.type === 'link')) {
-    throw new Error('A link selection cannot also be formatted as strong');
+  if (selectedNodes.some((node) => node.type === 'link' || node.type === 'dialog')) {
+    throw new Error('An interactive selection cannot also be formatted as strong');
   }
 
   const removeStrong = selectedNodes.every((node) => node.type === 'strong');
@@ -56,29 +39,32 @@ export function applyRichContentLink(
   href: string,
   external: boolean,
 ): RichContentInlineNode[] {
-  assertNonEmptyRange(nodes, start, end);
+  assertTargetSelection(nodes, start, end, 'link');
   const normalizedHref = href.trim();
-  if (!normalizedHref) throw new Error('A RichContent link requires an href');
-
-  const selectedNodes = sliceNodes(nodes, start, end);
-  if (selectedNodes.some((node) => node.type === 'strong')) {
-    throw new Error('A strong selection cannot also be formatted as a link');
-  }
-
-  if (
-    selectedNodes.some((node) => node.type === 'link') &&
-    !isExactLinkSelection(nodes, start, end)
-  ) {
-    throw new Error('A link selection cannot partially overlap another link');
+  if (!isValidRichContentLinkHref(normalizedHref)) {
+    throw new Error('A RichContent link requires a valid href');
   }
 
   const text = richContentInlineText(nodes).slice(start, end);
+  if (!text.trim()) throw new Error('A RichContent link requires nonempty text');
   return replaceNodesInRange(nodes, start, end, [
     { type: 'link', text, href: normalizedHref, external },
   ]);
 }
 
-export function removeRichContentLink(
+export function applyRichContentDialog(
+  nodes: readonly RichContentInlineNode[],
+  start: number,
+  end: number,
+  dialog: LegalDialogId,
+): RichContentInlineNode[] {
+  assertTargetSelection(nodes, start, end, 'dialog');
+  const text = richContentInlineText(nodes).slice(start, end);
+  if (!text.trim()) throw new Error('A RichContent dialog requires nonempty text');
+  return replaceNodesInRange(nodes, start, end, [{ type: 'dialog', text, dialog }]);
+}
+
+export function removeRichContentInlineTarget(
   nodes: readonly RichContentInlineNode[],
   start: number,
   end: number,
@@ -131,35 +117,36 @@ function sliceNodes(
   return result;
 }
 
-function sourceNodeForEdit(
+function assertTargetSelection(
   nodes: readonly RichContentInlineNode[],
   start: number,
   end: number,
-): RichContentInlineNode | null {
-  let offset = 0;
-
-  for (const node of nodes) {
-    const nodeEnd = offset + node.text.length;
-    const contained = start === end
-      ? start > offset && end < nodeEnd
-      : start >= offset && end <= nodeEnd;
-    if (contained) return node;
-    offset = nodeEnd;
+  type: RichContentInlineTargetType,
+): void {
+  assertNonEmptyRange(nodes, start, end);
+  const selectedNodes = sliceNodes(nodes, start, end);
+  if (selectedNodes.some((node) => node.type !== 'text' && node.type !== type)) {
+    throw new Error('Inline formats cannot overlap');
   }
-
-  return null;
+  if (
+    selectedNodes.some((node) => node.type === type) &&
+    !isExactTargetSelection(nodes, start, end, type)
+  ) {
+    throw new Error('An interactive selection cannot partially overlap another target');
+  }
 }
 
-function isExactLinkSelection(
+function isExactTargetSelection(
   nodes: readonly RichContentInlineNode[],
   start: number,
   end: number,
+  type: RichContentInlineTargetType,
 ): boolean {
   let offset = 0;
 
   for (const node of nodes) {
     const nodeEnd = offset + node.text.length;
-    if (node.type === 'link' && start === offset && end === nodeEnd) {
+    if (node.type === type && start === offset && end === nodeEnd) {
       return true;
     }
     offset = nodeEnd;
@@ -177,7 +164,7 @@ function normalizeNodes(
     if (!node.text) continue;
 
     const previous = result.at(-1);
-    if (previous && nodesHaveSameFormat(previous, node)) {
+    if (previous && richContentNodesHaveSameFormat(previous, node)) {
       previous.text += node.text;
     } else {
       result.push(cloneNode(node));
@@ -187,11 +174,14 @@ function normalizeNodes(
   return result;
 }
 
-function nodesHaveSameFormat(
+function richContentNodesHaveSameFormat(
   left: RichContentInlineNode,
   right: RichContentInlineNode,
 ): boolean {
   if (left.type !== right.type) return false;
+  if (left.type === 'dialog' && right.type === 'dialog') {
+    return left.dialog === right.dialog;
+  }
   if (left.type !== 'link' || right.type !== 'link') return true;
 
   return left.href === right.href &&
@@ -206,16 +196,7 @@ function cloneNodeWithText(
   node: RichContentInlineNode,
   text: string,
 ): RichContentInlineNode {
-  if (node.type === 'link') {
-    return {
-      type: 'link',
-      text,
-      href: node.href,
-      ...(node.external === undefined ? {} : { external: node.external }),
-    };
-  }
-
-  return { type: node.type, text };
+  return { ...node, text };
 }
 
 function assertNonEmptyRange(

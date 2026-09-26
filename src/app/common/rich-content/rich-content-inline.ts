@@ -1,5 +1,6 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 
+import { LegalDialogs } from '../../core/services/legal-dialogs/legal-dialogs';
 import type { RichContentInlineNode } from '../../core/types/rich-content';
 
 @Component({
@@ -8,4 +9,5 @@ import type { RichContentInlineNode } from '../../core/types/rich-content';
 })
 export class RichContentInline {
   readonly nodes = input.required<readonly RichContentInlineNode[]>();
+  protected readonly legalDialogs = inject(LegalDialogs);
 }

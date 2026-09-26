@@ -1,0 +1,91 @@
+@let availableLinks = links();
+@if (availableLinks.length) {
+  <div class="flex-row-start-center flex-wrap gap-xs">
+    <span class="small-caps">{{ i18n().links }}</span>
+    @for (link of availableLinks; track link.start) {
+      <p-button
+        type="button" size="small" severity="secondary" icon="pi pi-pencil"
+        [text]="true" [label]="link.text + ' - ' + link.href"
+        [disabled]="disabled()"
+        (onClick)="edit(link)"
+      />
+    }
+  </div>
+}
+
+@let availableDialogs = dialogs();
+@if (availableDialogs.length) {
+  <div class="flex-row-start-center flex-wrap gap-xs">
+    <span class="small-caps">{{ i18n().dialogs }}</span>
+    @for (dialog of availableDialogs; track dialog.start) {
+      <p-button
+        type="button" size="small" severity="secondary" icon="pi pi-pencil"
+        [text]="true"
+        [disabled]="disabled()"
+        [label]="dialog.text + ' - ' + (('common.' + dialogLabelKey(dialog.dialog)) | transloco)"
+        (onClick)="edit(dialog)"
+      />
+    }
+  </div>
+}
+
+@if (target(); as target) {
+  <div class="mg-card flex-col-start-stretch gap-sm p-sm mt-xs w-100">
+    @if (target.type === 'link') {
+      <label class="small-caps" [for]="controlId() + '-link-href'">{{ i18n().href }}</label>
+      <input
+        pInputText class="w-100" [id]="controlId() + '-link-href'"
+        [formControl]="hrefControl" autocomplete="off"
+        [class.p-invalid]="hrefControl.touched && hrefControl.invalid"
+        (blur)="blurred.emit()"
+      />
+      @if (hrefControl.touched && hrefControl.invalid) {
+        <small class="error-text">{{ i18n().invalidLink }}</small>
+      }
+      <div class="flex-row-start-center gap-xs">
+        <p-checkbox
+          [inputId]="controlId() + '-link-external'" [binary]="true"
+          [formControl]="externalControl"
+        />
+        <label [for]="controlId() + '-link-external'">{{ i18n().external }}</label>
+      </div>
+    } @else {
+      <label class="small-caps" [for]="controlId() + '-dialog'">{{ i18n().dialogDocument }}</label>
+      <p-select
+        class="w-100" [inputId]="controlId() + '-dialog'"
+        [options]="dialogOptions" optionLabel="labelKey" optionValue="dialog"
+        [placeholder]="actions().select" [formControl]="dialogControl"
+        [class.p-invalid]="dialogControl.touched && dialogControl.invalid"
+        (onBlur)="blurred.emit()"
+      >
+        <ng-template #item let-document>
+          {{ ('common.' + document.labelKey) | transloco }}
+        </ng-template>
+        <ng-template #selectedItem let-document>
+          {{ ('common.' + document.labelKey) | transloco }}
+        </ng-template>
+      </p-select>
+      @if (dialogControl.touched && dialogControl.invalid) {
+        <small class="error-text">{{ formCopy().required }}</small>
+      }
+    }
+    <div class="flex-row-end-center flex-wrap gap-xs">
+      @if (target.existing) {
+        <p-button
+          type="button" size="small" severity="danger" icon="pi pi-times"
+          [text]="true"
+          [label]="target.type === 'link' ? i18n().removeLink : i18n().removeDialog"
+          (onClick)="remove()"
+        />
+      }
+      <p-button
+        type="button" size="small" severity="secondary" [text]="true"
+        [label]="actions().cancel" (onClick)="close()"
+      />
+      <p-button
+        type="button" size="small" icon="pi pi-check"
+        [label]="actions().save" (onClick)="save()"
+      />
+    </div>
+  </div>
+}

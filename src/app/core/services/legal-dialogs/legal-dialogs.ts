@@ -1,15 +1,23 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import {
-  LegalDialogContent,
-  LegalDialogId,
-} from '../../types/i18n/legal';
+import type { LegalDialogContent } from '../../types/i18n/legal';
+import type { LegalDialogId } from '../../types/legal-dialog';
 
 @Injectable({ providedIn: 'root' })
 export class LegalDialogs {
+  private readonly activeDialogState = signal<LegalDialogId | null>(null);
+  private readonly contentState = signal<LegalDialogContent | null>(null);
+  private readonly loadingState = signal(false);
+  private readonly errorState = signal(false);
+
+  readonly activeDialog = this.activeDialogState.asReadonly();
+  readonly content = this.contentState.asReadonly();
+  readonly loading = this.loadingState.asReadonly();
+  readonly error = this.errorState.asReadonly();
+
   private readonly http = inject(HttpClient);
   private readonly appBaseHref = inject(APP_BASE_HREF, { optional: true }) ?? '/';
 
@@ -21,6 +29,28 @@ export class LegalDialogs {
     LegalDialogId,
     Promise<LegalDialogContent>
   >();
+
+  async open(dialog: LegalDialogId): Promise<void> {
+    this.activeDialogState.set(dialog);
+    this.contentState.set(null);
+    this.errorState.set(false);
+    this.loadingState.set(true);
+    try {
+      const content = await this.load(dialog);
+      if (this.activeDialog() === dialog) this.contentState.set(content);
+    } catch {
+      if (this.activeDialog() === dialog) this.errorState.set(true);
+    } finally {
+      if (this.activeDialog() === dialog) this.loadingState.set(false);
+    }
+  }
+
+  close(): void {
+    this.activeDialogState.set(null);
+    this.contentState.set(null);
+    this.loadingState.set(false);
+    this.errorState.set(false);
+  }
 
   load(dialog: LegalDialogId): Promise<LegalDialogContent> {
     const cached = this.cache.get(dialog);

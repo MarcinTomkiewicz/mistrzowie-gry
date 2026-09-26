@@ -1,21 +1,49 @@
-import type { RichContentLinkRange } from '../../types/rich-content-editor';
-import type { InternalLinkMarkupLinkNode } from '../../types/internal-link';
-import type { RichContentInlineNode } from '../../types/rich-content';
-import { assertRichContentInlineRange } from './rich-content-inline-operations';
+import type {
+  RichContentInlineRange,
+  RichContentInlineTargetType,
+  RichContentInlineNode,
+} from '../../types/rich-content';
+import {
+  assertRichContentInlineRange,
+  richContentInlineText,
+} from './rich-content-inline-operations';
 
-export function richContentSelectionHasLink(
+export function richContentInlineRanges(
+  nodes: readonly RichContentInlineNode[],
+): RichContentInlineRange[] {
+  let offset = 0;
+  return nodes.map((node) => {
+    const start = offset;
+    offset += node.text.length;
+    return { ...node, start, end: offset };
+  });
+}
+
+export function richContentInlineTargetAtSelection(
   nodes: readonly RichContentInlineNode[],
   start: number,
   end: number,
+  type: RichContentInlineTargetType,
+): RichContentInlineRange | null {
+  assertRichContentInlineRange(nodes, start, end);
+  return richContentInlineRanges(nodes).find((node) =>
+    node.type === type && (start === end
+      ? start > node.start && start < node.end
+      : start >= node.start && end <= node.end),
+  ) ?? null;
+}
+
+export function richContentSelectionHasFormat(
+  nodes: readonly RichContentInlineNode[],
+  start: number,
+  end: number,
+  type: RichContentInlineNode['type'],
 ): boolean {
   assertRichContentInlineRange(nodes, start, end);
-
-  if (start === end) {
-    return richContentLinkAtSelection(nodes, start, end) !== null;
-  }
-
-  return richContentLinks(nodes).some(
-    (link) => link.start < end && link.end > start,
+  return richContentInlineRanges(nodes).some((node) =>
+    node.type === type && (start === end
+      ? start > node.start && start < node.end
+      : node.start < end && node.end > start),
   );
 }
 
@@ -26,79 +54,25 @@ export function isRichContentSelectionStrong(
 ): boolean {
   if (start === end) return false;
   assertRichContentInlineRange(nodes, start, end);
-
-  let hasSelection = false;
-  let offset = 0;
-
-  for (const node of nodes) {
-    const nodeEnd = offset + node.text.length;
-    if (offset < end && nodeEnd > start) {
-      hasSelection = true;
-      if (node.type !== 'strong') return false;
-    }
-    offset = nodeEnd;
-  }
-
-  return hasSelection;
+  const selected = richContentInlineRanges(nodes).filter((node) =>
+    node.start < end && node.end > start,
+  );
+  return selected.length > 0 && selected.every((node) => node.type === 'strong');
 }
 
-export function richContentSelectionHasStrong(
+export function canApplyRichContentInlineTarget(
   nodes: readonly RichContentInlineNode[],
   start: number,
   end: number,
+  type: RichContentInlineTargetType,
 ): boolean {
-  if (start === end) return false;
-  assertRichContentInlineRange(nodes, start, end);
-
-  let offset = 0;
-  for (const node of nodes) {
-    const nodeEnd = offset + node.text.length;
-    if (offset < end && nodeEnd > start && node.type === 'strong') return true;
-    offset = nodeEnd;
+  const existing = richContentInlineTargetAtSelection(nodes, start, end, type);
+  const other = type === 'link' ? 'dialog' : 'link';
+  if (!(existing?.text ?? richContentInlineText(nodes).slice(start, end)).trim()) {
+    return false;
   }
-
-  return false;
-}
-
-export function richContentLinks(
-  nodes: readonly RichContentInlineNode[],
-): RichContentLinkRange[] {
-  const links: RichContentLinkRange[] = [];
-  let offset = 0;
-
-  for (const node of nodes) {
-    const end = offset + node.text.length;
-    if (node.type === 'link') links.push(linkRange(node, offset, end));
-    offset = end;
-  }
-
-  return links;
-}
-
-export function richContentLinkAtSelection(
-  nodes: readonly RichContentInlineNode[],
-  start: number,
-  end: number,
-): RichContentLinkRange | null {
-  assertRichContentInlineRange(nodes, start, end);
-
-  return richContentLinks(nodes).find((link) =>
-    start === end
-      ? start > link.start && start < link.end
-      : start >= link.start && end <= link.end,
-  ) ?? null;
-}
-
-function linkRange(
-  node: InternalLinkMarkupLinkNode,
-  start: number,
-  end: number,
-): RichContentLinkRange {
-  return {
-    start,
-    end,
-    text: node.text,
-    href: node.href,
-    external: node.external ?? false,
-  };
+  return !richContentSelectionHasFormat(nodes, start, end, 'strong') &&
+    !richContentSelectionHasFormat(nodes, start, end, other) &&
+    (existing !== null || (start !== end &&
+      !richContentSelectionHasFormat(nodes, start, end, type)));
 }

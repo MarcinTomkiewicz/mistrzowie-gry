@@ -1,3 +1,7 @@
+import type { InternalLinkMarkupNode } from './internal-link';
+import type { NumericInterval } from './interval';
+import type { LegalDialogId } from './legal-dialog';
+
 export type RichContentInput = string | RichContent | null | undefined;
 
 export interface RichContent {
@@ -38,11 +42,24 @@ export interface RichContentListItem {
 
 export type RichContentInlineNode =
   | InternalLinkMarkupNode
-  | RichContentStrongNode;
+  | RichContentStrongNode
+  | RichContentDialogNode;
 
 export interface RichContentStrongNode {
   type: 'strong';
   text: string;
 }
 
-import type { InternalLinkMarkupNode } from './internal-link';
+export interface RichContentDialogNode {
+  type: 'dialog';
+  text: string;
+  dialog: LegalDialogId;
+}
+
+export type RichContentInlineRange = NumericInterval & RichContentInlineNode;
+export type RichContentInlineTargetType = 'link' | 'dialog';
+
+export type RichContentInlineUpdate = {
+  nodes: RichContentInlineNode[];
+  selection: NumericInterval;
+};

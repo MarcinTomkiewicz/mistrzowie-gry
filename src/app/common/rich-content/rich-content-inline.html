@@ -15,8 +15,18 @@
         [target]="node.external ? '_blank' : null"
         [rel]="node.external ? 'noopener noreferrer' : null"
       >
-        {{ node.text }}
+        <strong>{{ node.text }}</strong>
       </a>
+    }
+    @case ('dialog') {
+      <button
+        type="button"
+        class="link-like-inline text-pre-line"
+        aria-haspopup="dialog"
+        (click)="legalDialogs.open(node.dialog)"
+      >
+        <strong>{{ node.text }}</strong>
+      </button>
     }
   }
 }

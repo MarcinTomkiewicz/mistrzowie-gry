@@ -1,3 +1,4 @@
+import { LEGAL_DIALOGS } from '../../configs/legal-dialogs.config';
 import type {
   RichContent,
   RichContentBlock,
@@ -59,6 +60,10 @@ function isRichContentInlineNode(value: unknown): boolean {
       return typeof value['href'] === 'string' &&
         (value['external'] === undefined ||
           typeof value['external'] === 'boolean');
+    case 'dialog':
+      return value['text'].trim().length > 0 &&
+        typeof value['dialog'] === 'string' &&
+        Object.hasOwn(LEGAL_DIALOGS, value['dialog']);
     default:
       return false;
   }

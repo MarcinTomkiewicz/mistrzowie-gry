@@ -1,11 +1,10 @@
-import type { LegalDialogId } from '../types/i18n/legal';
+import type { LegalDialogId } from '../types/legal-dialog';
 
 export interface ILegalLink {
-  labelKey: string;
   dialog: LegalDialogId;
   placement: 'bottom' | 'legal-information';
 }
 
-export interface IResolvedLegalLink extends Omit<ILegalLink, 'labelKey'> {
+export interface IResolvedLegalLink extends ILegalLink {
   label: string;
 }

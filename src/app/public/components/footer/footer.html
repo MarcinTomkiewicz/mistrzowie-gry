@@ -89,7 +89,7 @@
                   type="button"
                   class="link-like-inline"
                   aria-haspopup="dialog"
-                  (click)="onLegalClick(l.dialog)"
+                  (click)="legalDialogs.open(l.dialog)"
                 >
                   {{ l.label }}
                 </button>
@@ -116,7 +116,7 @@
             type="button"
             class="link-like-inline"
             aria-haspopup="dialog"
-            (click)="onLegalClick(l.dialog)"
+            (click)="legalDialogs.open(l.dialog)"
           >
             {{ l.label }}
           </button>
@@ -125,15 +125,3 @@
     </div>
   </div>
 </footer>
-
-@defer (when legalDialogViewModel().visible) {
-  @let dialog = legalDialogViewModel();
-  <app-legal-dialog
-    [visible]="dialog.visible"
-    [dialogTitle]="dialog.title"
-    [dialogSubtitle]="dialog.subtitle"
-    [dialogContent]="dialog.content"
-    [closeLabel]="dialog.closeLabel"
-    (visibleChange)="closeLegalDialog()"
-  />
-}

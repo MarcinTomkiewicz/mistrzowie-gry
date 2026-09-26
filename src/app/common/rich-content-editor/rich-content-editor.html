@@ -114,9 +114,9 @@
 
         @if (block.type === 'paragraph') {
           <ng-container
-            [ngTemplateOutlet]="nodesTemplate"
+            [ngTemplateOutlet]="inlineTemplate"
             [ngTemplateOutletContext]="{
-              $implicit: block.content ?? [],
+              $implicit: block,
               path: path + '-block-' + blockIndex,
               issuePath: blockIssuePath
             }"
@@ -142,9 +142,9 @@
               </div>
 
               <ng-container
-                [ngTemplateOutlet]="nodesTemplate"
+                [ngTemplateOutlet]="inlineTemplate"
                 [ngTemplateOutletContext]="{
-                  $implicit: item.content ?? [],
+                  $implicit: item,
                   path: path + '-block-' + blockIndex + '-item-' + itemIndex,
                   issuePath: itemIssuePath
                 }"
@@ -173,14 +173,14 @@
   </div>
 </ng-template>
 
-<ng-template #nodesTemplate let-nodes let-path="path" let-issuePath="issuePath">
+<ng-template #inlineTemplate let-inline let-path="path" let-issuePath="issuePath">
   <app-rich-content-inline-editor
     class="w-100"
-    [nodes]="nodes"
+    [source]="inline.content"
     [controlId]="path"
     [issues]="inlineIssues(issuePath)"
     (activated)="activateInlineEditor($event)"
-    (changed)="commit()"
+    (changed)="updateInlineContent(inline, $event)"
     (blurred)="control().markAsTouched()"
   />
 </ng-template>

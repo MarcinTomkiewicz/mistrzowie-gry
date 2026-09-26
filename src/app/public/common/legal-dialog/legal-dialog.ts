@@ -17,7 +17,7 @@ export class LegalDialog {
   readonly dialogTitle = input('');
   readonly dialogSubtitle = input('');
   readonly dialogContent = input<RichContentInput>(null);
-  readonly closeLabel = input('Zamknij');
+  readonly closeLabel = input.required<string>();
 
   readonly visibleChange = output<boolean>();
 

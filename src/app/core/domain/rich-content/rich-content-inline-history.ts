@@ -1,58 +1,55 @@
-import type {
-  RichContentInlineHistoryState,
-} from '../../types/rich-content-editor';
-import type { RichContentInlineNode } from '../../types/rich-content';
+import type { RichContentInlineHistoryState } from '../../types/rich-content-markup';
 
 export class RichContentInlineHistory {
   private readonly undoStack: RichContentInlineHistoryState[] = [];
   private readonly redoStack: RichContentInlineHistoryState[] = [];
 
   record(
-    nodes: readonly RichContentInlineNode[],
+    source: string,
     selection: RichContentInlineHistoryState['selection'],
   ): void {
-    this.undoStack.push(this.createHistoryState(nodes, selection));
+    this.undoStack.push(this.createHistoryState(source, selection));
     this.redoStack.length = 0;
   }
 
   private undo(
-    nodes: readonly RichContentInlineNode[],
+    source: string,
     selection: RichContentInlineHistoryState['selection'],
   ): RichContentInlineHistoryState | null {
     const state = this.undoStack.pop();
     if (!state) return null;
 
-    this.redoStack.push(this.createHistoryState(nodes, selection));
+    this.redoStack.push(this.createHistoryState(source, selection));
     return state;
   }
 
   private redo(
-    nodes: readonly RichContentInlineNode[],
+    source: string,
     selection: RichContentInlineHistoryState['selection'],
   ): RichContentInlineHistoryState | null {
     const state = this.redoStack.pop();
     if (!state) return null;
 
-    this.undoStack.push(this.createHistoryState(nodes, selection));
+    this.undoStack.push(this.createHistoryState(source, selection));
     return state;
   }
 
   restore(
     inputType: 'historyUndo' | 'historyRedo',
-    nodes: readonly RichContentInlineNode[],
+    source: string,
     selection: RichContentInlineHistoryState['selection'],
   ): RichContentInlineHistoryState | null {
     return inputType === 'historyUndo'
-      ? this.undo(nodes, selection)
-      : this.redo(nodes, selection);
+      ? this.undo(source, selection)
+      : this.redo(source, selection);
   }
 
   private createHistoryState(
-    nodes: readonly RichContentInlineNode[],
+    source: string,
     selection: RichContentInlineHistoryState['selection'],
   ): RichContentInlineHistoryState {
     return {
-      nodes: nodes.map((node) => ({ ...node })),
+      source,
       selection: { ...selection },
     };
   }

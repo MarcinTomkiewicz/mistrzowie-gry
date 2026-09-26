@@ -5,20 +5,17 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
-import {
-  richContentInlineText,
-  updateRichContentInlineText,
-} from '../../core/domain/rich-content/rich-content-inline-operations';
+import { escapeInlineMarkupText } from '../../core/domain/rich-content/rich-content-inline-markup';
 import type {
   RichContentEditorControl,
   RichContentEditorIssue,
 } from '../../core/types/rich-content-editor';
 import type {
-  RichContentBlock,
-  RichContentInlineNode,
-  RichContentListItem,
-  RichContentSection,
-} from '../../core/types/rich-content';
+  RichContentEditorBlock,
+  RichContentEditorListItem,
+  RichContentEditorParagraph,
+  RichContentEditorSection,
+} from '../../core/types/rich-content-editor-value';
 import {
   createCommonActionsI18n,
   createCommonLabelsI18n,
@@ -54,11 +51,11 @@ export class RichContentEditor {
   );
   private activeInlineEditor: RichContentInlineEditor | null = null;
 
-  protected sections(): RichContentSection[] {
+  protected sections(): RichContentEditorSection[] {
     return this.control().getRawValue().sections;
   }
 
-  protected blockLabel(type: RichContentBlock['type']): string {
+  protected blockLabel(type: RichContentEditorBlock['type']): string {
     return this.i18n()[type];
   }
 
@@ -90,7 +87,7 @@ export class RichContentEditor {
   }
 
   protected updateSectionTitle(
-    section: RichContentSection,
+    section: RichContentEditorSection,
     value: string,
   ): void {
     section.title = value;
@@ -98,9 +95,9 @@ export class RichContentEditor {
   }
 
   protected addBlock(
-    blocks: RichContentBlock[],
-    type: RichContentBlock['type'],
-    listItem?: RichContentListItem,
+    blocks: RichContentEditorBlock[],
+    type: RichContentEditorBlock['type'],
+    listItem?: RichContentEditorListItem,
   ): void {
     const target = listItem
       ? (listItem.blocks ??= [])
@@ -109,8 +106,16 @@ export class RichContentEditor {
     this.commit();
   }
 
-  protected addListItem(items: RichContentListItem[]): void {
-    items.push({ content: [] });
+  protected addListItem(items: RichContentEditorListItem[]): void {
+    items.push({ content: '' });
+    this.commit();
+  }
+
+  protected updateInlineContent(
+    inline: RichContentEditorParagraph | RichContentEditorListItem,
+    source: string,
+  ): void {
+    inline.content = source;
     this.commit();
   }
 
@@ -132,13 +137,7 @@ export class RichContentEditor {
       return;
     }
 
-    const nodes = this.ensureInlineNodes();
-    const end = richContentInlineText(nodes).length;
-    nodes.splice(
-      0,
-      nodes.length,
-      ...updateRichContentInlineText(nodes, end, end, syntax),
-    );
+    this.ensureInlineParagraph().content += escapeInlineMarkupText(syntax);
     this.commit();
   }
 
@@ -160,16 +159,16 @@ export class RichContentEditor {
     this.commit();
   }
 
-  private createBlock(type: RichContentBlock['type']): RichContentBlock {
+  private createBlock(type: RichContentEditorBlock['type']): RichContentEditorBlock {
     return type === 'paragraph'
-      ? { type, content: [] }
+      ? { type, content: '' }
       : {
           type,
-          items: [{ content: [] }],
+          items: [{ content: '' }],
         };
   }
 
-  private ensureInlineNodes(): RichContentInlineNode[] {
+  private ensureInlineParagraph(): RichContentEditorParagraph {
     let section = this.sections()[0];
     if (!section) {
       section = { blocks: [] };
@@ -180,12 +179,11 @@ export class RichContentEditor {
       candidate.type === 'paragraph'
     );
     if (!block || block.type !== 'paragraph') {
-      block = { type: 'paragraph', content: [] };
+      block = { type: 'paragraph', content: '' };
       section.blocks.push(block);
     }
 
-    block.content ??= [];
-    return block.content;
+    return block;
   }
 
   protected commit(): void {

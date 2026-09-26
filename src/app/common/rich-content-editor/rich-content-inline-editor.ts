@@ -1,339 +1,199 @@
 import {
   Component,
+  computed,
   ElementRef,
   input,
   output,
   signal,
   viewChild,
 } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
-
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
-import {
-  applyRichContentLink,
-  removeRichContentLink,
-  richContentInlineText,
-  toggleRichContentStrong,
-  updateRichContentInlineText,
-} from '../../core/domain/rich-content/rich-content-inline-operations';
+import { LEGAL_DIALOGS } from '../../core/configs/legal-dialogs.config';
 import { RichContentInlineHistory } from '../../core/domain/rich-content/rich-content-inline-history';
 import {
-  isRichContentSelectionStrong,
-  richContentLinkAtSelection,
-  richContentLinks,
-  richContentSelectionHasStrong,
-  richContentSelectionHasLink,
-} from '../../core/domain/rich-content/rich-content-inline-selection';
-import { resolveRichContentTextInput } from '../../core/domain/rich-content/rich-content-text-input';
-import type { NumericInterval } from '../../core/types/interval';
-import type {
-  RichContentEditorIssue,
-  RichContentLinkEditTarget,
-  RichContentLinkRange,
-  RichContentTextInput,
-} from '../../core/types/rich-content-editor';
-import type { RichContentInlineNode } from '../../core/types/rich-content';
-import { requiredTrimmedValidator } from '../../core/validators/required-trimmed.validator';
+  parseInlineMarkup,
+  escapeInlineMarkupText,
+} from '../../core/domain/rich-content/rich-content-inline-markup';
 import {
-  createCommonActionsI18n,
-  createCommonRichContentEditorI18n,
-} from '../../core/translations/common.i18n';
+  serializeRichContentInlineMarkup,
+  richContentMarkupSelectionToText,
+  richContentTextSelectionToMarkup,
+  richContentDialogTargetAtCaret,
+} from '../../core/domain/rich-content/rich-content-markup-source';
+import { toggleRichContentStrong } from '../../core/domain/rich-content/rich-content-inline-operations';
+import {
+  isRichContentSelectionStrong,
+  canApplyRichContentInlineTarget,
+  richContentSelectionHasFormat,
+} from '../../core/domain/rich-content/rich-content-inline-selection';
+import type { NumericInterval } from '../../core/types/interval';
+import type { LegalDialogId } from '../../core/types/legal-dialog';
+import type { RichContentEditorIssue } from '../../core/types/rich-content-editor';
+import type {
+  RichContentInlineUpdate,
+  RichContentInlineTargetType,
+} from '../../core/types/rich-content';
+import { createCommonRichContentEditorI18n } from '../../core/translations/common.i18n';
 import { RichContentInline } from '../rich-content/rich-content-inline';
+import { RichContentInlineTargetEditor } from './rich-content-inline-target-editor';
 
 @Component({
   selector: 'app-rich-content-inline-editor',
   imports: [
-    ReactiveFormsModule,
-    TranslocoPipe,
-    ButtonModule,
-    CheckboxModule,
-    InputTextModule,
-    TextareaModule,
-    RichContentInline,
+    TranslocoPipe, ButtonModule, TextareaModule,
+    RichContentInline, RichContentInlineTargetEditor,
   ],
   templateUrl: './rich-content-inline-editor.html',
 })
 export class RichContentInlineEditor {
-  readonly nodes = input.required<RichContentInlineNode[]>();
+  readonly source = input.required<string>();
   readonly controlId = input.required<string>();
   readonly issues = input<readonly RichContentEditorIssue[]>([]);
-  readonly changed = output<void>();
+  readonly changed = output<string>();
   readonly blurred = output<void>();
   readonly activated = output<RichContentInlineEditor>();
 
   protected readonly i18n = createCommonRichContentEditorI18n();
-  protected readonly actions = createCommonActionsI18n();
+  protected readonly markup = computed(() => parseInlineMarkup(this.source()));
+  protected readonly sourceInvalid = computed(() => this.markup().issues.length > 0);
   protected readonly selection = signal<NumericInterval>({ start: 0, end: 0 });
-  protected readonly linkEditTarget =
-    signal<RichContentLinkEditTarget | null>(null);
-  protected readonly linkHrefControl = new FormControl('', {
-    nonNullable: true,
-    validators: [requiredTrimmedValidator()],
+  protected readonly dialogOptions = Object.values(LEGAL_DIALOGS);
+  protected readonly dialogTarget = computed(() => {
+    const selection = this.selection();
+    return selection.start === selection.end
+      ? richContentDialogTargetAtCaret(this.source(), selection.start) : null;
   });
-  protected readonly linkExternalControl = new FormControl(false, {
-    nonNullable: true,
-  });
-
-  private readonly textSurface = viewChild<ElementRef<HTMLTextAreaElement>>(
-    'textSurface',
-  );
+  private readonly targetEditor = viewChild.required(RichContentInlineTargetEditor);
+  private readonly textSurface = viewChild<ElementRef<HTMLTextAreaElement>>('textSurface');
   private readonly history = new RichContentInlineHistory();
-  private pendingTextInput: RichContentTextInput | null = null;
-  private handledHistoryInput = false;
+  private inputSelection: NumericInterval | null = null;
 
-  protected text(): string {
-    return richContentInlineText(this.nodes());
-  }
-
-  protected links(): RichContentLinkRange[] {
-    return richContentLinks(this.nodes());
+  private textSelection(): NumericInterval {
+    return richContentMarkupSelectionToText(this.source(), this.markup(), this.selection());
   }
 
   protected strongActive(): boolean {
-    const { start, end } = this.selection();
-    return isRichContentSelectionStrong(this.nodes(), start, end);
+    if (this.sourceInvalid()) return false;
+    const { start, end } = this.textSelection();
+    return isRichContentSelectionStrong(this.markup().nodes, start, end);
   }
 
   protected strongDisabled(): boolean {
-    const { start, end } = this.selection();
+    if (this.sourceInvalid()) return true;
+    const { start, end } = this.textSelection();
     return start === end ||
-      richContentSelectionHasLink(this.nodes(), start, end);
+      richContentSelectionHasFormat(this.markup().nodes, start, end, 'link') ||
+      richContentSelectionHasFormat(this.markup().nodes, start, end, 'dialog');
   }
 
-  protected linkDisabled(): boolean {
-    const { start, end } = this.selection();
-    const existingLink = richContentLinkAtSelection(
-      this.nodes(),
-      start,
-      end,
-    );
-
-    return richContentSelectionHasStrong(this.nodes(), start, end) ||
-      (start === end && existingLink === null) ||
-      (existingLink === null &&
-        richContentSelectionHasLink(this.nodes(), start, end));
+  protected targetDisabled(type: RichContentInlineTargetType): boolean {
+    if (this.sourceInvalid()) return true;
+    const { start, end } = this.textSelection();
+    return !canApplyRichContentInlineTarget(this.markup().nodes, start, end, type);
   }
 
-  protected prepareTextInput(
-    event: InputEvent,
-    textarea: HTMLTextAreaElement,
-  ): void {
+  protected prepareTextInput(event: InputEvent, textarea: HTMLTextAreaElement): void {
     if (event.inputType === 'historyUndo' || event.inputType === 'historyRedo') {
       event.preventDefault();
-      this.pendingTextInput = null;
-      this.handledHistoryInput = true;
       this.restoreHistory(event.inputType, textarea);
       return;
     }
-
-    this.handledHistoryInput = false;
-    this.pendingTextInput = {
-      inputType: event.inputType,
-      value: textarea.value,
-      start: textarea.selectionStart,
-      end: textarea.selectionEnd,
-    };
+    this.inputSelection = { start: textarea.selectionStart, end: textarea.selectionEnd };
   }
 
   protected updateText(textarea: HTMLTextAreaElement): void {
-    if (this.handledHistoryInput) {
-      this.handledHistoryInput = false;
-      const { start, end } = this.selection();
-      this.restoreSelection(start, end);
-      return;
-    }
+    const value = textarea.value;
+    const selection = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    this.history.record(this.source(), this.inputSelection ?? this.selection());
+    this.inputSelection = null;
+    this.updateSource(value, selection);
+  }
 
-    const snapshot = this.pendingTextInput;
-    this.pendingTextInput = null;
-    if (!snapshot) {
-      const { start, end } = this.selection();
-      this.restoreSelection(start, end);
-      return;
-    }
-
-    const replacement = resolveRichContentTextInput(
-      snapshot,
-      textarea.value,
-      textarea.selectionStart,
-    );
-    const nextNodes = updateRichContentInlineText(
-      this.nodes(),
-      replacement.start,
-      replacement.end,
-      replacement.text,
-    );
-    this.recordHistory({
-      start: snapshot.start,
-      end: snapshot.end,
-    });
-    this.commitNodes(nextNodes);
-    this.setSelection(textarea.selectionStart, textarea.selectionEnd);
+  protected handleHistoryKey(event: KeyboardEvent, textarea: HTMLTextAreaElement): void {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+    const key = event.key.toLowerCase();
+    if (key !== 'z' && key !== 'y') return;
+    event.preventDefault();
+    this.restoreHistory(key === 'y' || event.shiftKey ? 'historyRedo' : 'historyUndo', textarea);
   }
 
   protected toggleStrong(): void {
     if (this.strongDisabled()) return;
-
-    const { start, end } = this.selection();
-    const nextNodes = toggleRichContentStrong(this.nodes(), start, end);
-    this.recordHistory({ start, end });
-    this.commitNodes(nextNodes);
-    this.restoreSelection(start, end);
-  }
-
-  protected openLinkEditor(): void {
-    if (this.linkDisabled()) return;
-
-    const { start, end } = this.selection();
-    const existingLink = richContentLinkAtSelection(
-      this.nodes(),
-      start,
-      end,
-    );
-    const target: RichContentLinkEditTarget = existingLink
-      ? {
-          start: existingLink.start,
-          end: existingLink.end,
-          existing: true,
-        }
-      : {
-          start,
-          end,
-          existing: false,
-        };
-
-    this.linkEditTarget.set(target);
-    this.linkHrefControl.reset(existingLink?.href ?? '', {
-      emitEvent: false,
-    });
-    this.linkExternalControl.reset(existingLink?.external ?? false, {
-      emitEvent: false,
+    const { start, end } = this.textSelection();
+    this.applyTarget({
+      nodes: toggleRichContentStrong(this.markup().nodes, start, end),
+      selection: { start, end },
     });
   }
 
-  protected editLink(link: RichContentLinkRange): void {
-    this.linkEditTarget.set({
-      start: link.start,
-      end: link.end,
-      existing: true,
-    });
-    this.linkHrefControl.reset(link.href, { emitEvent: false });
-    this.linkExternalControl.reset(link.external, { emitEvent: false });
-    this.setSelection(link.start, link.end);
-    this.restoreSelection(link.start, link.end);
+  protected openTargetEditor(type: RichContentInlineTargetType): void {
+    if (!this.targetDisabled(type)) this.targetEditor().open(type, this.textSelection());
   }
 
-  protected saveLink(): void {
-    this.linkHrefControl.markAsTouched();
-    const target = this.linkEditTarget();
-
-    if (!target || this.linkHrefControl.invalid) return;
-
-    const nextNodes = applyRichContentLink(
-      this.nodes(),
-      target.start,
-      target.end,
-      this.linkHrefControl.getRawValue(),
-      this.linkExternalControl.value,
-    );
-    this.recordHistory({
-      start: target.start,
-      end: target.end,
-    });
-    this.commitNodes(nextNodes);
-    this.restoreSelection(target.start, target.end);
+  protected selectTarget(selection: NumericInterval): void {
+    const range = richContentTextSelectionToMarkup(this.source(), this.markup(), selection);
+    this.setSelection(range.start, range.end);
+    this.restoreSelection(range);
   }
 
-  protected removeLink(): void {
-    const target = this.linkEditTarget();
-    if (!target?.existing) return;
-
-    const nextNodes = removeRichContentLink(
-      this.nodes(),
-      target.start,
-      target.end,
-    );
-    this.recordHistory({
-      start: target.start,
-      end: target.end,
-    });
-    this.commitNodes(nextNodes);
-    this.restoreSelection(target.start, target.end);
-  }
-
-  protected closeLinkEditor(): void {
-    this.linkEditTarget.set(null);
-    this.linkHrefControl.reset('', { emitEvent: false });
-    this.linkExternalControl.reset(false, { emitEvent: false });
+  protected applyTarget(state: RichContentInlineUpdate): void {
+    if (this.sourceInvalid()) return;
+    const source = serializeRichContentInlineMarkup(state.nodes);
+    const selection = richContentTextSelectionToMarkup(source, parseInlineMarkup(source), state.selection);
+    this.commitSource(source, selection);
   }
 
   insertText(text: string, atEnd = false): void {
-    const selection = this.selection();
-    const start = atEnd ? this.text().length : selection.start;
-    const end = atEnd ? start : selection.end;
-    const caret = start + text.length;
-    const nextNodes = updateRichContentInlineText(
-      this.nodes(),
-      start,
-      end,
-      text,
-    );
-
-    this.recordHistory({ start, end });
-    this.commitNodes(nextNodes);
-    this.setSelection(caret, caret);
-    this.restoreSelection(caret, caret);
+    const range = atEnd
+      ? { start: this.source().length, end: this.source().length } : this.selection();
+    this.replaceSource(range, escapeInlineMarkupText(text));
   }
 
-  protected setSelection(start: number | null, end: number | null): void {
-    const textLength = this.text().length;
-    const normalizedStart = start ?? textLength;
-    const normalizedEnd = end ?? normalizedStart;
-    this.selection.set({ start: normalizedStart, end: normalizedEnd });
+  protected completeDialogTarget(dialog: LegalDialogId): void {
+    const range = this.dialogTarget();
+    if (range) this.replaceSource(range, dialog);
+  }
+
+  protected setSelection(start: number, end: number): void {
+    this.selection.set({ start, end });
     this.activated.emit(this);
   }
 
-  private restoreSelection(start: number, end: number): void {
+  private replaceSource(range: NumericInterval, text: string): void {
+    const source = this.source().slice(0, range.start) + text + this.source().slice(range.end);
+    const caret = range.start + text.length;
+    this.commitSource(source, { start: caret, end: caret });
+  }
+
+  private commitSource(source: string, selection: NumericInterval): void {
+    this.history.record(this.source(), this.selection());
+    this.updateSource(source, selection);
+    this.restoreSelection(selection, source);
+  }
+
+  private updateSource(source: string, selection: NumericInterval): void {
+    this.setSelection(selection.start, selection.end);
+    this.targetEditor().close();
+    this.changed.emit(source);
+  }
+
+  private restoreSelection(selection: NumericInterval, source = this.source()): void {
     const textarea = this.textSurface()?.nativeElement;
     if (!textarea) return;
-
-    textarea.value = this.text();
+    if (textarea.value !== source) textarea.value = source;
+    textarea.setSelectionRange(selection.start, selection.end);
     textarea.focus();
-    textarea.setSelectionRange(start, end);
   }
 
-  private commitNodes(nodes: readonly RichContentInlineNode[]): void {
-    this.nodes().splice(0, this.nodes().length, ...nodes);
-    this.closeLinkEditor();
-    this.changed.emit();
-  }
-
-  private recordHistory(selection: NumericInterval): void {
-    this.history.record(this.nodes(), selection);
-  }
-
-  private restoreHistory(
-    inputType: 'historyUndo' | 'historyRedo',
-    textarea: HTMLTextAreaElement,
-  ): void {
-    const selection = {
-      start: textarea.selectionStart,
-      end: textarea.selectionEnd,
-    };
-    const state = this.history.restore(inputType, this.nodes(), selection);
-
-    if (!state) {
-      this.setSelection(selection.start, selection.end);
-      this.restoreSelection(selection.start, selection.end);
-      return;
-    }
-
-    this.commitNodes(state.nodes);
-    this.setSelection(state.selection.start, state.selection.end);
-    this.restoreSelection(state.selection.start, state.selection.end);
+  private restoreHistory(inputType: 'historyUndo' | 'historyRedo', textarea: HTMLTextAreaElement): void {
+    const selection = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    const state = this.history.restore(inputType, this.source(), selection);
+    this.inputSelection = null;
+    if (!state) return;
+    this.updateSource(state.source, state.selection);
+    this.restoreSelection(state.selection, state.source);
   }
 }
