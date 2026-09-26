@@ -1,7 +1,7 @@
 import type express from 'express';
 
 import { buildContactEmailHtml } from './contact-email';
-import { createMailerTransport } from './mail-transport';
+import { createMailerTransport, getMailSenderIdentity } from './mail-transport';
 
 type ContactPayload = {
   subject?: string;
@@ -70,9 +70,7 @@ export function registerContactRoute(app: express.Express): void {
 
       const to =
         process.env['CONTACT_TO']?.trim() || 'kontakt@mistrzowie-gry.pl';
-      const from =
-        process.env['MAIL_FROM']?.trim() || 'kontakt@mistrzowie-gry.pl';
-      const siteName = process.env['MAIL_FROM_NAME']?.trim() || 'Mistrzowie Gry';
+      const { address: from, name: siteName } = getMailSenderIdentity();
 
       const fullName = `${firstName} ${lastName}`.trim();
       await transporter.sendMail({

@@ -1,6 +1,7 @@
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
+  isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
@@ -8,6 +9,7 @@ import dotenv from 'dotenv';
 import { join } from 'node:path';
 import { registerContactRoute } from './server/contact';
 import { registerPublicSeoRoutes } from './server/public-seo';
+import { startNotificationEmailWorker } from './server/notification-email-worker';
 
 dotenv.config({
   path: join(import.meta.dirname, '../.env'),
@@ -96,6 +98,7 @@ function run(): void {
 
   server.listen(port, '127.0.0.1', () => {
     console.log(`Node Express server listening on http://127.0.0.1:${port}`);
+    if (isMainModule(import.meta.url)) startNotificationEmailWorker();
   });
 }
 

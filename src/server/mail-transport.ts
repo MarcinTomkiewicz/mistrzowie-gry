@@ -1,5 +1,12 @@
 import nodemailer from 'nodemailer';
 
+export function getMailSenderIdentity() {
+  return {
+    address: process.env['MAIL_FROM']?.trim() || 'kontakt@mistrzowie-gry.pl',
+    name: process.env['MAIL_FROM_NAME']?.trim() || 'Mistrzowie Gry',
+  };
+}
+
 export function createMailerTransport() {
   const host = process.env['MAIL_HOST']?.trim() || 'ssl0.ovh.net';
   const port = Number(process.env['MAIL_PORT'] || 465);
