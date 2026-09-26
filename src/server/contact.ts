@@ -1,7 +1,7 @@
 import type express from 'express';
-import nodemailer from 'nodemailer';
 
 import { buildContactEmailHtml } from './contact-email';
+import { createMailerTransport } from './mail-transport';
 
 type ContactPayload = {
   subject?: string;
@@ -16,34 +16,6 @@ type ContactPayload = {
 
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name]?.trim();
-
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-
-  return value;
-}
-
-function createMailerTransport() {
-  const host = process.env['MAIL_HOST']?.trim() || 'ssl0.ovh.net';
-  const port = Number(process.env['MAIL_PORT'] || 465);
-  const user =
-    process.env['MAIL_USER']?.trim() || 'kontakt@mistrzowie-gry.pl';
-  const pass = getRequiredEnv('MAIL_PASSWORD');
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: {
-      user,
-      pass,
-    },
-  });
 }
 
 export function registerContactRoute(app: express.Express): void {
