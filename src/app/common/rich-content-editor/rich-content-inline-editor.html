@@ -34,11 +34,26 @@
     </small>
   </div>
 
+  @if (tokens().length) {
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <span class="small-caps">{{ i18n().tokens }}</span>
+      <small class="text-muted">{{ i18n().tokensHint }}</small>
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        @for (token of tokens(); track token) {
+          <p-button
+            type="button" size="small" severity="secondary" [outlined]="true"
+            [label]="token" (onClick)="insertText(token)"
+          />
+        }
+      </div>
+    </div>
+  }
+
   <textarea
     #textSurface
     pTextarea
     class="w-100"
-    [class.p-invalid]="sourceInvalid() || issues().length"
+    [class.p-invalid]="invalid() || sourceInvalid() || issues().length"
     rows="4"
     [id]="controlId() + '-text'"
     [value]="source()"

@@ -8,7 +8,7 @@ import type {
   CommercialRenderProduct,
 } from './commercial-product';
 import type { Price } from './price';
-import type { RichContent } from './rich-content';
+import type { RichContent, RichContentInlineNode } from './rich-content';
 
 export type { CommercialIconKey } from './commercial-icon';
 export type {
@@ -93,8 +93,8 @@ export type CommercialTableRow = CommercialPositionedItem & {
 };
 
 export type CommercialFaqEntry = CommercialPositionedItem & {
-  question: string;
-  answer: string;
+  question: RichContentInlineNode[];
+  answer: RichContent;
 };
 
 export type CommercialRichTextBlock =

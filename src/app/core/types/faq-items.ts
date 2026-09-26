@@ -1,7 +1,7 @@
-import type { RichContent } from './rich-content';
+import type { RichContent, RichContentInlineNode } from './rich-content';
 
 export type DisplayFaqItem = { h: string; a: string };
 
 export type FaqAccordionItem =
   | DisplayFaqItem
-  | { h: string; a: RichContent };
+  | { h: RichContentInlineNode[]; a: RichContent };

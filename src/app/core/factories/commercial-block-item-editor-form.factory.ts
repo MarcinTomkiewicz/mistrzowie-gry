@@ -28,7 +28,10 @@ import { commercialProductFieldValidator } from '../validators/commercial-builde
 import { internalRouteValidator } from '../validators/internal-route.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 import { createPriceEditorForm } from './price-editor-form.factory';
-import { createRichContentEditorControl } from './rich-content-editor-form.factory';
+import {
+  createRichContentEditorControl,
+  createRichContentInlineEditorControl,
+} from './rich-content-editor-form.factory';
 import { createUuidFormControl } from './form-control.factory';
 
 export function createCommercialButtonEditorForm(
@@ -180,8 +183,8 @@ export function createCommercialFaqEntryEditorForm(
 ): CommercialFaqEntryEditorForm {
   return new FormGroup({
     id: createUuidFormControl(item?.id),
-    question: requiredTextControl(item?.question),
-    answer: requiredTextControl(item?.answer),
+    question: createRichContentInlineEditorControl(item?.question ?? []),
+    answer: createRichContentEditorControl(item?.answer ?? null, true),
   });
 }
 

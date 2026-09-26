@@ -72,7 +72,7 @@ export type CommercialTableRowEditorForm = FormGroup<{
 export type CommercialFaqEntryEditorForm = FormGroup<{
   id: FormControl<string>;
   question: FormControl<string>;
-  answer: FormControl<string>;
+  answer: RichContentEditorControl;
 }>;
 
 type CommercialBlockBaseEditorControls<TType extends string> = {

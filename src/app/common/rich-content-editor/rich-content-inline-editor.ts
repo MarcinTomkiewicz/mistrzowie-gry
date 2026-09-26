@@ -52,6 +52,8 @@ export class RichContentInlineEditor {
   readonly source = input.required<string>();
   readonly controlId = input.required<string>();
   readonly issues = input<readonly RichContentEditorIssue[]>([]);
+  readonly tokens = input<readonly string[]>([]);
+  readonly invalid = input(false);
   readonly changed = output<string>();
   readonly blurred = output<void>();
   readonly activated = output<RichContentInlineEditor>();

@@ -9,9 +9,31 @@ import {
   createRichContentEditorValue,
   parseRichContentEditorValue,
 } from '../domain/rich-content/rich-content-editor-value';
+import { parseInlineMarkup } from '../domain/rich-content/rich-content-inline-markup';
+import { serializeRichContentInlineMarkup } from '../domain/rich-content/rich-content-markup-source';
 import type { RichContentEditorControl } from '../types/rich-content-editor';
-import type { RichContent, RichContentInput } from '../types/rich-content';
-import { richContentValidator } from '../validators/rich-content.validator';
+import type { RichContent, RichContentInlineNode, RichContentInput } from '../types/rich-content';
+import {
+  richContentInlineSourceValidator,
+  richContentValidator,
+} from '../validators/rich-content.validator';
+
+export function createRichContentInlineEditorControl(
+  nodes: readonly RichContentInlineNode[],
+): FormControl<string> {
+  return new FormControl(serializeRichContentInlineMarkup(nodes), {
+    nonNullable: true,
+    validators: [richContentInlineSourceValidator()],
+  });
+}
+
+export function mapRichContentInlineEditorControl(
+  control: FormControl<string>,
+): RichContentInlineNode[] {
+  const parsed = parseInlineMarkup(control.getRawValue());
+  if (parsed.issues.length) throw new Error('Invalid RichContent source markup');
+  return parsed.nodes;
+}
 
 export function createRichContentEditorControl(
   content: RichContentInput,

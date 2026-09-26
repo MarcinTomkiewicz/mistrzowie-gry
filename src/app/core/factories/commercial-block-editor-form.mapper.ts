@@ -18,7 +18,10 @@ import type {
 import {
   mapPriceEditorForm,
 } from './price-editor-form.factory';
-import { mapRichContentEditorControl } from './rich-content-editor-form.factory';
+import {
+  mapRichContentEditorControl,
+  mapRichContentInlineEditorControl,
+} from './rich-content-editor-form.factory';
 import { mapCommercialProductCollectionBlockEditorForm } from './commercial-product-collection-editor-form.mapper';
 
 export function mapCommercialPageBlockEditorForm(
@@ -202,8 +205,8 @@ function mapFaqBlock(
     items: form.controls.items.controls.map((item, index) => ({
       id: item.controls.id.getRawValue(),
       position: positionFor(index),
-      question: item.controls.question.getRawValue().trim(),
-      answer: item.controls.answer.getRawValue().trim(),
+      question: mapRichContentInlineEditorControl(item.controls.question),
+      answer: mapRichContentEditorControl(item.controls.answer, true),
     })),
   };
 }

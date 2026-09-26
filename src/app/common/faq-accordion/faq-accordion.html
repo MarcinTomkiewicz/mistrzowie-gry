@@ -2,11 +2,19 @@
   @for (item of items(); track $index) {
     <p-accordion-panel [value]="$index">
       <p-accordion-header class="mg-section__title mg-section__title--xs">
-        {{ item.h }}
+        @if (isStructuredQuestion(item.h)) {
+          <app-rich-content-inline
+            [nodes]="item.h"
+            (click)="stopTargetToggle($event)"
+            (keydown)="stopTargetToggle($event)"
+          />
+        } @else {
+          {{ item.h }}
+        }
       </p-accordion-header>
 
       <p-accordion-content>
-        @if (isStructuredAnswer(item.a)) {
+        @if (typeof item.a !== 'string') {
           <app-rich-content [content]="item.a" />
         } @else {
           <p

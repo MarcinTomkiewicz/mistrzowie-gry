@@ -5,10 +5,23 @@ import type {
 } from '@angular/forms';
 
 import { hasRichContent } from '../domain/rich-content/rich-content';
+import { parseInlineMarkup } from '../domain/rich-content/rich-content-inline-markup';
 import {
   isRichContentEditorValue,
   parseRichContentEditorValue,
 } from '../domain/rich-content/rich-content-editor-value';
+
+export function richContentInlineSourceValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value: unknown = control.value;
+    if (typeof value !== 'string') return { richContent: true };
+
+    const parsed = parseInlineMarkup(value);
+    if (parsed.issues.length) return { richContentSource: true };
+
+    return parsed.nodes.some((node) => node.text.trim()) ? null : { richContent: true };
+  };
+}
 
 export function richContentValidator(required: boolean): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
