@@ -1,0 +1,13 @@
+{
+  "events": {
+    "onboarding_started": "Rozpoczęto onboarding",
+    "questionnaire_ready_for_signature": "Kwestionariusz jest gotowy do podpisu",
+    "private_documents_added": "Dodano dokumenty prywatne",
+    "signed_document_submitted": "Przesłano podpisany dokument",
+    "signed_document_rejected": "Podpisany dokument został odrzucony",
+    "signed_document_accepted": "Podpisany dokument został zaakceptowany",
+    "onboarding_completed": "Onboarding został zakończony",
+    "shared_documents_assigned": "Przydzielono dokumenty wspólne",
+    "shared_documents_acknowledged": "Potwierdzono zapoznanie z dokumentem wspólnym"
+  }
+}

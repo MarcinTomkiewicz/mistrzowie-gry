@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 
 import { DeployUpdate } from './core/services/deploy-update/deploy-update';
+import { NotificationFacade } from './core/facades/notifications/notification-facade';
 import { AppShell } from './public/components/app-shell/app-shell';
 
 @Component({
@@ -12,4 +13,5 @@ import { AppShell } from './public/components/app-shell/app-shell';
 })
 export class App {
   private readonly deployUpdate = inject(DeployUpdate);
+  private readonly notifications = inject(NotificationFacade);
 }
