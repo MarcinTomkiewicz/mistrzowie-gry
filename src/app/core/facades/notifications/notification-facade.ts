@@ -1,5 +1,6 @@
 import { effect, ErrorHandler, inject, Injectable, signal } from '@angular/core';
-import { finalize, Observable, Subscription, timer } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, finalize, Observable, Subscription, timer } from 'rxjs';
 
 import { NOTIFICATION_UNREAD_POLL_INTERVAL } from '../../configs/notifications.config';
 import { Auth } from '../../services/auth/auth';
@@ -12,6 +13,7 @@ export class NotificationFacade {
   private readonly auth = inject(Auth);
   private readonly data = inject(Notifications);
   private readonly platform = inject(Platform);
+  private readonly router = inject(Router);
   private readonly errorHandler = inject(ErrorHandler);
   private readonly notificationState = signal<readonly Notification[]>([]);
   private readonly unreadState = signal(0);
@@ -48,6 +50,9 @@ export class NotificationFacade {
         requests.add(timer(
           NOTIFICATION_UNREAD_POLL_INTERVAL,
           NOTIFICATION_UNREAD_POLL_INTERVAL,
+        ).subscribe(() => this.refreshUnreadCount()));
+        requests.add(this.router.events.pipe(
+          filter((event) => event instanceof NavigationEnd),
         ).subscribe(() => this.refreshUnreadCount()));
       }
     });
