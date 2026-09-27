@@ -1,11 +1,21 @@
 <section class="flex-col-start-stretch gap-sm w-px-350 w-px-250-sm max-w-full" [attr.aria-busy]="notifications.loading()">
   <h2 class="mg-section__title mg-section__title--xs m-0">{{ i18n.ui().title }}</h2>
-  <p-button
-    type="button" size="small" severity="secondary" [outlined]="true"
-    [label]="i18n.ui().markAllRead"
-    [disabled]="notifications.loading() || notifications.unreadCount() === 0"
-    (onClick)="notifications.markAllRead()"
-  />
+  <div class="flex-row-start-stretch flex-nowrap gap-xs">
+    <p-button
+      class="flex-1 basis-0 min-w-0" styleClass="w-100 h-100 text-wrap"
+      type="button" size="small" severity="secondary" [outlined]="true"
+      [label]="i18n.ui().markAllRead"
+      [disabled]="notifications.loading() || notifications.unreadCount() === 0"
+      (onClick)="notifications.markAllRead()"
+    />
+    <p-button
+      class="flex-1 basis-0 min-w-0" styleClass="w-100 h-100 text-wrap"
+      type="button" size="small" severity="danger" [outlined]="true"
+      [label]="i18n.ui().dismissAllRead"
+      [disabled]="notifications.loading()"
+      (onClick)="notifications.dismissAllRead()"
+    />
+  </div>
 
   @if (notifications.loading()) {
     <p class="m-0" role="status">{{ status().loading }}</p>

@@ -1,7 +1,8 @@
 {
   "ui": {
     "title": "Powiadomienia",
-    "markAllRead": "Oznacz wszystkie jako przeczytane",
+    "markAllRead": "Oznacz jako przeczytane",
+    "dismissAllRead": "Usuń wszystkie przeczytane",
     "empty": "Brak powiadomień",
     "goTo": "Przejdź",
     "buttonLabel": "Otwórz powiadomienia",

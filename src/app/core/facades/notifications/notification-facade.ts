@@ -84,7 +84,7 @@ export class NotificationFacade {
     this.runRequest(
       this.data.markRead(notificationId),
       () => {
-        this.refreshAfterRead();
+        this.refreshNotifications();
         onSuccess?.();
       },
       true,
@@ -94,7 +94,7 @@ export class NotificationFacade {
   markAllRead(): void {
     this.runRequest(
       this.data.markAllRead(),
-      () => this.refreshAfterRead(),
+      () => this.refreshNotifications(),
       true,
     );
   }
@@ -114,7 +114,15 @@ export class NotificationFacade {
     );
   }
 
-  private refreshAfterRead(): void {
+  dismissAllRead(): void {
+    this.runRequest(
+      this.data.dismissAllRead(),
+      () => this.refreshNotifications(),
+      true,
+    );
+  }
+
+  private refreshNotifications(): void {
     this.refreshUnreadCount();
     if (this.listLimit !== null) this.loadNotifications(this.listLimit);
   }
