@@ -53,7 +53,7 @@ export function createFooterI18n() {
   const resolveFooterMenu = (items: IMenu[]): IResolvedMenu[] =>
     items.map(({ children: _children, badgeKey: _badgeKey, ...item }) => ({
       ...item,
-      label: resolveNavLabel(item.labelKey),
+      label: item.label !== undefined ? item.label : resolveNavLabel(item.labelKey),
     }));
 
   const resolveSocialLinks = (items: ISocialLink[]): IResolvedSocialLink[] =>

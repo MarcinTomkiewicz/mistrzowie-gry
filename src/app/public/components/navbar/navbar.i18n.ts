@@ -1,5 +1,3 @@
-import { computed } from '@angular/core';
-
 import { IMenu } from '../../../core/interfaces/i-menu';
 import type {
   CommonNavMenuItem,
@@ -30,7 +28,7 @@ export function createNavbarI18n() {
   const resolveMenu = (items: IMenu[]): CommonNavMenuItem[] =>
     items.map((item) => ({
       ...item,
-      label: resolveLabel(item.labelKey),
+      label: item.label !== undefined ? item.label : resolveLabel(item.labelKey),
       children: item.children?.length ? resolveMenu(item.children) : undefined,
     }));
 

@@ -28,6 +28,7 @@ import type { CommonNavTranslations } from '../types/i18n/common';
 export const COMMERCIAL_PAGE_DEFAULT_LOCALE = 'pl';
 
 export const COMMERCIAL_PAGE_RPC = {
+  getPublicList: 'get_public_commercial_page_list',
   getPublicBySlug: 'get_public_commercial_page_by_slug',
   getAdminList: 'get_admin_commercial_page_list',
   getAdminDetail: 'get_admin_commercial_page_detail',

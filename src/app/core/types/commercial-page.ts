@@ -7,6 +7,12 @@ export type CommercialPageKey =
 
 export type CommercialPageKind = 'offer' | 'information';
 
+export type PublicCommercialPageNavItem = {
+  key: CommercialPageKey;
+  heading: string;
+  slug: string;
+};
+
 export type CommercialTaxDisplayMode =
   | 'gross'
   | 'net'

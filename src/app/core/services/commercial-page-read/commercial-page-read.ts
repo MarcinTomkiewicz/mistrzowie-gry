@@ -8,11 +8,21 @@ import {
 import type {
   CommercialPageBuilderDocument,
 } from '../../types/commercial-page-builder';
+import type { PublicCommercialPageNavItem } from '../../types/commercial-page';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
 export class CommercialPageRead {
   private readonly backend = inject(Backend);
+
+  getList(
+    locale = COMMERCIAL_PAGE_DEFAULT_LOCALE,
+  ): Observable<PublicCommercialPageNavItem[]> {
+    return this.backend.rpc<PublicCommercialPageNavItem[]>(
+      COMMERCIAL_PAGE_RPC.getPublicList,
+      { p_locale: locale },
+    );
+  }
 
   getBySlug(
     slug: string,

@@ -18,6 +18,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
+import { Navigation } from '../../../../core/services/navigation/navigation';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { createCommercialPageI18n } from '../../../../core/translations/commercial-pages.i18n';
 import type { CommercialPagePublicationIssue } from '../../../../core/types/commercial-page-admin';
@@ -34,6 +35,7 @@ import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
 })
 export class CommercialPagePublication {
   private readonly pages = inject(CommercialPageAdmin);
+  private readonly navigation = inject(Navigation);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -154,6 +156,7 @@ export class CommercialPagePublication {
             summary: toast.publishSuccessSummary,
             detail: toast.publishSuccessDetail,
           });
+          this.navigation.refreshCommercialPages();
           this.published.emit(result.document);
         },
         error: () => this.showPublishError(),

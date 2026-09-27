@@ -79,9 +79,12 @@ export class Navbar {
   readonly isNotificationPanelLoading = signal(false);
   readonly notificationOpen = signal(false);
 
-  readonly activeChildren = computed(
-    () => this.activeDropdown()?.children ?? [],
-  );
+  readonly activeChildren = computed(() => {
+    const active = this.activeDropdown();
+    return active
+      ? this.menu().find((item) => item.labelKey === active.labelKey)?.children ?? []
+      : [];
+  });
 
   readonly brandLogoSrc = this.theme.brandLogoSrc;
 
@@ -264,5 +267,5 @@ export class Navbar {
     });
   }
 
-  trackByLabelKey = (_: number, item: CommonNavMenuItem) => item.labelKey;
+  trackByMenuItem = (_: number, item: CommonNavMenuItem) => item.labelKey ?? item.path;
 }

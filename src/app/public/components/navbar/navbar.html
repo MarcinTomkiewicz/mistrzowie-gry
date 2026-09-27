@@ -12,7 +12,7 @@
     </a>
 
     <ul class="m-0 p-0 flex-row-center-center gap-xs hide-down-md">
-      @for (item of menu(); track trackByLabelKey($index, item)) {
+      @for (item of menu(); track trackByMenuItem($index, item)) {
         <li class="li--unset flex-row-start-center">
           @if (!item.children?.length) {
             <a
@@ -114,7 +114,7 @@
 
 <p-popover #navPopover styleClass="mg-popover" (onHide)="closeDropdown()">
   <ul class="m-0 p-sm flex-col-start-stretch gap-xs">
-    @for (child of activeChildren(); track trackByLabelKey($index, child)) {
+    @for (child of activeChildren(); track trackByMenuItem($index, child)) {
       <li class="li--unset">
         <a
           class="mg-popover-menu__link py-xs"
@@ -172,7 +172,7 @@
       </div>
 
       <ul class="m-0 p-0 flex-col-start-stretch gap-md">
-        @for (item of menu(); track trackByLabelKey($index, item)) {
+        @for (item of menu(); track trackByMenuItem($index, item)) {
           <li class="li--unset">
             @if (!item.children?.length) {
               <a
@@ -188,7 +188,7 @@
               </div>
 
               <ul class="m-0 mt-xs pl-md flex-col-start-stretch gap-xs">
-                @for (child of item.children; track trackByLabelKey($index, child)) {
+                @for (child of item.children; track trackByMenuItem($index, child)) {
                   <li class="li--unset">
                     <a
                       class="mg-mobile-menu__link py-sm"

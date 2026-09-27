@@ -1,5 +1,4 @@
-export interface IMenu {
-  labelKey: string;
+export type IMenu = {
   path?: string;
   children?: IMenu[];
 
@@ -9,9 +8,12 @@ export interface IMenu {
   disabled?: boolean;
   badgeKey?: string;
 
-    roles?: string[];
+  roles?: string[];
   footer?: boolean;
-}
+} & (
+  | { label: string; labelKey?: string }
+  | { label?: undefined; labelKey: string }
+);
 
 export interface IResolvedMenu extends Omit<IMenu, 'badgeKey' | 'children'> {
   label: string;

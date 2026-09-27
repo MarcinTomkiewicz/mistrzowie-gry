@@ -44,7 +44,7 @@
         </h3>
 
         <ul class="flex-col-center-center-md m-0 p-0">
-          @for (l of footerLinks.shortcuts; track l.labelKey) {
+          @for (l of footerLinks.shortcuts; track l.path) {
             <li class="w-30-md w-50-sm w-70-xs">
               <a [routerLink]="l.path">
                 {{ l.label }}
