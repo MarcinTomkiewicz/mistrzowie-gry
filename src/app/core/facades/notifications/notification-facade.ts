@@ -6,6 +6,8 @@ import { NOTIFICATION_UNREAD_POLL_INTERVAL } from '../../configs/notifications.c
 import { Auth } from '../../services/auth/auth';
 import { Notifications } from '../../services/notifications/notifications';
 import { Platform } from '../../services/platform/platform';
+import { UiToast } from '../../services/ui-toast/ui-toast';
+import { createCommonErrorsI18n } from '../../translations/common.i18n';
 import type { Notification } from '../../types/notification';
 
 @Injectable({ providedIn: 'root' })
@@ -15,6 +17,8 @@ export class NotificationFacade {
   private readonly platform = inject(Platform);
   private readonly router = inject(Router);
   private readonly errorHandler = inject(ErrorHandler);
+  private readonly uiToast = inject(UiToast);
+  private readonly errors = createCommonErrorsI18n();
   private readonly notificationState = signal<readonly Notification[]>([]);
   private readonly unreadState = signal(0);
   private readonly loadingState = signal(false);
@@ -95,6 +99,21 @@ export class NotificationFacade {
     );
   }
 
+  dismiss(notificationId: string): void {
+    this.runRequest(
+      this.data.dismiss(notificationId),
+      () => {
+        this.listRequest?.unsubscribe();
+        this.listRequest = null;
+        this.notificationState.update((notifications) =>
+          notifications.filter((notification) => notification.id !== notificationId),
+        );
+        this.refreshUnreadCount();
+      },
+      true,
+    );
+  }
+
   private refreshAfterRead(): void {
     this.refreshUnreadCount();
     if (this.listLimit !== null) this.loadNotifications(this.listLimit);
@@ -103,19 +122,19 @@ export class NotificationFacade {
   private runRequest<TResult>(
     request: Observable<TResult>,
     apply: (result: TResult) => void,
-    trackLoading = false,
+    foreground = false,
   ): Subscription {
     const userId = this.auth.userId();
     if (!userId) return Subscription.EMPTY;
 
-    if (trackLoading) {
+    if (foreground) {
       this.pendingLoads += 1;
       this.loadingState.set(true);
     }
 
     const subscription = request.pipe(
       finalize(() => {
-        if (trackLoading) {
+        if (foreground) {
           this.pendingLoads -= 1;
           this.loadingState.set(this.pendingLoads > 0);
         }
@@ -125,7 +144,12 @@ export class NotificationFacade {
         if (this.auth.userId() === userId) apply(result);
       },
       error: (error: unknown) => {
-        if (this.auth.userId() === userId) this.errorHandler.handleError(error);
+        if (this.auth.userId() === userId) {
+          this.errorHandler.handleError(error);
+          if (foreground && this.platform.isBrowser) {
+            this.uiToast.danger({ summary: this.errors().generic });
+          }
+        }
       },
     });
     this.requests.add(subscription);

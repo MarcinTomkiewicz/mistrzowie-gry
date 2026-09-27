@@ -10,6 +10,7 @@ export const NOTIFICATION_RPC = {
   unreadCount: 'get_my_unread_notification_count',
   markRead: 'mark_my_notification_read',
   markAllRead: 'mark_all_my_notifications_read',
+  dismiss: 'dismiss_my_notification',
 } as const;
 
 export const NOTIFICATION_UNREAD_POLL_INTERVAL = 60_000;

@@ -37,4 +37,10 @@ export class Notifications {
     return this.backend.rpc<unknown>(NOTIFICATION_RPC.markAllRead)
       .pipe(map(() => void 0));
   }
+
+  dismiss(notificationId: string): Observable<void> {
+    return this.backend.rpc<unknown>(NOTIFICATION_RPC.dismiss, {
+      p_notification_id: notificationId,
+    }).pipe(map(() => void 0));
+  }
 }

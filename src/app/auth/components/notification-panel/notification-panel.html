@@ -25,7 +25,14 @@
             <small class="tag-badge" [class.tag-badge--primary]="notification.readAt === null" [class.tag-badge--muted]="notification.readAt !== null">
               {{ notification.readAt === null ? i18n.ui().unread : i18n.ui().read }}
             </small>
-            <p-button type="button" size="small" [text]="true" [label]="i18n.ui().goTo" (onClick)="goTo(notification)" />
+            <div class="flex-row-start-center gap-xs">
+              <p-button type="button" size="small" [text]="true" [label]="i18n.ui().goTo" (onClick)="goTo(notification)" />
+              <p-button
+                type="button" size="small" severity="danger" [text]="true"
+                icon="pi pi-trash" [ariaLabel]="actions().delete"
+                (onClick)="notifications.dismiss(notification.id)"
+              />
+            </div>
           </div>
         </li>
       }

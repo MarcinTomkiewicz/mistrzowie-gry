@@ -5,7 +5,10 @@ import { ButtonModule } from 'primeng/button';
 
 import { NOTIFICATION_PRESENTATION } from '../../../core/configs/notifications.config';
 import { NotificationFacade } from '../../../core/facades/notifications/notification-facade';
-import { createCommonStatusI18n } from '../../../core/translations/common.i18n';
+import {
+  createCommonActionsI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
 import {
   createNotificationsI18n,
   NOTIFICATIONS_SCOPE,
@@ -24,6 +27,7 @@ export class NotificationPanel {
   readonly closed = output<void>();
   protected readonly notifications = inject(NotificationFacade);
   protected readonly i18n = createNotificationsI18n();
+  protected readonly actions = createCommonActionsI18n();
   protected readonly status = createCommonStatusI18n();
   protected readonly presentation = NOTIFICATION_PRESENTATION;
   protected readonly formatTimestamp = formatTimestampLabel;

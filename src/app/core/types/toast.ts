@@ -20,7 +20,7 @@ export type PrimeToastSeverity =
 
 export type ToastOptions = {
   summary: string;
-  detail: string;
+  detail?: string;
   life?: number;
   icon?: string;
 };
