@@ -2,6 +2,7 @@ import { NgOptimizedImage } from '@angular/common';
 import {
   Component,
   ComponentRef,
+  DestroyRef,
   OutputEmitterRef,
   Type,
   ViewContainerRef,
@@ -25,6 +26,7 @@ import { Auth } from '../../../core/services/auth/auth';
 import { AuthSession } from '../../../core/services/auth-session/auth-session';
 import { LazyComponentLoader } from '../../../core/services/lazy-component-loader/lazy-component-loader';
 import { Navigation } from '../../../core/services/navigation/navigation';
+import { Platform } from '../../../core/services/platform/platform';
 import { Theme } from '../../../core/services/theme/theme';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { CommonNavMenuItem } from '../../../core/types/i18n/common';
@@ -58,6 +60,7 @@ export class Navbar {
   private readonly authSession = inject(AuthSession);
   private readonly lazyComponentLoader = inject(LazyComponentLoader);
   private readonly nav = inject(Navigation);
+  private readonly platform = inject(Platform);
   private readonly theme = inject(Theme);
   private readonly uiConfirm = inject(UiConfirm);
 
@@ -103,6 +106,13 @@ export class Navbar {
     );
 
   constructor() {
+    const removeScrollListener = this.platform.onWindow('scroll', () => {
+      this.closeDropdown();
+      this.closeUserMenu();
+      this.closeNotifications();
+    }, { passive: true });
+    inject(DestroyRef).onDestroy(removeScrollListener);
+
     effect(() => {
       if (!this.isAuthenticated()) this.closeNotifications();
     });
@@ -151,6 +161,8 @@ export class Navbar {
   }
 
   openNotifications(event: Event): void {
+    if (!this.isAuthenticated()) return;
+
     this.closeDropdown();
     this.closeUserMenu();
     this.closeMobile();

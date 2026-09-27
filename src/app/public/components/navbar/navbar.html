@@ -50,10 +50,11 @@
       </div>
 
       <div class="flex-row-start-center gap-xs pl-sm">
-        @if (isAuthenticated()) {
+        @if (hasSessionCookie()) {
           <button
             type="button"
             class="mg-icon-btn position-relative"
+            [disabled]="!isAuthenticated()"
             [attr.aria-label]="notificationI18n.ui().buttonLabel"
             [attr.aria-describedby]="notifications.unreadCount() > 0 ? 'navbar-notification-count' : null"
             [attr.aria-expanded]="notificationOpen()"
