@@ -19,6 +19,7 @@ import type { RichContentEditorControl } from './rich-content-editor';
 export type CommercialPageMetadataEditorForm = FormGroup<{
   slug: FormControl<string>;
   heading: FormControl<string>;
+  menuLabel: FormControl<string>;
   lead: FormControl<string>;
 }>;
 

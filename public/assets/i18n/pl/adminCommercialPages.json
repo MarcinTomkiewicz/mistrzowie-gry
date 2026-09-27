@@ -110,7 +110,8 @@
       "sectionTitle": "Treść strony",
       "draftSlug": "Slug draftu",
       "slugPattern": "Slug może zawierać małe litery i cyfry rozdzielone pojedynczymi myślnikami.",
-      "heading": "Nagłówek strony"
+      "heading": "Nagłówek strony",
+      "menuLabel": "[PH] Etykieta w menu (opcjonalna)"
     },
     "seo": {
       "ogTitle": "Tytuł Open Graph",

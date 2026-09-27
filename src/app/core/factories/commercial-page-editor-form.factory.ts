@@ -42,6 +42,7 @@ export function createCommercialPageEditorForm(): CommercialPageEditorForm {
         ],
       }),
       heading: requiredTextControl(),
+      menuLabel: new FormControl('', { nonNullable: true }),
       lead: new FormControl('', { nonNullable: true }),
     }),
     seo: new FormGroup({
@@ -66,6 +67,7 @@ export function resetCommercialPageEditorForm(
       metadata: {
         slug: document.slug,
         heading: document.heading,
+        menuLabel: document.menuLabel ?? '',
         lead: document.lead ?? '',
       },
       seo: {
@@ -105,6 +107,7 @@ export function mapCommercialPageEditorFormToDocument(
   return {
     slug: value.metadata.slug.trim(),
     heading: value.metadata.heading.trim(),
+    menuLabel: normalizeText(value.metadata.menuLabel),
     lead: normalizeText(value.metadata.lead),
     seo: {
       title: value.seo.title.trim(),

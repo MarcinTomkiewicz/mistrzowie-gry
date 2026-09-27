@@ -59,6 +59,7 @@ export type AdminCommercialPagesMetadataTranslations = {
   draftSlug: string;
   slugPattern: string;
   heading: string;
+  menuLabel: string;
 };
 
 export type AdminCommercialPagesSeoTranslations = {

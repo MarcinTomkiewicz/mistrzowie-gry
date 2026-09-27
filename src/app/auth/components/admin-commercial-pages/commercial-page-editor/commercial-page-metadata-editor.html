@@ -73,6 +73,23 @@
 
   <div class="flex-col-start-stretch gap-xs w-100">
     <p-iftalabel class="w-100">
+      <input
+        pInputText
+        id="commercial-page-menu-label"
+        class="w-100"
+        [class.p-invalid]="diagnostics().issuesAt({ field: 'menuLabel' }).length"
+        formControlName="menuLabel"
+        autocomplete="off"
+      />
+      <label for="commercial-page-menu-label">{{ copy().menuLabel }}</label>
+    </p-iftalabel>
+    <app-commercial-publication-issue-messages
+      [issues]="diagnostics().issuesAt({ field: 'menuLabel' })"
+    />
+  </div>
+
+  <div class="flex-col-start-stretch gap-xs w-100">
+    <p-iftalabel class="w-100">
       <textarea
         pTextarea
         id="commercial-page-lead"

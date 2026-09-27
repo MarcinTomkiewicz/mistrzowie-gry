@@ -10,6 +10,7 @@ export type CommercialPageKind = 'offer' | 'information';
 export type PublicCommercialPageNavItem = {
   key: CommercialPageKey;
   heading: string;
+  menuLabel: string | null;
   slug: string;
 };
 

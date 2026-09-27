@@ -9,6 +9,7 @@ import type {
 export type CommercialPageEditorDocument = {
   slug: string;
   heading: string;
+  menuLabel: string | null;
   lead: string | null;
   seo: CommercialPageEditorSeo;
   products: CommercialEditorProduct[];

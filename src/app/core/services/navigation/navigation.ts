@@ -103,7 +103,7 @@ export class Navigation {
 
   private applyCommercialPages(pages: PublicCommercialPageNavItem[]): void {
     this.setOfferChildren(pages.map((page) => ({
-      label: page.heading,
+      label: page.menuLabel ?? page.heading,
       path: `/offer/${page.slug}`,
       footer: true,
     })));
