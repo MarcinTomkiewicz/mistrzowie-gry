@@ -20,6 +20,8 @@ export function startNotificationEmailWorker(): void {
     return;
   }
 
+  console.info('[NOTIFICATION EMAIL WORKER] Started.');
+
   let processing = false;
 
   const processBatch = async (): Promise<void> => {

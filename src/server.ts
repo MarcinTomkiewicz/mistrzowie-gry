@@ -1,7 +1,6 @@
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
-  isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
@@ -98,7 +97,7 @@ function run(): void {
 
   server.listen(port, '127.0.0.1', () => {
     console.log(`Node Express server listening on http://127.0.0.1:${port}`);
-    if (isMainModule(import.meta.url)) startNotificationEmailWorker();
+    startNotificationEmailWorker();
   });
 }
 
