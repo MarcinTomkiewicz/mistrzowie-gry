@@ -116,6 +116,16 @@
                 [disabled]="isLoading() || isPreviewing() || form.pristine"
                 (onClick)="saveDraft()"
               />
+              @if (step === 4) {
+                <p-button
+                  type="button"
+                  severity="success"
+                  [label]="i18n.commonActions().publish"
+                  icon="pi pi-send"
+                  [disabled]="isLoading() || isSaving() || isPreviewing() || form.dirty"
+                  (onClick)="openPublication()"
+                />
+              }
             </div>
           </div>
         </ng-template>
@@ -311,5 +321,28 @@
         />
       </div>
     </div>
+  </p-dialog>
+}
+
+@if (publicationDetail(); as pageDetail) {
+  <p-dialog
+    styleClass="mg-dialog mg-dialog--md"
+    [modal]="true"
+    [visible]="true"
+    [header]="i18n.publication().dialogTitle"
+    [closable]="!isPublicationBusy()"
+    [closeOnEscape]="!isPublicationBusy()"
+    [dismissableMask]="!isPublicationBusy()"
+    [draggable]="false"
+    (visibleChange)="onPublicationVisibleChange($event)"
+  >
+    <app-commercial-page-publication
+      [pageId]="pageDetail.page.id"
+      [locale]="pageDetail.page.locale"
+      [effectiveFrom]="pageDetail.effectiveFrom"
+      [autoValidate]="true"
+      (busyChange)="isPublicationBusy.set($event)"
+      (published)="onPublished()"
+    />
   </p-dialog>
 }

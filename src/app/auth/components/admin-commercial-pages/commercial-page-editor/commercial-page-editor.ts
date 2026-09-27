@@ -10,7 +10,7 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { StepperModule } from 'primeng/stepper';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, forkJoin, type Observable } from 'rxjs';
 
 import {
   COMMERCIAL_PAGE_DEFAULT_LOCALE,
@@ -37,6 +37,7 @@ import type { CommercialPageEditorDocument } from '../../../../core/types/commer
 import { CommercialPageRenderer } from '../../../../common/commercial-page/commercial-page-renderer';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createAdminCommercialPagesI18n } from '../admin-commercial-pages.i18n';
+import { CommercialPagePublication } from '../commercial-page-publication/commercial-page-publication';
 import { CommercialPageMetadataEditor } from './commercial-page-metadata-editor';
 import { CommercialPageSectionsEditor } from './commercial-page-sections-editor';
 import { CommercialPageSeoEditor } from './commercial-page-seo-editor';
@@ -53,6 +54,7 @@ import { CommercialPublicationIssueMessages } from './commercial-publication-iss
     StepperModule,
     LoadingOverlay,
     CommercialPageRenderer,
+    CommercialPagePublication,
     CommercialPageMetadataEditor,
     CommercialPageSectionsEditor,
     CommercialPageSeoEditor,
@@ -81,6 +83,8 @@ export class CommercialPageEditor {
   protected readonly i18n = createAdminCommercialPagesI18n();
   protected readonly form = createCommercialPageEditorForm();
   protected readonly detail = signal<CommercialPageAdminDetail | null>(null);
+  protected readonly publicationDetail = signal<CommercialPageAdminDetail | null>(null);
+  protected readonly isPublicationBusy = signal(false);
   protected readonly publicationDiagnostics = signal(
     EMPTY_COMMERCIAL_PAGE_PUBLICATION_ISSUE_INDEX,
   );
@@ -204,6 +208,28 @@ export class CommercialPageEditor {
       });
   }
 
+  protected openPublication(): void {
+    if (this.isLoading() || this.isSaving() || this.isPreviewing() || this.form.dirty) return;
+
+    const detail = this.detail();
+    if (!detail) return;
+
+    this.isPublicationBusy.set(false);
+    this.publicationDetail.set(detail);
+  }
+
+  protected onPublicationVisibleChange(visible: boolean): void {
+    if (!visible && !this.isPublicationBusy()) {
+      this.publicationDetail.set(null);
+    }
+  }
+
+  protected onPublished(): void {
+    this.isPublicationBusy.set(false);
+    this.publicationDetail.set(null);
+    this.loadPage();
+  }
+
   protected goBack(): void {
     if (this.isSaving()) return;
 
@@ -239,9 +265,16 @@ export class CommercialPageEditor {
     const detail = this.detail();
     if (!detail) return;
 
-    let document: CommercialPageEditorDocument;
+    const isDirty = this.form.dirty;
+    let previewRequest: Observable<CommercialPageBuilderDocument>;
     try {
-      document = mapCommercialPageEditorFormToDocument(this.form);
+      previewRequest = isDirty
+        ? this.pages.getUnsavedPreview(
+            detail.page.id,
+            mapCommercialPageEditorFormToDocument(this.form),
+            detail.page.locale,
+          )
+        : this.pages.getPreview(detail.page.id, detail.page.locale);
     } catch {
       this.showPreviewError();
       return;
@@ -249,11 +282,13 @@ export class CommercialPageEditor {
 
     this.isPreviewing.set(true);
 
-    this.pages
-      .getUnsavedPreview(detail.page.id, document, detail.page.locale)
+    previewRequest
       .pipe(finalize(() => this.isPreviewing.set(false)))
       .subscribe({
-        next: (previewDocument) => this.previewDocument.set(previewDocument),
+        next: (previewDocument) => {
+          this.previewDocument.set(previewDocument);
+          if (!isDirty) this.loadPublicationDiagnostics(detail);
+        },
         error: () => this.showPreviewError(),
       });
   }
