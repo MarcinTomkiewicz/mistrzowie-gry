@@ -9,6 +9,7 @@
 
   <form
     class="mg-form flex-col-start-stretch gap-md w-100"
+    [formGroup]="form"
     (ngSubmit)="publishPage()"
     novalidate
   >
@@ -21,7 +22,7 @@
         ngSkipHydration
         class="w-100"
         inputId="commercial-page-effective-from"
-        [formControl]="effectiveFromControl"
+        formControlName="effectiveFrom"
         dateFormat="dd.mm.yy"
         appendTo="body"
         [showIcon]="true"

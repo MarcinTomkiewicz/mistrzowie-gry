@@ -412,7 +412,7 @@
       "unknownToken": "Treść zawiera nieznany token.",
       "constantUnpublished": "Wymagana stała ma nieopublikowaną wartość.",
       "placeholderPresent": "Treść zawiera marker [PH].",
-      "previewRequired": "Bieżąca rewizja draftu wymaga ponownego podglądu."
+      "previewRequired": "[PH] Po ostatnim zapisie otwórz aktualny podgląd strony przed publikacją."
     }
   },
 

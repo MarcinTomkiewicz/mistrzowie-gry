@@ -10,7 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -51,6 +51,9 @@ export class CommercialPagePublication {
   protected readonly commercialI18n = createCommercialPageI18n();
   protected readonly effectiveFromControl = new FormControl<Date | null>(null, {
     validators: [Validators.required],
+  });
+  protected readonly form = new FormGroup({
+    effectiveFrom: this.effectiveFromControl,
   });
   protected readonly issues = signal<CommercialPagePublicationIssue[]>([]);
   protected readonly hasValidated = signal(false);

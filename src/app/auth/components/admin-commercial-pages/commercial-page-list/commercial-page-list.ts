@@ -104,6 +104,11 @@ export class CommercialPageList {
   }
 
   protected openPublication(page: CommercialPageAdminListItem): void {
+    if (page.previewedRevision !== page.draftRevision) {
+      this.previewPage(page);
+      return;
+    }
+
     this.isPublicationBusy.set(false);
     this.publicationPage.set(page);
   }

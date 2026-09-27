@@ -183,6 +183,7 @@ export class CommercialPageEditor {
     }
 
     const toast = this.i18n.editorToast();
+    let savedSuccessfully = false;
 
     this.isSaving.set(true);
     this.form.disable({ emitEvent: false });
@@ -194,11 +195,15 @@ export class CommercialPageEditor {
           this.form.enable({ emitEvent: false });
           syncCommercialPageEditorOptionalControls(this.form);
           this.isSaving.set(false);
+          if (savedSuccessfully && this.activeStep() === 4) {
+            this.loadWorkingPreview();
+          }
         }),
       )
       .subscribe({
         next: (savedDetail) => {
           this.applyDetail(savedDetail);
+          savedSuccessfully = true;
           this.toast.success({
             summary: toast.saveSuccessSummary,
             detail: toast.saveSuccessDetail,
