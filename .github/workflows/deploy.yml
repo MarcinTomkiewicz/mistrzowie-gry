@@ -46,7 +46,7 @@ jobs:
 
       - name: Validate deployment artifact
         run: |
-          test -f dist/mistrzowie-gry/browser/index.html
+          test -f dist/mistrzowie-gry/browser/index.csr.html
           test -f dist/mistrzowie-gry/server/server.mjs
           test -f dist/mistrzowie-gry/deployment-metadata.json
 

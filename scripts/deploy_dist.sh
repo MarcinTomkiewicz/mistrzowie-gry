@@ -188,8 +188,8 @@ validate_release() {
   local release_path="$1"
   local metadata_path="$release_path/deployment-metadata.json"
 
-  [[ -s "$release_path/browser/index.html" ]] ||
-    fail "Release is missing browser/index.html"
+  [[ -s "$release_path/browser/index.csr.html" ]] ||
+    fail "Release is missing browser/index.csr.html"
   [[ -s "$release_path/server/server.mjs" ]] ||
     fail "Release is missing server/server.mjs"
   [[ -s "$metadata_path" ]] ||

@@ -4,6 +4,7 @@ set -Eeuo pipefail
 ORIGIN_BASE_URL="${1:?Missing origin base URL}"
 PUBLIC_HOST="mistrzowie-gry.pl"
 SITE_URL="https://mistrzowie-gry.pl"
+REPRESENTATIVE_OFFER_PATH=""
 EXPECTED_CACHE_CONTROL="public, max-age=300, s-maxage=900, stale-if-error=86400"
 SMOKE_DIR="$(mktemp -d /tmp/mistrzowie-gry-origin-smoke.XXXXXX)"
 
@@ -209,14 +210,12 @@ smoke_sitemap() {
     fail "/sitemap.xml is missing the canonical root URL"
   grep -Fq "<loc>$SITE_URL/artykuly</loc>" "$body_path" ||
     fail "/sitemap.xml is missing /artykuly"
-  grep -Fq "<loc>$SITE_URL/offer/oferta-indywidualna</loc>" "$body_path" ||
-    fail "/sitemap.xml is missing the representative active offer"
 
   if grep -Eiq '<(priority|changefreq)([ >])' "$body_path"; then
     fail "/sitemap.xml contains unsupported priority or changefreq"
   fi
 
-  node - "$article_body_path" "$body_path" "$SITE_URL" <<'NODE'
+  REPRESENTATIVE_OFFER_PATH="$(node - "$article_body_path" "$body_path" "$SITE_URL" <<'NODE'
 const fs = require('node:fs');
 
 const [articleBodyPath, sitemapBodyPath, siteUrl] = process.argv.slice(2);
@@ -311,6 +310,12 @@ try {
   if (!locs.length) throw new Error('/sitemap.xml contains no <loc> entries');
 
   const sitemapRoutes = locs.map(normalizeSitemapRoute);
+  const offerRoute = sitemapRoutes.find((route) => /^\/offer\/[^/]+$/.test(route));
+
+  if (!offerRoute) {
+    throw new Error('/sitemap.xml is missing the representative active offer');
+  }
+
   const counts = new Map();
   sitemapRoutes.forEach((route) =>
     counts.set(route, (counts.get(route) ?? 0) + 1),
@@ -335,11 +340,14 @@ try {
     errors.forEach((error) => console.error(`[origin-smoke] ERROR: ${error}`));
     process.exit(1);
   }
+
+  process.stdout.write(offerRoute);
 } catch (error) {
   console.error(`[origin-smoke] ERROR: ${error.message}`);
   process.exit(1);
 }
 NODE
+  )"
 
   require_runtime_cache_control "$headers_path" "/sitemap.xml"
 }
@@ -374,17 +382,17 @@ smoke_robots() {
 trap cleanup EXIT
 
 wait_for_origin
+smoke_sitemap
 smoke_html '/' "<link rel=\"canonical\" href=\"$SITE_URL/\">"
 smoke_html \
-  '/offer/oferta-indywidualna' \
-  "<link rel=\"canonical\" href=\"$SITE_URL/offer/oferta-indywidualna\">"
+  "$REPRESENTATIVE_OFFER_PATH" \
+  "<link rel=\"canonical\" href=\"$SITE_URL$REPRESENTATIVE_OFFER_PATH\">"
 smoke_html \
   '/our-team' \
   "<link rel=\"canonical\" href=\"$SITE_URL/our-team\">"
 smoke_html \
   '/artykuly' \
   "<link rel=\"canonical\" href=\"$SITE_URL/artykuly\">"
-smoke_sitemap
 smoke_robots
 
 echo "[origin-smoke] all checks passed"
