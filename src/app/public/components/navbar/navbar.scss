@@ -28,7 +28,9 @@
   background: transparent;
   cursor: pointer;
 
-  transition: background-color v.$transition-fast, color v.$transition-fast;
+  transition:
+    background-color v.$transition-fast,
+    color v.$transition-fast;
   appearance: none;
   -webkit-appearance: none;
 }
@@ -62,7 +64,9 @@
   background: v.$color-bg-surface;
   cursor: pointer;
 
-  transition: transform v.$transition-fast, background-color v.$transition-fast;
+  transition:
+    transform v.$transition-fast,
+    background-color v.$transition-fast;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -98,7 +102,9 @@
   text-decoration: none;
   border-radius: v.$radius-sm;
 
-  transition: background-color v.$transition-fast, color v.$transition-fast;
+  transition:
+    background-color v.$transition-fast,
+    color v.$transition-fast;
 
   @media (hover: hover) and (pointer: fine) {
     &:hover {

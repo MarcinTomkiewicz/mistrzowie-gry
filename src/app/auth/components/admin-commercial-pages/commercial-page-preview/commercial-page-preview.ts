@@ -82,7 +82,7 @@ export class CommercialPagePreview {
   }
 
   protected goToEditor(): void {
-    void this.router.navigate(['/admin/offers', this.pageId, 'edit']);
+    void this.router.navigate(['/admin/content/offers', this.pageId, 'edit']);
   }
 
   protected onPublished(): void {

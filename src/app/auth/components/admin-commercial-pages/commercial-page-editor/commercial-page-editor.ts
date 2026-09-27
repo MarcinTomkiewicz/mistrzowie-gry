@@ -233,7 +233,7 @@ export class CommercialPageEditor {
   protected goBack(): void {
     if (this.isSaving()) return;
 
-    void this.router.navigate(['/admin/offers']);
+    void this.router.navigate(['/admin/content/offers']);
   }
 
   protected openQuickPreview(): void {

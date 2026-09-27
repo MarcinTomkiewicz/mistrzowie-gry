@@ -38,7 +38,10 @@ export class RouteTabs {
   protected readonly activePathControl = new FormControl<string | null>(null);
   protected readonly activeTab = computed(
     () =>
-      this.tabs().find((tab) => this.matchesCurrentUrl(tab.path)) ?? null,
+      this.tabs()
+        .filter((tab) => this.matchesCurrentUrl(tab.path))
+        .sort((a, b) => b.path.length - a.path.length)
+        .at(0) ?? null,
   );
 
   constructor() {

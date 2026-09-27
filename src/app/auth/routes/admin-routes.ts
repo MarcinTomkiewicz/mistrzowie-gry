@@ -4,6 +4,14 @@ import { authGuard } from '../../core/guards/auth.guard';
 import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
 
 const loaders = {
+  contentShell: () =>
+    import('../components/admin-content-shell/admin-content-shell').then(
+      (m) => m.AdminContentShell,
+    ),
+  userShell: () =>
+    import('../components/admin-user-shell/admin-user-shell').then(
+      (m) => m.AdminUserShell,
+    ),
   contentList: () =>
     import('../components/admin-content-articles/article-list/article-list').then(
       (m) => m.ArticleList,
@@ -60,48 +68,53 @@ const managementGuards = [
 
 const adminChildren: Routes = [
   {
-    path: 'content',
-    loadComponent: loaders.contentList,
+    path: 'content/offers/constants',
+    loadComponent: loaders.commercialConstantList,
+  },
+  {
+    path: 'content/offers/:id/edit',
+    loadComponent: loaders.commercialPageEditor,
+  },
+  {
+    path: 'content/offers/:id/preview',
+    loadComponent: loaders.commercialPagePreview,
+  },
+  {
+    path: 'content/events/new',
+    loadComponent: loaders.eventCoreEditor,
+  },
+  {
+    path: 'content/events/:coreId/edit',
+    loadComponent: loaders.eventCoreEditor,
+  },
+  {
+    path: 'content/events/:coreId/editions/new',
+    loadComponent: loaders.eventEditionEditor,
+  },
+  {
+    path: 'content/events/:coreId/editions/:eventId/edit',
+    loadComponent: loaders.eventEditionEditor,
   },
   {
     path: 'content/:id/edit',
     loadComponent: loaders.contentEditor,
   },
   {
-    path: 'offers',
-    loadComponent: loaders.commercialPageList,
-  },
-  {
-    path: 'offers/constants',
-    loadComponent: loaders.commercialConstantList,
-  },
-  {
-    path: 'offers/:id/edit',
-    loadComponent: loaders.commercialPageEditor,
-  },
-  {
-    path: 'offers/:id/preview',
-    loadComponent: loaders.commercialPagePreview,
-  },
-  {
-    path: 'events',
-    loadComponent: loaders.eventList,
-  },
-  {
-    path: 'events/new',
-    loadComponent: loaders.eventCoreEditor,
-  },
-  {
-    path: 'events/:coreId/edit',
-    loadComponent: loaders.eventCoreEditor,
-  },
-  {
-    path: 'events/:coreId/editions/new',
-    loadComponent: loaders.eventEditionEditor,
-  },
-  {
-    path: 'events/:coreId/editions/:eventId/edit',
-    loadComponent: loaders.eventEditionEditor,
+    path: 'content',
+    loadComponent: loaders.contentShell,
+    children: [
+      { path: '', pathMatch: 'full', loadComponent: loaders.contentList },
+      {
+        path: 'offers',
+        pathMatch: 'full',
+        loadComponent: loaders.commercialPageList,
+      },
+      {
+        path: 'events',
+        pathMatch: 'full',
+        loadComponent: loaders.eventList,
+      },
+    ],
   },
   {
     path: 'coworkers',
@@ -120,18 +133,13 @@ export const adminRoutes: Routes = [
 
 export const authAdminRoutes: Routes = [
   {
-    path: 'gm-availability',
-    loadComponent: loaders.gmAvailability,
-    canActivate: managementGuards,
-  },
-  {
-    path: 'work-log',
-    loadComponent: loaders.workLog,
-    canActivate: managementGuards,
-  },
-  {
     path: 'users',
-    loadComponent: loaders.users,
-    canActivate: [authGuard, minimumRoleGuard('marketing_manager')],
+    loadComponent: loaders.userShell,
+    canActivate: managementGuards,
+    children: [
+      { path: '', pathMatch: 'full', loadComponent: loaders.users },
+      { path: 'availability', loadComponent: loaders.gmAvailability },
+      { path: 'work-log', loadComponent: loaders.workLog },
+    ],
   },
 ];

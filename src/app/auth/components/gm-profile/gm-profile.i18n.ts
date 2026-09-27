@@ -3,11 +3,11 @@ import {
   createCommonErrorsI18n,
   createCommonFormI18n,
   createCommonLabelsI18n,
+  createCommonNavI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
-  EditProfileTabsTranslations,
   GmProfileActionsTranslations,
   GmProfileErrorsTranslations,
   GmProfileFormTranslations,
@@ -15,15 +15,13 @@ import {
 } from '../../../core/types/i18n/auth';
 
 export function createGmProfileI18n() {
-  const { gmProfileTitle, form, errors, actions, toast } =
+  const { form, errors, actions, toast } =
     createScopedSectionsI18n<{
-      gmProfileTitle: EditProfileTabsTranslations;
       form: GmProfileFormTranslations;
       errors: GmProfileErrorsTranslations;
       actions: GmProfileActionsTranslations;
       toast: GmProfileToastTranslations;
     }>('auth', {
-      gmProfileTitle: 'editProfile.tabs',
       form: 'gmProfile.form',
       errors: 'gmProfile.errors',
       actions: 'gmProfile.actions',
@@ -36,7 +34,7 @@ export function createGmProfileI18n() {
   const commonLabels = createCommonLabelsI18n();
 
   return {
-    gmProfileTitle,
+    commonNav: createCommonNavI18n(),
     form,
     errors,
     actions,

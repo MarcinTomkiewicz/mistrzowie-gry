@@ -42,6 +42,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
       title: args.gmZoneTitle,
       items: [
         {
+          id: 'gm-profile',
+          label: args.gmProfileLabel,
+          path: '/auth/gm/profile',
+        },
+        {
           id: 'event-signup',
           label: args.eventSignupLabel,
           path: EVENT_SIGNUP_SELECTION_ROUTE,
@@ -57,37 +62,12 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
 
   const administrationItems: IUserMenuSection['items'] = [];
 
-  if (args.canSeeAdministration) {
-    administrationItems.push(
-      {
-        id: 'gm-availability-overview',
-        label: args.gmAvailabilityOverviewLabel,
-        path: '/auth/admin/gm-availability',
-      },
-      {
-        id: 'work-log-overview',
-        label: args.workLogOverviewLabel,
-        path: '/auth/admin/work-log',
-      },
-    );
-  }
-
   if (args.canSeeAdminOnlyItems) {
     administrationItems.push(
       {
         id: 'admin-content',
         label: args.adminContentLabel,
         path: '/admin/content',
-      },
-      {
-        id: 'admin-offers',
-        label: args.adminOffersLabel,
-        path: '/admin/offers',
-      },
-      {
-        id: 'admin-events',
-        label: args.adminEventsLabel,
-        path: '/admin/events',
       },
       {
         id: 'admin-coworker-records',

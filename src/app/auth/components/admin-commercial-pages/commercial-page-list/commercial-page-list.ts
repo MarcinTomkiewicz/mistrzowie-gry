@@ -96,11 +96,11 @@ export class CommercialPageList {
   }
 
   protected editPage(page: CommercialPageAdminListItem): void {
-    void this.router.navigate(['/admin/offers', page.id, 'edit']);
+    void this.router.navigate(['/admin/content/offers', page.id, 'edit']);
   }
 
   protected previewPage(page: CommercialPageAdminListItem): void {
-    void this.router.navigate(['/admin/offers', page.id, 'preview']);
+    void this.router.navigate(['/admin/content/offers', page.id, 'preview']);
   }
 
   protected openPublication(page: CommercialPageAdminListItem): void {

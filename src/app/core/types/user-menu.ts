@@ -2,13 +2,10 @@ export type UserMenuItemId =
   | 'edit-profile'
   | 'session-reservation'
   | 'coworker-records'
+  | 'gm-profile'
   | 'event-signup'
   | 'my-work-log'
-  | 'gm-availability-overview'
-  | 'work-log-overview'
   | 'admin-content'
-  | 'admin-offers'
-  | 'admin-events'
   | 'admin-coworker-records'
   | 'admin-users';
 
@@ -26,13 +23,10 @@ export type BuildUserMenuArgs = {
   editProfileLabel: string;
   sessionReservationLabel: string;
   coworkerRecordsLabel: string;
+  gmProfileLabel: string;
   eventSignupLabel: string;
   myWorkLogLabel: string;
-  gmAvailabilityOverviewLabel: string;
-  workLogOverviewLabel: string;
   adminContentLabel: string;
-  adminOffersLabel: string;
-  adminEventsLabel: string;
   adminCoworkerRecordsLabel: string;
   adminUsersLabel: string;
   canSeeCoworker: boolean;

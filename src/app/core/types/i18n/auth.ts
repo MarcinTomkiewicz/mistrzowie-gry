@@ -88,16 +88,6 @@ export interface EditProfileSeoTranslations {
   description: string;
 }
 
-export interface EditProfileHeroTranslations {
-  subtitle: string;
-}
-
-export interface EditProfileTabsTranslations {
-  profile: string;
-  gmProfile: string;
-  gmAvailability: string;
-}
-
 export interface GmProfileFormTranslations {
   displayNameLabel: string;
   experienceLabel: string;
@@ -274,7 +264,4 @@ export interface UserMenuTranslations {
   gmZoneSectionTitle: string;
   administrationSectionTitle: string;
   myWorkLogLabel: string;
-  gmAvailabilityOverviewLabel: string;
-  workLogOverviewLabel: string;
-  adminOffersLabel: string;
 }

@@ -38,17 +38,13 @@ export class UserMenuPanel {
       editProfileLabel: this.i18n.commonNav().editProfile,
       sessionReservationLabel: this.i18n.commonCta().bookSession,
       coworkerRecordsLabel: this.i18n.commonNav().coworkerRecords,
+      gmProfileLabel: this.i18n.commonNav().gmProfile,
       eventSignupLabel: this.i18n.commonNav().eventSignup,
       myWorkLogLabel: this.i18n.userMenu().myWorkLogLabel,
-      gmAvailabilityOverviewLabel:
-        this.i18n.userMenu().gmAvailabilityOverviewLabel,
-      workLogOverviewLabel: this.i18n.userMenu().workLogOverviewLabel,
-      adminContentLabel: this.i18n.commonNav().contentManagement,
-      adminOffersLabel: this.i18n.userMenu().adminOffersLabel,
-      adminEventsLabel: this.i18n.commonNav().eventsManagement,
+      adminContentLabel: this.i18n.commonNav().contentAdministration,
       adminCoworkerRecordsLabel:
         this.i18n.commonNav().adminCoworkerRecords,
-      adminUsersLabel: this.i18n.commonNav().usersManagement,
+      adminUsersLabel: this.i18n.commonNav().usersAdministration,
       canSeeCoworker: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeAdministration: hasMinimumRole(

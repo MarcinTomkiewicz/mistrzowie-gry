@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "abstracts/variables" as v;
 
 /* =========================================================
@@ -37,7 +38,7 @@
 /* DARK/default: delikatny wash primary na surface */
 .p-popover-content[data-pc-section="content"] .mg-popover-menu__link {
   display: block;
-  padding: 0.55rem 0.7rem;
+  padding: map.get(v.$spacings, "xs") map.get(v.$spacings, "sm");
   border-radius: v.$radius-sm;
   text-decoration: none;
   color: v.$color-text;

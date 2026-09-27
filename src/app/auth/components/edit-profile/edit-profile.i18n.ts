@@ -1,26 +1,10 @@
 import { createCommonNavI18n } from '../../../core/translations/common.i18n';
-import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
-import {
-  EditProfileHeroTranslations,
-  EditProfileSeoTranslations,
-  EditProfileTabsTranslations,
-} from '../../../core/types/i18n/auth';
+import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
+import type { EditProfileSeoTranslations } from '../../../core/types/i18n/auth';
 
 export function createEditProfileI18n() {
-  const { seo, hero, tabs } = createScopedSectionsI18n<{
-    seo: EditProfileSeoTranslations;
-    hero: EditProfileHeroTranslations;
-    tabs: EditProfileTabsTranslations;
-  }>('auth', {
-    seo: 'editProfile.seo',
-    hero: 'editProfile.hero',
-    tabs: 'editProfile.tabs',
-  });
-
   return {
-    seo,
-    hero,
-    tabs,
+    seo: createScopedObjectI18n<EditProfileSeoTranslations>('auth', 'editProfile.seo'),
     commonNav: createCommonNavI18n(),
   };
 }

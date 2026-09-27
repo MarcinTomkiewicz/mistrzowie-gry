@@ -172,9 +172,16 @@ export type CommonNavTranslations = {
   editProfile: string;
   coworkerRecords: string;
   eventSignup: string;
+  gmProfile: string;
+  gmAvailability: string;
   gmSessions: string;
+  contentAdministration: string;
+  usersAdministration: string;
   contentManagement: string;
+  offersManagement: string;
   eventsManagement: string;
+  gmAvailabilityOverview: string;
+  workLogOverview: string;
   adminCoworkerRecords: string;
   usersManagement: string;
   sharedDocuments: string;

@@ -1,156 +1,154 @@
-<section class="mg-section mg-section--full">
-  <div class="mg-container position-relative flex-col-start-stretch gap-md">
-    <header class="mg-section__header w-100">
-      <h1 class="mg-section__title">{{ i18n.listPage().title }}</h1>
+<div class="position-relative flex-col-start-stretch gap-md w-100">
+  <header class="mg-section__header w-100">
+    <h2 class="mg-section__title mg-section__title--md">{{ i18n.listPage().title }}</h2>
 
-      <p class="mg-section__subtitle mg-section__subtitle--full">
-        {{ i18n.listPage().subtitle }}
-      </p>
-    </header>
+    <p class="mg-section__subtitle mg-section__subtitle--full">
+      {{ i18n.listPage().subtitle }}
+    </p>
+  </header>
 
-    <div class="flex-row-end-center w-100">
+  <div class="flex-row-end-center w-100">
+    <p-button
+      severity="secondary"
+      [outlined]="true"
+      icon="pi pi-sliders-h"
+      [label]="i18n.constantsPage().title"
+      routerLink="/admin/content/offers/constants"
+    />
+  </div>
+
+  <app-loading-overlay
+    [visible]="isLoading()"
+    [label]="i18n.commonStatus().loading"
+  />
+
+  @if (hasLoadError() && !isLoading()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+      <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+        {{ i18n.listPage().loadErrorTitle }}
+      </h2>
+
       <p-button
         severity="secondary"
-        [outlined]="true"
-        icon="pi pi-sliders-h"
-        [label]="i18n.constantsPage().title"
-        routerLink="/admin/offers/constants"
+        [label]="i18n.commonActions().retry"
+        icon="pi pi-refresh"
+        (onClick)="loadPages()"
       />
-    </div>
+    </section>
+  } @else if (rowVms().length) {
+    <div class="w-100">
+      <p-table
+        [value]="rowVms()"
+        class="w-100"
+        tableStyleClass="mg-responsive-table"
+      >
+        <ng-template #header>
+          <tr class="hide-down-sm">
+            <th scope="col" class="small-caps">{{ i18n.listTable().page }}</th>
+            <th scope="col" class="small-caps">
+              {{ i18n.commonLabels().status }}
+            </th>
+            <th scope="col" class="small-caps">
+              {{ i18n.listTable().draftUpdatedAt }}
+            </th>
+            <th scope="col" class="small-caps">
+              {{ i18n.commonLabels().publication }}
+            </th>
+            <th scope="col" class="small-caps text-right min-w-250">
+              {{ i18n.commonTable().actions }}
+            </th>
+          </tr>
+        </ng-template>
 
-    <app-loading-overlay
-      [visible]="isLoading()"
-      [label]="i18n.commonStatus().loading"
-    />
-
-    @if (hasLoadError() && !isLoading()) {
-      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
-        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
-          {{ i18n.listPage().loadErrorTitle }}
-        </h2>
-
-        <p-button
-          severity="secondary"
-          [label]="i18n.commonActions().retry"
-          icon="pi pi-refresh"
-          (onClick)="loadPages()"
-        />
-      </section>
-    } @else if (rowVms().length) {
-      <div class="w-100">
-        <p-table
-          [value]="rowVms()"
-          class="w-100"
-          tableStyleClass="mg-responsive-table"
-        >
-          <ng-template #header>
-            <tr class="hide-down-sm">
-              <th scope="col" class="small-caps">{{ i18n.listTable().page }}</th>
-              <th scope="col" class="small-caps">
+        <ng-template #body let-row>
+          <tr class="mg-responsive-table__row">
+            <th scope="row" class="mg-responsive-table__row-heading">
+              {{ row.page.navigationLabel }}
+            </th>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.commonLabels().status }}
-              </th>
-              <th scope="col" class="small-caps">
+              </span>
+              <span class="mg-responsive-table__value">
+                <span [class]="row.draftStatusClass">
+                  {{ row.draftStatusLabel }}
+                </span>
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.listTable().draftUpdatedAt }}
-              </th>
-              <th scope="col" class="small-caps">
+              </span>
+              <span class="mg-responsive-table__value">
+                {{ row.draftUpdatedAtLabel }}
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.commonLabels().publication }}
-              </th>
-              <th scope="col" class="small-caps text-right min-w-250">
+              </span>
+              <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                <span>{{ row.publishedAtLabel }}</span>
+                <small>
+                  {{ i18n.listTable().effectiveFrom }}:
+                  {{ row.effectiveFromLabel }}
+                </small>
+                <small>
+                  {{ i18n.commonLabels().publishedBy }}:
+                  {{ row.publishedByLabel }}
+                </small>
+              </div>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.commonTable().actions }}
-              </th>
-            </tr>
-          </ng-template>
+              </span>
+              <div
+                class="mg-responsive-table__value flex-row-end-center flex-nowrap flex-col-start-stretch-sm gap-xs"
+              >
+                <p-button
+                  size="small"
+                  severity="secondary"
+                  styleClass="w-100-sm"
+                  [label]="i18n.commonActions().edit"
+                  icon="pi pi-pencil"
+                  (onClick)="editPage(row.page)"
+                />
 
-          <ng-template #body let-row>
-            <tr class="mg-responsive-table__row">
-              <th scope="row" class="mg-responsive-table__row-heading">
-                {{ row.page.navigationLabel }}
-              </th>
-              <td class="mg-responsive-table__cell">
-                <span class="mg-responsive-table__label small-caps font-bold">
-                  {{ i18n.commonLabels().status }}
-                </span>
-                <span class="mg-responsive-table__value">
-                  <span [class]="row.draftStatusClass">
-                    {{ row.draftStatusLabel }}
-                  </span>
-                </span>
-              </td>
-              <td class="mg-responsive-table__cell">
-                <span class="mg-responsive-table__label small-caps font-bold">
-                  {{ i18n.listTable().draftUpdatedAt }}
-                </span>
-                <span class="mg-responsive-table__value">
-                  {{ row.draftUpdatedAtLabel }}
-                </span>
-              </td>
-              <td class="mg-responsive-table__cell">
-                <span class="mg-responsive-table__label small-caps font-bold">
-                  {{ i18n.commonLabels().publication }}
-                </span>
-                <div class="mg-responsive-table__value flex-col-start-start gap-xs">
-                  <span>{{ row.publishedAtLabel }}</span>
-                  <small>
-                    {{ i18n.listTable().effectiveFrom }}:
-                    {{ row.effectiveFromLabel }}
-                  </small>
-                  <small>
-                    {{ i18n.commonLabels().publishedBy }}:
-                    {{ row.publishedByLabel }}
-                  </small>
-                </div>
-              </td>
-              <td class="mg-responsive-table__cell">
-                <span class="mg-responsive-table__label small-caps font-bold">
-                  {{ i18n.commonTable().actions }}
-                </span>
-                <div
-                  class="mg-responsive-table__value flex-row-end-center flex-nowrap flex-col-start-stretch-sm gap-xs"
-                >
-                  <p-button
-                    size="small"
-                    severity="secondary"
-                    styleClass="w-100-sm"
-                    [label]="i18n.commonActions().edit"
-                    icon="pi pi-pencil"
-                    (onClick)="editPage(row.page)"
-                  />
+                <p-button
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  styleClass="w-100-sm"
+                  [label]="i18n.commonActions().preview"
+                  icon="pi pi-eye"
+                  (onClick)="previewPage(row.page)"
+                />
 
-                  <p-button
-                    size="small"
-                    severity="secondary"
-                    [outlined]="true"
-                    styleClass="w-100-sm"
-                    [label]="i18n.commonActions().preview"
-                    icon="pi pi-eye"
-                    (onClick)="previewPage(row.page)"
-                  />
+                <p-button
+                  size="small"
+                  severity="success"
+                  styleClass="w-100-sm"
+                  [label]="i18n.commonActions().publish"
+                  icon="pi pi-send"
+                  (onClick)="openPublication(row.page)"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  } @else if (!isLoading()) {
+    <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
+      <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+        {{ i18n.listPage().emptyTitle }}
+      </h2>
 
-                  <p-button
-                    size="small"
-                    severity="success"
-                    styleClass="w-100-sm"
-                    [label]="i18n.commonActions().publish"
-                    icon="pi pi-send"
-                    (onClick)="openPublication(row.page)"
-                  />
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-    } @else if (!isLoading()) {
-      <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">
-        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
-          {{ i18n.listPage().emptyTitle }}
-        </h2>
-
-        <p class="m-0">{{ i18n.listPage().emptyDescription }}</p>
-      </section>
-    }
-  </div>
-</section>
+      <p class="m-0">{{ i18n.listPage().emptyDescription }}</p>
+    </section>
+  }
+</div>
 
 @if (publicationPage(); as page) {
   <p-dialog

@@ -64,6 +64,7 @@ export class ProfileForm {
   private readonly hydratedUserId = signal<string | null>(null);
 
   readonly mode = input<ProfileFormMode>('register');
+  readonly showHeading = input(true);
 
   readonly i18n = createProfileFormI18n();
   readonly limits = PROFILE_TEXT_LIMITS;

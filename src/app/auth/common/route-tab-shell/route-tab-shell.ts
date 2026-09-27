@@ -14,9 +14,9 @@ export class RouteTabShell {
   private readonly seo = inject(Seo);
 
   readonly heading = input.required<string>();
-  readonly subtitle = input.required<string>();
+  readonly subtitle = input('');
   readonly seoTitle = input.required<string>();
-  readonly seoDescription = input.required<string>();
+  readonly seoDescription = input('');
   readonly canonicalUrl = input.required<string>();
   readonly tabs = input.required<readonly RouteTabDefinition[]>();
 

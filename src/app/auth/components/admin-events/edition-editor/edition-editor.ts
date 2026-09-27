@@ -244,7 +244,7 @@ export class EventEditionEditor {
           if (this.isNew) {
             void this.router.navigate(
               [
-                '/admin/events',
+                '/admin/content/events',
                 savedEdition.eventCoreId,
                 'editions',
                 savedEdition.id,
@@ -273,7 +273,7 @@ export class EventEditionEditor {
   }
 
   protected goBack(): void {
-    void this.router.navigate(['/admin/events', this.coreId, 'edit']);
+    void this.router.navigate(['/admin/content/events', this.coreId, 'edit']);
   }
 
   private syncGeneratedSlug(city: string): void {

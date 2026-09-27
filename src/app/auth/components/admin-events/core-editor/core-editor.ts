@@ -179,7 +179,7 @@ export class EventCoreEditor {
 
           if (this.isNew) {
             void this.router.navigate([
-              '/admin/events',
+              '/admin/content/events',
               savedCore.id,
               'edit',
             ]);
@@ -199,7 +199,7 @@ export class EventCoreEditor {
   }
 
   protected goBack(): void {
-    void this.router.navigate(['/admin/events']);
+    void this.router.navigate(['/admin/content/events']);
   }
 
   private populateForm(core: IEventCoreDetail): void {
