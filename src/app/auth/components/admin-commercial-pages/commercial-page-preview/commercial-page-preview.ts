@@ -1,10 +1,11 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { provideTranslocoScope } from '@jsverse/transloco';
+import { provideTranslocoScope, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
+import { COMMERCIAL_PAGE_DEFAULT_LOCALE } from '../../../../core/configs/commercial-pages.config';
 import { CommercialPageAdmin } from '../../../../core/services/commercial-page-admin/commercial-page-admin';
 import { Seo } from '../../../../core/services/seo/seo';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -32,6 +33,7 @@ export class CommercialPagePreview {
   private readonly router = inject(Router);
   private readonly seo = inject(Seo);
   private readonly toast = inject(UiToast);
+  private readonly transloco = inject(TranslocoService);
 
   protected readonly pageId =
     inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
@@ -64,11 +66,15 @@ export class CommercialPagePreview {
     this.isLoading.set(true);
     this.hasLoadError.set(false);
 
-    this.pages
-      .getPreview(this.pageId)
+    forkJoin({
+      document: this.pages.getPreview(this.pageId),
+      commercialPages: this.transloco.load(
+        `commercialPages/${COMMERCIAL_PAGE_DEFAULT_LOCALE}`,
+      ),
+    })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (document) => this.document.set(document),
+        next: ({ document }) => this.document.set(document),
         error: () => {
           const preview = this.i18n.previewPage();
 

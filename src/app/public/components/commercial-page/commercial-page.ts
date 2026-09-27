@@ -9,10 +9,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { provideTranslocoScope } from '@jsverse/transloco';
-import { catchError, distinctUntilChanged, finalize, map, of, switchMap } from 'rxjs';
+import { provideTranslocoScope, TranslocoService } from '@jsverse/transloco';
+import { catchError, distinctUntilChanged, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { buildSiteUrl } from '../../../core/config/site';
+import { COMMERCIAL_PAGE_DEFAULT_LOCALE } from '../../../core/configs/commercial-pages.config';
 import { createCommercialPageStructuredData } from '../../../core/domain/commercial-pages/commercial-page-structured-data';
 import { CommercialPageRead } from '../../../core/services/commercial-page-read/commercial-page-read';
 import { Platform } from '../../../core/services/platform/platform';
@@ -46,6 +47,7 @@ export class CommercialPage implements OnInit {
   private readonly platform = inject(Platform);
   private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
+  private readonly transloco = inject(TranslocoService);
 
   protected readonly status = createCommonStatusI18n();
   protected readonly errors = createCommonErrorsI18n();
@@ -137,7 +139,13 @@ export class CommercialPage implements OnInit {
         switchMap((slug) => {
           this.startLoading(slug);
 
-          return this.read.getBySlug(slug).pipe(
+          return forkJoin({
+            document: this.read.getBySlug(slug),
+            commercialPages: this.transloco.load(
+              `commercialPages/${COMMERCIAL_PAGE_DEFAULT_LOCALE}`,
+            ),
+          }).pipe(
+            map(({ document }) => document),
             catchError((error: unknown) => {
               console.error(
                 '[commercial-page] Failed to load public commercial page.',

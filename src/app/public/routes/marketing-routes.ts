@@ -6,7 +6,9 @@ const loaders = {
   ourTeam: () =>
     import('../components/our-team/our-team').then((m) => m.OurTeam),
   offer: () =>
-    import('../components/offers/offers').then((m) => m.Offers),
+    import('../components/commercial-page/commercial-page').then(
+      (m) => m.CommercialPage,
+    ),
   joinTheParty: () =>
     import('../components/join-the-party/join-the-party').then(
       (m) => m.JoinTheParty,
