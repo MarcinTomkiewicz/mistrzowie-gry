@@ -72,7 +72,7 @@ export class Theme {
       // ignore
     }
 
-    this.set(this.getPreferredSystemTheme(), {
+    this.set('dark', {
       persist: false,
       writeDom: true,
     });
@@ -81,42 +81,10 @@ export class Theme {
   private initBrowserTheme(): void {
     if (!this.platform.isBrowser) return;
 
-    const stored = this.safeReadStorage();
-    const domMode = this.readThemeFromDom();
-    const preferred = this.getPreferredSystemTheme();
-
-    this.set(stored ?? domMode ?? preferred, {
+    this.set(this.safeReadStorage() ?? 'dark', {
       persist: false,
       writeDom: true,
     });
-
-    if (stored) return;
-
-    const mq = this.platform.matchMedia('(prefers-color-scheme: light)');
-    if (!mq) return;
-
-    const handler = (event: MediaQueryListEvent): void => {
-      if (this.safeReadStorage()) return;
-
-      this.set(event.matches ? 'light' : 'dark', {
-        persist: false,
-        writeDom: true,
-      });
-    };
-
-    mq.addEventListener?.('change', handler);
-  }
-
-  private readThemeFromDom(): IThemeMode {
-    return this.document.documentElement.getAttribute('data-theme') === 'light'
-      ? 'light'
-      : 'dark';
-  }
-
-  private getPreferredSystemTheme(): IThemeMode {
-    return this.platform.matchMedia('(prefers-color-scheme: light)')?.matches
-      ? 'light'
-      : 'dark';
   }
 
   private safeReadStorage(): IThemeMode | null {

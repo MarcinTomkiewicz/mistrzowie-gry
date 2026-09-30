@@ -24,17 +24,8 @@
           const key = 'mg-theme';
           const root = document.documentElement;
           const stored = localStorage.getItem(key);
-          const systemLight =
-            window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: light)').matches;
-          const next =
-            stored === 'light' || stored === 'dark'
-              ? stored
-              : systemLight
-                ? 'light'
-                : 'dark';
 
-          if (next === 'light') root.setAttribute('data-theme', 'light');
+          if (stored === 'light') root.setAttribute('data-theme', 'light');
           else root.removeAttribute('data-theme');
         } catch {}
       })();
