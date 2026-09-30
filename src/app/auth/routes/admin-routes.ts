@@ -48,6 +48,10 @@ const loaders = {
     import('../components/admin-events/edition-editor/edition-editor').then(
       (m) => m.EventEditionEditor,
     ),
+  staffingRealizationCoreEditor: () =>
+    import(
+      '../components/admin-staffing/staffing-realization-core-editor/staffing-realization-core-editor'
+    ).then((m) => m.StaffingRealizationCoreEditor),
   gmAvailability: () =>
     import(
       '../components/gm-availability-overview/gm-availability-overview'
@@ -98,6 +102,14 @@ const adminChildren: Routes = [
   {
     path: 'content/:id/edit',
     loadComponent: loaders.contentEditor,
+  },
+  {
+    path: 'staffing/new',
+    loadComponent: loaders.staffingRealizationCoreEditor,
+  },
+  {
+    path: 'staffing/:realizationId/edit',
+    loadComponent: loaders.staffingRealizationCoreEditor,
   },
   {
     path: 'content',

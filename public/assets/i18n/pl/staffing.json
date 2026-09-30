@@ -1,0 +1,13 @@
+{
+  "realizationStatuses": {
+    "draft": "Szkic",
+    "open": "Otwarta",
+    "closed": "Zamknięta",
+    "completed": "Zakończona",
+    "archived": "Zarchiwizowana"
+  },
+  "realizationTypes": {
+    "stationary": "Stacjonarna",
+    "travel": "Wyjazdowa"
+  }
+}

@@ -1,0 +1,259 @@
+@let editor = i18n.editor();
+
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-center gap-md">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">
+        {{ isNew ? editor.page.createTitle : editor.page.editTitle }}
+      </h1>
+      <p class="mg-section__subtitle mg-section__subtitle--full">
+        {{ editor.page.subtitle }}
+      </p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading() || isSaving()"
+      [label]="
+        isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading
+      "
+    />
+
+    @if (loadErrorMessage() && !isLoading()) {
+      <section
+        class="mg-card flex-col-start-stretch gap-sm p-md w-80 w-100-sm"
+        role="alert"
+      >
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ editor.page.loadErrorTitle }}
+        </h2>
+        <p class="m-0">{{ loadErrorMessage() }}</p>
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button
+            severity="secondary"
+            [label]="i18n.commonActions().retry"
+            icon="pi pi-refresh"
+            (onClick)="loadEditor()"
+          />
+          <p-button
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            (onClick)="cancel()"
+          />
+        </div>
+      </section>
+    } @else if (!isLoading()) {
+      <form
+        class="mg-form flex-col-start-center gap-md w-100"
+        [formGroup]="form"
+        (ngSubmit)="save()"
+        novalidate
+      >
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm">
+          <div class="flex-row-start-center gap-md">
+            <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
+            <div class="flex-col-start-stretch gap-xs">
+              <h2 class="mg-section__title mg-section__title--md m-0">
+                {{ editor.sections.basic.title }}
+              </h2>
+              <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+                {{ editor.sections.basic.description }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex-row-start-center flex-col-start-stretch-sm gap-md w-100">
+            <div class="flex-col-start-stretch gap-xs w-80 w-100-sm">
+              <p-iftalabel class="w-100">
+                <input
+                  class="w-100"
+                  pInputText
+                  id="staffing-realization-name"
+                  formControlName="name"
+                  autocomplete="off"
+                  [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
+                />
+                <label for="staffing-realization-name">{{ editor.fields.name }}</label>
+              </p-iftalabel>
+              @if (form.controls.name.touched && form.controls.name.invalid) {
+                <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+              }
+            </div>
+
+            <div class="flex-row-start-center gap-xs w-20 w-100-sm">
+              <span>{{ i18n.commonLabels().status }}:</span>
+              <span class="tag-badge tag-badge--muted">
+                {{ currentStatusLabel() }}
+              </span>
+            </div>
+          </div>
+
+          <p-iftalabel class="w-100">
+            <textarea
+              class="w-100"
+              pTextarea
+              id="staffing-realization-description"
+              formControlName="description"
+              rows="4"
+            ></textarea>
+            <label for="staffing-realization-description">{{ editor.fields.description }}</label>
+          </p-iftalabel>
+
+          <p-iftalabel class="w-100">
+            <textarea
+              class="w-100"
+              pTextarea
+              id="staffing-realization-operational-notes"
+              formControlName="operationalNotes"
+              rows="4"
+            ></textarea>
+            <label for="staffing-realization-operational-notes">
+              {{ editor.fields.operationalNotes }}
+            </label>
+          </p-iftalabel>
+        </section>
+
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm">
+          <div class="flex-row-start-center gap-md">
+            <span class="pi pi-treasure-map square-11 flex-none" aria-hidden="true"></span>
+            <div class="flex-col-start-stretch gap-xs">
+              <h2 class="mg-section__title mg-section__title--md m-0">
+                {{ editor.sections.venue.title }}
+              </h2>
+              <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+                {{ editor.sections.venue.description }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+            <p-iftalabel class="w-100">
+              <input class="w-100" pInputText id="staffing-realization-city" formControlName="city" />
+              <label for="staffing-realization-city">
+                {{ i18n.commonLabels().city }}
+              </label>
+            </p-iftalabel>
+
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <p-iftalabel class="w-100">
+                <input
+                  class="w-100"
+                  pInputText
+                  id="staffing-realization-timezone"
+                  formControlName="timezone"
+                  autocomplete="off"
+                  [attr.aria-invalid]="form.controls.timezone.touched && form.controls.timezone.invalid"
+                />
+                <label for="staffing-realization-timezone">{{ editor.fields.timezone }}</label>
+              </p-iftalabel>
+              @if (form.controls.timezone.touched && form.controls.timezone.invalid) {
+                <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+              }
+            </div>
+          </div>
+
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+            <p-iftalabel class="w-100">
+              <input class="w-100" pInputText id="staffing-realization-venue-name" formControlName="venueName" />
+              <label for="staffing-realization-venue-name">{{ editor.fields.venueName }}</label>
+            </p-iftalabel>
+            <p-iftalabel class="w-100">
+              <input class="w-100" pInputText id="staffing-realization-venue-address" formControlName="venueAddress" />
+              <label for="staffing-realization-venue-address">{{ editor.fields.venueAddress }}</label>
+            </p-iftalabel>
+          </div>
+
+          <div class="flex-col-start-stretch gap-sm w-100">
+            <strong>{{ editor.fields.type }}</strong>
+            <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md" role="radiogroup">
+              <button
+                type="button"
+                class="mg-choice-card w-100 text-left"
+                [class.active]="form.controls.type.value === 'stationary'"
+                role="radio"
+                [attr.aria-checked]="form.controls.type.value === 'stationary'"
+                (click)="selectType('stationary')"
+              >
+                <div class="flex-row-start-center gap-md">
+                  <span class="pi pi-medieval-village-01 square-11 flex-none" aria-hidden="true"></span>
+                  <div class="flex-col-start-stretch gap-xs">
+                    <strong>{{ i18n.realizationTypes().stationary }}</strong>
+                    <span>{{ editor.types.stationary.description }}</span>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                class="mg-choice-card w-100 text-left"
+                [class.active]="form.controls.type.value === 'travel'"
+                role="radio"
+                [attr.aria-checked]="form.controls.type.value === 'travel'"
+                (click)="selectType('travel')"
+              >
+                <div class="flex-row-start-center gap-md">
+                  <span class="pi pi-bindle square-11 flex-none" aria-hidden="true"></span>
+                  <div class="flex-col-start-stretch gap-xs">
+                    <strong>{{ i18n.realizationTypes().travel }}</strong>
+                    <span>{{ editor.types.travel.description }}</span>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm">
+          <div class="flex-row-start-center gap-md">
+            <span class="pi pi-knot square-11 flex-none" aria-hidden="true"></span>
+            <div class="flex-col-start-stretch gap-xs">
+              <h2 class="mg-section__title mg-section__title--md m-0">
+                {{ editor.sections.event.title }}
+              </h2>
+              <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+                {{ editor.sections.event.description }}
+              </p>
+            </div>
+          </div>
+
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              inputId="staffing-realization-event"
+              formControlName="eventId"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              [options]="eventOptions()"
+              [showClear]="true"
+              [placeholder]="editor.event.placeholder"
+              [emptyMessage]="editor.event.empty"
+            />
+            <label for="staffing-realization-event">{{ editor.fields.event }}</label>
+          </p-iftalabel>
+        </section>
+
+        <div class="flex-row-center-center flex-wrap gap-sm w-80 w-100-sm">
+          <p-button
+            type="button"
+            severity="warn"
+            [outlined]="true"
+            [label]="i18n.commonActions().cancel"
+            icon="pi pi-arrow-left"
+            [disabled]="isSaving()"
+            (onClick)="cancel()"
+          />
+          <p-button
+            type="submit"
+            severity="success"
+            [label]="i18n.commonActions().save"
+            icon="pi pi-save"
+            [loading]="isSaving()"
+            [disabled]="isLoading()"
+          />
+        </div>
+      </form>
+    }
+  </div>
+</section>

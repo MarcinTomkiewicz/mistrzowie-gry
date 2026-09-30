@@ -1,0 +1,51 @@
+{
+  "editor": {
+    "page": {
+      "createTitle": "Nowa realizacja",
+      "editTitle": "Edycja realizacji",
+      "subtitle": "Uzupełnij podstawowe informacje o realizacji.",
+      "loadErrorTitle": "Nie udało się załadować realizacji",
+      "loadErrorDescription": "Dane realizacji lub wydarzeń są chwilowo niedostępne. Spróbuj ponownie."
+    },
+    "sections": {
+      "basic": {
+        "title": "Podstawowe informacje",
+        "description": "Podaj nazwę realizacji oraz krótki opis / informacje operacyjne."
+      },
+      "venue": {
+        "title": "Miejsce i typ realizacji",
+        "description": "Określ gdzie odbywa się realizacja oraz jaki jest jej typ."
+      },
+      "event": {
+        "title": "Powiązanie z wydarzeniem",
+        "description": "Opcjonalnie powiąż realizację z istniejącym wydarzeniem."
+      }
+    },
+    "fields": {
+      "name": "Nazwa realizacji",
+      "description": "Opis realizacji",
+      "operationalNotes": "Informacje operacyjne",
+      "venueName": "Nazwa miejsca",
+      "venueAddress": "Adres realizacji",
+      "timezone": "Strefa czasowa",
+      "type": "Typ realizacji",
+      "event": "Wydarzenie (opcjonalnie)"
+    },
+    "types": {
+      "stationary": {
+        "description": "Realizacja odbywa się stacjonarnie, bez konieczności wyjazdu poza miejsce zamieszkania."
+      },
+      "travel": {
+        "description": "Realizacja wymaga wyjazdu poza miejsce zamieszkania."
+      }
+    },
+    "event": {
+      "placeholder": "Wybierz wydarzenie...",
+      "empty": "Brak wydarzeń do wyboru"
+    },
+    "toast": {
+      "saveSuccessSummary": "Realizacja zapisana",
+      "saveFailedSummary": "Nie udało się zapisać realizacji"
+    }
+  }
+}
