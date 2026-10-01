@@ -224,6 +224,7 @@
     "maxLength": "Wpisz maksymalnie {{max}} znaków.",
     "invalid": "Sprawdź poprawność pól formularza.",
     "nonNegativeInteger": "Podaj nieujemną liczbę całkowitą.",
+    "positiveInteger": "[PH] Podaj dodatnią liczbę całkowitą.",
     "fileUpload": {
       "chooseImage": "Wybierz obrazek",
       "dropImage": "Przeciągnij obrazek tutaj albo wybierz plik",

@@ -10,6 +10,7 @@ export type AdminStaffingEditorCopy = {
   };
   sections: {
     basic: AdminStaffingEditorSectionCopy;
+    initialDays: AdminStaffingEditorSectionCopy;
     venue: AdminStaffingEditorSectionCopy;
     event: AdminStaffingEditorSectionCopy;
   };
@@ -22,6 +23,10 @@ export type AdminStaffingEditorCopy = {
     timezone: string;
     type: string;
     event: string;
+    dateRange: string;
+  };
+  validation: {
+    dateRange: string;
   };
   types: Record<
     StaffingRealizationType,
@@ -32,6 +37,28 @@ export type AdminStaffingEditorCopy = {
     empty: string;
   };
   toast: {
+    saveSuccessSummary: string;
+    saveFailedSummary: string;
+  };
+};
+
+export type AdminStaffingShellCopy = {
+  tabs: {
+    core: string;
+    schedule: string;
+  };
+};
+
+export type AdminStaffingScheduleEditorCopy = {
+  page: {
+    travelHint: string;
+  };
+  section: AdminStaffingEditorSectionCopy;
+  validation: {
+    duplicateDate: string;
+  };
+  toast: {
+    loadFailedSummary: string;
     saveSuccessSummary: string;
     saveFailedSummary: string;
   };

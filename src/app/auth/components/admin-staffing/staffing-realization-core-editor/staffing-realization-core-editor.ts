@@ -4,11 +4,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
 import { IftaLabelModule } from 'primeng/iftalabel';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, forkJoin, of } from 'rxjs';
+import { finalize, forkJoin, map, Observable, of } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import {
@@ -17,6 +19,10 @@ import {
   mapStaffingRealizationCoreFormToUpdatePayload,
   populateStaffingRealizationCoreForm,
 } from '../../../../core/factories/staffing-realization-core-form.factory';
+import {
+  createStaffingRealizationInitialDaysForm,
+  mapStaffingRealizationInitialDaysFormToInput,
+} from '../../../../core/factories/staffing-realization-days-form.factory';
 import { AdminStaffingRealizationCore } from '../../../../core/interfaces/admin-staffing-realization';
 import { IAdminEventListItem } from '../../../../core/interfaces/i-event-admin';
 import { ISelectOption } from '../../../../core/interfaces/i-select-option';
@@ -36,7 +42,9 @@ import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-
   imports: [
     ReactiveFormsModule,
     ButtonModule,
+    DatePickerModule,
     IftaLabelModule,
+    InputNumberModule,
     InputTextModule,
     SelectModule,
     TextareaModule,
@@ -50,16 +58,19 @@ import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-
 export class StaffingRealizationCoreEditor {
   private readonly eventAdmin = inject(EventAdmin);
   private readonly location = inject(Location);
+  private readonly route = inject(ActivatedRoute);
   private readonly realizationRead = inject(AdminStaffingRealizationRead);
   private readonly realizationWrite = inject(AdminStaffingRealization);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
 
   protected readonly realizationId =
-    inject(ActivatedRoute).snapshot.paramMap.get('realizationId') ?? '';
+    this.route.parent?.snapshot.paramMap.get('realizationId') ?? '';
   protected readonly isNew = !this.realizationId;
   protected readonly i18n = createStaffingRealizationCoreEditorI18n();
   protected readonly form = createStaffingRealizationCoreForm();
+  protected readonly initialDaysForm =
+    createStaffingRealizationInitialDaysForm();
   protected readonly realization = signal<AdminStaffingRealizationCore | null>(
     null,
   );
@@ -122,10 +133,15 @@ export class StaffingRealizationCoreEditor {
   }
 
   protected save(): void {
-    if (this.form.invalid || this.isSaving()) {
-      this.form.markAllAsTouched();
+    const initialDaysInvalid = this.isNew && this.initialDaysForm.invalid;
 
-      if (this.form.invalid) {
+    if (this.form.invalid || initialDaysInvalid || this.isSaving()) {
+      this.form.markAllAsTouched();
+      if (this.isNew) {
+        this.initialDaysForm.markAllAsTouched();
+      }
+
+      if (this.form.invalid || initialDaysInvalid) {
         this.toast.danger({
           summary: this.i18n.commonForm().invalidSummary,
           detail: this.i18n.commonForm().invalid,
@@ -140,20 +156,33 @@ export class StaffingRealizationCoreEditor {
       return;
     }
 
-    const saveRequest = current
+    const saveRequest: Observable<{
+      realization: AdminStaffingRealizationCore;
+      created: boolean;
+    }> = current
       ? this.realizationWrite.update(
           current.id,
           mapStaffingRealizationCoreFormToUpdatePayload(this.form, current),
-        )
+        ).pipe(map((realization) => ({ realization, created: false })))
       : this.realizationWrite.create(
-          mapStaffingRealizationCoreFormToCreatePayload(this.form),
+          mapStaffingRealizationCoreFormToCreatePayload(
+            this.form,
+            mapStaffingRealizationInitialDaysFormToInput(this.initialDaysForm),
+          ),
+        ).pipe(
+          map((result) => ({
+            realization: result.realization,
+            created: true,
+          })),
         );
 
     this.isSaving.set(true);
     saveRequest
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
-        next: (savedRealization) => {
+        next: (result) => {
+          const savedRealization = result.realization;
+
           this.realization.set(savedRealization);
           populateStaffingRealizationCoreForm(this.form, savedRealization);
           this.toast.success({
@@ -161,10 +190,10 @@ export class StaffingRealizationCoreEditor {
             detail: this.i18n.commonStatus().changesSaved,
           });
 
-          if (this.isNew) {
+          if (result.created) {
             void this.router.navigate([
               '/admin/staffing',
-              savedRealization.id,
+              result.realization.id,
               'edit',
             ]);
           }

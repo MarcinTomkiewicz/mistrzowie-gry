@@ -12,6 +12,10 @@
         "title": "Podstawowe informacje",
         "description": "Podaj nazwę realizacji oraz krótki opis / informacje operacyjne."
       },
+      "initialDays": {
+        "title": "[PH] Termin i zapotrzebowanie",
+        "description": "[PH] Wybierz zakres dat realizacji i bazową liczbę Mistrzów Gry wymaganą każdego dnia."
+      },
       "venue": {
         "title": "Miejsce i typ realizacji",
         "description": "Określ gdzie odbywa się realizacja oraz jaki jest jej typ."
@@ -29,7 +33,11 @@
       "venueAddress": "Adres realizacji",
       "timezone": "Strefa czasowa",
       "type": "Typ realizacji",
-      "event": "Wydarzenie (opcjonalnie)"
+      "event": "Wydarzenie (opcjonalnie)",
+      "dateRange": "[PH] Zakres dat realizacji"
+    },
+    "validation": {
+      "dateRange": "[PH] Wybierz pełny, prawidłowy zakres dat."
     },
     "types": {
       "stationary": {
@@ -46,6 +54,29 @@
     "toast": {
       "saveSuccessSummary": "Realizacja zapisana",
       "saveFailedSummary": "Nie udało się zapisać realizacji"
+    }
+  },
+  "shell": {
+    "tabs": {
+      "core": "Dane podstawowe",
+      "schedule": "Dni i sloty"
+    }
+  },
+  "schedule": {
+    "page": {
+      "travelHint": "[PH] W realizacji wyjazdowej udział Mistrza Gry obejmuje cały wyjazd."
+    },
+    "section": {
+      "title": "[PH] Dni realizacji i zapotrzebowanie",
+      "description": "[PH] Dodaj dni realizacji i określ wymaganą liczbę Mistrzów Gry dla każdego dnia."
+    },
+    "validation": {
+      "duplicateDate": "[PH] Każdy dzień realizacji musi mieć inną datę."
+    },
+    "toast": {
+      "loadFailedSummary": "[PH] Nie udało się załadować dni realizacji",
+      "saveSuccessSummary": "[PH] Dni realizacji zapisane",
+      "saveFailedSummary": "[PH] Nie udało się zapisać dni realizacji"
     }
   }
 }

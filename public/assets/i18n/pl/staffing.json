@@ -9,5 +9,8 @@
   "realizationTypes": {
     "stationary": "Stacjonarna",
     "travel": "Wyjazdowa"
+  },
+  "labels": {
+    "requiredGmCount": "[PH] Wymagana liczba MG"
   }
 }

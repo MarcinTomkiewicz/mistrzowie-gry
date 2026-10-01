@@ -52,6 +52,14 @@ const loaders = {
     import(
       '../components/admin-staffing/staffing-realization-core-editor/staffing-realization-core-editor'
     ).then((m) => m.StaffingRealizationCoreEditor),
+  staffingRealizationShell: () =>
+    import(
+      '../components/admin-staffing/staffing-realization-shell/staffing-realization-shell'
+    ).then((m) => m.StaffingRealizationShell),
+  staffingRealizationScheduleEditor: () =>
+    import(
+      '../components/admin-staffing/staffing-realization-schedule-editor/staffing-realization-schedule-editor'
+    ).then((m) => m.StaffingRealizationScheduleEditor),
   gmAvailability: () =>
     import(
       '../components/gm-availability-overview/gm-availability-overview'
@@ -108,8 +116,19 @@ const adminChildren: Routes = [
     loadComponent: loaders.staffingRealizationCoreEditor,
   },
   {
-    path: 'staffing/:realizationId/edit',
-    loadComponent: loaders.staffingRealizationCoreEditor,
+    path: 'staffing/:realizationId',
+    loadComponent: loaders.staffingRealizationShell,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'edit' },
+      {
+        path: 'edit',
+        loadComponent: loaders.staffingRealizationCoreEditor,
+      },
+      {
+        path: 'schedule',
+        loadComponent: loaders.staffingRealizationScheduleEditor,
+      },
+    ],
   },
   {
     path: 'content',

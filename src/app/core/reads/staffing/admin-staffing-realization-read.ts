@@ -2,7 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
-import { AdminStaffingRealizationCore } from '../../interfaces/admin-staffing-realization';
+import {
+  AdminStaffingRealizationCore,
+  AdminStaffingRealizationDay,
+} from '../../interfaces/admin-staffing-realization';
 import { Backend } from '../../services/backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +15,15 @@ export class AdminStaffingRealizationRead {
   getDetail(realizationId: string): Observable<AdminStaffingRealizationCore> {
     return this.backend.rpc<AdminStaffingRealizationCore>(
       STAFFING_REALIZATION_RPC.getAdminDetail,
+      { p_realization_id: realizationId },
+    );
+  }
+
+  getDays(
+    realizationId: string,
+  ): Observable<AdminStaffingRealizationDay[]> {
+    return this.backend.rpc<AdminStaffingRealizationDay[]>(
+      STAFFING_REALIZATION_RPC.getAdminDays,
       { p_realization_id: realizationId },
     );
   }

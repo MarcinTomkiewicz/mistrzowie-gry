@@ -1,4 +1,5 @@
 import type {
+  StaffingLabelsTranslations,
   StaffingRealizationStatusTranslations,
   StaffingRealizationTypeTranslations,
 } from '../types/i18n/staffing';
@@ -10,8 +11,10 @@ export function createStaffingI18n() {
   return createScopedSectionsI18n<{
     realizationStatuses: StaffingRealizationStatusTranslations;
     realizationTypes: StaffingRealizationTypeTranslations;
+    staffingLabels: StaffingLabelsTranslations;
   }>(STAFFING_SCOPE, {
     realizationStatuses: 'realizationStatuses',
     realizationTypes: 'realizationTypes',
+    staffingLabels: 'labels',
   });
 }

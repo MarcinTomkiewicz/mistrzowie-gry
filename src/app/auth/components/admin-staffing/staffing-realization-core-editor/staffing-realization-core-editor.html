@@ -1,15 +1,18 @@
 @let editor = i18n.editor();
 
-<section class="mg-section mg-section--full">
-  <div class="mg-container position-relative flex-col-start-center gap-md">
-    <header class="mg-section__header w-100">
-      <h1 class="mg-section__title">
-        {{ isNew ? editor.page.createTitle : editor.page.editTitle }}
-      </h1>
-      <p class="mg-section__subtitle mg-section__subtitle--full">
-        {{ editor.page.subtitle }}
-      </p>
-    </header>
+<section [class.mg-section]="isNew" [class.mg-section--full]="isNew">
+  <div
+    class="position-relative flex-col-start-center gap-md"
+    [class.mg-container]="isNew"
+  >
+    @if (isNew) {
+      <header class="mg-section__header w-100">
+        <h1 class="mg-section__title">{{ editor.page.createTitle }}</h1>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ editor.page.subtitle }}
+        </p>
+      </header>
+    }
 
     <app-loading-overlay
       [visible]="isLoading() || isSaving()"
@@ -113,6 +116,96 @@
             </label>
           </p-iftalabel>
         </section>
+
+        @if (isNew) {
+          <section
+            class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm"
+          >
+            <div class="flex-row-start-center gap-md">
+              <span
+                class="pi pi-calendar square-11 flex-none"
+                aria-hidden="true"
+              ></span>
+              <div class="flex-col-start-stretch gap-xs">
+                <h2 class="mg-section__title mg-section__title--md m-0">
+                  {{ editor.sections.initialDays.title }}
+                </h2>
+                <p
+                  class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
+                >
+                  {{ editor.sections.initialDays.description }}
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mg-grid grid-2-cols grid-1-cols-sm gap-md grid-items-start"
+            >
+              <div class="flex-col-start-stretch gap-xs w-100">
+                <p-iftalabel class="w-100">
+                  <p-datepicker
+                    ngSkipHydration
+                    class="w-100"
+                    inputStyleClass="w-100"
+                    inputId="staffing-realization-date-range"
+                    selectionMode="range"
+                    dateFormat="dd.mm.yy"
+                    appendTo="body"
+                    [showIcon]="true"
+                    [readonlyInput]="true"
+                    [formControl]="initialDaysForm.controls.dateRange"
+                  />
+                  <label for="staffing-realization-date-range">
+                    {{ editor.fields.dateRange }}
+                  </label>
+                </p-iftalabel>
+                @if (
+                  initialDaysForm.controls.dateRange.touched &&
+                  initialDaysForm.controls.dateRange.invalid
+                ) {
+                  <small class="mg-contact-error">
+                    {{
+                      initialDaysForm.controls.dateRange.hasError("required")
+                        ? i18n.commonForm().required
+                        : editor.validation.dateRange
+                    }}
+                  </small>
+                }
+              </div>
+
+              <div class="flex-col-start-stretch gap-xs w-100">
+                <p-iftalabel class="w-100">
+                  <p-inputnumber
+                    class="w-100"
+                    inputStyleClass="w-100"
+                    inputId="staffing-realization-required-gm-count"
+                    [formControl]="initialDaysForm.controls.requiredGmCount"
+                    [useGrouping]="false"
+                    [min]="1"
+                    [step]="1"
+                  />
+                  <label for="staffing-realization-required-gm-count">
+                    {{ i18n.staffingLabels().requiredGmCount }}
+                  </label>
+                </p-iftalabel>
+                @if (
+                  initialDaysForm.controls.requiredGmCount.touched &&
+                  initialDaysForm.controls.requiredGmCount.invalid
+                ) {
+                  <small class="mg-contact-error">
+                    {{
+                      initialDaysForm.controls.requiredGmCount.hasError(
+                        "required"
+                      )
+                        ? i18n.commonForm().required
+                        : i18n.commonForm().positiveInteger
+                    }}
+                  </small>
+                }
+              </div>
+            </div>
+          </section>
+        }
 
         <section class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm">
           <div class="flex-row-start-center gap-md">

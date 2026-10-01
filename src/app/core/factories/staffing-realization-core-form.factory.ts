@@ -2,7 +2,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import {
   AdminStaffingRealizationCore,
-  CreateAdminStaffingRealizationCorePayload,
+  CreateAdminStaffingRealizationDayInput,
+  CreateAdminStaffingRealizationRequest,
   UpdateAdminStaffingRealizationCorePayload,
 } from '../interfaces/admin-staffing-realization';
 import { StaffingRealizationCoreForm } from '../types/staffing-realization-form';
@@ -56,10 +57,12 @@ export function populateStaffingRealizationCoreForm(
 
 export function mapStaffingRealizationCoreFormToCreatePayload(
   form: StaffingRealizationCoreForm,
-): CreateAdminStaffingRealizationCorePayload {
+  days: CreateAdminStaffingRealizationDayInput[],
+): CreateAdminStaffingRealizationRequest {
   return {
     ...mapEditableCoreFields(form),
     coordinatorUserId: null,
+    days,
   };
 }
 

@@ -281,6 +281,7 @@ export type CommonFormTranslations = {
   invalid: string;
   invalidSummary: string;
   nonNegativeInteger: string;
+  positiveInteger: string;
   consent: CommonFormConsentTranslations;
   fileUpload: CommonFormFileUploadTranslations;
 };

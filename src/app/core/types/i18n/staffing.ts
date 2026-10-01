@@ -12,3 +12,7 @@ export type StaffingRealizationTypeTranslations = Record<
   StaffingRealizationType,
   string
 >;
+
+export type StaffingLabelsTranslations = {
+  requiredGmCount: string;
+};
