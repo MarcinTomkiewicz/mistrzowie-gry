@@ -4,10 +4,10 @@ import { Observable } from 'rxjs';
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
 import {
   AdminStaffingRealizationCore,
-  AdminStaffingRealizationDay,
+  AdminStaffingSchedule,
   CreateAdminStaffingRealizationRequest,
   CreateAdminStaffingRealizationResult,
-  SaveAdminStaffingRealizationDayInput,
+  SaveAdminStaffingScheduleDayInput,
   UpdateAdminStaffingRealizationCorePayload,
 } from '../../interfaces/admin-staffing-realization';
 import { Backend } from '../backend/backend';
@@ -38,12 +38,12 @@ export class AdminStaffingRealization {
     );
   }
 
-  saveDays(
+  saveSchedule(
     realizationId: string,
-    days: SaveAdminStaffingRealizationDayInput[],
-  ): Observable<AdminStaffingRealizationDay[]> {
-    return this.backend.rpc<AdminStaffingRealizationDay[]>(
-      STAFFING_REALIZATION_RPC.saveAdminDays,
+    days: SaveAdminStaffingScheduleDayInput[],
+  ): Observable<AdminStaffingSchedule> {
+    return this.backend.rpc<AdminStaffingSchedule>(
+      STAFFING_REALIZATION_RPC.saveAdminSchedule,
       {
         p_realization_id: realizationId,
         p_days: days,

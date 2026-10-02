@@ -1,0 +1,99 @@
+@let fields = i18n.fields();
+@let validation = i18n.validation();
+@let slotForm = slot();
+@let index = slotIndex();
+@let day = dayIndex();
+
+<div
+  class="flex-col-start-stretch gap-xs border radius-sm px-sm py-xs w-100"
+  [class.border-transparent]="!hasConflict()"
+  [class.border-danger]="hasConflict()"
+  [class.bg-danger-subtle]="hasConflict()"
+  [formGroup]="slotForm"
+>
+  <div class="flex-row-between-center flex-nowrap flex-wrap-lg gap-xs w-100">
+    <div class="flex-row-start-center flex-nowrap flex-wrap-lg gap-xs flex-1 min-w-0">
+      <input
+        class="w-px-200 w-100-sm"
+        pInputText
+        pSize="small"
+        [id]="'staffing-slot-label-' + day + '-' + index"
+        formControlName="label"
+        [placeholder]="fields.label"
+        [attr.aria-label]="fields.label"
+        [attr.aria-invalid]="slotForm.controls.label.touched && slotForm.controls.label.invalid"
+      />
+      <p-datepicker
+        ngSkipHydration
+        class="min-w-120 max-w-120 flex-none"
+        inputStyleClass="w-100"
+        size="small"
+        dataType="string"
+        hourFormat="24"
+        iconDisplay="input"
+        icon="pi pi-clock"
+        appendTo="body"
+        [timeOnly]="true"
+        [showIcon]="true"
+        [keepInvalid]="true"
+        [inputId]="'staffing-slot-start-' + day + '-' + index"
+        formControlName="startTime"
+        [ariaLabel]="fields.startTime"
+        [invalid]="slotForm.controls.startTime.touched && slotForm.controls.startTime.invalid"
+        (onBlur)="normalizeTime('startTime', $event)"
+      />
+      <span aria-hidden="true">-</span>
+      <p-datepicker
+        ngSkipHydration
+        class="min-w-120 max-w-120 flex-none"
+        inputStyleClass="w-100"
+        size="small"
+        dataType="string"
+        hourFormat="24"
+        iconDisplay="input"
+        icon="pi pi-clock"
+        appendTo="body"
+        [timeOnly]="true"
+        [showIcon]="true"
+        [keepInvalid]="true"
+        [inputId]="'staffing-slot-end-' + day + '-' + index"
+        formControlName="endTime"
+        [ariaLabel]="fields.endTime"
+        [invalid]="slotForm.controls.endTime.touched && slotForm.controls.endTime.invalid"
+        (onBlur)="normalizeTime('endTime', $event)"
+      />
+    </div>
+
+    <app-item-editor-actions
+      class="flex-none"
+      [index]="index"
+      [itemCount]="slotCount()"
+      [disabled]="isSaving()"
+      [compact]="true"
+      [copyable]="true"
+      (moveUp)="moveUp.emit()"
+      (moveDown)="moveDown.emit()"
+      (copyItem)="copyItem.emit()"
+      (remove)="remove.emit()"
+    />
+  </div>
+
+  @if (hasConflict()) {
+    <small class="mg-contact-error text-xs text-nowrap flex-row-start-center gap-xs">
+      <span class="pi pi-danger-orc" aria-hidden="true"></span>
+      {{ validation.slotConflict }}
+    </small>
+  }
+  @if (slotForm.controls.label.touched && slotForm.controls.label.invalid) {
+    <small class="mg-contact-error">{{ fieldError(slotForm, 'label', validation) }}</small>
+  }
+  @if (slotForm.controls.startTime.touched && slotForm.controls.startTime.invalid) {
+    <small class="mg-contact-error">{{ fieldError(slotForm, 'startTime', validation) }}</small>
+  }
+  @if (slotForm.controls.endTime.touched && slotForm.controls.endTime.invalid) {
+    <small class="mg-contact-error">{{ fieldError(slotForm, 'endTime', validation) }}</small>
+  }
+  @if (slotForm.touched && slotForm.hasError('timeRange')) {
+    <small class="mg-contact-error">{{ validation.slotTimeRange }}</small>
+  }
+</div>

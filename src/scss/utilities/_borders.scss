@@ -7,6 +7,10 @@ $radius-values: (
   "pill": v.$radius-pill,
 );
 
+.border {
+  border: 1px solid v.$color-border !important;
+}
+
 .border-0 {
   border: 0 !important;
 }
@@ -17,6 +21,10 @@ $radius-values: (
 
 .border-top {
   border-top: 1px solid v.$color-border !important;
+}
+
+.border-transparent {
+  border-color: transparent !important;
 }
 
 .border-secondary {

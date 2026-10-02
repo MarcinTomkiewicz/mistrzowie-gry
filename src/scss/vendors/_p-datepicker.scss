@@ -1,0 +1,57 @@
+@use "../abstracts/variables" as v;
+
+.p-datepicker,
+.p-datepicker-panel {
+  --p-datepicker-input-icon-color: #{v.$color-form-label};
+  --p-datepicker-dropdown-background: #{v.$color-form-bg};
+  --p-datepicker-dropdown-color: #{v.$color-form-label};
+  --p-datepicker-dropdown-border-color: #{v.$color-form-border};
+  --p-datepicker-dropdown-border-radius: #{v.$radius-sm};
+  --p-datepicker-dropdown-hover-background: #{v.$color-form-bg-hover};
+  --p-datepicker-dropdown-hover-color: #{v.$color-text};
+  --p-datepicker-dropdown-hover-border-color: #{v.$color-form-border-hover};
+  --p-datepicker-dropdown-active-background: #{v.$color-form-bg-focus};
+  --p-datepicker-dropdown-active-color: #{v.$color-text};
+  --p-datepicker-dropdown-active-border-color: #{v.$color-form-border-focus};
+  --p-datepicker-dropdown-focus-ring-color: #{v.$color-form-border-focus};
+  --p-datepicker-panel-background: #{v.$color-bg-surface};
+  --p-datepicker-panel-color: #{v.$color-text};
+  --p-datepicker-panel-border-color: #{v.$color-border};
+  --p-datepicker-panel-border-radius: #{v.$radius-md};
+  --p-datepicker-panel-shadow: #{v.$shadow-soft};
+  --p-datepicker-header-background: #{v.$color-bg-surface};
+  --p-datepicker-header-color: #{v.$heading-color};
+  --p-datepicker-header-border-color: #{v.$color-border};
+  --p-datepicker-select-month-color: #{v.$heading-color};
+  --p-datepicker-select-year-color: #{v.$heading-color};
+  --p-datepicker-select-month-hover-background: #{v.$color-form-bg-hover};
+  --p-datepicker-select-year-hover-background: #{v.$color-form-bg-hover};
+  --p-datepicker-select-month-hover-color: #{v.$heading-color};
+  --p-datepicker-select-year-hover-color: #{v.$heading-color};
+  --p-datepicker-group-border-color: #{v.$color-border};
+  --p-datepicker-week-day-color: #{v.$color-text-muted};
+  --p-datepicker-date-color: #{v.$color-text};
+  --p-datepicker-date-hover-background: #{v.$color-form-bg-hover};
+  --p-datepicker-date-hover-color: #{v.$color-text};
+  --p-datepicker-date-selected-background: #{v.$color-secondary};
+  --p-datepicker-date-selected-color: #{v.$color-bg};
+  --p-datepicker-date-range-selected-background: color-mix(in srgb, #{v.$color-bg-surface} 80%, #{v.$color-secondary});
+  --p-datepicker-date-range-selected-color: #{v.$color-text};
+  --p-datepicker-date-focus-ring-color: #{v.$color-form-border-focus};
+  --p-datepicker-today-background: #{v.$color-form-bg-focus};
+  --p-datepicker-today-color: #{v.$heading-color};
+  --p-datepicker-buttonbar-border-color: #{v.$color-border};
+  --p-datepicker-time-picker-border-color: #{v.$color-border};
+}
+
+.p-datepicker:has(.p-datepicker-input:disabled) .p-datepicker-dropdown {
+  background: v.$color-form-disabled-bg;
+  color: v.$color-form-disabled-text;
+}
+
+.p-datepicker-header,
+.p-datepicker-time-picker {
+  .p-button {
+    color: v.$color-secondary;
+  }
+}

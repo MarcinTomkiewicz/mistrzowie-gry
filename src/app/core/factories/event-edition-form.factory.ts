@@ -5,6 +5,7 @@ import {
   Validators,
 } from '@angular/forms';
 
+import { DEFAULT_TIMEZONE } from '../configs/time.config';
 import { ParticipantSignupKind } from '../enums/event';
 import {
   IAdminEventDetail,
@@ -31,7 +32,7 @@ import {
   isoDateValidator,
   storagePathValidator,
 } from '../validators/event-admin.validator';
-import { integerValidator } from '../validators/form-value.validator';
+import { integerValidator, timeFormatValidator } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
 
 export function createEventEditionForm(
@@ -81,17 +82,17 @@ export function createEventEditionForm(
         ],
       }),
       isForBeginners: new FormControl(false, { nonNullable: true }),
-      timezone: new FormControl('Europe/Warsaw', {
+      timezone: new FormControl(DEFAULT_TIMEZONE, {
         nonNullable: true,
         validators: [Validators.required, requiredTrimmedValidator()],
       }),
       startTime: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required, requiredTrimmedValidator()],
+        validators: [Validators.required, requiredTrimmedValidator(), timeFormatValidator()],
       }),
       endTime: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required, requiredTrimmedValidator()],
+        validators: [Validators.required, requiredTrimmedValidator(), timeFormatValidator()],
       }),
       participantSignupKind: new FormControl<ParticipantSignupKind>(
         ParticipantSignupKind.ProgramItem,
@@ -176,7 +177,7 @@ export function populateEventEditionForm(
       isDefaultPublic: detail?.isDefaultPublic ?? false,
       displayOrder: detail?.displayOrder ?? 0,
       isForBeginners: detail?.isForBeginners ?? false,
-      timezone: detail?.timezone ?? 'Europe/Warsaw',
+      timezone: detail?.timezone ?? DEFAULT_TIMEZONE,
       startTime: formatTimeLabel(detail?.startTime),
       endTime: formatTimeLabel(detail?.endTime),
       participantSignupKind:

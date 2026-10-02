@@ -1,3 +1,16 @@
+@use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
+
 .bg-transparent {
   background: transparent !important;
+}
+
+@each $name, $color in v.$semantic-colors {
+  .bg-#{$name}-subtle {
+    @include m.semantic-subtle-surface($color, $important: true);
+  }
+
+  html[data-theme="light"] .bg-#{$name}-subtle {
+    @include m.semantic-subtle-surface($color, v.$color-white, $important: true);
+  }
 }

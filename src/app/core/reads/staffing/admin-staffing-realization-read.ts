@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
 import {
   AdminStaffingRealizationCore,
-  AdminStaffingRealizationDay,
+  AdminStaffingSchedule,
 } from '../../interfaces/admin-staffing-realization';
 import { Backend } from '../../services/backend/backend';
 
@@ -19,11 +19,9 @@ export class AdminStaffingRealizationRead {
     );
   }
 
-  getDays(
-    realizationId: string,
-  ): Observable<AdminStaffingRealizationDay[]> {
-    return this.backend.rpc<AdminStaffingRealizationDay[]>(
-      STAFFING_REALIZATION_RPC.getAdminDays,
+  getSchedule(realizationId: string): Observable<AdminStaffingSchedule> {
+    return this.backend.rpc<AdminStaffingSchedule>(
+      STAFFING_REALIZATION_RPC.getAdminSchedule,
       { p_realization_id: realizationId },
     );
   }

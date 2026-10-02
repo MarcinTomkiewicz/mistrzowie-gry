@@ -6,10 +6,10 @@ import {
 
 export function createStaffingRealizationShellI18n() {
   return createScopedSectionsI18n<{
-    editor: AdminStaffingEditorCopy;
-    shell: AdminStaffingShellCopy;
+    page: AdminStaffingEditorCopy['page'];
+    tabLabels: AdminStaffingShellCopy['tabs'];
   }>('adminStaffing', {
-    editor: 'editor',
-    shell: 'shell',
+    page: 'editor.page',
+    tabLabels: 'shell.tabs',
   });
 }

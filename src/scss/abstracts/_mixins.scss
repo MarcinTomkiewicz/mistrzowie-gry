@@ -67,6 +67,19 @@
   box-shadow: v.$shadow-soft;
 }
 
+@mixin semantic-subtle-surface(
+  $color,
+  $surface: v.$color-bg-surface,
+  $important: false
+) {
+  $priority: null;
+  @if $important {
+    $priority: "!important";
+  }
+
+  background: color-mix(in srgb, $surface 88%, $color) #{$priority};
+}
+
 /* Grid helpers */
 @mixin grid($columns, $gap: map.get(v.$spacings, "md"), $align: center) {
   display: grid;

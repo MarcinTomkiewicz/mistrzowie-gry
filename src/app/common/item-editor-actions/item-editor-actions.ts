@@ -12,10 +12,12 @@ import { createCommonActionsI18n } from '../../core/translations/common.i18n';
 export class ItemEditorActions {
   readonly index = input.required<number>();
   readonly itemCount = input.required<number>();
-  readonly reorderable = input(true);
-  readonly removable = input(true);
+  readonly disabled = input(false);
+  readonly compact = input(false);
+  readonly copyable = input(false);
   readonly moveUp = output<void>();
   readonly moveDown = output<void>();
+  readonly copyItem = output<void>();
   readonly remove = output<void>();
 
   protected readonly actions = createCommonActionsI18n();

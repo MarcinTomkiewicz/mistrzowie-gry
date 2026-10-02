@@ -4,27 +4,17 @@ import {
   ValidatorFn,
 } from '@angular/forms';
 
+import { isValidIsoDate } from '../utils/date';
 import { normalizeText } from '../utils/normalize-text';
+import { timeRangeValidator } from './form-value.validator';
 
 const MONTHLY_NTH_VALUES = [1, 2, 3, 4, -1];
-const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
-export const eventTimeRangeValidator: ValidatorFn = (
-  control: AbstractControl,
-): ValidationErrors | null => {
-  const startTime = control.get('startTime')?.value;
-  const endTime = control.get('endTime')?.value;
-
-  if (!startTime || !endTime) {
-    return null;
-  }
-
-  return TIME_PATTERN.test(startTime) &&
-      TIME_PATTERN.test(endTime) &&
-      endTime > startTime
-    ? null
-    : { timeRange: true };
-};
+export const eventTimeRangeValidator: ValidatorFn = timeRangeValidator(
+  'startTime',
+  'endTime',
+  'timeRange',
+);
 
 export const eventScheduleValidator: ValidatorFn = (
   control: AbstractControl,
@@ -123,25 +113,4 @@ export function storagePathValidator(): ValidatorFn {
       ? { publicUrl: true }
       : null;
   };
-}
-
-function isValidIsoDate(value: unknown): value is string {
-  if (typeof value !== 'string') {
-    return false;
-  }
-
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-
-  if (!match) {
-    return false;
-  }
-
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(Date.UTC(year, month - 1, day));
-
-  return date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day;
 }

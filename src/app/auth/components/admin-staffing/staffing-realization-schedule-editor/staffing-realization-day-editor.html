@@ -1,0 +1,96 @@
+@let actions = i18n.actions();
+@let dayForm = day();
+@let index = dayIndex();
+@let slots = dayForm.controls.slots;
+
+<section class="mg-card flex-col-start-stretch gap-xs px-md py-sm w-100" [formGroup]="dayForm">
+  <header class="flex-row-between-center flex-wrap gap-sm border-bottom pb-sm">
+    <div class="flex-row-start-center flex-wrap gap-xs">
+      <h3 class="m-0">
+        <button
+          type="button"
+          class="mg-section__title mg-section__title--sm uppercase border-0 p-0 m-0 cursor-pointer text-left"
+          [attr.aria-label]="actions.editDate"
+          [disabled]="isSaving()"
+          (click)="datePopover.toggle($event)"
+        >
+          {{ i18n.labels().day }} {{ index + 1 }}
+          @if (dayDateLabel(); as dateLabel) {
+            - {{ dateLabel }}
+          }
+        </button>
+      </h3>
+      <p-popover #datePopover styleClass="mg-popover">
+        <p-datepicker
+          ngSkipHydration
+          [inline]="true"
+          [formControl]="dayForm.controls.date"
+          dateFormat="dd.mm.yy"
+          (onSelect)="datePopover.hide()"
+        />
+      </p-popover>
+    </div>
+
+    <div class="flex-row-end-center flex-nowrap flex-wrap-sm gap-sm">
+      <label class="text-xs text-nowrap" [for]="'staffing-realization-day-required-gm-' + index">
+        {{ i18n.staffingLabels().requiredGmCount }}:
+      </label>
+      <p-inputnumber
+        class="w-auto"
+        size="small"
+        [inputSize]="2"
+        [inputId]="'staffing-realization-day-required-gm-' + index"
+        formControlName="requiredGmCount"
+        [useGrouping]="false"
+        [min]="1"
+        [step]="1"
+        [showButtons]="true"
+        buttonLayout="stacked"
+      />
+      <p-button
+        type="button"
+        severity="danger"
+        size="small"
+        icon="pi pi-plus"
+        [label]="actions.addSlot"
+        [disabled]="isSaving()"
+        (onClick)="addSlot()"
+      />
+    </div>
+  </header>
+
+  @if (dayForm.controls.date.touched && dayForm.controls.date.invalid) {
+    <small class="mg-contact-error">
+      {{ dateError(dayForm.controls.date, i18n.validation()) }}
+    </small>
+  }
+  @if (
+    dayForm.controls.requiredGmCount.touched &&
+    dayForm.controls.requiredGmCount.invalid
+  ) {
+    <small class="mg-contact-error">
+      {{ demandError(dayForm.controls.requiredGmCount, i18n.staffingLabels().requiredGmCount, i18n.commonForm()) }}
+    </small>
+  }
+
+  <div class="flex-col-start-stretch gap-sm w-100">
+    @for (slot of slots.controls; track slot; let slotIndex = $index) {
+      <app-staffing-realization-slot-editor
+        [slot]="slot"
+        [dayIndex]="index"
+        [slotIndex]="slotIndex"
+        [slotCount]="slots.length"
+        [hasConflict]="slotHasConflict(slotIndex)"
+        [isSaving]="isSaving()"
+        (moveUp)="swapSlotLabels(slotIndex, slotIndex - 1)"
+        (moveDown)="swapSlotLabels(slotIndex, slotIndex + 1)"
+        (copyItem)="copySlot(slotIndex)"
+        (remove)="removeSlot(slotIndex)"
+      />
+    } @empty {
+      <p class="muted-text m-0">
+        {{ i18n.emptySlots() }}
+      </p>
+    }
+  </div>
+</section>

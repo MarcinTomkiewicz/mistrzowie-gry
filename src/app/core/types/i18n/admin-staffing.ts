@@ -26,7 +26,16 @@ export type AdminStaffingEditorCopy = {
     dateRange: string;
   };
   validation: {
+    nameRequired: string;
+    timezoneRequired: string;
+    typeRequired: string;
+    dateRangeRequired: string;
     dateRange: string;
+  };
+  summary: {
+    dayCount: string;
+    requiredGmCount: string;
+    dailyGmUnit: string;
   };
   types: Record<
     StaffingRealizationType,
@@ -54,8 +63,40 @@ export type AdminStaffingScheduleEditorCopy = {
     travelHint: string;
   };
   section: AdminStaffingEditorSectionCopy;
+  labels: {
+    day: string;
+  };
+  fields: {
+    label: string;
+    startTime: string;
+    endTime: string;
+  };
+  actions: {
+    addDay: string;
+    addSlot: string;
+    editDate: string;
+    saveDraft: string;
+  };
+  summary: {
+    title: string;
+    dayCount: string;
+    slotCount: string;
+    dailyStaffingPositions: string;
+    conflictCount: string;
+  };
+  emptySlots: string;
   validation: {
+    daysRequired: string;
+    dateRequired: string;
+    dateInvalid: string;
+    slotLabelRequired: string;
+    slotStartRequired: string;
+    slotEndRequired: string;
+    slotStartFormat: string;
+    slotEndFormat: string;
     duplicateDate: string;
+    slotTimeRange: string;
+    slotConflict: string;
   };
   toast: {
     loadFailedSummary: string;

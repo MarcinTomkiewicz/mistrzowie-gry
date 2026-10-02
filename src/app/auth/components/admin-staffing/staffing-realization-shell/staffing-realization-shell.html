@@ -1,11 +1,11 @@
-@let editor = i18n.editor();
+@let page = i18n.page();
 
 <app-route-tab-shell
-  [heading]="editor.page.editTitle"
-  [subtitle]="editor.page.subtitle"
-  [seoTitle]="editor.page.editTitle"
-  [seoDescription]="editor.page.subtitle"
-  [canonicalUrl]="pageUrl"
+  [heading]="page.editTitle"
+  [subtitle]="page.subtitle"
+  [seoTitle]="page.editTitle"
+  [seoDescription]="page.subtitle"
+  [canonicalUrl]="pageUrl()"
   [tabs]="tabs()"
 >
   <router-outlet />

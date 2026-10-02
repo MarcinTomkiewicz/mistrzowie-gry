@@ -243,16 +243,16 @@ $grid-common-patterns: (
 }
 
 /* =========================================================
-   ALIGNMENT
-   ========================================================= */
-
-@include _emit-grid-prop-map(grid-items, $grid-items-map, align-items);
-@include _emit-grid-prop-map(grid-content, $grid-content-map, justify-items);
-
-/* =========================================================
    COMMON PATTERNS
    ========================================================= */
 
 @each $name, $config in $grid-common-patterns {
   @include _emit-grid-common-pattern($name, $config);
 }
+
+/* =========================================================
+   ALIGNMENT OVERRIDES
+   ========================================================= */
+
+@include _emit-grid-prop-map(grid-items, $grid-items-map, align-items);
+@include _emit-grid-prop-map(grid-content, $grid-content-map, justify-items);

@@ -1,5 +1,7 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+import { isValidDate } from '../utils/date';
+import { isValidTime, parseTimeLabelToMinutes } from '../utils/time-format';
 import { timeZoneDateToTimestamp } from '../utils/time-zone';
 
 export function integerValidator(): ValidatorFn {
@@ -97,6 +99,31 @@ export function dateTimeRangeValidator(
   };
 }
 
-function isValidDate(value: unknown): value is Date {
-  return value instanceof Date && !Number.isNaN(value.getTime());
+export function timeFormatValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    return value === null || value === undefined || value === '' || isValidTime(value)
+      ? null
+      : { timeFormat: true };
+  };
+}
+
+export function timeRangeValidator(
+  startControlName: string,
+  endControlName: string,
+  errorKey: string,
+): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const start = parseTimeLabelToMinutes(control.get(startControlName)?.value);
+    const end = parseTimeLabelToMinutes(control.get(endControlName)?.value);
+
+    if (start === null || end === null) {
+      return null;
+    }
+
+    return end > start
+      ? null
+      : { [errorKey]: true };
+  };
 }

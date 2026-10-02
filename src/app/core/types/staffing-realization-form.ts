@@ -1,17 +1,12 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
-import { StaffingRealizationType } from './staffing-realization';
+import {
+  StaffingRealizationCoreDraft,
+  StaffingRealizationSlotDraft,
+} from './staffing-realization-editor-draft';
 
 export type StaffingRealizationCoreForm = FormGroup<{
-  name: FormControl<string>;
-  description: FormControl<string>;
-  operationalNotes: FormControl<string>;
-  city: FormControl<string>;
-  venueName: FormControl<string>;
-  venueAddress: FormControl<string>;
-  timezone: FormControl<string>;
-  type: FormControl<StaffingRealizationType>;
-  eventId: FormControl<string | null>;
+  [K in keyof StaffingRealizationCoreDraft]: FormControl<StaffingRealizationCoreDraft[K]>;
 }>;
 
 export type StaffingRealizationInitialDaysForm = FormGroup<{
@@ -23,6 +18,11 @@ export type StaffingRealizationDayForm = FormGroup<{
   id: FormControl<string | null>;
   date: FormControl<Date | null>;
   requiredGmCount: FormControl<number>;
+  slots: FormArray<StaffingRealizationSlotForm>;
+}>;
+
+export type StaffingRealizationSlotForm = FormGroup<{
+  [K in keyof StaffingRealizationSlotDraft]: FormControl<StaffingRealizationSlotDraft[K]>;
 }>;
 
 export type StaffingRealizationDaysForm = FormGroup<{

@@ -1,4 +1,5 @@
 @use "../abstracts/variables" as v;
+@use "../abstracts/mixins" as m;
 
 /* =========================================================
    PrimeNG - Toast (MG semantic colors)
@@ -35,7 +36,7 @@
    ========================================================= */
 
 .p-toast-message.mg-toast .p-toast-close-button {
-  color: v.$color-text; 
+  color: v.$color-text;
   opacity: 0.9;
   border-radius: v.$radius-sm;
   transition: opacity v.$transition-fast, background-color v.$transition-fast,
@@ -69,7 +70,7 @@
 
 /* INFO */
 .p-toast-message.mg-toast--info {
-  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-info);
+  @include m.semantic-subtle-surface(v.$color-info);
   border-color: color-mix(in srgb, v.$color-info 55%, v.$color-border);
 }
 .p-toast-message.mg-toast--info .p-toast-summary {
@@ -78,7 +79,7 @@
 
 /* SUCCESS */
 .p-toast-message.mg-toast--success {
-  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-success);
+  @include m.semantic-subtle-surface(v.$color-success);
   border-color: color-mix(in srgb, v.$color-success 55%, v.$color-border);
 }
 .p-toast-message.mg-toast--success .p-toast-summary {
@@ -87,7 +88,7 @@
 
 /* DANGER */
 .p-toast-message.mg-toast--danger {
-  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-danger);
+  @include m.semantic-subtle-surface(v.$color-danger);
   border-color: color-mix(in srgb, v.$color-danger 55%, v.$color-border);
 }
 .p-toast-message.mg-toast--danger .p-toast-summary {
@@ -96,7 +97,7 @@
 
 /* ARCANE */
 .p-toast-message.mg-toast--arcane {
-  background: color-mix(in srgb, v.$color-bg-surface 88%, v.$color-arcane);
+  @include m.semantic-subtle-surface(v.$color-arcane);
   border-color: color-mix(in srgb, v.$color-arcane 55%, v.$color-border);
 }
 .p-toast-message.mg-toast--arcane .p-toast-summary {
@@ -106,17 +107,17 @@
 /* ---------- LIGHT overrides ---------- */
 
 html[data-theme="light"] .p-toast-message.mg-toast--info {
-  background: color-mix(in srgb, white 88%, v.$color-info);
+  @include m.semantic-subtle-surface(v.$color-info, white);
 }
 
 html[data-theme="light"] .p-toast-message.mg-toast--success {
-  background: color-mix(in srgb, white 88%, v.$color-success);
+  @include m.semantic-subtle-surface(v.$color-success, white);
 }
 
 html[data-theme="light"] .p-toast-message.mg-toast--danger {
-  background: color-mix(in srgb, white 88%, v.$color-danger);
+  @include m.semantic-subtle-surface(v.$color-danger, white);
 }
 
 html[data-theme="light"] .p-toast-message.mg-toast--arcane {
-  background: color-mix(in srgb, white 88%, v.$color-arcane);
+  @include m.semantic-subtle-surface(v.$color-arcane, white);
 }

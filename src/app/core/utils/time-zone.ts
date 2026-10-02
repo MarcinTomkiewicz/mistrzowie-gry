@@ -1,4 +1,6 @@
 import { HOUR_IN_MS } from '../types/hour-offset';
+import { isValidDate, parseIsoDate } from './date';
+import { parseTimeLabelToMinutes } from './time-format';
 
 const DAY_IN_MS = 24 * HOUR_IN_MS;
 
@@ -9,7 +11,7 @@ export function timestampToTimeZoneDate(
   if (!timestamp) return null;
 
   const instant = new Date(timestamp);
-  if (Number.isNaN(instant.getTime())) return instant;
+  if (!isValidDate(instant)) return instant;
 
   const wallTime = new Date(getTimeZoneWallTime(instant.getTime(), timeZone));
   return new Date(
@@ -28,7 +30,7 @@ export function timeZoneDateToTimestamp(
   timeZone: string,
   preferredTimestamp?: string | null,
 ): string | null {
-  if (!date || Number.isNaN(date.getTime())) return null;
+  if (!isValidDate(date)) return null;
 
   const wallTime = Date.UTC(
     date.getFullYear(),
@@ -66,13 +68,21 @@ export function createLocalDateTimeRangeIso(
   startTime: string,
   durationHours: number,
 ): { startsAt: string; endsAt: string } {
-  const match = /^(\d{2}):(\d{2})(?::\d{2})?$/.exec(startTime);
-  if (!match) throw new Error(`Invalid start time: ${startTime}`);
+  const startMinutes = parseTimeLabelToMinutes(startTime);
+  if (startMinutes === null) throw new Error(`Invalid start time: ${startTime}`);
 
-  const [year, month, day] = dateIso.split('-').map(Number);
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  const startsAt = new Date(year, month - 1, day, hours, minutes);
+  const date = parseIsoDate(dateIso);
+  if (!date) throw new Error(`Invalid date: ${dateIso}`);
+
+  const hours = Math.floor(startMinutes / 60);
+  const minutes = startMinutes % 60;
+  const startsAt = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    hours,
+    minutes,
+  );
   const endsAt = new Date(startsAt.getTime() + durationHours * HOUR_IN_MS);
 
   return {

@@ -1,5 +1,6 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
+import { DEFAULT_TIMEZONE } from '../configs/time.config';
 import {
   AdminStaffingRealizationCore,
   CreateAdminStaffingRealizationDayInput,
@@ -7,11 +8,10 @@ import {
   UpdateAdminStaffingRealizationCorePayload,
 } from '../interfaces/admin-staffing-realization';
 import { StaffingRealizationCoreForm } from '../types/staffing-realization-form';
+import { StaffingRealizationCoreDraft } from '../types/staffing-realization-editor-draft';
 import { StaffingRealizationType } from '../types/staffing-realization';
 import { normalizeText } from '../utils/normalize-text';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
-
-const DEFAULT_TIMEZONE = 'Europe/Warsaw';
 
 export function createStaffingRealizationCoreForm(): StaffingRealizationCoreForm {
   return new FormGroup({
@@ -36,11 +36,10 @@ export function createStaffingRealizationCoreForm(): StaffingRealizationCoreForm
   });
 }
 
-export function populateStaffingRealizationCoreForm(
-  form: StaffingRealizationCoreForm,
+export function mapStaffingRealizationCoreToDraft(
   realization: AdminStaffingRealizationCore,
-): void {
-  form.reset({
+): StaffingRealizationCoreDraft {
+  return {
     name: realization.name,
     description: realization.description ?? '',
     operationalNotes: realization.operationalNotes ?? '',
@@ -50,7 +49,14 @@ export function populateStaffingRealizationCoreForm(
     timezone: realization.timezone,
     type: realization.type,
     eventId: realization.eventId,
-  });
+  };
+}
+
+export function populateStaffingRealizationCoreForm(
+  form: StaffingRealizationCoreForm,
+  draft: StaffingRealizationCoreDraft,
+): void {
+  form.reset(draft, { emitEvent: false });
   form.markAsPristine();
   form.markAsUntouched();
 }

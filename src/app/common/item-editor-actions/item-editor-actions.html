@@ -1,39 +1,59 @@
-@if (reorderable() || removable()) {
-  <div class="flex-row-end-center flex-wrap gap-xs">
-    @if (reorderable()) {
-      <p-button
-        type="button"
-        severity="secondary"
-        size="small"
-        [text]="true"
-        [label]="actions().moveItemUp"
-        icon="pi pi-arrow-up"
-        [disabled]="index() === 0"
-        (onClick)="moveUp.emit()"
-      />
+<div class="flex-row-end-center gap-xs" [class.flex-wrap]="!compact()" [class.flex-nowrap]="compact()">
+  <p-button
+    type="button"
+    severity="secondary"
+    size="small"
+    [text]="!compact()"
+    [outlined]="compact()"
+    [label]="compact() ? undefined : actions().moveItemUp"
+    [ariaLabel]="compact() ? actions().moveItemUp : undefined"
+    [styleClass]="compact() ? 'square-7 p-0' : undefined"
+    icon="pi pi-arrow-up"
+    [disabled]="disabled() || index() === 0"
+    (onClick)="moveUp.emit()"
+  />
 
-      <p-button
-        type="button"
-        severity="secondary"
-        size="small"
-        [text]="true"
-        [label]="actions().moveItemDown"
-        icon="pi pi-arrow-down"
-        [disabled]="index() === itemCount() - 1"
-        (onClick)="moveDown.emit()"
-      />
-    }
+  <p-button
+    type="button"
+    severity="secondary"
+    size="small"
+    [text]="!compact()"
+    [outlined]="compact()"
+    [label]="compact() ? undefined : actions().moveItemDown"
+    [ariaLabel]="compact() ? actions().moveItemDown : undefined"
+    [styleClass]="compact() ? 'square-7 p-0' : undefined"
+    icon="pi pi-arrow-down"
+    [disabled]="disabled() || index() === itemCount() - 1"
+    (onClick)="moveDown.emit()"
+  />
 
-    @if (removable()) {
-      <p-button
-        type="button"
-        severity="danger"
-        size="small"
-        [text]="true"
-        [label]="actions().removeItem"
-        icon="pi pi-trash"
-        (onClick)="remove.emit()"
-      />
-    }
-  </div>
-}
+  @if (copyable()) {
+    <p-button
+      type="button"
+      severity="secondary"
+      size="small"
+      [text]="!compact()"
+      [outlined]="compact()"
+      [label]="compact() ? undefined : actions().copy"
+      [ariaLabel]="compact() ? actions().copy : undefined"
+      [styleClass]="compact() ? 'square-7 p-0' : undefined"
+      icon="pi pi-copy"
+      [disabled]="disabled()"
+      (onClick)="copyItem.emit()"
+    />
+  }
+
+  <p-button
+    type="button"
+    severity="danger"
+    size="small"
+    [text]="!compact()"
+    [outlined]="compact()"
+    [label]="compact() ? undefined : actions().removeItem"
+    [ariaLabel]="compact() ? actions().removeItem : undefined"
+    [styleClass]="compact() ? 'square-7 p-0' : undefined"
+    icon="pi pi-trash"
+    [disabled]="disabled()"
+    (onClick)="remove.emit()"
+  />
+</div>

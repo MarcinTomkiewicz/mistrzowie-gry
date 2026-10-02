@@ -1,4 +1,5 @@
-@let editor = i18n.editor();
+@let page = i18n.page();
+@let fields = i18n.fields();
 
 <section [class.mg-section]="isNew" [class.mg-section--full]="isNew">
   <div
@@ -7,9 +8,9 @@
   >
     @if (isNew) {
       <header class="mg-section__header w-100">
-        <h1 class="mg-section__title">{{ editor.page.createTitle }}</h1>
+        <h1 class="mg-section__title">{{ page.createTitle }}</h1>
         <p class="mg-section__subtitle mg-section__subtitle--full">
-          {{ editor.page.subtitle }}
+          {{ page.subtitle }}
         </p>
       </header>
     }
@@ -27,7 +28,7 @@
         role="alert"
       >
         <h2 class="mg-section__title mg-section__title--sm m-0">
-          {{ editor.page.loadErrorTitle }}
+          {{ page.loadErrorTitle }}
         </h2>
         <p class="m-0">{{ loadErrorMessage() }}</p>
         <div class="flex-row-start-center flex-wrap gap-sm">
@@ -58,10 +59,10 @@
             <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
             <div class="flex-col-start-stretch gap-xs">
               <h2 class="mg-section__title mg-section__title--md m-0">
-                {{ editor.sections.basic.title }}
+                {{ i18n.basicSection().title }}
               </h2>
               <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
-                {{ editor.sections.basic.description }}
+                {{ i18n.basicSection().description }}
               </p>
             </div>
           </div>
@@ -77,10 +78,10 @@
                   autocomplete="off"
                   [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
                 />
-                <label for="staffing-realization-name">{{ editor.fields.name }}</label>
+                <label for="staffing-realization-name">{{ fields.name }}</label>
               </p-iftalabel>
               @if (form.controls.name.touched && form.controls.name.invalid) {
-                <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+                <small class="mg-contact-error">{{ i18n.validation().nameRequired }}</small>
               }
             </div>
 
@@ -100,7 +101,7 @@
               formControlName="description"
               rows="4"
             ></textarea>
-            <label for="staffing-realization-description">{{ editor.fields.description }}</label>
+            <label for="staffing-realization-description">{{ fields.description }}</label>
           </p-iftalabel>
 
           <p-iftalabel class="w-100">
@@ -112,110 +113,27 @@
               rows="4"
             ></textarea>
             <label for="staffing-realization-operational-notes">
-              {{ editor.fields.operationalNotes }}
+              {{ fields.operationalNotes }}
             </label>
           </p-iftalabel>
         </section>
 
-        @if (isNew) {
-          <section
-            class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm"
-          >
-            <div class="flex-row-start-center gap-md">
-              <span
-                class="pi pi-calendar square-11 flex-none"
-                aria-hidden="true"
-              ></span>
-              <div class="flex-col-start-stretch gap-xs">
-                <h2 class="mg-section__title mg-section__title--md m-0">
-                  {{ editor.sections.initialDays.title }}
-                </h2>
-                <p
-                  class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
-                >
-                  {{ editor.sections.initialDays.description }}
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="mg-grid grid-2-cols grid-1-cols-sm gap-md grid-items-start"
-            >
-              <div class="flex-col-start-stretch gap-xs w-100">
-                <p-iftalabel class="w-100">
-                  <p-datepicker
-                    ngSkipHydration
-                    class="w-100"
-                    inputStyleClass="w-100"
-                    inputId="staffing-realization-date-range"
-                    selectionMode="range"
-                    dateFormat="dd.mm.yy"
-                    appendTo="body"
-                    [showIcon]="true"
-                    [readonlyInput]="true"
-                    [formControl]="initialDaysForm.controls.dateRange"
-                  />
-                  <label for="staffing-realization-date-range">
-                    {{ editor.fields.dateRange }}
-                  </label>
-                </p-iftalabel>
-                @if (
-                  initialDaysForm.controls.dateRange.touched &&
-                  initialDaysForm.controls.dateRange.invalid
-                ) {
-                  <small class="mg-contact-error">
-                    {{
-                      initialDaysForm.controls.dateRange.hasError("required")
-                        ? i18n.commonForm().required
-                        : editor.validation.dateRange
-                    }}
-                  </small>
-                }
-              </div>
-
-              <div class="flex-col-start-stretch gap-xs w-100">
-                <p-iftalabel class="w-100">
-                  <p-inputnumber
-                    class="w-100"
-                    inputStyleClass="w-100"
-                    inputId="staffing-realization-required-gm-count"
-                    [formControl]="initialDaysForm.controls.requiredGmCount"
-                    [useGrouping]="false"
-                    [min]="1"
-                    [step]="1"
-                  />
-                  <label for="staffing-realization-required-gm-count">
-                    {{ i18n.staffingLabels().requiredGmCount }}
-                  </label>
-                </p-iftalabel>
-                @if (
-                  initialDaysForm.controls.requiredGmCount.touched &&
-                  initialDaysForm.controls.requiredGmCount.invalid
-                ) {
-                  <small class="mg-contact-error">
-                    {{
-                      initialDaysForm.controls.requiredGmCount.hasError(
-                        "required"
-                      )
-                        ? i18n.commonForm().required
-                        : i18n.commonForm().positiveInteger
-                    }}
-                  </small>
-                }
-              </div>
-            </div>
-          </section>
-        }
+        <app-staffing-realization-dates-and-demand
+          class="w-80 w-100-sm"
+          [isNew]="isNew"
+          [initialDaysForm]="initialDaysForm"
+          [days]="days()"
+        />
 
         <section class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm">
           <div class="flex-row-start-center gap-md">
             <span class="pi pi-treasure-map square-11 flex-none" aria-hidden="true"></span>
             <div class="flex-col-start-stretch gap-xs">
               <h2 class="mg-section__title mg-section__title--md m-0">
-                {{ editor.sections.venue.title }}
+                {{ i18n.venueSection().title }}
               </h2>
               <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
-                {{ editor.sections.venue.description }}
+                {{ i18n.venueSection().description }}
               </p>
             </div>
           </div>
@@ -238,10 +156,10 @@
                   autocomplete="off"
                   [attr.aria-invalid]="form.controls.timezone.touched && form.controls.timezone.invalid"
                 />
-                <label for="staffing-realization-timezone">{{ editor.fields.timezone }}</label>
+                <label for="staffing-realization-timezone">{{ fields.timezone }}</label>
               </p-iftalabel>
               @if (form.controls.timezone.touched && form.controls.timezone.invalid) {
-                <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+                <small class="mg-contact-error">{{ i18n.validation().timezoneRequired }}</small>
               }
             </div>
           </div>
@@ -249,16 +167,16 @@
           <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
             <p-iftalabel class="w-100">
               <input class="w-100" pInputText id="staffing-realization-venue-name" formControlName="venueName" />
-              <label for="staffing-realization-venue-name">{{ editor.fields.venueName }}</label>
+              <label for="staffing-realization-venue-name">{{ fields.venueName }}</label>
             </p-iftalabel>
             <p-iftalabel class="w-100">
               <input class="w-100" pInputText id="staffing-realization-venue-address" formControlName="venueAddress" />
-              <label for="staffing-realization-venue-address">{{ editor.fields.venueAddress }}</label>
+              <label for="staffing-realization-venue-address">{{ fields.venueAddress }}</label>
             </p-iftalabel>
           </div>
 
           <div class="flex-col-start-stretch gap-sm w-100">
-            <strong>{{ editor.fields.type }}</strong>
+            <strong>{{ fields.type }}</strong>
             <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md" role="radiogroup">
               <button
                 type="button"
@@ -272,7 +190,7 @@
                   <span class="pi pi-medieval-village-01 square-11 flex-none" aria-hidden="true"></span>
                   <div class="flex-col-start-stretch gap-xs">
                     <strong>{{ i18n.realizationTypes().stationary }}</strong>
-                    <span>{{ editor.types.stationary.description }}</span>
+                    <span>{{ i18n.stationaryType().description }}</span>
                   </div>
                 </div>
               </button>
@@ -289,11 +207,14 @@
                   <span class="pi pi-bindle square-11 flex-none" aria-hidden="true"></span>
                   <div class="flex-col-start-stretch gap-xs">
                     <strong>{{ i18n.realizationTypes().travel }}</strong>
-                    <span>{{ editor.types.travel.description }}</span>
+                    <span>{{ i18n.travelType().description }}</span>
                   </div>
                 </div>
               </button>
             </div>
+            @if (form.controls.type.touched && form.controls.type.invalid) {
+              <small class="mg-contact-error">{{ i18n.validation().typeRequired }}</small>
+            }
           </div>
         </section>
 
@@ -302,10 +223,10 @@
             <span class="pi pi-knot square-11 flex-none" aria-hidden="true"></span>
             <div class="flex-col-start-stretch gap-xs">
               <h2 class="mg-section__title mg-section__title--md m-0">
-                {{ editor.sections.event.title }}
+                {{ i18n.eventSection().title }}
               </h2>
               <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
-                {{ editor.sections.event.description }}
+                {{ i18n.eventSection().description }}
               </p>
             </div>
           </div>
@@ -320,10 +241,10 @@
               appendTo="body"
               [options]="eventOptions()"
               [showClear]="true"
-              [placeholder]="editor.event.placeholder"
-              [emptyMessage]="editor.event.empty"
+              [placeholder]="i18n.event().placeholder"
+              [emptyMessage]="i18n.event().empty"
             />
-            <label for="staffing-realization-event">{{ editor.fields.event }}</label>
+            <label for="staffing-realization-event">{{ fields.event }}</label>
           </p-iftalabel>
         </section>
 

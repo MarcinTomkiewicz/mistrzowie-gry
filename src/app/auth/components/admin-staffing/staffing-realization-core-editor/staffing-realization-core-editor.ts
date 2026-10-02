@@ -1,20 +1,20 @@
 import { Location } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, forkJoin, map, Observable, of } from 'rxjs';
+import { finalize, forkJoin, map, Observable, of, Subscription } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import {
   createStaffingRealizationCoreForm,
+  mapStaffingRealizationCoreToDraft,
   mapStaffingRealizationCoreFormToCreatePayload,
   mapStaffingRealizationCoreFormToUpdatePayload,
   populateStaffingRealizationCoreForm,
@@ -22,19 +22,20 @@ import {
 import {
   createStaffingRealizationInitialDaysForm,
   mapStaffingRealizationInitialDaysFormToInput,
-} from '../../../../core/factories/staffing-realization-days-form.factory';
+} from '../../../../core/factories/staffing-realization-initial-days-form.factory';
+import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { AdminStaffingRealizationCore } from '../../../../core/interfaces/admin-staffing-realization';
 import { IAdminEventListItem } from '../../../../core/interfaces/i-event-admin';
 import { ISelectOption } from '../../../../core/interfaces/i-select-option';
-import { AdminStaffingRealizationRead } from '../../../../core/reads/staffing/admin-staffing-realization-read';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
-import { AdminStaffingRealization } from '../../../../core/services/staffing/admin-staffing-realization';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationType } from '../../../../core/types/staffing-realization';
 import { setControlValue } from '../../../../core/utils/form-controls';
 import { joinTextParts } from '../../../../core/utils/normalize-text';
+import { getStaffingCoreFormError } from '../staffing-realization-form-errors';
 import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-core-editor.i18n';
+import { StaffingRealizationDatesAndDemand } from './staffing-realization-dates-and-demand';
 
 @Component({
   selector: 'app-staffing-realization-core-editor',
@@ -42,13 +43,12 @@ import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-
   imports: [
     ReactiveFormsModule,
     ButtonModule,
-    DatePickerModule,
     IftaLabelModule,
-    InputNumberModule,
     InputTextModule,
     SelectModule,
     TextareaModule,
     LoadingOverlay,
+    StaffingRealizationDatesAndDemand,
   ],
   templateUrl: './staffing-realization-core-editor.html',
   providers: [
@@ -56,24 +56,25 @@ import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-
   ],
 })
 export class StaffingRealizationCoreEditor {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly editor = inject(StaffingRealizationEditorFacade);
   private readonly eventAdmin = inject(EventAdmin);
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
-  private readonly realizationRead = inject(AdminStaffingRealizationRead);
-  private readonly realizationWrite = inject(AdminStaffingRealization);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
 
-  protected readonly realizationId =
+  private loadSubscription: Subscription | null = null;
+
+  protected realizationId =
     this.route.parent?.snapshot.paramMap.get('realizationId') ?? '';
   protected readonly isNew = !this.realizationId;
   protected readonly i18n = createStaffingRealizationCoreEditorI18n();
   protected readonly form = createStaffingRealizationCoreForm();
   protected readonly initialDaysForm =
     createStaffingRealizationInitialDaysForm();
-  protected readonly realization = signal<AdminStaffingRealizationCore | null>(
-    null,
-  );
+  protected readonly realization = this.editor.store.realization;
+  protected readonly days = computed(() => this.editor.store.scheduleDraft() ?? []);
   protected readonly events = signal<readonly IAdminEventListItem[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
@@ -82,36 +83,48 @@ export class StaffingRealizationCoreEditor {
   protected readonly eventOptions = computed<ISelectOption[]>(() =>
     this.events().map((event) => ({
       value: event.id,
-      label: joinTextParts([event.eventCoreName, event.city], ' — '),
+      label: joinTextParts([event.eventCoreName, event.city], ' - '),
     })),
   );
 
   constructor() {
-    this.loadEditor();
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (!this.isNew && this.editor.store.coreDraft() !== null) {
+        this.editor.store.setCoreDraft(this.form.getRawValue());
+      }
+    });
+    this.route.parent?.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.realizationId = params.get('realizationId') ?? '';
+      this.loadEditor();
+    });
   }
 
   protected loadEditor(): void {
+    this.loadSubscription?.unsubscribe();
     this.isLoading.set(true);
     this.loadErrorMessage.set(null);
 
-    forkJoin({
-      realization: this.isNew
-        ? of<AdminStaffingRealizationCore | null>(null)
-        : this.realizationRead.getDetail(this.realizationId),
+    this.loadSubscription = forkJoin({
+      draft: this.isNew ? of(void 0) : this.editor.load(this.realizationId),
       events: this.eventAdmin.getEditionList(),
     })
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isLoading.set(false)),
+      )
       .subscribe({
-        next: ({ realization, events }) => {
-          this.realization.set(realization);
+        next: ({ events }) => {
           this.events.set(events);
-
-          if (realization) {
-            populateStaffingRealizationCoreForm(this.form, realization);
+          const draft = this.editor.store.coreDraft();
+          if (!this.isNew && draft) {
+            populateStaffingRealizationCoreForm(this.form, draft);
+            if (this.editor.store.hasCoreChanges()) {
+              this.form.markAsDirty();
+            }
           }
         },
         error: () => {
-          const copy = this.i18n.editor().page;
+          const copy = this.i18n.page();
 
           this.loadErrorMessage.set(copy.loadErrorDescription);
           this.toast.danger({
@@ -142,16 +155,25 @@ export class StaffingRealizationCoreEditor {
       }
 
       if (this.form.invalid || initialDaysInvalid) {
-        this.toast.danger({
-          summary: this.i18n.commonForm().invalidSummary,
-          detail: this.i18n.commonForm().invalid,
-        });
+        const detail = getStaffingCoreFormError(
+          this.form,
+          this.isNew ? this.initialDaysForm : null,
+          this.i18n.validation(),
+          this.i18n.staffingLabels().requiredGmCount,
+          this.i18n.commonForm(),
+        );
+        if (detail) {
+          this.toast.danger({
+            summary: this.i18n.commonForm().invalidSummary,
+            detail,
+          });
+        }
       }
 
       return;
     }
 
-    const current = this.realization();
+    const current = this.isNew ? null : this.realization();
     if (!this.isNew && !current) {
       return;
     }
@@ -160,11 +182,11 @@ export class StaffingRealizationCoreEditor {
       realization: AdminStaffingRealizationCore;
       created: boolean;
     }> = current
-      ? this.realizationWrite.update(
+      ? this.editor.update(
           current.id,
           mapStaffingRealizationCoreFormToUpdatePayload(this.form, current),
         ).pipe(map((realization) => ({ realization, created: false })))
-      : this.realizationWrite.create(
+      : this.editor.create(
           mapStaffingRealizationCoreFormToCreatePayload(
             this.form,
             mapStaffingRealizationInitialDaysFormToInput(this.initialDaysForm),
@@ -182,11 +204,15 @@ export class StaffingRealizationCoreEditor {
       .subscribe({
         next: (result) => {
           const savedRealization = result.realization;
-
-          this.realization.set(savedRealization);
-          populateStaffingRealizationCoreForm(this.form, savedRealization);
+          if (!result.created && this.realizationId !== savedRealization.id) {
+            return;
+          }
+          populateStaffingRealizationCoreForm(
+            this.form,
+            mapStaffingRealizationCoreToDraft(savedRealization),
+          );
           this.toast.success({
-            summary: this.i18n.editor().toast.saveSuccessSummary,
+            summary: this.i18n.toast().saveSuccessSummary,
             detail: this.i18n.commonStatus().changesSaved,
           });
 
@@ -200,7 +226,7 @@ export class StaffingRealizationCoreEditor {
         },
         error: () => {
           this.toast.danger({
-            summary: this.i18n.editor().toast.saveFailedSummary,
+            summary: this.i18n.toast().saveFailedSummary,
             detail: this.i18n.commonErrors().changesNotSaved,
           });
         },
@@ -208,6 +234,7 @@ export class StaffingRealizationCoreEditor {
   }
 
   protected cancel(): void {
+    this.editor.store.reset();
     this.location.back();
   }
 }

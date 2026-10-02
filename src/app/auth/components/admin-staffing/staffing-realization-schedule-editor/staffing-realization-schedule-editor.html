@@ -1,179 +1,131 @@
-@let copy = i18n.schedule();
+@let actions = i18n.actions();
+@let summaryCopy = i18n.summary();
 
-<div class="position-relative flex-col-start-center gap-md">
+<div class="position-relative flex-col-start-stretch gap-md">
+  <app-loading-overlay
+    [visible]="isLoading() || isSaving()"
+    [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+  />
 
-    <app-loading-overlay
-      [visible]="isLoading() || isSaving()"
-      [label]="
-        isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading
-      "
-    />
+  @if (loadFailed() && !isLoading()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md" role="alert">
+      <h2 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.toast().loadFailedSummary }}
+      </h2>
+      <p class="m-0">{{ i18n.commonErrors().generic }}</p>
+      <p-button
+        severity="secondary"
+        icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry"
+        (onClick)="loadSchedule()"
+      />
+    </section>
+  } @else if (!isLoading() && realization(); as loadedRealization) {
+    <form
+      class="mg-form flex-col-start-stretch gap-md w-100"
+      [formGroup]="form"
+      (ngSubmit)="saveSchedule()"
+      novalidate
+    >
+      <div class="grid-3-1 grid-items-start gap-md w-100">
+        <div class="flex-col-start-stretch gap-md w-100">
+          <header class="flex-col-start-stretch gap-xs">
+            <h2 class="mg-section__title mg-section__title--md uppercase m-0">
+              {{ i18n.section().title }}
+            </h2>
+            <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+              {{ i18n.section().description }}
+            </p>
+          </header>
 
-    @if (loadFailed() && !isLoading()) {
-      <section
-        class="mg-card flex-col-start-stretch gap-sm p-md w-80 w-100-sm"
-        role="alert"
-      >
-        <h2 class="mg-section__title mg-section__title--sm m-0">
-          {{ copy.toast.loadFailedSummary }}
-        </h2>
-        <p class="m-0">{{ i18n.commonErrors().generic }}</p>
-        <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-button
-            severity="secondary"
-            icon="pi pi-refresh"
-            [label]="i18n.commonActions().retry"
-            (onClick)="loadSchedule()"
-          />
-        </div>
-      </section>
-    } @else if (!isLoading() && realization(); as loadedRealization) {
-      <form
-        class="mg-form flex-col-start-center gap-md w-100"
-        [formGroup]="form"
-        (ngSubmit)="saveDays()"
-        novalidate
-      >
-        <section
-          class="mg-card flex-col-start-stretch gap-md p-md w-80 w-100-sm"
-        >
-          <div class="flex-row-start-center gap-md">
-            <span
-              class="pi pi-calendar square-11 flex-none"
-              aria-hidden="true"
-            ></span>
-            <div class="flex-col-start-stretch gap-xs">
-              <h2 class="mg-section__title mg-section__title--md m-0">
-                {{ copy.section.title }}
-              </h2>
-              <p
-                class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full"
-              >
-                {{ copy.section.description }}
-              </p>
-            </div>
-          </div>
-
-          @if (loadedRealization.type === "travel") {
-            <p-message severity="info" [text]="copy.page.travelHint" />
+          @if (loadedRealization.type === 'travel') {
+            <p-message class="w-100 p-md" severity="warn" icon="pi pi-info-circle">
+              <span class="flex-col-start-stretch gap-xs">
+                <strong class="uppercase">{{ i18n.realizationTypes().travel }}</strong>
+                <span>{{ i18n.page().travelHint }}</span>
+              </span>
+            </p-message>
           }
 
-          <div class="flex-row-start-center">
-            <p-button
-              type="button"
-              severity="secondary"
-              [outlined]="true"
-              icon="pi pi-plus"
-              [label]="i18n.commonActions().add"
-              [disabled]="isSaving()"
-              (onClick)="addDay()"
+          @for (day of days.controls; track day; let dayIndex = $index) {
+            <app-staffing-realization-day-editor
+              [day]="day"
+              [dayIndex]="dayIndex"
+              [isSaving]="isSaving()"
             />
-          </div>
-        </section>
+          }
 
-        <div
-          class="flex-col-start-stretch gap-md w-80 w-100-sm"
-          formArrayName="days"
-        >
-          @for (day of days.controls; track day; let index = $index) {
-            <section
-              class="mg-card flex-col-start-stretch gap-sm p-md w-100"
-              [formGroupName]="index"
-            >
-              <app-item-editor-actions
-                [index]="index"
-                [itemCount]="days.length"
-                [reorderable]="false"
-                [removable]="days.length > 1"
-                (remove)="removeDay(index)"
-              />
-
-              <div
-                class="mg-grid grid-2-cols grid-1-cols-sm gap-md grid-items-start"
-              >
-                <div class="flex-col-start-stretch gap-xs w-100">
-                  <p-iftalabel class="w-100">
-                    <p-datepicker
-                      ngSkipHydration
-                      class="w-100"
-                      inputStyleClass="w-100"
-                      [inputId]="'staffing-realization-day-date-' + index"
-                      formControlName="date"
-                      dateFormat="dd.mm.yy"
-                      appendTo="body"
-                      [showIcon]="true"
-                      [readonlyInput]="true"
-                    />
-                    <label [for]="'staffing-realization-day-date-' + index">
-                      {{ i18n.commonLabels().date }}
-                    </label>
-                  </p-iftalabel>
-                  @if (day.controls.date.touched && day.controls.date.invalid) {
-                    <small class="mg-contact-error">
-                      {{
-                        day.controls.date.hasError("required")
-                          ? i18n.commonForm().required
-                          : i18n.commonForm().invalid
-                      }}
-                    </small>
-                  }
-                </div>
-
-                <div class="flex-col-start-stretch gap-xs w-100">
-                  <p-iftalabel class="w-100">
-                    <p-inputnumber
-                      class="w-100"
-                      inputStyleClass="w-100"
-                      [inputId]="
-                        'staffing-realization-day-required-gm-' + index
-                      "
-                      formControlName="requiredGmCount"
-                      [useGrouping]="false"
-                      [min]="1"
-                      [step]="1"
-                    />
-                    <label
-                      [for]="
-                        'staffing-realization-day-required-gm-' + index
-                      "
-                    >
-                      {{ i18n.staffingLabels().requiredGmCount }}
-                    </label>
-                  </p-iftalabel>
-                  @if (
-                    day.controls.requiredGmCount.touched &&
-                    day.controls.requiredGmCount.invalid
-                  ) {
-                    <small class="mg-contact-error">
-                      {{
-                        day.controls.requiredGmCount.hasError("required")
-                          ? i18n.commonForm().required
-                          : i18n.commonForm().positiveInteger
-                      }}
-                    </small>
-                  }
-                </div>
-              </div>
-            </section>
+          @if (days.touched && days.hasError('required')) {
+            <small class="mg-contact-error">
+              {{ i18n.validation().daysRequired }}
+            </small>
+          }
+          @if (days.touched && days.hasError('duplicateDate')) {
+            <small class="mg-contact-error">
+              {{ i18n.validation().duplicateDate }}
+            </small>
           }
         </div>
 
-        @if (days.touched && days.hasError("duplicateDate")) {
-          <small class="mg-contact-error w-80 w-100-sm">
-            {{ copy.validation.duplicateDate }}
-          </small>
-        }
+        <aside class="mg-card flex-col-start-stretch gap-xs px-md py-sm hide-down-md">
+          <h2 class="mg-section__title mg-section__title--sm uppercase m-0">
+            {{ summaryCopy.title }}
+          </h2>
+          <dl class="flex-col-start-stretch m-0">
+            <div class="flex-row-between-center gap-sm border-bottom py-sm">
+              <dt class="flex-row-start-center gap-sm text-sm">
+                <span class="pi pi-calendar" aria-hidden="true"></span>
+                {{ summaryCopy.dayCount }}
+              </dt>
+              <dd class="font-bold m-0">{{ summary().dayCount }}</dd>
+            </div>
+            <div class="flex-row-between-center gap-sm border-bottom py-sm">
+              <dt class="flex-row-start-center gap-sm text-sm">
+                <span class="pi pi-clone" aria-hidden="true"></span>
+                {{ summaryCopy.slotCount }}
+              </dt>
+              <dd class="font-bold m-0">{{ summary().slotCount }}</dd>
+            </div>
+            <div class="flex-row-between-center gap-sm border-bottom py-sm">
+              <dt class="flex-row-start-center gap-sm text-sm">
+                <span class="pi pi-users" aria-hidden="true"></span>
+                {{ summaryCopy.dailyStaffingPositions }}
+              </dt>
+              <dd class="font-bold m-0">{{ summary().dailyStaffingPositions }}</dd>
+            </div>
+            <div class="flex-row-between-center gap-sm py-sm" [class.error-text]="summary().conflictCount > 0">
+              <dt class="flex-row-start-center gap-sm text-sm">
+                <span class="pi pi-danger-orc" aria-hidden="true"></span>
+                {{ summaryCopy.conflictCount }}
+              </dt>
+              <dd class="font-bold m-0">
+                {{ summary().conflictCount }}
+              </dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
 
-        <div class="flex-row-center-center flex-wrap gap-sm w-80 w-100-sm">
-          <p-button
-            type="submit"
-            severity="success"
-            icon="pi pi-save"
-            [label]="i18n.commonActions().save"
-            [loading]="isSaving()"
-            [disabled]="form.pristine"
-          />
-        </div>
-      </form>
-    }
+      <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
+        <p-button
+          type="button"
+          severity="secondary"
+          size="small"
+          [outlined]="true"
+          icon="pi pi-plus"
+          [label]="actions.addDay"
+          [disabled]="isSaving()"
+          (onClick)="addDay()"
+        />
+        <p-button
+          type="submit"
+          severity="secondary"
+          icon="pi pi-save"
+          [label]="actions.saveDraft"
+          [loading]="isSaving()"
+          [disabled]="form.pristine"
+        />
+      </div>
+    </form>
+  }
 </div>

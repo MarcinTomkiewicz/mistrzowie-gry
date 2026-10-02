@@ -13,7 +13,7 @@
         "description": "Podaj nazwę realizacji oraz krótki opis / informacje operacyjne."
       },
       "initialDays": {
-        "title": "[PH] Termin i zapotrzebowanie",
+        "title": "Termin i zapotrzebowanie",
         "description": "[PH] Wybierz zakres dat realizacji i bazową liczbę Mistrzów Gry wymaganą każdego dnia."
       },
       "venue": {
@@ -37,7 +37,16 @@
       "dateRange": "[PH] Zakres dat realizacji"
     },
     "validation": {
+      "nameRequired": "[PH] Podaj nazwę realizacji.",
+      "timezoneRequired": "[PH] Podaj strefę czasową realizacji.",
+      "typeRequired": "[PH] Wybierz typ realizacji.",
+      "dateRangeRequired": "[PH] Wybierz zakres dat realizacji.",
       "dateRange": "[PH] Wybierz pełny, prawidłowy zakres dat."
+    },
+    "summary": {
+      "dayCount": "[PH] Liczba dni",
+      "requiredGmCount": "[PH] Zapotrzebowanie dzienne",
+      "dailyGmUnit": "MG dziennie"
     },
     "types": {
       "stationary": {
@@ -67,16 +76,48 @@
       "travelHint": "[PH] W realizacji wyjazdowej udział Mistrza Gry obejmuje cały wyjazd."
     },
     "section": {
-      "title": "[PH] Dni realizacji i zapotrzebowanie",
-      "description": "[PH] Dodaj dni realizacji i określ wymaganą liczbę Mistrzów Gry dla każdego dnia."
+      "title": "Dni i sloty",
+      "description": "[PH] Dodaj dni realizacji, określ wymagane zapotrzebowanie MG i skonfiguruj godziny slotów."
     },
+    "labels": {
+      "day": "Dzień"
+    },
+    "fields": {
+      "label": "[PH] Nazwa slotu",
+      "startTime": "[PH] Godzina rozpoczęcia",
+      "endTime": "[PH] Godzina zakończenia"
+    },
+    "actions": {
+      "addDay": "Dodaj dzień",
+      "addSlot": "Dodaj slot",
+      "editDate": "[PH] Edytuj datę dnia",
+      "saveDraft": "Zapisz szkic"
+    },
+    "summary": {
+      "title": "Podsumowanie realizacji",
+      "dayCount": "[PH] Liczba dni",
+      "slotCount": "[PH] Liczba slotów",
+      "dailyStaffingPositions": "[PH] Suma dziennych miejsc obsady",
+      "conflictCount": "[PH] Liczba konfliktów"
+    },
+    "emptySlots": "[PH] Ten dzień nie ma jeszcze slotów.",
     "validation": {
-      "duplicateDate": "[PH] Każdy dzień realizacji musi mieć inną datę."
+      "daysRequired": "[PH] Dodaj co najmniej jeden dzień realizacji.",
+      "dateRequired": "[PH] Wybierz datę dnia realizacji.",
+      "dateInvalid": "[PH] Wybierz prawidłową datę dnia realizacji.",
+      "slotLabelRequired": "[PH] Podaj nazwę slotu.",
+      "slotStartRequired": "[PH] Podaj godzinę rozpoczęcia slotu.",
+      "slotEndRequired": "[PH] Podaj godzinę zakończenia slotu.",
+      "slotStartFormat": "[PH] Podaj godzinę rozpoczęcia slotu w formacie HH:mm (00:00-23:59).",
+      "slotEndFormat": "[PH] Podaj godzinę zakończenia slotu w formacie HH:mm (00:00-23:59).",
+      "duplicateDate": "[PH] Każdy dzień realizacji musi mieć inną datę.",
+      "slotTimeRange": "[PH] Godzina zakończenia musi być późniejsza od godziny rozpoczęcia.",
+      "slotConflict": "[PH] Konflikt godzin"
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować dni realizacji",
-      "saveSuccessSummary": "[PH] Dni realizacji zapisane",
-      "saveFailedSummary": "[PH] Nie udało się zapisać dni realizacji"
+      "loadFailedSummary": "[PH] Nie udało się załadować harmonogramu realizacji",
+      "saveSuccessSummary": "[PH] Harmonogram realizacji zapisany",
+      "saveFailedSummary": "[PH] Nie udało się zapisać harmonogramu realizacji"
     }
   }
 }

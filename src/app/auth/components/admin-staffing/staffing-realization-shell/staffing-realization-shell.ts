@@ -1,8 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { map } from 'rxjs';
 
 import { buildSiteUrl } from '../../../../core/config/site';
+import { StaffingRealizationEditorStore } from '../../../../core/stores/staffing/staffing-realization-editor-store';
 import type { RouteTabDefinition } from '../../../../core/types/route-tab';
 import { RouteTabShell } from '../../../common/route-tab-shell/route-tab-shell';
 import { createStaffingRealizationShellI18n } from './staffing-realization-shell.i18n';
@@ -15,16 +18,18 @@ import { createStaffingRealizationShellI18n } from './staffing-realization-shell
   providers: [provideTranslocoScope('adminStaffing')],
 })
 export class StaffingRealizationShell {
-  private readonly realizationId =
-    inject(ActivatedRoute).snapshot.paramMap.get('realizationId') ?? '';
+  private readonly realizationId = toSignal(
+    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('realizationId') ?? '')),
+    { requireSync: true },
+  );
 
   protected readonly i18n = createStaffingRealizationShellI18n();
-  protected readonly pageUrl = buildSiteUrl(
-    `/admin/staffing/${this.realizationId}`,
-  );
+  protected readonly pageUrl = computed(() => buildSiteUrl(
+    `/admin/staffing/${this.realizationId()}`,
+  ));
   protected readonly tabs = computed<readonly RouteTabDefinition[]>(() => {
-    const labels = this.i18n.shell().tabs;
-    const realizationPath = `/admin/staffing/${this.realizationId}`;
+    const labels = this.i18n.tabLabels();
+    const realizationPath = `/admin/staffing/${this.realizationId()}`;
 
     return [
       {
@@ -41,4 +46,9 @@ export class StaffingRealizationShell {
       },
     ];
   });
+
+  constructor() {
+    const store = inject(StaffingRealizationEditorStore);
+    inject(DestroyRef).onDestroy(() => store.reset());
+  }
 }

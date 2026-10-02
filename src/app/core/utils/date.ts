@@ -41,6 +41,14 @@ export function parseIsoDate(value: string | null | undefined): Date | null {
     : null;
 }
 
+export function isValidDate(value: unknown): value is Date {
+  return value instanceof Date && !Number.isNaN(value.getTime());
+}
+
+export function isValidIsoDate(value: unknown): value is string {
+  return typeof value === 'string' && parseIsoDate(value) !== null;
+}
+
 export function compareDatesByDay(left: Date, right: Date): number {
   return (
     new Date(left.getFullYear(), left.getMonth(), left.getDate()).getTime() -
@@ -163,7 +171,7 @@ export function formatTimestampLabel(
 
   const date = new Date(timestamp);
 
-  if (Number.isNaN(date.getTime())) {
+  if (!isValidDate(date)) {
     return null;
   }
 
