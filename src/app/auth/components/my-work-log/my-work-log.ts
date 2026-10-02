@@ -128,6 +128,10 @@ export class MyWorkLog {
   protected readonly rows = computed<IUserWorkLogRowVm[]>(() =>
     createWorkLogRows(this.monthScope(), this.draftDays()),
   );
+  protected readonly trackRowByDate = (
+    _index: number,
+    row: IUserWorkLogRowVm,
+  ): string => row.date;
   protected readonly totalHours = computed(() =>
     getWorkLogTotalHours(this.draftDays()),
   );

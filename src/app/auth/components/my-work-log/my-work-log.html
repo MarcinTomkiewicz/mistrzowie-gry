@@ -66,6 +66,7 @@
     <div class="w-100">
       <p-table
         [value]="rows()"
+        [rowTrackBy]="trackRowByDate"
         dataKey="date"
         class="w-100"
         tableStyleClass="mg-responsive-table"
