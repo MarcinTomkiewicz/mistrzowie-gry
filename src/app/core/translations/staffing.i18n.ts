@@ -2,6 +2,9 @@ import type {
   StaffingLabelsTranslations,
   StaffingRealizationStatusTranslations,
   StaffingRealizationTypeTranslations,
+  StaffingReimbursementModeTranslations,
+  StaffingTransportModeTranslations,
+  StaffingWorkTimeScopeTranslations,
 } from '../types/i18n/staffing';
 import { createScopedSectionsI18n } from './scoped.i18n';
 
@@ -12,9 +15,15 @@ export function createStaffingI18n() {
     realizationStatuses: StaffingRealizationStatusTranslations;
     realizationTypes: StaffingRealizationTypeTranslations;
     staffingLabels: StaffingLabelsTranslations;
+    transportModes: StaffingTransportModeTranslations;
+    reimbursementModes: StaffingReimbursementModeTranslations;
+    workTimeScopes: StaffingWorkTimeScopeTranslations;
   }>(STAFFING_SCOPE, {
     realizationStatuses: 'realizationStatuses',
     realizationTypes: 'realizationTypes',
     staffingLabels: 'labels',
+    transportModes: 'transportModes',
+    reimbursementModes: 'reimbursementModes',
+    workTimeScopes: 'workTimeScopes',
   });
 }

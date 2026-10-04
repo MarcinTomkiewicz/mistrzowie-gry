@@ -4,6 +4,7 @@ import { AdminStaffingRealizationCore } from '../../interfaces/admin-staffing-re
 import {
   StaffingRealizationCoreDraft,
   StaffingRealizationDayDraft,
+  StaffingRealizationTravelTermsDraft,
 } from '../../types/staffing-realization-editor-draft';
 
 @Injectable({ providedIn: 'root' })
@@ -14,16 +15,22 @@ export class StaffingRealizationEditorStore {
   private readonly coreSource = signal<StaffingRealizationCoreDraft | null>(null);
   private readonly scheduleBaseline = signal<readonly StaffingRealizationDayDraft[] | null>(null);
   private readonly scheduleSource = signal<readonly StaffingRealizationDayDraft[] | null>(null);
+  private readonly travelTermsBaseline = signal<StaffingRealizationTravelTermsDraft | null>(null);
+  private readonly travelTermsSource = signal<StaffingRealizationTravelTermsDraft | null>(null);
 
   readonly realizationId = this.realizationIdSource.asReadonly();
   readonly realization = this.realizationSource.asReadonly();
   readonly coreDraft = this.coreSource.asReadonly();
   readonly scheduleDraft = this.scheduleSource.asReadonly();
+  readonly travelTermsDraft = this.travelTermsSource.asReadonly();
   readonly hasCoreChanges = computed(() =>
     JSON.stringify(this.coreBaseline()) !== JSON.stringify(this.coreDraft()),
   );
   readonly hasScheduleChanges = computed(() =>
     JSON.stringify(this.scheduleBaseline()) !== JSON.stringify(this.scheduleDraft()),
+  );
+  readonly hasTravelTermsChanges = computed(() =>
+    JSON.stringify(this.travelTermsBaseline()) !== JSON.stringify(this.travelTermsDraft()),
   );
 
   open(realizationId: string): void {
@@ -57,6 +64,20 @@ export class StaffingRealizationEditorStore {
     this.scheduleSource.set(draft);
   }
 
+  hydrateTravelTerms(draft: StaffingRealizationTravelTermsDraft): void {
+    this.travelTermsBaseline.set(draft);
+    this.travelTermsSource.set(draft);
+  }
+
+  setTravelTermsDraft(draft: StaffingRealizationTravelTermsDraft): void {
+    this.travelTermsSource.set(draft);
+  }
+
+  clearTravelTerms(): void {
+    this.travelTermsBaseline.set(null);
+    this.travelTermsSource.set(null);
+  }
+
   reset(): void {
     this.realizationIdSource.set(null);
     this.realizationSource.set(null);
@@ -64,5 +85,6 @@ export class StaffingRealizationEditorStore {
     this.coreSource.set(null);
     this.scheduleBaseline.set(null);
     this.scheduleSource.set(null);
+    this.clearTravelTerms();
   }
 }

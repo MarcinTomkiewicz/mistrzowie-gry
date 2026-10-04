@@ -18,6 +18,7 @@ import { createStaffingRealizationShellI18n } from './staffing-realization-shell
   providers: [provideTranslocoScope('adminStaffing')],
 })
 export class StaffingRealizationShell {
+  private readonly store = inject(StaffingRealizationEditorStore);
   private readonly realizationId = toSignal(
     inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('realizationId') ?? '')),
     { requireSync: true },
@@ -31,7 +32,7 @@ export class StaffingRealizationShell {
     const labels = this.i18n.tabLabels();
     const realizationPath = `/admin/staffing/${this.realizationId()}`;
 
-    return [
+    const tabs: RouteTabDefinition[] = [
       {
         id: 'core',
         label: labels.core,
@@ -45,10 +46,20 @@ export class StaffingRealizationShell {
         path: `${realizationPath}/schedule`,
       },
     ];
+
+    if (this.store.coreDraft()?.type === 'travel') {
+      tabs.push({
+        id: 'travel-terms',
+        label: labels.travelTerms,
+        icon: 'pi pi-bindle',
+        path: `${realizationPath}/travel-terms`,
+      });
+    }
+
+    return tabs;
   });
 
   constructor() {
-    const store = inject(StaffingRealizationEditorStore);
-    inject(DestroyRef).onDestroy(() => store.reset());
+    inject(DestroyRef).onDestroy(() => this.store.reset());
   }
 }

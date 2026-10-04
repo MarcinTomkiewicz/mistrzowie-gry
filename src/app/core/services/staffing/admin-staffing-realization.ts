@@ -10,6 +10,10 @@ import {
   SaveAdminStaffingScheduleDayInput,
   UpdateAdminStaffingRealizationCorePayload,
 } from '../../interfaces/admin-staffing-realization';
+import {
+  AdminStaffingTravelTerms,
+  SaveAdminStaffingTravelTermsPayload,
+} from '../../interfaces/admin-staffing-travel-terms';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +51,19 @@ export class AdminStaffingRealization {
       {
         p_realization_id: realizationId,
         p_days: days,
+      },
+    );
+  }
+
+  saveTravelTerms(
+    realizationId: string,
+    payload: SaveAdminStaffingTravelTermsPayload,
+  ): Observable<AdminStaffingTravelTerms> {
+    return this.backend.rpc<AdminStaffingTravelTerms>(
+      STAFFING_REALIZATION_RPC.saveAdminTravelTerms,
+      {
+        p_realization_id: realizationId,
+        p_payload: payload,
       },
     );
   }

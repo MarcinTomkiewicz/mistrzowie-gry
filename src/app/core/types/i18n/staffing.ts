@@ -1,6 +1,9 @@
 import type {
   StaffingRealizationStatus,
   StaffingRealizationType,
+  StaffingReimbursementMode,
+  StaffingTransportMode,
+  StaffingWorkTimeScope,
 } from '../staffing-realization';
 
 export type StaffingRealizationStatusTranslations = Record<
@@ -16,3 +19,7 @@ export type StaffingRealizationTypeTranslations = Record<
 export type StaffingLabelsTranslations = {
   requiredGmCount: string;
 };
+
+export type StaffingTransportModeTranslations = Record<StaffingTransportMode, string>;
+export type StaffingReimbursementModeTranslations = Record<StaffingReimbursementMode, string>;
+export type StaffingWorkTimeScopeTranslations = Record<StaffingWorkTimeScope, string>;

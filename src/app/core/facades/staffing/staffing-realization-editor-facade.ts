@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { mapStaffingRealizationCoreToDraft } from '../../factories/staffing-realization-core-form.factory';
 import { mapStaffingRealizationScheduleToDraft } from '../../factories/staffing-realization-days-form.factory';
+import { mapStaffingTravelTermsToDraft } from '../../factories/staffing-realization-travel-terms-form.factory';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
@@ -11,6 +12,10 @@ import {
   SaveAdminStaffingScheduleDayInput,
   UpdateAdminStaffingRealizationCorePayload,
 } from '../../interfaces/admin-staffing-realization';
+import {
+  AdminStaffingTravelTerms,
+  SaveAdminStaffingTravelTermsPayload,
+} from '../../interfaces/admin-staffing-travel-terms';
 import { AdminStaffingRealizationRead } from '../../reads/staffing/admin-staffing-realization-read';
 import { AdminStaffingRealization } from '../../services/staffing/admin-staffing-realization';
 import { StaffingRealizationEditorStore } from '../../stores/staffing/staffing-realization-editor-store';
@@ -57,11 +62,36 @@ export class StaffingRealizationEditorFacade {
     );
   }
 
+  loadTravelTerms(realizationId: string): Observable<void> {
+    this.store.open(realizationId);
+
+    const coreRequest: Observable<AdminStaffingRealizationCore | null> = this.store.coreDraft() === null
+      ? this.read.getDetail(realizationId)
+      : of(null);
+
+    return coreRequest.pipe(
+      tap((core) => {
+        if (core) this.hydrateCore(core);
+      }),
+      switchMap(() => {
+        if (this.store.travelTermsDraft() !== null) return of(void 0);
+
+        return this.read.getTravelTerms(realizationId).pipe(
+          tap((terms) => this.store.hydrateTravelTerms(mapStaffingTravelTermsToDraft(terms))),
+          map(() => void 0),
+        );
+      }),
+    );
+  }
+
   update(realizationId: string, payload: UpdateAdminStaffingRealizationCorePayload): Observable<AdminStaffingRealizationCore> {
     return this.write.update(realizationId, payload).pipe(
       tap((realization) => {
         if (this.store.realizationId() === realizationId) {
           this.hydrateCore(realization);
+          if (realization.type === 'stationary') {
+            this.store.clearTravelTerms();
+          }
         }
       }),
     );
@@ -72,6 +102,19 @@ export class StaffingRealizationEditorFacade {
       tap((schedule) => {
         if (this.store.realizationId() === realizationId) {
           this.hydrateSchedule(schedule);
+        }
+      }),
+    );
+  }
+
+  saveTravelTerms(
+    realizationId: string,
+    payload: SaveAdminStaffingTravelTermsPayload,
+  ): Observable<AdminStaffingTravelTerms> {
+    return this.write.saveTravelTerms(realizationId, payload).pipe(
+      tap((terms) => {
+        if (this.store.realizationId() === realizationId) {
+          this.store.hydrateTravelTerms(mapStaffingTravelTermsToDraft(terms));
         }
       }),
     );

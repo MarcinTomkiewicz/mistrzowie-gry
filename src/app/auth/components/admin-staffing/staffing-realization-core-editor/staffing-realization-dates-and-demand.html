@@ -20,7 +20,7 @@
   @if (isNew()) {
     <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md grid-items-start">
       <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
+        <p-floatlabel variant="on" class="w-100">
           <p-datepicker
             ngSkipHydration
             class="w-100"
@@ -36,7 +36,7 @@
           <label for="staffing-realization-date-range">
             {{ fields.dateRange }}
           </label>
-        </p-iftalabel>
+        </p-floatlabel>
         @if (
           initialDaysForm().controls.dateRange.touched &&
           initialDaysForm().controls.dateRange.invalid
@@ -48,7 +48,7 @@
       </div>
 
       <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
+        <p-floatlabel variant="on" class="w-100">
           <p-inputnumber
             class="w-100"
             inputStyleClass="w-100"
@@ -61,7 +61,7 @@
           <label for="staffing-realization-required-gm-count">
             {{ i18n.staffingLabels().requiredGmCount }}
           </label>
-        </p-iftalabel>
+        </p-floatlabel>
         @if (
           initialDaysForm().controls.requiredGmCount.touched &&
           initialDaysForm().controls.requiredGmCount.invalid

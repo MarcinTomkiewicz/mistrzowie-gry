@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import {
   AdminStaffingEditorCopy,
   AdminStaffingScheduleEditorCopy,
+  AdminStaffingTravelTermsEditorCopy,
 } from '../../../core/types/i18n/admin-staffing';
 import { CommonFormTranslations } from '../../../core/types/i18n/common';
 import {
@@ -10,11 +11,13 @@ import {
   StaffingRealizationDaysForm,
   StaffingRealizationInitialDaysForm,
   StaffingRealizationSlotForm,
+  StaffingRealizationTravelTermsForm,
 } from '../../../core/types/staffing-realization-form';
 import { joinTextParts } from '../../../core/utils/normalize-text';
 
 type CoreValidationCopy = AdminStaffingEditorCopy['validation'];
 type ScheduleValidationCopy = AdminStaffingScheduleEditorCopy['validation'];
+type TravelTermsValidationCopy = Pick<AdminStaffingTravelTermsEditorCopy, 'fields' | 'validation'>;
 
 export function getStaffingDemandError(
   control: FormControl<number>,
@@ -111,4 +114,39 @@ export function getStaffingScheduleFormError(
   }
 
   return days.hasError('duplicateDate') ? copy.duplicateDate : null;
+}
+
+export function getStaffingTravelTermsFieldError(
+  form: StaffingRealizationTravelTermsForm,
+  field: keyof StaffingRealizationTravelTermsForm['controls'],
+  copy: TravelTermsValidationCopy,
+  commonForm: CommonFormTranslations,
+): string | null {
+  const control = form.controls[field];
+  if (!control.invalid) return null;
+
+  const isNightCount = field === 'lodgingNights';
+  const message = control.hasError('required') || control.hasError('requiredTrimmed')
+    ? commonForm.required
+    : isNightCount ? commonForm.positiveInteger : copy.validation.positiveNumber;
+  return joinTextParts([
+    copy.fields[field],
+    message,
+  ], ': ');
+}
+
+export function getStaffingTravelTermsFormError(
+  form: StaffingRealizationTravelTermsForm,
+  copy: TravelTermsValidationCopy,
+  commonForm: CommonFormTranslations,
+): string | null {
+  for (const field of [
+    'mileageRatePlnPerKm', 'lodgingNights',
+  ] as const) {
+    const error = getStaffingTravelTermsFieldError(form, field, copy, commonForm);
+    if (error) return error;
+  }
+
+  return getStaffingTravelTermsFieldError(form, 'workTimeScope', copy, commonForm) ??
+    getStaffingTravelTermsFieldError(form, 'workTimeNote', copy, commonForm);
 }

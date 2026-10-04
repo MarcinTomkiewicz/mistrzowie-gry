@@ -3,6 +3,7 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import {
   StaffingRealizationCoreDraft,
   StaffingRealizationSlotDraft,
+  StaffingRealizationTravelTermsDraft,
 } from './staffing-realization-editor-draft';
 
 export type StaffingRealizationCoreForm = FormGroup<{
@@ -27,4 +28,8 @@ export type StaffingRealizationSlotForm = FormGroup<{
 
 export type StaffingRealizationDaysForm = FormGroup<{
   days: FormArray<StaffingRealizationDayForm>;
+}>;
+
+export type StaffingRealizationTravelTermsForm = FormGroup<{
+  [K in keyof StaffingRealizationTravelTermsDraft]: FormControl<StaffingRealizationTravelTermsDraft[K]>;
 }>;

@@ -12,5 +12,21 @@
   },
   "labels": {
     "requiredGmCount": "Wymagana liczba MG"
+  },
+  "transportModes": {
+    "organizer_provided": "[PH] Transport zapewnia organizator",
+    "self_arranged": "[PH] Transport we własnym zakresie",
+    "mixed": "[PH] Transport mieszany"
+  },
+  "reimbursementModes": {
+    "none": "[PH] Brak zwrotu kosztów",
+    "actual_cost": "[PH] Zwrot poniesionych kosztów",
+    "mileage": "[PH] Kilometrówka",
+    "custom": "[PH] Inne zasady zwrotu"
+  },
+  "workTimeScopes": {
+    "on_site_only": "[PH] Praca na miejscu (bez czasu przejazdu)",
+    "including_travel": "[PH] Praca na miejscu i czas przejazdu",
+    "custom": "[PH] Niestandardowy zakres czasu pracy"
   }
 }

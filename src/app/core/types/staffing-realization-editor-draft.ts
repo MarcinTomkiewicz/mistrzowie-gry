@@ -1,5 +1,6 @@
 import { SaveAdminStaffingScheduleSlotInput } from '../interfaces/admin-staffing-realization';
-import { StaffingRealizationType } from './staffing-realization';
+import { SaveAdminStaffingTravelTermsPayload } from '../interfaces/admin-staffing-travel-terms';
+import { StaffingRealizationType, StaffingWorkTimeScope } from './staffing-realization';
 
 export interface StaffingRealizationCoreDraft {
   name: string;
@@ -24,3 +25,17 @@ export interface StaffingRealizationDayDraft {
   requiredGmCount: number;
   slots: StaffingRealizationSlotDraft[];
 }
+
+type StaffingTravelTermsTextField =
+  | 'transportNote'
+  | 'reimbursementNote'
+  | 'lodgingNote'
+  | 'workTimeNote'
+  | 'travelNote';
+
+export type StaffingRealizationTravelTermsDraft = Omit<
+  SaveAdminStaffingTravelTermsPayload,
+  StaffingTravelTermsTextField | 'workTimeScope'
+> & Record<StaffingTravelTermsTextField, string> & {
+  workTimeScope: StaffingWorkTimeScope | null;
+};

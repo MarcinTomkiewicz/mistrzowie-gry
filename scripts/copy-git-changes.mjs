@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -81,18 +81,42 @@ function main() {
 
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
+  const shouldArchive = filesToCopy.length > 20;
+  const copyDirectory = shouldArchive
+    ? mkdtempSync(join(OUTPUT_DIR, 'git-diff-'))
+    : OUTPUT_DIR;
   const usedNames = new Set();
 
-  for (const filePath of filesToCopy) {
-    const outputName = toSafeOutputName(filePath, usedNames);
-    const outputPath = join(OUTPUT_DIR, outputName);
+  try {
+    for (const filePath of filesToCopy) {
+      const outputName = toSafeOutputName(filePath, usedNames);
+      const outputPath = join(copyDirectory, outputName);
 
-    copyFileSync(filePath, outputPath);
+      copyFileSync(filePath, outputPath);
 
-    console.log(`${filePath} -> ${relative(process.cwd(), outputPath)}`);
+      console.log(`${filePath} -> ${relative(process.cwd(), outputPath)}`);
+    }
+
+    if (shouldArchive) {
+      execFileSync('powershell.exe', [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        'Compress-Archive -Path * -DestinationPath ../git-diff.zip -ErrorAction Stop',
+      ], {
+        cwd: copyDirectory,
+        stdio: 'inherit',
+      });
+    }
+  } finally {
+    if (shouldArchive) {
+      rmSync(copyDirectory, { recursive: true, force: true });
+    }
   }
 
-  console.log(`Copied ${filesToCopy.length} file(s) to ${OUTPUT_DIR}`);
+  console.log(shouldArchive
+    ? `Archived ${filesToCopy.length} file(s) to ${join(OUTPUT_DIR, 'git-diff.zip')}`
+    : `Copied ${filesToCopy.length} file(s) to ${OUTPUT_DIR}`);
 }
 
 main();

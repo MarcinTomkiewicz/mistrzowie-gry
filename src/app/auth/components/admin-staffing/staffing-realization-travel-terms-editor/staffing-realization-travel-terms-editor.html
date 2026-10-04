@@ -1,0 +1,151 @@
+@let fields = i18n.fields();
+@let sections = i18n.sections();
+@let page = i18n.page();
+
+<div class="position-relative flex-col-start-center gap-md w-100 min-w-0">
+  <app-loading-overlay
+    [visible]="isLoading() || isSaving()"
+    [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+  />
+
+  @if (loadFailed() && !isLoading()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+      <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.toast().loadFailedSummary }}</h2>
+      <p class="m-0">{{ i18n.commonErrors().generic }}</p>
+      <p-button severity="secondary" icon="pi pi-refresh" [label]="i18n.commonActions().retry" (onClick)="loadTravelTerms()" />
+    </section>
+  } @else if (!isLoading() && !isTravel()) {
+    <p-message severity="info" icon="pi pi-info-circle" class="w-100">
+      {{ page.stationaryHint }}
+    </p-message>
+  } @else if (!isLoading()) {
+    <form class="mg-form flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <header class="flex-row-start-center gap-md min-w-0">
+        <span class="pi pi-bindle square-11 flex-none" aria-hidden="true"></span>
+        <div class="flex-col-start-stretch gap-xs min-w-0">
+          <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.title() }}</h2>
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">{{ page.description }}</p>
+        </div>
+      </header>
+
+      @if (!canSave()) {
+        <p-message severity="warn" icon="pi pi-info-circle">{{ page.saveCoreTypeHint }}</p-message>
+      }
+
+      <section class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ sections.logistics }}</h3>
+        <div class="flex-row-start-end flex-wrap gap-sm min-w-0">
+          <p-select class="w-px-250 w-100-sm min-w-0" inputId="staffing-travel-transport-mode" formControlName="transportMode"
+            size="small" optionLabel="label" optionValue="value" appendTo="body" [options]="transportOptions()" [showClear]="true"
+            [placeholder]="fields.transportMode" [ariaLabel]="fields.transportMode" />
+          <p-select class="w-px-250 w-100-sm min-w-0" inputId="staffing-travel-reimbursement-mode" formControlName="reimbursementMode"
+            size="small" optionLabel="label" optionValue="value" appendTo="body" [options]="reimbursementOptions()" [showClear]="true"
+            [placeholder]="fields.reimbursementMode" [ariaLabel]="fields.reimbursementMode" />
+          @if (form.controls.reimbursementMode.value === 'mileage') {
+            <div class="flex-col-start-start gap-xs min-w-0">
+              <p-floatlabel variant="on" class="w-px-200 max-w-full min-w-0">
+                <p-inputnumber class="w-100 min-w-0" inputClass="w-100 min-w-0"
+                inputId="staffing-travel-mileage" formControlName="mileageRatePlnPerKm"
+                size="small" [useGrouping]="false" [maxFractionDigits]="2" />
+                <label for="staffing-travel-mileage">{{ fields.mileageRatePlnPerKm }}</label>
+              </p-floatlabel>
+              @if (fieldError('mileageRatePlnPerKm'); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mg-grid grid-1-cols-sm gap-sm min-w-0" [class.grid-2-cols]="form.controls.reimbursementMode.value !== 'none'">
+          <p-floatlabel variant="on" class="w-100 min-w-0">
+            <textarea pTextarea class="w-100 min-w-0" id="staffing-travel-transport-note" formControlName="transportNote" rows="2"></textarea>
+            <label for="staffing-travel-transport-note">{{ fields.transportNote }}</label>
+          </p-floatlabel>
+          @if (form.controls.reimbursementMode.value !== 'none') {
+            <p-floatlabel variant="on" class="w-100 min-w-0">
+              <textarea pTextarea class="w-100 min-w-0" id="staffing-travel-reimbursement-note" formControlName="reimbursementNote" rows="2"></textarea>
+              <label for="staffing-travel-reimbursement-note">{{ fields.reimbursementNote }}</label>
+            </p-floatlabel>
+          }
+        </div>
+
+        <div class="flex-row-start-center flex-wrap gap-md min-w-0 border-top pt-sm">
+          <div class="flex-row-start-center gap-sm min-w-0">
+            <p-checkbox inputId="staffing-travel-lodging-provided" formControlName="lodgingProvided" [binary]="true" />
+            <label for="staffing-travel-lodging-provided">{{ fields.lodgingProvided }}</label>
+          </div>
+          @if (form.controls.lodgingProvided.value) {
+            <div class="flex-col-start-start gap-xs min-w-0">
+              <p-floatlabel variant="on" class="w-px-150 max-w-full min-w-0">
+                <p-inputnumber class="w-100 min-w-0" inputClass="w-100 min-w-0"
+                inputId="staffing-travel-lodging-nights" formControlName="lodgingNights"
+                size="small" [min]="1" [step]="1" [useGrouping]="false" [maxFractionDigits]="0" />
+                <label for="staffing-travel-lodging-nights">{{ fields.lodgingNights }}</label>
+              </p-floatlabel>
+              @if (fieldError('lodgingNights'); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+        </div>
+        <p-floatlabel variant="on" class="w-100 min-w-0">
+          <textarea pTextarea class="w-100 min-w-0" id="staffing-travel-lodging-note" formControlName="lodgingNote" rows="2"></textarea>
+          <label for="staffing-travel-lodging-note">{{ fields.lodgingNote }}</label>
+        </p-floatlabel>
+
+        <div class="flex-row-start-center flex-wrap gap-md min-w-0 border-top pt-sm">
+          <div class="flex-row-start-center gap-sm">
+            <p-checkbox inputId="staffing-travel-breakfast" formControlName="breakfastProvided" [binary]="true" />
+            <label for="staffing-travel-breakfast">{{ fields.breakfastProvided }}</label>
+          </div>
+          <div class="flex-row-start-center gap-sm">
+            <p-checkbox inputId="staffing-travel-lunch" formControlName="lunchProvided" [binary]="true" />
+            <label for="staffing-travel-lunch">{{ fields.lunchProvided }}</label>
+          </div>
+          <div class="flex-row-start-center gap-sm">
+            <p-checkbox inputId="staffing-travel-dinner" formControlName="dinnerProvided" [binary]="true" />
+            <label for="staffing-travel-dinner">{{ fields.dinnerProvided }}</label>
+          </div>
+          <div class="flex-row-start-center gap-sm">
+            <p-checkbox inputId="staffing-travel-meal-allowance" formControlName="mealAllowanceApplicable" [binary]="true" />
+            <label for="staffing-travel-meal-allowance">{{ fields.mealAllowanceApplicable }}</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ sections.workTime }}</h3>
+        <div class="flex-col-start-stretch gap-xs w-px-350 w-100-sm min-w-0">
+          <p-select class="w-100 min-w-0" inputId="staffing-travel-work-time-scope" formControlName="workTimeScope"
+            size="small" optionLabel="label" optionValue="value" appendTo="body" [options]="workTimeOptions()" [showClear]="true"
+            [placeholder]="fields.workTimeScope" [ariaLabel]="fields.workTimeScope" />
+          @if (fieldError('workTimeScope'); as error) {
+            <small class="mg-contact-error">{{ error }}</small>
+          }
+        </div>
+        @if (form.controls.workTimeScope.value === 'custom') {
+          <p-floatlabel variant="on" class="w-100 min-w-0">
+            <textarea pTextarea class="w-100 min-w-0" id="staffing-travel-work-time-note" formControlName="workTimeNote" rows="2"></textarea>
+            <label for="staffing-travel-work-time-note">{{ fields.workTimeNote }}</label>
+          </p-floatlabel>
+          @if (fieldError('workTimeNote'); as error) {
+            <small class="mg-contact-error">{{ error }}</small>
+          }
+        }
+      </section>
+
+      <section class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ sections.additionalNotes }}</h3>
+        <p-floatlabel variant="on" class="w-100 min-w-0">
+          <textarea pTextarea class="w-100 min-w-0" id="staffing-travel-note" formControlName="travelNote" rows="2"></textarea>
+          <label for="staffing-travel-note">{{ fields.travelNote }}</label>
+        </p-floatlabel>
+      </section>
+
+      <div class="flex-row-end-center gap-sm border-top pt-md">
+        <p-button type="submit" severity="success" icon="pi pi-save" [label]="i18n.commonActions().save"
+          [loading]="isSaving()" [disabled]="form.pristine || !canSave()" />
+      </div>
+    </form>
+  }
+</div>

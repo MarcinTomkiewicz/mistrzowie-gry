@@ -1,4 +1,5 @@
 import type { StaffingRealizationType } from '../staffing-realization';
+import type { StaffingRealizationTravelTermsDraft } from '../staffing-realization-editor-draft';
 
 export type AdminStaffingEditorCopy = {
   page: {
@@ -55,6 +56,7 @@ export type AdminStaffingShellCopy = {
   tabs: {
     core: string;
     schedule: string;
+    travelTerms: string;
   };
 };
 
@@ -97,6 +99,28 @@ export type AdminStaffingScheduleEditorCopy = {
     duplicateDate: string;
     slotTimeRange: string;
     slotConflict: string;
+  };
+  toast: {
+    loadFailedSummary: string;
+    saveSuccessSummary: string;
+    saveFailedSummary: string;
+  };
+};
+
+export type AdminStaffingTravelTermsEditorCopy = {
+  page: {
+    description: string;
+    stationaryHint: string;
+    saveCoreTypeHint: string;
+  };
+  sections: {
+    logistics: string;
+    workTime: string;
+    additionalNotes: string;
+  };
+  fields: Record<keyof StaffingRealizationTravelTermsDraft, string>;
+  validation: {
+    positiveNumber: string;
   };
   toast: {
     loadFailedSummary: string;

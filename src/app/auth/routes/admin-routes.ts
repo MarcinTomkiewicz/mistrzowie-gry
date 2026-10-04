@@ -60,6 +60,10 @@ const loaders = {
     import(
       '../components/admin-staffing/staffing-realization-schedule-editor/staffing-realization-schedule-editor'
     ).then((m) => m.StaffingRealizationScheduleEditor),
+  staffingRealizationTravelTermsEditor: () =>
+    import(
+      '../components/admin-staffing/staffing-realization-travel-terms-editor/staffing-realization-travel-terms-editor'
+    ).then((m) => m.StaffingRealizationTravelTermsEditor),
   gmAvailability: () =>
     import(
       '../components/gm-availability-overview/gm-availability-overview'
@@ -127,6 +131,10 @@ const adminChildren: Routes = [
       {
         path: 'schedule',
         loadComponent: loaders.staffingRealizationScheduleEditor,
+      },
+      {
+        path: 'travel-terms',
+        loadComponent: loaders.staffingRealizationTravelTermsEditor,
       },
     ],
   },

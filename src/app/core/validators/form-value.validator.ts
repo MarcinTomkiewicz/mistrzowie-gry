@@ -14,6 +14,17 @@ export function integerValidator(): ValidatorFn {
   };
 }
 
+export function positiveNumberValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value: unknown = control.value;
+
+    return value === null || value === '' ||
+      (typeof value === 'number' && Number.isFinite(value) && value > 0)
+      ? null
+      : { positiveNumber: true };
+  };
+}
+
 export function validDateValidator(
   getTimeZone?: () => string,
 ): ValidatorFn {

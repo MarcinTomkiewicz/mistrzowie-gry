@@ -2,7 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { DatePickerModule } from 'primeng/datepicker';
-import { IftaLabelModule } from 'primeng/iftalabel';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 
 import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
@@ -25,7 +25,7 @@ import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-
   imports: [
     ReactiveFormsModule,
     DatePickerModule,
-    IftaLabelModule,
+    FloatLabelModule,
     InputNumberModule,
   ],
   templateUrl: './staffing-realization-dates-and-demand.html',

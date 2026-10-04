@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { IftaLabelModule } from 'primeng/iftalabel';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -43,7 +43,7 @@ import { StaffingRealizationDatesAndDemand } from './staffing-realization-dates-
   imports: [
     ReactiveFormsModule,
     ButtonModule,
-    IftaLabelModule,
+    FloatLabelModule,
     InputTextModule,
     SelectModule,
     TextareaModule,

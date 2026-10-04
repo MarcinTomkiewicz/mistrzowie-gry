@@ -68,7 +68,8 @@
   "shell": {
     "tabs": {
       "core": "Dane podstawowe",
-      "schedule": "Dni i sloty"
+      "schedule": "Dni i sloty",
+      "travelTerms": "[PH] Warunki wyjazdu"
     }
   },
   "schedule": {
@@ -118,6 +119,43 @@
       "loadFailedSummary": "[PH] Nie udało się załadować harmonogramu realizacji",
       "saveSuccessSummary": "[PH] Harmonogram realizacji zapisany",
       "saveFailedSummary": "[PH] Nie udało się zapisać harmonogramu realizacji"
+    }
+  },
+  "travelTerms": {
+    "page": {
+      "description": "[PH] Określ warunki transportu, pobytu i czasu pracy potrzebne Mistrzom Gry do podjęcia decyzji o udziale w całym wyjeździe.",
+      "stationaryHint": "[PH] Warunki wyjazdu są dostępne tylko dla realizacji wyjazdowej.",
+      "saveCoreTypeHint": "[PH] Przed zapisem warunków wyjazdu zapisz typ Wyjazdowa w Danych podstawowych."
+    },
+    "sections": {
+      "logistics": "[PH] Transport, nocleg i wyżywienie",
+      "workTime": "Czas pracy",
+      "additionalNotes": "[PH] Dodatkowe uwagi"
+    },
+    "fields": {
+      "transportMode": "[PH] Organizacja transportu",
+      "transportNote": "[PH] Szczegóły transportu",
+      "reimbursementMode": "[PH] Zasady zwrotu kosztów",
+      "mileageRatePlnPerKm": "[PH] Stawka kilometrówki (PLN/km)",
+      "reimbursementNote": "[PH] Dodatkowe zasady zwrotu kosztów",
+      "lodgingProvided": "[PH] Organizator zapewnia nocleg",
+      "lodgingNights": "Liczba noclegów",
+      "lodgingNote": "[PH] Informacje o noclegu",
+      "breakfastProvided": "Śniadanie",
+      "lunchProvided": "Obiad",
+      "dinnerProvided": "Kolacja",
+      "mealAllowanceApplicable": "Ryczałt na wyżywienie",
+      "workTimeScope": "[PH] Zakres czasu pracy",
+      "workTimeNote": "[PH] Opis niestandardowego zakresu czasu pracy",
+      "travelNote": "[PH] Dodatkowe informacje o wyjeździe"
+    },
+    "validation": {
+      "positiveNumber": "[PH] Podaj liczbę większą od zera."
+    },
+    "toast": {
+      "loadFailedSummary": "[PH] Nie udało się załadować warunków wyjazdu",
+      "saveSuccessSummary": "[PH] Warunki wyjazdu zapisane",
+      "saveFailedSummary": "[PH] Nie udało się zapisać warunków wyjazdu"
     }
   }
 }
