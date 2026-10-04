@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   DestroyRef,
+  ElementRef,
   computed,
   effect,
   inject,
@@ -9,6 +10,7 @@ import {
   output,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
@@ -22,6 +24,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
+import { SESSION_TITLE_MAX_LENGTH } from '../../../core/configs/session-form.config';
 import {
   createSessionForm,
   mapSessionFormToPayload,
@@ -38,6 +41,7 @@ import {
 import { ISystem } from '../../../core/interfaces/i-system';
 import type { IPdfPreview } from '../../../core/interfaces/i-pdf';
 import { Storage } from '../../../core/services/storage/storage';
+import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import {
   NewSessionCharacterSheet,
   SessionCharacterSheetCard,
@@ -49,6 +53,7 @@ import {
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { setControlValue } from '../../../core/utils/form-controls';
+import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
 import { ChipPicker } from '../../../common/chip-picker/chip-picker';
 import { FileUpload } from '../../../common/file-upload/file-upload';
 import { PdfThumbnail } from '../../../common/pdf-thumbnail/pdf-thumbnail';
@@ -82,6 +87,8 @@ export class SessionForm {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly storage = inject(Storage);
+  private readonly toast = inject(UiToast);
+  private readonly formElement = viewChild<ElementRef<HTMLFormElement>>('formElement');
 
   readonly initial = input<ISessionFormInitialData | null>(null);
   readonly systems = input<readonly ISystem[]>([]);
@@ -97,6 +104,7 @@ export class SessionForm {
 
   readonly i18n = createSessionFormI18n();
   readonly form = createSessionForm(this.fb);
+  readonly titleMaxLength = SESSION_TITLE_MAX_LENGTH;
 
   readonly selectedImageFile = signal<File | null>(null);
   readonly storedImagePath = signal<string | null>(null);
@@ -314,6 +322,14 @@ export class SessionForm {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.toast.warn({
+        summary: this.i18n.commonForm().invalidSummary,
+        detail: this.i18n.commonForm().invalid,
+      });
+      scrollElementIntoViewWhenReady(
+        () => this.formElement()?.nativeElement.querySelector<HTMLElement>('.error-text'),
+        { behavior: 'smooth', block: 'center' },
+      );
       return;
     }
 

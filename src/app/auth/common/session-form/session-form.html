@@ -5,6 +5,7 @@
 @let errorTexts = i18n.errors();
 
 <form
+  #formElement
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
   novalidate
@@ -31,7 +32,10 @@
       </p-iftalabel>
 
       @if (showControlError("title", ["required", "requiredTrimmed"])) {
-        <small>{{ commonForm.required }}</small>
+        <small class="error-text">{{ commonForm.required }}</small>
+      }
+      @if (showControlError("title", ["maxlength"])) {
+        <small class="error-text">{{ commonForm.maxLength.replace('{{max}}', titleMaxLength.toString()) }}</small>
       }
     </div>
 
@@ -49,7 +53,7 @@
       </p-iftalabel>
 
       @if (showControlError("systemId", ["required"])) {
-        <small>{{ commonForm.required }}</small>
+        <small class="error-text">{{ commonForm.required }}</small>
       }
     </div>
 
@@ -71,7 +75,7 @@
         </p-iftalabel>
 
         @if (showControlError("difficultyLevel", ["required"])) {
-          <small>{{ commonForm.required }}</small>
+          <small class="error-text">{{ commonForm.required }}</small>
         }
       </div>
 
@@ -90,7 +94,7 @@
         />
 
         @if (showControlError("minPlayers", ["required", "min", "max"])) {
-          <small>{{ formTexts.playersRangeLabel }}</small>
+          <small class="error-text">{{ formTexts.playersRangeLabel }}</small>
         }
       </div>
 
@@ -109,7 +113,7 @@
         />
 
         @if (showControlError("maxPlayers", ["required", "min", "max"])) {
-          <small>{{ formTexts.playersRangeLabel }}</small>
+          <small class="error-text">{{ formTexts.playersRangeLabel }}</small>
         }
       </div>
 
@@ -127,13 +131,13 @@
         />
 
         @if (showControlError("minAge", ["required", "min"])) {
-          <small>{{ formTexts.minAgeRangeLabel }}</small>
+          <small class="error-text">{{ formTexts.minAgeRangeLabel }}</small>
         }
       </div>
     </div>
 
     @if (showPlayersRangeError()) {
-      <small>{{ errorTexts.invalidPlayersRange }}</small>
+      <small class="error-text">{{ errorTexts.invalidPlayersRange }}</small>
     }
 
     <div class="w-100">
@@ -153,7 +157,7 @@
       </p-iftalabel>
 
       @if (showControlError("description", ["required", "requiredTrimmed"])) {
-        <small>{{ commonForm.required }}</small>
+        <small class="error-text">{{ commonForm.required }}</small>
       }
     </div>
 
@@ -195,7 +199,7 @@
       />
 
       @if (showControlError("image", ["required", "requiredTrimmed"])) {
-        <small>{{ commonForm.required }}</small>
+        <small class="error-text">{{ commonForm.required }}</small>
       }
     </div>
   </div>
@@ -336,7 +340,7 @@
         />
 
         @if (showCharacterSheetsCountError()) {
-          <small>{{ errorTexts.invalidCharacterSheetsCount }}</small>
+          <small class="error-text">{{ errorTexts.invalidCharacterSheetsCount }}</small>
         }
       </div>
     }

@@ -1,5 +1,6 @@
 import { FormBuilder, Validators } from '@angular/forms';
 
+import { SESSION_TITLE_MAX_LENGTH } from '../configs/session-form.config';
 import {
   ICreateSessionPayload,
   ISessionFormData,
@@ -19,7 +20,7 @@ export function createSessionForm(fb: FormBuilder): SessionFormGroup {
         nonNullable: false,
       }),
       title: fb.control<string | null>(null, {
-        validators: [Validators.required, requiredTrimmedValidator(), Validators.maxLength(120)],
+        validators: [Validators.required, requiredTrimmedValidator(), Validators.maxLength(SESSION_TITLE_MAX_LENGTH)],
         nonNullable: false,
       }),
       description: fb.control<string | null>(null, {
