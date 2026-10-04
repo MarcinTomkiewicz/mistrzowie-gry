@@ -1,0 +1,47 @@
+@let copy = i18n.copy();
+
+<div class="flex-col-start-stretch gap-md w-100">
+  @if (isDraft()) {
+    @if (store.hasUnsavedChanges()) {
+      <p-message severity="warn" icon="pi pi-info-circle">{{ copy.saveDraftsFirst }}</p-message>
+    }
+    @if (store.readiness()?.ready) {
+      <p-message severity="success" icon="pi pi-check" role="status">{{ copy.ready }}</p-message>
+    }
+    @if (groups().length) {
+      <section class="mg-card flex-col-start-stretch gap-md border-danger bg-danger-subtle p-md" aria-live="polite">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.issuesTitle }}</h3>
+        @for (group of groups(); track group.section) {
+          <div class="flex-col-start-stretch gap-xs">
+            <h4 class="m-0">{{ sectionLabels()[group.section] }}</h4>
+            <ul class="m-0">
+              @for (issue of group.issues; track $index) {
+                <li>
+                  <a [routerLink]="['/admin/staffing', store.realizationId(), tabPaths[issue.section]]"
+                    [queryParams]="{ readinessSection: issue.section, field: issue.field, dayId: issue.dayId, slotId: issue.slotId }">
+                    {{ i18n.issues[issue.code]() }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </section>
+    }
+  }
+  <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
+    <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+      [label]="i18n.commonActions().cancel" [disabled]="busy()" (onClick)="cancel.emit()" />
+    <div class="flex-row-end-center flex-wrap gap-sm">
+      <p-button type="button" severity="success" icon="pi pi-save" [label]="saveLabel()"
+        [loading]="isSaving()" [disabled]="saveDisabled() || busy()" (onClick)="saveDraft.emit()" />
+      @if (isDraft()) {
+        <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-check"
+          [label]="copy.validate" [loading]="operation() === 'validate'"
+          [disabled]="busy() || store.hasUnsavedChanges()" (onClick)="validate()" />
+        <p-button type="button" severity="success" icon="pi pi-lock-open" [label]="copy.open"
+          [loading]="operation() === 'open'" [disabled]="busy() || !canOpen()" (onClick)="open()" />
+      }
+    </div>
+  </div>
+</div>

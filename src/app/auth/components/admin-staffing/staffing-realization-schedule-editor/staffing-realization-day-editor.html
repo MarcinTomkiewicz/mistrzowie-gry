@@ -3,12 +3,14 @@
 @let index = dayIndex();
 @let slots = dayForm.controls.slots;
 
-<section class="mg-card flex-col-start-stretch gap-xs px-md py-sm w-100" [formGroup]="dayForm">
+<section class="mg-card flex-col-start-stretch gap-xs px-md py-sm w-100" [formGroup]="dayForm"
+  [attr.data-staffing-day-id]="dayForm.controls.id.value">
   <header class="flex-row-between-center flex-wrap gap-sm border-bottom pb-sm">
     <div class="flex-row-start-center flex-wrap gap-xs">
       <h3 class="m-0">
         <button
           type="button"
+          data-staffing-field="date"
           class="mg-section__title mg-section__title--sm uppercase border-0 p-0 m-0 cursor-pointer text-left"
           [attr.aria-label]="actions.editDate"
           [disabled]="isSaving()"

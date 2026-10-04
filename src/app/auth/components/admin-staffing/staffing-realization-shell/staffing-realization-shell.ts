@@ -56,6 +56,13 @@ export class StaffingRealizationShell {
       });
     }
 
+    tabs.push({
+      id: 'recruitment-policy',
+      label: labels.recruitmentPolicy,
+      icon: 'pi pi-users',
+      path: `${realizationPath}/recruitment-policy`,
+    });
+
     return tabs;
   });
 

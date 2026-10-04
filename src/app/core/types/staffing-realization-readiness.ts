@@ -1,0 +1,32 @@
+export type StaffingRealizationReadinessSection =
+  | 'core'
+  | 'schedule'
+  | 'travel_terms'
+  | 'recruitment_policy';
+
+export type StaffingRealizationReadinessIssueCode =
+  | 'core.name_invalid'
+  | 'core.timezone_invalid'
+  | 'core.type_invalid'
+  | 'core.coordinator_invalid'
+  | 'core.event_reference_invalid'
+  | 'schedule.days_missing'
+  | 'schedule.day_demand_invalid'
+  | 'schedule.slot_label_invalid'
+  | 'schedule.slot_time_invalid'
+  | 'schedule.slot_position_invalid'
+  | 'schedule.slot_position_duplicate'
+  | 'schedule.slot_overlap'
+  | 'travel_terms.missing'
+  | 'travel_terms.unexpected_for_stationary'
+  | 'travel_terms.transport_mode_invalid'
+  | 'travel_terms.reimbursement_mode_invalid'
+  | 'travel_terms.mileage_rate_invalid'
+  | 'travel_terms.lodging_invalid'
+  | 'travel_terms.work_time_scope_invalid'
+  | 'travel_terms.work_time_note_invalid'
+  | 'travel_terms.note_invalid'
+  | 'recruitment_policy.missing'
+  | 'recruitment_policy.stationary_scope_invalid'
+  | 'recruitment_policy.session_selection_mode_invalid'
+  | 'recruitment_policy.session_requirement_invalid';

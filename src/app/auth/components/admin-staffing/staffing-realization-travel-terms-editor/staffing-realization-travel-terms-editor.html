@@ -2,7 +2,8 @@
 @let sections = i18n.sections();
 @let page = i18n.page();
 
-<div class="position-relative flex-col-start-center gap-md w-100 min-w-0">
+<div class="position-relative flex-col-start-center gap-md w-100 min-w-0"
+  appStaffingReadinessTarget="travel_terms" [staffingTargetReady]="!isLoading() && !loadFailed()">
   <app-loading-overlay
     [visible]="isLoading() || isSaving()"
     [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
@@ -34,7 +35,7 @@
 
       <section class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
         <h3 class="mg-section__title mg-section__title--sm m-0">{{ sections.logistics }}</h3>
-        <div class="flex-row-start-end flex-wrap gap-sm min-w-0">
+        <div class="flex-row-start-end flex-wrap gap-sm min-w-0" data-staffing-field="mileageRatePlnPerKm">
           <p-select class="w-px-250 w-100-sm min-w-0" inputId="staffing-travel-transport-mode" formControlName="transportMode"
             size="small" optionLabel="label" optionValue="value" appendTo="body" [options]="transportOptions()" [showClear]="true"
             [placeholder]="fields.transportMode" [ariaLabel]="fields.transportMode" />
@@ -69,7 +70,7 @@
           }
         </div>
 
-        <div class="flex-row-start-center flex-wrap gap-md min-w-0 border-top pt-sm">
+        <div class="flex-row-start-center flex-wrap gap-md min-w-0 border-top pt-sm" data-staffing-field="lodgingNights">
           <div class="flex-row-start-center gap-sm min-w-0">
             <p-checkbox inputId="staffing-travel-lodging-provided" formControlName="lodgingProvided" [binary]="true" />
             <label for="staffing-travel-lodging-provided">{{ fields.lodgingProvided }}</label>
@@ -113,7 +114,7 @@
         </div>
       </section>
 
-      <section class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
+      <section class="mg-card flex-col-start-stretch gap-sm p-md min-w-0" data-staffing-field="workTimeNote">
         <h3 class="mg-section__title mg-section__title--sm m-0">{{ sections.workTime }}</h3>
         <div class="flex-col-start-stretch gap-xs w-px-350 w-100-sm min-w-0">
           <p-select class="w-100 min-w-0" inputId="staffing-travel-work-time-scope" formControlName="workTimeScope"
@@ -142,8 +143,10 @@
         </p-floatlabel>
       </section>
 
-      <div class="flex-row-end-center gap-sm border-top pt-md">
-        <p-button type="submit" severity="success" icon="pi pi-save" [label]="i18n.commonActions().save"
+      <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
+        <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+          [label]="i18n.commonActions().cancel" [disabled]="isSaving()" (onClick)="cancel()" />
+        <p-button type="submit" severity="success" icon="pi pi-save" [label]="saveLabel()"
           [loading]="isSaving()" [disabled]="form.pristine || !canSave()" />
       </div>
     </form>

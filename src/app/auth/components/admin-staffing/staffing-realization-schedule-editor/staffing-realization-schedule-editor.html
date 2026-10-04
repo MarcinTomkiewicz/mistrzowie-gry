@@ -1,7 +1,8 @@
 @let actions = i18n.actions();
 @let summaryCopy = i18n.summary();
 
-<div class="position-relative flex-col-start-stretch gap-md">
+<div class="position-relative flex-col-start-stretch gap-md"
+  appStaffingReadinessTarget="schedule" [staffingTargetReady]="!isLoading() && !loadFailed()">
   <app-loading-overlay
     [visible]="isLoading() || isSaving()"
     [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
@@ -65,6 +66,19 @@
               {{ i18n.validation().duplicateDate }}
             </small>
           }
+
+          <div class="flex-row-start-center">
+            <p-button
+              type="button"
+              severity="secondary"
+              size="small"
+              [outlined]="true"
+              icon="pi pi-plus"
+              [label]="actions.addDay"
+              [disabled]="isSaving()"
+              (onClick)="addDay()"
+            />
+          </div>
         </div>
 
         <aside class="mg-card flex-col-start-stretch gap-xs px-md py-sm hide-down-md">
@@ -109,19 +123,18 @@
       <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
         <p-button
           type="button"
-          severity="secondary"
-          size="small"
+          severity="danger"
           [outlined]="true"
-          icon="pi pi-plus"
-          [label]="actions.addDay"
+          icon="pi pi-interdiction"
+          [label]="i18n.commonActions().cancel"
           [disabled]="isSaving()"
-          (onClick)="addDay()"
+          (onClick)="cancel()"
         />
         <p-button
           type="submit"
-          severity="secondary"
+          severity="success"
           icon="pi pi-save"
-          [label]="actions.saveDraft"
+          [label]="saveLabel()"
           [loading]="isSaving()"
           [disabled]="form.pristine"
         />

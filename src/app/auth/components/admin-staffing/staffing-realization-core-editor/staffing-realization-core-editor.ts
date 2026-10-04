@@ -29,13 +29,14 @@ import { IAdminEventListItem } from '../../../../core/interfaces/i-event-admin';
 import { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationType } from '../../../../core/types/staffing-realization';
 import { setControlValue } from '../../../../core/utils/form-controls';
 import { joinTextParts } from '../../../../core/utils/normalize-text';
 import { getStaffingCoreFormError } from '../staffing-realization-form-errors';
 import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-core-editor.i18n';
 import { StaffingRealizationDatesAndDemand } from './staffing-realization-dates-and-demand';
+import { StaffingReadinessTarget } from '../staffing-readiness-target';
 
 @Component({
   selector: 'app-staffing-realization-core-editor',
@@ -49,6 +50,7 @@ import { StaffingRealizationDatesAndDemand } from './staffing-realization-dates-
     TextareaModule,
     LoadingOverlay,
     StaffingRealizationDatesAndDemand,
+    StaffingReadinessTarget,
   ],
   templateUrl: './staffing-realization-core-editor.html',
   providers: [
@@ -74,6 +76,10 @@ export class StaffingRealizationCoreEditor {
   protected readonly initialDaysForm =
     createStaffingRealizationInitialDaysForm();
   protected readonly realization = this.editor.store.realization;
+  protected readonly saveLabel = createStaffingSaveLabel(
+    () => this.isNew ? undefined : this.realization()?.status,
+    () => this.isNew ? this.i18n.actions().createDraft : this.i18n.commonActions().save,
+  );
   protected readonly days = computed(() => this.editor.store.scheduleDraft() ?? []);
   protected readonly events = signal<readonly IAdminEventListItem[]>([]);
   protected readonly isLoading = signal(true);

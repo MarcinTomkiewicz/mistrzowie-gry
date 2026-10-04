@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -18,10 +19,11 @@ import {
 } from '../../../../core/factories/staffing-realization-days-form.factory';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { getStaffingScheduleFormError } from '../staffing-realization-form-errors';
 import { StaffingRealizationDayEditor } from './staffing-realization-day-editor';
 import { createStaffingRealizationScheduleEditorI18n } from './staffing-realization-schedule-editor.i18n';
+import { StaffingReadinessTarget } from '../staffing-readiness-target';
 
 @Component({
   selector: 'app-staffing-realization-schedule-editor',
@@ -32,6 +34,7 @@ import { createStaffingRealizationScheduleEditorI18n } from './staffing-realizat
     MessageModule,
     LoadingOverlay,
     StaffingRealizationDayEditor,
+    StaffingReadinessTarget,
   ],
   templateUrl: './staffing-realization-schedule-editor.html',
   providers: [
@@ -41,6 +44,7 @@ import { createStaffingRealizationScheduleEditorI18n } from './staffing-realizat
 export class StaffingRealizationScheduleEditor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly editor = inject(StaffingRealizationEditorFacade);
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(UiToast);
 
@@ -50,6 +54,10 @@ export class StaffingRealizationScheduleEditor {
     this.route.parent?.snapshot.paramMap.get('realizationId') ?? '';
   protected readonly i18n = createStaffingRealizationScheduleEditorI18n();
   protected readonly form = createStaffingRealizationDaysForm();
+  protected readonly saveLabel = createStaffingSaveLabel(
+    () => this.editor.store.realization()?.status,
+    () => this.i18n.commonActions().save,
+  );
   protected readonly days = this.form.controls.days;
   protected readonly summary = computed(() =>
     getStaffingScheduleSummary(this.editor.store.scheduleDraft() ?? []),
@@ -109,6 +117,11 @@ export class StaffingRealizationScheduleEditor {
     }
 
     addStaffingRealizationDay(this.days);
+  }
+
+  protected cancel(): void {
+    this.editor.store.reset();
+    this.location.back();
   }
 
   protected saveSchedule(): void {

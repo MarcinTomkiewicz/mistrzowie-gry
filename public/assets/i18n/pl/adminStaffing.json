@@ -1,4 +1,75 @@
 {
+  "finalization": {
+    "validate": "Sprawdź poprawność danych",
+    "open": "[PH] Zatwierdź i uruchom realizację",
+    "issuesTitle": "[PH] Problemy wymagające poprawy",
+    "saveDraftsFirst": "[PH] Najpierw zapisz wszystkie zmienione szkice. Sprawdzenie poprawności i zatwierdzenie i uruchomienie realizacji dotyczą wyłącznie zapisanych danych.",
+    "ready": "[PH] Wszystkie zapisane dane są poprawne. Realizacja jest gotowa do uruchomienia.",
+    "validateFailed": "[PH] Nie udało się sprawdzić poprawności danych",
+    "openFailed": "[PH] Nie udało się zatwierdzić i uruchomić realizacji",
+    "openFailedDetail": "[PH] Odśwież dane realizacji i spróbuj ponownie. Jej status mógł się zmienić.",
+    "openSuccess": "[PH] Realizacja została zatwierdzona i uruchomiona",
+    "issues": {
+      "core": {
+        "name_invalid": "[PH] Podaj prawidłową nazwę realizacji.",
+        "timezone_invalid": "[PH] Podaj prawidłową strefę czasową.",
+        "type_invalid": "[PH] Wybierz prawidłowy typ realizacji.",
+        "coordinator_invalid": "[PH] Koordynator realizacji musi być administratorem.",
+        "event_reference_invalid": "[PH] Powiąż realizację z istniejącą edycją wydarzenia lub usuń powiązanie."
+      },
+      "schedule": {
+        "days_missing": "[PH] Dodaj co najmniej jeden dzień realizacji.",
+        "day_demand_invalid": "[PH] Zapotrzebowanie w dniu realizacji musi wynosić co najmniej 1 MG.",
+        "slot_label_invalid": "[PH] Podaj prawidłową nazwę slotu.",
+        "slot_time_invalid": "[PH] Popraw godziny slotu: koniec musi być późniejszy od początku, bez przejścia przez północ.",
+        "slot_position_invalid": "[PH] Popraw pozycję slotu w kolejności dnia.",
+        "slot_position_duplicate": "[PH] Pozycje slotów w dniu muszą być unikalne.",
+        "slot_overlap": "[PH] Godziny slotów w tym dniu nakładają się na siebie."
+      },
+      "travel_terms": {
+        "missing": "[PH] Zapisz warunki wyjazdu.",
+        "unexpected_for_stationary": "[PH] Realizacja stacjonarna ma zapisane warunki wyjazdu.",
+        "transport_mode_invalid": "[PH] Wybierz prawidłowy sposób organizacji transportu.",
+        "reimbursement_mode_invalid": "[PH] Wybierz prawidłowe zasady zwrotu kosztów.",
+        "mileage_rate_invalid": "[PH] Popraw stawkę kilometrówki zgodnie z zasadami zwrotu kosztów.",
+        "lodging_invalid": "[PH] Popraw warunki noclegu i liczbę noclegów.",
+        "work_time_scope_invalid": "[PH] Wybierz prawidłowy zakres czasu pracy.",
+        "work_time_note_invalid": "[PH] Uzupełnij opis niestandardowego zakresu czasu pracy.",
+        "note_invalid": "[PH] Popraw wskazane informacje o wyjeździe."
+      },
+      "recruitment_policy": {
+        "missing": "[PH] Zapisz zasady rekrutacji.",
+        "stationary_scope_invalid": "[PH] Popraw zakres zgłoszenia odpowiednio do typu realizacji.",
+        "session_selection_mode_invalid": "[PH] Wybierz prawidłowy sposób wyboru sesji.",
+        "session_requirement_invalid": "[PH] Popraw wymaganie sesji przy zgłoszeniu zgodnie z trybem wyboru sesji i dostępnością zgłoszeń MG."
+      }
+    }
+  },
+  "recruitmentPolicy": {
+    "description": "[PH] Określ zasady zgłoszeń Mistrzów Gry i wymagania dotyczące proponowanych sesji.",
+    "travelHint": "[PH] Udział w realizacji wyjazdowej obejmuje cały wyjazd. Nie można zgłosić udziału tylko w wybranych dniach.",
+    "saveCoreTypeHint": "[PH] Przed zapisem zasad rekrutacji zapisz zmianę typu realizacji w Danych podstawowych.",
+    "sessionsHint": "[PH] Przy włączonych zgłoszeniach możesz wymagać od każdego kandydata jednej propozycji sesji dla każdego slotu objętego jego zgłoszeniem.",
+    "fields": {
+      "selfApplicationEnabled": "[PH] MG mogą zgłaszać udział",
+      "stationaryScopePolicy": "[PH] Zakres zgłoszenia",
+      "sessionSelectionMode": "[PH] Sposób wyboru sesji",
+      "sessionsRequiredAtApplication": "[PH] Wymagaj sesji przy zgłoszeniu"
+    },
+    "stationaryScopes": {
+      "whole_realization": "[PH] Cała realizacja",
+      "selected_days": "[PH] Wybrane dni realizacji"
+    },
+    "sessionModes": {
+      "gm_selects": "[PH] Sesje wybiera MG",
+      "realization_assigns": "[PH] Sesje przypisuje koordynator"
+    },
+    "toast": {
+      "loadFailedSummary": "[PH] Nie udało się załadować zasad rekrutacji",
+      "saveSuccessSummary": "[PH] Zasady rekrutacji zapisane",
+      "saveFailedSummary": "[PH] Nie udało się zapisać zasad rekrutacji"
+    }
+  },
   "editor": {
     "page": {
       "createTitle": "Nowa realizacja",
@@ -60,6 +131,9 @@
       "placeholder": "Wybierz wydarzenie...",
       "empty": "Brak wydarzeń do wyboru"
     },
+    "actions": {
+      "createDraft": "[PH] Utwórz szkic"
+    },
     "toast": {
       "saveSuccessSummary": "Realizacja zapisana",
       "saveFailedSummary": "Nie udało się zapisać realizacji"
@@ -67,6 +141,7 @@
   },
   "shell": {
     "tabs": {
+      "recruitmentPolicy": "[PH] Zasady rekrutacji",
       "core": "Dane podstawowe",
       "schedule": "Dni i sloty",
       "travelTerms": "[PH] Warunki wyjazdu"

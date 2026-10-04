@@ -23,6 +23,7 @@ export function createStaffingRealizationCoreEditorI18n() {
       stationaryType: AdminStaffingEditorCopy['types']['stationary'];
       travelType: AdminStaffingEditorCopy['types']['travel'];
       event: AdminStaffingEditorCopy['event'];
+      actions: AdminStaffingEditorCopy['actions'];
       toast: AdminStaffingEditorCopy['toast'];
     }>('adminStaffing', {
       page: 'editor.page',
@@ -36,6 +37,7 @@ export function createStaffingRealizationCoreEditorI18n() {
       stationaryType: 'editor.types.stationary',
       travelType: 'editor.types.travel',
       event: 'editor.event',
+      actions: 'editor.actions',
       toast: 'editor.toast',
     }),
     ...createStaffingI18n(),

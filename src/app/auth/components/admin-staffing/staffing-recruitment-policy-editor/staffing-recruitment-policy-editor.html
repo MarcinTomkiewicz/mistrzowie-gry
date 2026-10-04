@@ -1,0 +1,68 @@
+@let copy = i18n.copy();
+@let fields = copy.fields;
+
+<div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0"
+  appStaffingReadinessTarget="recruitment_policy" [staffingTargetReady]="!isLoading() && !loadFailed()">
+  <app-loading-overlay [visible]="isLoading() || isSaving() || finalizing()"
+    [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+  @if (loadFailed() && !isLoading()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+      <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy.toast.loadFailedSummary }}</h2>
+      <p class="m-0">{{ i18n.commonErrors().generic }}</p>
+      <p-button severity="secondary" icon="pi pi-refresh" [label]="i18n.commonActions().retry" (onClick)="loadPolicy()" />
+    </section>
+  } @else if (!isLoading()) {
+    <form class="mg-form flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <header class="flex-row-start-center gap-md min-w-0">
+        <span class="pi pi-users square-11 flex-none" aria-hidden="true"></span>
+        <div class="flex-col-start-stretch gap-xs min-w-0">
+          <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.title() }}</h2>
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">{{ copy.description }}</p>
+        </div>
+      </header>
+      @if (!canSave()) {
+        <p-message severity="warn" icon="pi pi-info-circle">{{ copy.saveCoreTypeHint }}</p-message>
+      }
+      @if (type() === 'travel') {
+        <p-message severity="info" icon="pi pi-info-circle">{{ copy.travelHint }}</p-message>
+      }
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0"
+        data-staffing-field="stationaryScopePolicy requiredSessionMappingsPerSlot sessionsRequiredAtApplication">
+        <div class="flex-row-start-center gap-sm">
+          <p-checkbox inputId="staffing-self-application" formControlName="selfApplicationEnabled" [binary]="true" />
+          <label for="staffing-self-application">{{ fields.selfApplicationEnabled }}</label>
+        </div>
+        <div class="flex-row-start-start flex-wrap gap-md min-w-0">
+          @if (type() === 'stationary') {
+            <div class="flex-col-start-stretch gap-xs w-px-300 w-100-sm min-w-0">
+              <p-select class="w-100 min-w-0" inputId="staffing-stationary-scope" formControlName="stationaryScopePolicy"
+                size="small" optionLabel="label" optionValue="value" appendTo="body" [options]="scopeOptions()"
+                [placeholder]="fields.stationaryScopePolicy" [ariaLabel]="fields.stationaryScopePolicy" />
+              @if (fieldError('stationaryScopePolicy'); as error) {
+                <small class="mg-contact-error">{{ error }}</small>
+              }
+            </div>
+          }
+          <div class="flex-col-start-stretch gap-xs w-px-300 w-100-sm min-w-0">
+            <p-select class="w-100 min-w-0" inputId="staffing-session-selection" formControlName="sessionSelectionMode"
+              size="small" optionLabel="label" optionValue="value" appendTo="body" [options]="sessionOptions()"
+              [placeholder]="fields.sessionSelectionMode" [ariaLabel]="fields.sessionSelectionMode" />
+            @if (fieldError('sessionSelectionMode'); as error) {
+              <small class="mg-contact-error">{{ error }}</small>
+            }
+          </div>
+        </div>
+        @if (form.controls.sessionSelectionMode.value === 'gm_selects') {
+          <p class="m-0 muted-text">{{ copy.sessionsHint }}</p>
+          <div class="flex-row-start-center gap-sm">
+            <p-checkbox inputId="staffing-sessions-required" formControlName="sessionsRequiredAtApplication" [binary]="true" />
+            <label for="staffing-sessions-required">{{ fields.sessionsRequiredAtApplication }}</label>
+          </div>
+        }
+      </section>
+      <app-staffing-realization-finalization class="w-100"
+        [isSaving]="isSaving()" [saveDisabled]="form.pristine || !canSave()"
+        (saveDraft)="save()" (cancel)="cancel()" (busyChange)="finalizing.set($event)" />
+    </form>
+  }
+</div>

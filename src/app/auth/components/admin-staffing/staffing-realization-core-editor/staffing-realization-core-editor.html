@@ -5,6 +5,8 @@
   <div
     class="position-relative flex-col-start-center gap-md"
     [class.mg-container]="isNew"
+    [appStaffingReadinessTarget]="isNew ? null : 'core'"
+    [staffingTargetReady]="!isLoading() && !loadErrorMessage()"
   >
     @if (isNew) {
       <header class="mg-section__header w-100">
@@ -54,7 +56,7 @@
         (ngSubmit)="save()"
         novalidate
       >
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew">
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew" data-staffing-field="coordinatorUserId">
           <div class="flex-row-start-center gap-md">
             <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
             <div class="flex-col-start-stretch gap-xs">
@@ -177,7 +179,7 @@
 
           <div class="flex-col-start-stretch gap-sm w-100">
             <strong>{{ fields.type }}</strong>
-            <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md" role="radiogroup">
+            <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md" role="radiogroup" data-staffing-field="type">
               <button
                 type="button"
                 class="mg-choice-card w-100 text-left"
@@ -246,20 +248,20 @@
           />
         </section>
 
-        <div class="flex-row-center-center flex-wrap gap-sm w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew">
+        <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew">
           <p-button
             type="button"
-            severity="warn"
+            severity="danger"
             [outlined]="true"
             [label]="i18n.commonActions().cancel"
-            icon="pi pi-arrow-left"
+            icon="pi pi-interdiction"
             [disabled]="isSaving()"
             (onClick)="cancel()"
           />
           <p-button
             type="submit"
             severity="success"
-            [label]="i18n.commonActions().save"
+            [label]="saveLabel()"
             icon="pi pi-save"
             [loading]="isSaving()"
             [disabled]="isLoading()"

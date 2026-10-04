@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -27,13 +28,14 @@ import {
   syncStaffingRealizationTravelTermsForm,
 } from '../../../../core/factories/staffing-realization-travel-terms-form.factory';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationTravelTermsForm } from '../../../../core/types/staffing-realization-form';
 import {
   getStaffingTravelTermsFieldError,
   getStaffingTravelTermsFormError,
 } from '../staffing-realization-form-errors';
 import { createStaffingRealizationTravelTermsEditorI18n } from './staffing-realization-travel-terms-editor.i18n';
+import { StaffingReadinessTarget } from '../staffing-readiness-target';
 
 @Component({
   selector: 'app-staffing-realization-travel-terms-editor',
@@ -41,6 +43,7 @@ import { createStaffingRealizationTravelTermsEditorI18n } from './staffing-reali
     ReactiveFormsModule, ButtonModule, CheckboxModule, FloatLabelModule,
     InputNumberModule, MessageModule, SelectModule, TextareaModule,
     LoadingOverlay,
+    StaffingReadinessTarget,
   ],
   templateUrl: './staffing-realization-travel-terms-editor.html',
   providers: [provideTranslocoScope('adminStaffing', STAFFING_SCOPE, 'common')],
@@ -48,6 +51,7 @@ import { createStaffingRealizationTravelTermsEditorI18n } from './staffing-reali
 export class StaffingRealizationTravelTermsEditor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly editor = inject(StaffingRealizationEditorFacade);
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(UiToast);
   private loadSubscription: Subscription | null = null;
@@ -55,6 +59,10 @@ export class StaffingRealizationTravelTermsEditor {
 
   protected readonly i18n = createStaffingRealizationTravelTermsEditorI18n();
   protected readonly form = createStaffingRealizationTravelTermsForm();
+  protected readonly saveLabel = createStaffingSaveLabel(
+    () => this.editor.store.realization()?.status,
+    () => this.i18n.commonActions().save,
+  );
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
   protected readonly loadFailed = signal(false);
@@ -113,6 +121,11 @@ export class StaffingRealizationTravelTermsEditor {
   protected fieldError(field: keyof StaffingRealizationTravelTermsForm['controls']): string | null {
     if (!this.form.controls[field].touched) return null;
     return getStaffingTravelTermsFieldError(this.form, field, this.validationCopy(), this.i18n.commonForm());
+  }
+
+  protected cancel(): void {
+    this.editor.store.reset();
+    this.location.back();
   }
 
   protected save(): void {

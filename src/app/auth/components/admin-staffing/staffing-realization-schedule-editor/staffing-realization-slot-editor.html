@@ -10,6 +10,7 @@
   [class.border-danger]="hasConflict()"
   [class.bg-danger-subtle]="hasConflict()"
   [formGroup]="slotForm"
+  [attr.data-staffing-slot-id]="slotForm.controls.id.value"
 >
   <div class="flex-row-between-center flex-nowrap flex-wrap-lg gap-xs w-100">
     <div class="flex-row-start-center flex-nowrap flex-wrap-lg gap-xs flex-1 min-w-0">
@@ -65,6 +66,7 @@
     </div>
 
     <app-item-editor-actions
+      data-staffing-field="position"
       class="flex-none"
       [index]="index"
       [itemCount]="slotCount()"

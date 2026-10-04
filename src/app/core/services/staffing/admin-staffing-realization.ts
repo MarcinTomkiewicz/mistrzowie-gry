@@ -15,10 +15,29 @@ import {
   SaveAdminStaffingTravelTermsPayload,
 } from '../../interfaces/admin-staffing-travel-terms';
 import { Backend } from '../backend/backend';
+import { AdminStaffingRecruitmentPolicy, SaveAdminStaffingRecruitmentPolicyPayload } from '../../interfaces/admin-staffing-recruitment-policy';
+import { OpenAdminStaffingRealizationResult } from '../../interfaces/staffing-realization-readiness';
 
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealization {
   private readonly backend = inject(Backend);
+
+  open(realizationId: string): Observable<OpenAdminStaffingRealizationResult> {
+    return this.backend.rpc<OpenAdminStaffingRealizationResult>(
+      STAFFING_REALIZATION_RPC.openAdmin,
+      { p_realization_id: realizationId },
+    );
+  }
+
+  saveRecruitmentPolicy(
+    realizationId: string,
+    payload: SaveAdminStaffingRecruitmentPolicyPayload,
+  ): Observable<AdminStaffingRecruitmentPolicy> {
+    return this.backend.rpc<AdminStaffingRecruitmentPolicy>(
+      STAFFING_REALIZATION_RPC.saveAdminRecruitmentPolicy,
+      { p_realization_id: realizationId, p_payload: payload },
+    );
+  }
 
   create(
     payload: CreateAdminStaffingRealizationRequest,

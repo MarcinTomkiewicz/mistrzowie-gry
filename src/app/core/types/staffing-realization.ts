@@ -1,5 +1,8 @@
 export type StaffingRealizationType = 'stationary' | 'travel';
 
+export type StaffingStationaryScopePolicy = 'whole_realization' | 'selected_days';
+export type StaffingSessionSelectionMode = 'gm_selects' | 'realization_assigns';
+
 export type StaffingRealizationStatus =
   | 'draft'
   | 'open'

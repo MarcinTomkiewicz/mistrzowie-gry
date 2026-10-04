@@ -7,11 +7,27 @@ import {
   AdminStaffingSchedule,
 } from '../../interfaces/admin-staffing-realization';
 import { AdminStaffingTravelTerms } from '../../interfaces/admin-staffing-travel-terms';
+import { AdminStaffingRecruitmentPolicy } from '../../interfaces/admin-staffing-recruitment-policy';
+import { StaffingRealizationReadinessResult } from '../../interfaces/staffing-realization-readiness';
 import { Backend } from '../../services/backend/backend';
 
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealizationRead {
   private readonly backend = inject(Backend);
+
+  validate(realizationId: string): Observable<StaffingRealizationReadinessResult> {
+    return this.backend.rpc<StaffingRealizationReadinessResult>(
+      STAFFING_REALIZATION_RPC.validateAdmin,
+      { p_realization_id: realizationId },
+    );
+  }
+
+  getRecruitmentPolicy(realizationId: string): Observable<AdminStaffingRecruitmentPolicy | null> {
+    return this.backend.rpc<AdminStaffingRecruitmentPolicy | null>(
+      STAFFING_REALIZATION_RPC.getAdminRecruitmentPolicy,
+      { p_realization_id: realizationId },
+    );
+  }
 
   getDetail(realizationId: string): Observable<AdminStaffingRealizationCore> {
     return this.backend.rpc<AdminStaffingRealizationCore>(

@@ -1,4 +1,6 @@
 import type { StaffingRealizationType } from '../staffing-realization';
+import type { StaffingSessionSelectionMode, StaffingStationaryScopePolicy } from '../staffing-realization';
+import type { StaffingRecruitmentPolicyDraft } from '../staffing-recruitment-policy-form';
 import type { StaffingRealizationTravelTermsDraft } from '../staffing-realization-editor-draft';
 
 export type AdminStaffingEditorCopy = {
@@ -46,6 +48,9 @@ export type AdminStaffingEditorCopy = {
     placeholder: string;
     empty: string;
   };
+  actions: {
+    createDraft: string;
+  };
   toast: {
     saveSuccessSummary: string;
     saveFailedSummary: string;
@@ -57,6 +62,7 @@ export type AdminStaffingShellCopy = {
     core: string;
     schedule: string;
     travelTerms: string;
+    recruitmentPolicy: string;
   };
 };
 
@@ -134,6 +140,33 @@ type AdminStaffingEditorSectionCopy = {
   description: string;
 };
 
+export type AdminStaffingRecruitmentPolicyCopy = {
+  description: string;
+  travelHint: string;
+  saveCoreTypeHint: string;
+  sessionsHint: string;
+  fields: Record<keyof StaffingRecruitmentPolicyDraft, string>;
+  stationaryScopes: Record<StaffingStationaryScopePolicy, string>;
+  sessionModes: Record<StaffingSessionSelectionMode, string>;
+  toast: {
+    loadFailedSummary: string;
+    saveSuccessSummary: string;
+    saveFailedSummary: string;
+  };
+};
+
 type AdminStaffingRealizationTypeDescriptionCopy = {
   description: string;
+};
+
+export type AdminStaffingFinalizationCopy = {
+  validate: string;
+  open: string;
+  issuesTitle: string;
+  saveDraftsFirst: string;
+  ready: string;
+  validateFailed: string;
+  openFailed: string;
+  openFailedDetail: string;
+  openSuccess: string;
 };
