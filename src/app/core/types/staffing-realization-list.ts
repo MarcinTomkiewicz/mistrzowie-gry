@@ -5,4 +5,5 @@ export type StaffingRealizationListFilters = {
   date: Date | null;
   type: StaffingRealizationType | null;
   status: StaffingRealizationStatus | null;
+  showArchived: boolean;
 };

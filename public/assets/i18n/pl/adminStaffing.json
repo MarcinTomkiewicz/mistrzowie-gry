@@ -21,7 +21,18 @@
     },
     "filters": {
       "search": "[PH] Szukaj po nazwie lub mieście",
-      "noResults": "[PH] Brak realizacji spełniających wybrane filtry."
+      "noResults": "[PH] Brak realizacji spełniających wybrane filtry.",
+      "showArchivedLabel": "Pokaż zarchiwizowane"
+    },
+    "confirmation": {
+      "delete": "[PH] Usunąć szkic realizacji „{{name}}” wraz z jego konfiguracją? Tej operacji nie można cofnąć.",
+      "archive": "[PH] Zarchiwizować realizację „{{name}}”? Historia realizacji zostanie zachowana."
+    },
+    "toast": {
+      "deleteSuccessSummary": "[PH] Szkic realizacji usunięty",
+      "deleteFailedSummary": "[PH] Nie udało się usunąć szkicu realizacji",
+      "archiveSuccessSummary": "[PH] Realizacja zarchiwizowana",
+      "archiveFailedSummary": "[PH] Nie udało się zarchiwizować realizacji"
     }
   },
   "finalization": {

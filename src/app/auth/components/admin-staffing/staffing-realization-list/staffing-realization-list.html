@@ -4,14 +4,14 @@
 @let table = copy.table;
 
 <section class="mg-section mg-section--full">
-  <div class="mg-container position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isLoading()">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isBusy()">
     <header class="mg-section__header w-100">
       <h1 class="mg-section__title">{{ copy.page.title }}</h1>
       <p class="mg-section__subtitle mg-section__subtitle--full">{{ copy.page.subtitle }}</p>
     </header>
     <div class="flex-row-end-center w-100">
       <p-button type="button" severity="success" icon="pi pi-plus" [label]="i18n.createLabel()"
-        routerLink="/admin/staffing/new" [disabled]="isLoading()" />
+        routerLink="/admin/staffing/new" [disabled]="isBusy()" />
     </div>
     <app-loading-overlay [visible]="isLoading()" [label]="i18n.commonStatus().loading" />
 
@@ -25,24 +25,30 @@
         </section>
       } @else if (rows().length) {
         <form [formGroup]="filterForm" novalidate
-          class="mg-card mg-grid grid-4-cols grid-2-cols-md grid-1-cols-sm gap-sm p-md w-100">
-          <p-floatlabel variant="on" class="w-100">
+          class="mg-card flex-row-start-center flex-wrap gap-sm p-md w-100">
+          <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
             <input pInputText pSize="small" type="search" class="w-100" id="staffing-list-search"
               formControlName="searchText" />
             <label for="staffing-list-search">{{ copy.filters.search }}</label>
           </p-floatlabel>
-          <p-floatlabel variant="on" class="w-100">
-            <p-datepicker ngSkipHydration size="small" class="w-100" inputStyleClass="w-100"
+          <p-floatlabel variant="on" class="flex-none w-100 max-w-150 max-w-none-sm">
+            <p-datepicker ngSkipHydration size="small" class="w-100" inputStyleClass="w-100 min-w-0"
               inputId="staffing-list-date" formControlName="date" dateFormat="dd.mm.yy" appendTo="body"
               [showIcon]="true" [showClear]="true" [readonlyInput]="true" />
             <label for="staffing-list-date">{{ labels.date }}</label>
           </p-floatlabel>
-          <p-select size="small" class="w-100" inputId="staffing-list-type" formControlName="type"
+          <p-select size="small" class="flex-none w-100 max-w-150 max-w-none-sm"
+            inputId="staffing-list-type" formControlName="type"
             [options]="typeOptions()" optionLabel="label" optionValue="value" appendTo="body"
             [showClear]="true" [placeholder]="table.type" [ariaLabel]="table.type" />
-          <p-select size="small" class="w-100" inputId="staffing-list-status" formControlName="status"
+          <p-select size="small" class="flex-none w-100 max-w-150 max-w-none-sm"
+            inputId="staffing-list-status" formControlName="status"
             [options]="statusOptions()" optionLabel="label" optionValue="value" appendTo="body"
             [showClear]="true" [placeholder]="labels.status" [ariaLabel]="labels.status" />
+          <div class="flex-row-start-center gap-sm flex-none w-100-sm">
+            <p-toggleswitch inputId="staffing-list-show-archived" formControlName="showArchived" />
+            <label for="staffing-list-show-archived">{{ copy.filters.showArchivedLabel }}</label>
+          </div>
         </form>
         <div class="w-100 overflow-x-auto">
           <p-table class="w-100" [value]="rowVms()" dataKey="item.id" tableStyleClass="mg-responsive-table"
@@ -113,9 +119,19 @@
                 </td>
                 <td class="mg-responsive-table__cell">
                   <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
-                  <div class="mg-responsive-table__value flex-row-end-center">
-                    <p-button type="button" size="small" severity="secondary" icon="pi pi-pencil"
-                      [label]="actions.edit" [routerLink]="['/admin/staffing', row.item.id, 'edit']" />
+                  <div class="mg-responsive-table__value flex-col-start-end gap-xs">
+                    <p-button type="button" size="small" severity="secondary" icon="pi pi-quill"
+                      [label]="actions.edit" [routerLink]="['/admin/staffing', row.item.id, 'edit']"
+                      [disabled]="isBusy()" />
+                    @if (row.item.status === 'draft') {
+                      <p-button type="button" size="small" severity="danger" icon="pi pi-demolish" styleClass="w-100"
+                        [label]="actions.delete" [outlined]="true" [disabled]="isBusy()"
+                        [loading]="activeRealizationId() === row.item.id" (onClick)="confirmDelete($event, row.item)" />
+                    } @else if (row.item.status === 'open' || row.item.status === 'closed' || row.item.status === 'completed') {
+                      <p-button type="button" size="small" severity="danger" icon="pi pi-warehouse" styleClass="w-100"
+                        [label]="actions.archive" [outlined]="true" [disabled]="isBusy()"
+                        [loading]="activeRealizationId() === row.item.id" (onClick)="confirmArchive($event, row.item)" />
+                    }
                   </div>
                 </td>
               </tr>

@@ -22,6 +22,17 @@ export type AdminStaffingRealizationListCopy = {
   filters: {
     search: string;
     noResults: string;
+    showArchivedLabel: string;
+  };
+  confirmation: {
+    delete: string;
+    archive: string;
+  };
+  toast: {
+    deleteSuccessSummary: string;
+    deleteFailedSummary: string;
+    archiveSuccessSummary: string;
+    archiveFailedSummary: string;
   };
 };
 

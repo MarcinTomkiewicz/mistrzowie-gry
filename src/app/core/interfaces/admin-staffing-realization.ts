@@ -124,5 +124,15 @@ export interface CreateAdminStaffingRealizationResult {
   days: AdminStaffingRealizationDay[];
 }
 
+export interface DeleteAdminStaffingRealizationResult {
+  deleted: true;
+  realizationId: string;
+}
+
+export interface ArchiveAdminStaffingRealizationResult {
+  archived: true;
+  realization: AdminStaffingRealizationCore;
+}
+
 export type UpdateAdminStaffingRealizationCorePayload =
   AdminStaffingRealizationCoreInput;

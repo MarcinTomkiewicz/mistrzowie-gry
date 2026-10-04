@@ -9,30 +9,38 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { finalize, map, tap } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { AdminStaffingRealizationListItem } from '../../../../core/interfaces/admin-staffing-realization';
 import { AdminStaffingRealizationRead } from '../../../../core/reads/staffing/admin-staffing-realization-read';
+import { AdminStaffingRealization } from '../../../../core/services/staffing/admin-staffing-realization';
+import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationListFilters } from '../../../../core/types/staffing-realization-list';
 import { formatDateLabel } from '../../../../core/utils/date';
-import { filterStaffingRealizations } from '../../../../core/utils/staffing-realization-list';
+import {
+  filterStaffingRealizations,
+  updateStaffingRealizationList,
+} from '../../../../core/utils/staffing-realization-list';
 import { createStaffingRealizationListI18n } from './staffing-realization-list.i18n';
 
 @Component({
   selector: 'app-staffing-realization-list',
   imports: [
     RouterLink, ReactiveFormsModule, ButtonModule, DatePickerModule, FloatLabelModule,
-    InputTextModule, SelectModule, TableModule, LoadingOverlay,
+    InputTextModule, SelectModule, TableModule, ToggleSwitchModule, LoadingOverlay,
   ],
   templateUrl: './staffing-realization-list.html',
   providers: [provideTranslocoScope('adminStaffing', STAFFING_SCOPE, 'common')],
 })
 export class StaffingRealizationList {
   private readonly read = inject(AdminStaffingRealizationRead);
+  private readonly write = inject(AdminStaffingRealization);
+  private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -40,6 +48,10 @@ export class StaffingRealizationList {
   protected readonly rows = signal<AdminStaffingRealizationListItem[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly hasLoadError = signal(false);
+  protected readonly activeRealizationId = signal<string | null>(null);
+  protected readonly isBusy = computed(
+    () => this.isLoading() || this.activeRealizationId() !== null,
+  );
   protected readonly first = signal(0);
   protected readonly pageSize = signal(10);
   protected readonly rowsPerPageOptions = [10, 25, 50];
@@ -48,9 +60,16 @@ export class StaffingRealizationList {
     date: new FormControl<Date | null>(null),
     type: new FormControl<StaffingRealizationListFilters['type']>(null),
     status: new FormControl<StaffingRealizationListFilters['status']>(null),
+    showArchived: new FormControl(false, { nonNullable: true }),
   });
   private readonly filterValue = toSignal(
     this.filterForm.valueChanges.pipe(
+      tap(() => {
+        const { showArchived, status } = this.filterForm.controls;
+        if (!showArchived.value && status.value === 'archived') {
+          status.setValue(null, { emitEvent: false });
+        }
+      }),
       map(() => this.filterForm.getRawValue()),
       tap(() => this.first.set(0)),
     ),
@@ -63,7 +82,9 @@ export class StaffingRealizationList {
     Object.entries(this.i18n.realizationTypes()).map(([value, label]) => ({ value, label })),
   );
   protected readonly statusOptions = computed(() =>
-    Object.entries(this.i18n.realizationStatuses()).map(([value, label]) => ({ value, label })),
+    Object.entries(this.i18n.realizationStatuses())
+      .filter(([value]) => this.filterValue().showArchived || value !== 'archived')
+      .map(([value, label]) => ({ value, label })),
   );
   protected readonly rowVms = computed(() => {
     const values = this.i18n.commonValues();
@@ -109,6 +130,60 @@ export class StaffingRealizationList {
         this.toast.danger({ summary: this.i18n.copy().page.loadErrorTitle,
           detail: this.i18n.commonErrors().generic });
       },
+    });
+  }
+
+  protected confirmDelete(event: Event, realization: AdminStaffingRealizationListItem): void {
+    this.confirm.dangerDecision(event, {
+      message: this.i18n.copy().confirmation.delete.replace('{{name}}', realization.name),
+      acceptLabel: this.i18n.commonActions().delete,
+      rejectLabel: this.i18n.commonActions().cancel,
+      accept: () => this.deleteRealization(realization.id),
+    });
+  }
+
+  protected confirmArchive(event: Event, realization: AdminStaffingRealizationListItem): void {
+    this.confirm.dangerDecision(event, {
+      message: this.i18n.copy().confirmation.archive.replace('{{name}}', realization.name),
+      acceptLabel: this.i18n.commonActions().archive,
+      rejectLabel: this.i18n.commonActions().cancel,
+      accept: () => this.archiveRealization(realization.id),
+    });
+  }
+
+  private deleteRealization(realizationId: string): void {
+    this.activeRealizationId.set(realizationId);
+    this.write.delete(realizationId).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.activeRealizationId.set(null)),
+    ).subscribe({
+      next: (result) => {
+        this.rows.update((rows) => rows.filter((row) => row.id !== result.realizationId));
+        this.first.set(0);
+        this.toast.success({ summary: this.i18n.copy().toast.deleteSuccessSummary });
+      },
+      error: () => this.toast.danger({
+        summary: this.i18n.copy().toast.deleteFailedSummary,
+        detail: this.i18n.commonErrors().generic,
+      }),
+    });
+  }
+
+  private archiveRealization(realizationId: string): void {
+    this.activeRealizationId.set(realizationId);
+    this.write.archive(realizationId).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.activeRealizationId.set(null)),
+    ).subscribe({
+      next: ({ realization }) => {
+        this.rows.update((rows) => updateStaffingRealizationList(rows, realization));
+        this.first.set(0);
+        this.toast.success({ summary: this.i18n.copy().toast.archiveSuccessSummary });
+      },
+      error: () => this.toast.danger({
+        summary: this.i18n.copy().toast.archiveFailedSummary,
+        detail: this.i18n.commonErrors().generic,
+      }),
     });
   }
 }

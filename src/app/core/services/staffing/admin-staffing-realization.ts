@@ -5,8 +5,10 @@ import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
+  ArchiveAdminStaffingRealizationResult,
   CreateAdminStaffingRealizationRequest,
   CreateAdminStaffingRealizationResult,
+  DeleteAdminStaffingRealizationResult,
   SaveAdminStaffingScheduleDayInput,
   UpdateAdminStaffingRealizationCorePayload,
 } from '../../interfaces/admin-staffing-realization';
@@ -25,6 +27,20 @@ export class AdminStaffingRealization {
   open(realizationId: string): Observable<OpenAdminStaffingRealizationResult> {
     return this.backend.rpc<OpenAdminStaffingRealizationResult>(
       STAFFING_REALIZATION_RPC.openAdmin,
+      { p_realization_id: realizationId },
+    );
+  }
+
+  delete(realizationId: string): Observable<DeleteAdminStaffingRealizationResult> {
+    return this.backend.rpc<DeleteAdminStaffingRealizationResult>(
+      STAFFING_REALIZATION_RPC.deleteAdmin,
+      { p_realization_id: realizationId },
+    );
+  }
+
+  archive(realizationId: string): Observable<ArchiveAdminStaffingRealizationResult> {
+    return this.backend.rpc<ArchiveAdminStaffingRealizationResult>(
+      STAFFING_REALIZATION_RPC.archiveAdmin,
       { p_realization_id: realizationId },
     );
   }
