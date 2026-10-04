@@ -54,7 +54,10 @@ The generated README may be stale and must not override them.
 2. If the working tree contains unexpected changes, stop before editing and
    report the paths. Never overwrite, revert, or absorb someone else's work.
 3. Inspect the complete task-relevant files, their direct callers/consumers,
-   and the existing pattern in the same feature.
+   and the closest existing production analogue for the same responsibility.
+   For any top-level page, list, table, editor, form, dialog, shell, navigation
+   entry, or action layout, inspect at least one comparable existing
+   implementation before planning the change.
 4. Check existing services, facades, read models, interfaces, types, configs,
    validators, utilities, shared UI, and translations before adding a new one.
 5. Confirm that the requested behavior is compatible with SSR and the current
@@ -88,6 +91,95 @@ The generated README may be stale and must not override them.
   not only to the added lines.
 - Prefer a small coherent diff. A smaller diff is not an excuse for leaving a
   clear violation inside touched code.
+
+## Existing UI pattern gate
+
+Existing production UI is the default implementation reference.
+
+Before planning or editing any top-level page, list, table, editor, form,
+dialog, shell, navigation entry, action footer, empty state, loading state, or
+error state, inspect the closest existing production analogue in the
+repository.
+
+This is a hard project rule:
+
+- Do not compose a new page structure from generic utility classes when an
+  equivalent production page pattern already exists.
+- A standalone top-level page must reuse the established page shell/container
+  hierarchy used by the closest comparable page. Check whether the existing
+  pattern uses `mg-section`, `mg-container`, `RouteTabShell`, another shared
+  shell, or another established wrapper before writing the template.
+- A list/table view must inspect and reuse the closest existing production
+  list/table pattern, including:
+  - outer page/container structure;
+  - width and overflow containment;
+  - PrimeNG table wrapping;
+  - `mg-responsive-table` behavior where applicable;
+  - responsive/mobile transformation;
+  - header and CTA placement;
+  - action-column alignment;
+  - loading, error, retry, and empty states.
+- An editor/form must inspect the closest sibling editor and reuse its existing
+  shell, section hierarchy, form layout, action footer, responsive widths, and
+  shared PrimeNG/global utility conventions where semantically applicable.
+- A new route does not justify inventing a new visual shell. If the route is a
+  sibling of existing admin/auth/public routes, compare it with those sibling
+  screens before implementation.
+- Reusing individual utility classes is not sufficient when the surrounding
+  page composition differs from the established project pattern.
+- Do not add local SCSS to compensate for a layout that should have reused an
+  existing shell, container, responsive-table pattern, global utility, or
+  PrimeNG override.
+- If several analogues exist, use the one with the closest responsibility and
+  interaction model, not whichever file is easiest to find.
+- If no credible production analogue exists, state that explicitly before
+  introducing a new composition pattern.
+- In the final report, `Quality: reuse:` must name the concrete production
+  analogue(s), shared component(s), or global pattern(s) inspected and reused.
+  Generic statements such as `used existing patterns` are not sufficient.
+
+A build passing does not excuse divergence from an existing production UI
+pattern. Failure to inspect and reuse the closest applicable pattern is an
+implementation defect.
+
+## User-visible punctuation gate
+
+For Polish user-visible UI copy authored or modified in this repository, use
+the ASCII hyphen:
+
+`-`
+
+Do not introduce:
+
+`–` en dash
+
+or:
+
+`—` em dash
+
+This rule applies to user-visible text including:
+
+- Transloco resources;
+- labels;
+- headings;
+- descriptions;
+- hints;
+- validation messages;
+- button copy;
+- table copy;
+- date and value ranges;
+- textual separators rendered by templates.
+
+When a touched user-visible string already contains an en dash or em dash and
+the copy is not protected or explicitly approved in that exact form, normalize
+that punctuation to the ASCII hyphen as part of the touched change.
+
+Do not rewrite arbitrary user data, backend-provided values, imported content,
+or protected/approved source text merely to apply this punctuation rule.
+
+The Copy approval contract remains authoritative. If approved or protected
+source copy explicitly contains an en dash or em dash, preserve it unless the
+current task explicitly authorizes changing that exact copy.
 
 ## Copy approval contract
 
@@ -211,7 +303,8 @@ implementation work. Do not run unit, integration, end-to-end, browser, or
 snapshot test commands. This project does not treat generated tests as useful
 evidence at the current stage.
 
-- `npm run build` is the mandatory automated correctness gate - Angular tasks only.
+- `npm run build` is the mandatory automated correctness gate - Angular tasks
+  only.
 - Existing specs may receive only the mechanical import, path, or symbol-name
   updates required by production moves and renames.
 - Do not add assertions, mocks, fixtures, test helpers, or new spec files.
@@ -273,44 +366,3 @@ Quality:
 
 Files over 300 LOC:
 - none
-```
-
-For each structurally changed in-scope file over 300 lines, replace `- none`
-with one compact line:
-
-```md
-- `<path>` - `<line count>` LOC - structural - kept | reduced | split - `<reason>` - SRP/SoC/DRY/KISS: PASS/PASS/PASS/PASS
-```
-
-For a mechanical-only edit, use:
-
-```md
-- `<path>` - `<line count>` LOC - mechanical-only - kept - `<import/path/symbol change>; no structural or behavioral edit` - SRP/SoC/DRY/KISS: unchanged
-```
-
-Expand a line only for the exceptional cases defined in the over-300-LOC gate.
-
-Then continue the same report:
-
-```md
-Build (Angular tasks only):
-- `npm run build`: PASS | FAIL | NOT RUN - ...
-- `npm run build:ssr`: PASS | FAIL | NOT RUN | N/A - ...
-
-Other verification:
-- `git diff --check`: PASS | FAIL - ...
-- static checks: ...
-- tests: NOT WRITTEN OR RUN - project policy
-- manual smoke: N/A - user-side
-- final `git status --short`: ...
-
-Risks / blockers:
-- none | ...
-
-Task-requested notes:
-- none | ...
-```
-
-Do not add a second reviewer-requested report, acceptance-criteria recap, or
-`Report back with` section. Map any useful requested facts into the fixed
-sections above.

@@ -12,6 +12,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { finalize, forkJoin, map, Observable, of, Subscription } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { DEFAULT_STAFFING_STATIONARY_CITY } from '../../../../core/configs/staffing-realization.config';
 import {
   createStaffingRealizationCoreForm,
   mapStaffingRealizationCoreToDraft,
@@ -32,7 +33,7 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationType } from '../../../../core/types/staffing-realization';
 import { setControlValue } from '../../../../core/utils/form-controls';
-import { joinTextParts } from '../../../../core/utils/normalize-text';
+import { joinTextParts, normalizeText } from '../../../../core/utils/normalize-text';
 import { getStaffingCoreFormError } from '../staffing-realization-form-errors';
 import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-core-editor.i18n';
 import { StaffingRealizationDatesAndDemand } from './staffing-realization-dates-and-demand';
@@ -142,7 +143,18 @@ export class StaffingRealizationCoreEditor {
   }
 
   protected selectType(type: StaffingRealizationType): void {
-    setControlValue(this.form.controls.type, type);
+    const { city, type: typeControl } = this.form.controls;
+
+    if (
+      this.isNew && typeControl.getRawValue() === 'stationary' && type === 'travel' &&
+      city.pristine && city.getRawValue() === DEFAULT_STAFFING_STATIONARY_CITY
+    ) {
+      city.setValue('');
+    }
+    if (type === 'stationary' && !normalizeText(city.getRawValue())) {
+      city.setValue(DEFAULT_STAFFING_STATIONARY_CITY);
+    }
+    setControlValue(typeControl, type);
   }
 
   protected currentStatusLabel(): string {

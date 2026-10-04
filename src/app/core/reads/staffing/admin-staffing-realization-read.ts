@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
 import {
   AdminStaffingRealizationCore,
+  AdminStaffingRealizationListItem,
   AdminStaffingSchedule,
 } from '../../interfaces/admin-staffing-realization';
 import { AdminStaffingTravelTerms } from '../../interfaces/admin-staffing-travel-terms';
@@ -14,6 +15,12 @@ import { Backend } from '../../services/backend/backend';
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealizationRead {
   private readonly backend = inject(Backend);
+
+  getList(): Observable<AdminStaffingRealizationListItem[]> {
+    return this.backend.rpc<AdminStaffingRealizationListItem[]>(
+      STAFFING_REALIZATION_RPC.getAdminList,
+    );
+  }
 
   validate(realizationId: string): Observable<StaffingRealizationReadinessResult> {
     return this.backend.rpc<StaffingRealizationReadinessResult>(

@@ -70,6 +70,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
         path: '/admin/content',
       },
       {
+        id: 'admin-staffing',
+        label: args.adminStaffingLabel,
+        path: '/admin/staffing',
+      },
+      {
         id: 'admin-coworker-records',
         label: args.adminCoworkerRecordsLabel,
         path: '/admin/coworkers',

@@ -22,6 +22,25 @@ export interface AdminStaffingRealizationCore {
   updatedBy: string;
 }
 
+export interface AdminStaffingRealizationListItem {
+  id: string;
+  name: string;
+  type: StaffingRealizationType;
+  status: StaffingRealizationStatus;
+  city: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  coordinatorUserId: string;
+  staffingSummary: {
+    required: number;
+    confirmed: number;
+    pending: number;
+    vacancies: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AdminStaffingRealizationDay {
   id: string;
   date: string;

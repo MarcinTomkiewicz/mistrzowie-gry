@@ -1,0 +1,1 @@
+export const DEFAULT_STAFFING_STATIONARY_CITY = 'Poznań';

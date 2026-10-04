@@ -1,4 +1,5 @@
 export const STAFFING_REALIZATION_RPC = {
+  getAdminList: 'get_admin_staffing_realization_list',
   validateAdmin: 'validate_admin_staffing_realization',
   openAdmin: 'open_admin_staffing_realization',
   getAdminRecruitmentPolicy: 'get_admin_staffing_recruitment_policy',

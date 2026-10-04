@@ -1,0 +1,141 @@
+@let copy = i18n.copy();
+@let labels = i18n.commonLabels();
+@let actions = i18n.commonActions();
+@let table = copy.table;
+
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isLoading()">
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ copy.page.title }}</h1>
+      <p class="mg-section__subtitle mg-section__subtitle--full">{{ copy.page.subtitle }}</p>
+    </header>
+    <div class="flex-row-end-center w-100">
+      <p-button type="button" severity="success" icon="pi pi-plus" [label]="i18n.createLabel()"
+        routerLink="/admin/staffing/new" [disabled]="isLoading()" />
+    </div>
+    <app-loading-overlay [visible]="isLoading()" [label]="i18n.commonStatus().loading" />
+
+    @if (!isLoading()) {
+      @if (hasLoadError()) {
+        <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.page.loadErrorTitle }}</h3>
+          <p class="m-0">{{ i18n.commonErrors().generic }}</p>
+          <p-button type="button" severity="secondary" icon="pi pi-refresh" [label]="actions.retry"
+            (onClick)="loadRealizations()" />
+        </section>
+      } @else if (rows().length) {
+        <form [formGroup]="filterForm" novalidate
+          class="mg-card mg-grid grid-4-cols grid-2-cols-md grid-1-cols-sm gap-sm p-md w-100">
+          <p-floatlabel variant="on" class="w-100">
+            <input pInputText pSize="small" type="search" class="w-100" id="staffing-list-search"
+              formControlName="searchText" />
+            <label for="staffing-list-search">{{ copy.filters.search }}</label>
+          </p-floatlabel>
+          <p-floatlabel variant="on" class="w-100">
+            <p-datepicker ngSkipHydration size="small" class="w-100" inputStyleClass="w-100"
+              inputId="staffing-list-date" formControlName="date" dateFormat="dd.mm.yy" appendTo="body"
+              [showIcon]="true" [showClear]="true" [readonlyInput]="true" />
+            <label for="staffing-list-date">{{ labels.date }}</label>
+          </p-floatlabel>
+          <p-select size="small" class="w-100" inputId="staffing-list-type" formControlName="type"
+            [options]="typeOptions()" optionLabel="label" optionValue="value" appendTo="body"
+            [showClear]="true" [placeholder]="table.type" [ariaLabel]="table.type" />
+          <p-select size="small" class="w-100" inputId="staffing-list-status" formControlName="status"
+            [options]="statusOptions()" optionLabel="label" optionValue="value" appendTo="body"
+            [showClear]="true" [placeholder]="labels.status" [ariaLabel]="labels.status" />
+        </form>
+        <div class="w-100 overflow-x-auto">
+          <p-table class="w-100" [value]="rowVms()" dataKey="item.id" tableStyleClass="mg-responsive-table"
+            [paginator]="true" [rows]="pageSize()" [rowsPerPageOptions]="rowsPerPageOptions"
+            [alwaysShowPaginator]="false" [first]="first()" (firstChange)="first.set($event)"
+            (rowsChange)="pageSize.set($event)">
+            <ng-template #header>
+              <tr class="hide-down-sm">
+                <th scope="col" class="small-caps" pSortableColumn="item.name">
+                  {{ labels.name }} <p-sortIcon field="item.name" />
+                </th>
+                <th scope="col" class="small-caps" pSortableColumn="item.startDate">
+                  {{ table.dates }} <p-sortIcon field="item.startDate" />
+                </th>
+                <th scope="col" class="small-caps" pSortableColumn="item.city">
+                  {{ labels.city }} <p-sortIcon field="item.city" />
+                </th>
+                <th scope="col" class="small-caps" pSortableColumn="typeLabel">
+                  {{ table.type }} <p-sortIcon field="typeLabel" />
+                </th>
+                <th scope="col" class="small-caps" pSortableColumn="statusLabel">
+                  {{ labels.status }} <p-sortIcon field="statusLabel" />
+                </th>
+                <th scope="col" class="small-caps text-center">{{ table.staffingSummary }}</th>
+                <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #sorticon let-sortOrder>
+              <i class="pi warn-text" [class.pi-ascending]="sortOrder === 1"
+                [class.pi-descending]="sortOrder !== 1" aria-hidden="true"></i>
+            </ng-template>
+            <ng-template #body let-row>
+              <tr class="mg-responsive-table__row">
+                <th scope="row" class="mg-responsive-table__row-heading">{{ row.item.name }}</th>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ table.dates }}</span>
+                  <span class="mg-responsive-table__value">
+                    {{ row.startDateLabel }}
+                    @if (row.endDateLabel) { - {{ row.endDateLabel }} }
+                  </span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ labels.city }}</span>
+                  <span class="mg-responsive-table__value">{{ row.cityLabel }}</span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ table.type }}</span>
+                  <span class="mg-responsive-table__value">
+                    <span [class]="row.typeBadgeClass">{{ row.typeLabel }}</span>
+                  </span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ labels.status }}</span>
+                  <span class="mg-responsive-table__value">
+                    <span [class]="row.statusBadgeClass">{{ row.statusLabel }}</span>
+                  </span>
+                </td>
+                <td class="mg-responsive-table__cell text-center">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ table.staffingSummary }}</span>
+                  <dl class="mg-responsive-table__value mg-grid grid-cols-2 gap-xs m-0 text-center">
+                    @for (stat of row.summary; track stat.key) {
+                      <div class="flex-col-start-center gap-xs">
+                        <dt class="small-caps muted-text">{{ stat.label }}</dt>
+                        <dd class="m-0"><span [class]="stat.badgeClass">{{ stat.value }}</span></dd>
+                      </div>
+                    }
+                  </dl>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+                  <div class="mg-responsive-table__value flex-row-end-center">
+                    <p-button type="button" size="small" severity="secondary" icon="pi pi-pencil"
+                      [label]="actions.edit" [routerLink]="['/admin/staffing', row.item.id, 'edit']" />
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="7">
+                  <p class="m-0 muted-text" role="status">{{ copy.filters.noResults }}</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <p class="m-0 muted-text">{{ copy.page.summaryHint }}</p>
+      } @else {
+        <section class="mg-card flex-col-start-stretch gap-xs p-md w-100" role="status">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.page.emptyTitle }}</h3>
+          <p class="m-0">{{ copy.page.emptyDescription }}</p>
+        </section>
+      }
+    }
+  </div>
+</section>

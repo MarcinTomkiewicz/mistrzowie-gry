@@ -1,6 +1,7 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { DEFAULT_TIMEZONE } from '../configs/time.config';
+import { DEFAULT_STAFFING_STATIONARY_CITY } from '../configs/staffing-realization.config';
 import {
   AdminStaffingRealizationCore,
   CreateAdminStaffingRealizationDayInput,
@@ -21,7 +22,7 @@ export function createStaffingRealizationCoreForm(): StaffingRealizationCoreForm
     }),
     description: new FormControl('', { nonNullable: true }),
     operationalNotes: new FormControl('', { nonNullable: true }),
-    city: new FormControl('', { nonNullable: true }),
+    city: new FormControl(DEFAULT_STAFFING_STATIONARY_CITY, { nonNullable: true }),
     venueName: new FormControl('', { nonNullable: true }),
     venueAddress: new FormControl('', { nonNullable: true }),
     timezone: new FormControl(DEFAULT_TIMEZONE, {

@@ -42,6 +42,7 @@ export class UserMenuPanel {
       eventSignupLabel: this.i18n.commonNav().eventSignup,
       myWorkLogLabel: this.i18n.userMenu().myWorkLogLabel,
       adminContentLabel: this.i18n.commonNav().contentAdministration,
+      adminStaffingLabel: this.i18n.commonNav().staffingManagement,
       adminCoworkerRecordsLabel:
         this.i18n.commonNav().adminCoworkerRecords,
       adminUsersLabel: this.i18n.commonNav().usersAdministration,

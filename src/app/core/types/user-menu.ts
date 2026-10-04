@@ -6,6 +6,7 @@ export type UserMenuItemId =
   | 'event-signup'
   | 'my-work-log'
   | 'admin-content'
+  | 'admin-staffing'
   | 'admin-coworker-records'
   | 'admin-users';
 
@@ -27,6 +28,7 @@ export type BuildUserMenuArgs = {
   eventSignupLabel: string;
   myWorkLogLabel: string;
   adminContentLabel: string;
+  adminStaffingLabel: string;
   adminCoworkerRecordsLabel: string;
   adminUsersLabel: string;
   canSeeCoworker: boolean;

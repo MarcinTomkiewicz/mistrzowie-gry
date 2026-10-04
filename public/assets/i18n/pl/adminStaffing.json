@@ -1,4 +1,29 @@
 {
+  "list": {
+    "page": {
+      "title": "[PH] Lista realizacji",
+      "subtitle": "[PH] Przegląd terminów, statusów i obsady realizacji.",
+      "summaryHint": "[PH] Obsada to suma miejsc we wszystkich dniach realizacji. Ta sama osoba może być liczona w kilku dniach.",
+      "emptyTitle": "[PH] Brak realizacji",
+      "emptyDescription": "[PH] Utwórz pierwszą realizację, aby skonfigurować jej dni i zasady obsady.",
+      "loadErrorTitle": "[PH] Nie udało się załadować listy realizacji"
+    },
+    "table": {
+      "dates": "Daty",
+      "type": "Typ",
+      "staffingSummary": "Obsada"
+    },
+    "summary": {
+      "required": "Wymagane",
+      "confirmed": "Potwierdzone",
+      "pending": "Oczekujące",
+      "vacancies": "Wolne"
+    },
+    "filters": {
+      "search": "[PH] Szukaj po nazwie lub mieście",
+      "noResults": "[PH] Brak realizacji spełniających wybrane filtry."
+    }
+  },
   "finalization": {
     "validate": "Sprawdź poprawność danych",
     "open": "[PH] Zatwierdź i uruchom realizację",

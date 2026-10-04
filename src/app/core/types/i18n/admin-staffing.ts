@@ -1,7 +1,29 @@
 import type { StaffingRealizationType } from '../staffing-realization';
+import type { AdminStaffingRealizationListItem } from '../../interfaces/admin-staffing-realization';
 import type { StaffingSessionSelectionMode, StaffingStationaryScopePolicy } from '../staffing-realization';
 import type { StaffingRecruitmentPolicyDraft } from '../staffing-recruitment-policy-form';
 import type { StaffingRealizationTravelTermsDraft } from '../staffing-realization-editor-draft';
+
+export type AdminStaffingRealizationListCopy = {
+  page: {
+    title: string;
+    subtitle: string;
+    summaryHint: string;
+    emptyTitle: string;
+    emptyDescription: string;
+    loadErrorTitle: string;
+  };
+  table: {
+    dates: string;
+    type: string;
+    staffingSummary: string;
+  };
+  summary: Record<keyof AdminStaffingRealizationListItem['staffingSummary'], string>;
+  filters: {
+    search: string;
+    noResults: string;
+  };
+};
 
 export type AdminStaffingEditorCopy = {
   page: {

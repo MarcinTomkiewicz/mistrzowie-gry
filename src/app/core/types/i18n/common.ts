@@ -176,6 +176,7 @@ export type CommonNavTranslations = {
   gmAvailability: string;
   gmSessions: string;
   contentAdministration: string;
+  staffingManagement: string;
   usersAdministration: string;
   contentManagement: string;
   offersManagement: string;

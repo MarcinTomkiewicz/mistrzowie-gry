@@ -3,8 +3,12 @@ import {
   CoworkerDocumentLifecycleStatus,
   CoworkerOnboardingLifecycleStatus,
 } from '../types/coworker-onboarding';
+import type { StaffingRealizationStatus } from '../types/staffing-realization';
 
 export const STATUS_BADGE_CLASS = {
+  draft: 'tag-badge--warn',
+  open: 'tag-badge--success',
+  closed: 'tag-badge--muted',
   pending: 'tag-badge--warn',
   in_progress: 'tag-badge--info',
   completed: 'tag-badge--success',
@@ -20,6 +24,7 @@ export const STATUS_BADGE_CLASS = {
 } as const satisfies Record<
   | CoworkerOnboardingLifecycleStatus
   | CoworkerDocumentLifecycleStatus
-  | CoworkerDocumentAssignmentStatus,
+  | CoworkerDocumentAssignmentStatus
+  | StaffingRealizationStatus,
   string
 >;
