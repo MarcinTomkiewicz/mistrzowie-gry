@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
+import type { AdminStaffingAvailability } from '../../interfaces/admin-staffing-availability';
+import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingRealizationListItem,
@@ -19,6 +21,20 @@ export class AdminStaffingRealizationRead {
   getList(): Observable<AdminStaffingRealizationListItem[]> {
     return this.backend.rpc<AdminStaffingRealizationListItem[]>(
       STAFFING_REALIZATION_RPC.getAdminList,
+    );
+  }
+
+  getCandidates(realizationId: string): Observable<StaffingCandidate[]> {
+    return this.backend.rpc<StaffingCandidate[]>(
+      STAFFING_REALIZATION_RPC.getAdminCandidates,
+      { p_realization_id: realizationId },
+    );
+  }
+
+  getAvailability(realizationId: string): Observable<AdminStaffingAvailability> {
+    return this.backend.rpc<AdminStaffingAvailability>(
+      STAFFING_REALIZATION_RPC.getAdminAvailability,
+      { p_realization_id: realizationId },
     );
   }
 

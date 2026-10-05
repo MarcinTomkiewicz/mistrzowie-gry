@@ -10,6 +10,8 @@ export const STAFFING_REALIZATION_RPC = {
   decideMyAdminProposal: 'decide_my_staffing_admin_proposal',
   withdrawMyConfirmedParticipation: 'withdraw_my_confirmed_staffing_participation',
   getAdminList: 'get_admin_staffing_realization_list',
+  getAdminCandidates: 'get_admin_staffing_realization_candidates',
+  getAdminAvailability: 'get_admin_staffing_realization_availability',
   validateAdmin: 'validate_admin_staffing_realization',
   openAdmin: 'open_admin_staffing_realization',
   deleteAdmin: 'delete_admin_staffing_realization',

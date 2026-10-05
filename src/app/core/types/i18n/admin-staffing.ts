@@ -1,4 +1,4 @@
-import type { StaffingRealizationType } from '../staffing-realization';
+import type { StaffingAvailabilityStatus, StaffingRealizationType } from '../staffing-realization';
 import type { AdminStaffingRealizationListItem } from '../../interfaces/admin-staffing-realization';
 import type { StaffingSessionSelectionMode, StaffingStationaryScopePolicy } from '../staffing-realization';
 import type { StaffingRecruitmentPolicyDraft } from '../staffing-recruitment-policy-form';
@@ -96,6 +96,7 @@ export type AdminStaffingShellCopy = {
     schedule: string;
     travelTerms: string;
     recruitmentPolicy: string;
+    board: string;
   };
 };
 
@@ -202,4 +203,38 @@ export type AdminStaffingFinalizationCopy = {
   openFailed: string;
   openFailedDetail: string;
   openSuccess: string;
+};
+
+export type AdminStaffingBoardCopy = {
+  title: string;
+  description: string;
+  persistedHint: string;
+  loadFailed: string;
+  candidatesTitle: string;
+  emptyCandidates: string;
+  outsideRoster: string;
+  candidateDetail: {
+    title: string;
+    show: string;
+    participationActive: string;
+    endedBy: string;
+  };
+  fields: {
+    gm: string;
+    origin: string;
+    scope: string;
+    gmDecision: string;
+    adminDecision: string;
+    participation: string;
+    availability: string;
+    slot: string;
+  };
+  availability: {
+    title: string;
+    hint: string;
+    showSlots: string;
+    emptyRoster: string;
+    noSchedule: string;
+    statuses: Record<StaffingAvailabilityStatus, string>;
+  };
 };

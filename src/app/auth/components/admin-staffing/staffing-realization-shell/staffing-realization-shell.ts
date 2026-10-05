@@ -57,6 +57,13 @@ export class StaffingRealizationShell {
     }
 
     tabs.push({
+      id: 'board',
+      label: labels.board,
+      icon: 'pi pi-users',
+      path: `${realizationPath}/board`,
+    });
+
+    tabs.push({
       id: 'recruitment-policy',
       label: labels.recruitmentPolicy,
       icon: 'pi pi-users',

@@ -6,6 +6,7 @@ import { mapStaffingRealizationScheduleToDraft } from '../../factories/staffing-
 import { mapStaffingTravelTermsToDraft } from '../../factories/staffing-realization-travel-terms-form.factory';
 import { mapStaffingRecruitmentPolicyToDraft } from '../../factories/staffing-recruitment-policy-form.factory';
 import { AdminStaffingRecruitmentPolicy, SaveAdminStaffingRecruitmentPolicyPayload } from '../../interfaces/admin-staffing-recruitment-policy';
+import type { AdminStaffingRealizationBoard } from '../../interfaces/admin-staffing-realization-board';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
@@ -110,6 +111,28 @@ export class StaffingRealizationEditorFacade {
         }
       }),
       map(() => void 0),
+    );
+  }
+
+  loadBoard(realizationId: string): Observable<AdminStaffingRealizationBoard> {
+    this.store.open(realizationId);
+    return forkJoin({
+      realization: this.read.getDetail(realizationId),
+      schedule: this.read.getSchedule(realizationId),
+      list: this.read.getList(),
+      candidates: this.read.getCandidates(realizationId),
+      availability: this.read.getAvailability(realizationId),
+    }).pipe(
+      map(({ list, ...board }) => {
+        const item = list.find((row) => row.id === realizationId);
+        if (!item) throw new Error('Staffing realization is missing from the admin list.');
+        return { ...board, summary: item.staffingSummary };
+      }),
+      tap(({ realization, schedule }) => {
+        if (this.store.realizationId() !== realizationId) return;
+        if (this.store.coreDraft() === null) this.hydrateCore(realization);
+        if (this.store.scheduleDraft() === null) this.hydrateSchedule(schedule);
+      }),
     );
   }
 

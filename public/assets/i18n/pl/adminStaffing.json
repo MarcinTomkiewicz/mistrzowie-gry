@@ -178,7 +178,8 @@
       "recruitmentPolicy": "[PH] Zasady rekrutacji",
       "core": "Dane podstawowe",
       "schedule": "Dni i sloty",
-      "travelTerms": "[PH] Warunki wyjazdu"
+      "travelTerms": "[PH] Warunki wyjazdu",
+      "board": "[PH] Obsada i kandydaci"
     }
   },
   "schedule": {
@@ -228,6 +229,45 @@
       "loadFailedSummary": "[PH] Nie udało się załadować harmonogramu realizacji",
       "saveSuccessSummary": "[PH] Harmonogram realizacji zapisany",
       "saveFailedSummary": "[PH] Nie udało się zapisać harmonogramu realizacji"
+    }
+  },
+  "board": {
+    "title": "[PH] Obsada i kandydaci",
+    "description": "[PH] Przegląd obsady, zgłoszeń i propozycji udziału w realizacji.",
+    "persistedHint": "[PH] Widok pokazuje zapisane dane. Zapisz zmiany szkiców, aby uwzględnić je w podsumowaniu.",
+    "loadFailed": "[PH] Nie udało się załadować obsady realizacji",
+    "candidatesTitle": "[PH] Kandydaci",
+    "emptyCandidates": "[PH] Ta realizacja nie ma jeszcze kandydatów.",
+    "outsideRoster": "[PH] MG spoza bieżącej listy dostępności",
+    "candidateDetail": {
+      "title": "[PH] Szczegóły kandydatury",
+      "show": "[PH] Szczegóły",
+      "participationActive": "[PH] Aktywny udział",
+      "endedBy": "[PH] Osoba kończąca udział (ID)"
+    },
+    "fields": {
+      "gm": "[PH] Mistrz Gry",
+      "origin": "[PH] Źródło udziału",
+      "scope": "[PH] Zakres udziału",
+      "gmDecision": "[PH] Decyzja MG",
+      "adminDecision": "[PH] Decyzja administratora",
+      "participation": "[PH] Stan udziału",
+      "availability": "[PH] Dostępność",
+      "slot": "[PH] Slot"
+    },
+    "availability": {
+      "title": "[PH] Dostępność MG",
+      "hint": "[PH] Dostępność odnosi się do całego zapisanego harmonogramu w strefie czasowej realizacji. Ma charakter informacyjny i nie oznacza potwierdzenia udziału ani przypisania do slotów.",
+      "showSlots": "[PH] Dostępność w slotach",
+      "emptyRoster": "[PH] Brak MG na bieżącej liście dostępności.",
+      "noSchedule": "[PH] Realizacja nie ma zapisanych slotów. Dostępność nie została oceniona.",
+      "statuses": {
+        "available": "[PH] Dostępny",
+        "partial": "[PH] Częściowe pokrycie",
+        "conflict": "[PH] Konflikt",
+        "no_declared_availability": "[PH] Brak deklaracji dostępności",
+        "no_schedule": "[PH] Brak slotów"
+      }
     }
   },
   "travelTerms": {

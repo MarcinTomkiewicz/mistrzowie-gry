@@ -4,6 +4,10 @@ import { authGuard } from '../../core/guards/auth.guard';
 import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
 
 const loaders = {
+  staffingRealizationBoard: () =>
+    import(
+      '../components/admin-staffing/staffing-realization-board/staffing-realization-board'
+    ).then((m) => m.StaffingRealizationBoard),
   staffingRealizationList: () =>
     import(
       '../components/admin-staffing/staffing-realization-list/staffing-realization-list'
@@ -137,6 +141,10 @@ const adminChildren: Routes = [
     loadComponent: loaders.staffingRealizationShell,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'edit' },
+      {
+        path: 'board',
+        loadComponent: loaders.staffingRealizationBoard,
+      },
       {
         path: 'recruitment-policy',
         loadComponent: loaders.staffingRecruitmentPolicyEditor,

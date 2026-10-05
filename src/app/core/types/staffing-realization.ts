@@ -5,6 +5,15 @@ export type StaffingSessionSelectionMode = 'gm_selects' | 'realization_assigns';
 
 export type StaffingParticipationEndReason = 'gm_withdrawal' | 'admin_removal';
 
+export type StaffingAvailabilityStatus =
+  | 'available'
+  | 'partial'
+  | 'conflict'
+  | 'no_declared_availability'
+  | 'no_schedule';
+
+export type StaffingSlotAvailabilityStatus = Exclude<StaffingAvailabilityStatus, 'no_schedule'>;
+
 export type StaffingRealizationStatus =
   | 'draft'
   | 'open'

@@ -1,0 +1,241 @@
+@let copy = i18n.copy();
+@let fields = copy.fields;
+
+<div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isLoading()">
+  <app-loading-overlay [visible]="isLoading()" [label]="i18n.commonStatus().loading" />
+
+  @if (!isLoading()) {
+    @if (loadFailed()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+        <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy.loadFailed }}</h2>
+        <p class="m-0">{{ i18n.commonErrors().generic }}</p>
+        <p-button type="button" severity="secondary" icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry" (onClick)="loadBoard()" />
+      </section>
+    } @else if (board(); as data) {
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <div class="flex-col-start-stretch gap-xs min-w-0">
+          <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
+          <strong>{{ data.realization.name }}</strong>
+          <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
+            {{ copy.description }}
+          </p>
+          <div class="flex-row-start-center flex-wrap gap-xs">
+            <span [class]="'tag-badge ' + statusBadgeClass[data.realization.status]">
+              {{ i18n.realizationStatuses()[data.realization.status] }}
+            </span>
+            <span class="tag-badge" [class.tag-badge--info]="data.realization.type === 'travel'"
+              [class.tag-badge--golden]="data.realization.type === 'stationary'">
+              {{ i18n.realizationTypes()[data.realization.type] }}
+            </span>
+            @if (data.realization.city) { <span>{{ data.realization.city }}</span> }
+          </div>
+        </div>
+        <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-refresh"
+          [label]="i18n.commonActions().refresh" (onClick)="loadBoard()" />
+      </header>
+
+      @if (hasUnsavedChanges()) {
+        <p class="mg-card bg-warn-subtle p-md m-0" role="status">{{ copy.persistedHint }}</p>
+      }
+
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+        <dl class="mg-grid grid-3-cols grid-1-cols-sm gap-sm m-0 text-center">
+          @for (stat of summary(); track stat.key) {
+            <div class="flex-col-start-center gap-xs">
+              <dt class="small-caps muted-text">{{ stat.label }}</dt>
+              <dd class="m-0"><span [class]="'tag-badge ' + stat.badgeClass">{{ stat.value }}</span></dd>
+            </div>
+          }
+        </dl>
+        <p class="muted-text m-0">{{ i18n.summaryHint() }}</p>
+      </section>
+
+      <section class="flex-col-start-stretch gap-sm w-100 min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.candidatesTitle }}</h3>
+        <div class="w-100 overflow-x-auto">
+          <p-table [value]="candidateRows()" dataKey="candidate.id" tableStyleClass="mg-responsive-table"
+            [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
+            <ng-template #header>
+              <tr class="hide-down-sm">
+                <th scope="col" class="small-caps">{{ fields.gm }}</th>
+                <th scope="col" class="small-caps">{{ fields.origin }}</th>
+                <th scope="col" class="small-caps">{{ fields.scope }}</th>
+                <th scope="col" class="small-caps">{{ fields.gmDecision }}</th>
+                <th scope="col" class="small-caps">{{ fields.adminDecision }}</th>
+                <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+                <th scope="col" class="small-caps">{{ fields.participation }}</th>
+                <th scope="col" class="small-caps">{{ fields.availability }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-row>
+              @let candidate = row.candidate;
+              <tr class="mg-responsive-table__row">
+                <th scope="row" class="mg-responsive-table__row-heading">
+                  <div class="flex-col-start-stretch gap-xs">
+                    @if (row.gm; as gm) {
+                      <strong>{{ getUserDisplayName(gm) || gm.userId }}</strong>
+                    } @else {
+                      <span class="muted-text">{{ copy.outsideRoster }}</span>
+                      <small class="muted-text text-wrap-anywhere">{{ candidate.gmUserId }}</small>
+                    }
+                    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
+                      [label]="copy.candidateDetail.show" (onClick)="selectedCandidateId.set(candidate.id)" />
+                  </div>
+                </th>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ fields.origin }}</span>
+                  <span class="mg-responsive-table__value">{{ row.originLabel }}</span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ fields.scope }}</span>
+                  <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+                    <span>{{ row.scopeLabel }}</span>
+                    @if (candidate.scope.mode === 'selected_days') {
+                      @for (day of row.days; track day.id) {
+                        <span>{{ formatDateLabel(day.date) }}</span>
+                      }
+                    }
+                  </div>
+                </td>
+                @for (decision of row.decisions; track decision.key) {
+                  <td class="mg-responsive-table__cell">
+                    <span class="mg-responsive-table__label small-caps font-bold">{{ decision.label }}</span>
+                    <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                      <span [class]="'tag-badge ' + decision.badgeClass">{{ decision.value }}</span>
+                      @if (decision.decidedAt; as timestamp) {
+                        <small class="muted-text">{{ formatTimestampLabel(timestamp, 'pl-PL', data.realization.timezone) }}</small>
+                      }
+                    </div>
+                  </td>
+                }
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
+                  <span class="mg-responsive-table__value">
+                    <span [class]="'tag-badge ' + row.stateBadgeClass">
+                      {{ row.stateLabel }}
+                    </span>
+                  </span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ fields.participation }}</span>
+                  <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                    @if (candidate.state === 'confirmed') {
+                      <span class="tag-badge" [class.tag-badge--success]="candidate.participation.active"
+                        [class.tag-badge--muted]="!candidate.participation.active">
+                        {{ candidate.participation.active ? i18n.participation().active : i18n.participation().ended }}
+                      </span>
+                      @if (candidate.participation.endedAt; as timestamp) {
+                        <small class="muted-text">{{ formatTimestampLabel(timestamp, 'pl-PL', data.realization.timezone) }}</small>
+                      }
+                      @if (row.endReasonLabel; as reason) {
+                        <small class="muted-text">{{ reason }}</small>
+                      }
+                    } @else {
+                      <span class="muted-text">{{ i18n.commonValues().notApplicable }}</span>
+                    }
+                  </div>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ fields.availability }}</span>
+                  <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                    @if (row.gm; as gm) {
+                      <span [class]="'tag-badge ' + row.availabilityBadgeClass">
+                        {{ row.availabilityLabel }}
+                      </span>
+                      <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-calendar"
+                        [label]="copy.availability.showSlots" (onClick)="selectedGm.set(gm)" />
+                    } @else {
+                      <span class="muted-text">{{ copy.outsideRoster }}</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr><td colspan="8"><p class="muted-text m-0" role="status">{{ copy.emptyCandidates }}</p></td></tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </section>
+
+      <app-staffing-realization-availability [availability]="data.availability" [(selectedGm)]="selectedGm" />
+
+      <p-dialog styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="candidateDetail() !== null"
+        [header]="copy.candidateDetail.title" (visibleChange)="selectedCandidateId.set(null)">
+        @if (candidateDetail(); as detail) {
+          @let candidate = detail.candidate;
+          @let days = candidate.scope.mode === 'whole_realization' ? data.schedule.days : detail.days;
+          <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ fields.gm }}</dt>
+              <dd class="m-0 text-wrap-anywhere">
+                @if (detail.gm; as gm) {
+                  <strong>{{ getUserDisplayName(gm) || gm.userId }}</strong>
+                } @else {
+                  <span>{{ copy.outsideRoster }}</span>
+                  <small class="d-block muted-text">{{ candidate.gmUserId }}</small>
+                }
+              </dd>
+            </div>
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ fields.origin }}</dt>
+              <dd class="m-0">{{ detail.originLabel }}</dd>
+            </div>
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ fields.scope }}</dt>
+              <dd class="m-0">
+                {{ detail.scopeLabel }}
+                <ul class="m-0">
+                  @for (day of days; track day.id) {
+                    <li>{{ formatDateLabel(day.date, 'pl-PL', true) }}</li>
+                  }
+                </ul>
+              </dd>
+            </div>
+            <div class="flex-col-start-start gap-xs">
+              <dt class="muted-text">{{ i18n.commonLabels().status }}</dt>
+              <dd [class]="'tag-badge m-0 ' + detail.stateBadgeClass">{{ detail.stateLabel }}</dd>
+            </div>
+            @for (decision of detail.decisions; track decision.key) {
+              <div class="flex-col-start-start gap-xs">
+                <dt class="muted-text">{{ decision.label }}</dt>
+                <dd class="flex-col-start-start gap-xs m-0">
+                  <span [class]="'tag-badge ' + decision.badgeClass">{{ decision.value }}</span>
+                  <small class="muted-text">
+                    {{ formatTimestampLabel(decision.decidedAt, 'pl-PL', data.realization.timezone) ?? i18n.commonValues().notApplicable }}
+                  </small>
+                </dd>
+              </div>
+            }
+            <div class="flex-col-start-start gap-xs">
+              <dt class="muted-text">{{ copy.candidateDetail.participationActive }}</dt>
+              <dd class="tag-badge m-0" [class.tag-badge--success]="candidate.participation.active"
+                [class.tag-badge--muted]="!candidate.participation.active">
+                {{ candidate.participation.active ? i18n.commonValues().yes : i18n.commonValues().no }}
+              </dd>
+            </div>
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ i18n.participation().endedAt }}</dt>
+              <dd class="m-0">
+                {{ formatTimestampLabel(candidate.participation.endedAt, 'pl-PL', data.realization.timezone) ?? i18n.commonValues().notApplicable }}
+              </dd>
+            </div>
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ copy.candidateDetail.endedBy }}</dt>
+              <dd class="m-0 text-wrap-anywhere">{{ candidate.participation.endedBy ?? i18n.commonValues().notApplicable }}</dd>
+            </div>
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ i18n.participation().endReason }}</dt>
+              <dd class="m-0">{{ detail.endReasonLabel ?? i18n.commonValues().notApplicable }}</dd>
+            </div>
+          </dl>
+        }
+        <ng-template #footer>
+          <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+            [label]="i18n.commonActions().close" (onClick)="selectedCandidateId.set(null)" />
+        </ng-template>
+      </p-dialog>
+    }
+  }
+</div>
