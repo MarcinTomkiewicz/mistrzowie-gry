@@ -1,8 +1,8 @@
 import { DestroyRef, effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, forkJoin, Subscription } from 'rxjs';
+import { finalize, forkJoin, Observable, Subscription, tap } from 'rxjs';
 
-import type { ISessionWithRelations } from '../../interfaces/i-session';
+import type { ISessionFormSubmitData, ISessionWithRelations } from '../../interfaces/i-session';
 import { Auth } from '../../services/auth/auth';
 import { GmSessions } from '../../services/gm-sessions/gm-sessions';
 import type { SessionSourceKind } from '../../types/session-source';
@@ -58,5 +58,32 @@ export class StaffingSessionSelectorFacade {
       },
       error: () => this.loadFailed.set(true),
     });
+  }
+
+  getFormOptions() {
+    return forkJoin({
+      systems: this.gmSessions.getAvailableSystems(),
+      styles: this.gmSessions.getAvailableStyles(),
+      triggers: this.gmSessions.getAvailableTriggers(),
+      languages: this.gmSessions.getAvailableLanguages(),
+    });
+  }
+
+  createSession(submit: ISessionFormSubmitData, sourceKind: SessionSourceKind): Observable<ISessionWithRelations> {
+    return this.gmSessions.createMySession(submit, sourceKind).pipe(
+      tap(session => {
+        this.sessionsSource.update(catalog => ({
+          ...catalog,
+          [sourceKind]: [...catalog[sourceKind].filter(item => item.id !== session.id), session],
+        }));
+        this.refresh();
+      }),
+    );
+  }
+
+  private refresh(): void {
+    this.request?.unsubscribe();
+    this.loaded = false;
+    this.load();
   }
 }

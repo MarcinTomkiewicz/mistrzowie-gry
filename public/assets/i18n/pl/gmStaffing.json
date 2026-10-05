@@ -31,11 +31,16 @@
       "template": "[PH] Sesje standardowe",
       "custom": "[PH] Sesje jednorazowe"
     },
+    "createTitles": {
+      "template": "[PH] Nowa sesja standardowa",
+      "custom": "[PH] Nowa sesja jednorazowa"
+    },
     "emptyDescriptions": {
       "template": "[PH] Nie masz jeszcze sesji standardowych do wyboru.",
       "custom": "[PH] Nie masz jeszcze sesji jednorazowych do wyboru."
     },
-    "loadFailed": "[PH] Nie udało się załadować sesji do wyboru"
+    "loadFailed": "[PH] Nie udało się załadować sesji do wyboru",
+    "formLoadFailed": "[PH] Nie udało się załadować danych formularza sesji."
   },
   "detail": {
     "title": "[PH] Szczegóły realizacji",

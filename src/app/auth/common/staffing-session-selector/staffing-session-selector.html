@@ -11,6 +11,9 @@
       [options]="sessionOptions()" optionLabel="label" optionValue="value" size="small" appendTo="body"
       class="flex-1 min-w-0 w-100-sm" [placeholder]="copy.sessionLabel" [ariaLabel]="copy.sessionLabel"
       [filter]="true" filterBy="label" [emptyMessage]="copy.emptyDescriptions[source()]" [readonly]="isBusy()" />
+    <p-button type="button" size="small" severity="success" icon="pi pi-creation"
+      class="flex-none w-100-sm" styleClass="w-100" [label]="i18n.sessionActions().addLabel"
+      [disabled]="isBusy()" (onClick)="openCreation()" />
   </div>
 
   @if (facade.loadFailed()) {
@@ -32,3 +35,28 @@
     }
   }
 </div>
+
+@if (creationSource(); as sourceKind) {
+  <p-dialog [visible]="true" [modal]="true" [draggable]="false" [resizable]="false"
+    [closable]="!isSubmitting()" [closeOnEscape]="!isSubmitting()" appendTo="body"
+    styleClass="mg-dialog mg-dialog--xl" [header]="copy.createTitles[sourceKind]"
+    (visibleChange)="closeCreation()">
+    <div class="position-relative w-100" [class.h-px-200]="isFormLoading()">
+      <app-loading-overlay [visible]="isFormLoading() || isSubmitting()"
+        [label]="isSubmitting() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+      @if (formLoadFailed()) {
+        <div class="flex-col-start-stretch gap-sm" role="alert">
+          <p class="m-0">{{ copy.formLoadFailed }}</p>
+          <div>
+            <p-button type="button" severity="secondary" icon="pi pi-refresh"
+              [label]="i18n.commonActions().retry" [disabled]="isFormLoading()" (onClick)="loadFormOptions()" />
+          </div>
+        </div>
+      } @else if (!isFormLoading()) {
+        <app-session-form [systems]="systems()" [styles]="styles()" [triggers]="triggers()" [languages]="languages()"
+          [busy]="isBusy()" [submitLabel]="i18n.sessionActions().createLabel" [cancelLabel]="i18n.commonActions().cancel"
+          (save)="saveSession($event)" (cancel)="closeCreation()" />
+      }
+    </div>
+  </p-dialog>
+}

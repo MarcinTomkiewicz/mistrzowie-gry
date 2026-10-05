@@ -9,8 +9,10 @@ export type StaffingSessionSelectorCopy = {
   sourceLabel: string;
   sessionLabel: string;
   sources: Record<SessionSourceKind, string>;
+  createTitles: Record<SessionSourceKind, string>;
   emptyDescriptions: Record<SessionSourceKind, string>;
   loadFailed: string;
+  formLoadFailed: string;
 };
 
 export type GmStaffingHubCopy = {
