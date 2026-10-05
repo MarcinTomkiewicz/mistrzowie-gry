@@ -3,6 +3,7 @@ import { translateSignal } from '@jsverse/transloco';
 import {
   createCommonActionsI18n,
   createCommonErrorsI18n,
+  createCommonFormI18n,
   createCommonLabelsI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
@@ -40,6 +41,7 @@ export function createStaffingRealizationBoardI18n() {
     summaryHint: translateSignal('list.page.summaryHint', {}, { scope: 'adminStaffing' }),
     commonActions: createCommonActionsI18n(),
     commonErrors: createCommonErrorsI18n(),
+    commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),

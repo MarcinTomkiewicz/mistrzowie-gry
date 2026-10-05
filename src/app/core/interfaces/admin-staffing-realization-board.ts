@@ -1,4 +1,5 @@
 import type { AdminStaffingAvailability } from './admin-staffing-availability';
+import type { AdminStaffingRecruitmentPolicy } from './admin-staffing-recruitment-policy';
 import type {
   AdminStaffingRealizationCore,
   AdminStaffingRealizationListItem,
@@ -12,4 +13,5 @@ export interface AdminStaffingRealizationBoard {
   schedule: AdminStaffingSchedule;
   candidates: StaffingCandidate[];
   availability: AdminStaffingAvailability;
+  recruitmentPolicy: AdminStaffingRecruitmentPolicy | null;
 }

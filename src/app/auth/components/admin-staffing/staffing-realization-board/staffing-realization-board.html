@@ -52,7 +52,13 @@
       </section>
 
       <section class="flex-col-start-stretch gap-sm w-100 min-w-0">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.candidatesTitle }}</h3>
+        <div class="flex-row-between-center flex-wrap gap-sm">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.candidatesTitle }}</h3>
+          @if (data.realization.status === 'open') {
+            <p-button type="button" severity="success" size="small" icon="pi pi-send"
+              [label]="copy.proposal.action" (onClick)="showProposal.set(true)" />
+          }
+        </div>
         <div class="w-100 overflow-x-auto">
           <p-table [value]="candidateRows()" dataKey="candidate.id" tableStyleClass="mg-responsive-table"
             [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
@@ -160,6 +166,10 @@
       </section>
 
       <app-staffing-realization-availability [availability]="data.availability" [(selectedGm)]="selectedGm" />
+
+      @if (showProposal()) {
+        <app-staffing-admin-proposal [board]="data" (closed)="showProposal.set(false)" (created)="loadBoard()" />
+      }
 
       <p-dialog styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="candidateDetail() !== null"
         [header]="copy.candidateDetail.title" (visibleChange)="selectedCandidateId.set(null)">

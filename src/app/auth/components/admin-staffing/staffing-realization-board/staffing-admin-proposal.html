@@ -1,0 +1,41 @@
+@let copy = i18n.copy();
+@let controls = form.controls;
+
+<p-dialog styleClass="mg-dialog" [modal]="true" [visible]="true" [header]="copy.proposal.title"
+  [closable]="!isSaving()" [closeOnEscape]="!isSaving()" [dismissableMask]="!isSaving()" [draggable]="false"
+  (visibleChange)="close()">
+  <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <strong>{{ board().realization.name }}</strong>
+
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-select inputId="staffing-proposal-gm" size="small" class="w-100" formControlName="gmUserId"
+        [options]="gmOptions()" optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
+        [placeholder]="copy.fields.gm" [ariaLabel]="copy.fields.gm" [emptyMessage]="copy.availability.emptyRoster"
+        [readonly]="isSaving()" appendTo="body" [class.p-invalid]="controls.gmUserId.touched && controls.gmUserId.invalid" />
+      @if (controls.gmUserId.touched && controls.gmUserId.invalid) {
+        <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+      }
+    </div>
+
+    @if (selectedDays()) {
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <p-multiselect inputId="staffing-proposal-days" size="small" class="w-100" formControlName="dayIds"
+          [options]="dayOptions()" optionLabel="label" optionValue="value" [placeholder]="copy.proposal.daysLabel"
+          [ariaLabel]="copy.proposal.daysLabel" [readonly]="isSaving()" appendTo="body"
+          [class.p-invalid]="controls.dayIds.touched && controls.dayIds.invalid" />
+        @if (controls.dayIds.touched && controls.dayIds.invalid) {
+          <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+        }
+      </div>
+    } @else {
+      <p class="m-0">{{ i18n.scopes().whole_realization }}</p>
+    }
+
+    <div class="p-dialog-footer flex-row-between-center flex-wrap gap-sm w-100 p-md">
+      <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+        [label]="i18n.commonActions().cancel" [disabled]="isSaving()" (onClick)="close()" />
+      <p-button type="submit" severity="success" icon="pi pi-send" [label]="copy.proposal.action"
+        [loading]="isSaving()" [disabled]="isSaving()" />
+    </div>
+  </form>
+</p-dialog>

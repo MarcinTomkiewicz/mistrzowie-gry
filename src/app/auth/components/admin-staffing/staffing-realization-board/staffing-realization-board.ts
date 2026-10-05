@@ -18,11 +18,12 @@ import { GM_STAFFING_SCOPE, STAFFING_SCOPE } from '../../../../core/translations
 import { formatDateLabel, formatTimestampLabel } from '../../../../core/utils/date';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { StaffingRealizationAvailability } from './staffing-realization-availability';
+import { StaffingAdminProposal } from './staffing-admin-proposal';
 import { createStaffingRealizationBoardI18n } from './staffing-realization-board.i18n';
 
 @Component({
   selector: 'app-staffing-realization-board',
-  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability],
+  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal],
   templateUrl: './staffing-realization-board.html',
   providers: [provideTranslocoScope('adminStaffing', STAFFING_SCOPE, GM_STAFFING_SCOPE, 'common')],
 })
@@ -41,6 +42,7 @@ export class StaffingRealizationBoard {
   protected readonly hasUnsavedChanges = this.facade.store.hasUnsavedChanges;
   protected readonly selectedGm = signal<AdminStaffingGmAvailability | null>(null);
   protected readonly selectedCandidateId = signal<string | null>(null);
+  protected readonly showProposal = signal(false);
   protected readonly statusBadgeClass = STATUS_BADGE_CLASS;
   protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly formatDateLabel = formatDateLabel;
@@ -107,6 +109,7 @@ export class StaffingRealizationBoard {
     this.board.set(null);
     this.selectedGm.set(null);
     this.selectedCandidateId.set(null);
+    this.showProposal.set(false);
     this.isLoading.set(true);
     this.loadFailed.set(false);
     this.loadSubscription = this.facade.loadBoard(this.realizationId).pipe(

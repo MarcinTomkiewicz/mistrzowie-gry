@@ -19,10 +19,19 @@ import {
 import { Backend } from '../backend/backend';
 import { AdminStaffingRecruitmentPolicy, SaveAdminStaffingRecruitmentPolicyPayload } from '../../interfaces/admin-staffing-recruitment-policy';
 import { OpenAdminStaffingRealizationResult } from '../../interfaces/staffing-realization-readiness';
+import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealization {
   private readonly backend = inject(Backend);
+
+  createProposal(realizationId: string, gmUserId: string, dayIds: string[] | null): Observable<StaffingCandidate> {
+    return this.backend.rpc<StaffingCandidate>(STAFFING_REALIZATION_RPC.createAdminProposal, {
+      p_realization_id: realizationId,
+      p_gm_user_id: gmUserId,
+      p_day_ids: dayIds,
+    });
+  }
 
   open(realizationId: string): Observable<OpenAdminStaffingRealizationResult> {
     return this.backend.rpc<OpenAdminStaffingRealizationResult>(

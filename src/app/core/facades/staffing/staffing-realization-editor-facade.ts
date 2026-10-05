@@ -7,6 +7,7 @@ import { mapStaffingTravelTermsToDraft } from '../../factories/staffing-realizat
 import { mapStaffingRecruitmentPolicyToDraft } from '../../factories/staffing-recruitment-policy-form.factory';
 import { AdminStaffingRecruitmentPolicy, SaveAdminStaffingRecruitmentPolicyPayload } from '../../interfaces/admin-staffing-recruitment-policy';
 import type { AdminStaffingRealizationBoard } from '../../interfaces/admin-staffing-realization-board';
+import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
@@ -122,6 +123,7 @@ export class StaffingRealizationEditorFacade {
       list: this.read.getList(),
       candidates: this.read.getCandidates(realizationId),
       availability: this.read.getAvailability(realizationId),
+      recruitmentPolicy: this.read.getRecruitmentPolicy(realizationId),
     }).pipe(
       map(({ list, ...board }) => {
         const item = list.find((row) => row.id === realizationId);
@@ -134,6 +136,10 @@ export class StaffingRealizationEditorFacade {
         if (this.store.scheduleDraft() === null) this.hydrateSchedule(schedule);
       }),
     );
+  }
+
+  createProposal(realizationId: string, gmUserId: string, dayIds: string[] | null): Observable<StaffingCandidate> {
+    return this.write.createProposal(realizationId, gmUserId, dayIds);
   }
 
   create(payload: CreateAdminStaffingRealizationRequest): Observable<CreateAdminStaffingRealizationResult> {

@@ -213,6 +213,13 @@ export type AdminStaffingBoardCopy = {
   candidatesTitle: string;
   emptyCandidates: string;
   outsideRoster: string;
+  proposal: {
+    action: string;
+    title: string;
+    daysLabel: string;
+    successSummary: string;
+    failedSummary: string;
+  };
   candidateDetail: {
     title: string;
     show: string;

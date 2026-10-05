@@ -239,6 +239,13 @@
     "candidatesTitle": "[PH] Kandydaci",
     "emptyCandidates": "[PH] Ta realizacja nie ma jeszcze kandydatów.",
     "outsideRoster": "[PH] MG spoza bieżącej listy dostępności",
+    "proposal": {
+      "action": "[PH] Zaproponuj MG",
+      "title": "[PH] Propozycja udziału MG",
+      "daysLabel": "[PH] Dni udziału",
+      "successSummary": "[PH] Propozycja udziału została utworzona",
+      "failedSummary": "[PH] Nie udało się utworzyć propozycji udziału"
+    },
     "candidateDetail": {
       "title": "[PH] Szczegóły kandydatury",
       "show": "[PH] Szczegóły",
