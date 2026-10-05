@@ -252,6 +252,15 @@
       "participationActive": "[PH] Aktywny udział",
       "endedBy": "[PH] Osoba kończąca udział (ID)"
     },
+    "selfApplicationDecision": {
+      "accept": "[PH] Akceptuj zgłoszenie",
+      "reject": "[PH] Odrzuć zgłoszenie",
+      "acceptConfirm": "[PH] Zaakceptować zgłoszenie tego MG i potwierdzić jego udział w realizacji?",
+      "rejectConfirm": "[PH] Odrzucić zgłoszenie tego MG do realizacji?",
+      "acceptSuccess": "[PH] Zgłoszenie zostało zaakceptowane",
+      "rejectSuccess": "[PH] Zgłoszenie zostało odrzucone",
+      "failedSummary": "[PH] Nie udało się zapisać decyzji dotyczącej zgłoszenia"
+    },
     "fields": {
       "gm": "[PH] Mistrz Gry",
       "origin": "[PH] Źródło udziału",

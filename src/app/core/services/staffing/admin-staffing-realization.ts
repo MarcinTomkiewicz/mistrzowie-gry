@@ -33,6 +33,13 @@ export class AdminStaffingRealization {
     });
   }
 
+  decideSelfApplication(candidateId: string, decision: 'accepted' | 'rejected'): Observable<StaffingCandidate> {
+    return this.backend.rpc<StaffingCandidate>(STAFFING_REALIZATION_RPC.decideAdminSelfApplication, {
+      p_candidate_id: candidateId,
+      p_decision: decision,
+    });
+  }
+
   open(realizationId: string): Observable<OpenAdminStaffingRealizationResult> {
     return this.backend.rpc<OpenAdminStaffingRealizationResult>(
       STAFFING_REALIZATION_RPC.openAdmin,

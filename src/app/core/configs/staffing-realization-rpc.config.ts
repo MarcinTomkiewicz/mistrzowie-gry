@@ -13,6 +13,7 @@ export const STAFFING_REALIZATION_RPC = {
   getAdminCandidates: 'get_admin_staffing_realization_candidates',
   getAdminAvailability: 'get_admin_staffing_realization_availability',
   createAdminProposal: 'create_admin_staffing_proposal',
+  decideAdminSelfApplication: 'decide_admin_staffing_self_application',
   validateAdmin: 'validate_admin_staffing_realization',
   openAdmin: 'open_admin_staffing_realization',
   deleteAdmin: 'delete_admin_staffing_realization',

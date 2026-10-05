@@ -13,6 +13,7 @@ import { STAFFING_AVAILABILITY_BADGE_CLASS } from '../../../../core/configs/staf
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import type { AdminStaffingGmAvailability } from '../../../../core/interfaces/admin-staffing-availability';
 import type { AdminStaffingRealizationBoard } from '../../../../core/interfaces/admin-staffing-realization-board';
+import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { GM_STAFFING_SCOPE, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { formatDateLabel, formatTimestampLabel } from '../../../../core/utils/date';
@@ -32,6 +33,7 @@ export class StaffingRealizationBoard {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly toast = inject(UiToast);
+  private readonly confirm = inject(UiConfirm);
   private realizationId = '';
   private loadSubscription: Subscription | null = null;
 
@@ -43,6 +45,7 @@ export class StaffingRealizationBoard {
   protected readonly selectedGm = signal<AdminStaffingGmAvailability | null>(null);
   protected readonly selectedCandidateId = signal<string | null>(null);
   protected readonly showProposal = signal(false);
+  protected readonly isDeciding = signal(false);
   protected readonly statusBadgeClass = STATUS_BADGE_CLASS;
   protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly formatDateLabel = formatDateLabel;
@@ -92,6 +95,12 @@ export class StaffingRealizationBoard {
   protected readonly candidateDetail = computed(() =>
     this.candidateRows().find((row) => row.candidate.id === this.selectedCandidateId()) ?? null,
   );
+  protected readonly canDecideSelfApplication = computed(() => {
+    const candidate = this.candidateDetail()?.candidate;
+    return this.board()?.realization.status !== 'archived' &&
+      candidate?.origin === 'self_application' && candidate.state === 'pending' &&
+      candidate.submittedAt !== null;
+  });
 
   constructor() {
     this.route.parent?.paramMap.pipe(
@@ -102,6 +111,39 @@ export class StaffingRealizationBoard {
       this.realizationId = realizationId;
       this.loadBoard();
     });
+  }
+
+  protected confirmSelfApplicationDecision(event: Event, decision: 'accepted' | 'rejected'): void {
+    const candidate = this.candidateDetail()?.candidate;
+    if (!candidate || !this.canDecideSelfApplication() || this.isDeciding()) return;
+    const realizationId = this.realizationId;
+    const copy = this.i18n.copy().selfApplicationDecision;
+    const options = {
+      message: decision === 'accepted' ? copy.acceptConfirm : copy.rejectConfirm,
+      acceptLabel: decision === 'accepted' ? copy.accept : copy.reject,
+      rejectLabel: this.i18n.commonActions().cancel,
+      accept: () => {
+        if (this.realizationId !== realizationId || this.candidateDetail()?.candidate.id !== candidate.id ||
+          !this.canDecideSelfApplication() || this.isDeciding()) return;
+        this.isDeciding.set(true);
+        this.facade.decideSelfApplication(candidate.id, decision).pipe(
+          takeUntilDestroyed(this.destroyRef),
+          finalize(() => this.isDeciding.set(false)),
+        ).subscribe({
+          next: () => {
+            if (this.realizationId !== realizationId) return;
+            this.toast.success({ summary: decision === 'accepted' ? copy.acceptSuccess : copy.rejectSuccess });
+            this.loadBoard();
+          },
+          error: () => {
+            if (this.realizationId !== realizationId) return;
+            this.toast.danger({ summary: copy.failedSummary, detail: this.i18n.commonErrors().generic });
+          },
+        });
+      },
+    };
+    if (decision === 'rejected') this.confirm.dangerDecision(event, options);
+    else this.confirm.decision(event, options);
   }
 
   protected loadBoard(): void {

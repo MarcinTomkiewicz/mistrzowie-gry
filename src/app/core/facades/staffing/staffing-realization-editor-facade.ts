@@ -142,6 +142,10 @@ export class StaffingRealizationEditorFacade {
     return this.write.createProposal(realizationId, gmUserId, dayIds);
   }
 
+  decideSelfApplication(candidateId: string, decision: 'accepted' | 'rejected'): Observable<StaffingCandidate> {
+    return this.write.decideSelfApplication(candidateId, decision);
+  }
+
   create(payload: CreateAdminStaffingRealizationRequest): Observable<CreateAdminStaffingRealizationResult> {
     return this.write.create(payload).pipe(
       tap(({ realization, days }) => {

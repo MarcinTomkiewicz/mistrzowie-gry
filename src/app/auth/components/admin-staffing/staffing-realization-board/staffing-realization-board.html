@@ -172,7 +172,8 @@
       }
 
       <p-dialog styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="candidateDetail() !== null"
-        [header]="copy.candidateDetail.title" (visibleChange)="selectedCandidateId.set(null)">
+        [header]="copy.candidateDetail.title" [closable]="!isDeciding()" [closeOnEscape]="!isDeciding()"
+        (visibleChange)="selectedCandidateId.set(null)">
         @if (candidateDetail(); as detail) {
           @let candidate = detail.candidate;
           @let days = candidate.scope.mode === 'whole_realization' ? data.schedule.days : detail.days;
@@ -242,8 +243,20 @@
           </dl>
         }
         <ng-template #footer>
-          <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
-            [label]="i18n.commonActions().close" (onClick)="selectedCandidateId.set(null)" />
+          <div class="flex-row-between-center flex-wrap gap-sm w-100">
+            <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+              [label]="i18n.commonActions().close" [disabled]="isDeciding()" (onClick)="selectedCandidateId.set(null)" />
+            @if (canDecideSelfApplication()) {
+              <div class="flex-row-end-center flex-wrap gap-sm">
+                <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+                  [label]="copy.selfApplicationDecision.reject" [disabled]="isDeciding()"
+                  (onClick)="confirmSelfApplicationDecision($event, 'rejected')" />
+                <p-button type="button" severity="success" icon="pi pi-check"
+                  [label]="copy.selfApplicationDecision.accept" [disabled]="isDeciding()"
+                  (onClick)="confirmSelfApplicationDecision($event, 'accepted')" />
+              </div>
+            }
+          </div>
         </ng-template>
       </p-dialog>
     }

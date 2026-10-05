@@ -226,6 +226,15 @@ export type AdminStaffingBoardCopy = {
     participationActive: string;
     endedBy: string;
   };
+  selfApplicationDecision: {
+    accept: string;
+    reject: string;
+    acceptConfirm: string;
+    rejectConfirm: string;
+    acceptSuccess: string;
+    rejectSuccess: string;
+    failedSummary: string;
+  };
   fields: {
     gm: string;
     origin: string;
