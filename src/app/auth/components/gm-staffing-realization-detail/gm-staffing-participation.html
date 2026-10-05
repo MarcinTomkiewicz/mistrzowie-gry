@@ -75,6 +75,10 @@
       </section>
     }
 
+    @if (facade.sessionProposalCandidateId()) {
+      <app-gm-staffing-session-proposals />
+    }
+
     @if (data.status !== 'archived') {
       @if (data.candidate; as candidate) {
         @if (candidate.origin === 'self_application' && candidate.state === 'draft') {

@@ -104,6 +104,22 @@ export type GmStaffingDetailCopy = {
     withdrawWithReplacementSuccess: string;
   };
   participationEndReasons: Record<StaffingParticipationEndReason, string>;
+  sessionProposals: {
+    title: string;
+    hint: string;
+    requiredPerSlot: string;
+    selectedCount: string;
+    complete: string;
+    incomplete: string;
+    unsavedHint: string;
+    readOnly: string;
+    add: string;
+    emptyMappings: string;
+    emptySlots: string;
+    loadFailed: string;
+    saveFailed: string;
+    saveSuccess: string;
+  };
   sessionProposalHint: string;
   archivedCandidateHint: string;
 };

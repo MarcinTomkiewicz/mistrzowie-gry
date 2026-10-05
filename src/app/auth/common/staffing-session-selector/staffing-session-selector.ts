@@ -36,7 +36,7 @@ export class StaffingSessionSelector {
   private formOptionsRequest: Subscription | null = null;
 
   readonly selection = input<StaffingSessionReference | null>(null);
-  readonly selectionChange = output<StaffingSessionReference>();
+  readonly selectionChange = output<StaffingSessionReference | null>();
   readonly busy = input(false);
 
   protected readonly facade = inject(StaffingSessionSelectorFacade);
@@ -86,9 +86,11 @@ export class StaffingSessionSelector {
       });
     });
 
-    this.sourceControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+    this.sourceControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(sourceKind => {
       this.sessionControl.setValue(this.selectedSessionId(), { emitEvent: false });
       this.showDetails.set(false);
+      const selection = this.selection();
+      if (selection && selection.sourceKind !== sourceKind && !this.isBusy()) this.selectionChange.emit(null);
     });
 
     this.sessionControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(sessionId => {

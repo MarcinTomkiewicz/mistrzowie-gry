@@ -1,6 +1,8 @@
 export const STAFFING_REALIZATION_RPC = {
   getMyHub: 'get_my_staffing_realization_hub',
   getMyDetail: 'get_my_staffing_realization_detail',
+  getMySessionProposals: 'get_my_staffing_candidate_session_proposals',
+  saveMySessionProposals: 'save_my_staffing_candidate_session_proposals',
   listMyReplacementCandidates: 'list_my_staffing_replacement_candidates',
   createMySelfApplication: 'create_my_staffing_self_application',
   submitMySelfApplication: 'submit_my_staffing_self_application',

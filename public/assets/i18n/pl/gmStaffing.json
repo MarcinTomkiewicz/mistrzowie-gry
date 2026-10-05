@@ -128,6 +128,22 @@
       "gm_withdrawal": "[PH] Wycofanie udziału przez MG",
       "admin_removal": "[PH] Zakończenie udziału przez koordynatora"
     },
+    "sessionProposals": {
+      "title": "[PH] Propozycje sesji",
+      "hint": "[PH] Wskaż sesje dla slotów objętych Twoim udziałem. Możesz zapisać także niekompletne propozycje.",
+      "requiredPerSlot": "[PH] Wymagana liczba propozycji na każdy slot",
+      "selectedCount": "[PH] Wybrane propozycje",
+      "complete": "[PH] Zapisane propozycje są kompletne",
+      "incomplete": "[PH] Zapisane propozycje są niekompletne",
+      "unsavedHint": "[PH] Masz niezapisane zmiany. Kompletność zapisanych propozycji zostanie sprawdzona po zapisie.",
+      "readOnly": "[PH] Propozycje sesji są obecnie dostępne tylko do odczytu.",
+      "add": "[PH] Dodaj propozycję",
+      "emptyMappings": "[PH] Nie wskazano propozycji sesji dla tego slotu.",
+      "emptySlots": "[PH] Twój udział nie obejmuje żadnych slotów wymagających propozycji sesji.",
+      "loadFailed": "[PH] Nie udało się załadować propozycji sesji",
+      "saveFailed": "[PH] Nie udało się zapisać propozycji sesji",
+      "saveSuccess": "[PH] Propozycje sesji zostały zapisane"
+    },
     "sessionProposalHint": "[PH] Sesje wybiera MG po potwierdzeniu udziału. Zgłoszenie udziału nie wymaga wskazania sesji."
   }
 }

@@ -1,0 +1,83 @@
+@let copy = i18n.copy().sessionProposals;
+<section class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0"
+  [class.h-px-200]="facade.sessionProposalsLoading()" [attr.aria-busy]="facade.sessionProposalsLoading() || facade.isMutating()">
+  <app-loading-overlay [visible]="facade.sessionProposalsLoading()" [label]="i18n.commonStatus().loading" />
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
+
+  @if (facade.sessionProposalsLoadError() && !facade.sessionProposalsLoading()) {
+    <div class="flex-col-start-stretch gap-sm" role="alert">
+      <p class="m-0">{{ copy.loadFailed }}</p>
+      <div>
+        <p-button type="button" severity="secondary" icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry" (onClick)="retry()" />
+      </div>
+    </div>
+  } @else if (facade.sessionProposals(); as proposals) {
+    <div class="flex-col-start-start gap-sm" role="status" aria-live="polite">
+      <span class="tag-badge" [class.tag-badge--success]="proposals.complete" [class.tag-badge--warn]="!proposals.complete">
+        {{ proposals.complete ? copy.complete : copy.incomplete }}
+      </span>
+      @if (proposals.requiredSessionMappingsPerSlot !== null) {
+        <p class="m-0">{{ copy.requiredPerSlot }}: {{ proposals.requiredSessionMappingsPerSlot }}</p>
+      }
+      <p class="m-0 muted-text">{{ proposals.editable ? copy.hint : copy.readOnly }}</p>
+      @if (facade.hasSessionProposalChanges()) {
+        <p class="m-0 warn-text">{{ copy.unsavedHint }}</p>
+      }
+    </div>
+
+    <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+      @for (slot of facade.sessionProposalSlots(); track slot.slotId) {
+        <article class="flex-col-start-stretch gap-sm border radius-sm p-sm w-100 min-w-0"
+          [attr.data-staffing-day-id]="slot.dayId" [attr.data-staffing-slot-id]="slot.slotId">
+          <div class="flex-row-between-center flex-wrap gap-sm">
+            <div class="flex-col-start-stretch gap-xs">
+              <h3 class="mg-section__title mg-section__title--sm m-0">{{ slot.label }}</h3>
+              <span>{{ formatDateLabel(slot.date, 'pl-PL', true) }} - {{ formatTimeRangeLabel(slot.startTime, slot.endTime) }}</span>
+            </div>
+            @if (proposals.requiredSessionMappingsPerSlot !== null) {
+              <span class="tag-badge"
+                [class.tag-badge--success]="slot.selectedCount >= proposals.requiredSessionMappingsPerSlot"
+                [class.tag-badge--warn]="slot.selectedCount < proposals.requiredSessionMappingsPerSlot">
+                {{ copy.selectedCount }}: {{ slot.selectedCount }} / {{ proposals.requiredSessionMappingsPerSlot }}
+              </span>
+            }
+          </div>
+          @for (mapping of slot.mappings; track mapping.key) {
+            <div class="flex-row-start-start flex-col-start-stretch-sm gap-sm w-100 min-w-0">
+              <app-staffing-session-selector class="flex-1 min-w-0 w-100-sm" [selection]="mapping.selection"
+                [busy]="!facade.canEditSessionProposals()"
+                (selectionChange)="facade.setSessionProposal(slot.slotId, mapping.key, $event)" />
+              @if (proposals.editable) {
+                <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-trash"
+                  [label]="i18n.commonActions().removeItem" [disabled]="!facade.canEditSessionProposals()"
+                  (onClick)="facade.removeSessionProposal(slot.slotId, mapping.key)" />
+              }
+            </div>
+          } @empty {
+            <p class="m-0 muted-text">{{ copy.emptyMappings }}</p>
+          }
+          @if (proposals.editable) {
+            <div>
+              <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-plus"
+                [label]="copy.add" [disabled]="!facade.canEditSessionProposals()"
+                (onClick)="facade.addSessionProposal(slot.slotId)" />
+            </div>
+          }
+        </article>
+      } @empty {
+        <p class="m-0 muted-text">{{ copy.emptySlots }}</p>
+      }
+    </div>
+
+    @if (proposals.editable) {
+      <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
+        <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+          [label]="i18n.commonActions().cancel" [disabled]="!facade.canEditSessionProposals() || !facade.hasSessionProposalChanges()"
+          (onClick)="facade.resetSessionProposalDraft()" />
+        <p-button type="button" severity="success" icon="pi pi-save" [label]="i18n.commonActions().save"
+          [disabled]="!facade.canEditSessionProposals() || !facade.hasSessionProposalChanges()" (onClick)="save()" />
+      </div>
+    }
+  }
+</section>

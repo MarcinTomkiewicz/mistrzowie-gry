@@ -14,10 +14,11 @@ import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel, formatTimestampLabel } from '../../../core/utils/date';
 import { createGmStaffingRealizationDetailI18n } from './gm-staffing-realization-detail.i18n';
+import { GmStaffingSessionProposals } from './gm-staffing-session-proposals';
 
 @Component({
   selector: 'app-gm-staffing-participation',
-  imports: [ReactiveFormsModule, ButtonModule, MultiSelectModule, SelectModule],
+  imports: [ReactiveFormsModule, ButtonModule, MultiSelectModule, SelectModule, GmStaffingSessionProposals],
   templateUrl: './gm-staffing-participation.html',
 })
 export class GmStaffingParticipation {

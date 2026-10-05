@@ -6,6 +6,10 @@ import type {
   MyStaffingCandidate,
   WithdrawMyConfirmedStaffingParticipationResult,
 } from '../../interfaces/my-staffing-realization';
+import type {
+  CandidateSlotSessionMappingInput,
+  StaffingCandidateSessionProposals,
+} from '../../interfaces/staffing-candidate-session-proposals';
 import { Backend } from '../backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -45,6 +49,16 @@ export class MyStaffingRealization {
     return this.backend.rpc<WithdrawMyConfirmedStaffingParticipationResult>(
       STAFFING_REALIZATION_RPC.withdrawMyConfirmedParticipation,
       { p_candidate_id: candidateId, p_replacement_gm_user_id: replacementGmUserId },
+    );
+  }
+
+  saveSessionProposals(
+    candidateId: string,
+    mappings: CandidateSlotSessionMappingInput[],
+  ): Observable<StaffingCandidateSessionProposals> {
+    return this.backend.rpc<StaffingCandidateSessionProposals>(
+      STAFFING_REALIZATION_RPC.saveMySessionProposals,
+      { p_candidate_id: candidateId, p_mappings: mappings },
     );
   }
 }
