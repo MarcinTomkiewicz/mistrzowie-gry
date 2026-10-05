@@ -1,6 +1,7 @@
 import type { IUserMenuSection } from '../interfaces/i-user-menu';
 import type { BuildUserMenuArgs } from '../types/user-menu';
 import { EVENT_SIGNUP_SELECTION_ROUTE } from '../configs/event-signup.config';
+import { GM_STAFFING_HUB_ROUTE } from '../configs/staffing-realization.config';
 
 export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
   const sections: IUserMenuSection[] = [
@@ -45,6 +46,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
           id: 'gm-profile',
           label: args.gmProfileLabel,
           path: '/auth/gm/profile',
+        },
+        {
+          id: 'gm-staffing',
+          label: args.gmStaffingLabel,
+          path: GM_STAFFING_HUB_ROUTE,
         },
         {
           id: 'event-signup',

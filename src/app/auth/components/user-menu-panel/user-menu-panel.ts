@@ -39,6 +39,7 @@ export class UserMenuPanel {
       sessionReservationLabel: this.i18n.commonCta().bookSession,
       coworkerRecordsLabel: this.i18n.commonNav().coworkerRecords,
       gmProfileLabel: this.i18n.commonNav().gmProfile,
+      gmStaffingLabel: this.i18n.commonNav().gmStaffing,
       eventSignupLabel: this.i18n.commonNav().eventSignup,
       myWorkLogLabel: this.i18n.userMenu().myWorkLogLabel,
       adminContentLabel: this.i18n.commonNav().contentAdministration,

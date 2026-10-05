@@ -3,6 +3,7 @@ import { translateSignal } from '@jsverse/transloco';
 
 import type { StaffingRealizationStatus } from '../types/staffing-realization';
 import type {
+  StaffingCandidateStateTranslations,
   StaffingLabelsTranslations,
   StaffingRealizationStatusTranslations,
   StaffingRealizationTypeTranslations,
@@ -13,6 +14,7 @@ import type {
 import { createScopedSectionsI18n } from './scoped.i18n';
 
 export const STAFFING_SCOPE = 'staffing';
+export const GM_STAFFING_SCOPE = 'gmStaffing';
 
 export function createStaffingSaveLabel(
   getStatus: () => StaffingRealizationStatus | undefined,
@@ -26,6 +28,7 @@ export function createStaffingI18n() {
   return createScopedSectionsI18n<{
     realizationStatuses: StaffingRealizationStatusTranslations;
     realizationTypes: StaffingRealizationTypeTranslations;
+    candidateStates: StaffingCandidateStateTranslations;
     staffingLabels: StaffingLabelsTranslations;
     transportModes: StaffingTransportModeTranslations;
     reimbursementModes: StaffingReimbursementModeTranslations;
@@ -33,6 +36,7 @@ export function createStaffingI18n() {
   }>(STAFFING_SCOPE, {
     realizationStatuses: 'realizationStatuses',
     realizationTypes: 'realizationTypes',
+    candidateStates: 'candidateStates',
     staffingLabels: 'labels',
     transportModes: 'transportModes',
     reimbursementModes: 'reimbursementModes',

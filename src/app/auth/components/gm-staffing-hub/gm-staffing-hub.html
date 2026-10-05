@@ -1,0 +1,109 @@
+<section class="mg-section mg-section--full">
+  <div
+    class="mg-container position-relative flex-col-start-stretch gap-md"
+    [attr.aria-busy]="isLoading()"
+  >
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.commonNav().gmStaffing }}</h1>
+      <p class="mg-section__subtitle">{{ i18n.page().subtitle }}</p>
+    </header>
+
+    <app-loading-overlay
+      [visible]="isLoading()"
+      [label]="i18n.commonStatus().loading"
+    />
+
+    @if (hasLoadError() && !isLoading()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+        <h2 class="mg-section__title mg-section__title--sm mg-section__title--no-margin">
+          {{ i18n.page().loadErrorTitle }}
+        </h2>
+        <p class="m-0">{{ i18n.commonErrors().generic }}</p>
+        <p-button
+          severity="secondary"
+          [label]="i18n.commonActions().retry"
+          icon="pi pi-refresh"
+          (onClick)="loadHub()"
+        />
+      </section>
+    } @else if (!isLoading()) {
+      @for (section of sections(); track section.key) {
+        <section
+          class="flex-col-start-stretch gap-sm w-100"
+          [attr.aria-labelledby]="'gm-staffing-' + section.key"
+        >
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <h2
+              class="mg-section__title mg-section__title--md m-0"
+              [id]="'gm-staffing-' + section.key"
+            >
+              {{ i18n.sections()[section.key].title }}
+            </h2>
+            <span class="tag-badge tag-badge--muted">{{ section.items.length }}</span>
+          </div>
+
+          @if (section.items.length) {
+            <div class="mg-grid grid-3-cols grid-2-cols-md grid-1-cols-sm gap-md w-100">
+              @for (item of section.items; track item.id) {
+                <article class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
+                  <h3 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">
+                    {{ item.name }}
+                  </h3>
+
+                  <div class="flex-row-start-center flex-wrap gap-xs">
+                    <span
+                      class="tag-badge"
+                      [class.tag-badge--info]="item.type === 'travel'"
+                      [class.tag-badge--golden]="item.type === 'stationary'"
+                    >
+                      {{ i18n.realizationTypes()[item.type] }}
+                    </span>
+                    <span [class]="'tag-badge ' + statusBadgeClass[item.status]">
+                      {{ i18n.realizationStatuses()[item.status] }}
+                    </span>
+                  </div>
+
+                  <div class="flex-col-start-stretch gap-xs">
+                    <div>
+                      <strong>{{ i18n.commonLabels().date }}:</strong>
+                      {{ item.startDate ? formatDateLabel(item.startDate) : i18n.commonValues().notAvailable }}
+                      @if (item.endDate && item.endDate !== item.startDate) {
+                        - {{ formatDateLabel(item.endDate) }}
+                      }
+                    </div>
+                    <div>
+                      <strong>{{ i18n.commonLabels().city }}:</strong>
+                      {{ item.city ?? i18n.commonValues().notProvided }}
+                    </div>
+                    @if (item.candidate; as candidate) {
+                      <div class="flex-row-start-center flex-wrap gap-xs">
+                        <strong>{{ i18n.card().candidateStatus }}:</strong>
+                        <span [class]="'tag-badge ' + statusBadgeClass[candidate.state]">
+                          {{ i18n.candidateStates()[candidate.state] }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="i18n.commonCta().checkDetails"
+                    icon="pi pi-arrow-right"
+                    [routerLink]="[hubRoute, item.id]"
+                    styleClass="w-100"
+                  />
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="mg-card p-md w-100" role="status">
+              <p class="m-0">{{ i18n.sections()[section.key].emptyDescription }}</p>
+            </div>
+          }
+        </section>
+      }
+    }
+  </div>
+</section>

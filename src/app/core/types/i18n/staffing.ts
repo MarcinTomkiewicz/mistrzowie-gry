@@ -1,3 +1,4 @@
+import type { MyStaffingCandidate } from '../../interfaces/my-staffing-realization';
 import type {
   StaffingRealizationStatus,
   StaffingRealizationType,
@@ -13,6 +14,11 @@ export type StaffingRealizationStatusTranslations = Record<
 
 export type StaffingRealizationTypeTranslations = Record<
   StaffingRealizationType,
+  string
+>;
+
+export type StaffingCandidateStateTranslations = Record<
+  MyStaffingCandidate['state'],
   string
 >;
 

@@ -4,6 +4,14 @@ import { authGuard } from '../../core/guards/auth.guard';
 import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
 
 const loaders = {
+  staffingHub: () =>
+    import('../components/gm-staffing-hub/gm-staffing-hub').then(
+      (m) => m.GmStaffingHub,
+    ),
+  staffingDetail: () =>
+    import('../components/gm-staffing-realization-detail/gm-staffing-realization-detail').then(
+      (m) => m.GmStaffingRealizationDetail,
+    ),
   profileShell: () =>
     import('../components/gm-profile-shell/gm-profile-shell').then(
       (m) => m.GmProfileShell,
@@ -25,6 +33,17 @@ const loaders = {
 const gmGuards = [authGuard, minimumRoleGuard('gm')];
 
 export const gmRoutes: Routes = [
+  {
+    path: 'staffing',
+    pathMatch: 'full',
+    loadComponent: loaders.staffingHub,
+    canActivate: gmGuards,
+  },
+  {
+    path: 'staffing/:realizationId',
+    loadComponent: loaders.staffingDetail,
+    canActivate: gmGuards,
+  },
   {
     path: 'profile',
     loadComponent: loaders.profileShell,

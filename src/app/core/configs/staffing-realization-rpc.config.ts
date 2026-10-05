@@ -1,4 +1,6 @@
 export const STAFFING_REALIZATION_RPC = {
+  getMyHub: 'get_my_staffing_realization_hub',
+  getMyDetail: 'get_my_staffing_realization_detail',
   getAdminList: 'get_admin_staffing_realization_list',
   validateAdmin: 'validate_admin_staffing_realization',
   openAdmin: 'open_admin_staffing_realization',

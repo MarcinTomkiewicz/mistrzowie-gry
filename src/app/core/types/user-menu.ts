@@ -3,6 +3,7 @@ export type UserMenuItemId =
   | 'session-reservation'
   | 'coworker-records'
   | 'gm-profile'
+  | 'gm-staffing'
   | 'event-signup'
   | 'my-work-log'
   | 'admin-content'
@@ -25,6 +26,7 @@ export type BuildUserMenuArgs = {
   sessionReservationLabel: string;
   coworkerRecordsLabel: string;
   gmProfileLabel: string;
+  gmStaffingLabel: string;
   eventSignupLabel: string;
   myWorkLogLabel: string;
   adminContentLabel: string;

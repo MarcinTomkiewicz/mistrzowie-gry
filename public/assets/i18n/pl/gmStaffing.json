@@ -1,0 +1,68 @@
+{
+  "page": {
+    "subtitle": "[PH] Sprawdź dostępne realizacje, otrzymane propozycje, swoje zgłoszenia i potwierdzony udział.",
+    "loadErrorTitle": "[PH] Nie udało się załadować realizacji"
+  },
+  "sections": {
+    "available": {
+      "title": "Dostępne do zgłoszenia",
+      "emptyDescription": "[PH] Nie ma obecnie realizacji dostępnych do zgłoszenia."
+    },
+    "proposals": {
+      "title": "Otrzymane propozycje",
+      "emptyDescription": "[PH] Nie masz oczekujących propozycji udziału."
+    },
+    "myApplications": {
+      "title": "Moje zgłoszenia",
+      "emptyDescription": "[PH] Nie masz aktywnych zgłoszeń."
+    },
+    "confirmed": {
+      "title": "Potwierdzone realizacje",
+      "emptyDescription": "[PH] Nie masz potwierdzonych realizacji."
+    }
+  },
+  "card": {
+    "candidateStatus": "[PH] Status udziału"
+  },
+  "detail": {
+    "title": "[PH] Szczegóły realizacji",
+    "sections": {
+      "description": "[PH] Opis realizacji",
+      "recruitmentPolicy": "[PH] Zasady udziału i sesji",
+      "candidate": "[PH] Twój udział"
+    },
+    "empty": {
+      "description": "[PH] Nie podano opisu realizacji.",
+      "days": "[PH] Nie ma zapisanych dni realizacji.",
+      "recruitmentPolicy": "[PH] Zasady udziału i sesji nie zostały jeszcze określone.",
+      "travelTerms": "[PH] Warunki wyjazdu nie zostały jeszcze określone."
+    },
+    "errors": {
+      "loadFailed": "[PH] Nie udało się załadować szczegółów realizacji",
+      "notFound": "[PH] Nie znaleziono realizacji lub nie masz dostępu do jej szczegółów."
+    },
+    "fields": {
+      "selfApplicationEnabled": "[PH] Samodzielne zgłoszenia MG",
+      "sessionsRequiredAtApplication": "[PH] Sesje wymagane przy zgłoszeniu",
+      "origin": "[PH] Źródło udziału",
+      "scope": "[PH] Zakres udziału",
+      "gmDecision": "[PH] Twoja decyzja",
+      "adminDecision": "[PH] Decyzja koordynatora",
+      "submittedAt": "[PH] Data zgłoszenia",
+      "withdrawnAt": "[PH] Data wycofania",
+      "gmDecidedAt": "[PH] Data Twojej decyzji",
+      "adminDecidedAt": "[PH] Data decyzji koordynatora"
+    },
+    "candidateOrigins": {
+      "self_application": "[PH] Własne zgłoszenie",
+      "admin_proposal": "[PH] Propozycja koordynatora"
+    },
+    "candidateDecisions": {
+      "pending": "[PH] Oczekuje na decyzję",
+      "accepted": "[PH] Zaakceptowano",
+      "rejected": "[PH] Odrzucono"
+    },
+    "sessionRequirementHint": "[PH] Przy zgłoszeniu należy wskazać sesję dla każdego objętego slotu.",
+    "archivedCandidateHint": "[PH] Realizacja jest zarchiwizowana. Poniższy stan udziału ma charakter historyczny i nie wymaga działania."
+  }
+}

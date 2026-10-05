@@ -10,6 +10,13 @@
     "stationary": "Stacjonarna",
     "travel": "Wyjazdowa"
   },
+  "candidateStates": {
+    "draft": "[PH] Szkic zgłoszenia",
+    "pending": "[PH] Oczekuje na decyzję",
+    "confirmed": "[PH] Udział potwierdzony",
+    "rejected": "[PH] Odrzucono",
+    "withdrawn": "[PH] Wycofano"
+  },
   "labels": {
     "requiredGmCount": "Wymagana liczba MG"
   },
