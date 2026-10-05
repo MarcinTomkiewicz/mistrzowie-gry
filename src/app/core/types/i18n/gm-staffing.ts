@@ -3,6 +3,15 @@ import type {
   MyStaffingRealizationHub,
 } from '../../interfaces/my-staffing-realization';
 import type { StaffingParticipationEndReason } from '../staffing-realization';
+import type { SessionSourceKind } from '../session-source';
+
+export type StaffingSessionSelectorCopy = {
+  sourceLabel: string;
+  sessionLabel: string;
+  sources: Record<SessionSourceKind, string>;
+  emptyDescriptions: Record<SessionSourceKind, string>;
+  loadFailed: string;
+};
 
 export type GmStaffingHubCopy = {
   page: {

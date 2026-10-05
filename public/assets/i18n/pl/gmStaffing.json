@@ -24,6 +24,19 @@
   "card": {
     "candidateStatus": "[PH] Status udziału"
   },
+  "sessionSelector": {
+    "sourceLabel": "[PH] Rodzaj sesji",
+    "sessionLabel": "[PH] Sesja",
+    "sources": {
+      "template": "[PH] Sesje standardowe",
+      "custom": "[PH] Sesje jednorazowe"
+    },
+    "emptyDescriptions": {
+      "template": "[PH] Nie masz jeszcze sesji standardowych do wyboru.",
+      "custom": "[PH] Nie masz jeszcze sesji jednorazowych do wyboru."
+    },
+    "loadFailed": "[PH] Nie udało się załadować sesji do wyboru"
+  },
   "detail": {
     "title": "[PH] Szczegóły realizacji",
     "sections": {

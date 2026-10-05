@@ -1,0 +1,34 @@
+@let copy = i18n.copy();
+<div class="position-relative flex-col-start-stretch gap-sm w-100 min-w-0" [attr.aria-busy]="isBusy()">
+  <app-loading-overlay [visible]="facade.isLoading()" [label]="i18n.commonStatus().loading" />
+
+  <div class="flex-row-start-center flex-col-start-stretch-sm gap-sm min-w-0">
+    <p-select [formControl]="sourceControl"
+      [options]="sourceOptions()" optionLabel="label" optionValue="value" size="small" appendTo="body"
+      class="flex-none w-px-200 w-100-sm" [placeholder]="copy.sourceLabel" [ariaLabel]="copy.sourceLabel"
+      [readonly]="isBusy()" />
+    <p-select [formControl]="sessionControl"
+      [options]="sessionOptions()" optionLabel="label" optionValue="value" size="small" appendTo="body"
+      class="flex-1 min-w-0 w-100-sm" [placeholder]="copy.sessionLabel" [ariaLabel]="copy.sessionLabel"
+      [filter]="true" filterBy="label" [emptyMessage]="copy.emptyDescriptions[source()]" [readonly]="isBusy()" />
+  </div>
+
+  @if (facade.loadFailed()) {
+    <div class="flex-col-start-stretch gap-xs" role="alert">
+      <p class="m-0">{{ copy.loadFailed }}. {{ i18n.commonErrors().generic }}</p>
+      <div>
+        <p-button type="button" size="small" severity="secondary" icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry" [disabled]="isBusy()" (onClick)="facade.load()" />
+      </div>
+    </div>
+  } @else if (selectedSession(); as session) {
+    <div>
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-eye"
+        [label]="showDetails() ? i18n.commonCta().showLess : i18n.commonCta().checkDetails"
+        [attr.aria-expanded]="showDetails()" (onClick)="showDetails.set(!showDetails())" />
+    </div>
+    @if (showDetails()) {
+      <app-session-details [session]="session" [gmDisplayName]="gmDisplayName()" />
+    }
+  }
+</div>
