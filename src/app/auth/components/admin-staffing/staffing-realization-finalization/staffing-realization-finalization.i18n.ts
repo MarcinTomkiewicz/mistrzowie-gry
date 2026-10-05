@@ -34,7 +34,6 @@ export function createStaffingRealizationFinalizationI18n() {
       'recruitment_policy.missing': 'finalization.issues.recruitment_policy.missing',
       'recruitment_policy.stationary_scope_invalid': 'finalization.issues.recruitment_policy.stationary_scope_invalid',
       'recruitment_policy.session_selection_mode_invalid': 'finalization.issues.recruitment_policy.session_selection_mode_invalid',
-      'recruitment_policy.session_requirement_invalid': 'finalization.issues.recruitment_policy.session_requirement_invalid',
     }),
   };
 }

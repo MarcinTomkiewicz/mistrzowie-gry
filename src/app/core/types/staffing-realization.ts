@@ -3,6 +3,8 @@ export type StaffingRealizationType = 'stationary' | 'travel';
 export type StaffingStationaryScopePolicy = 'whole_realization' | 'selected_days';
 export type StaffingSessionSelectionMode = 'gm_selects' | 'realization_assigns';
 
+export type StaffingParticipationEndReason = 'gm_withdrawal' | 'admin_removal';
+
 export type StaffingRealizationStatus =
   | 'draft'
   | 'open'

@@ -1,6 +1,12 @@
 export const STAFFING_REALIZATION_RPC = {
   getMyHub: 'get_my_staffing_realization_hub',
   getMyDetail: 'get_my_staffing_realization_detail',
+  listMyReplacementCandidates: 'list_my_staffing_replacement_candidates',
+  createMySelfApplication: 'create_my_staffing_self_application',
+  submitMySelfApplication: 'submit_my_staffing_self_application',
+  withdrawMySelfApplication: 'withdraw_my_staffing_self_application',
+  decideMyAdminProposal: 'decide_my_staffing_admin_proposal',
+  withdrawMyConfirmedParticipation: 'withdraw_my_confirmed_staffing_participation',
   getAdminList: 'get_admin_staffing_realization_list',
   validateAdmin: 'validate_admin_staffing_realization',
   openAdmin: 'open_admin_staffing_realization',

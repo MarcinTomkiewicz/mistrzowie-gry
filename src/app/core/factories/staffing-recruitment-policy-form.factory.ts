@@ -11,7 +11,6 @@ export function mapStaffingRecruitmentPolicyToDraft(
     selfApplicationEnabled: policy?.selfApplicationEnabled ?? false,
     stationaryScopePolicy: policy?.stationaryScopePolicy ?? null,
     sessionSelectionMode: policy?.sessionSelectionMode ?? null,
-    sessionsRequiredAtApplication: policy?.sessionsRequiredAtApplication ?? false,
   };
 }
 
@@ -21,7 +20,6 @@ export function createStaffingRecruitmentPolicyForm(): StaffingRecruitmentPolicy
     selfApplicationEnabled: new FormControl(draft.selfApplicationEnabled, { nonNullable: true }),
     stationaryScopePolicy: new FormControl(draft.stationaryScopePolicy, { validators: [Validators.required] }),
     sessionSelectionMode: new FormControl(draft.sessionSelectionMode, { validators: [Validators.required] }),
-    sessionsRequiredAtApplication: new FormControl(draft.sessionsRequiredAtApplication, { nonNullable: true }),
   });
 }
 
@@ -32,10 +30,6 @@ export function syncStaffingRecruitmentPolicyForm(
   const controls = form.controls;
   setControlEnabled(controls.stationaryScopePolicy, type === 'stationary');
   if (type === 'travel') controls.stationaryScopePolicy.setValue(null, { emitEvent: false });
-  const canRequireSessions = controls.selfApplicationEnabled.value &&
-    controls.sessionSelectionMode.value === 'gm_selects';
-  setControlEnabled(controls.sessionsRequiredAtApplication, canRequireSessions);
-  if (!canRequireSessions) controls.sessionsRequiredAtApplication.setValue(false, { emitEvent: false });
   form.updateValueAndValidity({ emitEvent: false });
 }
 
@@ -62,6 +56,6 @@ export function mapStaffingRecruitmentPolicyFormToPayload(
   return {
     ...value,
     sessionSelectionMode: value.sessionSelectionMode,
-    requiredSessionMappingsPerSlot: value.sessionsRequiredAtApplication ? 1 : null,
+    requiredSessionMappingsPerSlot: value.sessionSelectionMode === 'gm_selects' ? 1 : null,
   };
 }

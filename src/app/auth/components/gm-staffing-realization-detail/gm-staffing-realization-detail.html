@@ -1,249 +1,29 @@
-<section class="mg-section mg-section--full">
-  <div
-    class="mg-container position-relative flex-col-start-stretch gap-md"
-    [attr.aria-busy]="isLoading()"
-  >
-    <header class="mg-section__header w-100">
-      <h1 class="mg-section__title text-wrap-anywhere">
-        {{ detail()?.name ?? i18n.copy().title }}
-      </h1>
-    </header>
-
+<app-route-tab-shell
+  [heading]="facade.detail()?.name ?? i18n.copy().title"
+  [seoTitle]="facade.detail()?.name ?? i18n.copy().title"
+  [canonicalUrl]="pageUrl()"
+  [tabs]="tabs()"
+>
+  <div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0"
+    [attr.aria-busy]="facade.isLoading() || facade.isMutating()">
     <div>
-      <p-button
-        type="button"
-        severity="secondary"
-        [outlined]="true"
-        icon="pi pi-arrow-left"
-        [label]="i18n.commonCta().goBack"
-        [routerLink]="hubRoute"
-      />
+      <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-arrow-left"
+        [label]="i18n.commonCta().goBack" [routerLink]="hubRoute" />
     </div>
-
-    <app-loading-overlay
-      [visible]="isLoading()"
-      [label]="i18n.commonStatus().loading"
-    />
-
-    @if (loadError() && !isLoading()) {
+    <app-loading-overlay [visible]="facade.isLoading() || facade.isMutating()"
+      [label]="facade.isMutating() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+    @if (facade.loadError() && !facade.isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
         <h2 class="mg-section__title mg-section__title--sm m-0">
           {{ isNotFound() ? i18n.copy().errors.notFound : i18n.copy().errors.loadFailed }}
         </h2>
         @if (!isNotFound()) {
           <p class="m-0">{{ i18n.commonErrors().generic }}</p>
-          <p-button
-            severity="secondary"
-            icon="pi pi-refresh"
-            [label]="i18n.commonActions().retry"
-            (onClick)="retry()"
-          />
+          <p-button severity="secondary" icon="pi pi-refresh" [label]="i18n.commonActions().retry" (onClick)="retry()" />
         }
       </section>
-    } @else if (detail(); as data) {
-      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-        <h2 class="mg-section__title mg-section__title--md m-0">
-          {{ i18n.basicSection().title }}
-        </h2>
-        <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
-          <div class="flex-col-start-stretch gap-xs">
-            <dt class="muted-text">{{ i18n.commonLabels().city }}</dt>
-            <dd class="m-0">{{ data.city ?? i18n.commonValues().notProvided }}</dd>
-          </div>
-          <div class="flex-col-start-stretch gap-xs">
-            <dt class="muted-text">{{ i18n.coreFields().venueName }}</dt>
-            <dd class="m-0">{{ data.venueName ?? i18n.commonValues().notProvided }}</dd>
-          </div>
-          <div class="flex-col-start-stretch gap-xs">
-            <dt class="muted-text">{{ i18n.coreFields().venueAddress }}</dt>
-            <dd class="m-0">{{ data.venueAddress ?? i18n.commonValues().notProvided }}</dd>
-          </div>
-          <div class="flex-col-start-stretch gap-xs">
-            <dt class="muted-text">{{ i18n.coreFields().dateRange }}</dt>
-            <dd class="m-0">{{ dates() ?? i18n.commonValues().notProvided }}</dd>
-          </div>
-          <div class="flex-col-start-start gap-xs">
-            <dt class="muted-text">{{ i18n.coreFields().type }}</dt>
-            <dd
-              class="tag-badge m-0"
-              [class.tag-badge--info]="data.type === 'travel'"
-              [class.tag-badge--golden]="data.type === 'stationary'"
-            >
-              {{ i18n.realizationTypes()[data.type] }}
-            </dd>
-          </div>
-          <div class="flex-col-start-start gap-xs">
-            <dt class="muted-text">{{ i18n.commonLabels().status }}</dt>
-            <dd [class]="'tag-badge m-0 ' + statusBadgeClass[data.status]">
-              {{ i18n.realizationStatuses()[data.status] }}
-            </dd>
-          </div>
-          <div class="flex-col-start-stretch gap-xs">
-            <dt class="muted-text">{{ i18n.coreFields().timezone }}</dt>
-            <dd class="m-0">{{ data.timezone }}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
-        <h2 class="mg-section__title mg-section__title--md m-0">
-          {{ i18n.copy().sections.description }}
-        </h2>
-        <p class="m-0 text-pre-line">
-          {{ data.description ?? i18n.copy().empty.description }}
-        </p>
-      </section>
-
-      <section class="flex-col-start-stretch gap-sm w-100">
-        <h2 class="mg-section__title mg-section__title--md m-0">
-          {{ i18n.schedule().section.title }}
-        </h2>
-        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
-          @for (day of data.days; track day.id) {
-            <article class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
-              <h3 class="mg-section__title mg-section__title--sm m-0">
-                {{ formatDateLabel(day.date, 'pl-PL', true) }}
-              </h3>
-              <div class="flex-row-start-center flex-wrap gap-xs">
-                <span>{{ i18n.staffingLabels().requiredGmCount }}:</span>
-                <span class="tag-badge tag-badge--info">{{ day.requiredGmCount }}</span>
-              </div>
-              @if (day.slots.length) {
-                <ul class="flex-col-start-stretch gap-sm m-0 p-0">
-                  @for (slot of day.slots; track slot.id) {
-                    <li class="li--unset flex-row-between-center flex-wrap gap-xs">
-                      <span>{{ slot.label }}</span>
-                      <span class="tag-badge tag-badge--muted">
-                        {{ formatTimeRangeLabel(slot.startTime, slot.endTime) }}
-                      </span>
-                    </li>
-                  }
-                </ul>
-              } @else {
-                <p class="m-0 muted-text">{{ i18n.schedule().emptySlots }}</p>
-              }
-            </article>
-          } @empty {
-            <div class="mg-card p-md w-100">
-              <p class="m-0 muted-text">{{ i18n.copy().empty.days }}</p>
-            </div>
-          }
-        </div>
-      </section>
-
-      @if (data.type === 'travel') {
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-          <h2 class="mg-section__title mg-section__title--md m-0">
-            {{ i18n.tabs().travelTerms }}
-          </h2>
-          @if (data.travelTerms; as terms) {
-            <app-gm-staffing-travel-terms [terms]="terms" />
-          } @else {
-            <p class="m-0 muted-text">{{ i18n.copy().empty.travelTerms }}</p>
-          }
-        </section>
-      }
-
-      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-        <h2 class="mg-section__title mg-section__title--md m-0">
-          {{ i18n.copy().sections.recruitmentPolicy }}
-        </h2>
-        @if (data.type === 'travel') {
-          <p class="m-0">{{ i18n.recruitmentPolicy().travelHint }}</p>
-        }
-        @if (data.recruitmentPolicy; as policy) {
-          <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
-            <div class="flex-col-start-stretch gap-xs">
-              <dt class="muted-text">{{ i18n.copy().fields.selfApplicationEnabled }}</dt>
-              <dd class="m-0">
-                {{ policy.selfApplicationEnabled ? i18n.commonValues().yes : i18n.commonValues().no }}
-              </dd>
-            </div>
-            @if (data.type === 'stationary') {
-              <div class="flex-col-start-stretch gap-xs">
-                <dt class="muted-text">{{ i18n.recruitmentPolicy().fields.stationaryScopePolicy }}</dt>
-                <dd class="m-0">
-                  {{
-                    policy.stationaryScopePolicy === null
-                      ? i18n.commonValues().notProvided
-                      : i18n.recruitmentPolicy().stationaryScopes[policy.stationaryScopePolicy]
-                  }}
-                </dd>
-              </div>
-            }
-            <div class="flex-col-start-stretch gap-xs">
-              <dt class="muted-text">{{ i18n.recruitmentPolicy().fields.sessionSelectionMode }}</dt>
-              <dd class="m-0">{{ i18n.recruitmentPolicy().sessionModes[policy.sessionSelectionMode] }}</dd>
-            </div>
-            <div class="flex-col-start-stretch gap-xs">
-              <dt class="muted-text">{{ i18n.copy().fields.sessionsRequiredAtApplication }}</dt>
-              <dd class="m-0">
-                {{ policy.sessionsRequiredAtApplication ? i18n.commonValues().yes : i18n.commonValues().no }}
-              </dd>
-            </div>
-          </dl>
-          @if (policy.sessionsRequiredAtApplication && policy.sessionSelectionMode === 'gm_selects') {
-            <p class="m-0">{{ i18n.copy().sessionRequirementHint }}</p>
-          }
-        } @else {
-          <p class="m-0 muted-text">{{ i18n.copy().empty.recruitmentPolicy }}</p>
-        }
-      </section>
-
-      @if (data.candidate; as candidate) {
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-          @if (data.status === 'archived') {
-            <p class="m-0 muted-text">{{ i18n.copy().archivedCandidateHint }}</p>
-          }
-          <div class="flex-row-start-center flex-wrap gap-sm">
-            <h2 class="mg-section__title mg-section__title--md m-0">
-              {{ i18n.copy().sections.candidate }}
-            </h2>
-            <span [class]="'tag-badge ' + statusBadgeClass[candidate.state]">
-              {{ i18n.candidateStates()[candidate.state] }}
-            </span>
-          </div>
-          <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
-            <div class="flex-col-start-stretch gap-xs">
-              <dt class="muted-text">{{ i18n.copy().fields.origin }}</dt>
-              <dd class="m-0">{{ i18n.copy().candidateOrigins[candidate.origin] }}</dd>
-            </div>
-            <div class="flex-col-start-stretch gap-xs">
-              <dt class="muted-text">{{ i18n.copy().fields.scope }}</dt>
-              <dd class="m-0">
-                {{ i18n.recruitmentPolicy().stationaryScopes[candidate.scope.mode] }}
-                @if (candidate.scope.mode === 'selected_days') {
-                  <ul class="m-0">
-                    @for (day of candidateDays(); track day.id) {
-                      <li>{{ formatDateLabel(day.date, 'pl-PL', true) }}</li>
-                    }
-                  </ul>
-                }
-              </dd>
-            </div>
-            <div class="flex-col-start-start gap-xs">
-              <dt class="muted-text">{{ i18n.copy().fields.gmDecision }}</dt>
-              <dd [class]="'tag-badge m-0 ' + statusBadgeClass[candidate.gmDecision]">
-                {{ i18n.copy().candidateDecisions[candidate.gmDecision] }}
-              </dd>
-            </div>
-            <div class="flex-col-start-start gap-xs">
-              <dt class="muted-text">{{ i18n.copy().fields.adminDecision }}</dt>
-              <dd [class]="'tag-badge m-0 ' + statusBadgeClass[candidate.adminDecision]">
-                {{ i18n.copy().candidateDecisions[candidate.adminDecision] }}
-              </dd>
-            </div>
-            @for (field of candidateTimestampFields; track field) {
-              @if (candidate[field]; as timestamp) {
-                <div class="flex-col-start-stretch gap-xs">
-                  <dt class="muted-text">{{ i18n.copy().fields[field] }}</dt>
-                  <dd class="m-0">{{ formatTimestampLabel(timestamp, 'pl-PL', data.timezone) }}</dd>
-                </div>
-              }
-            }
-          </dl>
-        </section>
-      }
+    } @else if (facade.detail()) {
+      <router-outlet />
     }
   </div>
-</section>
+</app-route-tab-shell>

@@ -1,0 +1,12 @@
+@if (detail(); as data) {
+  @if (data.type === 'travel') {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.copy().tabs.travelTerms }}</h2>
+      @if (data.travelTerms; as terms) {
+        <app-gm-staffing-travel-terms [terms]="terms" />
+      } @else {
+        <p class="m-0 muted-text">{{ i18n.copy().empty.travelTerms }}</p>
+      }
+    </section>
+  }
+}

@@ -1,4 +1,5 @@
 import type {
+  StaffingParticipationEndReason,
   StaffingRealizationStatus,
   StaffingRealizationType,
 } from '../types/staffing-realization';
@@ -9,6 +10,19 @@ import type {
 } from './admin-staffing-realization';
 import type { SaveAdminStaffingRecruitmentPolicyPayload } from './admin-staffing-recruitment-policy';
 import type { SaveAdminStaffingTravelTermsPayload } from './admin-staffing-travel-terms';
+
+export interface StaffingReplacementCandidate {
+  userId: string;
+  firstName: string | null;
+  nickname: string | null;
+  useNickname: boolean;
+}
+
+export interface MyStaffingCandidateParticipation {
+  active: boolean;
+  endedAt: string | null;
+  endReason: StaffingParticipationEndReason | null;
+}
 
 export interface MyStaffingCandidate {
   id: string;
@@ -24,6 +38,12 @@ export interface MyStaffingCandidate {
   withdrawnAt: string | null;
   gmDecidedAt: string | null;
   adminDecidedAt: string | null;
+  participation: MyStaffingCandidateParticipation;
+}
+
+export interface WithdrawMyConfirmedStaffingParticipationResult {
+  candidate: MyStaffingCandidate;
+  replacementProposal: MyStaffingCandidate | null;
 }
 
 export interface MyStaffingRealizationHubItem {

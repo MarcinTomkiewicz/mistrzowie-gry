@@ -12,6 +12,18 @@ const loaders = {
     import('../components/gm-staffing-realization-detail/gm-staffing-realization-detail').then(
       (m) => m.GmStaffingRealizationDetail,
     ),
+  staffingInformation: () =>
+    import('../components/gm-staffing-realization-detail/gm-staffing-information').then(
+      (m) => m.GmStaffingInformation,
+    ),
+  staffingTravel: () =>
+    import('../components/gm-staffing-realization-detail/gm-staffing-travel').then(
+      (m) => m.GmStaffingTravel,
+    ),
+  staffingParticipation: () =>
+    import('../components/gm-staffing-realization-detail/gm-staffing-participation').then(
+      (m) => m.GmStaffingParticipation,
+    ),
   profileShell: () =>
     import('../components/gm-profile-shell/gm-profile-shell').then(
       (m) => m.GmProfileShell,
@@ -43,6 +55,11 @@ export const gmRoutes: Routes = [
     path: 'staffing/:realizationId',
     loadComponent: loaders.staffingDetail,
     canActivate: gmGuards,
+    children: [
+      { path: '', pathMatch: 'full', loadComponent: loaders.staffingInformation },
+      { path: 'travel-terms', loadComponent: loaders.staffingTravel },
+      { path: 'participation', loadComponent: loaders.staffingParticipation },
+    ],
   },
   {
     path: 'profile',

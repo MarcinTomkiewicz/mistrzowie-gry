@@ -1,0 +1,97 @@
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, defer, EMPTY, finalize, interval, map, Observable, tap, throwError } from 'rxjs';
+
+import { getStaffingParticipationActions } from '../../domain/staffing/participation';
+import type { MyStaffingCandidate, MyStaffingRealizationDetail } from '../../interfaces/my-staffing-realization';
+import type { ISelectOption } from '../../interfaces/i-select-option';
+import { MyStaffingRealizationRead } from '../../reads/staffing/my-staffing-realization-read';
+import { Platform } from '../../services/platform/platform';
+import { MyStaffingRealization } from '../../services/staffing/my-staffing-realization';
+import { getUserDisplayName } from '../../utils/user-display';
+
+@Injectable()
+export class GmStaffingRealizationFacade {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly read = inject(MyStaffingRealizationRead);
+  private readonly write = inject(MyStaffingRealization);
+  private readonly detailSource = signal<MyStaffingRealizationDetail | null>(null);
+  private readonly now = signal(Date.now());
+
+  readonly detail = this.detailSource.asReadonly();
+  readonly isLoading = signal(false);
+  readonly loadError = signal<unknown | null>(null);
+  readonly isMutating = signal(false);
+  readonly actions = computed(() => {
+    const detail = this.detail();
+    return detail ? getStaffingParticipationActions(detail, this.now()) : null;
+  });
+
+  constructor() {
+    if (inject(Platform).isBrowser) {
+      interval(1000).pipe(takeUntilDestroyed()).subscribe(() => this.refreshTime());
+    }
+  }
+
+  refreshTime(): void {
+    this.now.set(Date.now());
+  }
+
+  load(realizationId: string): Observable<MyStaffingRealizationDetail> {
+    return defer(() => {
+      this.detailSource.set(null);
+      this.isLoading.set(true);
+      this.loadError.set(null);
+      return this.read.getDetail(realizationId).pipe(
+        tap(detail => this.detailSource.set(detail)),
+        catchError((error: unknown) => {
+          this.loadError.set(error);
+          return throwError(() => error);
+        }),
+        finalize(() => this.isLoading.set(false)),
+      );
+    });
+  }
+
+  createSelfApplication(realizationId: string, dayIds: string[] | null): Observable<MyStaffingCandidate> {
+    return this.mutate(this.write.createSelfApplication(realizationId, dayIds));
+  }
+
+  submitSelfApplication(candidateId: string): Observable<MyStaffingCandidate> {
+    return this.mutate(this.write.submitSelfApplication(candidateId));
+  }
+
+  withdrawSelfApplication(candidateId: string): Observable<MyStaffingCandidate> {
+    return this.mutate(this.write.withdrawSelfApplication(candidateId));
+  }
+
+  decideAdminProposal(candidateId: string, decision: 'accepted' | 'rejected'): Observable<MyStaffingCandidate> {
+    return this.mutate(this.write.decideAdminProposal(candidateId, decision));
+  }
+
+  withdrawConfirmedParticipation(candidateId: string, replacementGmUserId: string | null): Observable<MyStaffingCandidate> {
+    return this.mutate(this.write.withdrawConfirmedParticipation(candidateId, replacementGmUserId).pipe(
+      map(result => result.candidate),
+    ));
+  }
+
+  getReplacementGmOptions(candidateId: string): Observable<ISelectOption<string>[]> {
+    return this.read.getReplacementCandidates(candidateId).pipe(
+      map(candidates => candidates.map(candidate => ({ value: candidate.userId, label: getUserDisplayName(candidate) }))),
+    );
+  }
+
+  private mutate(request: Observable<MyStaffingCandidate>): Observable<MyStaffingCandidate> {
+    return defer(() => {
+      if (this.isMutating()) return EMPTY;
+      const realizationId = this.detail()?.id;
+      this.isMutating.set(true);
+      return request.pipe(
+        tap(candidate => this.detailSource.update(detail =>
+          detail && detail.id === realizationId ? { ...detail, candidate } : detail,
+        )),
+        finalize(() => this.isMutating.set(false)),
+      );
+    }).pipe(takeUntilDestroyed(this.destroyRef));
+  }
+}

@@ -76,8 +76,7 @@
       "recruitment_policy": {
         "missing": "[PH] Zapisz zasady rekrutacji.",
         "stationary_scope_invalid": "[PH] Popraw zakres zgłoszenia odpowiednio do typu realizacji.",
-        "session_selection_mode_invalid": "[PH] Wybierz prawidłowy sposób wyboru sesji.",
-        "session_requirement_invalid": "[PH] Popraw wymaganie sesji przy zgłoszeniu zgodnie z trybem wyboru sesji i dostępnością zgłoszeń MG."
+        "session_selection_mode_invalid": "[PH] Wybierz prawidłowy sposób wyboru sesji."
       }
     }
   },
@@ -85,12 +84,11 @@
     "description": "[PH] Określ zasady zgłoszeń Mistrzów Gry i wymagania dotyczące proponowanych sesji.",
     "travelHint": "[PH] Udział w realizacji wyjazdowej obejmuje cały wyjazd. Nie można zgłosić udziału tylko w wybranych dniach.",
     "saveCoreTypeHint": "[PH] Przed zapisem zasad rekrutacji zapisz zmianę typu realizacji w Danych podstawowych.",
-    "sessionsHint": "[PH] Przy włączonych zgłoszeniach możesz wymagać od każdego kandydata jednej propozycji sesji dla każdego slotu objętego jego zgłoszeniem.",
+    "sessionsHint": "[PH] Po potwierdzeniu udziału MG proponuje jedną sesję dla każdego objętego slotu.",
     "fields": {
       "selfApplicationEnabled": "[PH] MG mogą zgłaszać udział",
       "stationaryScopePolicy": "[PH] Zakres zgłoszenia",
-      "sessionSelectionMode": "[PH] Sposób wyboru sesji",
-      "sessionsRequiredAtApplication": "[PH] Wymagaj sesji przy zgłoszeniu"
+      "sessionSelectionMode": "[PH] Sposób wyboru sesji"
     },
     "stationaryScopes": {
       "whole_realization": "[PH] Cała realizacja",

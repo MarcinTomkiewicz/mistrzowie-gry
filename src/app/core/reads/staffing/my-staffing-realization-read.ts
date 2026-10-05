@@ -5,6 +5,7 @@ import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc
 import type {
   MyStaffingRealizationDetail,
   MyStaffingRealizationHub,
+  StaffingReplacementCandidate,
 } from '../../interfaces/my-staffing-realization';
 import { Backend } from '../../services/backend/backend';
 
@@ -22,6 +23,13 @@ export class MyStaffingRealizationRead {
     return this.backend.rpc<MyStaffingRealizationDetail>(
       STAFFING_REALIZATION_RPC.getMyDetail,
       { p_realization_id: realizationId },
+    );
+  }
+
+  getReplacementCandidates(candidateId: string): Observable<StaffingReplacementCandidate[]> {
+    return this.backend.rpc<StaffingReplacementCandidate[]>(
+      STAFFING_REALIZATION_RPC.listMyReplacementCandidates,
+      { p_candidate_id: candidateId },
     );
   }
 }

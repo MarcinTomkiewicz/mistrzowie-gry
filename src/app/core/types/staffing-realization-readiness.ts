@@ -28,5 +28,4 @@ export type StaffingRealizationReadinessIssueCode =
   | 'travel_terms.note_invalid'
   | 'recruitment_policy.missing'
   | 'recruitment_policy.stationary_scope_invalid'
-  | 'recruitment_policy.session_selection_mode_invalid'
-  | 'recruitment_policy.session_requirement_invalid';
+  | 'recruitment_policy.session_selection_mode_invalid';

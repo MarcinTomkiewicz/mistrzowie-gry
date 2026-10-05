@@ -1,0 +1,175 @@
+@let copy = i18n.copy();
+@if (detail(); as data) {
+  <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+    @if (data.candidate; as candidate) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        @if (data.status === 'archived') {
+          <p class="m-0 muted-text">{{ i18n.copy().archivedCandidateHint }}</p>
+        }
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <h2 class="mg-section__title mg-section__title--md m-0">
+            {{ i18n.copy().sections.candidate }}
+          </h2>
+          <span [class]="'tag-badge ' + statusBadgeClass[candidate.state]">
+            {{ i18n.candidateStates()[candidate.state] }}
+          </span>
+        </div>
+        <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
+          <div class="flex-col-start-stretch gap-xs">
+            <dt class="muted-text">{{ i18n.copy().fields.origin }}</dt>
+            <dd class="m-0">{{ i18n.copy().candidateOrigins[candidate.origin] }}</dd>
+          </div>
+          <div class="flex-col-start-stretch gap-xs">
+            <dt class="muted-text">{{ i18n.copy().fields.scope }}</dt>
+            <dd class="m-0">
+              {{ i18n.recruitmentPolicy().stationaryScopes[candidate.scope.mode] }}
+              @if (candidate.scope.mode === 'selected_days') {
+                <ul class="m-0">
+                  @for (day of candidateDays(); track day.id) {
+                    <li>{{ formatDateLabel(day.date, 'pl-PL', true) }}</li>
+                  }
+                </ul>
+              }
+            </dd>
+          </div>
+          <div class="flex-col-start-start gap-xs">
+            <dt class="muted-text">{{ i18n.copy().fields.gmDecision }}</dt>
+            <dd [class]="'tag-badge m-0 ' + statusBadgeClass[candidate.gmDecision]">
+              {{ i18n.copy().candidateDecisions[candidate.gmDecision] }}
+            </dd>
+          </div>
+          <div class="flex-col-start-start gap-xs">
+            <dt class="muted-text">{{ i18n.copy().fields.adminDecision }}</dt>
+            <dd [class]="'tag-badge m-0 ' + statusBadgeClass[candidate.adminDecision]">
+              {{ i18n.copy().candidateDecisions[candidate.adminDecision] }}
+            </dd>
+          </div>
+          @for (field of candidateTimestampFields; track field) {
+            @if (candidate[field]; as timestamp) {
+              <div class="flex-col-start-stretch gap-xs">
+                <dt class="muted-text">{{ i18n.copy().fields[field] }}</dt>
+                <dd class="m-0">{{ formatTimestampLabel(timestamp, 'pl-PL', data.timezone) }}</dd>
+              </div>
+            }
+          }
+        </dl>
+        @if (candidate.state === 'confirmed') {
+          <div class="flex-col-start-stretch gap-sm">
+            <div>
+              <span class="tag-badge" [class.tag-badge--success]="candidate.participation.active"
+                [class.tag-badge--muted]="!candidate.participation.active">
+                {{ candidate.participation.active ? i18n.copy().participation.active : i18n.copy().participation.ended }}
+              </span>
+            </div>
+            @if (candidate.participation.endedAt; as endedAt) {
+              <p class="m-0">
+                {{ i18n.copy().participation.endedAt }}:
+                {{ formatTimestampLabel(endedAt, 'pl-PL', data.timezone) }}
+              </p>
+            }
+            @if (candidate.participation.endReason; as reason) {
+              <p class="m-0">{{ i18n.copy().participation.endReason }}: {{ i18n.copy().participationEndReasons[reason] }}</p>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    @if (data.status !== 'archived') {
+      @if (data.candidate; as candidate) {
+        @if (candidate.origin === 'self_application' && candidate.state === 'draft') {
+          <p class="m-0 muted-text">{{ copy.application.draftHint }}</p>
+        }
+        @if (candidate.origin === 'self_application' && candidate.state === 'pending') {
+          <p class="m-0 muted-text">{{ copy.application.pendingHint }}</p>
+        }
+      }
+    }
+
+    @if (actions()?.canCreate) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.application.scopeTitle }}</h2>
+        @if (actions()?.selectedDays) {
+          <div class="flex-col-start-stretch gap-xs w-px-300 w-100-sm min-w-0">
+            <p-multiselect inputId="staffing-application-days" size="small" class="w-100"
+              [formControl]="dayIds" [options]="dayOptions()" optionLabel="label" optionValue="value"
+              [placeholder]="copy.application.scopeTitle" [ariaLabel]="copy.application.scopeTitle" appendTo="body"
+              [class.p-invalid]="dayIds.touched && dayIds.invalid" />
+            @if (dayIds.touched && dayIds.invalid) {
+              <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+            }
+          </div>
+        } @else {
+          <p class="m-0">{{ i18n.recruitmentPolicy().stationaryScopes.whole_realization }}</p>
+        }
+        @if (data.type === 'travel') {
+          <p class="m-0 muted-text">{{ i18n.recruitmentPolicy().travelHint }}</p>
+        }
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button type="button" severity="success" icon="pi pi-save" [label]="copy.application.create"
+            [disabled]="facade.isMutating()" (onClick)="createApplication()" />
+        </div>
+      </section>
+    } @else if (!data.candidate) {
+      <p class="m-0 muted-text">{{ copy.application.unavailableHint }}</p>
+    }
+
+    <div class="flex-row-start-center flex-wrap gap-sm">
+      @if (actions()?.canSubmit) {
+        <p-button type="button" severity="success" icon="pi pi-check" [label]="copy.application.submit"
+          [disabled]="facade.isMutating()" (onClick)="submitApplication()" />
+      }
+      @if (actions()?.canWithdrawApplication) {
+        <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+          [label]="copy.application.withdraw" [disabled]="facade.isMutating()" (onClick)="confirmApplicationWithdrawal($event)" />
+      }
+      @if (actions()?.canDecideProposal) {
+        <p-button type="button" severity="success" icon="pi pi-check" [label]="copy.proposal.accept"
+          [disabled]="facade.isMutating()" (onClick)="confirmProposalDecision($event, 'accepted')" />
+        <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+          [label]="copy.proposal.reject" [disabled]="facade.isMutating()" (onClick)="confirmProposalDecision($event, 'rejected')" />
+      }
+      @if (actions()?.canWithdrawParticipation && !showWithdrawal()) {
+        <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+          [label]="copy.participation.withdraw" [disabled]="facade.isMutating()" (onClick)="openWithdrawal()" />
+      }
+    </div>
+
+    @if (actions()?.withdrawalStarted) {
+      <p class="m-0 muted-text">{{ copy.participation.startedHint }}</p>
+    }
+    @if (actions()?.canWithdrawParticipation && showWithdrawal()) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.participation.withdraw }}</h2>
+        <p class="m-0">
+          {{ actions()?.replacementRequired ? copy.participation.replacementRequiredHint : copy.participation.replacementOptionalHint }}
+        </p>
+        <div class="flex-col-start-stretch gap-xs w-px-300 w-100-sm min-w-0">
+          <p-select inputId="staffing-replacement-gm" size="small" class="w-100"
+            [formControl]="replacementId" [options]="replacementOptions()" optionLabel="label" optionValue="value"
+            [placeholder]="copy.participation.replacementLabel" [ariaLabel]="copy.participation.replacementLabel"
+            [showClear]="true" [filter]="true" [loading]="replacementLoading()" appendTo="body"
+            [class.p-invalid]="actions()?.replacementRequired && replacementId.touched && replacementId.value === null" />
+          @if (actions()?.replacementRequired && replacementId.touched && replacementId.value === null) {
+            <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>
+          }
+        </div>
+        @if (replacementLoadFailed()) {
+          <div class="flex-col-start-stretch gap-sm" role="alert">
+            <p class="m-0">{{ copy.participation.replacementLoadFailed }}</p>
+            <div>
+              <p-button severity="secondary" icon="pi pi-refresh" [label]="i18n.commonActions().retry" (onClick)="loadReplacements()" />
+            </div>
+          </div>
+        }
+        <p class="m-0 muted-text">{{ copy.participation.replacementHint }}</p>
+        <div class="flex-row-between-center flex-wrap gap-sm">
+          <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+            [label]="i18n.commonActions().cancel" [disabled]="facade.isMutating()" (onClick)="cancelWithdrawal()" />
+          <p-button type="button" severity="danger" icon="pi pi-interdiction" [label]="copy.participation.withdraw"
+            [disabled]="facade.isMutating()" (onClick)="confirmParticipationWithdrawal($event)" />
+        </div>
+      </section>
+    }
+  </div>
+}

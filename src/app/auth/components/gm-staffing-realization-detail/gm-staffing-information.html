@@ -1,0 +1,133 @@
+@if (detail(); as data) {
+  <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.basicSection().title }}
+      </h2>
+      <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
+        <div class="flex-col-start-stretch gap-xs">
+          <dt class="muted-text">{{ i18n.commonLabels().city }}</dt>
+          <dd class="m-0">{{ data.city ?? i18n.commonValues().notProvided }}</dd>
+        </div>
+        <div class="flex-col-start-stretch gap-xs">
+          <dt class="muted-text">{{ i18n.coreFields().venueName }}</dt>
+          <dd class="m-0">{{ data.venueName ?? i18n.commonValues().notProvided }}</dd>
+        </div>
+        <div class="flex-col-start-stretch gap-xs">
+          <dt class="muted-text">{{ i18n.coreFields().venueAddress }}</dt>
+          <dd class="m-0">{{ data.venueAddress ?? i18n.commonValues().notProvided }}</dd>
+        </div>
+        <div class="flex-col-start-stretch gap-xs">
+          <dt class="muted-text">{{ i18n.coreFields().dateRange }}</dt>
+          <dd class="m-0">{{ dates() ?? i18n.commonValues().notProvided }}</dd>
+        </div>
+        <div class="flex-col-start-start gap-xs">
+          <dt class="muted-text">{{ i18n.coreFields().type }}</dt>
+          <dd
+            class="tag-badge m-0"
+            [class.tag-badge--info]="data.type === 'travel'"
+            [class.tag-badge--golden]="data.type === 'stationary'"
+          >
+            {{ i18n.realizationTypes()[data.type] }}
+          </dd>
+        </div>
+        <div class="flex-col-start-start gap-xs">
+          <dt class="muted-text">{{ i18n.commonLabels().status }}</dt>
+          <dd [class]="'tag-badge m-0 ' + statusBadgeClass[data.status]">
+            {{ i18n.realizationStatuses()[data.status] }}
+          </dd>
+        </div>
+        <div class="flex-col-start-stretch gap-xs">
+          <dt class="muted-text">{{ i18n.coreFields().timezone }}</dt>
+          <dd class="m-0">{{ data.timezone }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.copy().sections.description }}
+      </h2>
+      <p class="m-0 text-pre-line">
+        {{ data.description ?? i18n.copy().empty.description }}
+      </p>
+    </section>
+
+    <section class="flex-col-start-stretch gap-sm w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.schedule().section.title }}
+      </h2>
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+        @for (day of data.days; track day.id) {
+          <article class="mg-card flex-col-start-stretch gap-sm p-md min-w-0">
+            <h3 class="mg-section__title mg-section__title--sm m-0">
+              {{ formatDateLabel(day.date, 'pl-PL', true) }}
+            </h3>
+            <div class="flex-row-start-center flex-wrap gap-xs">
+              <span>{{ i18n.staffingLabels().requiredGmCount }}:</span>
+              <span class="tag-badge tag-badge--info">{{ day.requiredGmCount }}</span>
+            </div>
+            @if (day.slots.length) {
+              <ul class="flex-col-start-stretch gap-sm m-0 p-0">
+                @for (slot of day.slots; track slot.id) {
+                  <li class="li--unset flex-row-between-center flex-wrap gap-xs">
+                    <span>{{ slot.label }}</span>
+                    <span class="tag-badge tag-badge--muted">
+                      {{ formatTimeRangeLabel(slot.startTime, slot.endTime) }}
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="m-0 muted-text">{{ i18n.schedule().emptySlots }}</p>
+            }
+          </article>
+        } @empty {
+          <div class="mg-card p-md w-100">
+            <p class="m-0 muted-text">{{ i18n.copy().empty.days }}</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ i18n.copy().sections.recruitmentPolicy }}
+      </h2>
+      @if (data.type === 'travel') {
+        <p class="m-0">{{ i18n.recruitmentPolicy().travelHint }}</p>
+      }
+      @if (data.recruitmentPolicy; as policy) {
+        <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
+          <div class="flex-col-start-stretch gap-xs">
+            <dt class="muted-text">{{ i18n.copy().fields.selfApplicationEnabled }}</dt>
+            <dd class="m-0">
+              {{ policy.selfApplicationEnabled ? i18n.commonValues().yes : i18n.commonValues().no }}
+            </dd>
+          </div>
+          @if (data.type === 'stationary') {
+            <div class="flex-col-start-stretch gap-xs">
+              <dt class="muted-text">{{ i18n.recruitmentPolicy().fields.stationaryScopePolicy }}</dt>
+              <dd class="m-0">
+                {{
+                  policy.stationaryScopePolicy === null
+                    ? i18n.commonValues().notProvided
+                    : i18n.recruitmentPolicy().stationaryScopes[policy.stationaryScopePolicy]
+                }}
+              </dd>
+            </div>
+          }
+          <div class="flex-col-start-stretch gap-xs">
+            <dt class="muted-text">{{ i18n.recruitmentPolicy().fields.sessionSelectionMode }}</dt>
+            <dd class="m-0">{{ i18n.recruitmentPolicy().sessionModes[policy.sessionSelectionMode] }}</dd>
+          </div>
+        </dl>
+        @if (policy.sessionSelectionMode === 'gm_selects') {
+          <p class="m-0">{{ i18n.copy().sessionProposalHint }}</p>
+        }
+      } @else {
+        <p class="m-0 muted-text">{{ i18n.copy().empty.recruitmentPolicy }}</p>
+      }
+    </section>
+  </div>
+}

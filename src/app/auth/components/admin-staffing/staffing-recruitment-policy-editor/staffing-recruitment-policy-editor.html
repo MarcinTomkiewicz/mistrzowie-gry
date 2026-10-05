@@ -27,7 +27,7 @@
         <p-message severity="info" icon="pi pi-info-circle">{{ copy.travelHint }}</p-message>
       }
       <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0"
-        data-staffing-field="stationaryScopePolicy requiredSessionMappingsPerSlot sessionsRequiredAtApplication">
+        data-staffing-field="stationaryScopePolicy requiredSessionMappingsPerSlot">
         <div class="flex-row-start-center gap-sm">
           <p-checkbox inputId="staffing-self-application" formControlName="selfApplicationEnabled" [binary]="true" />
           <label for="staffing-self-application">{{ fields.selfApplicationEnabled }}</label>
@@ -54,10 +54,6 @@
         </div>
         @if (form.controls.sessionSelectionMode.value === 'gm_selects') {
           <p class="m-0 muted-text">{{ copy.sessionsHint }}</p>
-          <div class="flex-row-start-center gap-sm">
-            <p-checkbox inputId="staffing-sessions-required" formControlName="sessionsRequiredAtApplication" [binary]="true" />
-            <label for="staffing-sessions-required">{{ fields.sessionsRequiredAtApplication }}</label>
-          </div>
         }
       </section>
       <app-staffing-realization-finalization class="w-100"

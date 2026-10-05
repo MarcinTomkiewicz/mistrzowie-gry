@@ -5,7 +5,6 @@ export interface AdminStaffingRecruitmentPolicy {
   selfApplicationEnabled: boolean;
   stationaryScopePolicy: StaffingStationaryScopePolicy | null;
   sessionSelectionMode: StaffingSessionSelectionMode;
-  sessionsRequiredAtApplication: boolean;
   requiredSessionMappingsPerSlot: number | null;
   createdAt: string;
   createdBy: string;

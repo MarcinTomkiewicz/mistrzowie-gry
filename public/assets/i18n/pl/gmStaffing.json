@@ -39,11 +39,11 @@
     },
     "errors": {
       "loadFailed": "[PH] Nie udało się załadować szczegółów realizacji",
-      "notFound": "[PH] Nie znaleziono realizacji lub nie masz dostępu do jej szczegółów."
+      "notFound": "[PH] Nie znaleziono realizacji lub nie masz dostępu do jej szczegółów.",
+      "actionFailed": "[PH] Nie udało się wykonać akcji udziału"
     },
     "fields": {
       "selfApplicationEnabled": "[PH] Samodzielne zgłoszenia MG",
-      "sessionsRequiredAtApplication": "[PH] Sesje wymagane przy zgłoszeniu",
       "origin": "[PH] Źródło udziału",
       "scope": "[PH] Zakres udziału",
       "gmDecision": "[PH] Twoja decyzja",
@@ -62,7 +62,54 @@
       "accepted": "[PH] Zaakceptowano",
       "rejected": "[PH] Odrzucono"
     },
-    "sessionRequirementHint": "[PH] Przy zgłoszeniu należy wskazać sesję dla każdego objętego slotu.",
-    "archivedCandidateHint": "[PH] Realizacja jest zarchiwizowana. Poniższy stan udziału ma charakter historyczny i nie wymaga działania."
+    "archivedCandidateHint": "[PH] Realizacja jest zarchiwizowana. Poniższy stan udziału ma charakter historyczny i nie wymaga działania.",
+    "tabs": {
+      "information": "[PH] Informacje",
+      "travelTerms": "[PH] Warunki wyjazdu",
+      "participation": "[PH] Udział"
+    },
+    "application": {
+      "create": "[PH] Utwórz szkic zgłoszenia",
+      "submit": "[PH] Wyślij zgłoszenie",
+      "withdraw": "[PH] Wycofaj zgłoszenie",
+      "scopeTitle": "[PH] Zakres zgłoszenia",
+      "draftHint": "[PH] Szkic zgłoszenia nie został jeszcze wysłany. Zgłoszenie udziału nie wymaga wskazania sesji.",
+      "pendingHint": "[PH] Zgłoszenie zostało wysłane i oczekuje na decyzję koordynatora.",
+      "unavailableHint": "[PH] Zgłoszenie udziału nie jest obecnie dostępne.",
+      "withdrawConfirm": "[PH] Wycofać to zgłoszenie udziału?",
+      "createSuccess": "[PH] Szkic zgłoszenia został utworzony",
+      "submitSuccess": "[PH] Zgłoszenie zostało wysłane",
+      "withdrawSuccess": "[PH] Zgłoszenie zostało wycofane"
+    },
+    "proposal": {
+      "accept": "[PH] Przyjmij propozycję",
+      "reject": "[PH] Odrzuć propozycję",
+      "acceptConfirm": "[PH] Przyjąć propozycję i potwierdzić udział w podanym zakresie?",
+      "rejectConfirm": "[PH] Odrzucić tę propozycję udziału?",
+      "acceptSuccess": "[PH] Propozycja została przyjęta, a udział potwierdzony",
+      "rejectSuccess": "[PH] Propozycja została odrzucona"
+    },
+    "participation": {
+      "active": "[PH] Udział aktywny",
+      "ended": "[PH] Udział zakończony",
+      "endedAt": "[PH] Data zakończenia udziału",
+      "endReason": "[PH] Powód zakończenia udziału",
+      "withdraw": "[PH] Wycofaj potwierdzony udział",
+      "startedHint": "[PH] Realizacja już się rozpoczęła. Nie można wycofać potwierdzonego udziału.",
+      "replacementLabel": "[PH] MG proponowany na zastępstwo",
+      "replacementRequiredHint": "[PH] Do rozpoczęcia realizacji pozostało mniej niż 72 godziny. Aby wycofać udział, wskaż zastępstwo.",
+      "replacementOptionalHint": "[PH] Do rozpoczęcia realizacji pozostały co najmniej 72 godziny. Wskazanie zastępstwa jest opcjonalne.",
+      "replacementHint": "[PH] Zastępstwo obejmuje ten sam zakres udziału i otrzyma propozycję wymagającą przyjęcia. Nie jest potwierdzane automatycznie.",
+      "replacementLoadFailed": "[PH] Nie udało się załadować listy MG do wyboru zastępstwa",
+      "withdrawConfirm": "[PH] Wycofać potwierdzony udział bez wskazania zastępstwa?",
+      "withdrawWithReplacementConfirm": "[PH] Wycofać potwierdzony udział? Wskazane zastępstwo otrzyma propozycję w tym samym zakresie.",
+      "withdrawSuccess": "[PH] Potwierdzony udział został wycofany",
+      "withdrawWithReplacementSuccess": "[PH] Twój udział został wycofany, a zastępstwo otrzymało propozycję wymagającą przyjęcia"
+    },
+    "participationEndReasons": {
+      "gm_withdrawal": "[PH] Wycofanie udziału przez MG",
+      "admin_removal": "[PH] Zakończenie udziału przez koordynatora"
+    },
+    "sessionProposalHint": "[PH] Sesje wybiera MG po potwierdzeniu udziału. Zgłoszenie udziału nie wymaga wskazania sesji."
   }
 }
