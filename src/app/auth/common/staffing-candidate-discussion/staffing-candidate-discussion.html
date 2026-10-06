@@ -1,0 +1,56 @@
+@let copy = i18n.copy();
+<section class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0"
+  [class.h-px-200]="isLoading()" [attr.aria-busy]="isLoading() || isSending()">
+  <app-loading-overlay [visible]="isLoading() || isSending()"
+    [label]="isSending() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+  <header class="flex-row-between-center flex-wrap gap-sm">
+    <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.title }}</h3>
+    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-refresh"
+      [label]="i18n.commonActions().refresh" [disabled]="isLoading() || isSending()" (onClick)="refresh()" />
+  </header>
+
+  @if (!isLoading()) {
+    @if (loadFailed()) {
+      <div class="flex-col-start-start gap-sm" role="alert">
+        <p class="m-0">{{ copy.loadFailed }}</p>
+        <p-button type="button" severity="secondary" icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry" (onClick)="refresh()" />
+      </div>
+    } @else if (thread(); as data) {
+      <div class="flex-col-start-stretch gap-sm w-100 min-w-0" aria-live="polite">
+        @for (message of data.messages; track message.id) {
+          <article class="flex-col-start-stretch gap-sm border radius-sm p-sm min-w-0">
+            <header class="flex-row-between-center flex-wrap gap-xs">
+              <strong class="text-wrap-anywhere">{{ getUserDisplayName(message.author) || message.author.userId }}</strong>
+              <time class="muted-text text-sm" [attr.datetime]="message.createdAt">
+                {{ formatTimestampLabel(message.createdAt, 'pl-PL', timezone()) }}
+              </time>
+            </header>
+            <p class="m-0 pre-line text-wrap-anywhere">{{ message.body }}</p>
+          </article>
+        } @empty {
+          <p class="m-0 muted-text" role="status">{{ copy.empty }}</p>
+        }
+      </div>
+
+      @if (data.writable) {
+        <form class="mg-form flex-col-start-stretch gap-sm w-100" [formGroup]="form" (ngSubmit)="send()" novalidate>
+          <p-floatlabel variant="on">
+            <textarea pTextarea class="w-100" rows="3" [autoResize]="true" formControlName="body"
+              [id]="'staffing-message-' + candidate().id"></textarea>
+            <label [for]="'staffing-message-' + candidate().id">{{ copy.bodyLabel }}</label>
+          </p-floatlabel>
+          @if (form.controls.body.touched && form.controls.body.invalid) {
+            <small class="mg-contact-error" role="alert">{{ i18n.commonForm().required }}</small>
+          }
+          <div class="flex-row-end-center flex-wrap gap-sm w-100">
+            <p-button type="submit" severity="success" icon="pi pi-send" [label]="copy.send"
+              [loading]="isSending()" [disabled]="!canWrite()" />
+          </div>
+        </form>
+      } @else {
+        <p class="m-0 muted-text" role="status">{{ copy.readOnly }}</p>
+      }
+    }
+  }
+</section>

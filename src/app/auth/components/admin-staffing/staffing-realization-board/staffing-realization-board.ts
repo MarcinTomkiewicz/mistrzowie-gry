@@ -21,16 +21,17 @@ import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { StaffingRealizationAvailability } from './staffing-realization-availability';
 import { StaffingAdminProposal } from './staffing-admin-proposal';
 import { StaffingFinalPlanEditor } from '../staffing-final-plan-editor/staffing-final-plan-editor';
+import { StaffingCandidateDiscussion } from '../../../common/staffing-candidate-discussion/staffing-candidate-discussion';
 import { createStaffingRealizationBoardI18n } from './staffing-realization-board.i18n';
 
 @Component({
   selector: 'app-staffing-realization-board',
-  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal, StaffingFinalPlanEditor],
+  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal, StaffingFinalPlanEditor, StaffingCandidateDiscussion],
   templateUrl: './staffing-realization-board.html',
   providers: [provideTranslocoScope('adminStaffing', STAFFING_SCOPE, GM_STAFFING_SCOPE, 'common')],
 })
 export class StaffingRealizationBoard {
-  private readonly facade = inject(StaffingRealizationEditorFacade);
+  protected readonly facade = inject(StaffingRealizationEditorFacade);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly toast = inject(UiToast);

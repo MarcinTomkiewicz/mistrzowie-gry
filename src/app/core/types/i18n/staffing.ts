@@ -26,6 +26,17 @@ export type StaffingLabelsTranslations = {
   requiredGmCount: string;
 };
 
+export type StaffingCandidateThreadCopy = {
+  title: string;
+  empty: string;
+  readOnly: string;
+  bodyLabel: string;
+  send: string;
+  loadFailed: string;
+  sendSuccess: string;
+  sendFailed: string;
+};
+
 export type StaffingTransportModeTranslations = Record<StaffingTransportMode, string>;
 export type StaffingReimbursementModeTranslations = Record<StaffingReimbursementMode, string>;
 export type StaffingWorkTimeScopeTranslations = Record<StaffingWorkTimeScope, string>;

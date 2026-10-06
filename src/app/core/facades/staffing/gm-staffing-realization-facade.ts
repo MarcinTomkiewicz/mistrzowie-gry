@@ -10,6 +10,7 @@ import type {
   StaffingCandidateSessionProposals,
 } from '../../interfaces/staffing-candidate-session-proposals';
 import type { StaffingSessionReference } from '../../interfaces/staffing-session-reference';
+import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import { MyStaffingRealizationRead } from '../../reads/staffing/my-staffing-realization-read';
 import { Platform } from '../../services/platform/platform';
 import { MyStaffingRealization } from '../../services/staffing/my-staffing-realization';
@@ -66,6 +67,12 @@ export class GmStaffingRealizationFacade {
   readonly canEditSessionProposals = computed(() =>
     this.sessionProposals()?.editable === true && !this.isMutating() && !this.sessionProposalsLoading(),
   );
+
+  readonly loadCandidateThread = (candidateId: string): Observable<StaffingCandidateThread> =>
+    this.read.getCandidateThread(candidateId);
+
+  readonly createCandidateMessage = (candidateId: string, body: string): Observable<StaffingCandidateThread> =>
+    this.write.createCandidateMessage(candidateId, body);
 
   constructor() {
     if (inject(Platform).isBrowser) {

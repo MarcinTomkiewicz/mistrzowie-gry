@@ -8,11 +8,18 @@ import type {
   StaffingReplacementCandidate,
 } from '../../interfaces/my-staffing-realization';
 import type { StaffingCandidateSessionProposals } from '../../interfaces/staffing-candidate-session-proposals';
+import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import { Backend } from '../../services/backend/backend';
 
 @Injectable({ providedIn: 'root' })
 export class MyStaffingRealizationRead {
   private readonly backend = inject(Backend);
+
+  getCandidateThread(candidateId: string): Observable<StaffingCandidateThread> {
+    return this.backend.rpc<StaffingCandidateThread>(STAFFING_REALIZATION_RPC.getMyCandidateThread, {
+      p_candidate_id: candidateId,
+    });
+  }
 
   getHub(): Observable<MyStaffingRealizationHub> {
     return this.backend.rpc<MyStaffingRealizationHub>(

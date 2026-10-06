@@ -8,6 +8,7 @@ import { mapStaffingRecruitmentPolicyToDraft } from '../../factories/staffing-re
 import { AdminStaffingRecruitmentPolicy, SaveAdminStaffingRecruitmentPolicyPayload } from '../../interfaces/admin-staffing-recruitment-policy';
 import type { AdminStaffingRealizationBoard } from '../../interfaces/admin-staffing-realization-board';
 import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
+import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import type { AdminStaffingFinalPlan, StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
 import type { StaffingFinalPlanCandidateOptions } from '../../interfaces/staffing-final-plan-candidate-options';
 import { SessionRead } from '../../reads/sessions/session-read';
@@ -35,6 +36,12 @@ export class StaffingRealizationEditorFacade {
   private readonly sessionRead = inject(SessionRead);
   private readonly finalPlanCandidates = new Map<string, Observable<StaffingFinalPlanCandidateOptions>>();
   readonly store = inject(StaffingRealizationEditorStore);
+
+  readonly loadCandidateThread = (candidateId: string): Observable<StaffingCandidateThread> =>
+    this.read.getCandidateThread(candidateId);
+
+  readonly createCandidateMessage = (candidateId: string, body: string): Observable<StaffingCandidateThread> =>
+    this.write.createCandidateMessage(candidateId, body);
 
   loadFinalPlan(realizationId: string): Observable<AdminStaffingFinalPlan> {
     return this.read.getFinalPlan(realizationId);

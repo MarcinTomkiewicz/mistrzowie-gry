@@ -243,6 +243,9 @@
               <dd class="m-0">{{ detail.endReasonLabel ?? i18n.commonValues().notApplicable }}</dd>
             </div>
           </dl>
+          <app-staffing-candidate-discussion class="d-block w-100 mt-md" [candidate]="candidate"
+            [timezone]="data.realization.timezone" [loadThread]="facade.loadCandidateThread"
+            [createMessage]="facade.createCandidateMessage" />
         }
         <ng-template #footer>
           <div class="flex-row-between-center flex-wrap gap-sm w-100">

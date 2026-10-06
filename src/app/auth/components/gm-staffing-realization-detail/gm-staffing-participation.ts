@@ -15,10 +15,11 @@ import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel, formatTimestampLabel } from '../../../core/utils/date';
 import { createGmStaffingRealizationDetailI18n } from './gm-staffing-realization-detail.i18n';
 import { GmStaffingSessionProposals } from './gm-staffing-session-proposals';
+import { StaffingCandidateDiscussion } from '../../common/staffing-candidate-discussion/staffing-candidate-discussion';
 
 @Component({
   selector: 'app-gm-staffing-participation',
-  imports: [ReactiveFormsModule, ButtonModule, MultiSelectModule, SelectModule, GmStaffingSessionProposals],
+  imports: [ReactiveFormsModule, ButtonModule, MultiSelectModule, SelectModule, GmStaffingSessionProposals, StaffingCandidateDiscussion],
   templateUrl: './gm-staffing-participation.html',
 })
 export class GmStaffingParticipation {

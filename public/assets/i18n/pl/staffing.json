@@ -20,6 +20,16 @@
   "labels": {
     "requiredGmCount": "Wymagana liczba MG"
   },
+  "candidateThread": {
+    "title": "[PH] Wiadomości dotyczące udziału",
+    "empty": "[PH] Brak wiadomości w tej rozmowie.",
+    "readOnly": "[PH] Ta rozmowa jest dostępna tylko do odczytu.",
+    "bodyLabel": "[PH] Wiadomość",
+    "send": "[PH] Wyślij wiadomość",
+    "loadFailed": "[PH] Nie udało się załadować wiadomości",
+    "sendSuccess": "[PH] Wiadomość została wysłana",
+    "sendFailed": "[PH] Nie udało się wysłać wiadomości"
+  },
   "transportModes": {
     "organizer_provided": "[PH] Transport zapewnia organizator",
     "self_arranged": "[PH] Transport we własnym zakresie",

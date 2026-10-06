@@ -11,10 +11,18 @@ import type {
   StaffingCandidateSessionProposals,
 } from '../../interfaces/staffing-candidate-session-proposals';
 import { Backend } from '../backend/backend';
+import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 
 @Injectable({ providedIn: 'root' })
 export class MyStaffingRealization {
   private readonly backend = inject(Backend);
+
+  createCandidateMessage(candidateId: string, body: string): Observable<StaffingCandidateThread> {
+    return this.backend.rpc<StaffingCandidateThread>(STAFFING_REALIZATION_RPC.createCandidateMessage, {
+      p_candidate_id: candidateId,
+      p_body: body,
+    });
+  }
 
   createSelfApplication(realizationId: string, dayIds: string[] | null): Observable<MyStaffingCandidate> {
     return this.backend.rpc<MyStaffingCandidate>(STAFFING_REALIZATION_RPC.createMySelfApplication, {

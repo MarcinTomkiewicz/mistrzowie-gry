@@ -6,6 +6,7 @@ import type { AdminStaffingAvailability } from '../../interfaces/admin-staffing-
 import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 import type { AdminStaffingFinalPlan } from '../../interfaces/admin-staffing-final-plan';
 import type { StaffingCandidateSessionProposals } from '../../interfaces/staffing-candidate-session-proposals';
+import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingRealizationListItem,
@@ -19,6 +20,12 @@ import { Backend } from '../../services/backend/backend';
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealizationRead {
   private readonly backend = inject(Backend);
+
+  getCandidateThread(candidateId: string): Observable<StaffingCandidateThread> {
+    return this.backend.rpc<StaffingCandidateThread>(STAFFING_REALIZATION_RPC.getAdminCandidateThread, {
+      p_candidate_id: candidateId,
+    });
+  }
 
   getFinalPlan(realizationId: string): Observable<AdminStaffingFinalPlan> {
     return this.backend.rpc<AdminStaffingFinalPlan>(STAFFING_REALIZATION_RPC.getAdminFinalPlan, {
