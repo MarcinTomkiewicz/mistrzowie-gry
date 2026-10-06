@@ -5,7 +5,7 @@ import { ImageModule } from 'primeng/image';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { ISessionWithRelations } from '../../core/interfaces/i-session';
+import type { SessionDetailsData } from '../../core/interfaces/i-session';
 import type { IPdfPreview } from '../../core/interfaces/i-pdf';
 import { Storage } from '../../core/services/storage/storage';
 import { resolveAltDifficultyLevel } from '../session-difficulty/session-difficulty';
@@ -26,7 +26,7 @@ import { SystemChip } from '../system-chip/system-chip';
 export class SessionDetails {
   private readonly storage = inject(Storage);
 
-  readonly session = input.required<ISessionWithRelations>();
+  readonly session = input.required<SessionDetailsData>();
   readonly gmDisplayName = input<string | null>(null);
   readonly canOpenGmProfile = input(false);
   readonly isGmProfileLoading = input(false);
@@ -46,12 +46,6 @@ export class SessionDetails {
 
     return this.storage.getPublicUrl(imagePath);
   });
-
-  readonly systemName = computed(
-    () =>
-      normalizeText(this.session().system?.name) ??
-      this.i18n.commonEmpty().title,
-  );
 
   readonly difficultyLabel = computed(() => {
     const difficultyVm = resolveAltDifficultyLevel(

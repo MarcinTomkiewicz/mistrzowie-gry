@@ -10,11 +10,11 @@
       </span>
 
       <div class="flex-1 min-w-0 text-right">
-        <app-system-chip
-          [system]="session().system"
-          maxWidthClass="max-w-none"
-          displayType="text"
-        />
+        @if (session().system; as system) {
+          <app-system-chip [system]="system" maxWidthClass="max-w-none" displayType="text" />
+        } @else {
+          <span class="text-wrap-anywhere">{{ session().systemId }}</span>
+        }
       </div>
     </div>
 
@@ -140,89 +140,95 @@
       </span>
     </div>
 
-    <div class="flex-col-start-stretch gap-xs">
-      <small class="status-text status-text--muted">
-        {{ i18n.sessionForm().stylesLabel }}
-      </small>
+    @if (session().styles; as styles) {
+      <div class="flex-col-start-stretch gap-xs">
+        <small class="status-text status-text--muted">
+          {{ i18n.sessionForm().stylesLabel }}
+        </small>
 
-      @if (session().styles.length) {
-        <div class="flex-row-start-center gap-xs flex-wrap">
-          @for (style of session().styles; track style.id) {
-            <span class="tag-badge tag-badge--arcane">
-              {{ style.label }}
-            </span>
-          }
-        </div>
-      } @else {
-        <span class="tag-badge tag-badge--muted">
-          {{ i18n.commonFallbacks().noStyles }}
-        </span>
-      }
-    </div>
-
-    <div class="flex-col-start-stretch gap-xs">
-      <small class="status-text status-text--muted">
-        {{ i18n.sessionForm().triggersLabel }}
-      </small>
-
-      @if (session().triggers.length) {
-        <div class="flex-row-start-center gap-xs flex-wrap">
-          @for (trigger of session().triggers; track trigger.id) {
-            <span class="tag-badge tag-badge--muted">
-              {{ trigger.label }}
-            </span>
-          }
-        </div>
-      } @else {
-        <span class="tag-badge tag-badge--muted">
-          {{ i18n.commonFallbacks().noTriggers }}
-        </span>
-      }
-    </div>
-
-    <div class="flex-col-start-stretch gap-xs">
-      <small class="status-text status-text--muted">
-        {{ i18n.sessionForm().characterSheetsLabel }}
-      </small>
-
-      @if (session().characterSheets.length) {
-        <div class="mg-grid grid-cols-5 grid-cols-3-md grid-cols-2-sm grid-cols-1-xs gap-sm">
-          @for (sheet of session().characterSheets; track sheet.id) {
-            @if (resolveCharacterSheetUrl(sheet.storagePath); as sheetUrl) {
-              <div
-                class="mg-card flex-col-start-stretch gap-sm p-sm cursor-pointer"
-                role="button"
-                tabindex="0"
-                (click)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
-                (keyup.enter)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
-              >
-                @if (enablePdfPreviews()) {
-                  <app-pdf-thumbnail
-                    [src]="sheetUrl"
-                    [title]="sheet.fileName"
-                  />
-                } @else {
-                  <div class="w-100 h-px-200 flex-col-center-center gap-xs">
-                    <i class="pi pi-file-pdf text-4xl"></i>
-                    <small>{{ i18n.sessionForm().characterSheetsLabel }}</small>
-                  </div>
-                }
-
-                <span class="tag-badge tag-badge--muted max-w-full">
-                  <span class="truncate-1 w-100">
-                    {{ sheet.fileName }}
-                  </span>
-                </span>
-              </div>
+        @if (styles.length) {
+          <div class="flex-row-start-center gap-xs flex-wrap">
+            @for (style of styles; track style.id) {
+              <span class="tag-badge tag-badge--arcane">
+                {{ style.label }}
+              </span>
             }
-          }
-        </div>
-      } @else {
-        <span class="tag-badge tag-badge--muted">
-          {{ i18n.commonFallbacks().noCharacterSheets }}
-        </span>
-      }
-    </div>
+          </div>
+        } @else {
+          <span class="tag-badge tag-badge--muted">
+            {{ i18n.commonFallbacks().noStyles }}
+          </span>
+        }
+      </div>
+    }
+
+    @if (session().triggers; as triggers) {
+      <div class="flex-col-start-stretch gap-xs">
+        <small class="status-text status-text--muted">
+          {{ i18n.sessionForm().triggersLabel }}
+        </small>
+
+        @if (triggers.length) {
+          <div class="flex-row-start-center gap-xs flex-wrap">
+            @for (trigger of triggers; track trigger.id) {
+              <span class="tag-badge tag-badge--muted">
+                {{ trigger.label }}
+              </span>
+            }
+          </div>
+        } @else {
+          <span class="tag-badge tag-badge--muted">
+            {{ i18n.commonFallbacks().noTriggers }}
+          </span>
+        }
+      </div>
+    }
+
+    @if (session().characterSheets; as characterSheets) {
+      <div class="flex-col-start-stretch gap-xs">
+        <small class="status-text status-text--muted">
+          {{ i18n.sessionForm().characterSheetsLabel }}
+        </small>
+
+        @if (characterSheets.length) {
+          <div class="mg-grid grid-cols-5 grid-cols-3-md grid-cols-2-sm grid-cols-1-xs gap-sm">
+            @for (sheet of characterSheets; track sheet.id) {
+              @if (resolveCharacterSheetUrl(sheet.storagePath); as sheetUrl) {
+                <div
+                  class="mg-card flex-col-start-stretch gap-sm p-sm cursor-pointer"
+                  role="button"
+                  tabindex="0"
+                  (click)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
+                  (keyup.enter)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
+                >
+                  @if (enablePdfPreviews()) {
+                    <app-pdf-thumbnail
+                      [src]="sheetUrl"
+                      [title]="sheet.fileName"
+                    />
+                  } @else {
+                    <div class="w-100 h-px-200 flex-col-center-center gap-xs">
+                      <i class="pi pi-file-pdf text-4xl"></i>
+                      <small>{{ i18n.sessionForm().characterSheetsLabel }}</small>
+                    </div>
+                  }
+
+                  <span class="tag-badge tag-badge--muted max-w-full">
+                    <span class="truncate-1 w-100">
+                      {{ sheet.fileName }}
+                    </span>
+                  </span>
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <span class="tag-badge tag-badge--muted">
+            {{ i18n.commonFallbacks().noCharacterSheets }}
+          </span>
+        }
+      </div>
+    }
   </div>
 </div>
 

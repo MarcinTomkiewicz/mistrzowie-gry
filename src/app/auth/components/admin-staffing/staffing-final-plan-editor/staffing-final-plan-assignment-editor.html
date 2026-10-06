@@ -1,0 +1,93 @@
+@let copy = i18n.finalPlan();
+@let fields = i18n.copy().fields;
+@let controls = form().controls;
+<div class="position-relative flex-col-start-stretch gap-sm border radius-sm p-sm w-100 min-w-0"
+  [class.border-danger]="assignment()?.conflict" [class.bg-warn-subtle]="assignment()?.conflict"
+  [formGroup]="form()" [attr.aria-busy]="isLoading()">
+  <app-loading-overlay [visible]="isLoading()" [label]="i18n.commonStatus().loading" />
+  <div class="flex-row-between-center flex-wrap gap-sm">
+    @if (assignment(); as saved) {
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        <span class="muted-text">{{ copy.provenance.saved }}</span>
+        <span class="tag-badge" [class.tag-badge--info]="saved.selectedFromCandidateProposal"
+          [class.tag-badge--muted]="!saved.selectedFromCandidateProposal">
+          {{ saved.selectedFromCandidateProposal ? copy.provenance.proposed : copy.provenance.coordinator }}
+        </span>
+        @if (saved.conflict; as conflict) {
+          <span class="tag-badge tag-badge--danger">{{ copy.conflicts[conflict] }}</span>
+        }
+      </div>
+    }
+    @if (editable()) {
+      <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-trash"
+        [label]="i18n.commonActions().removeItem" (onClick)="remove.emit()" />
+    }
+  </div>
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md min-w-0">
+    <div class="flex-col-start-stretch gap-sm min-w-0">
+      <p-select formControlName="candidateId" [options]="candidateOptions()" optionLabel="label" optionValue="value"
+        optionDisabled="disabled" size="small" class="w-100" appendTo="body" [filter]="true" filterBy="label"
+        [placeholder]="fields.gm" [ariaLabel]="fields.gm" [emptyMessage]="copy.noCandidates" (onChange)="resetSession()" />
+      <div class="flex-row-start-center flex-col-start-stretch-sm gap-sm">
+        <p-select formControlName="sourceKind" [options]="sourceOptions()" optionLabel="label" optionValue="value"
+          size="small" class="flex-none w-px-200 w-100-sm" appendTo="body"
+          [placeholder]="i18n.sessionSelector().sourceLabel" [ariaLabel]="i18n.sessionSelector().sourceLabel"
+          (onChange)="resetSession()" />
+        <p-select formControlName="sessionId" [options]="sessionOptions()" optionLabel="label" optionValue="value"
+          size="small" class="flex-1 min-w-0 w-100-sm" appendTo="body" [filter]="true" filterBy="label"
+          [placeholder]="i18n.sessionSelector().sessionLabel" [ariaLabel]="i18n.sessionSelector().sessionLabel"
+          [emptyMessage]="copy.noSessions" [readonly]="isLoading() || loadFailed() || !selectedCandidate()"
+          (onChange)="resetOverride()" />
+      </div>
+      @if ((controls.candidateId.invalid && controls.candidateId.touched) ||
+        (controls.sessionId.invalid && controls.sessionId.touched)) {
+        <small class="mg-contact-error" role="alert">{{ copy.invalid }}</small>
+      }
+      @if (!showOverride() && controls.sessionOverride.touched && controls.sessionOverride.hasError('invalidPlayersRange')) {
+        <small class="mg-contact-error" role="alert">{{ copy.validation.effectivePlayersRange }}</small>
+      }
+      @if (loadFailed()) {
+        <div class="flex-col-start-start gap-xs" role="alert">
+          <p class="m-0">{{ copy.candidateLoadFailed }}</p>
+          <p-button type="button" severity="secondary" size="small" icon="pi pi-refresh"
+            [label]="i18n.commonActions().retry" (onClick)="retry()" />
+        </div>
+      }
+      @if (preview(); as session) {
+        <strong>{{ session.title }}</strong>
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
+            [label]="copy.preview" [attr.aria-expanded]="showDetails()" (onClick)="showDetails.set(!showDetails())" />
+          @if (editable()) {
+            <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-file-edit"
+              [label]="copy.override.title" [attr.aria-expanded]="showOverride()" (onClick)="showOverride.set(!showOverride())" />
+          }
+        </div>
+        @if (showDetails()) {
+          <app-session-details [session]="session" [gmDisplayName]="gmName()" />
+        }
+      }
+    </div>
+    <aside class="flex-col-start-stretch gap-sm border radius-sm p-sm min-w-0">
+      <h5 class="mg-section__title mg-section__title--sm m-0">{{ copy.proposal.title }}</h5>
+      @if (options()) {
+        @for (proposal of proposalRows(); track proposal.id) {
+          <div class="flex-col-start-stretch gap-xs">
+            <span class="tag-badge tag-badge--info w-auto">{{ i18n.sessionSelector().sources[proposal.sourceKind] }}</span>
+            @if (proposal.session; as session) {
+              <strong>{{ session.title }} - {{ session.system.name }}</strong>
+              <p class="m-0 pre-line">{{ session.description }}</p>
+            } @else {
+              <span class="text-wrap-anywhere">{{ proposal.sessionId }}</span>
+            }
+          </div>
+        } @empty {
+          <p class="m-0 muted-text">{{ copy.proposal.empty }}</p>
+        }
+      }
+    </aside>
+  </div>
+  @if (showOverride() && editable()) {
+    <app-staffing-final-session-override-editor [form]="controls.sessionOverride" [controlId]="controlId()" />
+  }
+</div>

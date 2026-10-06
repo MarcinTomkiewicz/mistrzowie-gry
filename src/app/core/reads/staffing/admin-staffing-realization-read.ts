@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
 import type { AdminStaffingAvailability } from '../../interfaces/admin-staffing-availability';
 import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
+import type { AdminStaffingFinalPlan } from '../../interfaces/admin-staffing-final-plan';
+import type { StaffingCandidateSessionProposals } from '../../interfaces/staffing-candidate-session-proposals';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingRealizationListItem,
@@ -17,6 +19,18 @@ import { Backend } from '../../services/backend/backend';
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealizationRead {
   private readonly backend = inject(Backend);
+
+  getFinalPlan(realizationId: string): Observable<AdminStaffingFinalPlan> {
+    return this.backend.rpc<AdminStaffingFinalPlan>(STAFFING_REALIZATION_RPC.getAdminFinalPlan, {
+      p_realization_id: realizationId,
+    });
+  }
+
+  getCandidateSessionProposals(candidateId: string): Observable<StaffingCandidateSessionProposals> {
+    return this.backend.rpc<StaffingCandidateSessionProposals>(STAFFING_REALIZATION_RPC.getAdminSessionProposals, {
+      p_candidate_id: candidateId,
+    });
+  }
 
   getList(): Observable<AdminStaffingRealizationListItem[]> {
     return this.backend.rpc<AdminStaffingRealizationListItem[]>(

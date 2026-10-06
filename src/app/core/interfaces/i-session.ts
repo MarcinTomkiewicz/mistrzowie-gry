@@ -113,6 +113,14 @@ export interface ISessionWithRelations extends ISession {
   characterSheets: ISessionCharacterSheet[];
 }
 
+export type SessionDetailsData = Pick<ISession,
+  | 'systemId' | 'title' | 'description' | 'image'
+  | 'minPlayers' | 'maxPlayers' | 'minAge'
+  | 'hasReadyCharacterSheets' | 'allowsScenarioCustomization'
+> & {
+  difficultyLevel: `${SessionDifficultyLevel}`;
+} & Partial<Pick<ISessionWithRelations, 'system' | 'styles' | 'triggers' | 'languages' | 'characterSheets'>>;
+
 export interface ISessionListLabels {
   systemLabel: string;
   titleLabel: string;

@@ -1,0 +1,116 @@
+@let copy = i18n.finalPlan();
+<section class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0"
+  [class.h-px-200]="isLoading()" [attr.aria-busy]="isLoading() || isSaving()">
+  <app-loading-overlay [visible]="isLoading() || isSaving()"
+    [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+  <header class="flex-col-start-stretch gap-xs">
+    <h3 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h3>
+    <p class="m-0 muted-text">{{ copy.description }}</p>
+  </header>
+  @if (!isLoading()) {
+    @if (loadFailed()) {
+      <div class="flex-col-start-start gap-sm" role="alert">
+        <p class="m-0">{{ copy.loadFailed }}. {{ i18n.commonErrors().generic }}</p>
+        <p-button type="button" severity="secondary" icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry" (onClick)="retry()" />
+      </div>
+    } @else if (plan(); as savedPlan) {
+      @if (!savedPlan.editable) {
+        <p class="m-0 muted-text" role="status">{{ copy.readOnly }}</p>
+      }
+      @if (savedPlan.hasConflicts) {
+        <p class="bg-warn-subtle border border-danger radius-sm p-sm m-0" role="alert">{{ copy.hasConflicts }}</p>
+      }
+      <form class="flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="form" (ngSubmit)="save()">
+        @for (day of days(); track day.dayId) {
+          <section class="flex-col-start-stretch gap-sm w-100" [attr.data-staffing-day-id]="day.dayId">
+            <h4 class="mg-section__title mg-section__title--sm m-0">{{ formatDateLabel(day.date, 'pl-PL', true) }}</h4>
+            <p class="m-0 muted-text">{{ i18n.staffingLabels().requiredGmCount }}: {{ day.requiredGmCount }}</p>
+            @for (slot of day.slots; track slot.slotId) {
+              <article class="flex-col-start-stretch gap-sm border radius-sm p-sm w-100 min-w-0"
+                [class.border-danger]="slot.hasConflicts" [attr.data-staffing-slot-id]="slot.slotId">
+                <header class="flex-row-between-center flex-wrap gap-sm">
+                  <div class="flex-col-start-stretch gap-xs">
+                    <strong>{{ slot.label }} - {{ formatTimeRangeLabel(slot.startTime, slot.endTime) }}</strong>
+                    <div class="flex-row-start-center flex-wrap gap-xs">
+                      <span class="tag-badge" [class.tag-badge--success]="slot.assignedCount >= day.requiredGmCount && !slot.hasConflicts"
+                        [class.tag-badge--danger]="slot.assignedCount === 0 && !slot.hasConflicts"
+                        [class.tag-badge--warn]="slot.hasConflicts || (slot.assignedCount > 0 && slot.assignedCount < day.requiredGmCount)">
+                        {{ slot.assignedCount ? copy.assignments : copy.unfilled }}: {{ slot.assignedCount }} / {{ day.requiredGmCount }}
+                      </span>
+                      @if (slot.hasConflicts) { <span class="tag-badge tag-badge--warn">{{ copy.hasConflicts }}</span> }
+                    </div>
+                  </div>
+                  @if (savedPlan.editable) {
+                    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-plus"
+                      [label]="copy.addAssignment" [disabled]="!canEdit()" (onClick)="addAssignment(slot.slotId)" />
+                  }
+                </header>
+                @for (item of slot.items; track item.form) {
+                  <app-staffing-final-plan-assignment-editor [form]="item.form" [board]="board()" [dayId]="day.dayId"
+                    [gmNames]="gmNames()" [assignment]="item.saved" [editable]="canEdit()"
+                    (remove)="removeAssignment(item.form)" />
+                }
+              </article>
+            } @empty {
+              <p class="m-0 muted-text">{{ copy.noSlots }}</p>
+            }
+          </section>
+        } @empty {
+          <p class="m-0 muted-text">{{ copy.noDays }}</p>
+        }
+        @if (savedPlan.editable) {
+          @if (form.controls.items.touched && form.controls.items.hasError('duplicateSlotCandidate')) {
+            <small class="mg-contact-error" role="alert">{{ copy.validation.duplicateCandidatePerSlot }}</small>
+          }
+          <footer class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
+            <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
+              [label]="i18n.commonActions().cancel" [disabled]="!canEdit() || !hasChanges()" (onClick)="cancel()" />
+            <p-button type="submit" severity="success" icon="pi pi-save" [label]="copy.save"
+              [disabled]="!canEdit() || !hasChanges()" />
+          </footer>
+        }
+      </form>
+      @if (materialChanges(); as changes) {
+        <section class="flex-col-start-stretch gap-sm w-100" aria-live="polite">
+          <div class="flex-row-between-center flex-wrap gap-sm">
+            <h4 class="mg-section__title mg-section__title--sm m-0">{{ copy.changes.title }}</h4>
+            @if (changes.length) {
+              <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
+                [label]="copy.preview" [attr.aria-expanded]="showChangeDetails()" (onClick)="showChangeDetails.set(!showChangeDetails())" />
+            }
+          </div>
+          @for (change of changes; track change.itemId) {
+            <article class="flex-col-start-stretch gap-sm border radius-sm p-sm">
+              <div class="flex-row-start-center flex-wrap gap-xs">
+                @for (type of change.changeTypes; track type) {
+                  <span class="tag-badge tag-badge--info">{{ copy.changes.types[type] }}</span>
+                }
+              </div>
+              <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
+                @for (side of [{ label: copy.changes.before, item: change.old }, { label: copy.changes.after, item: change.new }]; track side.label) {
+                  <div class="flex-col-start-stretch gap-xs min-w-0">
+                    <span class="muted-text">{{ side.label }}</span>
+                    @if (side.item; as item) {
+                      <strong>{{ gmNames().get(item.gmUserId) ?? item.gmUserId }}</strong>
+                      <span>{{ slotLabel(item.slotId) }}</span>
+                      <span>{{ i18n.sessionSelector().sources[item.sourceKind] }} - {{ item.effectiveSession.title }}</span>
+                      @if (showChangeDetails()) {
+                        <app-session-details [session]="item.effectiveSession"
+                          [gmDisplayName]="gmNames().get(item.gmUserId) ?? item.gmUserId" />
+                      }
+                    } @else {
+                      <span class="muted-text">{{ i18n.commonValues().notApplicable }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </article>
+          } @empty {
+            <p class="m-0 muted-text">{{ copy.changes.empty }}</p>
+          }
+        </section>
+      }
+    }
+  }
+</section>

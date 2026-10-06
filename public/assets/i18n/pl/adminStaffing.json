@@ -286,6 +286,63 @@
       }
     }
   },
+  "finalPlan": {
+    "title": "[PH] Finalny plan realizacji",
+    "description": "[PH] Przypisz potwierdzonych, aktywnych MG i finalne sesje do zapisanych dni i slotów. Propozycje MG pozostają niezależne od finalnego planu.",
+    "readOnly": "[PH] Finalny plan jest dostępny tylko do odczytu w bieżącym statusie realizacji.",
+    "noDays": "[PH] Realizacja nie ma zapisanych dni.",
+    "noSlots": "[PH] Ten dzień nie ma zapisanych slotów.",
+    "unfilled": "[PH] Slot nieobsadzony",
+    "assignments": "[PH] Przypisania MG",
+    "hasConflicts": "[PH] Zapisany plan zawiera konflikty udziału.",
+    "conflicts": {
+      "candidate_not_confirmed": "[PH] Kandydat nie ma potwierdzonego udziału",
+      "participation_ended": "[PH] Udział MG został zakończony"
+    },
+    "provenance": {
+      "saved": "[PH] Zapisane przypisanie:",
+      "proposed": "[PH] Sesja wybrana z propozycji MG",
+      "coordinator": "[PH] Sesja wybrana przez koordynatora"
+    },
+    "addAssignment": "[PH] Przypisz MG",
+    "save": "[PH] Zapisz finalny plan",
+    "invalid": "[PH] Wybierz MG i sesję dla każdego przypisania oraz popraw nieprawidłowe pola.",
+    "validation": {
+      "duplicateCandidatePerSlot": "[PH] Ten sam MG może być przypisany tylko raz w obrębie slotu.",
+      "effectivePlayersRange": "[PH] Minimalna liczba graczy po uwzględnieniu zmian sesji nie może być większa niż maksymalna."
+    },
+    "loadFailed": "[PH] Nie udało się załadować finalnego planu",
+    "candidateLoadFailed": "[PH] Nie udało się załadować sesji i propozycji tego MG",
+    "noCandidates": "[PH] Brak aktywnych, potwierdzonych MG do wyboru w tym dniu",
+    "noSessions": "[PH] Ten MG nie ma sesji tego rodzaju",
+    "saveSuccess": "[PH] Finalny plan został zapisany",
+    "saveFailed": "[PH] Nie udało się zapisać finalnego planu",
+    "preview": "[PH] Podgląd sesji",
+    "proposal": {
+      "title": "[PH] Pierwotne propozycje MG dla tego slotu",
+      "empty": "[PH] MG nie zaproponował sesji dla tego slotu."
+    },
+    "override": {
+      "title": "[PH] Zmiany sesji tylko dla tej realizacji",
+      "hint": "[PH] Uzupełnij tylko zmieniane pola. Puste pola zachowują wartości zapisanej sesji. Zmiany nie modyfikują katalogu sesji ani propozycji MG.",
+      "inherit": "[PH] Zachowaj wartość sesji",
+      "image": "[PH] Obraz sesji"
+    },
+    "changes": {
+      "title": "[PH] Zmiany zwrócone po ostatnim zapisie",
+      "empty": "[PH] Zapis nie wprowadził zmian merytorycznych.",
+      "before": "[PH] Przed zapisem",
+      "after": "[PH] Po zapisie",
+      "types": {
+        "assignment_added": "[PH] Dodano przypisanie",
+        "assignment_removed": "[PH] Usunięto przypisanie",
+        "gm_changed": "[PH] Zmieniono MG",
+        "slot_changed": "[PH] Zmieniono slot",
+        "session_changed": "[PH] Zmieniono sesję",
+        "session_override_changed": "[PH] Zmieniono sesję dla tej realizacji"
+      }
+    }
+  },
   "travelTerms": {
     "page": {
       "description": "[PH] Określ warunki transportu, pobytu i czasu pracy potrzebne Mistrzom Gry do podjęcia decyzji o udziale w całym wyjeździe.",

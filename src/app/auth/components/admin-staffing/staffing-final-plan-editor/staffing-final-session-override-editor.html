@@ -1,0 +1,60 @@
+@let copy = i18n.finalPlan();
+@let labels = i18n.sessionDetails.sessionForm();
+<div class="flex-col-start-stretch gap-sm w-100" [formGroup]="form()">
+  <h5 class="mg-section__title mg-section__title--sm m-0">{{ copy.override.title }}</h5>
+  <p class="muted-text m-0">{{ copy.override.hint }}</p>
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
+    <p-floatlabel variant="on">
+      <input pInputText class="w-100" pSize="small" [id]="controlId() + '-title'" formControlName="title" />
+      <label [for]="controlId() + '-title'">{{ labels.titleLabel }}</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on">
+      <input pInputText class="w-100" pSize="small" [id]="controlId() + '-image'" formControlName="image" />
+      <label [for]="controlId() + '-image'">{{ copy.override.image }}</label>
+    </p-floatlabel>
+  </div>
+  <p-floatlabel variant="on">
+    <textarea pTextarea class="w-100" rows="3" [autoResize]="true"
+      [id]="controlId() + '-description'" formControlName="description"></textarea>
+    <label [for]="controlId() + '-description'">{{ labels.descriptionLabel }}</label>
+  </p-floatlabel>
+  <div class="mg-grid grid-4-cols grid-2-cols-md grid-1-cols-sm gap-sm">
+    <p-select formControlName="difficultyLevel" [options]="difficultyOptions()" optionLabel="label" optionValue="value"
+      size="small" class="w-100" appendTo="body" [showClear]="true"
+      [placeholder]="labels.difficultyLabel" [ariaLabel]="labels.difficultyLabel" />
+    <p-floatlabel variant="on">
+      <p-inputnumber formControlName="minPlayers" [inputId]="controlId() + '-minPlayers'" size="small"
+        class="w-100" [useGrouping]="false" [min]="1" />
+      <label [for]="controlId() + '-minPlayers'">{{ labels.minPlayersLabel }}</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on">
+      <p-inputnumber formControlName="maxPlayers" [inputId]="controlId() + '-maxPlayers'" size="small"
+        class="w-100" [useGrouping]="false" [min]="1" [max]="5" />
+      <label [for]="controlId() + '-maxPlayers'">{{ labels.maxPlayersLabel }}</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on">
+      <p-inputnumber formControlName="minAge" [inputId]="controlId() + '-minAge'" size="small"
+        class="w-100" [useGrouping]="false" [min]="0" />
+      <label [for]="controlId() + '-minAge'">{{ labels.minAgeLabel }}</label>
+    </p-floatlabel>
+  </div>
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
+    <div class="flex-col-start-stretch gap-xs">
+      <label [for]="controlId() + '-sheets'">{{ labels.hasReadyCharacterSheetsLabel }}</label>
+      <p-select formControlName="hasReadyCharacterSheets" [inputId]="controlId() + '-sheets'"
+        [options]="booleanOptions()" optionLabel="label" optionValue="value" size="small" class="w-100"
+        appendTo="body" [placeholder]="copy.override.inherit" [ariaLabel]="labels.hasReadyCharacterSheetsLabel" />
+    </div>
+    <div class="flex-col-start-stretch gap-xs">
+      <label [for]="controlId() + '-customization'">{{ labels.allowsScenarioCustomizationLabel }}</label>
+      <p-select formControlName="allowsScenarioCustomization" [inputId]="controlId() + '-customization'"
+        [options]="booleanOptions()" optionLabel="label" optionValue="value" size="small" class="w-100"
+        appendTo="body" [placeholder]="copy.override.inherit" [ariaLabel]="labels.allowsScenarioCustomizationLabel" />
+    </div>
+  </div>
+  @if (form().invalid && form().touched) {
+    <small class="mg-contact-error" role="alert">
+      {{ form().hasError('invalidPlayersRange') ? copy.validation.effectivePlayersRange : i18n.commonForm().invalid }}
+    </small>
+  }
+</div>

@@ -167,6 +167,8 @@
 
       <app-staffing-realization-availability [availability]="data.availability" [(selectedGm)]="selectedGm" />
 
+      <app-staffing-final-plan-editor [board]="data" />
+
       @if (showProposal()) {
         <app-staffing-admin-proposal [board]="data" (closed)="showProposal.set(false)" (created)="loadBoard()" />
       }

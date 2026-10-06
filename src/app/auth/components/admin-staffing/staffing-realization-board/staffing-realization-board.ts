@@ -20,11 +20,12 @@ import { formatDateLabel, formatTimestampLabel } from '../../../../core/utils/da
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { StaffingRealizationAvailability } from './staffing-realization-availability';
 import { StaffingAdminProposal } from './staffing-admin-proposal';
+import { StaffingFinalPlanEditor } from '../staffing-final-plan-editor/staffing-final-plan-editor';
 import { createStaffingRealizationBoardI18n } from './staffing-realization-board.i18n';
 
 @Component({
   selector: 'app-staffing-realization-board',
-  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal],
+  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal, StaffingFinalPlanEditor],
   templateUrl: './staffing-realization-board.html',
   providers: [provideTranslocoScope('adminStaffing', STAFFING_SCOPE, GM_STAFFING_SCOPE, 'common')],
 })

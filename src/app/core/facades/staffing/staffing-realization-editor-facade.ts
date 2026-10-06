@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { defer, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { defer, forkJoin, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 
 import { mapStaffingRealizationCoreToDraft } from '../../factories/staffing-realization-core-form.factory';
 import { mapStaffingRealizationScheduleToDraft } from '../../factories/staffing-realization-days-form.factory';
@@ -8,6 +8,9 @@ import { mapStaffingRecruitmentPolicyToDraft } from '../../factories/staffing-re
 import { AdminStaffingRecruitmentPolicy, SaveAdminStaffingRecruitmentPolicyPayload } from '../../interfaces/admin-staffing-recruitment-policy';
 import type { AdminStaffingRealizationBoard } from '../../interfaces/admin-staffing-realization-board';
 import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
+import type { AdminStaffingFinalPlan, StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
+import type { StaffingFinalPlanCandidateOptions } from '../../interfaces/staffing-final-plan-candidate-options';
+import { SessionRead } from '../../reads/sessions/session-read';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
@@ -29,7 +32,31 @@ import { OpenAdminStaffingRealizationResult, StaffingRealizationReadinessResult 
 export class StaffingRealizationEditorFacade {
   private readonly read = inject(AdminStaffingRealizationRead);
   private readonly write = inject(AdminStaffingRealization);
+  private readonly sessionRead = inject(SessionRead);
+  private readonly finalPlanCandidates = new Map<string, Observable<StaffingFinalPlanCandidateOptions>>();
   readonly store = inject(StaffingRealizationEditorStore);
+
+  loadFinalPlan(realizationId: string): Observable<AdminStaffingFinalPlan> {
+    return this.read.getFinalPlan(realizationId);
+  }
+
+  saveFinalPlan(realizationId: string, items: StaffingFinalPlanSaveItem[]): Observable<StaffingFinalPlanSaveResult> {
+    return this.write.saveFinalPlan(realizationId, items);
+  }
+
+  loadFinalPlanCandidate(candidate: StaffingCandidate): Observable<StaffingFinalPlanCandidateOptions> {
+    const cached = this.finalPlanCandidates.get(candidate.id);
+    if (cached) return cached;
+    const request = forkJoin({
+      sessions: forkJoin({
+        template: this.sessionRead.getSessionsByGmProfileId(candidate.gmUserId, 'template'),
+        custom: this.sessionRead.getSessionsByGmProfileId(candidate.gmUserId, 'custom'),
+      }),
+      proposals: this.read.getCandidateSessionProposals(candidate.id),
+    }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
+    this.finalPlanCandidates.set(candidate.id, request);
+    return request;
+  }
 
   validate(realizationId: string): Observable<StaffingRealizationReadinessResult> {
     return defer(() => {
@@ -116,6 +143,7 @@ export class StaffingRealizationEditorFacade {
   }
 
   loadBoard(realizationId: string): Observable<AdminStaffingRealizationBoard> {
+    this.finalPlanCandidates.clear();
     this.store.open(realizationId);
     return forkJoin({
       realization: this.read.getDetail(realizationId),

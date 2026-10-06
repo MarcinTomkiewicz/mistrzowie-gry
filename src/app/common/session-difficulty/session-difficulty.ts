@@ -2,7 +2,7 @@ import { SessionSlotDifficultyTranslations } from '../../core/types/i18n/session
 import { SessionDifficultyLevel } from '../../core/types/sessions';
 
 export function resolveAltDifficultyLevel(
-  difficulty: SessionDifficultyLevel | null | undefined,
+  difficulty: `${SessionDifficultyLevel}` | null | undefined,
   labels: SessionSlotDifficultyTranslations,
   fallbackLabel: string,
 ): { badgeClass: string; label: string } {
