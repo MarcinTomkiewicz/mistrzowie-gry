@@ -21,7 +21,7 @@
       <p class="m-0">{{ copy.loadFailed }}. {{ i18n.commonErrors().generic }}</p>
       <div>
         <p-button type="button" size="small" severity="secondary" icon="pi pi-refresh"
-          [label]="i18n.commonActions().retry" [disabled]="isBusy()" (onClick)="facade.load()" />
+          [label]="i18n.commonActions().retry" [disabled]="facade.isLoading() || isSubmitting()" (onClick)="facade.load()" />
       </div>
     </div>
   } @else if (selectedSession(); as session) {

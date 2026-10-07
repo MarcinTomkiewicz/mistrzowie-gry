@@ -89,7 +89,7 @@
 
             <div class="flex-row-start-center gap-xs w-20 w-100-sm">
               <span>{{ i18n.commonLabels().status }}:</span>
-              <span class="tag-badge tag-badge--muted">
+              <span [class]="'tag-badge ' + statusBadgeClass[realization()?.status ?? 'draft']">
                 {{ currentStatusLabel() }}
               </span>
             </div>

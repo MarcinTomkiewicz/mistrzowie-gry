@@ -153,7 +153,7 @@ export class StaffingRealizationScheduleEditor {
         realizationId,
         mapStaffingRealizationDaysFormToInput(this.form),
       )
-      .pipe(finalize(() => this.isSaving.set(false)))
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (schedule) => {
           if (this.realizationId !== realizationId) {

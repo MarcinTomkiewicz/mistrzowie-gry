@@ -140,7 +140,7 @@ export class StaffingRealizationTravelTermsEditor {
     const realizationId = this.realizationId;
     this.isSaving.set(true);
     this.editor.saveTravelTerms(realizationId, mapStaffingRealizationTravelTermsFormToPayload(this.form))
-      .pipe(finalize(() => this.isSaving.set(false)))
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (terms) => {
           if (this.editor.store.realizationId() !== realizationId) return;

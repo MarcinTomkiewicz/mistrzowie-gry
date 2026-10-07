@@ -12,6 +12,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { finalize, forkJoin, map, Observable, of, Subscription } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { DEFAULT_STAFFING_STATIONARY_CITY } from '../../../../core/configs/staffing-realization.config';
 import {
   createStaffingRealizationCoreForm,
@@ -77,6 +78,7 @@ export class StaffingRealizationCoreEditor {
   protected readonly initialDaysForm =
     createStaffingRealizationInitialDaysForm();
   protected readonly realization = this.editor.store.realization;
+  protected readonly statusBadgeClass = STATUS_BADGE_CLASS;
   protected readonly saveLabel = createStaffingSaveLabel(
     () => this.isNew ? undefined : this.realization()?.status,
     () => this.isNew ? this.i18n.actions().createDraft : this.i18n.commonActions().save,
@@ -218,7 +220,7 @@ export class StaffingRealizationCoreEditor {
 
     this.isSaving.set(true);
     saveRequest
-      .pipe(finalize(() => this.isSaving.set(false)))
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (result) => {
           const savedRealization = result.realization;

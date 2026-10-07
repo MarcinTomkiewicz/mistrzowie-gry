@@ -119,8 +119,8 @@
                 </td>
                 <td class="mg-responsive-table__cell">
                   <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
-                  <div class="mg-responsive-table__value flex-col-start-end gap-xs">
-                    <p-button type="button" size="small" severity="secondary" icon="pi pi-quill"
+                  <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+                    <p-button type="button" size="small" severity="secondary" icon="pi pi-quill" styleClass="w-100"
                       [label]="actions.edit" [routerLink]="['/admin/staffing', row.item.id, 'edit']"
                       [disabled]="isBusy()" />
                     @if (row.item.status === 'draft') {
