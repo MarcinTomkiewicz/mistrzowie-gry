@@ -6,13 +6,14 @@ import { finalize } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { SessionDetails } from '../../../../common/session-details/session-details';
+import { normalizeStaffingSessionMappings } from '../../../../core/domain/staffing/session-proposals';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { mapStaffingFinalSessionOverrideToInput } from '../../../../core/factories/staffing-final-plan-form.factory';
 import type { AdminStaffingFinalPlanAssignment } from '../../../../core/interfaces/admin-staffing-final-plan';
 import type { AdminStaffingRealizationBoard } from '../../../../core/interfaces/admin-staffing-realization-board';
 import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type { SessionDetailsData } from '../../../../core/interfaces/i-session';
-import type { StaffingFinalPlanCandidateOptions } from '../../../../core/interfaces/staffing-final-plan-candidate-options';
+import type { StaffingCandidateSessionOptions } from '../../../../core/interfaces/staffing-candidate-session-options';
 import type { SessionSourceKind } from '../../../../core/types/session-source';
 import type { StaffingFinalPlanItemDraft, StaffingFinalPlanItemForm } from '../../../../core/types/staffing-final-plan-form';
 import { sessionPlayersRangeValidator } from '../../../../core/validators/session-players-range.validator';
@@ -38,10 +39,11 @@ export class StaffingFinalPlanAssignmentEditor {
   readonly remove = output<void>();
 
   protected readonly i18n = createStaffingFinalPlanEditorI18n();
-  protected readonly options = signal<StaffingFinalPlanCandidateOptions | null>(null);
+  protected readonly options = signal<StaffingCandidateSessionOptions | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly loadFailed = signal(false);
   protected readonly showDetails = signal(false);
+  protected readonly previewedProposalId = signal<string | null>(null);
   protected readonly showOverride = signal(false);
   protected readonly controlId = computed(() => {
     const value = this.draft();
@@ -104,9 +106,11 @@ export class StaffingFinalPlanAssignmentEditor {
   protected readonly proposalRows = computed(() => {
     const options = this.options();
     const slotId = this.draft()?.slotId;
-    return (options?.proposals.slots.find(slot => slot.slotId === slotId)?.mappings ?? []).map(mapping => ({
+    if (!options) return [];
+    const mappings = options.proposals.slots.find(slot => slot.slotId === slotId)?.mappings ?? [];
+    return normalizeStaffingSessionMappings(mappings, options.proposals.requiredSessionMappingsPerSlot).map(mapping => ({
       ...mapping,
-      session: options?.sessions[mapping.sourceKind].find(session => session.id === mapping.sessionId) ?? null,
+      session: options.sessions[mapping.sourceKind].find(session => session.id === mapping.sessionId) ?? null,
     }));
   });
 
@@ -127,6 +131,7 @@ export class StaffingFinalPlanAssignmentEditor {
       const candidate = this.selectedCandidate();
       this.retryVersion();
       this.options.set(null);
+      this.previewedProposalId.set(null);
       this.loadFailed.set(false);
       if (!candidate) return;
       this.isLoading.set(true);
@@ -148,6 +153,7 @@ export class StaffingFinalPlanAssignmentEditor {
   protected resetOverride(): void {
     this.form().controls.sessionOverride.reset();
     this.showDetails.set(false);
+    this.showOverride.set(false);
   }
 
   protected retry(): void {

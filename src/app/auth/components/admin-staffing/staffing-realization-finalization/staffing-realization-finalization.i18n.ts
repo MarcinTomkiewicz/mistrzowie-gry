@@ -1,4 +1,4 @@
-import { createCommonActionsI18n, createCommonErrorsI18n } from '../../../../core/translations/common.i18n';
+import { createCommonActionsI18n, createCommonErrorsI18n, createCommonStatusI18n } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import { AdminStaffingFinalizationCopy, AdminStaffingShellCopy } from '../../../../core/types/i18n/admin-staffing';
 import { StaffingRealizationReadinessIssueCode } from '../../../../core/types/staffing-realization-readiness';
@@ -9,6 +9,7 @@ export function createStaffingRealizationFinalizationI18n() {
     tabs: createScopedObjectI18n<AdminStaffingShellCopy['tabs']>('adminStaffing', 'shell.tabs'),
     commonActions: createCommonActionsI18n(),
     commonErrors: createCommonErrorsI18n(),
+    commonStatus: createCommonStatusI18n(),
     issues: createScopedSectionsI18n<Record<StaffingRealizationReadinessIssueCode, string>>('adminStaffing', {
       'core.name_invalid': 'finalization.issues.core.name_invalid',
       'core.timezone_invalid': 'finalization.issues.core.timezone_invalid',

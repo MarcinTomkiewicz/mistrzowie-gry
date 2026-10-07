@@ -93,7 +93,10 @@ export class StaffingCandidateDiscussion {
       next: thread => {
         this.thread.set(thread);
         this.form.reset();
-        this.toast.success({ summary: this.i18n.copy().sendSuccess });
+        this.toast.success({
+          summary: this.i18n.commonStatus().success,
+          detail: this.i18n.copy().sendSuccess,
+        });
       },
       error: () => this.toast.danger({
         summary: this.i18n.copy().sendFailed,

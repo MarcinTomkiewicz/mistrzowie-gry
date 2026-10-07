@@ -10,7 +10,7 @@ import type { AdminStaffingRealizationBoard } from '../../interfaces/admin-staff
 import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import type { AdminStaffingFinalPlan, StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
-import type { StaffingFinalPlanCandidateOptions } from '../../interfaces/staffing-final-plan-candidate-options';
+import type { StaffingCandidateSessionOptions } from '../../interfaces/staffing-candidate-session-options';
 import { SessionRead } from '../../reads/sessions/session-read';
 import {
   AdminStaffingRealizationCore,
@@ -34,7 +34,7 @@ export class StaffingRealizationEditorFacade {
   private readonly read = inject(AdminStaffingRealizationRead);
   private readonly write = inject(AdminStaffingRealization);
   private readonly sessionRead = inject(SessionRead);
-  private readonly finalPlanCandidates = new Map<string, Observable<StaffingFinalPlanCandidateOptions>>();
+  private readonly finalPlanCandidates = new Map<string, Observable<StaffingCandidateSessionOptions>>();
   readonly store = inject(StaffingRealizationEditorStore);
 
   readonly loadCandidateThread = (candidateId: string): Observable<StaffingCandidateThread> =>
@@ -51,18 +51,22 @@ export class StaffingRealizationEditorFacade {
     return this.write.saveFinalPlan(realizationId, items);
   }
 
-  loadFinalPlanCandidate(candidate: StaffingCandidate): Observable<StaffingFinalPlanCandidateOptions> {
+  loadFinalPlanCandidate(candidate: StaffingCandidate): Observable<StaffingCandidateSessionOptions> {
     const cached = this.finalPlanCandidates.get(candidate.id);
     if (cached) return cached;
-    const request = forkJoin({
+    const request = this.loadCandidateSessionOptions(candidate).pipe(shareReplay({ bufferSize: 1, refCount: true }));
+    this.finalPlanCandidates.set(candidate.id, request);
+    return request;
+  }
+
+  loadCandidateSessionOptions(candidate: StaffingCandidate): Observable<StaffingCandidateSessionOptions> {
+    return forkJoin({
       sessions: forkJoin({
         template: this.sessionRead.getSessionsByGmProfileId(candidate.gmUserId, 'template'),
         custom: this.sessionRead.getSessionsByGmProfileId(candidate.gmUserId, 'custom'),
       }),
       proposals: this.read.getCandidateSessionProposals(candidate.id),
-    }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
-    this.finalPlanCandidates.set(candidate.id, request);
-    return request;
+    });
   }
 
   validate(realizationId: string): Observable<StaffingRealizationReadinessResult> {
@@ -179,6 +183,10 @@ export class StaffingRealizationEditorFacade {
 
   decideSelfApplication(candidateId: string, decision: 'accepted' | 'rejected'): Observable<StaffingCandidate> {
     return this.write.decideSelfApplication(candidateId, decision);
+  }
+
+  removeConfirmedParticipation(candidateId: string): Observable<StaffingCandidate> {
+    return this.write.removeConfirmedParticipation(candidateId);
   }
 
   create(payload: CreateAdminStaffingRealizationRequest): Observable<CreateAdminStaffingRealizationResult> {

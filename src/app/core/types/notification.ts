@@ -15,6 +15,7 @@ export type NotificationEventType =
   | 'staffing_admin_proposal_accepted'
   | 'staffing_admin_proposal_rejected'
   | 'staffing_candidate_message_created'
+  | 'staffing_candidate_session_proposals_changed'
   | 'staffing_final_plan_changed';
 
 export interface StaffingRealizationNotificationPayload {

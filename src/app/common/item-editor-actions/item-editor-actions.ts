@@ -15,6 +15,7 @@ export class ItemEditorActions {
   readonly disabled = input(false);
   readonly compact = input(false);
   readonly copyable = input(false);
+  readonly removeIcon = input('pi pi-trash');
   readonly moveUp = output<void>();
   readonly moveDown = output<void>();
   readonly copyItem = output<void>();

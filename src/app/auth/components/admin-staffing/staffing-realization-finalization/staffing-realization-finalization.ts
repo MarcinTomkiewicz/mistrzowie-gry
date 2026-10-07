@@ -77,7 +77,8 @@ export class StaffingRealizationFinalization {
     ).subscribe({
       next: (result) => {
         if (result.opened && this.store.realizationId() === realizationId) {
-          this.toast.success({ summary: this.i18n.copy().openSuccess });
+          this.toast.success({ summary: this.i18n.commonStatus().success,
+            detail: this.i18n.copy().openSuccess });
         }
       },
       error: () => this.toast.danger({ summary: this.i18n.copy().openFailed,

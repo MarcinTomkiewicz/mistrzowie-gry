@@ -4,6 +4,7 @@ export type BasePopupOptions = {
   message: string;
   acceptLabel: string;
   icon?: string;
+  acceptIcon?: string;
   accept?: () => void;
 };
 

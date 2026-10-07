@@ -60,7 +60,7 @@
           }
         </div>
         <div class="w-100 overflow-x-auto">
-          <p-table [value]="candidateRows()" dataKey="candidate.id" tableStyleClass="mg-responsive-table"
+          <p-table [value]="currentCandidateRows()" dataKey="candidate.id" tableStyleClass="mg-responsive-table"
             [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
             <ng-template #header>
               <tr class="hide-down-sm">
@@ -70,8 +70,8 @@
                 <th scope="col" class="small-caps">{{ fields.gmDecision }}</th>
                 <th scope="col" class="small-caps">{{ fields.adminDecision }}</th>
                 <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
-                <th scope="col" class="small-caps">{{ fields.participation }}</th>
                 <th scope="col" class="small-caps">{{ fields.availability }}</th>
+                <th scope="col" class="small-caps">{{ i18n.commonTable().actions }}</th>
               </tr>
             </ng-template>
             <ng-template #body let-row>
@@ -85,8 +85,6 @@
                       <span class="muted-text">{{ copy.outsideRoster }}</span>
                       <small class="muted-text text-wrap-anywhere">{{ candidate.gmUserId }}</small>
                     }
-                    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
-                      [label]="copy.candidateDetail.show" (onClick)="selectedCandidateId.set(candidate.id)" />
                   </div>
                 </th>
                 <td class="mg-responsive-table__cell">
@@ -124,25 +122,6 @@
                   </span>
                 </td>
                 <td class="mg-responsive-table__cell">
-                  <span class="mg-responsive-table__label small-caps font-bold">{{ fields.participation }}</span>
-                  <div class="mg-responsive-table__value flex-col-start-start gap-xs">
-                    @if (candidate.state === 'confirmed') {
-                      <span class="tag-badge" [class.tag-badge--success]="candidate.participation.active"
-                        [class.tag-badge--muted]="!candidate.participation.active">
-                        {{ candidate.participation.active ? i18n.participation().active : i18n.participation().ended }}
-                      </span>
-                      @if (candidate.participation.endedAt; as timestamp) {
-                        <small class="muted-text">{{ formatTimestampLabel(timestamp, 'pl-PL', data.realization.timezone) }}</small>
-                      }
-                      @if (row.endReasonLabel; as reason) {
-                        <small class="muted-text">{{ reason }}</small>
-                      }
-                    } @else {
-                      <span class="muted-text">{{ i18n.commonValues().notApplicable }}</span>
-                    }
-                  </div>
-                </td>
-                <td class="mg-responsive-table__cell">
                   <span class="mg-responsive-table__label small-caps font-bold">{{ fields.availability }}</span>
                   <div class="mg-responsive-table__value flex-col-start-start gap-xs">
                     @if (row.gm; as gm) {
@@ -156,6 +135,14 @@
                     }
                   </div>
                 </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+                  <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+                    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
+                      styleClass="w-100" [label]="copy.candidateDetail.show" (onClick)="selectedCandidateId.set(candidate.id)" />
+                    <ng-container [ngTemplateOutlet]="candidateDecisionActions" [ngTemplateOutletContext]="{ $implicit: candidate }" />
+                  </div>
+                </td>
               </tr>
             </ng-template>
             <ng-template #emptymessage>
@@ -164,6 +151,9 @@
           </p-table>
         </div>
       </section>
+
+      <app-staffing-confirmed-roster [board]="data" (candidateSelected)="selectedCandidateId.set($event)"
+        (availabilitySelected)="selectedGm.set($event)" (removed)="loadBoard()" />
 
       <app-staffing-realization-availability [availability]="data.availability" [(selectedGm)]="selectedGm" />
 
@@ -243,6 +233,8 @@
               <dd class="m-0">{{ detail.endReasonLabel ?? i18n.commonValues().notApplicable }}</dd>
             </div>
           </dl>
+          <app-staffing-candidate-session-proposals class="d-block w-100 mt-md" [candidate]="candidate"
+            [gmDisplayName]="detail.gm ? getUserDisplayName(detail.gm) : null" />
           <app-staffing-candidate-discussion class="d-block w-100 mt-md" [candidate]="candidate"
             [timezone]="data.realization.timezone" [loadThread]="facade.loadCandidateThread"
             [createMessage]="facade.createCandidateMessage" />
@@ -251,14 +243,9 @@
           <div class="flex-row-between-center flex-wrap gap-sm w-100">
             <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
               [label]="i18n.commonActions().close" [disabled]="isDeciding()" (onClick)="selectedCandidateId.set(null)" />
-            @if (canDecideSelfApplication()) {
+            @if (candidateDetail(); as detail) {
               <div class="flex-row-end-center flex-wrap gap-sm">
-                <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
-                  [label]="copy.selfApplicationDecision.reject" [disabled]="isDeciding()"
-                  (onClick)="confirmSelfApplicationDecision($event, 'rejected')" />
-                <p-button type="button" severity="success" icon="pi pi-check"
-                  [label]="copy.selfApplicationDecision.accept" [disabled]="isDeciding()"
-                  (onClick)="confirmSelfApplicationDecision($event, 'accepted')" />
+                <ng-container [ngTemplateOutlet]="candidateDecisionActions" [ngTemplateOutletContext]="{ $implicit: detail.candidate }" />
               </div>
             }
           </div>
@@ -267,3 +254,14 @@
     }
   }
 </div>
+
+<ng-template #candidateDecisionActions let-candidate>
+  @if (canDecideSelfApplication(candidate)) {
+    <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-interdiction"
+      styleClass="w-100" [label]="copy.selfApplicationDecision.reject" [disabled]="isDeciding()"
+      (onClick)="confirmSelfApplicationDecision($event, candidate, 'rejected')" />
+    <p-button type="button" severity="success" size="small" icon="pi pi-done-it"
+      styleClass="w-100" [label]="copy.selfApplicationDecision.accept" [disabled]="isDeciding()"
+      (onClick)="confirmSelfApplicationDecision($event, candidate, 'accepted')" />
+  }
+</ng-template>

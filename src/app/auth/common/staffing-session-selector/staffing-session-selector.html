@@ -2,18 +2,19 @@
 <div class="position-relative flex-col-start-stretch gap-sm w-100 min-w-0" [attr.aria-busy]="isBusy()">
   <app-loading-overlay [visible]="facade.isLoading()" [label]="i18n.commonStatus().loading" />
 
-  <div class="flex-row-start-center flex-col-start-stretch-sm gap-sm min-w-0">
+  <div class="flex-row-start-center flex-col-start-stretch-sm flex-wrap gap-sm min-w-0">
     <p-select [formControl]="sourceControl"
       [options]="sourceOptions()" optionLabel="label" optionValue="value" size="small" appendTo="body"
       class="flex-none w-px-200 w-100-sm" [placeholder]="copy.sourceLabel" [ariaLabel]="copy.sourceLabel"
       [readonly]="isBusy()" />
     <p-select [formControl]="sessionControl"
       [options]="sessionOptions()" optionLabel="label" optionValue="value" size="small" appendTo="body"
-      class="flex-1 min-w-0 w-100-sm" [placeholder]="copy.sessionLabel" [ariaLabel]="copy.sessionLabel"
+      class="flex-1 min-w-250 min-w-0-sm w-100-sm" [placeholder]="copy.sessionLabel" [ariaLabel]="copy.sessionLabel"
       [filter]="true" filterBy="label" [emptyMessage]="copy.emptyDescriptions[source()]" [readonly]="isBusy()" />
     <p-button type="button" size="small" severity="success" icon="pi pi-creation"
       class="flex-none w-100-sm" styleClass="w-100" [label]="i18n.sessionActions().addLabel"
       [disabled]="isBusy()" (onClick)="openCreation()" />
+    <ng-content select="[staffingSessionActions]" />
   </div>
 
   @if (facade.loadFailed()) {
@@ -24,13 +25,17 @@
           [label]="i18n.commonActions().retry" [disabled]="facade.isLoading() || isSubmitting()" (onClick)="facade.load()" />
       </div>
     </div>
-  } @else if (selectedSession(); as session) {
-    <div>
+  }
+  <div class="flex-row-start-center flex-wrap gap-sm">
+    @if (!facade.loadFailed() && selectedSession()) {
       <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-eye"
         [label]="showDetails() ? i18n.commonCta().showLess : i18n.commonCta().checkDetails"
         [attr.aria-expanded]="showDetails()" (onClick)="showDetails.set(!showDetails())" />
-    </div>
-    @if (showDetails()) {
+    }
+    <ng-content select="[staffingSessionFooterActions]" />
+  </div>
+  @if (!facade.loadFailed() && showDetails()) {
+    @if (selectedSession(); as session) {
       <app-session-details [session]="session" [gmDisplayName]="gmDisplayName()" />
     }
   }

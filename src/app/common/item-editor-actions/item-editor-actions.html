@@ -52,7 +52,7 @@
     [label]="compact() ? undefined : actions().removeItem"
     [ariaLabel]="compact() ? actions().removeItem : undefined"
     [styleClass]="compact() ? 'square-7 p-0' : undefined"
-    icon="pi pi-trash"
+    [icon]="removeIcon()"
     [disabled]="disabled()"
     (onClick)="remove.emit()"
   />

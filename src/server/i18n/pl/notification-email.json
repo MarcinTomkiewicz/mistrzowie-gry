@@ -100,5 +100,11 @@
     "heading": "[PH] Zmieniono finalny plan udziału MG {{gmDisplayName}}",
     "body": "[PH] Zmieniono finalny plan lub harmonogram dotyczący udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}”. Przejdź do panelu realizacji, aby sprawdzić aktualny kontekst udziału.",
     "ctaLabel": "[PH] Zobacz realizację"
+  },
+  "staffing_candidate_session_proposals_changed": {
+    "subjectLabel": "[PH] Zmiana propozycji sesji w realizacji „{{realizationName}}”",
+    "heading": "[PH] MG {{gmDisplayName}} zmienił propozycje sesji",
+    "body": "[PH] MG {{gmDisplayName}} zmienił zapisane propozycje sesji w realizacji „{{realizationName}}”. Przejdź do szczegółów kandydatury, aby zobaczyć aktualne propozycje dla slotów.",
+    "ctaLabel": "[PH] Zobacz propozycje sesji"
   }
 }

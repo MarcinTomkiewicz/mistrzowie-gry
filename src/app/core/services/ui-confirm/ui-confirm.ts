@@ -33,6 +33,7 @@ export class UiConfirm {
       acceptLabel: options.acceptLabel,
       acceptButtonProps: {
         severity: 'info',
+        icon: options.acceptIcon,
       },
     });
   }
@@ -46,6 +47,7 @@ export class UiConfirm {
       acceptLabel: options.acceptLabel,
       acceptButtonProps: {
         severity: 'warn',
+        icon: options.acceptIcon,
       },
     });
   }
@@ -59,6 +61,7 @@ export class UiConfirm {
       acceptLabel: options.acceptLabel,
       acceptButtonProps: {
         severity: 'danger',
+        icon: options.acceptIcon,
       },
     });
   }
@@ -73,6 +76,7 @@ export class UiConfirm {
       rejectLabel: options.rejectLabel,
       acceptButtonProps: {
         severity: 'info',
+        icon: options.acceptIcon,
       },
       rejectButtonProps: {
         severity: 'secondary',
@@ -91,6 +95,7 @@ export class UiConfirm {
       rejectLabel: options.rejectLabel,
       acceptButtonProps: {
         severity: 'danger',
+        icon: options.acceptIcon,
       },
       rejectButtonProps: {
         severity: 'secondary',

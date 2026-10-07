@@ -20,6 +20,7 @@ export const STAFFING_REALIZATION_RPC = {
   saveAdminFinalPlan: 'save_admin_staffing_final_plan',
   createAdminProposal: 'create_admin_staffing_proposal',
   decideAdminSelfApplication: 'decide_admin_staffing_self_application',
+  removeAdminConfirmedParticipation: 'remove_admin_staffing_confirmed_participation',
   validateAdmin: 'validate_admin_staffing_realization',
   openAdmin: 'open_admin_staffing_realization',
   deleteAdmin: 'delete_admin_staffing_realization',

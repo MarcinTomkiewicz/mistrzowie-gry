@@ -33,7 +33,7 @@
     <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
       [label]="i18n.commonActions().cancel" [disabled]="busy()" (onClick)="cancel.emit()" />
     <div class="flex-row-end-center flex-wrap gap-sm">
-      <p-button type="button" severity="success" icon="pi pi-save" [label]="saveLabel()"
+      <p-button type="button" severity="success" icon="pi pi-done-it" [label]="saveLabel()"
         [loading]="isSaving()" [disabled]="saveDisabled() || busy()" (onClick)="saveDraft.emit()" />
       @if (isDraft()) {
         <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-check"

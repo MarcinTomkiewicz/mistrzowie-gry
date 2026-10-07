@@ -120,7 +120,7 @@ export class StaffingFinalPlanEditor {
     if (!plan || !this.canEdit() || !this.hasChanges()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toast.danger({ summary: this.i18n.finalPlan().invalid });
+      this.toast.danger({ summary: this.i18n.commonForm().invalidSummary, detail: this.i18n.finalPlan().invalid });
       return;
     }
     const items = mapStaffingFinalPlanFormToInput(this.form);
@@ -133,7 +133,8 @@ export class StaffingFinalPlanEditor {
         this.applyPlan(result.plan);
         this.materialChanges.set(result.materialChanges);
         this.showChangeDetails.set(false);
-        this.toast.success({ summary: this.i18n.finalPlan().saveSuccess });
+        this.toast.success({ summary: this.i18n.commonStatus().success,
+          detail: this.i18n.finalPlan().saveSuccess });
       },
       error: () => this.toast.danger({
         summary: this.i18n.finalPlan().saveFailed,

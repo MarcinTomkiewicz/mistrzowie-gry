@@ -43,26 +43,29 @@
               </span>
             }
           </div>
-          @for (mapping of slot.mappings; track mapping.key) {
-            <div class="flex-row-start-start flex-col-start-stretch-sm gap-sm w-100 min-w-0">
-              <app-staffing-session-selector class="flex-1 min-w-0 w-100-sm" [selection]="mapping.selection"
-                [busy]="!facade.canEditSessionProposals()"
-                (selectionChange)="facade.setSessionProposal(slot.slotId, mapping.key, $event)" />
+          @for (mapping of slot.mappings; track mapping.key; let last = $last) {
+            <app-staffing-session-selector class="d-block w-100 min-w-0" [selection]="mapping.selection"
+              [busy]="!facade.canEditSessionProposals()"
+              (selectionChange)="facade.setSessionProposal(slot.slotId, mapping.key, $event)">
               @if (proposals.editable) {
-                <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-trash"
+                <p-button staffingSessionActions type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-demolish"
+                  class="flex-none w-100-sm" styleClass="w-100"
                   [label]="i18n.commonActions().removeItem" [disabled]="!facade.canEditSessionProposals()"
                   (onClick)="facade.removeSessionProposal(slot.slotId, mapping.key)" />
               }
-            </div>
+              @if (proposals.editable && slot.canAdd && last) {
+                <div staffingSessionFooterActions>
+                  <ng-container [ngTemplateOutlet]="addProposal" [ngTemplateOutletContext]="{ $implicit: slot.slotId }" />
+                </div>
+              }
+            </app-staffing-session-selector>
           } @empty {
             <p class="m-0 muted-text">{{ copy.emptyMappings }}</p>
-          }
-          @if (proposals.editable) {
-            <div>
-              <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-plus"
-                [label]="copy.add" [disabled]="!facade.canEditSessionProposals()"
-                (onClick)="facade.addSessionProposal(slot.slotId)" />
-            </div>
+            @if (proposals.editable && slot.canAdd) {
+              <div>
+                <ng-container [ngTemplateOutlet]="addProposal" [ngTemplateOutletContext]="{ $implicit: slot.slotId }" />
+              </div>
+            }
           }
         </article>
       } @empty {
@@ -75,9 +78,15 @@
         <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
           [label]="i18n.commonActions().cancel" [disabled]="!facade.canEditSessionProposals() || !facade.hasSessionProposalChanges()"
           (onClick)="facade.resetSessionProposalDraft()" />
-        <p-button type="button" severity="success" icon="pi pi-save" [label]="i18n.commonActions().save"
+        <p-button type="button" severity="success" icon="pi pi-done-it" [label]="i18n.commonActions().save"
           [disabled]="!facade.canEditSessionProposals() || !facade.hasSessionProposalChanges()" (onClick)="save()" />
       </div>
     }
   }
 </section>
+
+<ng-template #addProposal let-slotId>
+  <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-plus"
+    [label]="copy.add" [disabled]="!facade.canEditSessionProposals()"
+    (onClick)="facade.addSessionProposal(slotId)" />
+</ng-template>

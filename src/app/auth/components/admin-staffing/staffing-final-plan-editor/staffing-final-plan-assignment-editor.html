@@ -19,7 +19,7 @@
       </div>
     }
     @if (editable()) {
-      <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-trash"
+      <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-demolish"
         [label]="i18n.commonActions().removeItem" (onClick)="remove.emit()" />
     }
   </div>
@@ -58,10 +58,6 @@
         <div class="flex-row-start-center flex-wrap gap-sm">
           <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
             [label]="copy.preview" [attr.aria-expanded]="showDetails()" (onClick)="showDetails.set(!showDetails())" />
-          @if (editable()) {
-            <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-file-edit"
-              [label]="copy.override.title" [attr.aria-expanded]="showOverride()" (onClick)="showOverride.set(!showOverride())" />
-          }
         </div>
         @if (showDetails()) {
           <app-session-details [session]="session" [gmDisplayName]="gmName()" />
@@ -73,12 +69,24 @@
       @if (options()) {
         @for (proposal of proposalRows(); track proposal.id) {
           <div class="flex-col-start-stretch gap-xs">
-            <span class="tag-badge tag-badge--info w-auto">{{ i18n.sessionSelector().sources[proposal.sourceKind] }}</span>
             @if (proposal.session; as session) {
-              <strong>{{ session.title }} - {{ session.system.name }}</strong>
-              <p class="m-0 pre-line">{{ session.description }}</p>
+              <div class="flex-row-between-center flex-wrap gap-xs">
+                <div class="flex-col-start-start gap-xs min-w-0">
+                  <strong>{{ session.title }} - {{ session.system.name }}</strong>
+                  <span class="tag-badge tag-badge--info">{{ i18n.sessionSelector().sources[proposal.sourceKind] }}</span>
+                </div>
+                <p-button type="button" severity="secondary" size="small" [text]="true" icon="pi pi-eye"
+                  [label]="copy.preview" [attr.aria-expanded]="previewedProposalId() === proposal.id"
+                  (onClick)="previewedProposalId.set(previewedProposalId() === proposal.id ? null : proposal.id)" />
+              </div>
+              @if (previewedProposalId() === proposal.id) {
+                <app-session-details [session]="session" [gmDisplayName]="gmName()" />
+              }
             } @else {
-              <span class="text-wrap-anywhere">{{ proposal.sessionId }}</span>
+              <div class="flex-row-start-center flex-wrap gap-xs">
+                <span class="tag-badge tag-badge--info">{{ i18n.sessionSelector().sources[proposal.sourceKind] }}</span>
+                <span class="text-wrap-anywhere">{{ proposal.sessionId }}</span>
+              </div>
             }
           </div>
         } @empty {
@@ -87,7 +95,13 @@
       }
     </aside>
   </div>
-  @if (showOverride() && editable()) {
-    <app-staffing-final-session-override-editor [form]="controls.sessionOverride" [controlId]="controlId()" />
+  @if (editable() && preview()) {
+    <div class="flex-row-end-center border-top pt-sm">
+      <p-button type="button" severity="secondary" size="small" [text]="true" icon="pi pi-file-edit"
+        [label]="copy.override.title" [attr.aria-expanded]="showOverride()" (onClick)="showOverride.set(!showOverride())" />
+    </div>
+    @if (showOverride()) {
+      <app-staffing-final-session-override-editor [form]="controls.sessionOverride" [controlId]="controlId()" />
+    }
   }
 </div>

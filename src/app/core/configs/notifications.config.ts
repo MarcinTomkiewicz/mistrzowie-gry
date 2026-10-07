@@ -99,6 +99,11 @@ export const NOTIFICATION_PRESENTATION: Record<NotificationEventType, Notificati
     resolveRoute: gmStaffingParticipationRoute,
     resolveParams: getStaffingNotificationParams,
   },
+  staffing_candidate_session_proposals_changed: {
+    translationKey: 'notifications.events.staffing_candidate_session_proposals_changed',
+    resolveRoute: adminStaffingCandidateRoute,
+    resolveParams: getStaffingNotificationParams,
+  },
 };
 
 function adminStaffingCandidateRoute(payload: Notification['payload']): string {

@@ -213,6 +213,14 @@ export type AdminStaffingBoardCopy = {
   candidatesTitle: string;
   emptyCandidates: string;
   outsideRoster: string;
+  confirmedRoster: {
+    title: string;
+    empty: string;
+    remove: string;
+    removeConfirm: string;
+    removeSuccess: string;
+    removeFailed: string;
+  };
   proposal: {
     action: string;
     title: string;
@@ -225,6 +233,12 @@ export type AdminStaffingBoardCopy = {
     show: string;
     participationActive: string;
     endedBy: string;
+    sessionProposals: {
+      title: string;
+      emptySlots: string;
+      emptyMappings: string;
+      loadFailed: string;
+    };
   };
   selfApplicationDecision: {
     accept: string;

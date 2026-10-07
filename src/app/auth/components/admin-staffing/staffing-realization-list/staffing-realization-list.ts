@@ -137,6 +137,7 @@ export class StaffingRealizationList {
     this.confirm.dangerDecision(event, {
       message: this.i18n.copy().confirmation.delete.replace('{{name}}', realization.name),
       acceptLabel: this.i18n.commonActions().delete,
+      acceptIcon: 'pi pi-demolish',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => this.deleteRealization(realization.id),
     });
@@ -146,6 +147,7 @@ export class StaffingRealizationList {
     this.confirm.dangerDecision(event, {
       message: this.i18n.copy().confirmation.archive.replace('{{name}}', realization.name),
       acceptLabel: this.i18n.commonActions().archive,
+      acceptIcon: 'pi pi-warehouse',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => this.archiveRealization(realization.id),
     });
@@ -160,7 +162,8 @@ export class StaffingRealizationList {
       next: (result) => {
         this.rows.update((rows) => rows.filter((row) => row.id !== result.realizationId));
         this.first.set(0);
-        this.toast.success({ summary: this.i18n.copy().toast.deleteSuccessSummary });
+        this.toast.success({ summary: this.i18n.commonStatus().success,
+          detail: this.i18n.copy().toast.deleteSuccessSummary });
       },
       error: () => this.toast.danger({
         summary: this.i18n.copy().toast.deleteFailedSummary,
@@ -178,7 +181,8 @@ export class StaffingRealizationList {
       next: ({ realization }) => {
         this.rows.update((rows) => updateStaffingRealizationList(rows, realization));
         this.first.set(0);
-        this.toast.success({ summary: this.i18n.copy().toast.archiveSuccessSummary });
+        this.toast.success({ summary: this.i18n.commonStatus().success,
+          detail: this.i18n.copy().toast.archiveSuccessSummary });
       },
       error: () => this.toast.danger({
         summary: this.i18n.copy().toast.archiveFailedSummary,

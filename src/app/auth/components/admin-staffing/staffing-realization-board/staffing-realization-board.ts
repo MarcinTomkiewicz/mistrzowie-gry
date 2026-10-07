@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -10,9 +11,11 @@ import { distinctUntilChanged, finalize, map, Subscription } from 'rxjs';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import { STAFFING_AVAILABILITY_BADGE_CLASS } from '../../../../core/configs/staffing-availability.config';
+import { selectCurrentStaffingCandidates } from '../../../../core/domain/staffing/candidates';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import type { AdminStaffingGmAvailability } from '../../../../core/interfaces/admin-staffing-availability';
 import type { AdminStaffingRealizationBoard } from '../../../../core/interfaces/admin-staffing-realization-board';
+import type { StaffingCandidate } from '../../../../core/interfaces/staffing-candidate';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { GM_STAFFING_SCOPE, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
@@ -20,13 +23,15 @@ import { formatDateLabel, formatTimestampLabel } from '../../../../core/utils/da
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { StaffingRealizationAvailability } from './staffing-realization-availability';
 import { StaffingAdminProposal } from './staffing-admin-proposal';
+import { StaffingCandidateSessionProposals } from './staffing-candidate-session-proposals';
+import { StaffingConfirmedRoster } from './staffing-confirmed-roster';
 import { StaffingFinalPlanEditor } from '../staffing-final-plan-editor/staffing-final-plan-editor';
 import { StaffingCandidateDiscussion } from '../../../common/staffing-candidate-discussion/staffing-candidate-discussion';
 import { createStaffingRealizationBoardI18n } from './staffing-realization-board.i18n';
 
 @Component({
   selector: 'app-staffing-realization-board',
-  imports: [ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal, StaffingFinalPlanEditor, StaffingCandidateDiscussion],
+  imports: [NgTemplateOutlet, ButtonModule, DialogModule, TableModule, LoadingOverlay, StaffingRealizationAvailability, StaffingAdminProposal, StaffingFinalPlanEditor, StaffingCandidateDiscussion, StaffingCandidateSessionProposals, StaffingConfirmedRoster],
   templateUrl: './staffing-realization-board.html',
   providers: [provideTranslocoScope('adminStaffing', STAFFING_SCOPE, GM_STAFFING_SCOPE, 'common')],
 })
@@ -101,12 +106,21 @@ export class StaffingRealizationBoard {
   protected readonly candidateDetail = computed(() =>
     this.candidateRows().find((row) => row.candidate.id === this.selectedCandidateId()) ?? null,
   );
-  protected readonly canDecideSelfApplication = computed(() => {
-    const candidate = this.candidateDetail()?.candidate;
-    return this.board()?.realization.status !== 'archived' &&
-      candidate?.origin === 'self_application' && candidate.state === 'pending' &&
-      candidate.submittedAt !== null;
+  protected readonly currentCandidateRows = computed(() => {
+    const ids = new Set(selectCurrentStaffingCandidates(this.board()?.candidates ?? []).map(candidate => candidate.id));
+    const endedLabel = this.i18n.participation().ended;
+    return this.candidateRows().filter(row => ids.has(row.candidate.id) &&
+      !(row.candidate.state === 'confirmed' && row.candidate.participation.active === true))
+      .map(row => row.candidate.state === 'confirmed' && row.candidate.participation.active === false
+        ? { ...row, stateLabel: endedLabel, stateBadgeClass: 'tag-badge--muted' }
+        : row);
   });
+
+  protected canDecideSelfApplication(candidate: StaffingCandidate): boolean {
+    return this.board()?.realization.status !== 'archived' &&
+      candidate.origin === 'self_application' && candidate.state === 'pending' &&
+      candidate.submittedAt !== null;
+  }
 
   constructor() {
     effect(() => {
@@ -124,18 +138,19 @@ export class StaffingRealizationBoard {
     });
   }
 
-  protected confirmSelfApplicationDecision(event: Event, decision: 'accepted' | 'rejected'): void {
-    const candidate = this.candidateDetail()?.candidate;
-    if (!candidate || !this.canDecideSelfApplication() || this.isDeciding()) return;
+  protected confirmSelfApplicationDecision(event: Event, candidate: StaffingCandidate, decision: 'accepted' | 'rejected'): void {
+    if (!this.canDecideSelfApplication(candidate) || this.isDeciding()) return;
     const realizationId = this.realizationId;
     const copy = this.i18n.copy().selfApplicationDecision;
     const options = {
       message: decision === 'accepted' ? copy.acceptConfirm : copy.rejectConfirm,
       acceptLabel: decision === 'accepted' ? copy.accept : copy.reject,
+      acceptIcon: decision === 'accepted' ? 'pi pi-done-it' : 'pi pi-interdiction',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => {
-        if (this.realizationId !== realizationId || this.candidateDetail()?.candidate.id !== candidate.id ||
-          !this.canDecideSelfApplication() || this.isDeciding()) return;
+        const current = this.board()?.candidates.find(item => item.id === candidate.id);
+        if (this.realizationId !== realizationId || !current ||
+          !this.canDecideSelfApplication(current) || this.isDeciding()) return;
         this.isDeciding.set(true);
         this.facade.decideSelfApplication(candidate.id, decision).pipe(
           takeUntilDestroyed(this.destroyRef),
@@ -143,7 +158,10 @@ export class StaffingRealizationBoard {
         ).subscribe({
           next: () => {
             if (this.realizationId !== realizationId) return;
-            this.toast.success({ summary: decision === 'accepted' ? copy.acceptSuccess : copy.rejectSuccess });
+            this.toast.success({
+              summary: this.i18n.commonStatus().success,
+              detail: decision === 'accepted' ? copy.acceptSuccess : copy.rejectSuccess,
+            });
             this.loadBoard();
           },
           error: () => {

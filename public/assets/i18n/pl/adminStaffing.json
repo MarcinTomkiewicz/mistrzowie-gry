@@ -84,7 +84,7 @@
     "description": "[PH] Określ zasady zgłoszeń Mistrzów Gry i wymagania dotyczące proponowanych sesji.",
     "travelHint": "[PH] Udział w realizacji wyjazdowej obejmuje cały wyjazd. Nie można zgłosić udziału tylko w wybranych dniach.",
     "saveCoreTypeHint": "[PH] Przed zapisem zasad rekrutacji zapisz zmianę typu realizacji w Danych podstawowych.",
-    "sessionsHint": "[PH] Po potwierdzeniu udziału MG proponuje jedną sesję dla każdego objętego slotu.",
+    "sessionsHint": "[PH] Po potwierdzeniu udziału MG przedstawia wymaganą liczbę propozycji sesji dla każdego objętego slotu.",
     "fields": {
       "selfApplicationEnabled": "[PH] MG mogą zgłaszać udział",
       "stationaryScopePolicy": "[PH] Zakres zgłoszenia",
@@ -239,6 +239,14 @@
     "candidatesTitle": "[PH] Kandydaci",
     "emptyCandidates": "[PH] Ta realizacja nie ma jeszcze kandydatów.",
     "outsideRoster": "[PH] MG spoza bieżącej listy dostępności",
+    "confirmedRoster": {
+      "title": "[PH] Potwierdzona obsada",
+      "empty": "[PH] Ta realizacja nie ma aktywnych, potwierdzonych MG.",
+      "remove": "[PH] Usuń z realizacji",
+      "removeConfirm": "[PH] Zakończyć udział tego MG w realizacji? Potwierdzenie udziału pozostanie w historii.",
+      "removeSuccess": "[PH] Udział MG w realizacji został zakończony",
+      "removeFailed": "[PH] Nie udało się zakończyć udziału MG w realizacji"
+    },
     "proposal": {
       "action": "[PH] Zaproponuj MG",
       "title": "[PH] Propozycja udziału MG",
@@ -250,7 +258,13 @@
       "title": "[PH] Szczegóły kandydatury",
       "show": "[PH] Szczegóły",
       "participationActive": "[PH] Aktywny udział",
-      "endedBy": "[PH] Osoba kończąca udział (ID)"
+      "endedBy": "[PH] Osoba kończąca udział (ID)",
+      "sessionProposals": {
+        "title": "[PH] Propozycje sesji MG",
+        "emptySlots": "[PH] Ta kandydatura nie ma slotów z propozycjami sesji.",
+        "emptyMappings": "[PH] MG nie zaproponował sesji dla tego slotu.",
+        "loadFailed": "[PH] Nie udało się załadować propozycji sesji MG"
+      }
     },
     "selfApplicationDecision": {
       "accept": "[PH] Akceptuj zgłoszenie",

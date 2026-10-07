@@ -95,6 +95,7 @@ export class GmStaffingParticipation {
     this.confirm.dangerDecision(event, {
       message: this.i18n.copy().application.withdrawConfirm,
       acceptLabel: this.i18n.copy().application.withdraw,
+      acceptIcon: 'pi pi-interdiction',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => {
         if (this.detail()?.candidate?.id !== candidate.id ||
@@ -111,6 +112,7 @@ export class GmStaffingParticipation {
     const options = {
       message: decision === 'accepted' ? copy.acceptConfirm : copy.rejectConfirm,
       acceptLabel: decision === 'accepted' ? copy.accept : copy.reject,
+      acceptIcon: decision === 'accepted' ? 'pi pi-done-it' : 'pi pi-interdiction',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => {
         if (this.detail()?.candidate?.id !== candidate.id ||
@@ -161,6 +163,7 @@ export class GmStaffingParticipation {
     this.confirm.dangerDecision(event, {
       message: replacementId === null ? copy.withdrawConfirm : copy.withdrawWithReplacementConfirm,
       acceptLabel: copy.withdraw,
+      acceptIcon: 'pi pi-interdiction',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => {
         if (this.detail()?.candidate?.id !== candidate.id ||
@@ -182,14 +185,14 @@ export class GmStaffingParticipation {
     return true;
   }
 
-  private run(request: Observable<MyStaffingCandidate>, successSummary: string): void {
+  private run(request: Observable<MyStaffingCandidate>, successDetail: string): void {
     const realizationId = this.detail()?.id;
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         if (this.detail()?.id !== realizationId) return;
         this.dayIds.reset();
         this.cancelWithdrawal();
-        this.toast.success({ summary: successSummary });
+        this.toast.success({ summary: this.i18n.commonStatus().success, detail: successDetail });
       },
       error: () => {
         if (this.detail()?.id !== realizationId) return;

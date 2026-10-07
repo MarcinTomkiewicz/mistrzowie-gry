@@ -7,6 +7,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { finalize } from 'rxjs';
 
+import { isCurrentStaffingCandidate } from '../../../../core/domain/staffing/candidates';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import type { AdminStaffingRealizationBoard } from '../../../../core/interfaces/admin-staffing-realization-board';
 import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
@@ -40,9 +41,14 @@ export class StaffingAdminProposal {
     this.board().realization.type === 'stationary' &&
     this.board().recruitmentPolicy?.stationaryScopePolicy === 'selected_days',
   );
-  protected readonly gmOptions = computed<ISelectOption<string>[]>(() =>
-    this.board().availability.gms.map(gm => ({ value: gm.userId, label: getUserDisplayName(gm) || gm.userId })),
-  );
+  protected readonly gmOptions = computed<ISelectOption<string>[]>(() => {
+    const board = this.board();
+    const currentGms = new Set(board.candidates.filter(isCurrentStaffingCandidate).map(candidate => candidate.gmUserId));
+    return board.availability.gms.filter(gm => !currentGms.has(gm.userId)).map(gm => ({
+      value: gm.userId,
+      label: getUserDisplayName(gm) || gm.userId,
+    }));
+  });
   protected readonly dayOptions = computed<ISelectOption<string>[]>(() =>
     this.board().schedule.days.map(day => ({ value: day.id, label: formatDateLabel(day.date, 'pl-PL', true) })),
   );
@@ -73,7 +79,8 @@ export class StaffingAdminProposal {
       finalize(() => this.isSaving.set(false)),
     ).subscribe({
       next: () => {
-        this.toast.success({ summary: this.i18n.copy().proposal.successSummary });
+        this.toast.success({ summary: this.i18n.commonStatus().success,
+          detail: this.i18n.copy().proposal.successSummary });
         this.created.emit();
       },
       error: () => this.toast.danger({

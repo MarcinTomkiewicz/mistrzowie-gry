@@ -26,6 +26,7 @@
     "staffing_admin_proposal_accepted": "[PH] Propozycja udziału w realizacji „{{realizationName}}” została przyjęta przez MG {{gmDisplayName}}.",
     "staffing_admin_proposal_rejected": "[PH] Propozycja udziału w realizacji „{{realizationName}}” została odrzucona przez MG {{gmDisplayName}}.",
     "staffing_candidate_message_created": "[PH] Nowa wiadomość w rozmowie dotyczącej udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}”.",
-    "staffing_final_plan_changed": "[PH] Zmieniono finalny plan udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}”."
+    "staffing_final_plan_changed": "[PH] Zmieniono finalny plan udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}”.",
+    "staffing_candidate_session_proposals_changed": "[PH] MG {{gmDisplayName}} zmienił propozycje sesji w realizacji „{{realizationName}}”."
   }
 }

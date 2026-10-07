@@ -1,0 +1,52 @@
+@let copy = i18n.copy().candidateDetail.sessionProposals;
+<section class="mg-card position-relative flex-col-start-stretch gap-sm p-md w-100 min-w-0"
+  [class.h-px-200]="isLoading()" [attr.aria-busy]="isLoading()">
+  <app-loading-overlay [visible]="isLoading()" [label]="i18n.commonStatus().loading" />
+  <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.title }}</h3>
+  @if (!isLoading()) {
+    @if (loadFailed()) {
+      <div class="flex-col-start-start gap-xs" role="alert">
+        <p class="m-0">{{ copy.loadFailed }}</p>
+        <p-button type="button" severity="secondary" size="small" icon="pi pi-refresh"
+          [label]="i18n.commonActions().retry" (onClick)="retry()" />
+      </div>
+    } @else {
+      @for (slot of slots(); track slot.slotId) {
+        <article class="flex-col-start-stretch gap-sm border radius-sm p-sm w-100 min-w-0">
+          <div class="flex-col-start-stretch gap-xs">
+            <h4 class="m-0">{{ slot.label }}</h4>
+            <small class="muted-text">{{ formatDateLabel(slot.date, 'pl-PL', true) }} - {{ formatTimeRangeLabel(slot.startTime, slot.endTime) }}</small>
+          </div>
+          @for (proposal of slot.mappings; track proposal.id) {
+            <div class="flex-col-start-stretch gap-xs">
+              <div class="flex-row-between-center flex-wrap gap-xs">
+                <div class="flex-col-start-start gap-xs min-w-0">
+                  @if (proposal.session; as session) {
+                    <strong>{{ session.title }} - {{ session.system.name }}</strong>
+                  } @else {
+                    <span class="text-wrap-anywhere">{{ proposal.sessionId }}</span>
+                  }
+                  <span class="tag-badge tag-badge--info">{{ i18n.sessionSelector().sources[proposal.sourceKind] }}</span>
+                </div>
+                @if (proposal.session) {
+                  <p-button type="button" severity="secondary" size="small" [text]="true" icon="pi pi-eye"
+                    [label]="i18n.commonCta().checkDetails" [attr.aria-expanded]="previewedProposalId() === proposal.id"
+                    (onClick)="previewedProposalId.set(previewedProposalId() === proposal.id ? null : proposal.id)" />
+                }
+              </div>
+              @if (previewedProposalId() === proposal.id) {
+                @if (proposal.session; as session) {
+                  <app-session-details [session]="session" [gmDisplayName]="gmDisplayName()" />
+                }
+              }
+            </div>
+          } @empty {
+            <p class="m-0 muted-text">{{ copy.emptyMappings }}</p>
+          }
+        </article>
+      } @empty {
+        <p class="m-0 muted-text">{{ copy.emptySlots }}</p>
+      }
+    }
+  }
+</section>

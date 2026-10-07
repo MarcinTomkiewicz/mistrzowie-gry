@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, defer, EMPTY, finalize, interval, map, Observable, of, tap, throwError } from 'rxjs';
 
 import { getStaffingParticipationActions } from '../../domain/staffing/participation';
+import { normalizeStaffingSessionMappings } from '../../domain/staffing/session-proposals';
 import type { MyStaffingCandidate, MyStaffingRealizationDetail } from '../../interfaces/my-staffing-realization';
 import type { ISelectOption } from '../../interfaces/i-select-option';
 import type {
@@ -15,7 +16,6 @@ import { MyStaffingRealizationRead } from '../../reads/staffing/my-staffing-real
 import { Platform } from '../../services/platform/platform';
 import { MyStaffingRealization } from '../../services/staffing/my-staffing-realization';
 import type { StaffingSessionProposalSlotDraft } from '../../types/staffing-session-proposal-draft';
-import { compareByPosition } from '../../utils/compare-by-position';
 import { getUserDisplayName } from '../../utils/user-display';
 
 @Injectable()
@@ -40,16 +40,20 @@ export class GmStaffingRealizationFacade {
   readonly sessionProposalCandidateId = computed(() => {
     const detail = this.detail();
     const candidate = detail?.candidate;
-    return candidate?.state === 'confirmed' &&
+    return candidate?.state === 'confirmed' && candidate.participation.active === true &&
       detail?.recruitmentPolicy?.sessionSelectionMode === 'gm_selects' ? candidate.id : null;
   });
   readonly sessionProposals = this.sessionProposalsSource.asReadonly();
   readonly sessionProposalsLoading = signal(false);
   readonly sessionProposalsLoadError = signal<unknown | null>(null);
-  readonly sessionProposalSlots = computed(() => this.sessionProposalDraftSource().map(slot => ({
-    ...slot,
-    selectedCount: slot.mappings.filter(mapping => mapping.selection !== null).length,
-  })));
+  readonly sessionProposalSlots = computed(() => {
+    const required = this.sessionProposals()?.requiredSessionMappingsPerSlot;
+    return this.sessionProposalDraftSource().map(slot => ({
+      ...slot,
+      selectedCount: slot.mappings.filter(mapping => mapping.selection !== null).length,
+      canAdd: required != null && slot.mappings.length < required,
+    }));
+  });
   private readonly sessionProposalPayload = computed<CandidateSlotSessionMappingInput[]>(() =>
     this.sessionProposalDraftSource().flatMap(slot => slot.mappings.flatMap(mapping => mapping.selection ? [{
       slotId: slot.slotId,
@@ -59,9 +63,12 @@ export class GmStaffingRealizationFacade {
     }] : [])),
   );
   readonly hasSessionProposalChanges = computed(() => {
-    const persisted = this.sessionProposals()?.slots.flatMap(slot => [...slot.mappings].sort(compareByPosition).map(mapping => ({
-      slotId: slot.slotId, sourceKind: mapping.sourceKind, sessionId: mapping.sessionId, position: mapping.position,
-    }))) ?? [];
+    const proposals = this.sessionProposals();
+    const persisted = proposals?.slots.flatMap(slot =>
+      normalizeStaffingSessionMappings(slot.mappings, proposals.requiredSessionMappingsPerSlot).map(mapping => ({
+        slotId: slot.slotId, sourceKind: mapping.sourceKind, sessionId: mapping.sessionId, position: mapping.position,
+      })),
+    ) ?? [];
     return JSON.stringify(this.sessionProposalPayload()) !== JSON.stringify(persisted);
   });
   readonly canEditSessionProposals = computed(() =>
@@ -164,7 +171,7 @@ export class GmStaffingRealizationFacade {
   }
 
   addSessionProposal(slotId: string): void {
-    if (!this.canEditSessionProposals()) return;
+    if (!this.canEditSessionProposals() || !this.sessionProposalSlots().find(slot => slot.slotId === slotId)?.canAdd) return;
     this.sessionProposalDraftSource.update(slots => slots.map(slot => slot.slotId === slotId ? {
       ...slot,
       mappings: [...slot.mappings, {
@@ -178,20 +185,26 @@ export class GmStaffingRealizationFacade {
   removeSessionProposal(slotId: string, key: string): void {
     if (!this.canEditSessionProposals()) return;
     this.sessionProposalDraftSource.update(slots => slots.map(slot => slot.slotId === slotId ? {
-      ...slot, mappings: slot.mappings.filter(mapping => mapping.key !== key),
+      ...slot,
+      mappings: slot.mappings.length === 1
+        ? slot.mappings.map(mapping => mapping.key === key ? { ...mapping, selection: null } : mapping)
+        : slot.mappings.filter(mapping => mapping.key !== key),
     } : slot));
   }
 
   resetSessionProposalDraft(): void {
     const proposals = this.sessionProposals();
-    this.sessionProposalDraftSource.set(proposals?.slots.map(slot => ({
-      ...slot,
-      mappings: slot.mappings.length ? [...slot.mappings].sort(compareByPosition).map(mapping => ({
-        key: mapping.id,
-        position: mapping.position,
-        selection: { sourceKind: mapping.sourceKind, sessionId: mapping.sessionId },
-      })) : proposals.editable ? [{ key: `draft-${this.nextSessionMappingKey++}`, position: 1, selection: null }] : [],
-    })) ?? []);
+    this.sessionProposalDraftSource.set(proposals?.slots.map(slot => {
+      const mappings = normalizeStaffingSessionMappings(slot.mappings, proposals.requiredSessionMappingsPerSlot);
+      return {
+        ...slot,
+        mappings: mappings.length ? mappings.map(mapping => ({
+          key: mapping.id,
+          position: mapping.position,
+          selection: { sourceKind: mapping.sourceKind, sessionId: mapping.sessionId },
+        })) : proposals.editable ? [{ key: `draft-${this.nextSessionMappingKey++}`, position: 1, selection: null }] : [],
+      };
+    }) ?? []);
   }
 
   saveSessionProposals(): Observable<StaffingCandidateSessionProposals> {

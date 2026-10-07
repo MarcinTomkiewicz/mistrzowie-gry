@@ -56,6 +56,12 @@ export class AdminStaffingRealization {
     });
   }
 
+  removeConfirmedParticipation(candidateId: string): Observable<StaffingCandidate> {
+    return this.backend.rpc<StaffingCandidate>(STAFFING_REALIZATION_RPC.removeAdminConfirmedParticipation, {
+      p_candidate_id: candidateId,
+    });
+  }
+
   open(realizationId: string): Observable<OpenAdminStaffingRealizationResult> {
     return this.backend.rpc<OpenAdminStaffingRealizationResult>(
       STAFFING_REALIZATION_RPC.openAdmin,

@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, effect, inject, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
@@ -13,7 +14,7 @@ import { createGmStaffingRealizationDetailI18n } from './gm-staffing-realization
 
 @Component({
   selector: 'app-gm-staffing-session-proposals',
-  imports: [ButtonModule, LoadingOverlay, StaffingSessionSelector],
+  imports: [NgTemplateOutlet, ButtonModule, LoadingOverlay, StaffingSessionSelector],
   templateUrl: './gm-staffing-session-proposals.html',
 })
 export class GmStaffingSessionProposals {
@@ -50,7 +51,10 @@ export class GmStaffingSessionProposals {
     this.facade.saveSessionProposals().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         if (this.facade.sessionProposalCandidateId() !== candidateId) return;
-        this.toast.success({ summary: this.i18n.copy().sessionProposals.saveSuccess });
+        this.toast.success({
+          summary: this.i18n.commonStatus().success,
+          detail: this.i18n.copy().sessionProposals.saveSuccess,
+        });
       },
       error: () => {
         if (this.facade.sessionProposalCandidateId() !== candidateId) return;

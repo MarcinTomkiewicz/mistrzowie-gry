@@ -1,0 +1,70 @@
+@let copy = i18n.copy();
+@let fields = copy.fields;
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+  <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.confirmedRoster.title }}</h3>
+  <div class="w-100 overflow-x-auto">
+    <p-table [value]="rows()" dataKey="candidate.id" tableStyleClass="mg-responsive-table"
+      [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
+      <ng-template #header>
+        <tr class="hide-down-sm">
+          <th scope="col" class="small-caps">{{ fields.gm }}</th>
+          <th scope="col" class="small-caps">{{ fields.scope }}</th>
+          <th scope="col" class="small-caps">{{ fields.availability }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonTable().actions }}</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row>
+        @let candidate = row.candidate;
+        <tr class="mg-responsive-table__row">
+          <th scope="row" class="mg-responsive-table__row-heading">
+            @if (row.gm; as gm) {
+              <strong>{{ getUserDisplayName(gm) || gm.userId }}</strong>
+            } @else {
+              <span class="muted-text">{{ copy.outsideRoster }}</span>
+              <small class="d-block muted-text text-wrap-anywhere">{{ candidate.gmUserId }}</small>
+            }
+          </th>
+          <td class="mg-responsive-table__cell">
+            <span class="mg-responsive-table__label small-caps font-bold">{{ fields.scope }}</span>
+            <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+              <span>{{ row.scopeLabel }}</span>
+              @if (candidate.scope.mode === 'selected_days') {
+                @for (day of row.days; track day.id) {
+                  <span>{{ formatDateLabel(day.date) }}</span>
+                }
+              }
+            </div>
+          </td>
+          <td class="mg-responsive-table__cell">
+            <span class="mg-responsive-table__label small-caps font-bold">{{ fields.availability }}</span>
+            <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+              @if (row.gm; as gm) {
+                <span [class]="'tag-badge ' + row.availabilityBadgeClass">{{ row.availabilityLabel }}</span>
+                <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-calendar"
+                  [label]="copy.availability.showSlots" (onClick)="availabilitySelected.emit(gm)" />
+              } @else {
+                <span class="muted-text">{{ copy.outsideRoster }}</span>
+              }
+            </div>
+          </td>
+          <td class="mg-responsive-table__cell">
+            <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+            <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+              <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
+                styleClass="w-100" [label]="copy.candidateDetail.show"
+                (onClick)="candidateSelected.emit(candidate.id)" />
+              @if (canRemove()) {
+                <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-demolish"
+                  styleClass="w-100" [label]="copy.confirmedRoster.remove" [disabled]="removingCandidateId() !== null"
+                  [loading]="removingCandidateId() === candidate.id" (onClick)="confirmRemoval($event, candidate)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr><td colspan="4"><p class="muted-text m-0" role="status">{{ copy.confirmedRoster.empty }}</p></td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>

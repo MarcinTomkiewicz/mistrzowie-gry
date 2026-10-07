@@ -120,7 +120,7 @@
 
     <div class="flex-row-start-center flex-wrap gap-sm">
       @if (actions()?.canSubmit) {
-        <p-button type="button" severity="success" icon="pi pi-check" [label]="copy.application.submit"
+        <p-button type="button" severity="success" icon="pi pi-send" [label]="copy.application.submit"
           [disabled]="facade.isMutating()" (onClick)="submitApplication()" />
       }
       @if (actions()?.canWithdrawApplication) {
@@ -128,7 +128,7 @@
           [label]="copy.application.withdraw" [disabled]="facade.isMutating()" (onClick)="confirmApplicationWithdrawal($event)" />
       }
       @if (actions()?.canDecideProposal) {
-        <p-button type="button" severity="success" icon="pi pi-check" [label]="copy.proposal.accept"
+        <p-button type="button" severity="success" icon="pi pi-done-it" [label]="copy.proposal.accept"
           [disabled]="facade.isMutating()" (onClick)="confirmProposalDecision($event, 'accepted')" />
         <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
           [label]="copy.proposal.reject" [disabled]="facade.isMutating()" (onClick)="confirmProposalDecision($event, 'rejected')" />

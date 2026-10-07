@@ -66,7 +66,7 @@
           <footer class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100">
             <p-button type="button" severity="danger" [outlined]="true" icon="pi pi-interdiction"
               [label]="i18n.commonActions().cancel" [disabled]="!canEdit() || !hasChanges()" (onClick)="cancel()" />
-            <p-button type="submit" severity="success" icon="pi pi-save" [label]="copy.save"
+            <p-button type="submit" severity="success" icon="pi pi-done-it" [label]="copy.save"
               [disabled]="!canEdit() || !hasChanges()" />
           </footer>
         }
