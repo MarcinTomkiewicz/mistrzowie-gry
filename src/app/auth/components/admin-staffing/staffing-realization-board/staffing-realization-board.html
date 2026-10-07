@@ -71,7 +71,7 @@
                 <th scope="col" class="small-caps">{{ fields.adminDecision }}</th>
                 <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
                 <th scope="col" class="small-caps">{{ fields.availability }}</th>
-                <th scope="col" class="small-caps">{{ i18n.commonTable().actions }}</th>
+                <th scope="col" class="small-caps text-right w-px-0 text-nowrap">{{ i18n.commonTable().actions }}</th>
               </tr>
             </ng-template>
             <ng-template #body let-row>
@@ -135,11 +135,11 @@
                     }
                   </div>
                 </td>
-                <td class="mg-responsive-table__cell">
+                <td class="mg-responsive-table__cell w-px-0 w-px-auto-sm text-nowrap text-wrap-anywhere-sm">
                   <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
-                  <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+                  <div class="mg-responsive-table__value flex-col-start-end flex-col-start-stretch-sm gap-xs">
                     <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
-                      styleClass="w-100" [label]="copy.candidateDetail.show" (onClick)="selectedCandidateId.set(candidate.id)" />
+                      styleClass="w-100-sm" [label]="copy.candidateDetail.show" (onClick)="selectedCandidateId.set(candidate.id)" />
                     <ng-container [ngTemplateOutlet]="candidateDecisionActions" [ngTemplateOutletContext]="{ $implicit: candidate }" />
                   </div>
                 </td>
@@ -258,10 +258,10 @@
 <ng-template #candidateDecisionActions let-candidate>
   @if (canDecideSelfApplication(candidate)) {
     <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-interdiction"
-      styleClass="w-100" [label]="copy.selfApplicationDecision.reject" [disabled]="isDeciding()"
+      styleClass="w-100-sm" [label]="copy.selfApplicationDecision.reject" [disabled]="isDeciding()"
       (onClick)="confirmSelfApplicationDecision($event, candidate, 'rejected')" />
     <p-button type="button" severity="success" size="small" icon="pi pi-done-it"
-      styleClass="w-100" [label]="copy.selfApplicationDecision.accept" [disabled]="isDeciding()"
+      styleClass="w-100-sm" [label]="copy.selfApplicationDecision.accept" [disabled]="isDeciding()"
       (onClick)="confirmSelfApplicationDecision($event, candidate, 'accepted')" />
   }
 </ng-template>

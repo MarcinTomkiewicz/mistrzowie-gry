@@ -28,7 +28,7 @@
   }
   <div class="flex-row-start-center flex-wrap gap-sm">
     @if (!facade.loadFailed() && selectedSession()) {
-      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-eye"
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-horus"
         [label]="showDetails() ? i18n.commonCta().showLess : i18n.commonCta().checkDetails"
         [attr.aria-expanded]="showDetails()" (onClick)="showDetails.set(!showDetails())" />
     }

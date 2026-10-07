@@ -235,6 +235,7 @@ export type AdminStaffingBoardCopy = {
     endedBy: string;
     sessionProposals: {
       title: string;
+      preview: string;
       emptySlots: string;
       emptyMappings: string;
       loadFailed: string;

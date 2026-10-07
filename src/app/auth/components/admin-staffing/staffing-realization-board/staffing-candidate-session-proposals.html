@@ -19,18 +19,17 @@
           </div>
           @for (proposal of slot.mappings; track proposal.id) {
             <div class="flex-col-start-stretch gap-xs">
-              <div class="flex-row-between-center flex-wrap gap-xs">
-                <div class="flex-col-start-start gap-xs min-w-0">
+              <div class="flex-row-start-start flex-nowrap flex-col-start-stretch-sm gap-xs">
+                <div class="flex-1 min-w-0 text-wrap-anywhere">
                   @if (proposal.session; as session) {
                     <strong>{{ session.title }} - {{ session.system.name }}</strong>
                   } @else {
                     <span class="text-wrap-anywhere">{{ proposal.sessionId }}</span>
                   }
-                  <span class="tag-badge tag-badge--info">{{ i18n.sessionSelector().sources[proposal.sourceKind] }}</span>
                 </div>
                 @if (proposal.session) {
-                  <p-button type="button" severity="secondary" size="small" [text]="true" icon="pi pi-eye"
-                    [label]="i18n.commonCta().checkDetails" [attr.aria-expanded]="previewedProposalId() === proposal.id"
+                  <p-button type="button" severity="secondary" size="small" [text]="true" icon="pi pi-horus" class="flex-none"
+                    [label]="copy.preview" [attr.aria-expanded]="previewedProposalId() === proposal.id"
                     (onClick)="previewedProposalId.set(previewedProposalId() === proposal.id ? null : proposal.id)" />
                 }
               </div>

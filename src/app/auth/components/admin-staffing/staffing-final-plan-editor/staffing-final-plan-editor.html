@@ -76,7 +76,7 @@
           <div class="flex-row-between-center flex-wrap gap-sm">
             <h4 class="mg-section__title mg-section__title--sm m-0">{{ copy.changes.title }}</h4>
             @if (changes.length) {
-              <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
+              <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-horus"
                 [label]="copy.preview" [attr.aria-expanded]="showChangeDetails()" (onClick)="showChangeDetails.set(!showChangeDetails())" />
             }
           </div>

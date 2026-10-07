@@ -84,7 +84,7 @@
     "description": "[PH] Określ zasady zgłoszeń Mistrzów Gry i wymagania dotyczące proponowanych sesji.",
     "travelHint": "[PH] Udział w realizacji wyjazdowej obejmuje cały wyjazd. Nie można zgłosić udziału tylko w wybranych dniach.",
     "saveCoreTypeHint": "[PH] Przed zapisem zasad rekrutacji zapisz zmianę typu realizacji w Danych podstawowych.",
-    "sessionsHint": "[PH] Po potwierdzeniu udziału MG przedstawia wymaganą liczbę propozycji sesji dla każdego objętego slotu.",
+    "sessionsHint": "[PH] Po potwierdzeniu udziału MG przedstawia co najmniej wymaganą liczbę propozycji sesji dla każdego objętego slotu.",
     "fields": {
       "selfApplicationEnabled": "[PH] MG mogą zgłaszać udział",
       "stationaryScopePolicy": "[PH] Zakres zgłoszenia",
@@ -261,6 +261,7 @@
       "endedBy": "[PH] Osoba kończąca udział (ID)",
       "sessionProposals": {
         "title": "[PH] Propozycje sesji MG",
+        "preview": "[PH] Podgląd sesji",
         "emptySlots": "[PH] Ta kandydatura nie ma slotów z propozycjami sesji.",
         "emptyMappings": "[PH] MG nie zaproponował sesji dla tego slotu.",
         "loadFailed": "[PH] Nie udało się załadować propozycji sesji MG"
@@ -332,12 +333,16 @@
     "saveSuccess": "[PH] Finalny plan został zapisany",
     "saveFailed": "[PH] Nie udało się zapisać finalnego planu",
     "preview": "[PH] Podgląd sesji",
+    "chooseOtherSession": "[PH] Wybierz inną sesję",
     "proposal": {
       "title": "[PH] Pierwotne propozycje MG dla tego slotu",
-      "empty": "[PH] MG nie zaproponował sesji dla tego slotu."
+      "empty": "[PH] MG nie zaproponował sesji dla tego slotu.",
+      "accept": "[PH] Wybierz tę sesję",
+      "replace": "[PH] Podmień sesję",
+      "selected": "[PH] Wybrana sesja"
     },
     "override": {
-      "title": "[PH] Zmiany sesji tylko dla tej realizacji",
+      "title": "[PH] Dostosuj sesję dla tej realizacji",
       "hint": "[PH] Uzupełnij tylko zmieniane pola. Puste pola zachowują wartości zapisanej sesji. Zmiany nie modyfikują katalogu sesji ani propozycji MG.",
       "inherit": "[PH] Zachowaj wartość sesji",
       "image": "[PH] Obraz sesji"

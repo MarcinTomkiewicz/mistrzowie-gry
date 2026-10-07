@@ -36,11 +36,14 @@
               <span>{{ formatDateLabel(slot.date, 'pl-PL', true) }} - {{ formatTimeRangeLabel(slot.startTime, slot.endTime) }}</span>
             </div>
             @if (proposals.requiredSessionMappingsPerSlot !== null) {
-              <span class="tag-badge"
-                [class.tag-badge--success]="slot.selectedCount >= proposals.requiredSessionMappingsPerSlot"
-                [class.tag-badge--warn]="slot.selectedCount < proposals.requiredSessionMappingsPerSlot">
-                {{ copy.selectedCount }}: {{ slot.selectedCount }} / {{ proposals.requiredSessionMappingsPerSlot }}
-              </span>
+              <div class="flex-col-start-start gap-xs">
+                <span class="tag-badge"
+                  [class.tag-badge--success]="slot.selectedCount >= proposals.requiredSessionMappingsPerSlot"
+                  [class.tag-badge--warn]="slot.selectedCount < proposals.requiredSessionMappingsPerSlot">
+                  {{ copy.selectedCount }}: {{ slot.selectedCount }}
+                </span>
+                <span class="muted-text">{{ copy.requiredPerSlot }}: {{ proposals.requiredSessionMappingsPerSlot }}</span>
+              </div>
             }
           </div>
           @for (mapping of slot.mappings; track mapping.key; let last = $last) {
@@ -53,7 +56,7 @@
                   [label]="i18n.commonActions().removeItem" [disabled]="!facade.canEditSessionProposals()"
                   (onClick)="facade.removeSessionProposal(slot.slotId, mapping.key)" />
               }
-              @if (proposals.editable && slot.canAdd && last) {
+              @if (proposals.editable && last) {
                 <div staffingSessionFooterActions>
                   <ng-container [ngTemplateOutlet]="addProposal" [ngTemplateOutletContext]="{ $implicit: slot.slotId }" />
                 </div>
@@ -61,7 +64,7 @@
             </app-staffing-session-selector>
           } @empty {
             <p class="m-0 muted-text">{{ copy.emptyMappings }}</p>
-            @if (proposals.editable && slot.canAdd) {
+            @if (proposals.editable) {
               <div>
                 <ng-container [ngTemplateOutlet]="addProposal" [ngTemplateOutletContext]="{ $implicit: slot.slotId }" />
               </div>

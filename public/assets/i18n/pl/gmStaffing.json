@@ -130,8 +130,8 @@
     },
     "sessionProposals": {
       "title": "[PH] Propozycje sesji",
-      "hint": "[PH] Wskaż sesje dla slotów objętych Twoim udziałem. Możesz zapisać także niekompletne propozycje.",
-      "requiredPerSlot": "[PH] Wymagana liczba propozycji na każdy slot",
+      "hint": "[PH] Wskaż co najmniej wymaganą liczbę propozycji sesji dla każdego slotu objętego Twoim udziałem. Możesz zapisać także niekompletne propozycje.",
+      "requiredPerSlot": "[PH] Minimalna liczba propozycji na każdy slot",
       "selectedCount": "[PH] Wybrane propozycje",
       "complete": "[PH] Zapisane propozycje są kompletne",
       "incomplete": "[PH] Zapisane propozycje są niekompletne",
@@ -144,6 +144,6 @@
       "saveFailed": "[PH] Nie udało się zapisać propozycji sesji",
       "saveSuccess": "[PH] Propozycje sesji zostały zapisane"
     },
-    "sessionProposalHint": "[PH] Sesje wybiera MG po potwierdzeniu udziału. Zgłoszenie udziału nie wymaga wskazania sesji."
+    "sessionProposalHint": "[PH] Po potwierdzeniu udziału MG przedstawia co najmniej wymaganą liczbę propozycji sesji dla każdego objętego slotu. Zgłoszenie udziału nie wymaga wskazania sesji."
   }
 }

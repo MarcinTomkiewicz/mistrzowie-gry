@@ -6,7 +6,6 @@ import { finalize } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { SessionDetails } from '../../../../common/session-details/session-details';
-import { normalizeStaffingSessionMappings } from '../../../../core/domain/staffing/session-proposals';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { mapStaffingFinalSessionOverrideToInput } from '../../../../core/factories/staffing-final-plan-form.factory';
 import type { AdminStaffingFinalPlanAssignment } from '../../../../core/interfaces/admin-staffing-final-plan';
@@ -14,8 +13,10 @@ import type { AdminStaffingRealizationBoard } from '../../../../core/interfaces/
 import type { ISelectOption } from '../../../../core/interfaces/i-select-option';
 import type { SessionDetailsData } from '../../../../core/interfaces/i-session';
 import type { StaffingCandidateSessionOptions } from '../../../../core/interfaces/staffing-candidate-session-options';
+import type { StaffingCandidateSessionMapping } from '../../../../core/interfaces/staffing-candidate-session-proposals';
 import type { SessionSourceKind } from '../../../../core/types/session-source';
 import type { StaffingFinalPlanItemDraft, StaffingFinalPlanItemForm } from '../../../../core/types/staffing-final-plan-form';
+import { compareByPosition } from '../../../../core/utils/compare-by-position';
 import { sessionPlayersRangeValidator } from '../../../../core/validators/session-players-range.validator';
 import { createStaffingFinalPlanEditorI18n } from './staffing-final-plan-editor.i18n';
 import { StaffingFinalSessionOverrideEditor } from './staffing-final-session-override-editor';
@@ -45,6 +46,7 @@ export class StaffingFinalPlanAssignmentEditor {
   protected readonly showDetails = signal(false);
   protected readonly previewedProposalId = signal<string | null>(null);
   protected readonly showOverride = signal(false);
+  protected readonly showOtherSession = signal(false);
   protected readonly controlId = computed(() => {
     const value = this.draft();
     return `staffing-final-${value?.id ?? `${value?.slotId}-${value?.position}`}`;
@@ -105,14 +107,18 @@ export class StaffingFinalPlanAssignmentEditor {
   });
   protected readonly proposalRows = computed(() => {
     const options = this.options();
-    const slotId = this.draft()?.slotId;
+    const draft = this.draft();
     if (!options) return [];
-    const mappings = options.proposals.slots.find(slot => slot.slotId === slotId)?.mappings ?? [];
-    return normalizeStaffingSessionMappings(mappings, options.proposals.requiredSessionMappingsPerSlot).map(mapping => ({
+    const mappings = options.proposals.slots.find(slot => slot.slotId === draft?.slotId)?.mappings ?? [];
+    return [...mappings].sort(compareByPosition).map(mapping => ({
       ...mapping,
+      selected: mapping.sourceKind === draft?.sourceKind && mapping.sessionId === draft?.sessionId,
       session: options.sessions[mapping.sourceKind].find(session => session.id === mapping.sessionId) ?? null,
     }));
   });
+  protected readonly sessionSummary = computed(() =>
+    this.proposalRows().some(proposal => proposal.selected) ? null : this.preview(),
+  );
 
   constructor() {
     effect(onCleanup => {
@@ -132,6 +138,7 @@ export class StaffingFinalPlanAssignmentEditor {
       this.retryVersion();
       this.options.set(null);
       this.previewedProposalId.set(null);
+      this.showOtherSession.set(false);
       this.loadFailed.set(false);
       if (!candidate) return;
       this.isLoading.set(true);
@@ -143,6 +150,15 @@ export class StaffingFinalPlanAssignmentEditor {
       });
       onCleanup(() => request.unsubscribe());
     });
+  }
+
+  protected selectProposal(proposal: StaffingCandidateSessionMapping): void {
+    if (!this.editable()) return;
+    const form = this.form();
+    form.markAsDirty();
+    form.patchValue({ sourceKind: proposal.sourceKind, sessionId: proposal.sessionId });
+    this.resetOverride();
+    this.showOtherSession.set(false);
   }
 
   protected resetSession(): void {

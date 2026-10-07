@@ -1,6 +1,6 @@
 @let copy = i18n.copy();
 @let fields = copy.fields;
-<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+<section class="flex-col-start-stretch gap-sm w-100 min-w-0">
   <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.confirmedRoster.title }}</h3>
   <div class="w-100 overflow-x-auto">
     <p-table [value]="rows()" dataKey="candidate.id" tableStyleClass="mg-responsive-table"
@@ -10,7 +10,7 @@
           <th scope="col" class="small-caps">{{ fields.gm }}</th>
           <th scope="col" class="small-caps">{{ fields.scope }}</th>
           <th scope="col" class="small-caps">{{ fields.availability }}</th>
-          <th scope="col" class="small-caps">{{ i18n.commonTable().actions }}</th>
+          <th scope="col" class="small-caps text-right w-px-0 text-nowrap">{{ i18n.commonTable().actions }}</th>
         </tr>
       </ng-template>
       <ng-template #body let-row>
@@ -47,15 +47,15 @@
               }
             </div>
           </td>
-          <td class="mg-responsive-table__cell">
+          <td class="mg-responsive-table__cell w-px-0 w-px-auto-sm text-nowrap text-wrap-anywhere-sm">
             <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
-            <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+            <div class="mg-responsive-table__value flex-col-start-end flex-col-start-stretch-sm gap-xs">
               <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-eye"
-                styleClass="w-100" [label]="copy.candidateDetail.show"
+                styleClass="w-100-sm" [label]="copy.candidateDetail.show"
                 (onClick)="candidateSelected.emit(candidate.id)" />
               @if (canRemove()) {
                 <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-demolish"
-                  styleClass="w-100" [label]="copy.confirmedRoster.remove" [disabled]="removingCandidateId() !== null"
+                  styleClass="w-100-sm" [label]="copy.confirmedRoster.remove" [disabled]="removingCandidateId() !== null"
                   [loading]="removingCandidateId() === candidate.id" (onClick)="confirmRemoval($event, candidate)" />
               }
             </div>

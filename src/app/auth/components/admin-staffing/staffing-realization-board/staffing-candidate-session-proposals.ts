@@ -4,14 +4,10 @@ import { finalize } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { SessionDetails } from '../../../../common/session-details/session-details';
-import { normalizeStaffingSessionMappings } from '../../../../core/domain/staffing/session-proposals';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import type { StaffingCandidate } from '../../../../core/interfaces/staffing-candidate';
 import type { StaffingCandidateSessionOptions } from '../../../../core/interfaces/staffing-candidate-session-options';
-import { createCommonCtaI18n } from '../../../../core/translations/common.i18n';
-import { createScopedObjectI18n } from '../../../../core/translations/scoped.i18n';
-import { GM_STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
-import type { StaffingSessionSelectorCopy } from '../../../../core/types/i18n/gm-staffing';
+import { compareByPosition } from '../../../../core/utils/compare-by-position';
 import { formatDateLabel } from '../../../../core/utils/date';
 import { formatTimeRangeLabel } from '../../../../core/utils/time-format';
 import { createStaffingRealizationBoardI18n } from './staffing-realization-board.i18n';
@@ -29,11 +25,7 @@ export class StaffingCandidateSessionProposals {
   readonly candidate = input.required<StaffingCandidate>();
   readonly gmDisplayName = input<string | null>(null);
 
-  protected readonly i18n = {
-    ...createStaffingRealizationBoardI18n(),
-    sessionSelector: createScopedObjectI18n<StaffingSessionSelectorCopy>(GM_STAFFING_SCOPE, 'sessionSelector'),
-    commonCta: createCommonCtaI18n(),
-  };
+  protected readonly i18n = createStaffingRealizationBoardI18n();
   protected readonly isLoading = signal(true);
   protected readonly loadFailed = signal(false);
   protected readonly previewedProposalId = signal<string | null>(null);
@@ -44,7 +36,7 @@ export class StaffingCandidateSessionProposals {
     if (!options) return [];
     return options.proposals.slots.map(slot => ({
       ...slot,
-      mappings: normalizeStaffingSessionMappings(slot.mappings, options.proposals.requiredSessionMappingsPerSlot).map(mapping => ({
+      mappings: [...slot.mappings].sort(compareByPosition).map(mapping => ({
         ...mapping,
         session: options.sessions[mapping.sourceKind].find(session => session.id === mapping.sessionId) ?? null,
       })),

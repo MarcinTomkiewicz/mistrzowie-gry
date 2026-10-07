@@ -22,7 +22,8 @@ export type StaffingFinalPlanCopy = {
   saveSuccess: string;
   saveFailed: string;
   preview: string;
-  proposal: { title: string; empty: string };
+  chooseOtherSession: string;
+  proposal: { title: string; empty: string; accept: string; replace: string; selected: string };
   override: { title: string; hint: string; inherit: string; image: string };
   changes: {
     title: string;
