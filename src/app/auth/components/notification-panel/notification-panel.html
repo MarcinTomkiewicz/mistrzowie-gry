@@ -26,7 +26,7 @@
       @for (notification of notifications.notifications(); track notification.id) {
         <li class="li--unset mg-card flex-col-start-stretch gap-xs p-sm">
           <span [class.font-bold]="notification.readAt === null">
-            {{ presentation[notification.eventType].translationKey | transloco }}
+            {{ presentation[notification.eventType].translationKey | transloco: presentation[notification.eventType].resolveParams?.(notification.payload) }}
           </span>
           <time class="text-muted" [attr.datetime]="notification.createdAt">
             {{ formatTimestamp(notification.createdAt) }}

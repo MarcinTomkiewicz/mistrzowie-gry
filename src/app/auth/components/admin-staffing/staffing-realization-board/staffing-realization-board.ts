@@ -1,5 +1,5 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -33,6 +33,10 @@ import { createStaffingRealizationBoardI18n } from './staffing-realization-board
 export class StaffingRealizationBoard {
   protected readonly facade = inject(StaffingRealizationEditorFacade);
   private readonly route = inject(ActivatedRoute);
+  private readonly routeCandidateId = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('candidateId'))),
+    { requireSync: true },
+  );
   private readonly destroyRef = inject(DestroyRef);
   private readonly toast = inject(UiToast);
   private readonly confirm = inject(UiConfirm);
@@ -105,6 +109,11 @@ export class StaffingRealizationBoard {
   });
 
   constructor() {
+    effect(() => {
+      const board = this.board();
+      const candidateId = this.routeCandidateId();
+      this.selectedCandidateId.set(board?.candidates.find((candidate) => candidate.id === candidateId)?.id ?? null);
+    });
     this.route.parent?.paramMap.pipe(
       map((params) => params.get('realizationId') ?? ''),
       distinctUntilChanged(),

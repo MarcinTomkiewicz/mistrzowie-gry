@@ -7,7 +7,35 @@ export type NotificationEventType =
   | 'signed_document_accepted'
   | 'onboarding_completed'
   | 'shared_documents_assigned'
-  | 'shared_documents_acknowledged';
+  | 'shared_documents_acknowledged'
+  | 'staffing_self_application_submitted'
+  | 'staffing_self_application_accepted'
+  | 'staffing_self_application_rejected'
+  | 'staffing_admin_proposal_created'
+  | 'staffing_admin_proposal_accepted'
+  | 'staffing_admin_proposal_rejected'
+  | 'staffing_candidate_message_created'
+  | 'staffing_final_plan_changed';
+
+export interface StaffingRealizationNotificationPayload {
+  realizationId: string;
+  realizationName: string;
+  gmUserId: string;
+  gmDisplayName: string;
+}
+
+export interface StaffingCandidateNotificationPayload extends StaffingRealizationNotificationPayload {
+  candidateId: string;
+}
+
+export interface StaffingCandidateMessageNotificationPayload extends StaffingCandidateNotificationPayload {
+  messageId: string;
+  authorUserId: string;
+}
+
+export type NotificationEventParams = Pick<
+  StaffingRealizationNotificationPayload, 'realizationName' | 'gmDisplayName'
+>;
 
 export type Notification = {
   id: string;
@@ -28,4 +56,5 @@ export type NotificationRpcRow = {
 export type NotificationPresentation = {
   translationKey: `notifications.events.${NotificationEventType}`;
   resolveRoute: (payload: Notification['payload']) => string;
+  resolveParams?: (payload: Notification['payload']) => NotificationEventParams;
 };

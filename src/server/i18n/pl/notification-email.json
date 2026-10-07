@@ -52,5 +52,53 @@
     "heading": "Potwierdzono zapoznanie z dokumentem wspólnym",
     "body": "Współpracownik potwierdził zapoznanie się z dokumentem wspólnym. Szczegóły znajdziesz w panelu współpracowników.",
     "ctaLabel": "Otwórz onboarding"
+  },
+  "staffing_self_application_submitted": {
+    "subjectLabel": "[PH] Nowe zgłoszenie do realizacji „{{realizationName}}”",
+    "heading": "[PH] Nowe zgłoszenie MG {{gmDisplayName}}",
+    "body": "[PH] MG {{gmDisplayName}} zgłasza udział w realizacji „{{realizationName}}”. Przejdź do szczegółów kandydatury, aby zapoznać się ze zgłoszeniem.",
+    "ctaLabel": "[PH] Zobacz kandydaturę"
+  },
+  "staffing_self_application_accepted": {
+    "subjectLabel": "[PH] Zaakceptowano zgłoszenie do realizacji „{{realizationName}}”",
+    "heading": "[PH] Zgłoszenie MG {{gmDisplayName}} zostało zaakceptowane",
+    "body": "[PH] Zgłoszenie MG {{gmDisplayName}} do realizacji „{{realizationName}}” zostało zaakceptowane. Przejdź do zakładki Udział, aby sprawdzić aktualny stan udziału.",
+    "ctaLabel": "[PH] Zobacz udział"
+  },
+  "staffing_self_application_rejected": {
+    "subjectLabel": "[PH] Odrzucono zgłoszenie do realizacji „{{realizationName}}”",
+    "heading": "[PH] Zgłoszenie MG {{gmDisplayName}} zostało odrzucone",
+    "body": "[PH] Zgłoszenie MG {{gmDisplayName}} do realizacji „{{realizationName}}” zostało odrzucone. Szczegóły udziału znajdziesz w panelu realizacji.",
+    "ctaLabel": "[PH] Zobacz udział"
+  },
+  "staffing_admin_proposal_created": {
+    "subjectLabel": "[PH] Propozycja udziału w realizacji „{{realizationName}}”",
+    "heading": "[PH] Nowa propozycja udziału MG {{gmDisplayName}}",
+    "body": "[PH] Koordynator proponuje udział MG {{gmDisplayName}} w realizacji „{{realizationName}}”. Przejdź do zakładki Udział, aby zapoznać się z propozycją i podjąć decyzję.",
+    "ctaLabel": "[PH] Zobacz udział"
+  },
+  "staffing_admin_proposal_accepted": {
+    "subjectLabel": "[PH] Przyjęto propozycję udziału w realizacji „{{realizationName}}”",
+    "heading": "[PH] MG {{gmDisplayName}} - propozycja przyjęta",
+    "body": "[PH] Propozycja udziału w realizacji „{{realizationName}}” została przyjęta przez MG {{gmDisplayName}}. Aktualny stan kandydatury znajdziesz na boardzie realizacji.",
+    "ctaLabel": "[PH] Zobacz kandydaturę"
+  },
+  "staffing_admin_proposal_rejected": {
+    "subjectLabel": "[PH] Odrzucono propozycję udziału w realizacji „{{realizationName}}”",
+    "heading": "[PH] MG {{gmDisplayName}} - propozycja odrzucona",
+    "body": "[PH] Propozycja udziału w realizacji „{{realizationName}}” została odrzucona przez MG {{gmDisplayName}}. Szczegóły kandydatury znajdziesz na boardzie realizacji.",
+    "ctaLabel": "[PH] Zobacz kandydaturę"
+  },
+  "staffing_candidate_message_created": {
+    "subjectLabel": "[PH] Nowa wiadomość dotycząca realizacji „{{realizationName}}”",
+    "heading": "[PH] Nowa wiadomość dotycząca udziału MG {{gmDisplayName}}",
+    "body": "[PH] W rozmowie dotyczącej udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}” pojawiła się nowa wiadomość. Przejdź do rozmowy, aby przeczytać jej treść.",
+    "ctaLabel": "[PH] Zobacz rozmowę"
+  },
+  "staffing_final_plan_changed": {
+    "subjectLabel": "[PH] Zmiana finalnego planu realizacji „{{realizationName}}”",
+    "heading": "[PH] Zmieniono finalny plan udziału MG {{gmDisplayName}}",
+    "body": "[PH] Zmieniono finalny plan lub harmonogram dotyczący udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}”. Przejdź do panelu realizacji, aby sprawdzić aktualny kontekst udziału.",
+    "ctaLabel": "[PH] Zobacz realizację"
   }
 }

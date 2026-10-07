@@ -10,9 +10,16 @@ const emailCopy: NotificationEmailTranslations = emailTranslations;
 export function buildNotificationEmail(
   notification: Pick<NotificationEmailClaim, 'event_type' | 'payload'>,
 ) {
-  const copy = emailCopy[notification.event_type];
-  const route = NOTIFICATION_PRESENTATION[notification.event_type]
-    .resolveRoute(notification.payload);
+  const template = emailCopy[notification.event_type];
+  const presentation = NOTIFICATION_PRESENTATION[notification.event_type];
+  const params = presentation.resolveParams?.(notification.payload) ?? {};
+  const copy = {
+    subjectLabel: interpolateNotificationCopy(template.subjectLabel, params),
+    heading: interpolateNotificationCopy(template.heading, params),
+    body: interpolateNotificationCopy(template.body, params),
+    ctaLabel: interpolateNotificationCopy(template.ctaLabel, params),
+  };
+  const route = presentation.resolveRoute(notification.payload);
   const url = buildSiteUrl(route);
 
   return {
@@ -36,4 +43,12 @@ export function buildNotificationEmail(
       `,
     }),
   };
+}
+
+function interpolateNotificationCopy(template: string, params: Record<string, string>): string {
+  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_placeholder: string, key: string) => {
+    const value = params[key];
+    if (value === undefined) throw new TypeError(`Missing notification copy parameter: ${key}.`);
+    return value;
+  });
 }
