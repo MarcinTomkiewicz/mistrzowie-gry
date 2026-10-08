@@ -1,3 +1,4 @@
+import { DEFAULT_TIMEZONE } from '../../configs/time.config';
 import {
   IUserWorkLogDay,
   IUserWorkLogMonthScope,
@@ -11,11 +12,9 @@ import {
 } from '../../types/work-log';
 import {
   addDays,
-  addMonths,
   endOfMonth,
   formatMonthLabel,
   parseIsoDate,
-  startOfMonth,
   toIsoDate,
 } from '../../utils/date';
 import {
@@ -23,12 +22,20 @@ import {
   getHourOffsetDuration,
   getHourOffsetMutationError,
 } from '../../utils/hour-offset';
+import { getTimeZoneWallTime } from '../../utils/time-zone';
 
 export function getWorkLogMonthScope(
   monthOffset: WorkLogMonthOffset,
   baseDate: Date = new Date(),
 ): IUserWorkLogMonthScope {
-  const monthStart = startOfMonth(addMonths(baseDate, monthOffset));
+  const warsawDate = new Date(
+    getTimeZoneWallTime(baseDate.getTime(), DEFAULT_TIMEZONE),
+  );
+  const monthStart = new Date(
+    warsawDate.getUTCFullYear(),
+    warsawDate.getUTCMonth() + monthOffset,
+    1,
+  );
   const monthEnd = endOfMonth(monthStart);
   const days: string[] = [];
 
@@ -46,7 +53,7 @@ export function getWorkLogMonthScope(
     endDate: toIsoDate(monthEnd),
     days,
     label: formatMonthLabel(monthStart),
-    isEditable: canEditWorkLogMonth(monthOffset, baseDate),
+    isEditable: monthOffset === 0 || warsawDate.getUTCDate() <= 5,
   };
 }
 
@@ -92,11 +99,4 @@ export function getWorkLogTotalHours(
   days: readonly Pick<IUserWorkLogDay, 'ranges'>[],
 ): number {
   return days.reduce((total, day) => total + getWorkLogDayHours(day), 0);
-}
-
-function canEditWorkLogMonth(
-  monthOffset: WorkLogMonthOffset,
-  baseDate: Date = new Date(),
-): boolean {
-  return monthOffset === 0 || baseDate.getDate() <= 5;
 }

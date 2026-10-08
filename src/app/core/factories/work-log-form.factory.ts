@@ -7,7 +7,6 @@ import {
   WorkLogFormRecord,
   WorkLogRangeFormGroup,
 } from '../types/work-log-form';
-import { upsertWorkLogDay } from '../domain/work-log/mapping';
 import { isChaoticThursdayDate } from '../domain/work-log/rules';
 
 export function createWorkLogRangeFormGroup(
@@ -64,17 +63,17 @@ export function resetWorkLogDayForm(dayForm: WorkLogDayFormGroup): void {
 export function mapWorkLogFormToDays(
   form: WorkLogFormRecord,
 ): IUserWorkLogDay[] {
-  return Object.entries(form.getRawValue()).reduce<IUserWorkLogDay[]>(
-    (days, [date, day]) =>
-      upsertWorkLogDay(days, {
-        id: day.id ?? undefined,
-        date,
-        ranges: day.ranges,
-        isChaoticThursday: day.isChaoticThursday,
-        comment: day.comment,
-      }),
-    [],
-  );
+  return Object.entries(form.getRawValue())
+    .map(([date, day]) => ({
+      id: day.id ?? undefined,
+      date,
+      ranges: [...day.ranges].sort(
+        (left, right) => left.startOffset - right.startOffset,
+      ),
+      isChaoticThursday: day.isChaoticThursday,
+      comment: day.comment.trim() || null,
+    }))
+    .sort((left, right) => left.date.localeCompare(right.date));
 }
 
 export function placeWorkLogRangeFormGroupChronologically(

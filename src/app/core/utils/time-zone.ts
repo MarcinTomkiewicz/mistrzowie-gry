@@ -91,7 +91,7 @@ export function createLocalDateTimeRangeIso(
   };
 }
 
-function getTimeZoneWallTime(timestamp: number, timeZone: string): number {
+export function getTimeZoneWallTime(timestamp: number, timeZone: string): number {
   const instant = new Date(timestamp);
   const parts = new Map<string, number>(
     new Intl.DateTimeFormat('en-CA-u-ca-gregory-nu-latn', {

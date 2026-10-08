@@ -1,29 +1,38 @@
+import { AppRole } from '../types/app-role';
 import { HourOffsetDay } from '../types/hour-offset';
 import { WorkLogMonthOffset, WorkLogRangeDraft } from '../types/work-log';
-import { IUser } from './i-user';
+
+export interface IWorkLogOverviewUser {
+  id: string;
+  appRole: AppRole;
+  firstName: string | null;
+  nickname: string | null;
+  useNickname: boolean | null;
+  createdAt: string | null;
+}
 
 export interface IUserWorkLogRangeRecord {
-  id?: string;
+  id: string;
   workLogId: string;
   startsAt: string;
   endsAt: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUserWorkLogRecord {
-  id?: string;
+  id: string;
   userId: string;
   workDate: string;
   isChaoticThursday: boolean;
-  comment?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  userWorkLogRanges?: readonly IUserWorkLogRangeRecord[];
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+  userWorkLogRanges: readonly IUserWorkLogRangeRecord[];
 }
 
 export interface IWorkLogOverviewData {
-  users: IUser[];
+  users: IWorkLogOverviewUser[];
   records: IUserWorkLogRecord[];
 }
 
@@ -56,7 +65,7 @@ export interface IUserWorkLogRowVm {
 }
 
 export interface IUserWorkLogOverviewVm {
-  user: IUser;
+  user: IWorkLogOverviewUser;
   days: readonly IUserWorkLogDay[];
   totalHours: number;
 }
