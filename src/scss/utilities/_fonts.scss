@@ -40,6 +40,24 @@ $text-transforms: (
   }
 }
 
+@each $breakpoint in map.keys(v.$breakpoints) {
+  @include m.up($breakpoint) {
+    @each $name, $value in $text-sizes {
+      .text-#{$name}-up-#{$breakpoint} {
+        font-size: $value !important;
+      }
+    }
+  }
+
+  @include m.down($breakpoint) {
+    @each $name, $value in $text-sizes {
+      .text-#{$name}-down-#{$breakpoint} {
+        font-size: $value !important;
+      }
+    }
+  }
+}
+
 /* =========================================================
    FONT WEIGHT
    ========================================================= */

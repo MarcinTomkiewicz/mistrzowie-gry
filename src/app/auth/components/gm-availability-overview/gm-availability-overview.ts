@@ -25,7 +25,7 @@ import {
   toLocalDayStartIso,
 } from '../../../core/utils/date';
 import {
-  mapGmAvailabilityDaysToCalendarDays,
+  mapGmAvailabilityOverviewToCalendarDays,
   mapGmAvailabilityRecordsToCoveredDays,
 } from '../../../core/domain/gm-availability/mapping';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
@@ -59,6 +59,7 @@ export class GmAvailabilityOverview {
   protected readonly i18n = createGmAvailabilityOverviewI18n();
   protected readonly isLoading = signal(true);
   protected readonly selectedDate = signal<string | null>(null);
+  protected readonly visibleDates = signal<readonly string[]>([]);
   protected readonly selectedGmControl = new FormControl<string | null>(null);
   private readonly selectedGmId = toSignal(
     this.selectedGmControl.valueChanges,
@@ -91,14 +92,6 @@ export class GmAvailabilityOverview {
       })),
   );
 
-  private readonly filteredRecords = computed(() =>
-    this.selectedGmId()
-      ? this.availabilityRecords().filter(
-          (record) => record.gmProfileId === this.selectedGmId(),
-        )
-      : this.availabilityRecords(),
-  );
-
   private readonly allDaysByGmId = computed(() => {
     const daysByGmId = new Map<string, readonly IGmAvailabilityDay[]>();
     const gmProfileIds = [
@@ -119,22 +112,31 @@ export class GmAvailabilityOverview {
     return daysByGmId;
   });
 
+  private readonly filteredDaysByGmId = computed(() => {
+    const selectedGmId = this.selectedGmId();
+
+    return new Map(
+      [...this.allDaysByGmId()].filter(
+        ([gmProfileId]) => !selectedGmId || gmProfileId === selectedGmId,
+      ),
+    );
+  });
+
   protected readonly calendarDays = computed(() =>
-    mapGmAvailabilityDaysToCalendarDays(
-      mapGmAvailabilityRecordsToCoveredDays(this.filteredRecords()),
+    mapGmAvailabilityOverviewToCalendarDays(
+      this.filteredDaysByGmId(),
+      this.visibleDates(),
     ),
   );
 
   protected readonly selectedDayEntries = computed(() => {
     const selectedDate = this.selectedDate();
-    const selectedGmId = this.selectedGmId();
 
     if (!selectedDate) {
       return [];
     }
 
-    return [...this.allDaysByGmId().entries()]
-      .filter(([gmProfileId]) => !selectedGmId || gmProfileId === selectedGmId)
+    return [...this.filteredDaysByGmId().entries()]
       .map(([gmProfileId, days]) => {
         const day = days.find((entry) => entry.date === selectedDate);
 

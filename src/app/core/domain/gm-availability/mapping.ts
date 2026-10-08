@@ -143,6 +143,26 @@ export function mapGmAvailabilityDaysToCalendarDays(
     .sort((left, right) => left.date.localeCompare(right.date));
 }
 
+export function mapGmAvailabilityOverviewToCalendarDays(
+  daysByGmId: ReadonlyMap<string, readonly IGmAvailabilityDay[]>,
+  dates: readonly string[],
+): IUniversalCalendarDay[] {
+  const gmDays = [...daysByGmId.values()];
+  const calendarDayByDate = new Map(
+    mapGmAvailabilityDaysToCalendarDays(gmDays.flat()).map(
+      (day) => [day.date, day] as const,
+    ),
+  );
+
+  return dates.map((date) => ({
+    date,
+    hours: calendarDayByDate.get(date)?.hours,
+    availabilityCount: gmDays.filter((days) =>
+      days.some((day) => day.date === date && day.ranges.length > 0),
+    ).length,
+  }));
+}
+
 function mergeGmAvailabilityRanges(
   ranges: readonly IGmAvailabilityRange[],
 ): IGmAvailabilityRange[] {

@@ -2,6 +2,7 @@ export interface IUniversalCalendarDay {
   date: string;
   hours?: readonly boolean[] | null;
   isBlocked?: boolean;
+  availabilityCount?: number;
 }
 
 export interface IUniversalCalendarHourVm {
@@ -14,6 +15,7 @@ export interface IUniversalCalendarDayVm {
   readonly iso: string;
   readonly label: string;
   readonly dayNumber: number;
+  readonly availabilityCount?: number;
   readonly hours: readonly IUniversalCalendarHourVm[];
   readonly isCurrentMonth: boolean;
   readonly isDisabled: boolean;

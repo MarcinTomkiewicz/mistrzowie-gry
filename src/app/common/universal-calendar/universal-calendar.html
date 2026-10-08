@@ -1,7 +1,4 @@
-<section
-  class="calendar mg-card flex-col-start-stretch gap-sm"
-  [class.calendar--availability]="mode() === 'availability'"
->
+<section class="mg-card flex-col-start-stretch gap-sm">
   <header class="flex-row-between-center gap-xs">
     <p-button
       icon="pi pi-point-left"
@@ -34,11 +31,11 @@
     />
   </header>
 
-  <div class="calendar-viewport">
-    <div class="calendar-month flex-col-start-stretch gap-xs">
+  <div class="w-100">
+    <div class="flex-col-start-stretch gap-xs">
       <div class="mg-grid grid-cols-7 gap-xs">
         @for (weekday of weekdayLabels(); track weekday + $index) {
-          <small class="calendar-weekday text-center px-xs py-xs lh-1">
+          <small class="color-muted uppercase text-center px-xs py-xs lh-1">
             {{ weekday }}
           </small>
         }
@@ -46,8 +43,10 @@
 
       <div class="mg-grid grid-cols-7 gap-xs">
         @for (day of calendarDays(); track day.iso) {
+          @let hasAvailabilityCount = day.availabilityCount !== undefined;
           <div
-            class="calendar-day flex-col-between-stretch gap-xs p-xs"
+            class="calendar-day flex-col-between-stretch gap-xs p-xs min-w-0 border radius-md"
+            [class.text-xs]="hasAvailabilityCount"
             [class.calendar-day--outside]="!day.isCurrentMonth"
             [class.calendar-day--selected]="day.isSelected"
             [class.calendar-day--disabled]="day.isDisabled"
@@ -58,15 +57,31 @@
             (click)="handleDayClick($event, day)"
             (keydown)="onDayKeydown($event, day)"
           >
-            <div class="w-100 text-left">
-              <strong class="lh-1">
-                {{ day.dayNumber }}
-              </strong>
+            <div class="w-100">
+              <div class="flex-row-between-center w-100">
+                <strong
+                  class="color-heading lh-1"
+                  [class.text-md-up-sm]="hasAvailabilityCount"
+                  [class.text-xs-down-sm]="hasAvailabilityCount"
+                >
+                  {{ day.dayNumber }}
+                </strong>
+
+                @if (day.isCurrentMonth && hasAvailabilityCount) {
+                  <span class="tag-badge p-0 lh-12">
+                    {{ day.availabilityCount }}
+                  </span>
+                }
+              </div>
 
               <div class="show-down-sm mt-xs text-center">
-                <span class="calendar-day__hint" aria-hidden="true">
+                <span class="color-heading lh-1" aria-hidden="true">
                   @if (day.showDetailsHint) {
-                    <i class="pi pi-horus"></i>
+                    <i
+                      class="pi"
+                      [class.pi-horus]="day.availabilityCount !== 0"
+                      [class.pi-closed-eye]="day.availabilityCount === 0"
+                    ></i>
                   }
                 </span>
               </div>
@@ -76,7 +91,7 @@
               <div class="mg-inline-grid grid-max-8-cols grid-max-6-cols-sm gap-xs pb-xs">
                 @for (hour of day.hours; track hour.index) {
                   <span
-                    class="calendar-hour w-px-8 w-px-6-xs"
+                    class="calendar-hour d-block aspect-square w-px-8 w-px-6-xs"
                     [class.calendar-hour--active]="hour.isActive"
                     [pTooltip]="hour.label"
                     tooltipPosition="top"
@@ -92,24 +107,28 @@
 
   <p-popover
     #dayDetailsPopover
-    styleClass="mg-popover calendar-day-popover"
+    styleClass="mg-popover"
     showTransitionOptions=".08s cubic-bezier(0, 0, 0.2, 1)"
     hideTransitionOptions="0ms"
     (onHide)="handleDayDetailsHide()"
   >
     @if (activeDayDetails(); as activeDay) {
-      <div class="calendar-day-details flex-col-start-stretch gap-sm">
+      <div class="flex-col-start-stretch gap-sm">
         <div class="flex-row-between-center gap-sm">
           <strong>{{ activeDay.label }}</strong>
-          <span class="calendar-day__hint" aria-hidden="true">
-            <i class="pi pi-horus"></i>
+          <span class="color-heading lh-1" aria-hidden="true">
+            <i
+              class="pi"
+              [class.pi-horus]="activeDay.availabilityCount !== 0"
+              [class.pi-closed-eye]="activeDay.availabilityCount === 0"
+            ></i>
           </span>
         </div>
 
         <div class="mg-inline-grid grid-max-6-cols gap-xs align-self-center">
           @for (hour of activeDay.hours; track hour.index) {
             <span
-              class="calendar-hour calendar-hour--popover w-px-10"
+              class="calendar-hour d-block aspect-square w-px-10"
               [class.calendar-hour--active]="hour.isActive"
               [pTooltip]="hour.label"
               tooltipPosition="top"

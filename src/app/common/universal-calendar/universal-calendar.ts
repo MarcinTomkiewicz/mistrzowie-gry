@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, input, output, signal, viewChild } from '@angular/core';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -35,7 +34,7 @@ import { UNIVERSAL_CALENDAR_CONFIG } from './universal-calendar.config';
 @Component({
   selector: 'app-universal-calendar',
   standalone: true,
-  imports: [CommonModule, ButtonModule, PopoverModule, TooltipModule],
+  imports: [ButtonModule, PopoverModule, TooltipModule],
   templateUrl: './universal-calendar.html',
   styleUrl: './universal-calendar.scss',
   providers: [provideTranslocoScope('common')],
@@ -235,6 +234,7 @@ export class UniversalCalendar {
         true,
       ),
       dayNumber: date.getDate(),
+      availabilityCount: sourceDay?.availabilityCount,
       hours,
       isCurrentMonth,
       isDisabled,

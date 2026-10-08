@@ -61,6 +61,7 @@
       mode="availability"
       [minDate]="minDate"
       [maxDate]="maxDate"
+      (visibleDatesChange)="visibleDates.set($event)"
       (dateSelected)="onDateSelected($event)"
     />
 
