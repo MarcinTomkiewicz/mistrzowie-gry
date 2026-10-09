@@ -2,11 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, of, switchMap, throwError, map } from 'rxjs';
 
 import {
+  IGmAvailabilityOverviewData,
   IGmAvailabilitySlotRecord,
   IGmAvailabilityWindowData,
 } from '../../interfaces/i-gm-availability';
 import { IGmProfile } from '../../interfaces/i-gm-profile';
-import { IUser } from '../../interfaces/i-user';
 import { FilterOperator } from '../../enums/filter-operators';
 import { addDays } from '../../utils/date';
 import { Auth } from '../auth/auth';
@@ -58,61 +58,13 @@ export class GmAvailability {
     );
   }
 
-  getGmUsers(): Observable<IUser[]> {
-    return this.backend
-      .getAll<IGmProfile>({
-        table: 'gm_profiles',
-        sortBy: 'createdAt',
-        sortOrder: 'asc',
-        pagination: {
-          filters: {
-            isArchived: {
-              operator: FilterOperator.EQ,
-              value: false,
-            },
-          },
-        },
-      })
-      .pipe(
-        switchMap((profiles) => {
-          const gmProfileIds = profiles.map((profile) => profile.id);
-
-          if (!gmProfileIds.length) {
-            return of([]);
-          }
-
-          return this.backend.getByIds<IUser>('users', gmProfileIds);
-        }),
-      );
-  }
-
   getAvailabilityOverview(
     fromIso: string,
     toIsoExclusive: string,
-  ): Observable<{
-    gmUsers: IUser[];
-    records: IGmAvailabilitySlotRecord[];
-  }> {
-    return this.getGmUsers().pipe(
-      switchMap((gmUsers) => {
-        if (!gmUsers.length) {
-          return of({
-            gmUsers,
-            records: [],
-          });
-        }
-
-        return this.getAvailabilityForGmsOverlapping(
-          gmUsers.map((user) => user.id),
-          fromIso,
-          toIsoExclusive,
-        ).pipe(
-          map((records) => ({
-            gmUsers,
-            records,
-          })),
-        );
-      }),
+  ): Observable<IGmAvailabilityOverviewData> {
+    return this.backend.rpc<IGmAvailabilityOverviewData>(
+      'get_admin_gm_availability_overview',
+      { p_from: fromIso, p_to_exclusive: toIsoExclusive },
     );
   }
 

@@ -9,6 +9,23 @@ export interface IGmAvailabilitySlotRecord {
   updatedAt?: string | null;
 }
 
+export interface IGmAvailabilityOverviewUser {
+  id: string;
+  firstName: string | null;
+  nickname: string | null;
+  useNickname: boolean | null;
+}
+
+export interface IGmAvailabilityOverviewRecord
+  extends Pick<IGmAvailabilitySlotRecord, 'gmProfileId' | 'startsAt' | 'endsAt'> {
+  id: string;
+}
+
+export interface IGmAvailabilityOverviewData {
+  gmUsers: IGmAvailabilityOverviewUser[];
+  records: IGmAvailabilityOverviewRecord[];
+}
+
 export interface IGmAvailabilityRange extends HourOffsetRangeValue {}
 
 export interface IGmAvailabilityDay

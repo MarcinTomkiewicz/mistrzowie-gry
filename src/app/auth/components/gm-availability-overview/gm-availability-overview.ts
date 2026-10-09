@@ -6,12 +6,13 @@ import { finalize } from 'rxjs';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { SelectModule } from 'primeng/select';
 
+import { DEFAULT_TIMEZONE } from '../../../core/configs/time.config';
 import {
   IGmAvailabilityDay,
-  IGmAvailabilitySlotRecord,
+  IGmAvailabilityOverviewRecord,
+  IGmAvailabilityOverviewUser,
 } from '../../../core/interfaces/i-gm-availability';
 import { ISelectOption } from '../../../core/interfaces/i-select-option';
-import { IUser } from '../../../core/interfaces/i-user';
 import { Auth } from '../../../core/services/auth/auth';
 import { GmAvailability } from '../../../core/services/gm-availability/gm-availability';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
@@ -21,8 +22,6 @@ import {
   getEndOfNextMonthIso,
   getStartOfCurrentMonthIso,
   parseIsoDate,
-  toIsoDate,
-  toLocalDayStartIso,
 } from '../../../core/utils/date';
 import {
   mapGmAvailabilityOverviewToCalendarDays,
@@ -30,6 +29,10 @@ import {
 } from '../../../core/domain/gm-availability/mapping';
 import { formatHourOffsetRangeLabel } from '../../../core/utils/hour-offset';
 import { getUserDisplayName } from '../../../core/utils/user-display';
+import {
+  timestampToTimeZoneDate,
+  timeZoneDateToTimestamp,
+} from '../../../core/utils/time-zone';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { UniversalCalendar } from '../../../common/universal-calendar/universal-calendar';
 import {
@@ -65,15 +68,23 @@ export class GmAvailabilityOverview {
     this.selectedGmControl.valueChanges,
     { initialValue: this.selectedGmControl.value },
   );
-  private readonly gmUsers = signal<readonly IUser[]>([]);
-  private readonly availabilityRecords = signal<readonly IGmAvailabilitySlotRecord[]>([]);
+  private readonly gmUsers = signal<readonly IGmAvailabilityOverviewUser[]>([]);
+  private readonly availabilityRecords = signal<readonly IGmAvailabilityOverviewRecord[]>([]);
 
-  protected readonly minDate = getStartOfCurrentMonthIso();
-  protected readonly maxDate = getEndOfNextMonthIso();
-  private readonly rangeStartIso = toLocalDayStartIso(this.minDate);
-  private readonly rangeEndExclusiveIso = toLocalDayStartIso(
-    toIsoDate(addDays(parseIsoDate(this.maxDate)!, 1)),
-  );
+  private readonly currentDate = timestampToTimeZoneDate(
+    new Date().toISOString(),
+    DEFAULT_TIMEZONE,
+  )!;
+  protected readonly minDate = getStartOfCurrentMonthIso(this.currentDate);
+  protected readonly maxDate = getEndOfNextMonthIso(this.currentDate);
+  private readonly rangeStartIso = timeZoneDateToTimestamp(
+    parseIsoDate(this.minDate),
+    DEFAULT_TIMEZONE,
+  )!;
+  private readonly rangeEndExclusiveIso = timeZoneDateToTimestamp(
+    addDays(parseIsoDate(this.maxDate)!, 1),
+    DEFAULT_TIMEZONE,
+  )!;
   protected readonly gmDisplayNameById = computed(
     () =>
       new Map(
