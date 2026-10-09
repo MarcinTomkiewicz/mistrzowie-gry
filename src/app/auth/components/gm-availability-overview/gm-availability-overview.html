@@ -14,7 +14,18 @@
     [label]="i18n.commonStatus().loading"
   />
 
-  @if (gmOptions().length) {
+  @if (loadFailed()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+      <p class="m-0 error-text">{{ i18n.toast().loadFailedDetail }}</p>
+      <p-button
+        type="button"
+        severity="secondary"
+        icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry"
+        (onClick)="retry()"
+      />
+    </section>
+  } @else if (gmOptions().length) {
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
       <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
         <div class="flex-col-start-stretch gap-xs">

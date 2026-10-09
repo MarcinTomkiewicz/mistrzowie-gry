@@ -1,4 +1,7 @@
-import { createCommonStatusI18n } from '../../../core/translations/common.i18n';
+import {
+  createCommonActionsI18n,
+  createCommonStatusI18n,
+} from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
   GmAvailabilityOverviewToastTranslations,
@@ -15,11 +18,13 @@ export function createGmAvailabilityOverviewI18n() {
     gmAvailabilityOverview: 'page',
     toast: 'toast',
   });
+  const commonActions = createCommonActionsI18n();
   const commonStatus = createCommonStatusI18n();
 
   return {
     gmAvailabilityOverview,
     toast,
+    commonActions,
     commonStatus,
   };
 }

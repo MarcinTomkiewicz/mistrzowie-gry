@@ -4,6 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
 import { DEFAULT_TIMEZONE } from '../../../core/configs/time.config';
@@ -45,6 +46,7 @@ import {
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    ButtonModule,
     SelectModule,
     UniversalCalendar,
     LoadingOverlay,
@@ -58,9 +60,11 @@ export class GmAvailabilityOverview {
   private readonly auth = inject(Auth);
   private readonly gmAvailability = inject(GmAvailability);
   private readonly toast = inject(UiToast);
+  private readonly reloadVersion = signal(0);
 
   protected readonly i18n = createGmAvailabilityOverviewI18n();
   protected readonly isLoading = signal(true);
+  protected readonly loadFailed = signal(false);
   protected readonly selectedDate = signal<string | null>(null);
   protected readonly visibleDates = signal<readonly string[]>([]);
   protected readonly selectedGmControl = new FormControl<string | null>(null);
@@ -183,6 +187,8 @@ export class GmAvailabilityOverview {
       }
 
       const userId = this.auth.userId();
+      this.reloadVersion();
+      this.loadFailed.set(false);
       this.gmUsers.set([]);
       this.availabilityRecords.set([]);
       this.selectedDate.set(null);
@@ -206,6 +212,7 @@ export class GmAvailabilityOverview {
             this.availabilityRecords.set(records);
           },
           error: () => {
+            this.loadFailed.set(true);
             this.toast.danger({
               summary: this.i18n.toast().loadFailedSummary,
               detail: this.i18n.toast().loadFailedDetail,
@@ -215,6 +222,10 @@ export class GmAvailabilityOverview {
 
       onCleanup(() => subscription.unsubscribe());
     });
+  }
+
+  protected retry(): void {
+    this.reloadVersion.update((version) => version + 1);
   }
 
   protected onDateSelected(date: string | null): void {
