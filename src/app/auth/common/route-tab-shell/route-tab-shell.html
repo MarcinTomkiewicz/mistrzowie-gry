@@ -7,10 +7,12 @@
       }
     </header>
 
-    <app-route-tabs
-      [tabs]="tabs()"
-      (activeTabChange)="onActiveTabChange($event)"
-    />
+    <div class="mb-lg">
+      <app-route-tabs
+        [tabs]="tabs()"
+        (activeTabChange)="onActiveTabChange($event)"
+      />
+    </div>
 
     <ng-content />
   </div>
