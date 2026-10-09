@@ -11,7 +11,7 @@ const loaders = {
     ).then((m) => m.CoworkerOnboardingList),
   onboardingDetail: () =>
     import(
-      '../components/admin-coworker-onboarding/onboarding-detail/onboarding-detail'
+      '../components/admin-coworker-onboarding/onboarding-detail/coworker-onboarding-detail'
     ).then((m) => m.CoworkerOnboardingDetail),
   sharedDocuments: () =>
     import(

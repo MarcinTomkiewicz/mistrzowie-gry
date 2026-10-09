@@ -48,7 +48,7 @@ export class NotificationPanel {
 
   private navigate(notification: Notification): void {
     const route = this.presentation[notification.eventType].resolveRoute(notification.payload);
-    void this.router.navigateByUrl(route);
+    void this.router.navigateByUrl(route, { onSameUrlNavigation: 'reload' });
     this.closed.emit();
   }
 }

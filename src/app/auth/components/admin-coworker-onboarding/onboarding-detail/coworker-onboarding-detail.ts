@@ -1,12 +1,13 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, Observable } from 'rxjs';
+import { finalize, Observable, Subscription } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import type {
@@ -44,7 +45,7 @@ import { PrivateDocumentBatch } from '../private-document-batch/private-document
     PdfViewerDialog,
     PrivateDocumentBatch,
   ],
-  templateUrl: './onboarding-detail.html',
+  templateUrl: './coworker-onboarding-detail.html',
   providers: [provideTranslocoScope(COWORKER_ONBOARDING_SCOPE, 'common')],
 })
 export class CoworkerOnboardingDetail {
@@ -52,8 +53,12 @@ export class CoworkerOnboardingDetail {
   private readonly confirm = inject(UiConfirm);
   private readonly platform = inject(Platform);
   private readonly toast = inject(UiToast);
-  private readonly onboardingId = inject(ActivatedRoute).snapshot.paramMap.get('onboarding_id');
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly batch = viewChild(PrivateDocumentBatch);
+  private onboardingId: string | null = null;
+  private loadSubscription: Subscription | null = null;
 
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
@@ -77,10 +82,31 @@ export class CoworkerOnboardingDetail {
   );
 
   constructor() {
-    this.load();
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const onboardingId = params.get('onboarding_id');
+      if (this.onboardingId !== onboardingId) {
+        this.detail.set(null);
+        this.preview.set(null);
+        this.closeRejection();
+        this.batch()?.reset();
+      }
+      this.onboardingId = onboardingId;
+      this.load();
+    });
+
+    let sameUrlNavigationId: number | null = null;
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        sameUrlNavigationId = event.url === this.router.url ? event.id : null;
+      } else if (event instanceof NavigationEnd && event.id === sameUrlNavigationId) {
+        sameUrlNavigationId = null;
+        this.load();
+      }
+    });
   }
 
   protected load(): void {
+    this.loadSubscription?.unsubscribe();
     if (!this.onboardingId) {
       this.loading.set(false);
       this.loadFailed.set(true);
@@ -89,9 +115,12 @@ export class CoworkerOnboardingDetail {
 
     this.loading.set(true);
     this.loadFailed.set(false);
-    this.api
+    this.loadSubscription = this.api
       .getOnboarding(this.onboardingId)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false)),
+      )
       .subscribe({
         next: (detail) => this.detail.set(detail),
         error: () => this.loadFailed.set(true),
