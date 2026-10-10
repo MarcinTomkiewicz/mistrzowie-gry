@@ -14,13 +14,22 @@
 />
 
 <div class="flex-col-start-stretch gap-md w-100">
+  @if (hasInvalidTargetMonth()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+      <p class="m-0 error-text">{{ i18n.gmAvailability().targetMonthUnavailable }}</p>
+    </section>
+  }
+
   <app-universal-calendar
     class="w-100"
     [days]="calendarDays()"
+    [disabled]="!canEdit()"
     [selectedDate]="selectedDate()"
+    [visibleMonth]="visibleMonth()"
     mode="availability"
     [minDate]="minDate"
     [maxDate]="maxDate"
+    (visibleMonthChange)="onMonthChanged($event)"
     (dateSelected)="onDateSelected($event)"
   />
 
@@ -48,7 +57,7 @@
               severity="secondary"
               [outlined]="true"
               [label]="i18n.actions().previousDayLabel"
-              [disabled]="isSaving() || !canMoveSelectedDate(-1)"
+              [disabled]="!canEdit() || !canMoveSelectedDate(-1)"
               (onClick)="moveSelectedDate(-1)"
             />
 
@@ -56,7 +65,7 @@
               severity="secondary"
               [outlined]="true"
               [label]="i18n.actions().nextDayLabel"
-              [disabled]="isSaving() || !canMoveSelectedDate(1)"
+              [disabled]="!canEdit() || !canMoveSelectedDate(1)"
               (onClick)="moveSelectedDate(1)"
             />
 
@@ -65,14 +74,14 @@
               [outlined]="true"
               icon="pi pi-demolish"
               [label]="i18n.commonActions().clearDay"
-              [disabled]="isSaving()"
+              [disabled]="!canEdit()"
               (onClick)="clearSelectedDate()"
             />
 
             <p-button
               severity="success"
               [label]="i18n.commonActions().confirm"
-              [disabled]="isSaving()"
+              [disabled]="!canEdit()"
               (onClick)="confirmSelectedDate()"
               icon="pi pi-done-it"
               iconPos="left"
@@ -89,7 +98,7 @@
             size="small"
             [outlined]="true"
             [ariaLabel]="i18n.actions().previousDayLabel"
-            [disabled]="isSaving() || !canMoveSelectedDate(-1)"
+            [disabled]="!canEdit() || !canMoveSelectedDate(-1)"
             (onClick)="moveSelectedDate(-1)"
           />
 
@@ -111,7 +120,7 @@
             size="small"
             [outlined]="true"
             [ariaLabel]="i18n.actions().nextDayLabel"
-            [disabled]="isSaving() || !canMoveSelectedDate(1)"
+            [disabled]="!canEdit() || !canMoveSelectedDate(1)"
             (onClick)="moveSelectedDate(1)"
           />
         </div>
@@ -125,7 +134,7 @@
             [outlined]="true"
             icon="pi pi-demolish"
             [label]="i18n.commonActions().clearDay"
-            [disabled]="isSaving()"
+            [disabled]="!canEdit()"
             (onClick)="clearSelectedDate()"
           />
 
@@ -135,7 +144,7 @@
             iconPos="left"
             size="small"
             [label]="i18n.commonActions().confirm"
-            [disabled]="isSaving()"
+            [disabled]="!canEdit()"
             (onClick)="confirmSelectedDate()"
           />
         </div>
@@ -188,7 +197,7 @@
                   [outlined]="true"
                   icon="pi pi-demolish"
                   [label]="i18n.actions().removeRangeLabel"
-                  [disabled]="isSaving()"
+                  [disabled]="!canEdit()"
                   (onClick)="removeRange(index)"
                 />
               </div>
@@ -212,7 +221,7 @@
             severity="success"
             icon="pi pi-add-plus"
             [label]="i18n.actions().addRangeLabel"
-            [disabled]="isSaving()"
+            [disabled]="!canEdit()"
             (onClick)="addRange()"
           />
         </div>
@@ -224,7 +233,7 @@
     <p-button
       severity="success"
       [label]="i18n.actions().saveLabel"
-      [disabled]="(!hasChanges() && !ranges.dirty) || isSaving()"
+      [disabled]="!canEdit() || (!hasChanges() && !ranges.dirty)"
       [loading]="isSaving()"
       (onClick)="saveAvailability()"
       loadingIcon="pi pi-d20"

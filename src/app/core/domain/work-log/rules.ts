@@ -15,6 +15,7 @@ import {
   endOfMonth,
   formatMonthLabel,
   parseIsoDate,
+  parseIsoMonth,
   toIsoDate,
 } from '../../utils/date';
 import {
@@ -59,6 +60,17 @@ export function getWorkLogMonthScope(
 
 export function isChaoticThursdayDate(dateIso: string): boolean {
   return (parseIsoDate(dateIso)?.getDay() ?? -1) === 4;
+}
+
+export function getWorkLogMonthOffset(
+  targetMonth: string | null,
+  baseDate: Date = new Date(),
+): WorkLogMonthOffset | null {
+  if (!parseIsoMonth(targetMonth)) return null;
+
+  return ([0, -1] as const).find(
+    (offset) => getWorkLogMonthScope(offset, baseDate).startDate === `${targetMonth}-01`,
+  ) ?? null;
 }
 
 export function createDefaultWorkLogRange(

@@ -54,57 +54,69 @@
     "ctaLabel": "Otwórz onboarding"
   },
   "staffing_self_application_submitted": {
-    "subjectLabel": "[PH] Nowe zgłoszenie do realizacji „{{realizationName}}”",
-    "heading": "[PH] Nowe zgłoszenie MG {{gmDisplayName}}",
-    "body": "[PH] MG {{gmDisplayName}} zgłasza udział w realizacji „{{realizationName}}”. Przejdź do szczegółów kandydatury, aby zapoznać się ze zgłoszeniem.",
-    "ctaLabel": "[PH] Zobacz kandydaturę"
+    "subjectLabel": "Nowe zgłoszenie do zlecenia „{{realizationName}}”",
+    "heading": "Nowe zgłoszenie: {{gmDisplayName}}",
+    "body": "MG {{gmDisplayName}} zgłasza udział w zleceniu „{{realizationName}}”. Sprawdź szczegóły zgłoszenia.",
+    "ctaLabel": "Zobacz zgłoszenie"
   },
   "staffing_self_application_accepted": {
-    "subjectLabel": "[PH] Zaakceptowano zgłoszenie do realizacji „{{realizationName}}”",
-    "heading": "[PH] Zgłoszenie MG {{gmDisplayName}} zostało zaakceptowane",
-    "body": "[PH] Zgłoszenie MG {{gmDisplayName}} do realizacji „{{realizationName}}” zostało zaakceptowane. Przejdź do zakładki Udział, aby sprawdzić aktualny stan udziału.",
-    "ctaLabel": "[PH] Zobacz udział"
+    "subjectLabel": "Zaakceptowano zgłoszenie do zlecenia „{{realizationName}}”",
+    "heading": "Potwierdzono udział MG {{gmDisplayName}}",
+    "body": "Zgłoszenie MG {{gmDisplayName}} do zlecenia „{{realizationName}}” zostało zaakceptowane. Szczegóły znajdziesz w zakładce „Udział”.",
+    "ctaLabel": "Zobacz udział"
   },
   "staffing_self_application_rejected": {
-    "subjectLabel": "[PH] Odrzucono zgłoszenie do realizacji „{{realizationName}}”",
-    "heading": "[PH] Zgłoszenie MG {{gmDisplayName}} zostało odrzucone",
-    "body": "[PH] Zgłoszenie MG {{gmDisplayName}} do realizacji „{{realizationName}}” zostało odrzucone. Szczegóły udziału znajdziesz w panelu realizacji.",
-    "ctaLabel": "[PH] Zobacz udział"
+    "subjectLabel": "Odrzucono zgłoszenie do zlecenia „{{realizationName}}”",
+    "heading": "Zgłoszenie MG {{gmDisplayName}} odrzucone",
+    "body": "Zgłoszenie MG {{gmDisplayName}} do zlecenia „{{realizationName}}” zostało odrzucone. Szczegóły znajdziesz w zakładce „Udział”.",
+    "ctaLabel": "Zobacz udział"
   },
   "staffing_admin_proposal_created": {
-    "subjectLabel": "[PH] Propozycja udziału w realizacji „{{realizationName}}”",
-    "heading": "[PH] Nowa propozycja udziału MG {{gmDisplayName}}",
-    "body": "[PH] Koordynator proponuje udział MG {{gmDisplayName}} w realizacji „{{realizationName}}”. Przejdź do zakładki Udział, aby zapoznać się z propozycją i podjąć decyzję.",
-    "ctaLabel": "[PH] Zobacz udział"
+    "subjectLabel": "Propozycja udziału w zleceniu „{{realizationName}}”",
+    "heading": "Nowa propozycja dla {{gmDisplayName}}",
+    "body": "Dla MG {{gmDisplayName}} przygotowano propozycję udziału w zleceniu „{{realizationName}}”. Przejdź do zakładki „Udział”, aby zapoznać się ze szczegółami i podjąć decyzję.",
+    "ctaLabel": "Zobacz udział"
   },
   "staffing_admin_proposal_accepted": {
-    "subjectLabel": "[PH] Przyjęto propozycję udziału w realizacji „{{realizationName}}”",
-    "heading": "[PH] MG {{gmDisplayName}} - propozycja przyjęta",
-    "body": "[PH] Propozycja udziału w realizacji „{{realizationName}}” została przyjęta przez MG {{gmDisplayName}}. Aktualny stan kandydatury znajdziesz na boardzie realizacji.",
-    "ctaLabel": "[PH] Zobacz kandydaturę"
+    "subjectLabel": "Przyjęto propozycję udziału w zleceniu „{{realizationName}}”",
+    "heading": "Propozycja przyjęta: {{gmDisplayName}}",
+    "body": "Propozycja udziału MG {{gmDisplayName}} w zleceniu „{{realizationName}}” została przyjęta. Sprawdź aktualny stan obsady.",
+    "ctaLabel": "Zobacz szczegóły"
   },
   "staffing_admin_proposal_rejected": {
-    "subjectLabel": "[PH] Odrzucono propozycję udziału w realizacji „{{realizationName}}”",
-    "heading": "[PH] MG {{gmDisplayName}} - propozycja odrzucona",
-    "body": "[PH] Propozycja udziału w realizacji „{{realizationName}}” została odrzucona przez MG {{gmDisplayName}}. Szczegóły kandydatury znajdziesz na boardzie realizacji.",
-    "ctaLabel": "[PH] Zobacz kandydaturę"
+    "subjectLabel": "Odrzucono propozycję udziału w zleceniu „{{realizationName}}”",
+    "heading": "Propozycja odrzucona: {{gmDisplayName}}",
+    "body": "Propozycja udziału MG {{gmDisplayName}} w zleceniu „{{realizationName}}” została odrzucona. Sprawdź szczegóły propozycji.",
+    "ctaLabel": "Zobacz szczegóły"
   },
   "staffing_candidate_message_created": {
-    "subjectLabel": "[PH] Nowa wiadomość dotycząca realizacji „{{realizationName}}”",
-    "heading": "[PH] Nowa wiadomość dotycząca udziału MG {{gmDisplayName}}",
-    "body": "[PH] W rozmowie dotyczącej udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}” pojawiła się nowa wiadomość. Przejdź do rozmowy, aby przeczytać jej treść.",
-    "ctaLabel": "[PH] Zobacz rozmowę"
+    "subjectLabel": "Nowa wiadomość dotycząca zlecenia „{{realizationName}}”",
+    "heading": "Nowa wiadomość dotycząca udziału MG {{gmDisplayName}}",
+    "body": "W rozmowie dotyczącej udziału MG {{gmDisplayName}} w zleceniu „{{realizationName}}” pojawiła się nowa wiadomość. Otwórz rozmowę, aby ją przeczytać.",
+    "ctaLabel": "Otwórz rozmowę"
   },
   "staffing_final_plan_changed": {
-    "subjectLabel": "[PH] Zmiana finalnego planu realizacji „{{realizationName}}”",
-    "heading": "[PH] Zmieniono finalny plan udziału MG {{gmDisplayName}}",
-    "body": "[PH] Zmieniono finalny plan lub harmonogram dotyczący udziału MG {{gmDisplayName}} w realizacji „{{realizationName}}”. Przejdź do panelu realizacji, aby sprawdzić aktualny kontekst udziału.",
-    "ctaLabel": "[PH] Zobacz realizację"
+    "subjectLabel": "Zmieniono plan sesji i obsady zlecenia „{{realizationName}}”",
+    "heading": "Zmieniono plan udziału MG {{gmDisplayName}}",
+    "body": "Zmieniono plan sesji lub harmonogram udziału MG {{gmDisplayName}} w zleceniu „{{realizationName}}”. Sprawdź aktualne informacje o zleceniu.",
+    "ctaLabel": "Zobacz zlecenie"
   },
   "staffing_candidate_session_proposals_changed": {
-    "subjectLabel": "[PH] Zmiana propozycji sesji w realizacji „{{realizationName}}”",
-    "heading": "[PH] MG {{gmDisplayName}} zmienił propozycje sesji",
-    "body": "[PH] MG {{gmDisplayName}} zmienił zapisane propozycje sesji w realizacji „{{realizationName}}”. Przejdź do szczegółów kandydatury, aby zobaczyć aktualne propozycje dla slotów.",
-    "ctaLabel": "[PH] Zobacz propozycje sesji"
+    "subjectLabel": "Zmieniono propozycje sesji w zleceniu „{{realizationName}}”",
+    "heading": "Zmieniono propozycje sesji MG {{gmDisplayName}}",
+    "body": "Zaktualizowano propozycje sesji MG {{gmDisplayName}} w zleceniu „{{realizationName}}”. Sprawdź propozycje dla poszczególnych bloków.",
+    "ctaLabel": "Zobacz propozycje sesji"
+  },
+  "gm_availability_month_reminder": {
+    "subjectLabel": "Vlad przypomina o dyspozycyjności na {{targetMonth}}",
+    "heading": "Uzupełnij swoją dyspozycyjność na {{targetMonth}}",
+    "body": "Do 25. każdego miesiąca uzupełniaj swoją dostępność na miesiąc. Sprawdź czy uzupełniona jest Twoja dyspozycyjność na {{targetMonth}}. Przejdź do osobistego kalendarza MG i zapisz dyspozycyjność.",
+    "ctaLabel": "Idź do dyspozycyjności!"
+  },
+  "work_log_month_reminder": {
+    "subjectLabel": "Vlad przypomina o ewidencji czasu pracy na {{targetMonth}}",
+    "heading": "Wpisz swoje godziny pracy za {{targetMonth}}",
+    "body": "Nie zapomnij uzupełnić swoich godzin pracy za miesiąc {{targetMonth}}. Przejdź do panelu czasu pracy Mistrza Gry i wpisz brakujące przedziały, jeśli dotychczas nie udało Ci się tego zrobić.",
+    "ctaLabel": "Idź do czasu pracy!"
   }
 }

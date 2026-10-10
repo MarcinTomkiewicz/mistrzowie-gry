@@ -2,13 +2,10 @@ import {
   Component,
   DestroyRef,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormRecord, ReactiveFormsModule } from '@angular/forms';
-import { finalize, map } from 'rxjs';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -18,21 +15,13 @@ import { TableModule } from 'primeng/table';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
-import {
-  IUserWorkLogDay,
-  IUserWorkLogRowVm,
-} from '../../../core/interfaces/i-work-log';
+import { IUserWorkLogRowVm } from '../../../core/interfaces/i-work-log';
 import {
   createWorkLogRangeFormGroup,
-  mapWorkLogFormToDays,
   placeWorkLogRangeFormGroupChronologically,
-  replaceWorkLogFormDays,
   resetWorkLogDayForm,
 } from '../../../core/factories/work-log-form.factory';
-import { Auth } from '../../../core/services/auth/auth';
 import { Platform } from '../../../core/services/platform/platform';
-import { UiToast } from '../../../core/services/ui-toast/ui-toast';
-import { WorkLog } from '../../../core/services/work-log/work-log';
 import { HourOffsetValue } from '../../../core/types/hour-offset';
 import {
   WorkLogHourValue,
@@ -41,7 +30,6 @@ import {
 } from '../../../core/types/work-log';
 import {
   WorkLogDayFormGroup,
-  WorkLogFormRecord,
   WorkLogRangeFormGroup,
 } from '../../../core/types/work-log-form';
 import { UiDialogMessage } from '../../../core/types/ui';
@@ -54,15 +42,11 @@ import {
   createWorkLogRows,
   formatWorkLogHours,
 } from '../../../core/domain/work-log/display';
-import {
-  createDefaultWorkLogRange,
-  getWorkLogMonthScope,
-  getWorkLogMutationError,
-  getWorkLogTotalHours,
-} from '../../../core/domain/work-log/rules';
+import { createDefaultWorkLogRange } from '../../../core/domain/work-log/rules';
 import { InfoDialog } from '../../../common/info-dialog/info-dialog';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { createMyWorkLogI18n, MY_WORK_LOG_SCOPE } from './my-work-log.i18n';
+import { MyWorkLogFacade } from './my-work-log-facade';
 
 @Component({
   selector: 'app-my-work-log',
@@ -79,66 +63,39 @@ import { createMyWorkLogI18n, MY_WORK_LOG_SCOPE } from './my-work-log.i18n';
     InfoDialog,
   ],
   templateUrl: './my-work-log.html',
-  providers: [provideTranslocoScope(MY_WORK_LOG_SCOPE, 'common')],
+  providers: [MyWorkLogFacade, provideTranslocoScope(MY_WORK_LOG_SCOPE, 'common')],
 })
 export class MyWorkLog {
-  private readonly auth = inject(Auth);
+  private readonly facade = inject(MyWorkLogFacade);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platform = inject(Platform);
-  private readonly toast = inject(UiToast);
-  private readonly workLog = inject(WorkLog);
 
   protected readonly i18n = createMyWorkLogI18n();
-  protected readonly isLoading = signal(true);
+  protected readonly isLoading = this.facade.isLoading;
   protected readonly isCompactView = signal(false);
-  protected readonly isSaving = signal(false);
-  protected readonly monthOffset = signal<WorkLogMonthOffset>(0);
+  protected readonly isSaving = this.facade.isSaving;
+  protected readonly canEdit = this.facade.canEdit;
+  protected readonly monthOffset = this.facade.monthOffset;
+  protected readonly hasInvalidTargetMonth = this.facade.hasInvalidTargetMonth;
   protected readonly infoDialogVisible = signal(false);
   protected readonly infoDialogContent = signal<UiDialogMessage | null>(
     null,
-  );
-
-  private initialDays: readonly IUserWorkLogDay[] = [];
-  private readonly adjacentDays = signal<readonly IUserWorkLogDay[]>([]);
-  private readonly form: WorkLogFormRecord =
-    new FormRecord<WorkLogDayFormGroup>({});
-  private readonly draftDays = toSignal(
-    this.form.valueChanges.pipe(
-      map(() => mapWorkLogFormToDays(this.form)),
-    ),
-    { initialValue: mapWorkLogFormToDays(this.form) },
-  );
-  private readonly initialDraftValue = signal(
-    JSON.stringify(this.draftDays()),
-  );
-  private readonly mutationError = computed(() =>
-    getWorkLogMutationError([
-      ...this.adjacentDays(),
-      ...this.draftDays(),
-    ]),
   );
 
   protected readonly startHourOptions = createHourOffsetOptions(
     0,
     HourOffsetValue.DayTotalHours,
   );
-  protected readonly monthScope = computed(() =>
-    getWorkLogMonthScope(this.monthOffset()),
-  );
+  protected readonly monthScope = this.facade.monthScope;
   protected readonly rows = computed<IUserWorkLogRowVm[]>(() =>
-    createWorkLogRows(this.monthScope(), this.draftDays()),
+    createWorkLogRows(this.monthScope(), this.facade.draftDays()),
   );
   protected readonly trackRowByDate = (
     _index: number,
     row: IUserWorkLogRowVm,
   ): string => row.date;
-  protected readonly totalHours = computed(() =>
-    getWorkLogTotalHours(this.draftDays()),
-  );
-  protected readonly hasChanges = computed(
-    () =>
-      this.initialDraftValue() !== JSON.stringify(this.draftDays()),
-  );
+  protected readonly totalHours = this.facade.totalHours;
+  protected readonly hasChanges = this.facade.hasChanges;
   protected readonly formatHours = formatWorkLogHours;
 
   constructor() {
@@ -150,55 +107,10 @@ export class MyWorkLog {
     const disposeResize = this.platform.onWindow('resize', syncViewport);
     this.destroyRef.onDestroy(disposeResize);
     syncViewport();
-    this.replaceFormDays([]);
-
-    effect((onCleanup) => {
-      if (!this.auth.isReady()) {
-        return;
-      }
-
-      const userId = this.auth.userId();
-      const monthOffset = this.monthOffset();
-      this.initialDays = [];
-      this.adjacentDays.set([]);
-      this.replaceFormDays([]);
-
-      if (!userId) {
-        this.isLoading.set(false);
-        return;
-      }
-
-      this.isLoading.set(true);
-      const subscription = this.workLog
-        .getMyMonth(monthOffset)
-        .pipe(finalize(() => this.isLoading.set(false)))
-        .subscribe({
-          next: ({ days, adjacentDays }) => {
-            this.initialDays = days;
-            this.adjacentDays.set(adjacentDays);
-            this.replaceFormDays(days);
-          },
-          error: () => {
-            this.initialDays = [];
-            this.adjacentDays.set([]);
-            this.replaceFormDays([]);
-            this.toast.danger({
-              summary: this.i18n.toast().loadFailedSummary,
-              detail: this.i18n.toast().loadFailedDetail,
-            });
-          },
-        });
-
-      onCleanup(() => subscription.unsubscribe());
-    });
   }
 
   protected switchMonth(monthOffset: WorkLogMonthOffset): void {
-    if (this.isSaving() || this.monthOffset() === monthOffset) {
-      return;
-    }
-
-    this.monthOffset.set(monthOffset);
+    this.facade.switchMonth(monthOffset);
   }
 
   protected getEndHourOptions(
@@ -212,7 +124,7 @@ export class MyWorkLog {
   }
 
   protected addRange(date: string): void {
-    if (this.isSaving() || !this.monthScope().isEditable) {
+    if (!this.canEdit()) {
       return;
     }
 
@@ -235,85 +147,32 @@ export class MyWorkLog {
   }
 
   protected removeRange(date: string, rangeIndex: number): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     const ranges = this.getDayForm(date).controls.ranges;
     ranges.removeAt(rangeIndex);
   }
 
   protected clearDay(date: string): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     resetWorkLogDayForm(this.getDayForm(date));
   }
 
   protected resetChanges(): void {
-    if (this.isSaving()) return;
-
-    this.replaceFormDays(this.initialDays);
+    this.facade.resetChanges();
   }
 
   protected save(): void {
-    if (!this.monthScope().isEditable || this.isSaving()) {
-      return;
-    }
-
-    const mutationError = this.mutationError();
-
-    if (mutationError) {
-      this.handleMutationError(mutationError);
-      return;
-    }
-
-    const userId = this.auth.userId();
-    const monthOffset = this.monthOffset();
-    const days = this.draftDays();
-
-    if (!userId) {
-      return;
-    }
-
-    this.isSaving.set(true);
-    this.workLog
-      .replaceMyMonth(days, monthOffset)
-      .pipe(finalize(() => this.isSaving.set(false)))
-      .subscribe({
-        next: (days) => {
-          if (
-            this.auth.userId() !== userId ||
-            this.monthOffset() !== monthOffset
-          ) {
-            return;
-          }
-
-          this.initialDays = days;
-          this.replaceFormDays(days);
-          this.toast.success({
-            summary: this.i18n.toast().saveSuccessSummary,
-            detail: this.i18n.toast().saveSuccessDetail,
-          });
-        },
-        error: () => {
-          if (
-            this.auth.userId() !== userId ||
-            this.monthOffset() !== monthOffset
-          ) {
-            return;
-          }
-
-          this.toast.danger({
-            summary: this.i18n.toast().saveFailedSummary,
-            detail: this.i18n.toast().saveFailedDetail,
-          });
-        },
-      });
+    const error = this.facade.save();
+    if (error) this.handleMutationError(error);
   }
 
   protected onRangeStartChange(
     date: string,
     rangeGroup: WorkLogRangeFormGroup,
   ): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     const startOffset = rangeGroup.controls.startOffset.getRawValue();
     const endControl = rangeGroup.controls.endOffset;
@@ -335,28 +194,17 @@ export class MyWorkLog {
   }
 
   protected onRangeEndChange(): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     this.showCurrentMutationError();
   }
 
   protected getDayForm(date: string): WorkLogDayFormGroup {
-    return this.form.controls[date];
-  }
-
-  private replaceFormDays(days: readonly IUserWorkLogDay[]): void {
-    const monthScope = this.monthScope();
-    replaceWorkLogFormDays(
-      this.form,
-      monthScope.days,
-      days,
-      monthScope.isEditable,
-    );
-    this.initialDraftValue.set(JSON.stringify(mapWorkLogFormToDays(this.form)));
+    return this.facade.form.controls[date];
   }
 
   private showCurrentMutationError(): void {
-    const error = this.mutationError();
+    const error = this.facade.mutationError();
 
     if (error) {
       this.handleMutationError(error);

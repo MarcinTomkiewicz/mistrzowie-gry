@@ -49,6 +49,22 @@ export function isValidIsoDate(value: unknown): value is string {
   return typeof value === 'string' && parseIsoDate(value) !== null;
 }
 
+export function parseIsoMonth(value: string | null | undefined): Date | null {
+  if (!value || value.length !== 7 || !/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) {
+    return null;
+  }
+
+  const year = Number(value.slice(0, 4));
+  if (year === 0) return null;
+  const date = new Date(year, Number(value.slice(5)) - 1, 1);
+  date.setFullYear(year);
+  return date;
+}
+
+export function isValidIsoMonth(value: unknown): value is string {
+  return typeof value === 'string' && parseIsoMonth(value) !== null;
+}
+
 export function compareDatesByDay(left: Date, right: Date): number {
   return (
     new Date(left.getFullYear(), left.getMonth(), left.getDate()).getTime() -
@@ -125,7 +141,7 @@ export function formatMonthLabel(
   value: Date | string,
   locale: string = 'pl-PL',
 ): string {
-  const date = typeof value === 'string' ? parseIsoDate(value) : value;
+  const date = typeof value === 'string' ? parseIsoDate(value) ?? parseIsoMonth(value) : value;
 
   if (!date) {
     return '';

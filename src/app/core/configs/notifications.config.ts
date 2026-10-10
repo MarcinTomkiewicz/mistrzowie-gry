@@ -5,6 +5,7 @@ import type {
   NotificationPresentation,
   StaffingCandidateMessageNotificationPayload,
 } from '../types/notification';
+import { formatMonthLabel, isValidIsoMonth } from '../utils/date';
 import { normalizeText } from '../utils/normalize-text';
 import { GM_STAFFING_HUB_ROUTE } from './staffing-realization.config';
 
@@ -104,6 +105,18 @@ export const NOTIFICATION_PRESENTATION: Record<NotificationEventType, Notificati
     resolveRoute: adminStaffingCandidateRoute,
     resolveParams: getStaffingNotificationParams,
   },
+  gm_availability_month_reminder: {
+    translationKey: 'notifications.events.gm_availability_month_reminder',
+    resolveRoute: (payload) =>
+      `/auth/gm/profile/availability?month=${encodeURIComponent(readNotificationTargetMonth(payload))}`,
+    resolveParams: getMonthReminderParams,
+  },
+  work_log_month_reminder: {
+    translationKey: 'notifications.events.work_log_month_reminder',
+    resolveRoute: (payload) =>
+      `/auth/gm/work-log?month=${encodeURIComponent(readNotificationTargetMonth(payload))}`,
+    resolveParams: getMonthReminderParams,
+  },
 };
 
 function adminStaffingCandidateRoute(payload: Notification['payload']): string {
@@ -140,4 +153,16 @@ function getStaffingNotificationParams(payload: Notification['payload']): Notifi
     realizationName: readNotificationPayloadText(payload, 'realizationName'),
     gmDisplayName: readNotificationPayloadText(payload, 'gmDisplayName'),
   };
+}
+
+function readNotificationTargetMonth(payload: Notification['payload']): string {
+  const targetMonth = payload['targetMonth'];
+  if (!isValidIsoMonth(targetMonth)) {
+    throw new TypeError('Invalid notification payload: targetMonth must be a valid YYYY-MM string.');
+  }
+  return targetMonth;
+}
+
+function getMonthReminderParams(payload: Notification['payload']): NotificationEventParams {
+  return { targetMonth: formatMonthLabel(readNotificationTargetMonth(payload)) };
 }

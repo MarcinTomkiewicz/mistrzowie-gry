@@ -13,6 +13,12 @@
       [label]="i18n.commonStatus().loading"
     />
 
+    @if (hasInvalidTargetMonth()) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+        <p class="m-0 error-text">{{ i18n.myWorkLog().targetMonthUnavailable }}</p>
+      </section>
+    }
+
     <section class="mg-card flex-col-start-center gap-md p-md w-100">
       <div class="flex-row-between-center gap-sm w-100">
         <p-button
@@ -115,7 +121,7 @@
                         [formControl]="rangeGroup.controls.startOffset"
                         [ariaLabel]="i18n.commonLabels().from"
                         [disabled]="
-                          isSaving() ||
+                          !canEdit() ||
                           rangeGroup.controls.startOffset.disabled
                         "
                         (onChange)="
@@ -133,7 +139,7 @@
                         [formControl]="rangeGroup.controls.endOffset"
                         [ariaLabel]="i18n.commonLabels().to"
                         [disabled]="
-                          isSaving() || rangeGroup.controls.endOffset.disabled
+                          !canEdit() || rangeGroup.controls.endOffset.disabled
                         "
                         (onChange)="onRangeEndChange()"
                       />
@@ -144,9 +150,7 @@
                         size="small"
                         icon="pi pi-demolish"
                         [ariaLabel]="i18n.commonActions().delete"
-                        [disabled]="
-                          !monthScope().isEditable || isSaving()
-                        "
+                        [disabled]="!canEdit()"
                         (onClick)="removeRange(row.date, rangeIndex)"
                       />
                     </div>
@@ -160,7 +164,7 @@
                     severity="warn"
                     size="small"
                     [label]="i18n.actions().addRangeLabel"
-                    [disabled]="!monthScope().isEditable || isSaving()"
+                    [disabled]="!canEdit()"
                     icon="pi pi-add-plus"
                     (onClick)="addRange(row.date)"
                   />
@@ -170,7 +174,7 @@
                     [outlined]="true"
                     size="small"
                     [label]="i18n.commonActions().clearDay"
-                    [disabled]="!monthScope().isEditable || isSaving()"
+                    [disabled]="!canEdit()"
                     icon="pi pi-demolish"
                     (onClick)="clearDay(row.date)"
                   />
@@ -188,7 +192,7 @@
                   class="w-100"
                   rows="2"
                   [formControl]="dayForm.controls.comment"
-                  [readOnly]="isSaving()"
+                  [readOnly]="!canEdit()"
                   [attr.aria-label]="i18n.commonLabels().comment"
                 ></textarea>
               </div>
@@ -204,7 +208,7 @@
                   [formControl]="dayForm.controls.isChaoticThursday"
                   [ariaLabel]="i18n.commonLabels().chaoticThursday"
                   [disabled]="
-                    isSaving() ||
+                    !canEdit() ||
                     dayForm.controls.isChaoticThursday.disabled
                   "
                   [pTooltip]="
@@ -237,14 +241,14 @@
         severity="secondary"
         [outlined]="true"
         [label]="i18n.actions().resetChangesLabel"
-        [disabled]="!hasChanges() || isSaving()"
+        [disabled]="!canEdit() || !hasChanges()"
         (onClick)="resetChanges()"
       />
 
       <p-button
         severity="success"
         [label]="i18n.commonActions().save"
-        [disabled]="!hasChanges() || !monthScope().isEditable || isSaving()"
+        [disabled]="!canEdit() || !hasChanges()"
         [loading]="isSaving()"
         icon="pi pi-done-it"
         (onClick)="save()"

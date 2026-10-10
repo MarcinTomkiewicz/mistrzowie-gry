@@ -16,7 +16,9 @@ export type NotificationEventType =
   | 'staffing_admin_proposal_rejected'
   | 'staffing_candidate_message_created'
   | 'staffing_candidate_session_proposals_changed'
-  | 'staffing_final_plan_changed';
+  | 'staffing_final_plan_changed'
+  | 'gm_availability_month_reminder'
+  | 'work_log_month_reminder';
 
 export interface StaffingRealizationNotificationPayload {
   realizationId: string;
@@ -34,9 +36,13 @@ export interface StaffingCandidateMessageNotificationPayload extends StaffingCan
   authorUserId: string;
 }
 
+export interface MonthReminderNotificationPayload {
+  targetMonth: string;
+}
+
 export type NotificationEventParams = Pick<
   StaffingRealizationNotificationPayload, 'realizationName' | 'gmDisplayName'
->;
+> | Pick<MonthReminderNotificationPayload, 'targetMonth'>;
 
 export type Notification = {
   id: string;

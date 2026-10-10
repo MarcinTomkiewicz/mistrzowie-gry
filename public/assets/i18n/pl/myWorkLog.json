@@ -4,7 +4,8 @@
     "subtitle": "Poniżej uzupełnisz swoje przedziały czasu pracy dla bieżącego i poprzedniego miesiąca. Możesz dodać więcej niż jeden zakres na dzień, także na przełomie dni.",
     "monthHint": "Możesz przełączać się między bieżącym i poprzednim miesiącem.",
     "lockedPreviousMonthTitle": "Poprzedni miesiąc jest już zablokowany do edycji!",
-    "lockedPreviousMonthDescription": "Podgląd poprzedniego miesiąca pozostaje dostępny, ale po 5. dniu bieżącego miesiąca nie można już zapisywać zmian."
+    "lockedPreviousMonthDescription": "Podgląd poprzedniego miesiąca pozostaje dostępny, ale po 5. dniu bieżącego miesiąca nie można już zapisywać zmian.",
+    "targetMonthUnavailable": "Miesiąc wskazany w linku jest nieprawidłowy lub poza dostępnym zakresem. Wybierz bieżący lub poprzedni miesiąc."
   },
   "actions": {
     "addRangeLabel": "Dodaj zakres",

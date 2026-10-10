@@ -366,3 +366,44 @@ Quality:
 
 Files over 300 LOC:
 - none
+```
+
+For each structurally changed in-scope file over 300 lines, replace `- none`
+with one compact line:
+
+```md
+- `<path>` - `<line count>` LOC - structural - kept | reduced | split - `<reason>` - SRP/SoC/DRY/KISS: PASS/PASS/PASS/PASS
+```
+
+For a mechanical-only edit, use:
+
+```md
+- `<path>` - `<line count>` LOC - mechanical-only - kept - `<import/path/symbol change>; no structural or behavioral edit` - SRP/SoC/DRY/KISS: unchanged
+```
+
+Expand a line only for the exceptional cases defined in the over-300-LOC gate.
+
+Then continue the same report:
+
+```md
+Build (Angular tasks only):
+- `npm run build`: PASS | FAIL | NOT RUN - ...
+- `npm run build:ssr`: PASS | FAIL | NOT RUN | N/A - ...
+
+Other verification:
+- `git diff --check`: PASS | FAIL - ...
+- static checks: ...
+- tests: NOT WRITTEN OR RUN - project policy
+- manual smoke: N/A - user-side
+- final `git status --short`: ...
+
+Risks / blockers:
+- none | ...
+
+Task-requested notes:
+- none | ...
+```
+
+Do not add a second reviewer-requested report, acceptance-criteria recap, or
+`Report back with` section. Map any useful requested facts into the fixed
+sections above.

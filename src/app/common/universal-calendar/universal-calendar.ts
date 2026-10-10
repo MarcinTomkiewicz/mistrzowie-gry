@@ -25,6 +25,7 @@ import {
   getWeekdayLabels,
   isSameMonth,
   parseIsoDate,
+  parseIsoMonth,
   startOfMonth,
   toIsoDate,
   toIsoDates,
@@ -42,6 +43,7 @@ import { UNIVERSAL_CALENDAR_CONFIG } from './universal-calendar.config';
 export class UniversalCalendar {
   readonly days = input<readonly IUniversalCalendarDay[]>([]);
   readonly selectedDate = input<string | null>(null);
+  readonly visibleMonth = input<string | null>(null);
   readonly mode = input<UniversalCalendarMode>('readonly');
   readonly disabled = input<boolean>(false);
   readonly minDate = input<string>(getStartOfCurrentMonthIso());
@@ -49,6 +51,7 @@ export class UniversalCalendar {
 
   readonly dateSelected = output<string | null>();
   readonly visibleDatesChange = output<string[]>();
+  readonly visibleMonthChange = output<string>();
 
   readonly commonActions = createCommonActionsI18n();
   readonly dayDetailsPopover = viewChild<Popover>('dayDetailsPopover');
@@ -117,6 +120,14 @@ export class UniversalCalendar {
 
   constructor() {
     effect(() => {
+      const month = parseIsoMonth(this.visibleMonth());
+      if (!month || compareDatesByDay(month, this.minMonth()) < 0 ||
+        compareDatesByDay(month, this.maxMonth()) > 0) return;
+
+      this.currentMonth.set(month);
+    });
+
+    effect(() => {
       const selectedDate = parseIsoDate(this.selectedDate());
 
       if (!selectedDate) {
@@ -138,7 +149,9 @@ export class UniversalCalendar {
       return;
     }
 
-    this.currentMonth.set(addMonths(this.currentMonth(), -1));
+    const month = addMonths(this.currentMonth(), -1);
+    this.currentMonth.set(month);
+    this.visibleMonthChange.emit(toIsoDate(month).slice(0, 7));
   }
 
   nextMonth(): void {
@@ -146,7 +159,9 @@ export class UniversalCalendar {
       return;
     }
 
-    this.currentMonth.set(addMonths(this.currentMonth(), 1));
+    const month = addMonths(this.currentMonth(), 1);
+    this.currentMonth.set(month);
+    this.visibleMonthChange.emit(toIsoDate(month).slice(0, 7));
   }
 
   handleDayClick(event: Event, day: IUniversalCalendarDayVm): void {

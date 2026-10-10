@@ -25,7 +25,7 @@
     <ul class="m-0 p-xs flex-col-start-stretch gap-sm max-h-400 overflow-y-auto">
       @for (notification of notifications.notifications(); track notification.id) {
         <li class="li--unset mg-card flex-col-start-stretch gap-xs p-sm">
-          <span [class.font-bold]="notification.readAt === null">
+          <span class="text-pre-line" [class.font-bold]="notification.readAt === null">
             {{ presentation[notification.eventType].translationKey | transloco: presentation[notification.eventType].resolveParams?.(notification.payload) }}
           </span>
           <time class="text-muted" [attr.datetime]="notification.createdAt">

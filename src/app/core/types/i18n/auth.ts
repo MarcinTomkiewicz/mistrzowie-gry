@@ -152,6 +152,7 @@ export interface GmAvailabilityTranslations {
   subtitle: string;
   editorTitle: string;
   hint: string;
+  targetMonthUnavailable: string;
 }
 
 export interface GmAvailabilityActionsTranslations {
@@ -213,6 +214,7 @@ export interface MyWorkLogTranslations {
   monthHint: string;
   lockedPreviousMonthTitle: string;
   lockedPreviousMonthDescription: string;
+  targetMonthUnavailable: string;
 }
 
 export interface MyWorkLogActionsTranslations {

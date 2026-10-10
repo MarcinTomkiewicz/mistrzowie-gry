@@ -7,19 +7,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
-import {
-  IGmAvailabilityDay,
-  IGmAvailabilityRange,
-} from '../../../core/interfaces/i-gm-availability';
-import { Auth } from '../../../core/services/auth/auth';
-import { GmAvailability as CoreGmAvailability } from '../../../core/services/gm-availability/gm-availability';
-import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+import { IGmAvailabilityRange } from '../../../core/interfaces/i-gm-availability';
 import { GmAvailabilityStore } from '../../../core/stores/gm-availability/gm-availability.store';
 import { GmAvailabilityRangeFormGroup } from '../../../core/types/gm-availability-form';
 import {
@@ -32,10 +25,7 @@ import {
   addDays,
   compareDatesByDay,
   formatDateLabel,
-  getEndOfNextMonthIso,
-  getStartOfCurrentMonthIso,
   parseIsoDate,
-  toLocalDayStartIso,
   toIsoDate,
 } from '../../../core/utils/date';
 import {
@@ -48,16 +38,17 @@ import {
   mapGmAvailabilityRangeFormGroupsToRanges,
   replaceGmAvailabilityRangeFormGroups,
 } from '../../../core/factories/gm-availability-form.factory';
-import { mapGmAvailabilityRecordsToDays } from '../../../core/domain/gm-availability/mapping';
 import {
   createDefaultGmAvailabilityRange,
   getGmAvailabilityMutationError,
 } from '../../../core/domain/gm-availability/rules';
 import { scrollElementIntoViewWhenReady } from '../../../core/utils/scroll';
+import { setControlEnabled } from '../../../core/utils/form-controls';
 import { InfoDialog } from '../../../common/info-dialog/info-dialog';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { UniversalCalendar } from '../../../common/universal-calendar/universal-calendar';
 import { createGmAvailabilityI18n, GM_AVAILABILITY_SCOPE } from './gm-availability.i18n';
+import { GmAvailabilityFacade } from './gm-availability-facade';
 
 @Component({
   selector: 'app-gm-availability',
@@ -71,31 +62,27 @@ import { createGmAvailabilityI18n, GM_AVAILABILITY_SCOPE } from './gm-availabili
     InfoDialog,
   ],
   templateUrl: './gm-availability.html',
-  providers: [provideTranslocoScope(GM_AVAILABILITY_SCOPE, 'common')],
+  providers: [GmAvailabilityFacade, provideTranslocoScope(GM_AVAILABILITY_SCOPE, 'common')],
 })
 export class GmAvailability {
-  private readonly auth = inject(Auth);
-  private readonly gmAvailability = inject(CoreGmAvailability);
+  private readonly facade = inject(GmAvailabilityFacade);
   private readonly store = inject(GmAvailabilityStore);
-  private readonly toast = inject(UiToast);
 
   protected readonly i18n = createGmAvailabilityI18n();
   private readonly editorPanel =
     viewChild<ElementRef<HTMLElement>>('editorPanel');
 
-  protected readonly isLoading = signal(true);
-  protected readonly isSaving = signal(false);
-  private adjacentDays: readonly IGmAvailabilityDay[] = [];
+  protected readonly isLoading = this.facade.isLoading;
+  protected readonly isSaving = this.facade.isSaving;
+  protected readonly canEdit = this.facade.canEdit;
   protected readonly infoDialogVisible = signal(false);
   protected readonly infoDialogContent =
     signal<UiDialogMessage | null>(null);
 
-  protected readonly minDate = getStartOfCurrentMonthIso();
-  protected readonly maxDate = getEndOfNextMonthIso();
-  private readonly rangeStartIso = toLocalDayStartIso(this.minDate);
-  private readonly rangeEndExclusiveIso = toLocalDayStartIso(
-    toIsoDate(addDays(parseIsoDate(this.maxDate)!, 1)),
-  );
+  protected readonly minDate = this.facade.minDate;
+  protected readonly maxDate = this.facade.maxDate;
+  protected readonly visibleMonth = this.facade.visibleMonth;
+  protected readonly hasInvalidTargetMonth = this.facade.hasInvalidTargetMonth;
   protected readonly ranges = new FormArray<GmAvailabilityRangeFormGroup>([]);
 
   protected readonly startHourOptions = createHourOffsetOptions(
@@ -108,41 +95,10 @@ export class GmAvailability {
   protected readonly hasChanges = this.store.hasChanges;
 
   constructor() {
-    effect((onCleanup) => {
-      if (!this.auth.isReady()) {
-        return;
-      }
-
-      const userId = this.auth.userId();
-      this.store.hydrate([]);
-      this.adjacentDays = [];
-      this.resetEditor();
-
-      if (!userId) {
-        this.isLoading.set(false);
-        return;
-      }
-
-      this.isLoading.set(true);
-      const subscription = this.gmAvailability
-        .getMyAvailability(this.rangeStartIso, this.rangeEndExclusiveIso)
-        .pipe(finalize(() => this.isLoading.set(false)))
-        .subscribe({
-          next: ({ editableRecords, adjacentRecords }) => {
-            this.store.hydrate(editableRecords);
-            this.adjacentDays =
-              mapGmAvailabilityRecordsToDays(adjacentRecords);
-          },
-          error: () => {
-            this.toast.danger({
-              summary: this.i18n.toast().loadFailedSummary,
-              detail: this.i18n.toast().loadFailedDetail,
-            });
-          },
-        });
-
-      onCleanup(() => subscription.unsubscribe());
+    effect(() => {
+      if (!this.selectedDate()) this.resetEditor();
     });
+    effect(() => setControlEnabled(this.ranges, this.canEdit()));
   }
 
   protected onDateSelected(date: string | null): void {
@@ -153,8 +109,12 @@ export class GmAvailability {
     }
   }
 
+  protected onMonthChanged(month: string): void {
+    this.facade.setVisibleMonth(month);
+  }
+
   protected addRange(): void {
-    if (this.isSaving() || !this.selectedDate()) return;
+    if (!this.canEdit() || !this.selectedDate()) return;
 
     const range = createDefaultGmAvailabilityRange(
       mapGmAvailabilityRangeFormGroupsToRanges(this.ranges.controls),
@@ -170,7 +130,7 @@ export class GmAvailability {
   }
 
   protected removeRange(index: number): void {
-    if (this.isSaving() || index < 0 || index >= this.ranges.length) {
+    if (!this.canEdit() || index < 0 || index >= this.ranges.length) {
       return;
     }
 
@@ -181,7 +141,7 @@ export class GmAvailability {
   protected clearSelectedDate(): void {
     const selectedDate = this.selectedDate();
 
-    if (this.isSaving() || !selectedDate) return;
+    if (!this.canEdit() || !selectedDate) return;
 
     this.store.clearDay(selectedDate);
     this.openEditor(selectedDate, []);
@@ -196,7 +156,7 @@ export class GmAvailability {
   }
 
   protected syncRangeEndOffset(rangeGroup: GmAvailabilityRangeFormGroup): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     const startOffset = rangeGroup.controls.startOffset.getRawValue();
     const endControl = rangeGroup.controls.endOffset;
@@ -212,17 +172,13 @@ export class GmAvailability {
   }
 
   protected confirmSelectedDate(): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     this.handleMutationError(this.commitEditor(true));
   }
 
   protected saveAvailability(): void {
-    if (this.isSaving()) return;
-
-    const userId = this.auth.userId();
-
-    if (!userId) return;
+    if (!this.canEdit()) return;
 
     const confirmError = this.commitEditor(true);
 
@@ -231,44 +187,7 @@ export class GmAvailability {
       return;
     }
 
-    const records = this.store.toRecords(userId);
-    this.isSaving.set(true);
-    this.ranges.disable({ emitEvent: false });
-    this.gmAvailability
-      .replaceMyAvailability(
-        records,
-        this.rangeStartIso,
-        this.rangeEndExclusiveIso,
-      )
-      .pipe(
-        finalize(() => {
-          this.ranges.enable({ emitEvent: false });
-          this.isSaving.set(false);
-        }),
-      )
-      .subscribe({
-        next: (records) => {
-          if (this.auth.userId() !== userId) {
-            return;
-          }
-
-          this.store.hydrate(records);
-          this.toast.success({
-            summary: this.i18n.toast().saveSuccessSummary,
-            detail: this.i18n.toast().saveSuccessDetail,
-          });
-        },
-        error: () => {
-          if (this.auth.userId() !== userId) {
-            return;
-          }
-
-          this.toast.danger({
-            summary: this.i18n.toast().saveFailedSummary,
-            detail: this.i18n.toast().saveFailedDetail,
-          });
-        },
-      });
+    this.facade.save();
   }
 
   private handleMutationError(error: GmAvailabilityMutationError | null): void {
@@ -295,7 +214,7 @@ export class GmAvailability {
   }
 
   protected moveSelectedDate(direction: -1 | 1): void {
-    if (this.isSaving()) return;
+    if (!this.canEdit()) return;
 
     const targetDate = this.resolveTargetDate(direction);
 
@@ -309,7 +228,7 @@ export class GmAvailability {
   }
 
   private changeSelectedDate(date: string | null): boolean {
-    if (this.isSaving()) return false;
+    if (!this.canEdit()) return false;
 
     const currentDate = this.selectedDate();
 
@@ -329,6 +248,7 @@ export class GmAvailability {
     }
 
     this.openEditor(date, this.store.getDay(date)?.ranges ?? []);
+    this.facade.setVisibleMonth(date.slice(0, 7));
 
     return true;
   }
@@ -338,7 +258,7 @@ export class GmAvailability {
   ): GmAvailabilityMutationError | null {
     const selectedDate = this.selectedDate();
 
-    if (!selectedDate || (!force && !this.ranges.dirty)) {
+    if (!this.canEdit() || !selectedDate || (!force && !this.ranges.dirty)) {
       return null;
     }
 
@@ -346,7 +266,7 @@ export class GmAvailability {
       this.ranges.controls,
     );
     const error = getGmAvailabilityMutationError(
-      [...this.adjacentDays, ...this.store.days()],
+      [...this.facade.adjacentDays(), ...this.store.days()],
       selectedDate,
       ranges,
     );
