@@ -45,6 +45,7 @@ export type EditorFieldsCopy = {
 
 export type EditorValidationCopy = {
   keyPattern: string;
+  nameSlugSource: string;
   displayOrderMin: string;
 };
 
@@ -112,6 +113,7 @@ export type EditionFieldsCopy = {
 
 export type EditionValidationCopy = {
   slugPattern: string;
+  citySlugSource: string;
   priceAmountMin: string;
   displayOrderMin: string;
   timeRange: string;
@@ -123,6 +125,7 @@ export type EditionValidationCopy = {
 export type EditionInfoCopy = {
   capacities: string;
   publicDefault: string;
+  cityImmutable: string;
 };
 
 export type ParticipantKindCopy = {

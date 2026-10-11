@@ -75,8 +75,8 @@
         <app-event-edition-details-editor
           [form]="form"
           [coreName]="loadedCore.name"
+          [isNew]="isNew && !edition()"
           [i18n]="i18n"
-          (slugEdited)="onSlugInput()"
         />
 
         <app-event-edition-settings-editor

@@ -29,8 +29,14 @@ import {
   isoDateValidator,
   storagePathValidator,
 } from '../validators/event-admin.validator';
-import { integerValidator, timeFormatValidator } from '../validators/form-value.validator';
+import {
+  integerValidator,
+  slugSourceValidator,
+  timeFormatValidator,
+} from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
+
+const CITY_SLUG_SOURCE_VALIDATOR = slugSourceValidator();
 
 export function createEventEditionForm(
   eventCoreId: string,
@@ -51,7 +57,11 @@ export function createEventEditionForm(
       }),
       city: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required, requiredTrimmedValidator()],
+        validators: [
+          Validators.required,
+          requiredTrimmedValidator(),
+          CITY_SLUG_SOURCE_VALIDATOR,
+        ],
       }),
       venueName: new FormControl('', { nonNullable: true }),
       venueAddress: new FormControl('', { nonNullable: true }),
@@ -159,6 +169,12 @@ export function populateEventEditionForm(
   eventCoreId: string,
   detail: IAdminEventDetail | null,
 ): void {
+  if (detail) {
+    form.controls.city.removeValidators(CITY_SLUG_SOURCE_VALIDATOR);
+  } else {
+    form.controls.city.addValidators(CITY_SLUG_SOURCE_VALIDATOR);
+  }
+
   form.patchValue(
     {
       eventCoreId,
@@ -196,15 +212,15 @@ export function populateEventEditionForm(
 
 export function mapEventEditionFormToPayload(
   form: EventEditionFormGroup,
-  id: string | null,
+  detail: IAdminEventDetail | null,
 ): IEventSavePayload {
   const value = form.getRawValue();
 
   return {
-    id,
+    id: detail?.id ?? null,
     eventCoreId: value.eventCoreId,
-    slug: value.slug.trim(),
-    city: value.city.trim(),
+    slug: detail?.slug ?? value.slug,
+    city: detail?.city ?? value.city.trim(),
     venueName: normalizeText(value.venueName),
     venueAddress: normalizeText(value.venueAddress),
     priceAmount: value.priceAmount,

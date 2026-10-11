@@ -1,8 +1,19 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 import { isValidDate } from '../utils/date';
+import { normalizeText, stringToSlug } from '../utils/normalize-text';
 import { isValidTime, parseTimeLabelToMinutes } from '../utils/time-format';
 import { timeZoneDateToTimestamp } from '../utils/time-zone';
+
+export function slugSourceValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = normalizeText(control.value);
+
+    return !value || stringToSlug(value).length > 0
+      ? null
+      : { slugSource: true };
+  };
+}
 
 export function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

@@ -29,6 +29,13 @@
             id="event-edition-city"
             formControlName="city"
             autocomplete="off"
+            [readonly]="!isNew()"
+            [attr.aria-describedby]="
+              isNew() ? null : 'event-edition-city-info'
+            "
+            [attr.aria-invalid]="
+              form().controls.city.touched && form().controls.city.invalid
+            "
           />
           <label for="event-edition-city">
             {{ i18n().commonLabels().city }}
@@ -36,45 +43,34 @@
         </p-iftalabel>
 
         @if (
-          form().controls.city.touched && form().controls.city.invalid
-        ) {
-          <small class="mg-contact-error">
-            {{ i18n().commonForm().required }}
-          </small>
-        }
-      </div>
-
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <input
-            class="w-100"
-            pInputText
-            id="event-edition-slug"
-            formControlName="slug"
-            autocomplete="off"
-            (input)="slugEdited.emit()"
-          />
-          <label for="event-edition-slug">
-            {{ i18n().fields().slug }}
-          </label>
-        </p-iftalabel>
-
-        @if (
-          form().controls.slug.touched &&
-          (form().controls.slug.hasError("required") ||
-            form().controls.slug.hasError("requiredTrimmed"))
+          form().controls.city.touched &&
+          (form().controls.city.hasError("required") ||
+            form().controls.city.hasError("requiredTrimmed"))
         ) {
           <small class="mg-contact-error">
             {{ i18n().commonForm().required }}
           </small>
         } @else if (
-          form().controls.slug.touched &&
-          form().controls.slug.hasError("pattern")
+          form().controls.city.touched &&
+          form().controls.city.hasError("slugSource")
         ) {
           <small class="mg-contact-error">
-            {{ i18n().validation().slugPattern }}
+            {{ i18n().validation().citySlugSource }}
           </small>
         }
+
+        @if (!isNew()) {
+          <small id="event-edition-city-info" class="color-muted">
+            {{ i18n().info().cityImmutable }}
+          </small>
+        }
+      </div>
+
+      <div class="flex-col-start-stretch gap-xs w-100">
+        <span class="small-caps">{{ i18n().fields().slug }}</span>
+        <strong class="text-wrap-anywhere">
+          {{ form().controls.slug.value }}
+        </strong>
       </div>
     </div>
   </section>

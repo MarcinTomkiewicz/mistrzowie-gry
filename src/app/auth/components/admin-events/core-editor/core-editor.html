@@ -83,40 +83,6 @@
                 <input
                   class="w-100"
                   pInputText
-                  id="event-core-key"
-                  formControlName="key"
-                  autocomplete="off"
-                  [attr.aria-invalid]="
-                    form.controls.key.touched && form.controls.key.invalid
-                  "
-                  (input)="onKeyInput()"
-                />
-                <label for="event-core-key">{{ i18n.commonLabels().key }}</label>
-              </p-iftalabel>
-
-              @if (
-                form.controls.key.touched &&
-                (form.controls.key.hasError("required") ||
-                  form.controls.key.hasError("requiredTrimmed"))
-              ) {
-                <small class="mg-contact-error">
-                  {{ i18n.commonForm().required }}
-                </small>
-              } @else if (
-                form.controls.key.touched &&
-                form.controls.key.hasError("pattern")
-              ) {
-                <small class="mg-contact-error">
-                  {{ i18n.validation().keyPattern }}
-                </small>
-              }
-            </div>
-
-            <div class="flex-col-start-stretch gap-xs w-100">
-              <p-iftalabel class="w-100">
-                <input
-                  class="w-100"
-                  pInputText
                   id="event-core-name"
                   formControlName="name"
                   autocomplete="off"
@@ -135,7 +101,21 @@
                 <small class="mg-contact-error">
                   {{ i18n.commonForm().required }}
                 </small>
+              } @else if (
+                form.controls.name.touched &&
+                form.controls.name.hasError("slugSource")
+              ) {
+                <small class="mg-contact-error">
+                  {{ i18n.validation().nameSlugSource }}
+                </small>
               }
+            </div>
+
+            <div class="flex-col-start-stretch gap-xs w-100">
+              <span class="small-caps">{{ i18n.commonLabels().key }}</span>
+              <strong class="text-wrap-anywhere">
+                {{ form.controls.key.value }}
+              </strong>
             </div>
           </div>
 

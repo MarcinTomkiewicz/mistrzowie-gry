@@ -107,8 +107,6 @@ export class EventEditionEditor {
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
 
-  private readonly slugEdited = signal(false);
-
   constructor() {
     this.form.controls.city.valueChanges
       .pipe(takeUntilDestroyed())
@@ -158,7 +156,6 @@ export class EventEditionEditor {
 
           this.core.set(core);
           this.edition.set(edition);
-          this.slugEdited.set(!this.isNew);
           populateEventEditionForm(this.form, core.id, edition);
 
           if (this.isNew) {
@@ -181,10 +178,6 @@ export class EventEditionEditor {
           });
         },
       });
-  }
-
-  protected onSlugInput(): void {
-    this.slugEdited.set(true);
   }
 
   protected editOccurrence(occurrence: IAdminOccurrenceListItem): void {
@@ -241,14 +234,13 @@ export class EventEditionEditor {
       .saveEdition(
         mapEventEditionFormToPayload(
           this.form,
-          this.edition()?.id ?? null,
+          this.edition(),
         ),
       )
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (savedEdition) => {
           this.edition.set(savedEdition);
-          this.slugEdited.set(true);
           populateEventEditionForm(
             this.form,
             savedEdition.eventCoreId,
@@ -297,7 +289,7 @@ export class EventEditionEditor {
   private syncGeneratedSlug(city: string): void {
     const core = this.core();
 
-    if (!this.isNew || this.slugEdited() || !core) {
+    if (!this.isNew || this.edition() || !core) {
       return;
     }
 

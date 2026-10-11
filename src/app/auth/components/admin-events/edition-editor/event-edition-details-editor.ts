@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -25,10 +25,9 @@ export class EventEditionDetailsEditor {
 
   readonly form = input.required<EventEditionFormGroup>();
   readonly coreName = input.required<string>();
+  readonly isNew = input.required<boolean>();
   readonly i18n =
     input.required<ReturnType<typeof createEventEditionEditorI18n>>();
-
-  readonly slugEdited = output<void>();
 
   protected resolveCoverPreviewUrl(): string | null {
     const control = this.form().controls.coverImagePath;

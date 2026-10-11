@@ -25,6 +25,7 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
 import { normalizeText, stringToSlug } from '../../../../core/utils/normalize-text';
+import { slugSourceValidator } from '../../../../core/validators/form-value.validator';
 import {
   requiredTrimmedValidator,
 } from '../../../../core/validators/required-trimmed.validator';
@@ -54,6 +55,7 @@ export class EventCoreEditor {
   private readonly eventAdmin = inject(EventAdmin);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
+  private readonly nameSlugSourceValidator = slugSourceValidator();
 
   protected readonly coreId =
     inject(ActivatedRoute).snapshot.paramMap.get('coreId') ?? '';
@@ -76,8 +78,6 @@ export class EventCoreEditor {
     },
   ]);
 
-  private readonly keyEdited = signal(false);
-
   protected readonly form = new FormGroup({
     key: new FormControl('', {
       nonNullable: true,
@@ -89,7 +89,11 @@ export class EventCoreEditor {
     }),
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, requiredTrimmedValidator()],
+      validators: [
+        Validators.required,
+        requiredTrimmedValidator(),
+        ...(this.isNew ? [this.nameSlugSourceValidator] : []),
+      ],
     }),
     shortDescription: new FormControl('', { nonNullable: true }),
     longDescription: new FormControl('', { nonNullable: true }),
@@ -147,10 +151,6 @@ export class EventCoreEditor {
       });
   }
 
-  protected onKeyInput(): void {
-    this.keyEdited.set(true);
-  }
-
   protected saveCore(): void {
     if (this.form.invalid || this.isSaving()) {
       this.form.markAllAsTouched();
@@ -168,7 +168,7 @@ export class EventCoreEditor {
     const value = this.form.getRawValue();
     const payload: IEventCoreSavePayload = {
       id: this.core()?.id ?? null,
-      key: value.key.trim(),
+      key: this.core()?.key ?? value.key,
       name: value.name.trim(),
       shortDescription: normalizeText(value.shortDescription),
       longDescription: normalizeText(value.longDescription),
@@ -217,7 +217,7 @@ export class EventCoreEditor {
   }
 
   private populateForm(core: IEventCoreDetail): void {
-    this.keyEdited.set(true);
+    this.form.controls.name.removeValidators(this.nameSlugSourceValidator);
     this.form.reset({
       key: core.key,
       name: core.name,
@@ -232,7 +232,7 @@ export class EventCoreEditor {
   }
 
   private syncGeneratedKey(name: string): void {
-    if (this.isNew && !this.keyEdited()) {
+    if (this.isNew && !this.core()) {
       this.form.controls.key.setValue(stringToSlug(name), {
         emitEvent: false,
       });

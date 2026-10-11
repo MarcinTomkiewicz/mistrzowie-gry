@@ -41,6 +41,7 @@
     },
     "validation": {
       "keyPattern": "Klucz może zawierać wyłącznie małe litery, cyfry i myślniki.",
+      "nameSlugSource": "[PH] Z podanej nazwy nie można utworzyć klucza wydarzenia. Dodaj co najmniej jedną literę łacińską lub cyfrę.",
       "displayOrderMin": "Kolejność wyświetlania nie może być mniejsza niż 0."
     },
     "editions": {
@@ -98,6 +99,7 @@
     },
     "validation": {
       "slugPattern": "Slug może zawierać wyłącznie małe litery, cyfry i myślniki.",
+      "citySlugSource": "[PH] Z podanego miasta nie można utworzyć części slugu lokalizacji. Dodaj co najmniej jedną literę łacińską lub cyfrę.",
       "priceAmountMin": "Kwota nie może być mniejsza niż 0.",
       "displayOrderMin": "Kolejność wyświetlania musi być liczbą całkowitą nie mniejszą niż 0.",
       "timeRange": "Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia tego samego dnia.",
@@ -107,7 +109,8 @@
     },
     "info": {
       "capacities": "Nowe wartości pojemności dotyczą nowych terminów. Istniejące terminy nie zostaną automatycznie zmienione.",
-      "publicDefault": "Zmiana domyślnej edycji wpłynie na publiczną stronę tego wydarzenia."
+      "publicDefault": "Zmiana domyślnej edycji wpłynie na publiczną stronę tego wydarzenia.",
+      "cityImmutable": "[PH] Miasto tej lokalizacji jest stałe. Aby wskazać inne miasto, utwórz nową lokalizację."
     },
     "participantKinds": {
       "wholeEvent": "Zapisy na całe wydarzenie",
