@@ -7,5 +7,13 @@
 /* domyślnie: dark */
 @include engine.apply-theme(":root", map.merge(common.$common, dark.$dark));
 
+:root {
+  color-scheme: dark;
+}
+
 /* przełącznik: <html data-theme="light"> */
 @include engine.apply-theme(':root[data-theme="light"]', map.merge(common.$common, light.$light));
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}

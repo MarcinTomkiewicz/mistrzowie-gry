@@ -44,7 +44,7 @@
           </small>
         }
       </div>
-    } @else {
+    } @else if (form().controls.kind.value === "recurring") {
       <p-iftalabel class="w-100">
         <p-select
           class="w-100"
@@ -232,40 +232,54 @@
         </div>
       }
     }
+  }
 
-    <div class="flex-col-start-stretch gap-sm w-100">
+  @if (
+    form().controls.kind.value === "recurring" ||
+    form().controls.kind.value === "exact_dates"
+  ) {
+    @let isExactDates = form().controls.kind.value === "exact_dates";
+    @let dateField = isExactDates ? "dates" : "exdates";
+    @let dateArray = form().controls[dateField];
+    @let dateIdPrefix = isExactDates ? "event-exact-date-" : "event-exdate-";
+
+    <div
+      class="flex-col-start-stretch gap-sm w-100"
+      role="group"
+      aria-labelledby="event-schedule-dates-title"
+    >
       <div class="flex-row-between-center flex-wrap gap-sm">
-        <strong>{{ i18n.fields().exdates }}</strong>
+        <strong id="event-schedule-dates-title">
+          {{ isExactDates ? i18n.fields().dates : i18n.fields().exdates }}
+        </strong>
         <p-button
           type="button"
           size="small"
           severity="secondary"
           [label]="i18n.commonActions().add"
           icon="pi pi-plus"
-          (onClick)="addExdate()"
+          (onClick)="addDate(dateField)"
         />
       </div>
 
-      @for (
-        exdateControl of form().controls.exdates.controls;
-        track $index
-      ) {
+      @for (dateControl of dateArray.controls; track dateControl) {
         <div class="flex-row-start-center flex-col-start-stretch-sm gap-sm">
           <div class="flex-col-start-stretch gap-xs flex-1 w-100-sm">
             <p-iftalabel class="w-100">
               <input
                 class="w-100"
                 pInputText
-                [id]="'event-exdate-' + $index"
+                [id]="dateIdPrefix + $index"
                 type="date"
-                [formControl]="exdateControl"
+                [formControl]="dateControl"
               />
-              <label [for]="'event-exdate-' + $index">
-                {{ i18n.fields().exdate }} {{ $index + 1 }}
+              <label [for]="dateIdPrefix + $index">
+                {{ isExactDates ? i18n.fields().date : i18n.fields().exdate }}
+                {{ $index + 1 }}
               </label>
             </p-iftalabel>
 
-            @if (exdateControl.touched && exdateControl.invalid) {
+            @if (!isExactDates && dateControl.touched && dateControl.invalid) {
               <small class="mg-contact-error">
                 {{ i18n.validation().exdate }}
               </small>
@@ -278,9 +292,25 @@
             [outlined]="true"
             [label]="i18n.commonActions().delete"
             icon="pi pi-times"
-            (onClick)="removeExdate($index)"
+            (onClick)="removeDate(dateField, $index)"
           />
         </div>
+      }
+
+      @if (isExactDates && form().touched) {
+        @if (form().hasError("exactDatesRequired")) {
+          <small class="mg-contact-error" role="alert">
+            {{ i18n.validation().exactDatesRequired }}
+          </small>
+        } @else if (form().hasError("exactDatesInvalid")) {
+          <small class="mg-contact-error" role="alert">
+            {{ i18n.validation().exactDatesInvalid }}
+          </small>
+        } @else if (form().hasError("exactDatesDuplicate")) {
+          <small class="mg-contact-error" role="alert">
+            {{ i18n.validation().exactDatesDuplicate }}
+          </small>
+        }
       }
     </div>
   }

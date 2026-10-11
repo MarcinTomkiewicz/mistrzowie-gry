@@ -97,6 +97,7 @@ export class SessionForm {
   readonly languages = input<readonly ILanguage[]>([]);
   readonly submitLabel = input('');
   readonly cancelLabel = input('');
+  readonly cancelIcon = input('pi pi-interdiction');
   readonly busy = input(false);
 
   readonly save = output<ISessionFormSubmitData>();

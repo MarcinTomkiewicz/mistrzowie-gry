@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,6 +22,7 @@ import {
 } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import {
   formatDateLabel,
   formatTimestampLabel,
@@ -35,6 +36,7 @@ import {
 } from '../participant-signup-kind-options';
 import { stringToSlug } from '../../../../core/utils/normalize-text';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';
 import { EventEditionSettingsEditor } from './event-edition-settings-editor';
@@ -48,6 +50,7 @@ import { OccurrenceEditor } from './occurrence-editor';
     ReactiveFormsModule,
     ButtonModule,
     LoadingOverlay,
+    Breadcrumbs,
     EventEditionDetailsEditor,
     EventEditionSettingsEditor,
     EventScheduleEditor,
@@ -84,6 +87,21 @@ export class EventEditionEditor {
   protected readonly isSaving = signal(false);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
+  protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    {
+      label: this.i18n.commonNav().eventsManagement,
+      path: '/admin/content/events',
+    },
+    {
+      label: this.core()?.name ?? this.i18n.commonLabels().event,
+      path: `/admin/content/events/${this.coreId}/edit`,
+    },
+    {
+      label: this.isNew
+        ? this.i18n.page().createTitle
+        : this.edition()?.city ?? this.i18n.page().editTitle,
+    },
+  ]);
   protected readonly form = createEventEditionForm(this.coreId);
   protected readonly formatDateLabel = formatDateLabel;
   protected readonly formatTimestampLabel = formatTimestampLabel;

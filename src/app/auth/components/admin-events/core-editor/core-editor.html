@@ -1,5 +1,7 @@
 <section class="mg-section mg-section--full">
   <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <app-breadcrumbs [items]="breadcrumbs()" />
+
     <header class="mg-section__header w-100">
       <h1 class="mg-section__title">
         {{ isNew ? i18n.page().createTitle : i18n.page().editTitle }}
@@ -42,7 +44,7 @@
             severity="warn"
             [outlined]="true"
             [label]="i18n.commonActions().cancel"
-            icon="pi pi-arrow-left"
+            icon="pi pi-interdiction"
             (onClick)="goBack()"
           />
         </div>
@@ -59,7 +61,7 @@
           severity="warn"
           [outlined]="true"
           [label]="i18n.commonActions().cancel"
-          icon="pi pi-arrow-left"
+          icon="pi pi-interdiction"
           (onClick)="goBack()"
         />
       </section>
@@ -234,7 +236,7 @@
             severity="warn"
             [outlined]="true"
             [label]="i18n.commonActions().cancel"
-            icon="pi pi-arrow-left"
+            icon="pi pi-interdiction"
             [disabled]="isSaving()"
             (onClick)="goBack()"
           />

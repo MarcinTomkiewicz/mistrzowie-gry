@@ -205,6 +205,7 @@ export type ScheduleFieldsCopy = {
   sectionTitle: string;
   kind: string;
   date: string;
+  dates: string;
   recurrenceKind: string;
   interval: string;
   byweekday: string;
@@ -220,6 +221,7 @@ export type ScheduleFieldsCopy = {
 export type ScheduleOptionsCopy = {
   single: string;
   recurring: string;
+  exactDates: string;
   monthlyNthWeekday: string;
   monthlyDayOfMonth: string;
   first: string;
@@ -231,6 +233,9 @@ export type ScheduleOptionsCopy = {
 
 export type ScheduleValidationCopy = {
   singleDate: string;
+  exactDatesRequired: string;
+  exactDatesInvalid: string;
+  exactDatesDuplicate: string;
   recurrenceDates: string;
   recurrenceDateRange: string;
   weeklyDays: string;

@@ -180,6 +180,7 @@
       "sectionTitle": "Harmonogram",
       "kind": "Rodzaj harmonogramu",
       "date": "Data wydarzenia",
+      "dates": "[PH] Daty wydarzenia",
       "recurrenceKind": "Sposób powtarzania",
       "interval": "Interwał",
       "byweekday": "Dni tygodnia",
@@ -194,6 +195,7 @@
     "options": {
       "single": "Wydarzenie jednorazowe",
       "recurring": "Wydarzenie cykliczne",
+      "exactDates": "[PH] Wydarzenie w wybranych terminach",
       "monthlyNthWeekday": "Miesięcznie - wybrany dzień tygodnia",
       "monthlyDayOfMonth": "Miesięcznie - wybrany dzień miesiąca",
       "first": "Pierwszy",
@@ -204,6 +206,9 @@
     },
     "validation": {
       "singleDate": "Podaj poprawną datę wydarzenia.",
+      "exactDatesRequired": "[PH] Dodaj co najmniej jedną datę wydarzenia.",
+      "exactDatesInvalid": "[PH] Podaj poprawne daty wydarzenia.",
+      "exactDatesDuplicate": "[PH] Daty wydarzenia nie mogą się powtarzać.",
       "recurrenceDates": "Podaj poprawną datę początku i końca harmonogramu.",
       "recurrenceDateRange": "Koniec harmonogramu nie może być wcześniejszy niż jego początek.",
       "weeklyDays": "Wybierz co najmniej jeden dzień tygodnia.",

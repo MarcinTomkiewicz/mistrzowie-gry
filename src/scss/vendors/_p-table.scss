@@ -1,10 +1,13 @@
-@use "sass:map";
 @use "../abstracts/variables" as v;
 @use "../abstracts/mixins" as m;
 
 .p-datatable {
   background: v.$color-bg-surface;
   color: v.$color-text;
+}
+
+.p-datatable .p-datatable-table {
+  border-spacing: 0;
 }
 
 :root .p-datatable-thead th {
@@ -29,5 +32,10 @@
 
   &:hover {
     background: v.$color-form-bg-hover;
+
+    > td,
+    > th {
+      background: inherit;
+    }
   }
 }

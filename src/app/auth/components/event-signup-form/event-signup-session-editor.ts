@@ -205,6 +205,7 @@ export class EventSignupSessionEditor {
       {
         type: 'action',
         label: this.i18n().commonActions().cancel,
+        icon: 'pi pi-interdiction',
         severity: 'danger',
         outlined: true,
       },

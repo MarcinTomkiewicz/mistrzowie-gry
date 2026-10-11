@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { IftaLabelModule } from 'primeng/iftalabel';
@@ -57,6 +57,10 @@ export class EventScheduleEditor implements OnInit {
       value: 'recurring',
       label: this.i18n.options().recurring,
     },
+    {
+      value: 'exact_dates',
+      label: this.i18n.options().exactDates,
+    },
   ]);
   protected readonly recurrenceKindOptions = computed<
     ISelectOption<EventRecurrenceKind>[]
@@ -103,24 +107,28 @@ export class EventScheduleEditor implements OnInit {
     this.syncScheduleKind(form.controls.kind.value);
   }
 
-  protected addExdate(): void {
-    const exdates = this.form().controls.exdates;
+  protected addDate(field: 'dates' | 'exdates'): void {
+    const dates = this.form().controls[field];
 
-    exdates.push(createEventExdateControl());
-    exdates.markAsDirty();
+    dates.push(
+      field === 'dates'
+        ? new FormControl('', { nonNullable: true })
+        : createEventExdateControl(),
+    );
+    dates.markAsDirty();
   }
 
-  protected removeExdate(index: number): void {
-    const exdates = this.form().controls.exdates;
+  protected removeDate(field: 'dates' | 'exdates', index: number): void {
+    const dates = this.form().controls[field];
 
-    exdates.removeAt(index);
-    exdates.markAsDirty();
+    dates.removeAt(index);
+    dates.markAsDirty();
   }
 
   private syncScheduleKind(kind: EventScheduleKind): void {
     const form = this.form();
 
-    if (kind === 'single') {
+    if (kind !== 'recurring') {
       form.patchValue(
         {
           recurrenceKind: 'WEEKLY',
@@ -135,8 +143,13 @@ export class EventScheduleEditor implements OnInit {
         { emitEvent: false },
       );
       form.controls.exdates.clear({ emitEvent: false });
-    } else {
+    }
+
+    if (kind !== 'single') {
       form.controls.date.setValue('', { emitEvent: false });
+    }
+
+    if (kind === 'recurring') {
       this.syncRecurrenceKind(form.controls.recurrenceKind.value);
     }
 

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormControl,
@@ -22,12 +22,14 @@ import {
 } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
 import { normalizeText, stringToSlug } from '../../../../core/utils/normalize-text';
 import {
   requiredTrimmedValidator,
 } from '../../../../core/validators/required-trimmed.validator';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 
 @Component({
@@ -43,6 +45,7 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
     ToggleSwitchModule,
     RouterLink,
     LoadingOverlay,
+    Breadcrumbs,
   ],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common')],
@@ -61,6 +64,17 @@ export class EventCoreEditor {
   protected readonly isSaving = signal(false);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
+  protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    {
+      label: this.i18n.commonNav().eventsManagement,
+      path: '/admin/content/events',
+    },
+    {
+      label: this.isNew
+        ? this.i18n.page().createTitle
+        : this.core()?.name ?? this.i18n.page().editTitle,
+    },
+  ]);
 
   private readonly keyEdited = signal(false);
 

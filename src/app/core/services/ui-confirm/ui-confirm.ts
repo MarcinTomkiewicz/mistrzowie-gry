@@ -80,6 +80,7 @@ export class UiConfirm {
       },
       rejectButtonProps: {
         severity: 'secondary',
+        icon: 'pi pi-interdiction',
         outlined: true,
       },
     });
@@ -99,6 +100,7 @@ export class UiConfirm {
       },
       rejectButtonProps: {
         severity: 'secondary',
+        icon: 'pi pi-interdiction',
         outlined: true,
       },
     });
