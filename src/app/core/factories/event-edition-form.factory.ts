@@ -80,14 +80,6 @@ export function createEventEditionForm(
       facebookLink: new FormControl('', { nonNullable: true }),
       isActive: new FormControl(false, { nonNullable: true }),
       isDefaultPublic: new FormControl(false, { nonNullable: true }),
-      displayOrder: new FormControl(0, {
-        nonNullable: true,
-        validators: [
-          Validators.required,
-          integerValidator(),
-          Validators.min(0),
-        ],
-      }),
       isForBeginners: new FormControl(false, { nonNullable: true }),
       timezone: new FormControl(DEFAULT_TIMEZONE, {
         nonNullable: true,
@@ -189,7 +181,6 @@ export function populateEventEditionForm(
       facebookLink: detail?.facebookLink ?? '',
       isActive: detail?.isActive ?? false,
       isDefaultPublic: detail?.isDefaultPublic ?? false,
-      displayOrder: detail?.displayOrder ?? 0,
       isForBeginners: detail?.isForBeginners ?? false,
       timezone: detail?.timezone ?? DEFAULT_TIMEZONE,
       startTime: formatTimeLabel(detail?.startTime),
@@ -230,7 +221,7 @@ export function mapEventEditionFormToPayload(
     facebookLink: normalizeText(value.facebookLink),
     isActive: value.isActive,
     isDefaultPublic: value.isDefaultPublic,
-    displayOrder: value.displayOrder,
+    displayOrder: detail?.displayOrder ?? 0,
     isForBeginners: value.isForBeginners,
     timezone: value.timezone.trim(),
     startTime: value.startTime,

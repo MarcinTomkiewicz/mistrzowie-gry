@@ -10,7 +10,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -40,7 +39,6 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
     ReactiveFormsModule,
     ButtonModule,
     IftaLabelModule,
-    InputNumberModule,
     InputTextModule,
     TextareaModule,
     ToggleSwitchModule,
@@ -99,10 +97,6 @@ export class EventCoreEditor {
     longDescription: new FormControl('', { nonNullable: true }),
     isActive: new FormControl(false, { nonNullable: true }),
     hasPublicPage: new FormControl(false, { nonNullable: true }),
-    displayOrder: new FormControl(0, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.min(0)],
-    }),
   });
 
   constructor() {
@@ -174,7 +168,7 @@ export class EventCoreEditor {
       longDescription: normalizeText(value.longDescription),
       isActive: value.isActive,
       hasPublicPage: value.hasPublicPage,
-      displayOrder: value.displayOrder,
+      displayOrder: this.core()?.displayOrder ?? 0,
     };
 
     this.isSaving.set(true);
@@ -225,7 +219,6 @@ export class EventCoreEditor {
       longDescription: core.longDescription ?? '',
       isActive: core.isActive,
       hasPublicPage: core.hasPublicPage,
-      displayOrder: core.displayOrder,
     });
     this.form.markAsPristine();
     this.form.markAsUntouched();

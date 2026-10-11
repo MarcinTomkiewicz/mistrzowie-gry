@@ -46,7 +46,6 @@ export type EditorFieldsCopy = {
 export type EditorValidationCopy = {
   keyPattern: string;
   nameSlugSource: string;
-  displayOrderMin: string;
 };
 
 export type EditionsCopy = {
@@ -115,7 +114,6 @@ export type EditionValidationCopy = {
   slugPattern: string;
   citySlugSource: string;
   priceAmountMin: string;
-  displayOrderMin: string;
   timeRange: string;
   slotCapacityRange: string;
   participantCapacityMin: string;

@@ -41,8 +41,7 @@
     },
     "validation": {
       "keyPattern": "Klucz może zawierać wyłącznie małe litery, cyfry i myślniki.",
-      "nameSlugSource": "[PH] Z podanej nazwy nie można utworzyć klucza wydarzenia. Dodaj co najmniej jedną literę łacińską lub cyfrę.",
-      "displayOrderMin": "Kolejność wyświetlania nie może być mniejsza niż 0."
+      "nameSlugSource": "[PH] Z podanej nazwy nie można utworzyć klucza wydarzenia. Dodaj co najmniej jedną literę łacińską lub cyfrę."
     },
     "editions": {
       "sectionTitle": "Lokalne edycje",
@@ -101,7 +100,6 @@
       "slugPattern": "Slug może zawierać wyłącznie małe litery, cyfry i myślniki.",
       "citySlugSource": "[PH] Z podanego miasta nie można utworzyć części slugu lokalizacji. Dodaj co najmniej jedną literę łacińską lub cyfrę.",
       "priceAmountMin": "Kwota nie może być mniejsza niż 0.",
-      "displayOrderMin": "Kolejność wyświetlania musi być liczbą całkowitą nie mniejszą niż 0.",
       "timeRange": "Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia tego samego dnia.",
       "slotCapacityRange": "Liczba Mistrzów Gry musi być liczbą całkowitą od 1 do 12.",
       "participantCapacityMin": "Liczba uczestników musi być pusta albo być liczbą całkowitą nie mniejszą niż 1.",

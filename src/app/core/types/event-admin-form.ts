@@ -38,7 +38,6 @@ export type EventEditionFormGroup = FormGroup<{
   facebookLink: FormControl<string>;
   isActive: FormControl<boolean>;
   isDefaultPublic: FormControl<boolean>;
-  displayOrder: FormControl<number>;
   isForBeginners: FormControl<boolean>;
   timezone: FormControl<string>;
   startTime: FormControl<string>;

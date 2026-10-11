@@ -147,38 +147,7 @@
             </p-iftalabel>
           </div>
 
-          <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
-            <div class="flex-col-start-stretch gap-xs w-100">
-              <p-iftalabel class="w-100">
-                <p-inputnumber
-                  class="w-100"
-                  inputId="event-core-display-order"
-                  formControlName="displayOrder"
-                  [useGrouping]="false"
-                  [min]="0"
-                />
-                <label for="event-core-display-order">
-                  {{ i18n.commonLabels().displayOrder }}
-                </label>
-              </p-iftalabel>
-
-              @if (
-                form.controls.displayOrder.touched &&
-                form.controls.displayOrder.hasError("required")
-              ) {
-                <small class="mg-contact-error">
-                  {{ i18n.commonForm().required }}
-                </small>
-              } @else if (
-                form.controls.displayOrder.touched &&
-                form.controls.displayOrder.hasError("min")
-              ) {
-                <small class="mg-contact-error">
-                  {{ i18n.validation().displayOrderMin }}
-                </small>
-              }
-            </div>
-
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
             <div class="flex-row-start-center gap-md w-100">
               <p-toggleswitch
                 inputId="event-core-is-active"
@@ -262,9 +231,6 @@
                         {{ i18n.editionTable().defaultPublic }}
                       </th>
                       <th class="small-caps text-center" scope="col">
-                        {{ i18n.commonLabels().order }}
-                      </th>
-                      <th class="small-caps text-center" scope="col">
                         {{ i18n.editions().sectionTitle }}
                       </th>
                       <th class="small-caps text-center" scope="col">
@@ -303,7 +269,6 @@
                               : i18n.commonValues().no
                           }}
                         </td>
-                        <td class="text-center">{{ edition.displayOrder }}</td>
                         <td class="text-center">
                           {{ edition.occurrenceCount }}
                         </td>

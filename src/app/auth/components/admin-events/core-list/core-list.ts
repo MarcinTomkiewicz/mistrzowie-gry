@@ -3,12 +3,13 @@ import { RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import { IEventCoreListItem } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatTimestampLabel } from '../../../../core/utils/date';
+import { sortEventCoresByNextOccurrence } from '../../../../core/utils/event-admin-list';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createEventCoreListI18n } from './core-list.i18n';
@@ -35,7 +36,6 @@ export class EventCoreList {
   );
 
   protected readonly rowVms = computed(() => {
-    const table = this.i18n.table();
     const status = this.i18n.status();
     const commonValues = this.i18n.commonValues();
 
@@ -66,11 +66,15 @@ export class EventCoreList {
     this.isLoading.set(true);
     this.loadErrorMessage.set(null);
 
-    this.eventAdmin
-      .getCoreList()
+    forkJoin({
+      cores: this.eventAdmin.getCoreList(),
+      editions: this.eventAdmin.getEditionList(),
+    })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (rows) => this.rows.set(rows),
+        next: ({ cores, editions }) => {
+          this.rows.set(sortEventCoresByNextOccurrence(cores, editions));
+        },
         error: (error) => {
           const detail = resolveEventCoreAdminErrorMessage(
             error,
