@@ -11,10 +11,7 @@ import {
   IAdminEventDetail,
   IEventSavePayload,
 } from '../interfaces/i-event-admin';
-import {
-  IEventRecurringSchedule,
-  IEventSingleSchedule,
-} from '../interfaces/i-event-schedule';
+import { IEventSchedule } from '../interfaces/i-event-schedule';
 import {
   EventEditionFormGroup,
   EventScheduleFormGroup,
@@ -124,6 +121,7 @@ export function createEventScheduleForm(): EventScheduleFormGroup {
         nonNullable: true,
       }),
       date: new FormControl('', { nonNullable: true }),
+      dates: new FormArray<FormControl<string>>([]),
       recurrenceKind: new FormControl<EventRecurrenceKind>('WEEKLY', {
         nonNullable: true,
       }),
@@ -231,7 +229,7 @@ export function mapEventEditionFormToPayload(
 
 function populateEventScheduleForm(
   form: EventScheduleFormGroup,
-  schedule: IEventSingleSchedule | IEventRecurringSchedule | null,
+  schedule: IEventSchedule | null,
 ): void {
   const recurring = schedule?.kind === 'recurring' ? schedule : null;
 
@@ -251,6 +249,13 @@ function populateEventScheduleForm(
     { emitEvent: false },
   );
 
+  form.controls.dates.clear({ emitEvent: false });
+  for (const date of schedule?.kind === 'exact_dates' ? schedule.dates : []) {
+    form.controls.dates.push(new FormControl(date, { nonNullable: true }), {
+      emitEvent: false,
+    });
+  }
+
   form.controls.exdates.clear({ emitEvent: false });
   for (const exdate of recurring?.exdates ?? []) {
     form.controls.exdates.push(createEventExdateControl(exdate), {
@@ -262,13 +267,20 @@ function populateEventScheduleForm(
 
 function mapEventScheduleFormToPayload(
   form: EventScheduleFormGroup,
-): IEventSingleSchedule | IEventRecurringSchedule {
+): IEventSchedule {
   const value = form.getRawValue();
 
   if (value.kind === 'single') {
     return {
       kind: 'single',
       date: value.date,
+    };
+  }
+
+  if (value.kind === 'exact_dates') {
+    return {
+      kind: 'exact_dates',
+      dates: [...value.dates],
     };
   }
 

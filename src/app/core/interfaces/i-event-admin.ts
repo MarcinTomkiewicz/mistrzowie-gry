@@ -3,10 +3,7 @@ import {
   ParticipantSignupKind,
 } from '../enums/event';
 import { EventScheduleKind } from '../types/event';
-import {
-  IEventRecurringSchedule,
-  IEventSingleSchedule,
-} from './i-event-schedule';
+import { IEventSchedule } from './i-event-schedule';
 
 export interface IEventCoreListItem {
   id: string;
@@ -111,7 +108,7 @@ export interface IAdminEventDetail {
   signupRequired: boolean;
   defaultSlotCapacity: number;
   defaultParticipantCapacity: number | null;
-  schedule: IEventSingleSchedule | IEventRecurringSchedule;
+  schedule: IEventSchedule;
   occurrences: IAdminOccurrenceListItem[];
   createdAt: string;
   updatedAt: string;
@@ -140,7 +137,7 @@ export interface IEventSavePayload {
   signupRequired: boolean;
   defaultSlotCapacity: number;
   defaultParticipantCapacity: number | null;
-  schedule: IEventSingleSchedule | IEventRecurringSchedule;
+  schedule: IEventSchedule;
 }
 
 export interface IAdminOccurrenceListItem {

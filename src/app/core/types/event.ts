@@ -1,4 +1,4 @@
-export type EventScheduleKind = 'single' | 'recurring';
+export type EventScheduleKind = 'single' | 'recurring' | 'exact_dates';
 
 export type EventRecurrenceKind =
   | 'WEEKLY'

@@ -13,6 +13,7 @@ import {
 export type EventScheduleFormGroup = FormGroup<{
   kind: FormControl<EventScheduleKind>;
   date: FormControl<string>;
+  dates: FormArray<FormControl<string>>;
   recurrenceKind: FormControl<EventRecurrenceKind>;
   interval: FormControl<number>;
   byweekday: FormControl<number[]>;

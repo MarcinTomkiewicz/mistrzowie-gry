@@ -27,6 +27,19 @@ export const eventScheduleValidator: ValidatorFn = (
       : { singleDate: true };
   }
 
+  if (kind === 'exact_dates') {
+    const dates: unknown = control.get('dates')?.getRawValue();
+    if (!Array.isArray(dates) || dates.length === 0) {
+      return { exactDatesRequired: true };
+    }
+    if (!dates.every((date: unknown) => isValidIsoDate(date) && date.length === 10)) {
+      return { exactDatesInvalid: true };
+    }
+    return new Set(dates).size === dates.length
+      ? null
+      : { exactDatesDuplicate: true };
+  }
+
   if (kind !== 'recurring') {
     return { scheduleKind: true };
   }

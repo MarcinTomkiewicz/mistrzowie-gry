@@ -5,6 +5,11 @@ export interface IEventSingleSchedule {
   date: string;
 }
 
+export interface IEventExactDatesSchedule {
+  kind: 'exact_dates';
+  dates: string[];
+}
+
 export interface IEventRecurringSchedule {
   kind: 'recurring';
   recurrenceKind: EventRecurrenceKind;
@@ -17,3 +22,8 @@ export interface IEventRecurringSchedule {
   endDate: string;
   exdates: string[];
 }
+
+export type IEventSchedule =
+  | IEventSingleSchedule
+  | IEventRecurringSchedule
+  | IEventExactDatesSchedule;
