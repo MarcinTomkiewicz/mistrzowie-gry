@@ -11,7 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 
-import { renderPdfPageToCanvas } from '../../core/utils/pdf';
+import { renderPdfPageToCanvas, reportPdfError } from '../../core/utils/pdf';
 
 @Component({
   selector: 'app-pdf-thumbnail',
@@ -55,7 +55,8 @@ export class PdfThumbnail {
         next: () => {
           this.isLoading.set(false);
         },
-        error: () => {
+        error: (error: unknown) => {
+          reportPdfError('thumbnail', error);
           this.isLoading.set(false);
           this.hasError.set(true);
         },

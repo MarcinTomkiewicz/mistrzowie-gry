@@ -19,7 +19,8 @@ import { DialogModule } from 'primeng/dialog';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 import type { IPdfPreview } from '../../core/interfaces/i-pdf';
-import { loadPdfDocument, renderPdfPageToCanvas } from '../../core/utils/pdf';
+import { createCommonActionsI18n } from '../../core/translations/common.i18n';
+import { loadPdfDocument, renderPdfPageToCanvas, reportPdfError } from '../../core/utils/pdf';
 import {
   PDF_VIEWER_ZOOM_MAX,
   PDF_VIEWER_ZOOM_MIN,
@@ -40,6 +41,7 @@ export class PdfViewerDialog {
 
   readonly preview = input<IPdfPreview | null>(null);
   readonly closed = output<void>();
+  protected readonly commonActions = createCommonActionsI18n();
 
   readonly document = signal<PDFDocumentProxy | null>(null);
   readonly pageNumber = signal(1);
@@ -101,7 +103,8 @@ export class PdfViewerDialog {
           this.hasError.set(false);
 
           return loadPdfDocument(url).pipe(
-            catchError(() => {
+            catchError((error: unknown) => {
+              reportPdfError('dialog-load', error);
               this.document.set(null);
               this.pageCount.set(0);
               this.hasError.set(true);
@@ -146,7 +149,8 @@ export class PdfViewerDialog {
             targetHeight,
             request.zoom,
           ).pipe(
-            catchError(() => {
+            catchError((error: unknown) => {
+              reportPdfError('dialog-render', error);
               this.hasError.set(true);
               this.isLoading.set(false);
               return of(null);

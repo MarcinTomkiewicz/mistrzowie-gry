@@ -4,29 +4,19 @@
   [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
-  [closable]="false"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [closeAriaLabel]="commonActions().close"
   appendTo="body"
   [styleClass]="'mg-dialog mg-dialog--xl'"
-  (visibleChange)="close()"
+  (visibleChange)="$event ? null : close()"
 >
   @if (preview(); as activePreview) {
     <ng-template pTemplate="header">
       <div class="w-100 flex-row-between-center flex-col-start-stretch-xs gap-sm">
-        <div class="flex-row-between-center gap-sm w-100 flex-1">
-          <h2 class="mg-section__title mg-section__title--md m-0">
-            {{ activePreview.title }}
-          </h2>
-
-          <p-button
-            type="button"
-            severity="secondary"
-            styleClass="small-icon show-down-xs"
-            [rounded]="true"
-            [text]="true"
-            icon="pi pi-times"
-            (onClick)="close()"
-          />
-        </div>
+        <h2 class="mg-section__title mg-section__title--md m-0 flex-1">
+          {{ activePreview.title }}
+        </h2>
 
         @if (canShowControls()) {
           <div class="flex-row-end-center flex-row-center-center-xs gap-sm w-100-xs">
@@ -90,16 +80,6 @@
               icon="pi pi-point-right"
               [disabled]="!canGoNext() || isLoading()"
               (onClick)="nextPage()"
-            />
-
-            <p-button
-              type="button"
-              severity="secondary"
-              styleClass="small-icon hide-down-xs"
-              [rounded]="true"
-              [text]="true"
-              icon="pi pi-times"
-              (onClick)="close()"
             />
           </div>
         }

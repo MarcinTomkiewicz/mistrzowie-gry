@@ -10,7 +10,7 @@ export function loadPdfDocument(src: string): Observable<IPdfLoadResult> {
   return from(import('pdfjs-dist')).pipe(
     switchMap((pdfjs) => {
       if (!workerConfigured) {
-        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+        pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs?v=${encodeURIComponent(pdfjs.version)}`;
         workerConfigured = true;
       }
 
@@ -22,6 +22,31 @@ export function loadPdfDocument(src: string): Observable<IPdfLoadResult> {
       );
     }),
   );
+}
+
+export function reportPdfError(
+  operation: 'dialog-load' | 'dialog-render' | 'thumbnail',
+  error: unknown,
+): void {
+  const name = error instanceof Error ? error.name : '';
+  const errorName = [
+    'Error',
+    'TypeError',
+    'AbortException',
+    'InvalidPDFException',
+    'PasswordException',
+    'ResponseException',
+    'UnknownErrorException',
+    'RenderingCancelledException',
+  ].includes(name) ? name : 'UnknownError';
+  const httpStatus =
+    typeof error === 'object' && error !== null && 'status' in error &&
+    typeof error.status === 'number' && Number.isInteger(error.status) &&
+    error.status >= 100 && error.status <= 599
+      ? error.status
+      : null;
+
+  console.error('[PDF] Preview failed.', { operation, errorName, httpStatus });
 }
 
 export function renderPdfPageToCanvas(
