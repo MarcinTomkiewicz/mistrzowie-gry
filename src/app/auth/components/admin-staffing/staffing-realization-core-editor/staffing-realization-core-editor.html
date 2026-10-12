@@ -18,7 +18,7 @@
     }
 
     <app-loading-overlay
-      [visible]="isLoading() || isSaving()"
+      [visible]="isBusy()"
       [label]="
         isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading
       "
@@ -186,6 +186,7 @@
                 [class.active]="form.controls.type.value === 'stationary'"
                 role="radio"
                 [attr.aria-checked]="form.controls.type.value === 'stationary'"
+                [disabled]="isBusy()"
                 (click)="selectType('stationary')"
               >
                 <div class="flex-row-start-center gap-md">
@@ -203,6 +204,7 @@
                 [class.active]="form.controls.type.value === 'travel'"
                 role="radio"
                 [attr.aria-checked]="form.controls.type.value === 'travel'"
+                [disabled]="isBusy()"
                 (click)="selectType('travel')"
               >
                 <div class="flex-row-start-center gap-md">
@@ -246,6 +248,31 @@
             [ariaLabel]="fields.event"
             [emptyMessage]="i18n.event().empty"
           />
+
+          @if (!isNew) {
+            @if (!realization()?.eventId) {
+              <p-message severity="info" icon="pi pi-info-circle">
+                {{ i18n.event().privateCreationHint }}
+              </p-message>
+            }
+            @if (hasUnsavedChanges()) {
+              <p-message severity="warn" icon="pi pi-info-circle">
+                {{ i18n.event().saveChangesFirstHint }}
+              </p-message>
+            }
+            <div class="flex-row-end-center flex-wrap gap-sm">
+              <p-button
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [label]="realization()?.eventId ? i18n.commonActions().edit : i18n.actions().createEvent"
+                [icon]="realization()?.eventId ? 'pi pi-scroll-quill' : 'pi pi-plus'"
+                [loading]="isEventActionRunning()"
+                [disabled]="isBusy() || hasUnsavedChanges()"
+                (onClick)="openEvent()"
+              />
+            </div>
+          }
         </section>
 
         <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew">
@@ -255,7 +282,7 @@
             [outlined]="true"
             [label]="i18n.commonActions().cancel"
             icon="pi pi-interdiction"
-            [disabled]="isSaving()"
+            [disabled]="isBusy()"
             (onClick)="cancel()"
           />
           <p-button
@@ -264,7 +291,7 @@
             [label]="saveLabel()"
             icon="pi pi-done-it"
             [loading]="isSaving()"
-            [disabled]="isLoading()"
+            [disabled]="isBusy()"
           />
         </div>
       </form>

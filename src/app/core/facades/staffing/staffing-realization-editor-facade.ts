@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { defer, forkJoin, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { catchError, defer, forkJoin, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 
 import { mapStaffingRealizationCoreToDraft } from '../../factories/staffing-realization-core-form.factory';
 import { mapStaffingRealizationScheduleToDraft } from '../../factories/staffing-realization-days-form.factory';
@@ -12,9 +12,11 @@ import type { StaffingCandidateThread } from '../../interfaces/staffing-candidat
 import type { AdminStaffingFinalPlan, StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
 import type { StaffingCandidateSessionOptions } from '../../interfaces/staffing-candidate-session-options';
 import { SessionRead } from '../../reads/sessions/session-read';
+import { EventAdmin } from '../../services/event-admin/event-admin';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
+  ConvertAdminStaffingRealizationToEventResult,
   CreateAdminStaffingRealizationRequest,
   CreateAdminStaffingRealizationResult,
   SaveAdminStaffingScheduleDayInput,
@@ -34,6 +36,7 @@ export class StaffingRealizationEditorFacade {
   private readonly read = inject(AdminStaffingRealizationRead);
   private readonly write = inject(AdminStaffingRealization);
   private readonly sessionRead = inject(SessionRead);
+  private readonly eventAdmin = inject(EventAdmin);
   private readonly finalPlanCandidates = new Map<string, Observable<StaffingCandidateSessionOptions>>();
   readonly store = inject(StaffingRealizationEditorStore);
 
@@ -235,6 +238,31 @@ export class StaffingRealizationEditorFacade {
           }
         }
       }),
+    );
+  }
+
+  getOrCreateEvent(
+    realization: AdminStaffingRealizationCore,
+  ): Observable<Pick<ConvertAdminStaffingRealizationToEventResult, 'eventCoreId' | 'eventId'>> {
+    if (realization.eventId) {
+      return this.eventAdmin.getEditionDetail(realization.eventId).pipe(map((event) => {
+        if (!event) throw new Error('The linked Event edition is unavailable.');
+        return { eventCoreId: event.eventCoreId, eventId: event.id };
+      }));
+    }
+
+    const realizationId = realization.id;
+    return this.write.convertToEvent(realizationId).pipe(
+      switchMap((result) => this.read.getDetail(realizationId).pipe(
+        tap((realization) => {
+          if (this.store.realizationId() === realizationId) {
+            this.store.invalidateReadiness();
+            this.hydrateCore(realization);
+          }
+        }),
+        map(() => result),
+        catchError(() => of(result)),
+      )),
     );
   }
 

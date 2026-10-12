@@ -6,6 +6,7 @@ import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
   ArchiveAdminStaffingRealizationResult,
+  ConvertAdminStaffingRealizationToEventResult,
   CreateAdminStaffingRealizationRequest,
   CreateAdminStaffingRealizationResult,
   DeleteAdminStaffingRealizationResult,
@@ -99,6 +100,13 @@ export class AdminStaffingRealization {
     return this.backend.rpc<CreateAdminStaffingRealizationResult>(
       STAFFING_REALIZATION_RPC.createAdmin,
       { p_payload: payload },
+    );
+  }
+
+  convertToEvent(realizationId: string): Observable<ConvertAdminStaffingRealizationToEventResult> {
+    return this.backend.rpc<ConvertAdminStaffingRealizationToEventResult>(
+      STAFFING_REALIZATION_RPC.convertAdminToEvent,
+      { p_realization_id: realizationId },
     );
   }
 

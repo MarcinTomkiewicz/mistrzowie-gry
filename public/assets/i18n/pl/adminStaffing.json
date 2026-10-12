@@ -163,14 +163,18 @@
     },
     "event": {
       "placeholder": "Wybierz wydarzenie...",
-      "empty": "Brak wydarzeń do wyboru"
+      "empty": "Brak wydarzeń do wyboru",
+      "privateCreationHint": "[PH] Wydarzenie pozostanie prywatne. Wymagany jest co najmniej jeden blok czasowy; pełna obsada nie jest wymagana.",
+      "saveChangesFirstHint": "[PH] Zapisz zmiany we wszystkich zakładkach przed utworzeniem lub otwarciem wydarzenia."
     },
     "actions": {
-      "createDraft": "Utwórz szkic"
+      "createDraft": "Utwórz szkic",
+      "createEvent": "Utwórz wydarzenie"
     },
     "toast": {
       "saveSuccessSummary": "Zlecenie zapisane",
-      "saveFailedSummary": "Nie udało się zapisać zlecenia"
+      "saveFailedSummary": "Nie udało się zapisać zlecenia",
+      "eventActionFailedSummary": "[PH] Nie udało się utworzyć lub otworzyć wydarzenia"
     }
   },
   "shell": {

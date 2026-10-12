@@ -28,6 +28,7 @@ export const STAFFING_REALIZATION_RPC = {
   getAdminRecruitmentPolicy: 'get_admin_staffing_recruitment_policy',
   saveAdminRecruitmentPolicy: 'save_admin_staffing_recruitment_policy',
   createAdmin: 'create_admin_staffing_realization',
+  convertAdminToEvent: 'convert_admin_staffing_realization_to_event',
   updateAdminCore: 'update_admin_staffing_realization',
   getAdminDetail: 'get_admin_staffing_realization_detail',
   getAdminSchedule: 'get_admin_staffing_realization_schedule',

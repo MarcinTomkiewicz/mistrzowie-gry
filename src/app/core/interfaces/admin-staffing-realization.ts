@@ -124,6 +124,16 @@ export interface CreateAdminStaffingRealizationResult {
   days: AdminStaffingRealizationDay[];
 }
 
+export interface ConvertAdminStaffingRealizationToEventResult {
+  converted: boolean;
+  realizationId: string;
+  eventCoreId: string;
+  eventId: string;
+  occurrences: { date: string; occurrenceId: string }[];
+  programItemCount: number;
+  public: false;
+}
+
 export interface DeleteAdminStaffingRealizationResult {
   deleted: true;
   realizationId: string;

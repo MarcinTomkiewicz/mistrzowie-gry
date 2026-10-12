@@ -80,13 +80,17 @@ export type AdminStaffingEditorCopy = {
   event: {
     placeholder: string;
     empty: string;
+    privateCreationHint: string;
+    saveChangesFirstHint: string;
   };
   actions: {
     createDraft: string;
+    createEvent: string;
   };
   toast: {
     saveSuccessSummary: string;
     saveFailedSummary: string;
+    eventActionFailedSummary: string;
   };
 };
 

@@ -7,6 +7,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { finalize, forkJoin, map, Observable, of, Subscription } from 'rxjs';
@@ -48,6 +49,7 @@ import { StaffingReadinessTarget } from '../staffing-readiness-target';
     ButtonModule,
     FloatLabelModule,
     InputTextModule,
+    MessageModule,
     SelectModule,
     TextareaModule,
     LoadingOverlay,
@@ -87,6 +89,11 @@ export class StaffingRealizationCoreEditor {
   protected readonly events = signal<readonly IAdminEventListItem[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
+  protected readonly isEventActionRunning = signal(false);
+  protected readonly isBusy = computed(() =>
+    this.isLoading() || this.isSaving() || this.isEventActionRunning(),
+  );
+  protected readonly hasUnsavedChanges = this.editor.store.hasUnsavedChanges;
   protected readonly loadErrorMessage = signal<string | null>(null);
 
   protected readonly eventOptions = computed<ISelectOption[]>(() =>
@@ -166,28 +173,28 @@ export class StaffingRealizationCoreEditor {
   }
 
   protected save(): void {
+    if (this.isBusy()) return;
+
     const initialDaysInvalid = this.isNew && this.initialDaysForm.invalid;
 
-    if (this.form.invalid || initialDaysInvalid || this.isSaving()) {
+    if (this.form.invalid || initialDaysInvalid) {
       this.form.markAllAsTouched();
       if (this.isNew) {
         this.initialDaysForm.markAllAsTouched();
       }
 
-      if (this.form.invalid || initialDaysInvalid) {
-        const detail = getStaffingCoreFormError(
-          this.form,
-          this.isNew ? this.initialDaysForm : null,
-          this.i18n.validation(),
-          this.i18n.staffingLabels().requiredGmCount,
-          this.i18n.commonForm(),
-        );
-        if (detail) {
-          this.toast.danger({
-            summary: this.i18n.commonForm().invalidSummary,
-            detail,
-          });
-        }
+      const detail = getStaffingCoreFormError(
+        this.form,
+        this.isNew ? this.initialDaysForm : null,
+        this.i18n.validation(),
+        this.i18n.staffingLabels().requiredGmCount,
+        this.i18n.commonForm(),
+      );
+      if (detail) {
+        this.toast.danger({
+          summary: this.i18n.commonForm().invalidSummary,
+          detail,
+        });
       }
 
       return;
@@ -253,7 +260,34 @@ export class StaffingRealizationCoreEditor {
       });
   }
 
+  protected openEvent(): void {
+    const current = this.realization();
+    if (this.isNew || !current || this.isBusy() || this.hasUnsavedChanges()) return;
+
+    this.isEventActionRunning.set(true);
+    this.form.disable({ emitEvent: false });
+    this.editor.getOrCreateEvent(current).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => {
+        this.form.enable({ emitEvent: false });
+        this.isEventActionRunning.set(false);
+      }),
+    ).subscribe({
+      next: ({ eventCoreId, eventId }) => {
+        if (this.realizationId !== current.id) return;
+        const draft = this.editor.store.coreDraft();
+        if (draft) populateStaffingRealizationCoreForm(this.form, draft);
+        void this.router.navigate(['/admin/content/events', eventCoreId, 'editions', eventId, 'edit']);
+      },
+      error: () => this.toast.danger({
+        summary: this.i18n.toast().eventActionFailedSummary,
+        detail: this.i18n.commonErrors().generic,
+      }),
+    });
+  }
+
   protected cancel(): void {
+    if (this.isBusy()) return;
     this.editor.store.reset();
     this.location.back();
   }
