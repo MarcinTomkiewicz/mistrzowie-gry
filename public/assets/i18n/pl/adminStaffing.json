@@ -1,12 +1,12 @@
 {
   "list": {
     "page": {
-      "title": "[PH] Lista realizacji",
-      "subtitle": "[PH] Przegląd terminów, statusów i obsady realizacji.",
-      "summaryHint": "[PH] Obsada to suma miejsc we wszystkich dniach realizacji. Ta sama osoba może być liczona w kilku dniach.",
-      "emptyTitle": "[PH] Brak realizacji",
-      "emptyDescription": "[PH] Utwórz pierwszą realizację, aby skonfigurować jej dni i zasady obsady.",
-      "loadErrorTitle": "[PH] Nie udało się załadować listy realizacji"
+      "title": "Lista zleceń",
+      "subtitle": "Terminy, statusy i obsada zleceń.",
+      "summaryHint": "Obsada sumuje miejsca we wszystkich dniach zlecenia. Ten sam Mistrz Gry może być liczony w kilku dniach.",
+      "emptyTitle": "Brak zleceń",
+      "emptyDescription": "Utwórz pierwsze zlecenie, aby ustalić terminy i obsadę.",
+      "loadErrorTitle": "Nie udało się załadować listy zleceń"
     },
     "table": {
       "dates": "Daty",
@@ -20,145 +20,145 @@
       "vacancies": "Wolne"
     },
     "filters": {
-      "search": "[PH] Szukaj po nazwie lub mieście",
-      "noResults": "[PH] Brak realizacji spełniających wybrane filtry.",
+      "search": "Szukaj po nazwie lub mieście",
+      "noResults": "Brak zleceń pasujących do filtrów.",
       "showArchivedLabel": "Pokaż zarchiwizowane"
     },
     "confirmation": {
-      "delete": "[PH] Usunąć szkic realizacji „{{name}}” wraz z jego konfiguracją? Tej operacji nie można cofnąć.",
-      "archive": "[PH] Zarchiwizować realizację „{{name}}”? Historia realizacji zostanie zachowana."
+      "delete": "Usunąć szkic zlecenia „{{name}}” wraz z jego ustawieniami? Tej operacji nie można cofnąć.",
+      "archive": "Zarchiwizować zlecenie „{{name}}”? Historia zlecenia zostanie zachowana."
     },
     "toast": {
-      "deleteSuccessSummary": "[PH] Szkic realizacji usunięty",
-      "deleteFailedSummary": "[PH] Nie udało się usunąć szkicu realizacji",
-      "archiveSuccessSummary": "[PH] Realizacja zarchiwizowana",
-      "archiveFailedSummary": "[PH] Nie udało się zarchiwizować realizacji"
+      "deleteSuccessSummary": "Szkic zlecenia usunięty",
+      "deleteFailedSummary": "Nie udało się usunąć szkicu zlecenia",
+      "archiveSuccessSummary": "Zlecenie zarchiwizowane",
+      "archiveFailedSummary": "Nie udało się zarchiwizować zlecenia"
     }
   },
   "finalization": {
     "validate": "Sprawdź poprawność danych",
-    "open": "[PH] Zatwierdź i uruchom realizację",
-    "issuesTitle": "[PH] Problemy wymagające poprawy",
-    "saveDraftsFirst": "[PH] Najpierw zapisz wszystkie zmienione szkice. Sprawdzenie poprawności i zatwierdzenie i uruchomienie realizacji dotyczą wyłącznie zapisanych danych.",
-    "ready": "[PH] Wszystkie zapisane dane są poprawne. Realizacja jest gotowa do uruchomienia.",
-    "validateFailed": "[PH] Nie udało się sprawdzić poprawności danych",
-    "openFailed": "[PH] Nie udało się zatwierdzić i uruchomić realizacji",
-    "openFailedDetail": "[PH] Odśwież dane realizacji i spróbuj ponownie. Jej status mógł się zmienić.",
-    "openSuccess": "[PH] Realizacja została zatwierdzona i uruchomiona",
+    "open": "Zatwierdź i uruchom",
+    "issuesTitle": "Do poprawy",
+    "saveDraftsFirst": "Najpierw zapisz zmiany. Sprawdzenie danych i uruchomienie zlecenia obejmują tylko zapisane informacje.",
+    "ready": "Dane są poprawne. Zlecenie jest gotowe do uruchomienia.",
+    "validateFailed": "Nie udało się sprawdzić poprawności danych",
+    "openFailed": "Nie udało się zatwierdzić i uruchomić zlecenia",
+    "openFailedDetail": "Odśwież zlecenie i spróbuj ponownie. Jego status mógł się zmienić.",
+    "openSuccess": "Zlecenie zatwierdzone i uruchomione",
     "issues": {
       "core": {
-        "name_invalid": "[PH] Podaj prawidłową nazwę realizacji.",
-        "timezone_invalid": "[PH] Podaj prawidłową strefę czasową.",
-        "type_invalid": "[PH] Wybierz prawidłowy typ realizacji.",
-        "coordinator_invalid": "[PH] Koordynator realizacji musi być administratorem.",
-        "event_reference_invalid": "[PH] Powiąż realizację z istniejącą edycją wydarzenia lub usuń powiązanie."
+        "name_invalid": "Podaj prawidłową nazwę zlecenia.",
+        "timezone_invalid": "Podaj prawidłową strefę czasową.",
+        "type_invalid": "Wybierz prawidłowy typ zlecenia.",
+        "coordinator_invalid": "Koordynator zlecenia musi mieć uprawnienia administratora.",
+        "event_reference_invalid": "Wybierz istniejącą edycję wydarzenia lub usuń powiązanie."
       },
       "schedule": {
-        "days_missing": "[PH] Dodaj co najmniej jeden dzień realizacji.",
-        "day_demand_invalid": "[PH] Zapotrzebowanie w dniu realizacji musi wynosić co najmniej 1 MG.",
-        "slot_label_invalid": "[PH] Podaj prawidłową nazwę slotu.",
-        "slot_time_invalid": "[PH] Popraw godziny slotu: koniec musi być późniejszy od początku, bez przejścia przez północ.",
-        "slot_position_invalid": "[PH] Popraw pozycję slotu w kolejności dnia.",
-        "slot_position_duplicate": "[PH] Pozycje slotów w dniu muszą być unikalne.",
-        "slot_overlap": "[PH] Godziny slotów w tym dniu nakładają się na siebie."
+        "days_missing": "Dodaj co najmniej jeden dzień zlecenia.",
+        "day_demand_invalid": "W każdym dniu wymagany jest co najmniej jeden Mistrz Gry.",
+        "slot_label_invalid": "Podaj prawidłową nazwę bloku.",
+        "slot_time_invalid": "Godzina zakończenia bloku musi być późniejsza niż rozpoczęcia, w obrębie tego samego dnia.",
+        "slot_position_invalid": "Ustal prawidłową kolejność bloków.",
+        "slot_position_duplicate": "Każdy blok musi mieć inną pozycję w kolejności dnia.",
+        "slot_overlap": "Godziny bloków w tym dniu nakładają się na siebie."
       },
       "travel_terms": {
-        "missing": "[PH] Zapisz warunki wyjazdu.",
-        "unexpected_for_stationary": "[PH] Realizacja stacjonarna ma zapisane warunki wyjazdu.",
-        "transport_mode_invalid": "[PH] Wybierz prawidłowy sposób organizacji transportu.",
-        "reimbursement_mode_invalid": "[PH] Wybierz prawidłowe zasady zwrotu kosztów.",
-        "mileage_rate_invalid": "[PH] Popraw stawkę kilometrówki zgodnie z zasadami zwrotu kosztów.",
-        "lodging_invalid": "[PH] Popraw warunki noclegu i liczbę noclegów.",
-        "work_time_scope_invalid": "[PH] Wybierz prawidłowy zakres czasu pracy.",
-        "work_time_note_invalid": "[PH] Uzupełnij opis niestandardowego zakresu czasu pracy.",
-        "note_invalid": "[PH] Popraw wskazane informacje o wyjeździe."
+        "missing": "Zapisz warunki wyjazdu.",
+        "unexpected_for_stationary": "Zlecenie stacjonarne ma zapisane warunki wyjazdu.",
+        "transport_mode_invalid": "Wybierz prawidłowy sposób organizacji transportu.",
+        "reimbursement_mode_invalid": "Wybierz prawidłowe zasady zwrotu kosztów.",
+        "mileage_rate_invalid": "Popraw stawkę kilometrówki.",
+        "lodging_invalid": "Popraw warunki noclegu i liczbę noclegów.",
+        "work_time_scope_invalid": "Wybierz prawidłowy zakres czasu pracy.",
+        "work_time_note_invalid": "Opisz niestandardowy zakres czasu pracy.",
+        "note_invalid": "Popraw informacje o wyjeździe."
       },
       "recruitment_policy": {
-        "missing": "[PH] Zapisz zasady rekrutacji.",
-        "stationary_scope_invalid": "[PH] Popraw zakres zgłoszenia odpowiednio do typu realizacji.",
-        "session_selection_mode_invalid": "[PH] Wybierz prawidłowy sposób wyboru sesji."
+        "missing": "Zapisz zasady zgłoszeń.",
+        "stationary_scope_invalid": "Wybierz zakres zgłoszeń odpowiedni dla typu zlecenia.",
+        "session_selection_mode_invalid": "Wybierz prawidłowy sposób wyboru sesji."
       }
     }
   },
   "recruitmentPolicy": {
-    "description": "[PH] Określ zasady zgłoszeń Mistrzów Gry i wymagania dotyczące proponowanych sesji.",
-    "travelHint": "[PH] Udział w realizacji wyjazdowej obejmuje cały wyjazd. Nie można zgłosić udziału tylko w wybranych dniach.",
-    "saveCoreTypeHint": "[PH] Przed zapisem zasad rekrutacji zapisz zmianę typu realizacji w Danych podstawowych.",
-    "sessionsHint": "[PH] Po potwierdzeniu udziału MG przedstawia co najmniej wymaganą liczbę propozycji sesji dla każdego objętego slotu.",
+    "description": "Ustal zasady zgłoszeń Mistrzów Gry i wyboru sesji.",
+    "travelHint": "Zgłoszenie do zlecenia wyjazdowego obejmuje cały wyjazd.",
+    "saveCoreTypeHint": "Najpierw zapisz zmianę typu zlecenia w Danych podstawowych.",
+    "sessionsHint": "Po potwierdzeniu udziału Mistrz Gry zgłasza na każdy blok co najmniej wymaganą liczbę propozycji sesji.",
     "fields": {
-      "selfApplicationEnabled": "[PH] MG mogą zgłaszać udział",
-      "stationaryScopePolicy": "[PH] Zakres zgłoszenia",
-      "sessionSelectionMode": "[PH] Sposób wyboru sesji"
+      "selfApplicationEnabled": "Mistrzowie Gry mogą zgłaszać udział",
+      "stationaryScopePolicy": "Zakres zgłoszenia",
+      "sessionSelectionMode": "Sposób wyboru sesji"
     },
     "stationaryScopes": {
-      "whole_realization": "[PH] Cała realizacja",
-      "selected_days": "[PH] Wybrane dni realizacji"
+      "whole_realization": "Całe zlecenie",
+      "selected_days": "Wybrane dni"
     },
     "sessionModes": {
-      "gm_selects": "[PH] Sesje wybiera MG",
-      "realization_assigns": "[PH] Sesje przypisuje koordynator"
+      "gm_selects": "Sesje wybiera Mistrz Gry",
+      "realization_assigns": "Sesje przypisuje koordynator"
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować zasad rekrutacji",
-      "saveSuccessSummary": "[PH] Zasady rekrutacji zapisane",
-      "saveFailedSummary": "[PH] Nie udało się zapisać zasad rekrutacji"
+      "loadFailedSummary": "Nie udało się załadować zasad zgłoszeń",
+      "saveSuccessSummary": "Zasady zgłoszeń zapisane",
+      "saveFailedSummary": "Nie udało się zapisać zasad zgłoszeń"
     }
   },
   "editor": {
     "page": {
-      "createTitle": "Nowa realizacja",
-      "editTitle": "Edycja realizacji",
-      "subtitle": "Uzupełnij podstawowe informacje o realizacji.",
-      "loadErrorTitle": "Nie udało się załadować realizacji",
-      "loadErrorDescription": "Dane realizacji lub wydarzeń są chwilowo niedostępne. Spróbuj ponownie."
+      "createTitle": "Nowe zlecenie",
+      "editTitle": "Edycja zlecenia",
+      "subtitle": "Uzupełnij dane potrzebne do zaplanowania zlecenia.",
+      "loadErrorTitle": "Nie udało się załadować zlecenia",
+      "loadErrorDescription": "Dane zlecenia lub wydarzeń są chwilowo niedostępne. Spróbuj ponownie."
     },
     "sections": {
       "basic": {
         "title": "Podstawowe informacje",
-        "description": "Podaj nazwę realizacji oraz krótki opis / informacje operacyjne."
+        "description": "Podaj nazwę, opis i informacje organizacyjne."
       },
       "initialDays": {
         "title": "Termin i zapotrzebowanie",
-        "description": "[PH] Wybierz zakres dat realizacji i bazową liczbę Mistrzów Gry wymaganą każdego dnia."
+        "description": "Wybierz daty i podaj liczbę Mistrzów Gry potrzebnych każdego dnia."
       },
       "venue": {
-        "title": "Miejsce i typ realizacji",
-        "description": "Określ gdzie odbywa się realizacja oraz jaki jest jej typ."
+        "title": "Miejsce i typ zlecenia",
+        "description": "Określ miejsce i rodzaj zlecenia."
       },
       "event": {
         "title": "Powiązanie z wydarzeniem",
-        "description": "Opcjonalnie powiąż realizację z istniejącym wydarzeniem."
+        "description": "Powiąż z istniejącym wydarzeniem (opcjonalnie)."
       }
     },
     "fields": {
-      "name": "Nazwa realizacji",
-      "description": "Opis realizacji",
+      "name": "Nazwa zlecenia",
+      "description": "Opis zlecenia",
       "operationalNotes": "Informacje operacyjne",
       "venueName": "Nazwa miejsca",
-      "venueAddress": "Adres realizacji",
+      "venueAddress": "Adres miejsca",
       "timezone": "Strefa czasowa",
-      "type": "Typ realizacji",
+      "type": "Typ zlecenia",
       "event": "Wydarzenie (opcjonalnie)",
-      "dateRange": "[PH] Zakres dat realizacji"
+      "dateRange": "Zakres dat"
     },
     "validation": {
-      "nameRequired": "[PH] Podaj nazwę realizacji.",
-      "timezoneRequired": "[PH] Podaj strefę czasową realizacji.",
-      "typeRequired": "[PH] Wybierz typ realizacji.",
-      "dateRangeRequired": "[PH] Wybierz zakres dat realizacji.",
-      "dateRange": "[PH] Wybierz pełny, prawidłowy zakres dat."
+      "nameRequired": "Podaj nazwę zlecenia.",
+      "timezoneRequired": "Wybierz strefę czasową.",
+      "typeRequired": "Wybierz typ zlecenia.",
+      "dateRangeRequired": "Wybierz zakres dat.",
+      "dateRange": "Wybierz prawidłowy zakres dat."
     },
     "summary": {
-      "dayCount": "[PH] Liczba dni",
-      "requiredGmCount": "[PH] Zapotrzebowanie dzienne",
+      "dayCount": "Liczba dni",
+      "requiredGmCount": "Zapotrzebowanie",
       "dailyGmUnit": "MG dziennie"
     },
     "types": {
       "stationary": {
-        "description": "Realizacja odbywa się stacjonarnie, bez konieczności wyjazdu poza miejsce zamieszkania."
+        "description": "Zlecenie lokalne, w miejscowości zamieszkania Mistrza Gry."
       },
       "travel": {
-        "description": "Realizacja wymaga wyjazdu poza miejsce zamieszkania."
+        "description": "Zlecenie wymagające wyjazdu poza miejscowość zamieszkania Mistrza Gry."
       }
     },
     "event": {
@@ -166,237 +166,237 @@
       "empty": "Brak wydarzeń do wyboru"
     },
     "actions": {
-      "createDraft": "[PH] Utwórz szkic"
+      "createDraft": "Utwórz szkic"
     },
     "toast": {
-      "saveSuccessSummary": "Realizacja zapisana",
-      "saveFailedSummary": "Nie udało się zapisać realizacji"
+      "saveSuccessSummary": "Zlecenie zapisane",
+      "saveFailedSummary": "Nie udało się zapisać zlecenia"
     }
   },
   "shell": {
     "tabs": {
-      "recruitmentPolicy": "[PH] Zasady rekrutacji",
+      "recruitmentPolicy": "Zasady zgłoszeń",
       "core": "Dane podstawowe",
-      "schedule": "Dni i sloty",
-      "travelTerms": "[PH] Warunki wyjazdu",
-      "board": "[PH] Obsada i kandydaci"
+      "schedule": "Dni i bloki",
+      "travelTerms": "Warunki wyjazdu",
+      "board": "Obsada i kandydaci"
     }
   },
   "schedule": {
     "page": {
-      "travelHint": "[PH] W realizacji wyjazdowej udział Mistrza Gry obejmuje cały wyjazd."
+      "travelHint": "Udział w zleceniu wyjazdowym obejmuje cały wyjazd."
     },
     "section": {
-      "title": "Dni i sloty",
-      "description": "[PH] Dodaj dni realizacji, określ wymagane zapotrzebowanie MG i skonfiguruj godziny slotów."
+      "title": "Dni i bloki",
+      "description": "Dodaj dni, określ liczbę potrzebnych Mistrzów Gry i godziny bloków."
     },
     "labels": {
       "day": "Dzień"
     },
     "fields": {
-      "label": "[PH] Nazwa slotu",
-      "startTime": "[PH] Godzina rozpoczęcia",
-      "endTime": "[PH] Godzina zakończenia"
+      "label": "Nazwa bloku",
+      "startTime": "Godzina rozpoczęcia",
+      "endTime": "Godzina zakończenia"
     },
     "actions": {
       "addDay": "Dodaj dzień",
-      "addSlot": "Dodaj slot",
-      "editDate": "[PH] Edytuj datę dnia",
+      "addSlot": "Dodaj blok",
+      "editDate": "Zmień datę",
       "saveDraft": "Zapisz szkic"
     },
     "summary": {
-      "title": "Podsumowanie realizacji",
-      "dayCount": "[PH] Liczba dni",
-      "slotCount": "[PH] Liczba slotów",
-      "dailyStaffingPositions": "[PH] Suma dziennych miejsc obsady",
-      "conflictCount": "[PH] Liczba konfliktów"
+      "title": "Podsumowanie harmonogramu",
+      "dayCount": "Liczba dni",
+      "slotCount": "Liczba bloków",
+      "dailyStaffingPositions": "Suma miejsc w obsadzie",
+      "conflictCount": "Liczba konfliktów"
     },
-    "emptySlots": "[PH] Ten dzień nie ma jeszcze slotów.",
+    "emptySlots": "Brak bloków w tym dniu.",
     "validation": {
-      "daysRequired": "[PH] Dodaj co najmniej jeden dzień realizacji.",
-      "dateRequired": "[PH] Wybierz datę dnia realizacji.",
-      "dateInvalid": "[PH] Wybierz prawidłową datę dnia realizacji.",
-      "slotLabelRequired": "[PH] Podaj nazwę slotu.",
-      "slotStartRequired": "[PH] Podaj godzinę rozpoczęcia slotu.",
-      "slotEndRequired": "[PH] Podaj godzinę zakończenia slotu.",
-      "slotStartFormat": "[PH] Podaj godzinę rozpoczęcia slotu w formacie HH:mm (00:00-23:59).",
-      "slotEndFormat": "[PH] Podaj godzinę zakończenia slotu w formacie HH:mm (00:00-23:59).",
-      "duplicateDate": "[PH] Każdy dzień realizacji musi mieć inną datę.",
-      "slotTimeRange": "[PH] Godzina zakończenia musi być późniejsza od godziny rozpoczęcia.",
-      "slotConflict": "[PH] Konflikt godzin"
+      "daysRequired": "Dodaj co najmniej jeden dzień zlecenia.",
+      "dateRequired": "Wybierz datę dnia.",
+      "dateInvalid": "Wybierz prawidłową datę.",
+      "slotLabelRequired": "Podaj nazwę bloku.",
+      "slotStartRequired": "Podaj godzinę rozpoczęcia bloku.",
+      "slotEndRequired": "Podaj godzinę zakończenia bloku.",
+      "slotStartFormat": "Podaj godzinę rozpoczęcia w formacie HH:mm (00:00-23:59).",
+      "slotEndFormat": "Podaj godzinę zakończenia w formacie HH:mm (00:00-23:59).",
+      "duplicateDate": "Każdy dzień zlecenia musi mieć inną datę.",
+      "slotTimeRange": "Godzina zakończenia musi być późniejsza niż rozpoczęcia.",
+      "slotConflict": "Konflikt godzin"
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować harmonogramu realizacji",
-      "saveSuccessSummary": "[PH] Harmonogram realizacji zapisany",
-      "saveFailedSummary": "[PH] Nie udało się zapisać harmonogramu realizacji"
+      "loadFailedSummary": "Nie udało się załadować harmonogramu",
+      "saveSuccessSummary": "Harmonogram zapisany",
+      "saveFailedSummary": "Nie udało się zapisać harmonogramu"
     }
   },
   "board": {
-    "title": "[PH] Obsada i kandydaci",
-    "description": "[PH] Przegląd obsady, zgłoszeń i propozycji udziału w realizacji.",
-    "persistedHint": "[PH] Widok pokazuje zapisane dane. Zapisz zmiany szkiców, aby uwzględnić je w podsumowaniu.",
-    "loadFailed": "[PH] Nie udało się załadować obsady realizacji",
-    "candidatesTitle": "[PH] Kandydaci",
-    "emptyCandidates": "[PH] Ta realizacja nie ma jeszcze kandydatów.",
-    "outsideRoster": "[PH] MG spoza bieżącej listy dostępności",
+    "title": "Obsada i kandydaci",
+    "description": "Zgłoszenia, potwierdzenia i obsada zlecenia.",
+    "persistedHint": "Podsumowanie obejmuje zapisane dane. Zapisz wprowadzone zmiany, aby je odświeżyć.",
+    "loadFailed": "Nie udało się załadować obsady zlecenia",
+    "candidatesTitle": "Kandydaci",
+    "emptyCandidates": "Brak kandydatów.",
+    "outsideRoster": "Poza listą dostępności",
     "confirmedRoster": {
-      "title": "[PH] Potwierdzona obsada",
-      "empty": "[PH] Ta realizacja nie ma aktywnych, potwierdzonych MG.",
-      "remove": "[PH] Usuń z realizacji",
-      "removeConfirm": "[PH] Zakończyć udział tego MG w realizacji? Potwierdzenie udziału pozostanie w historii.",
-      "removeSuccess": "[PH] Udział MG w realizacji został zakończony",
-      "removeFailed": "[PH] Nie udało się zakończyć udziału MG w realizacji"
+      "title": "Potwierdzona obsada",
+      "empty": "Brak potwierdzonych Mistrzów Gry.",
+      "remove": "Usuń",
+      "removeConfirm": "Zakończyć udział tego Mistrza Gry w zleceniu? Potwierdzenie udziału pozostanie w historii.",
+      "removeSuccess": "Udział Mistrza Gry zakończony",
+      "removeFailed": "Nie udało się zakończyć udziału Mistrza Gry"
     },
     "proposal": {
-      "action": "[PH] Zaproponuj MG",
-      "title": "[PH] Propozycja udziału MG",
-      "daysLabel": "[PH] Dni udziału",
-      "successSummary": "[PH] Propozycja udziału została utworzona",
-      "failedSummary": "[PH] Nie udało się utworzyć propozycji udziału"
+      "action": "Zaproponuj Mistrza Gry",
+      "title": "Propozycja dla Mistrza Gry",
+      "daysLabel": "Dni udziału",
+      "successSummary": "Propozycja udziału utworzona",
+      "failedSummary": "Nie udało się utworzyć propozycji udziału"
     },
     "candidateDetail": {
-      "title": "[PH] Szczegóły kandydatury",
-      "show": "[PH] Szczegóły",
-      "participationActive": "[PH] Aktywny udział",
-      "endedBy": "[PH] Osoba kończąca udział (ID)",
+      "title": "Szczegóły kandydata",
+      "show": "Szczegóły",
+      "participationActive": "Aktywny",
+      "endedBy": "Udział zakończony przez (ID)",
       "sessionProposals": {
-        "title": "[PH] Propozycje sesji MG",
-        "preview": "[PH] Podgląd sesji",
-        "emptySlots": "[PH] Ta kandydatura nie ma slotów z propozycjami sesji.",
-        "emptyMappings": "[PH] MG nie zaproponował sesji dla tego slotu.",
-        "loadFailed": "[PH] Nie udało się załadować propozycji sesji MG"
+        "title": "Propozycje sesji",
+        "preview": "Podgląd sesji",
+        "emptySlots": "Brak bloków z propozycjami sesji.",
+        "emptyMappings": "Brak propozycji sesji dla tego bloku.",
+        "loadFailed": "Nie udało się załadować propozycji sesji"
       }
     },
     "selfApplicationDecision": {
-      "accept": "[PH] Akceptuj zgłoszenie",
-      "reject": "[PH] Odrzuć zgłoszenie",
-      "acceptConfirm": "[PH] Zaakceptować zgłoszenie tego MG i potwierdzić jego udział w realizacji?",
-      "rejectConfirm": "[PH] Odrzucić zgłoszenie tego MG do realizacji?",
-      "acceptSuccess": "[PH] Zgłoszenie zostało zaakceptowane",
-      "rejectSuccess": "[PH] Zgłoszenie zostało odrzucone",
-      "failedSummary": "[PH] Nie udało się zapisać decyzji dotyczącej zgłoszenia"
+      "accept": "Akceptuj",
+      "reject": "Odrzuć",
+      "acceptConfirm": "Zaakceptować zgłoszenie i potwierdzić udział Mistrza Gry w zleceniu?",
+      "rejectConfirm": "Odrzucić zgłoszenie Mistrza Gry?",
+      "acceptSuccess": "Zgłoszenie zaakceptowane",
+      "rejectSuccess": "Zgłoszenie odrzucone",
+      "failedSummary": "Nie udało się zapisać decyzji o zgłoszeniu"
     },
     "fields": {
-      "gm": "[PH] Mistrz Gry",
-      "origin": "[PH] Źródło udziału",
-      "scope": "[PH] Zakres udziału",
-      "gmDecision": "[PH] Decyzja MG",
-      "adminDecision": "[PH] Decyzja administratora",
-      "participation": "[PH] Stan udziału",
-      "availability": "[PH] Dostępność",
-      "slot": "[PH] Slot"
+      "gm": "Mistrz Gry",
+      "origin": "Źródło",
+      "scope": "Zakres",
+      "gmDecision": "Decyzja MG",
+      "adminDecision": "Decyzja admina",
+      "participation": "Udział",
+      "availability": "Dostępność",
+      "slot": "Blok"
     },
     "availability": {
-      "title": "[PH] Dostępność MG",
-      "hint": "[PH] Dostępność odnosi się do całego zapisanego harmonogramu w strefie czasowej realizacji. Ma charakter informacyjny i nie oznacza potwierdzenia udziału ani przypisania do slotów.",
-      "showSlots": "[PH] Dostępność w slotach",
-      "emptyRoster": "[PH] Brak MG na bieżącej liście dostępności.",
-      "noSchedule": "[PH] Realizacja nie ma zapisanych slotów. Dostępność nie została oceniona.",
+      "title": "Dostępność Mistrzów Gry",
+      "hint": "Dostępność obejmuje cały zapisany harmonogram w strefie czasowej zlecenia. Nie potwierdza udziału ani przypisania do bloku.",
+      "showSlots": "Dostępność w blokach",
+      "emptyRoster": "Brak Mistrzów Gry na liście dostępności.",
+      "noSchedule": "Brak bloków w harmonogramie. Nie można ocenić dostępności.",
       "statuses": {
-        "available": "[PH] Dostępny",
-        "partial": "[PH] Częściowe pokrycie",
-        "conflict": "[PH] Konflikt",
-        "no_declared_availability": "[PH] Brak deklaracji dostępności",
-        "no_schedule": "[PH] Brak slotów"
+        "available": "Dostępny",
+        "partial": "Częściowo dostępny",
+        "conflict": "Konflikt",
+        "no_declared_availability": "Brak deklaracji",
+        "no_schedule": "Brak bloków"
       }
     }
   },
   "finalPlan": {
-    "title": "[PH] Finalny plan realizacji",
-    "description": "[PH] Przypisz potwierdzonych, aktywnych MG i finalne sesje do zapisanych dni i slotów. Propozycje MG pozostają niezależne od finalnego planu.",
-    "readOnly": "[PH] Finalny plan jest dostępny tylko do odczytu w bieżącym statusie realizacji.",
-    "noDays": "[PH] Realizacja nie ma zapisanych dni.",
-    "noSlots": "[PH] Ten dzień nie ma zapisanych slotów.",
-    "unfilled": "[PH] Slot nieobsadzony",
-    "assignments": "[PH] Przypisania MG",
-    "hasConflicts": "[PH] Zapisany plan zawiera konflikty udziału.",
+    "title": "Plan sesji i obsady",
+    "description": "Przypisz potwierdzonych Mistrzów Gry i sesje do poszczególnych bloków.",
+    "readOnly": "Na tym etapie plan jest dostępny tylko do odczytu.",
+    "noDays": "Brak dni w harmonogramie.",
+    "noSlots": "Brak bloków w tym dniu.",
+    "unfilled": "Nieobsadzony",
+    "assignments": "Przypisania",
+    "hasConflicts": "W planie występują konflikty udziału.",
     "conflicts": {
-      "candidate_not_confirmed": "[PH] Kandydat nie ma potwierdzonego udziału",
-      "participation_ended": "[PH] Udział MG został zakończony"
+      "candidate_not_confirmed": "Udział Mistrza Gry nie został potwierdzony",
+      "participation_ended": "Udział Mistrza Gry został zakończony"
     },
     "provenance": {
-      "saved": "[PH] Zapisane przypisanie:",
-      "proposed": "[PH] Sesja wybrana z propozycji MG",
-      "coordinator": "[PH] Sesja wybrana przez koordynatora"
+      "saved": "Przypisanie:",
+      "proposed": "Sesja z propozycji MG",
+      "coordinator": "Sesja wybrana przez koordynatora"
     },
-    "addAssignment": "[PH] Przypisz MG",
-    "save": "[PH] Zapisz finalny plan",
-    "invalid": "[PH] Wybierz MG i sesję dla każdego przypisania oraz popraw nieprawidłowe pola.",
+    "addAssignment": "Przypisz Mistrza Gry",
+    "save": "Zapisz plan",
+    "invalid": "Wybierz Mistrza Gry i sesję w każdym przypisaniu oraz popraw błędne dane.",
     "validation": {
-      "duplicateCandidatePerSlot": "[PH] Ten sam MG może być przypisany tylko raz w obrębie slotu.",
-      "effectivePlayersRange": "[PH] Minimalna liczba graczy po uwzględnieniu zmian sesji nie może być większa niż maksymalna."
+      "duplicateCandidatePerSlot": "Ten sam Mistrz Gry może być przypisany tylko raz do jednego bloku.",
+      "effectivePlayersRange": "Po zmianach minimalna liczba graczy nie może przekraczać maksymalnej."
     },
-    "loadFailed": "[PH] Nie udało się załadować finalnego planu",
-    "candidateLoadFailed": "[PH] Nie udało się załadować sesji i propozycji tego MG",
-    "noCandidates": "[PH] Brak aktywnych, potwierdzonych MG do wyboru w tym dniu",
-    "noSessions": "[PH] Ten MG nie ma sesji tego rodzaju",
-    "saveSuccess": "[PH] Finalny plan został zapisany",
-    "saveFailed": "[PH] Nie udało się zapisać finalnego planu",
-    "preview": "[PH] Podgląd sesji",
-    "chooseOtherSession": "[PH] Wybierz inną sesję",
+    "loadFailed": "Nie udało się załadować planu",
+    "candidateLoadFailed": "Nie udało się załadować sesji i propozycji Mistrza Gry",
+    "noCandidates": "Brak aktywnych, potwierdzonych Mistrzów Gry na ten dzień",
+    "noSessions": "Ten Mistrz Gry nie ma sesji tego rodzaju",
+    "saveSuccess": "Plan zapisany",
+    "saveFailed": "Nie udało się zapisać planu",
+    "preview": "Podgląd sesji",
+    "chooseOtherSession": "Wybierz inną sesję",
     "proposal": {
-      "title": "[PH] Pierwotne propozycje MG dla tego slotu",
-      "empty": "[PH] MG nie zaproponował sesji dla tego slotu.",
-      "accept": "[PH] Wybierz tę sesję",
-      "replace": "[PH] Podmień sesję",
-      "selected": "[PH] Wybrana sesja"
+      "title": "Propozycje sesji dla tego bloku",
+      "empty": "Brak propozycji sesji dla tego bloku.",
+      "accept": "Wybierz tę sesję",
+      "replace": "Zmień sesję",
+      "selected": "Wybrana sesja"
     },
     "override": {
-      "title": "[PH] Dostosuj sesję dla tej realizacji",
-      "hint": "[PH] Uzupełnij tylko zmieniane pola. Puste pola zachowują wartości zapisanej sesji. Zmiany nie modyfikują katalogu sesji ani propozycji MG.",
-      "inherit": "[PH] Zachowaj wartość sesji",
-      "image": "[PH] Obraz sesji"
+      "title": "Dostosuj sesję do zlecenia",
+      "hint": "Uzupełnij tylko zmieniane pola. Pozostałe zachowają dane sesji. Katalog sesji i propozycje Mistrza Gry pozostaną bez zmian.",
+      "inherit": "Użyj wartości zapisanej sesji",
+      "image": "Obraz sesji"
     },
     "changes": {
-      "title": "[PH] Zmiany zwrócone po ostatnim zapisie",
-      "empty": "[PH] Zapis nie wprowadził zmian merytorycznych.",
-      "before": "[PH] Przed zapisem",
-      "after": "[PH] Po zapisie",
+      "title": "Zmiany po zapisie",
+      "empty": "Brak zmian.",
+      "before": "Przed zapisem",
+      "after": "Po zapisie",
       "types": {
-        "assignment_added": "[PH] Dodano przypisanie",
-        "assignment_removed": "[PH] Usunięto przypisanie",
-        "gm_changed": "[PH] Zmieniono MG",
-        "slot_changed": "[PH] Zmieniono slot",
-        "session_changed": "[PH] Zmieniono sesję",
-        "session_override_changed": "[PH] Zmieniono sesję dla tej realizacji"
+        "assignment_added": "Dodano przypisanie",
+        "assignment_removed": "Usunięto przypisanie",
+        "gm_changed": "Zmieniono Mistrza Gry",
+        "slot_changed": "Zmieniono blok",
+        "session_changed": "Zmieniono sesję",
+        "session_override_changed": "Zmieniono dane sesji dla zlecenia"
       }
     }
   },
   "travelTerms": {
     "page": {
-      "description": "[PH] Określ warunki transportu, pobytu i czasu pracy potrzebne Mistrzom Gry do podjęcia decyzji o udziale w całym wyjeździe.",
-      "stationaryHint": "[PH] Warunki wyjazdu są dostępne tylko dla realizacji wyjazdowej.",
-      "saveCoreTypeHint": "[PH] Przed zapisem warunków wyjazdu zapisz typ Wyjazdowa w Danych podstawowych."
+      "description": "Ustal transport, nocleg, wyżywienie i czas pracy podczas wyjazdu.",
+      "stationaryHint": "Warunki wyjazdu dotyczą zleceń wyjazdowych.",
+      "saveCoreTypeHint": "Najpierw zapisz typ „Wyjazdowa” w Danych podstawowych."
     },
     "sections": {
-      "logistics": "[PH] Transport, nocleg i wyżywienie",
+      "logistics": "Transport, nocleg i wyżywienie",
       "workTime": "Czas pracy",
-      "additionalNotes": "[PH] Dodatkowe uwagi"
+      "additionalNotes": "Dodatkowe uwagi"
     },
     "fields": {
-      "transportMode": "[PH] Organizacja transportu",
-      "transportNote": "[PH] Szczegóły transportu",
-      "reimbursementMode": "[PH] Zasady zwrotu kosztów",
-      "mileageRatePlnPerKm": "[PH] Stawka kilometrówki (PLN/km)",
-      "reimbursementNote": "[PH] Dodatkowe zasady zwrotu kosztów",
-      "lodgingProvided": "[PH] Organizator zapewnia nocleg",
+      "transportMode": "Organizacja transportu",
+      "transportNote": "Szczegóły transportu",
+      "reimbursementMode": "Zasady zwrotu kosztów",
+      "mileageRatePlnPerKm": "Stawka za kilometr (zł/km)",
+      "reimbursementNote": "Uwagi do zwrotu kosztów",
+      "lodgingProvided": "Nocleg zapewniony",
       "lodgingNights": "Liczba noclegów",
-      "lodgingNote": "[PH] Informacje o noclegu",
+      "lodgingNote": "Informacje o noclegu",
       "breakfastProvided": "Śniadanie",
       "lunchProvided": "Obiad",
       "dinnerProvided": "Kolacja",
       "mealAllowanceApplicable": "Ryczałt na wyżywienie",
-      "workTimeScope": "[PH] Zakres czasu pracy",
-      "workTimeNote": "[PH] Opis niestandardowego zakresu czasu pracy",
-      "travelNote": "[PH] Dodatkowe informacje o wyjeździe"
+      "workTimeScope": "Zakres czasu pracy",
+      "workTimeNote": "Opis niestandardowego czasu pracy",
+      "travelNote": "Dodatkowe informacje o wyjeździe"
     },
     "validation": {
-      "positiveNumber": "[PH] Podaj liczbę większą od zera."
+      "positiveNumber": "Podaj liczbę większą od zera."
     },
     "toast": {
-      "loadFailedSummary": "[PH] Nie udało się załadować warunków wyjazdu",
-      "saveSuccessSummary": "[PH] Warunki wyjazdu zapisane",
-      "saveFailedSummary": "[PH] Nie udało się zapisać warunków wyjazdu"
+      "loadFailedSummary": "Nie udało się załadować warunków wyjazdu",
+      "saveSuccessSummary": "Warunki wyjazdu zapisane",
+      "saveFailedSummary": "Nie udało się zapisać warunków wyjazdu"
     }
   }
 }

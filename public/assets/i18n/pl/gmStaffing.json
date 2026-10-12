@@ -1,149 +1,149 @@
 {
   "page": {
-    "subtitle": "[PH] Sprawdź dostępne realizacje, otrzymane propozycje, swoje zgłoszenia i potwierdzony udział.",
-    "loadErrorTitle": "[PH] Nie udało się załadować realizacji"
+    "subtitle": "Sprawdź dostępne zlecenia, otrzymane propozycje, swoje zgłoszenia i potwierdzony udział.",
+    "loadErrorTitle": "Nie udało się załadować zleceń"
   },
   "sections": {
     "available": {
-      "title": "Dostępne do zgłoszenia",
-      "emptyDescription": "[PH] Nie ma obecnie realizacji dostępnych do zgłoszenia."
+      "title": "Dostępne zlecenia",
+      "emptyDescription": "Brak zleceń dostępnych do zgłoszenia."
     },
     "proposals": {
       "title": "Otrzymane propozycje",
-      "emptyDescription": "[PH] Nie masz oczekujących propozycji udziału."
+      "emptyDescription": "Brak propozycji do rozpatrzenia."
     },
     "myApplications": {
       "title": "Moje zgłoszenia",
-      "emptyDescription": "[PH] Nie masz aktywnych zgłoszeń."
+      "emptyDescription": "Brak aktywnych zgłoszeń."
     },
     "confirmed": {
-      "title": "Potwierdzone realizacje",
-      "emptyDescription": "[PH] Nie masz potwierdzonych realizacji."
+      "title": "Potwierdzone zlecenia",
+      "emptyDescription": "Brak potwierdzonych zleceń."
     }
   },
   "card": {
-    "candidateStatus": "[PH] Status udziału"
+    "candidateStatus": "Udział"
   },
   "sessionSelector": {
-    "sourceLabel": "[PH] Rodzaj sesji",
-    "sessionLabel": "[PH] Sesja",
+    "sourceLabel": "Rodzaj sesji",
+    "sessionLabel": "Sesja",
     "sources": {
-      "template": "[PH] Sesje standardowe",
-      "custom": "[PH] Sesje jednorazowe"
+      "template": "Sesje standardowe",
+      "custom": "Sesje jednorazowe"
     },
     "createTitles": {
-      "template": "[PH] Nowa sesja standardowa",
-      "custom": "[PH] Nowa sesja jednorazowa"
+      "template": "Nowa sesja standardowa",
+      "custom": "Nowa sesja jednorazowa"
     },
     "emptyDescriptions": {
-      "template": "[PH] Nie masz jeszcze sesji standardowych do wyboru.",
-      "custom": "[PH] Nie masz jeszcze sesji jednorazowych do wyboru."
+      "template": "Brak sesji standardowych do wyboru.",
+      "custom": "Brak sesji jednorazowych do wyboru."
     },
-    "loadFailed": "[PH] Nie udało się załadować sesji do wyboru",
-    "formLoadFailed": "[PH] Nie udało się załadować danych formularza sesji."
+    "loadFailed": "Nie udało się załadować listy sesji",
+    "formLoadFailed": "Nie udało się załadować formularza sesji."
   },
   "detail": {
-    "title": "[PH] Szczegóły realizacji",
+    "title": "Szczegóły zlecenia",
     "sections": {
-      "description": "[PH] Opis realizacji",
-      "recruitmentPolicy": "[PH] Zasady udziału i sesji",
-      "candidate": "[PH] Twój udział"
+      "description": "Opis zlecenia",
+      "recruitmentPolicy": "Zasady udziału",
+      "candidate": "Twój udział"
     },
     "empty": {
-      "description": "[PH] Nie podano opisu realizacji.",
-      "days": "[PH] Nie ma zapisanych dni realizacji.",
-      "recruitmentPolicy": "[PH] Zasady udziału i sesji nie zostały jeszcze określone.",
-      "travelTerms": "[PH] Warunki wyjazdu nie zostały jeszcze określone."
+      "description": "Nie podano opisu zlecenia.",
+      "days": "Nie określono terminów zlecenia.",
+      "recruitmentPolicy": "Nie określono jeszcze zasad udziału.",
+      "travelTerms": "Nie określono jeszcze warunków wyjazdu."
     },
     "errors": {
-      "loadFailed": "[PH] Nie udało się załadować szczegółów realizacji",
-      "notFound": "[PH] Nie znaleziono realizacji lub nie masz dostępu do jej szczegółów.",
-      "actionFailed": "[PH] Nie udało się wykonać akcji udziału"
+      "loadFailed": "Nie udało się załadować szczegółów zlecenia",
+      "notFound": "Nie znaleziono zlecenia lub nie masz dostępu do jego szczegółów.",
+      "actionFailed": "Nie udało się wykonać działania"
     },
     "fields": {
-      "selfApplicationEnabled": "[PH] Samodzielne zgłoszenia MG",
-      "origin": "[PH] Źródło udziału",
-      "scope": "[PH] Zakres udziału",
-      "gmDecision": "[PH] Twoja decyzja",
-      "adminDecision": "[PH] Decyzja koordynatora",
-      "submittedAt": "[PH] Data zgłoszenia",
-      "withdrawnAt": "[PH] Data wycofania",
-      "gmDecidedAt": "[PH] Data Twojej decyzji",
-      "adminDecidedAt": "[PH] Data decyzji koordynatora"
+      "selfApplicationEnabled": "Możliwość zgłoszenia",
+      "origin": "Źródło",
+      "scope": "Zakres udziału",
+      "gmDecision": "Twoja decyzja",
+      "adminDecision": "Decyzja koordynatora",
+      "submittedAt": "Data zgłoszenia",
+      "withdrawnAt": "Data wycofania",
+      "gmDecidedAt": "Data Twojej decyzji",
+      "adminDecidedAt": "Data decyzji koordynatora"
     },
     "candidateOrigins": {
-      "self_application": "[PH] Własne zgłoszenie",
-      "admin_proposal": "[PH] Propozycja koordynatora"
+      "self_application": "Własne zgłoszenie",
+      "admin_proposal": "Propozycja koordynatora"
     },
     "candidateDecisions": {
-      "pending": "[PH] Oczekuje na decyzję",
-      "accepted": "[PH] Zaakceptowano",
-      "rejected": "[PH] Odrzucono"
+      "pending": "Oczekuje",
+      "accepted": "Zaakceptowano",
+      "rejected": "Odrzucono"
     },
-    "archivedCandidateHint": "[PH] Realizacja jest zarchiwizowana. Poniższy stan udziału ma charakter historyczny i nie wymaga działania.",
+    "archivedCandidateHint": "Zlecenie jest zarchiwizowane. Poniższe informacje o udziale mają charakter historyczny.",
     "tabs": {
-      "information": "[PH] Informacje",
-      "travelTerms": "[PH] Warunki wyjazdu",
-      "participation": "[PH] Udział"
+      "information": "Informacje",
+      "travelTerms": "Warunki wyjazdu",
+      "participation": "Udział"
     },
     "application": {
-      "create": "[PH] Utwórz szkic zgłoszenia",
-      "submit": "[PH] Wyślij zgłoszenie",
-      "withdraw": "[PH] Wycofaj zgłoszenie",
-      "scopeTitle": "[PH] Zakres zgłoszenia",
-      "draftHint": "[PH] Szkic zgłoszenia nie został jeszcze wysłany. Zgłoszenie udziału nie wymaga wskazania sesji.",
-      "pendingHint": "[PH] Zgłoszenie zostało wysłane i oczekuje na decyzję koordynatora.",
-      "unavailableHint": "[PH] Zgłoszenie udziału nie jest obecnie dostępne.",
-      "withdrawConfirm": "[PH] Wycofać to zgłoszenie udziału?",
-      "createSuccess": "[PH] Szkic zgłoszenia został utworzony",
-      "submitSuccess": "[PH] Zgłoszenie zostało wysłane",
-      "withdrawSuccess": "[PH] Zgłoszenie zostało wycofane"
+      "create": "Rozpocznij zgłoszenie",
+      "submit": "Wyślij zgłoszenie",
+      "withdraw": "Wycofaj zgłoszenie",
+      "scopeTitle": "Zakres zgłoszenia",
+      "draftHint": "Masz zapisany szkic zgłoszenia. Uzupełnij zakres udziału i wyślij zgłoszenie. Sesje zaproponujesz po potwierdzeniu udziału.",
+      "pendingHint": "Twoje zgłoszenie oczekuje na decyzję koordynatora.",
+      "unavailableHint": "Zgłoszenia do tego zlecenia są obecnie niedostępne.",
+      "withdrawConfirm": "Wycofać zgłoszenie?",
+      "createSuccess": "Utworzono szkic zgłoszenia",
+      "submitSuccess": "Zgłoszenie wysłane",
+      "withdrawSuccess": "Zgłoszenie wycofane"
     },
     "proposal": {
-      "accept": "[PH] Przyjmij propozycję",
-      "reject": "[PH] Odrzuć propozycję",
-      "acceptConfirm": "[PH] Przyjąć propozycję i potwierdzić udział w podanym zakresie?",
-      "rejectConfirm": "[PH] Odrzucić tę propozycję udziału?",
-      "acceptSuccess": "[PH] Propozycja została przyjęta, a udział potwierdzony",
-      "rejectSuccess": "[PH] Propozycja została odrzucona"
+      "accept": "Przyjmij propozycję",
+      "reject": "Odrzuć propozycję",
+      "acceptConfirm": "Przyjąć propozycję udziału w podanym zakresie?",
+      "rejectConfirm": "Odrzucić propozycję udziału?",
+      "acceptSuccess": "Propozycja przyjęta. Udział potwierdzony",
+      "rejectSuccess": "Propozycja odrzucona"
     },
     "participation": {
-      "active": "[PH] Udział aktywny",
-      "ended": "[PH] Udział zakończony",
-      "endedAt": "[PH] Data zakończenia udziału",
-      "endReason": "[PH] Powód zakończenia udziału",
-      "withdraw": "[PH] Wycofaj potwierdzony udział",
-      "startedHint": "[PH] Realizacja już się rozpoczęła. Nie można wycofać potwierdzonego udziału.",
-      "replacementLabel": "[PH] MG proponowany na zastępstwo",
-      "replacementRequiredHint": "[PH] Do rozpoczęcia realizacji pozostało mniej niż 72 godziny. Aby wycofać udział, wskaż zastępstwo.",
-      "replacementOptionalHint": "[PH] Do rozpoczęcia realizacji pozostały co najmniej 72 godziny. Wskazanie zastępstwa jest opcjonalne.",
-      "replacementHint": "[PH] Zastępstwo obejmuje ten sam zakres udziału i otrzyma propozycję wymagającą przyjęcia. Nie jest potwierdzane automatycznie.",
-      "replacementLoadFailed": "[PH] Nie udało się załadować listy MG do wyboru zastępstwa",
-      "withdrawConfirm": "[PH] Wycofać potwierdzony udział bez wskazania zastępstwa?",
-      "withdrawWithReplacementConfirm": "[PH] Wycofać potwierdzony udział? Wskazane zastępstwo otrzyma propozycję w tym samym zakresie.",
-      "withdrawSuccess": "[PH] Potwierdzony udział został wycofany",
-      "withdrawWithReplacementSuccess": "[PH] Twój udział został wycofany, a zastępstwo otrzymało propozycję wymagającą przyjęcia"
+      "active": "Aktywny",
+      "ended": "Zakończony",
+      "endedAt": "Data zakończenia udziału",
+      "endReason": "Powód zakończenia udziału",
+      "withdraw": "Wycofaj udział",
+      "startedHint": "Zlecenie już się rozpoczęło. Nie możesz wycofać potwierdzonego udziału.",
+      "replacementLabel": "Mistrz Gry na zastępstwo",
+      "replacementRequiredHint": "Do rozpoczęcia zlecenia pozostało mniej niż 72 godziny. Wskaż Mistrza Gry na zastępstwo.",
+      "replacementOptionalHint": "Do rozpoczęcia zlecenia pozostały co najmniej 72 godziny. Możesz wskazać zastępstwo.",
+      "replacementHint": "Wskazany Mistrz Gry otrzyma propozycję udziału w tym samym zakresie. Zastępstwo wymaga jego potwierdzenia.",
+      "replacementLoadFailed": "Nie udało się załadować listy Mistrzów Gry",
+      "withdrawConfirm": "Wycofać udział bez wskazania zastępstwa?",
+      "withdrawWithReplacementConfirm": "Wycofać udział? Wskazany Mistrz Gry otrzyma propozycję zastępstwa.",
+      "withdrawSuccess": "Udział wycofany",
+      "withdrawWithReplacementSuccess": "Udział wycofany. Propozycja zastępstwa została wysłana"
     },
     "participationEndReasons": {
-      "gm_withdrawal": "[PH] Wycofanie udziału przez MG",
-      "admin_removal": "[PH] Zakończenie udziału przez koordynatora"
+      "gm_withdrawal": "Wycofanie przez Mistrza Gry",
+      "admin_removal": "Zakończenie przez koordynatora"
     },
     "sessionProposals": {
-      "title": "[PH] Propozycje sesji",
-      "hint": "[PH] Wskaż co najmniej wymaganą liczbę propozycji sesji dla każdego slotu objętego Twoim udziałem. Możesz zapisać także niekompletne propozycje.",
-      "requiredPerSlot": "[PH] Minimalna liczba propozycji na każdy slot",
-      "selectedCount": "[PH] Wybrane propozycje",
-      "complete": "[PH] Zapisane propozycje są kompletne",
-      "incomplete": "[PH] Zapisane propozycje są niekompletne",
-      "unsavedHint": "[PH] Masz niezapisane zmiany. Kompletność zapisanych propozycji zostanie sprawdzona po zapisie.",
-      "readOnly": "[PH] Propozycje sesji są obecnie dostępne tylko do odczytu.",
-      "add": "[PH] Dodaj propozycję",
-      "emptyMappings": "[PH] Nie wskazano propozycji sesji dla tego slotu.",
-      "emptySlots": "[PH] Twój udział nie obejmuje żadnych slotów wymagających propozycji sesji.",
-      "loadFailed": "[PH] Nie udało się załadować propozycji sesji",
-      "saveFailed": "[PH] Nie udało się zapisać propozycji sesji",
-      "saveSuccess": "[PH] Propozycje sesji zostały zapisane"
+      "title": "Propozycje sesji",
+      "hint": "Wskaż wymaganą liczbę sesji dla każdego bloku objętego Twoim udziałem. Możesz zapisać również niekompletne propozycje.",
+      "requiredPerSlot": "Minimum propozycji na blok",
+      "selectedCount": "Wybrane sesje",
+      "complete": "Kompletne",
+      "incomplete": "Niekompletne",
+      "unsavedHint": "Masz niezapisane zmiany. Po zapisie sprawdzimy kompletność propozycji.",
+      "readOnly": "Propozycje sesji są teraz dostępne tylko do odczytu.",
+      "add": "Dodaj propozycję",
+      "emptyMappings": "Brak propozycji sesji dla tego bloku.",
+      "emptySlots": "Brak bloków wymagających propozycji sesji.",
+      "loadFailed": "Nie udało się załadować propozycji sesji",
+      "saveFailed": "Nie udało się zapisać propozycji sesji",
+      "saveSuccess": "Propozycje sesji zapisane"
     },
-    "sessionProposalHint": "[PH] Po potwierdzeniu udziału MG przedstawia co najmniej wymaganą liczbę propozycji sesji dla każdego objętego slotu. Zgłoszenie udziału nie wymaga wskazania sesji."
+    "sessionProposalHint": "Sesje proponujesz po potwierdzeniu udziału, osobno dla każdego bloku."
   }
 }
