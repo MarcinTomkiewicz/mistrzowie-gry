@@ -7,11 +7,12 @@ export type ListPageCopy = {
 };
 
 export type CoreTableCopy = {
-  active: string;
+  nextOccurrence: string;
+  location: string;
   publicPage: string;
-  editionCount: string;
-  activeEditionCount: string;
-  updatedAt: string;
+  noUpcomingOccurrences: string;
+  noLocation: string;
+  moreLocations: string;
 };
 
 export type ListActionsCopy = {

@@ -207,7 +207,7 @@ export class SessionList {
 
     switch (action.type) {
       case 'edit':
-        return 'pi pi-quill';
+        return 'pi pi-scroll-quill';
       case 'delete':
       case 'action':
         return 'pi pi-demolish';

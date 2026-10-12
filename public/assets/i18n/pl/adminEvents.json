@@ -6,11 +6,12 @@
       "emptyDescription": "Nie utworzono jeszcze żadnych wydarzeń. Kliknij przycisk \"Dodaj wydarzenie\", aby rozpocząć."
     },
     "table": {
-      "active": "Aktywność",
+      "nextOccurrence": "Najbliższy termin",
+      "location": "Lokalizacja",
       "publicPage": "Strona publiczna",
-      "editionCount": "Edycje",
-      "activeEditionCount": "Aktywne edycje",
-      "updatedAt": "Ostatnia zmiana"
+      "noUpcomingOccurrences": "Brak nadchodzących terminów",
+      "noLocation": "-",
+      "moreLocations": "+{{count}} więcej"
     },
     "actions": {
       "createCore": "Dodaj wydarzenie",

@@ -1,3 +1,6 @@
+import { inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+
 import {
   createCommonActionsI18n,
   createCommonErrorsI18n,
@@ -8,7 +11,7 @@ import {
   createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
-import {
+import type {
   CoreRpcErrorsCopy,
   CoreTableCopy,
   ListActionsCopy,
@@ -18,6 +21,7 @@ import {
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventCoreListI18n() {
+  const transloco = inject(TranslocoService);
   const { page, table, actions, toast, status, rpcErrors } =
     createScopedSectionsI18n<{
       page: ListPageCopy;
@@ -42,6 +46,10 @@ export function createEventCoreListI18n() {
     toast,
     status,
     rpcErrors,
+    moreLocations: (count: number): string => transloco.translate<string>(
+      'adminEvents.list.table.moreLocations',
+      { count },
+    ),
     commonActions: createCommonActionsI18n(),
     commonErrors: createCommonErrorsI18n(),
     commonLabels: createCommonLabelsI18n(),

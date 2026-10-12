@@ -44,110 +44,139 @@
       />
     </section>
   } @else if (rowVms().length) {
-    <div class="p-datatable p-component w-100">
-      <div class="p-datatable-table-container overflow-x-auto">
-        <table class="p-datatable-table w-100 min-w-500">
-          <thead class="p-datatable-thead">
-            <tr>
-              <th class="small-caps" scope="col">
-                {{ i18n.commonLabels().name }}
-              </th>
-              <th class="small-caps" scope="col">
-                {{ i18n.commonLabels().key }}
-              </th>
-              <th class="small-caps" scope="col">
-                {{ i18n.commonLabels().shortDescription }}
-              </th>
-              <th class="small-caps text-center" scope="col">
-                {{ i18n.table().active }}
-              </th>
-              <th class="small-caps text-center" scope="col">
+    <div class="w-100">
+      <p-table
+        [value]="rowVms()"
+        dataKey="core.id"
+        class="w-100"
+        tableStyleClass="mg-responsive-table"
+      >
+        <ng-template #header>
+          <tr class="hide-down-sm">
+            <th class="small-caps" scope="col">
+              {{ i18n.commonLabels().event }}
+            </th>
+            <th class="small-caps" scope="col">
+              {{ i18n.table().nextOccurrence }}
+            </th>
+            <th class="small-caps" scope="col">
+              {{ i18n.table().location }}
+            </th>
+            <th class="small-caps text-center" scope="col">
+              {{ i18n.commonLabels().status }}
+            </th>
+            <th class="small-caps text-center" scope="col">
+              {{ i18n.table().publicPage }}
+            </th>
+            <th class="small-caps text-right" scope="col">
+              {{ i18n.commonTable().actions }}
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-row>
+          <tr class="mg-responsive-table__row">
+            <th scope="row" class="mg-responsive-table__row-heading">
+              <strong>{{ row.core.name }}</strong>
+            </th>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
+                {{ i18n.table().nextOccurrence }}
+              </span>
+              <span class="mg-responsive-table__value">
+                {{ row.nextOccurrenceLabel }}
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
+                {{ i18n.table().location }}
+              </span>
+              <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                @for (city of row.visibleCities; track city) {
+                  <span>{{ city }}</span>
+                } @empty {
+                  <span>{{ i18n.table().noLocation }}</span>
+                }
+                @if (row.moreLocationsLabel) {
+                  <p-chip [label]="row.moreLocationsLabel" />
+                }
+              </div>
+            </td>
+            <td class="mg-responsive-table__cell text-center">
+              <span class="mg-responsive-table__label small-caps font-bold">
+                {{ i18n.commonLabels().status }}
+              </span>
+              <span class="mg-responsive-table__value">
+                <span [class]="row.activeBadgeClass">{{ row.activeLabel }}</span>
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell text-center">
+              <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.table().publicPage }}
-              </th>
-              <th class="small-caps text-right" scope="col">
-                {{ i18n.table().editionCount }}
-              </th>
-              <th class="small-caps text-right" scope="col">
-                {{ i18n.table().activeEditionCount }}
-              </th>
-              <th class="small-caps" scope="col">
-                {{ i18n.table().updatedAt }}
-              </th>
-              <th class="small-caps text-right" scope="col">
+              </span>
+              <span class="mg-responsive-table__value">
+                <span [class]="row.publicPageBadgeClass">{{ row.publicPageLabel }}</span>
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.commonTable().actions }}
-              </th>
-            </tr>
-          </thead>
+              </span>
+              <div
+                class="mg-responsive-table__value flex-row-end-center flex-nowrap gap-xs"
+              >
+                <p-button
+                  size="small"
+                  severity="secondary"
+                  styleClass="square-7 p-0"
+                  [ariaLabel]="i18n.commonActions().edit"
+                  [pTooltip]="i18n.commonActions().edit"
+                  tooltipPosition="top"
+                  tooltipEvent="both"
+                  icon="pi pi-scroll-quill"
+                  [routerLink]="['/admin/content/events', row.core.id, 'edit']"
+                  [disabled]="isBusy()"
+                />
 
-          <tbody class="p-datatable-tbody">
-            @for (row of rowVms(); track row.core.id) {
-              <tr>
-                <td><strong>{{ row.core.name }}</strong></td>
-                <td>{{ row.core.key }}</td>
-                <td>{{ row.shortDescriptionLabel }}</td>
-                <td class="text-center">
-                  <span [class]="row.activeBadgeClass">
-                    {{ row.activeLabel }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  <span [class]="row.publicPageBadgeClass">
-                    {{ row.publicPageLabel }}
-                  </span>
-                </td>
-                <td class="text-right">{{ row.core.editionCount }}</td>
-                <td class="text-right">
-                  {{ row.core.activeEditionCount }}
-                </td>
-                <td>{{ row.updatedAtLabel }}</td>
-                <td class="text-right">
-                  <div class="flex-row-end-center flex-wrap gap-xs">
-                    <p-button
-                      size="small"
-                      severity="secondary"
-                      [label]="i18n.commonActions().edit"
-                      icon="pi pi-pencil"
-                      [routerLink]="['/admin/content/events', row.core.id, 'edit']"
-                      [disabled]="isBusy()"
-                    />
-
-                    @if (row.core.isActive) {
-                      <p-button
-                        size="small"
-                        severity="danger"
-                        [outlined]="true"
-                        [label]="i18n.actions().deactivateCore"
-                        icon="pi pi-times-circle"
-                        [loading]="
-                          isActionLoading(row.core.id, 'deactivate')
-                        "
-                        [disabled]="
-                          isBusy() &&
-                          !isActionLoading(row.core.id, 'deactivate')
-                        "
-                        (onClick)="setCoreActive(row.core, false)"
-                      />
-                    } @else {
-                      <p-button
-                        size="small"
-                        severity="success"
-                        [label]="i18n.actions().activateCore"
-                        icon="pi pi-check-circle"
-                        [loading]="isActionLoading(row.core.id, 'activate')"
-                        [disabled]="
-                          isBusy() &&
-                          !isActionLoading(row.core.id, 'activate')
-                        "
-                        (onClick)="setCoreActive(row.core, true)"
-                      />
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+                @if (row.core.isActive) {
+                  <p-button
+                    size="small"
+                    severity="danger"
+                    [outlined]="true"
+                    styleClass="square-7 p-0"
+                    [ariaLabel]="i18n.actions().deactivateCore"
+                    [pTooltip]="i18n.actions().deactivateCore"
+                    tooltipPosition="top"
+                    tooltipEvent="both"
+                    icon="pi pi-settle"
+                    [loading]="isActionLoading(row.core.id, 'deactivate')"
+                    [disabled]="
+                      isBusy() && !isActionLoading(row.core.id, 'deactivate')
+                    "
+                    (onClick)="setCoreActive(row.core, false)"
+                  />
+                } @else {
+                  <p-button
+                    size="small"
+                    severity="success"
+                    styleClass="square-7 p-0"
+                    [ariaLabel]="i18n.actions().activateCore"
+                    [pTooltip]="i18n.actions().activateCore"
+                    tooltipPosition="top"
+                    tooltipEvent="both"
+                    icon="pi pi-lever"
+                    [loading]="isActionLoading(row.core.id, 'activate')"
+                    [disabled]="
+                      isBusy() && !isActionLoading(row.core.id, 'activate')
+                    "
+                    (onClick)="setCoreActive(row.core, true)"
+                  />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   } @else if (!isLoading()) {
     <section class="mg-card flex-col-start-stretch gap-xs p-md w-100">

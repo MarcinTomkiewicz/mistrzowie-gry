@@ -49,7 +49,7 @@ const loaders = {
       '../components/admin-commercial-pages/commercial-page-preview/commercial-page-preview'
     ).then((m) => m.CommercialPagePreview),
   eventList: () =>
-    import('../components/admin-events/core-list/core-list').then(
+    import('../components/admin-events/core-list/event-core-list').then(
       (m) => m.EventCoreList,
     ),
   eventCoreEditor: () =>

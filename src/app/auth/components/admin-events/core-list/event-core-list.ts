@@ -3,13 +3,19 @@ import { RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { ChipModule } from 'primeng/chip';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { finalize, forkJoin } from 'rxjs';
 
-import { IEventCoreListItem } from '../../../../core/interfaces/i-event-admin';
+import type { IEventCoreListItem } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { formatTimestampLabel } from '../../../../core/utils/date';
-import { sortEventCoresByNextOccurrence } from '../../../../core/utils/event-admin-list';
+import { formatDateLabel } from '../../../../core/utils/date';
+import {
+  buildEventCoreListRows,
+  type EventCoreListRow,
+} from '../../../../core/utils/event-admin-list';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { createEventCoreListI18n } from './core-list.i18n';
@@ -17,7 +23,7 @@ import { createEventCoreListI18n } from './core-list.i18n';
 @Component({
   selector: 'app-event-core-list',
   standalone: true,
-  imports: [RouterLink, ButtonModule, LoadingOverlay],
+  imports: [RouterLink, ButtonModule, ChipModule, TableModule, TooltipModule, LoadingOverlay],
   templateUrl: './core-list.html',
   providers: [provideTranslocoScope('adminEvents', 'common')],
 })
@@ -26,7 +32,7 @@ export class EventCoreList {
   private readonly toast = inject(UiToast);
 
   protected readonly i18n = createEventCoreListI18n();
-  protected readonly rows = signal<IEventCoreListItem[]>([]);
+  protected readonly rows = signal<EventCoreListRow[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly activeActionKey = signal<string | null>(null);
@@ -38,10 +44,17 @@ export class EventCoreList {
   protected readonly rowVms = computed(() => {
     const status = this.i18n.status();
     const commonValues = this.i18n.commonValues();
+    const table = this.i18n.table();
 
-    return this.rows().map((core) => ({
+    return this.rows().map(({ core, nextEdition, visibleCities, remainingCityCount }) => ({
       core,
-      shortDescriptionLabel: core.shortDescription ?? commonValues.notAvailable,
+      visibleCities,
+      nextOccurrenceLabel: nextEdition
+        ? formatDateLabel(nextEdition.nextOccurrenceDate)
+        : table.noUpcomingOccurrences,
+      moreLocationsLabel: remainingCityCount > 0
+        ? this.i18n.moreLocations(remainingCityCount)
+        : null,
       activeLabel: core.isActive ? commonValues.active : status.inactive,
       activeBadgeClass: core.isActive
         ? 'tag-badge tag-badge--success'
@@ -52,9 +65,6 @@ export class EventCoreList {
       publicPageBadgeClass: core.hasPublicPage
         ? 'tag-badge tag-badge--success'
         : 'tag-badge tag-badge--muted',
-      updatedAtLabel:
-        formatTimestampLabel(core.updatedAt, 'pl-PL') ??
-        commonValues.notAvailable,
     }));
   });
 
@@ -73,7 +83,7 @@ export class EventCoreList {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: ({ cores, editions }) => {
-          this.rows.set(sortEventCoresByNextOccurrence(cores, editions));
+          this.rows.set(buildEventCoreListRows(cores, editions));
         },
         error: (error) => {
           const detail = resolveEventCoreAdminErrorMessage(
