@@ -2,6 +2,10 @@ export const EVENT_RPC = {
   getPublicPage: 'get_public_event_page',
   getHostCatalog: 'get_host_event_catalog',
 
+  registerParticipant: 'register_event_participant',
+  getMyParticipant: 'get_my_event_participant',
+  cancelMyParticipant: 'cancel_my_event_participant',
+
   getCoreList: 'get_admin_event_core_list',
   getCoreDetail: 'get_admin_event_core_detail',
   saveCore: 'save_admin_event_core',
