@@ -1,8 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {
+  catchError,
+  defer,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import {
+  EventEditionSaveResult,
   IAdminEventDetail,
   IAdminEventListItem,
   IAdminOccurrence,
@@ -13,10 +22,14 @@ import {
   IOccurrenceSavePayload,
 } from '../../interfaces/i-event-admin';
 import { Backend } from '../backend/backend';
+import { ImageStorage } from '../image-storage/image-storage';
+import { Storage } from '../storage/storage';
 
 @Injectable({ providedIn: 'root' })
 export class EventAdmin {
   private readonly backend = inject(Backend);
+  private readonly imageStorage = inject(ImageStorage);
+  private readonly storage = inject(Storage);
 
   getCoreList(): Observable<IEventCoreListItem[]> {
     return this.backend.rpc<IEventCoreListItem[]>(EVENT_RPC.getCoreList);
@@ -60,6 +73,67 @@ export class EventAdmin {
     return this.backend.rpc<IAdminEventDetail>(EVENT_RPC.saveEdition, {
       p_payload: payload,
     });
+  }
+
+  saveEditionWithCover(
+    payload: IEventSavePayload,
+    file: File | null,
+    previousCoverPath: string | null,
+  ): Observable<EventEditionSaveResult> {
+    return defer(() => {
+      const coverPath$ = file
+        ? payload.id
+          ? this.imageStorage.transcodeAndUpload(file, {
+              bucket: 'images',
+              folder: `content/events/${payload.id}`,
+              usePublicUrl: false,
+            })
+          : throwError(() => new Error(
+              'Save the Event edition before uploading its cover.',
+            ))
+        : of(payload.coverImagePath);
+
+      return coverPath$.pipe(
+        switchMap((coverImagePath) =>
+          this.saveEdition({ ...payload, coverImagePath }).pipe(
+            map((edition): EventEditionSaveResult => ({
+              status: 'saved',
+              edition,
+              coverCleanupFailed: false,
+            })),
+            catchError((error: unknown) =>
+              of<EventEditionSaveResult>({
+                status: 'failed',
+                phase: 'save',
+                error,
+                coverCleanupFailed: false,
+              }),
+            ),
+            switchMap((result) => {
+              const cleanupPath = result.status === 'saved'
+                ? previousCoverPath !== result.edition.coverImagePath
+                  ? previousCoverPath
+                  : null
+                : file ? coverImagePath : null;
+
+              return this.storage.removeFile(cleanupPath, 'images').pipe(
+                map(() => result),
+                catchError(() => of({ ...result, coverCleanupFailed: true })),
+              );
+            }),
+          ),
+        ),
+      );
+    }).pipe(
+      catchError((error: unknown) =>
+        of<EventEditionSaveResult>({
+          status: 'failed',
+          phase: 'upload',
+          error,
+          coverCleanupFailed: false,
+        }),
+      ),
+    );
   }
 
   setEditionActive(

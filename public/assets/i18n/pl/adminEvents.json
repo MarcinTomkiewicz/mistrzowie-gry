@@ -84,7 +84,6 @@
       "venueAddress": "Adres miejsca",
       "priceCurrency": "Waluta",
       "priceLabel": "Opis ceny",
-      "coverImagePath": "Ścieżka do obrazka okładki",
       "coverPreviewAlt": "Podgląd okładki danej lokalizacji",
       "facebookLink": "Link do Facebooka",
       "isActive": "Aktywna",
@@ -103,13 +102,21 @@
       "priceAmountMin": "Kwota nie może być mniejsza niż 0.",
       "timeRange": "Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia tego samego dnia.",
       "slotCapacityRange": "Liczba Mistrzów Gry musi być liczbą całkowitą od 1 do 12.",
-      "participantCapacityMin": "Liczba uczestników musi być pusta albo być liczbą całkowitą nie mniejszą niż 1.",
-      "coverImagePath": "Podaj ścieżkę pliku w Storage, a nie publiczny URL ani dane base64."
+      "participantCapacityMin": "Liczba uczestników musi być pusta albo być liczbą całkowitą nie mniejszą niż 1."
     },
     "info": {
       "capacities": "Nowe wartości pojemności dotyczą nowych terminów. Istniejące terminy nie zostaną automatycznie zmienione.",
       "publicDefault": "Zmiana domyślnej edycji wpłynie na publiczną stronę tego wydarzenia.",
       "cityImmutable": "[PH] Miasto tej lokalizacji jest stałe. Aby wskazać inne miasto, utwórz nową lokalizację."
+    },
+    "cover": {
+      "saveFirst": "[PH] Zapisz lokalizację, aby dodać opcjonalną okładkę.",
+      "publicImageInfo": "[PH] Okładka jest opcjonalna. Przesłany obraz jest ogólnodostępny. Dodanie okładki nie publikuje wydarzenia.",
+      "cropHint": "[PH] Ustaw kadr okładki lokalizacji.",
+      "uploadFailedSummary": "[PH] Nie udało się przesłać okładki",
+      "uploadFailedDetail": "[PH] Zmiany nie zostały zapisane. Spróbuj ponownie.",
+      "cleanupFailedSummary": "[PH] Nie udało się usunąć nieużywanego obrazu",
+      "cleanupFailedDetail": "[PH] W bibliotece plików pozostał nieużywany obraz. Wynik zapisu lokalizacji nie uległ zmianie."
     },
     "participantKinds": {
       "wholeEvent": "Zapisy na całe wydarzenie",

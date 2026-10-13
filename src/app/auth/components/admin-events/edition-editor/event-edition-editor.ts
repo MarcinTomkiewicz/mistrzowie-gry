@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,10 +6,6 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { finalize, forkJoin, of } from 'rxjs';
 
-import {
-  EventOccurrenceStatus,
-  ParticipantSignupKind,
-} from '../../../../core/enums/event';
 import {
   createEventEditionForm,
   mapEventEditionFormToPayload,
@@ -23,22 +19,16 @@ import {
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
-import {
-  formatDateLabel,
-  formatTimestampLabel,
-} from '../../../../core/utils/date';
-import { formatTimeRangeLabel } from '../../../../core/utils/time-format';
+import { FileUploadImageChange } from '../../../../core/types/file-upload';
 import {
   resolveEventEditionAdminErrorMessage,
 } from '../event-admin-errors';
-import {
-  resolveParticipantSignupKindLabel,
-} from '../participant-signup-kind-options';
 import { stringToSlug } from '../../../../core/utils/normalize-text';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';
+import { EventEditionOccurrences } from './event-edition-occurrences/event-edition-occurrences';
 import { EventEditionSettingsEditor } from './event-edition-settings-editor';
 import { EventScheduleEditor } from './event-schedule-editor';
 import { OccurrenceEditor } from './occurrence-editor';
@@ -52,11 +42,12 @@ import { OccurrenceEditor } from './occurrence-editor';
     LoadingOverlay,
     Breadcrumbs,
     EventEditionDetailsEditor,
+    EventEditionOccurrences,
     EventEditionSettingsEditor,
     EventScheduleEditor,
     OccurrenceEditor,
   ],
-  templateUrl: './edition-editor.html',
+  templateUrl: './event-edition-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common')],
 })
 export class EventEditionEditor {
@@ -64,6 +55,8 @@ export class EventEditionEditor {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
+  private readonly detailsEditor = viewChild(EventEditionDetailsEditor);
+  private readonly coverFile = signal<File | null>(null);
   private readonly navigationState =
     this.router.getCurrentNavigation()?.extras.state;
   private readonly navigationCore = this.navigationState?.[
@@ -103,9 +96,6 @@ export class EventEditionEditor {
     },
   ]);
   protected readonly form = createEventEditionForm(this.coreId);
-  protected readonly formatDateLabel = formatDateLabel;
-  protected readonly formatTimestampLabel = formatTimestampLabel;
-  protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
 
   constructor() {
     this.form.controls.city.valueChanges
@@ -193,59 +183,71 @@ export class EventEditionEditor {
     this.selectedOccurrence.set(null);
   }
 
-  protected participantSignupKindLabel(
-    kind: ParticipantSignupKind,
-  ): string {
-    return resolveParticipantSignupKindLabel(
-      kind,
-      this.i18n.participantKinds(),
-    );
-  }
-
-  protected occurrenceStatusLabel(status: EventOccurrenceStatus): string {
-    if (status === EventOccurrenceStatus.Published) {
-      return this.i18n.commonValues().published;
-    }
-
-    if (status === EventOccurrenceStatus.Archived) {
-      return this.i18n.commonValues().archived;
-    }
-
-    return this.i18n.occurrenceStatuses()[status];
-  }
-
   protected saveEdition(): void {
-    if (this.form.invalid || this.isSaving()) {
-      this.form.markAllAsTouched();
+    if (this.isSaving() || this.isLoading()) {
+      return;
+    }
 
-      if (this.form.invalid) {
-        this.toast.danger({
-          summary: this.i18n.commonForm().invalidSummary,
-          detail: this.i18n.commonForm().invalid,
-        });
-      }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.toast.danger({
+        summary: this.i18n.commonForm().invalidSummary,
+        detail: this.i18n.commonForm().invalid,
+      });
 
       return;
     }
 
     this.isSaving.set(true);
+    this.form.disable({ emitEvent: false });
 
     this.eventAdmin
-      .saveEdition(
+      .saveEditionWithCover(
         mapEventEditionFormToPayload(
           this.form,
           this.edition(),
         ),
+        this.coverFile(),
+        this.edition()?.coverImagePath ?? null,
       )
-      .pipe(finalize(() => this.isSaving.set(false)))
+      .pipe(finalize(() => {
+        this.form.enable({ emitEvent: false });
+        this.isSaving.set(false);
+      }))
       .subscribe({
-        next: (savedEdition) => {
+        next: (result) => {
+          if (result.coverCleanupFailed) {
+            this.toast.warn({
+              summary: this.i18n.cover().cleanupFailedSummary,
+              detail: this.i18n.cover().cleanupFailedDetail,
+            });
+          }
+
+          if (result.status === 'failed') {
+            this.toast.danger({
+              summary: result.phase === 'upload'
+                ? this.i18n.cover().uploadFailedSummary
+                : this.i18n.toast().saveFailedSummary,
+              detail: result.phase === 'upload'
+                ? this.i18n.cover().uploadFailedDetail
+                : resolveEventEditionAdminErrorMessage(
+                    result.error,
+                    this.i18n.rpcErrors(),
+                    this.i18n.commonErrors().concurrentModification,
+                  ),
+            });
+            return;
+          }
+
+          const savedEdition = result.edition;
           this.edition.set(savedEdition);
           populateEventEditionForm(
             this.form,
             savedEdition.eventCoreId,
             savedEdition,
           );
+          this.coverFile.set(null);
+          this.detailsEditor()?.resetCoverSelection();
           this.toast.success({
             summary: this.i18n.toast().saveSuccessSummary,
             detail: this.i18n.toast().saveSuccessDetail,
@@ -269,20 +271,30 @@ export class EventEditionEditor {
             );
           }
         },
-        error: (error) => {
-          this.toast.danger({
-            summary: this.i18n.toast().saveFailedSummary,
-            detail: resolveEventEditionAdminErrorMessage(
-              error,
-              this.i18n.rpcErrors(),
-              this.i18n.commonErrors().concurrentModification,
-            ),
-          });
-        },
       });
   }
 
+  protected onCoverChanged(change: FileUploadImageChange): void {
+    const edition = this.edition();
+    if (!edition || this.isSaving()) {
+      return;
+    }
+
+    this.coverFile.set(change.kind === 'select' ? change.file : null);
+    const control = this.form.controls.coverImagePath;
+    control.setValue(change.kind === 'remove' ? edition.coverImagePath ?? '' : '');
+
+    if (change.kind === 'remove') {
+      control.markAsPristine();
+    } else {
+      control.markAsDirty();
+    }
+  }
+
   protected goBack(): void {
+    if (this.isSaving()) {
+      return;
+    }
     void this.router.navigate(['/admin/content/events', this.coreId, 'edit']);
   }
 

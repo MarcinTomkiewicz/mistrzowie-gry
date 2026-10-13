@@ -140,6 +140,19 @@ export interface IEventSavePayload {
   schedule: IEventSchedule;
 }
 
+export type EventEditionSaveResult =
+  | {
+      status: 'saved';
+      edition: IAdminEventDetail;
+      coverCleanupFailed: boolean;
+    }
+  | {
+      status: 'failed';
+      phase: 'upload' | 'save';
+      error: unknown;
+      coverCleanupFailed: boolean;
+    };
+
 export interface IAdminOccurrenceListItem {
   id: string;
   date: string;

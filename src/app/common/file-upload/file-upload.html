@@ -59,7 +59,11 @@
               (onClick)="chooseCallback()"
             />
 
-            @if (isImageMode() && files?.length) {
+            @if (
+              isImageMode() &&
+              (files?.length ||
+                (resolvedOptions().clearCurrent && previewUrl()))
+            ) {
               <p-button
                 type="button"
                 styleClass="arcane"
@@ -99,6 +103,8 @@
                   icon="pi pi-times"
                   [rounded]="true"
                   [text]="true"
+                  [ariaLabel]="resolvedTexts().cropCancelLabel"
+                  [disabled]="resolvedOptions().disabled"
                   (onClick)="removeFileCallback($event, index)"
                 />
               </div>

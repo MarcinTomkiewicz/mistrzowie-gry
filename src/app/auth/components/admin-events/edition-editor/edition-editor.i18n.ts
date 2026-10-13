@@ -10,6 +10,7 @@ import {
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import {
+  EditionCoverCopy,
   EditionFieldsCopy,
   EditionInfoCopy,
   EditionRpcErrorsCopy,
@@ -39,6 +40,7 @@ export function createEventEditionEditorI18n() {
     fields,
     validation,
     info,
+    cover,
     participantKinds,
     toast,
     rpcErrors,
@@ -56,6 +58,7 @@ export function createEventEditionEditorI18n() {
     fields: EditionFieldsCopy;
     validation: EditionValidationCopy;
     info: EditionInfoCopy;
+    cover: EditionCoverCopy;
     participantKinds: ParticipantKindCopy;
     toast: EditorToastCopy;
     rpcErrors: EditionRpcErrorsCopy;
@@ -73,6 +76,7 @@ export function createEventEditionEditorI18n() {
     fields: 'editionEditor.fields',
     validation: 'editionEditor.validation',
     info: 'editionEditor.info',
+    cover: 'editionEditor.cover',
     participantKinds: 'editionEditor.participantKinds',
     toast: 'editionEditor.toast',
     rpcErrors: 'editionRpcErrors',
@@ -92,6 +96,7 @@ export function createEventEditionEditorI18n() {
     fields,
     validation,
     info,
+    cover,
     participantKinds,
     toast,
     rpcErrors,

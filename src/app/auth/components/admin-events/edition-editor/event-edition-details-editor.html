@@ -1,10 +1,13 @@
+@let editionForm = form();
+@let translations = i18n();
+
 <div
   class="flex-col-start-stretch gap-md w-100"
-  [formGroup]="form()"
+  [formGroup]="editionForm"
 >
   <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ i18n().sections().identity }}
+      {{ translations.sections().identity }}
     </h2>
 
     <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
@@ -17,7 +20,7 @@
           readonly
         />
         <label for="event-edition-core">
-          {{ i18n().commonLabels().event }}
+          {{ translations.commonLabels().event }}
         </label>
       </p-iftalabel>
 
@@ -34,42 +37,42 @@
               isNew() ? null : 'event-edition-city-info'
             "
             [attr.aria-invalid]="
-              form().controls.city.touched && form().controls.city.invalid
+              editionForm.controls.city.touched && editionForm.controls.city.invalid
             "
           />
           <label for="event-edition-city">
-            {{ i18n().commonLabels().city }}
+            {{ translations.commonLabels().city }}
           </label>
         </p-iftalabel>
 
         @if (
-          form().controls.city.touched &&
-          (form().controls.city.hasError("required") ||
-            form().controls.city.hasError("requiredTrimmed"))
+          editionForm.controls.city.touched &&
+          (editionForm.controls.city.hasError("required") ||
+            editionForm.controls.city.hasError("requiredTrimmed"))
         ) {
           <small class="mg-contact-error">
-            {{ i18n().commonForm().required }}
+            {{ translations.commonForm().required }}
           </small>
         } @else if (
-          form().controls.city.touched &&
-          form().controls.city.hasError("slugSource")
+          editionForm.controls.city.touched &&
+          editionForm.controls.city.hasError("slugSource")
         ) {
           <small class="mg-contact-error">
-            {{ i18n().validation().citySlugSource }}
+            {{ translations.validation().citySlugSource }}
           </small>
         }
 
         @if (!isNew()) {
           <small id="event-edition-city-info" class="color-muted">
-            {{ i18n().info().cityImmutable }}
+            {{ translations.info().cityImmutable }}
           </small>
         }
       </div>
 
       <div class="flex-col-start-stretch gap-xs w-100">
-        <span class="small-caps">{{ i18n().fields().slug }}</span>
+        <span class="small-caps">{{ translations.fields().slug }}</span>
         <strong class="text-wrap-anywhere">
-          {{ form().controls.slug.value }}
+          {{ editionForm.controls.slug.value }}
         </strong>
       </div>
     </div>
@@ -77,7 +80,7 @@
 
   <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ i18n().sections().venueAndPrice }}
+      {{ translations.sections().venueAndPrice }}
     </h2>
 
     <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
@@ -89,7 +92,7 @@
           formControlName="venueName"
         />
         <label for="event-edition-venue-name">
-          {{ i18n().fields().venueName }}
+          {{ translations.fields().venueName }}
         </label>
       </p-iftalabel>
 
@@ -101,7 +104,7 @@
           formControlName="venueAddress"
         />
         <label for="event-edition-venue-address">
-          {{ i18n().fields().venueAddress }}
+          {{ translations.fields().venueAddress }}
         </label>
       </p-iftalabel>
     </div>
@@ -119,16 +122,16 @@
             [maxFractionDigits]="2"
           />
           <label for="event-edition-price-amount">
-            {{ i18n().commonLabels().amount }}
+            {{ translations.commonLabels().amount }}
           </label>
         </p-iftalabel>
 
         @if (
-          form().controls.priceAmount.touched &&
-          form().controls.priceAmount.hasError("min")
+          editionForm.controls.priceAmount.touched &&
+          editionForm.controls.priceAmount.hasError("min")
         ) {
           <small class="mg-contact-error">
-            {{ i18n().validation().priceAmountMin }}
+            {{ translations.validation().priceAmountMin }}
           </small>
         }
       </div>
@@ -142,16 +145,16 @@
             formControlName="priceCurrency"
           />
           <label for="event-edition-price-currency">
-            {{ i18n().fields().priceCurrency }}
+            {{ translations.fields().priceCurrency }}
           </label>
         </p-iftalabel>
 
         @if (
-          form().controls.priceCurrency.touched &&
-          form().controls.priceCurrency.invalid
+          editionForm.controls.priceCurrency.touched &&
+          editionForm.controls.priceCurrency.invalid
         ) {
           <small class="mg-contact-error">
-            {{ i18n().commonForm().required }}
+            {{ translations.commonForm().required }}
           </small>
         }
       </div>
@@ -164,7 +167,7 @@
           formControlName="priceLabel"
         />
         <label for="event-edition-price-label">
-          {{ i18n().fields().priceLabel }}
+          {{ translations.fields().priceLabel }}
         </label>
       </p-iftalabel>
     </div>
@@ -172,40 +175,21 @@
 
   <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ i18n().sections().cover }}
+      {{ translations.sections().cover }}
     </h2>
 
-    <div class="flex-col-start-stretch gap-xs w-100">
-      <p-iftalabel class="w-100">
-        <input
-          class="w-100"
-          pInputText
-          id="event-edition-cover-image-path"
-          formControlName="coverImagePath"
-        />
-        <label for="event-edition-cover-image-path">
-          {{ i18n().fields().coverImagePath }}
-        </label>
-      </p-iftalabel>
-
-      @if (
-        form().controls.coverImagePath.touched &&
-        form().controls.coverImagePath.hasError("publicUrl")
-      ) {
-        <small class="mg-contact-error">
-          {{ i18n().validation().coverImagePath }}
-        </small>
-      }
-    </div>
-
-    @if (resolveCoverPreviewUrl(); as coverUrl) {
-      <div class="image__preview image__preview--landscape max-w-500">
-        <img
-          [src]="coverUrl"
-          [alt]="i18n().fields().coverPreviewAlt"
-          loading="lazy"
-        />
-      </div>
+    @if (isNew()) {
+      <p class="m-0 color-muted">{{ translations.cover().saveFirst }}</p>
+    } @else {
+      <p class="m-0 color-muted">{{ translations.cover().publicImageInfo }}</p>
+      <app-image-upload
+        [currentUrl]="resolveCoverPreviewUrl()"
+        [clearCurrent]="true"
+        [cropHint]="translations.cover().cropHint"
+        [disabled]="disabled()"
+        [previewAlt]="translations.fields().coverPreviewAlt"
+        (imageChange)="coverChanged.emit($event)"
+      />
     }
   </section>
 </div>

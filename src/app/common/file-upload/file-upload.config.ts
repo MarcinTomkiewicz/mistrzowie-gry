@@ -32,6 +32,7 @@ export const DEFAULT_FILE_UPLOAD_OPTIONS: FileUploadOptions = {
   previewShape: 'circle',
   multiple: false,
   clearAfterSelect: false,
+  clearCurrent: false,
   chooseIcon: 'pi pi-mona-lisa',
   emptyIcon: 'pi pi-soul',
 };

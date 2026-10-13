@@ -1,6 +1,10 @@
 export type FileUploadPreviewShape = 'circle' | 'square' | 'landscape';
 export type FileUploadMode = 'image' | 'files';
 
+export type FileUploadImageChange =
+  | { kind: 'select'; file: File }
+  | { kind: 'remove' | 'clear' };
+
 export interface FileUploadTexts {
   chooseLabel: string;
   clearLabel: string;
@@ -29,6 +33,7 @@ export interface FileUploadOptions {
   previewShape: FileUploadPreviewShape;
   multiple?: boolean;
   clearAfterSelect?: boolean;
+  clearCurrent?: boolean;
   chooseIcon?: string;
   emptyIcon?: string;
 }

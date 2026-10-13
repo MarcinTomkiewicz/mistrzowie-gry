@@ -22,6 +22,7 @@ import { ImageModule } from 'primeng/image';
 import { CropImageDialog } from '../crop-image-dialog/crop-image-dialog';
 import {
   FileUploadCropConfig,
+  FileUploadImageChange,
   FileUploadOptions,
   FileUploadSelectedImageState,
   FileUploadTexts,
@@ -34,9 +35,9 @@ import {
 
 function createInitialSelectedState(): FileUploadSelectedImageState {
   return {
-  file: null,
-  objectUrl: null,
-  displayedFiles: [],
+    file: null,
+    objectUrl: null,
+    displayedFiles: [],
   };
 }
 
@@ -61,6 +62,7 @@ export class FileUpload {
   readonly cropConfig = input<Partial<FileUploadCropConfig>>({});
 
   readonly valueChange = output<File | null>();
+  readonly imageChange = output<FileUploadImageChange>();
   readonly filesSelected = output<File[]>();
 
   readonly selected = signal(createInitialSelectedState());
@@ -124,7 +126,7 @@ export class FileUpload {
     }
 
     if (event.file === this.selected().file) {
-      this.clearSelectedFile();
+      this.clearSelectedFile('remove');
     }
   }
 
@@ -133,7 +135,7 @@ export class FileUpload {
       return;
     }
 
-    this.clearSelectedFile();
+    this.clearSelectedFile('clear');
   }
 
   onCropCancel(): void {
@@ -147,27 +149,32 @@ export class FileUpload {
     this.uploader()?.clearInputElement();
   }
 
-  private setFile(file: File | null): void {
+  resetSelection(): void {
     this.revokeObjectUrl();
+    this.selected.set(createInitialSelectedState());
+    this.pendingFile.set(undefined);
+    this.resetPendingUploaderSelection();
+  }
 
-    if (!file) {
-      this.selected.set(createInitialSelectedState());
-      this.valueChange.emit(null);
-      return;
-    }
+  private setFile(file: File): void {
+    this.revokeObjectUrl();
 
     this.selected.set({
       file,
       objectUrl: URL.createObjectURL(file),
       displayedFiles: [file],
     });
-    this.valueChange.emit(file);
+    this.emitImageChange({ kind: 'select', file });
   }
 
-  private clearSelectedFile(): void {
-    this.revokeObjectUrl();
-    this.selected.set(createInitialSelectedState());
-    this.valueChange.emit(null);
+  private clearSelectedFile(kind: 'remove' | 'clear'): void {
+    this.resetSelection();
+    this.emitImageChange({ kind });
+  }
+
+  private emitImageChange(change: FileUploadImageChange): void {
+    this.valueChange.emit(change.kind === 'select' ? change.file : null);
+    this.imageChange.emit(change);
   }
 
   private revokeObjectUrl(): void {

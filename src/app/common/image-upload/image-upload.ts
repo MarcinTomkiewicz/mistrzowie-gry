@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, viewChild } from '@angular/core';
 
 import {
   IMAGE_UPLOAD_CROP_CONFIG,
@@ -8,7 +8,11 @@ import {
   createCommonActionsI18n,
   createCommonFormI18n,
 } from '../../core/translations/common.i18n';
-import { FileUploadOptions, FileUploadTexts } from '../../core/types/file-upload';
+import {
+  FileUploadImageChange,
+  FileUploadOptions,
+  FileUploadTexts,
+} from '../../core/types/file-upload';
 import { FileUpload } from '../file-upload/file-upload';
 
 @Component({
@@ -18,11 +22,14 @@ import { FileUpload } from '../file-upload/file-upload';
   templateUrl: './image-upload.html',
 })
 export class ImageUpload {
+  private readonly fileUpload = viewChild(FileUpload);
   readonly currentUrl = input<string | null>(null);
+  readonly clearCurrent = input(false);
   readonly cropHint = input('');
   readonly disabled = input(false);
   readonly previewAlt = input('');
   readonly fileSelected = output<File | null>();
+  readonly imageChange = output<FileUploadImageChange>();
 
   protected readonly cropConfig = IMAGE_UPLOAD_CROP_CONFIG;
   private readonly commonActions = createCommonActionsI18n();
@@ -30,6 +37,7 @@ export class ImageUpload {
   protected readonly options = computed<FileUploadOptions>(() => ({
     ...IMAGE_UPLOAD_OPTIONS,
     currentUrl: this.currentUrl(),
+    clearCurrent: this.clearCurrent(),
     disabled: this.disabled(),
   }));
   protected readonly texts = computed<FileUploadTexts>(() => {
@@ -54,4 +62,8 @@ export class ImageUpload {
       cropPreviewSquareLabel: fileUpload.cropPreviewSquareLabel,
     };
   });
+
+  resetSelection(): void {
+    this.fileUpload()?.resetSelection();
+  }
 }

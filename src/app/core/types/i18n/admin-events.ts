@@ -97,7 +97,6 @@ export type EditionFieldsCopy = {
   venueAddress: string;
   priceCurrency: string;
   priceLabel: string;
-  coverImagePath: string;
   coverPreviewAlt: string;
   facebookLink: string;
   isActive: string;
@@ -118,7 +117,16 @@ export type EditionValidationCopy = {
   timeRange: string;
   slotCapacityRange: string;
   participantCapacityMin: string;
-  coverImagePath: string;
+};
+
+export type EditionCoverCopy = {
+  saveFirst: string;
+  publicImageInfo: string;
+  cropHint: string;
+  uploadFailedSummary: string;
+  uploadFailedDetail: string;
+  cleanupFailedSummary: string;
+  cleanupFailedDetail: string;
 };
 
 export type EditionInfoCopy = {

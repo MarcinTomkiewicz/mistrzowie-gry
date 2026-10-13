@@ -57,7 +57,7 @@ const loaders = {
       (m) => m.EventCoreEditor,
     ),
   eventEditionEditor: () =>
-    import('../components/admin-events/edition-editor/edition-editor').then(
+    import('../components/admin-events/edition-editor/event-edition-editor').then(
       (m) => m.EventEditionEditor,
     ),
   staffingRealizationCoreEditor: () =>
