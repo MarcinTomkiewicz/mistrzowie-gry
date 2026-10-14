@@ -15,7 +15,10 @@ import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 import { provideTranslocoScope } from '@jsverse/transloco';
 
-import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
+import type {
+  GmProfilePresentation,
+  IGmPublicProfile,
+} from '../../../core/interfaces/i-gm-public-profile';
 import {
   GM_PROFILE_DIALOG_TABS,
   GmProfileDialogTabDefinition,
@@ -28,8 +31,10 @@ import { normalizeText } from '../../../core/utils/normalize-text';
 import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { SessionList } from '../../../common/session-list/session-list';
 import { createGmProfileDialogI18n } from './gm-profile-dialog.i18n';
-import { ISessionListLabels } from '../../../core/interfaces/i-session';
-import { ISystem } from '../../../core/interfaces/i-system';
+import type {
+  ISessionListLabels,
+  SessionPresentation,
+} from '../../../core/interfaces/i-session';
 import { SystemChip } from '../../../common/system-chip/system-chip';
 
 interface IGmProfileDialogTabOption {
@@ -55,16 +60,19 @@ interface IGmProfileDialogTabOption {
   styleUrl: './gm-profile-dialog.scss',
   providers: [provideTranslocoScope('ourTeam', 'common', 'sessions')],
 })
-export class GmProfileDialog {
+export class GmProfileDialog<
+  TProfile extends GmProfilePresentation = IGmPublicProfile,
+> {
   private readonly storage = inject(Storage);
 
   readonly visible = input(false);
-  readonly profile = input<IGmPublicProfile | null>(null);
-  readonly profiles = input<readonly IGmPublicProfile[]>([]);
+  readonly profile = input<TProfile | null>(null);
+  readonly profiles = input<readonly TProfile[]>([]);
   readonly enableProfileNavigation = input(false);
+  readonly showCharacterSheets = input(true);
 
   readonly visibleChange = output<boolean>();
-  readonly profileChange = output<IGmPublicProfile>();
+  readonly profileChange = output<TProfile>();
 
   readonly i18n = createGmProfileDialogI18n();
   readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
@@ -108,7 +116,7 @@ export class GmProfileDialog {
     return this.storage.getPublicUrl(imagePath);
   });
 
-  readonly systems = computed<ISystem[]>(() => {
+  readonly systems = computed<SessionPresentation['system'][]>(() => {
     const profile = this.profile();
 
     if (!profile) {
@@ -120,7 +128,7 @@ export class GmProfileDialog {
     return profile.sessions
       .map((session) => session.system)
       .filter(
-        (system): system is ISystem => !!system && !!normalizeText(system.name),
+        (system) => !!normalizeText(system.name),
       )
       .filter((system) => {
         if (seen.has(system.id)) {

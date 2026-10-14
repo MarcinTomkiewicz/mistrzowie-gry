@@ -4,17 +4,27 @@ import {
   createCommonErrorsI18n,
   createCommonLabelsI18n,
   createCommonStatusI18n,
+  createCommonValuesI18n,
+  createCommonAppRolesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
-import type { EventPageTranslations } from '../../../core/types/i18n/event-page';
+import type {
+  EventPageProgramTranslations,
+  EventPageTranslations,
+} from '../../../core/types/i18n/event-page';
 
 export function createEventPageI18n() {
   return {
     page: createScopedObjectI18n<EventPageTranslations>('eventPage', 'page'),
+    program: createScopedObjectI18n<EventPageProgramTranslations>(
+      'eventPage', 'program',
+    ),
     actions: createCommonActionsI18n(),
     cta: createCommonCtaI18n(),
     errors: createCommonErrorsI18n(),
     labels: createCommonLabelsI18n(),
     status: createCommonStatusI18n(),
+    values: createCommonValuesI18n(),
+    roles: createCommonAppRolesI18n(),
   };
 }

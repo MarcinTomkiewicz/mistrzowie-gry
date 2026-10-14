@@ -106,6 +106,7 @@
             [session]="session"
             [gmDisplayName]="gmDisplayName()"
             [enablePdfPreviews]="true"
+            [showCharacterSheets]="showCharacterSheets()"
           />
         </td>
       </tr>
@@ -214,12 +215,14 @@
                   [session]="session"
                   [gmDisplayName]="gmDisplayName()"
                   [enablePdfPreviews]="true"
+                  [showCharacterSheets]="showCharacterSheets()"
                 />
               } @placeholder {
                 <app-session-details
                   [session]="session"
                   [gmDisplayName]="gmDisplayName()"
                   [enablePdfPreviews]="false"
+                  [showCharacterSheets]="showCharacterSheets()"
                 />
               }
             </div>

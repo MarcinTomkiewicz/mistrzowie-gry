@@ -4,5 +4,11 @@
     "addressLabel": "Adres",
     "datesTitle": "Terminy wydarzenia",
     "noOccurrences": "Brak opublikowanych terminów dla wybranego miasta."
+  },
+  "program": {
+    "title": "Program wydarzenia",
+    "confirmed": "Potwierdzone",
+    "pending": "Oczekujące",
+    "inPreparation": "Program w przygotowaniu"
   }
 }

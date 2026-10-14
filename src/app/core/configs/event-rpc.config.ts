@@ -1,5 +1,7 @@
 export const EVENT_RPC = {
   getPublicPage: 'get_public_event_page',
+  getPublicProgram: 'get_public_event_program',
+  getPublicGmProfile: 'get_public_event_gm_profile',
   getHostCatalog: 'get_host_event_catalog',
 
   registerParticipant: 'register_event_participant',
@@ -13,6 +15,7 @@ export const EVENT_RPC = {
 
   getEditionList: 'get_admin_event_list',
   getEditionDetail: 'get_admin_event_detail',
+  publishStaffingEvent: 'publish_admin_staffing_event',
   saveEdition: 'save_admin_event',
   setEditionActive: 'set_admin_event_active',
 

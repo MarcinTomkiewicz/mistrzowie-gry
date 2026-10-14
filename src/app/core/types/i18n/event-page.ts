@@ -4,3 +4,10 @@ export type EventPageTranslations = {
   datesTitle: string;
   noOccurrences: string;
 };
+
+export type EventPageProgramTranslations = {
+  title: string;
+  confirmed: string;
+  pending: string;
+  inPreparation: string;
+};

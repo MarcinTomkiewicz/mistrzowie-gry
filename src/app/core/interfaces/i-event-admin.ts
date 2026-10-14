@@ -99,6 +99,9 @@ export interface IAdminEventDetail {
   facebookLink: string | null;
   isActive: boolean;
   isDefaultPublic: boolean;
+  isStaffingConverted: boolean;
+  isStaffingReleased: boolean;
+  currentlyPublic: boolean;
   displayOrder: number;
   isForBeginners: boolean;
   timezone: string;
@@ -139,6 +142,30 @@ export interface IEventSavePayload {
   defaultParticipantCapacity: number | null;
   schedule: IEventSchedule;
 }
+
+export type EventPublishResult =
+  | {
+      published: true;
+      alreadyPublished: false;
+      eventId: string;
+      eventCoreId: string;
+      realizationId: string;
+      public: true;
+      occurrenceCount: number;
+      confirmedProgramItemCount: number;
+      pendingProgramEntryCount: number;
+      hasUpcomingOccurrences: boolean;
+      publishedAt: string;
+    }
+  | {
+      published: false;
+      alreadyPublished: true;
+      eventId: string;
+      eventCoreId: string;
+      realizationId: string;
+      currentlyPublic: boolean;
+      publishedAt: string;
+    };
 
 export type EventEditionSaveResult =
   | {

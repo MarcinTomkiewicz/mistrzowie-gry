@@ -58,6 +58,7 @@ export class OccurrenceEditor {
   readonly eventId = input.required<string>();
   readonly occurrence = input.required<IAdminOccurrenceListItem>();
   readonly timezone = input.required<string>();
+  readonly isStaffingConverted = input(false);
   readonly i18n =
     input.required<ReturnType<typeof createEventEditionEditorI18n>>();
 
@@ -73,7 +74,9 @@ export class OccurrenceEditor {
   protected readonly statusOptions = computed<
     ISelectOption<EventOccurrenceStatus>[]
   >(() =>
-    Object.values(EventOccurrenceStatus).map((value) => ({
+    (this.isStaffingConverted()
+      ? [this.occurrence().status]
+      : Object.values(EventOccurrenceStatus)).map((value) => ({
       value,
       label:
         value === EventOccurrenceStatus.Published

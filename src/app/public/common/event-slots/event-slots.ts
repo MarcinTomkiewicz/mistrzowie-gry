@@ -78,6 +78,14 @@ export class EventSlots {
   }
 
   onSlotKeydown(event: KeyboardEvent, item: IEventSlotCardVm): void {
+    if (
+      !item.canOpenDetails ||
+      item.isEmpty ||
+      event.target !== event.currentTarget
+    ) {
+      return;
+    }
+
     if (event.key !== 'Enter' && event.key !== ' ') {
       return;
     }

@@ -9,7 +9,6 @@ import {
 } from 'rxjs';
 
 import {
-  EventOccurrenceStatus,
   EventProgramItemSourceKind,
   EventProgramItemStatus,
 } from '../../enums/event';
@@ -20,20 +19,51 @@ import {
 } from '../../interfaces/i-event-program-item';
 import { IFilter } from '../../interfaces/i-filter';
 import { ISessionWithRelations } from '../../interfaces/i-session';
-import { IEventPublicProgramLoadData } from '../../types/event-program';
 import { ACTIVE_HOST_SIGNUP_STATUSES } from '../../types/event-signup';
 import { SessionSourceKind } from '../../types/session-source';
 import { Backend } from '../../services/backend/backend';
 import { GmRead } from '../gm/gm-read';
 import { SessionRead } from '../sessions/session-read';
-import { EventRead } from './event-read';
+import { EVENT_RPC } from '../../configs/event-rpc.config';
+import type {
+  PublicEventProgramData,
+  PublicEventProgramWireEntry,
+} from '../../types/public-event-program';
+import type { ISystem } from '../../interfaces/i-system';
+import { decodePublicEventProgram } from './public-event-program.contract';
 
 @Injectable({ providedIn: 'root' })
 export class EventProgramRead {
   private readonly backend = inject(Backend);
-  private readonly eventRead = inject(EventRead);
   private readonly gmRead = inject(GmRead);
   private readonly sessionRead = inject(SessionRead);
+
+  getPublicProgram(
+    eventId: string,
+    occurrenceId: string | null = null,
+  ): Observable<PublicEventProgramData> {
+    return this.backend
+      .rpc<PublicEventProgramWireEntry[]>(EVENT_RPC.getPublicProgram, {
+        p_event_id: eventId,
+        p_occurrence_id: occurrenceId,
+      })
+      .pipe(
+        map(decodePublicEventProgram),
+        switchMap((entries) => {
+          const systemIds = [...new Set(entries.flatMap((entry) =>
+            entry.session?.systemId ? [entry.session.systemId] : [],
+          ))];
+          return this.backend.getByIds<ISystem>('systems', systemIds).pipe(
+            map((systems) => {
+              if (systemIds.some((id) => !systems.some((system) => system.id === id))) {
+                throw new Error('Public Event program references a missing system.');
+              }
+              return { entries, systems };
+            }),
+          );
+        }),
+      );
+  }
 
   getProgramItemsByOccurrenceId(
     occurrenceId: string,
@@ -104,87 +134,6 @@ export class EventProgramRead {
         value: [...ACTIVE_HOST_SIGNUP_STATUSES],
       },
     });
-  }
-
-  getPublicProgramLoadData(
-    eventSlug: string,
-    options: {
-      startIso: string;
-      endIso: string;
-      todayIso?: string;
-      occurrenceStatuses?: EventOccurrenceStatus[];
-      programStatuses?: EventProgramItemStatus[];
-      includePastOccurrences?: boolean;
-    },
-  ): Observable<IEventPublicProgramLoadData | null> {
-    return this.eventRead.getEventBySlug(eventSlug).pipe(
-      switchMap((event) => {
-        if (!event) {
-          return of(null);
-        }
-
-        return this.eventRead
-          .getOccurrencesInRange(
-            event.id,
-            options.startIso,
-            options.endIso,
-            options.occurrenceStatuses,
-          )
-          .pipe(
-            map((occurrences) => {
-              const todayIso = options.todayIso;
-
-              if (options.includePastOccurrences || !todayIso) {
-                return occurrences;
-              }
-
-              return occurrences.filter(
-                (occurrence) => occurrence.occurrenceDate >= todayIso,
-              );
-            }),
-            switchMap((occurrences) => {
-              if (!occurrences.length) {
-                return of({
-                  event,
-                  occurrences: [],
-                  programsByOccurrenceId: new Map<
-                    string,
-                    IEventProgramItemWithDetails[]
-                  >(),
-                } satisfies IEventPublicProgramLoadData);
-              }
-
-              return forkJoin(
-                occurrences.map((occurrence) =>
-                  this.getProgramItemsByOccurrenceId(
-                    occurrence.id,
-                    options.programStatuses,
-                  ).pipe(
-                    map((items) => ({
-                      occurrenceId: occurrence.id,
-                      items,
-                    })),
-                  ),
-                ),
-              ).pipe(
-                map(
-                  (programs) =>
-                    ({
-                      event,
-                      occurrences,
-                      programsByOccurrenceId: new Map(
-                        programs.map((program) => [
-                          program.occurrenceId,
-                          program.items,
-                        ]),
-                      ),
-                    }) satisfies IEventPublicProgramLoadData,
-                ),
-              );
-            }),
-          );
-      }),
-    );
   }
 
   private hydrateProgramItem(

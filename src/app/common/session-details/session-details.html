@@ -184,7 +184,7 @@
       </div>
     }
 
-    @if (session().characterSheets; as characterSheets) {
+    @if (showCharacterSheets() && session().characterSheets; as characterSheets) {
       <div class="flex-col-start-stretch gap-xs">
         <small class="status-text status-text--muted">
           {{ i18n.sessionForm().characterSheetsLabel }}

@@ -13,11 +13,23 @@ import { IGmProfileLanguage, ILanguage } from '../../interfaces/i-languages';
 import { IUser } from '../../interfaces/i-user';
 import { Backend } from '../../services/backend/backend';
 import { SessionRead } from '../sessions/session-read';
+import { EVENT_RPC } from '../../configs/event-rpc.config';
+import type { PublicEventGmProfile } from '../../types/public-event-program';
 
 @Injectable({ providedIn: 'root' })
 export class GmRead {
   private readonly backend = inject(Backend);
   private readonly sessionRead = inject(SessionRead);
+
+  getPublicEventProfile(
+    eventId: string,
+    gmUserId: string,
+  ): Observable<PublicEventGmProfile | null> {
+    return this.backend.rpc<PublicEventGmProfile | null>(
+      EVENT_RPC.getPublicGmProfile,
+      { p_event_id: eventId, p_gm_user_id: gmUserId },
+    );
+  }
 
   getGmProfileWithRelationsById(
     gmProfileId: string,

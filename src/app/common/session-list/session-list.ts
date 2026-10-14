@@ -10,7 +10,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import {
   ISessionListLabels,
-  ISessionWithRelations,
+  SessionPresentation,
 } from '../../core/interfaces/i-session';
 import { SessionDifficultyLevel } from '../../core/types/sessions';
 import type { ISessionListAction } from '../../core/types/session-list';
@@ -40,7 +40,7 @@ export class SessionList {
 
   private readonly confirmation = inject(ConfirmationService);
 
-  readonly sessions = input.required<ISessionWithRelations[]>();
+  readonly sessions = input.required<SessionPresentation[]>();
 
   readonly labels = input.required<ISessionListLabels>();
   readonly emptyTitle = input.required<string>();
@@ -56,6 +56,7 @@ export class SessionList {
   readonly selectedSessionId = input<string | null>(null);
   readonly selectLabel = input<string>('');
   readonly gmDisplayName = input<string | null>(null);
+  readonly showCharacterSheets = input(true);
 
   readonly resolveDifficultyLabel =
     input.required<(value: SessionDifficultyLevel) => string>();

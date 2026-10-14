@@ -8,7 +8,8 @@ import {
   createCommonTableI18n,
   createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
-import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import type { EventPublicationCopy } from '../../../../core/types/i18n/event-publication';
 import {
   EditionCoverCopy,
   EditionFieldsCopy,
@@ -91,6 +92,7 @@ export function createEventEditionEditorI18n() {
   });
 
   return {
+    publication: createScopedObjectI18n<EventPublicationCopy>('adminEvents', 'editionEditor.publication'),
     page,
     sections,
     fields,

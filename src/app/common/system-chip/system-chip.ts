@@ -21,7 +21,7 @@ import { normalizeText } from '../../core/utils/normalize-text';
 export class SystemChip {
   readonly popover = viewChild<Popover>('popover');
 
-  readonly system = input.required<ISystem>();
+  readonly system = input.required<Pick<ISystem, 'id' | 'name' | 'description'>>();
   readonly badgeClass = input<string>('');
   readonly maxWidthClass = input<string>('max-w-none max-w-150-xs');
   readonly wrapClass = input<string>('text-wrap-auto-xs');

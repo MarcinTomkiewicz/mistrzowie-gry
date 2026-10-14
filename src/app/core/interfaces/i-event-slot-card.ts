@@ -3,6 +3,7 @@ import { IContentTrigger } from './i-content-trigger';
 import { IGmStyleOption } from './i-gm-style';
 import { ILanguage } from './i-languages';
 import { ISystem } from './i-system';
+import type { PublicEventSession } from '../types/public-event-program';
 
 export interface IEventSlotCardVm {
   id: string | null;
@@ -20,6 +21,11 @@ export interface IEventSlotCardVm {
   isEmpty: boolean;
   canOpenDetails: boolean;
   canOpenGmProfile: boolean;
+  programStatus?: 'confirmed' | 'pending';
+  statusLabel?: string;
+  slotLabel?: string | null;
+  timeLabel?: string;
+  sessionDetails?: PublicEventSession | null;
 }
 
 export interface IEventSlotParticipantScope {

@@ -25,7 +25,6 @@ import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
 import type { RouteTabDefinition } from '../../../core/types/route-tab';
-import { formatDateLabel } from '../../../core/utils/date';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { formatMoney } from '../../../core/utils/pricing';
 import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
@@ -33,13 +32,16 @@ import {
   createBreadcrumbStructuredData,
   createPageStructuredData,
 } from '../../../core/utils/structured-data';
-import { formatTimeRangeLabel } from '../../../core/utils/time-format';
+import { EventPageProgram } from './event-page-program';
 import { EventPageFacade } from './event-page-facade';
 import { createEventPageI18n } from './event-page.i18n';
 
 @Component({
   selector: 'app-event-page',
-  imports: [Breadcrumbs, ButtonModule, LoadingOverlay, RouterLink, RouteTabs],
+  imports: [
+    Breadcrumbs, ButtonModule, EventPageProgram, LoadingOverlay,
+    RouterLink, RouteTabs,
+  ],
   templateUrl: './event-page.html',
   providers: [EventPageFacade, provideTranslocoScope('eventPage', 'common')],
 })
@@ -59,7 +61,7 @@ export class EventPage implements OnInit {
     const state = this.facade.state();
     if (state.kind !== 'ready') return null;
 
-    const { page, edition, occurrences } = state;
+    const { page, edition } = state;
     return {
       page,
       edition,
@@ -71,16 +73,11 @@ export class EventPage implements OnInit {
         buildPublicEventPath(page.core.key, edition.slug),
       ),
       coverImageUrl: resolvePublicStorageUrl(this.storage, edition.coverImagePath),
-      timeLabel: formatTimeRangeLabel(edition.startTime, edition.endTime),
       priceLabel:
         normalizeText(edition.priceLabel) ||
         (edition.priceAmount === null
           ? null
           : formatMoney(edition.priceAmount, edition.priceCurrency)),
-      occurrences: occurrences.map((occurrence) => ({
-        ...occurrence,
-        label: formatDateLabel(occurrence.occurrenceDate, 'pl-PL', true),
-      })),
       editionTabs: page.editions
         .filter((item) => isPublicEventSlug(item.slug))
         .map<RouteTabDefinition>((item) => ({

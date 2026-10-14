@@ -1,0 +1,33 @@
+<section class="position-relative">
+  <h2 class="mg-section__title mg-section__title--sm">{{ i18n.page().datesTitle }}</h2>
+  @if (occurrenceOptions().length) {
+    <app-occurrence-switcher
+      [options]="occurrenceOptions()"
+      [selectedIndex]="facade.selectedOccurrenceIndex()"
+      (selectedIndexChange)="facade.selectOccurrence($event)"
+    />
+    <h3 class="mg-section__title mg-section__title--sm">{{ i18n.program().title }}</h3>
+    @if (cards().length) {
+      <app-event-slots
+        [items]="cards()"
+        [slotCount]="0"
+        (gmSelect)="facade.openGmProfile($event.id)"
+      />
+    } @else {
+      <div class="mg-card"><p class="m-0">{{ i18n.program().inPreparation }}</p></div>
+    }
+  } @else {
+    <div class="mg-card"><p class="m-0">{{ i18n.page().noOccurrences }}</p></div>
+  }
+</section>
+
+<app-loading-overlay
+  [visible]="facade.profileState().kind === 'loading'"
+  [label]="i18n.status().loading"
+/>
+<app-gm-profile-dialog
+  [profile]="profile()"
+  [visible]="profile() !== null"
+  [showCharacterSheets]="false"
+  (visibleChange)="!$event && facade.closeGmProfile()"
+/>

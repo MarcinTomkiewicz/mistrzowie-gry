@@ -78,11 +78,6 @@
                 {{ data.edition.venueAddress }}
               </li>
             }
-            @if (data.timeLabel) {
-              <li>
-                <strong>{{ i18n.labels().hours }}:</strong> {{ data.timeLabel }}
-              </li>
-            }
             @if (data.priceLabel) {
               <li>
                 <strong>{{ i18n.labels().price }}:</strong> {{ data.priceLabel }}
@@ -105,24 +100,7 @@
           </section>
         }
 
-        <section class="mg-card">
-          <h2 class="mg-section__title mg-section__title--sm">
-            {{ i18n.page().datesTitle }}
-          </h2>
-          @if (data.occurrences.length) {
-            <ul class="flex-col gap-sm m-0 px-md">
-              @for (occurrence of data.occurrences; track occurrence.id) {
-                <li>
-                  <time [attr.datetime]="occurrence.occurrenceDate">
-                    {{ occurrence.label }}
-                  </time>
-                </li>
-              }
-            </ul>
-          } @else {
-            <p class="m-0">{{ i18n.page().noOccurrences }}</p>
-          }
-        </section>
+        <app-event-page-program />
       </article>
     }
   </div>

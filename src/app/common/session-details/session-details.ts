@@ -31,6 +31,7 @@ export class SessionDetails {
   readonly canOpenGmProfile = input(false);
   readonly isGmProfileLoading = input(false);
   readonly enablePdfPreviews = input(true);
+  readonly showCharacterSheets = input(true);
 
   readonly gmProfileSelect = output<void>();
 

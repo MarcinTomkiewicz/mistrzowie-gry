@@ -113,13 +113,23 @@ export interface ISessionWithRelations extends ISession {
   characterSheets: ISessionCharacterSheet[];
 }
 
+export type SessionPresentation = Omit<
+  ISessionWithRelations,
+  'system' | 'styles' | 'languages' | 'triggers'
+> & {
+  system: Pick<ISystem, 'id' | 'name' | 'description'>;
+  styles: Omit<IGmStyle, 'createdAt' | 'updatedAt'>[];
+  languages: Omit<ILanguage, 'createdAt' | 'updatedAt'>[];
+  triggers: Omit<IContentTrigger, 'createdAt' | 'updatedAt'>[];
+};
+
 export type SessionDetailsData = Pick<ISession,
   | 'systemId' | 'title' | 'description' | 'image'
   | 'minPlayers' | 'maxPlayers' | 'minAge'
   | 'hasReadyCharacterSheets' | 'allowsScenarioCustomization'
 > & {
   difficultyLevel: `${SessionDifficultyLevel}`;
-} & Partial<Pick<ISessionWithRelations, 'system' | 'styles' | 'triggers' | 'languages' | 'characterSheets'>>;
+} & Partial<Pick<SessionPresentation, 'system' | 'styles' | 'triggers' | 'languages' | 'characterSheets'>>;
 
 export interface ISessionListLabels {
   systemLabel: string;

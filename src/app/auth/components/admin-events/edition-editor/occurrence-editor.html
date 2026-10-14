@@ -25,27 +25,33 @@
     </div>
     <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
       <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <p-select
-            class="w-100"
-            inputId="occurrence-status"
-            formControlName="status"
-            [options]="statusOptions()"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-          />
-          <label for="occurrence-status">
-            {{ i18n().commonLabels().status }}
-          </label>
-        </p-iftalabel>
-        @if (
-          form.controls.status.touched &&
-          form.controls.status.hasError("required")
-        ) {
-          <small class="mg-contact-error">
-            {{ i18n().commonForm().required }}
-          </small>
+        @if (isStaffingConverted()) {
+          <span class="small-caps">{{ i18n().commonLabels().status }}</span>
+          <strong>{{ statusOptions()[0].label }}</strong>
+          <p class="m-0 color-muted">{{ i18n().publication().convertedOccurrenceInfo }}</p>
+        } @else {
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              inputId="occurrence-status"
+              formControlName="status"
+              [options]="statusOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            />
+            <label for="occurrence-status">
+              {{ i18n().commonLabels().status }}
+            </label>
+          </p-iftalabel>
+          @if (
+            form.controls.status.touched &&
+            form.controls.status.hasError("required")
+          ) {
+            <small class="mg-contact-error">
+              {{ i18n().commonForm().required }}
+            </small>
+          }
         }
       </div>
       <div class="flex-col-start-stretch gap-xs w-100">

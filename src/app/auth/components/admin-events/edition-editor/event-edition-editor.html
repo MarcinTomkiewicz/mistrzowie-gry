@@ -4,7 +4,7 @@
 
     <header class="mg-section__header w-100">
       <h1 class="mg-section__title">
-        {{ isNew ? i18n.page().createTitle : i18n.page().editTitle }}
+        {{ isNew() ? i18n.page().createTitle : i18n.page().editTitle }}
       </h1>
 
       <p class="mg-section__subtitle mg-section__subtitle--full">
@@ -13,13 +13,39 @@
     </header>
 
     <app-loading-overlay
-      [visible]="isLoading() || isSaving()"
+      [visible]="isBusy()"
       [label]="
-        isSaving()
-          ? i18n.commonStatus().saving
-          : i18n.commonStatus().loading
+        isPublishing()
+          ? i18n.publication().publishing
+          : isSaving()
+            ? i18n.commonStatus().saving
+            : i18n.commonStatus().loading
       "
     />
+
+    @if (publicationResult(); as result) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="status" aria-live="polite">
+        <h2 class="mg-section__title mg-section__title--sm m-0">
+          {{ result.published ? i18n.publication().success : i18n.publication().alreadyPublished }}
+        </h2>
+        <p class="m-0">
+          {{ i18n.publication().publishedAt }}:
+          {{ formatTimestampLabel(result.publishedAt, 'pl-PL', edition()?.timezone) }}
+        </p>
+        @if (result.published) {
+          <ul class="m-0">
+            <li>{{ i18n.publication().occurrenceCount }}: {{ result.occurrenceCount }}</li>
+            <li>{{ i18n.publication().confirmedCount }}: {{ result.confirmedProgramItemCount }}</li>
+            <li>{{ i18n.publication().pendingCount }}: {{ result.pendingProgramEntryCount }}</li>
+          </ul>
+          @if (!result.hasUpcomingOccurrences) {
+            <p class="m-0">{{ i18n.publication().noUpcomingOccurrences }}</p>
+          }
+        } @else if (!result.currentlyPublic) {
+          <p class="m-0">{{ i18n.publication().stillPrivate }}</p>
+        }
+      </section>
+    }
 
     @if (loadErrorMessage() && !isLoading()) {
       <section
@@ -72,11 +98,56 @@
         (ngSubmit)="saveEdition()"
         novalidate
       >
+        @if (edition(); as loadedEdition) {
+          @if (loadedEdition.isStaffingConverted) {
+            <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+              <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.publication().title }}</h2>
+              <div class="tag-badges">
+                <span class="tag-badge" [class.tag-badge--success]="loadedEdition.currentlyPublic"
+                  [class.tag-badge--muted]="!loadedEdition.currentlyPublic">
+                  {{ loadedEdition.currentlyPublic ? i18n.publication().public : i18n.publication().private }}
+                </span>
+                <span class="tag-badge tag-badge--muted">
+                  {{ loadedEdition.isStaffingReleased ? i18n.publication().released : i18n.publication().unreleased }}
+                </span>
+              </div>
+              @if (privateDraftBlocked()) {
+                <p-message severity="warn" icon="pi pi-info-circle">
+                  <div>
+                    <p class="m-0">{{ i18n.publication().privateDraftRequired }}</p>
+                    <ul class="mb-0">
+                      @if (loadedCore.isActive) { <li>{{ i18n.publication().coreActive }}</li> }
+                      @if (loadedCore.hasPublicPage) { <li>{{ i18n.publication().corePublicPage }}</li> }
+                      @if (loadedEdition.isActive) { <li>{{ i18n.publication().editionActive }}</li> }
+                      @if (loadedEdition.isDefaultPublic) { <li>{{ i18n.publication().editionDefaultPublic }}</li> }
+                    </ul>
+                  </div>
+                </p-message>
+              }
+              <p class="m-0">
+                {{ loadedEdition.isStaffingReleased ? i18n.publication().repeatInfo : i18n.publication().validationInfo }}
+              </p>
+              @if (hasUnsavedChanges()) { <p class="m-0">{{ i18n.publication().saveFirst }}</p> }
+              <div class="flex-row-start-center flex-wrap gap-sm">
+                <p-button type="button" severity="success" icon="pi pi-globe"
+                  [label]="i18n.publication().publish" [loading]="isPublishing()"
+                  [disabled]="!canPublish()" (onClick)="confirmPublication($event)" />
+                <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+                  [label]="i18n.commonActions().refresh" [disabled]="isBusy() || hasUnsavedChanges()"
+                  (onClick)="loadScreenData()" />
+                <a [routerLink]="['/admin/content/events', coreId(), 'edit']">{{ i18n.publication().editCore }}</a>
+                @if (publicPath(); as path) {
+                  <a [routerLink]="path" target="_blank" rel="noopener">{{ i18n.publication().publicLink }}</a>
+                }
+              </div>
+            </section>
+          }
+        }
         <app-event-edition-details-editor
           [form]="form"
           [coreName]="loadedCore.name"
-          [isNew]="isNew && !edition()"
-          [disabled]="isSaving()"
+          [isNew]="isNew() && !edition()"
+          [disabled]="isBusy()"
           [i18n]="i18n"
           (coverChanged)="onCoverChanged($event)"
         />
@@ -88,11 +159,11 @@
 
         <app-event-schedule-editor [form]="form.controls.schedule" />
 
-        @if (!isNew && edition(); as loadedEdition) {
+        @if (!isNew() && edition(); as loadedEdition) {
           <app-event-edition-occurrences
             [edition]="loadedEdition"
             [i18n]="i18n"
-            [disabled]="isSaving()"
+            [disabled]="isBusy()"
             (edit)="editOccurrence($event)"
           />
         }
@@ -104,7 +175,7 @@
             [label]="i18n.commonActions().save"
             icon="pi pi-save"
             [loading]="isSaving()"
-            [disabled]="isLoading()"
+            [disabled]="isBusy()"
           />
 
           <p-button
@@ -113,18 +184,19 @@
             [outlined]="true"
             [label]="i18n.commonActions().cancel"
             icon="pi pi-interdiction"
-            [disabled]="isSaving()"
+            [disabled]="isBusy()"
             (onClick)="goBack()"
           />
         </div>
       </form>
 
-      @if (!isNew && edition(); as loadedEdition) {
+      @if (!isNew() && edition(); as loadedEdition) {
         @if (selectedOccurrence(); as occurrence) {
           <app-occurrence-editor
-            [eventId]="eventId"
+            [eventId]="eventId()"
             [occurrence]="occurrence"
             [timezone]="loadedEdition.timezone"
+            [isStaffingConverted]="loadedEdition.isStaffingConverted"
             [i18n]="i18n"
             (closed)="closeOccurrenceEditor()"
             (saved)="onOccurrenceSaved($event)"

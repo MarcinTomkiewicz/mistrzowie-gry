@@ -12,6 +12,7 @@ import {
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import {
   EventEditionSaveResult,
+  EventPublishResult,
   IAdminEventDetail,
   IAdminEventListItem,
   IAdminOccurrence,
@@ -72,6 +73,12 @@ export class EventAdmin {
   saveEdition(payload: IEventSavePayload): Observable<IAdminEventDetail> {
     return this.backend.rpc<IAdminEventDetail>(EVENT_RPC.saveEdition, {
       p_payload: payload,
+    });
+  }
+
+  publishStaffingEvent(eventId: string): Observable<EventPublishResult> {
+    return this.backend.rpc<EventPublishResult>(EVENT_RPC.publishStaffingEvent, {
+      p_event_id: eventId,
     });
   }
 
