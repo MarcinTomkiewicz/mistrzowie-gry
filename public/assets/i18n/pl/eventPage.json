@@ -1,0 +1,8 @@
+{
+  "page": {
+    "placeLabel": "Miejsce",
+    "addressLabel": "Adres",
+    "datesTitle": "Terminy wydarzenia",
+    "noOccurrences": "Brak opublikowanych terminów dla wybranego miasta."
+  }
+}

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import { EventOccurrenceStatus } from '../../enums/event';
@@ -9,6 +9,7 @@ import { IHostEventCatalogItem } from '../../interfaces/i-event-catalog';
 import { IEventOccurrence } from '../../interfaces/i-event-occurence';
 import { IPublicEventPage } from '../../interfaces/i-event-page';
 import { FilterDefinition } from '../../types/filter';
+import type { PublicEventOccurrence } from '../../types/public-event-page';
 import { Backend } from '../../services/backend/backend';
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +26,24 @@ export class EventRead {
   getHostCatalog(): Observable<IHostEventCatalogItem[]> {
     return this.backend.rpc<IHostEventCatalogItem[]>(
       EVENT_RPC.getHostCatalog,
+    );
+  }
+
+  getPublicOccurrences(eventId: string): Observable<PublicEventOccurrence[]> {
+    return this.getOccurrences({
+      eventId: { operator: FilterOperator.EQ, value: eventId },
+      status: {
+        operator: FilterOperator.IN,
+        value: [
+          EventOccurrenceStatus.Published,
+          EventOccurrenceStatus.ParticipantSignupOpen,
+          EventOccurrenceStatus.ParticipantSignupClosed,
+        ],
+      },
+    }).pipe(
+      map((occurrences) =>
+        occurrences.map(({ id, occurrenceDate }) => ({ id, occurrenceDate })),
+      ),
     );
   }
 
@@ -83,6 +102,12 @@ export class EventRead {
       };
     }
 
+    return this.getOccurrences(filters);
+  }
+
+  private getOccurrences(
+    filters: Record<string, FilterDefinition>,
+  ): Observable<IEventOccurrence[]> {
     return this.backend.getAll<IEventOccurrence>({
       table: 'event_occurrences',
       sortBy: 'occurrenceDate',

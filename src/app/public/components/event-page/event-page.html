@@ -1,0 +1,129 @@
+@let state = facade.state();
+
+<section class="mg-section mg-section--full">
+  <div
+    class="mg-container position-relative"
+    [attr.aria-busy]="state.kind === 'loading'"
+  >
+    <app-loading-overlay
+      [visible]="state.kind === 'loading'"
+      [label]="i18n.status().loading"
+    />
+
+    @if (state.kind === 'error') {
+      <div class="mg-card text-center" role="alert">
+        <h1 class="mg-section__title mg-section__title--sm">
+          {{ i18n.errors().eventsLoadFailed }}
+        </h1>
+        <p class="mg-section__subtitle mb-md">{{ i18n.errors().server }}</p>
+        <p-button
+          [label]="i18n.actions().retry"
+          icon="pi pi-refresh"
+          severity="secondary"
+          size="small"
+          (onClick)="reload()"
+        />
+      </div>
+    } @else if (state.kind === 'not-found') {
+      <div class="mg-card text-center">
+        <h1 class="mg-section__title mg-section__title--sm">
+          {{ i18n.errors().notFound }}
+        </h1>
+        <p-button
+          [label]="i18n.cta().goHome"
+          icon="pi pi-home"
+          severity="secondary"
+          size="small"
+          routerLink="/"
+        />
+      </div>
+    } @else if (view(); as data) {
+      <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
+
+      <article>
+        <header class="mg-section__header">
+          <h1 class="mg-section__title">{{ data.page.core.name }}</h1>
+          @if (data.page.core.shortDescription) {
+            <p class="mg-section__subtitle mg-section__subtitle--full">
+              {{ data.page.core.shortDescription }}
+            </p>
+          }
+          @if (data.coverImageUrl) {
+            <div class="image__preview image__preview--landscape my-lg">
+              <img [src]="data.coverImageUrl" [alt]="data.title" />
+            </div>
+          }
+        </header>
+
+        @if (data.editionTabs.length > 1) {
+          <nav class="mb-md" [attr.aria-label]="i18n.labels().city">
+            <app-route-tabs [tabs]="data.editionTabs" />
+          </nav>
+        }
+
+        <section class="mg-card flex-col-start-stretch gap-sm mb-xl">
+          <h2 class="mg-section__title mg-section__title--sm">
+            {{ data.edition.city }}
+          </h2>
+          <ul class="flex-col m-0 px-md">
+            @if (data.edition.venueName) {
+              <li>
+                <strong>{{ i18n.page().placeLabel }}:</strong>
+                {{ data.edition.venueName }}
+              </li>
+            }
+            @if (data.edition.venueAddress) {
+              <li>
+                <strong>{{ i18n.page().addressLabel }}:</strong>
+                {{ data.edition.venueAddress }}
+              </li>
+            }
+            @if (data.timeLabel) {
+              <li>
+                <strong>{{ i18n.labels().hours }}:</strong> {{ data.timeLabel }}
+              </li>
+            }
+            @if (data.priceLabel) {
+              <li>
+                <strong>{{ i18n.labels().price }}:</strong> {{ data.priceLabel }}
+              </li>
+            }
+            @if (data.edition.isForBeginners) {
+              <li>{{ i18n.labels().forBeginners }}</li>
+            }
+          </ul>
+        </section>
+
+        @if (data.page.core.longDescription) {
+          <section class="mb-xl">
+            <h2 class="mg-section__title mg-section__title--sm">
+              {{ i18n.labels().description }}
+            </h2>
+            <p class="text-md lh-18 color-text text-pre-line">
+              {{ data.page.core.longDescription }}
+            </p>
+          </section>
+        }
+
+        <section class="mg-card">
+          <h2 class="mg-section__title mg-section__title--sm">
+            {{ i18n.page().datesTitle }}
+          </h2>
+          @if (data.occurrences.length) {
+            <ul class="flex-col gap-sm m-0 px-md">
+              @for (occurrence of data.occurrences; track occurrence.id) {
+                <li>
+                  <time [attr.datetime]="occurrence.occurrenceDate">
+                    {{ occurrence.label }}
+                  </time>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="m-0">{{ i18n.page().noOccurrences }}</p>
+          }
+        </section>
+      </article>
+    }
+  </div>
+</section>
