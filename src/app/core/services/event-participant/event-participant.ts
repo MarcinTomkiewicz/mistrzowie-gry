@@ -1,19 +1,45 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type {
+  IEventParticipantAvailability,
   IEventParticipantCancelMyResult,
   IEventParticipantGetMyResult,
   IEventParticipantOwnRequest,
   IEventParticipantRegisterRequest,
   IEventParticipantRegisterResult,
 } from '../../interfaces/i-event-participant';
+import {
+  assertEdgeContract, createEdgeArrayReader, createEdgeNullableReader, readEdgeBoolean,
+  readEdgeNonNegativeInteger, readEdgeUuid,
+} from '../../utils/edge-contract';
+import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
 import { Backend } from '../backend/backend';
+
+const readAvailability = createEdgeArrayReader(createStrictEdgeObjectReader({
+  programItemId: readEdgeUuid,
+  occurrenceId: readEdgeUuid,
+  canSignup: readEdgeBoolean,
+  remainingSeats: createEdgeNullableReader(readEdgeNonNegativeInteger),
+}));
 
 @Injectable({ providedIn: 'root' })
 export class EventParticipant {
   private readonly backend = inject(Backend);
+
+  getPublicAvailability(eventId: string): Observable<IEventParticipantAvailability[]> {
+    return this.backend.rpc<unknown>(EVENT_RPC.getPublicParticipantAvailability, {
+      p_event_id: eventId,
+    }).pipe(map((response) => {
+      const items = readAvailability(response, 'participantAvailability');
+      assertEdgeContract(
+        items.every((item) => !item.canSignup || (item.remainingSeats !== null && item.remainingSeats > 0)),
+        'participantAvailability', 'positive remaining seats when signup is allowed',
+      );
+      return items;
+    }));
+  }
 
   register(
     request: IEventParticipantRegisterRequest,

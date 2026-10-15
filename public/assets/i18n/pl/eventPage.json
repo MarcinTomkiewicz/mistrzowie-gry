@@ -11,5 +11,18 @@
     "timeToBeDetermined": "Godzina do ustalenia",
     "pending": "Oczekujące",
     "inPreparation": "Program w przygotowaniu"
+  },
+  "participantSignup": {
+    "title": "Zapis na sesję",
+    "guestNameLabel": "Nazwa uczestnika",
+    "phoneHint": "Podaj numer w formacie międzynarodowym, np. +48123456789.",
+    "invalidPhone": "Podaj numer telefonu z prefiksem kraju, bez spacji.",
+    "accountNotice": "Zapis zostanie powiązany z Twoim kontem.",
+    "privacyNotice": "Podane dane wykorzystujemy do obsługi zapisu i kontaktu w sprawie sesji.",
+    "remainingSeats": "Wolne miejsca: {{count}}",
+    "availabilityError": "Nie udało się odczytać dostępności zapisów.",
+    "confirmed": "Zapis został potwierdzony.",
+    "unavailable": "Zapis na tę sesję jest niedostępny. Sprawdź aktualną dostępność.",
+    "unknownResult": "Nie udało się ustalić wyniku zapisu. Nie wysyłaj zgłoszenia ponownie. Skontaktuj się z organizatorem."
   }
 }

@@ -8,6 +8,9 @@ export const EVENT_KEYS = {
   chaoticThursdays: 'chaotic-thursdays',
 } as const;
 
+// Release stays closed until EFS-014/023 and EFS-022/037 are accepted.
+export const PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED = false;
+
 export function isPublicEventSlug(value: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) && !value.startsWith('stf-');
 }

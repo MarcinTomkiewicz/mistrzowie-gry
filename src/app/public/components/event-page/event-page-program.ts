@@ -16,13 +16,18 @@ import { EventSlots } from '../../common/event-slots/event-slots';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { SessionDialog } from '../session-dialog/session-dialog';
 import { EventPageFacade } from './event-page-facade';
+import { EventParticipantSignup } from './event-participant-signup';
+import { EventParticipantSignupFacade } from './event-participant-signup-facade';
 import { createEventPageI18n } from './event-page.i18n';
 
 @Component({
   selector: 'app-event-page-program',
-  imports: [ButtonModule, EventSlots, GmProfileDialog, LoadingOverlay, OccurrenceSwitcher, SessionDialog],
+  imports: [
+    ButtonModule, EventSlots, GmProfileDialog, LoadingOverlay, OccurrenceSwitcher,
+    SessionDialog, EventParticipantSignup,
+  ],
   templateUrl: './event-page-program.html',
-  providers: [provideTranslocoScope('eventPage', 'common')],
+  providers: [EventParticipantSignupFacade, provideTranslocoScope('eventPage', 'common')],
 })
 export class EventPageProgram {
   private readonly storage = inject(Storage);
@@ -30,6 +35,7 @@ export class EventPageProgram {
   private readonly collapsedCardLimit = 6;
   private readonly expandedGroupKeys = signal<ReadonlySet<string>>(new Set());
   protected readonly facade = inject(EventPageFacade);
+  protected readonly signup = inject(EventParticipantSignupFacade);
   protected readonly i18n = createEventPageI18n();
   protected readonly selectedProgramItemId = signal<string | null>(null);
 
@@ -53,7 +59,16 @@ export class EventPageProgram {
             group.entries, state.systems, this.storage,
             this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
             state.page.core.name,
-          ),
+          ).map((card) => {
+            const availability = this.signup.availabilityFor(card.id);
+            return availability && availability.remainingSeats !== null ? {
+              ...card,
+              participantSignup: {
+                canSignup: availability.canSignup && !this.signup.hasUncertainResult(card.id),
+                remainingSeatsLabel: this.i18n.remainingSeats(availability.remainingSeats),
+              },
+            } : card;
+          }),
         }))
       : [];
   });

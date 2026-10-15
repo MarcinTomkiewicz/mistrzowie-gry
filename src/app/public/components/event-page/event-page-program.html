@@ -14,6 +14,20 @@
       </div>
     }
   </header>
+  @if (signup.released) {
+    @if (signup.hasUncertainResults() && !signup.selected()) {
+      <p role="alert">{{ i18n.signup().unknownResult }}</p>
+    }
+    @if (signup.availability().kind === 'loading') {
+      <p class="muted-text" role="status">{{ i18n.status().loading }}</p>
+    } @else if (signup.availability().kind === 'error') {
+      <div class="mg-card flex-col-start-stretch gap-sm mb-md" role="alert">
+        <p class="m-0">{{ i18n.signup().availabilityError }}</p>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true"
+          [label]="i18n.actions().retry" (onClick)="signup.refreshAvailability()" />
+      </div>
+    }
+  }
   @if (occurrenceOptions().length) {
     @if (programGroups.length) {
       <div class="flex-col-start-stretch gap-xl">
@@ -32,8 +46,10 @@
               [attr.id]="'event-program-cards-' + group.key"
               [items]="group.visibleCards"
               [slotCount]="0"
+              [participantSignupDisabled]="signup.isSubmitting()"
               (slotSelect)="selectSession($event)"
               (gmSelect)="facade.openGmProfile($event.id)"
+              (participantSignupSelect)="signup.open($event.id)"
             />
             @if (group.remainingCount > 0) {
               <div class="flex-row-end-center mt-md">
@@ -55,6 +71,8 @@
     <div class="mg-card"><p class="m-0">{{ i18n.page().noOccurrences }}</p></div>
   }
 </section>
+
+<app-event-participant-signup />
 
 @let selected = selectedCard();
 <app-session-dialog

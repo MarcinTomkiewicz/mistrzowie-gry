@@ -1,8 +1,20 @@
+export interface IEventParticipantAvailability {
+  programItemId: string;
+  occurrenceId: string;
+  canSignup: boolean;
+  remainingSeats: number | null;
+}
+
+export interface IEventParticipantGuestIdentity {
+  guestName: string;
+  guestPhone: string;
+}
+
 export type IEventParticipantRegisterRequest = {
   programItemId: string;
 } & (
   | { mode: 'authenticated' }
-  | { mode: 'guest'; guestName: string; guestPhone: string }
+  | ({ mode: 'guest' } & IEventParticipantGuestIdentity)
 );
 
 export interface IEventParticipantOwnRequest {

@@ -180,6 +180,16 @@
               }
             </div>
           }
+          @if (item.participantSignup; as signup) {
+            <div class="flex-col-start-stretch gap-sm mt-auto pt-sm">
+              <span class="muted-text">{{ signup.remainingSeatsLabel }}</span>
+              @if (signup.canSignup) {
+                <p-button type="button" size="small" severity="success"
+                  [label]="i18n.cta().signUp" [ariaLabel]="i18n.cta().signUp + ': ' + item.title"
+                  [disabled]="participantSignupDisabled()" (onClick)="onParticipantSignupClick($event, item)" />
+              }
+            </div>
+          }
         </article>
       }
     </div>

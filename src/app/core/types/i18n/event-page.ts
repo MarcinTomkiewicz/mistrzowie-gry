@@ -12,3 +12,17 @@ export type EventPageProgramTranslations = {
   pending: string;
   inPreparation: string;
 };
+
+export type EventPageParticipantSignupTranslations = {
+  title: string;
+  guestNameLabel: string;
+  phoneHint: string;
+  invalidPhone: string;
+  accountNotice: string;
+  privacyNotice: string;
+  remainingSeats: string;
+  availabilityError: string;
+  confirmed: string;
+  unavailable: string;
+  unknownResult: string;
+};

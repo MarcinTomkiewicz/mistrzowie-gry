@@ -24,6 +24,7 @@ export interface IEventSlotCardVm {
   slotLabel?: string | null;
   timeLabel?: string;
   sessionDetails?: SessionDetailsData | null;
+  participantSignup?: { canSignup: boolean; remainingSeatsLabel: string };
 }
 
 export interface IEventSlotParticipantScope {

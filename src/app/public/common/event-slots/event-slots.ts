@@ -28,9 +28,11 @@ export class EventSlots {
   readonly slotCount = input<number>(0);
   readonly isLoading = input<boolean>(false);
   readonly systemBadgeClass = input<string>('');
+  readonly participantSignupDisabled = input(false);
 
   readonly slotSelect = output<IEventSlotCardVm>();
   readonly gmSelect = output<IEventSlotCardVm>();
+  readonly participantSignupSelect = output<IEventSlotCardVm>();
 
   readonly placeholderImageSrc = '/logo/logoMG-transparent.png';
   readonly i18n = createEventSlotsI18n();
@@ -103,6 +105,12 @@ export class EventSlots {
     }
 
     this.gmSelect.emit(item);
+  }
+
+  onParticipantSignupClick(event: Event, item: IEventSlotCardVm): void {
+    event.stopPropagation();
+    if (this.participantSignupDisabled() || !item.participantSignup?.canSignup || item.isEmpty) return;
+    this.participantSignupSelect.emit(item);
   }
 
   difficultyBadgeClass(

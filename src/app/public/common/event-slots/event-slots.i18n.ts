@@ -1,5 +1,6 @@
 import {
   createCommonAppRolesI18n,
+  createCommonCtaI18n,
   createCommonEmptyI18n,
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
@@ -22,6 +23,7 @@ export function createEventSlotsI18n() {
     difficulty,
     commonFallbacks,
     commonAppRoles: createCommonAppRolesI18n(),
+    cta: createCommonCtaI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonValues: createCommonValuesI18n(),
   };

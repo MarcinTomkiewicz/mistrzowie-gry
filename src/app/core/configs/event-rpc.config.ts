@@ -3,6 +3,7 @@ export const EVENT_RPC = {
   getPublicCatalog: 'get_public_event_catalog',
   getPublicProgram: 'get_public_event_program',
   getPublicGmProfile: 'get_public_event_gm_profile',
+  getPublicParticipantAvailability: 'get_public_event_participant_availability',
   getHostCatalog: 'get_host_event_catalog',
 
   registerParticipant: 'register_event_participant',
