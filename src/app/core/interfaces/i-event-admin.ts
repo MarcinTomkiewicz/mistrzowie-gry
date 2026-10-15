@@ -167,6 +167,16 @@ export type EventPublishResult =
       publishedAt: string;
     };
 
+export interface EventProgramReconciliationResult {
+  reconciled: true;
+  eventId: string;
+  realizationId: string;
+  createdCount: number;
+  promotedCount: number;
+  unchangedCount: number;
+  createdProgramItemIds: string[];
+}
+
 export type EventEditionSaveResult =
   | {
       status: 'saved';

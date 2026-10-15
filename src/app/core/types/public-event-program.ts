@@ -15,6 +15,15 @@ export type PublicEventSession = {
   [K in keyof SessionFields]: SessionFields[K] | null;
 };
 
+export type PublicEventConfirmedSession = PublicEventSession &
+  Pick<SessionPresentation, 'styles' | 'triggers' | 'languages'> & {
+    system: SessionPresentation['system'] | null;
+    characterSheets: (SessionPresentation['characterSheets'][number] & {
+      thumbnailStoragePath: string | null;
+      sortOrder: number;
+    })[];
+  };
+
 type ProgramContext = {
   occurrenceId: string;
   occurrenceDate: string;
@@ -34,7 +43,7 @@ export type PublicEventLegacyEntry = ProgramContext & {
   session: PublicEventSession;
 };
 
-export type PublicEventConfirmedEntry<TSession = PublicEventSession> = ProgramContext & {
+export type PublicEventConfirmedEntry<TSession = PublicEventConfirmedSession> = ProgramContext & {
   kind: 'confirmed';
   status: 'confirmed';
   canSignup?: never;
@@ -57,7 +66,7 @@ export type PublicEventPendingEntry = ProgramContext & {
 );
 
 export type PublicEventProgramWireEntry = PublicEventLegacyEntry |
-  PublicEventConfirmedEntry<Record<keyof PublicEventSession, JsonValue>> |
+  PublicEventConfirmedEntry<Record<keyof PublicEventConfirmedSession, JsonValue>> |
   PublicEventPendingEntry;
 
 export type PublicEventProgramEntry = PublicEventLegacyEntry |

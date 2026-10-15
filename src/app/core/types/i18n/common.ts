@@ -163,6 +163,7 @@ export type CommonNavTranslations = {
   programs: string;
   join: string;
   chaoticThursdays: string;
+  events: string;
   contact: string;
   faq: string;
   pricing: string;

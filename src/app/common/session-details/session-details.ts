@@ -10,6 +10,7 @@ import type { IPdfPreview } from '../../core/interfaces/i-pdf';
 import { Storage } from '../../core/services/storage/storage';
 import { resolveAltDifficultyLevel } from '../session-difficulty/session-difficulty';
 import { normalizeText } from '../../core/utils/normalize-text';
+import { resolvePublicStorageUrl } from '../../core/utils/storage-url';
 import { PdfThumbnail } from '../pdf-thumbnail/pdf-thumbnail';
 import { PdfViewerDialog } from '../pdf-viewer-dialog/pdf-viewer-dialog';
 import { createSessionDetailsI18n } from './session-details.i18n';
@@ -38,15 +39,7 @@ export class SessionDetails {
   readonly i18n = createSessionDetailsI18n();
   readonly characterSheetPreview = signal<IPdfPreview | null>(null);
 
-  readonly imageUrl = computed(() => {
-    const imagePath = normalizeText(this.session().image);
-
-    if (!imagePath) {
-      return null;
-    }
-
-    return this.storage.getPublicUrl(imagePath);
-  });
+  readonly imageUrl = computed(() => resolvePublicStorageUrl(this.storage, this.session().image));
 
   readonly difficultyLabel = computed(() => {
     const difficultyVm = resolveAltDifficultyLevel(

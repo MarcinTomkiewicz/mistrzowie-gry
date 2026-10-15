@@ -72,7 +72,9 @@ export class EventPage implements OnInit {
       canonicalUrl: buildSiteUrl(
         buildPublicEventPath(page.core.key, edition.slug),
       ),
-      coverImageUrl: resolvePublicStorageUrl(this.storage, edition.coverImagePath),
+      coverImageUrl: resolvePublicStorageUrl(
+        this.storage, edition.coverImagePath ?? page.core.coverImagePath,
+      ),
       priceLabel:
         normalizeText(edition.priceLabel) ||
         (edition.priceAmount === null

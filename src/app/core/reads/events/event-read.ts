@@ -5,7 +5,7 @@ import { EVENT_RPC } from '../../configs/event-rpc.config';
 import { EventOccurrenceStatus } from '../../enums/event';
 import { FilterOperator } from '../../enums/filter-operators';
 import { IEvent } from '../../interfaces/i-event';
-import { IHostEventCatalogItem } from '../../interfaces/i-event-catalog';
+import type { IHostEventCatalogItem, IPublicEventCatalogItem } from '../../interfaces/i-event-catalog';
 import { IEventOccurrence } from '../../interfaces/i-event-occurence';
 import { IPublicEventPage } from '../../interfaces/i-event-page';
 import { FilterDefinition } from '../../types/filter';
@@ -21,6 +21,10 @@ export class EventRead {
       EVENT_RPC.getPublicPage,
       { p_event_key: eventKey },
     );
+  }
+
+  getPublicCatalog(): Observable<IPublicEventCatalogItem[]> {
+    return this.backend.rpc<IPublicEventCatalogItem[]>(EVENT_RPC.getPublicCatalog);
   }
 
   getHostCatalog(): Observable<IHostEventCatalogItem[]> {

@@ -9,6 +9,7 @@ import { Theme } from '../../../core/services/theme/theme';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { resolveAltDifficultyLevel } from '../../../common/session-difficulty/session-difficulty';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
+import { formatDateLabel } from '../../../core/utils/date';
 import { createEventSlotsI18n } from './event-slots.i18n';
 import { SystemChip } from '../../../common/system-chip/system-chip';
 
@@ -39,8 +40,8 @@ export class EventSlots {
   );
 
   readonly displayItems = computed<IEventSlotCardVm[]>(() => {
-    const items = this.items() ?? [];
-    const slotCount = Math.max(0, this.slotCount() ?? 0);
+    const items = this.items();
+    const slotCount = Math.max(0, this.slotCount());
 
     if (!slotCount) {
       return items;
@@ -51,8 +52,8 @@ export class EventSlots {
     }
 
     const missingCount = slotCount - items.length;
-    const placeholders = Array.from({ length: missingCount }, (_, index) =>
-      this.createEmptySlot(index),
+    const placeholders = Array.from({ length: missingCount }, () =>
+      this.createEmptySlot(),
     );
 
     return [...items, ...placeholders];
@@ -129,8 +130,9 @@ export class EventSlots {
   }
 
   readonly resolveLanguageFlagClass = resolveLanguageFlagClass;
+  readonly formatDateLabel = formatDateLabel;
 
-  private createEmptySlot(_index: number): IEventSlotCardVm {
+  private createEmptySlot(): IEventSlotCardVm {
     const fallback = this.i18n.commonFallbacks();
 
     return {

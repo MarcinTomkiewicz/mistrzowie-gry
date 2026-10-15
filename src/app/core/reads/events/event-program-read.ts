@@ -51,7 +51,7 @@ export class EventProgramRead {
         map(decodePublicEventProgram),
         switchMap((entries) => {
           const systemIds = [...new Set(entries.flatMap((entry) =>
-            entry.session?.systemId ? [entry.session.systemId] : [],
+            entry.kind === undefined && entry.session.systemId ? [entry.session.systemId] : [],
           ))];
           return this.backend.getByIds<ISystem>('systems', systemIds).pipe(
             map((systems) => {

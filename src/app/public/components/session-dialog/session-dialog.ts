@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
@@ -16,7 +15,7 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { catchError, finalize, of } from 'rxjs';
 
 import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
-import { ISessionWithRelations } from '../../../core/interfaces/i-session';
+import type { SessionDetailsData } from '../../../core/interfaces/i-session';
 import { GmRead } from '../../../core/reads/gm/gm-read';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { normalizeText } from '../../../core/utils/normalize-text';
@@ -29,7 +28,6 @@ import { createSessionDialogI18n } from './session-dialog.i18n';
   selector: 'app-session-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     DialogModule,
     ButtonModule,
     SessionDetails,
@@ -43,10 +41,11 @@ export class SessionDialog {
   private readonly gmRead = inject(GmRead);
 
   readonly visible = input(false);
-  readonly session = input<ISessionWithRelations | null>(null);
+  readonly session = input<SessionDetailsData | null>(null);
   readonly gmProfile = input<IGmPublicProfile | null>(null);
   readonly gmProfileId = input<string | null>(null);
   readonly gmDisplayName = input<string | null>(null);
+  readonly showCharacterSheets = input(true);
 
   readonly visibleChange = output<boolean>();
 
@@ -88,9 +87,7 @@ export class SessionDialog {
     effect((onCleanup) => {
       const isVisible = this.visible();
       const initialProfile = this.gmProfile();
-      const gmProfileId =
-        normalizeText(this.gmProfileId()) ??
-        normalizeText(this.session()?.gmProfileId);
+      const gmProfileId = normalizeText(this.gmProfileId());
 
       this.selectedProfile.set(initialProfile);
       this.isGmDialogVisible.set(false);
@@ -109,7 +106,7 @@ export class SessionDialog {
       const subscription = this.gmRead
         .getProfileById(gmProfileId)
         .pipe(
-          catchError(() => of(null as IGmPublicProfile | null)),
+          catchError(() => of(null)),
           finalize(() => this.isGmProfileLoading.set(false)),
         )
         .subscribe((profile) => {

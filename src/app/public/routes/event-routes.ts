@@ -1,6 +1,8 @@
 import type { Routes } from '@angular/router';
 
 const loaders = {
+  eventCatalog: () =>
+    import('../components/event-catalog/event-catalog').then((m) => m.EventCatalog),
   eventPage: () =>
     import('../components/event-page/event-page').then((m) => m.EventPage),
   calendarPreview: () =>
@@ -14,6 +16,11 @@ const loaders = {
 } as const;
 
 export const eventRoutes: Routes = [
+  {
+    path: 'wydarzenia',
+    pathMatch: 'full',
+    loadComponent: loaders.eventCatalog,
+  },
   {
     path: 'wydarzenia/:eventKey/:editionSlug',
     loadComponent: loaders.eventPage,

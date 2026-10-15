@@ -13,7 +13,7 @@
         @if (session().system; as system) {
           <app-system-chip [system]="system" maxWidthClass="max-w-none" displayType="text" />
         } @else {
-          <span class="text-wrap-anywhere">{{ session().systemId }}</span>
+          <span class="text-wrap-anywhere">{{ session().systemId ?? i18n.commonValues().notProvided }}</span>
         }
       </div>
     </div>
@@ -83,7 +83,7 @@
         >
           <p-image
             [src]="imageUrl()!"
-            [alt]="session().title"
+            [alt]="session().title ?? ''"
             imageClass="image__preview-image"
             loading="lazy"
             [preview]="true"
@@ -114,7 +114,9 @@
         "
       >
         {{
-          session().allowsScenarioCustomization
+          session().allowsScenarioCustomization === null
+            ? i18n.commonValues().notProvided
+            : session().allowsScenarioCustomization
             ? i18n.commonValues().yes
             : i18n.commonValues().no
         }}
@@ -133,7 +135,9 @@
         "
       >
         {{
-          session().hasReadyCharacterSheets
+          session().hasReadyCharacterSheets === null
+            ? i18n.commonValues().notProvided
+            : session().hasReadyCharacterSheets
             ? i18n.commonValues().yes
             : i18n.commonValues().no
         }}

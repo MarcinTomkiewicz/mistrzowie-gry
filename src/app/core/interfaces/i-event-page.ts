@@ -12,6 +12,7 @@ export interface IPublicEventCore {
   name: string;
   shortDescription: string | null;
   longDescription: string | null;
+  coverImagePath: string | null;
 }
 
 export interface IPublicEventEdition {

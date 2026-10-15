@@ -1,0 +1,132 @@
+@let state = facade.state();
+
+<section class="mg-section mg-section--full" [attr.aria-label]="i18n.nav().events">
+  <div class="mg-container position-relative" [attr.aria-busy]="state.kind === 'loading'">
+    <app-loading-overlay
+      [visible]="state.kind === 'loading'"
+      [label]="i18n.status().loading"
+    />
+
+    <app-breadcrumbs class="d-block mb-xl" [items]="breadcrumbs()" />
+
+    <header class="mg-section__header">
+      <h1 class="mg-section__title">{{ i18n.nav().events }}</h1>
+      <p class="mg-section__subtitle">{{ i18n.page().subtitle }}</p>
+    </header>
+
+    @if (state.kind === 'error') {
+      <div class="mg-card" role="alert">
+        <h2 class="mg-section__title mg-section__title--sm">
+          {{ i18n.errors().eventsLoadFailed }}
+        </h2>
+        <p class="mg-section__subtitle mg-section__subtitle--full">
+          {{ i18n.errors().server }}
+        </p>
+        <p-button
+          [label]="i18n.actions().retry"
+          icon="pi pi-refresh"
+          severity="secondary"
+          size="small"
+          (onClick)="facade.load()"
+        />
+      </div>
+    } @else if (state.kind === 'ready') {
+      @if (!rows().length) {
+        <div class="mg-card">
+          <h2 class="mg-section__title mg-section__title--sm">
+            {{ i18n.page().emptyTitle }}
+          </h2>
+          <p class="mg-section__subtitle mg-section__subtitle--full">
+            {{ i18n.page().emptyDescription }}
+          </p>
+        </div>
+      } @else {
+        <div class="w-100">
+          <p-table
+            [value]="rows()"
+            dataKey="item.coreId"
+            class="w-100"
+            size="small"
+            tableStyleClass="mg-responsive-table"
+          >
+            <ng-template #header>
+              <tr class="hide-down-sm">
+                <th class="small-caps" scope="col">{{ i18n.labels().event }}</th>
+                <th class="small-caps" scope="col">{{ i18n.page().nextDateLabel }}</th>
+                <th class="small-caps" scope="col">{{ i18n.page().locationsLabel }}</th>
+                <th class="small-caps" scope="col">{{ i18n.labels().description }}</th>
+                <th class="small-caps text-right" scope="col">{{ i18n.page().detailsLabel }}</th>
+              </tr>
+            </ng-template>
+
+            <ng-template #body let-row>
+              <tr class="mg-responsive-table__row">
+                <th scope="row" class="mg-responsive-table__row-heading">
+                  <a class="text-wrap-anywhere" [routerLink]="row.path">
+                    <strong>{{ row.item.name }}</strong>
+                  </a>
+                </th>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">
+                    {{ i18n.page().nextDateLabel }}
+                  </span>
+                  <span class="mg-responsive-table__value">
+                    <time [attr.datetime]="row.item.nextOccurrenceDate">
+                      {{ formatDateLabel(row.item.nextOccurrenceDate) }}
+                    </time>
+                  </span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">
+                    {{ i18n.page().locationsLabel }}
+                  </span>
+                  <nav class="mg-responsive-table__value text-wrap-anywhere"
+                    [attr.aria-label]="i18n.page().citiesLabel">
+                    <ul class="m-0 p-0 flex-col-start-stretch gap-xs">
+                      @for (location of row.editions; track location.edition.id) {
+                        <li class="li--unset">
+                          <a [routerLink]="location.path">{{ location.edition.city }}</a>
+                          - <time [attr.datetime]="location.edition.nextOccurrenceDate">
+                            {{ formatDateLabel(location.edition.nextOccurrenceDate) }}
+                          </time>
+                          @if (location.edition.venueName) {
+                            <span class="d-block text-sm color-muted">{{ location.edition.venueName }}</span>
+                          }
+                        </li>
+                      }
+                    </ul>
+                  </nav>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">
+                    {{ i18n.labels().description }}
+                  </span>
+                  <span class="mg-responsive-table__value truncate-2 text-wrap-anywhere"
+                    [attr.title]="row.item.shortDescription">
+                    {{ row.item.shortDescription || i18n.values().notAvailable }}
+                  </span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">
+                    {{ i18n.page().detailsLabel }}
+                  </span>
+                  <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
+                    <p-button
+                      [label]="i18n.cta().checkDetails"
+                      icon="pi pi-arrow-right"
+                      iconPos="right"
+                      severity="secondary"
+                      size="small"
+                      [outlined]="true"
+                      [routerLink]="row.path"
+                    />
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      }
+    }
+  </div>
+</section>

@@ -1,9 +1,7 @@
 import { SessionDifficultyLevel } from '../types/sessions';
-import { IContentTrigger } from './i-content-trigger';
 import { IGmStyleOption } from './i-gm-style';
 import { ILanguage } from './i-languages';
-import { ISystem } from './i-system';
-import type { PublicEventSession } from '../types/public-event-program';
+import type { SessionDetailsData, SessionPresentation } from './i-session';
 
 export interface IEventSlotCardVm {
   id: string | null;
@@ -11,21 +9,21 @@ export interface IEventSlotCardVm {
   title: string;
   imageUrl: string | null;
   gmDisplayName: string | null;
-  system: ISystem | null;
-  languages: Pick<ILanguage, 'id' | 'label' | 'flagCode'>[];
+  system: SessionPresentation['system'] | null;
+  languages?: Pick<ILanguage, 'id' | 'label' | 'flagCode'>[];
   difficultyLevel: SessionDifficultyLevel | null;
-  styles: IGmStyleOption[];
-  triggers: IContentTrigger[];
+  styles?: IGmStyleOption[];
+  triggers?: SessionPresentation['triggers'];
   minAge: number | null;
   description: string | null;
   isEmpty: boolean;
   canOpenDetails: boolean;
   canOpenGmProfile: boolean;
   programStatus?: 'confirmed' | 'pending';
-  statusLabel?: string;
+  occurrenceDate?: string;
   slotLabel?: string | null;
   timeLabel?: string;
-  sessionDetails?: PublicEventSession | null;
+  sessionDetails?: SessionDetailsData | null;
 }
 
 export interface IEventSlotParticipantScope {

@@ -336,6 +336,17 @@
     "noSessions": "Ten Mistrz Gry nie ma sesji tego rodzaju",
     "saveSuccess": "Plan zapisany",
     "saveFailed": "Nie udało się zapisać planu",
+    "saveRejected": "Serwer odrzucił zmianę planu. Przypisań już opublikowanych w wydarzeniu nie można zmieniać ani usuwać. Jeśli zmiana dotyczy takiego przypisania, zachowaj je bez zmian i dodaj osobne przypisanie.",
+    "synchronization": {
+      "inProgress": "Synchronizacja programu wydarzenia",
+      "failed": "Plan zapisany, ale program opublikowanego Eventu nie został potwierdzony jako zaktualizowany",
+      "retry": "Ponów synchronizację",
+      "updated": "Program wydarzenia zaktualizowany",
+      "current": "Program wydarzenia jest aktualny",
+      "created": "Dodane sesje",
+      "promoted": "Opublikowane istniejące sesje",
+      "unchanged": "Sesje bez zmian"
+    },
     "preview": "Podgląd sesji",
     "chooseOtherSession": "Wybierz inną sesję",
     "proposal": {

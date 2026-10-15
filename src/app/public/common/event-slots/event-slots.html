@@ -54,7 +54,9 @@
         >
           @if (item.programStatus) {
             <div class="flex-col-start-stretch gap-xs">
-              <span class="tag-badge tag-badge--muted">{{ item.statusLabel }}</span>
+              @if (item.occurrenceDate) {
+                <time class="muted-text" [attr.datetime]="item.occurrenceDate">{{ formatDateLabel(item.occurrenceDate, 'pl-PL', true) }}</time>
+              }
               @if (item.slotLabel) {
                 <strong>{{ item.slotLabel }}</strong>
               }
@@ -65,19 +67,25 @@
           }
           <header class="min-h-lines-2 flex-row-between-center gap-sm">
             <div class="flex-row-start-center gap-xs flex-wrap min-w-0">
-              <h3
-                class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
-              >
-                {{ item.title }}
-              </h3>
+              @if (item.programStatus === 'pending') {
+                <span class="tag-badge tag-badge--muted" role="status">{{ item.title }}</span>
+              } @else {
+                <h3
+                  class="mg-section__title mg-section__title--sm mg-section__title--no-margin truncate-2"
+                >
+                  {{ item.title }}
+                </h3>
+              }
 
-              @for (language of item.languages; track language.id) {
-                @if (resolveLanguageFlagClass(language.flagCode); as flagClass) {
-                  <i
-                    [class]="flagClass"
-                    [attr.aria-label]="language.label"
-                    [title]="language.label"
-                  ></i>
+              @if (item.languages; as languages) {
+                @for (language of languages; track language.id) {
+                  @if (resolveLanguageFlagClass(language.flagCode); as flagClass) {
+                    <i
+                      [class]="flagClass"
+                      [attr.aria-label]="language.label"
+                      [title]="language.label"
+                    ></i>
+                  }
                 }
               }
             </div>
@@ -143,62 +151,32 @@
                 }
               </div>
 
-              @if (item.styles.length) {
+              @if (item.styles; as styles) {
                 <div class="tag-badges">
-                  @for (style of item.styles; track style.id) {
+                  @for (style of styles; track style.id) {
                     <span class="tag-badge" [class]="styleBadgeClass()">
                       {{ style.label }}
                     </span>
-                  }
-                </div>
-              } @else if (!item.programStatus) {
-                <div class="tag-badges">
-                  <span class="tag-badge tag-badge--muted">
-                    {{ i18n.commonFallbacks().noStyles }}
-                  </span>
-                </div>
-              }
-
-              @if (item.triggers.length) {
-                <div class="tag-badges">
-                  @for (trigger of item.triggers; track trigger.id) {
-                    <span class="tag-badge tag-badge--arcane">
-                      {{ trigger.label }}
+                  } @empty {
+                    <span class="tag-badge tag-badge--muted">
+                      {{ i18n.commonFallbacks().noStyles }}
                     </span>
                   }
                 </div>
-              } @else if (!item.programStatus) {
-                <div class="tag-badges">
-                  <span class="tag-badge tag-badge--muted">
-                    {{ i18n.commonFallbacks().noTriggers }}
-                  </span>
-                </div>
               }
-              @if (item.sessionDetails; as session) {
-                @if (session.description) {
-                  <p class="m-0 text-pre-line">{{ session.description }}</p>
-                }
-                <ul class="flex-col gap-xs m-0 px-md">
-                  @if (session.minPlayers !== null) {
-                    <li>{{ i18n.sessionForm().minPlayersLabel }}: {{ session.minPlayers }}</li>
+
+              @if (item.triggers; as triggers) {
+                <div class="tag-badges">
+                  @for (trigger of triggers; track trigger.id) {
+                    <span class="tag-badge tag-badge--arcane">
+                      {{ trigger.label }}
+                    </span>
+                  } @empty {
+                    <span class="tag-badge tag-badge--muted">
+                      {{ i18n.commonFallbacks().noTriggers }}
+                    </span>
                   }
-                  @if (session.maxPlayers !== null) {
-                    <li>{{ i18n.sessionForm().maxPlayersLabel }}: {{ session.maxPlayers }}</li>
-                  }
-                  @if (session.minAge !== null) {
-                    <li>{{ i18n.sessionForm().minAgeLabel }}: {{ session.minAge }}+</li>
-                  }
-                  @if (session.hasReadyCharacterSheets !== null) {
-                    <li>{{ i18n.sessionForm().hasReadyCharacterSheetsLabel }}:
-                      {{ session.hasReadyCharacterSheets ? i18n.commonValues().yes : i18n.commonValues().no }}
-                    </li>
-                  }
-                  @if (session.allowsScenarioCustomization !== null) {
-                    <li>{{ i18n.sessionForm().allowsScenarioCustomizationLabel }}:
-                      {{ session.allowsScenarioCustomization ? i18n.commonValues().yes : i18n.commonValues().no }}
-                    </li>
-                  }
-                </ul>
+                </div>
               }
             </div>
           }

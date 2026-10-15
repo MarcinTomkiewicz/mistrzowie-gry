@@ -13,6 +13,7 @@ import { EVENT_RPC } from '../../configs/event-rpc.config';
 import {
   EventEditionSaveResult,
   EventPublishResult,
+  EventProgramReconciliationResult,
   IAdminEventDetail,
   IAdminEventListItem,
   IAdminOccurrence,
@@ -78,6 +79,12 @@ export class EventAdmin {
 
   publishStaffingEvent(eventId: string): Observable<EventPublishResult> {
     return this.backend.rpc<EventPublishResult>(EVENT_RPC.publishStaffingEvent, {
+      p_event_id: eventId,
+    });
+  }
+
+  reconcileStaffingEventProgram(eventId: string): Observable<EventProgramReconciliationResult> {
+    return this.backend.rpc<EventProgramReconciliationResult>(EVENT_RPC.reconcileStaffingEventProgram, {
       p_event_id: eventId,
     });
   }

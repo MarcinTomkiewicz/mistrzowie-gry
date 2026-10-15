@@ -3,14 +3,10 @@ import {
   createCommonEmptyI18n,
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
-import {
-  createScopedObjectI18n,
-  createScopedSectionsI18n,
-} from '../../../core/translations/scoped.i18n';
+import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
 import {
   SessionSlotDifficultyTranslations,
   SessionSlotFallbacksTranslations,
-  SessionFormTranslations,
 } from '../../../core/types/i18n/sessions';
 
 export function createEventSlotsI18n() {
@@ -28,6 +24,5 @@ export function createEventSlotsI18n() {
     commonAppRoles: createCommonAppRolesI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonValues: createCommonValuesI18n(),
-    sessionForm: createScopedObjectI18n<SessionFormTranslations>('sessions', 'form'),
   };
 }

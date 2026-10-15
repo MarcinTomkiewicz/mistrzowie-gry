@@ -115,21 +115,23 @@ export interface ISessionWithRelations extends ISession {
 
 export type SessionPresentation = Omit<
   ISessionWithRelations,
-  'system' | 'styles' | 'languages' | 'triggers'
+  'system' | 'styles' | 'languages' | 'triggers' | 'characterSheets'
 > & {
   system: Pick<ISystem, 'id' | 'name' | 'description'>;
   styles: Omit<IGmStyle, 'createdAt' | 'updatedAt'>[];
   languages: Omit<ILanguage, 'createdAt' | 'updatedAt'>[];
   triggers: Omit<IContentTrigger, 'createdAt' | 'updatedAt'>[];
+  characterSheets: Pick<ISessionCharacterSheet, 'id' | 'fileName' | 'storagePath'>[];
 };
 
-export type SessionDetailsData = Pick<ISession,
-  | 'systemId' | 'title' | 'description' | 'image'
-  | 'minPlayers' | 'maxPlayers' | 'minAge'
-  | 'hasReadyCharacterSheets' | 'allowsScenarioCustomization'
-> & {
-  difficultyLevel: `${SessionDifficultyLevel}`;
-} & Partial<Pick<SessionPresentation, 'system' | 'styles' | 'triggers' | 'languages' | 'characterSheets'>>;
+export type SessionDetailsData = {
+  [K in 'systemId' | 'title' | 'description' | 'image'
+    | 'minPlayers' | 'maxPlayers' | 'minAge'
+    | 'hasReadyCharacterSheets' | 'allowsScenarioCustomization']: ISession[K] | null;
+} & {
+  difficultyLevel: `${SessionDifficultyLevel}` | null;
+  system?: SessionPresentation['system'] | null;
+} & Partial<Pick<SessionPresentation, 'styles' | 'triggers' | 'languages' | 'characterSheets'>>;
 
 export interface ISessionListLabels {
   systemLabel: string;

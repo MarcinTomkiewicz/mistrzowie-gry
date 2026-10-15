@@ -49,6 +49,11 @@ export const MENU_CONFIG: IMenu[] = [
   },
 
   {
+    labelKey: 'nav.events',
+    path: '/wydarzenia',
+    footer: true,
+  },
+  {
     labelKey: 'nav.chaoticThursdays',
     path: '/chaotyczne-czwartki',
     footer: true,

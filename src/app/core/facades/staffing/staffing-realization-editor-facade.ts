@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, defer, forkJoin, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { catchError, defer, EMPTY, forkJoin, map, Observable, of, shareReplay, switchMap, tap, timeout } from 'rxjs';
 
 import { mapStaffingRealizationCoreToDraft } from '../../factories/staffing-realization-core-form.factory';
 import { mapStaffingRealizationScheduleToDraft } from '../../factories/staffing-realization-days-form.factory';
@@ -11,6 +11,7 @@ import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import type { AdminStaffingFinalPlan, StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
 import type { StaffingCandidateSessionOptions } from '../../interfaces/staffing-candidate-session-options';
+import type { EventProgramReconciliationResult } from '../../interfaces/i-event-admin';
 import { SessionRead } from '../../reads/sessions/session-read';
 import { EventAdmin } from '../../services/event-admin/event-admin';
 import {
@@ -52,6 +53,30 @@ export class StaffingRealizationEditorFacade {
 
   saveFinalPlan(realizationId: string, items: StaffingFinalPlanSaveItem[]): Observable<StaffingFinalPlanSaveResult> {
     return this.write.saveFinalPlan(realizationId, items);
+  }
+
+  reconcileEventProgram(realization: AdminStaffingRealizationCore): Observable<EventProgramReconciliationResult | null> {
+    return defer(() => {
+      const eventId = realization.eventId;
+      if (this.store.realizationId() !== realization.id) return EMPTY;
+      if (!eventId || realization.status === 'archived') return of(null);
+
+      return this.eventAdmin.getEditionDetail(eventId).pipe(
+        switchMap(event => {
+          if (this.store.realizationId() !== realization.id) return EMPTY;
+          if (!event || event.id !== eventId) throw new Error('The linked Event edition is unavailable.');
+          if (!event.isStaffingConverted || !event.isStaffingReleased || !event.currentlyPublic || !event.isActive) {
+            return of(null);
+          }
+          return this.eventAdmin.reconcileStaffingEventProgram(eventId).pipe(tap(result => {
+            if (result.eventId !== eventId || result.realizationId !== realization.id) {
+              throw new Error('Event program reconciliation returned a different Staffing realization or edition.');
+            }
+          }));
+        }),
+        timeout({ first: 30_000 }),
+      );
+    });
   }
 
   loadFinalPlanCandidate(candidate: StaffingCandidate): Observable<StaffingCandidateSessionOptions> {

@@ -21,6 +21,17 @@ export type StaffingFinalPlanCopy = {
   noSessions: string;
   saveSuccess: string;
   saveFailed: string;
+  saveRejected: string;
+  synchronization: {
+    inProgress: string;
+    failed: string;
+    retry: string;
+    updated: string;
+    current: string;
+    created: string;
+    promoted: string;
+    unchanged: string;
+  };
   preview: string;
   chooseOtherSession: string;
   proposal: { title: string; empty: string; accept: string; replace: string; selected: string };

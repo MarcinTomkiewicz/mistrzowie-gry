@@ -83,7 +83,7 @@ export class StaffingFinalPlanAssignmentEditor {
     const draft = this.draft();
     return draft ? this.options()?.sessions[draft.sourceKind].find(session => session.id === draft.sessionId) ?? null : null;
   });
-  private readonly baseSession = computed<SessionDetailsData | null>(() => {
+  private readonly baseSession = computed(() => {
     const draft = this.draft();
     const assignment = this.assignment();
     const session = this.selectedSession();
