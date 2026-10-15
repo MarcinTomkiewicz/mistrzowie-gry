@@ -25,9 +25,11 @@ import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
 import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
 import type { RouteTabDefinition } from '../../../core/types/route-tab';
+import { formatDateLabel } from '../../../core/utils/date';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { formatMoney } from '../../../core/utils/pricing';
 import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
+import { formatTimeRangeLabel } from '../../../core/utils/time-format';
 import {
   createBreadcrumbStructuredData,
   createPageStructuredData,
@@ -56,6 +58,8 @@ export class EventPage implements OnInit {
 
   protected readonly facade = inject(EventPageFacade);
   protected readonly i18n = createEventPageI18n();
+  protected readonly formatDateLabel = formatDateLabel;
+  protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
 
   protected readonly view = computed(() => {
     const state = this.facade.state();
@@ -78,7 +82,7 @@ export class EventPage implements OnInit {
       priceLabel:
         normalizeText(edition.priceLabel) ||
         (edition.priceAmount === null
-          ? null
+          ? this.i18n.page().freeLabel
           : formatMoney(edition.priceAmount, edition.priceCurrency)),
       editionTabs: page.editions
         .filter((item) => isPublicEventSlug(item.slug))

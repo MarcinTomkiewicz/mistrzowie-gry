@@ -2,6 +2,11 @@
 @use "../abstracts/variables" as v;
 @use "../abstracts/mixins" as m;
 
+.mg-responsive-table--fixed {
+  width: 100%;
+  table-layout: fixed;
+}
+
 .mg-responsive-table__label {
   display: none;
 }
@@ -70,5 +75,9 @@
     display: block;
     min-width: 0;
     color: v.$color-text-muted;
+  }
+
+  .mg-responsive-table__cell--actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

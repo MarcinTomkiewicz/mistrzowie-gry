@@ -2,11 +2,13 @@
   "page": {
     "placeLabel": "Miejsce",
     "addressLabel": "Adres",
+    "freeLabel": "Bezpłatne",
     "noOccurrences": "Brak opublikowanych terminów dla wybranego miasta."
   },
   "program": {
     "title": "Program wydarzenia",
     "occurrenceLabel": "Termin",
+    "timeToBeDetermined": "Godzina do ustalenia",
     "pending": "Oczekujące",
     "inPreparation": "Program w przygotowaniu"
   }

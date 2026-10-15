@@ -23,6 +23,7 @@ import { GmRead } from '../../../core/reads/gm/gm-read';
 import { Platform } from '../../../core/services/platform/platform';
 import type { PublicEventPageState } from '../../../core/types/public-event-page';
 import type { PublicEventGmProfileState } from '../../../core/types/public-event-program';
+import { formatTimeLabel, getTimeRangeBounds } from '../../../core/utils/time-format';
 
 @Injectable()
 export class EventPageFacade {
@@ -54,6 +55,24 @@ export class EventPageFacade {
     return state.kind === 'ready'
       ? state.program.filter((entry) => entry.occurrenceId === occurrenceId)
       : [];
+  });
+  readonly selectedTimeRange = computed(() => {
+    const state = this.state();
+    const occurrence = this.selectedOccurrence();
+    if (state.kind !== 'ready' || !occurrence) return null;
+
+    const program = this.selectedProgram()
+      .filter((entry) => entry.occurrenceDate === occurrence.occurrenceDate);
+    const timeRange = getTimeRangeBounds(program.map((entry) => entry.slot));
+    // Date-only pending must not inherit Edition defaults as actual program hours.
+    if (timeRange || program.some((entry) => entry.kind === 'pending' && entry.slot.startTime === null)) {
+      return timeRange;
+    }
+
+    return getTimeRangeBounds([{
+      startTime: formatTimeLabel(state.edition.startTime),
+      endTime: formatTimeLabel(state.edition.endTime),
+    }]);
   });
 
   constructor() {

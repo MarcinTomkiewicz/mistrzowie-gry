@@ -45,6 +45,8 @@ export class EventCatalog implements OnInit {
         path: buildPublicEventPath(item.coreKey, edition.slug),
         editions: item.editions.map((edition) => ({
           edition, path: buildPublicEventPath(item.coreKey, edition.slug),
+          showDate: item.editions.length > 1 &&
+            edition.nextOccurrenceDate !== item.nextOccurrenceDate,
         })),
       }] : [];
     }) : [];

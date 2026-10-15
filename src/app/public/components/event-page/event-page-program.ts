@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { ButtonModule } from 'primeng/button';
 
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../common/occurrence-switcher/occurrence-switcher';
@@ -7,7 +8,10 @@ import type { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-car
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel } from '../../../core/utils/date';
-import { createPublicEventProgramCards } from '../../../core/utils/public-event-program-cards';
+import {
+  createPublicEventProgramCards, groupPublicEventProgramEntries,
+} from '../../../core/utils/public-event-program-cards';
+import { formatTimeRangeLabel } from '../../../core/utils/time-format';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { SessionDialog } from '../session-dialog/session-dialog';
@@ -16,13 +20,15 @@ import { createEventPageI18n } from './event-page.i18n';
 
 @Component({
   selector: 'app-event-page-program',
-  imports: [EventSlots, GmProfileDialog, LoadingOverlay, OccurrenceSwitcher, SessionDialog],
+  imports: [ButtonModule, EventSlots, GmProfileDialog, LoadingOverlay, OccurrenceSwitcher, SessionDialog],
   templateUrl: './event-page-program.html',
   providers: [provideTranslocoScope('eventPage', 'common')],
 })
 export class EventPageProgram {
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
+  private readonly collapsedCardLimit = 6;
+  private readonly expandedGroupKeys = signal<ReadonlySet<string>>(new Set());
   protected readonly facade = inject(EventPageFacade);
   protected readonly i18n = createEventPageI18n();
   protected readonly selectedProgramItemId = signal<string | null>(null);
@@ -36,27 +42,61 @@ export class EventPageProgram {
         }))
       : [];
   });
-  protected readonly cards = computed(() => {
+  protected readonly groups = computed(() => {
     const state = this.facade.state();
     return state.kind === 'ready'
-      ? createPublicEventProgramCards(
-          this.facade.selectedProgram(), state.systems, this.storage,
-          this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
-        )
+      ? groupPublicEventProgramEntries(this.facade.selectedProgram()).map((group) => ({
+          key: group.key,
+          label: formatTimeRangeLabel(group.startTime, group.endTime) ||
+            this.i18n.program().timeToBeDetermined,
+          cards: createPublicEventProgramCards(
+            group.entries, state.systems, this.storage,
+            this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
+            state.page.core.name,
+          ),
+        }))
       : [];
   });
+  protected readonly displayGroups = computed(() => this.groups().map((group) => {
+    const expanded = this.expandedGroupKeys().has(group.key);
+    return {
+      ...group,
+      expanded,
+      remainingCount: Math.max(0, group.cards.length - this.collapsedCardLimit),
+      visibleCards: expanded ? group.cards : group.cards.slice(0, this.collapsedCardLimit),
+    };
+  }));
   protected readonly profile = computed(() => {
     const state = this.facade.profileState();
     return state.kind === 'ready' ? state.profile : null;
   });
-  protected readonly selectedCard = computed(() => this.cards().find(card =>
+  protected readonly selectedCard = computed(() => this.groups().flatMap(group => group.cards).find(card =>
     card.id === this.selectedProgramItemId() && card.canOpenDetails,
   ) ?? null);
 
-  private readonly resetSelectionEffect = effect(() => {
+  private readonly resetOccurrenceStateEffect = effect(() => {
     this.facade.selectedOccurrence();
     this.selectedProgramItemId.set(null);
+    this.expandedGroupKeys.set(new Set());
   });
+
+  protected toggleGroup(key: string): void {
+    const group = this.groups().find((group) => group.key === key);
+    if (!group || group.cards.length <= this.collapsedCardLimit) return;
+
+    const expanded = this.expandedGroupKeys().has(key);
+    const selectedId = this.selectedProgramItemId();
+    if (expanded && selectedId !== null && group.cards.slice(this.collapsedCardLimit)
+      .some((card) => card.id === selectedId)) {
+      this.selectedProgramItemId.set(null);
+    }
+    this.expandedGroupKeys.update((current) => {
+      const next = new Set(current);
+      if (expanded) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
 
   protected selectSession(card: IEventSlotCardVm): void {
     if (card.canOpenDetails && card.sessionDetails && card.id) this.selectedProgramItemId.set(card.id);

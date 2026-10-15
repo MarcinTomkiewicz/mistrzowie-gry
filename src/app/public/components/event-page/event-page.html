@@ -66,6 +66,14 @@
             {{ data.edition.city }}
           </h2>
           <ul class="flex-col m-0 px-md">
+            @if (facade.selectedOccurrence(); as occurrence) {
+              <li>
+                <strong>{{ i18n.labels().date }}:</strong>
+                <time [attr.datetime]="occurrence.occurrenceDate">
+                  {{ formatDateLabel(occurrence.occurrenceDate, 'pl-PL', true) }}
+                </time>
+              </li>
+            }
             @if (data.edition.venueName) {
               <li>
                 <strong>{{ i18n.page().placeLabel }}:</strong>
@@ -78,11 +86,15 @@
                 {{ data.edition.venueAddress }}
               </li>
             }
-            @if (data.priceLabel) {
+            @if (facade.selectedTimeRange(); as timeRange) {
               <li>
-                <strong>{{ i18n.labels().price }}:</strong> {{ data.priceLabel }}
+                <strong>{{ i18n.labels().hours }}:</strong>
+                {{ formatTimeRangeLabel(timeRange.startTime, timeRange.endTime) }}
               </li>
             }
+            <li>
+              <strong>{{ i18n.labels().price }}:</strong> {{ data.priceLabel }}
+            </li>
             @if (data.edition.isForBeginners) {
               <li>{{ i18n.labels().forBeginners }}</li>
             }

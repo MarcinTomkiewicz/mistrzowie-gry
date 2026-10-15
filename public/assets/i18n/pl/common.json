@@ -13,7 +13,9 @@
     "viewAll": "Zobacz wszystko",
     "viewLess": "Zobacz mniej",
     "showMore": "Zobacz szczegóły",
-    "showLess": "Zwiń szczegóły"
+    "showLess": "Zwiń szczegóły",
+    "showRemainingSessions": "Pokaż więcej sesji ({{count}})",
+    "collapse": "Zwiń"
   },
 
   "actions": {

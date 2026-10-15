@@ -7,6 +7,34 @@ import { resolvePublicStorageUrl } from './storage-url';
 import { normalizeText } from './normalize-text';
 import { formatTimeRangeLabel } from './time-format';
 
+type PublicEventProgramGroup = Pick<PublicEventProgramEntry['slot'], 'startTime' | 'endTime'> & {
+  key: string;
+  entries: PublicEventProgramEntry[];
+};
+
+export function groupPublicEventProgramEntries(
+  entries: readonly PublicEventProgramEntry[],
+): PublicEventProgramGroup[] {
+  const groups = new Map<string, PublicEventProgramGroup>();
+  for (const entry of entries) {
+    const { startTime, endTime } = entry.slot;
+    const key = `${entry.occurrenceId}:${startTime ?? ''}:${endTime ?? ''}`;
+    const group = groups.get(key);
+    if (group) {
+      group.entries.push(entry);
+    } else {
+      groups.set(key, { key, startTime, endTime, entries: [entry] });
+    }
+  }
+
+  return [...groups.values()].sort((left, right) => {
+    if (left.startTime === null) return right.startTime === null ? 0 : 1;
+    if (right.startTime === null) return -1;
+    return left.startTime.localeCompare(right.startTime) ||
+      (left.endTime ?? '').localeCompare(right.endTime ?? '');
+  });
+}
+
 export function createPublicEventProgramCards(
   entries: readonly PublicEventProgramEntry[],
   systems: readonly ISystem[],
@@ -14,10 +42,13 @@ export function createPublicEventProgramCards(
   copy: EventPageProgramTranslations,
   missingTitle: string,
   gmLabel: string,
+  eventName: string,
 ): IEventSlotCardVm[] {
+  const eventLabel = normalizeText(eventName)?.toLocaleLowerCase('pl-PL');
   return entries.map((entry) => {
     const pending = entry.kind === 'pending';
     const session = entry.session;
+    const slotLabel = normalizeText(entry.slot.label);
     const title = pending ? copy.pending : normalizeText(session?.title) || missingTitle;
     const system = entry.kind === 'confirmed'
       ? entry.session.system
@@ -42,7 +73,7 @@ export function createPublicEventProgramCards(
       canOpenGmProfile: !pending,
       programStatus: pending ? 'pending' : 'confirmed',
       occurrenceDate: entry.occurrenceDate,
-      slotLabel: entry.slot.label,
+      slotLabel: slotLabel?.toLocaleLowerCase('pl-PL') === eventLabel ? null : slotLabel,
       timeLabel: formatTimeRangeLabel(entry.slot.startTime, entry.slot.endTime),
       sessionDetails: session ? { ...session, title, ...(system ? { system } : {}) } : null,
     };

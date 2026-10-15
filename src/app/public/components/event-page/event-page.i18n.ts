@@ -1,3 +1,6 @@
+import { inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+
 import {
   createCommonActionsI18n,
   createCommonCtaI18n,
@@ -14,6 +17,7 @@ import type {
 } from '../../../core/types/i18n/event-page';
 
 export function createEventPageI18n() {
+  const transloco = inject(TranslocoService);
   return {
     page: createScopedObjectI18n<EventPageTranslations>('eventPage', 'page'),
     program: createScopedObjectI18n<EventPageProgramTranslations>(
@@ -21,6 +25,9 @@ export function createEventPageI18n() {
     ),
     actions: createCommonActionsI18n(),
     cta: createCommonCtaI18n(),
+    remainingSessions: (count: number): string => transloco.translate<string>(
+      'common.cta.showRemainingSessions', { count },
+    ),
     errors: createCommonErrorsI18n(),
     labels: createCommonLabelsI18n(),
     status: createCommonStatusI18n(),

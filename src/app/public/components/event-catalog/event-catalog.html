@@ -47,15 +47,15 @@
             dataKey="item.coreId"
             class="w-100"
             size="small"
-            tableStyleClass="mg-responsive-table"
+            tableStyleClass="mg-responsive-table mg-responsive-table--fixed"
           >
             <ng-template #header>
               <tr class="hide-down-sm">
-                <th class="small-caps" scope="col">{{ i18n.labels().event }}</th>
-                <th class="small-caps" scope="col">{{ i18n.page().nextDateLabel }}</th>
-                <th class="small-caps" scope="col">{{ i18n.page().locationsLabel }}</th>
+                <th class="small-caps w-20" scope="col">{{ i18n.labels().event }}</th>
+                <th class="small-caps w-px-100" scope="col">{{ i18n.page().nextDateLabel }}</th>
+                <th class="small-caps w-25" scope="col">{{ i18n.page().locationsLabel }}</th>
                 <th class="small-caps" scope="col">{{ i18n.labels().description }}</th>
-                <th class="small-caps text-right" scope="col">{{ i18n.page().detailsLabel }}</th>
+                <th class="small-caps text-right w-px-200" scope="col">{{ i18n.page().detailsLabel }}</th>
               </tr>
             </ng-template>
 
@@ -70,7 +70,7 @@
                   <span class="mg-responsive-table__label small-caps font-bold">
                     {{ i18n.page().nextDateLabel }}
                   </span>
-                  <span class="mg-responsive-table__value">
+                  <span class="mg-responsive-table__value text-nowrap">
                     <time [attr.datetime]="row.item.nextOccurrenceDate">
                       {{ formatDateLabel(row.item.nextOccurrenceDate) }}
                     </time>
@@ -85,12 +85,16 @@
                     <ul class="m-0 p-0 flex-col-start-stretch gap-xs">
                       @for (location of row.editions; track location.edition.id) {
                         <li class="li--unset">
-                          <a [routerLink]="location.path">{{ location.edition.city }}</a>
-                          - <time [attr.datetime]="location.edition.nextOccurrenceDate">
-                            {{ formatDateLabel(location.edition.nextOccurrenceDate) }}
-                          </time>
-                          @if (location.edition.venueName) {
-                            <span class="d-block text-sm color-muted">{{ location.edition.venueName }}</span>
+                          <a class="d-block" [routerLink]="location.path">
+                            {{ location.edition.venueName || location.edition.city }}
+                            @if (location.edition.venueName) {
+                              <span class="d-block text-sm color-muted">{{ location.edition.city }}</span>
+                            }
+                          </a>
+                          @if (location.showDate) {
+                            <time class="d-block text-sm color-muted" [attr.datetime]="location.edition.nextOccurrenceDate">
+                              {{ formatDateLabel(location.edition.nextOccurrenceDate) }}
+                            </time>
                           }
                         </li>
                       }
@@ -106,17 +110,19 @@
                     {{ row.item.shortDescription || i18n.values().notAvailable }}
                   </span>
                 </td>
-                <td class="mg-responsive-table__cell">
+                <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
                   <span class="mg-responsive-table__label small-caps font-bold">
                     {{ i18n.page().detailsLabel }}
                   </span>
-                  <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
+                  <div class="mg-responsive-table__value flex-row-end-center flex-nowrap gap-xs">
                     <p-button
                       [label]="i18n.cta().checkDetails"
                       icon="pi pi-arrow-right"
                       iconPos="right"
                       severity="secondary"
                       size="small"
+                      class="flex-none"
+                      styleClass="text-nowrap min-w-160"
                       [outlined]="true"
                       [routerLink]="row.path"
                     />

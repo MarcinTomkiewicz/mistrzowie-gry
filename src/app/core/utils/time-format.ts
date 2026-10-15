@@ -44,6 +44,24 @@ export function formatTimeRangeLabel(
   return `${start} - ${end}`;
 }
 
+export function getTimeRangeBounds(
+  ranges: readonly { startTime: string | null; endTime: string | null }[],
+): { startTime: string; endTime: string } | null {
+  return ranges.reduce<{ startTime: string; endTime: string } | null>(
+    (bounds, { startTime, endTime }) => {
+      if (!isValidTime(startTime) || !isValidTime(endTime) || startTime >= endTime) {
+        return bounds;
+      }
+
+      return {
+        startTime: bounds && bounds.startTime < startTime ? bounds.startTime : startTime,
+        endTime: bounds && bounds.endTime > endTime ? bounds.endTime : endTime,
+      };
+    },
+    null,
+  );
+}
+
 export function formatDateTimeAsTimeLabel(date: Date): string {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');

@@ -1,7 +1,8 @@
+@let programGroups = displayGroups();
 <section class="position-relative">
   <header class="mg-section__header mb-md">
     <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.program().title }}</h2>
-    @if (occurrenceOptions().length) {
+    @if (occurrenceOptions().length > 1) {
       <div class="flex-row-center-center flex-wrap gap-sm mt-sm" role="group" [attr.aria-label]="i18n.program().occurrenceLabel">
         <span class="small-caps muted-text">{{ i18n.program().occurrenceLabel }}</span>
         <app-occurrence-switcher
@@ -14,13 +15,39 @@
     }
   </header>
   @if (occurrenceOptions().length) {
-    @if (cards().length) {
-      <app-event-slots
-        [items]="cards()"
-        [slotCount]="0"
-        (slotSelect)="selectSession($event)"
-        (gmSelect)="facade.openGmProfile($event.id)"
-      />
+    @if (programGroups.length) {
+      <div class="flex-col-start-stretch gap-xl">
+        @for (group of programGroups; track group.key) {
+          <section
+            [attr.aria-labelledby]="programGroups.length > 1 ? 'event-program-group-' + group.key : null"
+            [attr.aria-label]="programGroups.length === 1 ? group.label : null"
+          >
+            @if (programGroups.length > 1) {
+              <h3 [id]="'event-program-group-' + group.key"
+                class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">
+                {{ group.label }}
+              </h3>
+            }
+            <app-event-slots
+              [attr.id]="'event-program-cards-' + group.key"
+              [items]="group.visibleCards"
+              [slotCount]="0"
+              (slotSelect)="selectSession($event)"
+              (gmSelect)="facade.openGmProfile($event.id)"
+            />
+            @if (group.remainingCount > 0) {
+              <div class="flex-row-end-center mt-md">
+                <button pButton type="button" size="small" severity="secondary" [outlined]="true"
+                  [attr.aria-expanded]="group.expanded"
+                  [attr.aria-controls]="'event-program-cards-' + group.key"
+                  (click)="toggleGroup(group.key)">
+                  <span pButtonLabel>{{ group.expanded ? i18n.cta().collapse : i18n.remainingSessions(group.remainingCount) }}</span>
+                </button>
+              </div>
+            }
+          </section>
+        }
+      </div>
     } @else {
       <div class="mg-card"><p class="m-0">{{ i18n.program().inPreparation }}</p></div>
     }

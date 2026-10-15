@@ -16,6 +16,8 @@ export type CommonCtaTranslations = {
   viewLess: string;
   showMore: string;
   showLess: string;
+  showRemainingSessions: string;
+  collapse: string;
 };
 
 export type CommonActionsTranslations = {
