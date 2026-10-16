@@ -1,170 +1,190 @@
-import {
-  DestroyRef, Injectable, TransferState, afterNextRender, computed, effect, inject, makeStateKey,
-  signal, untracked, type StateKey,
-} from '@angular/core';
+import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subscription, finalize, timer } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 
 import { PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED } from '../../../core/configs/events.config';
-import { ParticipantSignupKind } from '../../../core/enums/event';
+import type { IPublicEventEdition } from '../../../core/interfaces/i-event-page';
 import type {
-  IEventParticipantAvailability, IEventParticipantGuestIdentity, IEventParticipantRegisterRequest,
-  IEventParticipantRegisterResult,
+  IEventParticipantGetMyResult, IEventParticipantGuestIdentity,
+  IEventParticipantRegisterRequest, IEventParticipantRegisterResult,
 } from '../../../core/interfaces/i-event-participant';
 import { Auth } from '../../../core/services/auth/auth';
 import { EventParticipant } from '../../../core/services/event-participant/event-participant';
 import { Platform } from '../../../core/services/platform/platform';
 import type { PublicEventConfirmedEntry } from '../../../core/types/public-event-program';
-import { parseIsoDate } from '../../../core/utils/date';
-import { isValidTime, parseTimeLabelToMinutes } from '../../../core/utils/time-format';
-import { timeZoneDateToTimestamp } from '../../../core/utils/time-zone';
 import { EventPageFacade } from './event-page-facade';
-
-type AvailabilityState =
-  | { kind: 'idle' | 'loading' | 'error' }
-  | { kind: 'ready'; eventId: string; items: IEventParticipantAvailability[] };
+import { EventParticipantAvailability } from './event-participant-availability';
 
 type SignupSelection = {
   entry: PublicEventConfirmedEntry;
-  eventId: string;
+  edition: IPublicEventEdition;
+  eventName: string;
   actorId: string | null;
 };
+type SignupDialog = { selection: SignupSelection; result: IEventParticipantRegisterResult | null };
+type UncertainRequest = { actorKey: string; eventId: string; programItemId: string };
+type OwnRegistrationState =
+  | { kind: 'idle' | 'loading' | 'error' | 'unavailable' }
+  | { kind: 'ready'; registration: Extract<IEventParticipantGetMyResult, { found: true }> };
 
 @Injectable()
 export class EventParticipantSignupFacade {
   private readonly page = inject(EventPageFacade);
+  private readonly availability = inject(EventParticipantAvailability);
   private readonly participant = inject(EventParticipant);
   private readonly auth = inject(Auth);
   private readonly platform = inject(Platform);
-  private readonly transferState = inject(TransferState);
   private readonly destroyRef = inject(DestroyRef);
-  private availabilityRequest: Subscription | null = null;
-  private readonly availabilityState = signal<AvailabilityState>({ kind: 'idle' });
-  private readonly selection = signal<SignupSelection | null>(null);
+  private ownRequest: Subscription | null = null;
+  private readonly dialogState = signal<SignupDialog | null>(null);
   private readonly submitting = signal(false);
-  private readonly registrationResult = signal<IEventParticipantRegisterResult | null>(null);
-  private readonly uncertainProgramItemIds = signal<ReadonlySet<string>>(new Set());
-  private readonly clock = signal(Date.now());
-  private readonly clientReady = signal(false);
+  // These identities and results stay in route memory, never in TransferState or storage.
+  private readonly uncertainRequests = signal<readonly UncertainRequest[]>([]);
+  private readonly guestPhone = signal('');
+  private readonly guestHistoryActorKey = signal<string | null>(null);
+  private readonly guestReceiptRevoked = signal(false);
+  private presentedReceipt: SignupDialog | null = null;
+  private readonly ownState = signal<OwnRegistrationState>({ kind: 'idle' });
+  private readonly currentUncertainRequests = computed(() => {
+    const page = this.page.state();
+    const userId = this.auth.userId();
+    const actorKey = userId !== null ? `user:${userId}` : this.guestHistoryActorKey();
+    return this.auth.isReady() && page.kind === 'ready'
+      ? this.uncertainRequests().filter((item) =>
+          item.eventId === page.edition.id && item.actorKey === actorKey)
+      : [];
+  });
 
   readonly released = PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED;
-  readonly availability = this.availabilityState.asReadonly();
   readonly isSubmitting = this.submitting.asReadonly();
-  // Mutation results, including the guest receipt, stay only in this client instance.
-  readonly result = this.registrationResult.asReadonly();
-  readonly hasUncertainResults = computed(() => this.uncertainProgramItemIds().size > 0);
   readonly isAuthenticated = this.auth.isAuthenticated;
   readonly accountName = this.auth.displayName;
-  readonly selected = computed(() => {
-    const selection = this.selection();
-    const page = this.page.state();
-    if (!selection || !this.auth.isReady() || page.kind !== 'ready' ||
-      selection.eventId !== page.edition.id || selection.actorId !== this.auth.userId() ||
-      selection.entry.occurrenceId !== this.page.selectedOccurrence()?.id) return null;
-
-    return this.page.selectedProgram().find((entry): entry is PublicEventConfirmedEntry =>
-      entry.kind === 'confirmed' && entry.programItemId === selection.entry.programItemId,
-    ) ?? null;
+  readonly ownRegistration = this.ownState.asReadonly();
+  readonly hasUncertainResults = computed(() => this.currentUncertainRequests().length > 0);
+  readonly dialog = computed(() => {
+    const dialog = this.dialogState();
+    return dialog && this.isActorCurrent(dialog.selection) ? dialog : null;
+  });
+  readonly confirmationCode = computed(() => {
+    const dialog = this.dialog();
+    return dialog?.selection.actorId === null && dialog.result?.registered
+      ? dialog.result.confirmationCode : null;
+  });
+  readonly hasGuestReceipt = computed(() => {
+    const dialog = this.dialogState();
+    return dialog?.selection.actorId === null && !!(dialog.result?.registered && dialog.result.confirmationCode);
   });
   readonly canSubmit = computed(() => {
-    const entry = this.selected();
-    return !!entry && !this.isSubmitting() && !this.result() && !this.hasUncertainResult(entry.programItemId) &&
-      this.availabilityFor(entry.programItemId)?.canSignup === true;
+    const dialog = this.dialog();
+    return this.released && !!dialog && this.isSelectionCurrent(dialog.selection) &&
+      !this.isSubmitting() && !dialog.result && !this.hasUncertainResult(dialog.selection.entry.programItemId) &&
+      this.availability.forProgramItem(dialog.selection.entry.programItemId)?.canSignup === true;
   });
-  readonly requestFailed = computed(() => this.hasUncertainResult(this.selected()?.programItemId ?? null));
 
   constructor() {
-    afterNextRender(() => this.clientReady.set(true));
-    effect((onCleanup) => {
-      const page = this.page.state();
-      untracked(() => {
-        this.selection.set(null);
-        if (page.kind === 'ready') this.loadAvailability(page.edition.id, true);
-        else this.availabilityState.set({ kind: 'idle' });
-      });
-      onCleanup(() => this.availabilityRequest?.unsubscribe());
-    });
     effect(() => {
+      this.page.state();
       this.page.selectedOccurrence();
-      this.auth.userId();
-      this.auth.isReady();
-      untracked(() => this.selection.set(null));
+      const actorId = this.auth.userId();
+      const actorReady = this.auth.isReady();
+      const dialog = this.dialogState();
+      const submitting = this.isSubmitting();
+      untracked(() => {
+        // A confirmed authenticated identity permanently revokes the previous anonymous identity.
+        if (dialog?.selection.actorId === null && actorReady && actorId !== null) {
+          this.guestReceiptRevoked.set(true);
+        }
+        if (dialog && !submitting && actorReady) {
+          const staleSelection = !dialog.result && !this.isSelectionCurrent(dialog.selection);
+          const staleResult = dialog.result !== null && !this.isActorCurrent(dialog.selection) && !this.hasGuestReceipt();
+          // Preserve pending writes and protected guest receipts until explicit acknowledgement/discard.
+          if (staleSelection || staleResult) {
+            this.clearDialog();
+            return;
+          }
+        }
+        if (!dialog || !this.isActorCurrent(dialog.selection)) {
+          this.ownRequest?.unsubscribe();
+          this.ownState.set({ kind: 'idle' });
+        } else if (dialog.result?.registered && dialog.selection.actorId !== null && this.ownState().kind === 'idle') {
+          this.refreshOwnRegistration();
+        }
+      });
     });
-    effect((onCleanup) => {
-      const page = this.page.state();
-      const entries = this.page.selectedProgram();
-      const now = this.clock();
-      if (!this.released || !this.clientReady() || page.kind !== 'ready') return;
-
-      const nextStart = Math.min(...entries.flatMap((entry) => {
-        const startsAt = entry.kind === 'confirmed' ? this.sessionStartAt(entry, page.edition.timezone) : null;
-        return startsAt !== null && startsAt > now ? [startsAt] : [];
-      }));
-      if (!Number.isFinite(nextStart)) return;
-      // Expire past-session CTAs without polling the backend; respect the native timer limit.
-      const request = timer(Math.min(nextStart - now, 2_147_483_647))
-        .subscribe(() => this.clock.set(Date.now()));
-      onCleanup(() => request.unsubscribe());
-    });
-    this.destroyRef.onDestroy(() => this.availabilityRequest?.unsubscribe());
-  }
-
-  availabilityFor(programItemId: string | null): IEventParticipantAvailability | null {
-    const page = this.page.state();
-    const availability = this.availability();
-    const occurrence = this.page.selectedOccurrence();
-    if (!this.released || !this.clientReady() || !this.auth.isReady() || page.kind !== 'ready' ||
-      page.edition.participantSignupKind !== ParticipantSignupKind.ProgramItem ||
-      availability.kind !== 'ready' || availability.eventId !== page.edition.id || !occurrence) return null;
-
-    const entry = this.page.selectedProgram().find((item) =>
-      item.kind === 'confirmed' && item.programItemId === programItemId,
-    );
-    if (!entry || entry.kind !== 'confirmed' || entry.status !== 'confirmed' ||
-      entry.occurrenceDate !== occurrence.occurrenceDate ||
-      !isValidTime(entry.slot.startTime) || !isValidTime(entry.slot.endTime) ||
-      entry.slot.endTime <= entry.slot.startTime ||
-      !Number.isInteger(entry.session.maxPlayers) || (entry.session.maxPlayers ?? 0) <= 0) return null;
-
-    const startsAt = this.sessionStartAt(entry, page.edition.timezone);
-    if (startsAt === null || startsAt <= Math.max(this.clock(), Date.now())) return null;
-
-    const item = availability.items.find((item) =>
-      item.programItemId === entry.programItemId && item.occurrenceId === entry.occurrenceId,
-    );
-    // Null means signup is closed, never an unlimited or inferred number of seats.
-    return item && item.remainingSeats !== null ? item : null;
+    this.destroyRef.onDestroy(() => this.ownRequest?.unsubscribe());
   }
 
   hasUncertainResult(programItemId: string | null): boolean {
-    return programItemId !== null && this.uncertainProgramItemIds().has(programItemId);
+    const page = this.page.state();
+    const actorKey = this.actorKey();
+    return this.auth.isReady() && page.kind === 'ready' && actorKey !== null &&
+      this.uncertainRequests().some((item) => item.eventId === page.edition.id &&
+        item.actorKey === actorKey && item.programItemId === programItemId);
+  }
+
+  setGuestPhone(value: string): void {
+    const dialog = this.dialog();
+    if (dialog && !this.isAuthenticated() && !this.isSubmitting() && !dialog.result) {
+      const phone = value.trim();
+      this.guestPhone.set(phone);
+      // A form reset clears the input, not the identity whose uncertain history is being shown.
+      if (phone) this.guestHistoryActorKey.set(`guest:${phone}`);
+    }
   }
 
   open(programItemId: string | null): void {
     const page = this.page.state();
-    if (!this.platform.isBrowser || this.isSubmitting() || this.hasUncertainResult(programItemId) ||
-      page.kind !== 'ready' || !this.availabilityFor(programItemId)?.canSignup) return;
-
+    if (!this.released || !this.platform.isBrowser || this.isSubmitting() || this.dialogState()?.result ||
+      page.kind !== 'ready' || this.hasUncertainResult(programItemId) ||
+      !this.availability.forProgramItem(programItemId)?.canSignup) return;
     const entry = this.page.selectedProgram().find((item): item is PublicEventConfirmedEntry =>
-      item.kind === 'confirmed' && item.programItemId === programItemId,
-    );
+      item.kind === 'confirmed' && item.programItemId === programItemId);
     if (!entry) return;
-    this.registrationResult.set(null);
-    this.selection.set({ entry, eventId: page.edition.id, actorId: this.auth.userId() });
+    this.clearDialog();
+    this.dialogState.set({
+      selection: { entry, edition: page.edition, eventName: page.page.core.name, actorId: this.auth.userId() },
+      result: null,
+    });
   }
 
   close(): void {
-    if (!this.isSubmitting()) this.selection.set(null);
+    if (!this.isSubmitting() && this.dialog() && (!this.hasGuestReceipt() || this.canAcknowledgeReceipt())) {
+      this.clearDialog();
+    }
+  }
+
+  markReceiptPresented(): void {
+    if (this.confirmationCode()) this.presentedReceipt = this.dialog();
+  }
+
+  canAcknowledgeReceipt(): boolean {
+    return this.hasGuestReceipt() && this.dialog() !== null && this.dialog() === this.presentedReceipt;
+  }
+
+  prepareGuestReceiptDiscard(): () => boolean {
+    const result = this.dialogState()?.result;
+    const registrationId = result?.registered ? result.registrationId : null;
+    // Capture only the registration identity; the navigation callback never receives the secret.
+    return () => {
+      const current = this.dialogState()?.result;
+      if (this.isSubmitting() || !this.hasGuestReceipt() || !current?.registered ||
+        current.registrationId !== registrationId) return false;
+      this.clearDialog();
+      return true;
+    };
   }
 
   register(guest: IEventParticipantGuestIdentity): void {
-    const entry = this.selected();
-    const page = this.page.state();
-    // Recheck the current route, actor, deadline and advisory gate at the last moment.
-    if (!this.platform.isBrowser || !entry || page.kind !== 'ready' ||
-      !this.canSubmit() || !this.availabilityFor(entry.programItemId)?.canSignup) return;
+    const selection = this.dialog()?.selection;
+    if (!this.platform.isBrowser || !selection || this.isSubmitting()) return;
+    if (!this.isAuthenticated()) this.setGuestPhone(guest.guestPhone);
+    const actorKey = this.actorKey();
+    if (!actorKey || !this.canSubmit() ||
+      !this.availability.forProgramItem(selection.entry.programItemId)?.canSignup) return;
 
-    const request: IEventParticipantRegisterRequest = this.auth.isAuthenticated()
+    const { entry, edition } = selection;
+    const context: UncertainRequest = { actorKey, eventId: edition.id, programItemId: entry.programItemId };
+    const request: IEventParticipantRegisterRequest = selection.actorId !== null
       ? { mode: 'authenticated', programItemId: entry.programItemId }
       : { mode: 'guest', programItemId: entry.programItemId, ...guest };
 
@@ -173,52 +193,75 @@ export class EventParticipantSignupFacade {
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.submitting.set(false)),
     ).subscribe({
-      next: (result) => {
-        this.registrationResult.set(result);
-        if (this.page.state() === page) this.loadAvailability(page.edition.id, false);
+      next: (response) => {
+        if (response.registered && (response.status !== 'confirmed' ||
+          response.eventProgramItemId !== entry.programItemId || response.occurrenceId !== entry.occurrenceId ||
+          (selection.actorId === null ? !response.confirmationCode?.trim() : response.confirmationCode !== null))) {
+          this.recordUncertain(context);
+          return;
+        }
+        // Never drop the one-time guest receipt because Edition, occurrence or auth changed during the RPC.
+        this.dialogState.set({ selection, result: response });
+        this.availability.refresh();
       },
-      // A transport fault can leave the write outcome unknown. Never auto-retry it.
-      error: () => this.uncertainProgramItemIds.update((ids) => new Set(ids).add(entry.programItemId)),
+      // Keep the original actor/Event/session even if navigation or auth changed during the write.
+      error: () => this.recordUncertain(context),
     });
   }
 
-  refreshAvailability(): void {
+  refreshOwnRegistration(): void {
+    const dialog = this.dialog();
+    const result = dialog?.result;
+    if (!this.platform.isBrowser || !dialog?.selection.actorId || !result?.registered ||
+      this.ownState().kind === 'loading') return;
+    this.ownRequest?.unsubscribe();
+    this.ownState.set({ kind: 'loading' });
+    this.ownRequest = this.participant.getMy({
+      registrationId: result.registrationId, confirmationCode: null,
+    }).subscribe({
+      next: (registration) => {
+        if (this.dialog() !== dialog) return;
+        this.ownState.set(registration.found && registration.registrationId === result.registrationId &&
+          registration.occurrenceId === result.occurrenceId &&
+          registration.eventProgramItemId === result.eventProgramItemId
+          ? { kind: 'ready', registration } : { kind: 'unavailable' });
+      },
+      error: () => {
+        if (this.dialog() === dialog) {
+          this.ownState.set({ kind: 'error' });
+        }
+      },
+    });
+  }
+
+  private actorKey(): string | null {
+    const userId = this.auth.userId();
+    const phone = this.guestPhone();
+    return userId !== null ? `user:${userId}` : phone ? `guest:${phone}` : null;
+  }
+
+  private isSelectionCurrent(selection: SignupSelection): boolean {
     const page = this.page.state();
-    if (page.kind === 'ready' && this.availability().kind !== 'loading') {
-      this.loadAvailability(page.edition.id, false);
-    }
+    return this.isActorCurrent(selection) && page.kind === 'ready' && selection.edition.id === page.edition.id &&
+      selection.entry.occurrenceId === this.page.selectedOccurrence()?.id;
   }
 
-  private sessionStartAt(entry: PublicEventConfirmedEntry, timezone: string): number | null {
-    const date = parseIsoDate(entry.occurrenceDate);
-    const minutes = parseTimeLabelToMinutes(entry.slot.startTime);
-    if (!date || minutes === null) return null;
-    date.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
-    const timestamp = timeZoneDateToTimestamp(date, timezone);
-    return timestamp === null ? null : Date.parse(timestamp);
+  private isActorCurrent(selection: SignupSelection): boolean {
+    return this.auth.isReady() && selection.actorId === this.auth.userId() &&
+      (selection.actorId !== null || !this.guestReceiptRevoked());
   }
 
-  private loadAvailability(eventId: string, hydrate: boolean): void {
-    this.availabilityRequest?.unsubscribe();
-    const key = makeStateKey<AvailabilityState>(`public-event-participant-availability:${eventId}`);
-    if (hydrate && this.platform.isBrowser && this.transferState.hasKey(key)) {
-      this.availabilityState.set(this.transferState.get(key, { kind: 'error' }));
-      this.transferState.remove(key);
-      return;
-    }
-
-    this.availabilityState.set({ kind: 'loading' });
-    this.availabilityRequest = this.participant.getPublicAvailability(eventId).subscribe({
-      next: (items) => this.setAvailability({ kind: 'ready', eventId, items }, key),
-      error: () => this.setAvailability({ kind: 'error' }, key),
-    });
+  private recordUncertain(context: UncertainRequest): void {
+    this.uncertainRequests.update((items) => [...items, context]);
   }
 
-  private setAvailability(
-    state: AvailabilityState,
-    key: StateKey<AvailabilityState>,
-  ): void {
-    this.availabilityState.set(state);
-    if (!this.platform.isBrowser) this.transferState.set(key, state);
+  private clearDialog(): void {
+    this.ownRequest?.unsubscribe();
+    this.ownRequest = null;
+    this.dialogState.set(null);
+    this.guestPhone.set('');
+    this.guestReceiptRevoked.set(false);
+    this.presentedReceipt = null;
+    this.ownState.set({ kind: 'idle' });
   }
 }

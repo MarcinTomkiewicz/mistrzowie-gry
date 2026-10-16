@@ -1,5 +1,4 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
@@ -18,6 +17,7 @@ import { SessionDialog } from '../session-dialog/session-dialog';
 import { EventPageFacade } from './event-page-facade';
 import { EventParticipantSignup } from './event-participant-signup';
 import { EventParticipantSignupFacade } from './event-participant-signup-facade';
+import { EventParticipantAvailability } from './event-participant-availability';
 import { createEventPageI18n } from './event-page.i18n';
 
 @Component({
@@ -27,7 +27,6 @@ import { createEventPageI18n } from './event-page.i18n';
     SessionDialog, EventParticipantSignup,
   ],
   templateUrl: './event-page-program.html',
-  providers: [EventParticipantSignupFacade, provideTranslocoScope('eventPage', 'common')],
 })
 export class EventPageProgram {
   private readonly storage = inject(Storage);
@@ -36,6 +35,7 @@ export class EventPageProgram {
   private readonly expandedGroupKeys = signal<ReadonlySet<string>>(new Set());
   protected readonly facade = inject(EventPageFacade);
   protected readonly signup = inject(EventParticipantSignupFacade);
+  protected readonly availability = inject(EventParticipantAvailability);
   protected readonly i18n = createEventPageI18n();
   protected readonly selectedProgramItemId = signal<string | null>(null);
 
@@ -60,7 +60,7 @@ export class EventPageProgram {
             this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
             state.page.core.name,
           ).map((card) => {
-            const availability = this.signup.availabilityFor(card.id);
+            const availability = this.availability.forProgramItem(card.id);
             return availability && availability.remainingSeats !== null ? {
               ...card,
               participantSignup: {
@@ -111,6 +111,10 @@ export class EventPageProgram {
       else next.add(key);
       return next;
     });
+  }
+
+  protected selectOccurrence(index: number): void {
+    if (!this.signup.isSubmitting()) this.facade.selectOccurrence(index);
   }
 
   protected selectSession(card: IEventSlotCardVm): void {

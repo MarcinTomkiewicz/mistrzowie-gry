@@ -1,4 +1,7 @@
-import type { Routes } from '@angular/router';
+import type { CanDeactivateFn, Routes } from '@angular/router';
+import type { EventPage } from '../components/event-page/event-page';
+
+const canLeaveEventPage: CanDeactivateFn<EventPage> = (page) => page.canDeactivate();
 
 const loaders = {
   eventCatalog: () =>
@@ -24,10 +27,12 @@ export const eventRoutes: Routes = [
   {
     path: 'wydarzenia/:eventKey/:editionSlug',
     loadComponent: loaders.eventPage,
+    canDeactivate: [canLeaveEventPage],
   },
   {
     path: 'wydarzenia/:eventKey',
     loadComponent: loaders.eventPage,
+    canDeactivate: [canLeaveEventPage],
   },
   {
     path: 'preview/universal-calendar',

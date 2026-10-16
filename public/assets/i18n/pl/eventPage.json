@@ -3,26 +3,35 @@
     "placeLabel": "Miejsce",
     "addressLabel": "Adres",
     "freeLabel": "Bezpłatne",
-    "noOccurrences": "Brak opublikowanych terminów dla wybranego miasta."
+    "noOccurrences": "Brak terminów dla wybranego miasta."
   },
   "program": {
     "title": "Program wydarzenia",
     "occurrenceLabel": "Termin",
     "timeToBeDetermined": "Godzina do ustalenia",
-    "pending": "Oczekujące",
+    "pending": "Oczekuje",
     "inPreparation": "Program w przygotowaniu"
   },
   "participantSignup": {
     "title": "Zapis na sesję",
-    "guestNameLabel": "Nazwa uczestnika",
-    "phoneHint": "Podaj numer w formacie międzynarodowym, np. +48123456789.",
+    "guestNameLabel": "Imię lub pseudonim uczestnika",
+    "phoneHint": "Podaj numer telefonu w formacie +48123456789.",
     "invalidPhone": "Podaj numer telefonu z prefiksem kraju, bez spacji.",
     "accountNotice": "Zapis zostanie powiązany z Twoim kontem.",
     "privacyNotice": "Podane dane wykorzystujemy do obsługi zapisu i kontaktu w sprawie sesji.",
     "remainingSeats": "Wolne miejsca: {{count}}",
-    "availabilityError": "Nie udało się odczytać dostępności zapisów.",
+    "availabilityError": "Nie udało się sprawdzić, czy można się zapisać na sesję.",
     "confirmed": "Zapis został potwierdzony.",
-    "unavailable": "Zapis na tę sesję jest niedostępny. Sprawdź aktualną dostępność.",
-    "unknownResult": "Nie udało się ustalić wyniku zapisu. Nie wysyłaj zgłoszenia ponownie. Skontaktuj się z organizatorem."
+    "unavailable": "Nie można teraz zapisać się na tę sesję.",
+    "unknownResult": "Nie możemy potwierdzić, czy zapis został przyjęty. Nie wysyłaj zgłoszenia ponownie. Skontaktuj się z organizatorem.",
+    "registrationNumber": "Numer zapisu",
+    "confirmationCodeLabel": "Poufny kod potwierdzenia",
+    "confirmationCodeInstructions": "Zapisz ten kod w bezpiecznym miejscu. Będzie potrzebny do sprawdzenia lub anulowania zapisu. Po zamknięciu okna nie będzie można go ponownie wyświetlić. Jeśli go utracisz, skontaktuj się z organizatorem.",
+    "nextSteps": "Zachowaj numer zapisu, kod potwierdzenia i informacje o sesji.",
+    "copyCodeFailed": "Nie udało się skopiować kodu. Zaznacz go i zapisz ręcznie.",
+    "ownReadError": "Zapis został przyjęty, ale nie udało się sprawdzić jego aktualnego statusu. Spróbuj sprawdzić go ponownie. Nie wysyłaj nowego zgłoszenia.",
+    "cancelled": "Zapis anulowany.",
+    "leaveConfirmation": "Przed opuszczeniem strony zapisz kod potwierdzenia. Nie będzie można go później ponownie wyświetlić. Czy na pewno chcesz wyjść?",
+    "discardHiddenReceiptConfirmation": "Po opuszczeniu strony nie będzie można ponownie wyświetlić kodu potwierdzenia poprzedniego zapisu. Sam zapis pozostanie ważny. Czy na pewno chcesz wyjść?"
   }
 }

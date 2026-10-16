@@ -1,9 +1,11 @@
 <p-dialog styleClass="mg-dialog mg-dialog--md" appendTo="body"
   [modal]="true" [draggable]="false" [resizable]="false"
-  [header]="i18n.signup().title" [visible]="signup.selected() !== null"
+  [header]="i18n.signup().title" [visible]="signup.dialog() !== null"
   [closable]="!signup.isSubmitting()" [closeOnEscape]="!signup.isSubmitting()"
   [dismissableMask]="false" (visibleChange)="!$event && signup.close()">
-  @if (signup.selected(); as entry) {
+  @if (signup.dialog(); as dialog) {
+    @let details = dialog.selection;
+    @let entry = details.entry;
     <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form"
       [attr.aria-busy]="signup.isSubmitting()" (ngSubmit)="submit()" novalidate>
       <div class="flex-col-start-stretch gap-xs">
@@ -11,10 +13,57 @@
         <time [attr.datetime]="entry.occurrenceDate">{{ formatDateLabel(entry.occurrenceDate, 'pl-PL', true) }}</time>
         <span>{{ formatTimeRangeLabel(entry.slot.startTime, entry.slot.endTime) }}</span>
       </div>
-      @if (signup.result(); as result) {
-        <p class="m-0" role="status">{{ result.registered ? i18n.signup().confirmed : i18n.signup().unavailable }}</p>
-      } @else if (signup.requestFailed()) {
-        <p class="m-0" role="alert">{{ i18n.signup().unknownResult }}</p>
+      @if (dialog.result; as result) {
+        @if (result.registered) {
+          @let own = signup.ownRegistration();
+          <section class="mg-card flex-col-start-stretch gap-md w-100">
+            <p class="m-0" role="status">{{ own.kind === 'ready' && own.registration.status === 'cancelled' ? i18n.signup().cancelled : i18n.signup().confirmed }}</p>
+            <dl class="m-0 flex-col-start-stretch gap-sm">
+              <div class="flex-col-start-stretch gap-xs">
+                <dt>{{ i18n.signup().registrationNumber }}</dt>
+                <dd class="m-0 text-wrap-anywhere">{{ result.registrationId }}</dd>
+              </div>
+              <div class="flex-col-start-stretch gap-xs">
+                <dt>{{ i18n.labels().event }}</dt>
+                <dd class="m-0">{{ details.eventName }} - {{ details.edition.city }}</dd>
+              </div>
+              @if (details.edition.venueName; as venueName) {
+                <div class="flex-col-start-stretch gap-xs">
+                  <dt>{{ i18n.page().placeLabel }}</dt><dd class="m-0">{{ venueName }}</dd>
+                </div>
+              }
+              @if (details.edition.venueAddress; as venueAddress) {
+                <div class="flex-col-start-stretch gap-xs">
+                  <dt>{{ i18n.page().addressLabel }}</dt><dd class="m-0">{{ venueAddress }}</dd>
+                </div>
+              }
+            </dl>
+            <p class="m-0">{{ i18n.signup().nextSteps }}</p>
+            @if (signup.confirmationCode(); as code) {
+              <section class="flex-col-start-stretch gap-sm" aria-labelledby="event-participant-code-label">
+                <h3 id="event-participant-code-label" class="mg-section__title mg-section__title--sm m-0">{{ i18n.signup().confirmationCodeLabel }}</h3>
+                <code class="text-wrap-anywhere">{{ code }}</code>
+                <p class="m-0">{{ i18n.signup().confirmationCodeInstructions }}</p>
+                <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-copy"
+                  [label]="i18n.actions().copy" [loading]="isCopying()" [disabled]="isCopying()"
+                  (onClick)="copyConfirmationCode()" />
+              </section>
+            } @else if (signup.isAuthenticated()) {
+              <p class="m-0">{{ i18n.signup().accountNotice }}</p>
+            }
+            @if (own.kind === 'loading') {
+              <p class="muted-text m-0" role="status">{{ i18n.status().loading }}</p>
+            } @else if (own.kind === 'error' || own.kind === 'unavailable') {
+              <div class="flex-col-start-stretch gap-sm" role="alert">
+                <p class="m-0">{{ i18n.signup().ownReadError }}</p>
+                <p-button type="button" size="small" severity="secondary" [outlined]="true"
+                  [label]="i18n.actions().retry" (onClick)="signup.refreshOwnRegistration()" />
+              </div>
+            }
+          </section>
+        } @else {
+          <p class="m-0" role="status">{{ i18n.signup().unavailable }}</p>
+        }
       } @else {
         @if (signup.isAuthenticated()) {
           <p class="m-0">{{ i18n.signup().accountNotice }} <strong>{{ signup.accountName() }}</strong></p>
@@ -51,14 +100,16 @@
           </fieldset>
         }
         <p class="muted-text text-sm m-0">{{ i18n.signup().privacyNotice }}</p>
-        @if (!signup.canSubmit() && !signup.isSubmitting()) {
+        @if (signup.hasUncertainResults()) {
+          <p class="m-0" role="alert">{{ i18n.signup().unknownResult }}</p>
+        } @else if (!signup.canSubmit() && !signup.isSubmitting()) {
           <p class="m-0" role="status">{{ i18n.signup().unavailable }}</p>
         }
       }
       <div class="p-dialog-footer flex-row-end-center flex-wrap gap-sm w-100">
         <p-button type="button" severity="secondary" [outlined]="true"
           [label]="i18n.actions().close" [disabled]="signup.isSubmitting()" (onClick)="signup.close()" />
-        @if (!signup.result() && !signup.requestFailed()) {
+        @if (!dialog.result) {
           <p-button type="submit" severity="success" [label]="i18n.cta().signUp"
             [loading]="signup.isSubmitting()" [disabled]="!signup.canSubmit()" />
         }

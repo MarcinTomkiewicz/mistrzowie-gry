@@ -25,4 +25,13 @@ export type EventPageParticipantSignupTranslations = {
   confirmed: string;
   unavailable: string;
   unknownResult: string;
+  registrationNumber: string;
+  confirmationCodeLabel: string;
+  confirmationCodeInstructions: string;
+  nextSteps: string;
+  copyCodeFailed: string;
+  ownReadError: string;
+  cancelled: string;
+  leaveConfirmation: string;
+  discardHiddenReceiptConfirmation: string;
 };

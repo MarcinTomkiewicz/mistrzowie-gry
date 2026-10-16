@@ -8,23 +8,24 @@
         <app-occurrence-switcher
           [options]="occurrenceOptions()"
           [selectedIndex]="facade.selectedOccurrenceIndex()"
+          [disabled]="signup.isSubmitting()"
           marginBottomClass=""
-          (selectedIndexChange)="facade.selectOccurrence($event)"
+          (selectedIndexChange)="selectOccurrence($event)"
         />
       </div>
     }
   </header>
   @if (signup.released) {
-    @if (signup.hasUncertainResults() && !signup.selected()) {
+    @if (signup.hasUncertainResults() && !signup.dialog()) {
       <p role="alert">{{ i18n.signup().unknownResult }}</p>
     }
-    @if (signup.availability().kind === 'loading') {
+    @if (availability.state().kind === 'loading') {
       <p class="muted-text" role="status">{{ i18n.status().loading }}</p>
-    } @else if (signup.availability().kind === 'error') {
+    } @else if (availability.state().kind === 'error') {
       <div class="mg-card flex-col-start-stretch gap-sm mb-md" role="alert">
         <p class="m-0">{{ i18n.signup().availabilityError }}</p>
         <p-button type="button" size="small" severity="secondary" [outlined]="true"
-          [label]="i18n.actions().retry" (onClick)="signup.refreshAvailability()" />
+          [label]="i18n.actions().retry" (onClick)="availability.refresh()" />
       </div>
     }
   }
@@ -72,7 +73,9 @@
   }
 </section>
 
-<app-event-participant-signup />
+@if (signup.released) {
+  <app-event-participant-signup />
+}
 
 @let selected = selectedCard();
 <app-session-dialog

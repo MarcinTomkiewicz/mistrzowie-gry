@@ -92,6 +92,7 @@ export class AppShell {
         host,
         load: this.loadConfirmPopupHost,
         onMount: (componentRef) => {
+          componentRef.changeDetectorRef.detectChanges();
           this.confirmPopupRef = componentRef;
           this.uiConfirm.markHostReady();
         },
