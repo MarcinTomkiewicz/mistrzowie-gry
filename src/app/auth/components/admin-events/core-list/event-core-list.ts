@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -6,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { finalize, forkJoin } from 'rxjs';
+import { EMPTY, Subscription, catchError, finalize, map, switchMap } from 'rxjs';
 
 import type { IEventCoreListItem } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
@@ -30,6 +31,8 @@ import { createEventCoreListI18n } from './core-list.i18n';
 export class EventCoreList {
   private readonly eventAdmin = inject(EventAdmin);
   private readonly toast = inject(UiToast);
+  private readonly destroyRef = inject(DestroyRef);
+  private loadSubscription: Subscription | null = null;
 
   protected readonly i18n = createEventCoreListI18n();
   protected readonly rows = signal<EventCoreListRow[]>([]);
@@ -45,6 +48,8 @@ export class EventCoreList {
     const status = this.i18n.commonEntityStatuses();
     const commonValues = this.i18n.commonValues();
     const table = this.i18n.table();
+    const activeLabel = status?.active?.neuter ?? commonValues.notAvailable;
+    const inactiveLabel = status?.inactive?.neuter ?? commonValues.notAvailable;
 
     return this.rows().map(({ core, nextEdition, visibleCities, remainingCityCount }) => ({
       core,
@@ -55,7 +60,7 @@ export class EventCoreList {
       moreLocationsLabel: remainingCityCount > 0
         ? this.i18n.moreLocations(remainingCityCount)
         : null,
-      activeLabel: core.isActive ? status.active.neuter : status.inactive.neuter,
+      activeLabel: core.isActive ? activeLabel : inactiveLabel,
       activeBadgeClass: core.isActive
         ? 'tag-badge tag-badge--success'
         : 'tag-badge tag-badge--muted',
@@ -73,17 +78,37 @@ export class EventCoreList {
   }
 
   protected loadCores(): void {
+    this.loadSubscription?.unsubscribe();
     this.isLoading.set(true);
     this.loadErrorMessage.set(null);
 
-    forkJoin({
-      cores: this.eventAdmin.getCoreList(),
-      editions: this.eventAdmin.getEditionList(),
-    })
-      .pipe(finalize(() => this.isLoading.set(false)))
+    this.loadSubscription = this.eventAdmin.getCoreList()
+      .pipe(
+        finalize(() => this.isLoading.set(false)),
+        switchMap((cores) => {
+          this.rows.set(buildEventCoreListRows(cores, []));
+          this.isLoading.set(false);
+
+          return this.eventAdmin.getEditionList().pipe(
+            map((editions) => buildEventCoreListRows(cores, editions)),
+            catchError((error: unknown) => {
+              this.toast.danger({
+                summary: this.i18n.commonErrors().eventsLoadFailed,
+                detail: resolveEventCoreAdminErrorMessage(
+                  error,
+                  this.i18n.rpcErrors(),
+                  this.i18n.commonErrors().concurrentModification,
+                ),
+              });
+              return EMPTY;
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: ({ cores, editions }) => {
-          this.rows.set(buildEventCoreListRows(cores, editions));
+        next: (rows) => {
+          this.rows.set(rows);
         },
         error: (error) => {
           const detail = resolveEventCoreAdminErrorMessage(
@@ -113,7 +138,10 @@ export class EventCoreList {
 
     this.eventAdmin
       .setCoreActive(core.id, isActive)
-      .pipe(finalize(() => this.activeActionKey.set(null)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.activeActionKey.set(null)),
+      )
       .subscribe({
         next: () => {
           this.toast.success(
