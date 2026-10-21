@@ -1,8 +1,36 @@
+import { DEFAULT_TIMEZONE } from '../configs/time.config';
+import type { ISelectOption } from '../interfaces/i-select-option';
 import { HOUR_IN_MS } from '../types/hour-offset';
 import { isValidDate, parseIsoDate } from './date';
 import { parseTimeLabelToMinutes } from './time-format';
 
 const DAY_IN_MS = 24 * HOUR_IN_MS;
+
+export function createTimeZoneOptions(referenceDate: Date): ISelectOption[] {
+  const commonZones = [DEFAULT_TIMEZONE, 'UTC', 'Europe/London', 'America/New_York', 'Asia/Tokyo'];
+  return [...new Set([...commonZones, ...Intl.supportedValuesOf('timeZone')])]
+    .map((timeZone) => {
+      const offset = Math.round((getTimeZoneWallTime(referenceDate.getTime(), timeZone) - referenceDate.getTime()) / 60000);
+      const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+      const minutes = String(Math.abs(offset) % 60).padStart(2, '0');
+      const zoneName = new Intl.DateTimeFormat('pl-PL', { timeZone, timeZoneName: 'short' })
+        .formatToParts(referenceDate)
+        .filter((part) => part.type === 'timeZoneName')
+        .map((part) => part.value).join('');
+      const city = timeZone.replace(/^.*\//, '').replaceAll('_', ' ');
+
+      return { value: timeZone, label: `${zoneName} (UTC${offset < 0 ? '-' : '+'}${hours}:${minutes}) - ${city}`, offset };
+    })
+    .sort((left, right) => {
+      const leftCommon = commonZones.indexOf(left.value);
+      const rightCommon = commonZones.indexOf(right.value);
+      if (leftCommon >= 0 || rightCommon >= 0) {
+        return (leftCommon < 0 ? commonZones.length : leftCommon) - (rightCommon < 0 ? commonZones.length : rightCommon);
+      }
+      return left.offset - right.offset || left.value.localeCompare(right.value);
+    })
+    .map(({ value, label }) => ({ value, label }));
+}
 
 export function timestampToTimeZoneDate(
   timestamp: string | null | undefined,
@@ -11,7 +39,7 @@ export function timestampToTimeZoneDate(
   if (!timestamp) return null;
 
   const instant = new Date(timestamp);
-  if (!isValidDate(instant)) return instant;
+  if (!isValidDate(instant)) return null;
 
   const wallTime = new Date(getTimeZoneWallTime(instant.getTime(), timeZone));
   return new Date(

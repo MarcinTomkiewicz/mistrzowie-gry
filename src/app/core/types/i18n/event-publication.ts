@@ -4,8 +4,6 @@ export type EventPublicationCopy = {
   confirm: string;
   repeatConfirm: string;
   publishing: string;
-  public: string;
-  private: string;
   released: string;
   unreleased: string;
   privateDraftRequired: string;

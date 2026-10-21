@@ -1,0 +1,30 @@
+@let draft = value();
+@let copy = i18n.creation();
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ draft.name }}</h2>
+  <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
+    <div><dt class="muted-text">{{ i18n.commonLabels().shortDescription }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.shortDescription || i18n.commonValues().notProvided }}</dd></div>
+    <div><dt class="muted-text">{{ i18n.commonLabels().longDescription }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.longDescription || i18n.commonValues().notProvided }}</dd></div>
+    <div><dt class="muted-text">{{ copy.mainCity }}</dt><dd class="m-0">{{ draft.mainCity.city }}</dd></div>
+    <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0">{{ draft.mainCity.timezone }}</dd></div>
+    <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0">{{ draft.mainCity.venueName || i18n.commonValues().notProvided }}</dd></div>
+    <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0">{{ draft.mainCity.venueAddress || i18n.commonValues().notProvided }}</dd></div>
+    <div><dt class="muted-text">{{ copy.facebookLink }}</dt><dd class="m-0 text-wrap-anywhere">
+      @if (draft.mainCity.facebookLink) { <a [href]="draft.mainCity.facebookLink" target="_blank" rel="noopener noreferrer">{{ draft.mainCity.facebookLink }}</a> }
+      @else { {{ i18n.commonValues().notProvided }} }
+    </dd></div>
+    <div><dt class="muted-text">{{ i18n.commonLabels().eventDate }}</dt><dd class="m-0"><time [attr.datetime]="date()">{{ formatDateLabel(date()) }}</time></dd></div>
+  </dl>
+  <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
+  @for (block of draft.timeBlocks; track block.position) {
+    <div class="flex-row-between-center flex-wrap gap-sm border-top pt-sm">
+      <strong>{{ block.label }}</strong>
+      <span class="text-nowrap">{{ formatTimeRangeLabel(block.startTime, block.endTime) }}</span>
+      <span>{{ copy.requiredGmCount }}: {{ block.requiredGmCount }}</span>
+    </div>
+  }
+</section>
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.policy }}</h2>
+  <app-event-global-policy-summary [policy]="draft.policy" />
+</section>

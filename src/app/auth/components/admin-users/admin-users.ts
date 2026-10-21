@@ -72,6 +72,7 @@ export class AdminUsers {
       this.i18n.filters(),
       this.i18n.commonLabels(),
       this.i18n.appRoles(),
+      this.i18n.commonEntityStatuses().public.masculine,
     ),
   );
   private readonly filterValue = toSignal(

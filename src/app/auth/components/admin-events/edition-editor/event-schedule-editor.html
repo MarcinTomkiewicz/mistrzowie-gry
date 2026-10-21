@@ -3,7 +3,7 @@
   [formGroup]="form()"
 >
   <h2 class="mg-section__title mg-section__title--md m-0">
-    {{ i18n.fields().sectionTitle }}
+    {{ i18n.commonLabels().schedule }}
   </h2>
 
   <div class="flex-col-start-stretch gap-xs">
@@ -22,7 +22,7 @@
         optionLabel="label"
         optionValue="value"
       />
-      <label for="event-schedule-kind">{{ i18n.fields().kind }}</label>
+      <label for="event-schedule-kind">{{ i18n.commonLabels().scheduleKind }}</label>
     </p-iftalabel>
 
     @if (form().controls.kind.value === "single") {
@@ -35,7 +35,7 @@
             type="date"
             formControlName="date"
           />
-          <label for="event-schedule-date">{{ i18n.fields().date }}</label>
+          <label for="event-schedule-date">{{ i18n.commonLabels().eventDate }}</label>
         </p-iftalabel>
 
         @if (form().touched && form().hasError("singleDate")) {
@@ -55,7 +55,7 @@
           optionValue="value"
         />
         <label for="event-recurrence-kind">
-          {{ i18n.fields().recurrenceKind }}
+          {{ i18n.commonLabels().recurrenceKind }}
         </label>
       </p-iftalabel>
     }
@@ -74,7 +74,7 @@
             [useGrouping]="false"
           />
           <label for="event-recurrence-interval">
-            {{ i18n.fields().interval }}
+            {{ i18n.commonLabels().interval }}
           </label>
         </p-iftalabel>
 
@@ -100,7 +100,7 @@
             formControlName="startDate"
           />
           <label for="event-recurrence-start-date">
-            {{ i18n.fields().startDate }}
+            {{ i18n.commonLabels().scheduleStart }}
           </label>
         </p-iftalabel>
       </div>
@@ -115,7 +115,7 @@
             formControlName="endDate"
           />
           <label for="event-recurrence-end-date">
-            {{ i18n.fields().endDate }}
+            {{ i18n.commonLabels().scheduleEnd }}
           </label>
         </p-iftalabel>
       </div>
@@ -138,9 +138,9 @@
         <div
           class="flex-col-start-stretch gap-sm w-100"
           role="group"
-          [attr.aria-label]="i18n.fields().byweekday"
+          [attr.aria-label]="i18n.commonLabels().weekdays"
         >
-          <strong>{{ i18n.fields().byweekday }}</strong>
+          <strong>{{ i18n.commonLabels().weekdays }}</strong>
 
           <div class="flex-row-start-center flex-wrap gap-md">
             @for (weekday of weekdayOptions; track weekday.value) {
@@ -176,7 +176,7 @@
               optionValue="value"
             />
             <label for="event-monthly-nth">
-              {{ i18n.fields().monthlyNth }}
+              {{ i18n.commonLabels().dayOfMonth }}
             </label>
           </p-iftalabel>
 
@@ -190,7 +190,7 @@
               optionValue="value"
             />
             <label for="event-monthly-weekday">
-              {{ i18n.fields().monthlyWeekday }}
+              {{ i18n.commonLabels().weekday }}
             </label>
           </p-iftalabel>
         </div>
@@ -220,7 +220,7 @@
               [useGrouping]="false"
             />
             <label for="event-day-of-month">
-              {{ i18n.fields().dayOfMonth }}
+              {{ i18n.commonLabels().dayOfMonth }}
             </label>
           </p-iftalabel>
 
@@ -250,7 +250,7 @@
     >
       <div class="flex-row-between-center flex-wrap gap-sm">
         <strong id="event-schedule-dates-title">
-          {{ isExactDates ? i18n.fields().dates : i18n.fields().exdates }}
+          {{ isExactDates ? i18n.fields().dates : i18n.commonLabels().excludedDates }}
         </strong>
         <p-button
           type="button"
@@ -274,14 +274,14 @@
                 [formControl]="dateControl"
               />
               <label [for]="dateIdPrefix + $index">
-                {{ isExactDates ? i18n.fields().date : i18n.fields().exdate }}
+                {{ isExactDates ? i18n.commonLabels().eventDate : i18n.commonLabels().excludedDate }}
                 {{ $index + 1 }}
               </label>
             </p-iftalabel>
 
             @if (!isExactDates && dateControl.touched && dateControl.invalid) {
               <small class="mg-contact-error">
-                {{ i18n.validation().exdate }}
+                {{ i18n.commonForm().invalidDate }}
               </small>
             }
           </div>

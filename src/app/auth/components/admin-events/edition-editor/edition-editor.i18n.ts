@@ -1,8 +1,12 @@
+import { computed } from '@angular/core';
+
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
   createCommonErrorsI18n,
+  createCommonEntityStatusesI18n,
   createCommonLabelsI18n,
+  createCommonPriceI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
@@ -17,13 +21,13 @@ import {
   EditionRpcErrorsCopy,
   EditionSectionsCopy,
   EditionValidationCopy,
-  EditorPageCopy,
+  EditionEditorPageCopy,
   EditorToastCopy,
   OccurrenceDialogCopy,
   OccurrenceFieldsCopy,
   OccurrenceRpcErrorsCopy,
   OccurrencesCopy,
-  OccurrenceStatusCopy,
+  OccurrenceSignupStatusCopy,
   OccurrenceTableCopy,
   OccurrenceToastCopy,
   OccurrenceValidationCopy,
@@ -50,11 +54,11 @@ export function createEventEditionEditorI18n() {
     occurrenceDialog,
     occurrenceFields,
     occurrenceValidation,
-    occurrenceStatuses,
+    occurrenceSignupStatuses,
     occurrenceToast,
     occurrenceRpcErrors,
   } = createScopedSectionsI18n<{
-    page: EditorPageCopy;
+    page: EditionEditorPageCopy;
     sections: EditionSectionsCopy;
     fields: EditionFieldsCopy;
     validation: EditionValidationCopy;
@@ -68,7 +72,7 @@ export function createEventEditionEditorI18n() {
     occurrenceDialog: OccurrenceDialogCopy;
     occurrenceFields: OccurrenceFieldsCopy;
     occurrenceValidation: OccurrenceValidationCopy;
-    occurrenceStatuses: OccurrenceStatusCopy;
+    occurrenceSignupStatuses: OccurrenceSignupStatusCopy;
     occurrenceToast: OccurrenceToastCopy;
     occurrenceRpcErrors: OccurrenceRpcErrorsCopy;
   }>('adminEvents', {
@@ -86,10 +90,13 @@ export function createEventEditionEditorI18n() {
     occurrenceDialog: 'occurrenceEditor.dialog',
     occurrenceFields: 'occurrenceEditor.fields',
     occurrenceValidation: 'occurrenceEditor.validation',
-    occurrenceStatuses: 'occurrenceEditor.statuses',
+    occurrenceSignupStatuses: 'occurrenceEditor.statuses',
     occurrenceToast: 'occurrenceEditor.toast',
     occurrenceRpcErrors: 'occurrenceRpcErrors',
   });
+
+  const commonEntityStatuses = createCommonEntityStatusesI18n();
+  const commonValues = createCommonValuesI18n();
 
   return {
     publication: createScopedObjectI18n<EventPublicationCopy>('adminEvents', 'editionEditor.publication'),
@@ -107,17 +114,24 @@ export function createEventEditionEditorI18n() {
     occurrenceDialog,
     occurrenceFields,
     occurrenceValidation,
-    occurrenceStatuses,
+    occurrenceStatuses: computed(() => ({
+      ...occurrenceSignupStatuses(),
+      planned: commonEntityStatuses().planned.masculine,
+      published: commonValues().published,
+      archived: commonValues().archived,
+    })),
     occurrenceToast,
     occurrenceRpcErrors,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonErrors: createCommonErrorsI18n(),
+    commonEntityStatuses,
     commonLabels: createCommonLabelsI18n(),
+    commonPrice: createCommonPriceI18n(),
     commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
-    commonValues: createCommonValuesI18n(),
+    commonValues,
   };
 }
 
@@ -141,6 +155,7 @@ export function createEventScheduleEditorI18n() {
     validation,
     info,
     commonActions: createCommonActionsI18n(),
+    commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),
     commonValues: createCommonValuesI18n(),
   };

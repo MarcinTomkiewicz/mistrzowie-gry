@@ -6,17 +6,12 @@
       "emptyDescription": "Nie utworzono jeszcze żadnych wydarzeń. Kliknij przycisk \"Dodaj wydarzenie\", aby rozpocząć."
     },
     "table": {
-      "nextOccurrence": "Najbliższy termin",
-      "location": "Lokalizacja",
-      "publicPage": "Strona publiczna",
       "noUpcomingOccurrences": "Brak nadchodzących terminów",
       "noLocation": "-",
       "moreLocations": "+{{count}} więcej"
     },
     "actions": {
-      "createCore": "Dodaj wydarzenie",
-      "activateCore": "Aktywuj",
-      "deactivateCore": "Dezaktywuj"
+      "createCore": "Dodaj wydarzenie"
     },
     "toast": {
       "activateSuccessSummary": "Wydarzenie aktywowane",
@@ -32,12 +27,10 @@
       "editTitle": "Edycja wydarzenia",
       "subtitle": "Ustaw wspólne dane wydarzenia i zarządzaj jego lokalnymi edycjami.",
       "loadErrorTitle": "Nie udało się załadować wydarzenia",
-      "notFoundTitle": "Nie znaleziono wydarzenia",
-      "notFoundDescription": "Wskazany wydarzenie nie istnieje."
+      "notFoundTitle": "Nie znaleziono wydarzenia"
     },
     "fields": {
       "coreSectionTitle": "Dane wydarzenia",
-      "longDescription": "Pełny opis",
       "hasPublicPage": "Ma stronę publiczną"
     },
     "validation": {
@@ -50,7 +43,6 @@
       "emptyDescription": "To wydarzenie nie ma jeszcze lokalnych edycji."
     },
     "editionTable": {
-      "active": "Aktywne",
       "defaultPublic": "Domyślna lokalizacja"
     },
     "actions": {
@@ -60,6 +52,48 @@
       "saveSuccessSummary": "Wydarzenie zapisane",
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
+    },
+    "creation": {
+      "steps": {
+        "location": "[PH] Główna lokalizacja",
+        "policy": "[PH] Cena i zapisy"
+      },
+      "leaveConfirmation": "[PH] Opuścić kreator i porzucić niezapisane dane wydarzenia?",
+      "discardDraft": "[PH] Porzuć dane",
+      "help": "[PH] Wyjaśnienie ustawienia",
+      "signupKindHint": "[PH] Wybierz zapisy na sesje, na całe wydarzenie albo oba rodzaje. Każdy rodzaj ma osobną pulę miejsc. Wybór sposobu zapisów nie otwiera rejestracji uczestników.",
+      "signupRequiredHint": "[PH] Określa, czy udział wymaga zapisu. Nie otwiera rejestracji i nie publikuje wydarzenia.",
+      "mainCity": "[PH] Główna lokalizacja wydarzenia",
+      "timezoneHint": "[PH] Przesunięcie UTC uwzględnia czas letni i zimowy dla wybranej daty, a przed jej wyborem - dla dzisiaj. Wyszukaj miasto, nazwę strefy lub jej kod IANA.",
+      "facebookLink": "[PH] Link do wydarzenia na Facebooku",
+      "facebookInvalid": "[PH] Podaj adres HTTPS z domeną facebook.com, fb.com lub fb.me i niepustą ścieżką, np. https://www.facebook.com/events/123 (maks. 500 znaków).",
+      "schedule": "[PH] Wspólny harmonogram wydarzenia",
+      "dateInvalid": "[PH] Wybierz datę od dzisiaj w strefie czasowej głównej lokalizacji wydarzenia, w latach 2000-2100.",
+      "blocks": "[PH] Dzienne bloki harmonogramu",
+      "addBlock": "[PH] Dodaj blok",
+      "blockLabel": "[PH] Nazwa bloku",
+      "requiredGmCount": "[PH] Planowana liczba MG",
+      "requiredGmHint": "[PH] Liczba MG potrzebnych do obsadzenia bloku. To plan, nie limit uczestników.",
+      "timeInvalid": "[PH] Podaj godzinę od 00:00 do 23:59. Możesz wpisać samo HH, np. 15.",
+      "policy": "[PH] Podstawowe ustawienia wydarzenia",
+      "audience": "[PH] Przeznaczenie wydarzenia",
+      "registration": "[PH] Zapisy i limity uczestników",
+      "priceHint": "[PH] Pusta kwota oznacza brak określonej ceny. Wpisz 0 dla wydarzenia bezpłatnego.",
+      "sessionCapacityCeiling": "[PH] Limit organizatora na sesję",
+      "wholeEventCapacity": "[PH] Limit na cały termin",
+      "sessionCapacityHint": "[PH] Wspólny limit organizatora może obniżyć liczbę miejsc podaną przez MG. To ustawienie domyślne, nie indywidualny limit konkretnej sesji. Puste pole nie nakłada dodatkowego limitu.",
+      "wholeEventCapacityHint": "[PH] Osobna pula zapisów na całe wydarzenie, dla każdej lokalizacji i terminu. Nie określa pojemności miejsca i nie zużywa miejsc sesji. Puste pole nie nakłada dodatkowego limitu.",
+      "uncertain": "[PH] Nie można potwierdzić wyniku zapisu. Zachowano pierwotne dane; ponów tę samą operację, aby ustalić wynik bez tworzenia drugiego wydarzenia. Nie odświeżaj strony.",
+      "created": "[PH] Szkic został zapisany. Ponów odczyt, aby przejść do jego edycji.",
+      "retryCreation": "[PH] Ponów ten sam zapis",
+      "retryRead": "[PH] Ponów odczyt szkicu",
+      "readbackFailed": "[PH] Szkic został zapisany, ale nie udało się odczytać danych. Ponów odczyt bez tworzenia nowego wydarzenia.",
+      "effectivePolicy": "[PH] Ustawienia dla lokalizacji",
+      "noAdditionalLimit": "[PH] Bez dodatkowego limitu",
+      "dayOffset": "[PH] +{{count}} dni",
+      "appliedToPublicEvent": "[PH] Wspólne ustawienia stosowane na stronie publicznej",
+      "appliedToRegistration": "[PH] Wspólne ustawienia stosowane przy zapisach uczestników",
+      "venueName": "Miejsce wydarzenia"
     }
   },
   "editionEditor": {
@@ -75,32 +109,18 @@
       "identity": "Wydarzenie i lokalizacja",
       "venueAndPrice": "Miejsce i cena",
       "publication": "Publikacja i dostępność",
-      "signup": "Zapisy i liczba uczestników",
-      "cover": "Okładka"
+      "signup": "Zapisy i liczba uczestników"
     },
     "fields": {
       "slug": "Slug lokalizacji",
-      "venueName": "Nazwa miejsca",
-      "venueAddress": "Adres miejsca",
-      "priceCurrency": "Waluta",
-      "priceLabel": "Opis ceny",
       "coverPreviewAlt": "Podgląd okładki danej lokalizacji",
-      "facebookLink": "Link do Facebooka",
-      "isActive": "Aktywna",
       "isDefaultPublic": "Domyślna lokalizacja na stronie wydarzenia",
-      "timezone": "Strefa czasowa",
-      "startTime": "Godzina rozpoczęcia",
-      "endTime": "Godzina zakończenia",
-      "participantSignupKind": "Sposób zapisów uczestników",
-      "signupRequired": "Zapisy uczestników wymagane",
       "defaultSlotCapacity": "Domyślna liczba Mistrzów Gry",
       "defaultParticipantCapacity": "Domyślna liczba uczestników"
     },
     "validation": {
       "slugPattern": "Slug może zawierać wyłącznie małe litery, cyfry i myślniki.",
       "citySlugSource": "[PH] Z podanego miasta nie można utworzyć części slugu lokalizacji. Dodaj co najmniej jedną literę łacińską lub cyfrę.",
-      "priceAmountMin": "Kwota nie może być mniejsza niż 0.",
-      "timeRange": "Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia tego samego dnia.",
       "slotCapacityRange": "Liczba Mistrzów Gry musi być liczbą całkowitą od 1 do 12.",
       "participantCapacityMin": "Liczba uczestników musi być pusta albo być liczbą całkowitą nie mniejszą niż 1."
     },
@@ -124,8 +144,6 @@
       "confirm": "Opublikować zapisane wydarzenie? Warunki publikacji zostaną sprawdzone. Ta operacja nie otwiera zapisów uczestników. Ponowienie nie przywraca widoczności wyłączonego wydarzenia.",
       "repeatConfirm": "Potwierdzić historyczną publikację wydarzenia? Ponowienie nie publikuje go ponownie i nie przywraca wyłączonej widoczności.",
       "publishing": "Publikowanie wydarzenia",
-      "public": "Publiczne",
-      "private": "Prywatne",
       "released": "Wydarzenie było już opublikowane",
       "unreleased": "Wydarzenie nie było jeszcze opublikowane",
       "privateDraftRequired": "Pierwsza publikacja wymaga prywatnego stanu wydarzenia i lokalizacji. Wyłącz wskazane ustawienia i odśwież dane. Zmian dokonaj świadomie w odpowiednim edytorze.",
@@ -180,7 +198,6 @@
       "emptyDescription": "Ta lokalizacja nie ma jeszcze terminów."
     },
     "occurrenceTable": {
-      "slotCapacity": "Liczba Mistrzów Gry",
       "hostSignupWindow": "Okno zapisów Mistrzów Gry",
       "participantSignupWindow": "Okno zapisów uczestników",
       "programItemCount": "Elementy programu",
@@ -192,9 +209,6 @@
       "title": "Edycja terminu"
     },
     "fields": {
-      "date": "Data wydarzenia",
-      "slotCapacity": "Liczba Mistrzów Gry",
-      "participantSignupKind": "Rodzaj zapisów",
       "hostSignupWindow": "Zapisy Mistrzów Gry",
       "hostSignupOpensAt": "Otwarcie zapisów Mistrzów Gry",
       "hostSignupClosesAt": "Zamknięcie zapisów Mistrzów Gry",
@@ -203,12 +217,10 @@
       "participantSignupClosesAt": "Zamknięcie zapisów uczestników"
     },
     "validation": {
-      "timestamp": "Podaj poprawną datę i godzinę.",
       "hostSignupRange": "Zamknięcie zapisów Mistrzów Gry musi być późniejsze niż ich otwarcie.",
       "participantSignupRange": "Zamknięcie zapisów uczestników musi być późniejsze niż ich otwarcie."
     },
     "statuses": {
-      "planned": "Planowany",
       "host_signup_open": "Zapisy Mistrzów Gry otwarte",
       "host_signup_closed": "Zapisy Mistrzów Gry zamknięte",
       "participant_signup_open": "Zapisy uczestników otwarte",
@@ -231,32 +243,12 @@
   },
   "scheduleEditor": {
     "fields": {
-      "sectionTitle": "Harmonogram",
-      "kind": "Rodzaj harmonogramu",
-      "date": "Data wydarzenia",
-      "dates": "[PH] Daty wydarzenia",
-      "recurrenceKind": "Sposób powtarzania",
-      "interval": "Interwał",
-      "byweekday": "Dni tygodnia",
-      "monthlyNth": "Dzień miesiąca",
-      "monthlyWeekday": "Dzień tygodnia",
-      "dayOfMonth": "Dzień miesiąca",
-      "startDate": "Początek harmonogramu",
-      "endDate": "Koniec harmonogramu",
-      "exdates": "Wykluczone daty",
-      "exdate": "Wykluczona data"
+      "dates": "[PH] Daty wydarzenia"
     },
     "options": {
       "single": "Wydarzenie jednorazowe",
       "recurring": "Wydarzenie cykliczne",
-      "exactDates": "[PH] Wydarzenie w wybranych terminach",
-      "monthlyNthWeekday": "Miesięcznie - wybrany dzień tygodnia",
-      "monthlyDayOfMonth": "Miesięcznie - wybrany dzień miesiąca",
-      "first": "Pierwszy",
-      "second": "Drugi",
-      "third": "Trzeci",
-      "fourth": "Czwarty",
-      "last": "Ostatni"
+      "exactDates": "[PH] Wydarzenie w wybranych terminach"
     },
     "validation": {
       "singleDate": "Podaj poprawną datę wydarzenia.",
@@ -269,12 +261,11 @@
       "monthlyNth": "Wybierz dzień miesiąca.",
       "monthlyWeekday": "Wybierz dzień tygodnia.",
       "dayOfMonth": "Dzień miesiąca musi zawierać się w zakresie od 1 do 31.",
-      "intervalMin": "Interwał musi być liczbą całkowitą nie mniejszą niż 1.",
-      "exdate": "Podaj poprawną datę."
+      "intervalMin": "Interwał musi być liczbą całkowitą nie mniejszą niż 1."
     },
     "info": {
       "scheduleChange": "Zmiana harmonogramu może usunąć przyszłe terminy.",
-      "protectedOccurrences": "Termin z zostanie zablokowany.",
+      "protectedOccurrences": "Termin zostanie zablokowany.",
       "conflict": "Konflikt kończy się błędem i harmonogram nie zostanie zapisany."
     }
   },
@@ -282,7 +273,7 @@
     "forbidden": "Nie masz uprawnień do zarządzania edycjami.",
     "notFound": "Wskazane wydarzenie lub lokalna edycja nie istnieje.",
     "invalid": "Dane lokalnej edycji lub harmonogramu są nieprawidłowe.",
-    "foreignKey": "Powiązane wydarzenie nie istnieje albo nie może zostać użyty.",
+    "foreignKey": "Powiązane wydarzenie nie istnieje albo nie może zostać użyte.",
     "duplicateSlug": "Lokalna edycja o takim slugu już istnieje.",
     "activeCityConflict": "To wydarzenie ma już aktywną lokalną edycję w podanym mieście.",
     "defaultPublicConflict": "To wydarzenie ma już inną domyślną edycję publiczną.",
@@ -290,8 +281,28 @@
     "constraint": "Operacja narusza regułę publicznych wydarzeń lub aktywnej domyślnej edycji.",
     "unknown": "Wystąpił nieoczekiwany błąd podczas operacji na lokalnej edycji."
   },
-  "status": {
-    "inactive": "Nieaktywny"
+  "timeline": {
+    "title": "[PH] Program lokalny",
+    "source": "[PH] Źródło przypisania",
+    "frozen": "[PH] Utrwalona przy publikacji",
+    "noOccurrences": "[PH] Brak terminów w programie.",
+    "noRows": "[PH] Brak pozycji programu dla tego terminu.",
+    "unassigned": "[PH] Nieobsadzony blok",
+    "noHost": "[PH] Brak przypisanego MG",
+    "loadFailed": "[PH] Nie udało się odczytać programu",
+    "eventHours": "[PH] Godziny wydarzenia",
+    "participationEnded": "[PH] Udział MG zakończony",
+    "sources": {
+      "staffing": "[PH] Plan Staffingu",
+      "manual": "[PH] Ręczne przypisanie",
+      "legacy_host": "[PH] Zapisy MG"
+    },
+    "candidateStates": {
+      "draft": "[PH] Zgłoszenie robocze",
+      "confirmed": "[PH] MG potwierdzony",
+      "rejected": "[PH] Zgłoszenie odrzucone",
+      "withdrawn": "[PH] Zgłoszenie wycofane"
+    }
   },
   "rpcErrors": {
     "forbidden": "Nie masz uprawnień do zarządzania wydarzeniami.",

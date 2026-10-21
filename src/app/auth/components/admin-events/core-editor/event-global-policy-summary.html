@@ -1,0 +1,14 @@
+<dl class="mg-grid grid-3-cols grid-1-cols-sm gap-md m-0">
+  @for (row of rows(); track row.label) {
+    <div class="flex-col-start-stretch gap-xs min-w-0">
+      <dt class="muted-text">{{ row.label }}</dt>
+      <dd class="m-0">
+        @if (row.previewUrl) {
+          <a [href]="row.previewUrl" target="_blank" rel="noopener noreferrer">{{ row.value }}</a>
+        } @else {
+          {{ row.value }}
+        }
+      </dd>
+    </div>
+  }
+</dl>

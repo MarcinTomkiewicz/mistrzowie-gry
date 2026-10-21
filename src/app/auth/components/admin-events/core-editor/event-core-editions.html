@@ -1,0 +1,119 @@
+@let loadedCore = core();
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+  <div class="flex-row-between-center flex-wrap gap-sm w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">
+      {{ i18n.editions().sectionTitle }}
+    </h2>
+
+    @if (legacyEditing()) {
+      <p-button
+        severity="success"
+        [label]="i18n.actions().addEdition"
+        icon="pi pi-plus"
+        [routerLink]="[
+          '/admin/content/events',
+          loadedCore.id,
+          'editions',
+          'new',
+        ]"
+      />
+    }
+  </div>
+
+  @if (loadedCore.editions.length) {
+    <div class="p-datatable p-component w-100">
+      <div class="p-datatable-table-container overflow-x-auto">
+        <table class="p-datatable-table w-100 min-w-500">
+          <thead class="p-datatable-thead">
+            <tr>
+              <th class="small-caps" scope="col">
+                {{ i18n.commonLabels().city }}
+              </th>
+              <th class="small-caps" scope="col">
+                {{ i18n.commonLabels().slug }}
+              </th>
+              <th class="small-caps text-center" scope="col">
+                {{ i18n.commonEntityStatuses().active.pluralNonMasculinePersonal }}
+              </th>
+              <th class="small-caps text-center" scope="col">
+                {{ i18n.editionTable().defaultPublic }}
+              </th>
+              <th class="small-caps text-center" scope="col">
+                {{ i18n.occurrences().sectionTitle }}
+              </th>
+              <th class="small-caps text-center" scope="col">
+                {{ i18n.occurrenceTable().programItemCount }}
+              </th>
+              @if (legacyEditing()) {
+                <th class="small-caps text-right" scope="col">
+                  {{ i18n.commonTable().actions }}
+                </th>
+              }
+            </tr>
+          </thead>
+
+          <tbody class="p-datatable-tbody">
+            @for (edition of loadedCore.editions; track edition.id) {
+              <tr>
+                <td><strong>{{ edition.city }}</strong></td>
+                <td>{{ edition.slug }}</td>
+                <td class="text-center">
+                  <span
+                    [class]="
+                      edition.isActive
+                        ? 'tag-badge tag-badge--success'
+                        : 'tag-badge tag-badge--muted'
+                    "
+                  >
+                    {{
+                      edition.isActive
+                        ? i18n.commonEntityStatuses().active.feminine
+                        : i18n.commonEntityStatuses().inactive.feminine
+                    }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  {{
+                    edition.isDefaultPublic
+                      ? i18n.commonValues().yes
+                      : i18n.commonValues().no
+                  }}
+                </td>
+                <td class="text-center">
+                  {{ edition.occurrenceCount }}
+                </td>
+                <td class="text-center">
+                  {{ edition.programItemCount }}
+                </td>
+                @if (legacyEditing()) {
+                  <td class="text-right">
+                    <p-button
+                      size="small"
+                      severity="secondary"
+                      [label]="i18n.commonActions().edit"
+                      icon="pi pi-scroll-quill"
+                      [routerLink]="[
+                        '/admin/content/events',
+                        loadedCore.id,
+                        'editions',
+                        edition.id,
+                        'edit',
+                      ]"
+                    />
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ i18n.editions().emptyTitle }}
+      </h3>
+      <p class="m-0">{{ i18n.editions().emptyDescription }}</p>
+    </div>
+  }
+</section>

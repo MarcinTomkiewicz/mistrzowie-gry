@@ -4,6 +4,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import {
   createCommonActionsI18n,
   createCommonErrorsI18n,
+  createCommonEntityStatusesI18n,
   createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
@@ -17,25 +18,22 @@ import type {
   ListActionsCopy,
   ListPageCopy,
   ListToastCopy,
-  StatusCopy,
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventCoreListI18n() {
   const transloco = inject(TranslocoService);
-  const { page, table, actions, toast, status, rpcErrors } =
+  const { page, table, actions, toast, rpcErrors } =
     createScopedSectionsI18n<{
       page: ListPageCopy;
       table: CoreTableCopy;
       actions: ListActionsCopy;
       toast: ListToastCopy;
-      status: StatusCopy;
       rpcErrors: CoreRpcErrorsCopy;
     }>('adminEvents', {
       page: 'list.page',
       table: 'list.table',
       actions: 'list.actions',
       toast: 'list.toast',
-      status: 'status',
       rpcErrors: 'rpcErrors',
     });
 
@@ -44,7 +42,6 @@ export function createEventCoreListI18n() {
     table,
     actions,
     toast,
-    status,
     rpcErrors,
     moreLocations: (count: number): string => transloco.translate<string>(
       'adminEvents.list.table.moreLocations',
@@ -52,6 +49,7 @@ export function createEventCoreListI18n() {
     ),
     commonActions: createCommonActionsI18n(),
     commonErrors: createCommonErrorsI18n(),
+    commonEntityStatuses: createCommonEntityStatusesI18n(),
     commonLabels: createCommonLabelsI18n(),
     commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),

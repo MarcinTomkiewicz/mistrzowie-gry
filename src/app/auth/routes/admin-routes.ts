@@ -1,4 +1,5 @@
 import type { Routes } from '@angular/router';
+import type { EventGlobalDraftWizard } from '../components/admin-events/core-editor/event-global-draft-wizard';
 
 import { authGuard } from '../../core/guards/auth.guard';
 import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
@@ -56,6 +57,8 @@ const loaders = {
     import('../components/admin-events/core-editor/core-editor').then(
       (m) => m.EventCoreEditor,
     ),
+  eventGlobalDraftWizard: () =>
+    import('../components/admin-events/core-editor/event-global-draft-wizard').then((m) => m.EventGlobalDraftWizard),
   eventEditionEditor: () =>
     import('../components/admin-events/edition-editor/event-edition-editor').then(
       (m) => m.EventEditionEditor,
@@ -109,7 +112,8 @@ const adminChildren: Routes = [
   },
   {
     path: 'content/events/new',
-    loadComponent: loaders.eventCoreEditor,
+    loadComponent: loaders.eventGlobalDraftWizard,
+    canDeactivate: [(wizard: EventGlobalDraftWizard) => wizard.canDeactivate()],
   },
   {
     path: 'content/events/:coreId/edit',

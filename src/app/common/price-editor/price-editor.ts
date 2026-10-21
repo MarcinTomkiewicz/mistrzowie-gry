@@ -50,7 +50,9 @@ export class PriceEditor {
 
     return BILLING_UNITS.map((value) => ({
       value,
-      label: value === 'event' ? this.labels().event : labels[value],
+      label: value === 'event' || value === 'session'
+        ? this.labels()[value]
+        : labels[value],
     }));
   });
   protected readonly percentageBasisOptions = computed(() => {

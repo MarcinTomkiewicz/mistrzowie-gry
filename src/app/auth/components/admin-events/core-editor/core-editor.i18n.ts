@@ -1,78 +1,97 @@
+import { computed } from '@angular/core';
+
 import {
   createCommonActionsI18n,
   createCommonFormI18n,
   createCommonErrorsI18n,
+  createCommonEntityStatusesI18n,
   createCommonLabelsI18n,
+  createCommonPriceI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
   createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
-import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
-import {
+import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import type { EventPriceBasis } from '../../../../core/interfaces/i-admin-global-event';
+import type { EventGlobalDraftCopy } from '../../../../core/types/i18n/event-global-draft';
+import type {
   CoreRpcErrorsCopy,
   EditionTableCopy,
   EditionsCopy,
   EditorFieldsCopy,
+  EditorValidationCopy,
+  EditionValidationCopy,
+  OccurrencesCopy,
   EditorActionsCopy,
   EditorPageCopy,
   EditorToastCopy,
-  EditorValidationCopy,
   OccurrenceTableCopy,
-  StatusCopy,
+  ParticipantKindCopy,
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventCoreEditorI18n() {
   const {
     page,
     fields,
-    validation,
     editions,
     editionTable,
     occurrenceTable,
     actions,
     toast,
-    status,
     rpcErrors,
   } = createScopedSectionsI18n<{
     page: EditorPageCopy;
     fields: EditorFieldsCopy;
-    validation: EditorValidationCopy;
     editions: EditionsCopy;
     editionTable: EditionTableCopy;
     occurrenceTable: OccurrenceTableCopy;
     actions: EditorActionsCopy;
     toast: EditorToastCopy;
-    status: StatusCopy;
     rpcErrors: CoreRpcErrorsCopy;
   }>('adminEvents', {
     page: 'editor.page',
     fields: 'editor.fields',
-    validation: 'editor.validation',
     editions: 'editor.editions',
     editionTable: 'editor.editionTable',
     occurrenceTable: 'editionEditor.occurrenceTable',
     actions: 'editor.actions',
     toast: 'editor.toast',
-    status: 'status',
     rpcErrors: 'rpcErrors',
   });
 
+  const commonPrice = createCommonPriceI18n();
+
   return {
+    creation: createScopedObjectI18n<EventGlobalDraftCopy>('adminEvents', 'editor.creation'),
+    creationSteps: createScopedObjectI18n<EventGlobalDraftCopy['steps']>('adminEvents', 'editor.creation.steps'),
+    priceBases: computed<Record<EventPriceBasis, string>>(() => {
+      const units = commonPrice().presentation.units;
+      return {
+        per_participant: units.participant,
+        per_session: units.session,
+        per_group: units.group,
+        per_event: units.whole_event,
+      };
+    }),
+    validation: createScopedObjectI18n<EditorValidationCopy>('adminEvents', 'editor.validation'),
+    editionValidation: createScopedObjectI18n<EditionValidationCopy>('adminEvents', 'editionEditor.validation'),
+    occurrences: createScopedObjectI18n<OccurrencesCopy>('adminEvents', 'editionEditor.occurrences'),
+    participantKinds: createScopedObjectI18n<ParticipantKindCopy>('adminEvents', 'editionEditor.participantKinds'),
     page,
     fields,
-    validation,
     editions,
     editionTable,
     occurrenceTable,
     actions,
     toast,
-    status,
     rpcErrors,
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonErrors: createCommonErrorsI18n(),
+    commonEntityStatuses: createCommonEntityStatusesI18n(),
     commonLabels: createCommonLabelsI18n(),
+    commonPrice,
     commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),

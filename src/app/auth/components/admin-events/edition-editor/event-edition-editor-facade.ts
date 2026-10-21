@@ -1,10 +1,11 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import {
   Observable, catchError, defer, finalize, forkJoin, map, of, switchMap, tap,
   throwError,
 } from 'rxjs';
 
 import { buildPublicEventPath, isPublicEventSlug } from '../../../../core/configs/events.config';
+import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
 import type {
   EventEditionSaveResult, EventPublishResult, IAdminEventDetail,
   IEventCoreDetail, IEventSavePayload,
@@ -20,12 +21,22 @@ export class EventEditionEditorFacade {
   private readonly operation = signal<'save' | 'publish' | null>(null);
   private readonly notFound = signal(false);
   private readonly publishResult = signal<EventPublishResult | null>(null);
+  private readonly timelineState = signal<AdminEventTimeline | null>(null);
+  private readonly timelineFailure = signal<unknown>(null);
+  private readonly timelineLoading = signal(false);
+  private readonly timelineVersion = signal(0);
 
   readonly core = this.coreState.asReadonly();
   readonly edition = this.editionState.asReadonly();
   readonly isLoading = this.loading.asReadonly();
   readonly isNotFound = this.notFound.asReadonly();
   readonly publicationResult = this.publishResult.asReadonly();
+  readonly timeline = computed(() => {
+    const timeline = this.timelineState();
+    return timeline?.eventId === this.edition()?.id ? timeline : null;
+  });
+  readonly timelineError = this.timelineFailure.asReadonly();
+  readonly isTimelineLoading = this.timelineLoading.asReadonly();
   readonly isSaving = computed(() => this.operation() === 'save');
   readonly isPublishing = computed(() => this.operation() === 'publish');
   readonly isBusy = computed(() => this.loading() || this.operation() !== null);
@@ -41,6 +52,43 @@ export class EventEditionEditorFacade {
       isPublicEventSlug(edition.eventCoreKey) && isPublicEventSlug(edition.slug)
       ? buildPublicEventPath(edition.eventCoreKey, edition.slug) : null;
   });
+
+  constructor() {
+    effect((onCleanup) => {
+      const edition = this.edition();
+      this.timelineVersion();
+      this.timelineState.set(null);
+      this.timelineFailure.set(null);
+      this.timelineLoading.set(!!edition);
+      if (!edition) return;
+
+      const subscription = this.admin.getTimeline(edition.id).pipe(
+        map((timeline) => {
+          if (timeline.eventId !== edition.id || timeline.eventCoreId !== edition.eventCoreId) {
+            throw new Error('[EVENT_TIMELINE] Inconsistent Edition readback.');
+          }
+          return timeline;
+        }),
+        finalize(() => {
+          if (this.edition() === edition) this.timelineLoading.set(false);
+        }),
+      ).subscribe({
+        next: (timeline) => {
+          if (this.edition() === edition) this.timelineState.set(timeline);
+        },
+        error: (error: unknown) => {
+          if (this.edition() === edition) this.timelineFailure.set(error);
+        },
+      });
+      onCleanup(() => subscription.unsubscribe());
+    });
+  }
+
+  reloadTimeline(): void {
+    if (this.edition() && !this.isBusy() && !this.isTimelineLoading()) {
+      this.timelineVersion.update((version) => version + 1);
+    }
+  }
 
   reset(): void {
     this.coreState.set(null);

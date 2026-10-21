@@ -17,6 +17,7 @@ import {
   CommonTableTranslations,
   CommonValuesTranslations,
 } from '../types/i18n/common';
+import type { CommonEntityStatusesTranslations, CommonStatusPhrasesTranslations } from '../types/i18n/entity-statuses';
 import type { RichContentEditorTranslations } from '../types/i18n/rich-content-editor';
 import type { PriceTranslations } from '../types/i18n/price';
 import { AppRoleLabels } from '../types/app-role';
@@ -50,6 +51,14 @@ export function createCommonDurationUnitI18n() {
 
 export function createCommonEmptyI18n() {
   return createCommonScopeSignal<CommonEmptyTranslations>('empty');
+}
+
+export function createCommonEntityStatusesI18n() {
+  return createCommonScopeSignal<CommonEntityStatusesTranslations>('entityStatuses');
+}
+
+export function createCommonStatusPhrasesI18n() {
+  return createCommonScopeSignal<CommonStatusPhrasesTranslations>('statusPhrases');
 }
 
 export function createCommonErrorsI18n() {

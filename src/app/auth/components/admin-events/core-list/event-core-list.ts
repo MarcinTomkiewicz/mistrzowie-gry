@@ -42,7 +42,7 @@ export class EventCoreList {
   );
 
   protected readonly rowVms = computed(() => {
-    const status = this.i18n.status();
+    const status = this.i18n.commonEntityStatuses();
     const commonValues = this.i18n.commonValues();
     const table = this.i18n.table();
 
@@ -55,7 +55,7 @@ export class EventCoreList {
       moreLocationsLabel: remainingCityCount > 0
         ? this.i18n.moreLocations(remainingCityCount)
         : null,
-      activeLabel: core.isActive ? commonValues.active : status.inactive,
+      activeLabel: core.isActive ? status.active.neuter : status.inactive.neuter,
       activeBadgeClass: core.isActive
         ? 'tag-badge tag-badge--success'
         : 'tag-badge tag-badge--muted',

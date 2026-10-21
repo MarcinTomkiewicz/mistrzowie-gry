@@ -10,6 +10,13 @@ import {
 } from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
+import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
+import type {
+  AdminEffectivePolicyResult,
+  AdminGlobalCalendarResult,
+  CreateAdminGlobalEventPayload,
+  CreateAdminGlobalEventResult,
+} from '../../interfaces/i-admin-global-event';
 import {
   EventEditionSaveResult,
   EventPublishResult,
@@ -50,6 +57,21 @@ export class EventAdmin {
     });
   }
 
+  createGlobalEvent(requestId: string, payload: CreateAdminGlobalEventPayload): Observable<CreateAdminGlobalEventResult> {
+    return this.backend.rpc<CreateAdminGlobalEventResult>(EVENT_RPC.createGlobalEvent, {
+      p_request_id: requestId,
+      p_payload: payload,
+    });
+  }
+
+  getGlobalCalendar(coreId: string): Observable<AdminGlobalCalendarResult> {
+    return this.backend.rpc<AdminGlobalCalendarResult>(EVENT_RPC.getGlobalCalendar, { p_core_id: coreId });
+  }
+
+  getEffectivePolicy(coreId: string): Observable<AdminEffectivePolicyResult> {
+    return this.backend.rpc<AdminEffectivePolicyResult>(EVENT_RPC.getEffectivePolicy, { p_core_id: coreId });
+  }
+
   setCoreActive(
     coreId: string,
     isActive: boolean,
@@ -75,6 +97,10 @@ export class EventAdmin {
     return this.backend.rpc<IAdminEventDetail>(EVENT_RPC.saveEdition, {
       p_payload: payload,
     });
+  }
+
+  getTimeline(editionId: string): Observable<AdminEventTimeline> {
+    return this.backend.rpc<AdminEventTimeline>(EVENT_RPC.getTimeline, { p_event_id: editionId });
   }
 
   publishStaffingEvent(eventId: string): Observable<EventPublishResult> {

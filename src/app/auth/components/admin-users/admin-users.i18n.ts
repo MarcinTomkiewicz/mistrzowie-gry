@@ -1,5 +1,6 @@
 import {
   createCommonActionsI18n,
+  createCommonEntityStatusesI18n,
   createCommonAppRolesI18n,
   createCommonFormI18n,
   createCommonErrorsI18n,
@@ -49,6 +50,7 @@ export function createAdminUsersI18n() {
     commonLabels: createCommonLabelsI18n(),
     commonNav: createCommonNavI18n(),
     commonActions: createCommonActionsI18n(),
+    commonEntityStatuses: createCommonEntityStatusesI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),

@@ -45,14 +45,6 @@ export class EventEditionOccurrences {
   }
 
   protected occurrenceStatusLabel(status: EventOccurrenceStatus): string {
-    if (status === EventOccurrenceStatus.Published) {
-      return this.i18n().commonValues().published;
-    }
-
-    if (status === EventOccurrenceStatus.Archived) {
-      return this.i18n().commonValues().archived;
-    }
-
     return this.i18n().occurrenceStatuses()[status];
   }
 }

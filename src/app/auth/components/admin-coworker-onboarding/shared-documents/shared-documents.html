@@ -96,7 +96,7 @@
             <div class="flex-col-start-start gap-xs">
               <strong>{{ document.title }}</strong>
               <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]">
-                {{ document.status === 'active' ? i18n.commonValues().active : i18n.commonValues().archived }}
+                {{ document.status === 'active' ? i18n.commonEntityStatuses().active.masculine : i18n.commonValues().archived }}
               </span>
             </div>
             <div class="flex-row-start-center flex-wrap gap-md">

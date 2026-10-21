@@ -48,7 +48,9 @@
     "moveItemUp": "Przesuń element wyżej",
     "moveItemDown": "Przesuń element niżej",
     "removeItem": "Usuń element",
-    "addPrice": "Dodaj cenę"
+    "addPrice": "Dodaj cenę",
+    "activate": "Aktywuj",
+    "deactivate": "Dezaktywuj"
   },
 
   "values": {
@@ -57,7 +59,6 @@
     "notProvided": "Nie podano",
     "notAvailable": "Brak",
     "notApplicable": "Nie dotyczy",
-    "active": "Aktywny",
     "published": "Opublikowano",
     "archived": "Zarchiwizowano",
     "oneTime": "Jednorazowo",
@@ -76,7 +77,6 @@
     "date": "Data",
     "comment": "Komentarz",
     "role": "Rola",
-    "public": "Publiczny",
     "firstName": "Imię",
     "lastName": "Nazwisko",
     "nickname": "Nick",
@@ -108,6 +108,7 @@
     "tableCount": "Liczba stołów",
     "participantCount": "Liczba uczestników",
     "event": "Wydarzenie",
+    "session": "Sesja",
     "forBeginners": "Dla początkujących",
     "amount": "Kwota",
     "lead": "Tekst wiodący",
@@ -137,7 +138,47 @@
     "toLowercase": "do",
     "hours": "Godziny",
     "item": "Pozycja",
-    "section": "Sekcja"
+    "section": "Sekcja",
+    "nextOccurrence": "Najbliższy termin",
+    "location": "Lokalizacja",
+    "publicPage": "Strona publiczna",
+    "longDescription": "Pełny opis",
+    "venueName": "Nazwa miejsca",
+    "venueAddress": "Adres miejsca",
+    "currency": "Waluta",
+    "facebookLink": "Link do Facebooka",
+    "timezone": "Strefa czasowa",
+    "startTime": "Godzina rozpoczęcia",
+    "endTime": "Godzina zakończenia",
+    "cover": "Okładka",
+    "eventDate": "Data wydarzenia",
+    "gmCount": "Liczba Mistrzów Gry",
+    "schedule": "Harmonogram",
+    "dayOfMonth": "Dzień miesiąca",
+    "weekday": "Dzień tygodnia",
+    "weekdays": "Dni tygodnia",
+    "gm": "Prowadzący MG",
+    "editability": "Edytowalność",
+    "summary": "Podsumowanie",
+    "start": "Początek",
+    "end": "Koniec",
+    "participantSignupKind": "Sposób zapisów uczestników",
+    "signupRequired": "Zapisy uczestników wymagane",
+    "signupKind": "Rodzaj zapisów",
+    "scheduleKind": "Rodzaj harmonogramu",
+    "recurrenceKind": "Sposób powtarzania",
+    "interval": "Interwał",
+    "scheduleStart": "Początek harmonogramu",
+    "scheduleEnd": "Koniec harmonogramu",
+    "excludedDates": "Wykluczone daty",
+    "excludedDate": "Wykluczona data",
+    "monthlyNthWeekday": "Miesięcznie - wybrany dzień tygodnia",
+    "monthlyDayOfMonth": "Miesięcznie - wybrany dzień miesiąca",
+    "first": "Pierwszy",
+    "second": "Drugi",
+    "third": "Trzeci",
+    "fourth": "Czwarty",
+    "last": "Ostatni"
   },
 
   "durationUnit": {
@@ -248,7 +289,10 @@
     "consent": {
       "label": "Wyrażam zgodę na kontakt w sprawie zapytania.",
       "required": "Zgoda jest wymagana."
-    }
+    },
+    "invalidDateTime": "Podaj poprawną datę i godzinę.",
+    "invalidDate": "Podaj poprawną datę.",
+    "sameDayTimeRange": "Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia tego samego dnia."
   },
 
   "empty": {
@@ -294,7 +338,9 @@
         "day": "dzień",
         "half_day": "pół dnia",
         "night": "noc",
-        "kilometer": "kilometr"
+        "kilometer": "kilometr",
+        "group": "grupę",
+        "whole_event": "całe wydarzenie"
       },
       "percentageBases": {
         "base_service": "wartości usługi podstawowej",
@@ -313,13 +359,16 @@
         "maxValue": "Maksymalna wartość procentowa",
         "unit": "Jednostka rozliczeniowa",
         "basis": "Podstawa rozliczenia",
-        "note": "Nota cenowa"
+        "note": "Nota cenowa",
+        "perUnit": "Cena za",
+        "description": "Opis ceny"
       },
       "validation": {
         "invalid": "Uzupełnij wymagane informacje o cenie.",
         "invalidRange": "Minimalna kwota nie może być większa od maksymalnej.",
         "invalidPercentage": "Podaj jedną wartość procentową albo pełny zakres.",
-        "noteRequired": "Nota jest wymagana dla tego rodzaju ceny."
+        "noteRequired": "Nota jest wymagana dla tego rodzaju ceny.",
+        "amountMin": "Kwota nie może być mniejsza niż 0."
       },
       "types": {
         "fixed": "Stała kwota",
@@ -330,7 +379,6 @@
         "custom_quote": "Wycena indywidualna"
       },
       "billingUnits": {
-        "session": "Sesja",
         "hour": "Godzina",
         "month": "Miesiąc",
         "package": "Pakiet",
@@ -467,5 +515,127 @@
       "hint": "Jeśli to pomyłka, wróć na stronę główną i spróbuj skorzystać z innej ścieżki.",
       "imageAlt": "Symbol zamkniętego dostępu"
     }
+  },
+
+  "entityStatuses": {
+    "active": {
+      "masculine": "Aktywny",
+      "feminine": "Aktywna",
+      "neuter": "Aktywne",
+      "pluralMasculinePersonal": "Aktywni",
+      "pluralNonMasculinePersonal": "Aktywne"
+    },
+    "inactive": {
+      "masculine": "Nieaktywny",
+      "feminine": "Nieaktywna",
+      "neuter": "Nieaktywne",
+      "pluralMasculinePersonal": "Nieaktywni",
+      "pluralNonMasculinePersonal": "Nieaktywne"
+    },
+    "planned": {
+      "masculine": "Planowany",
+      "feminine": "Planowana",
+      "neuter": "Planowane",
+      "pluralMasculinePersonal": "Planowani",
+      "pluralNonMasculinePersonal": "Planowane"
+    },
+    "draft": {
+      "masculine": "Roboczy",
+      "feminine": "Robocza",
+      "neuter": "Robocze",
+      "pluralMasculinePersonal": "Roboczy",
+      "pluralNonMasculinePersonal": "Robocze"
+    },
+    "pending": {
+      "masculine": "Oczekujący",
+      "feminine": "Oczekująca",
+      "neuter": "Oczekujące",
+      "pluralMasculinePersonal": "Oczekujący",
+      "pluralNonMasculinePersonal": "Oczekujące"
+    },
+    "submitted": {
+      "masculine": "Zgłoszony",
+      "feminine": "Zgłoszona",
+      "neuter": "Zgłoszone",
+      "pluralMasculinePersonal": "Zgłoszeni",
+      "pluralNonMasculinePersonal": "Zgłoszone"
+    },
+    "sent": {
+      "masculine": "Wysłany",
+      "feminine": "Wysłana",
+      "neuter": "Wysłane",
+      "pluralMasculinePersonal": "Wysłani",
+      "pluralNonMasculinePersonal": "Wysłane"
+    },
+    "accepted": {
+      "masculine": "Zaakceptowany",
+      "feminine": "Zaakceptowana",
+      "neuter": "Zaakceptowane",
+      "pluralMasculinePersonal": "Zaakceptowani",
+      "pluralNonMasculinePersonal": "Zaakceptowane"
+    },
+    "approved": {
+      "masculine": "Zatwierdzony",
+      "feminine": "Zatwierdzona",
+      "neuter": "Zatwierdzone",
+      "pluralMasculinePersonal": "Zatwierdzeni",
+      "pluralNonMasculinePersonal": "Zatwierdzone"
+    },
+    "confirmed": {
+      "masculine": "Potwierdzony",
+      "feminine": "Potwierdzona",
+      "neuter": "Potwierdzone",
+      "pluralMasculinePersonal": "Potwierdzeni",
+      "pluralNonMasculinePersonal": "Potwierdzone"
+    },
+    "rejected": {
+      "masculine": "Odrzucony",
+      "feminine": "Odrzucona",
+      "neuter": "Odrzucone",
+      "pluralMasculinePersonal": "Odrzuceni",
+      "pluralNonMasculinePersonal": "Odrzucone"
+    },
+    "withdrawn": {
+      "masculine": "Wycofany",
+      "feminine": "Wycofana",
+      "neuter": "Wycofane",
+      "pluralMasculinePersonal": "Wycofani",
+      "pluralNonMasculinePersonal": "Wycofane"
+    },
+    "published": {
+      "masculine": "Opublikowany",
+      "feminine": "Opublikowana",
+      "neuter": "Opublikowane",
+      "pluralMasculinePersonal": "Opublikowani",
+      "pluralNonMasculinePersonal": "Opublikowane"
+    },
+    "archived": {
+      "masculine": "Zarchiwizowany",
+      "feminine": "Zarchiwizowana",
+      "neuter": "Zarchiwizowane",
+      "pluralMasculinePersonal": "Zarchiwizowani",
+      "pluralNonMasculinePersonal": "Zarchiwizowane"
+    },
+    "public": {
+      "masculine": "Publiczny",
+      "feminine": "Publiczna",
+      "neuter": "Publiczne",
+      "pluralMasculinePersonal": "Publiczni",
+      "pluralNonMasculinePersonal": "Publiczne"
+    },
+    "private": {
+      "masculine": "Prywatny",
+      "feminine": "Prywatna",
+      "neuter": "Prywatne",
+      "pluralMasculinePersonal": "Prywatni",
+      "pluralNonMasculinePersonal": "Prywatne"
+    }
+  },
+
+  "statusPhrases": {
+    "awaitingAcceptance": "Oczekuje na akceptację",
+    "awaitingDecision": "Oczekuje na decyzję",
+    "editable": "Możliwa edycja",
+    "readOnly": "Tylko do odczytu"
   }
 }

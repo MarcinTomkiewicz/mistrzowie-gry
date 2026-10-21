@@ -78,12 +78,7 @@ export class OccurrenceEditor {
       ? [this.occurrence().status]
       : Object.values(EventOccurrenceStatus)).map((value) => ({
       value,
-      label:
-        value === EventOccurrenceStatus.Published
-          ? this.i18n().commonValues().published
-          : value === EventOccurrenceStatus.Archived
-            ? this.i18n().commonValues().archived
-            : this.i18n().occurrenceStatuses()[value],
+      label: this.i18n().occurrenceStatuses()[value],
     })),
   );
   protected readonly participantSignupKindOptions = computed(() =>

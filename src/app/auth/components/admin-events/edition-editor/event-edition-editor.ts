@@ -22,6 +22,7 @@ import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import {
   resolveEventEditionAdminErrorMessage, resolveEventPublicationErrorMessage,
 } from '../event-admin-errors';
+import { EventAdminTimeline } from '../event-admin-timeline/event-admin-timeline';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
 import { EventEditionDetailsEditor } from './event-edition-details-editor';
 import { EventEditionOccurrences } from './event-edition-occurrences/event-edition-occurrences';
@@ -35,7 +36,7 @@ import { EventEditionEditorFacade } from './event-edition-editor-facade';
   imports: [
     ReactiveFormsModule, ButtonModule, MessageModule, RouterLink, LoadingOverlay, Breadcrumbs,
     EventEditionDetailsEditor, EventEditionOccurrences, EventEditionSettingsEditor,
-    EventScheduleEditor, OccurrenceEditor,
+    EventScheduleEditor, OccurrenceEditor, EventAdminTimeline,
   ],
   templateUrl: './event-edition-editor.html',
   providers: [EventEditionEditorFacade, provideTranslocoScope('adminEvents', 'common')],
@@ -66,6 +67,9 @@ export class EventEditionEditor {
   protected readonly privateDraftBlocked = this.facade.privateDraftBlocked;
   protected readonly publicPath = this.facade.publicPath;
   protected readonly publicationResult = this.facade.publicationResult;
+  protected readonly timeline = this.facade.timeline;
+  protected readonly timelineError = this.facade.timelineError;
+  protected readonly isTimelineLoading = this.facade.isTimelineLoading;
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly selectedOccurrence = signal<IAdminOccurrenceListItem | null>(null);
   protected readonly form = createEventEditionForm(this.coreId());
@@ -124,6 +128,10 @@ export class EventEditionEditor {
 
   protected closeOccurrenceEditor(): void {
     this.selectedOccurrence.set(null);
+  }
+
+  protected reloadTimeline(): void {
+    this.facade.reloadTimeline();
   }
 
   protected onOccurrenceSaved(detail: IAdminEventDetail): void {

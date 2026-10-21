@@ -6,7 +6,7 @@ import type {
 } from '../price';
 
 export type PricePresentationTranslations = {
-  units: Record<BillingUnit, string>;
+  units: Record<BillingUnit | 'group' | 'whole_event', string>;
   percentageBases: Record<PercentageBasis, string>;
 };
 
@@ -21,15 +21,18 @@ export type PriceEditorTranslations = {
     unit: string;
     basis: string;
     note: string;
+    perUnit: string;
+    description: string;
   };
   validation: {
     invalid: string;
     invalidRange: string;
     invalidPercentage: string;
     noteRequired: string;
+    amountMin: string;
   };
   types: Record<PriceType, string>;
-  billingUnits: Record<Exclude<BillingUnit, 'event'>, string>;
+  billingUnits: Record<Exclude<BillingUnit, 'event' | 'session'>, string>;
   percentageBases: Pick<Record<PercentageBasis, string>, 'base_service'>;
   actualCostBases: Record<ActualCostBasis, string>;
 };

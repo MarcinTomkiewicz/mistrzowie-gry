@@ -7,9 +7,6 @@ export type ListPageCopy = {
 };
 
 export type CoreTableCopy = {
-  nextOccurrence: string;
-  location: string;
-  publicPage: string;
   noUpcomingOccurrences: string;
   noLocation: string;
   moreLocations: string;
@@ -17,8 +14,6 @@ export type CoreTableCopy = {
 
 export type ListActionsCopy = {
   createCore: string;
-  activateCore: string;
-  deactivateCore: string;
 };
 
 export type ListToastCopy = {
@@ -35,12 +30,14 @@ export type EditorPageCopy = {
   subtitle: string;
   loadErrorTitle: string;
   notFoundTitle: string;
+};
+
+export type EditionEditorPageCopy = EditorPageCopy & {
   notFoundDescription: string;
 };
 
 export type EditorFieldsCopy = {
   coreSectionTitle: string;
-  longDescription: string;
   hasPublicPage: string;
 };
 
@@ -56,7 +53,6 @@ export type EditionsCopy = {
 };
 
 export type EditionTableCopy = {
-  active: string;
   defaultPublic: string;
 };
 
@@ -68,10 +64,6 @@ export type EditorToastCopy = {
   saveSuccessSummary: string;
   saveSuccessDetail: string;
   saveFailedSummary: string;
-};
-
-export type StatusCopy = {
-  inactive: string;
 };
 
 export type CoreRpcErrorsCopy = {
@@ -88,24 +80,12 @@ export type EditionSectionsCopy = {
   venueAndPrice: string;
   publication: string;
   signup: string;
-  cover: string;
 };
 
 export type EditionFieldsCopy = {
   slug: string;
-  venueName: string;
-  venueAddress: string;
-  priceCurrency: string;
-  priceLabel: string;
   coverPreviewAlt: string;
-  facebookLink: string;
-  isActive: string;
   isDefaultPublic: string;
-  timezone: string;
-  startTime: string;
-  endTime: string;
-  participantSignupKind: string;
-  signupRequired: string;
   defaultSlotCapacity: string;
   defaultParticipantCapacity: string;
 };
@@ -113,8 +93,6 @@ export type EditionFieldsCopy = {
 export type EditionValidationCopy = {
   slugPattern: string;
   citySlugSource: string;
-  priceAmountMin: string;
-  timeRange: string;
   slotCapacityRange: string;
   participantCapacityMin: string;
 };
@@ -148,7 +126,6 @@ export type OccurrencesCopy = {
 };
 
 export type OccurrenceTableCopy = {
-  slotCapacity: string;
   hostSignupWindow: string;
   participantSignupWindow: string;
   programItemCount: string;
@@ -160,9 +137,6 @@ export type OccurrenceDialogCopy = {
 };
 
 export type OccurrenceFieldsCopy = {
-  date: string;
-  slotCapacity: string;
-  participantSignupKind: string;
   hostSignupWindow: string;
   hostSignupOpensAt: string;
   hostSignupClosesAt: string;
@@ -172,13 +146,12 @@ export type OccurrenceFieldsCopy = {
 };
 
 export type OccurrenceValidationCopy = {
-  timestamp: string;
   hostSignupRange: string;
   participantSignupRange: string;
 };
 
-export type OccurrenceStatusCopy = Record<
-  Exclude<EventOccurrenceStatus, 'published' | 'archived'>,
+export type OccurrenceSignupStatusCopy = Record<
+  Exclude<EventOccurrenceStatus, 'planned' | 'published' | 'archived'>,
   string
 >;
 
@@ -212,33 +185,13 @@ export type EditionRpcErrorsCopy = {
 };
 
 export type ScheduleFieldsCopy = {
-  sectionTitle: string;
-  kind: string;
-  date: string;
   dates: string;
-  recurrenceKind: string;
-  interval: string;
-  byweekday: string;
-  monthlyNth: string;
-  monthlyWeekday: string;
-  dayOfMonth: string;
-  startDate: string;
-  endDate: string;
-  exdates: string;
-  exdate: string;
 };
 
 export type ScheduleOptionsCopy = {
   single: string;
   recurring: string;
   exactDates: string;
-  monthlyNthWeekday: string;
-  monthlyDayOfMonth: string;
-  first: string;
-  second: string;
-  third: string;
-  fourth: string;
-  last: string;
 };
 
 export type ScheduleValidationCopy = {
@@ -253,7 +206,6 @@ export type ScheduleValidationCopy = {
   monthlyWeekday: string;
   dayOfMonth: string;
   intervalMin: string;
-  exdate: string;
 };
 
 export type ScheduleInfoCopy = {

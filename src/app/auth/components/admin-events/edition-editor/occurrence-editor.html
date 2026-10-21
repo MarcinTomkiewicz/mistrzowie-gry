@@ -17,7 +17,7 @@
   >
     <div class="flex-col-start-stretch gap-xs w-100">
       <span class="small-caps">
-        {{ i18n().occurrenceFields().date }}
+        {{ i18n().commonLabels().eventDate }}
       </span>
       <strong>
         {{ formatDateLabel(occurrence().date, "pl-PL", true) }}
@@ -66,7 +66,7 @@
             appendTo="body"
           />
           <label for="occurrence-participant-signup-kind">
-            {{ i18n().occurrenceFields().participantSignupKind }}
+            {{ i18n().commonLabels().signupKind }}
           </label>
         </p-iftalabel>
         @if (
@@ -89,7 +89,7 @@
             [max]="12"
           />
           <label for="occurrence-slot-capacity">
-            {{ i18n().occurrenceFields().slotCapacity }}
+            {{ i18n().commonLabels().gmCount }}
           </label>
         </p-iftalabel>
         @if (
@@ -154,7 +154,7 @@
             form.controls.hostSignupOpensAt.hasError("validDate")
           ) {
             <small class="mg-contact-error">
-              {{ i18n().occurrenceValidation().timestamp }}
+              {{ i18n().commonForm().invalidDateTime }}
             </small>
           }
         </div>
@@ -183,7 +183,7 @@
             form.controls.hostSignupClosesAt.hasError("validDate")
           ) {
             <small class="mg-contact-error">
-              {{ i18n().occurrenceValidation().timestamp }}
+              {{ i18n().commonForm().invalidDateTime }}
             </small>
           }
         </div>
@@ -228,7 +228,7 @@
             form.controls.participantSignupOpensAt.hasError("validDate")
           ) {
             <small class="mg-contact-error">
-              {{ i18n().occurrenceValidation().timestamp }}
+              {{ i18n().commonForm().invalidDateTime }}
             </small>
           }
         </div>
@@ -257,7 +257,7 @@
             form.controls.participantSignupClosesAt.hasError("validDate")
           ) {
             <small class="mg-contact-error">
-              {{ i18n().occurrenceValidation().timestamp }}
+              {{ i18n().commonForm().invalidDateTime }}
             </small>
           }
         </div>

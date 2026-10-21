@@ -92,7 +92,7 @@
           formControlName="venueName"
         />
         <label for="event-edition-venue-name">
-          {{ translations.fields().venueName }}
+          {{ translations.commonLabels().venueName }}
         </label>
       </p-iftalabel>
 
@@ -104,7 +104,7 @@
           formControlName="venueAddress"
         />
         <label for="event-edition-venue-address">
-          {{ translations.fields().venueAddress }}
+          {{ translations.commonLabels().venueAddress }}
         </label>
       </p-iftalabel>
     </div>
@@ -131,7 +131,7 @@
           editionForm.controls.priceAmount.hasError("min")
         ) {
           <small class="mg-contact-error">
-            {{ translations.validation().priceAmountMin }}
+            {{ translations.commonPrice().editor.validation.amountMin }}
           </small>
         }
       </div>
@@ -145,7 +145,7 @@
             formControlName="priceCurrency"
           />
           <label for="event-edition-price-currency">
-            {{ translations.fields().priceCurrency }}
+            {{ translations.commonLabels().currency }}
           </label>
         </p-iftalabel>
 
@@ -167,7 +167,7 @@
           formControlName="priceLabel"
         />
         <label for="event-edition-price-label">
-          {{ translations.fields().priceLabel }}
+          {{ translations.commonPrice().editor.fields.description }}
         </label>
       </p-iftalabel>
     </div>
@@ -175,7 +175,7 @@
 
   <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ translations.sections().cover }}
+      {{ translations.commonLabels().cover }}
     </h2>
 
     @if (isNew()) {

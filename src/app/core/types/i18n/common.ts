@@ -51,6 +51,8 @@ export type CommonActionsTranslations = {
   moveItemDown: string;
   removeItem: string;
   addPrice: string;
+  activate: string;
+  deactivate: string;
 };
 
 export type CommonValuesTranslations = {
@@ -59,7 +61,6 @@ export type CommonValuesTranslations = {
   notProvided: string;
   notAvailable: string;
   notApplicable: string;
-  active: string;
   published: string;
   archived: string;
   oneTime: string;
@@ -78,7 +79,6 @@ export type CommonLabelsTranslations = {
   date: string;
   comment: string;
   role: string;
-  public: string;
   firstName: string;
   lastName: string;
   nickname: string;
@@ -110,6 +110,7 @@ export type CommonLabelsTranslations = {
   tableCount: string;
   participantCount: string;
   event: string;
+  session: string;
   forBeginners: string;
   amount: string;
   lead: string;
@@ -140,6 +141,46 @@ export type CommonLabelsTranslations = {
   hours: string;
   item: string;
   section: string;
+  nextOccurrence: string;
+  location: string;
+  publicPage: string;
+  longDescription: string;
+  venueName: string;
+  venueAddress: string;
+  currency: string;
+  facebookLink: string;
+  timezone: string;
+  startTime: string;
+  endTime: string;
+  cover: string;
+  eventDate: string;
+  gmCount: string;
+  schedule: string;
+  dayOfMonth: string;
+  weekday: string;
+  weekdays: string;
+  gm: string;
+  editability: string;
+  summary: string;
+  start: string;
+  end: string;
+  participantSignupKind: string;
+  signupRequired: string;
+  signupKind: string;
+  scheduleKind: string;
+  recurrenceKind: string;
+  interval: string;
+  scheduleStart: string;
+  scheduleEnd: string;
+  excludedDates: string;
+  excludedDate: string;
+  monthlyNthWeekday: string;
+  monthlyDayOfMonth: string;
+  first: string;
+  second: string;
+  third: string;
+  fourth: string;
+  last: string;
 };
 
 export type CommonDurationUnitTranslations = {
@@ -281,6 +322,9 @@ export type CommonFormFileUploadTranslations = {
 export type CommonFormTranslations = {
   required: string;
   invalidEmail: string;
+  invalidDateTime: string;
+  invalidDate: string;
+  sameDayTimeRange: string;
   minLength: string;
   maxLength: string;
   invalid: string;

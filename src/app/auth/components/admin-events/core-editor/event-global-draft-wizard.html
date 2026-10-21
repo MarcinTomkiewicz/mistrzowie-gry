@@ -1,0 +1,54 @@
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+    <app-breadcrumbs [items]="breadcrumbs()" />
+    <header class="mg-section__header w-100">
+      <h1 class="mg-section__title">{{ i18n.page().createTitle }}</h1>
+    </header>
+    <app-loading-overlay [visible]="isSaving()" [label]="i18n.commonStatus().saving" />
+    <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="draft.form" (ngSubmit)="submit()" novalidate>
+      <p-stepper class="d-block w-100" [value]="activeStep()" [linear]="false" (valueChange)="goToStep($event)">
+        <p-step-list class="w-100">
+          @for (step of steps(); track step.value) {
+            <p-step class="min-w-0" [value]="step.value"
+              [disabled]="step.value > activeStep() || isSaving() || draft.state() !== 'idle'">{{ step.label }}</p-step>
+          }
+        </p-step-list>
+        <p-step-panels>
+          @for (step of steps(); track step.value) {
+            <p-step-panel [value]="step.value">
+              <ng-template #content>
+                @if (activeStep() === step.value) {
+                  @if (step.value < 5) {
+                    <app-event-global-draft-fields [form]="draft.form" [step]="step.value" />
+                  } @else {
+                    <app-event-global-draft-review [form]="draft.form" />
+                  }
+                }
+              </ng-template>
+            </p-step-panel>
+          }
+        </p-step-panels>
+      </p-stepper>
+      @if (!isSaving() && draft.state() !== 'idle') {
+        <p-message severity="warn">{{ draft.state() === 'created' ? i18n.creation().created : i18n.creation().uncertain }}</p-message>
+      }
+      <div class="flex-row-between-center flex-col-start-stretch-sm flex-wrap gap-sm border-top pt-md w-100">
+        <p-button type="button" severity="secondary" size="small" [outlined]="true"
+          [label]="i18n.commonActions().cancel" icon="pi pi-interdiction"
+          [disabled]="isSaving() || draft.state() === 'uncertain'" (onClick)="cancel()" />
+        <div class="flex-row-end-center flex-wrap gap-sm">
+          <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-arrow-left"
+            [label]="i18n.commonActions().previous" [disabled]="activeStep() === 1 || isSaving() || draft.state() !== 'idle'"
+            (onClick)="goToStep(activeStep() - 1)" />
+          @if (activeStep() < 5) {
+            <p-button type="button" severity="success" size="small" icon="pi pi-arrow-right" iconPos="right"
+              [label]="i18n.commonActions().next" [disabled]="isSaving()" (onClick)="goToStep(activeStep() + 1)" />
+          } @else {
+            <p-button type="submit" severity="success" size="small" icon="pi pi-save"
+              [label]="saveLabel()" [loading]="isSaving()" [disabled]="isSaving()" />
+          }
+        </div>
+      </div>
+    </form>
+  </div>
+</section>

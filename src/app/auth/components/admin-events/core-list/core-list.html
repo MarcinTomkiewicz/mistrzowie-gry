@@ -57,16 +57,16 @@
               {{ i18n.commonLabels().event }}
             </th>
             <th class="small-caps" scope="col">
-              {{ i18n.table().nextOccurrence }}
+              {{ i18n.commonLabels().nextOccurrence }}
             </th>
             <th class="small-caps" scope="col">
-              {{ i18n.table().location }}
+              {{ i18n.commonLabels().location }}
             </th>
             <th class="small-caps text-center" scope="col">
               {{ i18n.commonLabels().status }}
             </th>
             <th class="small-caps text-center" scope="col">
-              {{ i18n.table().publicPage }}
+              {{ i18n.commonLabels().publicPage }}
             </th>
             <th class="small-caps text-right" scope="col">
               {{ i18n.commonTable().actions }}
@@ -81,7 +81,7 @@
             </th>
             <td class="mg-responsive-table__cell">
               <span class="mg-responsive-table__label small-caps font-bold">
-                {{ i18n.table().nextOccurrence }}
+                {{ i18n.commonLabels().nextOccurrence }}
               </span>
               <span class="mg-responsive-table__value">
                 {{ row.nextOccurrenceLabel }}
@@ -89,7 +89,7 @@
             </td>
             <td class="mg-responsive-table__cell">
               <span class="mg-responsive-table__label small-caps font-bold">
-                {{ i18n.table().location }}
+                {{ i18n.commonLabels().location }}
               </span>
               <div class="mg-responsive-table__value flex-col-start-start gap-xs">
                 @for (city of row.visibleCities; track city) {
@@ -112,7 +112,7 @@
             </td>
             <td class="mg-responsive-table__cell text-center">
               <span class="mg-responsive-table__label small-caps font-bold">
-                {{ i18n.table().publicPage }}
+                {{ i18n.commonLabels().publicPage }}
               </span>
               <span class="mg-responsive-table__value">
                 <span [class]="row.publicPageBadgeClass">{{ row.publicPageLabel }}</span>
@@ -144,8 +144,8 @@
                     severity="danger"
                     [outlined]="true"
                     styleClass="square-7 p-0"
-                    [ariaLabel]="i18n.actions().deactivateCore"
-                    [pTooltip]="i18n.actions().deactivateCore"
+                    [ariaLabel]="i18n.commonActions().deactivate"
+                    [pTooltip]="i18n.commonActions().deactivate"
                     tooltipPosition="top"
                     tooltipEvent="both"
                     icon="pi pi-settle"
@@ -160,8 +160,8 @@
                     size="small"
                     severity="success"
                     styleClass="square-7 p-0"
-                    [ariaLabel]="i18n.actions().activateCore"
-                    [pTooltip]="i18n.actions().activateCore"
+                    [ariaLabel]="i18n.commonActions().activate"
+                    [pTooltip]="i18n.commonActions().activate"
                     tooltipPosition="top"
                     tooltipEvent="both"
                     icon="pi pi-lever"

@@ -14,7 +14,7 @@
           formControlName="isActive"
         />
         <label for="event-edition-is-active">
-          {{ i18n().fields().isActive }}
+          {{ i18n().commonEntityStatuses().active.feminine }}
         </label>
       </div>
 
@@ -50,7 +50,7 @@
           formControlName="timezone"
         />
         <label for="event-edition-timezone">
-          {{ i18n().fields().timezone }}
+          {{ i18n().commonLabels().timezone }}
         </label>
       </p-iftalabel>
 
@@ -75,7 +75,7 @@
             formControlName="startTime"
           />
           <label for="event-edition-start-time">
-            {{ i18n().fields().startTime }}
+            {{ i18n().commonLabels().startTime }}
           </label>
         </p-iftalabel>
 
@@ -99,7 +99,7 @@
             formControlName="endTime"
           />
           <label for="event-edition-end-time">
-            {{ i18n().fields().endTime }}
+            {{ i18n().commonLabels().endTime }}
           </label>
         </p-iftalabel>
 
@@ -121,14 +121,14 @@
           formControlName="facebookLink"
         />
         <label for="event-edition-facebook-link">
-          {{ i18n().fields().facebookLink }}
+          {{ i18n().commonLabels().facebookLink }}
         </label>
       </p-iftalabel>
     </div>
 
     @if (form().touched && form().hasError("timeRange")) {
       <small class="mg-contact-error">
-        {{ i18n().validation().timeRange }}
+        {{ i18n().commonForm().sameDayTimeRange }}
       </small>
     }
   </section>
@@ -149,7 +149,7 @@
           optionValue="value"
         />
         <label for="event-edition-participant-signup-kind">
-          {{ i18n().fields().participantSignupKind }}
+          {{ i18n().commonLabels().participantSignupKind }}
         </label>
       </p-iftalabel>
 
@@ -159,7 +159,7 @@
           formControlName="signupRequired"
         />
         <label for="event-edition-signup-required">
-          {{ i18n().fields().signupRequired }}
+          {{ i18n().commonLabels().signupRequired }}
         </label>
       </div>
     </div>

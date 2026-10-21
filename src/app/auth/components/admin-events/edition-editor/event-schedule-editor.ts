@@ -71,21 +71,21 @@ export class EventScheduleEditor implements OnInit {
     },
     {
       value: 'MONTHLY_NTH_WEEKDAY',
-      label: this.i18n.options().monthlyNthWeekday,
+      label: this.i18n.commonLabels().monthlyNthWeekday,
     },
     {
       value: 'MONTHLY_DAY_OF_MONTH',
-      label: this.i18n.options().monthlyDayOfMonth,
+      label: this.i18n.commonLabels().monthlyDayOfMonth,
     },
   ]);
   protected readonly monthlyNthOptions = computed<
     ISelectOption<EventMonthlyNth>[]
   >(() => [
-    { value: 1, label: this.i18n.options().first },
-    { value: 2, label: this.i18n.options().second },
-    { value: 3, label: this.i18n.options().third },
-    { value: 4, label: this.i18n.options().fourth },
-    { value: -1, label: this.i18n.options().last },
+    { value: 1, label: this.i18n.commonLabels().first },
+    { value: 2, label: this.i18n.commonLabels().second },
+    { value: 3, label: this.i18n.commonLabels().third },
+    { value: 4, label: this.i18n.commonLabels().fourth },
+    { value: -1, label: this.i18n.commonLabels().last },
   ]);
   protected readonly weekdayOptions = getWeekdayLabels('pl-PL', 1).map(
     (label, index) => ({

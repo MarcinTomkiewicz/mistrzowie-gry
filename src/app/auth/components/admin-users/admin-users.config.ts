@@ -168,12 +168,13 @@ export function createAdminUsersFilterSelectFieldVms(
   filters: AdminUsersFiltersTranslations,
   labels: CommonLabelsTranslations,
   roleLabels: AppRoleLabels,
+  publicLabel: string,
 ): AdminUsersFilterSelectFieldVm[] {
   return ADMIN_USERS_FILTER_SELECT_FIELDS.map((field) => ({
     controlName: field.controlName,
     inputId: field.inputId,
     reloadOnChange: field.reloadOnChange,
-    label: getAdminUsersFilterLabel(field.controlName, filters, labels),
+    label: getAdminUsersFilterLabel(field.controlName, filters, labels, publicLabel),
     options: field.options.map((value) => ({
       value,
       label: getAdminUsersFilterOptionLabel(
@@ -182,6 +183,7 @@ export function createAdminUsersFilterSelectFieldVms(
         filters,
         labels,
         roleLabels,
+        publicLabel,
       ),
     })),
   }));
@@ -191,10 +193,11 @@ function getAdminUsersFilterLabel(
   controlName: AdminUsersFilterSelectControlName,
   filters: AdminUsersFiltersTranslations,
   labels: CommonLabelsTranslations,
+  publicLabel: string,
 ): string {
   if (controlName === 'role') return labels.role;
   if (controlName === 'profile') return labels.gmProfile;
-  if (controlName === 'public') return labels.public;
+  if (controlName === 'public') return publicLabel;
   if (controlName === 'sortBy') return filters.sortLabel;
   return filters.sortOrderLabel;
 }
@@ -205,6 +208,7 @@ function getAdminUsersFilterOptionLabel(
   filters: AdminUsersFiltersTranslations,
   labels: CommonLabelsTranslations,
   roleLabels: AppRoleLabels,
+  publicLabel: string,
 ): string {
   switch (controlName) {
     case 'role': {
@@ -220,7 +224,7 @@ function getAdminUsersFilterOptionLabel(
       break;
     case 'public':
       if (value === 'all') return filters.publicAll;
-      if (value === 'public') return labels.public;
+      if (value === 'public') return publicLabel;
       if (value === 'not_public') return filters.publicHidden;
       break;
     case 'sortBy':

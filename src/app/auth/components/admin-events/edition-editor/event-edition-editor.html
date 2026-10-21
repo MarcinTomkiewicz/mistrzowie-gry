@@ -105,7 +105,7 @@
               <div class="tag-badges">
                 <span class="tag-badge" [class.tag-badge--success]="loadedEdition.currentlyPublic"
                   [class.tag-badge--muted]="!loadedEdition.currentlyPublic">
-                  {{ loadedEdition.currentlyPublic ? i18n.publication().public : i18n.publication().private }}
+                  {{ loadedEdition.currentlyPublic ? i18n.commonEntityStatuses().public.neuter : i18n.commonEntityStatuses().private.neuter }}
                 </span>
                 <span class="tag-badge tag-badge--muted">
                   {{ loadedEdition.isStaffingReleased ? i18n.publication().released : i18n.publication().unreleased }}
@@ -165,6 +165,13 @@
             [i18n]="i18n"
             [disabled]="isBusy()"
             (edit)="editOccurrence($event)"
+          />
+          <app-event-admin-timeline
+            [timeline]="timeline()"
+            [loading]="isTimelineLoading()"
+            [error]="timelineError()"
+            [disabled]="isBusy()"
+            (reload)="reloadTimeline()"
           />
         }
 
