@@ -54,7 +54,7 @@ const loaders = {
       (m) => m.EventCoreList,
     ),
   eventCoreEditor: () =>
-    import('../components/admin-events/core-editor/core-editor').then(
+    import('../components/admin-events/core-editor/event-core-editor').then(
       (m) => m.EventCoreEditor,
     ),
   eventGlobalDraftWizard: () =>

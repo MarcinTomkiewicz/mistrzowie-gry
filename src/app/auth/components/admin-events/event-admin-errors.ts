@@ -19,8 +19,6 @@ export function resolveEventCoreAdminErrorMessage(
   switch (error.code) {
     case '42501':
       return copy.forbidden;
-    case 'P0002':
-      return copy.notFound;
     case '22023':
     case '22P02':
       return copy.invalid;

@@ -135,7 +135,8 @@
                 <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh"
                   [label]="i18n.commonActions().refresh" [disabled]="isBusy() || hasUnsavedChanges()"
                   (onClick)="loadScreenData()" />
-                <a [routerLink]="['/admin/content/events', coreId(), 'edit']">{{ i18n.publication().editCore }}</a>
+                <a [routerLink]="['/admin/content/events', coreId(), 'edit']"
+                  [queryParams]="{ editCore: 1 }">{{ i18n.publication().editCore }}</a>
                 @if (publicPath(); as path) {
                   <a [routerLink]="path" target="_blank" rel="noopener">{{ i18n.publication().publicLink }}</a>
                 }

@@ -76,8 +76,7 @@ export class EventEditionEditor {
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: this.i18n.commonNav().eventsManagement, path: '/admin/content/events' },
-    { label: this.core()?.name ?? this.i18n.commonLabels().event,
-      path: `/admin/content/events/${this.coreId()}/edit` },
+    { label: this.core()?.name ?? this.i18n.commonLabels().event },
     { label: this.isNew() ? this.i18n.page().createTitle
       : this.edition()?.city ?? this.i18n.page().editTitle },
   ]);
@@ -244,7 +243,7 @@ export class EventEditionEditor {
 
   protected goBack(): void {
     if (!this.isBusy()) {
-      void this.router.navigate(['/admin/content/events', this.coreId(), 'edit']);
+      void this.router.navigate(['/admin/content/events']);
     }
   }
 

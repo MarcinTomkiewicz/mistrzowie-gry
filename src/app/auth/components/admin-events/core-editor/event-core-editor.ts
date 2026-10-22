@@ -8,7 +8,7 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { finalize } from 'rxjs';
+import { finalize, from, ignoreElements, of, switchMap, tap } from 'rxjs';
 
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
@@ -16,6 +16,7 @@ import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
+import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
@@ -36,7 +37,8 @@ export class EventCoreEditor {
   private readonly eventAdmin = inject(EventAdmin);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
-  private readonly coreId = inject(ActivatedRoute).snapshot.paramMap.get('coreId') ?? '';
+  private readonly route = inject(ActivatedRoute);
+  private readonly coreId = this.route.snapshot.paramMap.get('coreId') ?? '';
   protected readonly globalDraft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly core = signal<IEventCoreDetail | null>(null);
@@ -64,14 +66,32 @@ export class EventCoreEditor {
 
   protected loadCore(): void {
     this.isLoading.set(true);
+    this.core.set(null);
     this.loadErrorMessage.set(null);
     this.isNotFound.set(false);
     this.globalDraft.readCore(this.coreId)
-      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isLoading.set(false)))
+      .pipe(
+        switchMap((core) => {
+          const editionId = this.globalDraft.staffingEditionId();
+          const editCore = this.route.snapshot.queryParamMap.get('editCore') === '1';
+          if (core === null || editionId === null || editCore) return of(core);
+          return from(this.router.navigate(
+            ['/admin/content/events', core.id, 'editions', editionId, 'edit'],
+            { replaceUrl: true },
+          )).pipe(
+            tap((navigated) => {
+              if (!navigated) throw new Error('[EVENT_CORE_EDITOR] Staffing Edition navigation failed.');
+            }),
+            ignoreElements(),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isLoading.set(false)),
+      )
       .subscribe({
         next: (core) => {
           this.core.set(core);
-          this.isNotFound.set(!core);
+          this.isNotFound.set(core === null);
           if (core && !this.globalDraft.calendar()) this.populateForm(core);
         },
         error: (error: unknown) => {
@@ -96,7 +116,9 @@ export class EventCoreEditor {
     this.eventAdmin.saveCore({
       id: current.id, key: current.key, name: value.name.trim(),
       shortDescription: normalizeText(value.shortDescription), longDescription: normalizeText(value.longDescription),
-      isActive: value.isActive, hasPublicPage: value.hasPublicPage, displayOrder: current.displayOrder,
+      isActive: value.isActive,
+      hasPublicPage: this.globalDraft.isUnreleasedStaffing() ? current.hasPublicPage : value.hasPublicPage,
+      displayOrder: current.displayOrder,
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isSaving.set(false))).subscribe({
       next: (core) => {
         this.core.set(core);
@@ -119,6 +141,7 @@ export class EventCoreEditor {
       key: core.key, name: core.name, shortDescription: core.shortDescription ?? '',
       longDescription: core.longDescription ?? '', isActive: core.isActive, hasPublicPage: core.hasPublicPage,
     });
+    setControlEnabled(this.form.controls.hasPublicPage, !this.globalDraft.isUnreleasedStaffing());
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }

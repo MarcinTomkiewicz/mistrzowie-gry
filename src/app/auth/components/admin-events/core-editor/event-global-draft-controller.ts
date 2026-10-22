@@ -23,6 +23,8 @@ export class EventGlobalDraftController {
   readonly result = signal<CreateAdminGlobalEventResult | null>(null);
   readonly calendar = signal<AdminGlobalCalendarResult | null>(null);
   readonly policy = signal<AdminEffectivePolicyResult | null>(null);
+  readonly staffingEditionId = signal<string | null>(null);
+  readonly isUnreleasedStaffing = signal(false);
 
   constructor() {
     this.form.controls.priceAmount.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.syncPolicyControls());
@@ -33,29 +35,56 @@ export class EventGlobalDraftController {
     return defer(() => {
       this.calendar.set(null);
       this.policy.set(null);
+      this.staffingEditionId.set(null);
+      this.isUnreleasedStaffing.set(false);
       return this.eventAdmin.getCoreDetail(coreId).pipe(switchMap((core) => {
-        if (!core) return of(null);
-        return this.eventAdmin.getGlobalCalendar(coreId).pipe(switchMap((calendar) => {
-          const createdHere = this.result()?.coreId === coreId;
-          if (calendar.coreId !== coreId || (createdHere && calendar.calendarLifecycle !== 'global')) {
-            throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global calendar readback.');
-          }
-          if (calendar.calendarLifecycle !== 'global') return of(core);
-          if (!calendar.cities.some((city) => city.editionId === calendar.mainEditionId && city.isMain)) {
-            throw new Error('[EVENT_GLOBAL_DRAFT] Global calendar main city is missing.');
-          }
-          return this.eventAdmin.getEffectivePolicy(coreId).pipe(map((policy) => {
-            if (policy.coreId !== coreId || policy.lifecycle !== 'global' || policy.mainEditionId !== calendar.mainEditionId ||
-              !policy.editions.some((edition) => edition.editionId === calendar.mainEditionId && edition.isMain)) {
-              throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global policy readback.');
-            }
-            this.calendar.set(calendar);
-            this.policy.set(policy);
-            return core;
-          }));
+        if (core === null) return of(null);
+        if (core.id !== coreId) {
+          throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Core readback.');
+        }
+        return this.readStaffingEditionId(core).pipe(switchMap((editionId) => {
+          this.staffingEditionId.set(editionId);
+          return editionId ? of(core) : this.readGlobalCalendar(core);
         }));
       }));
     });
+  }
+
+  private readStaffingEditionId(core: IEventCoreDetail): Observable<string | null> {
+    if (core.editions.length !== 1) return of(null);
+    const { id } = core.editions[0];
+    return this.eventAdmin.getEditionDetail(id).pipe(
+      map((edition) => {
+        if (!edition || edition.id !== id || edition.eventCoreId !== core.id) {
+          throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Edition readback.');
+        }
+        const isStaffingConverted = edition.isStaffingConverted === true;
+        this.isUnreleasedStaffing.set(isStaffingConverted && !edition.isStaffingReleased);
+        return isStaffingConverted ? edition.id : null;
+      }),
+    );
+  }
+
+  private readGlobalCalendar(core: IEventCoreDetail): Observable<IEventCoreDetail> {
+    return this.eventAdmin.getGlobalCalendar(core.id).pipe(switchMap((calendar) => {
+      const createdHere = this.result()?.coreId === core.id;
+      if (calendar.coreId !== core.id || (createdHere && calendar.calendarLifecycle !== 'global')) {
+        throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global calendar readback.');
+      }
+      if (calendar.calendarLifecycle !== 'global') return of(core);
+      if (!calendar.cities.some((city) => city.editionId === calendar.mainEditionId && city.isMain)) {
+        throw new Error('[EVENT_GLOBAL_DRAFT] Global calendar main city is missing.');
+      }
+      return this.eventAdmin.getEffectivePolicy(core.id).pipe(map((policy) => {
+        if (policy.coreId !== core.id || policy.lifecycle !== 'global' || policy.mainEditionId !== calendar.mainEditionId ||
+          !policy.editions.some((edition) => edition.editionId === calendar.mainEditionId && edition.isMain)) {
+          throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global policy readback.');
+        }
+        this.calendar.set(calendar);
+        this.policy.set(policy);
+        return core;
+      }));
+    }));
   }
 
   create(): Observable<IEventCoreDetail> {
