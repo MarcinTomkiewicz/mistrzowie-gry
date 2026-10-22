@@ -1,12 +1,13 @@
 import {
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
   input,
   output,
-  signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -14,7 +15,7 @@ import { DialogModule } from 'primeng/dialog';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { finalize, map, switchMap, tap } from 'rxjs';
+import { finalize, type Observable } from 'rxjs';
 
 import { EventOccurrenceStatus } from '../../../../core/enums/event';
 import {
@@ -27,7 +28,6 @@ import {
   IAdminOccurrenceListItem,
 } from '../../../../core/interfaces/i-event-admin';
 import { ISelectOption } from '../../../../core/interfaces/i-select-option';
-import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel } from '../../../../core/utils/date';
 import {
@@ -36,6 +36,7 @@ import {
 } from '../event-admin-errors';
 import { createParticipantSignupKindOptions } from '../participant-signup-kind-options';
 import { createEventEditionEditorI18n } from './edition-editor.i18n';
+import { OccurrenceEditorController, type OccurrenceWriteResult } from './occurrence-editor-controller';
 
 @Component({
   selector: 'app-occurrence-editor',
@@ -50,9 +51,11 @@ import { createEventEditionEditorI18n } from './edition-editor.i18n';
     SelectModule,
   ],
   templateUrl: './occurrence-editor.html',
+  providers: [OccurrenceEditorController],
 })
 export class OccurrenceEditor {
-  private readonly eventAdmin = inject(EventAdmin);
+  private readonly controller = inject(OccurrenceEditorController);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly toast = inject(UiToast);
 
   readonly eventId = input.required<string>();
@@ -69,7 +72,16 @@ export class OccurrenceEditor {
     () => this.timezone(),
     () => this.occurrence(),
   );
-  protected readonly isSaving = signal(false);
+  protected readonly isSaving = this.controller.isSaving;
+  protected readonly isBusy = this.controller.isBusy;
+  protected readonly isChangingSignup = this.controller.isChangingSignup;
+  protected readonly participantSignupOpen = computed(() =>
+    this.occurrence().status === EventOccurrenceStatus.ParticipantSignupOpen);
+  protected readonly canChangeSignupState = computed(() => {
+    const status = this.occurrence().status;
+    return status === EventOccurrenceStatus.Published || status === EventOccurrenceStatus.ParticipantSignupOpen ||
+      status === EventOccurrenceStatus.ParticipantSignupClosed;
+  });
   protected readonly formatDateLabel = formatDateLabel;
   protected readonly statusOptions = computed<
     ISelectOption<EventOccurrenceStatus>[]
@@ -96,7 +108,7 @@ export class OccurrenceEditor {
   }
 
   protected close(): void {
-    if (!this.isSaving()) {
+    if (!this.isBusy()) {
       this.closed.emit();
     }
   }
@@ -108,7 +120,7 @@ export class OccurrenceEditor {
   }
 
   protected saveOccurrence(): void {
-    if (this.form.invalid || this.isSaving()) {
+    if (this.form.invalid || this.isBusy()) {
       this.form.markAllAsTouched();
 
       if (this.form.invalid) {
@@ -121,58 +133,40 @@ export class OccurrenceEditor {
       return;
     }
 
-    this.isSaving.set(true);
-    let occurrenceSaved = false;
+    this.runWrite(this.controller.save(this.eventId(),
+      mapEventOccurrenceFormToPayload(this.form, this.occurrence(), this.timezone())), 'save');
+  }
 
-    this.eventAdmin
-      .saveOccurrence(
-        mapEventOccurrenceFormToPayload(
-          this.form,
-          this.occurrence(),
-          this.timezone(),
-        ),
-      )
-      .pipe(
-        tap(() => {
-          occurrenceSaved = true;
-        }),
-        switchMap(() => this.eventAdmin.getEditionDetail(this.eventId())),
-        map((detail) => {
-          if (!detail) {
-            throw new Error(
-              `[OCCURRENCE_EDITOR] Missing event detail "${this.eventId()}" after saving occurrence "${this.occurrence().id}".`,
-            );
-          }
+  protected changeParticipantSignupState(): void {
+    if (this.isBusy() || this.form.dirty || !this.canChangeSignupState()) return;
+    this.runWrite(this.controller.setParticipantSignupState(
+      this.eventId(), this.occurrence().id, !this.participantSignupOpen()), 'signup');
+  }
 
-          return detail;
-        }),
-        finalize(() => this.isSaving.set(false)),
-      )
-      .subscribe({
-        next: (detail) => {
-          this.toast.success({
-            summary: this.i18n().occurrenceToast().saveSuccessSummary,
-            detail: this.i18n().occurrenceToast().saveSuccessDetail,
-          });
-          this.saved.emit(detail);
-        },
-        error: (error) => {
-          this.toast.danger({
-            summary: occurrenceSaved
-              ? this.i18n().occurrenceToast().reloadFailedSummary
-              : this.i18n().occurrenceToast().saveFailedSummary,
-            detail: occurrenceSaved
-              ? resolveEventEditionAdminErrorMessage(
-                  error,
-                  this.i18n().rpcErrors(),
-                  this.i18n().commonErrors().concurrentModification,
-                )
-              : resolveEventOccurrenceAdminErrorMessage(
-                  error,
-                  this.i18n().occurrenceRpcErrors(),
-                ),
-          });
-        },
-      });
+  private runWrite(request: Observable<OccurrenceWriteResult>, operation: 'save' | 'signup'): void {
+    this.form.disable({ emitEvent: false });
+    request.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.form.enable({ emitEvent: false })),
+    ).subscribe((result) => {
+      const copy = this.i18n().occurrenceToast();
+      if (result.kind === 'updated') {
+        this.toast.success({
+          summary: operation === 'save' ? copy.saveSuccessSummary
+            : this.i18n().occurrenceStatuses()[result.occurrence.status],
+          detail: operation === 'save' ? copy.saveSuccessDetail : undefined,
+        });
+        this.saved.emit(result.detail);
+        return;
+      }
+      const summary = operation === 'save'
+        ? result.confirmed ? copy.reloadFailedSummary : copy.saveFailedSummary
+        : result.confirmed ? copy.signupReloadFailedSummary : copy.signupChangeFailedSummary;
+      const detail = result.confirmed
+        ? resolveEventEditionAdminErrorMessage(result.error, this.i18n().rpcErrors(), this.i18n().commonErrors().concurrentModification)
+        : resolveEventOccurrenceAdminErrorMessage(result.error, this.i18n().occurrenceRpcErrors());
+      if (result.confirmed) this.toast.warn({ summary, detail });
+      else this.toast.danger({ summary, detail });
+    });
   }
 }

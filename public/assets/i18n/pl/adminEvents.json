@@ -214,7 +214,10 @@
       "hostSignupClosesAt": "Zamknięcie zapisów Mistrzów Gry",
       "participantSignupWindow": "Zapisy uczestników",
       "participantSignupOpensAt": "Otwarcie zapisów uczestników",
-      "participantSignupClosesAt": "Zamknięcie zapisów uczestników"
+      "participantSignupClosesAt": "Zamknięcie zapisów uczestników",
+      "openParticipantSignup": "Otwórz zapisy uczestników",
+      "closeParticipantSignup": "Zamknij zapisy uczestników",
+      "saveBeforeSignupChange": "[PH] Zapisz zmiany formularza przed zmianą stanu zapisów uczestników."
     },
     "validation": {
       "hostSignupRange": "Zamknięcie zapisów Mistrzów Gry musi być późniejsze niż ich otwarcie.",
@@ -230,7 +233,9 @@
       "saveSuccessSummary": "Termin zapisany!",
       "saveSuccessDetail": "Zmiany terminu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać terminu!",
-      "reloadFailedSummary": "Termin zapisano, ale nie udało się odświeżyć lokalnej edycji"
+      "reloadFailedSummary": "Termin zapisano, ale nie udało się odświeżyć lokalnej edycji",
+      "signupChangeFailedSummary": "[PH] Nie udało się potwierdzić zmiany stanu zapisów uczestników",
+      "signupReloadFailedSummary": "[PH] Stan zapisów potwierdzono, ale nie udało się odświeżyć lokalnej edycji"
     }
   },
   "occurrenceRpcErrors": {
@@ -292,6 +297,10 @@
     "loadFailed": "[PH] Nie udało się odczytać programu",
     "eventHours": "[PH] Godziny wydarzenia",
     "participationEnded": "[PH] Udział MG zakończony",
+    "participantsEmpty": "[PH] Brak aktywnych zapisów na tę sesję.",
+    "participantRemoveConfirm": "[PH] Usunąć uczestnika z tej sesji? Zwolni to jego miejsce.",
+    "participantRemoveFailed": "[PH] Nie udało się potwierdzić usunięcia zapisu",
+    "participantsRefreshFailed": "[PH] Zapis anulowano, ale nie udało się odświeżyć danych. Odśwież listę uczestników i program.",
     "sources": {
       "staffing": "[PH] Plan Staffingu",
       "manual": "[PH] Ręczne przypisanie",

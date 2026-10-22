@@ -18,6 +18,8 @@ import type {
   CreateAdminGlobalEventResult,
 } from '../../interfaces/i-admin-global-event';
 import {
+  AdminEventProgramParticipants,
+  AdminParticipantSignupState,
   EventEditionSaveResult,
   EventPublishResult,
   EventProgramReconciliationResult,
@@ -101,6 +103,12 @@ export class EventAdmin {
 
   getTimeline(editionId: string): Observable<AdminEventTimeline> {
     return this.backend.rpc<AdminEventTimeline>(EVENT_RPC.getTimeline, { p_event_id: editionId });
+  }
+
+  getProgramParticipants(programItemId: string): Observable<AdminEventProgramParticipants> {
+    return this.backend.rpc<AdminEventProgramParticipants>(EVENT_RPC.getProgramParticipants, {
+      p_program_item_id: programItemId,
+    });
   }
 
   publishStaffingEvent(eventId: string): Observable<EventPublishResult> {
@@ -191,6 +199,13 @@ export class EventAdmin {
   ): Observable<IAdminOccurrence> {
     return this.backend.rpc<IAdminOccurrence>(EVENT_RPC.saveOccurrence, {
       p_payload: payload,
+    });
+  }
+
+  setParticipantSignupState(occurrenceId: string, open: boolean): Observable<AdminParticipantSignupState> {
+    return this.backend.rpc<AdminParticipantSignupState>(EVENT_RPC.setParticipantSignupState, {
+      p_occurrence_id: occurrenceId,
+      p_open: open,
     });
   }
 }

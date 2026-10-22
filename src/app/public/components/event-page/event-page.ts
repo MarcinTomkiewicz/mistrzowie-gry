@@ -10,7 +10,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { map, type Observable } from 'rxjs';
 
 import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
@@ -24,7 +23,6 @@ import { Platform } from '../../../core/services/platform/platform';
 import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
 import { Storage } from '../../../core/services/storage/storage';
-import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import type { BreadcrumbItem } from '../../../core/types/breadcrumb';
 import type { RouteTabDefinition } from '../../../core/types/route-tab';
 import { formatDateLabel } from '../../../core/utils/date';
@@ -62,7 +60,6 @@ export class EventPage implements OnInit {
   private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
-  private readonly confirm = inject(UiConfirm);
   private readonly signup = inject(EventParticipantSignupFacade);
 
   protected readonly facade = inject(EventPageFacade);
@@ -195,21 +192,8 @@ export class EventPage implements OnInit {
       .subscribe(() => this.reload());
   }
 
-  canDeactivate(): boolean | Observable<boolean> {
-    if (this.signup.isSubmitting()) return false;
-    if (!this.signup.hasGuestReceipt()) return true;
-    const receiptVisible = this.signup.dialog() !== null;
-    if (receiptVisible && !this.signup.canAcknowledgeReceipt()) return false;
-    const discardReceipt = this.signup.prepareGuestReceiptDiscard();
-    return this.confirm.modalDecision({
-      header: this.i18n.signup().title,
-      message: receiptVisible ? this.i18n.signup().leaveConfirmation
-        : this.i18n.signup().discardHiddenReceiptConfirmation,
-      acceptLabel: this.i18n.actions().confirm,
-      rejectLabel: this.i18n.actions().cancel,
-    }).pipe(map((accepted) => accepted && !this.destroyRef.destroyed &&
-      receiptVisible === (this.signup.dialog() !== null) &&
-      (!receiptVisible || this.signup.canAcknowledgeReceipt()) && discardReceipt()));
+  canDeactivate(): boolean {
+    return !this.signup.isSubmitting();
   }
 
   protected reload(): void {

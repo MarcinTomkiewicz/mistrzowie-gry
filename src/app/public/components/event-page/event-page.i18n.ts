@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 
+import { PUBLIC_CONTACT_EMAIL } from '../../../core/config/site';
 import {
   createCommonActionsI18n,
   createCommonCtaI18n,
@@ -36,6 +37,9 @@ export function createEventPageI18n() {
     ),
     remainingSeats: (count: number): string => transloco.translate<string>(
       'eventPage.participantSignup.remainingSeats', { count },
+    ),
+    cancellationContact: (phone: string): string => transloco.translate<string>(
+      'eventPage.participantSignup.cancellationContact', { email: PUBLIC_CONTACT_EMAIL, phone },
     ),
     errors: createCommonErrorsI18n(),
     labels: createCommonLabelsI18n(),

@@ -3,9 +3,9 @@
   [modal]="true"
   [visible]="true"
   [header]="i18n().occurrenceDialog().title"
-  [closable]="!isSaving()"
-  [closeOnEscape]="!isSaving()"
-  [dismissableMask]="!isSaving()"
+  [closable]="!isBusy()"
+  [closeOnEscape]="!isBusy()"
+  [dismissableMask]="!isBusy()"
   [draggable]="false"
   (visibleChange)="onVisibleChange($event)"
 >
@@ -202,6 +202,14 @@
       <h3 class="mg-section__title mg-section__title--sm m-0">
         {{ i18n().occurrenceFields().participantSignupWindow }}
       </h3>
+      @if (canChangeSignupState()) {
+        <div class="flex-col-start-start gap-xs">
+          <p-button type="button" size="small" severity="secondary" [outlined]="true"
+            [label]="participantSignupOpen() ? i18n().occurrenceFields().closeParticipantSignup : i18n().occurrenceFields().openParticipantSignup"
+            [loading]="isChangingSignup()" [disabled]="isBusy() || form.dirty" (onClick)="changeParticipantSignupState()" />
+          @if (form.dirty) { <small class="muted-text">{{ i18n().occurrenceFields().saveBeforeSignupChange }}</small> }
+        </div>
+      }
       <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
         <div class="flex-col-start-stretch gap-xs w-100">
           <p-iftalabel class="w-100">
@@ -279,7 +287,7 @@
         [outlined]="true"
         [label]="i18n().commonActions().cancel"
         icon="pi pi-interdiction"
-        [disabled]="isSaving()"
+        [disabled]="isBusy()"
         (onClick)="close()"
       />
       <p-button
@@ -288,6 +296,7 @@
         [label]="i18n().commonActions().save"
         icon="pi pi-save"
         [loading]="isSaving()"
+        [disabled]="isBusy()"
       />
     </div>
   </form>

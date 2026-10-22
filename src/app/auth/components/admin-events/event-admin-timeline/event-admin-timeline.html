@@ -3,7 +3,7 @@
   <header class="flex-row-between-center flex-wrap gap-sm w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
     <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
-      [label]="i18n.actions().refresh" [disabled]="disabled() || loading()" (onClick)="reload.emit()" />
+      [label]="i18n.actions().refresh" [disabled]="disabled() || loading()" (onClick)="refresh()" />
   </header>
   <app-loading-overlay [visible]="loading()" [label]="i18n.status().loading" />
 
@@ -14,7 +14,7 @@
         <p class="m-0">{{ message }}</p>
         <div class="flex-row-start-center">
           <p-button type="button" size="small" severity="secondary" icon="pi pi-refresh"
-            [label]="i18n.actions().retry" [disabled]="disabled()" (onClick)="reload.emit()" />
+            [label]="i18n.actions().retry" [disabled]="disabled()" (onClick)="refresh()" />
         </div>
       </div>
     } @else if (timeline(); as data) {
@@ -43,6 +43,17 @@
                       <strong>{{ entry.title }}</strong>
                       @if (entry.row.slotLabel && entry.row.slotLabel !== entry.title) {
                         <small class="d-block muted-text">{{ entry.row.slotLabel }}</small>
+                      }
+                      @if (entry.participantProgramItemId; as programItemId) {
+                        @let state = participants().get(programItemId);
+                        <div class="flex-row-start-center mt-sm">
+                          <button pButton type="button" size="small" severity="secondary" [outlined]="true"
+                            [disabled]="disabled() || loading()" [attr.aria-expanded]="expandedProgramItemId() === programItemId"
+                            [attr.aria-controls]="'event-program-participants-' + programItemId" (click)="toggleParticipants(programItemId)">
+                            <i pButtonIcon [class]="expandedProgramItemId() === programItemId ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+                            <span pButtonLabel>{{ i18n.labels().participants }} ({{ expandedProgramItemId() === programItemId && state && state.kind === 'ready' ? state.data.activeCount : entry.row.activeBookings }})</span>
+                          </button>
+                        </div>
                       }
                     </th>
                     <td class="mg-responsive-table__cell">
@@ -85,6 +96,64 @@
                       </div>
                     </td>
                   </tr>
+                  @if (entry.participantProgramItemId; as programItemId) {
+                    @if (expandedProgramItemId() === programItemId) {
+                      @let state = participants().get(programItemId);
+                      <tr class="mg-responsive-table__group-row">
+                        <td colspan="6" class="mg-responsive-table__cell mg-responsive-table__cell--actions">
+                          <section [id]="'event-program-participants-' + programItemId"
+                            class="mg-responsive-table__value flex-col-start-stretch gap-sm w-100 min-w-0"
+                            [attr.aria-label]="i18n.labels().participants" [attr.aria-busy]="state?.kind === 'loading'">
+                            @if (state?.kind === 'loading') {
+                              <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p>
+                            } @else if (state?.kind === 'error') {
+                              <div class="flex-col-start-start gap-sm" role="alert">
+                                <p class="m-0">{{ i18n.errors().generic }}</p>
+                                <p-button type="button" size="small" severity="secondary" icon="pi pi-refresh"
+                                  [label]="i18n.actions().retry" [disabled]="disabled()" (onClick)="reloadParticipants(programItemId)" />
+                              </div>
+                            } @else if (state && state.kind === 'ready') {
+                              <div class="w-100 overflow-x-auto">
+                                <p-table [value]="state.data.registrations" dataKey="registrationId" size="small"
+                                  class="w-100" tableStyleClass="mg-responsive-table">
+                                  <ng-template #header>
+                                    <tr class="hide-down-sm">
+                                      <th scope="col" class="small-caps">{{ i18n.labels().name }}</th>
+                                      <th scope="col" class="small-caps">{{ i18n.labels().phoneNumber }}</th>
+                                      <th scope="col" class="small-caps text-right w-px-0 text-nowrap">{{ i18n.table().actions }}</th>
+                                    </tr>
+                                  </ng-template>
+                                  <ng-template #body let-participant>
+                                    <tr class="mg-responsive-table__row">
+                                      <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">{{ participant.displayName }}</th>
+                                      <td class="mg-responsive-table__cell">
+                                        @if (participant.contactPhone; as phone) {
+                                          <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.labels().phoneNumber }}</span>
+                                          <span class="mg-responsive-table__value text-wrap-anywhere">{{ phone }}</span>
+                                        }
+                                      </td>
+                                      <td class="mg-responsive-table__cell w-px-0 w-px-auto-sm">
+                                        <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.table().actions }}</span>
+                                        <div class="mg-responsive-table__value flex-row-end-center">
+                                          <p-button type="button" size="small" severity="danger" [outlined]="true"
+                                            [label]="i18n.actions().delete" [ariaLabel]="i18n.actions().delete + ' - ' + participant.displayName"
+                                            [loading]="removingParticipantId() === participant.registrationId" [disabled]="disabled() || removingParticipantId() !== null"
+                                            (onClick)="confirmRemoval($event, programItemId, participant.registrationId)" />
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  </ng-template>
+                                  <ng-template #emptymessage>
+                                    <tr><td colspan="3"><p class="m-0 muted-text" role="status">{{ copy.participantsEmpty }}</p></td></tr>
+                                  </ng-template>
+                                </p-table>
+                              </div>
+                            }
+                          </section>
+                        </td>
+                      </tr>
+                    }
+                  }
                 </ng-template>
               </p-table>
             </div>

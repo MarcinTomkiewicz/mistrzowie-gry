@@ -23,6 +23,8 @@ export type EventPageParticipantSignupTranslations = {
   remainingSeats: string;
   availabilityError: string;
   confirmed: string;
+  confirmedSession: string;
+  cancellationContact: string;
   unavailable: string;
   unknownResult: string;
   registrationNumber: string;

@@ -11,16 +11,27 @@ import type {
   IEventParticipantRegisterResult,
 } from '../../interfaces/i-event-participant';
 import {
-  assertEdgeContract, createEdgeArrayReader, createEdgeNullableReader, readEdgeBoolean,
-  readEdgeNonNegativeInteger, readEdgeUuid,
+  assertEdgeContract,
+  createEdgeArrayReader,
+  createEdgeLiteralReader,
+  createEdgeNullableReader,
+  readEdgeBoolean,
+  readEdgeNonNegativeInteger,
+  readEdgeUuid,
 } from '../../utils/edge-contract';
 import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
 import { Backend } from '../backend/backend';
 
 const readAvailability = createEdgeArrayReader(createStrictEdgeObjectReader({
-  programItemId: readEdgeUuid,
+  scope: createEdgeLiteralReader(['program_item', 'whole_event']),
   occurrenceId: readEdgeUuid,
+  programItemId: createEdgeNullableReader(readEdgeUuid),
+  availabilityStatus: createEdgeLiteralReader([
+    'available', 'full', 'not_open', 'scheduled', 'closed', 'past', 'unavailable', 'release_disabled',
+  ]),
   canSignup: readEdgeBoolean,
+  capacity: createEdgeNullableReader(readEdgeNonNegativeInteger),
+  isUnlimited: readEdgeBoolean,
   remainingSeats: createEdgeNullableReader(readEdgeNonNegativeInteger),
 }));
 
@@ -32,12 +43,25 @@ export class EventParticipant {
     return this.backend.rpc<unknown>(EVENT_RPC.getPublicParticipantAvailability, {
       p_event_id: eventId,
     }).pipe(map((response) => {
-      const items = readAvailability(response, 'participantAvailability');
+      const items = readAvailability(response, 'participantAvailability')
+        .filter((item) => item.scope === 'program_item');
       assertEdgeContract(
-        items.every((item) => !item.canSignup || (item.remainingSeats !== null && item.remainingSeats > 0)),
-        'participantAvailability', 'positive remaining seats when signup is allowed',
+        items.every((item) => !item.canSignup ||
+          (item.availabilityStatus === 'available' && item.remainingSeats !== null && item.remainingSeats > 0)),
+        'participantAvailability', 'available status and positive remaining seats when signup is allowed',
       );
-      return items;
+      return items.map((item) => {
+        assertEdgeContract(
+          item.programItemId !== null,
+          'participantAvailability.programItemId', 'a UUID for program_item scope',
+        );
+        return {
+          programItemId: item.programItemId,
+          occurrenceId: item.occurrenceId,
+          canSignup: item.canSignup,
+          remainingSeats: item.remainingSeats,
+        };
+      });
     }));
   }
 

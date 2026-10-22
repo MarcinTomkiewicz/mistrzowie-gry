@@ -15,7 +15,7 @@
       </div>
     }
   </header>
-  @if (signup.released) {
+  @if (signup.released()) {
     @if (signup.hasUncertainResults() && !signup.dialog()) {
       <p role="alert">{{ i18n.signup().unknownResult }}</p>
     }
@@ -73,7 +73,7 @@
   }
 </section>
 
-@if (signup.released) {
+@if (signup.released()) {
   <app-event-participant-signup />
 }
 

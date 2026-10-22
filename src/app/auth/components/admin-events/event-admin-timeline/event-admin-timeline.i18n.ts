@@ -1,7 +1,7 @@
 import {
   createCommonActionsI18n, createCommonErrorsI18n, createCommonLabelsI18n,
   createCommonStatusI18n, createCommonValuesI18n, createCommonEntityStatusesI18n,
-  createCommonStatusPhrasesI18n,
+  createCommonStatusPhrasesI18n, createCommonTableI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../../core/translations/scoped.i18n';
 import type { EditionRpcErrorsCopy } from '../../../../core/types/i18n/admin-events';
@@ -18,5 +18,6 @@ export function createEventAdminTimelineI18n() {
     values: createCommonValuesI18n(),
     entityStatuses: createCommonEntityStatusesI18n(),
     statusPhrases: createCommonStatusPhrasesI18n(),
+    table: createCommonTableI18n(),
   };
 }

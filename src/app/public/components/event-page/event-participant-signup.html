@@ -14,15 +14,10 @@
         <span>{{ formatTimeRangeLabel(entry.slot.startTime, entry.slot.endTime) }}</span>
       </div>
       @if (dialog.result; as result) {
-        @if (result.registered) {
-          @let own = signup.ownRegistration();
+        @if (result === 'confirmed') {
           <section class="mg-card flex-col-start-stretch gap-md w-100">
-            <p class="m-0" role="status">{{ own.kind === 'ready' && own.registration.status === 'cancelled' ? i18n.signup().cancelled : i18n.signup().confirmed }}</p>
+            <p class="m-0" role="status">{{ i18n.signup().confirmedSession }}</p>
             <dl class="m-0 flex-col-start-stretch gap-sm">
-              <div class="flex-col-start-stretch gap-xs">
-                <dt>{{ i18n.signup().registrationNumber }}</dt>
-                <dd class="m-0 text-wrap-anywhere">{{ result.registrationId }}</dd>
-              </div>
               <div class="flex-col-start-stretch gap-xs">
                 <dt>{{ i18n.labels().event }}</dt>
                 <dd class="m-0">{{ details.eventName }} - {{ details.edition.city }}</dd>
@@ -38,27 +33,8 @@
                 </div>
               }
             </dl>
-            <p class="m-0">{{ i18n.signup().nextSteps }}</p>
-            @if (signup.confirmationCode(); as code) {
-              <section class="flex-col-start-stretch gap-sm" aria-labelledby="event-participant-code-label">
-                <h3 id="event-participant-code-label" class="mg-section__title mg-section__title--sm m-0">{{ i18n.signup().confirmationCodeLabel }}</h3>
-                <code class="text-wrap-anywhere">{{ code }}</code>
-                <p class="m-0">{{ i18n.signup().confirmationCodeInstructions }}</p>
-                <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-copy"
-                  [label]="i18n.actions().copy" [loading]="isCopying()" [disabled]="isCopying()"
-                  (onClick)="copyConfirmationCode()" />
-              </section>
-            } @else if (signup.isAuthenticated()) {
-              <p class="m-0">{{ i18n.signup().accountNotice }}</p>
-            }
-            @if (own.kind === 'loading') {
-              <p class="muted-text m-0" role="status">{{ i18n.status().loading }}</p>
-            } @else if (own.kind === 'error' || own.kind === 'unavailable') {
-              <div class="flex-col-start-stretch gap-sm" role="alert">
-                <p class="m-0">{{ i18n.signup().ownReadError }}</p>
-                <p-button type="button" size="small" severity="secondary" [outlined]="true"
-                  [label]="i18n.actions().retry" (onClick)="signup.refreshOwnRegistration()" />
-              </div>
+            @if (signup.cancellationPhone(); as phone) {
+              <p class="m-0">{{ i18n.cancellationContact(phone) }}</p>
             }
           </section>
         } @else {

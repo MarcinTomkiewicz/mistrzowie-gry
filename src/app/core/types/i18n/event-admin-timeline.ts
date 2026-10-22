@@ -12,6 +12,10 @@ export type EventAdminTimelineCopy = {
   loadFailed: string;
   eventHours: string;
   participationEnded: string;
+  participantsEmpty: string;
+  participantRemoveConfirm: string;
+  participantRemoveFailed: string;
+  participantsRefreshFailed: string;
   sources: Record<EventTimelineOrigin, string>;
   candidateStates: Record<Exclude<MyStaffingCandidate['state'], 'pending'>, string>;
 };

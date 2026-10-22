@@ -117,6 +117,21 @@ export interface IAdminEventDetail {
   updatedAt: string;
 }
 
+export interface AdminEventProgramParticipant {
+  registrationId: string;
+  displayName: string;
+  contactPhone: string | null;
+  participantKind: 'guest' | 'account';
+  registeredAt: string;
+}
+
+export interface AdminEventProgramParticipants {
+  programItemId: string;
+  occurrenceId: string;
+  activeCount: number;
+  registrations: AdminEventProgramParticipant[];
+}
+
 export interface IEventSavePayload {
   id: string | null;
   eventCoreId: string;
@@ -221,4 +236,14 @@ export interface IOccurrenceSavePayload {
 export interface IAdminOccurrence extends IAdminOccurrenceListItem {
   eventId: string;
   updatedAt: string;
+}
+
+export interface AdminParticipantSignupState {
+  occurrenceId: string;
+  status: EventOccurrenceStatus;
+  participantSignupKind: ParticipantSignupKind;
+  capacityPolicy: 'legacy_shared' | 'independent';
+  participantSignupOpenedAt: string | null;
+  participantSignupOpensAt: string | null;
+  participantSignupClosesAt: string | null;
 }

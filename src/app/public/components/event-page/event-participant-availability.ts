@@ -1,10 +1,10 @@
 import {
-  DestroyRef, Injectable, TransferState, afterNextRender, effect, inject,
+  DestroyRef, Injectable, TransferState, afterNextRender, computed, effect, inject,
   makeStateKey, signal, untracked, type StateKey,
 } from '@angular/core';
 import { Subscription, timer } from 'rxjs';
 
-import { PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED } from '../../../core/configs/events.config';
+import { PUBLIC_EVENT_PARTICIPANT_SIGNUP_CORE_KEY } from '../../../core/configs/events.config';
 import { ParticipantSignupKind } from '../../../core/enums/event';
 import type { IEventParticipantAvailability } from '../../../core/interfaces/i-event-participant';
 import { Auth } from '../../../core/services/auth/auth';
@@ -32,13 +32,18 @@ export class EventParticipantAvailability {
   private readonly clock = signal(Date.now());
   private readonly clientReady = signal(false);
   readonly state = this.availabilityState.asReadonly();
+  readonly released = computed(() => {
+    const page = this.page.state();
+    return page.kind === 'ready' && page.page.core.key === PUBLIC_EVENT_PARTICIPANT_SIGNUP_CORE_KEY;
+  });
 
   constructor() {
     afterNextRender(() => this.clientReady.set(true));
     effect((onCleanup) => {
       const page = this.page.state();
+      const released = this.released();
       untracked(() => {
-        if (PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED && page.kind === 'ready') this.load(page.edition.id, true);
+        if (released && page.kind === 'ready') this.load(page.edition.id, true);
         else this.availabilityState.set({ kind: 'idle' });
       });
       onCleanup(() => this.request?.unsubscribe());
@@ -47,7 +52,7 @@ export class EventParticipantAvailability {
       const page = this.page.state();
       const entries = this.page.selectedProgram();
       const now = this.clock();
-      if (!PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED || !this.clientReady() || page.kind !== 'ready') return;
+      if (!this.released() || !this.clientReady() || page.kind !== 'ready') return;
       const nextStart = Math.min(...entries.flatMap((entry) => {
         const startsAt = entry.kind === 'confirmed' ? this.sessionStartAt(entry, page.edition.timezone) : null;
         return startsAt !== null && startsAt > now ? [startsAt] : [];
@@ -64,7 +69,7 @@ export class EventParticipantAvailability {
     const page = this.page.state();
     const availability = this.state();
     const occurrence = this.page.selectedOccurrence();
-    if (!PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED || !this.clientReady() || !this.auth.isReady() ||
+    if (!this.released() || !this.clientReady() || !this.auth.isReady() ||
       page.kind !== 'ready' || page.edition.participantSignupKind !== ParticipantSignupKind.ProgramItem ||
       availability.kind !== 'ready' || availability.eventId !== page.edition.id || !occurrence) return null;
 
@@ -87,7 +92,7 @@ export class EventParticipantAvailability {
 
   refresh(): void {
     const page = this.page.state();
-    if (PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED && page.kind === 'ready' && this.state().kind !== 'loading') {
+    if (this.released() && page.kind === 'ready' && this.state().kind !== 'loading') {
       this.load(page.edition.id, false);
     }
   }

@@ -22,6 +22,8 @@
     "remainingSeats": "Wolne miejsca: {{count}}",
     "availabilityError": "Nie udało się sprawdzić, czy można się zapisać na sesję.",
     "confirmed": "Zapis został potwierdzony.",
+    "confirmedSession": "Zapisano na sesję",
+    "cancellationContact": "Jeśli chcesz zrezygnować, skontaktuj się z organizatorem: {{email}} lub {{phone}}.",
     "unavailable": "Nie można teraz zapisać się na tę sesję.",
     "unknownResult": "Nie możemy potwierdzić, czy zapis został przyjęty. Nie wysyłaj zgłoszenia ponownie. Skontaktuj się z organizatorem.",
     "registrationNumber": "Numer zapisu",

@@ -21,10 +21,12 @@ export const EVENT_RPC = {
   getEditionList: 'get_admin_event_list',
   getEditionDetail: 'get_admin_event_detail',
   getTimeline: 'get_admin_event_timeline',
+  getProgramParticipants: 'list_admin_event_program_participants',
   publishStaffingEvent: 'publish_admin_staffing_event',
   reconcileStaffingEventProgram: 'reconcile_admin_staffing_event_program',
   saveEdition: 'save_admin_event',
   setEditionActive: 'set_admin_event_active',
 
   saveOccurrence: 'save_admin_event_occurrence',
+  setParticipantSignupState: 'set_admin_event_participant_signup_state',
 } as const;

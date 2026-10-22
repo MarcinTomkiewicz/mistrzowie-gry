@@ -143,6 +143,9 @@ export type OccurrenceFieldsCopy = {
   participantSignupWindow: string;
   participantSignupOpensAt: string;
   participantSignupClosesAt: string;
+  openParticipantSignup: string;
+  closeParticipantSignup: string;
+  saveBeforeSignupChange: string;
 };
 
 export type OccurrenceValidationCopy = {
@@ -160,6 +163,8 @@ export type OccurrenceToastCopy = {
   saveSuccessDetail: string;
   saveFailedSummary: string;
   reloadFailedSummary: string;
+  signupChangeFailedSummary: string;
+  signupReloadFailedSummary: string;
 };
 
 export type OccurrenceRpcErrorsCopy = {

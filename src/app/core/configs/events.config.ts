@@ -6,10 +6,15 @@ export type EventSlug = (typeof EVENT_SLUGS)[keyof typeof EVENT_SLUGS];
 
 export const EVENT_KEYS = {
   chaoticThursdays: 'chaotic-thursdays',
+  pga: 'pga-x-nocne-retro-granie',
 } as const;
 
-// Release stays closed until EFS-014/023 and EFS-022/037 are accepted.
-export const PUBLIC_EVENT_PARTICIPANT_SIGNUP_ENABLED = false;
+// Frontend signup is released only for this Core; backend canSignup remains authoritative.
+export const PUBLIC_EVENT_PARTICIPANT_SIGNUP_CORE_KEY = EVENT_KEYS.pga;
+
+export const EVENT_PARTICIPANT_CONTACT_PHONES: Readonly<Partial<Record<string, string>>> = {
+  [EVENT_KEYS.pga]: '792 314 240',
+};
 
 export const EVENT_CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK', 'SEK', 'NOK', 'DKK'] as const;
 export const EVENT_PRICE_BASES = ['per_participant', 'per_session', 'per_group', 'per_event'] as const;
