@@ -7,7 +7,9 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { formatDateLabel } from '../../../core/utils/date';
+import { normalizePolishPhoneNumber } from '../../../core/utils/phone';
 import { formatTimeRangeLabel } from '../../../core/utils/time-format';
+import { polishPhoneNumberValidator } from '../../../core/validators/polish-phone-number.validator';
 import { requiredTrimmedValidator } from '../../../core/validators/required-trimmed.validator';
 import { createEventPageI18n } from './event-page.i18n';
 import { EventParticipantSignupFacade } from './event-participant-signup-facade';
@@ -25,7 +27,7 @@ export class EventParticipantSignup {
   protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
   protected readonly form = inject(FormBuilder).nonNullable.group({
     guestName: ['', requiredTrimmedValidator()],
-    guestPhone: ['', [Validators.required, Validators.pattern(/^\+[1-9]\d{1,14}$/)]],
+    guestPhone: ['', [Validators.required, polishPhoneNumberValidator()]],
   });
 
   constructor() {
@@ -39,12 +41,16 @@ export class EventParticipantSignup {
 
   protected submit(): void {
     if (!this.signup.canSubmit()) return;
-    const { guestName, guestPhone } = this.form.getRawValue();
-    this.form.setValue({ guestName: guestName.trim(), guestPhone: guestPhone.trim() });
-    if (!this.signup.isAuthenticated() && this.form.invalid) {
+    if (this.signup.isAuthenticated()) {
+      this.signup.register();
+      return;
+    }
+    const guest = this.form.getRawValue();
+    const guestPhone = normalizePolishPhoneNumber(guest.guestPhone);
+    if (this.form.invalid || guestPhone === null) {
       this.form.markAllAsTouched();
       return;
     }
-    this.signup.register(this.form.getRawValue());
+    this.signup.register({ guestName: guest.guestName.trim(), guestPhone });
   }
 }

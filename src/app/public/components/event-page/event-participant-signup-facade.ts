@@ -13,6 +13,7 @@ import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import type { PublicEventConfirmedEntry } from '../../../core/types/public-event-program';
 import { assertEdgeContract, readEdgeNonBlankString, readEdgeUuid } from '../../../core/utils/edge-contract';
+import { normalizePolishPhoneNumber } from '../../../core/utils/phone';
 import { EventPageFacade } from './event-page-facade';
 import { EventParticipantAvailability } from './event-participant-availability';
 import { createEventPageI18n } from './event-page.i18n';
@@ -40,7 +41,7 @@ export class EventParticipantSignupFacade {
   private readonly submitting = signal(false);
   // Uncertain request identities stay in route memory, never in TransferState or storage.
   private readonly uncertainRequests = signal<readonly UncertainRequest[]>([]);
-  private readonly guestPhone = signal('');
+  private readonly guestPhone = signal<string | null>(null);
   private readonly guestHistoryActorKey = signal<string | null>(null);
   private readonly currentUncertainRequests = computed(() => {
     const page = this.page.state();
@@ -99,7 +100,7 @@ export class EventParticipantSignupFacade {
   setGuestPhone(value: string): void {
     const dialog = this.dialog();
     if (dialog && !this.isAuthenticated() && !this.isSubmitting() && !dialog.result) {
-      const phone = value.trim();
+      const phone = normalizePolishPhoneNumber(value);
       this.guestPhone.set(phone);
       // A form reset clears the input, not the identity whose uncertain history is being shown.
       if (phone) this.guestHistoryActorKey.set(`guest:${phone}`);
@@ -127,19 +128,24 @@ export class EventParticipantSignupFacade {
     }
   }
 
-  register(guest: IEventParticipantGuestIdentity): void {
+  register(guest?: IEventParticipantGuestIdentity): void {
     const selection = this.dialog()?.selection;
     if (!this.platform.isBrowser || !selection || this.isSubmitting()) return;
-    if (!this.isAuthenticated()) this.setGuestPhone(guest.guestPhone);
+    const { entry, edition } = selection;
+    let request: IEventParticipantRegisterRequest;
+    if (selection.actorId !== null) {
+      request = { mode: 'authenticated', programItemId: entry.programItemId };
+    } else {
+      if (!guest) return;
+      this.setGuestPhone(guest.guestPhone);
+      const guestPhone = this.guestPhone();
+      if (guestPhone === null) return;
+      request = { mode: 'guest', programItemId: entry.programItemId, guestName: guest.guestName, guestPhone };
+    }
     const actorKey = this.actorKey();
     if (!actorKey || !this.canSubmit() ||
-      !this.availability.forProgramItem(selection.entry.programItemId)?.canSignup) return;
-
-    const { entry, edition } = selection;
+      !this.availability.forProgramItem(entry.programItemId)?.canSignup) return;
     const context: UncertainRequest = { actorKey, eventId: edition.id, programItemId: entry.programItemId };
-    const request: IEventParticipantRegisterRequest = selection.actorId !== null
-      ? { mode: 'authenticated', programItemId: entry.programItemId }
-      : { mode: 'guest', programItemId: entry.programItemId, ...guest };
 
     this.submitting.set(true);
     this.participant.register(request).pipe(
@@ -200,6 +206,6 @@ export class EventParticipantSignupFacade {
 
   private clearDialog(): void {
     this.dialogState.set(null);
-    this.guestPhone.set('');
+    this.guestPhone.set(null);
   }
 }

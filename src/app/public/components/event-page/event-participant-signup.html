@@ -87,7 +87,8 @@
           [label]="i18n.actions().close" [disabled]="signup.isSubmitting()" (onClick)="signup.close()" />
         @if (!dialog.result) {
           <p-button type="submit" severity="success" [label]="i18n.cta().signUp"
-            [loading]="signup.isSubmitting()" [disabled]="!signup.canSubmit()" />
+            [loading]="signup.isSubmitting()"
+            [disabled]="!signup.canSubmit() || (!signup.isAuthenticated() && !form.valid)" />
         }
       </div>
     </form>

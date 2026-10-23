@@ -15,8 +15,8 @@
   "participantSignup": {
     "title": "Zapis na sesję",
     "guestNameLabel": "Imię lub pseudonim uczestnika",
-    "phoneHint": "Podaj numer telefonu w formacie +48123456789.",
-    "invalidPhone": "Podaj numer telefonu z prefiksem kraju, bez spacji.",
+    "phoneHint": "Podaj numer telefonu z prefiksem kraju (np. +48).",
+    "invalidPhone": "Podaj poprawny 9-cyfrowy polski numer telefonu. Prefiks +48 jest opcjonalny.",
     "accountNotice": "Zapis zostanie powiązany z Twoim kontem.",
     "privacyNotice": "Podane dane wykorzystujemy do obsługi zapisu i kontaktu w sprawie sesji.",
     "remainingSeats": "Wolne miejsca: {{count}}",
