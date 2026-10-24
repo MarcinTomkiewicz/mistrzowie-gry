@@ -114,6 +114,17 @@ export interface CreateAdminGlobalEventPayload {
   policy: EventGlobalPolicyInput;
 }
 
+export type AddAdminGlobalEventCityPayload = CreateAdminGlobalEventPayload['mainCity'];
+
+export interface AddAdminGlobalEventCityResult {
+  created: boolean;
+  replayed: boolean;
+  coreId: string;
+  editionId: string;
+  calendar: AdminGlobalCalendarResult;
+  policy: AdminEffectivePolicyResult;
+}
+
 export interface AdminGlobalCalendarResult {
   coreId: string;
   coreKey: string;

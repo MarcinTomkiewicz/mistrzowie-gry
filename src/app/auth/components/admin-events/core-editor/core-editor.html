@@ -69,7 +69,9 @@
       </section>
     } @else if (!isLoading() && core(); as loadedCore) {
       @if (globalDraft.calendar(); as calendar) {
-        <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
+        @if (!globalDraft.cityEditing()) {
+          <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
+        }
         @if (globalDraft.policy(); as policy) {
           <app-event-global-draft-summary [core]="loadedCore" [calendar]="calendar" [policy]="policy" />
         }
@@ -197,7 +199,8 @@
           </div>
         </form>
       }
-      <app-event-core-editions [core]="loadedCore" [legacyEditing]="!globalDraft.calendar()" />
+      <app-event-core-editions [core]="loadedCore" [legacyEditing]="!globalDraft.calendar()"
+        [addCityDisabled]="datedBlocks()?.selectionLocked() ?? false" (cityAdded)="core.set($event)" />
     }
   </div>
 </section>

@@ -34,7 +34,8 @@ import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
   providers: [provideTranslocoScope('adminEvents', 'common'), EventGlobalDraftController],
 })
 export class EventCoreEditor {
-  private readonly datedBlocks = viewChild(EventDatedBlocksEditor);
+  protected readonly datedBlocks = viewChild(EventDatedBlocksEditor);
+  private readonly editions = viewChild(EventCoreEditions);
   private readonly destroyRef = inject(DestroyRef);
   private readonly eventAdmin = inject(EventAdmin);
   private readonly router = inject(Router);
@@ -139,6 +140,7 @@ export class EventCoreEditor {
   }
 
   canDeactivate() {
+    if (this.globalDraft.cityEditing()) return this.editions()?.canDeactivate() ?? false;
     return this.datedBlocks()?.canDeactivate() ?? true;
   }
 

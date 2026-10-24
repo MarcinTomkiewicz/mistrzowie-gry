@@ -144,8 +144,8 @@ export class EventGlobalDraftWizard {
       ) ?? host.querySelector<HTMLElement>('[data-event-schedule] input')
         : field === 'timeBlocks' ? host.querySelector<HTMLElement>('#global-base-add')
         : field === 'dateTimeBlocks' || field === 'mainCityDateTimeBlocks' ? host.querySelector<HTMLElement>('[data-event-dated-drafts] input')
-        : Array.from(scope?.querySelectorAll<HTMLElement>('[formControlName]') ?? [])
-          .find((element) => element.getAttribute('formControlName') === (blockField ?? name));
+        : Array.from(scope?.querySelectorAll<HTMLElement>('[formControlName], [name]') ?? [])
+          .find((element) => (element.getAttribute('formControlName') ?? element.getAttribute('name')) === (blockField ?? name));
       const target = control?.matches('input, textarea, button') ? control
         : control?.querySelector<HTMLElement>('input, button, [tabindex="0"]');
       target?.focus({ preventScroll: true });

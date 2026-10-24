@@ -14,6 +14,7 @@ export const EVENT_RPC = {
   getCoreDetail: 'get_admin_event_core_detail',
   saveCore: 'save_admin_event_core',
   createGlobalEvent: 'create_admin_global_event',
+  addGlobalEventCity: 'add_admin_global_event_city',
   getGlobalCalendar: 'get_admin_event_global_calendar',
   previewDatedTimeBlocks: 'preview_admin_event_dated_time_blocks',
   saveDatedTimeBlocks: 'save_admin_event_dated_time_blocks',

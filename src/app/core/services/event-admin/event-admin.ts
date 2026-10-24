@@ -12,6 +12,8 @@ import {
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type {
+  AddAdminGlobalEventCityPayload,
+  AddAdminGlobalEventCityResult,
   AdminDatedTimeBlocksPreview,
   AdminDatedTimeBlocksSave,
   AdminEffectivePolicyResult,
@@ -71,6 +73,14 @@ export class EventAdmin {
 
   getGlobalCalendar(coreId: string): Observable<AdminGlobalCalendarResult> {
     return this.backend.rpc<AdminGlobalCalendarResult>(EVENT_RPC.getGlobalCalendar, { p_core_id: coreId });
+  }
+
+  addGlobalEventCity(coreId: string, requestId: string, payload: AddAdminGlobalEventCityPayload): Observable<AddAdminGlobalEventCityResult> {
+    return this.backend.rpc<AddAdminGlobalEventCityResult>(EVENT_RPC.addGlobalEventCity, {
+      p_core_id: coreId,
+      p_request_id: requestId,
+      p_payload: payload,
+    });
   }
 
   previewDatedTimeBlocks(command: EventDatedTimeBlocksCommand): Observable<AdminDatedTimeBlocksPreview> {

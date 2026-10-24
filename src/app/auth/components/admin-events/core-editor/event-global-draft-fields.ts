@@ -21,12 +21,13 @@ import { EventScheduleEditor } from '../edition-editor/event-schedule-editor';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalDraftDateBlocks } from './event-global-draft-date-blocks';
 import { EventGlobalTimeBlocks } from './event-global-time-blocks';
+import { EventGlobalCityFields } from './event-global-city-fields';
 
 @Component({
   selector: 'app-event-global-draft-fields',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, FloatLabelModule, InputNumberModule,
     InputTextModule, SelectModule, TextareaModule, ToggleSwitchModule, TooltipModule, EventScheduleEditor,
-    EventGlobalTimeBlocks, EventGlobalDraftDateBlocks],
+    EventGlobalTimeBlocks, EventGlobalDraftDateBlocks, EventGlobalCityFields],
   templateUrl: './event-global-draft-fields.html',
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })

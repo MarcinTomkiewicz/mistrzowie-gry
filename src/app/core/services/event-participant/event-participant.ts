@@ -33,6 +33,12 @@ const readAvailability = createEdgeArrayReader(createStrictEdgeObjectReader({
   capacity: createEdgeNullableReader(readEdgeNonNegativeInteger),
   isUnlimited: readEdgeBoolean,
   remainingSeats: createEdgeNullableReader(readEdgeNonNegativeInteger),
+  venueAttendance: createStrictEdgeObjectReader({
+    capacity: createEdgeNullableReader(readEdgeNonNegativeInteger),
+    remaining: createEdgeNullableReader(readEdgeNonNegativeInteger),
+    activeIdentities: readEdgeNonNegativeInteger,
+    atCapacityForNewIdentity: readEdgeBoolean,
+  }),
 }));
 
 @Injectable({ providedIn: 'root' })

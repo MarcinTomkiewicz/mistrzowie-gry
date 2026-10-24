@@ -1,10 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { defer, map, Observable, of, switchMap, tap } from 'rxjs';
+import { FormGroup } from '@angular/forms';
+import { defer, EMPTY, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import { ParticipantSignupKind } from '../../../../core/enums/event';
-import { createEventGlobalDraftForm, mapEventGlobalDraftToPayload } from '../../../../core/factories/event-global-draft-form.factory';
+import { createEventGlobalCityControls, createEventGlobalDraftForm, mapEventGlobalCity, mapEventGlobalDraftToPayload } from '../../../../core/factories/event-global-draft-form.factory';
 import type {
+  AddAdminGlobalEventCityPayload, AddAdminGlobalEventCityResult,
   AdminEffectivePolicyResult, AdminGlobalCalendarResult,
   CreateAdminGlobalEventPayload, CreateAdminGlobalEventResult,
 } from '../../../../core/interfaces/i-admin-global-event';
@@ -25,6 +27,14 @@ export class EventGlobalDraftController {
   readonly policy = signal<AdminEffectivePolicyResult | null>(null);
   readonly staffingEditionId = signal<string | null>(null);
   readonly isUnreleasedStaffing = signal(false);
+  readonly cityForm = new FormGroup(createEventGlobalCityControls());
+  readonly cityEditing = signal(false);
+  readonly cityBusy = signal(false);
+  readonly cityState = signal<'idle' | 'uncertain' | 'created'>('idle');
+  private cityCommand: {
+    coreId: string; mainEditionId: string; requestId: string; payload: AddAdminGlobalEventCityPayload;
+  } | null = null;
+  private cityResult: AddAdminGlobalEventCityResult | null = null;
 
   constructor() {
     this.form.controls.priceAmount.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.syncPolicyControls());
@@ -33,18 +43,25 @@ export class EventGlobalDraftController {
 
   readCore(coreId: string): Observable<IEventCoreDetail | null> {
     return defer(() => {
-      this.calendar.set(null);
-      this.policy.set(null);
       this.staffingEditionId.set(null);
       this.isUnreleasedStaffing.set(false);
       return this.eventAdmin.getCoreDetail(coreId).pipe(switchMap((core) => {
-        if (core === null) return of(null);
+        if (core === null) {
+          if (this.cityCommand?.coreId === coreId) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
+          this.calendar.set(null);
+          this.policy.set(null);
+          return of(null);
+        }
         if (core.id !== coreId) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Core readback.');
         }
+        if (this.cityCommand?.coreId === core.id) return this.readGlobalCalendar(core);
         return this.readStaffingEditionId(core).pipe(switchMap((editionId) => {
           this.staffingEditionId.set(editionId);
-          return editionId ? of(core) : this.readGlobalCalendar(core);
+          if (!editionId) return this.readGlobalCalendar(core);
+          this.calendar.set(null);
+          this.policy.set(null);
+          return of(core);
         }));
       }));
     });
@@ -68,10 +85,16 @@ export class EventGlobalDraftController {
   private readGlobalCalendar(core: IEventCoreDetail): Observable<IEventCoreDetail> {
     return this.eventAdmin.getGlobalCalendar(core.id).pipe(switchMap((calendar) => {
       const createdHere = this.result()?.coreId === core.id;
-      if (calendar.coreId !== core.id || (createdHere && calendar.calendarLifecycle !== 'global')) {
+      const cityCommand = this.cityCommand?.coreId === core.id ? this.cityCommand : null;
+      if (calendar.coreId !== core.id || ((createdHere || cityCommand) && calendar.calendarLifecycle !== 'global') ||
+        (cityCommand && calendar.mainEditionId !== cityCommand.mainEditionId)) {
         throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global calendar readback.');
       }
-      if (calendar.calendarLifecycle !== 'global') return of(core);
+      if (calendar.calendarLifecycle !== 'global') {
+        this.calendar.set(null);
+        this.policy.set(null);
+        return of(core);
+      }
       if (!calendar.cities.some((city) => city.editionId === calendar.mainEditionId && city.isMain)) {
         throw new Error('[EVENT_GLOBAL_DRAFT] Global calendar main city is missing.');
       }
@@ -79,6 +102,12 @@ export class EventGlobalDraftController {
         if (policy.coreId !== core.id || policy.lifecycle !== 'global' || policy.mainEditionId !== calendar.mainEditionId ||
           !policy.editions.some((edition) => edition.editionId === calendar.mainEditionId && edition.isMain)) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global policy readback.');
+        }
+        const editionId = cityCommand ? this.cityResult?.editionId : null;
+        if (editionId && (!core.editions.some(edition => edition.id === editionId) ||
+          !calendar.cities.some(city => city.editionId === editionId) ||
+          !policy.editions.some(edition => edition.editionId === editionId))) {
+          throw new Error('[EVENT_GLOBAL_DRAFT] Added city readback is missing.');
         }
         this.calendar.set(calendar);
         this.policy.set(policy);
@@ -117,6 +146,77 @@ export class EventGlobalDraftController {
         return core;
       }),
     );
+  }
+
+  canAddCity(core: IEventCoreDetail): boolean {
+    const calendar = this.calendar();
+    return calendar !== null && calendar.coreId === core.id && calendar.calendarLifecycle === 'global' &&
+      !core.isActive && !core.hasPublicPage && calendar.cities.every(city => !city.isActive) &&
+      calendar.globalDates.every(date => date.status === 'planned' && date.cityOccurrences.every(city =>
+        !city.protected && !city.publishedAt && (city.occurrenceStatus === null || city.occurrenceStatus === 'planned')));
+  }
+
+  openCity(core: IEventCoreDetail): void {
+    if (this.cityEditing() || !this.canAddCity(core)) return;
+    this.cityEditing.set(true);
+  }
+
+  closeCity(): void {
+    if (this.cityBusy() || this.cityState() !== 'idle') return;
+    this.resetCity();
+  }
+
+  addCity(core: IEventCoreDetail): Observable<IEventCoreDetail> {
+    return defer(() => {
+      if (this.cityBusy() || !this.cityEditing()) return EMPTY;
+      if (this.cityState() === 'idle' && (!this.canAddCity(core) || this.cityForm.invalid)) return EMPTY;
+      const calendar = this.calendar();
+      if (!calendar) return EMPTY;
+      this.cityCommand ??= {
+        coreId: core.id, mainEditionId: calendar.mainEditionId, requestId: crypto.randomUUID(),
+        payload: mapEventGlobalCity(this.cityForm.controls),
+      };
+      const command = this.cityCommand;
+      this.cityForm.disable({ emitEvent: false });
+      this.cityBusy.set(true);
+      const write = this.cityResult ? of(this.cityResult)
+        : this.eventAdmin.addGlobalEventCity(command.coreId, command.requestId, command.payload).pipe(
+          tap(saved => {
+            if ((!saved.created && !saved.replayed) || saved.coreId !== command.coreId || !saved.editionId) {
+              throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent added city confirmation.');
+            }
+            this.cityResult = saved;
+            this.cityState.set('created');
+          }),
+          tap({ error: (error: unknown) => {
+            if (this.cityState() === 'idle' && error instanceof RpcError &&
+              ['42501', '22023', '22P02', '22007', '23503', '23505', '23514', '40001', 'P0002'].includes(error.code)) {
+              this.cityCommand = null;
+              this.cityForm.enable({ emitEvent: false });
+            } else {
+              this.cityState.set('uncertain');
+            }
+          } }),
+        );
+      return write.pipe(
+        switchMap(() => this.readCore(command.coreId)),
+        map(loaded => {
+          if (!loaded) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
+          this.resetCity();
+          return loaded;
+        }),
+        finalize(() => this.cityBusy.set(false)),
+      );
+    });
+  }
+
+  private resetCity(): void {
+    this.cityCommand = null;
+    this.cityResult = null;
+    this.cityForm.enable({ emitEvent: false });
+    this.cityForm.reset();
+    this.cityState.set('idle');
+    this.cityEditing.set(false);
   }
 
   private syncPolicyControls(): void {

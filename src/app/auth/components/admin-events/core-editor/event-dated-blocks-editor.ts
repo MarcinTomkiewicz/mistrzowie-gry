@@ -41,7 +41,7 @@ export class EventDatedBlocksEditor {
     { value: 'date', label: this.i18n.datedBlocks().dateScope },
     ...(this.editor.day()?.cities.map(row => ({ value: row.editionId, label: row.city })) ?? []),
   ]);
-  protected readonly selectionLocked = computed(() => this.editor.isBusy() || this.editor.isDirty() || this.editor.readbackPending());
+  readonly selectionLocked = computed(() => this.editor.isBusy() || this.editor.isDirty() || this.editor.readbackPending());
 
   constructor() {
     effect(() => {

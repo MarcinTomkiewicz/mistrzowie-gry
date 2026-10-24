@@ -53,6 +53,15 @@
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
     },
+    "city": {
+      "action": "Dodaj miasto",
+      "hint": "[PH] Nowe miasto korzysta ze wspólnych dat i ustawień wydarzenia.",
+      "uncertain": "[PH] Nie można potwierdzić wyniku zapisu. Zachowano wpisane dane. Ponów ten sam zapis, aby ustalić wynik bez dodawania drugiego miasta. Nie odświeżaj strony.",
+      "readbackFailed": "[PH] Miasto zostało zapisane, ale nie udało się odświeżyć danych. Ponów odczyt.",
+      "saved": "[PH] Miasto zostało dodane do szkicu.",
+      "leaveConfirmation": "[PH] Opuścić edytor i porzucić niezapisane dane miasta?",
+      "discard": "[PH] Porzuć dane miasta"
+    },
     "datedBlocks": {
       "title": "[PH] Bloki wybranej daty i miasta",
       "creationHint": "[PH] Wybierz datę z harmonogramu. Osobne bloki dodawaj tylko tam, gdzie mają różnić się od podstawowych. Pozostałe daty i miasta korzystają ze wspólnych ustawień.",

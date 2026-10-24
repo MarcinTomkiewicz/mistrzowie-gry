@@ -1,5 +1,15 @@
 import type { AdminDatedTimeBlocks } from '../../interfaces/i-admin-global-event';
 
+export type EventGlobalCityCopy = {
+  action: string;
+  hint: string;
+  uncertain: string;
+  readbackFailed: string;
+  saved: string;
+  leaveConfirmation: string;
+  discard: string;
+};
+
 export type EventDatedBlocksCopy = {
   title: string;
   creationHint: string;

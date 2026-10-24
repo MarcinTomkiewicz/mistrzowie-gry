@@ -39,62 +39,12 @@
   </section>
 }
 @if (step() === 2) {
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="draft">
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
     <div class="flex-row-start-center gap-md">
       <span class="pi pi-capitol square-11 flex-none" aria-hidden="true"></span>
       <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.mainCity }}</h2>
     </div>
-    <div class="mg-grid-2 gap-md w-100">
-      <div class="flex-col-start-stretch gap-xs min-w-0">
-        <p-floatlabel variant="on" class="w-100">
-          <input pInputText pSize="small" id="global-event-city" formControlName="city" class="w-100" maxlength="120"
-            [attr.aria-invalid]="controls.city.touched && controls.city.invalid"
-            [attr.aria-describedby]="controls.city.touched && controls.city.invalid ? 'global-event-city-error' : null" />
-          <label for="global-event-city">{{ i18n.commonLabels().city }}</label>
-        </p-floatlabel>
-        @if (controls.city.touched && controls.city.invalid) {
-          <small id="global-event-city-error" class="mg-contact-error">
-            @if (controls.city.hasError('required') || controls.city.hasError('requiredTrimmed')) { {{ i18n.commonForm().required }} }
-            @else if (controls.city.hasError('slugSource')) { {{ i18n.editionValidation().citySlugSource }} }
-            @else { {{ i18n.commonForm().maxLength.replace('{{max}}', '120') }} }
-          </small>
-        }
-      </div>
-      <div class="flex-col-start-stretch gap-xs min-w-0">
-        <div class="flex-row-start-center gap-xs">
-          <p-floatlabel variant="on" class="flex-1 min-w-0">
-            <p-select inputId="global-event-timezone" formControlName="timezone" [options]="timezones()" [filter]="true"
-              optionLabel="label" optionValue="value" filterBy="label,value"
-              size="small" appendTo="body" class="w-100">
-              <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
-              <ng-template #filtericon><span class="pi pi-spy" aria-hidden="true"></span></ng-template>
-            </p-select>
-            <label for="global-event-timezone">{{ i18n.commonLabels().timezone }}</label>
-          </p-floatlabel>
-          <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().timezone, text: copy.timezoneHint }" />
-        </div>
-        @if (controls.timezone.touched && controls.timezone.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
-      </div>
-      <p-floatlabel variant="on" class="min-w-0 w-100">
-        <input pInputText pSize="small" id="global-event-venue" formControlName="venueName" class="w-100" maxlength="140" />
-        <label for="global-event-venue">{{ copy.venueName }}</label>
-      </p-floatlabel>
-      <p-floatlabel variant="on" class="min-w-0 w-100">
-        <input pInputText pSize="small" id="global-event-address" formControlName="venueAddress" class="w-100" maxlength="240" />
-        <label for="global-event-address">{{ i18n.commonLabels().venueAddress }}</label>
-      </p-floatlabel>
-      <div class="flex-col-start-stretch gap-xs min-w-0">
-        <p-floatlabel variant="on" class="w-100">
-          <input pInputText pSize="small" id="global-event-facebook" formControlName="facebookLink" class="w-100" maxlength="500"
-            [attr.aria-invalid]="controls.facebookLink.touched && controls.facebookLink.invalid"
-            [attr.aria-describedby]="controls.facebookLink.touched && controls.facebookLink.invalid ? 'global-event-facebook-error' : null" />
-          <label for="global-event-facebook">{{ copy.facebookLink }}</label>
-        </p-floatlabel>
-        @if (controls.facebookLink.touched && controls.facebookLink.invalid) {
-          <small id="global-event-facebook-error" class="mg-contact-error">{{ copy.facebookInvalid }}</small>
-        }
-      </div>
-    </div>
+    <app-event-global-city-fields [fields]="controls" idPrefix="global-event" [timezones]="timezones()" />
   </section>
 }
 @if (step() === 3) {

@@ -17,8 +17,32 @@
           'new',
         ]"
       />
+    } @else if (globalDraft.canAddCity(loadedCore) && !globalDraft.cityEditing()) {
+      <p-button id="additional-city-open" type="button" size="small" severity="success" icon="pi pi-plus"
+        [label]="i18n.city().action" [disabled]="addCityDisabled()" (onClick)="openCity()" />
     }
   </div>
+
+  @if (globalDraft.cityEditing()) {
+    <form id="additional-city-form" class="mg-form flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0"
+      [formGroup]="globalDraft.cityForm" (ngSubmit)="submitCity()" novalidate>
+      <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.city().action }}</h3>
+      <p class="m-0 muted-text">{{ i18n.city().hint }}</p>
+      <app-event-global-city-fields [fields]="globalDraft.cityForm.controls" idPrefix="additional-city" [timezones]="timezones()" />
+      @if (errorMessage()) {
+        <p-message [severity]="globalDraft.cityState() === 'idle' ? 'error' : 'warn'" icon="pi pi-biohazard">{{ errorMessage() }}</p-message>
+      }
+      <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+        <p-button type="submit" size="small" severity="success" icon="pi pi-done-it" loadingIcon="pi pi-d20"
+          [label]="globalDraft.cityState() === 'created' ? i18n.creation().retryRead
+            : globalDraft.cityState() === 'uncertain' ? i18n.creation().retryCreation : i18n.city().action"
+          [loading]="globalDraft.cityBusy()" [disabled]="globalDraft.cityBusy() || addCityDisabled()" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+          [label]="i18n.commonActions().cancel" [disabled]="globalDraft.cityBusy() || globalDraft.cityState() !== 'idle'"
+          (onClick)="closeCity()" />
+      </div>
+    </form>
+  }
 
   @if (loadedCore.editions.length) {
     <div class="p-datatable p-component w-100">
@@ -74,7 +98,7 @@
                 </td>
                 <td class="text-center">
                   {{
-                    edition.isDefaultPublic
+                    (legacyEditing() ? edition.isDefaultPublic : globalDraft.calendar()?.mainEditionId === edition.id)
                       ? i18n.commonValues().yes
                       : i18n.commonValues().no
                   }}

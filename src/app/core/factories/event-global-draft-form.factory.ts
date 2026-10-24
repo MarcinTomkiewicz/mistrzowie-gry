@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, V
 import { DEFAULT_TIMEZONE } from '../configs/time.config';
 import { MAX_GLOBAL_EVENT_DATES } from '../configs/events.config';
 import { ParticipantSignupKind } from '../enums/event';
-import type { CreateAdminGlobalEventPayload, EventCurrency, EventGlobalSchedule, EventPriceBasis } from '../interfaces/i-admin-global-event';
+import type { AddAdminGlobalEventCityPayload, CreateAdminGlobalEventPayload, EventCurrency, EventGlobalSchedule, EventPriceBasis } from '../interfaces/i-admin-global-event';
 import type { IEventSchedule } from '../interfaces/i-event-schedule';
 import { isValidIsoDate, parseIsoDate, toIsoDate } from '../utils/date';
 import { getEventDateRangeLength } from '../utils/event-schedule';
@@ -18,17 +18,33 @@ import { createEventGlobalTimeBlocksForm, mapEventGlobalTimeBlocks } from './eve
 const requiredText = [Validators.required, requiredTrimmedValidator()];
 const positiveInteger = [integerValidator(), Validators.min(1), Validators.max(2147483647)];
 
-export function createEventGlobalDraftForm() {
-  const form = new FormGroup({
-    name: new FormControl('', { nonNullable: true, validators: [...requiredText, Validators.maxLength(140), slugSourceValidator()] }),
-    shortDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(500) }),
-    longDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(12000) }),
+export function createEventGlobalCityControls() {
+  return {
     city: new FormControl('', { nonNullable: true, validators: [...requiredText, Validators.maxLength(120), slugSourceValidator()] }),
     venueName: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(140)] }),
     venueAddress: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(240)] }),
     timezone: new FormControl(DEFAULT_TIMEZONE, { nonNullable: true, validators: [...requiredText, timezoneValidator] }),
     facebookLink: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500),
       Validators.pattern(/^https:\/\/(?:www\.)?(?:facebook\.com|fb\.com|fb\.me)\/[^\s/?#]+[^\s]*$/)] }),
+  };
+}
+
+export type EventGlobalCityControls = ReturnType<typeof createEventGlobalCityControls>;
+
+export function mapEventGlobalCity(controls: EventGlobalCityControls): AddAdminGlobalEventCityPayload {
+  return {
+    city: controls.city.value.trim(), venueName: normalizeText(controls.venueName.value),
+    venueAddress: normalizeText(controls.venueAddress.value), timezone: controls.timezone.value,
+    facebookLink: normalizeText(controls.facebookLink.value),
+  };
+}
+
+export function createEventGlobalDraftForm() {
+  const form = new FormGroup({
+    name: new FormControl('', { nonNullable: true, validators: [...requiredText, Validators.maxLength(140), slugSourceValidator()] }),
+    shortDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(500) }),
+    longDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(12000) }),
+    ...createEventGlobalCityControls(),
     schedule: createEventScheduleForm(),
     timeBlocks: createEventGlobalTimeBlocksForm(),
     dateTimeBlocks: new FormArray<EventDateTimeBlocksForm>([]),
@@ -57,11 +73,7 @@ export function mapEventGlobalDraftToPayload(
     name: value.name.trim(),
     shortDescription: normalizeText(value.shortDescription),
     longDescription: normalizeText(value.longDescription),
-    mainCity: {
-      city: value.city.trim(), venueName: normalizeText(value.venueName),
-      venueAddress: normalizeText(value.venueAddress), timezone: value.timezone,
-      facebookLink: normalizeText(value.facebookLink),
-    },
+    mainCity: mapEventGlobalCity(form.controls),
     schedule: mapGlobalSchedule(mapEventScheduleFormToPayload(form.controls.schedule)),
     timeBlocks: mapEventGlobalTimeBlocks(form.controls.timeBlocks),
     ...(value.dateTimeBlocks.length ? { dateTimeBlocks: mapEventDateTimeBlocks(form.controls.dateTimeBlocks) } : {}),
