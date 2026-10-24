@@ -191,12 +191,25 @@ export type EditionRpcErrorsCopy = {
 
 export type ScheduleFieldsCopy = {
   dates: string;
+  dateSelection: string;
+  monthlyPosition: string;
+  exclusionRules: string;
+  addExclusionRule: string;
+  allExcludedDates: string;
 };
 
 export type ScheduleOptionsCopy = {
   single: string;
   recurring: string;
   exactDates: string;
+  range: string;
+  individualDates: string;
+  selectedDates: string;
+  cyclic: string;
+  singleHint: string;
+  selectedDatesHint: string;
+  cyclicHint: string;
+  weeklyCycle: string;
 };
 
 export type ScheduleValidationCopy = {
@@ -211,10 +224,15 @@ export type ScheduleValidationCopy = {
   monthlyWeekday: string;
   dayOfMonth: string;
   intervalMin: string;
+  dateRangeLength: string;
+  exclusionRule: string;
+  allDatesExcluded: string;
 };
 
 export type ScheduleInfoCopy = {
   scheduleChange: string;
   protectedOccurrences: string;
   conflict: string;
+  globalDates: string;
+  exclusionRules: string;
 };

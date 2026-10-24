@@ -14,7 +14,7 @@ import {
 } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type { EventPriceBasis } from '../../../../core/interfaces/i-admin-global-event';
-import type { EventGlobalDraftCopy } from '../../../../core/types/i18n/event-global-draft';
+import type { EventDatedBlocksCopy, EventGlobalDraftCopy } from '../../../../core/types/i18n/event-global-draft';
 import type {
   CoreRpcErrorsCopy,
   EditionTableCopy,
@@ -61,10 +61,22 @@ export function createEventCoreEditorI18n() {
   });
 
   const commonPrice = createCommonPriceI18n();
+  const commonValues = createCommonValuesI18n();
+  const commonEntityStatuses = createCommonEntityStatusesI18n();
 
   return {
+    datedBlocks: createScopedObjectI18n<EventDatedBlocksCopy>('adminEvents', 'editor.datedBlocks'),
     creation: createScopedObjectI18n<EventGlobalDraftCopy>('adminEvents', 'editor.creation'),
     creationSteps: createScopedObjectI18n<EventGlobalDraftCopy['steps']>('adminEvents', 'editor.creation.steps'),
+    coreStatuses: computed(() => {
+      const statuses = commonEntityStatuses();
+      const fallback = commonValues().notAvailable;
+      return {
+        active: statuses?.active?.neuter ?? fallback,
+        inactive: statuses?.inactive?.neuter ?? fallback,
+        draft: statuses?.draft?.neuter ?? fallback,
+      };
+    }),
     priceBases: computed<Record<EventPriceBasis, string>>(() => {
       const units = commonPrice().presentation.units;
       return {
@@ -89,12 +101,12 @@ export function createEventCoreEditorI18n() {
     commonActions: createCommonActionsI18n(),
     commonForm: createCommonFormI18n(),
     commonErrors: createCommonErrorsI18n(),
-    commonEntityStatuses: createCommonEntityStatusesI18n(),
+    commonEntityStatuses,
     commonLabels: createCommonLabelsI18n(),
     commonPrice,
     commonNav: createCommonNavI18n(),
     commonStatus: createCommonStatusI18n(),
     commonTable: createCommonTableI18n(),
-    commonValues: createCommonValuesI18n(),
+    commonValues,
   };
 }

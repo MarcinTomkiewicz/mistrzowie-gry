@@ -2,46 +2,51 @@
 @let draft = form();
 @let controls = draft.controls;
 @if (step() === 1) {
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="draft">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
-    <div class="flex-col-start-stretch gap-xs w-100 max-w-500">
-      <p-floatlabel variant="on">
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="draft">
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
+    </div>
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-floatlabel variant="on" class="w-100">
         <input pInputText pSize="small" id="global-event-name" formControlName="name" class="w-100" maxlength="140"
-          [attr.aria-invalid]="controls.name.touched && controls.name.invalid" />
+          [attr.aria-invalid]="controls.name.touched && controls.name.invalid"
+          [attr.aria-describedby]="controls.name.touched && controls.name.invalid ? 'global-event-name-error' : null" />
         <label for="global-event-name">{{ i18n.commonLabels().name }}</label>
       </p-floatlabel>
       @if (controls.name.touched && controls.name.invalid) {
-        <small class="mg-contact-error">
+        <small id="global-event-name-error" class="mg-contact-error">
           @if (controls.name.hasError('required') || controls.name.hasError('requiredTrimmed')) { {{ i18n.commonForm().required }} }
           @else if (controls.name.hasError('slugSource')) { {{ i18n.validation().nameSlugSource }} }
           @else { {{ i18n.commonForm().maxLength.replace('{{max}}', '140') }} }
         </small>
       }
     </div>
-    <div class="grid-1-2 gap-md">
-      <div class="flex-col-start-stretch gap-xs min-w-0">
-        <p-floatlabel variant="on">
-          <textarea pTextarea pSize="small" id="global-event-short-description" formControlName="shortDescription" class="w-100" rows="4" maxlength="500"></textarea>
-          <label for="global-event-short-description">{{ i18n.commonLabels().shortDescription }}</label>
-        </p-floatlabel>
-        @if (controls.shortDescription.touched && controls.shortDescription.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '500') }}</small> }
-      </div>
-      <div class="flex-col-start-stretch gap-xs min-w-0">
-        <p-floatlabel variant="on">
-          <textarea pTextarea pSize="small" id="global-event-long-description" formControlName="longDescription" class="w-100" rows="7" maxlength="12000"></textarea>
-          <label for="global-event-long-description">{{ i18n.commonLabels().longDescription }}</label>
-        </p-floatlabel>
-        @if (controls.longDescription.touched && controls.longDescription.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '12000') }}</small> }
-      </div>
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-floatlabel variant="on" class="w-100">
+        <textarea pTextarea pSize="small" id="global-event-short-description" formControlName="shortDescription" class="w-100" rows="3" maxlength="500"></textarea>
+        <label for="global-event-short-description">{{ i18n.commonLabels().shortDescription }}</label>
+      </p-floatlabel>
+      @if (controls.shortDescription.touched && controls.shortDescription.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '500') }}</small> }
+    </div>
+    <div class="flex-col-start-stretch gap-xs w-100">
+      <p-floatlabel variant="on" class="w-100">
+        <textarea pTextarea pSize="small" id="global-event-long-description" formControlName="longDescription" class="w-100" rows="6" maxlength="12000"></textarea>
+        <label for="global-event-long-description">{{ i18n.commonLabels().longDescription }}</label>
+      </p-floatlabel>
+      @if (controls.longDescription.touched && controls.longDescription.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '12000') }}</small> }
     </div>
   </section>
 }
 @if (step() === 2) {
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="draft">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.mainCity }}</h2>
-    <div class="flex-row-start-start flex-wrap gap-md">
-      <div class="flex-col-start-stretch gap-xs w-px-250 w-100-sm">
-        <p-floatlabel variant="on">
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="draft">
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-capitol square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.mainCity }}</h2>
+    </div>
+    <div class="mg-grid-2 gap-md w-100">
+      <div class="flex-col-start-stretch gap-xs min-w-0">
+        <p-floatlabel variant="on" class="w-100">
           <input pInputText pSize="small" id="global-event-city" formControlName="city" class="w-100" maxlength="120"
             [attr.aria-invalid]="controls.city.touched && controls.city.invalid"
             [attr.aria-describedby]="controls.city.touched && controls.city.invalid ? 'global-event-city-error' : null" />
@@ -49,204 +54,157 @@
         </p-floatlabel>
         @if (controls.city.touched && controls.city.invalid) {
           <small id="global-event-city-error" class="mg-contact-error">
-            @if (controls.city.hasError('required') || controls.city.hasError('requiredTrimmed')) {
-              {{ i18n.commonForm().required }}
-            } @else if (controls.city.hasError('slugSource')) {
-              {{ i18n.editionValidation().citySlugSource }}
-            } @else {
-              {{ i18n.commonForm().maxLength.replace('{{max}}', '120') }}
-            }
+            @if (controls.city.hasError('required') || controls.city.hasError('requiredTrimmed')) { {{ i18n.commonForm().required }} }
+            @else if (controls.city.hasError('slugSource')) { {{ i18n.editionValidation().citySlugSource }} }
+            @else { {{ i18n.commonForm().maxLength.replace('{{max}}', '120') }} }
           </small>
         }
       </div>
-      <div class="flex-col-start-stretch gap-xs w-px-400 w-100-sm">
+      <div class="flex-col-start-stretch gap-xs min-w-0">
         <div class="flex-row-start-center gap-xs">
-        <p-floatlabel variant="on" class="flex-1 min-w-0">
-          <p-select inputId="global-event-timezone" formControlName="timezone" [options]="timezones()" [filter]="true"
-            optionLabel="label" optionValue="value" filterBy="label,value"
-            size="small" appendTo="body" class="w-100" />
-          <label for="global-event-timezone">{{ i18n.commonLabels().timezone }}</label>
-        </p-floatlabel>
-        <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().timezone, text: copy.timezoneHint }" />
+          <p-floatlabel variant="on" class="flex-1 min-w-0">
+            <p-select inputId="global-event-timezone" formControlName="timezone" [options]="timezones()" [filter]="true"
+              optionLabel="label" optionValue="value" filterBy="label,value"
+              size="small" appendTo="body" class="w-100">
+              <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+              <ng-template #filtericon><span class="pi pi-spy" aria-hidden="true"></span></ng-template>
+            </p-select>
+            <label for="global-event-timezone">{{ i18n.commonLabels().timezone }}</label>
+          </p-floatlabel>
+          <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().timezone, text: copy.timezoneHint }" />
         </div>
         @if (controls.timezone.touched && controls.timezone.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
       </div>
-    </div>
-    <div class="flex-row-start-start flex-wrap gap-md">
-      <p-floatlabel variant="on" class="w-px-400 w-100-sm">
+      <p-floatlabel variant="on" class="min-w-0 w-100">
         <input pInputText pSize="small" id="global-event-venue" formControlName="venueName" class="w-100" maxlength="140" />
         <label for="global-event-venue">{{ copy.venueName }}</label>
       </p-floatlabel>
-      <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
+      <p-floatlabel variant="on" class="min-w-0 w-100">
         <input pInputText pSize="small" id="global-event-address" formControlName="venueAddress" class="w-100" maxlength="240" />
         <label for="global-event-address">{{ i18n.commonLabels().venueAddress }}</label>
       </p-floatlabel>
-    </div>
-    <div class="flex-col-start-stretch gap-xs w-100 max-w-500 max-w-none-sm">
-      <p-floatlabel variant="on">
-        <input pInputText pSize="small" id="global-event-facebook" formControlName="facebookLink" class="w-100" maxlength="500"
-          [attr.aria-invalid]="controls.facebookLink.touched && controls.facebookLink.invalid"
-          [attr.aria-describedby]="controls.facebookLink.touched && controls.facebookLink.invalid ? 'global-event-facebook-error' : null" />
-        <label for="global-event-facebook">{{ copy.facebookLink }}</label>
-      </p-floatlabel>
-      @if (controls.facebookLink.touched && controls.facebookLink.invalid) {
-        <small id="global-event-facebook-error" class="mg-contact-error">{{ copy.facebookInvalid }}</small>
-      }
+      <div class="flex-col-start-stretch gap-xs min-w-0">
+        <p-floatlabel variant="on" class="w-100">
+          <input pInputText pSize="small" id="global-event-facebook" formControlName="facebookLink" class="w-100" maxlength="500"
+            [attr.aria-invalid]="controls.facebookLink.touched && controls.facebookLink.invalid"
+            [attr.aria-describedby]="controls.facebookLink.touched && controls.facebookLink.invalid ? 'global-event-facebook-error' : null" />
+          <label for="global-event-facebook">{{ copy.facebookLink }}</label>
+        </p-floatlabel>
+        @if (controls.facebookLink.touched && controls.facebookLink.invalid) {
+          <small id="global-event-facebook-error" class="mg-contact-error">{{ copy.facebookInvalid }}</small>
+        }
+      </div>
     </div>
   </section>
 }
 @if (step() === 3) {
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="draft">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
-    <div class="flex-col-start-stretch gap-xs max-w-250 w-100-sm">
-      <p-floatlabel variant="on">
-        <p-datepicker ngSkipHydration inputId="global-event-date" formControlName="date" dateFormat="dd.mm.yy"
-          size="small" [showIcon]="true" appendTo="body" class="w-100" inputStyleClass="w-100" [readonlyInput]="true" [invalid]="controls.date.touched && (controls.date.invalid || draft.hasError('globalDate'))" />
-        <label for="global-event-date">{{ i18n.commonLabels().eventDate }}</label>
-      </p-floatlabel>
-      @if (controls.date.touched && (controls.date.invalid || draft.hasError('globalDate'))) {
-        <small class="mg-contact-error">{{ copy.dateInvalid }}</small>
-      }
+  <app-event-schedule-editor [form]="controls.schedule" [globalCalendar]="true"
+    [validationAttempted]="scheduleValidationAttempted()" [externalError]="draft.hasError('globalDates') ? copy.dateInvalid : null" />
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="draft" data-event-base-blocks>
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-sundial square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.blocks }}</h2>
     </div>
-    <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
-    @for (block of controls.timeBlocks.controls; track block; let index = $index) {
-      <div class="flex-col-start-stretch gap-xs border radius-sm p-sm w-100" [formGroup]="block" [attr.data-event-block]="index">
-        <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-floatlabel variant="on" class="w-px-300 w-100-sm">
-            <input pInputText pSize="small" [id]="'global-event-block-' + index" formControlName="label" class="w-100" maxlength="140" />
-            <label [for]="'global-event-block-' + index">{{ copy.blockLabel }}</label>
-          </p-floatlabel>
-          <p-floatlabel variant="on" class="w-px-150">
-            <p-datepicker ngSkipHydration [inputId]="'global-event-start-' + index" formControlName="startTime" size="small"
-              dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-              iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
-              [invalid]="block.controls.startTime.touched && block.controls.startTime.invalid"
-              (onBlur)="normalizeTime(index, 'startTime', $event)">
-              <ng-template #inputicon let-clickCallBack="clickCallBack"><span class="pi pi-clock" aria-hidden="true" (click)="clickCallBack($event)"></span></ng-template>
-            </p-datepicker>
-            <label [for]="'global-event-start-' + index">{{ i18n.commonLabels().start }}</label>
-          </p-floatlabel>
-          <p-floatlabel variant="on" class="w-px-150">
-            <p-datepicker ngSkipHydration [inputId]="'global-event-end-' + index" formControlName="endTime" size="small"
-              dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-              iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
-              [invalid]="block.controls.endTime.touched && (block.controls.endTime.invalid || block.hasError('timeRange'))"
-              (onBlur)="normalizeTime(index, 'endTime', $event)">
-              <ng-template #inputicon let-clickCallBack="clickCallBack"><span class="pi pi-clock" aria-hidden="true" (click)="clickCallBack($event)"></span></ng-template>
-            </p-datepicker>
-            <label [for]="'global-event-end-' + index">{{ i18n.commonLabels().end }}</label>
-          </p-floatlabel>
-          <div class="flex-row-start-center gap-xs w-px-300 w-100-sm"><p-floatlabel variant="on" class="flex-1 min-w-0">
-            <p-inputnumber [inputId]="'global-event-gm-count-' + index" formControlName="requiredGmCount" [min]="1"
-              [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
-            <label [for]="'global-event-gm-count-' + index">{{ copy.requiredGmCount }}</label>
-          </p-floatlabel>
-          <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.requiredGmCount, text: copy.requiredGmHint }" />
-          </div>
-          <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
-            [ariaLabel]="i18n.commonActions().removeItem" [pTooltip]="i18n.commonActions().removeItem" tooltipEvent="both"
-            [disabled]="draft.disabled || controls.timeBlocks.length === 1" (onClick)="removeBlock(index)" />
-        </div>
-        @if (block.controls.label.touched && block.controls.label.invalid) {
-          <small class="mg-contact-error">
-            {{ copy.blockLabel }}:
-            {{ block.controls.label.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}
-          </small>
-        }
-        @if (block.controls.startTime.touched && block.controls.startTime.invalid) {
-          <small class="mg-contact-error">{{ i18n.commonLabels().start }}: {{ copy.timeInvalid }}</small>
-        }
-        @if (block.controls.endTime.touched && block.controls.endTime.invalid) {
-          <small class="mg-contact-error">{{ i18n.commonLabels().end }}: {{ copy.timeInvalid }}</small>
-        }
-        @if (block.controls.requiredGmCount.touched && block.controls.requiredGmCount.invalid) {
-          <small class="mg-contact-error">{{ copy.requiredGmCount }}: {{ i18n.commonForm().positiveInteger }}</small>
-        }
-        @if (block.touched && block.hasError('timeRange')) {
-          <small class="mg-contact-error">{{ i18n.commonForm().sameDayTimeRange }}</small>
-        }
-      </div>
-    }
-    <div class="flex-row-start-center">
-      <p-button type="button" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
-        id="global-event-add-block" [label]="copy.addBlock" [disabled]="draft.disabled" (onClick)="addBlock()" />
-    </div>
+    <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
+    <app-event-global-time-blocks [blocks]="controls.timeBlocks" idPrefix="global-base"
+      [validationAttempted]="scheduleValidationAttempted()" />
   </section>
+  <app-event-global-draft-date-blocks [form]="draft" [validationAttempted]="scheduleValidationAttempted()" />
 }
 @if (step() === 4) {
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="draft">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.policy }}</h2>
-    <div class="flex-row-start-center gap-xs"><h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.commonLabels().price }}</h3><ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().price, text: copy.priceHint }" /></div>
-    <div class="flex-row-start-start flex-wrap gap-sm">
-      <div class="flex-col-start-stretch gap-xs max-w-150">
-        <p-floatlabel variant="on">
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="draft">
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-cash square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().price }}</h2>
+      <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().price, text: copy.priceHint }" />
+    </div>
+    <div class="mg-grid-3 gap-md w-100">
+      <div class="flex-col-start-stretch gap-xs min-w-0">
+        <p-floatlabel variant="on" class="w-100">
           <p-inputnumber inputId="global-event-price" formControlName="priceAmount" size="small" [min]="0"
             [maxFractionDigits]="2" [useGrouping]="false" class="w-100" inputStyleClass="w-100" />
           <label for="global-event-price">{{ i18n.commonLabels().amount }}</label>
         </p-floatlabel>
         @if (controls.priceAmount.touched && controls.priceAmount.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
       </div>
-      <p-floatlabel variant="on" class="w-px-150">
-        <p-select inputId="global-event-currency" formControlName="priceCurrency" [options]="currencies" size="small" appendTo="body" class="w-100" />
+      <p-floatlabel variant="on" class="min-w-0 w-100">
+        <p-select inputId="global-event-currency" formControlName="priceCurrency" [options]="currencies" size="small" appendTo="body" class="w-100">
+          <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+        </p-select>
         <label for="global-event-currency">{{ i18n.commonLabels().currency }}</label>
       </p-floatlabel>
-      <p-floatlabel variant="on" class="w-px-250 w-100-sm">
+      <p-floatlabel variant="on" class="min-w-0 w-100">
         <p-select inputId="global-event-price-basis" formControlName="priceBasis" [options]="priceBases()"
-          optionValue="value" optionLabel="label" size="small" appendTo="body" class="w-100" />
+          optionValue="value" optionLabel="label" size="small" appendTo="body" class="w-100">
+          <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+        </p-select>
         <label for="global-event-price-basis">{{ i18n.commonPrice().editor.fields.perUnit }}</label>
       </p-floatlabel>
     </div>
-    <div class="flex-col-start-stretch gap-sm border-top pt-md">
-      <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.audience }}</h3>
-      <div class="flex-row-start-center gap-sm">
-        <p-toggleswitch inputId="global-event-beginners" formControlName="isForBeginners" />
-        <label for="global-event-beginners">{{ i18n.commonLabels().forBeginners }}</label>
-      </div>
+  </section>
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100" [formGroup]="draft">
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-teacher square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.audience }}</h2>
     </div>
-    <div class="flex-col-start-stretch gap-md border-top pt-md">
-      <div class="flex-row-start-center gap-xs"><h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.registration }}</h3><ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().participantSignupKind, text: copy.signupKindHint }" /></div>
-      <div class="flex-row-start-start flex-wrap gap-sm">
-        <p-floatlabel variant="on" class="min-w-250 min-w-0-sm w-100-sm">
+    <div class="flex-row-start-center gap-sm">
+      <p-toggleswitch inputId="global-event-beginners" formControlName="isForBeginners" />
+      <label for="global-event-beginners">{{ i18n.commonLabels().forBeginners }}</label>
+    </div>
+  </section>
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="draft">
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-knot square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.registration }}</h2>
+    </div>
+    <div class="mg-grid-2 gap-md w-100">
+      <div class="flex-row-start-center gap-xs">
+        <p-floatlabel variant="on" class="flex-1 min-w-0">
           <p-select inputId="global-event-signup-kind" formControlName="participantSignupKind" [options]="signupKinds()"
-            optionValue="value" optionLabel="label" size="small" appendTo="body" class="w-100" />
+            optionValue="value" optionLabel="label" size="small" appendTo="body" class="w-100">
+            <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+          </p-select>
           <label for="global-event-signup-kind">{{ i18n.commonLabels().participantSignupKind }}</label>
         </p-floatlabel>
-        @if (controls.sessionCapacityCeiling.enabled) {
-          <div class="flex-col-start-stretch gap-xs w-px-300 w-100-sm">
-            <div class="flex-row-start-center gap-xs">
-              <p-floatlabel variant="on" class="flex-1 min-w-0">
-                <p-inputnumber inputId="global-event-session-capacity" formControlName="sessionCapacityCeiling" [min]="1"
-                  size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
-                <label for="global-event-session-capacity">{{ copy.sessionCapacityCeiling }}</label>
-              </p-floatlabel>
-              <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.sessionCapacityCeiling, text: copy.sessionCapacityHint }" />
-            </div>
-            @if (controls.sessionCapacityCeiling.touched && controls.sessionCapacityCeiling.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
-          </div>
-        }
-        @if (controls.wholeEventCapacity.enabled) {
-          <div class="flex-col-start-stretch gap-xs w-px-300 w-100-sm">
-            <div class="flex-row-start-center gap-xs">
-              <p-floatlabel variant="on" class="flex-1 min-w-0">
-                <p-inputnumber inputId="global-event-whole-capacity" formControlName="wholeEventCapacity" [min]="1"
-                  size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
-                <label for="global-event-whole-capacity">{{ copy.wholeEventCapacity }}</label>
-              </p-floatlabel>
-              <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.wholeEventCapacity, text: copy.wholeEventCapacityHint }" />
-            </div>
-            @if (controls.wholeEventCapacity.touched && controls.wholeEventCapacity.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
-          </div>
-        }
-      </div>
-      <div class="flex-row-start-center gap-sm">
-        <p-toggleswitch inputId="global-event-signup-required" formControlName="signupRequired" />
-        <label for="global-event-signup-required">{{ i18n.commonLabels().signupRequired }}</label><ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().signupRequired, text: copy.signupRequiredHint }" />
+        <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().participantSignupKind, text: copy.signupKindHint }" />
       </div>
     </div>
-
+    <div class="flex-row-start-center gap-sm">
+      <p-toggleswitch inputId="global-event-signup-required" formControlName="signupRequired" />
+      <label for="global-event-signup-required">{{ i18n.commonLabels().signupRequired }}</label>
+      <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().signupRequired, text: copy.signupRequiredHint }" />
+    </div>
+    <div class="mg-grid-2 gap-md border-top pt-md w-100">
+      @if (controls.sessionCapacityCeiling.enabled) {
+        <div class="flex-col-start-stretch gap-xs min-w-0">
+          <div class="flex-row-start-center gap-xs">
+            <p-floatlabel variant="on" class="flex-1 min-w-0">
+              <p-inputnumber inputId="global-event-session-capacity" formControlName="sessionCapacityCeiling" [min]="1"
+                size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
+              <label for="global-event-session-capacity">{{ copy.sessionCapacityCeiling }}</label>
+            </p-floatlabel>
+            <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.sessionCapacityCeiling, text: copy.sessionCapacityHint }" />
+          </div>
+          @if (controls.sessionCapacityCeiling.touched && controls.sessionCapacityCeiling.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
+        </div>
+      }
+      @if (controls.wholeEventCapacity.enabled) {
+        <div class="flex-col-start-stretch gap-xs min-w-0">
+          <div class="flex-row-start-center gap-xs">
+            <p-floatlabel variant="on" class="flex-1 min-w-0">
+              <p-inputnumber inputId="global-event-whole-capacity" formControlName="wholeEventCapacity" [min]="1"
+                size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
+              <label for="global-event-whole-capacity">{{ copy.wholeEventCapacity }}</label>
+            </p-floatlabel>
+            <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.wholeEventCapacity, text: copy.wholeEventCapacityHint }" />
+          </div>
+          @if (controls.wholeEventCapacity.touched && controls.wholeEventCapacity.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
+        </div>
+      }
+    </div>
   </section>
 }
 <ng-template #help let-label="label" let-text="text">
-  <button pButton type="button" icon="pi pi-question-circle" severity="secondary" size="small" [text]="true" [rounded]="true"
+  <button pButton type="button" icon="pi pi-read" severity="secondary" size="small" [text]="true" [rounded]="true"
     [attr.aria-label]="label + ': ' + copy.help" [pTooltip]="text" tooltipEvent="both" tooltipPosition="top" appendTo="body"></button>
 </ng-template>

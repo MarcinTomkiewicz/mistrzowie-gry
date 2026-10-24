@@ -1,30 +1,94 @@
 @let draft = value();
 @let copy = i18n.creation();
-<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-  <h2 class="mg-section__title mg-section__title--md m-0">{{ draft.name }}</h2>
-  <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
-    <div><dt class="muted-text">{{ i18n.commonLabels().shortDescription }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.shortDescription || i18n.commonValues().notProvided }}</dd></div>
-    <div><dt class="muted-text">{{ i18n.commonLabels().longDescription }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.longDescription || i18n.commonValues().notProvided }}</dd></div>
-    <div><dt class="muted-text">{{ copy.mainCity }}</dt><dd class="m-0">{{ draft.mainCity.city }}</dd></div>
-    <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0">{{ draft.mainCity.timezone }}</dd></div>
-    <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0">{{ draft.mainCity.venueName || i18n.commonValues().notProvided }}</dd></div>
-    <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0">{{ draft.mainCity.venueAddress || i18n.commonValues().notProvided }}</dd></div>
-    <div><dt class="muted-text">{{ copy.facebookLink }}</dt><dd class="m-0 text-wrap-anywhere">
-      @if (draft.mainCity.facebookLink) { <a [href]="draft.mainCity.facebookLink" target="_blank" rel="noopener noreferrer">{{ draft.mainCity.facebookLink }}</a> }
-      @else { {{ i18n.commonValues().notProvided }} }
-    </dd></div>
-    <div><dt class="muted-text">{{ i18n.commonLabels().eventDate }}</dt><dd class="m-0"><time [attr.datetime]="date()">{{ formatDateLabel(date()) }}</time></dd></div>
-  </dl>
-  <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
-  @for (block of draft.timeBlocks; track block.position) {
-    <div class="flex-row-between-center flex-wrap gap-sm border-top pt-sm">
-      <strong>{{ block.label }}</strong>
-      <span class="text-nowrap">{{ formatTimeRangeLabel(block.startTime, block.endTime) }}</span>
-      <span>{{ copy.requiredGmCount }}: {{ block.requiredGmCount }}</span>
+<div class="grid-2-1 grid-items-start gap-md w-100 min-w-0">
+  <div class="flex-col-start-stretch gap-md min-w-0">
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <div class="flex-row-start-center gap-md">
+        <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
+        <h2 class="mg-section__title mg-section__title--md m-0 text-wrap-anywhere">{{ draft.name }}</h2>
+      </div>
+      <dl class="flex-col-start-stretch gap-md m-0">
+        <div class="min-w-0">
+          <dt class="muted-text">{{ i18n.commonLabels().shortDescription }}</dt>
+          <dd class="m-0 text-wrap-anywhere">{{ draft.shortDescription || i18n.commonValues().notProvided }}</dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="muted-text">{{ i18n.commonLabels().longDescription }}</dt>
+          <dd class="m-0 text-wrap-anywhere">{{ draft.longDescription || i18n.commonValues().notProvided }}</dd>
+        </div>
+      </dl>
+    </section>
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <div class="flex-row-start-center gap-md">
+        <span class="pi pi-capitol square-11 flex-none" aria-hidden="true"></span>
+        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.mainCity }}</h2>
+      </div>
+      <dl class="mg-grid-2 gap-md m-0">
+        <div><dt class="muted-text">{{ i18n.commonLabels().city }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.mainCity.city }}</dd></div>
+        <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.mainCity.timezone }}</dd></div>
+        <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.mainCity.venueName || i18n.commonValues().notProvided }}</dd></div>
+        <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ draft.mainCity.venueAddress || i18n.commonValues().notProvided }}</dd></div>
+      </dl>
+      <dl class="m-0">
+        <dt class="muted-text">{{ copy.facebookLink }}</dt>
+        <dd class="m-0 text-wrap-anywhere">
+          @if (draft.mainCity.facebookLink) { <a [href]="draft.mainCity.facebookLink" target="_blank" rel="noopener noreferrer">{{ draft.mainCity.facebookLink }}</a> }
+          @else { {{ i18n.commonValues().notProvided }} }
+        </dd>
+      </dl>
+    </section>
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <div class="flex-row-start-center gap-md">
+        <span class="pi pi-sun-eclipse square-11 flex-none" aria-hidden="true"></span>
+        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
+      </div>
+      @if (draft.schedule.kind === 'recurring') {
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <time [attr.datetime]="draft.schedule.startDate">{{ formatDateLabel(draft.schedule.startDate) }}</time>
+          <span aria-hidden="true">-</span>
+          <time [attr.datetime]="draft.schedule.endDate">{{ formatDateLabel(draft.schedule.endDate) }}</time>
+        </div>
+        <dl class="mg-grid-2 gap-sm m-0">
+          @for (row of recurrenceRows(); track row.label) {
+            <div><dt class="muted-text">{{ row.label }}</dt><dd class="m-0">{{ row.value }}</dd></div>
+          }
+        </dl>
+        @if (draft.schedule.exdates?.length) {
+          <strong>{{ i18n.commonLabels().excludedDates }}</strong>
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            @for (date of draft.schedule.exdates; track date) {
+              <time [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
+            }
+          </div>
+        }
+      } @else {
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          @for (date of dates(); track date) {
+            <time class="tag-badge tag-badge--muted" [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
+          }
+        </div>
+      }
+      <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
+        <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
+        <app-event-global-time-blocks-summary [blocks]="draft.timeBlocks" />
+        <p class="m-0 muted-text">{{ i18n.datedBlocks().unchangedDates }}</p>
+        @for (row of draft.dateTimeBlocks; track row.date) {
+          <h4 class="m-0">{{ formatDateLabel(row.date) }} - {{ i18n.datedBlocks().sources.date_specific }}</h4>
+          <app-event-global-time-blocks-summary [blocks]="row.timeBlocks" />
+        }
+        @for (row of draft.mainCityDateTimeBlocks; track row.date) {
+          <h4 class="m-0">{{ formatDateLabel(row.date) }} - {{ draft.mainCity.city }} - {{ i18n.datedBlocks().cityOverride }}</h4>
+          <app-event-global-time-blocks-summary [blocks]="row.timeBlocks" />
+        }
+      </section>
+    </section>
+  </div>
+  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+    <div class="flex-row-start-center gap-md">
+      <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.policy }}</h2>
     </div>
-  }
-</section>
-<section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.policy }}</h2>
-  <app-event-global-policy-summary [policy]="draft.policy" />
-</section>
+    <app-event-global-policy-summary [policy]="draft.policy" />
+  </section>
+</div>

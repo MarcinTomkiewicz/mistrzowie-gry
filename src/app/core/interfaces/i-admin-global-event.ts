@@ -26,6 +26,58 @@ export interface GlobalTimeBlockInput {
   endTime: string;
 }
 
+export interface EventDateTimeBlocks {
+  date: string;
+  timeBlocks: GlobalTimeBlockInput[];
+}
+
+export interface EventDateTimeBlocksChange {
+  date: string;
+  timeBlocks: GlobalTimeBlockInput[] | null;
+}
+
+export interface EventCityDateTimeBlocksChange extends EventDateTimeBlocksChange {
+  editionId: string;
+}
+
+export interface EventDatedTimeBlocksCommand {
+  coreId: string;
+  expectedCalendarRevision: number;
+  dateTimeBlocks: EventDateTimeBlocksChange[];
+  cityDateTimeBlocks: EventCityDateTimeBlocksChange[];
+}
+
+export interface AdminDatedTimeBlocksPreview {
+  valid: true;
+  status: 'preview_ready';
+  applied: false;
+  coreId: string;
+  calendarRevision: number;
+  dateTimeBlocks: EventDateTimeBlocksChange[];
+  cityDateTimeBlocks: EventCityDateTimeBlocksChange[];
+  published: false;
+  participantSignupOpened: false;
+}
+
+export interface AdminDatedTimeBlocksSave {
+  status: 'draft_saved';
+  applied: true;
+  calendarRevision: number;
+  dateTimeBlocks: EventDateTimeBlocksChange[];
+  cityDateTimeBlocks: EventCityDateTimeBlocksChange[];
+}
+
+export interface AdminDatedTimeBlocks extends EventDateTimeBlocks {
+  globalOccurrenceId: string;
+  source: 'published_snapshot' | 'date_specific' | 'core_baseline';
+  cities: {
+    editionId: string;
+    city: string;
+    isOverride: boolean;
+    timeBlocks: GlobalTimeBlockInput[];
+  }[];
+}
+
 export interface EventGlobalPrice {
   amount: number | null;
   currency: EventCurrency;
@@ -57,6 +109,8 @@ export interface CreateAdminGlobalEventPayload {
   };
   schedule: EventGlobalSchedule;
   timeBlocks: GlobalTimeBlockInput[];
+  dateTimeBlocks?: EventDateTimeBlocks[];
+  mainCityDateTimeBlocks?: EventDateTimeBlocks[];
   policy: EventGlobalPolicyInput;
 }
 
@@ -81,6 +135,7 @@ export interface AdminGlobalCalendarResult {
     isMain: boolean; isActive: boolean; isDefaultPublicLegacy: boolean;
   }[];
   timeBlocks: (GlobalTimeBlockInput & { blockId: string })[];
+  datedTimeBlocks: AdminDatedTimeBlocks[];
   globalDates: {
     globalOccurrenceId: string;
     date: string;

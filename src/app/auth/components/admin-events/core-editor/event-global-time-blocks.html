@@ -1,0 +1,82 @@
+@let copy = i18n.creation();
+<div class="flex-col-start-stretch gap-md w-100 min-w-0" data-event-block-editor>
+    @for (block of blocks().controls; track block; let index = $index) {
+      <div class="flex-col-start-stretch gap-sm border radius-sm p-md w-100 min-w-0" [formGroup]="block" [attr.data-event-block]="index">
+        <div class="mg-grid-3 gap-sm w-100">
+          <p-floatlabel variant="on" class="min-w-0 w-100">
+            <input pInputText pSize="small" [id]="idPrefix() + '-label-' + index" formControlName="label" class="w-100" maxlength="140" />
+            <label [for]="idPrefix() + '-label-' + index">{{ copy.blockLabel }}</label>
+          </p-floatlabel>
+          <p-floatlabel variant="on" class="min-w-0 w-100">
+            <p-datepicker #startPicker ngSkipHydration [inputId]="idPrefix() + '-start-' + index" formControlName="startTime" size="small"
+              dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
+              iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
+              [invalid]="canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid"
+              (onBlur)="normalizeTime(index, 'startTime', $event)" (onClose)="block.controls.startTime.markAsTouched()">
+              <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
+              <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
+              <ng-template #inputicon let-clickCallBack="clickCallBack">
+                <span class="flex-row-center-center w-px-16 aspect-square">
+                  <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
+                </span>
+              </ng-template>
+              <ng-template #footer>
+                <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
+                  [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(startPicker)" />
+              </ng-template>
+            </p-datepicker>
+            <label [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
+          </p-floatlabel>
+          <p-floatlabel variant="on" class="min-w-0 w-100">
+            <p-datepicker #endPicker ngSkipHydration [inputId]="idPrefix() + '-end-' + index" formControlName="endTime" size="small"
+              dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
+              iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
+              [invalid]="(canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) || showTimeRangeError(block, startPicker, endPicker)"
+              (onBlur)="normalizeTime(index, 'endTime', $event)" (onClose)="block.controls.endTime.markAsTouched()">
+              <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
+              <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
+              <ng-template #inputicon let-clickCallBack="clickCallBack">
+                <span class="flex-row-center-center w-px-16 aspect-square">
+                  <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
+                </span>
+              </ng-template>
+              <ng-template #footer>
+                <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
+                  [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(endPicker)" />
+              </ng-template>
+            </p-datepicker>
+            <label [for]="idPrefix() + '-end-' + index">{{ i18n.commonLabels().end }}</label>
+          </p-floatlabel>
+        </div>
+        <div class="flex-row-between-center flex-wrap gap-sm w-100">
+          <div class="flex-row-start-center gap-xs w-px-250 max-w-full flex-none">
+            <p-floatlabel variant="on" class="flex-1 min-w-0">
+              <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="1"
+                [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+              <label [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
+            </p-floatlabel>
+            <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.requiredGmCount, text: copy.requiredGmHint }" />
+          </div>
+          <div class="flex-row-end-center flex-none">
+            <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
+              [label]="i18n.commonActions().removeItem" [disabled]="blocks().disabled || blocks().length === 1" (onClick)="removeBlock(index)" />
+          </div>
+        </div>
+        @if (block.controls.label.touched && block.controls.label.invalid) {
+          <small class="mg-contact-error">{{ copy.blockLabel }}: {{ block.controls.label.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}</small>
+        }
+        @if (canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().start }}: {{ copy.timeInvalid }}</small> }
+        @if (canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().end }}: {{ copy.timeInvalid }}</small> }
+        @if (block.controls.requiredGmCount.touched && block.controls.requiredGmCount.invalid) { <small class="mg-contact-error">{{ copy.requiredGmCount }}: {{ i18n.commonForm().positiveInteger }}</small> }
+        @if (showTimeRangeError(block, startPicker, endPicker)) { <small class="mg-contact-error">{{ i18n.datedBlocks().blockRange }}</small> }
+      </div>
+    }
+    <div class="flex-row-start-center">
+      <p-button type="button" icon="pi pi-add-plus" size="small" severity="secondary" [outlined]="true"
+        [id]="idPrefix() + '-add'" [label]="copy.addBlock" [disabled]="blocks().disabled" (onClick)="addBlock()" />
+    </div>
+</div>
+<ng-template #help let-label="label" let-text="text">
+  <button pButton type="button" icon="pi pi-read" severity="secondary" size="small" [text]="true" [rounded]="true"
+    [attr.aria-label]="label + ': ' + copy.help" [pTooltip]="text" tooltipEvent="both" tooltipPosition="top" appendTo="body"></button>
+</ng-template>

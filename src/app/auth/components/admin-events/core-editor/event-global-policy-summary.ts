@@ -21,10 +21,14 @@ export class EventGlobalPolicySummary {
   private policyRows(policy: EventGlobalPolicyInput) {
     const copy = this.i18n.creation();
     const values = this.i18n.commonValues();
+    const priceCopy = this.i18n.commonPrice();
+    const { amount, currency, basis } = policy.price;
     return [
-      { label: this.i18n.commonLabels().price, value: policy.price.amount === null
-        ? `${values.notProvided} (${policy.price.currency})` : formatMoney(policy.price.amount, policy.price.currency) },
-      { label: this.i18n.commonPrice().editor.fields.perUnit, value: policy.price.basis === null ? values.notApplicable : this.i18n.priceBases()[policy.price.basis] },
+      { label: this.i18n.commonLabels().price, value: amount === null || amount === 0
+        ? priceCopy.presentation.free : formatMoney(amount, currency) },
+      ...(amount !== null && amount > 0 ? [
+        { label: priceCopy.editor.fields.perUnit, value: basis === null ? values.notApplicable : this.i18n.priceBases()[basis] },
+      ] : []),
       { label: this.i18n.commonLabels().forBeginners, value: policy.isForBeginners ? values.yes : values.no },
       { label: this.i18n.commonLabels().participantSignupKind, value: resolveParticipantSignupKindLabel(policy.participantSignupKind, this.i18n.participantKinds()) },
       { label: this.i18n.commonLabels().signupRequired, value: policy.signupRequired ? values.yes : values.no },

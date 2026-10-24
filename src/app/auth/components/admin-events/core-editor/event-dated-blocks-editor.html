@@ -1,0 +1,72 @@
+@let copy = i18n.datedBlocks();
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.editTitle }}</h2>
+  @if (!dateOptions().length) {
+    <p class="m-0 muted-text">{{ copy.noDates }}</p>
+  } @else {
+    <div class="flex-row-start-center flex-wrap gap-md">
+      <p-floatlabel variant="on" class="w-px-250 max-w-full">
+        <p-select inputId="dated-blocks-date" [options]="dateOptions()" optionLabel="label" optionValue="value" size="small"
+          [ngModel]="editor.date()" (ngModelChange)="select($event, 'date')" [disabled]="selectionLocked()" appendTo="body" class="w-100" />
+        <label for="dated-blocks-date">{{ i18n.commonLabels().eventDate }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-px-300 max-w-full">
+        <p-select inputId="dated-blocks-scope" [options]="scopeOptions()" optionLabel="label" optionValue="value" size="small"
+          [ngModel]="editor.editionId() || 'date'" (ngModelChange)="select($event, 'city')" [disabled]="selectionLocked()" appendTo="body" class="w-100" />
+        <label for="dated-blocks-scope">{{ copy.scope }}</label>
+      </p-floatlabel>
+    </div>
+    @if (editor.isDirty()) { <p class="m-0 muted-text">{{ copy.selectHint }}</p> }
+    @if (editor.day(); as day) {
+      <details class="w-100">
+        <summary>{{ copy.current }} - {{ editor.editionId() ? (editor.city()?.isOverride ? copy.cityOverride : copy.fromDate) : copy.sources[day.source] }}</summary>
+        <app-event-global-time-blocks-summary [blocks]="editor.currentBlocks()" />
+      </details>
+      @if (!editor.canEdit()) {
+        <p class="m-0 muted-text">{{ copy.protected }}</p>
+      } @else {
+        <form class="mg-form flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="editor.form" (ngSubmit)="preview()" novalidate>
+          <div class="flex-row-start-center gap-sm">
+            <p-toggleswitch inputId="dated-blocks-override" formControlName="override" />
+            <label for="dated-blocks-override">{{ copy.configure }}</label>
+          </div>
+          @if (editor.form.controls.override.value) {
+            <app-event-global-time-blocks [blocks]="editor.form.controls.timeBlocks" idPrefix="dated-edit"
+              [validationAttempted]="editor.validationAttempted()" />
+          } @else {
+            <p class="m-0 muted-text">{{ editor.editionId() ? copy.fromDate : copy.fromCore }}</p>
+          }
+          @if (editor.validationAttempted() && editor.form.invalid) {
+            <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+          }
+          @if (editor.preview(); as preview) {
+            <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+              <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.previewReady }}</h3>
+              <p class="m-0 muted-text">{{ copy.previewChanges }}</p>
+              @for (row of preview.dateTimeBlocks; track row.date) {
+                @if (row.timeBlocks; as blocks) { <app-event-global-time-blocks-summary [blocks]="blocks" /> }
+                @else { <p class="m-0">{{ copy.restoreInheritance }} - {{ copy.fromCore }}</p> }
+              }
+              @for (row of preview.cityDateTimeBlocks; track row.editionId + row.date) {
+                @if (row.timeBlocks; as blocks) { <app-event-global-time-blocks-summary [blocks]="blocks" /> }
+                @else { <p class="m-0">{{ copy.restoreInheritance }} - {{ copy.fromDate }}</p> }
+              }
+            </section>
+          }
+          <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+            <p-button type="submit" size="small" [outlined]="true" icon="pi pi-spy" [label]="copy.preview"
+              [loading]="editor.isPreviewing()" loadingIcon="pi pi-d20"
+              [disabled]="editor.isBusy() || !editor.isDirty() || editor.conflicted() || editor.readbackPending()" />
+            <p-button type="button" size="small" severity="success" icon="pi pi-done-it" [label]="copy.save"
+              [loading]="editor.isSaving()" loadingIcon="pi pi-d20"
+              [disabled]="editor.isBusy() || !editor.preview() || editor.readbackPending()" (onClick)="save()" />
+          </div>
+        </form>
+      }
+    }
+    @if (errorMessage()) { <p class="mg-contact-error m-0" role="alert">{{ errorMessage() }}</p> }
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+      [loading]="editor.isReading()" loadingIcon="pi pi-d20"
+      [label]="editor.readbackPending() ? i18n.creation().retryRead : copy.discard" [disabled]="editor.isBusy()" (onClick)="refresh()" />
+  }
+</section>

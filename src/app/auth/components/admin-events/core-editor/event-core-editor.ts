@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,15 +24,17 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventCoreEditions } from './event-core-editions';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
+import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
 
 @Component({
   selector: 'app-event-core-editor',
   imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule,
-    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, LoadingOverlay, Breadcrumbs],
+    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, LoadingOverlay, Breadcrumbs],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventGlobalDraftController],
 })
 export class EventCoreEditor {
+  private readonly datedBlocks = viewChild(EventDatedBlocksEditor);
   private readonly destroyRef = inject(DestroyRef);
   private readonly eventAdmin = inject(EventAdmin);
   private readonly router = inject(Router);
@@ -134,6 +136,10 @@ export class EventCoreEditor {
 
   protected goBack(): void {
     void this.router.navigate(['/admin/content/events']);
+  }
+
+  canDeactivate() {
+    return this.datedBlocks()?.canDeactivate() ?? true;
   }
 
   private populateForm(core: IEventCoreDetail): void {

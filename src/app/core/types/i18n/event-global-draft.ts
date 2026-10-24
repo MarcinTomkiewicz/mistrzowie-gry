@@ -1,3 +1,37 @@
+import type { AdminDatedTimeBlocks } from '../../interfaces/i-admin-global-event';
+
+export type EventDatedBlocksCopy = {
+  title: string;
+  creationHint: string;
+  recurrenceHint: string;
+  dateInvalid: string;
+  dateScope: string;
+  mainCityScope: string;
+  configure: string;
+  restoreInheritance: string;
+  fromDate: string;
+  fromCore: string;
+  cityOverride: string;
+  sources: Record<AdminDatedTimeBlocks['source'], string>;
+  blockRange: string;
+  draftOnly: string;
+  editTitle: string;
+  scope: string;
+  protected: string;
+  preview: string;
+  previewReady: string;
+  save: string;
+  discard: string;
+  discardPrompt: string;
+  selectHint: string;
+  readbackFailed: string;
+  conflict: string;
+  previewChanges: string;
+  unchangedDates: string;
+  noDates: string;
+  current: string;
+};
+
 export type EventGlobalDraftCopy = {
   steps: Record<'location' | 'policy', string>;
   leaveConfirmation: string;
@@ -13,11 +47,13 @@ export type EventGlobalDraftCopy = {
   schedule: string;
   dateInvalid: string;
   blocks: string;
+  blocksHint: string;
   addBlock: string;
   blockLabel: string;
   requiredGmCount: string;
   requiredGmHint: string;
   timeInvalid: string;
+  setTime: string;
   policy: string;
   audience: string;
   registration: string;
@@ -33,7 +69,6 @@ export type EventGlobalDraftCopy = {
   readbackFailed: string;
   effectivePolicy: string;
   noAdditionalLimit: string;
-  dayOffset: string;
   appliedToPublicEvent: string;
   appliedToRegistration: string;
 };

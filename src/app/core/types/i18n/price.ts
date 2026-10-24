@@ -6,6 +6,8 @@ import type {
 } from '../price';
 
 export type PricePresentationTranslations = {
+  notProvided: string;
+  free: string;
   units: Record<BillingUnit | 'group' | 'whole_event', string>;
   percentageBases: Record<PercentageBasis, string>;
 };

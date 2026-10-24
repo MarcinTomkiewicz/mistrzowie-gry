@@ -24,7 +24,7 @@ import { EventGlobalDraftReview } from './event-global-draft-review';
 const STEP_FIELDS = [
   ['name', 'shortDescription', 'longDescription'],
   ['city', 'venueName', 'venueAddress', 'timezone', 'facebookLink'],
-  ['date', 'timeBlocks'],
+  ['schedule', 'timeBlocks', 'dateTimeBlocks', 'mainCityDateTimeBlocks'],
   ['priceAmount', 'priceCurrency', 'priceBasis', 'isForBeginners', 'participantSignupKind',
     'signupRequired', 'sessionCapacityCeiling', 'wholeEventCapacity'],
 ] as const;
@@ -47,6 +47,7 @@ export class EventGlobalDraftWizard {
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly activeStep = signal(1);
   protected readonly isSaving = signal(false);
+  protected readonly scheduleValidationAttempted = signal(false);
   protected readonly steps = computed(() => [
     { value: 1, label: this.i18n.fields().coreSectionTitle },
     { value: 2, label: this.i18n.creationSteps().location },
@@ -119,13 +120,16 @@ export class EventGlobalDraftWizard {
     if (this.draft.form.pristine) return true;
     return this.confirm.modalDecision({
       header: this.i18n.page().createTitle,
+      icon: 'pi pi-interdiction',
       message: this.i18n.creation().leaveConfirmation,
       acceptLabel: this.i18n.creation().discardDraft,
+      acceptIcon: 'pi pi-vacuum-cleaner',
       rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(map((accepted) => accepted && !this.destroyRef.destroyed && !this.isSaving() && this.draft.state() === 'idle'));
   }
 
   private validateStep(step: number): boolean {
+    if (step === 3) this.scheduleValidationAttempted.set(true);
     const field = this.findStepError(step);
     if (!field) return true;
     this.activeStep.set(step);
@@ -134,8 +138,12 @@ export class EventGlobalDraftWizard {
       if (this.destroyRef.destroyed || this.activeStep() !== step) return null;
       const [name, index, blockField] = field.split('.');
       const host = this.host.nativeElement;
-      const scope = blockField ? host.querySelector<HTMLElement>(`[data-event-block="${index}"]`) : host;
-      const control = field === 'timeBlocks' ? host.querySelector<HTMLElement>('#global-event-add-block')
+      const scope = blockField ? host.querySelector<HTMLElement>(`[data-event-base-blocks] [data-event-block="${index}"]`) : host;
+      const control = field === 'schedule' ? host.querySelector<HTMLElement>(
+        '[data-event-schedule] .p-invalid, [data-event-schedule] [aria-invalid="true"], [data-event-schedule] .ng-invalid',
+      ) ?? host.querySelector<HTMLElement>('[data-event-schedule] input')
+        : field === 'timeBlocks' ? host.querySelector<HTMLElement>('#global-base-add')
+        : field === 'dateTimeBlocks' || field === 'mainCityDateTimeBlocks' ? host.querySelector<HTMLElement>('[data-event-dated-drafts] input')
         : Array.from(scope?.querySelectorAll<HTMLElement>('[formControlName]') ?? [])
           .find((element) => element.getAttribute('formControlName') === (blockField ?? name));
       const target = control?.matches('input, textarea, button') ? control
@@ -162,7 +170,8 @@ export class EventGlobalDraftWizard {
         }
       }
       if (form.controls[field].invalid) return field;
-      if (field === 'date' && form.hasError('globalDate')) return field;
+      if (field === 'schedule' && form.hasError('globalDates')) return field;
+      if (field === 'dateTimeBlocks' && form.hasError('datedDates')) return field;
     }
     return null;
   }

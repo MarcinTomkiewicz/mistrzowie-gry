@@ -1,0 +1,49 @@
+@let draft = form();
+@let copy = i18n.datedBlocks();
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" data-event-dated-drafts>
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
+  <p class="m-0 muted-text">{{ copy.creationHint }}</p>
+  <p-floatlabel variant="on" class="w-px-250 max-w-full">
+    <p-datepicker ngSkipHydration inputId="global-blocks-date" [ngModel]="selectedDate() | isoDateValue"
+      [ngModelOptions]="standalone" (ngModelChange)="selectDate($event)" [disabled]="draft.disabled || draft.controls.schedule.invalid"
+      dateFormat="dd.mm.yy" [readonlyInput]="true" size="small" appendTo="body" class="w-100" inputStyleClass="w-100"
+      [invalid]="!!selectedDate() && !dateAllowed(selectedDate())" />
+    <label for="global-blocks-date">{{ i18n.commonLabels().eventDate }}</label>
+  </p-floatlabel>
+  @if (draft.controls.schedule.controls.kind.value === 'recurring') {
+    <p class="m-0 muted-text">{{ copy.recurrenceHint }}</p>
+  }
+  <div class="flex-row-start-center flex-wrap gap-xs">
+    @for (date of configuredDates(); track date) {
+      <p-button type="button" size="small" [outlined]="selectedDate() !== date" [disabled]="draft.disabled"
+        [severity]="validationAttempted() && dateInvalid(date) ? 'danger' : 'secondary'" [label]="formatDateLabel(date)" (onClick)="selectedDate.set(date)" />
+    }
+  </div>
+  @if ((selectedDate() && !dateAllowed(selectedDate())) || (validationAttempted() && draft.hasError('datedDates'))) {
+    <small class="mg-contact-error" role="alert">{{ copy.dateInvalid }}</small>
+  }
+  @if (validationAttempted() && (draft.controls.dateTimeBlocks.invalid || draft.controls.mainCityDateTimeBlocks.invalid)) {
+    <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+  }
+  @if (selectedDate()) {
+    @for (scope of scopes; track scope.key) {
+      <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ copy[scope.label] }}
+          @if (scope.key === 'mainCityDateTimeBlocks') { - {{ draft.controls.city.value }} }
+        </h3>
+        @if (row(scope.key); as configured) {
+          <app-event-global-time-blocks [blocks]="configured.controls.timeBlocks" [idPrefix]="'global-' + scope.key"
+            [validationAttempted]="validationAttempted()" />
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+            [label]="copy.restoreInheritance" [disabled]="draft.disabled" (onClick)="inherit(scope.key)" />
+        } @else {
+          <p class="m-0 muted-text">{{ scope.key === 'mainCityDateTimeBlocks' && row('dateTimeBlocks') ? copy.fromDate : copy.fromCore }}</p>
+          <app-event-global-time-blocks-summary [blocks]="inheritedBlocks(scope.key)" />
+          <p-button type="button" size="small" [outlined]="true" icon="pi pi-quill" [label]="copy.configure"
+            [disabled]="draft.disabled || !dateAllowed(selectedDate())" (onClick)="configure(scope.key)" />
+        }
+      </section>
+    }
+  }
+</section>

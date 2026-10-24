@@ -53,6 +53,41 @@
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
     },
+    "datedBlocks": {
+      "title": "[PH] Bloki wybranej daty i miasta",
+      "creationHint": "[PH] Wybierz datę z harmonogramu. Osobne bloki dodawaj tylko tam, gdzie mają różnić się od podstawowych. Pozostałe daty i miasta korzystają ze wspólnych ustawień.",
+      "recurrenceHint": "[PH] Wybierz konkretną datę zgodną z cyklem i wykluczeniami.",
+      "dateInvalid": "[PH] Każda konfiguracja musi wskazywać datę z harmonogramu, bez wykluczeń i powtórzeń. Sprawdź również konfiguracje po zmianie dat wydarzenia.",
+      "dateScope": "[PH] Bloki daty dla wszystkich miast",
+      "mainCityScope": "[PH] Osobne bloki głównej lokalizacji",
+      "configure": "[PH] Ustaw osobne bloki",
+      "restoreInheritance": "[PH] Przywróć wspólne bloki",
+      "fromDate": "[PH] Bloki wspólne dla wybranej daty",
+      "fromCore": "[PH] Podstawowe bloki wydarzenia",
+      "cityOverride": "[PH] Osobne bloki miasta",
+      "sources": {
+        "published_snapshot": "[PH] Utrwalone bloki opublikowanego terminu",
+        "date_specific": "[PH] Osobne bloki daty",
+        "core_baseline": "[PH] Podstawowe bloki wydarzenia"
+      },
+      "blockRange": "[PH] Początek i koniec bloku muszą mieć różne godziny.",
+      "draftOnly": "[PH] Edycja bloków szkicu",
+      "editTitle": "[PH] Edytuj bloki daty lub miasta",
+      "scope": "[PH] Zakres zmiany",
+      "protected": "[PH] Ten termin jest chroniony lub wyszedł ze stanu szkicu. Jego bloków nie można edytować.",
+      "preview": "[PH] Sprawdź zmiany",
+      "previewReady": "[PH] Zmiany sprawdzone. Możesz zapisać szkic. Kolejna edycja wymaga ponownego sprawdzenia.",
+      "save": "[PH] Zapisz bloki szkicu",
+      "discard": "[PH] Odrzuć zmiany i odczytaj kalendarz",
+      "discardPrompt": "[PH] Odrzucić wpisane zmiany bloków i wczytać aktualny kalendarz?",
+      "selectHint": "[PH] Zapisz lub odrzuć zmiany przed wybraniem innej daty lub miasta.",
+      "readbackFailed": "[PH] Bloki zostały zapisane, ale nie udało się odczytać aktualnego kalendarza. Ponów odczyt.",
+      "conflict": "[PH] Kalendarz został zmieniony przez inną osobę. Twoje wpisane zmiany zostały zachowane. Przed dalszą edycją odczytaj aktualny kalendarz.",
+      "previewChanges": "[PH] Zmiany dotyczą tylko szkicu wybranej daty i zakresu. Ten zapis nie publikuje bloków ani nie otwiera zapisów uczestników.",
+      "unchangedDates": "[PH] Daty bez osobnej konfiguracji korzystają z podstawowych bloków. Miasta bez odstępstwa korzystają z bloków swojej daty.",
+      "noDates": "[PH] Brak dat do edycji bloków.",
+      "current": "[PH] Aktualnie zapisane bloki"
+    },
     "creation": {
       "steps": {
         "location": "[PH] Główna lokalizacja",
@@ -64,21 +99,23 @@
       "signupKindHint": "[PH] Wybierz zapisy na sesje, na całe wydarzenie albo oba rodzaje. Każdy rodzaj ma osobną pulę miejsc. Wybór sposobu zapisów nie otwiera rejestracji uczestników.",
       "signupRequiredHint": "[PH] Określa, czy udział wymaga zapisu. Nie otwiera rejestracji i nie publikuje wydarzenia.",
       "mainCity": "[PH] Główna lokalizacja wydarzenia",
-      "timezoneHint": "[PH] Przesunięcie UTC uwzględnia czas letni i zimowy dla wybranej daty, a przed jej wyborem - dla dzisiaj. Wyszukaj miasto, nazwę strefy lub jej kod IANA.",
+      "timezoneHint": "[PH] Przesunięcie UTC uwzględnia czas letni i zimowy dla najwcześniejszej wybranej daty lub początku cyklu, a przed ich wyborem - dla dzisiaj. Wyszukaj miasto, nazwę strefy lub jej kod IANA.",
       "facebookLink": "[PH] Link do wydarzenia na Facebooku",
       "facebookInvalid": "[PH] Podaj adres HTTPS z domeną facebook.com, fb.com lub fb.me i niepustą ścieżką, np. https://www.facebook.com/events/123 (maks. 500 znaków).",
       "schedule": "[PH] Wspólny harmonogram wydarzenia",
-      "dateInvalid": "[PH] Wybierz datę od dzisiaj w strefie czasowej głównej lokalizacji wydarzenia, w latach 2000-2100.",
-      "blocks": "[PH] Dzienne bloki harmonogramu",
+      "dateInvalid": "[PH] Terminy muszą przypadać od dzisiaj w strefie głównej lokalizacji, w latach 2000-2100. Można wybrać do 732 dat. Cykl może obejmować do 3660 dni, z interwałem od 1 do 52.",
+      "blocks": "[PH] Wspólny szablon bloków czasowych",
+      "blocksHint": "[PH] Podstawowe ramy organizacyjne wydarzenia. Dla poszczególnych dat i miast możesz ustawić osobne bloki. Rzeczywiste punkty programu przypisuje się osobno do lokalizacji i terminu.",
       "addBlock": "[PH] Dodaj blok",
       "blockLabel": "[PH] Nazwa bloku",
       "requiredGmCount": "[PH] Planowana liczba MG",
       "requiredGmHint": "[PH] Liczba MG potrzebnych do obsadzenia bloku. To plan, nie limit uczestników.",
       "timeInvalid": "[PH] Podaj godzinę od 00:00 do 23:59. Możesz wpisać samo HH, np. 15.",
+      "setTime": "Ustaw godzinę",
       "policy": "[PH] Podstawowe ustawienia wydarzenia",
       "audience": "[PH] Przeznaczenie wydarzenia",
       "registration": "[PH] Zapisy i limity uczestników",
-      "priceHint": "[PH] Pusta kwota oznacza brak określonej ceny. Wpisz 0 dla wydarzenia bezpłatnego.",
+      "priceHint": "[PH] Pusta kwota lub 0 oznacza wydarzenie bezpłatne.",
       "sessionCapacityCeiling": "[PH] Limit organizatora na sesję",
       "wholeEventCapacity": "[PH] Limit na cały termin",
       "sessionCapacityHint": "[PH] Wspólny limit organizatora może obniżyć liczbę miejsc podaną przez MG. To ustawienie domyślne, nie indywidualny limit konkretnej sesji. Puste pole nie nakłada dodatkowego limitu.",
@@ -90,7 +127,6 @@
       "readbackFailed": "[PH] Szkic został zapisany, ale nie udało się odczytać danych. Ponów odczyt bez tworzenia nowego wydarzenia.",
       "effectivePolicy": "[PH] Ustawienia dla lokalizacji",
       "noAdditionalLimit": "[PH] Bez dodatkowego limitu",
-      "dayOffset": "[PH] +{{count}} dni",
       "appliedToPublicEvent": "[PH] Wspólne ustawienia stosowane na stronie publicznej",
       "appliedToRegistration": "[PH] Wspólne ustawienia stosowane przy zapisach uczestników",
       "venueName": "Miejsce wydarzenia"
@@ -248,12 +284,25 @@
   },
   "scheduleEditor": {
     "fields": {
-      "dates": "[PH] Daty wydarzenia"
+      "dates": "[PH] Daty wydarzenia",
+      "dateSelection": "[PH] Sposób wyboru terminów",
+      "monthlyPosition": "[PH] Wystąpienie dnia tygodnia w miesiącu",
+      "exclusionRules": "[PH] Miesięczne reguły wykluczeń",
+      "addExclusionRule": "[PH] Dodaj regułę wykluczenia",
+      "allExcludedDates": "[PH] Wszystkie wykluczone daty"
     },
     "options": {
       "single": "Wydarzenie jednorazowe",
       "recurring": "Wydarzenie cykliczne",
-      "exactDates": "[PH] Wydarzenie w wybranych terminach"
+      "exactDates": "[PH] Wydarzenie w wybranych terminach",
+      "range": "[PH] Zakres dat",
+      "individualDates": "[PH] Konkretne daty",
+      "selectedDates": "Wybrane terminy",
+      "cyclic": "Cyklicznie",
+      "singleHint": "[PH] Jeden wspólny dzień",
+      "selectedDatesHint": "[PH] Zakres lub lista wspólnych dat",
+      "cyclicHint": "[PH] Wspólny cykl",
+      "weeklyCycle": "[PH] Cykl tygodniowy"
     },
     "validation": {
       "singleDate": "Podaj poprawną datę wydarzenia.",
@@ -266,12 +315,17 @@
       "monthlyNth": "Wybierz dzień miesiąca.",
       "monthlyWeekday": "Wybierz dzień tygodnia.",
       "dayOfMonth": "Dzień miesiąca musi zawierać się w zakresie od 1 do 31.",
-      "intervalMin": "Interwał musi być liczbą całkowitą nie mniejszą niż 1."
+      "intervalMin": "Interwał musi być liczbą całkowitą nie mniejszą niż 1.",
+      "dateRangeLength": "[PH] Zakres może obejmować maksymalnie 732 daty, łącznie z pierwszym i ostatnim dniem.",
+      "exclusionRule": "[PH] Wybierz poprawne wystąpienie w miesiącu i dzień tygodnia.",
+      "allDatesExcluded": "[PH] Reguły i wybrane daty wykluczają wszystkie terminy cyklu. Zmień wykluczenia lub okres harmonogramu."
     },
     "info": {
       "scheduleChange": "Zmiana harmonogramu może usunąć przyszłe terminy.",
       "protectedOccurrences": "Termin zostanie zablokowany.",
-      "conflict": "Konflikt kończy się błędem i harmonogram nie zostanie zapisany."
+      "conflict": "Konflikt kończy się błędem i harmonogram nie zostanie zapisany.",
+      "globalDates": "[PH] Daty i cykl są wspólne dla wszystkich miast.",
+      "exclusionRules": "[PH] Reguły dotyczą każdego miesiąca w wybranym okresie. Łączą się z wykluczonymi datami. Po zapisie pozostaje lista konkretnych dat wykluczeń."
     }
   },
   "editionRpcErrors": {

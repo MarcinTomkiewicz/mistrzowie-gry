@@ -19,6 +19,8 @@ export const EVENT_PARTICIPANT_CONTACT_PHONES: Readonly<Partial<Record<string, s
 export const EVENT_CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK', 'SEK', 'NOK', 'DKK'] as const;
 export const EVENT_PRICE_BASES = ['per_participant', 'per_session', 'per_group', 'per_event'] as const;
 
+export const MAX_GLOBAL_EVENT_DATES = 732;
+
 export function isPublicEventSlug(value: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) && !value.startsWith('stf-');
 }

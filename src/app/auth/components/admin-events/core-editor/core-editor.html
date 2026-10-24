@@ -1,15 +1,17 @@
 <section class="mg-section mg-section--full">
-  <div class="mg-container position-relative flex-col-start-stretch gap-md">
+  <div class="mg-container position-relative flex-col-start-stretch gap-lg min-w-0">
     <app-breadcrumbs [items]="breadcrumbs()" />
 
-    <header class="mg-section__header w-100">
+    <header class="mg-section__header flex-col-start-center gap-sm w-100 m-0">
       <h1 class="mg-section__title">
-        {{ i18n.page().editTitle }}
+        {{ globalDraft.calendar() ? core()?.name : i18n.page().editTitle }}
       </h1>
 
-      <p class="mg-section__subtitle mg-section__subtitle--full">
-        {{ i18n.page().subtitle }}
-      </p>
+      @if (globalDraft.calendar()) {
+        <span class="tag-badge tag-badge--muted">{{ i18n.datedBlocks().draftOnly }}</span>
+      } @else if (!isLoading()) {
+        <p class="mg-section__subtitle mg-section__subtitle--full">{{ i18n.page().subtitle }}</p>
+      }
     </header>
 
     <app-loading-overlay
@@ -36,7 +38,7 @@
           <p-button
             severity="secondary"
             [label]="i18n.commonActions().retry"
-            icon="pi pi-refresh"
+            icon="pi pi-trail"
             (onClick)="loadCore()"
           />
 
@@ -67,12 +69,13 @@
       </section>
     } @else if (!isLoading() && core(); as loadedCore) {
       @if (globalDraft.calendar(); as calendar) {
+        <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
         @if (globalDraft.policy(); as policy) {
           <app-event-global-draft-summary [core]="loadedCore" [calendar]="calendar" [policy]="policy" />
         }
-        <div class="flex-row-center-center w-100">
+        <div class="flex-row-start-center border-top pt-md w-100">
           <p-button type="button" severity="secondary" [outlined]="true"
-            [label]="i18n.commonActions().cancel" icon="pi pi-arrow-left" (onClick)="goBack()" />
+            [label]="i18n.commonActions().previous" icon="pi pi-point-left" (onClick)="goBack()" />
         </div>
       } @else {
         <form
@@ -156,7 +159,7 @@
                   formControlName="isActive"
                 />
                 <label for="event-core-is-active">
-                  {{ i18n.commonEntityStatuses().active.neuter }}
+                  {{ i18n.coreStatuses().active }}
                 </label>
               </div>
 
@@ -177,7 +180,7 @@
               type="submit"
               severity="success"
               [label]="i18n.commonActions().save"
-              icon="pi pi-save"
+              icon="pi pi-done-it" loadingIcon="pi pi-d20"
               [loading]="isSaving()"
               [disabled]="isLoading()"
             />

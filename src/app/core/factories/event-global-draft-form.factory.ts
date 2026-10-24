@@ -1,30 +1,25 @@
 import { AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 
 import { DEFAULT_TIMEZONE } from '../configs/time.config';
+import { MAX_GLOBAL_EVENT_DATES } from '../configs/events.config';
 import { ParticipantSignupKind } from '../enums/event';
-import type { CreateAdminGlobalEventPayload, EventCurrency, EventPriceBasis } from '../interfaces/i-admin-global-event';
-import type { IEventSingleSchedule } from '../interfaces/i-event-schedule';
-import { isValidDate, toIsoDate } from '../utils/date';
+import type { CreateAdminGlobalEventPayload, EventCurrency, EventGlobalSchedule, EventPriceBasis } from '../interfaces/i-admin-global-event';
+import type { IEventSchedule } from '../interfaces/i-event-schedule';
+import { isValidIsoDate, parseIsoDate, toIsoDate } from '../utils/date';
+import { getEventDateRangeLength } from '../utils/event-schedule';
 import { normalizeText } from '../utils/normalize-text';
 import { timestampToTimeZoneDate } from '../utils/time-zone';
-import { eventTimeRangeValidator } from '../validators/event-admin.validator';
-import { integerValidator, slugSourceValidator, timeFormatValidator, validDateValidator } from '../validators/form-value.validator';
+import { integerValidator, slugSourceValidator } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
+import { createEventScheduleForm, mapEventScheduleFormToPayload } from './event-schedule-form.factory';
+import { type EventDateTimeBlocksForm, eventDraftDatedBlocksValidator, mapEventDateTimeBlocks } from './event-dated-time-block-form.factory';
+import { createEventGlobalTimeBlocksForm, mapEventGlobalTimeBlocks } from './event-global-time-block-form.factory';
 
 const requiredText = [Validators.required, requiredTrimmedValidator()];
 const positiveInteger = [integerValidator(), Validators.min(1), Validators.max(2147483647)];
 
-export function createEventGlobalTimeBlockForm() {
-  return new FormGroup({
-    label: new FormControl('', { nonNullable: true, validators: [...requiredText, Validators.maxLength(140)] }),
-    startTime: new FormControl('', { nonNullable: true, validators: [...requiredText, timeFormatValidator()] }),
-    endTime: new FormControl('', { nonNullable: true, validators: [...requiredText, timeFormatValidator()] }),
-    requiredGmCount: new FormControl(1, { nonNullable: true, validators: [Validators.required, ...positiveInteger] }),
-  }, { validators: eventTimeRangeValidator });
-}
-
 export function createEventGlobalDraftForm() {
-  return new FormGroup({
+  const form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [...requiredText, Validators.maxLength(140), slugSourceValidator()] }),
     shortDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(500) }),
     longDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(12000) }),
@@ -34,8 +29,10 @@ export function createEventGlobalDraftForm() {
     timezone: new FormControl(DEFAULT_TIMEZONE, { nonNullable: true, validators: [...requiredText, timezoneValidator] }),
     facebookLink: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500),
       Validators.pattern(/^https:\/\/(?:www\.)?(?:facebook\.com|fb\.com|fb\.me)\/[^\s/?#]+[^\s]*$/)] }),
-    date: new FormControl<Date | null>(null, { validators: [Validators.required, validDateValidator()] }),
-    timeBlocks: new FormArray([createEventGlobalTimeBlockForm()], { validators: Validators.required }),
+    schedule: createEventScheduleForm(),
+    timeBlocks: createEventGlobalTimeBlocksForm(),
+    dateTimeBlocks: new FormArray<EventDateTimeBlocksForm>([]),
+    mainCityDateTimeBlocks: new FormArray<EventDateTimeBlocksForm>([]),
     priceAmount: new FormControl<number | null>(null, { validators: [Validators.min(0), Validators.max(99999999.99), pricePrecisionValidator] }),
     priceCurrency: new FormControl<EventCurrency>('PLN', { nonNullable: true, validators: Validators.required }),
     priceBasis: new FormControl<EventPriceBasis>({ value: 'per_participant', disabled: true }, { nonNullable: true, validators: Validators.required }),
@@ -44,16 +41,18 @@ export function createEventGlobalDraftForm() {
     signupRequired: new FormControl(false, { nonNullable: true }),
     sessionCapacityCeiling: new FormControl<number | null>(null, { validators: positiveInteger }),
     wholeEventCapacity: new FormControl<number | null>({ value: null, disabled: true }, { validators: positiveInteger }),
-  }, { validators: globalDateValidator });
+  }, { validators: globalDatesValidator });
+  form.addValidators(() => eventDraftDatedBlocksValidator(form.controls.schedule,
+    [form.controls.dateTimeBlocks, form.controls.mainCityDateTimeBlocks]));
+  return form;
 }
 
 export type EventGlobalDraftForm = ReturnType<typeof createEventGlobalDraftForm>;
 
 export function mapEventGlobalDraftToPayload(
   form: EventGlobalDraftForm,
-): CreateAdminGlobalEventPayload & { schedule: IEventSingleSchedule } {
+): CreateAdminGlobalEventPayload {
   const value = form.getRawValue();
-  if (!isValidDate(value.date)) throw new Error('[EVENT_GLOBAL_DRAFT] Invalid global date.');
   return {
     name: value.name.trim(),
     shortDescription: normalizeText(value.shortDescription),
@@ -63,12 +62,12 @@ export function mapEventGlobalDraftToPayload(
       venueAddress: normalizeText(value.venueAddress), timezone: value.timezone,
       facebookLink: normalizeText(value.facebookLink),
     },
-    schedule: { kind: 'single', date: toIsoDate(value.date) },
-    timeBlocks: value.timeBlocks.map((block, index) => ({
-      ...block, label: block.label.trim(), position: index + 1, startDayOffset: 0, endDayOffset: 0,
-    })),
+    schedule: mapGlobalSchedule(mapEventScheduleFormToPayload(form.controls.schedule)),
+    timeBlocks: mapEventGlobalTimeBlocks(form.controls.timeBlocks),
+    ...(value.dateTimeBlocks.length ? { dateTimeBlocks: mapEventDateTimeBlocks(form.controls.dateTimeBlocks) } : {}),
+    ...(value.mainCityDateTimeBlocks.length ? { mainCityDateTimeBlocks: mapEventDateTimeBlocks(form.controls.mainCityDateTimeBlocks) } : {}),
     policy: {
-      price: { amount: value.priceAmount, currency: value.priceCurrency, basis: value.priceAmount === null ? null : value.priceBasis },
+      price: { amount: value.priceAmount ?? 0, currency: value.priceCurrency, basis: value.priceBasis },
       coverImagePath: null, isForBeginners: value.isForBeginners,
       participantSignupKind: value.participantSignupKind, signupRequired: value.signupRequired,
       sessionCapacityCeiling: value.sessionCapacityCeiling,
@@ -86,13 +85,43 @@ function timezoneValidator(control: AbstractControl): ValidationErrors | null {
   }
 }
 
-function globalDateValidator(control: AbstractControl): ValidationErrors | null {
-  const date: unknown = control.get('date')?.value;
+function globalDatesValidator(control: AbstractControl): ValidationErrors | null {
+  const schedule = control.get('schedule');
   const timezone: unknown = control.get('timezone')?.value;
-  if (!isValidDate(date) || typeof timezone !== 'string' || control.get('timezone')?.invalid) return null;
+  if (!schedule || schedule.invalid || typeof timezone !== 'string' || control.get('timezone')?.invalid) return null;
+  const kind: unknown = schedule.get('kind')?.value;
+  const selection: unknown = kind === 'single' ? [schedule.get('date')?.value]
+    : kind === 'exact_dates' ? schedule.get('dates')?.getRawValue()
+    : [schedule.get('startDate')?.value, schedule.get('endDate')?.value];
+  if (!Array.isArray(selection) || !selection.every(isValidIsoDate)) return { globalDates: true };
+  const dates = selection;
   const today = timestampToTimeZoneDate(new Date().toISOString(), timezone);
-  return today && date.getFullYear() >= 2000 && date.getFullYear() <= 2100 && toIsoDate(date) >= toIsoDate(today)
-    ? null : { globalDate: true };
+  const validDates = today && dates.length > 0 && new Set(dates).size <= MAX_GLOBAL_EVENT_DATES && dates.every((date) => {
+    const parsed = parseIsoDate(date);
+    return parsed && parsed.getFullYear() >= 2000 && parsed.getFullYear() <= 2100 && date >= toIsoDate(today);
+  });
+  const interval: unknown = schedule.get('interval')?.value;
+  const validRecurrence = kind !== 'recurring' || (typeof interval === 'number' && interval <= 52 &&
+    (getEventDateRangeLength(dates[0], dates[1]) ?? 0) <= 3661);
+  return validDates && validRecurrence
+    ? null : { globalDates: true };
+}
+
+function mapGlobalSchedule(schedule: IEventSchedule): EventGlobalSchedule {
+  if (schedule.kind !== 'recurring') return schedule;
+  const { kind, recurrenceKind, interval, startDate, endDate, exdates } = schedule;
+  const base = { kind, interval, startDate, endDate, exdates };
+  switch (recurrenceKind) {
+    case 'WEEKLY':
+      if (!schedule.byweekday) throw new Error('[EVENT_GLOBAL_DRAFT] Missing weekdays.');
+      return { ...base, recurrenceKind, byweekday: schedule.byweekday };
+    case 'MONTHLY_DAY_OF_MONTH':
+      if (schedule.dayOfMonth === null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing month day.');
+      return { ...base, recurrenceKind, dayOfMonth: schedule.dayOfMonth };
+    case 'MONTHLY_NTH_WEEKDAY':
+      if (schedule.monthlyNth === null || schedule.monthlyWeekday === null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing monthly weekday.');
+      return { ...base, recurrenceKind, monthlyNth: schedule.monthlyNth, monthlyWeekday: schedule.monthlyWeekday };
+  }
 }
 
 function pricePrecisionValidator(control: AbstractControl): ValidationErrors | null {

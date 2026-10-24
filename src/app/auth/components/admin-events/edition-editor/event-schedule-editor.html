@@ -1,317 +1,222 @@
-<section
-  class="mg-card flex-col-start-stretch gap-md p-md w-100"
-  [formGroup]="form()"
->
-  <h2 class="mg-section__title mg-section__title--md m-0">
-    {{ i18n.commonLabels().schedule }}
-  </h2>
-
-  <div class="flex-col-start-stretch gap-xs">
-    <p class="m-0">{{ i18n.info().scheduleChange }}</p>
-    <p class="m-0">{{ i18n.info().protectedOccurrences }}</p>
-    <p class="m-0">{{ i18n.info().conflict }}</p>
-  </div>
-
-  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-    <p-iftalabel class="w-100">
-      <p-select
-        class="w-100"
-        inputId="event-schedule-kind"
-        formControlName="kind"
-        [options]="scheduleKindOptions()"
-        optionLabel="label"
-        optionValue="value"
-      />
-      <label for="event-schedule-kind">{{ i18n.commonLabels().scheduleKind }}</label>
-    </p-iftalabel>
-
-    @if (form().controls.kind.value === "single") {
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <input
-            class="w-100"
-            pInputText
-            id="event-schedule-date"
-            type="date"
-            formControlName="date"
-          />
-          <label for="event-schedule-date">{{ i18n.commonLabels().eventDate }}</label>
-        </p-iftalabel>
-
-        @if (form().touched && form().hasError("singleDate")) {
-          <small class="mg-contact-error">
-            {{ i18n.validation().singleDate }}
-          </small>
-        }
-      </div>
-    } @else if (form().controls.kind.value === "recurring") {
-      <p-iftalabel class="w-100">
-        <p-select
-          class="w-100"
-          inputId="event-recurrence-kind"
-          formControlName="recurrenceKind"
-          [options]="recurrenceKindOptions()"
-          optionLabel="label"
-          optionValue="value"
-        />
-        <label for="event-recurrence-kind">
-          {{ i18n.commonLabels().recurrenceKind }}
-        </label>
-      </p-iftalabel>
-    }
-  </div>
-
-  @if (form().controls.kind.value === "recurring") {
-    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <p-inputnumber
-            class="w-100"
-            inputId="event-recurrence-interval"
-            formControlName="interval"
-            [min]="1"
-            [maxFractionDigits]="0"
-            [useGrouping]="false"
-          />
-          <label for="event-recurrence-interval">
-            {{ i18n.commonLabels().interval }}
-          </label>
-        </p-iftalabel>
-
-        @if (
-          form().controls.interval.touched &&
-          (form().controls.interval.hasError("required") ||
-            form().controls.interval.hasError("integer") ||
-            form().controls.interval.hasError("min"))
-        ) {
-          <small class="mg-contact-error">
-            {{ i18n.validation().intervalMin }}
-          </small>
-        }
-      </div>
-
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <input
-            class="w-100"
-            pInputText
-            id="event-recurrence-start-date"
-            type="date"
-            formControlName="startDate"
-          />
-          <label for="event-recurrence-start-date">
-            {{ i18n.commonLabels().scheduleStart }}
-          </label>
-        </p-iftalabel>
-      </div>
-
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <input
-            class="w-100"
-            pInputText
-            id="event-recurrence-end-date"
-            type="date"
-            formControlName="endDate"
-          />
-          <label for="event-recurrence-end-date">
-            {{ i18n.commonLabels().scheduleEnd }}
-          </label>
-        </p-iftalabel>
-      </div>
+@let schedule = form();
+@let controls = schedule.controls;
+@let kind = controls.kind.value;
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="schedule" data-event-schedule>
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().schedule }}</h2>
+  @if (globalCalendar()) {
+    <p class="m-0 muted-text">{{ i18n.info().globalDates }}</p>
+  } @else {
+    <div class="flex-col-start-stretch gap-xs">
+      <p class="m-0">{{ i18n.info().scheduleChange }}</p>
+      <p class="m-0">{{ i18n.info().protectedOccurrences }}</p>
+      <p class="m-0">{{ i18n.info().conflict }}</p>
     </div>
-
-    @if (form().touched && form().hasError("recurrenceDates")) {
-      <small class="mg-contact-error">
-        {{ i18n.validation().recurrenceDates }}
-      </small>
-    } @else if (
-      form().touched && form().hasError("recurrenceDateRange")
-    ) {
-      <small class="mg-contact-error">
-        {{ i18n.validation().recurrenceDateRange }}
-      </small>
+  }
+  @if (globalCalendar()) {
+    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-sm w-100" role="radiogroup" [attr.aria-label]="i18n.commonLabels().scheduleKind">
+      @for (option of globalKindOptions(); track option.value) {
+        @let selected = (kind === 'range' ? 'exact_dates' : kind) === option.value;
+        <label class="mg-choice-card w-100 min-w-0 text-left" [class.active]="selected" [for]="'event-global-kind-' + option.value">
+          <span class="flex-row-start-center gap-sm">
+            <p-radiobutton [inputId]="'event-global-kind-' + option.value" name="event-global-kind" [value]="option.value"
+              [ngModel]="kind === 'range' ? 'exact_dates' : kind" [ngModelOptions]="standaloneModel"
+              [disabled]="schedule.disabled" (ngModelChange)="selectGlobalKind($event)" />
+            <span [class]="option.icon + ' square-8 flex-none'" aria-hidden="true"></span>
+            <span class="flex-col-start-stretch gap-xs min-w-0">
+              <strong>{{ option.label }}</strong>
+              <span class="muted-text">{{ option.hint }}</span>
+            </span>
+          </span>
+        </label>
+      }
+    </div>
+    @if (kind === 'range' || kind === 'exact_dates') {
+      <div class="flex-row-start-center flex-wrap gap-md" role="radiogroup" [attr.aria-label]="i18n.fields().dateSelection">
+        <div class="flex-row-start-center gap-xs">
+          <p-radiobutton inputId="event-global-date-range" name="event-global-dates-mode" formControlName="kind" value="range" />
+          <label for="event-global-date-range">{{ i18n.options().range }}</label>
+        </div>
+        <div class="flex-row-start-center gap-xs">
+          <p-radiobutton inputId="event-global-date-selection" name="event-global-dates-mode" formControlName="kind" value="exact_dates" />
+          <label for="event-global-date-selection">{{ i18n.options().individualDates }}</label>
+        </div>
+      </div>
     }
-
-    @switch (form().controls.recurrenceKind.value) {
-      @case ("WEEKLY") {
-        <div
-          class="flex-col-start-stretch gap-sm w-100"
-          role="group"
-          [attr.aria-label]="i18n.commonLabels().weekdays"
-        >
+  }
+  <div class="flex-row-start-center flex-wrap gap-md w-100">
+    @if (!globalCalendar()) {
+      <p-floatlabel variant="on" class="w-px-250 max-w-full">
+        <p-select inputId="event-schedule-kind" formControlName="kind" [options]="scheduleKindOptions()"
+          optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
+          <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+        </p-select>
+        <label for="event-schedule-kind">{{ i18n.commonLabels().scheduleKind }}</label>
+      </p-floatlabel>
+    }
+    @if (kind === 'recurring') {
+      <p-floatlabel variant="on" class="w-px-300 max-w-full">
+        <p-select inputId="event-recurrence-kind" formControlName="recurrenceKind" [options]="recurrenceKindOptions()"
+          optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
+          <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+        </p-select>
+        <label for="event-recurrence-kind">{{ i18n.commonLabels().recurrenceKind }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-px-150 max-w-full">
+        <p-inputnumber inputId="event-recurrence-interval" formControlName="interval" size="small" [min]="1"
+          [maxFractionDigits]="0" [useGrouping]="false" class="w-100" inputStyleClass="w-100" />
+        <label for="event-recurrence-interval">{{ i18n.commonLabels().interval }}</label>
+      </p-floatlabel>
+    }
+  </div>
+  <div class="flex-row-start-center flex-wrap gap-md w-100">
+    @for (field of dateFields(); track field.name) {
+      <p-floatlabel variant="on" class="w-px-200 max-w-full">
+        <p-datepicker ngSkipHydration [inputId]="'event-schedule-' + field.name" [attr.data-schedule-field]="field.name"
+          [ngModel]="controls[field.name].value | isoDateValue" [ngModelOptions]="standaloneModel" (ngModelChange)="setDate(field.name, $event)"
+          [disabled]="schedule.disabled" dateFormat="dd.mm.yy" size="small" [readonlyInput]="true" [showIcon]="true"
+          iconDisplay="input" appendTo="body" class="w-px-200 max-w-full" inputStyleClass="w-100" [invalid]="dateInvalid(field.name)"
+          (onClose)="controls[field.name].markAsTouched()">
+          <ng-template #previousicon><span class="pi pi-point-left" aria-hidden="true"></span></ng-template>
+          <ng-template #nexticon><span class="pi pi-point-right" aria-hidden="true"></span></ng-template>
+          <ng-template #inputicon let-clickCallBack="clickCallBack">
+            <span class="flex-row-center-center w-px-16 aspect-square">
+              <span class="pi pi-report-spy w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
+            </span>
+          </ng-template>
+        </p-datepicker>
+        <label [for]="'event-schedule-' + field.name">{{ field.label }}</label>
+      </p-floatlabel>
+    }
+  </div>
+  @if (kind === 'recurring') {
+    @switch (controls.recurrenceKind.value) {
+      @case ('WEEKLY') {
+        <div class="flex-col-start-stretch gap-sm w-100" role="group" [attr.aria-label]="i18n.commonLabels().weekdays"
+          [attr.aria-invalid]="canShowError('weeklyDays') && schedule.hasError('weeklyDays')">
           <strong>{{ i18n.commonLabels().weekdays }}</strong>
-
           <div class="flex-row-start-center flex-wrap gap-md">
             @for (weekday of weekdayOptions; track weekday.value) {
               <div class="flex-row-start-center gap-xs">
-                <p-checkbox
-                  [inputId]="'event-weekday-' + weekday.value"
-                  [formControl]="form().controls.byweekday"
-                  [value]="weekday.value"
-                />
-                <label [for]="'event-weekday-' + weekday.value">
-                  {{ weekday.label }}
-                </label>
+                <p-checkbox [inputId]="'event-weekday-' + weekday.value" [formControl]="controls.byweekday" [value]="weekday.value" />
+                <label [for]="'event-weekday-' + weekday.value">{{ weekday.label }}</label>
               </div>
             }
           </div>
-
-          @if (form().touched && form().hasError("weeklyDays")) {
-            <small class="mg-contact-error">
-              {{ i18n.validation().weeklyDays }}
-            </small>
-          }
         </div>
       }
-      @case ("MONTHLY_NTH_WEEKDAY") {
-        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-          <p-iftalabel class="w-100">
-            <p-select
-              class="w-100"
-              inputId="event-monthly-nth"
-              formControlName="monthlyNth"
-              [options]="monthlyNthOptions()"
-              optionLabel="label"
-              optionValue="value"
-            />
-            <label for="event-monthly-nth">
-              {{ i18n.commonLabels().dayOfMonth }}
-            </label>
-          </p-iftalabel>
-
-          <p-iftalabel class="w-100">
-            <p-select
-              class="w-100"
-              inputId="event-monthly-weekday"
-              formControlName="monthlyWeekday"
-              [options]="weekdayOptions"
-              optionLabel="label"
-              optionValue="value"
-            />
-            <label for="event-monthly-weekday">
-              {{ i18n.commonLabels().weekday }}
-            </label>
-          </p-iftalabel>
+      @case ('MONTHLY_NTH_WEEKDAY') {
+        <div class="flex-row-start-center flex-wrap gap-md">
+          <p-floatlabel variant="on" class="w-px-200 max-w-full">
+            <p-select inputId="event-monthly-nth" formControlName="monthlyNth" [options]="monthlyNthOptions()"
+              optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body"
+              [invalid]="canShowError('monthlyNth') && schedule.hasError('monthlyNth')">
+              <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+            </p-select>
+            <label for="event-monthly-nth">{{ globalCalendar() ? i18n.fields().monthlyPosition : i18n.commonLabels().dayOfMonth }}</label>
+          </p-floatlabel>
+          <p-floatlabel variant="on" class="w-px-200 max-w-full">
+            <p-select inputId="event-monthly-weekday" formControlName="monthlyWeekday" [options]="weekdayOptions"
+              optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body"
+              [invalid]="canShowError('monthlyWeekday') && schedule.hasError('monthlyWeekday')">
+              <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+            </p-select>
+            <label for="event-monthly-weekday">{{ i18n.commonLabels().weekday }}</label>
+          </p-floatlabel>
         </div>
-
-        @if (form().touched && form().hasError("monthlyNth")) {
-          <small class="mg-contact-error">
-            {{ i18n.validation().monthlyNth }}
-          </small>
-        } @else if (
-          form().touched && form().hasError("monthlyWeekday")
-        ) {
-          <small class="mg-contact-error">
-            {{ i18n.validation().monthlyWeekday }}
-          </small>
-        }
       }
-      @case ("MONTHLY_DAY_OF_MONTH") {
-        <div class="flex-col-start-stretch gap-xs w-100">
-          <p-iftalabel class="w-100">
-            <p-inputnumber
-              class="w-100"
-              inputId="event-day-of-month"
-              formControlName="dayOfMonth"
-              [min]="1"
-              [max]="31"
-              [maxFractionDigits]="0"
-              [useGrouping]="false"
-            />
-            <label for="event-day-of-month">
-              {{ i18n.commonLabels().dayOfMonth }}
-            </label>
-          </p-iftalabel>
-
-          @if (form().touched && form().hasError("dayOfMonth")) {
-            <small class="mg-contact-error">
-              {{ i18n.validation().dayOfMonth }}
-            </small>
-          }
-        </div>
+      @case ('MONTHLY_DAY_OF_MONTH') {
+        <p-floatlabel variant="on" class="w-px-200 max-w-full">
+          <p-inputnumber inputId="event-day-of-month" formControlName="dayOfMonth" [min]="1" [max]="31"
+            size="small" [maxFractionDigits]="0" [useGrouping]="false" class="w-100" inputStyleClass="w-100"
+            [invalid]="canShowError('dayOfMonth') && schedule.hasError('dayOfMonth')" />
+          <label for="event-day-of-month">{{ i18n.commonLabels().dayOfMonth }}</label>
+        </p-floatlabel>
       }
     }
   }
-
-  @if (
-    form().controls.kind.value === "recurring" ||
-    form().controls.kind.value === "exact_dates"
-  ) {
-    @let isExactDates = form().controls.kind.value === "exact_dates";
-    @let dateField = isExactDates ? "dates" : "exdates";
-    @let dateArray = form().controls[dateField];
-    @let dateIdPrefix = isExactDates ? "event-exact-date-" : "event-exdate-";
-
-    <div
-      class="flex-col-start-stretch gap-sm w-100"
-      role="group"
-      aria-labelledby="event-schedule-dates-title"
-    >
-      <div class="flex-row-between-center flex-wrap gap-sm">
-        <strong id="event-schedule-dates-title">
-          {{ isExactDates ? i18n.fields().dates : i18n.commonLabels().excludedDates }}
-        </strong>
-        <p-button
-          type="button"
-          size="small"
-          severity="secondary"
-          [label]="i18n.commonActions().add"
-          icon="pi pi-plus"
-          (onClick)="addDate(dateField)"
-        />
-      </div>
-
-      @for (dateControl of dateArray.controls; track dateControl) {
-        <div class="flex-row-start-center flex-col-start-stretch-sm gap-sm">
-          <div class="flex-col-start-stretch gap-xs flex-1 w-100-sm">
-            <p-iftalabel class="w-100">
-              <input
-                class="w-100"
-                pInputText
-                [id]="dateIdPrefix + $index"
-                type="date"
-                [formControl]="dateControl"
-              />
-              <label [for]="dateIdPrefix + $index">
-                {{ isExactDates ? i18n.commonLabels().eventDate : i18n.commonLabels().excludedDate }}
-                {{ $index + 1 }}
-              </label>
-            </p-iftalabel>
-
-            @if (!isExactDates && dateControl.touched && dateControl.invalid) {
-              <small class="mg-contact-error">
-                {{ i18n.commonForm().invalidDate }}
-              </small>
-            }
-          </div>
-
-          <p-button
-            type="button"
-            severity="danger"
-            [outlined]="true"
-            [label]="i18n.commonActions().delete"
-            icon="pi pi-times"
-            (onClick)="removeDate(dateField, $index)"
-          />
-        </div>
-      }
-
-      @if (isExactDates && form().touched) {
-        @if (form().hasError("exactDatesRequired")) {
-          <small class="mg-contact-error" role="alert">
-            {{ i18n.validation().exactDatesRequired }}
-          </small>
-        } @else if (form().hasError("exactDatesInvalid")) {
-          <small class="mg-contact-error" role="alert">
-            {{ i18n.validation().exactDatesInvalid }}
-          </small>
-        } @else if (form().hasError("exactDatesDuplicate")) {
-          <small class="mg-contact-error" role="alert">
-            {{ i18n.validation().exactDatesDuplicate }}
-          </small>
-        }
+  @if (kind === 'exact_dates' || kind === 'recurring') {
+    @if (globalCalendar() && kind === 'recurring') {
+      <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ i18n.commonLabels().excludedDates }}</h3>
+    }
+    @let field = kind === 'exact_dates' ? 'dates' : 'exdates';
+    @let label = kind === 'exact_dates' ? i18n.fields().dates : i18n.commonLabels().excludedDates;
+    <p-floatlabel variant="on" class="w-px-250 max-w-full">
+      <p-datepicker ngSkipHydration [inputId]="'event-schedule-' + field" [attr.data-schedule-field]="field"
+        [ngModel]="controls[field].value | isoDateValue" [ngModelOptions]="standaloneModel" (ngModelChange)="setDates(field, $event)"
+        [disabled]="schedule.disabled" selectionMode="multiple" dateFormat="dd.mm.yy" size="small"
+        [readonlyInput]="true" [showIcon]="true" iconDisplay="input" appendTo="body" class="w-px-250 max-w-full" inputStyleClass="w-100"
+        [invalid]="(canShowError('exactDatesRequired') && (schedule.hasError('exactDatesRequired') || schedule.hasError('exactDatesInvalid'))) || showExternalError()"
+        (onClose)="controls[field].markAsTouched()">
+        <ng-template #previousicon><span class="pi pi-point-left" aria-hidden="true"></span></ng-template>
+        <ng-template #nexticon><span class="pi pi-point-right" aria-hidden="true"></span></ng-template>
+        <ng-template #inputicon let-clickCallBack="clickCallBack">
+          <span class="flex-row-center-center w-px-16 aspect-square">
+            <span class="pi pi-report-spy w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
+          </span>
+        </ng-template>
+      </p-datepicker>
+      <label [for]="'event-schedule-' + field">{{ label }}</label>
+    </p-floatlabel>
+    <div class="flex-row-start-center flex-wrap gap-xs" role="list" [attr.aria-label]="label">
+      @for (date of selectedDates(field); track date) {
+        <span class="tag-badge tag-badge--muted flex-row-start-center gap-xs" role="listitem">
+          <time [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
+          <button pButton type="button" size="small" severity="danger" [text]="true" icon="pi pi-demolish"
+            [disabled]="schedule.disabled" [attr.aria-label]="i18n.commonActions().removeItem + ': ' + formatDateLabel(date)"
+            (click)="removeDate(field, date)"></button>
+        </span>
       }
     </div>
+  }
+  @if (globalCalendar() && kind === 'recurring') {
+    <div class="flex-col-start-stretch gap-sm w-100 min-w-0">
+      <strong>{{ i18n.fields().exclusionRules }}</strong>
+      <p class="m-0 muted-text">{{ i18n.info().exclusionRules }}</p>
+      @for (rule of controls.exclusionRules.controls; track rule; let index = $index) {
+        <div class="flex-col-start-stretch gap-xs" [formGroup]="rule">
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <p-floatlabel variant="on" class="w-px-250 max-w-full">
+              <p-select [inputId]="'event-exclusion-nth-' + index" formControlName="monthlyNth" [options]="monthlyNthOptions()"
+                optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
+                <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+              </p-select>
+              <label [for]="'event-exclusion-nth-' + index">{{ i18n.fields().monthlyPosition }}</label>
+            </p-floatlabel>
+            <p-floatlabel variant="on" class="w-px-200 max-w-full">
+              <p-select [inputId]="'event-exclusion-weekday-' + index" formControlName="monthlyWeekday" [options]="weekdayOptions"
+                optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
+                <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+              </p-select>
+              <label [for]="'event-exclusion-weekday-' + index">{{ i18n.commonLabels().weekday }}</label>
+            </p-floatlabel>
+            <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-vacuum-cleaner"
+              [label]="i18n.commonActions().removeItem" [disabled]="schedule.disabled" (onClick)="removeExclusionRule(index)" />
+          </div>
+          @if (showValidation() && rule.invalid && (validationAttempted() || rule.touched)) {
+            <small class="mg-contact-error" role="alert">{{ i18n.validation().exclusionRule }}</small>
+          }
+        </div>
+      }
+      <p-button type="button" size="small" [outlined]="true" icon="pi pi-add-plus" [label]="i18n.fields().addExclusionRule"
+        [disabled]="schedule.disabled" (onClick)="addExclusionRule()" />
+      @let exdates = getEventScheduleExdates(schedule);
+      @if (exdates.length) {
+        <details class="w-100">
+          <summary>{{ i18n.fields().allExcludedDates }} ({{ exdates.length }})</summary>
+          <div class="flex-row-start-center flex-wrap gap-xs pt-sm">
+            @for (date of exdates; track date) {
+              <time class="tag-badge tag-badge--muted" [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
+            }
+          </div>
+        </details>
+      }
+    </div>
+  }
+  @if (showValidation()) {
+    @for (error of errors(); track error.key) {
+      @if (canShowError(error.key) && schedule.hasError(error.key)) { <small class="mg-contact-error" role="alert">{{ error.label }}</small> }
+    }
+    @if (canShowError('intervalMin') && controls.interval.invalid) { <small class="mg-contact-error">{{ i18n.validation().intervalMin }}</small> }
+    @if (showExternalError()) { <small class="mg-contact-error" role="alert">{{ externalError() }}</small> }
   }
 </section>

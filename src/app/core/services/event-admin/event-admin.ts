@@ -12,10 +12,13 @@ import {
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type {
+  AdminDatedTimeBlocksPreview,
+  AdminDatedTimeBlocksSave,
   AdminEffectivePolicyResult,
   AdminGlobalCalendarResult,
   CreateAdminGlobalEventPayload,
   CreateAdminGlobalEventResult,
+  EventDatedTimeBlocksCommand,
 } from '../../interfaces/i-admin-global-event';
 import {
   AdminEventProgramParticipants,
@@ -68,6 +71,24 @@ export class EventAdmin {
 
   getGlobalCalendar(coreId: string): Observable<AdminGlobalCalendarResult> {
     return this.backend.rpc<AdminGlobalCalendarResult>(EVENT_RPC.getGlobalCalendar, { p_core_id: coreId });
+  }
+
+  previewDatedTimeBlocks(command: EventDatedTimeBlocksCommand): Observable<AdminDatedTimeBlocksPreview> {
+    return this.backend.rpc<AdminDatedTimeBlocksPreview>(EVENT_RPC.previewDatedTimeBlocks, {
+      p_core_id: command.coreId,
+      p_expected_calendar_revision: command.expectedCalendarRevision,
+      p_date_time_blocks: command.dateTimeBlocks,
+      p_city_date_time_blocks: command.cityDateTimeBlocks,
+    });
+  }
+
+  saveDatedTimeBlocks(command: EventDatedTimeBlocksCommand): Observable<AdminDatedTimeBlocksSave> {
+    return this.backend.rpc<AdminDatedTimeBlocksSave>(EVENT_RPC.saveDatedTimeBlocks, {
+      p_core_id: command.coreId,
+      p_expected_calendar_revision: command.expectedCalendarRevision,
+      p_date_time_blocks: command.dateTimeBlocks,
+      p_city_date_time_blocks: command.cityDateTimeBlocks,
+    });
   }
 
   getEffectivePolicy(coreId: string): Observable<AdminEffectivePolicyResult> {

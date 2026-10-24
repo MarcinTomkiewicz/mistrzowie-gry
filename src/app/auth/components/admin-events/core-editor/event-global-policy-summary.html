@@ -1,8 +1,8 @@
-<dl class="mg-grid grid-3-cols grid-1-cols-sm gap-md m-0">
+<dl class="flex-col-start-stretch gap-sm m-0 w-100">
   @for (row of rows(); track row.label) {
-    <div class="flex-col-start-stretch gap-xs min-w-0">
-      <dt class="muted-text">{{ row.label }}</dt>
-      <dd class="m-0">
+    <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm min-w-0">
+      <dt class="muted-text flex-1 min-w-0 text-wrap-anywhere">{{ row.label }}</dt>
+      <dd class="m-0 text-right text-left-sm text-wrap-anywhere">
         @if (row.previewUrl) {
           <a [href]="row.previewUrl" target="_blank" rel="noopener noreferrer">{{ row.value }}</a>
         } @else {

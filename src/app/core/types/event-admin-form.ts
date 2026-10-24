@@ -7,11 +7,11 @@ import {
 import {
   EventMonthlyNth,
   EventRecurrenceKind,
-  EventScheduleKind,
+  EventScheduleMode,
 } from './event';
 
 export type EventScheduleFormGroup = FormGroup<{
-  kind: FormControl<EventScheduleKind>;
+  kind: FormControl<EventScheduleMode>;
   date: FormControl<string>;
   dates: FormArray<FormControl<string>>;
   recurrenceKind: FormControl<EventRecurrenceKind>;
@@ -23,6 +23,12 @@ export type EventScheduleFormGroup = FormGroup<{
   startDate: FormControl<string>;
   endDate: FormControl<string>;
   exdates: FormArray<FormControl<string>>;
+  exclusionRules: FormArray<EventScheduleExclusionRuleFormGroup>;
+}>;
+
+export type EventScheduleExclusionRuleFormGroup = FormGroup<{
+  monthlyNth: FormControl<EventMonthlyNth>;
+  monthlyWeekday: FormControl<number>;
 }>;
 
 export type EventEditionFormGroup = FormGroup<{

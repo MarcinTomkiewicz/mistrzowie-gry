@@ -1,5 +1,4 @@
 import {
-  FormArray,
   FormControl,
   FormGroup,
   Validators,
@@ -11,22 +10,11 @@ import {
   IAdminEventDetail,
   IEventSavePayload,
 } from '../interfaces/i-event-admin';
-import { IEventSchedule } from '../interfaces/i-event-schedule';
-import {
-  EventEditionFormGroup,
-  EventScheduleFormGroup,
-} from '../types/event-admin-form';
-import {
-  EventMonthlyNth,
-  EventRecurrenceKind,
-  EventScheduleKind,
-} from '../types/event';
+import { EventEditionFormGroup } from '../types/event-admin-form';
 import { normalizeText } from '../utils/normalize-text';
 import { formatTimeLabel } from '../utils/time-format';
 import {
-  eventScheduleValidator,
   eventTimeRangeValidator,
-  isoDateValidator,
   storagePathValidator,
 } from '../validators/event-admin.validator';
 import {
@@ -35,6 +23,7 @@ import {
   timeFormatValidator,
 } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
+import { createEventScheduleForm, mapEventScheduleFormToPayload, populateEventScheduleForm } from './event-schedule-form.factory';
 
 const CITY_SLUG_SOURCE_VALIDATOR = slugSourceValidator();
 
@@ -116,46 +105,6 @@ export function createEventEditionForm(
   );
 }
 
-export function createEventScheduleForm(): EventScheduleFormGroup {
-  return new FormGroup(
-    {
-      kind: new FormControl<EventScheduleKind>('single', {
-        nonNullable: true,
-      }),
-      date: new FormControl('', { nonNullable: true }),
-      dates: new FormArray<FormControl<string>>([]),
-      recurrenceKind: new FormControl<EventRecurrenceKind>('WEEKLY', {
-        nonNullable: true,
-      }),
-      interval: new FormControl(1, {
-        nonNullable: true,
-        validators: [
-          Validators.required,
-          integerValidator(),
-          Validators.min(1),
-        ],
-      }),
-      byweekday: new FormControl<number[]>([], { nonNullable: true }),
-      monthlyNth: new FormControl<EventMonthlyNth | null>(null),
-      monthlyWeekday: new FormControl<number | null>(null),
-      dayOfMonth: new FormControl<number | null>(null),
-      startDate: new FormControl('', { nonNullable: true }),
-      endDate: new FormControl('', { nonNullable: true }),
-      exdates: new FormArray<FormControl<string>>([]),
-    },
-    { validators: [eventScheduleValidator] },
-  );
-}
-
-export function createEventExdateControl(
-  value = '',
-): FormControl<string> {
-  return new FormControl(value, {
-    nonNullable: true,
-    validators: [Validators.required, isoDateValidator()],
-  });
-}
-
 export function populateEventEditionForm(
   form: EventEditionFormGroup,
   eventCoreId: string,
@@ -232,98 +181,4 @@ export function mapEventEditionFormToPayload(
     defaultParticipantCapacity: value.defaultParticipantCapacity,
     schedule: mapEventScheduleFormToPayload(form.controls.schedule),
   };
-}
-
-function populateEventScheduleForm(
-  form: EventScheduleFormGroup,
-  schedule: IEventSchedule | null,
-): void {
-  const recurring = schedule?.kind === 'recurring' ? schedule : null;
-
-  form.patchValue(
-    {
-      kind: schedule?.kind ?? 'single',
-      date: schedule?.kind === 'single' ? schedule.date : '',
-      recurrenceKind: recurring?.recurrenceKind ?? 'WEEKLY',
-      interval: recurring?.interval ?? 1,
-      byweekday: recurring?.byweekday ?? [],
-      monthlyNth: recurring?.monthlyNth ?? null,
-      monthlyWeekday: recurring?.monthlyWeekday ?? null,
-      dayOfMonth: recurring?.dayOfMonth ?? null,
-      startDate: recurring?.startDate ?? '',
-      endDate: recurring?.endDate ?? '',
-    },
-    { emitEvent: false },
-  );
-
-  form.controls.dates.clear({ emitEvent: false });
-  for (const date of schedule?.kind === 'exact_dates' ? schedule.dates : []) {
-    form.controls.dates.push(new FormControl(date, { nonNullable: true }), {
-      emitEvent: false,
-    });
-  }
-
-  form.controls.exdates.clear({ emitEvent: false });
-  for (const exdate of recurring?.exdates ?? []) {
-    form.controls.exdates.push(createEventExdateControl(exdate), {
-      emitEvent: false,
-    });
-  }
-  form.updateValueAndValidity({ emitEvent: false });
-}
-
-function mapEventScheduleFormToPayload(
-  form: EventScheduleFormGroup,
-): IEventSchedule {
-  const value = form.getRawValue();
-
-  if (value.kind === 'single') {
-    return {
-      kind: 'single',
-      date: value.date,
-    };
-  }
-
-  if (value.kind === 'exact_dates') {
-    return {
-      kind: 'exact_dates',
-      dates: [...value.dates],
-    };
-  }
-
-  const base = {
-    kind: 'recurring' as const,
-    recurrenceKind: value.recurrenceKind,
-    interval: value.interval,
-    startDate: value.startDate,
-    endDate: value.endDate,
-    exdates: [...value.exdates],
-  };
-
-  switch (value.recurrenceKind) {
-    case 'WEEKLY':
-      return {
-        ...base,
-        byweekday: [...value.byweekday],
-        monthlyNth: null,
-        monthlyWeekday: null,
-        dayOfMonth: null,
-      };
-    case 'MONTHLY_NTH_WEEKDAY':
-      return {
-        ...base,
-        byweekday: null,
-        monthlyNth: value.monthlyNth,
-        monthlyWeekday: value.monthlyWeekday,
-        dayOfMonth: null,
-      };
-    case 'MONTHLY_DAY_OF_MONTH':
-      return {
-        ...base,
-        byweekday: null,
-        monthlyNth: null,
-        monthlyWeekday: null,
-        dayOfMonth: value.dayOfMonth,
-      };
-  }
 }
