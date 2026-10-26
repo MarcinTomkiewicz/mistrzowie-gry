@@ -1,0 +1,70 @@
+@let copy = i18n.diagnostics();
+<div class="flex-col-start-start gap-xs">
+  <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-check"
+    [label]="copy.action" [loading]="isChecking()" loadingIcon="pi pi-d20"
+    [disabled]="disabled() || isChecking()" (onClick)="check()" />
+  @if (disabled()) { <small class="muted-text">{{ copy.savedDataOnly }}</small> }
+</div>
+
+<p-dialog styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="visible()" [header]="copy.title"
+  [closable]="!isChecking()" [closeOnEscape]="!isChecking()" [dismissableMask]="false" [draggable]="false"
+  (visibleChange)="onVisibleChange($event)" (onHide)="onHide()">
+  <div class="flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isChecking()" aria-live="polite">
+    @if (isChecking()) {
+      <p class="m-0 muted-text" role="status">{{ copy.checking }}</p>
+    } @else if (errorMessage(); as error) {
+      <section class="flex-col-start-stretch gap-sm" role="alert">
+        <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy.failed }}</h2>
+        <p-message severity="error">{{ error }}</p-message>
+        <div class="flex-row-start-center">
+          <p-button type="button" size="small" severity="secondary" icon="pi pi-trail"
+            [label]="i18n.commonActions().retry" [disabled]="disabled()" (onClick)="check()" />
+        </div>
+      </section>
+    } @else if (result(); as checked) {
+      <p-message [severity]="checked.status === 'invalid' ? 'error' : checked.status === 'blocked' ? 'warn' : 'info'">
+        {{ copy.statuses[checked.status] }}
+      </p-message>
+      <dl class="m-0">
+        <dt class="muted-text">{{ copy.valid }}</dt>
+        <dd class="m-0">{{ checked.valid ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
+      </dl>
+      <p class="m-0 muted-text">{{ copy.readOnly }}</p>
+      @for (group of groups(); track group.field) {
+        <section class="mg-card flex-col-start-stretch gap-sm border-danger bg-danger-subtle p-md">
+          <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy.fields[group.field] }}</h2>
+          <ul class="m-0">
+            @for (issue of group.issues; track $index) {
+              <li class="text-wrap-anywhere">
+                @if (issue.city) { <strong>{{ i18n.commonLabels().city }}: {{ issue.city }} - </strong> }
+                {{ issue.message }}
+                @if (issue.detail) { <p class="m-0">{{ issue.detail }}</p> }
+              </li>
+            }
+          </ul>
+          <div class="flex-row-start-center">
+            <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
+              [label]="copy.goToSection" (onClick)="goToSection(group.field)" />
+          </div>
+        </section>
+      }
+      @if (blockers().length) {
+        <section class="mg-card flex-col-start-stretch gap-sm p-md">
+          <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy.blockers }}</h2>
+          <ul class="m-0">
+            @for (issue of blockers(); track $index) {
+              <li class="text-wrap-anywhere">
+                @if (issue.city) { <strong>{{ i18n.commonLabels().city }}: {{ issue.city }} - </strong> }
+                {{ issue.message }}
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+  </div>
+  <ng-template #footer>
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-times"
+      [label]="i18n.commonActions().close" [disabled]="isChecking()" (onClick)="close()" />
+  </ng-template>
+</p-dialog>

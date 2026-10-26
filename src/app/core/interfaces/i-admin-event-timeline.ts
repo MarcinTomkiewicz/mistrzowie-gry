@@ -12,12 +12,18 @@ export interface TimelineHost {
   displayName: string;
 }
 
-export interface TimelineSession {
+export interface LegacyTimelineSession {
   title: string | null;
   systemId: string | null;
   systemName: string | null;
-  maxPlayers: unknown; // Raw JSONB in Staffing and manual snapshots.
+  maxPlayers: unknown; // Legacy raw JSONB projection.
   effectiveCapacity: number | null;
+}
+
+export interface TimelineSession extends LegacyTimelineSession {
+  maxPlayers: number | null;
+  gmDeclaredMaxPlayers: number | null;
+  playerCapacityOverride: number | null;
 }
 
 export interface TimelineRowBase {
@@ -33,7 +39,7 @@ export interface TimelineRowBase {
   status: TimelineStatus;
   programStatus: EventProgramItemStatus | null;
   host: TimelineHost | null;
-  session: TimelineSession | null;
+  session: LegacyTimelineSession | null;
   editable: boolean;
   activeBookings: number;
   updatedAt: string;
@@ -41,6 +47,7 @@ export interface TimelineRowBase {
 
 export interface StaffingTimelineRow extends TimelineRowBase {
   source: 'staffing';
+  session: TimelineSession | null;
   slotId: string;
   sourceFinalPlanItemId: string | null;
   candidateState: MyStaffingCandidate['state'] | null;
@@ -51,6 +58,7 @@ export interface StaffingTimelineRow extends TimelineRowBase {
 
 export interface ManualTimelineRow extends TimelineRowBase {
   source: 'manual';
+  session: TimelineSession | null;
   slotId: string;
   sourceFinalPlanItemId: null;
   candidateState?: never;
@@ -69,7 +77,7 @@ export interface LegacyHostTimelineRow extends TimelineRowBase {
   programStatus: EventProgramItemStatus;
   slotLabel: null;
   host: TimelineHost;
-  session: TimelineSession;
+  session: LegacyTimelineSession;
   candidateState?: never;
   participationEnded?: never;
   frozen: false;

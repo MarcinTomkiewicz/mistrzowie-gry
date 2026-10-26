@@ -42,6 +42,9 @@ const sessionFieldReaders = {
 const readLegacySession = createStrictEdgeObjectReader(sessionFieldReaders);
 const readConfirmedSession = createStrictEdgeObjectReader({
   ...sessionFieldReaders,
+  gmDeclaredMaxPlayers: readEdgeNullableInteger,
+  playerCapacityOverride: readEdgeNullableInteger,
+  effectiveCapacity: readEdgeNullableInteger,
   system: createEdgeNullableReader(createStrictEdgeObjectReader({
     id: readEdgeUuid,
     name: readEdgeString,

@@ -11,6 +11,7 @@ import {
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
+import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import type {
   AddAdminGlobalEventCityPayload,
   AddAdminGlobalEventCityResult,
@@ -73,6 +74,12 @@ export class EventAdmin {
 
   getGlobalCalendar(coreId: string): Observable<AdminGlobalCalendarResult> {
     return this.backend.rpc<AdminGlobalCalendarResult>(EVENT_RPC.getGlobalCalendar, { p_core_id: coreId });
+  }
+
+  previewGlobalEventPage(coreId: string): Observable<AdminGlobalEventPagePreview> {
+    return this.backend.rpc<AdminGlobalEventPagePreview>(EVENT_RPC.previewGlobalEventPage, {
+      p_payload: { coreId },
+    });
   }
 
   addGlobalEventCity(coreId: string, requestId: string, payload: AddAdminGlobalEventCityPayload): Observable<AddAdminGlobalEventCityResult> {

@@ -75,9 +75,14 @@
         @if (globalDraft.policy(); as policy) {
           <app-event-global-draft-summary [core]="loadedCore" [calendar]="calendar" [policy]="policy" />
         }
-        <div class="flex-row-start-center border-top pt-md w-100">
+        <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
           <p-button type="button" severity="secondary" [outlined]="true"
             [label]="i18n.commonActions().previous" icon="pi pi-point-left" (onClick)="goBack()" />
+          @if (globalDraft.policy()) {
+            <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
+              [disabled]="globalDraft.cityEditing() || (datedBlocks()?.selectionLocked() ?? false)"
+              (navigateToSection)="goToDiagnosticSection($event)" />
+          }
         </div>
       } @else {
         <form
@@ -200,7 +205,7 @@
         </form>
       }
       <app-event-core-editions [core]="loadedCore" [legacyEditing]="!globalDraft.calendar()"
-        [addCityDisabled]="datedBlocks()?.selectionLocked() ?? false" (cityAdded)="core.set($event)" />
+        [addCityDisabled]="globalDraft.isChecking() || (datedBlocks()?.selectionLocked() ?? false)" (cityAdded)="core.set($event)" />
     }
   </div>
 </section>

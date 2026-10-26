@@ -11,9 +11,11 @@ import type {
   CreateAdminGlobalEventPayload, CreateAdminGlobalEventResult,
 } from '../../../../core/interfaces/i-admin-global-event';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { AdminGlobalEventPagePreview } from '../../../../core/interfaces/i-admin-global-event-preview';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
+import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 
 @Injectable()
 export class EventGlobalDraftController {
@@ -31,6 +33,7 @@ export class EventGlobalDraftController {
   readonly cityEditing = signal(false);
   readonly cityBusy = signal(false);
   readonly cityState = signal<'idle' | 'uncertain' | 'created'>('idle');
+  readonly isChecking = signal(false);
   private cityCommand: {
     coreId: string; mainEditionId: string; requestId: string; payload: AddAdminGlobalEventCityPayload;
   } | null = null;
@@ -150,7 +153,7 @@ export class EventGlobalDraftController {
 
   canAddCity(core: IEventCoreDetail): boolean {
     const calendar = this.calendar();
-    return calendar !== null && calendar.coreId === core.id && calendar.calendarLifecycle === 'global' &&
+    return !this.isChecking() && calendar !== null && calendar.coreId === core.id && calendar.calendarLifecycle === 'global' &&
       !core.isActive && !core.hasPublicPage && calendar.cities.every(city => !city.isActive) &&
       calendar.globalDates.every(date => date.status === 'planned' && date.cityOccurrences.every(city =>
         !city.protected && !city.publishedAt && (city.occurrenceStatus === null || city.occurrenceStatus === 'planned')));
@@ -168,7 +171,7 @@ export class EventGlobalDraftController {
 
   addCity(core: IEventCoreDetail): Observable<IEventCoreDetail> {
     return defer(() => {
-      if (this.cityBusy() || !this.cityEditing()) return EMPTY;
+      if (this.isChecking() || this.cityBusy() || !this.cityEditing()) return EMPTY;
       if (this.cityState() === 'idle' && (!this.canAddCity(core) || this.cityForm.invalid)) return EMPTY;
       const calendar = this.calendar();
       if (!calendar) return EMPTY;
@@ -206,6 +209,25 @@ export class EventGlobalDraftController {
           return loaded;
         }),
         finalize(() => this.cityBusy.set(false)),
+      );
+    });
+  }
+
+  checkErrors(coreId: string): Observable<AdminGlobalEventPagePreview> {
+    return defer(() => {
+      const calendar = this.calendar();
+      if (this.isChecking() || this.cityEditing() || this.cityBusy() ||
+        calendar?.coreId !== coreId || calendar.calendarLifecycle !== 'global') return EMPTY;
+      this.isChecking.set(true);
+      return this.eventAdmin.previewGlobalEventPage(coreId).pipe(
+        tap(result => {
+          const status = result.fieldErrors.length ? 'invalid' : result.blockers.length ? 'blocked' : 'preview_ready';
+          assertEdgeContract(result.coreId === coreId && result.preview === true && result.appliedToPublic === false &&
+            result.status === status && result.valid === (status === 'preview_ready') &&
+            (result.page === null || (result.page.core.id === coreId && result.participantSignupOpened === false)),
+          'globalEventPagePreview', 'a read-only diagnostic result for the selected Core');
+        }),
+        finalize(() => this.isChecking.set(false)),
       );
     });
   }

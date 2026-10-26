@@ -15,8 +15,12 @@ export type PublicEventSession = {
   [K in keyof SessionFields]: SessionFields[K] | null;
 };
 
+// The server projects effective minPlayers/maxPlayers for this execution.
 export type PublicEventConfirmedSession = PublicEventSession &
   Pick<SessionPresentation, 'styles' | 'triggers' | 'languages'> & {
+    gmDeclaredMaxPlayers: number | null;
+    playerCapacityOverride: number | null;
+    effectiveCapacity: number | null;
     system: SessionPresentation['system'] | null;
     characterSheets: (SessionPresentation['characterSheets'][number] & {
       thumbnailStoragePath: string | null;

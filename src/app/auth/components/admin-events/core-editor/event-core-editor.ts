@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,11 +13,13 @@ import { finalize, from, ignoreElements, of, switchMap, tap } from 'rxjs';
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { normalizeText } from '../../../../core/utils/normalize-text';
+import { scrollElementIntoViewWhenReady } from '../../../../core/utils/scroll';
 import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
@@ -25,17 +27,20 @@ import { EventCoreEditions } from './event-core-editions';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
+import { EventGlobalDiagnostics } from './event-global-diagnostics';
 
 @Component({
   selector: 'app-event-core-editor',
   imports: [ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule,
-    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, LoadingOverlay, Breadcrumbs],
+    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, EventGlobalDiagnostics,
+    LoadingOverlay, Breadcrumbs],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventGlobalDraftController],
 })
 export class EventCoreEditor {
   protected readonly datedBlocks = viewChild(EventDatedBlocksEditor);
   private readonly editions = viewChild(EventCoreEditions);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly eventAdmin = inject(EventAdmin);
   private readonly router = inject(Router);
@@ -139,7 +144,24 @@ export class EventCoreEditor {
     void this.router.navigate(['/admin/content/events']);
   }
 
+  protected goToDiagnosticSection(field: AdminGlobalEventPageFieldError['field']): void {
+    const sections: Record<AdminGlobalEventPageFieldError['field'], string> = {
+      coreDraft: '#global-event-core',
+      editionDrafts: '#event-core-editions',
+      selectedDate: '#global-event-schedule',
+      calendarDraft: '#global-event-schedule',
+      policy: '#global-event-policy',
+      cityOverrides: '#global-event-policy',
+    };
+    scrollElementIntoViewWhenReady(() => {
+      const target = this.host.nativeElement.querySelector<HTMLElement>(sections[field]);
+      target?.focus({ preventScroll: true });
+      return target;
+    }, { behavior: 'smooth', block: 'center' });
+  }
+
   canDeactivate() {
+    if (this.globalDraft.isChecking()) return false;
     if (this.globalDraft.cityEditing()) return this.editions()?.canDeactivate() ?? false;
     return this.datedBlocks()?.canDeactivate() ?? true;
   }

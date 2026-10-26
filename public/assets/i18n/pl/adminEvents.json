@@ -62,6 +62,45 @@
       "leaveConfirmation": "[PH] Opuścić edytor i porzucić niezapisane dane miasta?",
       "discard": "[PH] Porzuć dane miasta"
     },
+    "diagnostics": {
+      "action": "[PH] Sprawdź błędy",
+      "title": "[PH] Wynik sprawdzenia wydarzenia",
+      "checking": "[PH] Sprawdzanie zapisanych danych wydarzenia...",
+      "failed": "[PH] Nie udało się sprawdzić wydarzenia",
+      "savedDataOnly": "[PH] Sprawdzenie wymaga zakończenia bieżących operacji oraz zapisania lub odrzucenia zmian w edytorze.",
+      "readOnly": "[PH] To wynik sprawdzenia zapisanych danych, nie zgoda na publikację. Sprawdzenie nie zmienia wydarzenia ani nie otwiera zapisów uczestników.",
+      "valid": "[PH] Dane poprawne w tym sprawdzeniu",
+      "blockers": "[PH] Blokady zgłoszone przez serwer",
+      "goToSection": "[PH] Przejdź do sekcji",
+      "fields": {
+        "coreDraft": "[PH] Dane wydarzenia",
+        "editionDrafts": "[PH] Dane lokalizacji",
+        "selectedDate": "[PH] Wybrany termin",
+        "calendarDraft": "[PH] Harmonogram i bloki",
+        "policy": "[PH] Ustawienia wydarzenia",
+        "cityOverrides": "[PH] Ustawienia lokalizacji"
+      },
+      "statuses": {
+        "invalid": "[PH] Wykryto błędy danych",
+        "blocked": "[PH] Wykryto blokady",
+        "preview_ready": "[PH] Nie wykryto błędów ani blokad"
+      },
+      "messages": {
+        "INVALID_CORE_METADATA": "[PH] Nazwa lub opisy wydarzenia są nieprawidłowe.",
+        "INVALID_EDITION_METADATA": "[PH] Nazwa miejsca, adres lub link do Facebooka są nieprawidłowe.",
+        "INVALID_SELECTED_DATE": "[PH] Wybrany termin jest miniony, nie należy do harmonogramu lub jest wykluczony w wybranym mieście.",
+        "INVALID_PREVIEW_CALENDAR": "[PH] Harmonogram lub bloki czasowe są nieprawidłowe.",
+        "INVALID_POLICY_DRAFT": "[PH] Szkic ustawień wydarzenia jest nieprawidłowy.",
+        "INCOMPATIBLE_SIGNUP_CAPACITY": "[PH] Limity uczestników są niezgodne z wybranym sposobem zapisów w tej lokalizacji.",
+        "STALE_SAVED_POLICY_DRAFT": "[PH] Zapisany szkic ustawień opiera się na nieaktualnych danych.",
+        "PUBLISHED_POLICY_WRITE_NOT_RELEASED": "[PH] Zastosowanie roboczych ustawień do opublikowanego wydarzenia nie jest dostępne.",
+        "STALE_SAVED_CALENDAR_DRAFT": "[PH] Terminy zapisanego szkicu kalendarza nie odpowiadają jego harmonogramowi.",
+        "GLOBAL_CALENDAR_WRITE_NOT_RELEASED": "[PH] Zastosowanie szkicu wspólnego kalendarza nie jest dostępne.",
+        "NO_UPCOMING_DATE_FOR_SELECTED_CITY": "[PH] Wybrane miasto nie ma dostępnego obecnego ani przyszłego terminu.",
+        "EDITION_EFFECTIVE_POLICY_MISSING": "[PH] Brakuje ustawień obowiązujących w tej lokalizacji.",
+        "PROTECTED_PARTICIPANT_POLICY": "[PH] Zmiana ustawień zapisów lub limitów dotyczy lokalizacji z otwartymi zapisami albo historią uczestników."
+      }
+    },
     "datedBlocks": {
       "title": "[PH] Bloki wybranej daty i miasta",
       "creationHint": "[PH] Wybierz datę z harmonogramu. Osobne bloki dodawaj tylko tam, gdzie mają różnić się od podstawowych. Pozostałe daty i miasta korzystają ze wspólnych ustawień.",

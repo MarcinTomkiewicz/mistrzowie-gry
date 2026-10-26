@@ -14,7 +14,7 @@ import {
 } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type { EventPriceBasis } from '../../../../core/interfaces/i-admin-global-event';
-import type { EventDatedBlocksCopy, EventGlobalCityCopy, EventGlobalDraftCopy } from '../../../../core/types/i18n/event-global-draft';
+import type { EventDatedBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy } from '../../../../core/types/i18n/event-global-draft';
 import type {
   CoreRpcErrorsCopy,
   EditionTableCopy,
@@ -66,6 +66,7 @@ export function createEventCoreEditorI18n() {
   const commonEntityStatuses = createCommonEntityStatusesI18n();
 
   return {
+    diagnostics: createScopedObjectI18n<EventGlobalDiagnosticsCopy>('adminEvents', 'editor.diagnostics'),
     city: createScopedObjectI18n<EventGlobalCityCopy>('adminEvents', 'editor.city'),
     editionRpcErrors: createScopedObjectI18n<EditionRpcErrorsCopy>('adminEvents', 'editionRpcErrors'),
     datedBlocks: createScopedObjectI18n<EventDatedBlocksCopy>('adminEvents', 'editor.datedBlocks'),

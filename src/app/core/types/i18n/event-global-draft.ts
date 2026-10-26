@@ -1,4 +1,20 @@
 import type { AdminDatedTimeBlocks } from '../../interfaces/i-admin-global-event';
+import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
+
+export type EventGlobalDiagnosticsCopy = {
+  action: string;
+  title: string;
+  checking: string;
+  failed: string;
+  savedDataOnly: string;
+  readOnly: string;
+  valid: string;
+  blockers: string;
+  goToSection: string;
+  fields: Record<AdminGlobalEventPageFieldError['field'], string>;
+  statuses: Record<AdminGlobalEventPagePreview['status'], string>;
+  messages: Record<AdminGlobalEventPageFieldError['code'] | AdminGlobalEventPageBlocker['code'], string>;
+};
 
 export type EventGlobalCityCopy = {
   action: string;
