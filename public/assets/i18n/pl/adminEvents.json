@@ -53,6 +53,15 @@
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
     },
+    "metadata": {
+      "readOnly": "[PH] Te metadane są dostępne tylko do odczytu.",
+      "operationBlocked": "[PH] Zakończ edycję miasta lub harmonogramu i bieżące operacje przed zapisem lub odświeżeniem tych danych.",
+      "protected": "[PH] Serwer odmówił zmiany chronionych lub opublikowanych danych. Odśwież dane, aby sprawdzić bieżący stan.",
+      "conflict": "[PH] Metadane zostały zmienione przez inną osobę. Zachowano wpisane wartości. Przed kolejnym zapisem odśwież dane.",
+      "uncertain": "[PH] Nie można potwierdzić wyniku zapisu. Zachowano wpisane dane. Ponów ten sam zapis, aby ustalić wynik. Nie odświeżaj strony.",
+      "readbackFailed": "[PH] Zapis potwierdzono, ale nie udało się odczytać aktualnych metadanych. Ponów odczyt.",
+      "reloadConfirm": "[PH] Odrzucić niezapisane zmiany metadanych i wczytać aktualne dane?"
+    },
     "city": {
       "action": "Dodaj miasto",
       "hint": "[PH] Nowe miasto korzysta ze wspólnych dat i ustawień wydarzenia.",

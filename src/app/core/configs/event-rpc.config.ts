@@ -29,6 +29,7 @@ export const EVENT_RPC = {
   publishStaffingEvent: 'publish_admin_staffing_event',
   reconcileStaffingEventProgram: 'reconcile_admin_staffing_event_program',
   saveEdition: 'save_admin_event',
+  saveGlobalEditionMetadata: 'save_admin_global_event_edition_metadata',
   setEditionActive: 'set_admin_event_active',
 
   saveOccurrence: 'save_admin_event_occurrence',

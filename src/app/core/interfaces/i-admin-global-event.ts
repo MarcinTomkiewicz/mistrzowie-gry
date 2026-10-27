@@ -2,6 +2,7 @@ import type { EVENT_CURRENCIES, EVENT_PRICE_BASES } from '../configs/events.conf
 import type { ParticipantSignupKind } from '../enums/event';
 import type { EventMonthlyNth } from '../types/event';
 import type { IEventExactDatesSchedule, IEventRecurringSchedule, IEventSingleSchedule } from './i-event-schedule';
+import type { IAdminEventDetail } from './i-event-admin';
 
 export type EventCurrency = (typeof EVENT_CURRENCIES)[number];
 export type EventPriceBasis = (typeof EVENT_PRICE_BASES)[number];
@@ -115,6 +116,22 @@ export interface CreateAdminGlobalEventPayload {
 }
 
 export type AddAdminGlobalEventCityPayload = CreateAdminGlobalEventPayload['mainCity'];
+
+export type AdminGlobalEventEditionMetadata = Pick<IAdminEventDetail, 'venueName' | 'venueAddress' | 'facebookLink'>;
+
+export type SaveAdminGlobalEventEditionMetadataPayload = {
+  editionId: string;
+  expectedUpdatedAt: string;
+} & Partial<AdminGlobalEventEditionMetadata>;
+
+export interface SaveAdminGlobalEventEditionMetadataResult {
+  saved: boolean;
+  alreadyApplied: boolean;
+  coreId: string;
+  editionId: string;
+  updatedAt: string;
+  metadata: AdminGlobalEventEditionMetadata;
+}
 
 export interface AddAdminGlobalEventCityResult {
   created: boolean;

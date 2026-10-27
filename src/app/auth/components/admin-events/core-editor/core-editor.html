@@ -1,99 +1,89 @@
 <section class="mg-section mg-section--full">
   <div class="mg-container position-relative flex-col-start-stretch gap-lg min-w-0">
     <app-breadcrumbs [items]="breadcrumbs()" />
-
     <header class="mg-section__header flex-col-start-center gap-sm w-100 m-0">
-      <h1 class="mg-section__title">
-        {{ globalDraft.calendar() ? core()?.name : i18n.page().editTitle }}
-      </h1>
-
-      @if (globalDraft.calendar()) {
+      <h1 class="mg-section__title">{{ metadata.isGlobal() ? core()?.name : i18n.page().editTitle }}</h1>
+      @if (metadata.isGlobal()) {
         <span class="tag-badge tag-badge--muted">{{ core()?.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().draft }}</span>
       } @else if (!isLoading()) {
         <p class="mg-section__subtitle mg-section__subtitle--full">{{ i18n.page().subtitle }}</p>
       }
     </header>
-
-    <app-loading-overlay
-      [visible]="isLoading() || isSaving()"
-      [label]="
-        isSaving()
-          ? i18n.commonStatus().saving
-          : i18n.commonStatus().loading
-      "
-    />
-
+    <app-loading-overlay [visible]="isLoading() || isSaving()"
+      [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
     @if (loadErrorMessage() && !isLoading()) {
-      <section
-        class="mg-card flex-col-start-stretch gap-sm p-md w-100"
-        role="alert"
-      >
-        <h2 class="mg-section__title mg-section__title--sm m-0">
-          {{ i18n.page().loadErrorTitle }}
-        </h2>
-
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
+        <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.page().loadErrorTitle }}</h2>
         <p class="m-0">{{ loadErrorMessage() }}</p>
-
         <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-button
-            severity="secondary"
-            [label]="i18n.commonActions().retry"
-            icon="pi pi-trail"
-            (onClick)="loadCore()"
-          />
-
-          <p-button
-            severity="warn"
-            [outlined]="true"
-            [label]="i18n.commonActions().cancel"
-            icon="pi pi-interdiction"
-            (onClick)="goBack()"
-          />
+          <p-button severity="secondary" [label]="i18n.commonActions().retry" icon="pi pi-trail" (onClick)="loadCore()" />
+          <p-button severity="warn" [outlined]="true" [label]="i18n.commonActions().cancel" icon="pi pi-interdiction" (onClick)="goBack()" />
         </div>
       </section>
     } @else if (isNotFound() && !isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
-        <h2 class="mg-section__title mg-section__title--sm m-0">
-          {{ i18n.page().notFoundTitle }}
-        </h2>
-
+        <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.page().notFoundTitle }}</h2>
         <p class="m-0">{{ i18n.rpcErrors().notFound }}</p>
-
-        <p-button
-          severity="warn"
-          [outlined]="true"
-          [label]="i18n.commonActions().cancel"
-          icon="pi pi-interdiction"
-          (onClick)="goBack()"
-        />
+        <p-button severity="warn" [outlined]="true" [label]="i18n.commonActions().cancel" icon="pi pi-interdiction" (onClick)="goBack()" />
       </section>
     } @else if (!isLoading() && core(); as loadedCore) {
-      @if (globalDraft.calendar(); as calendar) {
-        <app-event-global-steps [activeStep]="globalDraft.activeStep()" [disabled]="navigationLocked()"
-          [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
-        <ng-template #stepContent>
-          <div class="flex-col-start-stretch gap-md w-100 min-w-0">
-            <p class="m-0 muted-text">{{ i18n.creation().savedData }}</p>
-            @if (globalDraft.policy(); as policy) {
-              @if (globalDraft.mainEdition(); as mainEdition) {
-                <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
-                  [mainEdition]="mainEdition" [calendar]="calendar" [policy]="policy" />
+      @if (metadata.isGlobal()) {
+        @if (globalDraft.calendar(); as calendar) {
+          <app-event-global-steps [activeStep]="globalDraft.activeStep()" [disabled]="navigationLocked()"
+            [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
+          <ng-template #stepContent>
+            <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+              @if (globalDraft.activeStep() === 1 && metadata.canEditCore()) {
+                <ng-container [ngTemplateOutlet]="coreForm" />
+              } @else if (globalDraft.activeStep() === 2 && metadata.canEditEdition()) {
+                @if (metadata.edition(); as edition) {
+                  <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="metadata.editionForm"
+                    (ngSubmit)="saveMetadata('edition')" novalidate>
+                    <section id="event-main-edition" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+                      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h2>
+                      <dl class="m-0">
+                        <dt class="muted-text">{{ i18n.commonLabels().slug }}</dt>
+                        <dd class="m-0 text-wrap-anywhere">{{ edition.slug }}</dd>
+                      </dl>
+                      <app-event-global-city-fields [fields]="metadata.editionForm.controls" idPrefix="main-edition" [timezones]="metadata.timezones()" />
+                      @if ((metadata.editionForm.controls.venueName.touched && metadata.editionForm.controls.venueName.invalid) ||
+                        (metadata.editionForm.controls.venueAddress.touched && metadata.editionForm.controls.venueAddress.invalid)) {
+                        <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+                      }
+                    </section>
+                    <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: 'edition' }" />
+                  </form>
+                }
+              } @else {
+                <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
+                @if (globalDraft.policy(); as policy) {
+                  @if (metadata.edition(); as edition) {
+                    <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
+                      [mainEdition]="edition" [calendar]="calendar" [policy]="policy" />
+                  }
+                }
+                @if (metadataTarget(); as target) {
+                  <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
+                }
               }
-            }
-            @if (globalDraft.activeStep() === 2) {
-              <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
-                [addCityDisabled]="globalDraft.isChecking() || datedBlocks.isDirty() || datedBlocks.readbackPending()" (cityAdded)="core.set($event)" />
-            }
-            @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
-              <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
-            }
-            @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
-              <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-                [disabled]="globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
-                (navigateToSection)="goToDiagnosticSection($event)" />
-            }
-          </div>
-        </ng-template>
+              @if (globalDraft.activeStep() === 2) {
+                <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
+                  [addCityDisabled]="metadata.locked() || globalDraft.isChecking() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  (cityAdded)="core.set($event)" />
+              }
+              @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
+                <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
+              }
+              @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
+                <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
+                  [disabled]="metadata.locked() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  (navigateToSection)="goToDiagnosticSection($event)" />
+              }
+            </div>
+          </ng-template>
+        } @else if (metadataTarget(); as target) {
+          <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
+        }
         <div class="flex-row-between-center flex-col-start-stretch-sm flex-wrap gap-sm border-top pt-md w-100">
           <div class="flex-row-start-center flex-wrap gap-sm">
             <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-point-left"
@@ -108,128 +98,90 @@
           }
         </div>
       } @else {
-        <form
-          class="mg-form flex-col-start-stretch gap-md w-100"
-          [formGroup]="form"
-          (ngSubmit)="saveCore()"
-          novalidate
-        >
-          <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-            <h2 class="mg-section__title mg-section__title--md m-0">
-              {{ i18n.fields().coreSectionTitle }}
-            </h2>
-
-            <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-              <div class="flex-col-start-stretch gap-xs w-100">
-                <p-iftalabel class="w-100">
-                  <input
-                    class="w-100"
-                    pInputText
-                    id="event-core-name"
-                    formControlName="name"
-                    autocomplete="off"
-                    [attr.aria-invalid]="
-                      form.controls.name.touched && form.controls.name.invalid
-                    "
-                  />
-                  <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
-                </p-iftalabel>
-
-                @if (
-                  form.controls.name.touched &&
-                  (form.controls.name.hasError("required") ||
-                    form.controls.name.hasError("requiredTrimmed"))
-                ) {
-                  <small class="mg-contact-error">
-                    {{ i18n.commonForm().required }}
-                  </small>
-                }
-              </div>
-
-              <div class="flex-col-start-stretch gap-xs w-100">
-                <span class="small-caps">{{ i18n.commonLabels().key }}</span>
-                <strong class="text-wrap-anywhere">
-                  {{ form.controls.key.value }}
-                </strong>
-              </div>
-            </div>
-
-            <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-              <p-iftalabel class="w-100">
-                <textarea
-                  class="w-100"
-                  pTextarea
-                  id="event-core-short-description"
-                  formControlName="shortDescription"
-                  rows="4"
-                ></textarea>
-                <label for="event-core-short-description">
-                  {{ i18n.commonLabels().shortDescription }}
-                </label>
-              </p-iftalabel>
-
-              <p-iftalabel class="w-100">
-                <textarea
-                  class="w-100"
-                  pTextarea
-                  id="event-core-long-description"
-                  formControlName="longDescription"
-                  rows="7"
-                ></textarea>
-                <label for="event-core-long-description">
-                  {{ i18n.commonLabels().longDescription }}
-                </label>
-              </p-iftalabel>
-            </div>
-
-            <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-              <div class="flex-row-start-center gap-md w-100">
-                <p-toggleswitch
-                  inputId="event-core-is-active"
-                  formControlName="isActive"
-                />
-                <label for="event-core-is-active">
-                  {{ i18n.coreStatuses().active }}
-                </label>
-              </div>
-
-              <div class="flex-row-start-center gap-md w-100">
-                <p-toggleswitch
-                  inputId="event-core-has-public-page"
-                  formControlName="hasPublicPage"
-                />
-                <label for="event-core-has-public-page">
-                  {{ i18n.fields().hasPublicPage }}
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <div class="flex-row-center-center flex-wrap gap-sm w-100">
-            <p-button
-              type="submit"
-              severity="success"
-              [label]="i18n.commonActions().save"
-              icon="pi pi-done-it" loadingIcon="pi pi-d20"
-              [loading]="isSaving()"
-              [disabled]="isLoading()"
-            />
-
-            <p-button
-              type="button"
-              severity="warn"
-              [outlined]="true"
-              [label]="i18n.commonActions().cancel"
-              icon="pi pi-interdiction"
-              [disabled]="isSaving()"
-              (onClick)="goBack()"
-            />
-          </div>
-        </form>
-      }
-      @if (!globalDraft.calendar()) {
+        <ng-container [ngTemplateOutlet]="coreForm" />
         <app-event-core-editions [core]="loadedCore" [legacyEditing]="true" />
       }
     }
   </div>
 </section>
+
+<ng-template #coreForm>
+  <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="saveMetadata('core')" novalidate>
+    <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <input class="w-100" pInputText id="event-core-name" formControlName="name" autocomplete="off" [maxlength]="metadata.isGlobal() ? 140 : null"
+              [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
+              [attr.aria-describedby]="form.controls.name.touched && form.controls.name.invalid ? 'event-core-name-error' : null" />
+            <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
+          </p-iftalabel>
+          @if (form.controls.name.touched && form.controls.name.invalid) {
+            <small id="event-core-name-error" class="mg-contact-error">
+              {{ form.controls.name.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}
+            </small>
+          }
+        </div>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <span class="small-caps">{{ i18n.commonLabels().key }}</span>
+          <strong class="text-wrap-anywhere">{{ form.controls.key.value }}</strong>
+        </div>
+      </div>
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <textarea class="w-100" pTextarea id="event-core-short-description" formControlName="shortDescription" rows="4" [maxlength]="metadata.isGlobal() ? 500 : null"
+              [attr.aria-invalid]="form.controls.shortDescription.touched && form.controls.shortDescription.invalid"></textarea>
+            <label for="event-core-short-description">{{ i18n.commonLabels().shortDescription }}</label>
+          </p-iftalabel>
+          @if (form.controls.shortDescription.touched && form.controls.shortDescription.invalid) {
+            <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '500') }}</small>
+          }
+        </div>
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <textarea class="w-100" pTextarea id="event-core-long-description" formControlName="longDescription" rows="7" [maxlength]="metadata.isGlobal() ? 12000 : null"
+              [attr.aria-invalid]="form.controls.longDescription.touched && form.controls.longDescription.invalid"></textarea>
+            <label for="event-core-long-description">{{ i18n.commonLabels().longDescription }}</label>
+          </p-iftalabel>
+          @if (form.controls.longDescription.touched && form.controls.longDescription.invalid) {
+            <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '12000') }}</small>
+          }
+        </div>
+      </div>
+      @if (!metadata.isGlobal()) {
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+          <div class="flex-row-start-center gap-md w-100">
+            <p-toggleswitch inputId="event-core-is-active" formControlName="isActive" />
+            <label for="event-core-is-active">{{ i18n.coreStatuses().active }}</label>
+          </div>
+          <div class="flex-row-start-center gap-md w-100">
+            <p-toggleswitch inputId="event-core-has-public-page" formControlName="hasPublicPage" />
+            <label for="event-core-has-public-page">{{ i18n.fields().hasPublicPage }}</label>
+          </div>
+        </div>
+      }
+    </section>
+    <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: 'core' }" />
+  </form>
+</ng-template>
+
+<ng-template #metadataActions let-target>
+  @if (metadataError(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
+  @if (metadata.blocked()) { <p class="m-0 muted-text">{{ i18n.metadata().operationBlocked }}</p> }
+  <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+    @if ((target === 'core' ? metadata.canEditCore() : metadata.canEditEdition()) || metadata.pendingTarget() === target) {
+      <p-button type="button" severity="success" size="small" icon="pi pi-done-it" loadingIcon="pi pi-d20"
+        [label]="metadata.pendingTarget() === target && metadata.state() === 'saved' ? i18n.creation().retryRead
+          : metadata.pendingTarget() === target && metadata.state() === 'uncertain' ? i18n.creation().retryCreation : i18n.commonActions().save"
+        [loading]="isSaving()" [disabled]="isLoading() || !metadata.canSave(target)" (onClick)="saveMetadata(target)" />
+    }
+    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-trail"
+      [label]="i18n.commonActions().refresh" [disabled]="metadata.locked() || metadata.blocked()" (onClick)="refreshMetadata(target)" />
+    @if (!metadata.isGlobal()) {
+      <p-button type="button" severity="warn" size="small" [outlined]="true" icon="pi pi-interdiction"
+        [label]="i18n.commonActions().cancel" [disabled]="metadata.locked()" (onClick)="goBack()" />
+    }
+  </div>
+</ng-template>

@@ -1,6 +1,16 @@
 import type { AdminDatedTimeBlocks } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 
+export type EventMetadataCopy = {
+  readOnly: string;
+  operationBlocked: string;
+  protected: string;
+  conflict: string;
+  uncertain: string;
+  readbackFailed: string;
+  reloadConfirm: string;
+};
+
 export type EventGlobalDiagnosticsCopy = {
   action: string;
   title: string;

@@ -22,6 +22,8 @@ import type {
   CreateAdminGlobalEventPayload,
   CreateAdminGlobalEventResult,
   EventDatedTimeBlocksCommand,
+  SaveAdminGlobalEventEditionMetadataPayload,
+  SaveAdminGlobalEventEditionMetadataResult,
 } from '../../interfaces/i-admin-global-event';
 import {
   AdminEventProgramParticipants,
@@ -137,6 +139,10 @@ export class EventAdmin {
     return this.backend.rpc<IAdminEventDetail>(EVENT_RPC.saveEdition, {
       p_payload: payload,
     });
+  }
+
+  saveGlobalEditionMetadata(payload: SaveAdminGlobalEventEditionMetadataPayload): Observable<SaveAdminGlobalEventEditionMetadataResult> {
+    return this.backend.rpc<SaveAdminGlobalEventEditionMetadataResult>(EVENT_RPC.saveGlobalEditionMetadata, { p_payload: payload });
   }
 
   getTimeline(editionId: string): Observable<AdminEventTimeline> {
