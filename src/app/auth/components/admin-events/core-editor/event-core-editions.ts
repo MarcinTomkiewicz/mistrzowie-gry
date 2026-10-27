@@ -4,11 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
-import { map, Observable } from 'rxjs';
 
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
-import { Platform } from '../../../../core/services/platform/platform';
-import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { parseIsoDate } from '../../../../core/utils/date';
 import { scrollElementIntoViewWhenReady } from '../../../../core/utils/scroll';
@@ -35,8 +32,6 @@ export class EventCoreEditions {
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(UiToast);
-  private readonly confirm = inject(UiConfirm);
-  private readonly platform = inject(Platform);
   private readonly initialDate = new Date();
   protected readonly timezones = computed(() => {
     const schedule = this.globalDraft.calendar()?.schedule;
@@ -45,15 +40,6 @@ export class EventCoreEditions {
     return createTimeZoneOptions(date
       ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12)) : this.initialDate);
   });
-
-  constructor() {
-    this.destroyRef.onDestroy(this.platform.onWindow('beforeunload', event => {
-      if (!this.globalDraft.cityEditing() || this.globalDraft.cityState() === 'created' ||
-        (!this.globalDraft.cityBusy() && this.globalDraft.cityState() === 'idle' && this.globalDraft.cityForm.pristine)) return;
-      event.preventDefault();
-      event.returnValue = '';
-    }));
-  }
 
   protected openCity(): void {
     if (this.addCityDisabled()) return;
@@ -95,15 +81,6 @@ export class EventCoreEditions {
         else this.toast.danger({ summary: this.i18n.toast().saveFailedSummary, detail });
       },
     });
-  }
-
-  canDeactivate(): boolean | Observable<boolean> {
-    if (this.globalDraft.cityBusy() || this.globalDraft.cityState() === 'uncertain') return false;
-    if (this.globalDraft.cityState() === 'created' || this.globalDraft.cityForm.pristine) return true;
-    return this.confirm.modalDecision({
-      header: this.i18n.city().action, message: this.i18n.city().leaveConfirmation,
-      acceptLabel: this.i18n.city().discard, rejectLabel: this.i18n.commonActions().cancel,
-    }).pipe(map(accepted => accepted && !this.destroyRef.destroyed && !this.globalDraft.cityBusy() && this.globalDraft.cityState() === 'idle'));
   }
 
   private focusCityControl(selector: string): void {

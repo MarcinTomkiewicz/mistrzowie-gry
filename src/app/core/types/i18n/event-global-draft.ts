@@ -59,7 +59,9 @@ export type EventDatedBlocksCopy = {
 };
 
 export type EventGlobalDraftCopy = {
-  steps: Record<'location' | 'policy', string>;
+  steps: Record<'event' | 'location' | 'schedule' | 'policy' | 'program' | 'summary', string>;
+  programAfterSave: string;
+  savedData: string;
   leaveConfirmation: string;
   discardDraft: string;
   help: string;

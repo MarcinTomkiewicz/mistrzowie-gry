@@ -5,10 +5,9 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import type { AdminGlobalCalendarResult } from '../../../../core/interfaces/i-admin-global-event';
-import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel } from '../../../../core/utils/date';
@@ -23,7 +22,6 @@ import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary
   imports: [FormsModule, ReactiveFormsModule, ButtonModule, FloatLabelModule, SelectModule, ToggleSwitchModule,
     EventGlobalTimeBlocks, EventGlobalTimeBlocksSummary],
   templateUrl: './event-dated-blocks-editor.html',
-  providers: [EventDatedBlocksController],
   host: { class: 'd-block w-100 min-w-0' },
 })
 export class EventDatedBlocksEditor {
@@ -34,27 +32,23 @@ export class EventDatedBlocksEditor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
-  private readonly platform = inject(Platform);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly dateOptions = computed(() => this.calendar().datedTimeBlocks.map(row => ({ value: row.date, label: formatDateLabel(row.date) })));
   protected readonly scopeOptions = computed(() => [
     { value: 'date', label: this.i18n.datedBlocks().dateScope },
     ...(this.editor.day()?.cities.map(row => ({ value: row.editionId, label: row.city })) ?? []),
   ]);
-  readonly selectionLocked = computed(() => this.editor.isBusy() || this.editor.isDirty() || this.editor.readbackPending());
+  protected readonly selectionLocked = computed(() => this.editor.isBusy() || this.editor.isDirty() || this.editor.readbackPending());
 
   constructor() {
     effect(() => {
       const calendar = this.calendar();
       untracked(() => {
-        if (!this.editor.isDirty() && !this.editor.isBusy() && !this.editor.readbackPending()) this.editor.load(calendar);
+        if (this.editor.calendar() !== calendar && !this.editor.isDirty() && !this.editor.isBusy() && !this.editor.readbackPending()) {
+          this.editor.load(calendar);
+        }
       });
     });
-    this.destroyRef.onDestroy(this.platform.onWindow('beforeunload', event => {
-      if (!this.editor.isDirty() && !this.editor.isBusy()) return;
-      event.preventDefault();
-      event.returnValue = '';
-    }));
   }
 
   protected select(value: unknown, scope: 'date' | 'city'): void {
@@ -84,15 +78,6 @@ export class EventDatedBlocksEditor {
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
       if (accepted) this.runWrite(this.editor.refresh(), false);
     });
-  }
-
-  canDeactivate(): boolean | Observable<boolean> {
-    if (this.editor.isBusy()) return false;
-    if (!this.editor.isDirty() || this.editor.readbackPending()) return true;
-    return this.confirm.modalDecision({
-      header: this.i18n.datedBlocks().editTitle, message: this.i18n.creation().leaveConfirmation,
-      acceptLabel: this.i18n.creation().discardDraft, rejectLabel: this.i18n.commonActions().cancel,
-    }).pipe(map(accepted => accepted && !this.destroyRef.destroyed && !this.editor.isBusy()));
   }
 
   private runWrite(request: Observable<AdminGlobalCalendarResult>, notify: boolean): void {

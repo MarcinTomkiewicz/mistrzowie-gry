@@ -8,7 +8,7 @@
       </h1>
 
       @if (globalDraft.calendar()) {
-        <span class="tag-badge tag-badge--muted">{{ i18n.datedBlocks().draftOnly }}</span>
+        <span class="tag-badge tag-badge--muted">{{ core()?.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().draft }}</span>
       } @else if (!isLoading()) {
         <p class="mg-section__subtitle mg-section__subtitle--full">{{ i18n.page().subtitle }}</p>
       }
@@ -69,19 +69,42 @@
       </section>
     } @else if (!isLoading() && core(); as loadedCore) {
       @if (globalDraft.calendar(); as calendar) {
-        @if (!globalDraft.cityEditing()) {
-          <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
-        }
-        @if (globalDraft.policy(); as policy) {
-          <app-event-global-draft-summary [core]="loadedCore" [calendar]="calendar" [policy]="policy" />
-        }
-        <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
-          <p-button type="button" severity="secondary" [outlined]="true"
-            [label]="i18n.commonActions().previous" icon="pi pi-point-left" (onClick)="goBack()" />
-          @if (globalDraft.policy()) {
-            <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-              [disabled]="globalDraft.cityEditing() || (datedBlocks()?.selectionLocked() ?? false)"
-              (navigateToSection)="goToDiagnosticSection($event)" />
+        <app-event-global-steps [activeStep]="globalDraft.activeStep()" [disabled]="navigationLocked()"
+          [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
+        <ng-template #stepContent>
+          <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+            <p class="m-0 muted-text">{{ i18n.creation().savedData }}</p>
+            @if (globalDraft.policy(); as policy) {
+              @if (globalDraft.mainEdition(); as mainEdition) {
+                <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
+                  [mainEdition]="mainEdition" [calendar]="calendar" [policy]="policy" />
+              }
+            }
+            @if (globalDraft.activeStep() === 2) {
+              <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
+                [addCityDisabled]="globalDraft.isChecking() || datedBlocks.isDirty() || datedBlocks.readbackPending()" (cityAdded)="core.set($event)" />
+            }
+            @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
+              <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
+            }
+            @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
+              <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
+                [disabled]="globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                (navigateToSection)="goToDiagnosticSection($event)" />
+            }
+          </div>
+        </ng-template>
+        <div class="flex-row-between-center flex-col-start-stretch-sm flex-wrap gap-sm border-top pt-md w-100">
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-point-left"
+              [label]="i18n.commonActions().previous" [disabled]="globalDraft.activeStep() === 1 || navigationLocked()"
+              (onClick)="goToStep(globalDraft.activeStep() - 1)" />
+            <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-interdiction"
+              [label]="i18n.commonActions().cancel" [disabled]="navigationLocked()" (onClick)="goBack()" />
+          </div>
+          @if (globalDraft.activeStep() < 6) {
+            <p-button type="button" severity="success" size="small" icon="pi pi-point-right" iconPos="right"
+              [label]="i18n.commonActions().next" [disabled]="navigationLocked()" (onClick)="goToStep(globalDraft.activeStep() + 1)" />
           }
         </div>
       } @else {
@@ -204,8 +227,9 @@
           </div>
         </form>
       }
-      <app-event-core-editions [core]="loadedCore" [legacyEditing]="!globalDraft.calendar()"
-        [addCityDisabled]="globalDraft.isChecking() || (datedBlocks()?.selectionLocked() ?? false)" (cityAdded)="core.set($event)" />
+      @if (!globalDraft.calendar()) {
+        <app-event-core-editions [core]="loadedCore" [legacyEditing]="true" />
+      }
     }
   </div>
 </section>

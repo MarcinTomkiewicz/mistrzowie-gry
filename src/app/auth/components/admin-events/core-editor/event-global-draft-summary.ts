@@ -3,7 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import type {
   AdminEffectivePolicyResult, AdminGlobalCalendarResult,
 } from '../../../../core/interfaces/i-admin-global-event';
-import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { formatDateLabel } from '../../../../core/utils/date';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalPolicySummary } from './event-global-policy-summary';
@@ -16,7 +16,9 @@ import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary
   host: { class: 'd-block w-100 min-w-0' },
 })
 export class EventGlobalDraftSummary {
+  readonly step = input(6);
   readonly core = input.required<IEventCoreDetail>();
+  readonly mainEdition = input.required<IAdminEventDetail>();
   readonly calendar = input.required<AdminGlobalCalendarResult>();
   readonly policy = input.required<AdminEffectivePolicyResult>();
   protected readonly i18n = createEventCoreEditorI18n();

@@ -7,30 +7,23 @@
     </header>
     <app-loading-overlay [visible]="isSaving()" [label]="i18n.commonStatus().saving" />
     <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="draft.form" (ngSubmit)="submit()" novalidate>
-      <p-stepper class="d-block w-100 min-w-0" [value]="activeStep()" [linear]="false" (valueChange)="goToStep($event)">
-        <p-step-list class="mg-grid grid-5-cols grid-2-cols-md grid-1-cols-sm gap-xs border-bottom pb-sm w-100">
-          @for (step of steps(); track step.value) {
-            <p-step class="min-w-0" [value]="step.value"
-              [disabled]="step.value > activeStep() || isSaving() || draft.state() !== 'idle'"><span class="text-wrap-anywhere">{{ step.label }}</span></p-step>
-          }
-        </p-step-list>
-        <p-step-panels>
-          @for (step of steps(); track step.value) {
-            <p-step-panel [value]="step.value">
-              <ng-template #content>
-                @if (activeStep() === step.value) {
-                  @if (step.value < 5) {
-                    <app-event-global-draft-fields [form]="draft.form" [step]="step.value"
-                      [scheduleValidationAttempted]="scheduleValidationAttempted()" />
-                  } @else {
-                    <app-event-global-draft-review [form]="draft.form" />
-                  }
-                }
-              </ng-template>
-            </p-step-panel>
-          }
-        </p-step-panels>
-      </p-stepper>
+      <app-event-global-steps [activeStep]="activeStep()" [reachedStep]="draft.reachedStep()"
+        [disabled]="isSaving() || draft.state() !== 'idle'" [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
+      <ng-template #stepContent>
+        @if (activeStep() < 5) {
+          <app-event-global-draft-fields [form]="draft.form" [step]="activeStep()"
+            [scheduleValidationAttempted]="scheduleValidationAttempted()" />
+        } @else if (activeStep() === 5) {
+          <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+            <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h2>
+            <p class="m-0 muted-text">{{ i18n.creation().programAfterSave }}</p>
+          </section>
+        } @else if (!draft.form.invalid) {
+          <app-event-global-draft-review [form]="draft.form" />
+        } @else {
+          <p-message severity="error">{{ i18n.commonForm().invalid }}</p-message>
+        }
+      </ng-template>
       @if (!isSaving() && draft.state() !== 'idle') {
         <p-message severity="warn" icon="pi pi-biohazard">{{ draft.state() === 'created' ? i18n.creation().created : i18n.creation().uncertain }}</p-message>
       }
@@ -44,7 +37,7 @@
             [disabled]="isSaving() || draft.state() === 'uncertain'" (onClick)="cancel()" />
         </div>
         <div class="flex-row-end-center flex-wrap gap-sm">
-          @if (activeStep() < 5) {
+          @if (activeStep() < 6) {
             <p-button type="button" severity="success" size="small" icon="pi pi-point-right" iconPos="right"
               [label]="i18n.commonActions().next" [disabled]="isSaving()" (onClick)="goToStep(activeStep() + 1)" />
           } @else {

@@ -138,9 +138,15 @@
     },
     "creation": {
       "steps": {
-        "location": "[PH] Główna lokalizacja",
-        "policy": "[PH] Cena i zapisy"
+        "event": "Wydarzenie",
+        "location": "Główna lokalizacja",
+        "schedule": "Harmonogram",
+        "policy": "Cena i zapisy",
+        "program": "Program lokalny",
+        "summary": "Podsumowanie"
       },
+      "programAfterSave": "[PH] Zapisz szkic wydarzenia, aby zobaczyć dane lokalnego programu.",
+      "savedData": "[PH] Podgląd zapisanych danych wydarzenia.",
       "leaveConfirmation": "[PH] Opuścić kreator i porzucić niezapisane dane wydarzenia?",
       "discardDraft": "[PH] Porzuć dane",
       "help": "[PH] Wyjaśnienie ustawienia",

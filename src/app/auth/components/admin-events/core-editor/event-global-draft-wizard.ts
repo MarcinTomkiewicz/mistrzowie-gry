@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
-import { StepperModule } from 'primeng/stepper';
-import { finalize, map, Observable } from 'rxjs';
+import { finalize, from, map, Observable, switchMap, tap } from 'rxjs';
 
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
@@ -20,6 +19,7 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventGlobalDraftFields } from './event-global-draft-fields';
 import { EventGlobalDraftReview } from './event-global-draft-review';
+import { EventGlobalSteps } from './event-global-steps';
 
 const STEP_FIELDS = [
   ['name', 'shortDescription', 'longDescription'],
@@ -31,10 +31,10 @@ const STEP_FIELDS = [
 
 @Component({
   selector: 'app-event-global-draft-wizard',
-  imports: [ReactiveFormsModule, ButtonModule, MessageModule, StepperModule,
+  imports: [ReactiveFormsModule, ButtonModule, MessageModule, EventGlobalSteps,
     Breadcrumbs, LoadingOverlay, EventGlobalDraftFields, EventGlobalDraftReview],
   templateUrl: './event-global-draft-wizard.html',
-  providers: [provideTranslocoScope('adminEvents', 'common'), EventGlobalDraftController],
+  providers: [provideTranslocoScope('adminEvents', 'common')],
 })
 export class EventGlobalDraftWizard {
   private readonly destroyRef = inject(DestroyRef);
@@ -45,16 +45,9 @@ export class EventGlobalDraftWizard {
   private readonly toast = inject(UiToast);
   protected readonly draft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
-  protected readonly activeStep = signal(1);
+  protected readonly activeStep = this.draft.activeStep;
   protected readonly isSaving = signal(false);
   protected readonly scheduleValidationAttempted = signal(false);
-  protected readonly steps = computed(() => [
-    { value: 1, label: this.i18n.fields().coreSectionTitle },
-    { value: 2, label: this.i18n.creationSteps().location },
-    { value: 3, label: this.i18n.commonLabels().schedule },
-    { value: 4, label: this.i18n.creationSteps().policy },
-    { value: 5, label: this.i18n.commonLabels().summary },
-  ]);
   protected readonly saveLabel = computed(() => this.draft.state() === 'created' ? this.i18n.creation().retryRead
     : this.draft.state() === 'uncertain' ? this.i18n.creation().retryCreation : this.i18n.commonActions().saveDraft);
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
@@ -63,6 +56,7 @@ export class EventGlobalDraftWizard {
   ]);
 
   constructor() {
+    this.draft.reset();
     this.destroyRef.onDestroy(this.platform.onWindow('beforeunload', (event) => {
       if (this.draft.state() === 'created' || (!this.isSaving() && !this.draft.form.dirty && this.draft.state() === 'idle')) return;
       event.preventDefault();
@@ -71,17 +65,18 @@ export class EventGlobalDraftWizard {
   }
 
   protected goToStep(step: number | undefined): void {
-    if (step === undefined || step < 1 || step > 5 || this.isSaving() || this.draft.state() !== 'idle') return;
-    if (step > this.activeStep()) {
+    if (step === undefined || step < 1 || step > 6 || this.isSaving() || this.draft.state() !== 'idle') return;
+    if (step > this.draft.reachedStep()) {
       for (let current = 1; current < step; current++) {
         if (!this.validateStep(current)) return;
       }
     }
     this.activeStep.set(step);
+    this.draft.reachedStep.update(reached => Math.max(reached, step));
   }
 
   protected submit(): void {
-    if (this.activeStep() !== 5 || this.isSaving()) return;
+    if (this.activeStep() !== 6 || this.isSaving()) return;
     if (this.draft.state() === 'idle') {
       for (let step = 1; step <= 4; step++) {
         if (!this.validateStep(step)) return;
@@ -89,13 +84,17 @@ export class EventGlobalDraftWizard {
     }
     this.isSaving.set(true);
     this.draft.create().pipe(
+      tap(() => this.toast.success({ summary: this.i18n.toast().saveSuccessSummary, detail: this.i18n.toast().saveSuccessDetail })),
+      switchMap(core => from(this.router.navigate(['/admin/content/events', core.id, 'edit'], {
+        replaceUrl: true,
+        queryParams: { step: this.activeStep() },
+      }))),
+      tap(navigated => {
+        if (!navigated) throw new Error('[EVENT_GLOBAL_DRAFT] Saved Core navigation failed.');
+      }),
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.isSaving.set(false)),
     ).subscribe({
-      next: (core) => {
-        this.toast.success({ summary: this.i18n.toast().saveSuccessSummary, detail: this.i18n.toast().saveSuccessDetail });
-        void this.router.navigate(['/admin/content/events', core.id, 'edit']);
-      },
       error: (error: unknown) => {
         const state = this.draft.state();
         if (state === 'uncertain') {

@@ -51,6 +51,14 @@ export class EventDatedBlocksController {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.invalidatePreview());
   }
 
+  reset(): void {
+    this.operation.set(null);
+    this.savedRevision = null;
+    this.calendar.set(null);
+    this.readbackPending.set(false);
+    this.populate('', '');
+  }
+
   load(calendar: AdminGlobalCalendarResult): void {
     assertEdgeContract(Array.isArray(calendar.datedTimeBlocks), 'datedTimeBlocks', 'the canonical dated calendar');
     this.calendar.set(calendar);

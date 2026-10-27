@@ -10,7 +10,7 @@ import type {
   AdminEffectivePolicyResult, AdminGlobalCalendarResult,
   CreateAdminGlobalEventPayload, CreateAdminGlobalEventResult,
 } from '../../../../core/interfaces/i-admin-global-event';
-import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import type { AdminGlobalEventPagePreview } from '../../../../core/interfaces/i-admin-global-event-preview';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
@@ -23,10 +23,13 @@ export class EventGlobalDraftController {
   private requestId: string | null = null;
   private payload: CreateAdminGlobalEventPayload | null = null;
   readonly form = createEventGlobalDraftForm();
+  readonly activeStep = signal(1);
+  readonly reachedStep = signal(1);
   readonly state = signal<'idle' | 'uncertain' | 'created'>('idle');
   readonly result = signal<CreateAdminGlobalEventResult | null>(null);
   readonly calendar = signal<AdminGlobalCalendarResult | null>(null);
   readonly policy = signal<AdminEffectivePolicyResult | null>(null);
+  readonly mainEdition = signal<IAdminEventDetail | null>(null);
   readonly staffingEditionId = signal<string | null>(null);
   readonly isUnreleasedStaffing = signal(false);
   readonly cityForm = new FormGroup(createEventGlobalCityControls());
@@ -44,10 +47,36 @@ export class EventGlobalDraftController {
     this.form.controls.participantSignupKind.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.syncPolicyControls());
   }
 
+  reset(): void {
+    this.requestId = null;
+    this.payload = null;
+    this.result.set(null);
+    this.state.set('idle');
+    this.activeStep.set(1);
+    this.reachedStep.set(1);
+    this.calendar.set(null);
+    this.policy.set(null);
+    this.mainEdition.set(null);
+    this.staffingEditionId.set(null);
+    this.isUnreleasedStaffing.set(false);
+    this.isChecking.set(false);
+    this.cityBusy.set(false);
+    this.resetCity();
+    const fresh = createEventGlobalDraftForm();
+    this.form.setControl('schedule', fresh.controls.schedule, { emitEvent: false });
+    this.form.setControl('timeBlocks', fresh.controls.timeBlocks, { emitEvent: false });
+    this.form.setControl('dateTimeBlocks', fresh.controls.dateTimeBlocks, { emitEvent: false });
+    this.form.setControl('mainCityDateTimeBlocks', fresh.controls.mainCityDateTimeBlocks, { emitEvent: false });
+    this.form.reset(fresh.getRawValue(), { emitEvent: false });
+    this.form.enable({ emitEvent: false });
+    this.syncPolicyControls();
+  }
+
   readCore(coreId: string): Observable<IEventCoreDetail | null> {
     return defer(() => {
       this.staffingEditionId.set(null);
       this.isUnreleasedStaffing.set(false);
+      this.mainEdition.set(null);
       return this.eventAdmin.getCoreDetail(coreId).pipe(switchMap((core) => {
         if (core === null) {
           if (this.cityCommand?.coreId === coreId) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
@@ -79,6 +108,7 @@ export class EventGlobalDraftController {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Edition readback.');
         }
         const isStaffingConverted = edition.isStaffingConverted === true;
+        if (!isStaffingConverted) this.mainEdition.set(edition);
         this.isUnreleasedStaffing.set(isStaffingConverted && !edition.isStaffingReleased);
         return isStaffingConverted ? edition.id : null;
       }),
@@ -90,6 +120,7 @@ export class EventGlobalDraftController {
       const createdHere = this.result()?.coreId === core.id;
       const cityCommand = this.cityCommand?.coreId === core.id ? this.cityCommand : null;
       if (calendar.coreId !== core.id || ((createdHere || cityCommand) && calendar.calendarLifecycle !== 'global') ||
+        (createdHere && calendar.mainEditionId !== this.result()?.mainEditionId) ||
         (cityCommand && calendar.mainEditionId !== cityCommand.mainEditionId)) {
         throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global calendar readback.');
       }
@@ -101,7 +132,7 @@ export class EventGlobalDraftController {
       if (!calendar.cities.some((city) => city.editionId === calendar.mainEditionId && city.isMain)) {
         throw new Error('[EVENT_GLOBAL_DRAFT] Global calendar main city is missing.');
       }
-      return this.eventAdmin.getEffectivePolicy(core.id).pipe(map((policy) => {
+      return this.eventAdmin.getEffectivePolicy(core.id).pipe(tap((policy) => {
         if (policy.coreId !== core.id || policy.lifecycle !== 'global' || policy.mainEditionId !== calendar.mainEditionId ||
           !policy.editions.some((edition) => edition.editionId === calendar.mainEditionId && edition.isMain)) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global policy readback.');
@@ -114,6 +145,12 @@ export class EventGlobalDraftController {
         }
         this.calendar.set(calendar);
         this.policy.set(policy);
+      }), switchMap(() => this.mainEdition()?.id === calendar.mainEditionId
+        ? of(this.mainEdition()) : this.eventAdmin.getEditionDetail(calendar.mainEditionId)), map(edition => {
+        if (!edition || edition.id !== calendar.mainEditionId || edition.eventCoreId !== core.id) {
+          throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent main Edition readback.');
+        }
+        this.mainEdition.set(edition);
         return core;
       }));
     }));

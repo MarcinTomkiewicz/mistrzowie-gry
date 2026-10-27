@@ -58,6 +58,8 @@ const loaders = {
     import('../components/admin-events/core-editor/event-core-editor').then(
       (m) => m.EventCoreEditor,
     ),
+  eventCoreEditorShell: () =>
+    import('../components/admin-events/core-editor/event-core-editor-shell').then((m) => m.EventCoreEditorShell),
   eventGlobalDraftWizard: () =>
     import('../components/admin-events/core-editor/event-global-draft-wizard').then((m) => m.EventGlobalDraftWizard),
   eventEditionEditor: () =>
@@ -112,14 +114,20 @@ const adminChildren: Routes = [
     loadComponent: loaders.commercialPagePreview,
   },
   {
-    path: 'content/events/new',
-    loadComponent: loaders.eventGlobalDraftWizard,
-    canDeactivate: [(wizard: EventGlobalDraftWizard) => wizard.canDeactivate()],
-  },
-  {
-    path: 'content/events/:coreId/edit',
-    loadComponent: loaders.eventCoreEditor,
-    canDeactivate: [(editor: EventCoreEditor) => editor.canDeactivate()],
+    path: '',
+    loadComponent: loaders.eventCoreEditorShell,
+    children: [
+      {
+        path: 'content/events/new',
+        loadComponent: loaders.eventGlobalDraftWizard,
+        canDeactivate: [(wizard: EventGlobalDraftWizard) => wizard.canDeactivate()],
+      },
+      {
+        path: 'content/events/:coreId/edit',
+        loadComponent: loaders.eventCoreEditor,
+        canDeactivate: [(editor: EventCoreEditor) => editor.canDeactivate()],
+      },
+    ],
   },
   {
     path: 'content/events/:coreId/editions/new',

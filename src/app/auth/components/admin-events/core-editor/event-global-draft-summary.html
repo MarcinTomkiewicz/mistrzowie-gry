@@ -1,91 +1,127 @@
 @let copy = i18n.creation();
 @let details = core();
-<div class="grid-2-1 grid-items-start gap-md w-100 min-w-0">
-  <div class="flex-col-start-stretch gap-md min-w-0">
-    <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-      <div class="flex-row-start-center gap-md">
-        <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
-        <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
-      </div>
-      <dl class="mg-grid-2 gap-md m-0">
-        <div><dt class="muted-text">{{ i18n.commonLabels().name }}</dt><dd class="m-0 text-wrap-anywhere"><strong>{{ details.name }}</strong></dd></div>
-        <div><dt class="muted-text">{{ i18n.commonLabels().key }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.key }}</dd></div>
-      </dl>
-      <dl class="flex-col-start-stretch gap-md m-0">
-        <div>
-          <dt class="muted-text">{{ i18n.commonLabels().shortDescription }}</dt>
-          <dd class="m-0 text-wrap-anywhere">{{ details.shortDescription || i18n.commonValues().notProvided }}</dd>
-        </div>
-        <div>
-          <dt class="muted-text">{{ i18n.commonLabels().longDescription }}</dt>
-          <dd class="m-0 text-wrap-anywhere">{{ details.longDescription || i18n.commonValues().notProvided }}</dd>
-        </div>
-      </dl>
-      <dl class="mg-grid-2 gap-md m-0 border-top pt-md">
-        <div>
-          <dt class="muted-text">{{ i18n.commonLabels().status }}</dt>
-          <dd class="m-0">{{ details.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().inactive }}</dd>
-        </div>
-        <div>
-          <dt class="muted-text">{{ i18n.fields().hasPublicPage }}</dt>
-          <dd class="m-0">{{ details.hasPublicPage ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
-        </div>
-      </dl>
-    </section>
-    <section id="global-event-schedule" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-      <div class="flex-row-start-center gap-md">
-        <span class="pi pi-sun-eclipse square-11 flex-none" aria-hidden="true"></span>
-        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
-      </div>
-      @if (mainCity(); as city) {
-        <dl class="mg-grid-2 gap-md m-0">
-          <div><dt class="muted-text">{{ copy.mainCity }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.city }}</dd></div>
-          <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.timezone }}</dd></div>
-        </dl>
-      }
-      <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.occurrences().sectionTitle }}</h3>
-      <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
-        <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
-        <app-event-global-time-blocks-summary [blocks]="calendar().timeBlocks" />
-        @for (day of dates(); track day.globalOccurrenceId) {
-          <details class="w-100 border-top pt-sm">
-            <summary>{{ formatDateLabel(day.date) }} - {{ i18n.datedBlocks().sources[day.source] }}</summary>
-            <div class="flex-col-start-stretch gap-md pt-sm w-100 min-w-0">
-              <app-event-global-time-blocks-summary [blocks]="day.timeBlocks" />
-              @for (city of day.cities; track city.editionId) {
-                <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100 min-w-0">
-                  <h4 class="m-0">{{ city.city }} - {{ city.isOverride ? i18n.datedBlocks().cityOverride : i18n.datedBlocks().fromDate }}</h4>
-                  <app-event-global-time-blocks-summary [blocks]="city.timeBlocks" />
-                </section>
-              }
+<div [class]="step() === 6 ? 'grid-2-1 grid-items-start gap-md w-100 min-w-0' : 'flex-col-start-stretch gap-md w-100 min-w-0'">
+  @if (step() !== 4 && step() !== 5) {
+    <div class="flex-col-start-stretch gap-md min-w-0">
+      @if (step() === 1 || step() === 6) {
+        <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+          <div class="flex-row-start-center gap-md">
+            <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
+            <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
+          </div>
+          <dl class="mg-grid-2 gap-md m-0">
+            <div><dt class="muted-text">{{ i18n.commonLabels().name }}</dt><dd class="m-0 text-wrap-anywhere"><strong>{{ details.name }}</strong></dd></div>
+            <div><dt class="muted-text">{{ i18n.commonLabels().key }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.key }}</dd></div>
+          </dl>
+          <dl class="flex-col-start-stretch gap-md m-0">
+            <div>
+              <dt class="muted-text">{{ i18n.commonLabels().shortDescription }}</dt>
+              <dd class="m-0 text-wrap-anywhere">{{ details.shortDescription || i18n.commonValues().notProvided }}</dd>
             </div>
-          </details>
-        }
-      </section>
-    </section>
-  </div>
-  <section id="global-event-policy" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-    @for (group of policyGroups(); track group.key; let first = $first) {
-      @if (first) {
-        <div class="flex-row-start-center gap-md">
-          <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
-          <h2 class="mg-section__title mg-section__title--md m-0">{{ group.title }}</h2>
-        </div>
-      } @else {
-        <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ group.title }}</h3>
+            <div>
+              <dt class="muted-text">{{ i18n.commonLabels().longDescription }}</dt>
+              <dd class="m-0 text-wrap-anywhere">{{ details.longDescription || i18n.commonValues().notProvided }}</dd>
+            </div>
+          </dl>
+          <dl class="mg-grid-2 gap-md m-0 border-top pt-md">
+            <div>
+              <dt class="muted-text">{{ i18n.commonLabels().status }}</dt>
+              <dd class="m-0">{{ details.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().inactive }}</dd>
+            </div>
+            <div>
+              <dt class="muted-text">{{ i18n.fields().hasPublicPage }}</dt>
+              <dd class="m-0">{{ details.hasPublicPage ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
+            </div>
+          </dl>
+        </section>
       }
-      <app-event-global-policy-summary [policy]="group.values" />
-    }
-    <dl class="flex-col-start-stretch gap-sm m-0">
-      <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm">
-        <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToPublicEvent }}</dt>
-        <dd class="m-0">{{ policy().appliedToPublicEvent ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
-      </div>
-      <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
-        <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToRegistration }}</dt>
-        <dd class="m-0">{{ policy().appliedToParticipantRegistration ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
-      </div>
-    </dl>
-  </section>
+      @if (step() === 2 || step() === 6) {
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+          <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h2>
+          @if (mainCity(); as city) {
+            <dl class="mg-grid-2 gap-md m-0">
+              <div><dt class="muted-text">{{ copy.mainCity }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.city }}</dd></div>
+              <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.timezone }}</dd></div>
+              <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ mainEdition().venueName || i18n.commonValues().notProvided }}</dd></div>
+              <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ mainEdition().venueAddress || i18n.commonValues().notProvided }}</dd></div>
+            </dl>
+            <dl class="m-0">
+              <dt class="muted-text">{{ copy.facebookLink }}</dt>
+              <dd class="m-0 text-wrap-anywhere">
+                @if (mainEdition().facebookLink; as link) { <a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a> }
+                @else { {{ i18n.commonValues().notProvided }} }
+              </dd>
+            </dl>
+          }
+        </section>
+      }
+      @if (step() === 3 || step() === 6) {
+        <section id="global-event-schedule" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+          <div class="flex-row-start-center gap-md">
+            <span class="pi pi-sun-eclipse square-11 flex-none" aria-hidden="true"></span>
+            <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
+          </div>
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.occurrences().sectionTitle }}</h3>
+          <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+            <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
+            <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
+            <app-event-global-time-blocks-summary [blocks]="calendar().timeBlocks" />
+            @for (day of dates(); track day.globalOccurrenceId) {
+              <details class="w-100 border-top pt-sm">
+                <summary>{{ formatDateLabel(day.date) }} - {{ i18n.datedBlocks().sources[day.source] }}</summary>
+                <div class="flex-col-start-stretch gap-md pt-sm w-100 min-w-0">
+                  <app-event-global-time-blocks-summary [blocks]="day.timeBlocks" />
+                  @for (city of day.cities; track city.editionId) {
+                    <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100 min-w-0">
+                      <h4 class="m-0">{{ city.city }} - {{ city.isOverride ? i18n.datedBlocks().cityOverride : i18n.datedBlocks().fromDate }}</h4>
+                      <app-event-global-time-blocks-summary [blocks]="city.timeBlocks" />
+                    </section>
+                  }
+                </div>
+              </details>
+            }
+          </section>
+        </section>
+      }
+    </div>
+  }
+  @if (step() === 4 || step() === 6) {
+    <section id="global-event-policy" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      @for (group of policyGroups(); track group.key; let first = $first) {
+        @if (first) {
+          <div class="flex-row-start-center gap-md">
+            <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
+            <h2 class="mg-section__title mg-section__title--md m-0">{{ group.title }}</h2>
+          </div>
+        } @else {
+          <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ group.title }}</h3>
+        }
+        <app-event-global-policy-summary [policy]="group.values" />
+      }
+      <dl class="flex-col-start-stretch gap-sm m-0">
+        <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm">
+          <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToPublicEvent }}</dt>
+          <dd class="m-0">{{ policy().appliedToPublicEvent ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
+        </div>
+        <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
+          <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToRegistration }}</dt>
+          <dd class="m-0">{{ policy().appliedToParticipantRegistration ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
+        </div>
+      </dl>
+    </section>
+  }
+  @if (step() === 5) {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h2>
+      @for (edition of details.editions; track edition.id) {
+        <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100 min-w-0">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ edition.city }}</h3>
+          <dl class="mg-grid-2 gap-md m-0">
+            <div><dt class="muted-text">{{ i18n.occurrences().sectionTitle }}</dt><dd class="m-0">{{ edition.occurrenceCount }}</dd></div>
+            <div><dt class="muted-text">{{ i18n.occurrenceTable().programItemCount }}</dt><dd class="m-0">{{ edition.programItemCount }}</dd></div>
+          </dl>
+        </section>
+      }
+    </section>
+  }
 </div>
