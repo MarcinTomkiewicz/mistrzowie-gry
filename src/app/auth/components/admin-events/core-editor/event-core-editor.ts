@@ -68,8 +68,12 @@ export class EventCoreEditor {
     { label: this.core()?.name ?? this.i18n.page().editTitle },
   ]);
   protected readonly form = this.metadata.coreForm;
+  protected readonly selectedMainEdition = computed(() => {
+    const edition = this.globalDraft.selectedEdition();
+    return edition !== null && edition.id === this.globalDraft.calendar()?.mainEditionId;
+  });
   protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => !this.metadata.isGlobal() || this.globalDraft.activeStep() === 1
-    ? 'core' : this.globalDraft.activeStep() === 2 ? 'edition' : null);
+    ? 'core' : this.globalDraft.activeStep() === 2 && this.selectedMainEdition() ? 'edition' : null);
   protected readonly metadataError = computed(() => {
     const target = this.metadataTarget();
     const error = target ? this.metadata.errors()[target] : undefined;

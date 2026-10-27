@@ -18,12 +18,12 @@ import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary
 export class EventGlobalDraftSummary {
   readonly step = input(6);
   readonly core = input.required<IEventCoreDetail>();
-  readonly mainEdition = input.required<IAdminEventDetail>();
+  readonly edition = input.required<IAdminEventDetail>();
   readonly calendar = input.required<AdminGlobalCalendarResult>();
   readonly policy = input.required<AdminEffectivePolicyResult>();
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly formatDateLabel = formatDateLabel;
-  protected readonly mainCity = computed(() => this.calendar().cities.find((city) => city.editionId === this.calendar().mainEditionId));
+  protected readonly locationCity = computed(() => this.calendar().cities.find((city) => city.editionId === this.edition().id));
   protected readonly dates = computed(() => [...this.calendar().datedTimeBlocks].sort((a, b) => a.date.localeCompare(b.date)));
   protected readonly policyGroups = computed(() => [
     { key: 'global', title: this.i18n.creation().policy, values: this.policy().global },

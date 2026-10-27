@@ -1,7 +1,7 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup } from '@angular/forms';
-import { defer, EMPTY, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { defer, EMPTY, finalize, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 
 import { ParticipantSignupKind } from '../../../../core/enums/event';
 import { createEventGlobalCityControls, createEventGlobalDraftForm, mapEventGlobalCity, mapEventGlobalDraftToPayload } from '../../../../core/factories/event-global-draft-form.factory';
@@ -20,6 +20,9 @@ import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 @Injectable()
 export class EventGlobalDraftController {
   private readonly eventAdmin = inject(EventAdmin);
+  private readonly destroyRef = inject(DestroyRef);
+  private selectionCoreId: string | null = null;
+  private editionReadSubscription: Subscription | null = null;
   private requestId: string | null = null;
   private payload: CreateAdminGlobalEventPayload | null = null;
   readonly form = createEventGlobalDraftForm();
@@ -30,6 +33,10 @@ export class EventGlobalDraftController {
   readonly calendar = signal<AdminGlobalCalendarResult | null>(null);
   readonly policy = signal<AdminEffectivePolicyResult | null>(null);
   readonly mainEdition = signal<IAdminEventDetail | null>(null);
+  readonly selectedEditionId = signal<string | null>(null);
+  readonly selectedEdition = signal<IAdminEventDetail | null>(null);
+  readonly isReadingEdition = signal(false);
+  readonly editionReadError = signal<unknown | null>(null);
   readonly staffingEditionId = signal<string | null>(null);
   readonly isUnreleasedStaffing = signal(false);
   readonly cityForm = new FormGroup(createEventGlobalCityControls());
@@ -48,6 +55,8 @@ export class EventGlobalDraftController {
   }
 
   reset(): void {
+    this.selectionCoreId = null;
+    this.resetEditionSelection();
     this.requestId = null;
     this.payload = null;
     this.result.set(null);
@@ -74,12 +83,15 @@ export class EventGlobalDraftController {
 
   readCore(coreId: string): Observable<IEventCoreDetail | null> {
     return defer(() => {
+      if (this.selectionCoreId !== coreId) this.resetEditionSelection();
+      this.selectionCoreId = coreId;
       this.staffingEditionId.set(null);
       this.isUnreleasedStaffing.set(false);
       this.mainEdition.set(null);
       return this.eventAdmin.getCoreDetail(coreId).pipe(switchMap((core) => {
         if (core === null) {
           if (this.cityCommand?.coreId === coreId) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
+          this.resetEditionSelection();
           this.calendar.set(null);
           this.policy.set(null);
           return of(null);
@@ -91,6 +103,7 @@ export class EventGlobalDraftController {
         return this.readStaffingEditionId(core).pipe(switchMap((editionId) => {
           this.staffingEditionId.set(editionId);
           if (!editionId) return this.readGlobalCalendar(core);
+          this.resetEditionSelection();
           this.calendar.set(null);
           this.policy.set(null);
           return of(core);
@@ -125,6 +138,7 @@ export class EventGlobalDraftController {
         throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global calendar readback.');
       }
       if (calendar.calendarLifecycle !== 'global') {
+        this.resetEditionSelection();
         this.calendar.set(null);
         this.policy.set(null);
         return of(core);
@@ -151,9 +165,54 @@ export class EventGlobalDraftController {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent main Edition readback.');
         }
         this.mainEdition.set(edition);
+        this.syncEditionSelection(calendar, edition);
         return core;
       }));
     }));
+  }
+
+  selectEdition(editionId: string): void {
+    const calendar = this.calendar();
+    const city = calendar?.cities.find(row => row.editionId === editionId);
+    if (!calendar || calendar.calendarLifecycle !== 'global' || calendar.coreId !== this.selectionCoreId || !city) return;
+    this.editionReadSubscription?.unsubscribe();
+    this.selectedEditionId.set(editionId);
+    this.selectedEdition.set(null);
+    this.editionReadError.set(null);
+    this.isReadingEdition.set(true);
+    this.editionReadSubscription = this.eventAdmin.getEditionDetail(editionId).pipe(
+      map(edition => {
+        assertEdgeContract(edition !== null && edition.id === editionId && edition.eventCoreId === calendar.coreId &&
+          edition.city === city.city && edition.slug === city.slug && edition.timezone === city.timezone,
+        'globalSelectedEdition', 'the selected saved Edition belonging to the current Core');
+        return edition;
+      }),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.isReadingEdition.set(false)),
+    ).subscribe({
+      next: edition => this.selectedEdition.set(edition),
+      error: (error: unknown) => this.editionReadError.set(error),
+    });
+  }
+
+  private resetEditionSelection(): void {
+    this.editionReadSubscription?.unsubscribe();
+    this.editionReadSubscription = null;
+    this.selectedEditionId.set(null);
+    this.selectedEdition.set(null);
+    this.isReadingEdition.set(false);
+    this.editionReadError.set(null);
+  }
+
+  private syncEditionSelection(calendar: AdminGlobalCalendarResult, mainEdition: IAdminEventDetail): void {
+    const selectedId = this.selectedEditionId();
+    if (selectedId !== null && selectedId !== mainEdition.id && calendar.cities.some(city => city.editionId === selectedId)) {
+      this.selectEdition(selectedId);
+      return;
+    }
+    this.resetEditionSelection();
+    this.selectedEditionId.set(mainEdition.id);
+    this.selectedEdition.set(mainEdition);
   }
 
   create(): Observable<IEventCoreDetail> {

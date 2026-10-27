@@ -1,9 +1,11 @@
 import { Component, computed, DestroyRef, ElementRef, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
+import { SelectModule } from 'primeng/select';
 
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import type { EventGlobalCityCopy } from '../../../../core/types/i18n/event-global-draft';
@@ -18,7 +20,7 @@ import { EventGlobalDraftController } from './event-global-draft-controller';
 
 @Component({
   selector: 'app-event-core-editions',
-  imports: [RouterLink, ReactiveFormsModule, ButtonModule, MessageModule, EventGlobalCityFields],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, ButtonModule, MessageModule, FloatLabelModule, SelectModule, EventGlobalCityFields],
   templateUrl: './event-core-editions.html',
   host: { class: 'd-block w-100' },
 })
@@ -26,6 +28,7 @@ export class EventCoreEditions {
   readonly core = input.required<IEventCoreDetail>();
   readonly legacyEditing = input.required<boolean>();
   readonly addCityDisabledReason = input<'metadata' | 'schedule' | null>(null);
+  readonly selectionDisabled = input(false);
   readonly cityAdded = output<IEventCoreDetail>();
   protected readonly globalDraft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
@@ -34,6 +37,13 @@ export class EventCoreEditions {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(UiToast);
   private readonly initialDate = new Date();
+  protected readonly editionOptions = computed(() => this.globalDraft.calendar()?.cities.map(city => ({
+    value: city.editionId, label: city.city,
+  })) ?? []);
+  protected readonly editionErrorMessage = computed(() => {
+    const error = this.globalDraft.editionReadError();
+    return error === null ? null : resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification);
+  });
   protected readonly addCityBlocker = computed<keyof EventGlobalCityCopy['blockers'] | null>(() => this.globalDraft.addCityBlocker(this.core()) ??
     this.addCityDisabledReason() ?? (this.globalDraft.cityBusy() ? 'saving'
       : this.globalDraft.cityState() === 'uncertain' ? 'uncertain' : this.globalDraft.cityState() === 'created' ? 'readback'
@@ -47,6 +57,11 @@ export class EventCoreEditions {
     return createTimeZoneOptions(date
       ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12)) : this.initialDate);
   });
+
+  protected selectEdition(value: unknown): void {
+    if (typeof value !== 'string' || this.legacyEditing() || this.selectionDisabled()) return;
+    this.globalDraft.selectEdition(value);
+  }
 
   protected openCity(): void {
     if (this.addCityBlocker() !== null) return;

@@ -37,18 +37,18 @@
       }
       @if (step() === 2 || step() === 6) {
         <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-          <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h2>
-          @if (mainCity(); as city) {
+          <h2 class="mg-section__title mg-section__title--md m-0">{{ step() === 2 ? edition().city : i18n.creationSteps().location }}</h2>
+          @if (locationCity(); as city) {
             <dl class="mg-grid-2 gap-md m-0">
-              <div><dt class="muted-text">{{ copy.mainCity }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.city }}</dd></div>
+              <div><dt class="muted-text">{{ step() === 2 ? i18n.commonLabels().city : copy.mainCity }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.city }}</dd></div>
               <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.timezone }}</dd></div>
-              <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ mainEdition().venueName || i18n.commonValues().notProvided }}</dd></div>
-              <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ mainEdition().venueAddress || i18n.commonValues().notProvided }}</dd></div>
+              <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ edition().venueName || i18n.commonValues().notProvided }}</dd></div>
+              <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ edition().venueAddress || i18n.commonValues().notProvided }}</dd></div>
             </dl>
             <dl class="m-0">
               <dt class="muted-text">{{ copy.facebookLink }}</dt>
               <dd class="m-0 text-wrap-anywhere">
-                @if (mainEdition().facebookLink; as link) { <a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a> }
+                @if (edition().facebookLink; as link) { <a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a> }
                 @else { {{ i18n.commonValues().notProvided }} }
               </dd>
             </dl>

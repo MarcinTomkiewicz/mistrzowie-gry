@@ -33,9 +33,16 @@
             [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
           <ng-template #stepContent>
             <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+              @if (globalDraft.activeStep() === 2) {
+                <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
+                  [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
+                  [addCityDisabledReason]="metadata.locked() ? 'metadata'
+                    : datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
+                  (cityAdded)="core.set($event)" />
+              }
               @if (globalDraft.activeStep() === 1 && metadata.canEditCore()) {
                 <ng-container [ngTemplateOutlet]="coreForm" />
-              } @else if (globalDraft.activeStep() === 2 && metadata.canEditEdition()) {
+              } @else if (globalDraft.activeStep() === 2 && selectedMainEdition() && metadata.canEditEdition()) {
                 @if (metadata.edition(); as edition) {
                   <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="metadata.editionForm"
                     (ngSubmit)="saveMetadata('edition')" novalidate>
@@ -54,23 +61,27 @@
                     <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: 'edition' }" />
                   </form>
                 }
+              } @else if (globalDraft.activeStep() === 2) {
+                @if (globalDraft.selectedEdition(); as edition) {
+                  <p class="m-0 muted-text">{{ i18n.metadata().readOnly }}</p>
+                  @if (globalDraft.policy(); as policy) {
+                    <app-event-global-draft-summary [step]="2" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                  }
+                  @if (metadataTarget(); as target) {
+                    <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
+                  }
+                }
               } @else {
                 <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
                 @if (globalDraft.policy(); as policy) {
                   @if (metadata.edition(); as edition) {
                     <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
-                      [mainEdition]="edition" [calendar]="calendar" [policy]="policy" />
+                      [edition]="edition" [calendar]="calendar" [policy]="policy" />
                   }
                 }
                 @if (metadataTarget(); as target) {
                   <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
                 }
-              }
-              @if (globalDraft.activeStep() === 2) {
-                <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
-                  [addCityDisabledReason]="metadata.locked() ? 'metadata'
-                    : datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
-                  (cityAdded)="core.set($event)" />
               }
               @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
                 <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
