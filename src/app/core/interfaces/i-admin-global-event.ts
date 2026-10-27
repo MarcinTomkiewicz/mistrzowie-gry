@@ -117,6 +117,9 @@ export interface CreateAdminGlobalEventPayload {
 
 export type AddAdminGlobalEventCityPayload = CreateAdminGlobalEventPayload['mainCity'];
 
+export type AdminGlobalEventCityBlocker = 'checking' | 'calendar' | 'coreActive' | 'corePublic' | 'activeCity' |
+  'protectedDates' | 'occurrenceStatus' | 'calendarStatus' | 'noScheduledDates';
+
 export type AdminGlobalEventEditionMetadata = Pick<IAdminEventDetail, 'venueName' | 'venueAddress' | 'facebookLink'>;
 
 export type SaveAdminGlobalEventEditionMetadataPayload = {

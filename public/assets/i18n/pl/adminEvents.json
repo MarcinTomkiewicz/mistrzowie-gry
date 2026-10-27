@@ -64,6 +64,23 @@
     },
     "city": {
       "action": "Dodaj miasto",
+      "blockers": {
+        "checking": "[PH] Trwa sprawdzanie wydarzenia. Poczekaj na zakończenie.",
+        "calendar": "[PH] Brakuje prawidłowego wspólnego kalendarza lub głównej lokalizacji tego wydarzenia. Odśwież dane.",
+        "coreActive": "[PH] Wydarzenie jest aktywne. Dodawanie miast jest dostępne dla nieaktywnego szkicu.",
+        "corePublic": "[PH] Wydarzenie ma włączoną stronę publiczną. Dodawanie miast jest dostępne dla prywatnego szkicu.",
+        "activeCity": "[PH] Co najmniej jedna lokalizacja jest aktywna. Dodawanie miast wymaga nieaktywnych lokalizacji szkicu.",
+        "protectedDates": "[PH] Co najmniej jeden termin jest opublikowany lub chroniony. Do tego szkicu nie można dodać miasta.",
+        "occurrenceStatus": "[PH] Co najmniej jeden lokalny termin wyszedł ze stanu planowania. Do tego szkicu nie można dodać miasta.",
+        "calendarStatus": "[PH] Wspólny kalendarz zawiera nierozpoznany stan daty. Odśwież dane.",
+        "noScheduledDates": "[PH] Wspólny kalendarz nie zawiera zaplanowanych dat dla nowego miasta.",
+        "editing": "[PH] Formularz nowego miasta jest już otwarty. Zapisz go lub anuluj edycję.",
+        "saving": "[PH] Trwa zapis lub odczyt dodawanego miasta. Poczekaj na zakończenie.",
+        "uncertain": "[PH] Wynik dodawania miasta jest niepewny. Ponów ten sam zapis w otwartym formularzu.",
+        "readback": "[PH] Miasto zostało zapisane. Ponów odczyt w otwartym formularzu przed dodaniem kolejnego miasta.",
+        "metadata": "[PH] Rozstrzygnij wynik bieżącego zapisu metadanych przed dodaniem miasta.",
+        "schedule": "[PH] Zapisz lub odrzuć zmiany harmonogramu i zakończ jego odczyt przed dodaniem miasta."
+      },
       "hint": "[PH] Nowe miasto korzysta ze wspólnych dat i ustawień wydarzenia.",
       "uncertain": "[PH] Nie można potwierdzić wyniku zapisu. Zachowano wpisane dane. Ponów ten sam zapis, aby ustalić wynik bez dodawania drugiego miasta. Nie odświeżaj strony.",
       "readbackFailed": "[PH] Miasto zostało zapisane, ale nie udało się odświeżyć danych. Ponów odczyt.",

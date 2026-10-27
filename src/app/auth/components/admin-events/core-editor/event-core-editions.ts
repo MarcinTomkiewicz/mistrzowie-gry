@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { EventGlobalCityCopy } from '../../../../core/types/i18n/event-global-draft';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { parseIsoDate } from '../../../../core/utils/date';
 import { scrollElementIntoViewWhenReady } from '../../../../core/utils/scroll';
@@ -24,7 +25,7 @@ import { EventGlobalDraftController } from './event-global-draft-controller';
 export class EventCoreEditions {
   readonly core = input.required<IEventCoreDetail>();
   readonly legacyEditing = input.required<boolean>();
-  readonly addCityDisabled = input(false);
+  readonly addCityDisabledReason = input<'metadata' | 'schedule' | null>(null);
   readonly cityAdded = output<IEventCoreDetail>();
   protected readonly globalDraft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
@@ -33,6 +34,12 @@ export class EventCoreEditions {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(UiToast);
   private readonly initialDate = new Date();
+  protected readonly addCityBlocker = computed<keyof EventGlobalCityCopy['blockers'] | null>(() => this.globalDraft.addCityBlocker(this.core()) ??
+    this.addCityDisabledReason() ?? (this.globalDraft.cityBusy() ? 'saving'
+      : this.globalDraft.cityState() === 'uncertain' ? 'uncertain' : this.globalDraft.cityState() === 'created' ? 'readback'
+      : this.globalDraft.cityEditing() ? 'editing' : null));
+  protected readonly citySaveBlocked = computed(() => this.globalDraft.cityBusy() || this.globalDraft.isChecking() || this.addCityDisabledReason() !== null ||
+    (this.globalDraft.cityState() === 'idle' && this.globalDraft.addCityBlocker(this.core()) !== null));
   protected readonly timezones = computed(() => {
     const schedule = this.globalDraft.calendar()?.schedule;
     const date = parseIsoDate(schedule?.kind === 'single' ? schedule.date
@@ -42,7 +49,7 @@ export class EventCoreEditions {
   });
 
   protected openCity(): void {
-    if (this.addCityDisabled()) return;
+    if (this.addCityBlocker() !== null) return;
     this.errorMessage.set(null);
     this.globalDraft.openCity(this.core());
     this.focusCityControl('#additional-city-city');
@@ -57,7 +64,7 @@ export class EventCoreEditions {
   }
 
   protected submitCity(): void {
-    if (this.globalDraft.cityBusy() || this.addCityDisabled()) return;
+    if (this.citySaveBlocked()) return;
     this.globalDraft.cityForm.markAllAsTouched();
     if (this.globalDraft.cityState() === 'idle' && this.globalDraft.cityForm.invalid) {
       this.toast.danger({ summary: this.i18n.commonForm().invalidSummary, detail: this.i18n.commonForm().invalid });

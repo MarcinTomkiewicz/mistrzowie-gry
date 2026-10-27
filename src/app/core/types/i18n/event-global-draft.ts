@@ -1,4 +1,4 @@
-import type { AdminDatedTimeBlocks } from '../../interfaces/i-admin-global-event';
+import type { AdminDatedTimeBlocks, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 
 export type EventMetadataCopy = {
@@ -27,6 +27,7 @@ export type EventGlobalDiagnosticsCopy = {
 };
 
 export type EventGlobalCityCopy = {
+  blockers: Record<AdminGlobalEventCityBlocker | 'editing' | 'saving' | 'uncertain' | 'readback' | 'metadata' | 'schedule', string>;
   action: string;
   hint: string;
   uncertain: string;

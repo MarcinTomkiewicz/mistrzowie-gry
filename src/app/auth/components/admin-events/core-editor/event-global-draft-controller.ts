@@ -7,7 +7,7 @@ import { ParticipantSignupKind } from '../../../../core/enums/event';
 import { createEventGlobalCityControls, createEventGlobalDraftForm, mapEventGlobalCity, mapEventGlobalDraftToPayload } from '../../../../core/factories/event-global-draft-form.factory';
 import type {
   AddAdminGlobalEventCityPayload, AddAdminGlobalEventCityResult,
-  AdminEffectivePolicyResult, AdminGlobalCalendarResult,
+  AdminEffectivePolicyResult, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker,
   CreateAdminGlobalEventPayload, CreateAdminGlobalEventResult,
 } from '../../../../core/interfaces/i-admin-global-event';
 import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
@@ -188,16 +188,24 @@ export class EventGlobalDraftController {
     );
   }
 
-  canAddCity(core: IEventCoreDetail): boolean {
+  addCityBlocker(core: IEventCoreDetail): AdminGlobalEventCityBlocker | null {
+    if (this.isChecking()) return 'checking';
     const calendar = this.calendar();
-    return !this.isChecking() && calendar !== null && calendar.coreId === core.id && calendar.calendarLifecycle === 'global' &&
-      !core.isActive && !core.hasPublicPage && calendar.cities.every(city => !city.isActive) &&
-      calendar.globalDates.every(date => date.status === 'planned' && date.cityOccurrences.every(city =>
-        !city.protected && !city.publishedAt && (city.occurrenceStatus === null || city.occurrenceStatus === 'planned')));
+    if (!calendar || calendar.coreId !== core.id || calendar.calendarLifecycle !== 'global' ||
+      !calendar.cities.some(city => city.editionId === calendar.mainEditionId && city.isMain)) return 'calendar';
+    if (core.isActive) return 'coreActive';
+    if (core.hasPublicPage) return 'corePublic';
+    if (calendar.cities.some(city => city.isActive)) return 'activeCity';
+    if (calendar.globalDates.some(date => date.cityOccurrences.some(city => city.protected || city.publishedAt))) return 'protectedDates';
+    if (calendar.globalDates.some(date => date.cityOccurrences.some(city =>
+      city.occurrenceStatus !== null && city.occurrenceStatus !== 'planned'))) return 'occurrenceStatus';
+    if (calendar.globalDates.some(date => date.status !== 'scheduled' && date.status !== 'cancelled')) return 'calendarStatus';
+    if (!calendar.globalDates.some(date => date.status === 'scheduled')) return 'noScheduledDates';
+    return null;
   }
 
   openCity(core: IEventCoreDetail): void {
-    if (this.cityEditing() || !this.canAddCity(core)) return;
+    if (this.cityEditing() || this.addCityBlocker(core) !== null) return;
     this.cityEditing.set(true);
   }
 
@@ -209,7 +217,7 @@ export class EventGlobalDraftController {
   addCity(core: IEventCoreDetail): Observable<IEventCoreDetail> {
     return defer(() => {
       if (this.isChecking() || this.cityBusy() || !this.cityEditing()) return EMPTY;
-      if (this.cityState() === 'idle' && (!this.canAddCity(core) || this.cityForm.invalid)) return EMPTY;
+      if (this.cityState() === 'idle' && (this.addCityBlocker(core) !== null || this.cityForm.invalid)) return EMPTY;
       const calendar = this.calendar();
       if (!calendar) return EMPTY;
       this.cityCommand ??= {

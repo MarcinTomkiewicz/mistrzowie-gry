@@ -17,11 +17,17 @@
           'new',
         ]"
       />
-    } @else if (globalDraft.canAddCity(loadedCore) && !globalDraft.cityEditing()) {
+    } @else {
       <p-button id="additional-city-open" type="button" size="small" severity="success" icon="pi pi-plus"
-        [label]="i18n.city().action" [disabled]="addCityDisabled()" (onClick)="openCity()" />
+        [label]="i18n.city().action" [disabled]="addCityBlocker() !== null" (onClick)="openCity()" />
     }
   </div>
+
+  @if (!legacyEditing()) {
+    @if (addCityBlocker(); as blocker) {
+      <p id="additional-city-blocker" class="m-0 muted-text" role="status">{{ i18n.city().blockers[blocker] }}</p>
+    }
+  }
 
   @if (globalDraft.cityEditing()) {
     <form id="additional-city-form" class="mg-form flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0"
@@ -36,7 +42,7 @@
         <p-button type="submit" size="small" severity="success" icon="pi pi-done-it" loadingIcon="pi pi-d20"
           [label]="globalDraft.cityState() === 'created' ? i18n.creation().retryRead
             : globalDraft.cityState() === 'uncertain' ? i18n.creation().retryCreation : i18n.city().action"
-          [loading]="globalDraft.cityBusy()" [disabled]="globalDraft.cityBusy() || addCityDisabled()" />
+          [loading]="globalDraft.cityBusy()" [disabled]="citySaveBlocked()" />
         <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
           [label]="i18n.commonActions().cancel" [disabled]="globalDraft.cityBusy() || globalDraft.cityState() !== 'idle'"
           (onClick)="closeCity()" />

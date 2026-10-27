@@ -68,7 +68,8 @@
               }
               @if (globalDraft.activeStep() === 2) {
                 <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
-                  [addCityDisabled]="metadata.locked() || globalDraft.isChecking() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  [addCityDisabledReason]="metadata.locked() ? 'metadata'
+                    : datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
                   (cityAdded)="core.set($event)" />
               }
               @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
