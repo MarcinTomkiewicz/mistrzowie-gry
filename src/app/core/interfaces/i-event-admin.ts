@@ -10,6 +10,7 @@ export interface IEventCoreListItem {
   key: string;
   name: string;
   shortDescription: string | null;
+  coverImagePath: string | null;
   isActive: boolean;
   hasPublicPage: boolean;
   displayOrder: number;
@@ -25,6 +26,7 @@ export interface IEventCoreDetail {
   name: string;
   shortDescription: string | null;
   longDescription: string | null;
+  coverImagePath: string | null;
   isActive: boolean;
   hasPublicPage: boolean;
   displayOrder: number;
@@ -47,11 +49,12 @@ export interface IEventEditionSummary {
 }
 
 export interface IEventCoreSavePayload {
-  id: string | null;
+  id?: string | null;
   key: string;
   name: string;
-  shortDescription: string | null;
-  longDescription: string | null;
+  shortDescription?: string | null;
+  longDescription?: string | null;
+  coverImagePath?: string | null;
   isActive: boolean;
   hasPublicPage: boolean;
   displayOrder: number;

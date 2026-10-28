@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { defer, EMPTY, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 
@@ -13,6 +13,7 @@ import { normalizeText } from '../../../../core/utils/normalize-text';
 import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 import { EventDatedBlocksController } from './event-dated-blocks-controller';
 import { EventGlobalDraftController } from './event-global-draft-controller';
+import { EventCoreCoverController } from './event-core-cover-controller';
 
 export type EventMetadataTarget = 'core' | 'edition';
 type MetadataCommand = { coreId: string } & (
@@ -25,6 +26,7 @@ export class EventCoreMetadataController {
   private readonly admin = inject(EventAdmin);
   private readonly global = inject(EventGlobalDraftController);
   private readonly blocks = inject(EventDatedBlocksController);
+  private readonly cover = inject(EventCoreCoverController);
   private command: MetadataCommand | null = null;
   readonly core = signal<IEventCoreDetail | null>(null);
   readonly edition = signal<IAdminEventDetail | null>(null);
@@ -72,6 +74,10 @@ export class EventCoreMetadataController {
         .every(city => !city.protected && !city.publishedAt));
   });
 
+  constructor() {
+    effect(() => this.syncControls());
+  }
+
   reset(): void {
     this.core.set(null);
     this.edition.set(null);
@@ -98,7 +104,7 @@ export class EventCoreMetadataController {
   }
 
   canSave(target: EventMetadataTarget): boolean {
-    return !this.isBusy() && !this.blocked() && (this.pendingTarget() === target || (this.state() === 'idle' &&
+    return !this.isBusy() && !this.blocked() && this.cover.ready() && (this.pendingTarget() === target || (this.state() === 'idle' &&
       !this.issues()[target] && (target === 'core' ? this.canEditCore() : this.canEditEdition())));
   }
 
@@ -133,7 +139,7 @@ export class EventCoreMetadataController {
   refresh(target: EventMetadataTarget): Observable<IEventCoreDetail> {
     return defer(() => {
       const core = this.core();
-      if (!core || this.locked() || this.blocked()) return EMPTY;
+      if (!core || this.locked() || this.blocked() || this.cover.locked()) return EMPTY;
       this.isBusy.set(true);
       this.syncControls();
       return this.readback(target, core.id).pipe(
@@ -213,6 +219,7 @@ export class EventCoreMetadataController {
         this.populateCore(core);
       }
       this.core.set(core);
+      if (this.cover.needsReconciliation()) this.cover.reconcile(core);
       return core;
     }));
   }
@@ -250,11 +257,11 @@ export class EventCoreMetadataController {
   }
 
   private syncControls(): void {
-    const coreEnabled = !this.locked() && this.canEditCore();
+    const coreEnabled = !this.locked() && this.cover.ready() && this.canEditCore();
     setControlEnabled(this.coreForm, coreEnabled);
     setControlEnabled(this.coreForm.controls.isActive, coreEnabled && !this.isGlobal());
     setControlEnabled(this.coreForm.controls.hasPublicPage, coreEnabled && !this.isGlobal() && !this.global.isUnreleasedStaffing());
-    setControlEnabled(this.editionForm, !this.locked() && this.canEditEdition());
+    setControlEnabled(this.editionForm, !this.locked() && this.cover.ready() && this.canEditEdition());
     this.editionForm.controls.city.disable({ emitEvent: false });
     this.editionForm.controls.timezone.disable({ emitEvent: false });
   }

@@ -27,16 +27,19 @@
         <p-button severity="warn" [outlined]="true" [label]="i18n.commonActions().cancel" icon="pi pi-interdiction" (onClick)="goBack()" />
       </section>
     } @else if (!isLoading() && core(); as loadedCore) {
+      @if (cover.needsReconciliation()) {
+        <p-message severity="warn" role="status">{{ coverCopy().refreshRequired }}</p-message>
+      }
       @if (metadata.isGlobal()) {
         @if (globalDraft.calendar(); as calendar) {
-          <app-event-global-steps [activeStep]="globalDraft.activeStep()" [disabled]="navigationLocked()"
+          <app-event-global-steps [activeStep]="globalDraft.activeStep()" [disabled]="navigationLocked() || cover.dirty()"
             [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
           <ng-template #stepContent>
             <div class="flex-col-start-stretch gap-md w-100 min-w-0">
               @if (globalDraft.activeStep() === 2) {
                 <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
                   [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
-                  [addCityDisabledReason]="metadata.locked() ? 'metadata'
+                  [addCityDisabledReason]="metadata.locked() || cover.needsReconciliation() ? 'metadata'
                     : datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
                   (cityAdded)="core.set($event)" />
               }
@@ -86,9 +89,14 @@
               @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
                 <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
               }
+              @if (globalDraft.activeStep() === 1) {
+                @for (coverCoreId of [loadedCore.id]; track coverCoreId) {
+                  <app-event-core-cover />
+                }
+              }
               @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
                 <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-                  [disabled]="metadata.locked() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  [disabled]="metadata.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
                   (navigateToSection)="goToDiagnosticSection($event)" />
               }
             </div>
@@ -99,14 +107,14 @@
         <div class="flex-row-between-center flex-col-start-stretch-sm flex-wrap gap-sm border-top pt-md w-100">
           <div class="flex-row-start-center flex-wrap gap-sm">
             <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-point-left"
-              [label]="i18n.commonActions().previous" [disabled]="globalDraft.activeStep() === 1 || navigationLocked()"
+              [label]="i18n.commonActions().previous" [disabled]="globalDraft.activeStep() === 1 || navigationLocked() || cover.dirty()"
               (onClick)="goToStep(globalDraft.activeStep() - 1)" />
             <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-interdiction"
-              [label]="i18n.commonActions().cancel" [disabled]="navigationLocked()" (onClick)="goBack()" />
+              [label]="i18n.commonActions().cancel" [disabled]="!canCancel()" (onClick)="goBack()" />
           </div>
           @if (globalDraft.activeStep() < 6) {
             <p-button type="button" severity="success" size="small" icon="pi pi-point-right" iconPos="right"
-              [label]="i18n.commonActions().next" [disabled]="navigationLocked()" (onClick)="goToStep(globalDraft.activeStep() + 1)" />
+              [label]="i18n.commonActions().next" [disabled]="navigationLocked() || cover.dirty()" (onClick)="goToStep(globalDraft.activeStep() + 1)" />
           }
         </div>
       } @else {
@@ -190,7 +198,7 @@
         [loading]="isSaving()" [disabled]="isLoading() || !metadata.canSave(target)" (onClick)="saveMetadata(target)" />
     }
     <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-trail"
-      [label]="i18n.commonActions().refresh" [disabled]="metadata.locked() || metadata.blocked()" (onClick)="refreshMetadata(target)" />
+      [label]="i18n.commonActions().refresh" [disabled]="metadata.locked() || metadata.blocked() || cover.locked()" (onClick)="refreshMetadata(target)" />
     @if (!metadata.isGlobal()) {
       <p-button type="button" severity="warn" size="small" [outlined]="true" icon="pi pi-interdiction"
         [label]="i18n.commonActions().cancel" [disabled]="metadata.locked()" (onClick)="goBack()" />

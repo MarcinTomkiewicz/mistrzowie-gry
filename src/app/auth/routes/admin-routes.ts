@@ -125,7 +125,7 @@ const adminChildren: Routes = [
       {
         path: 'content/events/:coreId/edit',
         loadComponent: loaders.eventCoreEditor,
-        canDeactivate: [(editor: EventCoreEditor) => editor.canDeactivate()],
+        canDeactivate: [(editor: EventCoreEditor, _route, _state, nextState) => editor.canDeactivate(nextState)],
       },
     ],
   },

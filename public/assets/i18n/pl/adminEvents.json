@@ -53,6 +53,25 @@
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
     },
+    "cover": {
+      "info": "[PH] Okładka jest opcjonalna i wspólna dla lokalizacji bez własnej okładki. Przesłany obraz jest ogólnodostępny. Zapis okładki nie publikuje wydarzenia ani nie zapisuje metadanych.",
+      "cropHint": "[PH] Ustaw kadr okładki wydarzenia.",
+      "previewAlt": "[PH] Podgląd okładki wydarzenia",
+      "save": "[PH] Zapisz okładkę",
+      "saved": "[PH] Okładka została zapisana.",
+      "metadataFirst": "[PH] Zapisz lub odśwież metadane przed zmianą okładki.",
+      "readOnly": "[PH] Okładka tego wydarzenia jest dostępna tylko do odczytu.",
+      "uncertain": "[PH] Nie udało się potwierdzić aktualnej okładki. Ponów odczyt lub wybierz Anuluj, aby zakończyć sprawdzanie wyniku.",
+      "cleanupFailed": "[PH] Nie udało się usunąć nieużywanego obrazu. Ponów usuwanie lub wybierz Anuluj, aby zakończyć operację i zachować pozostałe obrazy.",
+      "conflict": "[PH] Dane wydarzenia zmieniły się podczas zapisu okładki. Wczytano aktualny stan. Sprawdź go przed ponownym zapisem.",
+      "abandonConfirm": "[PH] Zakończyć sprawdzanie wyniku zapisu okładki? Zapis mógł zostać wykonany lub zakończyć się później. Przesłany obraz pozostanie zachowany. Przed kolejną zmianą trzeba odświeżyć dane wydarzenia.",
+      "abandonCleanupConfirm": "[PH] Zakończyć usuwanie nieużywanego obrazu? Nieusunięte obrazy pozostaną w bibliotece. Zakończenie nie cofa zapisu. Przed kolejną zmianą trzeba odświeżyć dane wydarzenia.",
+      "abandonAction": "[PH] Zakończ operację",
+      "abandoned": "[PH] Zakończono sprawdzanie wyniku zapisu okładki. Wynik pozostaje niepotwierdzony. Odśwież dane wydarzenia, aby odblokować kolejne zmiany.",
+      "cleanupAbandoned": "[PH] Zakończono usuwanie nieużywanych obrazów. Nieusunięte obrazy pozostawiono w bibliotece. Odśwież dane wydarzenia, aby odblokować kolejne zmiany.",
+      "refreshFailed": "[PH] Nie udało się odświeżyć danych wydarzenia. Kolejne zmiany pozostają zablokowane. Ponów odczyt lub opuść edytor.",
+      "refreshRequired": "[PH] Odśwież dane wydarzenia przed kolejną zmianą."
+    },
     "metadata": {
       "readOnly": "[PH] Te metadane są dostępne tylko do odczytu.",
       "operationBlocked": "[PH] Zakończ edycję miasta lub harmonogramu i bieżące operacje przed zapisem lub odświeżeniem tych danych.",

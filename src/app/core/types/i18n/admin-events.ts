@@ -107,6 +107,26 @@ export type EditionCoverCopy = {
   cleanupFailedDetail: string;
 };
 
+export type CoreCoverCopy = {
+  info: string;
+  cropHint: string;
+  previewAlt: string;
+  save: string;
+  saved: string;
+  metadataFirst: string;
+  readOnly: string;
+  uncertain: string;
+  cleanupFailed: string;
+  conflict: string;
+  abandonConfirm: string;
+  abandonCleanupConfirm: string;
+  abandonAction: string;
+  abandoned: string;
+  cleanupAbandoned: string;
+  refreshFailed: string;
+  refreshRequired: string;
+};
+
 export type EditionInfoCopy = {
   capacities: string;
   publicDefault: string;
