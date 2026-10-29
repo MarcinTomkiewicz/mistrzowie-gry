@@ -3,20 +3,20 @@
   <header class="flex-row-between-center flex-wrap gap-sm w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
     <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-      [label]="i18n.actions().refresh" [disabled]="disabled() || loading()" (onClick)="refresh()" />
+      [label]="i18n.actions().refresh" [disabled]="selectionLocked() || loading()" (onClick)="refresh()" />
   </header>
   <p class="m-0 muted-text">{{ copy.localHint }}</p>
   <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
     <p-floatlabel variant="on" class="w-100 min-w-0">
       <p-select inputId="global-program-city" [options]="cityOptions()" optionValue="value" optionLabel="label" size="small"
-        [ngModel]="global.selectedEditionId()" (ngModelChange)="selectCity($event)" [disabled]="disabled()"
+        [ngModel]="global.selectedEditionId()" (ngModelChange)="selectCity($event)" [disabled]="selectionLocked()"
         [loading]="global.isReadingEdition()" appendTo="body" class="w-100" />
       <label for="global-program-city">{{ i18n.labels().city }}</label>
     </p-floatlabel>
     <p-floatlabel variant="on" class="w-100 min-w-0">
       <p-select inputId="global-program-occurrence" [options]="occurrenceOptions()" optionValue="value" optionLabel="label" size="small"
         [ngModel]="selectedOccurrenceId()" (ngModelChange)="selectOccurrence($event)"
-        [disabled]="disabled() || global.isReadingEdition() || !occurrenceOptions().length" appendTo="body" class="w-100" />
+        [disabled]="selectionLocked() || global.isReadingEdition() || !occurrenceOptions().length" appendTo="body" class="w-100" />
       <label for="global-program-occurrence">{{ copy.selectOccurrence }}</label>
     </p-floatlabel>
   </div>
@@ -28,7 +28,7 @@
         <p class="m-0">{{ message }}</p>
         <div class="flex-row-start-center">
           <p-button type="button" size="small" severity="secondary" icon="pi pi-trail" [label]="i18n.actions().retry"
-            [disabled]="disabled()" (onClick)="refresh()" />
+            [disabled]="selectionLocked()" (onClick)="refresh()" />
         </div>
       </div>
     } @else if (data(); as selected) {
@@ -36,6 +36,7 @@
       <h3 class="mg-section__title mg-section__title--sm m-0">
         <time [attr.datetime]="selected.occurrence.date">{{ formatDateLabel(selected.occurrence.date) }}</time>
       </h3>
+      <app-event-manual-rpg-editor (readback)="acceptReadback($event)" />
       @if (rows().length) {
         <div class="w-100 overflow-x-auto">
           <p-table [value]="rows()" dataKey="key" size="small" class="w-100" tableStyleClass="mg-responsive-table">

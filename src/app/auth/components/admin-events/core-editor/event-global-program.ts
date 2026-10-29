@@ -8,6 +8,7 @@ import { map, Subscription } from 'rxjs';
 
 import type { AdminEventTimeline, AdminEventTimelineOccurrence } from '../../../../core/interfaces/i-admin-event-timeline';
 import type { AdminGlobalCalendarResult } from '../../../../core/interfaces/i-admin-global-event';
+import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { formatDateLabel } from '../../../../core/utils/date';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
@@ -15,18 +16,23 @@ import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { presentEventTimelineRows } from '../event-admin-timeline/event-admin-timeline-presenter';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { EventGlobalDraftController } from './event-global-draft-controller';
+import { EventManualRpgController } from './event-manual-rpg-controller';
+import { EventManualRpgEditor } from './event-manual-rpg-editor';
 
 @Component({
   selector: 'app-event-global-program',
-  imports: [FormsModule, ButtonModule, FloatLabelModule, SelectModule, TableModule],
+  imports: [FormsModule, ButtonModule, FloatLabelModule, SelectModule, TableModule, EventManualRpgEditor],
   templateUrl: './event-global-program.html',
   host: { class: 'd-block w-100 min-w-0' },
 })
 export class EventGlobalProgram {
   readonly coreId = input.required<string>();
+  readonly core = input.required<IEventCoreDetail>();
   readonly calendar = input.required<AdminGlobalCalendarResult>();
   readonly disabled = input(false);
   protected readonly global = inject(EventGlobalDraftController);
+  protected readonly manual = inject(EventManualRpgController);
+  protected readonly selectionLocked = computed(() => this.disabled() || this.manual.locked());
   protected readonly i18n = createEventAdminTimelineI18n();
   protected readonly formatDateLabel = formatDateLabel;
   private readonly admin = inject(EventAdmin);
@@ -55,6 +61,7 @@ export class EventGlobalProgram {
     return result && edition && occurrence && result.timeline.eventId === edition.id && result.timeline.eventCoreId === this.coreId() &&
       result.occurrence.occurrenceId === occurrence.id && result.occurrence.date === occurrence.date ? result : null;
   });
+  private readonly timeline = computed(() => this.data()?.timeline ?? null);
   protected readonly rows = computed(() => presentEventTimelineRows(this.data()?.occurrence.rows ?? [], this.i18n));
   protected readonly loading = computed(() => this.readingTimeline() || this.global.isReadingEdition());
   protected readonly errorMessage = computed(() => {
@@ -67,6 +74,18 @@ export class EventGlobalProgram {
   constructor() {
     // Admin programme data is fetched only after browser rendering, never during SSR.
     afterNextRender(() => this.browserReady.set(true));
+    effect(() => this.manual.blocked.set(this.disabled()));
+    effect(() => {
+      const data = this.data();
+      const edition = this.edition();
+      const occurrence = this.occurrence();
+      const core = this.core();
+      const calendar = this.calendar();
+      untracked(() => {
+        if (!this.manual.locked()) this.manual.context.set(data && edition && occurrence && core.id === this.coreId()
+          ? { core, edition, occurrence, calendar, timeline: this.timeline } : null);
+      });
+    });
     effect(() => {
       const options = this.occurrenceOptions();
       untracked(() => {
@@ -102,23 +121,30 @@ export class EventGlobalProgram {
   }
 
   protected selectCity(value: unknown): void {
-    if (this.disabled() || typeof value !== 'string' || !this.cityOptions().some(option => option.value === value)) return;
+    if (this.selectionLocked() || typeof value !== 'string' || !this.cityOptions().some(option => option.value === value)) return;
     this.clearRead();
     this.selectedOccurrenceId.set(null);
     this.global.selectEdition(value);
   }
 
   protected selectOccurrence(value: unknown): void {
-    if (this.disabled() || typeof value !== 'string' || !this.occurrenceOptions().some(option => option.value === value)) return;
+    if (this.selectionLocked() || typeof value !== 'string' || !this.occurrenceOptions().some(option => option.value === value)) return;
     if (value === this.selectedOccurrenceId()) return;
     this.clearRead();
     this.selectedOccurrenceId.set(value);
   }
 
   protected refresh(): void {
-    if (this.disabled() || this.loading()) return;
+    if (this.selectionLocked() || this.loading()) return;
     if (!this.edition()) this.selectCity(this.global.selectedEditionId());
     else this.readAttempt.update(value => value + 1);
+  }
+
+  protected acceptReadback(timeline: AdminEventTimeline): void {
+    const occurrence = this.occurrence();
+    if (timeline.eventId !== this.edition()?.id || timeline.eventCoreId !== this.coreId() || !occurrence) return;
+    const selected = timeline.occurrences.find(row => row.occurrenceId === occurrence.id && row.date === occurrence.date);
+    if (selected) this.result.set({ timeline, occurrence: selected });
   }
 
   private clearRead(): void {

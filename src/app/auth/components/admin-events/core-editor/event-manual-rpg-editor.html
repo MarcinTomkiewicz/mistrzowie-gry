@@ -1,0 +1,99 @@
+@let copy = this.copy();
+@if (!editor.editing()) {
+  <div class="flex-col-start-start gap-xs">
+    <p-button type="button" size="small" icon="pi pi-plus" [label]="copy.action" [disabled]="!editor.canOpen()" (onClick)="editor.open()" />
+    @if (editor.needsRefresh()) {
+      <p-message severity="warn" role="alert">{{ copy.refreshRequired }}</p-message>
+      @if (editor.error() !== null) { <p class="m-0 error-text" role="alert">{{ copy.failed }}</p> }
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+        [label]="i18n.actions().refresh" [loading]="editor.isBusy()" [disabled]="editor.isBusy() || editor.blocked()" (onClick)="refresh()" />
+    } @else if (!editor.canOpen()) { <p class="m-0 muted-text">{{ copy.unavailable }}</p> }
+  </div>
+} @else {
+  <form class="mg-form flex-col-start-stretch gap-md border radius-sm p-md w-100 min-w-0" [formGroup]="editor.form" (ngSubmit)="save()" novalidate
+    [attr.aria-busy]="editor.isBusy() || editor.catalogBusy()">
+    <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.action }}</h3>
+    <p class="m-0 muted-text">{{ copy.hint }}</p>
+    @if (editor.catalogBusy()) { <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p> }
+    @if (editor.catalogError()) {
+      <div class="flex-row-start-center flex-wrap gap-sm" role="alert">
+        <p class="m-0 error-text">{{ copy.catalogFailed }}</p>
+        <p-button type="button" size="small" severity="secondary" [label]="i18n.actions().retry" [disabled]="editor.isBusy() || editor.readbackPending()"
+          (onClick)="editor.form.controls.gmUserId.value ? editor.loadSessions() : editor.loadProfiles()" />
+      </div>
+    }
+    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-select inputId="manual-rpg-gm" formControlName="gmUserId" [options]="profiles()" optionValue="value" optionLabel="label"
+          size="small" [filter]="true" filterBy="label" appendTo="body" class="w-100" (onChange)="editor.loadSessions()" />
+        <label for="manual-rpg-gm">{{ copy.gm }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-select inputId="manual-rpg-source" formControlName="sessionKind" [options]="sources()" optionValue="value" optionLabel="label"
+          size="small" appendTo="body" class="w-100" [readonly]="!profiles().length" (onChange)="editor.loadSessions()" />
+        <label for="manual-rpg-source">{{ copy.source }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-select inputId="manual-rpg-session" formControlName="sessionId" [options]="sessions()" optionValue="value" optionLabel="label"
+          size="small" [filter]="true" filterBy="label" appendTo="body" class="w-100" [emptyMessage]="copy.noSessions" [readonly]="editor.catalogBusy() || editor.catalogError()" />
+        <label for="manual-rpg-session">{{ copy.session }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-select inputId="manual-rpg-block" formControlName="blockPosition" [options]="blocks()" optionValue="value" optionLabel="label"
+          size="small" appendTo="body" class="w-100" (onChange)="editor.selectBlock()" />
+        <label for="manual-rpg-block">{{ copy.block }}</label>
+      </p-floatlabel>
+      <div class="flex-col-start-stretch gap-xs w-100 min-w-0">
+        <p-floatlabel variant="on" class="w-100 min-w-0">
+          <input pInputText pSize="small" id="manual-rpg-label" formControlName="label" maxlength="140" class="w-100" />
+          <label for="manual-rpg-label">{{ copy.slotLabel }}</label>
+        </p-floatlabel>
+        @if (editor.form.controls.label.touched && editor.form.controls.label.hasError('maxlength')) {
+          <small class="mg-contact-error" role="alert">{{ coreI18n.commonForm().maxLength.replace('{{max}}', '140') }}</small>
+        }
+      </div>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-inputnumber inputId="manual-rpg-position" formControlName="position" [min]="1" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+        <label for="manual-rpg-position">{{ copy.position }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-datepicker ngSkipHydration inputId="manual-rpg-start" formControlName="startTime" dataType="string" hourFormat="24" [timeOnly]="true"
+          [keepInvalid]="true" [showIcon]="true" iconDisplay="input" appendTo="body" size="small" class="w-100" inputStyleClass="w-100" />
+        <label for="manual-rpg-start">{{ i18n.labels().start }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-datepicker ngSkipHydration inputId="manual-rpg-end" formControlName="endTime" dataType="string" hourFormat="24" [timeOnly]="true"
+          [keepInvalid]="true" [showIcon]="true" iconDisplay="input" appendTo="body" size="small" class="w-100" inputStyleClass="w-100" />
+        <label for="manual-rpg-end">{{ i18n.labels().end }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-inputnumber inputId="manual-rpg-start-day" formControlName="startDayOffset" [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+        <label for="manual-rpg-start-day">{{ coreI18n.baseTimeBlocks().startDayOffset }}</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-inputnumber inputId="manual-rpg-end-day" formControlName="endDayOffset" [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+        <label for="manual-rpg-end-day">{{ coreI18n.baseTimeBlocks().endDayOffset }}</label>
+      </p-floatlabel>
+      <div class="flex-col-start-stretch gap-xs w-100 min-w-0">
+        <p-floatlabel variant="on" class="w-100 min-w-0">
+          <p-inputnumber inputId="manual-rpg-capacity" formControlName="playerCapacityOverride" [min]="1" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+          <label for="manual-rpg-capacity">{{ copy.capacity }}</label>
+        </p-floatlabel>
+        <small class="muted-text">{{ copy.capacityHint }}</small>
+      </div>
+    </div>
+    @if (selectedSession(); as session) { <app-session-details [session]="session" /> }
+    @if (editor.form.touched && editor.form.invalid) { <small class="mg-contact-error" role="alert">{{ coreI18n.commonForm().invalid }}</small> }
+    @if (editor.form.touched && intervalInvalid()) { <small class="mg-contact-error" role="alert">{{ copy.intervalInvalid }}</small> }
+    @if (editor.positionTaken()) { <small class="mg-contact-error" role="alert">{{ copy.positionTaken }}</small> }
+    @if (message(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
+    <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+      <p-button type="submit" size="small" severity="success" icon="pi pi-done-it" [label]="copy.action" [disabled]="!editor.canSave()" [loading]="editor.isBusy()" />
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+        [label]="editor.readbackPending() ? coreI18n.creation().retryRead : i18n.actions().refresh" [disabled]="editor.isBusy()" (onClick)="refresh()" />
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+        [label]="editor.canAbandon() ? copy.abandon : i18n.actions().cancel"
+        [disabled]="!editor.canDiscard() && !editor.canAbandon()" (onClick)="discard()" />
+    </div>
+  </form>
+}

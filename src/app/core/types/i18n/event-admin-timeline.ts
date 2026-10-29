@@ -2,6 +2,13 @@ import type { EventTimelineOrigin } from '../../interfaces/i-admin-event-timelin
 import type { MyStaffingCandidate } from '../../interfaces/my-staffing-realization';
 
 export type EventAdminTimelineCopy = {
+  manualRpg: {
+    action: string; hint: string; unavailable: string; gm: string; source: string; session: string;
+    template: string; custom: string; block: string; slotLabel: string; position: string; capacity: string; capacityHint: string;
+    saveConfirm: string; discardConfirm: string; saved: string; failed: string; catalogFailed: string;
+    noSessions: string; uncertain: string; conflict: string; contractFailed: string; intervalInvalid: string; positionTaken: string;
+    abandon: string; abandonConfirm: string; refreshRequired: string;
+  };
   title: string;
   entry: string;
   host: string;

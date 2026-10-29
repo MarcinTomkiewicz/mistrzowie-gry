@@ -20,6 +20,7 @@ import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { createScopedObjectI18n } from '../../../../core/translations/scoped.i18n';
 import type { CoreCoverCopy } from '../../../../core/types/i18n/admin-events';
+import type { EventAdminTimelineCopy } from '../../../../core/types/i18n/event-admin-timeline';
 import type { EventGlobalScheduleCopy } from '../../../../core/types/i18n/event-global-draft';
 import { RpcError } from '../../../../core/types/rpc-error';
 import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
@@ -44,6 +45,7 @@ import { EventGlobalBaseTimeBlocksEditor } from './event-global-base-time-blocks
 import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
 import { EventGlobalPolicyEditor } from './policy/event-global-policy-editor';
 import { EventGlobalProgram } from './event-global-program';
+import { EventManualRpgController } from './event-manual-rpg-controller';
 
 @Component({
   selector: 'app-event-core-editor',
@@ -52,13 +54,14 @@ import { EventGlobalProgram } from './event-global-program';
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
-    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade],
+    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualRpgController],
 })
 export class EventCoreEditor {
   protected readonly datedBlocks = inject(EventDatedBlocksController);
   protected readonly schedule = inject(EventGlobalScheduleController);
   protected readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
   protected readonly policy = inject(EventGlobalPolicyFacade);
+  protected readonly program = inject(EventManualRpgController);
   private readonly platform = inject(Platform);
   private readonly confirm = inject(UiConfirm);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -75,18 +78,20 @@ export class EventCoreEditor {
   protected readonly globalDraft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly coverCopy = createScopedObjectI18n<CoreCoverCopy>('adminEvents', 'editor.cover');
+  private readonly programCopy = createScopedObjectI18n<EventAdminTimelineCopy['manualRpg']>('adminEvents', 'timeline.manualRpg');
   protected readonly scheduleCopy = createScopedObjectI18n<EventGlobalScheduleCopy>('adminEvents', 'editor.schedule');
   protected readonly core = this.metadata.core;
   protected readonly isLoading = signal(true);
   protected readonly isSaving = this.metadata.isBusy;
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
-  protected readonly canCancel = computed(() => !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
+  protected readonly canCancel = computed(() => !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
     this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
-  protected readonly navigationLocked = computed(() => this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
+  private readonly otherOperationsLocked = computed(() => this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
     this.cover.needsReconciliation() || this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
+  protected readonly navigationLocked = computed(() => this.otherOperationsLocked() || this.program.locked());
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: this.i18n.commonNav().eventsManagement, path: '/admin/content/events' },
     { label: this.core()?.name ?? this.i18n.page().editTitle },
@@ -136,6 +141,7 @@ export class EventCoreEditor {
       this.schedule.reset();
       this.baseBlocks.reset();
       this.policy.reset();
+      this.program.reset();
       this.cover.reset();
       this.metadata.reset();
       this.restoreStep(this.route.snapshot.queryParamMap.get('step'));
@@ -235,6 +241,11 @@ export class EventCoreEditor {
     void this.router.navigate(['/admin/content/events']);
   }
 
+  protected programBlocked(): boolean {
+    return this.otherOperationsLocked() || this.form.dirty || this.metadata.editionForm.dirty ||
+      this.cover.dirty() || this.datedBlocks.isDirty() || this.globalDraft.cityEditing();
+  }
+
   private restoreStep(value: string | null): void {
     const step = Number(value);
     if (Number.isInteger(step) && step >= 1 && step <= 6 && !this.navigationLocked() && !this.cover.dirty()) this.globalDraft.activeStep.set(step);
@@ -275,8 +286,12 @@ export class EventCoreEditor {
     if (nextRoute?.routeConfig === this.route.routeConfig) return true;
     if (!this.canCancel()) return false;
     const coreId = this.coreId();
+    const endingProgram = this.program.canAbandon();
     const endingCover = this.cover.canAbandon();
-    const decision = endingCover ? this.confirm.modalDecision({
+    const decision = endingProgram ? this.confirm.modalDecision({
+      header: this.i18n.creationSteps().program, message: this.programCopy().abandonConfirm,
+      acceptLabel: this.programCopy().abandon, rejectLabel: this.i18n.commonActions().cancel,
+    }) : endingCover ? this.confirm.modalDecision({
       header: this.i18n.commonLabels().cover,
       message: this.cover.state() === 'cleanup' ? this.coverCopy().abandonCleanupConfirm : this.coverCopy().abandonConfirm,
       acceptLabel: this.coverCopy().abandonAction,
@@ -284,23 +299,24 @@ export class EventCoreEditor {
     }) : of(true);
     return decision.pipe(switchMap(accepted => {
       if (!accepted || this.destroyRef.destroyed || this.coreId() !== coreId || !this.canCancel()) return of(false);
+      if (endingProgram && !this.program.abandon()) return of(false);
       if (endingCover && !this.cover.abandon()) return of(false);
       if (!this.hasUnsavedChanges()) return of(!this.cover.locked());
       const city = this.globalDraft.cityEditing();
       return this.confirm.modalDecision({
-        header: this.policy.locked() ? this.i18n.policyEditor().title : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().title
+        header: this.program.locked() ? this.i18n.creationSteps().program : this.policy.locked() ? this.i18n.policyEditor().title : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().title
           : this.schedule.locked() ? this.i18n.commonLabels().schedule : city ? this.i18n.city().action
           : this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ? this.i18n.page().editTitle : this.i18n.datedBlocks().editTitle,
-        message: this.policy.locked() ? this.i18n.policyEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.scheduleCopy().leave
+        message: this.program.locked() ? this.programCopy().discardConfirm : this.policy.locked() ? this.i18n.policyEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.scheduleCopy().leave
           : city ? this.i18n.city().leaveConfirmation : this.i18n.creation().leaveConfirmation,
-        acceptLabel: this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() ? this.i18n.commonActions().close : city ? this.i18n.city().discard : this.i18n.creation().discardDraft,
+        acceptLabel: this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() ? this.i18n.commonActions().close : city ? this.i18n.city().discard : this.i18n.creation().discardDraft,
         rejectLabel: this.i18n.commonActions().cancel,
       }).pipe(map(leave => leave && !this.destroyRef.destroyed && this.coreId() === coreId && this.canCancel() && !this.cover.locked()));
     }));
   }
 
   private hasUnsavedChanges(): boolean {
-    return this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
+    return this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
       (this.globalDraft.cityEditing() && this.globalDraft.cityState() !== 'created' && this.globalDraft.cityForm.dirty) ||
       (this.datedBlocks.isDirty() && !this.datedBlocks.readbackPending());
   }

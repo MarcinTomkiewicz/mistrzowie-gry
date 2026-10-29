@@ -12,6 +12,7 @@ import {
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
+import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
@@ -207,6 +208,10 @@ export class EventAdmin {
 
   getTimeline(editionId: string): Observable<AdminEventTimeline> {
     return this.backend.rpc<AdminEventTimeline>(EVENT_RPC.getTimeline, { p_event_id: editionId }).pipe(tap(assertAdminEventTimeline));
+  }
+
+  saveManualRpgSlot(payload: ManualRpgSlotPayload): Observable<ManualRpgSlotResult> {
+    return this.backend.rpc<ManualRpgSlotResult>(EVENT_RPC.saveManualRpgSlot, { p_payload: payload });
   }
 
   getProgramParticipants(programItemId: string): Observable<AdminEventProgramParticipants> {

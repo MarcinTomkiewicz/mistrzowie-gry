@@ -33,6 +33,7 @@ export const EVENT_RPC = {
   getEditionList: 'get_admin_event_list',
   getEditionDetail: 'get_admin_event_detail',
   getTimeline: 'get_admin_event_timeline',
+  saveManualRpgSlot: 'save_admin_manual_event_slot',
   getProgramParticipants: 'list_admin_event_program_participants',
   publishStaffingEvent: 'publish_admin_staffing_event',
   reconcileStaffingEventProgram: 'reconcile_admin_staffing_event_program',
