@@ -4,6 +4,12 @@ import type {
 } from '@angular/forms';
 import { isRecord } from '../utils/is-record';
 
+export function pricePrecisionValidator(control: AbstractControl): ValidationErrors | null {
+  const value: unknown = control.value;
+  return value === null || (typeof value === 'number' && Number.isFinite(value) && Math.round(value * 100) / 100 === value)
+    ? null : { pricePrecision: true };
+}
+
 export function priceValidator(
   control: AbstractControl,
 ): ValidationErrors | null {

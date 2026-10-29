@@ -11,6 +11,32 @@ export type EventMetadataCopy = {
   reloadConfirm: string;
 };
 
+export type EventGlobalPriceCopy = {
+  title: string;
+  hint: string;
+  amountHint: string;
+  amountInvalid: string;
+  basisRequired: string;
+  protected: string;
+  denied: string;
+  otherOperation: string;
+  unapplied: string;
+  preview: string;
+  previewReady: string;
+  invalid: string;
+  blocked: string;
+  save: string;
+  saveConfirm: string;
+  saved: string;
+  conflict: string;
+  baselineChanged: string;
+  readbackPending: string;
+  refresh: string;
+  discard: string;
+  discardConfirm: string;
+  leave: string;
+};
+
 export type EventGlobalBaseTimeBlocksCopy = {
   title: string;
   hint: string;
@@ -83,7 +109,7 @@ export type EventGlobalDiagnosticsCopy = {
 };
 
 export type EventGlobalCityCopy = {
-  blockers: Record<AdminGlobalEventCityBlocker | 'editing' | 'saving' | 'uncertain' | 'readback' | 'metadata' | 'schedule', string>;
+  blockers: Record<AdminGlobalEventCityBlocker | 'editing' | 'saving' | 'uncertain' | 'readback' | 'metadata' | 'schedule' | 'price', string>;
   action: string;
   hint: string;
   uncertain: string;

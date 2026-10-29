@@ -126,6 +126,31 @@
       "preservedDateOverrides": "[PH] Zachowane konfiguracje dat",
       "preservedCityOverrides": "[PH] Zachowane konfiguracje miast"
     },
+    "price": {
+      "title": "[PH] Edytuj wspólną cenę",
+      "hint": "[PH] Zmieniasz wyłącznie wspólną kwotę, walutę i podstawę ceny. Lokalne ceny, okładki, zapisy i limity pozostają zachowane. Zapis tworzy lub aktualizuje niezastosowany szkic polityki.",
+      "amountHint": "[PH] Puste pole oznacza cenę nieokreśloną. Wartość 0 oznacza jawną kwotę zerową i wymaga podstawy ceny. Waluta jest wymagana również przy pustej kwocie.",
+      "amountInvalid": "[PH] Podaj kwotę od 0 do 99999999,99, z najwyżej dwoma miejscami po przecinku, albo pozostaw pole puste.",
+      "basisRequired": "[PH] Wybierz podstawę ceny dla podanej kwoty, również dla 0.",
+      "protected": "[PH] Edycja ceny jest dostępna dla zapisanego prywatnego Global Core. Serwer sprawdza również ochronę danych i zależności polityki.",
+      "denied": "[PH] Brak uprawnień do odczytu lub zapisu szkicu polityki. Wpisane dane zostały zachowane.",
+      "otherOperation": "[PH] Zakończ pozostałe operacje i zapisz lub odrzuć zmiany w innych sekcjach przed edycją ceny.",
+      "unapplied": "[PH] W bazie istnieje niezastosowany szkic polityki. Formularz edytuje jego wspólną cenę. Cena obowiązująca nie została zmieniona.",
+      "preview": "[PH] Sprawdź szkic ceny",
+      "previewReady": "[PH] Sprawdzony, niezastosowany szkic polityki. Możesz zapisać zmianę wspólnej ceny.",
+      "invalid": "[PH] Serwer odrzucił dokument polityki. Zachowano formularz. Sprawdź zgłoszone błędy.",
+      "blocked": "[PH] Serwer zablokował tę zmianę polityki. Zachowano formularz i lokalne nadpisania.",
+      "save": "[PH] Zapisz szkic ceny",
+      "saveConfirm": "[PH] Zapisać sprawdzoną zmianę wspólnej ceny w szkicu polityki? Pozostałe pola i lokalne nadpisania zostaną zachowane. Szkic nie zostanie zastosowany ani opublikowany i nie otworzy zapisów uczestników.",
+      "saved": "[PH] Potwierdzono zapis całego szkicu polityki oraz jego rewizję. Szkic pozostaje niezastosowany; cena obowiązująca nie została zmieniona.",
+      "conflict": "[PH] Rewizja, podstawa lub dokument polityki zmieniły się podczas edycji. Zachowano wpisane dane. Odrzuć lokalne zmiany, aby wczytać aktualny stan przed dalszą edycją.",
+      "baselineChanged": "[PH] Zapisany szkic opiera się na nieaktualnej polityce. Nie można go nadpisać w tym edytorze. Zachowano dane; możesz ponowić odczyt lub opuścić edytor.",
+      "readbackPending": "[PH] Nie potwierdzono wyniku zapisu szkicu. Ponów wyłącznie odczyt. Zapis mógł zostać wykonany lub zakończyć się później i nie zostanie automatycznie powtórzony.",
+      "refresh": "[PH] Odśwież politykę bez odrzucania formularza",
+      "discard": "[PH] Odrzuć lokalne zmiany ceny",
+      "discardConfirm": "[PH] Odrzucić lokalne zmiany ceny i odtworzyć formularz z aktualnego odczytu? Zapisany szkic pozostanie w bazie i nie zostanie zastosowany.",
+      "leave": "[PH] Opuścić edytor ceny? Niezapisane dane formularza zostaną utracone. Zapisany szkic pozostanie niezastosowany. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później; opuszczenie edytora jej nie powtarza ani nie cofa."
+    },
     "metadata": {
       "readOnly": "[PH] Te metadane są dostępne tylko do odczytu.",
       "operationBlocked": "[PH] Zakończ edycję miasta lub harmonogramu i bieżące operacje przed zapisem lub odświeżeniem tych danych.",
@@ -152,7 +177,8 @@
         "uncertain": "[PH] Wynik dodawania miasta jest niepewny. Ponów ten sam zapis w otwartym formularzu.",
         "readback": "[PH] Miasto zostało zapisane. Ponów odczyt w otwartym formularzu przed dodaniem kolejnego miasta.",
         "metadata": "[PH] Rozstrzygnij wynik bieżącego zapisu metadanych przed dodaniem miasta.",
-        "schedule": "[PH] Zapisz lub odrzuć zmiany harmonogramu i zakończ jego odczyt przed dodaniem miasta."
+        "schedule": "[PH] Zapisz lub odrzuć zmiany harmonogramu i zakończ jego odczyt przed dodaniem miasta.",
+        "price": "[PH] Zapisz lub odrzuć lokalne zmiany ceny i rozstrzygnij wynik zapisu szkicu przed dodaniem miasta."
       },
       "hint": "[PH] Nowe miasto korzysta ze wspólnych dat i ustawień wydarzenia.",
       "uncertain": "[PH] Nie można potwierdzić wyniku zapisu. Zachowano wpisane dane. Ponów ten sam zapis, aby ustalić wynik bez dodawania drugiego miasta. Nie odświeżaj strony.",

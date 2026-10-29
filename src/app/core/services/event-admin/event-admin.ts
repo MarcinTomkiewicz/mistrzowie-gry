@@ -12,6 +12,7 @@ import {
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
+import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
 import type {
   AddAdminGlobalEventCityPayload,
   AddAdminGlobalEventCityResult,
@@ -155,6 +156,20 @@ export class EventAdmin {
 
   getEffectivePolicy(coreId: string): Observable<AdminEffectivePolicyResult> {
     return this.backend.rpc<AdminEffectivePolicyResult>(EVENT_RPC.getEffectivePolicy, { p_core_id: coreId });
+  }
+
+  getPolicyDraft(coreId: string): Observable<AdminEventPolicyDraft> {
+    return this.backend.rpc<AdminEventPolicyDraft>(EVENT_RPC.getPolicyDraft, { p_core_id: coreId });
+  }
+
+  previewPolicyChange(coreId: string, document: PolicyDocument): Observable<AdminEventPolicyPreview> {
+    return this.backend.rpc<AdminEventPolicyPreview>(EVENT_RPC.previewPolicyChange, { p_core_id: coreId, p_document: document });
+  }
+
+  savePolicyDraft(coreId: string, revision: number, document: PolicyDocument): Observable<AdminEventPolicySave> {
+    return this.backend.rpc<AdminEventPolicySave>(EVENT_RPC.savePolicyDraft, {
+      p_core_id: coreId, p_expected_revision: revision, p_document: document,
+    });
   }
 
   setCoreActive(

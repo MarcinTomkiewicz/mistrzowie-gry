@@ -11,6 +11,7 @@ import { normalizeText } from '../utils/normalize-text';
 import { timestampToTimeZoneDate } from '../utils/time-zone';
 import { integerValidator, slugSourceValidator } from '../validators/form-value.validator';
 import { requiredTrimmedValidator } from '../validators/required-trimmed.validator';
+import { pricePrecisionValidator } from '../validators/price.validator';
 import { createEventScheduleForm, mapEventScheduleFormToPayload } from './event-schedule-form.factory';
 import { type EventDateTimeBlocksForm, eventDraftDatedBlocksValidator, mapEventDateTimeBlocks } from './event-dated-time-block-form.factory';
 import { createEventGlobalTimeBlocksForm, mapEventGlobalTimeBlocks } from './event-global-time-block-form.factory';
@@ -134,10 +135,4 @@ export function mapGlobalSchedule(schedule: IEventSchedule | EventGlobalSchedule
       if (schedule.monthlyNth == null || schedule.monthlyWeekday == null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing monthly weekday.');
       return { ...base, recurrenceKind, monthlyNth: schedule.monthlyNth, monthlyWeekday: schedule.monthlyWeekday };
   }
-}
-
-function pricePrecisionValidator(control: AbstractControl): ValidationErrors | null {
-  const value: unknown = control.value;
-  return value === null || (typeof value === 'number' && Number.isFinite(value) && Math.round(value * 100) / 100 === value)
-    ? null : { pricePrecision: true };
 }

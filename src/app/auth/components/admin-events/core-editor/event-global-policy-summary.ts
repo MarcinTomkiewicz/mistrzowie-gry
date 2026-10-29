@@ -24,9 +24,9 @@ export class EventGlobalPolicySummary {
     const priceCopy = this.i18n.commonPrice();
     const { amount, currency, basis } = policy.price;
     return [
-      { label: this.i18n.commonLabels().price, value: amount === null || amount === 0
-        ? priceCopy.presentation.free : formatMoney(amount, currency) },
-      ...(amount !== null && amount > 0 ? [
+      { label: this.i18n.commonLabels().price, value: amount === null ? values.notProvided
+        : amount === 0 ? priceCopy.presentation.free : formatMoney(amount, currency) },
+      ...(amount !== null ? [
         { label: priceCopy.editor.fields.perUnit, value: basis === null ? values.notApplicable : this.i18n.priceBases()[basis] },
       ] : []),
       { label: this.i18n.commonLabels().forBeginners, value: policy.isForBeginners ? values.yes : values.no },
