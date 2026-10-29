@@ -1,0 +1,95 @@
+@let copy = i18n.copy();
+<section id="global-event-program" tabindex="-1" class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="loading()">
+  <header class="flex-row-between-center flex-wrap gap-sm w-100">
+    <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+      [label]="i18n.actions().refresh" [disabled]="disabled() || loading()" (onClick)="refresh()" />
+  </header>
+  <p class="m-0 muted-text">{{ copy.localHint }}</p>
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+    <p-floatlabel variant="on" class="w-100 min-w-0">
+      <p-select inputId="global-program-city" [options]="cityOptions()" optionValue="value" optionLabel="label" size="small"
+        [ngModel]="global.selectedEditionId()" (ngModelChange)="selectCity($event)" [disabled]="disabled()"
+        [loading]="global.isReadingEdition()" appendTo="body" class="w-100" />
+      <label for="global-program-city">{{ i18n.labels().city }}</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on" class="w-100 min-w-0">
+      <p-select inputId="global-program-occurrence" [options]="occurrenceOptions()" optionValue="value" optionLabel="label" size="small"
+        [ngModel]="selectedOccurrenceId()" (ngModelChange)="selectOccurrence($event)"
+        [disabled]="disabled() || global.isReadingEdition() || !occurrenceOptions().length" appendTo="body" class="w-100" />
+      <label for="global-program-occurrence">{{ copy.selectOccurrence }}</label>
+    </p-floatlabel>
+  </div>
+  @if (loading()) { <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p> }
+  @if (!loading()) {
+    @if (errorMessage(); as message) {
+      <div class="flex-col-start-stretch gap-sm" role="alert">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.loadFailed }}</h3>
+        <p class="m-0">{{ message }}</p>
+        <div class="flex-row-start-center">
+          <p-button type="button" size="small" severity="secondary" icon="pi pi-trail" [label]="i18n.actions().retry"
+            [disabled]="disabled()" (onClick)="refresh()" />
+        </div>
+      </div>
+    } @else if (data(); as selected) {
+      <p class="m-0 muted-text">{{ i18n.labels().timezone }}: {{ selected.timeline.timezone }}</p>
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        <time [attr.datetime]="selected.occurrence.date">{{ formatDateLabel(selected.occurrence.date) }}</time>
+      </h3>
+      @if (rows().length) {
+        <div class="w-100 overflow-x-auto">
+          <p-table [value]="rows()" dataKey="key" size="small" class="w-100" tableStyleClass="mg-responsive-table">
+            <ng-template #header>
+              <tr class="hide-down-sm">
+                <th scope="col" class="small-caps">{{ copy.entry }}</th>
+                <th scope="col" class="small-caps">{{ copy.host }}</th>
+                <th scope="col" class="small-caps">{{ i18n.labels().hours }}</th>
+                <th scope="col" class="small-caps">{{ i18n.labels().status }}</th>
+                <th scope="col" class="small-caps">{{ copy.programStatus }}</th>
+                <th scope="col" class="small-caps">{{ copy.source }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-entry>
+              <tr class="mg-responsive-table__row">
+                <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">
+                  <strong>{{ entry.title }}</strong>
+                  <small class="d-block muted-text">{{ entry.kind }}</small>
+                  @if (entry.row.slotLabel && entry.row.slotLabel !== entry.title) { <small class="d-block muted-text">{{ entry.row.slotLabel }}</small> }
+                </th>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ copy.host }}</span>
+                  <span class="mg-responsive-table__value text-wrap-anywhere">{{ entry.host }}</span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.labels().hours }}</span>
+                  <div class="mg-responsive-table__value">
+                    <span class="text-nowrap">{{ entry.time }}</span>
+                    @if (entry.row.source === 'legacy_host') { <small class="d-block muted-text">{{ copy.eventHours }}</small> }
+                  </div>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.labels().status }}</span>
+                  <span class="mg-responsive-table__value tag-badge" [class.tag-badge--success]="entry.row.status === 'confirmed'"
+                    [class.tag-badge--muted]="entry.row.status === 'pending'">{{ entry.status }}</span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ copy.programStatus }}</span>
+                  <span class="mg-responsive-table__value">{{ entry.programStatus ?? i18n.values().notProvided }}</span>
+                </td>
+                <td class="mg-responsive-table__cell">
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ copy.source }}</span>
+                  <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+                    <span>{{ entry.source }}</span>
+                    @if (entry.candidate) { <small class="muted-text">{{ entry.candidate }}</small> }
+                    @if (entry.row.source === 'staffing' && entry.row.participationEnded) { <small class="error-text">{{ copy.participationEnded }}</small> }
+                    @if (entry.row.frozen === true) { <small class="muted-text">{{ copy.frozen }}</small> }
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      } @else { <p class="m-0 muted-text" role="status">{{ copy.noRows }}</p> }
+    } @else { <p class="m-0 muted-text" role="status">{{ copy.noOccurrences }}</p> }
+  }
+</section>

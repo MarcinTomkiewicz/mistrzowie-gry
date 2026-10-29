@@ -29,8 +29,8 @@
               <p-table [value]="day.rows" dataKey="key" size="small" class="w-100" tableStyleClass="mg-responsive-table">
                 <ng-template #header>
                   <tr class="hide-down-sm">
-                    <th scope="col" class="small-caps">{{ i18n.labels().session }}</th>
-                    <th scope="col" class="small-caps">{{ i18n.labels().gm }}</th>
+                    <th scope="col" class="small-caps">{{ copy.entry }}</th>
+                    <th scope="col" class="small-caps">{{ copy.host }}</th>
                     <th scope="col" class="small-caps">{{ i18n.labels().hours }}</th>
                     <th scope="col" class="small-caps">{{ i18n.labels().status }}</th>
                     <th scope="col" class="small-caps">{{ copy.source }}</th>
@@ -41,6 +41,7 @@
                   <tr class="mg-responsive-table__row">
                     <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">
                       <strong>{{ entry.title }}</strong>
+                      <small class="d-block muted-text">{{ entry.kind }}</small>
                       @if (entry.row.slotLabel && entry.row.slotLabel !== entry.title) {
                         <small class="d-block muted-text">{{ entry.row.slotLabel }}</small>
                       }
@@ -57,15 +58,14 @@
                       }
                     </th>
                     <td class="mg-responsive-table__cell">
-                      <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.labels().gm }}</span>
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ copy.host }}</span>
                       <span class="mg-responsive-table__value text-wrap-anywhere">{{ entry.host }}</span>
                     </td>
                     <td class="mg-responsive-table__cell">
                       <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.labels().hours }}</span>
                       <span class="mg-responsive-table__value">
                         <span class="text-nowrap">
-                          <time [attr.datetime]="entry.row.startTime">{{ formatTimeLabel(entry.row.startTime) }}</time>
-                          - <time [attr.datetime]="entry.row.endTime">{{ formatTimeLabel(entry.row.endTime) }}</time>
+                          {{ entry.time }}
                         </span>
                         @if (entry.row.source === 'legacy_host') { <small class="d-block muted-text">{{ copy.eventHours }}</small> }
                       </span>
@@ -75,7 +75,7 @@
                       <div class="mg-responsive-table__value flex-col-start-start gap-xs">
                         <span class="tag-badge" [class.tag-badge--success]="entry.row.status === 'confirmed'"
                           [class.tag-badge--muted]="entry.row.status === 'pending'">{{ entry.status }}</span>
-                        @if (entry.programStatus) { <small class="muted-text">{{ entry.programStatus }}</small> }
+                        @if (entry.programStatus) { <small class="muted-text">{{ copy.programStatus }}: {{ entry.programStatus }}</small> }
                         @if (entry.row.source === 'staffing' && entry.row.participationEnded) {
                           <small class="error-text">{{ copy.participationEnded }}</small>
                         }

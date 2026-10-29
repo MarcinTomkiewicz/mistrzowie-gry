@@ -75,6 +75,9 @@
                   }
                 }
               } @else {
+                @if (globalDraft.activeStep() === 5 && !globalDraft.cityEditing()) {
+                  <app-event-global-program [coreId]="loadedCore.id" [calendar]="calendar" [disabled]="navigationLocked()" />
+                }
                 @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
                   <app-event-global-schedule-editor [core]="loadedCore" [calendar]="calendar"
                     [blocked]="policy.locked() || baseBlocks.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
@@ -93,10 +96,12 @@
                       schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()" />
                 }
                 <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
-                @if (globalDraft.policy(); as policy) {
-                  @if (metadata.edition(); as edition) {
-                    <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
-                      [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                @if (globalDraft.activeStep() !== 5) {
+                  @if (globalDraft.policy(); as policy) {
+                    @if (metadata.edition(); as edition) {
+                      <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
+                        [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                    }
                   }
                 }
                 @if (metadataTarget(); as target) {

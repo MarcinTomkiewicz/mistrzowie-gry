@@ -43,11 +43,12 @@ import { EventGlobalBaseTimeBlocksController } from './event-global-base-time-bl
 import { EventGlobalBaseTimeBlocksEditor } from './event-global-base-time-blocks-editor';
 import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
 import { EventGlobalPolicyEditor } from './policy/event-global-policy-editor';
+import { EventGlobalProgram } from './event-global-program';
 
 @Component({
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule, MessageModule,
-    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, EventGlobalDiagnostics,
+    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,

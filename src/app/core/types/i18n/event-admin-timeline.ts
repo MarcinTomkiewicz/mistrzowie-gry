@@ -3,6 +3,14 @@ import type { MyStaffingCandidate } from '../../interfaces/my-staffing-realizati
 
 export type EventAdminTimelineCopy = {
   title: string;
+  entry: string;
+  host: string;
+  rpgSession: string;
+  programStatus: string;
+  dayOffset: string;
+  localHint: string;
+  selectOccurrence: string;
+  invalidSelection: string;
   source: string;
   frozen: string;
   noOccurrences: string;

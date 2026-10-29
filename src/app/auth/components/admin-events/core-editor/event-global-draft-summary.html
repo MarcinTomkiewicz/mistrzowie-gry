@@ -1,7 +1,7 @@
 @let copy = i18n.creation();
 @let details = core();
 <div [class]="step() === 6 ? 'grid-2-1 grid-items-start gap-md w-100 min-w-0' : 'flex-col-start-stretch gap-md w-100 min-w-0'">
-  @if (step() !== 4 && step() !== 5) {
+  @if (step() !== 4) {
     <div class="flex-col-start-stretch gap-md min-w-0">
       @if (step() === 1 || step() === 6) {
         <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
@@ -108,20 +108,6 @@
           <dd class="m-0">{{ policy().appliedToParticipantRegistration ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
         </div>
       </dl>
-    </section>
-  }
-  @if (step() === 5) {
-    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h2>
-      @for (edition of details.editions; track edition.id) {
-        <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100 min-w-0">
-          <h3 class="mg-section__title mg-section__title--sm m-0">{{ edition.city }}</h3>
-          <dl class="mg-grid-2 gap-md m-0">
-            <div><dt class="muted-text">{{ i18n.occurrences().sectionTitle }}</dt><dd class="m-0">{{ edition.occurrenceCount }}</dd></div>
-            <div><dt class="muted-text">{{ i18n.occurrenceTable().programItemCount }}</dt><dd class="m-0">{{ edition.programItemCount }}</dd></div>
-          </dl>
-        </section>
-      }
     </section>
   }
 </div>

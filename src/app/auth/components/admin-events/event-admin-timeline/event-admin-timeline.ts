@@ -4,15 +4,14 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
-import { EventProgramItemStatus } from '../../../../core/enums/event';
 import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel } from '../../../../core/utils/date';
-import { formatTimeLabel } from '../../../../core/utils/time-format';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { EventEditionEditorFacade } from '../edition-editor/event-edition-editor-facade';
 import { createEventAdminTimelineI18n } from './event-admin-timeline.i18n';
+import { presentEventTimelineRows } from './event-admin-timeline-presenter';
 
 @Component({
   selector: 'app-event-admin-timeline',
@@ -36,33 +35,15 @@ export class EventAdminTimeline {
   protected readonly participants = this.facade.programParticipants;
   protected readonly removingParticipantId = this.facade.removingParticipantId;
   protected readonly formatDateLabel = formatDateLabel;
-  protected readonly formatTimeLabel = formatTimeLabel;
   protected readonly errorMessage = computed(() => this.error()
     ? resolveEventEditionAdminErrorMessage(this.error(), this.i18n.rpcErrors(), this.i18n.errors().concurrentModification)
     : null);
   protected readonly days = computed(() => {
     const timeline = this.timeline();
     if (!timeline) return [];
-    const copy = this.i18n.copy();
-    const values = this.i18n.values();
-    const statuses = this.i18n.entityStatuses();
-    const candidateStates = { ...copy.candidateStates, pending: this.i18n.statusPhrases().awaitingAcceptance };
     return [...timeline.occurrences].sort((a, b) => a.date.localeCompare(b.date)).map((occurrence) => ({
       occurrence,
-      rows: occurrence.rows.map((row) => ({
-        key: `${row.source}:${row.slotId ?? ''}:${row.sourceFinalPlanItemId ?? row.programItemId ?? ''}`,
-        participantProgramItemId: row.programItemId && row.session !== null &&
-          (row.programStatus === EventProgramItemStatus.Approved || row.programStatus === EventProgramItemStatus.Published)
-          ? row.programItemId : null,
-        row,
-        title: row.session ? row.session.title ?? values.notProvided : copy.unassigned,
-        host: row.host ? row.host.displayName : copy.noHost,
-        status: statuses[row.status].feminine,
-        programStatus: row.programStatus === null ? null : statuses[row.programStatus].feminine,
-        source: copy.sources[row.source],
-        candidate: row.source === 'staffing' && row.candidateState !== null
-          ? candidateStates[row.candidateState] : null,
-      })),
+      rows: presentEventTimelineRows(occurrence.rows, this.i18n),
     }));
   });
 
