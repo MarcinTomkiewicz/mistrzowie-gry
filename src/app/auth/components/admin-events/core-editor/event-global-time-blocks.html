@@ -2,12 +2,12 @@
 <div class="flex-col-start-stretch gap-md w-100 min-w-0" data-event-block-editor>
     @for (block of blocks().controls; track block; let index = $index) {
       <div class="flex-col-start-stretch gap-sm border radius-sm p-md w-100 min-w-0" [formGroup]="block" [attr.data-event-block]="index">
-        <div class="mg-grid-3 gap-sm w-100">
-          <p-floatlabel variant="on" class="min-w-0 w-100">
+        <div class="flex-row-start-center flex-wrap gap-sm w-100 min-w-0">
+          <p-floatlabel variant="on" class="flex-1 min-w-200 min-w-0-sm w-100-sm">
             <input pInputText pSize="small" [id]="idPrefix() + '-label-' + index" formControlName="label" class="w-100" maxlength="140" />
             <label [for]="idPrefix() + '-label-' + index">{{ copy.blockLabel }}</label>
           </p-floatlabel>
-          <p-floatlabel variant="on" class="min-w-0 w-100">
+          <p-floatlabel variant="on" class="flex-none w-px-150 w-100-xs max-w-full min-w-0">
             <p-datepicker #startPicker ngSkipHydration [inputId]="idPrefix() + '-start-' + index" formControlName="startTime" size="small"
               dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
               iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
@@ -27,7 +27,7 @@
             </p-datepicker>
             <label [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
           </p-floatlabel>
-          <p-floatlabel variant="on" class="min-w-0 w-100">
+          <p-floatlabel variant="on" class="flex-none w-px-150 w-100-xs max-w-full min-w-0">
             <p-datepicker #endPicker ngSkipHydration [inputId]="idPrefix() + '-end-' + index" formControlName="endTime" size="small"
               dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
               iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
@@ -47,9 +47,7 @@
             </p-datepicker>
             <label [for]="idPrefix() + '-end-' + index">{{ i18n.commonLabels().end }}</label>
           </p-floatlabel>
-        </div>
-        <div class="flex-row-between-center flex-wrap gap-sm w-100">
-          <div class="flex-row-start-center gap-xs w-px-250 max-w-full flex-none">
+          <div class="flex-row-start-center gap-xs flex-none w-px-200 w-100-xs max-w-full min-w-0">
             <p-floatlabel variant="on" class="flex-1 min-w-0">
               <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="savedBase() ? 0 : 1"
                 [max]="savedBase() ? 32767 : undefined"
