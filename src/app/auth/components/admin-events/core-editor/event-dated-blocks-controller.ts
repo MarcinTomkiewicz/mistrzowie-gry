@@ -9,11 +9,13 @@ import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { EventGlobalScheduleController } from './event-global-schedule-controller';
+import { EventGlobalBaseTimeBlocksController } from './event-global-base-time-blocks-controller';
 
 @Injectable()
 export class EventDatedBlocksController {
   private readonly admin = inject(EventAdmin);
   private readonly schedule = inject(EventGlobalScheduleController);
+  private readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
   private command: EventDatedTimeBlocksCommand | null = null;
   private readonly operation = signal<'preview' | 'save' | 'read' | null>(null);
   private savedRevision: number | null = null;
@@ -39,7 +41,7 @@ export class EventDatedBlocksController {
   readonly currentBlocks = computed(() => this.editionId() ? this.city()?.timeBlocks ?? [] : this.day()?.timeBlocks ?? []);
   readonly canEdit = computed(() => {
     const day = this.day();
-    if (!day || this.schedule.locked()) return false;
+    if (!day || this.schedule.locked() || this.baseBlocks.locked()) return false;
     const occurrence = this.calendar()?.globalDates.find(row => row.globalOccurrenceId === day.globalOccurrenceId && row.date === day.date);
     if (!occurrence || day.source === 'published_snapshot' || occurrence.status !== 'scheduled') return false;
     if (this.editionId() && !this.city()) return false;
@@ -72,7 +74,7 @@ export class EventDatedBlocksController {
   }
 
   select(date: string, editionId: string): void {
-    if (this.schedule.locked() || this.isBusy() || this.isDirty() || this.readbackPending()) return;
+    if (this.schedule.locked() || this.baseBlocks.locked() || this.isBusy() || this.isDirty() || this.readbackPending()) return;
     this.populate(date, editionId);
   }
 
@@ -127,7 +129,7 @@ export class EventDatedBlocksController {
   refresh(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
       const calendar = this.calendar();
-      if (!calendar || this.isBusy() || this.schedule.locked()) return EMPTY;
+      if (!calendar || this.isBusy() || this.schedule.locked() || this.baseBlocks.locked()) return EMPTY;
       this.operation.set('read');
       this.form.disable({ emitEvent: false });
       return this.readCalendar(calendar.coreId).pipe(finalize(() => this.finishOperation()));

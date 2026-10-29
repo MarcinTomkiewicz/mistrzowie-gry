@@ -51,30 +51,52 @@
         <div class="flex-row-between-center flex-wrap gap-sm w-100">
           <div class="flex-row-start-center gap-xs w-px-250 max-w-full flex-none">
             <p-floatlabel variant="on" class="flex-1 min-w-0">
-              <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="1"
+              <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="savedBase() ? 0 : 1"
+                [max]="savedBase() ? 32767 : undefined"
                 [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
               <label [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
             </p-floatlabel>
             <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.requiredGmCount, text: copy.requiredGmHint }" />
           </div>
-          <div class="flex-row-end-center flex-none">
-            <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
-              [label]="i18n.commonActions().removeItem" [disabled]="blocks().disabled || blocks().length === 1" (onClick)="removeBlock(index)" />
-          </div>
+          @if (!savedBase()) {
+            <div class="flex-row-end-center flex-none">
+              <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
+                [label]="i18n.commonActions().removeItem" [disabled]="blocks().disabled || blocks().length === 1" (onClick)="removeBlock(index)" />
+            </div>
+          }
         </div>
+        @if (savedBase()) {
+          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm w-100">
+            <p-floatlabel variant="on" class="min-w-0 w-100">
+              <p-inputnumber [inputId]="idPrefix() + '-start-day-' + index" formControlName="startDayOffset"
+                [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+              <label [for]="idPrefix() + '-start-day-' + index">{{ i18n.baseTimeBlocks().startDayOffset }}</label>
+            </p-floatlabel>
+            <p-floatlabel variant="on" class="min-w-0 w-100">
+              <p-inputnumber [inputId]="idPrefix() + '-end-day-' + index" formControlName="endDayOffset"
+                [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+              <label [for]="idPrefix() + '-end-day-' + index">{{ i18n.baseTimeBlocks().endDayOffset }}</label>
+            </p-floatlabel>
+          </div>
+          @if ((validationAttempted() || block.touched) && (block.controls.startDayOffset.invalid || block.controls.endDayOffset.invalid)) {
+            <small class="mg-contact-error" role="alert">{{ i18n.baseTimeBlocks().offsetRange }}</small>
+          }
+        }
         @if (block.controls.label.touched && block.controls.label.invalid) {
           <small class="mg-contact-error">{{ copy.blockLabel }}: {{ block.controls.label.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}</small>
         }
         @if (canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().start }}: {{ copy.timeInvalid }}</small> }
         @if (canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().end }}: {{ copy.timeInvalid }}</small> }
-        @if (block.controls.requiredGmCount.touched && block.controls.requiredGmCount.invalid) { <small class="mg-contact-error">{{ copy.requiredGmCount }}: {{ i18n.commonForm().positiveInteger }}</small> }
-        @if (showTimeRangeError(block, startPicker, endPicker)) { <small class="mg-contact-error">{{ i18n.datedBlocks().blockRange }}</small> }
+        @if (block.controls.requiredGmCount.touched && block.controls.requiredGmCount.invalid) { <small class="mg-contact-error">{{ savedBase() ? i18n.baseTimeBlocks().gmRange : copy.requiredGmCount + ': ' + i18n.commonForm().positiveInteger }}</small> }
+        @if (showTimeRangeError(block, startPicker, endPicker)) { <small class="mg-contact-error">{{ savedBase() ? i18n.baseTimeBlocks().duration : i18n.datedBlocks().blockRange }}</small> }
       </div>
     }
-    <div class="flex-row-start-center">
-      <p-button type="button" icon="pi pi-add-plus" size="small" severity="secondary" [outlined]="true"
-        [id]="idPrefix() + '-add'" [label]="copy.addBlock" [disabled]="blocks().disabled" (onClick)="addBlock()" />
-    </div>
+    @if (!savedBase()) {
+      <div class="flex-row-start-center">
+        <p-button type="button" icon="pi pi-add-plus" size="small" severity="secondary" [outlined]="true"
+          [id]="idPrefix() + '-add'" [label]="copy.addBlock" [disabled]="blocks().disabled" (onClick)="addBlock()" />
+      </div>
+    }
 </div>
 <ng-template #help let-label="label" let-text="text">
   <button pButton type="button" icon="pi pi-read" severity="secondary" size="small" [text]="true" [rounded]="true"

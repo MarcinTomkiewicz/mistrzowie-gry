@@ -17,6 +17,8 @@ import type {
   AddAdminGlobalEventCityResult,
   AdminDatedTimeBlocksPreview,
   AdminDatedTimeBlocksSave,
+  AdminGlobalBaseTimeBlocksPreview,
+  AdminGlobalBaseTimeBlocksSave,
   AdminEffectivePolicyResult,
   AdminGlobalCalendarResult,
   AdminGlobalCalendarPreview,
@@ -26,6 +28,7 @@ import type {
   CreateAdminGlobalEventPayload,
   CreateAdminGlobalEventResult,
   EventDatedTimeBlocksCommand,
+  EventGlobalBaseTimeBlocksCommand,
   SaveAdminGlobalEventEditionMetadataPayload,
   SaveAdminGlobalEventEditionMetadataResult,
 } from '../../interfaces/i-admin-global-event';
@@ -105,6 +108,22 @@ export class EventAdmin {
   previewGlobalEventPage(coreId: string): Observable<AdminGlobalEventPagePreview> {
     return this.backend.rpc<AdminGlobalEventPagePreview>(EVENT_RPC.previewGlobalEventPage, {
       p_payload: { coreId },
+    });
+  }
+
+  previewGlobalBaseTimeBlocks(command: EventGlobalBaseTimeBlocksCommand): Observable<AdminGlobalBaseTimeBlocksPreview> {
+    return this.backend.rpc<AdminGlobalBaseTimeBlocksPreview>(EVENT_RPC.previewGlobalBaseTimeBlocks, {
+      p_core_id: command.coreId,
+      p_expected_calendar_revision: command.expectedCalendarRevision,
+      p_time_blocks: command.timeBlocks,
+    });
+  }
+
+  saveGlobalBaseTimeBlocks(command: EventGlobalBaseTimeBlocksCommand): Observable<AdminGlobalBaseTimeBlocksSave> {
+    return this.backend.rpc<AdminGlobalBaseTimeBlocksSave>(EVENT_RPC.saveGlobalBaseTimeBlocks, {
+      p_core_id: command.coreId,
+      p_expected_calendar_revision: command.expectedCalendarRevision,
+      p_time_blocks: command.timeBlocks,
     });
   }
 

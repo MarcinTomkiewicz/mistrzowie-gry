@@ -14,6 +14,12 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
           <span class="text-nowrap">{{ formatTimeRangeLabel(block.startTime, block.endTime) }}</span>
           <span>{{ i18n.creation().requiredGmCount }}: {{ block.requiredGmCount }}</span>
         </div>
+        @if (showDayOffsets()) {
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <span>{{ i18n.baseTimeBlocks().startDayOffset }}: {{ block.startDayOffset }}</span>
+            <span>{{ i18n.baseTimeBlocks().endDayOffset }}: {{ block.endDayOffset }}</span>
+          </div>
+        }
       </div>
     }
   `,
@@ -21,6 +27,7 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
 })
 export class EventGlobalTimeBlocksSummary {
   readonly blocks = input.required<readonly GlobalTimeBlockInput[]>();
+  readonly showDayOffsets = input(false);
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
   protected readonly orderedBlocks = computed(() => [...this.blocks()].sort((a, b) => a.position - b.position));

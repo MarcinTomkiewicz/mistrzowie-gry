@@ -1,0 +1,49 @@
+<section id="global-event-base-time-blocks-editor" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().title }}</h2>
+  <p class="m-0 muted-text">{{ copy().hint }}</p>
+  @if (blocked()) { <p-message severity="warn" role="status">{{ copy().otherOperation }}</p-message> }
+  @if (!editor.canEdit() && !blocked()) { <p-message severity="warn" role="status">{{ copy().protected }}</p-message> }
+  @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
+  @if (editor.calendar(); as current) {
+    <details class="w-100">
+      <summary>{{ i18n.datedBlocks().current }}</summary>
+      <app-event-global-time-blocks-summary [blocks]="current.timeBlocks" [showDayOffsets]="true" />
+    </details>
+  }
+  <form class="mg-form flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="editor.form" (ngSubmit)="preview()" novalidate>
+    <app-event-global-time-blocks [blocks]="editor.form.controls.timeBlocks" idPrefix="base-time-blocks"
+      [savedBase]="true" [validationAttempted]="editor.validationAttempted()" />
+    @if (editor.validationAttempted() && editor.form.invalid) {
+      <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+    }
+    @if (editor.preview(); as preview) {
+      @switch (preview.status) {
+        @case ('preview_ready') {
+          <p-message severity="info" role="status">{{ preview.changed === false ? copy().unchanged : copy().previewReady }}</p-message>
+        }
+        @case ('unchanged') { <p-message severity="info" role="status">{{ copy().unchanged }}</p-message> }
+        @case ('blocked') { <p-message severity="warn" role="alert">{{ copy().blocked }}</p-message> }
+        @case ('invalid') { <p-message severity="error" role="alert">{{ copy().invalid }}</p-message> }
+      }
+      @if (preview.timeBlocks; as blocks) { <app-event-global-time-blocks-summary [blocks]="blocks" [showDayOffsets]="true" /> }
+      @if (preview.impact; as impact) {
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <span>{{ copy().preservedDateOverrides }}: {{ impact.preservedDateOverrides }}</span>
+          <span>{{ copy().preservedCityOverrides }}: {{ impact.preservedCityOverrides }}</span>
+        </div>
+      }
+    }
+    @if (editor.result() === 'unchanged') { <p-message severity="info" role="status">{{ copy().unchanged }}</p-message> }
+    <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+      <p-button type="submit" size="small" [outlined]="true" icon="pi pi-spy" [label]="copy().preview"
+        [disabled]="!editor.canPreview()" [loading]="editor.isBusy()" loadingIcon="pi pi-d20" />
+      <p-button type="button" size="small" severity="success" icon="pi pi-done-it" [label]="copy().save"
+        [disabled]="!editor.canSave()" (onClick)="save()" />
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+        [label]="editor.readbackPending() ? i18n.creation().retryRead : copy().refresh"
+        [disabled]="editor.isBusy() || blocked()" (onClick)="refresh()" />
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+        [label]="copy().discard" [disabled]="!editor.canDiscard()" (onClick)="discard()" />
+    </div>
+  </form>
+</section>

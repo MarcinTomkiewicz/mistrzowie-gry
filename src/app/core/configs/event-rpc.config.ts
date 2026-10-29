@@ -19,6 +19,8 @@ export const EVENT_RPC = {
   previewGlobalCalendar: 'preview_admin_event_global_calendar_change',
   saveGlobalCalendarDraft: 'save_admin_event_global_calendar_draft',
   applyGlobalCalendarDraft: 'apply_admin_event_global_calendar_draft',
+  previewGlobalBaseTimeBlocks: 'preview_admin_event_global_base_time_blocks',
+  saveGlobalBaseTimeBlocks: 'save_admin_event_global_base_time_blocks',
   previewGlobalEventPage: 'preview_admin_global_event_page',
   previewDatedTimeBlocks: 'preview_admin_event_dated_time_blocks',
   saveDatedTimeBlocks: 'save_admin_event_dated_time_blocks',

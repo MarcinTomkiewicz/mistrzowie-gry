@@ -27,6 +27,57 @@ export interface GlobalTimeBlockInput {
   endTime: string;
 }
 
+export interface EventGlobalBaseTimeBlocksCommand {
+  coreId: string;
+  expectedCalendarRevision: number;
+  timeBlocks: GlobalTimeBlockInput[];
+}
+
+type GlobalBaseTimeBlocksPreviewData = {
+  applied: false;
+  published: false;
+  participantSignupOpened: false;
+  appliedToPublic?: false;
+  changed?: boolean;
+  coreId?: string;
+  calendarRevision?: number;
+  timeBlocks?: GlobalTimeBlockInput[];
+  fieldErrors: unknown[];
+  blockers: unknown[];
+  impact?: {
+    previousBaseBlockCount: number;
+    proposedBaseBlockCount: number;
+    affectedEditionCount: number;
+    affectedPlannedOccurrenceCount: number;
+    scheduledGlobalDateCount: number;
+    preservedDateOverrides: number;
+    preservedCityOverrides: number;
+    derivedEnvelope: { startTime: string; endTime: string; endDayOffset: number; legacySlotCapacity: number };
+  };
+};
+
+export type AdminGlobalBaseTimeBlocksPreview = GlobalBaseTimeBlocksPreviewData & (
+  | { valid: true; status: 'preview_ready' }
+  | { valid: true; status: 'unchanged' }
+  | { valid: false; status: 'blocked' }
+  | { valid: false; status: 'invalid' }
+);
+
+export type AdminGlobalBaseTimeBlocksSave = {
+  coreId: string;
+  calendarRevision?: number;
+  timeBlocks?: GlobalTimeBlockInput[];
+  preview: AdminGlobalBaseTimeBlocksPreview;
+  published: false;
+  participantSignupOpened: false;
+  appliedToPublic: false;
+} & (
+  | { saved: true; status: 'applied' }
+  | { saved: true; status: 'unchanged' }
+  | { saved: false; status: 'blocked' }
+  | { saved: false; status: 'invalid' }
+);
+
 export interface CityExclusion {
   editionId: string;
   date: string;

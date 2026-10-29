@@ -11,6 +11,34 @@ export type EventMetadataCopy = {
   reloadConfirm: string;
 };
 
+export type EventGlobalBaseTimeBlocksCopy = {
+  title: string;
+  hint: string;
+  protected: string;
+  otherOperation: string;
+  preview: string;
+  previewReady: string;
+  save: string;
+  saveConfirm: string;
+  saved: string;
+  unchanged: string;
+  blocked: string;
+  invalid: string;
+  conflict: string;
+  readbackPending: string;
+  refresh: string;
+  discard: string;
+  discardConfirm: string;
+  leave: string;
+  startDayOffset: string;
+  endDayOffset: string;
+  gmRange: string;
+  offsetRange: string;
+  duration: string;
+  preservedDateOverrides: string;
+  preservedCityOverrides: string;
+};
+
 export type EventGlobalScheduleCopy = {
   hint: string;
   otherOperation: string;

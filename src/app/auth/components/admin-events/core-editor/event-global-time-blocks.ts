@@ -24,6 +24,7 @@ export class EventGlobalTimeBlocks {
   readonly blocks = input.required<EventGlobalTimeBlocksForm>();
   readonly idPrefix = input.required<string>();
   readonly validationAttempted = input(false);
+  readonly savedBase = input(false);
   protected readonly i18n = createEventCoreEditorI18n();
 
   protected canShowScheduleError(control: AbstractControl, picker: DatePicker): boolean {
@@ -49,13 +50,13 @@ export class EventGlobalTimeBlocks {
   }
 
   protected addBlock(): void {
-    if (this.blocks().disabled) return;
+    if (this.savedBase() || this.blocks().disabled) return;
     this.blocks().push(createEventGlobalTimeBlockForm());
     this.blocks().markAsDirty();
   }
 
   protected removeBlock(index: number): void {
-    if (this.blocks().disabled || this.blocks().length <= 1) return;
+    if (this.savedBase() || this.blocks().disabled || this.blocks().length <= 1) return;
     this.blocks().removeAt(index);
     this.blocks().markAsDirty();
   }
