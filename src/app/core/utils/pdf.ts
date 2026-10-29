@@ -10,7 +10,7 @@ export function loadPdfDocument(src: string): Observable<IPdfLoadResult> {
   return from(import('pdfjs-dist')).pipe(
     switchMap((pdfjs) => {
       if (!workerConfigured) {
-        pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs?v=${encodeURIComponent(pdfjs.version)}`;
+        pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js?v=${encodeURIComponent(pdfjs.version)}`;
         workerConfigured = true;
       }
 

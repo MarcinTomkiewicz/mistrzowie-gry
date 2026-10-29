@@ -30,11 +30,6 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
-              },
-              {
-                "glob": "pdf.worker.min.mjs",
-                "input": "node_modules/pdfjs-dist/build",
-                "output": "/"
               }
             ],
             "stylePreprocessorOptions": {
@@ -119,11 +114,6 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
-              },
-              {
-                "glob": "pdf.worker.min.mjs",
-                "input": "node_modules/pdfjs-dist/build",
-                "output": "/"
               }
             ],
             "stylePreprocessorOptions": {

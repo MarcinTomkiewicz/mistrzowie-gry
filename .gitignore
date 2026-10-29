@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+/public/pdf.worker.min.js
 
 # Node
 /node_modules
