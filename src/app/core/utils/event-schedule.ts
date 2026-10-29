@@ -33,8 +33,9 @@ export function buildEventScheduleExdates(
         const offset = rule.monthlyNth === -1
           ? -((anchor.getDay() - rule.monthlyWeekday + 7) % 7)
           : (rule.monthlyWeekday - anchor.getDay() + 7) % 7 + (rule.monthlyNth - 1) * 7;
-        const candidate = toIsoDate(addDays(anchor, offset));
-        if (candidate >= startDate && candidate <= endDate) dates.add(candidate);
+        const day = addDays(anchor, offset);
+        const candidate = toIsoDate(day);
+        if (day.getMonth() === month.getMonth() && candidate >= startDate && candidate <= endDate) dates.add(candidate);
       }
     }
   }

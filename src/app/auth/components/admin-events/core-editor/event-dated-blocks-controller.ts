@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { defer, EMPTY, finalize, Observable, switchMap, tap } from 'rxjs';
@@ -8,10 +8,12 @@ import type { AdminDatedTimeBlocksPreview, AdminGlobalCalendarResult, EventDated
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
+import { EventGlobalScheduleController } from './event-global-schedule-controller';
 
 @Injectable()
 export class EventDatedBlocksController {
   private readonly admin = inject(EventAdmin);
+  private readonly schedule = inject(EventGlobalScheduleController);
   private command: EventDatedTimeBlocksCommand | null = null;
   private readonly operation = signal<'preview' | 'save' | 'read' | null>(null);
   private savedRevision: number | null = null;
@@ -37,9 +39,9 @@ export class EventDatedBlocksController {
   readonly currentBlocks = computed(() => this.editionId() ? this.city()?.timeBlocks ?? [] : this.day()?.timeBlocks ?? []);
   readonly canEdit = computed(() => {
     const day = this.day();
-    if (!day) return false;
+    if (!day || this.schedule.locked()) return false;
     const occurrence = this.calendar()?.globalDates.find(row => row.globalOccurrenceId === day.globalOccurrenceId && row.date === day.date);
-    if (!occurrence || day.source === 'published_snapshot' || occurrence.status !== 'planned') return false;
+    if (!occurrence || day.source === 'published_snapshot' || occurrence.status !== 'scheduled') return false;
     if (this.editionId() && !this.city()) return false;
     const targets = this.editionId() ? occurrence.cityOccurrences.filter(row => row.editionId === this.editionId()) : occurrence.cityOccurrences;
     return targets.length > 0 && targets.every(row => !row.protected && !row.publishedAt &&
@@ -47,6 +49,7 @@ export class EventDatedBlocksController {
   });
 
   constructor() {
+    effect(() => this.syncEnabled());
     this.form.controls.override.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.syncEnabled());
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.invalidatePreview());
   }
@@ -69,7 +72,7 @@ export class EventDatedBlocksController {
   }
 
   select(date: string, editionId: string): void {
-    if (this.isBusy() || this.isDirty() || this.readbackPending()) return;
+    if (this.schedule.locked() || this.isBusy() || this.isDirty() || this.readbackPending()) return;
     this.populate(date, editionId);
   }
 
@@ -124,7 +127,7 @@ export class EventDatedBlocksController {
   refresh(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
       const calendar = this.calendar();
-      if (!calendar || this.isBusy()) return EMPTY;
+      if (!calendar || this.isBusy() || this.schedule.locked()) return EMPTY;
       this.operation.set('read');
       this.form.disable({ emitEvent: false });
       return this.readCalendar(calendar.coreId).pipe(finalize(() => this.finishOperation()));

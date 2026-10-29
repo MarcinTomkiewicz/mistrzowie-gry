@@ -53,7 +53,7 @@
             <div><dt class="muted-text">{{ row.label }}</dt><dd class="m-0">{{ row.value }}</dd></div>
           }
         </dl>
-        @if (draft.schedule.exdates?.length) {
+        @if (draft.schedule.exdates.length) {
           <strong>{{ i18n.commonLabels().excludedDates }}</strong>
           <div class="flex-row-start-center flex-wrap gap-sm">
             @for (date of draft.schedule.exdates; track date) {

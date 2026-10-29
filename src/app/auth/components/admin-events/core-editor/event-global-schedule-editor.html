@@ -1,0 +1,53 @@
+<section id="global-event-schedule-editor" tabindex="-1" class="flex-col-start-stretch gap-md w-100 min-w-0">
+  <form class="mg-form flex-col-start-stretch gap-md w-100 min-w-0" (ngSubmit)="preview()" novalidate>
+    <app-event-schedule-editor [form]="editor.form" [globalCalendar]="true" [validationAttempted]="editor.validationAttempted()" />
+    <div class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <p class="m-0 muted-text">{{ copy().hint }}</p>
+      @if (blocked()) { <p-message severity="warn" role="status">{{ copy().otherOperation }}</p-message> }
+      @if (!editor.canEdit() && !blocked() && !errorMessage()) {
+        <p-message severity="warn" role="status">{{ copy().protected }}</p-message>
+      }
+      @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
+      @if (editor.state() === 'draft') { <p-message severity="info" role="status">{{ copy().draftSaved }}</p-message> }
+      @if (editor.preview(); as preview) {
+        @if (preview.status === 'invalid') {
+          @for (error of preview.fieldErrors; track $index) {
+            <p-message severity="error" role="alert">{{ copy().invalid }} {{ error.detail }}</p-message>
+          }
+        }
+        @for (blocker of preview.blockers; track $index) {
+          <p-message severity="error" role="alert">{{ blockerMessage(blocker.code) }}</p-message>
+        }
+      }
+      @if (fullPreview(); as preview) {
+        <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy().preview }}</h3>
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <span>{{ copy().added }}: {{ preview.impact.addedDates.length }}</span>
+            <span>{{ copy().retired }}: {{ preview.impact.retirableUnprotectedDates.length }}</span>
+            <span>{{ copy().preserved }}: {{ preview.impact.preservedHistoricalDates.length }}</span>
+            <span>{{ copy().cities }}: {{ preview.impact.affectedCityCount }}</span>
+            <span>{{ copy().exclusions }}: {{ preview.cityExclusions.length }}</span>
+          </div>
+          <div class="flex-row-start-center flex-wrap gap-xs">
+            @for (date of preview.candidateDates; track date) {
+              <time class="tag-badge tag-badge--muted" [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
+            }
+          </div>
+        </section>
+      }
+      <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+        <p-button type="submit" size="small" [outlined]="true" icon="pi pi-spy" [label]="copy().preview"
+          [disabled]="!editor.canPreview()" [loading]="editor.isBusy()" loadingIcon="pi pi-d20" />
+        <p-button type="button" size="small" severity="success" icon="pi pi-done-it" [label]="copy().saveDraft"
+          [disabled]="!editor.canSave()" (onClick)="save()" />
+        <p-button type="button" size="small" severity="success" icon="pi pi-done-it" [label]="copy().apply"
+          [disabled]="!editor.canApply()" (onClick)="apply()" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+          [label]="copy().refresh" [disabled]="editor.isBusy() || blocked()" (onClick)="refresh()" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+          [label]="copy().discard" [disabled]="!editor.canDiscard()" (onClick)="discard()" />
+      </div>
+    </div>
+  </form>
+</section>

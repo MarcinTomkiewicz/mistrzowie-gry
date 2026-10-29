@@ -19,6 +19,10 @@ import type {
   AdminDatedTimeBlocksSave,
   AdminEffectivePolicyResult,
   AdminGlobalCalendarResult,
+  AdminGlobalCalendarPreview,
+  AdminGlobalCalendarSave,
+  AdminGlobalCalendarApply,
+  EventGlobalCalendarChange,
   CreateAdminGlobalEventPayload,
   CreateAdminGlobalEventResult,
   EventDatedTimeBlocksCommand,
@@ -76,6 +80,26 @@ export class EventAdmin {
 
   getGlobalCalendar(coreId: string): Observable<AdminGlobalCalendarResult> {
     return this.backend.rpc<AdminGlobalCalendarResult>(EVENT_RPC.getGlobalCalendar, { p_core_id: coreId });
+  }
+
+  previewGlobalCalendar(change: EventGlobalCalendarChange): Observable<AdminGlobalCalendarPreview> {
+    return this.backend.rpc<AdminGlobalCalendarPreview>(EVENT_RPC.previewGlobalCalendar, {
+      p_core_id: change.coreId, p_schedule: change.schedule,
+      p_time_blocks: change.timeBlocks, p_city_exclusions: change.cityExclusions,
+    });
+  }
+
+  saveGlobalCalendarDraft(change: EventGlobalCalendarChange, draftRevision: number): Observable<AdminGlobalCalendarSave> {
+    return this.backend.rpc<AdminGlobalCalendarSave>(EVENT_RPC.saveGlobalCalendarDraft, {
+      p_core_id: change.coreId, p_expected_revision: draftRevision, p_schedule: change.schedule,
+      p_time_blocks: change.timeBlocks, p_city_exclusions: change.cityExclusions,
+    });
+  }
+
+  applyGlobalCalendarDraft(coreId: string, calendarRevision: number, draftRevision: number): Observable<AdminGlobalCalendarApply> {
+    return this.backend.rpc<AdminGlobalCalendarApply>(EVENT_RPC.applyGlobalCalendarDraft, {
+      p_core_id: coreId, p_expected_calendar_revision: calendarRevision, p_expected_draft_revision: draftRevision,
+    });
   }
 
   previewGlobalEventPage(coreId: string): Observable<AdminGlobalEventPagePreview> {

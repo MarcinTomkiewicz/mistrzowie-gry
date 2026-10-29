@@ -72,6 +72,33 @@
       "refreshFailed": "[PH] Nie udało się odświeżyć danych wydarzenia. Kolejne zmiany pozostają zablokowane. Ponów odczyt lub opuść edytor.",
       "refreshRequired": "[PH] Odśwież dane wydarzenia przed kolejną zmianą."
     },
+    "schedule": {
+      "hint": "[PH] Edytujesz wyłącznie daty i cykl. Godziny oraz wykluczenia miast dla zachowanych przyszłych terminów pozostają bez zmian. Zapis szkicu nie stosuje harmonogramu i nie publikuje wydarzenia.",
+      "otherOperation": "[PH] Zakończ pozostałe operacje i zapisz lub odrzuć zmiany w innych sekcjach przed edycją harmonogramu.",
+      "protected": "[PH] Ten harmonogram nie jest dostępny do edycji. Wymagane jest prywatne wydarzenie oraz zachowanie chronionych danych.",
+      "offScope": "[PH] Szkic zawiera zmiany godzin lub wykluczeń miast wykraczające poza edycję dat i cyklu. Nie można ich zastosować w tym edytorze.",
+      "historical": "[PH] Istnieją historyczne wykluczenia udziału miast. Backend nie pozwala bezpiecznie zmienić tego harmonogramu w obecnym kontrakcie.",
+      "conflict": "[PH] Kalendarz lub jego szkic zmienił się podczas edycji. Zachowano formularz. Odrzuć lokalne zmiany, aby wczytać aktualny stan i rozpocząć edycję od nowa.",
+      "uncertain": "[PH] Wynik operacji jest niepewny. Ponów odczyt danych. Zapis ani zastosowanie szkicu nie zostaną automatycznie powtórzone.",
+      "readback": "[PH] Nie udało się potwierdzić wyniku operacji. Odśwież dane, aby ponowić sam odczyt.",
+      "invalid": "[PH] Backend odrzucił harmonogram lub zachowane dane kalendarza.",
+      "blocked": "[PH] Backend nie zezwala na tę zmianę harmonogramu.",
+      "preview": "[PH] Sprawdź zmiany harmonogramu",
+      "saveDraft": "[PH] Zapisz szkic harmonogramu",
+      "draftSaved": "[PH] Potwierdzono zapis szkicu. Harmonogram nie został jeszcze zastosowany. Zastosuj go osobną akcją.",
+      "apply": "[PH] Zastosuj zapisany harmonogram",
+      "applyConfirm": "[PH] Zastosować potwierdzony szkic harmonogramu? Operacja zmieni daty i planowane terminy miast zgodnie ze sprawdzonym zakresem. Nie publikuje wydarzenia ani nie otwiera zapisów.",
+      "applied": "[PH] Potwierdzono zastosowanie harmonogramu i odczyt aktualnych terminów.",
+      "refresh": "[PH] Odśwież dane bez odrzucania formularza",
+      "discard": "[PH] Odrzuć lokalne zmiany",
+      "discardConfirm": "[PH] Odrzucić wyłącznie lokalne zmiany i wczytać formularz z aktualnych danych? Istniejący szkic w bazie pozostanie bez zmian i nie zostanie zastosowany.",
+      "leave": "[PH] Opuścić edytor harmonogramu? Niezapisane zmiany formularza zostaną utracone. Zapisany szkic pozostanie niezastosowany. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później; opuszczenie edytora jej nie powtarza ani nie cofa.",
+      "added": "[PH] Nowe daty",
+      "retired": "[PH] Wycofywane terminy",
+      "preserved": "[PH] Zachowane daty historyczne",
+      "cities": "[PH] Miasta objęte zmianą",
+      "exclusions": "[PH] Zachowane wykluczenia miast"
+    },
     "metadata": {
       "readOnly": "[PH] Te metadane są dostępne tylko do odczytu.",
       "operationBlocked": "[PH] Zakończ edycję miasta lub harmonogramu i bieżące operacje przed zapisem lub odświeżeniem tych danych.",
@@ -401,7 +428,8 @@
       "singleHint": "[PH] Jeden wspólny dzień",
       "selectedDatesHint": "[PH] Zakres lub lista wspólnych dat",
       "cyclicHint": "[PH] Wspólny cykl",
-      "weeklyCycle": "[PH] Cykl tygodniowy"
+      "weeklyCycle": "[PH] Cykl tygodniowy",
+      "fifth": "[PH] Piąty"
     },
     "validation": {
       "singleDate": "Podaj poprawną datę wydarzenia.",

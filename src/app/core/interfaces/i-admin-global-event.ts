@@ -8,13 +8,13 @@ export type EventCurrency = (typeof EVENT_CURRENCIES)[number];
 export type EventPriceBasis = (typeof EVENT_PRICE_BASES)[number];
 
 type GlobalRecurrence = Pick<IEventRecurringSchedule, 'kind' | 'interval' | 'startDate' | 'endDate'> & {
-  exdates?: string[];
+  exdates: string[];
 };
 
 export type EventGlobalSchedule = IEventSingleSchedule | IEventExactDatesSchedule | (GlobalRecurrence & (
   | { recurrenceKind: 'WEEKLY'; byweekday: number[] }
   | { recurrenceKind: 'MONTHLY_DAY_OF_MONTH'; dayOfMonth: number }
-  | { recurrenceKind: 'MONTHLY_NTH_WEEKDAY'; monthlyNth: EventMonthlyNth | 5; monthlyWeekday: number }
+  | { recurrenceKind: 'MONTHLY_NTH_WEEKDAY'; monthlyNth: EventMonthlyNth; monthlyWeekday: number }
 ));
 
 export interface GlobalTimeBlockInput {
@@ -25,6 +25,74 @@ export interface GlobalTimeBlockInput {
   startTime: string;
   endDayOffset: number;
   endTime: string;
+}
+
+export interface CityExclusion {
+  editionId: string;
+  date: string;
+}
+
+export interface EventGlobalCalendarChange {
+  coreId: string;
+  schedule: EventGlobalSchedule;
+  timeBlocks: GlobalTimeBlockInput[];
+  cityExclusions: CityExclusion[];
+}
+
+export interface AdminGlobalCalendarImpact {
+  addedDates: string[];
+  retirableUnprotectedDates: string[];
+  preservedHistoricalDates: string[];
+  affectedCityCount: number;
+  existingParticipantRows: number;
+}
+
+export type AdminGlobalCalendarFullPreview = EventGlobalCalendarChange & {
+  fieldErrors: [];
+  blockers: { code: string }[];
+  candidateDates: string[];
+  impact: AdminGlobalCalendarImpact;
+  currentDraftRevision: number;
+  appliedToPublic: false;
+  published: false;
+} & ({ valid: true; status: 'draft_ready' } | { valid: false; status: 'blocked' });
+
+export type AdminGlobalCalendarPreview = AdminGlobalCalendarFullPreview | {
+  valid: false;
+  status: 'invalid';
+  fieldErrors: {
+    field: 'schedule' | 'timeBlocks' | 'cityExclusions';
+    code: 'INVALID_GLOBAL_SCHEDULE' | 'INVALID_TIME_BLOCKS' | 'INVALID_CITY_EXCLUSIONS';
+    detail?: string;
+  }[];
+  blockers: [];
+  appliedToPublic: false;
+};
+
+export type AdminGlobalCalendarSave = {
+  coreId: string;
+  revision: number;
+  calendarLifecycle: 'shadow' | 'global';
+} & (
+  | { saved: true; status: 'draft_saved'; appliedToPublic: false;
+      preview: Extract<AdminGlobalCalendarFullPreview, { valid: true }> }
+  | { saved: false; status: 'blocked'; preview: Extract<AdminGlobalCalendarPreview, { valid: false }> }
+);
+
+export interface AdminGlobalCalendarApply {
+  applied: true;
+  published: false;
+  coreId: string;
+  calendarLifecycle: 'global';
+  calendarRevision: number;
+  appliedDraftRevision: number;
+  createdLocalOccurrences: number;
+  removedPlannedOccurrences: number;
+  retiredGlobalDates: number;
+  excludedCityDates: number;
+  participantSignupOpened: false;
+  appliedToPublic: false;
+  impact: AdminGlobalCalendarImpact;
 }
 
 export interface EventDateTimeBlocks {
@@ -75,6 +143,7 @@ export interface AdminDatedTimeBlocks extends EventDateTimeBlocks {
     editionId: string;
     city: string;
     isOverride: boolean;
+    publishedSnapshot: boolean;
     timeBlocks: GlobalTimeBlockInput[];
   }[];
 }
@@ -149,14 +218,14 @@ export interface AdminGlobalCalendarResult {
   coreId: string;
   coreKey: string;
   mainEditionId: string;
-  calendarLifecycle: string;
+  calendarLifecycle: 'shadow' | 'global';
   calendarRevision: number;
   draftRevision: number;
   pendingDraft: null | {
     revision: number;
     schedule: EventGlobalSchedule;
     timeBlocks: GlobalTimeBlockInput[];
-    cityExclusions: unknown;
+    cityExclusions: CityExclusion[];
     candidateDates: string[];
     updatedAt: string;
   };
@@ -170,9 +239,9 @@ export interface AdminGlobalCalendarResult {
   globalDates: {
     globalOccurrenceId: string;
     date: string;
-    status: string;
+    status: 'scheduled' | 'cancelled';
     cityOccurrences: {
-      editionId: string; city: string; decision: string;
+      editionId: string; city: string; decision: 'included' | 'excluded' | 'unspecified';
       occurrenceId: string | null; occurrenceStatus: string | null;
       publishedAt: string | null; protected: boolean; unlinkedSameDate: boolean;
     }[];

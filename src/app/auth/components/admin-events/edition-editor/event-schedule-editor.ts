@@ -67,6 +67,7 @@ export class EventScheduleEditor implements OnInit {
   protected readonly monthlyNthOptions = computed<{ value: EventMonthlyNth; label: string }[]>(() => [
     { value: 1, label: this.i18n.commonLabels().first }, { value: 2, label: this.i18n.commonLabels().second },
     { value: 3, label: this.i18n.commonLabels().third }, { value: 4, label: this.i18n.commonLabels().fourth },
+    ...(this.globalCalendar() ? [{ value: 5 as const, label: this.i18n.options().fifth }] : []),
     { value: -1, label: this.i18n.commonLabels().last },
   ]);
   protected readonly weekdayOptions = getWeekdayLabels('pl-PL', 1).map((label, index) => ({
@@ -91,7 +92,7 @@ export class EventScheduleEditor implements OnInit {
   protected addExclusionRule(): void {
     const rules = this.form().controls.exclusionRules;
     if (rules.disabled) return;
-    rules.push(createEventScheduleExclusionRule());
+    rules.push(createEventScheduleExclusionRule(this.globalCalendar()));
     rules.markAsDirty();
     rules.markAsTouched();
   }

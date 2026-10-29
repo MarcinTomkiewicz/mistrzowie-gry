@@ -219,6 +219,7 @@ export type ScheduleFieldsCopy = {
 };
 
 export type ScheduleOptionsCopy = {
+  fifth: string;
   single: string;
   recurring: string;
   exactDates: string;

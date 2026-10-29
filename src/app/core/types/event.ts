@@ -7,7 +7,7 @@ export type EventRecurrenceKind =
   | 'MONTHLY_NTH_WEEKDAY'
   | 'MONTHLY_DAY_OF_MONTH';
 
-export type EventMonthlyNth = 1 | 2 | 3 | 4 | -1;
+export type EventMonthlyNth = 1 | 2 | 3 | 4 | 5 | -1;
 
 export type EventMonthlyWeekdayRule = {
   monthlyNth: EventMonthlyNth;

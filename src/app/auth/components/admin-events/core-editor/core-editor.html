@@ -40,7 +40,7 @@
                 <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
                   [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
                   [addCityDisabledReason]="metadata.locked() || cover.needsReconciliation() ? 'metadata'
-                    : datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
+                    : schedule.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
                   (cityAdded)="core.set($event)" />
               }
               @if (globalDraft.activeStep() === 1 && metadata.canEditCore()) {
@@ -75,6 +75,12 @@
                   }
                 }
               } @else {
+                @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
+                  <app-event-global-schedule-editor [core]="loadedCore" [calendar]="calendar"
+                    [blocked]="metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
+                      cover.needsReconciliation() || globalDraft.isChecking() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                    (calendarChanged)="globalDraft.calendar.set($event)" (applied)="loadCore()" />
+                }
                 <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
                 @if (globalDraft.policy(); as policy) {
                   @if (metadata.edition(); as edition) {
@@ -87,7 +93,9 @@
                 }
               }
               @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
-                <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
+                @if (!schedule.locked()) {
+                  <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
+                }
               }
               @if (globalDraft.activeStep() === 1) {
                 @for (coverCoreId of [loadedCore.id]; track coverCoreId) {
@@ -96,7 +104,7 @@
               }
               @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
                 <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-                  [disabled]="metadata.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  [disabled]="metadata.locked() || schedule.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
                   (navigateToSection)="goToDiagnosticSection($event)" />
               }
             </div>

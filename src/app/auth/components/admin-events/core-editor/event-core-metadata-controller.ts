@@ -14,6 +14,7 @@ import { requiredTrimmedValidator } from '../../../../core/validators/required-t
 import { EventDatedBlocksController } from './event-dated-blocks-controller';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventCoreCoverController } from './event-core-cover-controller';
+import { EventGlobalScheduleController } from './event-global-schedule-controller';
 
 export type EventMetadataTarget = 'core' | 'edition';
 type MetadataCommand = { coreId: string } & (
@@ -27,6 +28,7 @@ export class EventCoreMetadataController {
   private readonly global = inject(EventGlobalDraftController);
   private readonly blocks = inject(EventDatedBlocksController);
   private readonly cover = inject(EventCoreCoverController);
+  private readonly schedule = inject(EventGlobalScheduleController);
   private command: MetadataCommand | null = null;
   readonly core = signal<IEventCoreDetail | null>(null);
   readonly edition = signal<IAdminEventDetail | null>(null);
@@ -38,7 +40,7 @@ export class EventCoreMetadataController {
   readonly issues = signal<Partial<Record<EventMetadataTarget, 'conflict' | 'protected'>>>({});
   readonly locked = computed(() => this.isBusy() || this.state() !== 'idle');
   readonly blocked = computed(() => this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
-    this.blocks.isBusy() || this.blocks.isDirty() || this.blocks.readbackPending());
+    this.schedule.locked() || this.blocks.isBusy() || this.blocks.isDirty() || this.blocks.readbackPending());
   readonly coreForm = new FormGroup({
     key: new FormControl('', { nonNullable: true,
       validators: [Validators.required, requiredTrimmedValidator(), Validators.pattern(/^[a-z0-9-]+$/)] }),
@@ -257,11 +259,11 @@ export class EventCoreMetadataController {
   }
 
   private syncControls(): void {
-    const coreEnabled = !this.locked() && this.cover.ready() && this.canEditCore();
+    const coreEnabled = !this.locked() && !this.schedule.locked() && this.cover.ready() && this.canEditCore();
     setControlEnabled(this.coreForm, coreEnabled);
     setControlEnabled(this.coreForm.controls.isActive, coreEnabled && !this.isGlobal());
     setControlEnabled(this.coreForm.controls.hasPublicPage, coreEnabled && !this.isGlobal() && !this.global.isUnreleasedStaffing());
-    setControlEnabled(this.editionForm, !this.locked() && this.cover.ready() && this.canEditEdition());
+    setControlEnabled(this.editionForm, !this.locked() && !this.schedule.locked() && this.cover.ready() && this.canEditEdition());
     this.editionForm.controls.city.disable({ emitEvent: false });
     this.editionForm.controls.timezone.disable({ emitEvent: false });
   }

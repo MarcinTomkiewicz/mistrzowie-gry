@@ -12,14 +12,14 @@ import { timeRangeValidator } from './form-value.validator';
 
 const MONTHLY_NTH_VALUES = [1, 2, 3, 4, -1];
 
-export const eventMonthlyWeekdayRuleValidator: ValidatorFn = (control) => {
+export function eventMonthlyWeekdayRuleValidator(control: AbstractControl, globalCalendar = false): ValidationErrors | null {
   const monthlyNth = control.get('monthlyNth')?.value;
   const monthlyWeekday = control.get('monthlyWeekday')?.value;
   const errors: ValidationErrors = {};
-  if (!MONTHLY_NTH_VALUES.includes(monthlyNth)) errors['monthlyNth'] = true;
+  if (!MONTHLY_NTH_VALUES.includes(monthlyNth) && !(globalCalendar && monthlyNth === 5)) errors['monthlyNth'] = true;
   if (!Number.isInteger(monthlyWeekday) || monthlyWeekday < 0 || monthlyWeekday > 6) errors['monthlyWeekday'] = true;
   return Object.keys(errors).length ? errors : null;
-};
+}
 
 export const eventTimeRangeValidator: ValidatorFn = timeRangeValidator(
   'startTime',
@@ -27,9 +27,10 @@ export const eventTimeRangeValidator: ValidatorFn = timeRangeValidator(
   'timeRange',
 );
 
-export const eventScheduleValidator: ValidatorFn = (
+export function eventScheduleValidator(
   control: AbstractControl,
-): ValidationErrors | null => {
+  globalCalendar = false,
+): ValidationErrors | null {
   const kind = control.get('kind')?.value;
 
   if (kind === 'single') {
@@ -90,7 +91,7 @@ export const eventScheduleValidator: ValidatorFn = (
       break;
     }
     case 'MONTHLY_NTH_WEEKDAY': {
-      Object.assign(errors, eventMonthlyWeekdayRuleValidator(control));
+      Object.assign(errors, eventMonthlyWeekdayRuleValidator(control, globalCalendar));
       break;
     }
     case 'MONTHLY_DAY_OF_MONTH': {
@@ -110,7 +111,7 @@ export const eventScheduleValidator: ValidatorFn = (
   }
 
   return Object.keys(errors).length ? errors : null;
-};
+}
 
 export function isoDateValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

@@ -1,13 +1,14 @@
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import type { IEventSchedule } from '../interfaces/i-event-schedule';
+import type { EventGlobalSchedule } from '../interfaces/i-admin-global-event';
 import type { EventScheduleExclusionRuleFormGroup, EventScheduleFormGroup } from '../types/event-admin-form';
 import type { EventMonthlyNth, EventRecurrenceKind, EventScheduleMode } from '../types/event';
 import { buildEventScheduleExdates, excludesEveryEventRecurrenceCandidate, expandEventDateRange, getEventDateRangeLength } from '../utils/event-schedule';
 import { eventMonthlyWeekdayRuleValidator, eventScheduleValidator, isoDateValidator } from '../validators/event-admin.validator';
 import { integerValidator } from '../validators/form-value.validator';
 
-export function createEventScheduleForm(): EventScheduleFormGroup {
+export function createEventScheduleForm(globalCalendar = false): EventScheduleFormGroup {
   const form: EventScheduleFormGroup = new FormGroup(
     {
       kind: new FormControl<EventScheduleMode>('single', {
@@ -35,12 +36,12 @@ export function createEventScheduleForm(): EventScheduleFormGroup {
       exdates: new FormArray<FormControl<string>>([]),
       exclusionRules: new FormArray<EventScheduleExclusionRuleFormGroup>([]),
     },
-    { validators: [eventScheduleValidator] },
+    { validators: [control => eventScheduleValidator(control, globalCalendar)] },
   );
   form.addValidators(() => {
     const controls = form.controls;
     if (controls.kind.value !== 'recurring' || controls.exclusionRules.invalid ||
-      eventScheduleValidator(form) || controls.interval.invalid ||
+      eventScheduleValidator(form, globalCalendar) || controls.interval.invalid ||
       (getEventDateRangeLength(controls.startDate.value, controls.endDate.value) ?? Infinity) > 3661) return null;
     const schedule = mapEventScheduleFormToPayload(form);
     return schedule.kind === 'recurring' && excludesEveryEventRecurrenceCandidate(schedule)
@@ -49,11 +50,11 @@ export function createEventScheduleForm(): EventScheduleFormGroup {
   return form;
 }
 
-export function createEventScheduleExclusionRule(): EventScheduleExclusionRuleFormGroup {
+export function createEventScheduleExclusionRule(globalCalendar = false): EventScheduleExclusionRuleFormGroup {
   return new FormGroup({
     monthlyNth: new FormControl<EventMonthlyNth>(1, { nonNullable: true, validators: Validators.required }),
     monthlyWeekday: new FormControl(1, { nonNullable: true, validators: Validators.required }),
-  }, { validators: eventMonthlyWeekdayRuleValidator });
+  }, { validators: control => eventMonthlyWeekdayRuleValidator(control, globalCalendar) });
 }
 
 export function getEventScheduleExdates(form: EventScheduleFormGroup): string[] {
@@ -72,7 +73,7 @@ export function createEventExdateControl(
 
 export function populateEventScheduleForm(
   form: EventScheduleFormGroup,
-  schedule: IEventSchedule | null,
+  schedule: IEventSchedule | EventGlobalSchedule | null,
 ): void {
   const recurring = schedule?.kind === 'recurring' ? schedule : null;
 
@@ -82,10 +83,10 @@ export function populateEventScheduleForm(
       date: schedule?.kind === 'single' ? schedule.date : '',
       recurrenceKind: recurring?.recurrenceKind ?? 'WEEKLY',
       interval: recurring?.interval ?? 1,
-      byweekday: recurring?.byweekday ?? [],
-      monthlyNth: recurring?.monthlyNth ?? null,
-      monthlyWeekday: recurring?.monthlyWeekday ?? null,
-      dayOfMonth: recurring?.dayOfMonth ?? null,
+      byweekday: recurring?.recurrenceKind === 'WEEKLY' ? recurring.byweekday ?? [] : [],
+      monthlyNth: recurring?.recurrenceKind === 'MONTHLY_NTH_WEEKDAY' ? recurring.monthlyNth : null,
+      monthlyWeekday: recurring?.recurrenceKind === 'MONTHLY_NTH_WEEKDAY' ? recurring.monthlyWeekday : null,
+      dayOfMonth: recurring?.recurrenceKind === 'MONTHLY_DAY_OF_MONTH' ? recurring.dayOfMonth : null,
       startDate: recurring?.startDate ?? '',
       endDate: recurring?.endDate ?? '',
     },

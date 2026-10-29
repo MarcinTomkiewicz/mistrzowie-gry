@@ -11,6 +11,34 @@ export type EventMetadataCopy = {
   reloadConfirm: string;
 };
 
+export type EventGlobalScheduleCopy = {
+  hint: string;
+  otherOperation: string;
+  protected: string;
+  offScope: string;
+  historical: string;
+  conflict: string;
+  uncertain: string;
+  readback: string;
+  invalid: string;
+  blocked: string;
+  preview: string;
+  saveDraft: string;
+  draftSaved: string;
+  apply: string;
+  applyConfirm: string;
+  applied: string;
+  refresh: string;
+  discard: string;
+  discardConfirm: string;
+  leave: string;
+  added: string;
+  retired: string;
+  preserved: string;
+  cities: string;
+  exclusions: string;
+};
+
 export type EventGlobalDiagnosticsCopy = {
   action: string;
   title: string;

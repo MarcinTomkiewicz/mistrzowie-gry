@@ -45,7 +45,7 @@ export function createEventGlobalDraftForm() {
     shortDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(500) }),
     longDescription: new FormControl('', { nonNullable: true, validators: Validators.maxLength(12000) }),
     ...createEventGlobalCityControls(),
-    schedule: createEventScheduleForm(),
+    schedule: createEventScheduleForm(true),
     timeBlocks: createEventGlobalTimeBlocksForm(),
     dateTimeBlocks: new FormArray<EventDateTimeBlocksForm>([]),
     mainCityDateTimeBlocks: new FormArray<EventDateTimeBlocksForm>([]),
@@ -119,7 +119,7 @@ function globalDatesValidator(control: AbstractControl): ValidationErrors | null
     ? null : { globalDates: true };
 }
 
-function mapGlobalSchedule(schedule: IEventSchedule): EventGlobalSchedule {
+export function mapGlobalSchedule(schedule: IEventSchedule | EventGlobalSchedule): EventGlobalSchedule {
   if (schedule.kind !== 'recurring') return schedule;
   const { kind, recurrenceKind, interval, startDate, endDate, exdates } = schedule;
   const base = { kind, interval, startDate, endDate, exdates };
@@ -128,10 +128,10 @@ function mapGlobalSchedule(schedule: IEventSchedule): EventGlobalSchedule {
       if (!schedule.byweekday) throw new Error('[EVENT_GLOBAL_DRAFT] Missing weekdays.');
       return { ...base, recurrenceKind, byweekday: schedule.byweekday };
     case 'MONTHLY_DAY_OF_MONTH':
-      if (schedule.dayOfMonth === null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing month day.');
+      if (schedule.dayOfMonth == null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing month day.');
       return { ...base, recurrenceKind, dayOfMonth: schedule.dayOfMonth };
     case 'MONTHLY_NTH_WEEKDAY':
-      if (schedule.monthlyNth === null || schedule.monthlyWeekday === null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing monthly weekday.');
+      if (schedule.monthlyNth == null || schedule.monthlyWeekday == null) throw new Error('[EVENT_GLOBAL_DRAFT] Missing monthly weekday.');
       return { ...base, recurrenceKind, monthlyNth: schedule.monthlyNth, monthlyWeekday: schedule.monthlyWeekday };
   }
 }
