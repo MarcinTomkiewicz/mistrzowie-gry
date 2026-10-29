@@ -14,7 +14,7 @@ import {
 } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type { EventPriceBasis } from '../../../../core/interfaces/i-admin-global-event';
-import type { EventDatedBlocksCopy, EventGlobalBaseTimeBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy, EventGlobalPriceCopy, EventMetadataCopy } from '../../../../core/types/i18n/event-global-draft';
+import type { EventDatedBlocksCopy, EventGlobalBaseTimeBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy, EventGlobalPriceCopy, EventGlobalPolicyCopy, EventMetadataCopy } from '../../../../core/types/i18n/event-global-draft';
 import type {
   CoreRpcErrorsCopy,
   EditionTableCopy,
@@ -67,6 +67,7 @@ export function createEventCoreEditorI18n() {
 
   return {
     priceEditor: createScopedObjectI18n<EventGlobalPriceCopy>('adminEvents', 'editor.price'),
+    policyEditor: createScopedObjectI18n<EventGlobalPolicyCopy>('adminEvents', 'editor.policy'),
     baseTimeBlocks: createScopedObjectI18n<EventGlobalBaseTimeBlocksCopy>('adminEvents', 'editor.baseTimeBlocks'),
     metadata: createScopedObjectI18n<EventMetadataCopy>('adminEvents', 'editor.metadata'),
     diagnostics: createScopedObjectI18n<EventGlobalDiagnosticsCopy>('adminEvents', 'editor.diagnostics'),

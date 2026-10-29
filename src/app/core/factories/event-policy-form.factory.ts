@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { EVENT_CURRENCIES, EVENT_PRICE_BASES } from '../configs/events.config';
 import { ParticipantSignupKind } from '../enums/event';
@@ -6,6 +6,7 @@ import type { AdminEventPolicyDraft, PolicyCityOverride, PolicyDocument, PolicyO
 import type { EventCurrency, EventGlobalPrice, EventPriceBasis } from '../interfaces/i-admin-global-event';
 import { assertEdgeContract } from '../utils/edge-contract';
 import { pricePrecisionValidator } from '../validators/price.validator';
+import { integerValidator } from '../validators/form-value.validator';
 
 export function createEventPolicyPriceForm() {
   const form = new FormGroup({
@@ -58,6 +59,87 @@ export function mapEventPolicyDocument(read: AdminEventPolicyDraft): PolicyDocum
 export function mapEventPolicyPrice(form: ReturnType<typeof createEventPolicyPriceForm>, source: PolicyDocument): PolicyDocument {
   const price = policyPrice(form.getRawValue());
   return { ...source, global: { ...source.global, price } };
+}
+
+function capacityControl(value: number | null) {
+  return new FormControl(value, { validators: [integerValidator(), Validators.min(1), Validators.max(2147483647)] });
+}
+
+function createPolicyCityRules(row: PolicyCityOverride, global: PolicyDocument['global']) {
+  const overrides = row.overrides;
+  const signup = overrides.signup.enabled ? overrides.signup.value
+    : { kind: global.participantSignupKind, required: global.signupRequired };
+  return new FormGroup({
+    editionId: new FormControl({ value: row.editionId, disabled: true }, { nonNullable: true }),
+    signup: new FormGroup({
+      enabled: new FormControl(overrides.signup.enabled, { nonNullable: true }),
+      value: new FormGroup({
+        kind: new FormControl(signup.kind, { nonNullable: true, validators: [Validators.required, signupKindValidator] }),
+        required: new FormControl(signup.required, { nonNullable: true }),
+      }),
+    }),
+    sessionCapacityCeiling: new FormGroup({
+      enabled: new FormControl(overrides.sessionCapacityCeiling.enabled, { nonNullable: true }),
+      value: capacityControl(overrides.sessionCapacityCeiling.value),
+    }),
+    wholeEventCapacity: new FormGroup({
+      enabled: new FormControl(overrides.wholeEventCapacity.enabled, { nonNullable: true }),
+      value: capacityControl(overrides.wholeEventCapacity.value),
+    }),
+  });
+}
+
+export function createEventPolicyRulesForm(source?: PolicyDocument) {
+  const global = source?.global;
+  const form = new FormGroup({
+    global: new FormGroup({
+      participantSignupKind: new FormControl(global?.participantSignupKind ?? ParticipantSignupKind.ProgramItem,
+        { nonNullable: true, validators: [Validators.required, signupKindValidator] }),
+      signupRequired: new FormControl(global?.signupRequired ?? false, { nonNullable: true }),
+      sessionCapacityCeiling: capacityControl(global?.sessionCapacityCeiling ?? null),
+      wholeEventCapacity: capacityControl(global?.wholeEventCapacity ?? null),
+    }),
+    cityOverrides: new FormArray(source ? source.cityOverrides.map(row => createPolicyCityRules(row, source.global)) : []),
+  });
+  form.addValidators(() => {
+    const value = form.getRawValue();
+    const global = value.global;
+    if (!compatibleCapacities(global.participantSignupKind, global.sessionCapacityCeiling, global.wholeEventCapacity)) {
+      return { policyCapacity: true };
+    }
+    return value.cityOverrides.every(row => compatibleCapacities(
+      row.signup.enabled ? row.signup.value.kind : global.participantSignupKind,
+      row.sessionCapacityCeiling.enabled ? row.sessionCapacityCeiling.value : global.sessionCapacityCeiling,
+      row.wholeEventCapacity.enabled ? row.wholeEventCapacity.value : global.wholeEventCapacity,
+    )) ? null : { policyCapacity: true };
+  });
+  return form;
+}
+
+export function mapEventPolicyRules(form: ReturnType<typeof createEventPolicyRulesForm>, source: PolicyDocument): PolicyDocument {
+  const value = form.getRawValue();
+  const cityOverrides = source.cityOverrides.map<PolicyCityOverride>(row => {
+    const edited = value.cityOverrides.find(candidate => candidate.editionId === row.editionId);
+    assertEdgeContract(edited !== undefined, 'policyRules', 'the existing Edition override row');
+    return { ...row, overrides: {
+      ...row.overrides,
+      signup: edited.signup.enabled ? { enabled: true, value: { ...edited.signup.value } } : { enabled: false, value: null },
+      sessionCapacityCeiling: edited.sessionCapacityCeiling.enabled
+        ? { enabled: true, value: edited.sessionCapacityCeiling.value } : { enabled: false, value: null },
+      wholeEventCapacity: edited.wholeEventCapacity.enabled
+        ? { enabled: true, value: edited.wholeEventCapacity.value } : { enabled: false, value: null },
+    } };
+  });
+  return { ...source, global: { ...source.global, ...value.global }, cityOverrides };
+}
+
+function signupKindValidator(control: AbstractControl) {
+  return Object.values(ParticipantSignupKind).includes(control.value) ? null : { signupKind: true };
+}
+
+function compatibleCapacities(kind: ParticipantSignupKind, session: number | null, whole: number | null): boolean {
+  return (kind !== ParticipantSignupKind.WholeEvent || session === null) &&
+    (kind !== ParticipantSignupKind.ProgramItem || whole === null);
 }
 
 function policyPrice(price: Omit<EventGlobalPrice, 'currency'> & { currency: EventCurrency | null }): PolicyPrice {

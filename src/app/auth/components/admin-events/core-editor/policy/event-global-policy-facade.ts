@@ -1,37 +1,42 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormGroup } from '@angular/forms';
 import { catchError, defer, EMPTY, finalize, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 
-import { assertPolicyDocument, createEventPolicyPriceForm, mapEventPolicyDocument,
-  mapEventPolicyPrice, samePolicyDocument } from '../../../../core/factories/event-policy-form.factory';
-import type { AdminEventPolicyDraft, AdminEventPolicyPreview } from '../../../../core/interfaces/i-admin-event-policy';
-import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
-import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
-import { RpcError } from '../../../../core/types/rpc-error';
-import { assertEdgeContract } from '../../../../core/utils/edge-contract';
-import { setControlEnabled } from '../../../../core/utils/form-controls';
-import { assertPolicyPreview, assertPolicyRead, EventGlobalPriceError, type GlobalPriceCommand,
-  type GlobalPriceIssue, matchesPolicySave, samePolicyBaseline } from './event-global-price-state';
+import { assertPolicyDocument, createEventPolicyPriceForm, createEventPolicyRulesForm, mapEventPolicyDocument,
+  mapEventPolicyPrice, mapEventPolicyRules, samePolicyDocument } from '../../../../../core/factories/event-policy-form.factory';
+import type { AdminEventPolicyDraft, AdminEventPolicyPreview } from '../../../../../core/interfaces/i-admin-event-policy';
+import type { IEventCoreDetail } from '../../../../../core/interfaces/i-event-admin';
+import { EventAdmin } from '../../../../../core/services/event-admin/event-admin';
+import { RpcError } from '../../../../../core/types/rpc-error';
+import { assertEdgeContract } from '../../../../../core/utils/edge-contract';
+import { setControlEnabled } from '../../../../../core/utils/form-controls';
+import { assertPolicyPreview, assertPolicyRead, EventGlobalPolicyError, type GlobalPolicyCommand,
+  type GlobalPolicyIssue, matchesPolicySave, samePolicyBaseline } from './event-global-policy-state';
 
 @Injectable()
-export class EventGlobalPriceController {
+export class EventGlobalPolicyFacade {
   private readonly admin = inject(EventAdmin);
   private readonly core = signal<IEventCoreDetail | null>(null);
-  private readonly command = signal<GlobalPriceCommand | null>(null);
+  private readonly command = signal<GlobalPolicyCommand | null>(null);
   private baseline: AdminEventPolicyDraft | null = null;
   private saveContractError: unknown | null = null;
   private readonly operation = signal<'read' | 'preview' | 'save' | null>(null);
   readonly draft = signal<AdminEventPolicyDraft | null>(null);
   readonly blocked = signal(false);
-  readonly issue = signal<GlobalPriceIssue | null>(null);
+  readonly issue = signal<GlobalPolicyIssue | null>(null);
   readonly readbackPending = signal(false);
   readonly error = signal<unknown | null>(null);
   readonly preview = signal<AdminEventPolicyPreview | null>(null);
   readonly saved = signal(false);
   readonly validationAttempted = signal(false);
-  readonly form = createEventPolicyPriceForm();
+  readonly form = new FormGroup({ price: createEventPolicyPriceForm(), rules: createEventPolicyRulesForm() });
   private readonly formEvents = toSignal(this.form.events);
   readonly dirty = computed(() => { this.formEvents(); return this.form.dirty; });
+  readonly activeEditor = computed(() => {
+    this.formEvents();
+    return this.form.controls.rules.dirty ? 'rules' : this.form.controls.price.dirty ? 'price' : null;
+  });
   readonly isBusy = computed(() => this.operation() !== null);
   readonly conflicted = computed(() => this.issue() !== null);
   readonly locked = computed(() => this.isBusy() || this.dirty() || this.issue() === 'conflict' || this.readbackPending());
@@ -47,12 +52,12 @@ export class EventGlobalPriceController {
 
   constructor() {
     effect(() => this.syncControls());
-    this.form.controls.amount.valueChanges.pipe(takeUntilDestroyed()).subscribe(amount => {
-      if (amount === null) this.form.controls.basis.setValue(null, { emitEvent: false });
+    this.form.controls.price.controls.amount.valueChanges.pipe(takeUntilDestroyed()).subscribe(amount => {
+      if (amount === null) this.form.controls.price.controls.basis.setValue(null, { emitEvent: false });
       this.form.updateValueAndValidity({ emitEvent: false });
       this.syncControls();
     });
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.invalidatePreview());
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => { this.invalidatePreview(); this.syncControls(); });
   }
 
   reset(): void {
@@ -68,6 +73,7 @@ export class EventGlobalPriceController {
     this.preview.set(null);
     this.saved.set(false);
     this.validationAttempted.set(false);
+    this.form.setControl('rules', createEventPolicyRulesForm());
     this.form.reset();
   }
 
@@ -85,13 +91,15 @@ export class EventGlobalPriceController {
       this.form.markAllAsTouched();
       if (!this.canPreview() || this.form.invalid) return EMPTY;
       const baseline = this.baseline;
-      assertEdgeContract(baseline !== null, 'globalPrice', 'the authoritative edit baseline');
-      const command: GlobalPriceCommand = { coreId: baseline.coreId, baseline,
-        document: mapEventPolicyPrice(this.form, mapEventPolicyDocument(baseline)), confirmedRevision: null };
+      assertEdgeContract(baseline !== null, 'globalPolicy', 'the authoritative edit baseline');
+      const source = mapEventPolicyDocument(baseline);
+      const command: GlobalPolicyCommand = { coreId: baseline.coreId, baseline,
+        document: this.activeEditor() === 'rules' ? mapEventPolicyRules(this.form.controls.rules, source)
+          : mapEventPolicyPrice(this.form.controls.price, source), confirmedRevision: null };
       this.invalidatePreview();
       return this.run('preview', this.readCurrent().pipe(switchMap(read => {
         if (read.baselineChanged || !samePolicyBaseline(baseline, read)) {
-          throw new EventGlobalPriceError(read.baselineChanged ? 'baselineChanged' : 'conflict');
+          throw new EventGlobalPolicyError(read.baselineChanged ? 'baselineChanged' : 'conflict');
         }
         if (!this.canEdit()) return EMPTY;
         return this.admin.previewPolicyChange(command.coreId, command.document).pipe(tap(preview => {
@@ -168,9 +176,9 @@ export class EventGlobalPriceController {
 
   private readCurrent(): Observable<AdminEventPolicyDraft> {
     const core = this.core();
-    assertEdgeContract(core !== null, 'globalPrice', 'a loaded Core');
+    assertEdgeContract(core !== null, 'globalPolicy', 'a loaded Core');
     return forkJoin({ core: this.admin.getCoreDetail(core.id), draft: this.admin.getPolicyDraft(core.id) }).pipe(map(result => {
-      assertEdgeContract(result.core !== null && result.core.id === core.id, 'globalPrice', 'an authoritative owner Core');
+      assertEdgeContract(result.core !== null && result.core.id === core.id, 'globalPolicy', 'an authoritative owner Core');
       assertPolicyRead(result.core, result.draft);
       this.core.set(result.core);
       this.draft.set(result.draft);
@@ -178,7 +186,7 @@ export class EventGlobalPriceController {
     }));
   }
 
-  private reconcile(read: AdminEventPolicyDraft, command: GlobalPriceCommand): void {
+  private reconcile(read: AdminEventPolicyDraft, command: GlobalPolicyCommand): void {
     if (this.saveContractError !== null) {
       this.readbackPending.set(false);
       this.command.set(null);
@@ -207,7 +215,11 @@ export class EventGlobalPriceController {
     this.saved.set(false);
     this.issue.set(read.baselineChanged ? 'baselineChanged' : null);
     this.validationAttempted.set(false);
-    this.form.reset(mapEventPolicyDocument(read).global.price);
+    const document = mapEventPolicyDocument(read);
+    this.form.controls.price.reset(document.global.price);
+    this.form.setControl('rules', createEventPolicyRulesForm(document));
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
     this.syncControls();
   }
 
@@ -220,7 +232,19 @@ export class EventGlobalPriceController {
   private syncControls(): void {
     const enabled = this.canEdit() && !this.isBusy() && !this.conflicted() && !this.readbackPending();
     setControlEnabled(this.form, enabled);
-    setControlEnabled(this.form.controls.basis, enabled && this.form.controls.amount.value !== null);
+    const { price, rules } = this.form.controls;
+    const priceEnabled = enabled && this.activeEditor() !== 'rules';
+    const rulesEnabled = enabled && this.activeEditor() !== 'price';
+    setControlEnabled(price, priceEnabled);
+    setControlEnabled(price.controls.basis, priceEnabled && price.controls.amount.value !== null);
+    setControlEnabled(rules, rulesEnabled);
+    for (const row of rules.controls.cityOverrides.controls) {
+      row.controls.editionId.disable({ emitEvent: false });
+      for (const group of [row.controls.signup, row.controls.sessionCapacityCeiling, row.controls.wholeEventCapacity]) {
+        setControlEnabled(group.controls.value, rulesEnabled && group.controls.enabled.value);
+      }
+    }
+    rules.updateValueAndValidity({ emitEvent: false });
   }
 
   private run<T>(operation: 'read' | 'preview' | 'save', request: Observable<T>): Observable<T> {
@@ -231,7 +255,7 @@ export class EventGlobalPriceController {
       this.error.set(error);
       if (!this.readbackPending()) {
         this.invalidatePreview();
-        if (error instanceof EventGlobalPriceError) this.issue.set(error.issue);
+        if (error instanceof EventGlobalPolicyError) this.issue.set(error.issue);
         else if (error instanceof RpcError && error.code === '40001') this.issue.set('conflict');
       }
     } }), finalize(() => this.operation.set(null)));

@@ -3,7 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { mapEventGlobalDraftToPayload, type EventGlobalDraftForm } from '../../../../core/factories/event-global-draft-form.factory';
 import { formatDateLabel, getWeekdayLabels } from '../../../../core/utils/date';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
-import { EventGlobalPolicySummary } from './event-global-policy-summary';
+import { EventGlobalPolicySummary } from './policy/event-global-policy-summary';
 import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary';
 
 @Component({

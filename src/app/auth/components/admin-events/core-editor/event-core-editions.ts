@@ -27,7 +27,7 @@ import { EventGlobalDraftController } from './event-global-draft-controller';
 export class EventCoreEditions {
   readonly core = input.required<IEventCoreDetail>();
   readonly legacyEditing = input.required<boolean>();
-  readonly addCityDisabledReason = input<'metadata' | 'schedule' | 'price' | null>(null);
+  readonly addCityDisabledReason = input<'metadata' | 'schedule' | 'policy' | null>(null);
   readonly selectionDisabled = input(false);
   readonly cityAdded = output<IEventCoreDetail>();
   protected readonly globalDraft = inject(EventGlobalDraftController);

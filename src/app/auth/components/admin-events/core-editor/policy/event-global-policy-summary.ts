@@ -1,12 +1,12 @@
 import { Component, computed, inject, input } from '@angular/core';
 
-import { ParticipantSignupKind } from '../../../../core/enums/event';
-import type { EventGlobalPolicyInput } from '../../../../core/interfaces/i-admin-global-event';
-import { Storage } from '../../../../core/services/storage/storage';
-import { formatMoney } from '../../../../core/utils/pricing';
-import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
-import { resolveParticipantSignupKindLabel } from '../participant-signup-kind-options';
-import { createEventCoreEditorI18n } from './core-editor.i18n';
+import { ParticipantSignupKind } from '../../../../../core/enums/event';
+import type { EventGlobalPolicyInput } from '../../../../../core/interfaces/i-admin-global-event';
+import { Storage } from '../../../../../core/services/storage/storage';
+import { formatMoney } from '../../../../../core/utils/pricing';
+import { resolvePublicStorageUrl } from '../../../../../core/utils/storage-url';
+import { resolveParticipantSignupKindLabel } from '../../participant-signup-kind-options';
+import { createEventCoreEditorI18n } from '../core-editor.i18n';
 
 @Component({
   selector: 'app-event-global-policy-summary',

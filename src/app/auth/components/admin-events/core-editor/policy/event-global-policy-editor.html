@@ -1,0 +1,45 @@
+<form id="global-event-policy" tabindex="-1" class="mg-form flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="editor.form" (ngSubmit)="preview()" novalidate>
+  @if (blocked()) { <p-message severity="warn" role="status">{{ copy().otherOperation }}</p-message> }
+  @if (editor.draft() && !editor.canEdit() && !blocked() && !editor.conflicted()) {
+    <p-message severity="warn" role="status">{{ copy().protected }}</p-message>
+  }
+  @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
+  @if (editor.draft()?.hasDraft) { <p-message severity="info" role="status">{{ copy().unapplied }}</p-message> }
+  @if (editor.draft()) {
+    <app-event-global-price-editor />
+    <app-event-global-rules-editor />
+  } @else if (editor.isBusy()) { <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p> }
+  @if (editor.preview(); as preview) {
+    @if (preview.status === 'invalid') { <p-message severity="error" role="alert">{{ copy().invalid }}</p-message> }
+    @if (preview.status === 'blocked') { <p-message severity="warn" role="alert">{{ copy().blocked }}</p-message> }
+    @for (error of fieldErrors(); track $index) {
+      <p-message severity="error" role="alert">{{ error.field }}: {{ error.code }}
+        @if (error.editionId) { - {{ error.editionId }} } @if (error.detail) { - {{ error.detail }} }
+      </p-message>
+    }
+    @for (blocker of preview.blockers; track $index) {
+      <p-message severity="warn" role="alert">{{ blocker.code }} @if (blocker.editionId) { - {{ blocker.editionId }} }</p-message>
+    }
+    @if (fullPreview(); as full) {
+      <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().previewReady }}</h2>
+        <app-event-global-policy-summary [policy]="full.normalizedDocument.global" />
+        @for (edition of full.editions; track edition.editionId) {
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.creation().effectivePolicy }} - {{ edition.city }}</h3>
+          <app-event-global-policy-summary [policy]="edition.effective" />
+        }
+      </section>
+    }
+  }
+  <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
+    <p-button type="submit" size="small" [outlined]="true" icon="pi pi-spy" [label]="copy().preview"
+      [disabled]="!editor.canPreview()" [loading]="editor.isBusy()" loadingIcon="pi pi-d20" />
+    <p-button type="button" size="small" severity="success" icon="pi pi-done-it" [label]="copy().save"
+      [disabled]="!editor.canSave()" (onClick)="save()" />
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+      [label]="editor.readbackPending() ? i18n.creation().retryRead : copy().refresh"
+      [disabled]="editor.isBusy() || blocked()" (onClick)="refresh()" />
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-interdiction"
+      [label]="copy().discard" [disabled]="!editor.canDiscard()" (onClick)="discard()" />
+  </div>
+</form>

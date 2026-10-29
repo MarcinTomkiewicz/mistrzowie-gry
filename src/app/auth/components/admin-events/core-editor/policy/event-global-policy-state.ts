@@ -1,18 +1,18 @@
-import { assertPolicyDocument, mapEventPolicyDocument, samePolicyDocument } from '../../../../core/factories/event-policy-form.factory';
-import type { AdminEventPolicyDraft, AdminEventPolicyPreview, PolicyDocument } from '../../../../core/interfaces/i-admin-event-policy';
-import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
-import { assertEdgeContract } from '../../../../core/utils/edge-contract';
+import { assertPolicyDocument, mapEventPolicyDocument, samePolicyDocument } from '../../../../../core/factories/event-policy-form.factory';
+import type { AdminEventPolicyDraft, AdminEventPolicyPreview, PolicyDocument } from '../../../../../core/interfaces/i-admin-event-policy';
+import type { IEventCoreDetail } from '../../../../../core/interfaces/i-event-admin';
+import { assertEdgeContract, readEdgeUuid } from '../../../../../core/utils/edge-contract';
 
-export interface GlobalPriceCommand {
+export interface GlobalPolicyCommand {
   coreId: string;
   baseline: AdminEventPolicyDraft;
   document: PolicyDocument;
   confirmedRevision: number | null;
 }
 
-export type GlobalPriceIssue = 'conflict' | 'baselineChanged';
-export class EventGlobalPriceError extends Error {
-  constructor(readonly issue: GlobalPriceIssue) { super(`[GLOBAL_PRICE] ${issue}`); }
+export type GlobalPolicyIssue = 'conflict' | 'baselineChanged';
+export class EventGlobalPolicyError extends Error {
+  constructor(readonly issue: GlobalPolicyIssue) { super(`[GLOBAL_POLICY] ${issue}`); }
 }
 
 export function assertPolicyRead(core: IEventCoreDetail, read: AdminEventPolicyDraft): void {
@@ -23,10 +23,16 @@ export function assertPolicyRead(core: IEventCoreDetail, read: AdminEventPolicyD
     (read.hasDraft === true ? Number.isInteger(read.revision) && read.revision > 0 && read.document !== null
       : read.hasDraft === false && read.revision === 0 && read.document === null && read.baselineChanged === false),
   'policyDraft', 'the authoritative draft revision, current baseline fingerprint and explicit draft branch');
-  assertPolicyDocument(mapEventPolicyDocument(read), read.canonicalBaseline.editions.map(row => row.editionId));
+  const document = mapEventPolicyDocument(read);
+  let editionIds = read.canonicalBaseline.editions.map(row => row.editionId);
+  if (read.hasDraft && read.baselineChanged) {
+    assertEdgeContract(Array.isArray(document.cityOverrides), 'policyDraft.document.cityOverrides', 'an array of historical Edition overrides');
+    editionIds = document.cityOverrides.map(row => readEdgeUuid(row.editionId, 'policyDraft.document.cityOverrides.editionId'));
+  }
+  assertPolicyDocument(document, editionIds);
 }
 
-export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: GlobalPriceCommand): void {
+export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: GlobalPolicyCommand): void {
   assertEdgeContract(preview.coreId === command.coreId && preview.requiresEfs050OptionalCapacityAmendment === false &&
     preview.appliedToPublic === false && preview.appliedToParticipantRegistration === false &&
     Array.isArray(preview.fieldErrors) && Array.isArray(preview.blockers) &&
@@ -38,7 +44,7 @@ export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: G
       'policyPreview', 'the same main Edition as the edit baseline');
     assertPolicyDocument(preview.normalizedDocument, command.baseline.canonicalBaseline.editions.map(row => row.editionId));
     if (preview.baselineFingerprint !== command.baseline.baselineFingerprint ||
-      !samePolicyDocument(preview.normalizedDocument, command.document)) throw new EventGlobalPriceError('conflict');
+      !samePolicyDocument(preview.normalizedDocument, command.document)) throw new EventGlobalPolicyError('conflict');
   } else {
     assertEdgeContract(preview.status === 'invalid' && preview.participantSignupOpened === false,
       'policyPreview', 'the short normalization failure');
@@ -50,7 +56,7 @@ export function samePolicyBaseline(left: AdminEventPolicyDraft, right: AdminEven
     left.baselineFingerprint === right.baselineFingerprint && samePolicyDocument(mapEventPolicyDocument(left), mapEventPolicyDocument(right));
 }
 
-export function matchesPolicySave(read: AdminEventPolicyDraft, command: GlobalPriceCommand): boolean {
+export function matchesPolicySave(read: AdminEventPolicyDraft, command: GlobalPolicyCommand): boolean {
   return read.hasDraft && !read.baselineChanged && read.revision === command.baseline.revision + 1 &&
     (command.confirmedRevision === null || read.revision === command.confirmedRevision) &&
     read.baselineFingerprint === command.baseline.baselineFingerprint && samePolicyDocument(read.document, command.document);

@@ -39,7 +39,7 @@
               @if (globalDraft.activeStep() === 2) {
                 <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
                   [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
-                  [addCityDisabledReason]="price.locked() ? 'price' : metadata.locked() || cover.needsReconciliation() ? 'metadata'
+                  [addCityDisabledReason]="policy.locked() ? 'policy' : metadata.locked() || cover.needsReconciliation() ? 'metadata'
                     : schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
                   (cityAdded)="core.set($event)" />
               }
@@ -77,17 +77,17 @@
               } @else {
                 @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
                   <app-event-global-schedule-editor [core]="loadedCore" [calendar]="calendar"
-                    [blocked]="price.locked() || baseBlocks.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
+                    [blocked]="policy.locked() || baseBlocks.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
                       cover.needsReconciliation() || globalDraft.isChecking() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
                     (calendarChanged)="globalDraft.calendar.set($event)" (applied)="loadCore()" />
                   <app-event-global-base-time-blocks-editor [core]="loadedCore" [calendar]="calendar"
-                    [blocked]="price.locked() || schedule.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty ||
+                    [blocked]="policy.locked() || schedule.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty ||
                       cover.locked() || cover.dirty() || cover.needsReconciliation() || globalDraft.isChecking() ||
                       datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
                     (calendarChanged)="globalDraft.calendar.set($event)" (saved)="loadCore()" />
                 }
                 @if (globalDraft.activeStep() === 4 && !globalDraft.cityEditing()) {
-                  <app-event-global-price-editor [core]="loadedCore"
+                  <app-event-global-policy-editor [core]="loadedCore"
                     [blocked]="metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
                       cover.needsReconciliation() || globalDraft.isChecking() || globalDraft.cityBusy() || globalDraft.cityState() !== 'idle' ||
                       schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()" />
@@ -104,7 +104,7 @@
                 }
               }
               @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
-                @if (!price.locked() && !schedule.locked() && !baseBlocks.locked()) {
+                @if (!policy.locked() && !schedule.locked() && !baseBlocks.locked()) {
                   <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
                 }
               }
@@ -115,7 +115,7 @@
               }
               @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
                 <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-                  [disabled]="price.locked() || metadata.locked() || schedule.locked() || baseBlocks.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  [disabled]="policy.locked() || metadata.locked() || schedule.locked() || baseBlocks.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
                   (navigateToSection)="goToDiagnosticSection($event)" />
               }
             </div>

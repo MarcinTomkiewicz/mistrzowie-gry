@@ -41,23 +41,23 @@ import { EventGlobalScheduleController } from './event-global-schedule-controlle
 import { EventGlobalScheduleEditor } from './event-global-schedule-editor';
 import { EventGlobalBaseTimeBlocksController } from './event-global-base-time-blocks-controller';
 import { EventGlobalBaseTimeBlocksEditor } from './event-global-base-time-blocks-editor';
-import { EventGlobalPriceController } from './event-global-price-controller';
-import { EventGlobalPriceEditor } from './event-global-price-editor';
+import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
+import { EventGlobalPolicyEditor } from './policy/event-global-policy-editor';
 
 @Component({
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule, MessageModule,
     ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, EventGlobalDiagnostics,
-    LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPriceEditor],
+    LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
-    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPriceController],
+    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade],
 })
 export class EventCoreEditor {
   protected readonly datedBlocks = inject(EventDatedBlocksController);
   protected readonly schedule = inject(EventGlobalScheduleController);
   protected readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
-  protected readonly price = inject(EventGlobalPriceController);
+  protected readonly policy = inject(EventGlobalPolicyFacade);
   private readonly platform = inject(Platform);
   private readonly confirm = inject(UiConfirm);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -81,10 +81,10 @@ export class EventCoreEditor {
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
   protected readonly canCancel = computed(() => !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
-    this.globalDraft.cityState() !== 'uncertain' && !this.price.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
+    this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
   protected readonly navigationLocked = computed(() => this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
-    this.cover.needsReconciliation() || this.price.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
+    this.cover.needsReconciliation() || this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: this.i18n.commonNav().eventsManagement, path: '/admin/content/events' },
@@ -134,7 +134,7 @@ export class EventCoreEditor {
       this.datedBlocks.reset();
       this.schedule.reset();
       this.baseBlocks.reset();
-      this.price.reset();
+      this.policy.reset();
       this.cover.reset();
       this.metadata.reset();
       this.restoreStep(this.route.snapshot.queryParamMap.get('step'));
@@ -287,19 +287,19 @@ export class EventCoreEditor {
       if (!this.hasUnsavedChanges()) return of(!this.cover.locked());
       const city = this.globalDraft.cityEditing();
       return this.confirm.modalDecision({
-        header: this.price.locked() ? this.i18n.priceEditor().title : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().title
+        header: this.policy.locked() ? this.i18n.policyEditor().title : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().title
           : this.schedule.locked() ? this.i18n.commonLabels().schedule : city ? this.i18n.city().action
           : this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ? this.i18n.page().editTitle : this.i18n.datedBlocks().editTitle,
-        message: this.price.locked() ? this.i18n.priceEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.scheduleCopy().leave
+        message: this.policy.locked() ? this.i18n.policyEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.scheduleCopy().leave
           : city ? this.i18n.city().leaveConfirmation : this.i18n.creation().leaveConfirmation,
-        acceptLabel: this.price.locked() || this.baseBlocks.locked() || this.schedule.locked() ? this.i18n.commonActions().close : city ? this.i18n.city().discard : this.i18n.creation().discardDraft,
+        acceptLabel: this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() ? this.i18n.commonActions().close : city ? this.i18n.city().discard : this.i18n.creation().discardDraft,
         rejectLabel: this.i18n.commonActions().cancel,
       }).pipe(map(leave => leave && !this.destroyRef.destroyed && this.coreId() === coreId && this.canCancel() && !this.cover.locked()));
     }));
   }
 
   private hasUnsavedChanges(): boolean {
-    return this.price.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
+    return this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
       (this.globalDraft.cityEditing() && this.globalDraft.cityState() !== 'created' && this.globalDraft.cityForm.dirty) ||
       (this.datedBlocks.isDirty() && !this.datedBlocks.readbackPending());
   }

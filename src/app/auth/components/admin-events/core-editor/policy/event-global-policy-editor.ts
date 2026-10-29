@@ -2,36 +2,32 @@ import { Component, computed, DestroyRef, effect, inject, input, untracked } fro
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
-import { SelectModule } from 'primeng/select';
 import type { Observable } from 'rxjs';
 
-import { EVENT_CURRENCIES, EVENT_PRICE_BASES } from '../../../../core/configs/events.config';
-import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
-import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
-import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { RpcError } from '../../../../core/types/rpc-error';
-import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
-import { createEventCoreEditorI18n } from './core-editor.i18n';
+import type { IEventCoreDetail } from '../../../../../core/interfaces/i-event-admin';
+import { UiConfirm } from '../../../../../core/services/ui-confirm/ui-confirm';
+import { UiToast } from '../../../../../core/services/ui-toast/ui-toast';
+import { RpcError } from '../../../../../core/types/rpc-error';
+import { resolveEventCoreAdminErrorMessage } from '../../event-admin-errors';
+import { createEventCoreEditorI18n } from '../core-editor.i18n';
 import { EventGlobalPolicySummary } from './event-global-policy-summary';
-import { EventGlobalPriceController } from './event-global-price-controller';
+import { EventGlobalPolicyFacade } from './event-global-policy-facade';
+import { EventGlobalPriceEditor } from './event-global-price-editor';
+import { EventGlobalRulesEditor } from './event-global-rules-editor';
 
 @Component({
-  selector: 'app-event-global-price-editor',
-  imports: [ReactiveFormsModule, ButtonModule, FloatLabelModule, InputNumberModule, MessageModule, SelectModule, EventGlobalPolicySummary],
-  templateUrl: './event-global-price-editor.html',
+  selector: 'app-event-global-policy-editor',
+  imports: [ReactiveFormsModule, ButtonModule, MessageModule, EventGlobalPolicySummary, EventGlobalPriceEditor, EventGlobalRulesEditor],
+  templateUrl: './event-global-policy-editor.html',
   host: { class: 'd-block w-100 min-w-0' },
 })
-export class EventGlobalPriceEditor {
+export class EventGlobalPolicyEditor {
   readonly core = input.required<IEventCoreDetail>();
   readonly blocked = input(false);
-  protected readonly editor = inject(EventGlobalPriceController);
+  protected readonly editor = inject(EventGlobalPolicyFacade);
   protected readonly i18n = createEventCoreEditorI18n();
-  protected readonly copy = this.i18n.priceEditor;
-  protected readonly currencies = [...EVENT_CURRENCIES];
-  protected readonly priceBases = computed(() => EVENT_PRICE_BASES.map(value => ({ value, label: this.i18n.priceBases()[value] })));
+  protected readonly copy = this.i18n.policyEditor;
   private readonly destroyRef = inject(DestroyRef);
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);

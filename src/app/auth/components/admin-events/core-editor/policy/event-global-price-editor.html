@@ -1,0 +1,38 @@
+<section id="global-event-price-editor" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="form">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().title }}</h2>
+  <p class="m-0 muted-text">{{ copy().hint }}</p>
+  @if (editor.activeEditor() === 'rules') { <p class="m-0 muted-text" role="status">{{ i18n.policyEditor().oneSection }}</p> }
+  <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md w-100">
+    <div class="flex-col-start-stretch gap-xs min-w-0">
+      <p-floatlabel variant="on" class="w-100">
+        <p-inputnumber inputId="global-price-amount" formControlName="amount" size="small" [min]="0" [max]="99999999.99"
+          [maxFractionDigits]="2" [useGrouping]="false" class="w-100" inputStyleClass="w-100"
+          [invalid]="form.controls.amount.touched && form.controls.amount.invalid" />
+        <label for="global-price-amount">{{ i18n.commonLabels().amount }}</label>
+      </p-floatlabel>
+      @if (form.controls.amount.touched && form.controls.amount.invalid) {
+        <small class="mg-contact-error" role="alert">{{ copy().amountInvalid }}</small>
+      }
+    </div>
+    <p-floatlabel variant="on" class="min-w-0 w-100">
+      <p-select inputId="global-price-currency" formControlName="currency" [options]="currencies" size="small" appendTo="body" class="w-100">
+        <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+      </p-select>
+      <label for="global-price-currency">{{ i18n.commonLabels().currency }}</label>
+    </p-floatlabel>
+    <div class="flex-col-start-stretch gap-xs min-w-0">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select inputId="global-price-basis" formControlName="basis" [options]="priceBases()" optionValue="value" optionLabel="label"
+          size="small" appendTo="body" class="w-100" [placeholder]="i18n.commonValues().notProvided"
+          [invalid]="editor.validationAttempted() && form.hasError('basis')">
+          <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+        </p-select>
+        <label for="global-price-basis">{{ i18n.commonPrice().editor.fields.perUnit }}</label>
+      </p-floatlabel>
+      @if (editor.validationAttempted() && form.hasError('basis')) {
+        <small class="mg-contact-error" role="alert">{{ copy().basisRequired }}</small>
+      }
+    </div>
+  </div>
+  <p class="m-0 muted-text">{{ copy().amountHint }}</p>
+</section>

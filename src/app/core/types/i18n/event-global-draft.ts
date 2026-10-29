@@ -17,6 +17,21 @@ export type EventGlobalPriceCopy = {
   amountHint: string;
   amountInvalid: string;
   basisRequired: string;
+};
+
+export type EventGlobalPolicyCopy = {
+  title: string;
+  rulesTitle: string;
+  hint: string;
+  oneSection: string;
+  compatibilityHint: string;
+  capacityConflict: string;
+  capacityInvalid: string;
+  cityOverrides: string;
+  overrideHint: string;
+  signupOverride: string;
+  sessionOverride: string;
+  wholeOverride: string;
   protected: string;
   denied: string;
   otherOperation: string;
@@ -109,7 +124,7 @@ export type EventGlobalDiagnosticsCopy = {
 };
 
 export type EventGlobalCityCopy = {
-  blockers: Record<AdminGlobalEventCityBlocker | 'editing' | 'saving' | 'uncertain' | 'readback' | 'metadata' | 'schedule' | 'price', string>;
+  blockers: Record<AdminGlobalEventCityBlocker | 'editing' | 'saving' | 'uncertain' | 'readback' | 'metadata' | 'schedule' | 'policy', string>;
   action: string;
   hint: string;
   uncertain: string;

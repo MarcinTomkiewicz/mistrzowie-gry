@@ -1,0 +1,120 @@
+@let global = form.controls.global.controls;
+<section id="global-event-rules-editor" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().rulesTitle }}</h2>
+  <p class="m-0 muted-text">{{ copy().hint }}</p>
+  @if (editor.activeEditor() === 'price') { <p class="m-0 muted-text" role="status">{{ copy().oneSection }}</p> }
+  <ng-container [ngTemplateOutlet]="signupFields" [ngTemplateOutletContext]="{
+    kind: global.participantSignupKind, required: global.signupRequired, id: 'policy-global'
+  }" />
+  <p class="m-0 muted-text">{{ i18n.creation().signupKindHint }}</p>
+  <p class="m-0 muted-text">{{ i18n.creation().signupRequiredHint }}</p>
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+    <ng-container [ngTemplateOutlet]="capacityField" [ngTemplateOutletContext]="{
+      control: global.sessionCapacityCeiling, id: 'policy-global-session', label: i18n.creation().sessionCapacityCeiling
+    }" />
+    <ng-container [ngTemplateOutlet]="capacityField" [ngTemplateOutletContext]="{
+      control: global.wholeEventCapacity, id: 'policy-global-whole', label: i18n.creation().wholeEventCapacity
+    }" />
+  </div>
+  <p class="m-0 muted-text">{{ i18n.creation().sessionCapacityHint }}</p>
+  <p class="m-0 muted-text">{{ i18n.creation().wholeEventCapacityHint }}</p>
+  <p class="m-0 muted-text">{{ copy().compatibilityHint }}</p>
+  @if ((form.dirty || editor.validationAttempted()) && form.hasError('policyCapacity')) {
+    <small class="mg-contact-error" role="alert">{{ copy().capacityConflict }}</small>
+  }
+  <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md w-100">{{ copy().cityOverrides }}</h3>
+  <p class="m-0 muted-text">{{ copy().overrideHint }}</p>
+  @for (row of form.controls.cityOverrides.controls; track row.controls.editionId.value) {
+    @let controls = row.controls;
+    @let id = 'policy-city-' + controls.editionId.value;
+    <section class="flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0">
+      <h4 class="mg-section__title mg-section__title--sm m-0">{{ cityName(controls.editionId.value) }}</h4>
+      <div class="flex-row-start-center gap-sm">
+        <p-toggleswitch [inputId]="id + '-signup-override'" [formControl]="controls.signup.controls.enabled" />
+        <label [for]="id + '-signup-override'">{{ copy().signupOverride }}</label>
+      </div>
+      @if (controls.signup.controls.enabled.value) {
+        <ng-container [ngTemplateOutlet]="signupFields" [ngTemplateOutletContext]="{
+          kind: controls.signup.controls.value.controls.kind, required: controls.signup.controls.value.controls.required, id: id
+        }" />
+      } @else {
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+          <ng-container [ngTemplateOutlet]="inheritedValue" [ngTemplateOutletContext]="{
+            label: i18n.commonLabels().participantSignupKind, value: inheritedSignupKindLabel
+          }" />
+          <ng-container [ngTemplateOutlet]="inheritedValue" [ngTemplateOutletContext]="{
+            label: i18n.commonLabels().signupRequired, value: global.signupRequired.value ? i18n.commonValues().yes : i18n.commonValues().no
+          }" />
+        </div>
+      }
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+        <div class="flex-col-start-stretch gap-sm min-w-0">
+          <div class="flex-row-start-center gap-sm">
+            <p-toggleswitch [inputId]="id + '-session-override'" [formControl]="controls.sessionCapacityCeiling.controls.enabled" />
+            <label [for]="id + '-session-override'">{{ copy().sessionOverride }}</label>
+          </div>
+          @if (controls.sessionCapacityCeiling.controls.enabled.value) {
+            <ng-container [ngTemplateOutlet]="capacityField" [ngTemplateOutletContext]="{
+              control: controls.sessionCapacityCeiling.controls.value, id: id + '-session', label: i18n.creation().sessionCapacityCeiling
+            }" />
+          } @else {
+            <ng-container [ngTemplateOutlet]="inheritedValue" [ngTemplateOutletContext]="{
+              label: i18n.creation().sessionCapacityCeiling, value: global.sessionCapacityCeiling.value ?? i18n.creation().noAdditionalLimit
+            }" />
+          }
+        </div>
+        <div class="flex-col-start-stretch gap-sm min-w-0">
+          <div class="flex-row-start-center gap-sm">
+            <p-toggleswitch [inputId]="id + '-whole-override'" [formControl]="controls.wholeEventCapacity.controls.enabled" />
+            <label [for]="id + '-whole-override'">{{ copy().wholeOverride }}</label>
+          </div>
+          @if (controls.wholeEventCapacity.controls.enabled.value) {
+            <ng-container [ngTemplateOutlet]="capacityField" [ngTemplateOutletContext]="{
+              control: controls.wholeEventCapacity.controls.value, id: id + '-whole', label: i18n.creation().wholeEventCapacity
+            }" />
+          } @else {
+            <ng-container [ngTemplateOutlet]="inheritedValue" [ngTemplateOutletContext]="{
+              label: i18n.creation().wholeEventCapacity, value: global.wholeEventCapacity.value ?? i18n.creation().noAdditionalLimit
+            }" />
+          }
+        </div>
+      </div>
+    </section>
+  }
+</section>
+
+<ng-template #inheritedValue let-label="label" let-value="value">
+  <dl class="flex-col-start-stretch gap-xs m-0 min-w-0">
+    <dt class="muted-text text-wrap-anywhere">{{ label }}</dt>
+    <dd class="m-0 text-wrap-anywhere">{{ value }}</dd>
+  </dl>
+</ng-template>
+
+<ng-template #signupFields let-kind="kind" let-required="required" let-id="id">
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+    <p-floatlabel variant="on" class="w-100 min-w-0">
+      <p-select [inputId]="id + '-kind'" [formControl]="kind" [options]="signupKinds()"
+        optionValue="value" optionLabel="label" size="small" appendTo="body" class="w-100"
+        [invalid]="kind.touched && kind.invalid">
+        <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+      </p-select>
+      <label [for]="id + '-kind'">{{ i18n.commonLabels().participantSignupKind }}</label>
+    </p-floatlabel>
+    <div class="flex-row-start-center gap-sm">
+      <p-toggleswitch [inputId]="id + '-required'" [formControl]="required" />
+      <label [for]="id + '-required'">{{ i18n.commonLabels().signupRequired }}</label>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #capacityField let-control="control" let-id="id" let-label="label">
+  <div class="flex-col-start-stretch gap-xs min-w-0 w-100">
+    <p-floatlabel variant="on" class="w-100">
+      <p-inputnumber [inputId]="id" [formControl]="control" [min]="1" [max]="2147483647" [maxFractionDigits]="0"
+        size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="i18n.creation().noAdditionalLimit"
+        class="w-100" [invalid]="control.touched && control.invalid" />
+      <label [for]="id">{{ label }}</label>
+    </p-floatlabel>
+    @if (control.touched && control.invalid) { <small class="mg-contact-error" role="alert">{{ copy().capacityInvalid }}</small> }
+  </div>
+</ng-template>
