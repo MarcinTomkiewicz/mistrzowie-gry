@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize } from 'rxjs';
+import { filter, finalize, of, switchMap } from 'rxjs';
 import {
   ARTICLE_EDITOR_MAIN_FORM_FIELD_ROWS,
   ARTICLE_EDITOR_SEO_FORM_FIELD_ROWS,
@@ -17,6 +17,7 @@ import { ContentArticles } from '../../../../core/services/content-articles/cont
 import { ImageStorage } from '../../../../core/services/image-storage/image-storage';
 import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import {
   ArticleEditorForm,
   ArticleEditorFormFieldInputAction,
@@ -32,7 +33,7 @@ import { ImageUpload } from '../../../../common/image-upload/image-upload';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { ArticleBlocksEditor } from '../article-blocks-editor/article-blocks-editor';
 import { getContentArticleStatusBadgeClass } from '../content-article-publication';
-import { createArticleEditorBlockForm, mapArticleEditorFormToPayload } from './article-editor-form';
+import { createArticleEditorBlockForm, mapArticleEditorFormToPayload, populateArticleEditorForm } from './article-editor-form';
 import { createAdminContentArticleEditorI18n } from './article-editor.i18n';
 
 @Component({
@@ -57,6 +58,7 @@ export class ArticleEditor {
   private readonly storage = inject(Storage);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
+  private readonly confirm = inject(UiConfirm);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly articleId =
     inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
@@ -184,6 +186,8 @@ export class ArticleEditor {
   }
 
   protected saveArticle(): void {
+    const article = this.article();
+    if (!article || this.isLoading() || this.isSaving() || this.isUploading()) return;
     const toast = this.i18n.toast();
     this.showBlockValidation.set(true);
     if (
@@ -199,18 +203,30 @@ export class ArticleEditor {
       });
       return;
     }
-    if (this.isUploading()) {
-      return;
-    }
-    this.isSaving.set(true);
-    this.articles
-      .saveAdminArticle(
-        mapArticleEditorFormToPayload(
-          this.form,
-          this.article()?.id ?? this.articleId,
-        ),
-      )
-      .pipe(finalize(() => this.isSaving.set(false)))
+    const payload = mapArticleEditorFormToPayload(this.form, article, this.slugEdited());
+    const value = JSON.stringify(this.form.getRawValue());
+    const actions = this.i18n.editorActions();
+    const decision = article.publishedAt !== null && payload.slug !== article.slug
+      ? this.confirm.modalDecision({
+          header: actions.changeUrlHeader,
+          message: actions.changeUrlMessage
+            .replace('{{current}}', `/artykuly/${article.slug}`)
+            .replace('{{next}}', `/artykuly/${payload.slug ?? ''}`),
+          acceptLabel: actions.changeUrlAction,
+          rejectLabel: this.i18n.commonActions().cancel,
+        })
+      : of(true);
+    decision.pipe(
+      filter((accepted) => accepted && this.article() === article && !this.isSaving() &&
+        !this.isLoading() && !this.isUploading() && JSON.stringify(this.form.getRawValue()) === value),
+      switchMap(() => {
+        this.isSaving.set(true);
+        return this.articles.saveAdminArticle(payload).pipe(
+          finalize(() => this.isSaving.set(false)),
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    )
       .subscribe({
         next: () => {
           this.toast.success({
@@ -238,50 +254,11 @@ export class ArticleEditor {
 
   private populateForm(article: IAdminContentArticleDetail): void {
     const title = normalizeText(article.title) ?? '';
-    const slug = normalizeText(article.slug);
     const seoTitle = normalizeText(article.seoTitle);
-    this.slugEdited.set(!!slug && slug !== stringToSlug(title));
+    this.slugEdited.set(false);
     this.seoTitleEdited.set(!!seoTitle && seoTitle !== title);
     this.showBlockValidation.set(false);
-    this.textBlocks.clear({ emitEvent: false });
-    for (const block of [...article.blocks].sort(
-      (a, b) => a.sortOrder - b.sortOrder,
-    )) {
-      const blockForm = block.kind === 'text_section'
-        ? createArticleEditorBlockForm(
-            'text_section',
-            block.heading ?? '',
-            block.body,
-          )
-        : createArticleEditorBlockForm(
-            'image',
-            '',
-            '',
-            block.imagePath,
-            block.imageAlt,
-            block.caption ?? '',
-          );
-
-      this.textBlocks.push(blockForm, { emitEvent: false });
-    }
-    if (!this.textBlocks.length) {
-      this.textBlocks.push(
-        createArticleEditorBlockForm('text_section'),
-        { emitEvent: false },
-      );
-    }
-    this.form.patchValue(
-      {
-        title: article.title ?? '',
-        slug: article.slug ?? '',
-        excerpt: article.excerpt ?? '',
-        heroImagePath: article.heroImagePath ?? '',
-        heroImageAlt: article.heroImageAlt ?? '',
-        seoTitle: article.seoTitle ?? '',
-        seoDescription: article.seoDescription ?? '',
-      },
-      { emitEvent: false },
-    );
+    populateArticleEditorForm(this.form, article);
     this.syncTitleDerivedFields(title);
     this.form.markAsPristine();
     this.form.markAsUntouched();
@@ -293,7 +270,9 @@ export class ArticleEditor {
   }
 
   private syncTitleDerivedFields(title: string): void {
-    if (!this.slugEdited()) {
+    const article = this.article();
+    if (!this.slugEdited() && article?.publishedAt === null &&
+      (!article.slug || article.slug === stringToSlug(article.title ?? ''))) {
       this.form.controls.slug.setValue(
         stringToSlug(title),
         { emitEvent: false },

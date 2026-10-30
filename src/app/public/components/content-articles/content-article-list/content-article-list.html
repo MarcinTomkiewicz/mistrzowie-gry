@@ -44,7 +44,9 @@
 
             <div class="flex-col-start-stretch gap-sm flex-1">
               <h2 class="mg-section__title mg-section__title--sm">
-                {{ article.title }}
+                <a class="heading-color" [routerLink]="['/artykuly', article.slug]">
+                  {{ article.title }}
+                </a>
               </h2>
 
               <p class="mg-section__subtitle mg-section__subtitle--full">

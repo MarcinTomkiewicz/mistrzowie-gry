@@ -1,12 +1,12 @@
 import { FormControl, FormGroup } from '@angular/forms';
 
-import { ISaveContentArticlePayload } from '../../../../core/interfaces/i-content-article';
+import { IAdminContentArticleDetail, ISaveContentArticlePayload } from '../../../../core/interfaces/i-content-article';
 import {
   ArticleEditorBlockForm,
   ArticleEditorForm,
 } from '../../../../core/types/article-editor-form';
 import { ContentArticleBlockKind } from '../../../../core/types/content-article';
-import { normalizeText } from '../../../../core/utils/normalize-text';
+import { normalizeText, stringToSlug } from '../../../../core/utils/normalize-text';
 
 export function createArticleEditorBlockForm(
   kind: ContentArticleBlockKind,
@@ -28,14 +28,17 @@ export function createArticleEditorBlockForm(
 
 export function mapArticleEditorFormToPayload(
   form: ArticleEditorForm,
-  articleId: string,
+  article: IAdminContentArticleDetail,
+  slugEdited: boolean,
 ): ISaveContentArticlePayload {
   const value = form.getRawValue();
 
   return {
-    id: articleId,
+    id: article.id,
     title: normalizeText(value.title),
-    slug: normalizeText(value.slug),
+    slug: value.slug === article.slug || (article.publishedAt !== null && !slugEdited)
+      ? article.slug
+      : normalizeText(stringToSlug(value.slug)),
     excerpt: normalizeText(value.excerpt),
     heroImagePath: normalizeText(value.heroImagePath),
     heroImageAlt: normalizeText(value.heroImageAlt),
@@ -68,4 +71,30 @@ export function mapArticleEditorFormToPayload(
             },
       ),
   };
+}
+
+export function populateArticleEditorForm(
+  form: ArticleEditorForm,
+  article: IAdminContentArticleDetail,
+): void {
+  const blocks = form.controls.blocks;
+  blocks.clear({ emitEvent: false });
+  for (const block of [...article.blocks].sort((a, b) => a.sortOrder - b.sortOrder)) {
+    blocks.push(block.kind === 'text_section'
+      ? createArticleEditorBlockForm('text_section', block.heading ?? '', block.body)
+      : createArticleEditorBlockForm('image', '', '', block.imagePath, block.imageAlt, block.caption ?? ''),
+    { emitEvent: false });
+  }
+  if (!blocks.length) {
+    blocks.push(createArticleEditorBlockForm('text_section'), { emitEvent: false });
+  }
+  form.patchValue({
+    title: article.title ?? '',
+    slug: article.slug ?? '',
+    excerpt: article.excerpt ?? '',
+    heroImagePath: article.heroImagePath ?? '',
+    heroImageAlt: article.heroImageAlt ?? '',
+    seoTitle: article.seoTitle ?? '',
+    seoDescription: article.seoDescription ?? '',
+  }, { emitEvent: false });
 }

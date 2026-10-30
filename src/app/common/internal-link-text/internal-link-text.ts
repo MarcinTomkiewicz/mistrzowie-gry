@@ -1,5 +1,5 @@
-import { Component, computed, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, input } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 import { parseInternalLinkText } from '../../core/domain/internal-link/internal-link-markup';
 
@@ -10,9 +10,15 @@ import { parseInternalLinkText } from '../../core/domain/internal-link/internal-
   templateUrl: './internal-link-text.html',
 })
 export class InternalLinkText {
+  private readonly router = inject(Router);
+
   readonly text = input.required<string>();
 
   protected readonly nodes = computed(() =>
-    parseInternalLinkText(this.text()),
+    parseInternalLinkText(this.text()).map((node) =>
+      node.type === 'link'
+        ? { ...node, href: this.router.parseUrl(node.href) }
+        : node,
+    ),
   );
 }

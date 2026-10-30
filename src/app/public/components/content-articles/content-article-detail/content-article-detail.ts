@@ -8,8 +8,8 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { catchError, EMPTY, finalize, from, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 
 import { ButtonModule } from 'primeng/button';
@@ -23,6 +23,7 @@ import {
   IContentArticleTextSectionBlock,
 } from '../../../../core/interfaces/i-content-article';
 import { ResponseStatus } from '../../../../core/services/response-status/response-status';
+import { Platform } from '../../../../core/services/platform/platform';
 import { ContentArticles } from '../../../../core/services/content-articles/content-articles';
 import { Seo } from '../../../../core/services/seo/seo';
 import { Storage } from '../../../../core/services/storage/storage';
@@ -53,6 +54,8 @@ import { createContentArticlesI18n } from '../content-articles.i18n';
 export class ContentArticleDetail implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly platform = inject(Platform);
   private readonly articles = inject(ContentArticles);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
@@ -143,7 +146,7 @@ export class ContentArticleDetail implements OnInit {
           createArticleStructuredData({
             id: `${canonicalUrl}#article`,
             url: canonicalUrl,
-            headline: title,
+            headline: article.title,
             description,
             image: imageUrl ?? undefined,
             datePublished: article.publishedAt,
@@ -232,6 +235,22 @@ export class ContentArticleDetail implements OnInit {
     this.article.set(null);
 
     return this.articles.getPublicArticleBySlug(slug).pipe(
+      switchMap((article) => {
+        if (article || !this.platform.isBrowser) return of(article);
+
+        return this.articles.getPublicArticleRedirect(slug).pipe(
+          switchMap((path) => {
+            if (path === null) return of(null);
+
+            return from(this.router.navigateByUrl(path, { replaceUrl: true })).pipe(
+              switchMap((navigated) => {
+                if (!navigated) throw new Error('Article redirect navigation was cancelled');
+                return EMPTY;
+              }),
+            );
+          }),
+        );
+      }),
       catchError((error: unknown) => {
         console.error('[content articles] detail load error', error);
         this.error.set(this.i18n.errors().listDescription);

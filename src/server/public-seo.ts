@@ -3,13 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 
 import publicStaticPaths from '../../scripts/public-routes.json';
 import { SITE_URL } from '../app/core/config/site';
+import { CONTENT_ARTICLE_RPC } from '../app/core/configs/content-articles.config';
 import type { ISitemapEntry } from '../app/core/interfaces/i-sitemap-entry';
+import { readPublicContentArticleRedirect } from '../app/core/reads/content-articles/public-content-article-redirect.contract';
 import { environment } from '../env/environment';
 
 const SITEMAP_RPC = 'get_public_sitemap_entries';
 const PUBLIC_CACHE_CONTROL =
   'public, max-age=300, s-maxage=900, stale-if-error=86400';
-const ERROR_CACHE_CONTROL = 'no-store';
+const NO_STORE_CACHE_CONTROL = 'no-store';
 const XML_CONTENT_TYPE = 'application/xml; charset=utf-8';
 const TEXT_CONTENT_TYPE = 'text/plain; charset=utf-8';
 const EXCLUDED_PATH_PREFIXES = [
@@ -21,7 +23,7 @@ const EXCLUDED_PATH_PREFIXES = [
   '/not-authorized',
 ] as const;
 
-const sitemapClient = createClient(
+const publicSeoClient = createClient(
   environment.supabase.url,
   environment.supabase.publishableKey,
   {
@@ -38,6 +40,43 @@ export function registerPublicSeoRoutes(app: express.Express): void {
   app.head('/sitemap.xml', handleSitemap);
   app.get('/robots.txt', handleRobots);
   app.head('/robots.txt', handleRobots);
+  app.route('/artykuly/:slug')
+    .get(handleArticleRedirect)
+    .head(handleArticleRedirect);
+}
+
+async function handleArticleRedirect(
+  req: express.Request<{ slug: string }>,
+  res: express.Response,
+  next: express.NextFunction,
+): Promise<void> {
+  try {
+    const { data, error } = await publicSeoClient.rpc(
+      CONTENT_ARTICLE_RPC.getPublicArticleRedirect,
+      { p_slug: req.params.slug },
+    );
+    if (error) throw new Error(error.message);
+
+    const path = readPublicContentArticleRedirect(data, req.params.slug);
+    if (path === null) {
+      next();
+      return;
+    }
+    res
+      .status(301)
+      .set('Location', path)
+      .set('Cache-Control', NO_STORE_CACHE_CONTROL)
+      .end();
+  } catch (error) {
+    logPublicSeoError('article redirect', error);
+    sendResponse(
+      res,
+      503,
+      TEXT_CONTENT_TYPE,
+      NO_STORE_CACHE_CONTROL,
+      'Service unavailable\n',
+    );
+  }
 }
 
 async function handleSitemap(
@@ -61,7 +100,7 @@ async function handleSitemap(
       res,
       503,
       XML_CONTENT_TYPE,
-      ERROR_CACHE_CONTROL,
+      NO_STORE_CACHE_CONTROL,
       '<?xml version="1.0" encoding="UTF-8"?>\n<error>Service unavailable</error>\n',
     );
   }
@@ -87,14 +126,14 @@ function handleRobots(
       res,
       503,
       TEXT_CONTENT_TYPE,
-      ERROR_CACHE_CONTROL,
+      NO_STORE_CACHE_CONTROL,
       'Robots configuration unavailable\n',
     );
   }
 }
 
 async function getDynamicEntries(): Promise<ISitemapEntry[]> {
-  const response = await sitemapClient.rpc(SITEMAP_RPC);
+  const response = await publicSeoClient.rpc(SITEMAP_RPC);
 
   if (response.error) {
     throw new Error(`${SITEMAP_RPC} failed: ${response.error.message}`);

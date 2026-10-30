@@ -25,6 +25,9 @@ export interface AdminContentArticlesActionsTranslations {
 }
 
 export interface AdminContentArticleEditorActionsTranslations {
+  changeUrlHeader: string;
+  changeUrlMessage: string;
+  changeUrlAction: string;
   addImageBlock: string;
   removeBlock: string;
   moveSectionUp: string;

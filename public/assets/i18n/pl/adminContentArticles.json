@@ -21,6 +21,9 @@
     "createArticle": "Utwórz artykuł"
   },
   "editorActions": {
+    "changeUrlHeader": "Zmiana opublikowanego adresu",
+    "changeUrlMessage": "Czy na pewno chcesz zmienić adres artykułu z {{current}} na {{next}}?",
+    "changeUrlAction": "Zmień adres i zapisz",
     "addImageBlock": "Dodaj obrazek",
     "removeBlock": "Usuń blok",
     "moveSectionUp": "Przesuń wyżej",

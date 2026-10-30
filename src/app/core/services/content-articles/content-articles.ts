@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { CONTENT_ARTICLE_RPC } from '../../configs/content-articles.config';
+import { readPublicContentArticleRedirect } from '../../reads/content-articles/public-content-article-redirect.contract';
 import {
   IAdminContentArticleDetail,
   IAdminContentArticleListItem,
@@ -28,6 +29,13 @@ export class ContentArticles {
       CONTENT_ARTICLE_RPC.getPublicArticleBySlug,
       { p_slug: slug },
     );
+  }
+
+  getPublicArticleRedirect(slug: string): Observable<string | null> {
+    return this.backend.rpc<unknown>(
+      CONTENT_ARTICLE_RPC.getPublicArticleRedirect,
+      { p_slug: slug },
+    ).pipe(map((response) => readPublicContentArticleRedirect(response, slug)));
   }
 
   getAdminArticleList(): Observable<IAdminContentArticleListItem[]> {
