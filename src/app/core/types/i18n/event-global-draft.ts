@@ -1,4 +1,4 @@
-import type { AdminDatedTimeBlocks, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
+import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 
 export type EventMetadataCopy = {
@@ -9,6 +9,20 @@ export type EventMetadataCopy = {
   uncertain: string;
   readbackFailed: string;
   reloadConfirm: string;
+};
+
+export type EventGlobalSavedSummaryCopy = {
+  readFailed: string;
+  calendarDraft: string;
+  policyDraft: string;
+  program: string;
+  countsHint: string;
+  pending: string;
+  confirmed: string;
+  unknown: string;
+  noOccurrence: string;
+  participation: Record<'included' | 'excluded' | 'unspecified' | 'unlinked' | 'missing', string>;
+  calendarStatuses: Record<AdminGlobalCalendarResult['globalDates'][number]['status'], string>;
 };
 
 export type EventGlobalPriceCopy = {

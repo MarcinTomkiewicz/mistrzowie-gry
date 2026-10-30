@@ -96,7 +96,10 @@
                       schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()" />
                 }
                 <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
-                @if (globalDraft.activeStep() !== 5) {
+                @if (globalDraft.activeStep() === 6) {
+                  <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="navigationLocked() || cover.dirty()"
+                    (navigateToStep)="goToStep($event)" />
+                } @else if (globalDraft.activeStep() !== 5) {
                   @if (globalDraft.policy(); as policy) {
                     @if (metadata.edition(); as edition) {
                       <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"

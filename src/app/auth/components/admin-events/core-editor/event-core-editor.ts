@@ -30,6 +30,7 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventCoreEditions } from './event-core-editions';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
+import { EventGlobalSavedSummary } from './event-global-saved-summary';
 import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
 import { EventGlobalDiagnostics } from './event-global-diagnostics';
 import { EventDatedBlocksController } from './event-dated-blocks-controller';
@@ -50,7 +51,7 @@ import { EventManualProgramController } from './event-manual-program-controller'
 @Component({
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule, MessageModule,
-    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
+    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,

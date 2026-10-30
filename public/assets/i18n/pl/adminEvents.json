@@ -53,6 +53,28 @@
       "saveSuccessDetail": "Zmiany w wydarzeniu zostały zapisane.",
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
     },
+    "savedSummary": {
+      "readFailed": "[PH] Nie udało się odczytać spójnego podsumowania zapisanych danych. Liczniki programu są nieznane. Ponów odczyt.",
+      "calendarDraft": "[PH] Istnieje zapisany, niezastosowany szkic harmonogramu. Poniżej pokazano obecny kalendarz. Przejdź do kroku Harmonogram, aby sprawdzić szkic.",
+      "policyDraft": "[PH] Istnieje zapisany szkic ceny i zapisów. Poniżej pokazano obecne ustawienia, bez zmian ze szkicu. Przejdź do kroku Cena i zapisy, aby sprawdzić szkic.",
+      "program": "[PH] Program we wszystkich lokalizacjach",
+      "countsHint": "[PH] Liczniki obejmują zapisane sesje i aktywności. Puste sloty nie są pozycjami programu. Zatwierdzona pozycja pozostaje oczekująca do publikacji.",
+      "pending": "[PH] Oczekujące pozycje",
+      "confirmed": "[PH] Opublikowane pozycje",
+      "unknown": "[PH] Nieznane",
+      "noOccurrence": "[PH] Brak lokalnego terminu - liczników nie wyliczono.",
+      "participation": {
+        "included": "[PH] Lokalizacja uwzględniona",
+        "excluded": "[PH] Lokalizacja wykluczona",
+        "unspecified": "[PH] Udział lokalizacji nieokreślony",
+        "unlinked": "[PH] Termin poza wspólnym kalendarzem",
+        "missing": "[PH] Brak danych udziału lokalizacji"
+      },
+      "calendarStatuses": {
+        "scheduled": "[PH] Data zaplanowana",
+        "cancelled": "[PH] Data anulowana"
+      }
+    },
     "cover": {
       "info": "[PH] Okładka jest opcjonalna i wspólna dla lokalizacji bez własnej okładki. Przesłany obraz jest ogólnodostępny. Zapis okładki nie publikuje wydarzenia ani nie zapisuje metadanych.",
       "cropHint": "[PH] Ustaw kadr okładki wydarzenia.",
