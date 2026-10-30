@@ -45,7 +45,7 @@ import { EventGlobalBaseTimeBlocksEditor } from './event-global-base-time-blocks
 import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
 import { EventGlobalPolicyEditor } from './policy/event-global-policy-editor';
 import { EventGlobalProgram } from './event-global-program';
-import { EventManualRpgController } from './event-manual-rpg-controller';
+import { EventManualProgramController } from './event-manual-program-controller';
 
 @Component({
   selector: 'app-event-core-editor',
@@ -54,14 +54,14 @@ import { EventManualRpgController } from './event-manual-rpg-controller';
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
-    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualRpgController],
+    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualProgramController],
 })
 export class EventCoreEditor {
   protected readonly datedBlocks = inject(EventDatedBlocksController);
   protected readonly schedule = inject(EventGlobalScheduleController);
   protected readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
   protected readonly policy = inject(EventGlobalPolicyFacade);
-  protected readonly program = inject(EventManualRpgController);
+  protected readonly program = inject(EventManualProgramController);
   private readonly platform = inject(Platform);
   private readonly confirm = inject(UiConfirm);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -78,7 +78,7 @@ export class EventCoreEditor {
   protected readonly globalDraft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly coverCopy = createScopedObjectI18n<CoreCoverCopy>('adminEvents', 'editor.cover');
-  private readonly programCopy = createScopedObjectI18n<EventAdminTimelineCopy['manualRpg']>('adminEvents', 'timeline.manualRpg');
+  private readonly programCopy = createScopedObjectI18n<EventAdminTimelineCopy['manualProgram']>('adminEvents', 'timeline.manualProgram');
   protected readonly scheduleCopy = createScopedObjectI18n<EventGlobalScheduleCopy>('adminEvents', 'editor.schedule');
   protected readonly core = this.metadata.core;
   protected readonly isLoading = signal(true);

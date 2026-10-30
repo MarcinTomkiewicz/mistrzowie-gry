@@ -2,12 +2,18 @@ import type { EventTimelineOrigin } from '../../interfaces/i-admin-event-timelin
 import type { MyStaffingCandidate } from '../../interfaces/my-staffing-realization';
 
 export type EventAdminTimelineCopy = {
-  manualRpg: {
-    action: string; hint: string; unavailable: string; gm: string; source: string; session: string;
-    template: string; custom: string; block: string; slotLabel: string; position: string; capacity: string; capacityHint: string;
-    saveConfirm: string; discardConfirm: string; saved: string; failed: string; catalogFailed: string;
-    noSessions: string; uncertain: string; conflict: string; contractFailed: string; intervalInvalid: string; positionTaken: string;
+  manualProgram: {
+    unavailable: string; block: string; position: string; discardConfirm: string; saved: string; failed: string;
+    uncertain: string; conflict: string; contractFailed: string; intervalInvalid: string; positionTaken: string;
     abandon: string; abandonConfirm: string; refreshRequired: string;
+  };
+  manualRpg: {
+    action: string; hint: string; gm: string; source: string; session: string; template: string; custom: string;
+    slotLabel: string; capacity: string; capacityHint: string; saveConfirm: string; catalogFailed: string; noSessions: string;
+  };
+  manualActivity: {
+    action: string; hint: string; kind: string; title: string; description: string; presenter: string;
+    capacity: string; capacityHint: string; catalogFailed: string; emptyKinds: string; refreshKinds: string; saveConfirm: string;
   };
   title: string;
   entry: string;

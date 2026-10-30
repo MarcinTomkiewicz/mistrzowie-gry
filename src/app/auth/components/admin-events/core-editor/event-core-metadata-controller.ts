@@ -17,7 +17,7 @@ import { EventCoreCoverController } from './event-core-cover-controller';
 import { EventGlobalScheduleController } from './event-global-schedule-controller';
 import { EventGlobalBaseTimeBlocksController } from './event-global-base-time-blocks-controller';
 import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
-import { EventManualRpgController } from './event-manual-rpg-controller';
+import { EventManualProgramController } from './event-manual-program-controller';
 
 export type EventMetadataTarget = 'core' | 'edition';
 type MetadataCommand = { coreId: string } & (
@@ -34,7 +34,7 @@ export class EventCoreMetadataController {
   private readonly schedule = inject(EventGlobalScheduleController);
   private readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
   private readonly policy = inject(EventGlobalPolicyFacade);
-  private readonly program = inject(EventManualRpgController);
+  private readonly program = inject(EventManualProgramController);
   private command: MetadataCommand | null = null;
   readonly core = signal<IEventCoreDetail | null>(null);
   readonly edition = signal<IAdminEventDetail | null>(null);

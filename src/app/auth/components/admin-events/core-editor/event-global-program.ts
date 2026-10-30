@@ -16,12 +16,12 @@ import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { presentEventTimelineRows } from '../event-admin-timeline/event-admin-timeline-presenter';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { EventGlobalDraftController } from './event-global-draft-controller';
-import { EventManualRpgController } from './event-manual-rpg-controller';
-import { EventManualRpgEditor } from './event-manual-rpg-editor';
+import { EventManualProgramController } from './event-manual-program-controller';
+import { EventManualProgramEditor } from './event-manual-program-editor';
 
 @Component({
   selector: 'app-event-global-program',
-  imports: [FormsModule, ButtonModule, FloatLabelModule, SelectModule, TableModule, EventManualRpgEditor],
+  imports: [FormsModule, ButtonModule, FloatLabelModule, SelectModule, TableModule, EventManualProgramEditor],
   templateUrl: './event-global-program.html',
   host: { class: 'd-block w-100 min-w-0' },
 })
@@ -31,7 +31,7 @@ export class EventGlobalProgram {
   readonly calendar = input.required<AdminGlobalCalendarResult>();
   readonly disabled = input(false);
   protected readonly global = inject(EventGlobalDraftController);
-  protected readonly manual = inject(EventManualRpgController);
+  protected readonly manual = inject(EventManualProgramController);
   protected readonly selectionLocked = computed(() => this.disabled() || this.manual.locked());
   protected readonly i18n = createEventAdminTimelineI18n();
   protected readonly formatDateLabel = formatDateLabel;

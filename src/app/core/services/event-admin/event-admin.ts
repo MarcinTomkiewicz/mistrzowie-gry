@@ -13,6 +13,7 @@ import {
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
+import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
@@ -212,6 +213,14 @@ export class EventAdmin {
 
   saveManualRpgSlot(payload: ManualRpgSlotPayload): Observable<ManualRpgSlotResult> {
     return this.backend.rpc<ManualRpgSlotResult>(EVENT_RPC.saveManualRpgSlot, { p_payload: payload });
+  }
+
+  getActivityKinds(): Observable<AdminEventActivityKinds> {
+    return this.backend.rpc<AdminEventActivityKinds>(EVENT_RPC.getActivityKinds);
+  }
+
+  saveManualActivity(payload: ManualActivityPayload): Observable<ManualActivityResult> {
+    return this.backend.rpc<ManualActivityResult>(EVENT_RPC.saveManualActivity, { p_payload: payload });
   }
 
   getProgramParticipants(programItemId: string): Observable<AdminEventProgramParticipants> {

@@ -1,0 +1,69 @@
+@let copy = this.copy();
+@let controls = editor.activityForm.controls;
+<div class="flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="editor.activityForm">
+  @if (editor.catalogBusy()) { <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p> }
+  @if (!editor.catalogBusy() && (editor.catalogError() || !editor.activityKinds().length)) {
+    <div class="flex-col-start-start gap-sm" [attr.role]="editor.catalogError() ? 'alert' : 'status'">
+      <p class="m-0" [class.error-text]="editor.catalogError()">{{ editor.catalogError() ? copy.catalogFailed : copy.emptyKinds }}</p>
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-trail" [label]="i18n.actions().retry"
+        [disabled]="editor.isBusy() || editor.readbackPending()" (onClick)="editor.loadActivityKinds()" />
+    </div>
+  }
+  @if (!editor.catalogBusy() && !editor.catalogError() && editor.activityKinds().length) {
+    <div class="flex-row-start-center">
+      <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-trail" [label]="copy.refreshKinds"
+        [disabled]="editor.isBusy() || editor.readbackPending()" (onClick)="editor.loadActivityKinds()" />
+    </div>
+  }
+  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+    <p-floatlabel variant="on" class="w-100 min-w-0">
+      <p-select inputId="manual-activity-kind" formControlName="kindKey" [options]="editor.activityKinds()" optionValue="key" optionLabel="label"
+        size="small" appendTo="body" class="w-100" [readonly]="editor.catalogBusy() || editor.catalogError()" [emptyMessage]="copy.emptyKinds" />
+      <label for="manual-activity-kind">{{ copy.kind }}</label>
+    </p-floatlabel>
+    <div class="flex-col-start-stretch gap-xs w-100 min-w-0">
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <input pInputText pSize="small" id="manual-activity-title" formControlName="title" maxlength="140" class="w-100"
+          [attr.aria-invalid]="controls.title.touched && controls.title.invalid"
+          [attr.aria-describedby]="controls.title.touched && controls.title.invalid ? 'manual-activity-title-error' : null" />
+        <label for="manual-activity-title">{{ copy.title }}</label>
+      </p-floatlabel>
+      @if (controls.title.touched && controls.title.invalid) {
+        <small id="manual-activity-title-error" class="mg-contact-error" role="alert">
+          {{ controls.title.hasError('maxlength') ? commonForm().maxLength.replace('{{max}}', '140') : commonForm().required }}
+        </small>
+      }
+    </div>
+    <div class="flex-col-start-stretch gap-xs w-100 min-w-0">
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <input pInputText pSize="small" id="manual-activity-presenter" formControlName="presenter" maxlength="140" class="w-100"
+          [attr.aria-invalid]="controls.presenter.touched && controls.presenter.invalid"
+          [attr.aria-describedby]="controls.presenter.touched && controls.presenter.invalid ? 'manual-activity-presenter-error' : null" />
+        <label for="manual-activity-presenter">{{ copy.presenter }}</label>
+      </p-floatlabel>
+      @if (controls.presenter.touched && controls.presenter.hasError('maxlength')) {
+        <small id="manual-activity-presenter-error" class="mg-contact-error" role="alert">{{ commonForm().maxLength.replace('{{max}}', '140') }}</small>
+      }
+    </div>
+    <div class="flex-col-start-stretch gap-xs w-100 min-w-0">
+      <p-floatlabel variant="on" class="w-100 min-w-0">
+        <p-inputnumber inputId="manual-activity-capacity" formControlName="attendeeCapacity" [min]="1" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
+        <label for="manual-activity-capacity">{{ copy.capacity }}</label>
+      </p-floatlabel>
+      <small class="muted-text">{{ copy.capacityHint }}</small>
+    </div>
+  </div>
+  <div class="flex-col-start-stretch gap-xs w-100 min-w-0">
+    <p-floatlabel variant="on" class="w-100 min-w-0">
+      <textarea pTextarea id="manual-activity-description" formControlName="description" maxlength="12000" rows="4" class="w-100"
+        [attr.aria-invalid]="controls.description.touched && controls.description.invalid"
+        [attr.aria-describedby]="controls.description.touched && controls.description.invalid ? 'manual-activity-description-error' : null"></textarea>
+      <label for="manual-activity-description">{{ copy.description }}</label>
+    </p-floatlabel>
+    @if (controls.description.touched && controls.description.invalid) {
+      <small id="manual-activity-description-error" class="mg-contact-error" role="alert">
+        {{ controls.description.hasError('maxlength') ? commonForm().maxLength.replace('{{max}}', '12000') : commonForm().required }}
+      </small>
+    }
+  </div>
+</div>

@@ -36,7 +36,7 @@
       <h3 class="mg-section__title mg-section__title--sm m-0">
         <time [attr.datetime]="selected.occurrence.date">{{ formatDateLabel(selected.occurrence.date) }}</time>
       </h3>
-      <app-event-manual-rpg-editor (readback)="acceptReadback($event)" />
+      <app-event-manual-program-editor (readback)="acceptReadback($event)" />
       @if (rows().length) {
         <div class="w-100 overflow-x-auto">
           <p-table [value]="rows()" dataKey="key" size="small" class="w-100" tableStyleClass="mg-responsive-table">
