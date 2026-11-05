@@ -6,6 +6,7 @@
     "noOccurrences": "Brak terminów dla wybranego miasta."
   },
   "program": {
+    "dayOffset": "[PH] dzień +{{days}}",
     "title": "Program wydarzenia",
     "occurrenceLabel": "Termin",
     "timeToBeDetermined": "Godzina do ustalenia",

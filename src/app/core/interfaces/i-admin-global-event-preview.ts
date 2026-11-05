@@ -1,4 +1,5 @@
-import type { GlobalTimeBlockInput } from './i-admin-global-event';
+import type { EventPriceBasis, GlobalTimeBlockInput } from './i-admin-global-event';
+import type { PublicEventProgramEntry } from '../types/public-event-program';
 
 export type AdminGlobalEventPageFieldError =
   | { field: 'coreDraft'; code: 'INVALID_CORE_METADATA' }
@@ -14,7 +15,7 @@ export type AdminGlobalEventPageBlocker =
       'NO_UPCOMING_DATE_FOR_SELECTED_CITY' }
   | { code: 'EDITION_EFFECTIVE_POLICY_MISSING' | 'PROTECTED_PARTICIPANT_POLICY'; editionId: string };
 
-interface AdminGlobalEventPreviewPage {
+export interface AdminGlobalEventPreviewPage {
   core: {
     id: string;
     key: string;
@@ -38,7 +39,7 @@ interface AdminGlobalEventPreviewPage {
     endDayOffset: number | null;
     priceAmount: number | null;
     priceCurrency: string | null;
-    priceBasis: string | null;
+    priceBasis: EventPriceBasis | null;
     coverImagePath: string | null;
     isForBeginners: boolean | null;
     participantSignupKind: string | null;
@@ -63,7 +64,7 @@ interface AdminGlobalEventPreviewPage {
   selectedEditionId: string;
   selectedDate: string | null;
   selectedOccurrenceId: string | null;
-  program: unknown[];
+  program: PublicEventProgramEntry[];
 }
 
 interface AdminGlobalEventPreviewBase {

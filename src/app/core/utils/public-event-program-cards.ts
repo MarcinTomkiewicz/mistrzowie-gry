@@ -7,7 +7,7 @@ import { resolvePublicStorageUrl } from './storage-url';
 import { normalizeText } from './normalize-text';
 import { formatTimeRangeLabel } from './time-format';
 
-type PublicEventProgramGroup = Pick<PublicEventProgramEntry['slot'], 'startTime' | 'endTime'> & {
+type PublicEventProgramGroup = Pick<PublicEventProgramEntry['slot'], 'startTime' | 'endTime' | 'startDayOffset' | 'endDayOffset'> & {
   key: string;
   entries: PublicEventProgramEntry[];
 };
@@ -18,19 +18,20 @@ export function groupPublicEventProgramEntries(
   const groups = new Map<string, PublicEventProgramGroup>();
   for (const entry of entries) {
     const { startTime, endTime } = entry.slot;
-    const key = `${entry.occurrenceId}:${startTime ?? ''}:${endTime ?? ''}`;
+    const key = `${entry.occurrenceId}:${entry.slot.startDayOffset ?? 0}:${startTime ?? ''}:${entry.slot.endDayOffset ?? 0}:${endTime ?? ''}`;
     const group = groups.get(key);
     if (group) {
       group.entries.push(entry);
     } else {
-      groups.set(key, { key, startTime, endTime, entries: [entry] });
+      groups.set(key, { key, startTime, endTime, startDayOffset: entry.slot.startDayOffset, endDayOffset: entry.slot.endDayOffset, entries: [entry] });
     }
   }
 
   return [...groups.values()].sort((left, right) => {
     if (left.startTime === null) return right.startTime === null ? 0 : 1;
     if (right.startTime === null) return -1;
-    return left.startTime.localeCompare(right.startTime) ||
+    return (left.startDayOffset ?? 0) - (right.startDayOffset ?? 0) || left.startTime.localeCompare(right.startTime) ||
+      (left.endDayOffset ?? 0) - (right.endDayOffset ?? 0) ||
       (left.endTime ?? '').localeCompare(right.endTime ?? '');
   });
 }
@@ -47,20 +48,21 @@ export function createPublicEventProgramCards(
   const eventLabel = normalizeText(eventName)?.toLocaleLowerCase('pl-PL');
   return entries.map((entry) => {
     const pending = entry.kind === 'pending';
+    const activity = 'activity' in entry ? entry.activity : null;
     const session = entry.session;
     const slotLabel = normalizeText(entry.slot.label);
-    const title = pending ? copy.pending : normalizeText(session?.title) || missingTitle;
-    const system = entry.kind === 'confirmed'
+    const title = pending ? copy.pending : activity?.title ?? normalizeText(session?.title) ?? missingTitle;
+    const system = entry.kind === 'confirmed' && entry.session !== null
       ? entry.session.system
       : systems.find((system) => system.id === session?.systemId) ?? null;
     return {
-      id: entry.programItemId,
+      id: 'activityId' in entry ? entry.activityId : entry.programItemId,
       gmProfileId: entry.host?.userId ?? null,
       title,
       imageUrl: resolvePublicStorageUrl(storage, session?.image),
       gmDisplayName: entry.host ? entry.host.displayName || gmLabel : null,
       system,
-      ...(entry.kind === 'confirmed' ? {
+      ...(entry.kind === 'confirmed' && entry.session !== null ? {
         styles: entry.session.styles,
         triggers: entry.session.triggers,
         languages: entry.session.languages,
@@ -69,13 +71,24 @@ export function createPublicEventProgramCards(
       minAge: session?.minAge ?? null,
       description: pending ? copy.inPreparation : null,
       isEmpty: pending,
-      canOpenDetails: !pending,
-      canOpenGmProfile: !pending,
+      canOpenDetails: !pending && !activity,
+      canOpenGmProfile: !pending && !activity,
       programStatus: pending ? 'pending' : 'confirmed',
       occurrenceDate: entry.occurrenceDate,
       slotLabel: slotLabel?.toLocaleLowerCase('pl-PL') === eventLabel ? null : slotLabel,
-      timeLabel: formatTimeRangeLabel(entry.slot.startTime, entry.slot.endTime),
+      timeLabel: formatPublicEventProgramTime(entry.slot, copy.dayOffset),
       sessionDetails: session ? { ...session, title, ...(system ? { system } : {}) } : null,
+      ...(activity ? { activity } : {}),
     };
   });
+}
+
+export function formatPublicEventProgramTime(
+  slot: Pick<PublicEventProgramEntry['slot'], 'startTime' | 'endTime' | 'startDayOffset' | 'endDayOffset'>, dayOffset: string,
+): string {
+  const range = formatTimeRangeLabel(slot.startTime, slot.endTime);
+  if (!range || (!slot.startDayOffset && !slot.endDayOffset)) return range;
+  const label = (time: string | null, offset: number | undefined) =>
+    `${time ?? ''}${offset ? ' (' + dayOffset.replace('{{days}}', String(offset)) + ')' : ''}`;
+  return `${label(slot.startTime, slot.startDayOffset)} - ${label(slot.endTime, slot.endDayOffset)}`;
 }

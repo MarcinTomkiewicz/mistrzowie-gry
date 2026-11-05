@@ -23,7 +23,7 @@ import { GmRead } from '../../../core/reads/gm/gm-read';
 import { Platform } from '../../../core/services/platform/platform';
 import type { PublicEventPageState } from '../../../core/types/public-event-page';
 import type { PublicEventGmProfileState } from '../../../core/types/public-event-program';
-import { formatTimeLabel, getTimeRangeBounds } from '../../../core/utils/time-format';
+import { formatTimeLabel, getTimeRangeBounds, parseTimeLabelToMinutes } from '../../../core/utils/time-format';
 
 @Injectable()
 export class EventPageFacade {
@@ -63,11 +63,27 @@ export class EventPageFacade {
 
     const program = this.selectedProgram()
       .filter((entry) => entry.occurrenceDate === occurrence.occurrenceDate);
-    const timeRange = getTimeRangeBounds(program.map((entry) => entry.slot));
-    // Date-only pending must not inherit Edition defaults as actual program hours.
-    if (timeRange || program.some((entry) => entry.kind === 'pending' && entry.slot.startTime === null)) {
-      return timeRange;
+    const ranges = program.flatMap(({ slot }) => {
+      const { startTime, endTime } = slot;
+      if (startTime === null || endTime === null) return [];
+      const start = parseTimeLabelToMinutes(startTime);
+      const end = parseTimeLabelToMinutes(endTime);
+      if (start === null || end === null) return [];
+      const startDayOffset = slot.startDayOffset ?? 0;
+      const endDayOffset = slot.endDayOffset ?? 0;
+      const startMinute = startDayOffset * 1440 + start;
+      const endMinute = endDayOffset * 1440 + end;
+      return endMinute > startMinute
+        ? [{ startTime, endTime, startDayOffset, endDayOffset, startMinute, endMinute }] : [];
+    });
+    if (ranges.length) {
+      const first = ranges.reduce((first, range) => range.startMinute < first.startMinute ? range : first);
+      const last = ranges.reduce((last, range) => range.endMinute > last.endMinute ? range : last);
+      return { startTime: first.startTime, endTime: last.endTime,
+        startDayOffset: first.startDayOffset, endDayOffset: last.endDayOffset };
     }
+    // Date-only pending must not inherit Edition defaults as actual program hours.
+    if (program.some((entry) => entry.kind === 'pending' && entry.slot.startTime === null)) return null;
 
     return getTimeRangeBounds([{
       startTime: formatTimeLabel(state.edition.startTime),
@@ -180,7 +196,7 @@ export class EventPageFacade {
     const entry = this.selectedProgram().find((item) =>
       item.kind !== 'pending' && item.programItemId === programItemId,
     );
-    if (state.kind !== 'ready' || !entry || entry.kind === 'pending') return;
+    if (state.kind !== 'ready' || !entry || entry.kind === 'pending' || entry.host === null) return;
 
     this.closeGmProfile();
     this.gmProfileState.set({ kind: 'loading' });

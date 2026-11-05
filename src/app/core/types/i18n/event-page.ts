@@ -6,6 +6,7 @@ export type EventPageTranslations = {
 };
 
 export type EventPageProgramTranslations = {
+  dayOffset: string;
   title: string;
   occurrenceLabel: string;
   timeToBeDetermined: string;

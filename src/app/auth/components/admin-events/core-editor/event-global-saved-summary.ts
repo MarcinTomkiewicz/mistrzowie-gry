@@ -20,10 +20,11 @@ import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventGlobalPublicationController } from './event-global-publication-controller';
 import { readEventGlobalSavedSummary } from './event-global-saved-summary-read';
 import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
+import { EventGlobalPagePreview } from './event-global-page-preview';
 
 @Component({
   selector: 'app-event-global-saved-summary',
-  imports: [NgTemplateOutlet, ButtonModule, MessageModule, TableModule, EventGlobalDraftSummary, EventProgramSchedule],
+  imports: [NgTemplateOutlet, ButtonModule, MessageModule, TableModule, EventGlobalDraftSummary, EventProgramSchedule, EventGlobalPagePreview],
   templateUrl: './event-global-saved-summary.html',
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })

@@ -8,9 +8,8 @@ import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel } from '../../../core/utils/date';
 import {
-  createPublicEventProgramCards, groupPublicEventProgramEntries,
+  createPublicEventProgramCards, formatPublicEventProgramTime, groupPublicEventProgramEntries,
 } from '../../../core/utils/public-event-program-cards';
-import { formatTimeRangeLabel } from '../../../core/utils/time-format';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { SessionDialog } from '../session-dialog/session-dialog';
@@ -53,7 +52,7 @@ export class EventPageProgram {
     return state.kind === 'ready'
       ? groupPublicEventProgramEntries(this.facade.selectedProgram()).map((group) => ({
           key: group.key,
-          label: formatTimeRangeLabel(group.startTime, group.endTime) ||
+          label: formatPublicEventProgramTime(group, this.i18n.program().dayOffset) ||
             this.i18n.program().timeToBeDetermined,
           cards: createPublicEventProgramCards(
             group.entries, state.systems, this.storage,

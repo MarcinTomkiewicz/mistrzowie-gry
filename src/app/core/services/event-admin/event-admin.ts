@@ -17,6 +17,7 @@ import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces
 import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
+import { readAdminGlobalEventPagePreview } from '../../reads/events/admin-global-event-preview.contract';
 import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult } from '../../interfaces/i-admin-global-event-publication';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
 import type {
@@ -112,10 +113,10 @@ export class EventAdmin {
     });
   }
 
-  previewGlobalEventPage(coreId: string): Observable<AdminGlobalEventPagePreview> {
+  previewGlobalEventPage(coreId: string, selectedEditionId?: string, selectedDate?: string): Observable<AdminGlobalEventPagePreview> {
     return this.backend.rpc<AdminGlobalEventPagePreview>(EVENT_RPC.previewGlobalEventPage, {
-      p_payload: { coreId },
-    });
+      p_payload: { coreId, ...(selectedEditionId ? { selectedEditionId } : {}), ...(selectedDate ? { selectedDate } : {}) },
+    }).pipe(map(result => readAdminGlobalEventPagePreview(result, coreId, selectedEditionId, selectedDate)));
   }
 
   previewGlobalPublication(coreId: string): Observable<AdminGlobalPublicationPreview> {

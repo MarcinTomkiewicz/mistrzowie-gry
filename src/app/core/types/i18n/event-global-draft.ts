@@ -31,6 +31,8 @@ export type EventGlobalSavedSummaryCopy = {
   calendarStatuses: Record<AdminGlobalCalendarResult['globalDates'][number]['status'], string>;
 };
 
+export type EventGlobalPagePreviewCopy = Record<'title' | 'hint' | 'failed' | 'unavailable', string>;
+
 export type EventGlobalPriceCopy = {
   title: string;
   hint: string;

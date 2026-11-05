@@ -29,7 +29,7 @@ import { formatDateLabel } from '../../../core/utils/date';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { formatMoney } from '../../../core/utils/pricing';
 import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
-import { formatTimeRangeLabel } from '../../../core/utils/time-format';
+import { formatPublicEventProgramTime } from '../../../core/utils/public-event-program-cards';
 import {
   createBreadcrumbStructuredData,
   createPageStructuredData,
@@ -65,7 +65,7 @@ export class EventPage implements OnInit {
   protected readonly facade = inject(EventPageFacade);
   protected readonly i18n = createEventPageI18n();
   protected readonly formatDateLabel = formatDateLabel;
-  protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
+  protected readonly formatPublicEventProgramTime = formatPublicEventProgramTime;
 
   protected readonly view = computed(() => {
     const state = this.facade.state();

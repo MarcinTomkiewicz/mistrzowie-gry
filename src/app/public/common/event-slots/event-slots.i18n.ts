@@ -11,15 +11,18 @@ import {
 } from '../../../core/types/i18n/sessions';
 
 export function createEventSlotsI18n() {
-  const { difficulty, commonFallbacks } = createScopedSectionsI18n<{
+  const { difficulty, commonFallbacks, activity } = createScopedSectionsI18n<{
+    activity: Record<'presenter' | 'capacity', string>;
     difficulty: SessionSlotDifficultyTranslations;
     commonFallbacks: SessionSlotFallbacksTranslations;
   }>('sessions', {
+    activity: 'slots.activity',
     difficulty: 'slots.difficulty',
     commonFallbacks: 'slots.fallbacks',
   });
 
   return {
+    activity,
     difficulty,
     commonFallbacks,
     commonAppRoles: createCommonAppRolesI18n(),

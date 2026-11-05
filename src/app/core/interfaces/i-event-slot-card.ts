@@ -2,6 +2,7 @@ import { SessionDifficultyLevel } from '../types/sessions';
 import { IGmStyleOption } from './i-gm-style';
 import { ILanguage } from './i-languages';
 import type { SessionDetailsData, SessionPresentation } from './i-session';
+import type { PublicEventActivityEntry } from '../types/public-event-program';
 
 export interface IEventSlotCardVm {
   id: string | null;
@@ -24,6 +25,7 @@ export interface IEventSlotCardVm {
   slotLabel?: string | null;
   timeLabel?: string;
   sessionDetails?: SessionDetailsData | null;
+  activity?: PublicEventActivityEntry['activity'];
   participantSignup?: { canSignup: boolean; remainingSeatsLabel: string };
 }
 

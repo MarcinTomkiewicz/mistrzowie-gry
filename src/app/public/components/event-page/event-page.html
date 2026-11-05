@@ -89,7 +89,7 @@
             @if (facade.selectedTimeRange(); as timeRange) {
               <li>
                 <strong>{{ i18n.labels().hours }}:</strong>
-                {{ formatTimeRangeLabel(timeRange.startTime, timeRange.endTime) }}
+                {{ formatPublicEventProgramTime(timeRange, i18n.program().dayOffset) }}
               </li>
             }
             <li>

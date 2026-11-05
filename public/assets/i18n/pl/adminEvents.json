@@ -265,6 +265,12 @@
       "leaveConfirmation": "[PH] Opuścić edytor i porzucić niezapisane dane miasta?",
       "discard": "[PH] Porzuć dane miasta"
     },
+    "pagePreview": {
+      "title": "[PH] Podgląd strony wydarzenia",
+      "hint": "[PH] Podgląd uwzględnia zapisane dane oraz szkice kalendarza i zasad. Nie publikuje wydarzenia i nie umożliwia zapisów uczestników.",
+      "failed": "[PH] Nie udało się wczytać podglądu strony wydarzenia.",
+      "unavailable": "[PH] Nie można wyświetlić strony dla niepoprawnego szkicu kalendarza. Popraw wskazane błędy w harmonogramie."
+    },
     "diagnostics": {
       "action": "[PH] Sprawdź błędy",
       "title": "[PH] Wynik sprawdzenia wydarzenia",

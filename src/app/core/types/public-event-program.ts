@@ -35,7 +35,12 @@ type ProgramContext = {
 };
 
 type ProgramHost = { userId: string; displayName: string | null };
-type TimedProgramSlot = { label: string | null; startTime: string; endTime: string };
+type TimedProgramSlot = {
+  label: string | null; startTime: string; endTime: string;
+  startDayOffset?: number; endDayOffset?: number;
+  space?: { id: string; name: string } | null;
+  blockId?: string | null; blockPosition?: number | null;
+};
 
 export type PublicEventLegacyEntry = ProgramContext & {
   kind?: never;
@@ -50,9 +55,10 @@ export type PublicEventLegacyEntry = ProgramContext & {
 export type PublicEventConfirmedEntry<TSession = PublicEventConfirmedSession> = ProgramContext & {
   kind: 'confirmed';
   status: 'confirmed';
-  canSignup?: never;
+  canSignup?: false;
+  participantSignupSupported?: false;
   programItemId: string;
-  host: ProgramHost & { displayName: string };
+  host: ProgramHost;
   slot: TimedProgramSlot;
   session: TSession;
 };
@@ -65,16 +71,29 @@ export type PublicEventPendingEntry = ProgramContext & {
   session: null;
   canSignup: false;
 } & (
-  | { displayOrder: number; slot: TimedProgramSlot & { label: string } }
-  | { displayOrder: null; slot: { label: null; startTime: null; endTime: null } }
+  | { displayOrder: number; slot: TimedProgramSlot }
+  | { displayOrder: null; slot: { label: null; startTime: null; endTime: null; startDayOffset?: never; endDayOffset?: never } }
 );
+
+export type PublicEventActivityEntry = ProgramContext & {
+  kind: 'confirmed'; status: 'confirmed'; source: 'manual_activity'; activityId: string;
+  programItemId: null; host: null; session: null; canSignup: false; participantSignupSupported: false;
+  activity: {
+    kindKey: string; kindLabel: string; title: string; description: string;
+    presenter: string | null; attendeeCapacity: number | null;
+  };
+  slot: TimedProgramSlot & {
+    startDayOffset: number; endDayOffset: number; blockPosition: number | null;
+    space: { id: string; name: string } | null;
+  };
+};
 
 export type PublicEventProgramWireEntry = PublicEventLegacyEntry |
   PublicEventConfirmedEntry<Record<keyof PublicEventConfirmedSession, JsonValue>> |
-  PublicEventPendingEntry;
+  PublicEventActivityEntry | PublicEventPendingEntry;
 
 export type PublicEventProgramEntry = PublicEventLegacyEntry |
-  PublicEventConfirmedEntry | PublicEventPendingEntry;
+  PublicEventConfirmedEntry | PublicEventActivityEntry | PublicEventPendingEntry;
 
 export type PublicEventProgramData = {
   entries: PublicEventProgramEntry[];

@@ -14,7 +14,7 @@ import {
 } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type { EventPriceBasis } from '../../../../core/interfaces/i-admin-global-event';
-import type { EventDatedBlocksCopy, EventGlobalBaseTimeBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy, EventGlobalPriceCopy, EventGlobalPolicyCopy, EventGlobalPublicationCopy, EventGlobalSavedSummaryCopy, EventMetadataCopy } from '../../../../core/types/i18n/event-global-draft';
+import type { EventDatedBlocksCopy, EventGlobalBaseTimeBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy, EventGlobalPagePreviewCopy, EventGlobalPriceCopy, EventGlobalPolicyCopy, EventGlobalPublicationCopy, EventGlobalSavedSummaryCopy, EventMetadataCopy } from '../../../../core/types/i18n/event-global-draft';
 import type {
   CoreRpcErrorsCopy,
   EditionTableCopy,
@@ -72,6 +72,7 @@ export function createEventCoreEditorI18n() {
     metadata: createScopedObjectI18n<EventMetadataCopy>('adminEvents', 'editor.metadata'),
     diagnostics: createScopedObjectI18n<EventGlobalDiagnosticsCopy>('adminEvents', 'editor.diagnostics'),
     savedSummary: createScopedObjectI18n<EventGlobalSavedSummaryCopy>('adminEvents', 'editor.savedSummary'),
+    pagePreview: createScopedObjectI18n<EventGlobalPagePreviewCopy>('adminEvents', 'editor.pagePreview'),
     globalPublication: createScopedObjectI18n<EventGlobalPublicationCopy>('adminEvents', 'editor.globalPublication'),
     city: createScopedObjectI18n<EventGlobalCityCopy>('adminEvents', 'editor.city'),
     editionRpcErrors: createScopedObjectI18n<EditionRpcErrorsCopy>('adminEvents', 'editionRpcErrors'),

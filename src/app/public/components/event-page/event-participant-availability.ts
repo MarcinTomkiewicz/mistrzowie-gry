@@ -54,7 +54,7 @@ export class EventParticipantAvailability {
       const now = this.clock();
       if (!this.released() || !this.clientReady() || page.kind !== 'ready') return;
       const nextStart = Math.min(...entries.flatMap((entry) => {
-        const startsAt = entry.kind === 'confirmed' ? this.sessionStartAt(entry, page.edition.timezone) : null;
+        const startsAt = entry.kind === 'confirmed' && entry.session !== null ? this.sessionStartAt(entry, page.edition.timezone) : null;
         return startsAt !== null && startsAt > now ? [startsAt] : [];
       }));
       if (!Number.isFinite(nextStart)) return;
@@ -76,7 +76,7 @@ export class EventParticipantAvailability {
     const entry = this.page.selectedProgram().find((item) =>
       item.kind === 'confirmed' && item.programItemId === programItemId,
     );
-    if (!entry || entry.kind !== 'confirmed' || entry.status !== 'confirmed' ||
+    if (!entry || entry.kind !== 'confirmed' || entry.session === null || entry.status !== 'confirmed' ||
       entry.occurrenceDate !== occurrence.occurrenceDate ||
       !isValidTime(entry.slot.startTime) || !isValidTime(entry.slot.endTime) ||
       entry.slot.endTime <= entry.slot.startTime ||

@@ -31,6 +31,10 @@
     "playersHeaderLabel": "Gracze"
   },
   "slots": {
+    "activity": {
+      "presenter": "[PH] Prowadzący",
+      "capacity": "[PH] Liczba miejsc"
+    },
     "difficulty": {
       "beginner": "Łatwa",
       "intermediate": "Średnia",

@@ -90,7 +90,7 @@
               }
             </div>
 
-            @if (item.programStatus !== 'pending') {
+            @if (item.programStatus !== 'pending' && !item.activity) {
               <div
                 class="tag-badge"
                 [class]="difficultyBadgeClass(item.difficultyLevel)"
@@ -102,6 +102,11 @@
 
           @if (item.programStatus === 'pending') {
             <p class="m-0">{{ item.description }}</p>
+          } @else if (item.activity; as activity) {
+            <span class="tag-badge tag-badge--muted">{{ activity.kindLabel }}</span>
+            <p class="m-0 pre-line text-wrap-anywhere">{{ activity.description }}</p>
+            @if (activity.presenter) { <p class="m-0"><strong>{{ i18n.activity().presenter }}:</strong> {{ activity.presenter }}</p> }
+            @if (activity.attendeeCapacity !== null) { <p class="m-0"><strong>{{ i18n.activity().capacity }}:</strong> {{ activity.attendeeCapacity }}</p> }
           } @else {
             <div class="event-slot-card__image-wrap">
               <img

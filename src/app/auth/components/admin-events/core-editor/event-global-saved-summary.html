@@ -2,9 +2,12 @@
 <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="loading()">
   <header class="flex-row-between-center flex-wrap gap-sm w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().summary }}</h2>
-    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-      [label]="errorMessage() ? i18n.commonActions().retry : i18n.commonActions().refresh"
-      [disabled]="loading() || publication.locked()" (onClick)="refresh()" />
+    <div class="flex-row-start-center flex-wrap gap-sm">
+      <app-event-global-page-preview [coreId]="coreId()" [disabled]="disabled() || publication.locked()" />
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+        [label]="errorMessage() ? i18n.commonActions().retry : i18n.commonActions().refresh"
+        [disabled]="loading() || publication.locked()" (onClick)="refresh()" />
+    </div>
   </header>
   @if (loading()) {
     <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
