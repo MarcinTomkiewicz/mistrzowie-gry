@@ -126,15 +126,93 @@
     @let publishCopy = publicationCopy();
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="publication.isBusy()">
       <h2 class="mg-section__title mg-section__title--md m-0">{{ publicationLabels().title }}</h2>
-      <p class="m-0 muted-text">{{ publishCopy.hint }}</p>
+      <p class="m-0 muted-text">{{ scoped() ? publishCopy.scope.hint : publishCopy.hint }}</p>
       @if (publication.verified()) {
         <p-message severity="success" role="status">
-          {{ publication.result()?.alreadyPublished ? publicationLabels().alreadyPublished : publishCopy.verified }}
+          {{ publication.scopeResult()?.alreadyPublished || publication.result()?.alreadyPublished ? publicationLabels().alreadyPublished : publishCopy.verified }}
         </p-message>
-      } @else if (hasRelease() && !publication.needsReadback()) {
+      } @else if (!scoped() && hasRelease() && !publication.needsReadback()) {
         <p class="m-0 muted-text" role="status">{{ publishCopy.alreadyReleased }}</p>
       }
       @if (publicationError(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
+      @if (publication.scopeReadbackAbandoned()) {
+        <p-message severity="warn" role="status">{{ publishCopy.scope.readbackEnded }}</p-message>
+      }
+      @if (scoped()) {
+        @if (scopeCalendar(); as calendar) {
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ publishCopy.scope.title }}</h3>
+          <div class="flex-col-start-stretch gap-sm">
+            <span id="scope-publication-cities" class="small-caps">{{ publishCopy.affectedCities }}</span>
+            <div class="flex-row-start-center flex-wrap gap-sm" role="group" aria-labelledby="scope-publication-cities">
+              @for (city of calendar.cities; track city.editionId) {
+                <p-button type="button" size="small" severity="secondary" [label]="city.city"
+                  [outlined]="!scopeEditionIds().includes(city.editionId)" [disabled]="disabled() || publication.locked()"
+                  [pt]="{ root: { 'aria-pressed': scopeEditionIds().includes(city.editionId) } }"
+                  (onClick)="toggleScope('edition', city.editionId)" />
+              }
+            </div>
+            <span id="scope-publication-dates" class="small-caps">{{ publishCopy.scope.dates }}</span>
+            <div class="flex-row-start-center flex-wrap gap-sm" role="group" aria-labelledby="scope-publication-dates">
+              @for (day of scopeDates(); track day.globalOccurrenceId) {
+                <p-button type="button" size="small" severity="secondary" [label]="formatDateLabel(day.date)"
+                  [outlined]="!scopeDateIds().includes(day.globalOccurrenceId)" [disabled]="disabled() || publication.locked()"
+                  [pt]="{ root: { 'aria-pressed': scopeDateIds().includes(day.globalOccurrenceId) } }"
+                  (onClick)="toggleScope('date', day.globalOccurrenceId)" />
+              }
+            </div>
+          </div>
+          @if (!scopeEditionIds().length || !scopeDateIds().length) {
+            <small class="muted-text">{{ publishCopy.scope.selectionRequired }}</small>
+          }
+          @if (publication.scopePreview(); as preview) {
+            <dl class="mg-grid-2 gap-md m-0">
+              <div><dt class="muted-text">{{ publishCopy.affectedCities }}</dt><dd class="m-0 text-wrap-anywhere">{{ scopeSelection().cities }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.dates }}</dt><dd class="m-0 text-wrap-anywhere">{{ scopeSelection().dates }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.revision }}</dt><dd class="m-0">{{ preview.calendarRevision ?? i18n.commonValues().notAvailable }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.publishableOccurrences }}</dt><dd class="m-0">{{ preview.impact.plannedOccurrenceCount }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.alreadyPublishedOccurrences }}</dt><dd class="m-0">{{ preview.impact.alreadyPublishedOccurrenceCount }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.legacyCapacityUpgrades }}</dt><dd class="m-0">{{ preview.impact.legacyCapacityUpgrades }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.excludedSelections }}</dt><dd class="m-0">{{ preview.impact.excludedSelections }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.activateEditions }}</dt><dd class="m-0 text-wrap-anywhere">{{ scopeActivationCities() || i18n.commonValues().notApplicable }}</dd></div>
+            </dl>
+            @if (scopeBlockers().length) {
+              <ul class="m-0" role="alert">
+                @for (blocker of scopeBlockers(); track $index) {
+                  <li class="text-wrap-anywhere">
+                    {{ blocker.message }}
+                    @if (blocker.city) { <span> - {{ blocker.city }}</span> }
+                    @if (blocker.date) { <span> - {{ formatDateLabel(blocker.date) }}</span> }
+                    @if (blocker.unresolvedId) { <span> - {{ blocker.unresolvedId }}</span> }
+                    @if (blocker.blockPosition !== null) { <span> - {{ publishCopy.block }}: {{ blocker.blockPosition }}</span> }
+                  </li>
+                }
+              </ul>
+            } @else if (publication.scopeConfirmable()) {
+              <p-message severity="info" role="status">{{ publishCopy.scope.ready }}</p-message>
+            }
+          }
+          @if (publication.verified() && publication.scopeResult(); as result) {
+            <dl class="mg-grid-2 gap-md m-0">
+              <div><dt class="muted-text">{{ publishCopy.scope.publishedOccurrences }}</dt><dd class="m-0">{{ result.publishedOccurrenceCount }}</dd></div>
+              <div><dt class="muted-text">{{ publishCopy.scope.activatedEditions }}</dt><dd class="m-0">{{ result.activatedEditionCount }}</dd></div>
+            </dl>
+          }
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            @if (publication.scopeConfirmable()) {
+              <p-button type="button" size="small" severity="success" icon="pi pi-globe"
+                [label]="publicationLabels().publish" [disabled]="scopeDecisionPending()" (onClick)="confirmScopePublication()" />
+              <p-button type="button" size="small" severity="secondary" [outlined]="true"
+                [label]="i18n.commonActions().cancel" [disabled]="scopeDecisionPending()" (onClick)="publication.cancelConfirmation()" />
+            } @else if (!publication.needsReadback()) {
+              <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-search"
+                [label]="publishCopy.scope.preview" [loading]="publication.isBusy()" [disabled]="!canPreviewScope()" (onClick)="previewScope()" />
+              <p-button type="button" size="small" severity="secondary" [text]="true"
+                [label]="i18n.commonActions().clear" [disabled]="disabled() || publication.locked()" (onClick)="clearScopeSelection()" />
+            }
+          </div>
+          @if (disabled() && !publication.locked()) { <small class="muted-text">{{ publicationLabels().saveFirst }}</small> }
+        }
+      }
       @if (publication.preview(); as preview) {
         <dl class="mg-grid-2 gap-md m-0">
           <div><dt class="muted-text">{{ publishCopy.affectedCities }}</dt><dd class="m-0">{{ preview.impact.affectedCityCount }}</dd></div>
@@ -157,8 +235,12 @@
       <div class="flex-row-start-center flex-wrap gap-sm">
         @if (publication.needsReadback()) {
           <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-            [label]="i18n.commonActions().retry" [disabled]="publication.isBusy()" (onClick)="retryPublicationReadback()" />
-        } @else if (!hasRelease() && !publication.verified()) {
+            [label]="i18n.commonActions().retry" [disabled]="publication.isBusy() || scopeDecisionPending()" (onClick)="retryPublicationReadback()" />
+          @if (publication.canAbandonScopeReadback()) {
+            <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
+              [label]="publishCopy.scope.endReadback" [disabled]="scopeDecisionPending()" (onClick)="endScopeReadback()" />
+          }
+        } @else if (!scoped() && !hasRelease() && !publication.verified()) {
           <p-button type="button" size="small" severity="success" icon="pi pi-globe" loadingIcon="pi pi-d20"
             [label]="publicationLabels().publish" [loading]="publication.isBusy()" [disabled]="!canPublish()" (onClick)="confirmPublication()" />
           @if (disabled() && !publication.isBusy()) { <small class="muted-text">{{ publicationLabels().saveFirst }}</small> }

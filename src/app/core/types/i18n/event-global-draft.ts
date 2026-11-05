@@ -1,11 +1,18 @@
 import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
-import type { AdminGlobalPublicationBlocker } from '../../interfaces/i-admin-global-event-publication';
+import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker } from '../../interfaces/i-admin-global-event-publication';
 
 export type EventGlobalPublicationCopy = Record<
   'hint' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'verified' | 'alreadyReleased' |
   'affectedCities' | 'publishableOccurrences' | 'preservedPastDrafts' | 'policyDraft' | 'block', string
-> & { blockers: Record<AdminGlobalPublicationBlocker['code'], string> };
+> & {
+  blockers: Record<AdminGlobalPublicationBlocker['code'], string>;
+  scope: Record<'title' | 'hint' | 'dates' | 'preview' | 'confirm' | 'alreadyPublishedOccurrences' | 'legacyCapacityUpgrades' |
+    'excludedSelections' | 'activateEditions' | 'selectionRequired' | 'ready' | 'revision' | 'publishedOccurrences' | 'activatedEditions' |
+    'endReadback' | 'endReadbackWarning' | 'readbackEnded', string> & {
+      blockers: Record<AdminGlobalScopePublicationBlocker['code'], string>;
+    };
+};
 
 export type EventMetadataCopy = {
   readOnly: string;

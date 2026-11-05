@@ -1,3 +1,6 @@
+import type { AdminEffectivePolicyResult, AdminGlobalCalendarResult } from './i-admin-global-event';
+import type { IAdminEventDetail, IEventCoreDetail } from './i-event-admin';
+
 export const GLOBAL_PUBLICATION_BLOCKER_CODES = [
   'GLOBAL_CALENDAR_REQUIRED', 'CORE_NOT_PRIVATE_DRAFT', 'STAFFING_PUBLICATION_IS_SEPARATE',
   'PARTICIPANT_RELEASE_MUST_BE_OFF', 'UNAPPROVED_FUTURE_BLUEPRINT', 'PENDING_CALENDAR_DRAFT',
@@ -54,3 +57,72 @@ export type AdminGlobalPublicationResult = {
       policyDraftApplied: boolean; globalSignupReleaseEnabled: boolean; publishedOccurrences: AdminGlobalPublicationOccurrence[] }
   | { published: false; alreadyPublished: true }
 );
+// Exact blocker fields from the EFS-S04 C/3 scoped-publication addendum.
+export const GLOBAL_SCOPE_PUBLICATION_BLOCKER_FIELDS = {
+  GLOBAL_CALENDAR_REQUIRED: [], STALE_CALENDAR_REVISION: [], PUBLISHED_CORE_REQUIRED: [],
+  MAIN_EDITION_NOT_PUBLIC: [], STAFFING_PUBLICATION_IS_SEPARATE: [], PENDING_CORE_DRAFT: [],
+  PARTICIPANT_RELEASE_MUST_BE_OFF: [], INVALID_GLOBAL_SLOT_DEMAND: [], EMPTY_PUBLICATION_SCOPE: [],
+  FOREIGN_EDITION: ['editionId'], INVALID_EDITION_PUBLIC_METADATA: ['editionId'], SECOND_DEFAULT_EDITION: ['editionId'],
+  INACTIVE_CITY_HAS_OTHER_PUBLICATIONS: ['editionId'], EFFECTIVE_CITY_POLICY_MISSING: ['editionId'],
+  INCOMPATIBLE_EFFECTIVE_CITY_POLICY: ['editionId'], INVALID_PUBLIC_COVER: ['editionId'], NO_INCLUDED_DATES_FOR_EDITION: ['editionId'],
+  FOREIGN_OR_CANCELLED_GLOBAL_DATE: ['editionId', 'globalDateId'], CITY_DATE_PARTICIPATION_MISSING: ['editionId', 'globalDateId'],
+  LOCAL_OCCURRENCE_MISSING_OR_DRIFTED: ['editionId', 'globalDateId'],
+  PUBLISHED_DATE_BLUEPRINT_MISSING: ['globalDateId'], UNAPPROVED_FUTURE_BLUEPRINT: ['globalDateId'], INVALID_DATED_SLOT_DEMAND: ['globalDateId'],
+  OCCURRENCE_STATUS_NOT_PUBLISHABLE: ['occurrenceId'], PROTECTED_OR_EXPIRED_PLANNED_OCCURRENCE: ['occurrenceId'],
+  OCCURRENCE_CAPACITY_POLICY_DRIFT: ['occurrenceId'], INVALID_LOCAL_DST_TIME: ['occurrenceId', 'blockPosition'],
+  NON_POSITIVE_REAL_BLOCK_DURATION: ['occurrenceId', 'blockPosition'],
+} as const;
+
+export type AdminGlobalScopePublicationBlocker = {
+  [Code in keyof typeof GLOBAL_SCOPE_PUBLICATION_BLOCKER_FIELDS]: { code: Code } & {
+    [Field in (typeof GLOBAL_SCOPE_PUBLICATION_BLOCKER_FIELDS)[Code][number]]: Field extends 'blockPosition' ? number : string;
+  }
+}[keyof typeof GLOBAL_SCOPE_PUBLICATION_BLOCKER_FIELDS];
+
+export interface EventGlobalScopePublicationCommand {
+  coreId: string;
+  expectedCalendarRevision: number;
+  editionIds: string[];
+  globalDateIds: string[];
+}
+
+export interface AdminGlobalScopePublicationImpact {
+  plannedOccurrenceCount: number;
+  alreadyPublishedOccurrenceCount: number;
+  legacyCapacityUpgrades: number;
+  excludedSelections: number;
+  willActivateEditionIds: string[];
+}
+
+export interface AdminGlobalScopePublicationPreview {
+  valid: boolean;
+  status: 'draft_ready' | 'blocked';
+  coreId: string;
+  calendarRevision: number | null;
+  editionIds: string[];
+  globalDateIds: string[];
+  blockers: AdminGlobalScopePublicationBlocker[];
+  impact: AdminGlobalScopePublicationImpact;
+  published: false;
+  participantSignupOpened: false;
+  appliedToPublic: false;
+}
+
+export type AdminGlobalScopePublicationResult = {
+  coreId: string;
+  calendarRevision: number;
+  publishedOccurrenceCount: number;
+  activatedEditionCount: number;
+  legacyCapacityUpgrades: number;
+  mainEditionId: string;
+  impact: AdminGlobalScopePublicationImpact;
+  participantSignupOpened: false;
+  globalSignupReleaseEnabled: boolean;
+} & ({ published: true; alreadyPublished: false } | { published: false; alreadyPublished: true });
+
+export interface AdminGlobalScopePublicationSnapshot {
+  core: IEventCoreDetail;
+  calendar: AdminGlobalCalendarResult;
+  editions: IAdminEventDetail[];
+  policy: AdminEffectivePolicyResult;
+}

@@ -215,6 +215,10 @@ export interface IAdminOccurrenceListItem {
   slotCapacity: number;
   participantCapacity: number | null;
   participantSignupKind: ParticipantSignupKind;
+  capacityPolicy: 'legacy_shared' | 'independent';
+  sessionCapacityCeiling: number | null;
+  wholeEventCapacity: number | null;
+  participantSignupOpenedAt: string | null;
   hostSignupOpensAt: string | null;
   hostSignupClosesAt: string | null;
   participantSignupOpensAt: string | null;

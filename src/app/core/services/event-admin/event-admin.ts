@@ -18,7 +18,9 @@ import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResu
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import { readAdminGlobalEventPagePreview } from '../../reads/events/admin-global-event-preview.contract';
-import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult } from '../../interfaces/i-admin-global-event-publication';
+import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult, AdminGlobalScopePublicationPreview,
+  AdminGlobalScopePublicationResult, EventGlobalScopePublicationCommand } from '../../interfaces/i-admin-global-event-publication';
+import { assertGlobalScopePublicationCommand, assertGlobalScopePublicationPreview, assertGlobalScopePublicationResult } from '../../reads/events/admin-global-scope-publication.contract';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
 import type {
   AddAdminGlobalEventCityPayload,
@@ -127,6 +129,24 @@ export class EventAdmin {
     return this.backend.rpc<AdminGlobalPublicationResult>(EVENT_RPC.publishGlobalEvent, {
       p_core_id: coreId, p_expected_policy_draft_revision: policyDraftRevision,
     });
+  }
+
+  previewGlobalScopePublication(command: EventGlobalScopePublicationCommand): Observable<AdminGlobalScopePublicationPreview> {
+    return defer(() => this.backend.rpc<AdminGlobalScopePublicationPreview>(
+      EVENT_RPC.previewGlobalScopePublication, this.scopePublicationArgs(command),
+    )).pipe(tap(preview => assertGlobalScopePublicationPreview(preview, command)));
+  }
+
+  publishGlobalScope(command: EventGlobalScopePublicationCommand): Observable<AdminGlobalScopePublicationResult> {
+    return defer(() => this.backend.rpc<AdminGlobalScopePublicationResult>(
+      EVENT_RPC.publishGlobalScope, this.scopePublicationArgs(command),
+    )).pipe(tap(result => assertGlobalScopePublicationResult(result, command)));
+  }
+
+  private scopePublicationArgs(command: EventGlobalScopePublicationCommand) {
+    assertGlobalScopePublicationCommand(command);
+    return { p_core_id: command.coreId, p_expected_calendar_revision: command.expectedCalendarRevision,
+      p_edition_ids: command.editionIds, p_global_date_ids: command.globalDateIds };
   }
 
   previewGlobalBaseTimeBlocks(command: EventGlobalBaseTimeBlocksCommand): Observable<AdminGlobalBaseTimeBlocksPreview> {

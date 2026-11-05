@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
-import { EMPTY, switchMap } from 'rxjs';
+import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import type { EventGlobalSavedSnapshot } from '../../../../core/interfaces/i-event-global-saved-summary';
@@ -56,13 +56,37 @@ export class EventGlobalSavedSummary {
   });
   protected readonly hasRelease = computed(() => this.snapshot()?.calendar.globalDates.some(day =>
     day.cityOccurrences.some(city => city.publishedAt !== null)) ?? false);
+  protected readonly scoped = computed(() => this.snapshot()?.core.isActive === true && this.snapshot()?.core.hasPublicPage === true);
+  protected readonly scopeEditionIds = signal<string[]>([]);
+  protected readonly scopeDateIds = signal<string[]>([]);
+  protected readonly scopeDecisionPending = signal(false);
+  protected readonly scopeCalendar = computed(() => {
+    const calendar = this.publication.scopeCalendar();
+    return calendar?.coreId === this.coreId() ? calendar : this.snapshot()?.calendar ?? null;
+  });
+  protected readonly scopeDates = computed(() => this.scopeCalendar()?.globalDates.filter(day => day.status === 'scheduled') ?? []);
+  protected readonly canPreviewScope = computed(() => this.browserReady() && this.isAdmin() && this.scoped() && !this.disabled() &&
+    !this.loading() && this.error() === null && !this.publication.locked() && this.scopeEditionIds().length > 0 && this.scopeDateIds().length > 0);
+  protected readonly scopeSelection = computed(() => {
+    const preview = this.publication.scopePreview();
+    const calendar = this.scopeCalendar();
+    return {
+      cities: (preview?.editionIds ?? this.scopeEditionIds()).map(id => calendar?.cities.find(city => city.editionId === id)?.city ?? id).join(', '),
+      dates: (preview?.globalDateIds ?? this.scopeDateIds()).map(id => {
+        const day = calendar?.globalDates.find(day => day.globalOccurrenceId === id);
+        return day ? formatDateLabel(day.date) : id;
+      }).join(', '),
+    };
+  });
+  protected readonly scopeActivationCities = computed(() => this.publication.scopePreview()?.impact.willActivateEditionIds
+    .map(id => this.scopeCalendar()?.cities.find(city => city.editionId === id)?.city ?? id).join(', ') ?? '');
   protected readonly canPublish = computed(() => this.browserReady() && this.isAdmin() && !this.disabled() &&
     !this.loading() && this.error() === null && this.snapshot()?.core.id === this.coreId() &&
     !this.hasRelease() && !this.publication.locked());
   protected readonly publicationError = computed(() => {
     const error = this.publication.error();
     if (error === null) return null;
-    if (this.publication.needsReadback()) return this.publication.result()
+    if (this.publication.needsReadback()) return this.publication.result() || this.publication.scopeResult()
       ? this.publicationCopy().readbackFailed : this.publicationCopy().uncertain;
     if (error instanceof RpcError && error.code === '40001') return this.i18n.commonErrors().concurrentModification;
     if (error instanceof RpcError && error.code === '23514') return this.publicationCopy().blocked;
@@ -74,6 +98,17 @@ export class EventGlobalSavedSummary {
     message: this.publicationCopy().blockers[blocker.code],
     city: blocker.editionId ? this.snapshot()?.calendar.cities.find(city => city.editionId === blocker.editionId)?.city ?? blocker.editionId : null,
   })) ?? []);
+  protected readonly scopeBlockers = computed(() => this.publication.scopePreview()?.blockers.map(blocker => {
+    const calendar = this.scopeCalendar();
+    const day = 'globalDateId' in blocker ? calendar?.globalDates.find(day => day.globalOccurrenceId === blocker.globalDateId)
+      : 'occurrenceId' in blocker ? calendar?.globalDates.find(day => day.cityOccurrences.some(city => city.occurrenceId === blocker.occurrenceId)) : undefined;
+    const editionId = 'editionId' in blocker ? blocker.editionId
+      : 'occurrenceId' in blocker ? day?.cityOccurrences.find(city => city.occurrenceId === blocker.occurrenceId)?.editionId : undefined;
+    return { code: blocker.code, message: this.publicationCopy().scope.blockers[blocker.code],
+      city: editionId ? calendar?.cities.find(city => city.editionId === editionId)?.city ?? editionId : null,
+      date: day?.date, unresolvedId: day ? null : 'globalDateId' in blocker ? blocker.globalDateId : 'occurrenceId' in blocker ? blocker.occurrenceId : null,
+      blockPosition: 'blockPosition' in blocker ? blocker.blockPosition : null };
+  }) ?? []);
   protected readonly errorMessage = computed(() => this.error() === null ? null : resolveEventCoreAdminErrorMessage(
     this.error(), this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification,
   ));
@@ -102,6 +137,7 @@ export class EventGlobalSavedSummary {
         this.snapshot.set(null);
         this.error.set(null);
         this.loading.set(true);
+        if (!this.publication.locked()) this.publication.scopeCalendar.set(null);
         if (!ready) return;
         const subscription = readEventGlobalSavedSummary(this.admin, coreId).subscribe({
           next: snapshot => { this.snapshot.set(snapshot); this.loading.set(false); },
@@ -113,7 +149,55 @@ export class EventGlobalSavedSummary {
   }
 
   protected refresh(): void {
-    if (!this.loading() && !this.publication.locked()) this.readAttempt.update(value => value + 1);
+    if (!this.loading() && !this.publication.locked()) {
+      this.clearScopeSelection();
+      this.readAttempt.update(value => value + 1);
+    }
+  }
+
+  protected toggleScope(kind: 'edition' | 'date', id: string): void {
+    if (this.disabled() || this.publication.locked()) return;
+    this.publication.invalidateScope();
+    const selected = kind === 'edition' ? this.scopeEditionIds : this.scopeDateIds;
+    selected.update(ids => ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]);
+  }
+
+  protected clearScopeSelection(): void {
+    if (this.publication.locked()) return;
+    this.publication.invalidateScope();
+    this.scopeEditionIds.set([]);
+    this.scopeDateIds.set([]);
+  }
+
+  protected previewScope(): void {
+    if (!this.canPreviewScope()) return;
+    this.publication.prepareScope(this.coreId(), this.scopeEditionIds(), this.scopeDateIds())
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => { /* The controller owns inline readiness errors. */ } });
+  }
+
+  protected confirmScopePublication(): void {
+    const preview = this.publication.scopePreview();
+    if (!this.publication.scopeConfirmable() || !preview?.valid || this.scopeDecisionPending()) return;
+    this.scopeDecisionPending.set(true);
+    const coreId = this.coreId();
+    const impact = preview.impact;
+    const selection = this.scopeSelection();
+    const message = this.publicationCopy().scope.confirm.replace('{{cities}}', selection.cities).replace('{{dates}}', selection.dates)
+      .replace('{{planned}}', String(impact.plannedOccurrenceCount)).replace('{{already}}', String(impact.alreadyPublishedOccurrenceCount))
+      .replace('{{excluded}}', String(impact.excludedSelections)).replace('{{upgrades}}', String(impact.legacyCapacityUpgrades))
+      .replace('{{activate}}', this.scopeActivationCities() || this.i18n.commonValues().notApplicable);
+    this.confirm.modalDecision({ header: this.publicationCopy().scope.title, message,
+      acceptLabel: this.publicationLabels().publish, rejectLabel: this.i18n.commonActions().cancel,
+    }).pipe(switchMap(accepted => {
+      if (!accepted || coreId !== this.coreId() || !this.isAdmin()) {
+        this.publication.cancelConfirmation();
+        return EMPTY;
+      }
+      return this.publication.publish();
+    }), finalize(() => this.scopeDecisionPending.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: core => { if (core) this.acceptPublication(core); },
+      error: () => { /* Pending outcomes offer readback only; definite refusals show fresh preview. */ },
+    });
   }
 
   protected confirmPublication(): void {
@@ -143,13 +227,31 @@ export class EventGlobalSavedSummary {
   }
 
   protected retryPublicationReadback(): void {
+    if (this.scopeDecisionPending()) return;
     this.publication.retryReadback().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: core => this.acceptPublication(core),
       error: () => { /* Readback remains available without repeating the writer. */ },
     });
   }
 
+  protected endScopeReadback(): void {
+    if (!this.publication.canAbandonScopeReadback() || this.scopeDecisionPending()) return;
+    const coreId = this.coreId();
+    this.scopeDecisionPending.set(true);
+    this.confirm.modalDecision({
+      header: this.publicationCopy().scope.title, message: this.publicationCopy().scope.endReadbackWarning,
+      icon: 'pi pi-exclamation-triangle', acceptLabel: this.publicationCopy().scope.endReadback,
+      rejectLabel: this.i18n.commonActions().cancel,
+    }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.scopeDecisionPending.set(false))).subscribe(accepted => {
+      if (accepted && coreId === this.coreId() && this.isAdmin() && this.publication.abandonScopeReadback()) {
+        this.readAttempt.update(value => value + 1);
+      }
+    });
+  }
+
   private acceptPublication(core: IEventCoreDetail): void {
+    this.scopeEditionIds.set([]);
+    this.scopeDateIds.set([]);
     this.published.emit(core);
     this.readAttempt.update(value => value + 1);
   }
