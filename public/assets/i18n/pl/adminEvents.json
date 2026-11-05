@@ -118,6 +118,7 @@
     },
     "cover": {
       "info": "[PH] Okładka jest opcjonalna i wspólna dla lokalizacji bez własnej okładki. Przesłany obraz jest ogólnodostępny. Zapis okładki nie publikuje wydarzenia ani nie zapisuje metadanych.",
+      "editionOverride": "[PH] Lokalizacja ma własną okładkę, która ma pierwszeństwo przed okładką wydarzenia. Podsumowanie pokazuje efektywną okładkę.",
       "cropHint": "[PH] Ustaw kadr okładki wydarzenia.",
       "previewAlt": "[PH] Podgląd okładki wydarzenia",
       "save": "[PH] Zapisz okładkę",

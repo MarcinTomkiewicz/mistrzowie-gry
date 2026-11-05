@@ -5,191 +5,203 @@
   class="flex-col-start-stretch gap-md w-100"
   [formGroup]="editionForm"
 >
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-    <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ translations.sections().identity }}
-    </h2>
+  @if (section() !== 'price') {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ translations.sections().identity }}
+      </h2>
 
-    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
-      <p-iftalabel class="w-100">
-        <input
-          class="w-100"
-          pInputText
-          id="event-edition-core"
-          [value]="coreName()"
-          readonly
-        />
-        <label for="event-edition-core">
-          {{ translations.commonLabels().event }}
-        </label>
-      </p-iftalabel>
-
-      <div class="flex-col-start-stretch gap-xs w-100">
+      <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
         <p-iftalabel class="w-100">
           <input
             class="w-100"
             pInputText
-            id="event-edition-city"
-            formControlName="city"
-            autocomplete="off"
-            [readonly]="!isNew()"
-            [attr.aria-describedby]="
-              isNew() ? null : 'event-edition-city-info'
-            "
-            [attr.aria-invalid]="
-              editionForm.controls.city.touched && editionForm.controls.city.invalid
-            "
+            id="event-edition-core"
+            [value]="coreName()"
+            readonly
           />
-          <label for="event-edition-city">
-            {{ translations.commonLabels().city }}
+          <label for="event-edition-core">
+            {{ translations.commonLabels().event }}
           </label>
         </p-iftalabel>
 
-        @if (
-          editionForm.controls.city.touched &&
-          (editionForm.controls.city.hasError("required") ||
-            editionForm.controls.city.hasError("requiredTrimmed"))
-        ) {
-          <small class="mg-contact-error">
-            {{ translations.commonForm().required }}
-          </small>
-        } @else if (
-          editionForm.controls.city.touched &&
-          editionForm.controls.city.hasError("slugSource")
-        ) {
-          <small class="mg-contact-error">
-            {{ translations.validation().citySlugSource }}
-          </small>
-        }
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="event-edition-city"
+              formControlName="city"
+              autocomplete="off"
+              [readonly]="!isNew()"
+              [attr.aria-describedby]="
+                isNew() ? null : 'event-edition-city-info'
+              "
+              [attr.aria-invalid]="
+                editionForm.controls.city.touched && editionForm.controls.city.invalid
+              "
+            />
+            <label for="event-edition-city">
+              {{ translations.commonLabels().city }}
+            </label>
+          </p-iftalabel>
 
-        @if (!isNew()) {
-          <small id="event-edition-city-info" class="color-muted">
-            {{ translations.info().cityImmutable }}
-          </small>
-        }
-      </div>
+          @if (
+            editionForm.controls.city.touched &&
+            (editionForm.controls.city.hasError("required") ||
+              editionForm.controls.city.hasError("requiredTrimmed"))
+          ) {
+            <small class="mg-contact-error">
+              {{ translations.commonForm().required }}
+            </small>
+          } @else if (
+            editionForm.controls.city.touched &&
+            editionForm.controls.city.hasError("slugSource")
+          ) {
+            <small class="mg-contact-error">
+              {{ translations.validation().citySlugSource }}
+            </small>
+          }
 
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <span class="small-caps">{{ translations.fields().slug }}</span>
-        <strong class="text-wrap-anywhere">
-          {{ editionForm.controls.slug.value }}
-        </strong>
+          @if (!isNew()) {
+            <small id="event-edition-city-info" class="color-muted">
+              {{ translations.info().cityImmutable }}
+            </small>
+          }
+        </div>
+
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <span class="small-caps">{{ translations.fields().slug }}</span>
+          <strong class="text-wrap-anywhere">
+            {{ editionForm.controls.slug.value }}
+          </strong>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  }
 
   <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ translations.sections().venueAndPrice }}
+      {{ section() === 'location' ? translations.commonLabels().venueName : section() === 'price' ? translations.commonLabels().amount : translations.sections().venueAndPrice }}
     </h2>
 
-    <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
-      <p-iftalabel class="w-100">
-        <input
-          class="w-100"
-          pInputText
-          id="event-edition-venue-name"
-          formControlName="venueName"
-        />
-        <label for="event-edition-venue-name">
-          {{ translations.commonLabels().venueName }}
-        </label>
-      </p-iftalabel>
-
-      <p-iftalabel class="w-100">
-        <input
-          class="w-100"
-          pInputText
-          id="event-edition-venue-address"
-          formControlName="venueAddress"
-        />
-        <label for="event-edition-venue-address">
-          {{ translations.commonLabels().venueAddress }}
-        </label>
-      </p-iftalabel>
-    </div>
-
-    <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
-      <div class="flex-col-start-stretch gap-xs w-100">
-        <p-iftalabel class="w-100">
-          <p-inputnumber
-            class="w-100"
-            inputId="event-edition-price-amount"
-            formControlName="priceAmount"
-            mode="decimal"
-            [min]="0"
-            [minFractionDigits]="0"
-            [maxFractionDigits]="2"
-          />
-          <label for="event-edition-price-amount">
-            {{ translations.commonLabels().amount }}
-          </label>
-        </p-iftalabel>
-
-        @if (
-          editionForm.controls.priceAmount.touched &&
-          editionForm.controls.priceAmount.hasError("min")
-        ) {
-          <small class="mg-contact-error">
-            {{ translations.commonPrice().editor.validation.amountMin }}
-          </small>
-        }
-      </div>
-
-      <div class="flex-col-start-stretch gap-xs w-100">
+    @if (section() !== 'price') {
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
         <p-iftalabel class="w-100">
           <input
             class="w-100"
             pInputText
-            id="event-edition-price-currency"
-            formControlName="priceCurrency"
+            id="event-edition-venue-name"
+            formControlName="venueName"
           />
-          <label for="event-edition-price-currency">
-            {{ translations.commonLabels().currency }}
+          <label for="event-edition-venue-name">
+            {{ translations.commonLabels().venueName }}
           </label>
         </p-iftalabel>
 
-        @if (
-          editionForm.controls.priceCurrency.touched &&
-          editionForm.controls.priceCurrency.invalid
-        ) {
-          <small class="mg-contact-error">
-            {{ translations.commonForm().required }}
-          </small>
-        }
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-venue-address"
+            formControlName="venueAddress"
+          />
+          <label for="event-edition-venue-address">
+            {{ translations.commonLabels().venueAddress }}
+          </label>
+        </p-iftalabel>
       </div>
-
       <p-iftalabel class="w-100">
-        <input
-          class="w-100"
-          pInputText
-          id="event-edition-price-label"
-          formControlName="priceLabel"
-        />
-        <label for="event-edition-price-label">
-          {{ translations.commonPrice().editor.fields.description }}
-        </label>
+        <input class="w-100" pInputText id="event-edition-facebook-link" formControlName="facebookLink" />
+        <label for="event-edition-facebook-link">{{ translations.commonLabels().facebookLink }}</label>
       </p-iftalabel>
-    </div>
-  </section>
+    }
 
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
-    <h2 class="mg-section__title mg-section__title--md m-0">
-      {{ translations.commonLabels().cover }}
-    </h2>
+    @if (section() !== 'location') {
+      <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <p-inputnumber
+              class="w-100"
+              inputId="event-edition-price-amount"
+              formControlName="priceAmount"
+              mode="decimal"
+              [min]="0"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+            />
+            <label for="event-edition-price-amount">
+              {{ translations.commonLabels().amount }}
+            </label>
+          </p-iftalabel>
 
-    @if (isNew()) {
-      <p class="m-0 color-muted">{{ translations.cover().saveFirst }}</p>
-    } @else {
-      <p class="m-0 color-muted">{{ translations.cover().publicImageInfo }}</p>
-      <app-image-upload
-        [currentUrl]="resolveCoverPreviewUrl()"
-        [clearCurrent]="true"
-        [cropHint]="translations.cover().cropHint"
-        [disabled]="disabled()"
-        [previewAlt]="translations.fields().coverPreviewAlt"
-        (imageChange)="coverChanged.emit($event)"
-      />
+          @if (
+            editionForm.controls.priceAmount.touched &&
+            editionForm.controls.priceAmount.hasError("min")
+          ) {
+            <small class="mg-contact-error">
+              {{ translations.commonPrice().editor.validation.amountMin }}
+            </small>
+          }
+        </div>
+
+        <div class="flex-col-start-stretch gap-xs w-100">
+          <p-iftalabel class="w-100">
+            <input
+              class="w-100"
+              pInputText
+              id="event-edition-price-currency"
+              formControlName="priceCurrency"
+            />
+            <label for="event-edition-price-currency">
+              {{ translations.commonLabels().currency }}
+            </label>
+          </p-iftalabel>
+
+          @if (
+            editionForm.controls.priceCurrency.touched &&
+            editionForm.controls.priceCurrency.invalid
+          ) {
+            <small class="mg-contact-error">
+              {{ translations.commonForm().required }}
+            </small>
+          }
+        </div>
+
+        <p-iftalabel class="w-100">
+          <input
+            class="w-100"
+            pInputText
+            id="event-edition-price-label"
+            formControlName="priceLabel"
+          />
+          <label for="event-edition-price-label">
+            {{ translations.commonPrice().editor.fields.description }}
+          </label>
+        </p-iftalabel>
+      </div>
     }
   </section>
+
+  @if (section() === 'all') {
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+      <h2 class="mg-section__title mg-section__title--md m-0">
+        {{ translations.commonLabels().cover }}
+      </h2>
+
+      @if (isNew()) {
+        <p class="m-0 color-muted">{{ translations.cover().saveFirst }}</p>
+      } @else {
+        <p class="m-0 color-muted">{{ translations.cover().publicImageInfo }}</p>
+        <app-image-upload
+          [currentUrl]="resolveCoverPreviewUrl()"
+          [clearCurrent]="true"
+          [cropHint]="translations.cover().cropHint"
+          [disabled]="disabled()"
+          [previewAlt]="translations.fields().coverPreviewAlt"
+          (imageChange)="coverChanged.emit($event)"
+        />
+      }
+    </section>
+  }
 </div>

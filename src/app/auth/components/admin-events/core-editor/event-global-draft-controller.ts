@@ -83,15 +83,19 @@ export class EventGlobalDraftController {
 
   readCore(coreId: string): Observable<IEventCoreDetail | null> {
     return defer(() => {
-      if (this.selectionCoreId !== coreId) this.resetEditionSelection();
+      if (this.selectionCoreId !== coreId) {
+        this.resetEditionSelection();
+        this.staffingEditionId.set(null);
+        this.isUnreleasedStaffing.set(false);
+      }
       this.selectionCoreId = coreId;
-      this.staffingEditionId.set(null);
-      this.isUnreleasedStaffing.set(false);
       this.mainEdition.set(null);
       return this.eventAdmin.getCoreDetail(coreId).pipe(switchMap((core) => {
         if (core === null) {
           if (this.cityCommand?.coreId === coreId) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
           this.resetEditionSelection();
+          this.staffingEditionId.set(null);
+          this.isUnreleasedStaffing.set(false);
           this.calendar.set(null);
           this.policy.set(null);
           return of(null);
@@ -106,6 +110,8 @@ export class EventGlobalDraftController {
           this.resetEditionSelection();
           this.calendar.set(null);
           this.policy.set(null);
+          this.selectedEditionId.set(editionId);
+          this.selectedEdition.set(this.mainEdition());
           return of(core);
         }));
       }));
@@ -121,7 +127,9 @@ export class EventGlobalDraftController {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Edition readback.');
         }
         const isStaffingConverted = edition.isStaffingConverted === true;
-        if (!isStaffingConverted) this.mainEdition.set(edition);
+        assertEdgeContract(!isStaffingConverted || edition.schedule?.kind === 'exact_dates',
+          'staffingEdition', 'the converted Edition with its exact-date schedule');
+        this.mainEdition.set(edition);
         this.isUnreleasedStaffing.set(isStaffingConverted && !edition.isStaffingReleased);
         return isStaffingConverted ? edition.id : null;
       }),

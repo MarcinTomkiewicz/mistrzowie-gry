@@ -1,0 +1,151 @@
+@let details = core();
+@let location = edition();
+@let labels = i18n.commonLabels();
+@let values = i18n.commonValues();
+<header class="flex-col-start-stretch gap-sm w-100">
+  <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().summary }}</h2>
+  <p class="m-0 muted-text">{{ i18n.creation().savedData }}</p>
+  @if (unsavedSteps().length) {
+    <p-message severity="warn" role="status">{{ editionI18n.publication().saveFirst }}</p-message>
+    <div class="flex-row-start-center flex-wrap gap-sm">
+      @for (step of unsavedSteps(); track step.value) {
+        <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-point-left"
+          [label]="step.label" [disabled]="disabled()" (onClick)="navigateToStep.emit(step.value)" />
+      }
+    </div>
+  }
+</header>
+<div class="grid-2-1 grid-items-start gap-md w-100 min-w-0">
+  <div class="flex-col-start-stretch gap-md min-w-0">
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <div class="flex-row-start-center gap-md min-w-0">
+          <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
+          <h3 class="mg-section__title mg-section__title--md m-0 text-wrap-anywhere">{{ details.name }}</h3>
+        </div>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+          [label]="i18n.creationSteps().event" [disabled]="disabled()" (onClick)="navigateToStep.emit(1)" />
+      </header>
+      <dl class="flex-col-start-stretch gap-md m-0">
+        <div><dt class="muted-text">{{ labels.key }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.key }}</dd></div>
+        <div><dt class="muted-text">{{ labels.shortDescription }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.shortDescription || values.notProvided }}</dd></div>
+        <div><dt class="muted-text">{{ labels.longDescription }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.longDescription || values.notProvided }}</dd></div>
+      </dl>
+      @if (coverUrl(); as url) {
+        <figure class="flex-col-start-stretch gap-sm m-0 w-100 min-w-0">
+          <img class="w-100" [src]="url" [alt]="editionI18n.fields().coverPreviewAlt" />
+          <figcaption class="muted-text">
+            {{ labels.cover }} - {{ timelineI18n.copy().source }}:
+            {{ location.coverImagePath !== null ? i18n.creationSteps().location : i18n.creationSteps().event }}
+          </figcaption>
+        </figure>
+      } @else {
+        <p class="m-0 muted-text">{{ labels.cover }}: {{ values.notProvided }}</p>
+      }
+      <dl class="mg-grid-2 gap-md m-0 border-top pt-md">
+        <div><dt class="muted-text">{{ labels.status }}</dt><dd class="m-0">{{ details.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().inactive }}</dd></div>
+        <div><dt class="muted-text">{{ i18n.fields().hasPublicPage }}</dt><dd class="m-0">{{ details.hasPublicPage ? values.yes : values.no }}</dd></div>
+      </dl>
+    </section>
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h3>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+          [label]="i18n.creationSteps().location" [disabled]="disabled()" (onClick)="navigateToStep.emit(2)" />
+      </header>
+      <dl class="mg-grid-2 gap-md m-0">
+        <div><dt class="muted-text">{{ labels.city }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.city }}</dd></div>
+        <div><dt class="muted-text">{{ labels.slug }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.slug }}</dd></div>
+        <div><dt class="muted-text">{{ labels.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.venueName || values.notProvided }}</dd></div>
+        <div><dt class="muted-text">{{ labels.venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.venueAddress || values.notProvided }}</dd></div>
+        <div><dt class="muted-text">{{ labels.status }}</dt><dd class="m-0">{{ location.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().inactive }}</dd></div>
+      </dl>
+      <dl class="m-0">
+        <dt class="muted-text">{{ labels.facebookLink }}</dt>
+        <dd class="m-0 text-wrap-anywhere">
+          @if (location.facebookLink; as link) { <a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a> }
+          @else { {{ values.notProvided }} }
+        </dd>
+      </dl>
+    </section>
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().schedule }}</h3>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+          [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
+      </header>
+      <dl class="mg-grid-2 gap-md m-0">
+        <div><dt class="muted-text">{{ labels.timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.timezone }}</dd></div>
+        <div><dt class="muted-text">{{ labels.hours }}</dt><dd class="m-0">{{ formatTimeRangeLabel(location.startTime, location.endTime) }}</dd></div>
+      </dl>
+      @if (location.schedule.kind === 'exact_dates') {
+        <h4 class="mg-section__title mg-section__title--sm m-0">{{ scheduleI18n.options().exactDates }}</h4>
+      }
+      <dl class="flex-col-start-stretch gap-sm m-0 border-top pt-md">
+        @for (day of dates(); track day.date) {
+          <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
+            <dt><time [attr.datetime]="day.date">{{ formatDateLabel(day.date) }}</time></dt>
+            <dd class="m-0">{{ day.status ? editionI18n.occurrenceStatuses()[day.status] : i18n.savedSummary().noOccurrence }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="timelineLoading()">
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h3>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+          [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
+      </header>
+      @if (timelineLoading()) {
+        <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
+      } @else if (timelineErrorMessage(); as error) {
+        <p-message severity="error" role="alert">{{ timelineI18n.copy().loadFailed }}: {{ error }}</p-message>
+        <div class="flex-row-start-center">
+          <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry"
+            [disabled]="disabled()" (onClick)="reloadTimeline.emit()" />
+        </div>
+      } @else if (timeline()) {
+        @for (day of days(); track day.occurrence.occurrenceId) {
+          <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+            <h4 class="mg-section__title mg-section__title--sm m-0"><time [attr.datetime]="day.occurrence.date">{{ formatDateLabel(day.occurrence.date) }}</time></h4>
+            @for (entry of day.rows; track entry.key) {
+              <article class="mg-card flex-col-start-stretch gap-xs p-sm w-100 min-w-0">
+                <strong class="text-wrap-anywhere">{{ entry.title }}</strong>
+                <p class="m-0 text-wrap-anywhere">{{ entry.time }} - {{ entry.host }}</p>
+                <div class="flex-row-start-center flex-wrap gap-sm">
+                  <span class="tag-badge" [class.tag-badge--success]="entry.row.status === 'confirmed'"
+                    [class.tag-badge--muted]="entry.row.status === 'pending'">{{ entry.status }}</span>
+                  @if (entry.programStatus) { <small>{{ entry.programStatus }}</small> }
+                  @if (entry.candidate) { <small>{{ entry.candidate }}</small> }
+                  @if (entry.row.source === 'staffing' && entry.row.participationEnded) {
+                    <small class="error-text">{{ timelineI18n.copy().participationEnded }}</small>
+                  }
+                </div>
+              </article>
+            } @empty { <p class="m-0 muted-text">{{ timelineI18n.copy().noRows }}</p> }
+          </section>
+        } @empty { <p class="m-0 muted-text">{{ timelineI18n.copy().noOccurrences }}</p> }
+      } @else {
+        <p class="m-0 muted-text" role="status">{{ values.notProvided }}</p>
+      }
+    </section>
+  </div>
+  <div class="flex-col-start-stretch gap-md min-w-0">
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().policy }}</h3>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+          [label]="i18n.creationSteps().policy" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" />
+      </header>
+      <dl class="flex-col-start-stretch gap-sm m-0 w-100">
+        @for (row of policyRows(); track row.label) {
+          <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm min-w-0">
+            <dt class="muted-text flex-1 min-w-0 text-wrap-anywhere">{{ row.label }}</dt>
+            <dd class="m-0 text-right text-left-sm text-wrap-anywhere">{{ row.value }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+    <ng-content />
+  </div>
+</div>

@@ -188,6 +188,8 @@ export class EventEditionEditorFacade {
           : of<IAdminEventDetail | null>(null),
       }).pipe(
         map(({ core, edition }) => {
+          assertEdgeContract((core === null || core.id === coreId) && (edition === null || edition.id === eventId),
+            'eventEdition', 'the requested Core and Edition identities');
           if (!core || (eventId && (!edition || edition.eventCoreId !== core.id))) {
             this.coreState.set(null);
             this.editionState.set(null);
@@ -214,7 +216,11 @@ export class EventEditionEditorFacade {
         payload, file, this.edition()?.coverImagePath ?? null,
       ).pipe(
         tap((result) => {
-          if (result.status === 'saved') this.editionState.set(result.edition);
+          if (result.status === 'saved') {
+            assertEdgeContract(result.edition.eventCoreId === payload.eventCoreId &&
+              (payload.id === null || result.edition.id === payload.id), 'eventEdition', 'the saved Edition with unchanged ownership');
+            this.editionState.set(result.edition);
+          }
         }),
         finalize(() => this.operation.set(null)),
       );
@@ -226,12 +232,20 @@ export class EventEditionEditorFacade {
       this.operation.set('publish');
       this.publishResult.set(null);
       return this.admin.publishStaffingEvent(eventId).pipe(
-        tap((result) => this.publishResult.set(result)),
+        tap((result) => {
+          assertEdgeContract(result.eventId === eventId && result.eventCoreId === coreId &&
+            ((result.published === true && result.alreadyPublished === false) || (result.published === false && result.alreadyPublished === true)) &&
+            Number.isFinite(Date.parse(result.publishedAt)), 'staffingPublication', 'the publication result for the requested Core and Edition');
+          this.publishResult.set(result);
+        }),
         switchMap((result) => this.load(coreId, eventId).pipe(
           map(() => {
-            if (!this.edition() || !this.core()) {
-              throw new Error('Published Event is missing from the admin read.');
-            }
+            const edition = this.edition();
+            const core = this.core();
+            assertEdgeContract(core?.id === coreId && edition?.id === eventId && edition.eventCoreId === core.id &&
+              edition.isStaffingConverted && edition.isStaffingReleased && (!result.published ||
+                (core.isActive && core.hasPublicPage && edition.isActive && edition.isDefaultPublic && edition.currentlyPublic)),
+            'staffingPublication', 'the canonical Staffing release and public state after first publication');
             return result;
           }),
         )),
@@ -242,6 +256,10 @@ export class EventEditionEditorFacade {
 
   updateEdition(edition: IAdminEventDetail): void {
     this.editionState.set(edition);
+  }
+
+  updateCore(core: IEventCoreDetail): void {
+    if (this.core()?.id === core.id) this.coreState.set(core);
   }
 
   private programOccurrenceId(programItemId: string): string | null {

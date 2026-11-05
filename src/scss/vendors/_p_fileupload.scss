@@ -1,4 +1,4 @@
-:where(.mg-form, form, .mg-card form) {
+:where(.mg-form, form, .mg-card form, app-file-upload) {
   .p-fileupload {
     color: var(--mg-form-text);
 

@@ -39,13 +39,14 @@ export class EventCoreMetadataController {
   readonly core = signal<IEventCoreDetail | null>(null);
   readonly edition = signal<IAdminEventDetail | null>(null);
   readonly isGlobal = signal(false);
+  readonly embeddedEditionLocked = signal(false);
   readonly isBusy = signal(false);
   readonly state = signal<'idle' | 'uncertain' | 'saved'>('idle');
   readonly pendingTarget = signal<EventMetadataTarget | null>(null);
   readonly errors = signal<Partial<Record<EventMetadataTarget, unknown>>>({});
   readonly issues = signal<Partial<Record<EventMetadataTarget, 'conflict' | 'protected'>>>({});
   readonly locked = computed(() => this.isBusy() || this.state() !== 'idle');
-  readonly blocked = computed(() => this.program.locked() || this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
+  readonly blocked = computed(() => this.embeddedEditionLocked() || this.program.locked() || this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
     this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() || this.blocks.isBusy() || this.blocks.isDirty() || this.blocks.readbackPending());
   readonly coreForm = new FormGroup({
     key: new FormControl('', { nonNullable: true,
@@ -166,12 +167,12 @@ export class EventCoreMetadataController {
   private createCommand(target: EventMetadataTarget, core: IEventCoreDetail): MetadataCommand {
     if (target === 'core') {
       const value = this.coreForm.getRawValue();
-      const global = this.isGlobal();
+      const managedPublication = this.isGlobal() || this.global.staffingEditionId() !== null;
       return { target, coreId: core.id, payload: {
         id: core.id, key: core.key, name: value.name.trim(),
         shortDescription: normalizeText(value.shortDescription), longDescription: normalizeText(value.longDescription),
-        isActive: global ? core.isActive : value.isActive,
-        hasPublicPage: global || this.global.isUnreleasedStaffing() ? core.hasPublicPage : value.hasPublicPage,
+        isActive: managedPublication ? core.isActive : value.isActive,
+        hasPublicPage: managedPublication ? core.hasPublicPage : value.hasPublicPage,
         displayOrder: core.displayOrder,
       } };
     }
@@ -265,10 +266,10 @@ export class EventCoreMetadataController {
   }
 
   private syncControls(): void {
-    const coreEnabled = !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditCore();
+    const coreEnabled = !this.embeddedEditionLocked() && !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditCore();
     setControlEnabled(this.coreForm, coreEnabled);
-    setControlEnabled(this.coreForm.controls.isActive, coreEnabled && !this.isGlobal());
-    setControlEnabled(this.coreForm.controls.hasPublicPage, coreEnabled && !this.isGlobal() && !this.global.isUnreleasedStaffing());
+    setControlEnabled(this.coreForm.controls.isActive, coreEnabled && !this.isGlobal() && !this.global.staffingEditionId());
+    setControlEnabled(this.coreForm.controls.hasPublicPage, coreEnabled && !this.isGlobal() && !this.global.staffingEditionId());
     setControlEnabled(this.editionForm, !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditEdition());
     this.editionForm.controls.city.disable({ emitEvent: false });
     this.editionForm.controls.timezone.disable({ emitEvent: false });

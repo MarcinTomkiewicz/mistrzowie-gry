@@ -2,8 +2,8 @@
   <div class="mg-container position-relative flex-col-start-stretch gap-lg min-w-0">
     <app-breadcrumbs [items]="breadcrumbs()" />
     <header class="mg-section__header flex-col-start-center gap-sm w-100 m-0">
-      <h1 class="mg-section__title">{{ metadata.isGlobal() ? core()?.name : i18n.page().editTitle }}</h1>
-      @if (metadata.isGlobal()) {
+      <h1 class="mg-section__title">{{ metadata.isGlobal() || globalDraft.staffingEditionId() ? core()?.name : i18n.page().editTitle }}</h1>
+      @if (metadata.isGlobal() || globalDraft.staffingEditionId()) {
         <span class="tag-badge tag-badge--muted">{{ core()?.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().draft }}</span>
       } @else if (!isLoading()) {
         <p class="mg-section__subtitle mg-section__subtitle--full">{{ i18n.page().subtitle }}</p>
@@ -30,8 +30,24 @@
       @if (cover.needsReconciliation()) {
         <p-message severity="warn" role="status">{{ coverCopy().refreshRequired }}</p-message>
       }
-      @if (metadata.isGlobal()) {
-        @if (globalDraft.calendar(); as calendar) {
+      @if (metadata.isGlobal() || globalDraft.staffingEditionId()) {
+        @if (globalDraft.staffingEditionId(); as editionId) {
+          <app-event-global-steps [activeStep]="globalDraft.activeStep()" [persistentContent]="true"
+            [disabled]="navigationLocked() || cover.dirty()" [stepContent]="staffingContent" (stepSelected)="goToStep($event)" />
+          <ng-template #staffingContent>
+            <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+              @if (globalDraft.activeStep() === 1) {
+                <ng-container [ngTemplateOutlet]="coreForm" />
+                <app-event-core-cover [editionCoverPresent]="!!globalDraft.mainEdition()?.coverImagePath" />
+              }
+              <app-event-edition-editor [embeddedEditionId]="editionId" [coreData]="loadedCore"
+                [step]="globalDraft.activeStep()" [blocked]="staffingBlocked()"
+                [coreDirty]="form.dirty || cover.dirty()" [navigationDisabled]="navigationLocked() || cover.dirty()"
+                (navigateToStep)="goToStep($event)"
+                (coreChanged)="acceptPublication($event)" (editionChanged)="acceptStaffingEdition($event)" (cancelled)="goBack()" />
+            </div>
+          </ng-template>
+        } @else if (globalDraft.calendar(); as calendar) {
           <app-event-global-steps [activeStep]="globalDraft.activeStep()" [disabled]="navigationLocked() || cover.dirty()"
             [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
           <ng-template #stepContent>
@@ -197,7 +213,7 @@
           }
         </div>
       </div>
-      @if (!metadata.isGlobal()) {
+      @if (!metadata.isGlobal() && !globalDraft.staffingEditionId()) {
         <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
           <div class="flex-row-start-center gap-md w-100">
             <p-toggleswitch inputId="event-core-is-active" formControlName="isActive" />
@@ -226,7 +242,7 @@
     }
     <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-trail"
       [label]="i18n.commonActions().refresh" [disabled]="metadata.locked() || metadata.blocked() || cover.locked()" (onClick)="refreshMetadata(target)" />
-    @if (!metadata.isGlobal()) {
+    @if (!metadata.isGlobal() && !globalDraft.staffingEditionId()) {
       <p-button type="button" severity="warn" size="small" [outlined]="true" icon="pi pi-interdiction"
         [label]="i18n.commonActions().cancel" [disabled]="metadata.locked()" (onClick)="goBack()" />
     }

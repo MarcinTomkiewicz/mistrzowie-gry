@@ -109,6 +109,7 @@ export type EditionCoverCopy = {
 
 export type CoreCoverCopy = {
   info: string;
+  editionOverride: string;
   cropHint: string;
   previewAlt: string;
   save: string;

@@ -25,6 +25,7 @@ import { createEventEditionEditorI18n } from './edition-editor.i18n';
 })
 export class EventEditionSettingsEditor {
   readonly form = input.required<EventEditionFormGroup>();
+  readonly section = input<'all' | 'schedule' | 'policy'>('all');
   readonly i18n =
     input.required<ReturnType<typeof createEventEditionEditorI18n>>();
 

@@ -30,6 +30,7 @@ export class EventEditionDetailsEditor {
   readonly coreName = input.required<string>();
   readonly isNew = input.required<boolean>();
   readonly disabled = input(false);
+  readonly section = input<'all' | 'location' | 'price'>('all');
   readonly coverChanged = output<FileUploadImageChange>();
   readonly i18n =
     input.required<ReturnType<typeof createEventEditionEditorI18n>>();

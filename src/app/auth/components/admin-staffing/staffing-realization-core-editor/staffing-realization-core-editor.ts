@@ -273,11 +273,13 @@ export class StaffingRealizationCoreEditor {
         this.isEventActionRunning.set(false);
       }),
     ).subscribe({
-      next: ({ eventCoreId, eventId }) => {
+      next: ({ eventCoreId }) => {
         if (this.realizationId !== current.id) return;
         const draft = this.editor.store.coreDraft();
         if (draft) populateStaffingRealizationCoreForm(this.form, draft);
-        void this.router.navigate(['/admin/content/events', eventCoreId, 'editions', eventId, 'edit']);
+        void this.router.navigate(['/admin/content/events', eventCoreId, 'edit'], {
+          queryParams: { staffingRealizationId: current.id },
+        });
       },
       error: () => this.toast.danger({
         summary: this.i18n.toast().eventActionFailedSummary,

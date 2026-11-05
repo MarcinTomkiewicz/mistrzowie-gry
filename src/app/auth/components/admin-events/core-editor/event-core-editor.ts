@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, DestroyRef, ElementRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, type RouterStateSnapshot } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -10,12 +10,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { distinctUntilChanged, EMPTY, filter, finalize, from, ignoreElements, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { distinctUntilChanged, EMPTY, filter, finalize, map, Observable, of, Subscription, switchMap } from 'rxjs';
 
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
-import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -49,11 +49,12 @@ import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
 import { EventGlobalPolicyEditor } from './policy/event-global-policy-editor';
 import { EventGlobalProgram } from './event-global-program';
 import { EventManualProgramController } from './event-manual-program-controller';
+import { EventEditionEditor } from '../edition-editor/event-edition-editor';
 
 @Component({
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule, MessageModule,
-    ToggleSwitchModule, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
+    ToggleSwitchModule, EventEditionEditor, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
@@ -61,6 +62,7 @@ import { EventManualProgramController } from './event-manual-program-controller'
     EventGlobalPublicationController],
 })
 export class EventCoreEditor {
+  private readonly staffingEditor = viewChild(EventEditionEditor);
   protected readonly datedBlocks = inject(EventDatedBlocksController);
   protected readonly schedule = inject(EventGlobalScheduleController);
   protected readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
@@ -90,23 +92,28 @@ export class EventCoreEditor {
   protected readonly isSaving = this.metadata.isBusy;
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
-  protected readonly canCancel = computed(() => !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
+  protected readonly canCancel = computed(() => !this.staffingEditor()?.locked() && !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
     this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
   private readonly otherOperationsLocked = computed(() => this.publication.locked() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
     this.cover.needsReconciliation() || this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
-  protected readonly navigationLocked = computed(() => this.otherOperationsLocked() || this.program.locked());
+  protected readonly navigationLocked = computed(() => this.otherOperationsLocked() || this.program.locked() || !!this.staffingEditor()?.locked());
+  protected readonly staffingBlocked = computed(() => {
+    this.coreFormEvents();
+    return this.otherOperationsLocked() || this.program.locked() || this.form.dirty || this.cover.dirty();
+  });
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: this.i18n.commonNav().eventsManagement, path: '/admin/content/events' },
     { label: this.core()?.name ?? this.i18n.page().editTitle },
   ]);
   protected readonly form = this.metadata.coreForm;
+  private readonly coreFormEvents = toSignal(this.form.events);
   protected readonly selectedMainEdition = computed(() => {
     const edition = this.globalDraft.selectedEdition();
     return edition !== null && edition.id === this.globalDraft.calendar()?.mainEditionId;
   });
-  protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => !this.metadata.isGlobal() || this.globalDraft.activeStep() === 1
+  protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => (!this.metadata.isGlobal() && !this.globalDraft.staffingEditionId()) || this.globalDraft.activeStep() === 1
     ? 'core' : this.globalDraft.activeStep() === 2 && this.selectedMainEdition() ? 'edition' : null);
   protected readonly metadataError = computed(() => {
     const target = this.metadataTarget();
@@ -123,6 +130,7 @@ export class EventCoreEditor {
   });
 
   constructor() {
+    effect(() => this.metadata.embeddedEditionLocked.set(!!this.staffingEditor()?.locked() || !!this.staffingEditor()?.hasUnsavedChanges()));
     this.route.paramMap.pipe(
       map(params => params.get('coreId') ?? ''),
       distinctUntilChanged(),
@@ -177,20 +185,6 @@ export class EventCoreEditor {
     this.isNotFound.set(false);
     this.loadSubscription = this.globalDraft.readCore(this.coreId())
       .pipe(
-        switchMap((core) => {
-          const editionId = this.globalDraft.staffingEditionId();
-          const editCore = this.route.snapshot.queryParamMap.get('editCore') === '1';
-          if (core === null || editionId === null || editCore) return of(core);
-          return from(this.router.navigate(
-            ['/admin/content/events', core.id, 'editions', editionId, 'edit'],
-            { replaceUrl: true },
-          )).pipe(
-            tap((navigated) => {
-              if (!navigated) throw new Error('[EVENT_CORE_EDITOR] Staffing Edition navigation failed.');
-            }),
-            ignoreElements(),
-          );
-        }),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
@@ -244,12 +238,20 @@ export class EventCoreEditor {
 
   protected goBack(): void {
     if (!this.canCancel()) return;
-    void this.router.navigate(['/admin/content/events']);
+    const realizationId = this.globalDraft.staffingEditionId() ? this.route.snapshot.queryParamMap.get('staffingRealizationId') : null;
+    void this.router.navigate(realizationId ? ['/admin/staffing', realizationId, 'edit'] : ['/admin/content/events']);
   }
 
   protected acceptPublication(core: IEventCoreDetail): void {
     this.metadata.load(core);
     this.cover.reconcile(core);
+  }
+
+  protected acceptStaffingEdition(edition: IAdminEventDetail): void {
+    if (edition.id !== this.globalDraft.staffingEditionId()) return;
+    this.globalDraft.mainEdition.set(edition);
+    this.globalDraft.selectedEdition.set(edition);
+    this.globalDraft.isUnreleasedStaffing.set(!edition.isStaffingReleased);
   }
 
   protected programBlocked(): boolean {
@@ -327,7 +329,7 @@ export class EventCoreEditor {
   }
 
   private hasUnsavedChanges(): boolean {
-    return this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
+    return !!this.staffingEditor()?.hasUnsavedChanges() || this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
       (this.globalDraft.cityEditing() && this.globalDraft.cityState() !== 'created' && this.globalDraft.cityForm.dirty) ||
       (this.datedBlocks.isDirty() && !this.datedBlocks.readbackPending());
   }

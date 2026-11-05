@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -23,6 +23,9 @@ import { EventCoreMetadataController } from './event-core-metadata-controller';
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
       <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().cover }}</h2>
       <p class="m-0 muted-text">{{ copy().info }}</p>
+      @if (editionCoverPresent()) {
+        <p-message severity="warn" role="status">{{ copy().editionOverride }}</p-message>
+      }
       @if (!metadata.canEditCore() && !cover.locked()) {
         <p class="m-0 muted-text">{{ copy().readOnly }}</p>
       }
@@ -47,6 +50,7 @@ import { EventCoreMetadataController } from './event-core-metadata-controller';
   `,
 })
 export class EventCoreCover {
+  readonly editionCoverPresent = input(false);
   private readonly storage = inject(Storage);
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
