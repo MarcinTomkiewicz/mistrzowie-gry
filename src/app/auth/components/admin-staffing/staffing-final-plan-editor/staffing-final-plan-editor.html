@@ -7,6 +7,8 @@
     <h3 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h3>
     <p class="m-0 muted-text">{{ copy.description }}</p>
   </header>
+  <app-staffing-event-synchronization-status [realizationId]="board().realization.id"
+    [disabled]="isLoading() || isSaving()" [dirty]="hasChanges()" />
   @if (!isLoading()) {
     @if (loadFailed()) {
       <div class="flex-col-start-start gap-sm" role="alert">
@@ -27,22 +29,6 @@
       @if (materialChanges() !== null) {
         <section class="flex-col-start-stretch gap-sm border radius-sm p-sm w-100" aria-live="polite">
           <strong>{{ copy.saveSuccess }}</strong>
-          @if (isReconciling()) {
-            <p class="m-0 muted-text" role="status">{{ copy.synchronization.inProgress }}</p>
-          } @else if (reconciliationFailed()) {
-            <p class="m-0" role="alert">{{ copy.synchronization.failed }}</p>
-            <div class="flex-row-start-center flex-wrap gap-sm">
-              <p-button type="button" severity="secondary" size="small" icon="pi pi-refresh"
-                [label]="copy.synchronization.retry" [disabled]="isSaving()" (onClick)="retrySynchronization()" />
-            </div>
-          } @else if (reconciliationResult(); as result) {
-            <p class="m-0" role="status">{{ result.createdCount || result.promotedCount ? copy.synchronization.updated : copy.synchronization.current }}</p>
-            <dl class="flex-row-start-center flex-wrap gap-sm m-0">
-              <div class="flex-row-start-center gap-xs"><dt>{{ copy.synchronization.created }}:</dt><dd class="m-0">{{ result.createdCount }}</dd></div>
-              <div class="flex-row-start-center gap-xs"><dt>{{ copy.synchronization.promoted }}:</dt><dd class="m-0">{{ result.promotedCount }}</dd></div>
-              <div class="flex-row-start-center gap-xs"><dt>{{ copy.synchronization.unchanged }}:</dt><dd class="m-0">{{ result.unchangedCount }}</dd></div>
-            </dl>
-          }
         </section>
       }
       <form class="flex-col-start-stretch gap-md w-100 min-w-0" [formGroup]="form" (ngSubmit)="save()">

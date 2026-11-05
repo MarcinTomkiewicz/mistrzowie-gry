@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -24,6 +24,7 @@ import { getStaffingScheduleFormError } from '../staffing-realization-form-error
 import { StaffingRealizationDayEditor } from './staffing-realization-day-editor';
 import { createStaffingRealizationScheduleEditorI18n } from './staffing-realization-schedule-editor.i18n';
 import { StaffingReadinessTarget } from '../staffing-readiness-target';
+import { StaffingEventSynchronizationStatus } from '../staffing-event-synchronization-status';
 
 @Component({
   selector: 'app-staffing-realization-schedule-editor',
@@ -35,6 +36,7 @@ import { StaffingReadinessTarget } from '../staffing-readiness-target';
     LoadingOverlay,
     StaffingRealizationDayEditor,
     StaffingReadinessTarget,
+    StaffingEventSynchronizationStatus,
   ],
   templateUrl: './staffing-realization-schedule-editor.html',
   providers: [
@@ -50,8 +52,7 @@ export class StaffingRealizationScheduleEditor {
 
   private loadSubscription: Subscription | null = null;
 
-  protected realizationId =
-    this.route.parent?.snapshot.paramMap.get('realizationId') ?? '';
+  protected readonly realizationId = signal(this.route.parent?.snapshot.paramMap.get('realizationId') ?? '');
   protected readonly i18n = createStaffingRealizationScheduleEditorI18n();
   protected readonly form = createStaffingRealizationDaysForm();
   protected readonly saveLabel = createStaffingSaveLabel(
@@ -66,8 +67,14 @@ export class StaffingRealizationScheduleEditor {
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
   protected readonly loadFailed = signal(false);
+  protected readonly synchronizationLocked = computed(() => this.editor.eventSynchronization.locked(this.realizationId()));
+  protected readonly synchronizationBusy = computed(() => this.editor.eventSynchronization.busy(this.realizationId()));
 
   constructor() {
+    effect(() => {
+      if (this.isLoading() || this.isSaving() || this.synchronizationLocked()) this.form.disable({ emitEvent: false });
+      else this.form.enable({ emitEvent: false });
+    });
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
@@ -76,7 +83,7 @@ export class StaffingRealizationScheduleEditor {
         }
       });
     this.route.parent?.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      this.realizationId = params.get('realizationId') ?? '';
+      this.realizationId.set(params.get('realizationId') ?? '');
       this.loadSchedule();
     });
   }
@@ -86,7 +93,7 @@ export class StaffingRealizationScheduleEditor {
     this.isLoading.set(true);
     this.loadFailed.set(false);
 
-    this.loadSubscription = this.editor.load(this.realizationId)
+    this.loadSubscription = this.editor.load(this.realizationId())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
@@ -112,7 +119,7 @@ export class StaffingRealizationScheduleEditor {
   }
 
   protected addDay(): void {
-    if (this.isSaving()) {
+    if (this.isSaving() || this.synchronizationLocked()) {
       return;
     }
 
@@ -120,34 +127,34 @@ export class StaffingRealizationScheduleEditor {
   }
 
   protected cancel(): void {
+    if (this.isSaving() || this.synchronizationLocked()) return;
     this.editor.store.reset();
     this.location.back();
   }
 
   protected saveSchedule(): void {
-    if (this.form.invalid || this.isSaving()) {
+    if (this.isLoading() || this.isSaving() || this.synchronizationLocked()) return;
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
 
-      if (this.form.invalid) {
-        const detail = getStaffingScheduleFormError(
-          this.form,
-          this.i18n.validation(),
-          this.i18n.staffingLabels().requiredGmCount,
-          this.i18n.commonForm(),
-        );
-        if (detail) {
-          this.toast.danger({
-            summary: this.i18n.commonForm().invalidSummary,
-            detail,
-          });
-        }
+      const detail = getStaffingScheduleFormError(
+        this.form,
+        this.i18n.validation(),
+        this.i18n.staffingLabels().requiredGmCount,
+        this.i18n.commonForm(),
+      );
+      if (detail) {
+        this.toast.danger({
+          summary: this.i18n.commonForm().invalidSummary,
+          detail,
+        });
       }
 
       return;
     }
 
     this.isSaving.set(true);
-    const realizationId = this.realizationId;
+    const realizationId = this.realizationId();
     this.editor
       .saveSchedule(
         realizationId,
@@ -156,7 +163,7 @@ export class StaffingRealizationScheduleEditor {
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (schedule) => {
-          if (this.realizationId !== realizationId) {
+          if (this.realizationId() !== realizationId) {
             return;
           }
           populateStaffingRealizationDaysForm(

@@ -139,6 +139,13 @@ export interface DeleteAdminStaffingRealizationResult {
   realizationId: string;
 }
 
+export interface SyncAdminStaffingPrivateEventResult extends Pick<ConvertAdminStaffingRealizationToEventResult,
+  'realizationId' | 'eventCoreId' | 'eventId' | 'public' | 'occurrences' | 'programItemCount'> {
+  synchronized: true;
+  changed: boolean;
+  slotCount: number;
+}
+
 export interface ArchiveAdminStaffingRealizationResult {
   archived: true;
   realization: AdminStaffingRealizationCore;

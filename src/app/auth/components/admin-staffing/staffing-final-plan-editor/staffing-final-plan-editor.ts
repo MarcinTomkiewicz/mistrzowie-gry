@@ -18,7 +18,6 @@ import {
 import type { AdminStaffingFinalPlan, StaffingFinalPlanMaterialChange } from '../../../../core/interfaces/admin-staffing-final-plan';
 import type { AdminStaffingRealizationBoard } from '../../../../core/interfaces/admin-staffing-realization-board';
 import type { AdminStaffingRealizationCore } from '../../../../core/interfaces/admin-staffing-realization';
-import type { EventProgramReconciliationResult } from '../../../../core/interfaces/i-event-admin';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import type { StaffingFinalPlanItemForm } from '../../../../core/types/staffing-final-plan-form';
 import { RpcError } from '../../../../core/types/rpc-error';
@@ -28,10 +27,11 @@ import { formatTimeRangeLabel } from '../../../../core/utils/time-format';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { StaffingFinalPlanAssignmentEditor } from './staffing-final-plan-assignment-editor';
 import { createStaffingFinalPlanEditorI18n } from './staffing-final-plan-editor.i18n';
+import { StaffingEventSynchronizationStatus } from '../staffing-event-synchronization-status';
 
 @Component({
   selector: 'app-staffing-final-plan-editor',
-  imports: [ReactiveFormsModule, ButtonModule, LoadingOverlay, SessionDetails, StaffingFinalPlanAssignmentEditor],
+  imports: [ReactiveFormsModule, ButtonModule, LoadingOverlay, SessionDetails, StaffingFinalPlanAssignmentEditor, StaffingEventSynchronizationStatus],
   templateUrl: './staffing-final-plan-editor.html',
   providers: [provideTranslocoScope('sessions')],
 })
@@ -46,7 +46,6 @@ export class StaffingFinalPlanEditor {
   private readonly baseline = signal('');
   private readonly retryVersion = signal(0);
   private actionRequest: Subscription | null = null;
-  private pendingReconciliation: AdminStaffingRealizationCore | null = null;
 
   readonly board = input.required<AdminStaffingRealizationBoard>();
 
@@ -58,9 +57,7 @@ export class StaffingFinalPlanEditor {
   protected readonly plan = signal<AdminStaffingFinalPlan | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
-  protected readonly isReconciling = signal(false);
-  protected readonly reconciliationResult = signal<EventProgramReconciliationResult | null>(null);
-  protected readonly reconciliationFailed = signal(false);
+  protected readonly isReconciling = computed(() => this.facade.eventSynchronization.busy(this.board().realization.id));
   protected readonly saveErrorDetail = signal<string | null>(null);
   protected readonly loadFailed = signal(false);
   protected readonly materialChanges = signal<StaffingFinalPlanMaterialChange[] | null>(null);
@@ -69,7 +66,7 @@ export class StaffingFinalPlanEditor {
     const plan = this.plan();
     return !!plan?.editable && plan.realizationId === this.board().realization.id &&
       this.isCurrentRealization(this.board().realization) &&
-      !this.isLoading() && !this.isSaving() && !this.isReconciling();
+      !this.isLoading() && !this.isSaving() && !this.facade.eventSynchronization.locked(plan.realizationId);
   });
   protected readonly hasChanges = computed(() => JSON.stringify(this.draft()) !== this.baseline());
   protected readonly formatDateLabel = formatDateLabel;
@@ -102,14 +99,10 @@ export class StaffingFinalPlanEditor {
       const realization = this.board().realization;
       const routeRealizationId = this.routeRealizationId();
       this.retryVersion();
-      this.pendingReconciliation = null;
       this.plan.set(null);
       this.materialChanges.set(null);
       this.showChangeDetails.set(false);
       this.isSaving.set(false);
-      this.isReconciling.set(false);
-      this.reconciliationResult.set(null);
-      this.reconciliationFailed.set(false);
       this.saveErrorDetail.set(null);
       this.isLoading.set(true);
       this.loadFailed.set(false);
@@ -171,7 +164,6 @@ export class StaffingFinalPlanEditor {
         this.toast.success({ summary: this.i18n.commonStatus().success,
           detail: this.i18n.finalPlan().saveSuccess });
         this.isSaving.set(false);
-        this.synchronize(realization);
       },
       error: (error: unknown) => {
         if (!this.isCurrentRealization(realization)) return;
@@ -180,45 +172,6 @@ export class StaffingFinalPlanEditor {
           : this.i18n.commonErrors().changesNotSaved;
         this.saveErrorDetail.set(detail);
         this.toast.danger({ summary: this.i18n.finalPlan().saveFailed, detail });
-      },
-    });
-  }
-
-  protected retrySynchronization(): void {
-    const realization = this.pendingReconciliation;
-    if (!realization || !this.reconciliationFailed() || this.isLoading() ||
-      this.isSaving() || this.isReconciling() || !this.isCurrentRealization(realization)) return;
-    this.synchronize(realization);
-  }
-
-  private synchronize(realization: AdminStaffingRealizationCore): void {
-    if (!this.isCurrentRealization(realization)) return;
-    this.pendingReconciliation = realization;
-    this.reconciliationResult.set(null);
-    this.reconciliationFailed.set(false);
-    this.isReconciling.set(true);
-    this.actionRequest = this.facade.reconcileEventProgram(realization).pipe(
-      takeUntilDestroyed(this.destroyRef),
-      finalize(() => this.isReconciling.set(false)),
-    ).subscribe({
-      next: result => {
-        if (!this.isCurrentRealization(realization)) return;
-        this.pendingReconciliation = null;
-        this.reconciliationResult.set(result);
-        if (result) this.toast.success({
-          summary: this.i18n.commonStatus().success,
-          detail: result.createdCount || result.promotedCount
-            ? this.i18n.finalPlan().synchronization.updated
-            : this.i18n.finalPlan().synchronization.current,
-        });
-      },
-      error: () => {
-        if (!this.isCurrentRealization(realization)) return;
-        this.reconciliationFailed.set(true);
-        this.toast.danger({
-          summary: this.i18n.finalPlan().saveSuccess,
-          detail: this.i18n.finalPlan().synchronization.failed,
-        });
       },
     });
   }

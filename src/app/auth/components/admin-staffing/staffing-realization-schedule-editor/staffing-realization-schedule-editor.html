@@ -4,9 +4,11 @@
 <div class="position-relative flex-col-start-stretch gap-md"
   appStaffingReadinessTarget="schedule" [staffingTargetReady]="!isLoading() && !loadFailed()">
   <app-loading-overlay
-    [visible]="isLoading() || isSaving()"
+    [visible]="isLoading() || isSaving() || synchronizationBusy()"
     [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
   />
+  <app-staffing-event-synchronization-status [realizationId]="realizationId()"
+    [disabled]="isLoading() || isSaving()" [dirty]="form.dirty" />
 
   @if (loadFailed() && !isLoading()) {
     <section class="mg-card flex-col-start-stretch gap-sm p-md" role="alert">
@@ -52,7 +54,7 @@
             <app-staffing-realization-day-editor
               [day]="day"
               [dayIndex]="dayIndex"
-              [isSaving]="isSaving()"
+              [isSaving]="isSaving() || synchronizationLocked()"
             />
           }
 
@@ -75,7 +77,7 @@
               [outlined]="true"
               icon="pi pi-plus"
               [label]="actions.addDay"
-              [disabled]="isSaving()"
+              [disabled]="isSaving() || synchronizationLocked()"
               (onClick)="addDay()"
             />
           </div>
@@ -127,7 +129,7 @@
           [outlined]="true"
           icon="pi pi-interdiction"
           [label]="i18n.commonActions().cancel"
-          [disabled]="isSaving()"
+          [disabled]="isSaving() || synchronizationLocked()"
           (onClick)="cancel()"
         />
         <p-button
@@ -136,7 +138,7 @@
           icon="pi pi-done-it"
           [label]="saveLabel()"
           [loading]="isSaving()"
-          [disabled]="form.pristine"
+          [disabled]="isSaving() || synchronizationLocked() || form.pristine"
         />
       </div>
     </form>

@@ -1,4 +1,41 @@
 {
+  "eventSynchronization": {
+    "title": "[PH] Synchronizacja wydarzenia ze Staffingiem",
+    "inProgress": "[PH] Sprawdzanie i synchronizacja zapisanych danych wydarzenia...",
+    "updated": "[PH] Prywatne wydarzenie zostało zsynchronizowane. Odczyt potwierdził aktualne terminy i program.",
+    "current": "[PH] Odczyt potwierdził aktualne terminy i program wydarzenia.",
+    "failed": "[PH] Staffing zapisany. Powiązane wydarzenie wymaga synchronizacji.",
+    "uncertain": "[PH] Staffing zapisany. Wynik synchronizacji wydarzenia jest niepewny. Ponów sam odczyt, bez powtarzania zapisu.",
+    "readbackFailed": "[PH] Synchronizacja została potwierdzona, ale odczyt wydarzenia nie potwierdził jeszcze całego wyniku. Ponów sam odczyt.",
+    "retry": "[PH] Ponów synchronizację wydarzenia",
+    "retryRead": "[PH] Ponów odczyt wydarzenia",
+    "abandon": "[PH] Zakończ sprawdzanie wyniku",
+    "abandonConfirm": "[PH] Zakończyć sprawdzanie wyniku synchronizacji i odblokować edycję? Zapis mógł zostać wykonany lub zakończyć się później. Ta akcja nie cofa zmian, nie ponawia zapisu ani nie potwierdza spójności wydarzenia.",
+    "abandoned": "[PH] Zakończono sprawdzanie wyniku. Edycja jest odblokowana, ale spójność wydarzenia pozostaje niepotwierdzona. Zapis mógł zostać wykonany lub zakończyć się później.",
+    "dirty": "[PH] Niezapisane zmiany Staffingu nie są objęte tym wynikiem. Zapisz je, aby zsynchronizować wydarzenie.",
+    "occurrences": "[PH] Terminy",
+    "slots": "[PH] Bloki harmonogramu",
+    "programItems": "[PH] Pozycje programu",
+    "openEvent": "[PH] Otwórz wspólny edytor wydarzenia",
+    "errors": {
+      "forbidden": "[PH] Synchronizacja wymaga uprawnień administratora.",
+      "notConverted": "[PH] Wskazana lokalizacja nie jest powiązanym wydarzeniem utworzonym ze Staffingu.",
+      "privateRequired": "[PH] Synchronizacja prywatnego wydarzenia wymaga nieopublikowanego i nieaktywnego Core oraz lokalizacji bez strony publicznej.",
+      "history": "[PH] Wydarzenie ma chronioną historię publikacji, zapisów lub rezerwacji. Prywatna synchronizacja została odrzucona.",
+      "provenance": "[PH] Program zawiera pozycje spoza zapisanego źródła Staffingu. Sprawdź powiązania programu.",
+      "schedule": "[PH] Zapisane dni Staffingu nie spełniają warunków synchronizacji.",
+      "capacity": "[PH] Liczba wymaganych MG, bloków lub przypisań przekracza dozwoloną pojemność dnia.",
+      "slots": "[PH] Harmonogram wymaga co najmniej jednego bloku z poprawnymi godzinami.",
+      "sourceIdentity": "[PH] Powiązania źródłowych dni lub bloków harmonogramu są niespójne.",
+      "sourceChanged": "[PH] Zapisany harmonogram lub finalny plan Staffingu zmienił się podczas synchronizacji. Wynik nie potwierdza spójności wydarzenia z aktualnym źródłem.",
+      "assignment": "[PH] Plan zawiera nieprawidłowe przypisanie MG lub sesji. Sprawdź potwierdzenie udziału i przypisane sesje.",
+      "pastRemoval": "[PH] Synchronizacja nie może usunąć minionego terminu wydarzenia.",
+      "occurrences": "[PH] Terminy wydarzenia nie odpowiadają zapisanym dniom Staffingu.",
+      "identity": "[PH] Powiązanie realizacji, Core i lokalizacji jest niespójne. Nie utworzono zastępczego wydarzenia.",
+      "invalid": "[PH] Nie wskazano poprawnego identyfikatora lokalizacji wydarzenia.",
+      "unknown": "[PH] Nie udało się potwierdzić spójności wydarzenia. Sprawdź błąd i ponów właściwą akcję."
+    }
+  },
   "list": {
     "page": {
       "title": "Lista zleceń",

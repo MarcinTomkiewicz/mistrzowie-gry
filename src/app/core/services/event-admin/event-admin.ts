@@ -11,6 +11,7 @@ import {
 } from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
+import type { SyncAdminStaffingPrivateEventResult } from '../../interfaces/admin-staffing-realization';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
 import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
@@ -249,6 +250,12 @@ export class EventAdmin {
   reconcileStaffingEventProgram(eventId: string): Observable<EventProgramReconciliationResult> {
     return this.backend.rpc<EventProgramReconciliationResult>(EVENT_RPC.reconcileStaffingEventProgram, {
       p_event_id: eventId,
+    });
+  }
+
+  syncStaffingPrivateEvent(editionId: string): Observable<SyncAdminStaffingPrivateEventResult> {
+    return this.backend.rpc<SyncAdminStaffingPrivateEventResult>(EVENT_RPC.syncStaffingPrivateEvent, {
+      p_event_id: editionId,
     });
   }
 
