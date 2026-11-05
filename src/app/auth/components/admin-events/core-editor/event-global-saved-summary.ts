@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { afterNextRender, Component, computed, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
@@ -17,11 +18,12 @@ import { createEventEditionEditorI18n } from '../edition-editor/edition-editor.i
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventGlobalPublicationController } from './event-global-publication-controller';
-import { readEventGlobalSavedSummary } from './event-global-saved-summary-state';
+import { readEventGlobalSavedSummary } from './event-global-saved-summary-read';
+import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
 
 @Component({
   selector: 'app-event-global-saved-summary',
-  imports: [ButtonModule, MessageModule, TableModule, EventGlobalDraftSummary],
+  imports: [NgTemplateOutlet, ButtonModule, MessageModule, TableModule, EventGlobalDraftSummary, EventProgramSchedule],
   templateUrl: './event-global-saved-summary.html',
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })
@@ -46,9 +48,15 @@ export class EventGlobalSavedSummary {
   private readonly admin = inject(EventAdmin);
   private readonly browserReady = signal(false);
   private readonly readAttempt = signal(0);
+  protected readonly selectedCityId = signal<string | null>(null);
+  protected readonly selectedCity = computed<EventGlobalSavedSnapshot['cities'][number] | null>(() => {
+    const cities = this.snapshot()?.cities ?? [];
+    return cities.find(entry => entry.city.editionId === this.selectedCityId()) ?? cities.find(entry => entry.city.isMain) ?? null;
+  });
   protected readonly hasRelease = computed(() => this.snapshot()?.calendar.globalDates.some(day =>
     day.cityOccurrences.some(city => city.publishedAt !== null)) ?? false);
   protected readonly canPublish = computed(() => this.browserReady() && this.isAdmin() && !this.disabled() &&
+    !this.loading() && this.error() === null && this.snapshot()?.core.id === this.coreId() &&
     !this.hasRelease() && !this.publication.locked());
   protected readonly publicationError = computed(() => {
     const error = this.publication.error();

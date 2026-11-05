@@ -1,0 +1,110 @@
+@let copy = i18n.copy();
+@let activeDayId = day()?.occurrenceId;
+<div class="flex-col-start-stretch gap-md w-100 min-w-0">
+  <div class="flex-row-start-center gap-sm w-100 min-w-0 overflow-x-auto" role="group" [attr.aria-label]="copy.selectOccurrence">
+    @for (date of days(); track date.occurrenceId) {
+      @let active = activeDayId === date.occurrenceId;
+      <p-button type="button" size="small" class="flex-none" severity="secondary" [outlined]="!active"
+        [icon]="active ? 'pi pi-check' : undefined" [label]="formatDateLabel(date.date)" [disabled]="disabled()"
+        [pt]="{ root: { 'aria-pressed': active } }" (onClick)="selectDay(date.occurrenceId)" />
+    }
+  </div>
+  @if (day()) {
+    <p class="m-0 muted-text">{{ i18n.labels().timezone }}: {{ timeline().timezone }}</p>
+    @if (timeline().origin === 'legacy_host') { <p class="m-0 muted-text">{{ copy.eventHours }}</p> }
+    @if (layout().lanes.length) {
+      <p class="m-0 muted-text text-sm">{{ copy.schedule.hint }}</p>
+      <div class="event-schedule__scroll" [class.event-schedule__scroll--rooms]="layout().hasSpaces"
+        tabindex="0" role="region" [attr.aria-label]="copy.schedule.title">
+        <div class="event-schedule__grid" [class.event-schedule__grid--rooms]="layout().hasSpaces"
+          [style.--schedule-min-width]="window()?.minimumWidthRem + 'rem'">
+          <div class="event-schedule__axis" aria-hidden="true">
+            @if (layout().hasSpaces) { <span class="event-schedule__label">{{ i18n.labels().hours }}</span> }
+            <div class="event-schedule__ruler">
+              @for (tick of layout().ticks; track tick.minute; let first = $first; let last = $last) {
+                <span class="event-schedule__tick" [class.event-schedule__tick--first]="first" [class.event-schedule__tick--last]="last"
+                  [style.left.%]="tick.left">{{ tick.label }}</span>
+              }
+            </div>
+          </div>
+          @for (lane of layout().lanes; track lane.key; let index = $index) {
+            <section class="event-schedule__lane" [attr.aria-label]="lane.spaceName ?? trackLabel(index)">
+              @if (layout().hasSpaces) { <strong class="event-schedule__label">{{ lane.spaceName }}</strong> }
+              <div class="event-schedule__track">
+                @for (tick of layout().ticks; track tick.minute) {
+                  <span class="event-schedule__line" [style.left.%]="tick.left" aria-hidden="true"></span>
+                }
+                @for (block of lane.entries; track block.entry.key) {
+                  @let entry = block.entry;
+                  <button type="button" class="event-schedule__block" [class.event-schedule__block--approved]="block.approved"
+                    [class.event-schedule__block--pending]="block.pending" [class.event-schedule__block--inactive]="block.inactive"
+                    [style.left.%]="block.left" [style.width.%]="block.width" [disabled]="disabled()"
+                    [attr.aria-pressed]="selected()?.key === entry.key"
+                    [title]="entry.time + ' - ' + entry.title + ' - ' + entry.host"
+                    [attr.aria-label]="entry.title + ' - ' + entry.time + ' - ' + entry.host + ' - ' + copy.programStatus + ': ' + (entry.programStatus ?? copy.unassigned) + ' - ' + entry.status + (entry.candidate ? ' - ' + entry.candidate : '')"
+                    (click)="selectEntry(entry.key)">
+                    <span class="event-schedule__text text-sm">{{ entry.time }}</span>
+                    <strong class="event-schedule__title">{{ entry.title }}</strong>
+                    <span class="event-schedule__text text-sm">{{ entry.host }}</span>
+                  </button>
+                }
+              </div>
+            </section>
+          }
+        </div>
+      </div>
+    }
+    @if (layout().unplaced.length) {
+      <div class="flex-col-start-stretch gap-sm border radius-sm p-sm" role="status">
+        <p class="m-0">{{ copy.schedule.timeUnavailable }}</p>
+        @for (entry of layout().unplaced; track entry.key) {
+          <p-button type="button" severity="secondary" [outlined]="true" [disabled]="disabled()"
+            [label]="entry.time + ' - ' + entry.title" (onClick)="selectEntry(entry.key)" />
+        }
+      </div>
+    }
+    @if (selected(); as entry) {
+      <p-dialog styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="true" [header]="entry.title"
+        [closable]="!detailsBusy()" [closeOnEscape]="!detailsBusy()" [dismissableMask]="false" [draggable]="false"
+        (visibleChange)="!$event && closeDetails()">
+        <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+          @if (day(); as date) { <time [attr.datetime]="date.date">{{ formatDateLabel(date.date) }}</time> }
+          <p class="m-0 text-wrap-anywhere">{{ entry.time }} - {{ entry.host }}</p>
+          <p class="m-0 text-wrap-anywhere">{{ entry.kind }} - {{ entry.source }}</p>
+          @if (entry.row.slotLabel) { <p class="m-0 text-wrap-anywhere">{{ entry.row.slotLabel }}</p> }
+          @if (entry.row.source === 'manual' && entry.row.spaceName) { <p class="m-0">{{ entry.row.spaceName }}</p> }
+          @if (entry.row.source === 'legacy_host') { <p class="m-0 muted-text">{{ copy.eventHours }}</p> }
+          @if (entry.row.source === 'manual' && entry.row.activity; as activity) {
+            <p class="m-0 pre-line text-wrap-anywhere">{{ activity.description }}</p>
+          }
+          @if (entry.row.session; as session) {
+            <dl class="mg-grid-2 gap-sm m-0">
+              <div><dt class="muted-text">{{ i18n.labels().rpgSystem }}</dt><dd class="m-0">{{ session.systemName ?? session.systemId ?? i18n.values().notProvided }}</dd></div>
+              @if (session.effectiveCapacity !== null) {
+                <div><dt class="muted-text">{{ copy.manualRpg.capacity }}</dt><dd class="m-0">{{ session.effectiveCapacity }}</dd></div>
+              }
+            </dl>
+          }
+          <dl class="mg-grid-2 gap-sm m-0">
+            <div><dt class="muted-text">{{ copy.programStatus }}</dt><dd class="m-0">{{ entry.programStatus ?? i18n.values().notProvided }}</dd></div>
+            <div><dt class="muted-text">{{ i18n.labels().status }}</dt><dd class="m-0">{{ entry.status }}</dd></div>
+            @if (entry.candidate) {
+              <div><dt class="muted-text">{{ copy.schedule.assignmentStatus }}</dt><dd class="m-0">{{ entry.candidate }}</dd></div>
+            }
+          </dl>
+          @if (entry.row.source === 'staffing' && entry.row.participationEnded) { <p class="m-0 error-text">{{ copy.participationEnded }}</p> }
+          @if (entry.row.frozen) { <p class="m-0 muted-text">{{ copy.frozen }}</p> }
+          @if (entry.participantProgramItemId && participantActions()) {
+            <ng-container [ngTemplateOutlet]="participantActions()"
+              [ngTemplateOutletContext]="{ $implicit: entry.participantProgramItemId, activeBookings: entry.row.activeBookings }" />
+          }
+        </div>
+        <ng-template #footer>
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-times"
+            [label]="i18n.actions().close" [disabled]="detailsBusy()" (onClick)="closeDetails()" />
+        </ng-template>
+      </p-dialog>
+    }
+    @if (!entries().length) { <p class="m-0 muted-text" role="status">{{ copy.noRows }}</p> }
+  } @else { <p class="m-0 muted-text" role="status">{{ copy.noOccurrences }}</p> }
+</div>

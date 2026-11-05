@@ -17,7 +17,7 @@ import { RpcError } from '../../../../core/types/rpc-error';
 import { isValidIsoDate } from '../../../../core/utils/date';
 import { assertEdgeContract, readEdgeObject, readEdgeUuid } from '../../../../core/utils/edge-contract';
 import { EventGlobalDraftController } from './event-global-draft-controller';
-import { readEventGlobalSavedSummary } from './event-global-saved-summary-state';
+import { readEventGlobalSavedSummary } from './event-global-saved-summary-read';
 
 type PublicationContext = Pick<AdminGlobalPublicationResult, 'coreId' | 'mainEditionId'> & {
   snapshot: EventGlobalSavedSnapshot;

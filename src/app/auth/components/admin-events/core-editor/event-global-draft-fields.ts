@@ -1,17 +1,15 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TooltipModule } from 'primeng/tooltip';
 import { startWith, switchMap } from 'rxjs';
 
+import { ContextHelp } from '../../../../common/context-help/context-help';
 import { EVENT_CURRENCIES, EVENT_PRICE_BASES } from '../../../../core/configs/events.config';
 import type { EventGlobalDraftForm } from '../../../../core/factories/event-global-draft-form.factory';
 import { parseIsoDate } from '../../../../core/utils/date';
@@ -25,8 +23,8 @@ import { EventGlobalCityFields } from './event-global-city-fields';
 
 @Component({
   selector: 'app-event-global-draft-fields',
-  imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, FloatLabelModule, InputNumberModule,
-    InputTextModule, SelectModule, TextareaModule, ToggleSwitchModule, TooltipModule, EventScheduleEditor,
+  imports: [ReactiveFormsModule, FloatLabelModule, InputNumberModule,
+    InputTextModule, SelectModule, TextareaModule, ToggleSwitchModule, ContextHelp, EventScheduleEditor,
     EventGlobalTimeBlocks, EventGlobalDraftDateBlocks, EventGlobalCityFields],
   templateUrl: './event-global-draft-fields.html',
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },

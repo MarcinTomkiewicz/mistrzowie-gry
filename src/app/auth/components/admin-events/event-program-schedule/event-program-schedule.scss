@@ -1,0 +1,99 @@
+@use "abstracts/variables" as v;
+
+.event-schedule__scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  scroll-padding-inline-start: 0.5rem;
+  border: 1px solid var(--mg-color-border);
+  border-radius: v.$radius-sm;
+  &:focus-visible { outline: 2px solid var(--mg-color-secondary); }
+  &--rooms { scroll-padding-inline-start: 9rem; }
+}
+
+.event-schedule__grid {
+  min-width: var(--schedule-min-width);
+  &--rooms { min-width: calc(var(--schedule-min-width) + 9rem); }
+}
+
+.event-schedule__axis, .event-schedule__lane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.event-schedule__grid--rooms {
+  .event-schedule__axis, .event-schedule__lane { grid-template-columns: 9rem minmax(0, 1fr); }
+}
+
+.event-schedule__axis { min-height: 3.5rem; }
+.event-schedule__lane { border-top: 1px solid var(--mg-color-border); }
+
+.event-schedule__label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  padding: 0.5rem;
+  background: var(--mg-color-bg-surface);
+  color: var(--mg-color-secondary);
+  overflow-wrap: anywhere;
+  border-right: 1px solid var(--mg-color-border);
+}
+
+.event-schedule__ruler, .event-schedule__track { position: relative; min-width: 0; }
+.event-schedule__track { height: 6rem; }
+
+.event-schedule__tick {
+  position: absolute;
+  top: 0.5rem;
+  max-width: 8rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--mg-color-text-muted);
+  &--first { transform: none; padding-left: 0.25rem; }
+  &--last { transform: translateX(-100%); padding-right: 0.25rem; }
+}
+
+.event-schedule__line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--mg-color-border);
+}
+
+.event-schedule__block {
+  --schedule-color: var(--mg-color-text-muted);
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--schedule-color);
+  border-radius: v.$radius-sm;
+  background: color-mix(in srgb, var(--schedule-color) 22%, var(--mg-color-bg-surface));
+  color: var(--mg-color-text);
+  font: inherit;
+  line-height: 1.25;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  &--approved { --schedule-color: var(--mg-color-success); }
+  &--pending { --schedule-color: var(--mg-color-warn); }
+  &--inactive { --schedule-color: var(--mg-color-danger); }
+  &:hover, &[aria-pressed="true"] { border-color: var(--mg-color-secondary); }
+  &:focus-visible { outline: 2px solid var(--mg-color-secondary); outline-offset: -3px; }
+  &:disabled { cursor: default; opacity: 0.65; }
+}
+
+.event-schedule__text { flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-schedule__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}

@@ -90,45 +90,6 @@
         }
       </dl>
     </section>
-    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="timelineLoading()">
-      <header class="flex-row-between-center flex-wrap gap-sm w-100">
-        <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h3>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
-          [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
-      </header>
-      @if (timelineLoading()) {
-        <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
-      } @else if (timelineErrorMessage(); as error) {
-        <p-message severity="error" role="alert">{{ timelineI18n.copy().loadFailed }}: {{ error }}</p-message>
-        <div class="flex-row-start-center">
-          <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry"
-            [disabled]="disabled()" (onClick)="reloadTimeline.emit()" />
-        </div>
-      } @else if (timeline()) {
-        @for (day of days(); track day.occurrence.occurrenceId) {
-          <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
-            <h4 class="mg-section__title mg-section__title--sm m-0"><time [attr.datetime]="day.occurrence.date">{{ formatDateLabel(day.occurrence.date) }}</time></h4>
-            @for (entry of day.rows; track entry.key) {
-              <article class="mg-card flex-col-start-stretch gap-xs p-sm w-100 min-w-0">
-                <strong class="text-wrap-anywhere">{{ entry.title }}</strong>
-                <p class="m-0 text-wrap-anywhere">{{ entry.time }} - {{ entry.host }}</p>
-                <div class="flex-row-start-center flex-wrap gap-sm">
-                  <span class="tag-badge" [class.tag-badge--success]="entry.row.status === 'confirmed'"
-                    [class.tag-badge--muted]="entry.row.status === 'pending'">{{ entry.status }}</span>
-                  @if (entry.programStatus) { <small>{{ entry.programStatus }}</small> }
-                  @if (entry.candidate) { <small>{{ entry.candidate }}</small> }
-                  @if (entry.row.source === 'staffing' && entry.row.participationEnded) {
-                    <small class="error-text">{{ timelineI18n.copy().participationEnded }}</small>
-                  }
-                </div>
-              </article>
-            } @empty { <p class="m-0 muted-text">{{ timelineI18n.copy().noRows }}</p> }
-          </section>
-        } @empty { <p class="m-0 muted-text">{{ timelineI18n.copy().noOccurrences }}</p> }
-      } @else {
-        <p class="m-0 muted-text" role="status">{{ values.notProvided }}</p>
-      }
-    </section>
   </div>
   <div class="flex-col-start-stretch gap-md min-w-0">
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
@@ -149,3 +110,23 @@
     <ng-content />
   </div>
 </div>
+<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="timelineLoading()">
+  <header class="flex-row-between-center flex-wrap gap-sm w-100">
+    <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h3>
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+      [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
+  </header>
+  @if (timelineLoading()) {
+    <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
+  } @else if (timelineErrorMessage(); as error) {
+    <p-message severity="error" role="alert">{{ timelineI18n.copy().loadFailed }}: {{ error }}</p-message>
+    <div class="flex-row-start-center">
+      <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry"
+        [disabled]="disabled()" (onClick)="reloadTimeline.emit()" />
+    </div>
+  } @else if (timeline(); as savedTimeline) {
+    <app-event-program-schedule [timeline]="savedTimeline" [disabled]="disabled()" />
+  } @else {
+    <p class="m-0 muted-text" role="status">{{ values.notProvided }}</p>
+  }
+</section>

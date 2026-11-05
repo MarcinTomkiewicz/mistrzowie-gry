@@ -7,15 +7,14 @@ import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overl
 import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { formatDateLabel } from '../../../../core/utils/date';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { EventEditionEditorFacade } from '../edition-editor/event-edition-editor-facade';
 import { createEventAdminTimelineI18n } from './event-admin-timeline.i18n';
-import { presentEventTimelineRows } from './event-admin-timeline-presenter';
+import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
 
 @Component({
   selector: 'app-event-admin-timeline',
-  imports: [ButtonModule, TableModule, LoadingOverlay],
+  imports: [ButtonModule, TableModule, LoadingOverlay, EventProgramSchedule],
   templateUrl: './event-admin-timeline.html',
   host: { class: 'd-block w-100 min-w-0' },
 })
@@ -34,18 +33,8 @@ export class EventAdminTimeline {
   protected readonly expandedProgramItemId = signal<string | null>(null);
   protected readonly participants = this.facade.programParticipants;
   protected readonly removingParticipantId = this.facade.removingParticipantId;
-  protected readonly formatDateLabel = formatDateLabel;
-  protected readonly errorMessage = computed(() => this.error()
-    ? resolveEventEditionAdminErrorMessage(this.error(), this.i18n.rpcErrors(), this.i18n.errors().concurrentModification)
-    : null);
-  protected readonly days = computed(() => {
-    const timeline = this.timeline();
-    if (!timeline) return [];
-    return [...timeline.occurrences].sort((a, b) => a.date.localeCompare(b.date)).map((occurrence) => ({
-      occurrence,
-      rows: presentEventTimelineRows(occurrence.rows, this.i18n),
-    }));
-  });
+  protected readonly errorMessage = computed(() => this.error() === null ? null
+    : resolveEventEditionAdminErrorMessage(this.error(), this.i18n.rpcErrors(), this.i18n.errors().concurrentModification));
 
   protected toggleParticipants(programItemId: string): void {
     if (this.disabled() || this.loading()) return;

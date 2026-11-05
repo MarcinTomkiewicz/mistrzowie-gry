@@ -12,4 +12,6 @@ export class ContextHelp {
   readonly text = input.required<string>();
   readonly ariaLabel = input.required<string>();
   readonly position = input<'right' | 'left' | 'top' | 'bottom'>('top');
+  readonly icon = input('pi pi-question-circle');
+  readonly styleClass = input('square-9 cursor-pointer');
 }

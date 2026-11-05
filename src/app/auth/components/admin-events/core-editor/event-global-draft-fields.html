@@ -66,7 +66,7 @@
     <div class="flex-row-start-center gap-md">
       <span class="pi pi-cash square-11 flex-none" aria-hidden="true"></span>
       <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().price }}</h2>
-      <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().price, text: copy.priceHint }" />
+      <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().price + ': ' + copy.help" [text]="copy.priceHint" />
     </div>
     <div class="mg-grid-3 gap-md w-100">
       <div class="flex-col-start-stretch gap-xs min-w-0">
@@ -116,13 +116,13 @@
           </p-select>
           <label for="global-event-signup-kind">{{ i18n.commonLabels().participantSignupKind }}</label>
         </p-floatlabel>
-        <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().participantSignupKind, text: copy.signupKindHint }" />
+        <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().participantSignupKind + ': ' + copy.help" [text]="copy.signupKindHint" />
       </div>
     </div>
     <div class="flex-row-start-center gap-sm">
       <p-toggleswitch inputId="global-event-signup-required" formControlName="signupRequired" />
       <label for="global-event-signup-required">{{ i18n.commonLabels().signupRequired }}</label>
-      <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().signupRequired, text: copy.signupRequiredHint }" />
+      <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().signupRequired + ': ' + copy.help" [text]="copy.signupRequiredHint" />
     </div>
     <div class="mg-grid-2 gap-md border-top pt-md w-100">
       @if (controls.sessionCapacityCeiling.enabled) {
@@ -133,7 +133,7 @@
                 size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
               <label for="global-event-session-capacity">{{ copy.sessionCapacityCeiling }}</label>
             </p-floatlabel>
-            <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.sessionCapacityCeiling, text: copy.sessionCapacityHint }" />
+            <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="copy.sessionCapacityCeiling + ': ' + copy.help" [text]="copy.sessionCapacityHint" />
           </div>
           @if (controls.sessionCapacityCeiling.touched && controls.sessionCapacityCeiling.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
         </div>
@@ -146,7 +146,7 @@
                 size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
               <label for="global-event-whole-capacity">{{ copy.wholeEventCapacity }}</label>
             </p-floatlabel>
-            <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.wholeEventCapacity, text: copy.wholeEventCapacityHint }" />
+            <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="copy.wholeEventCapacity + ': ' + copy.help" [text]="copy.wholeEventCapacityHint" />
           </div>
           @if (controls.wholeEventCapacity.touched && controls.wholeEventCapacity.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
         </div>
@@ -154,7 +154,3 @@
     </div>
   </section>
 }
-<ng-template #help let-label="label" let-text="text">
-  <button pButton type="button" icon="pi pi-read" severity="secondary" size="small" [text]="true" [rounded]="true"
-    [attr.aria-label]="label + ': ' + copy.help" [pTooltip]="text" tooltipEvent="both" tooltipPosition="top" appendTo="body"></button>
-</ng-template>

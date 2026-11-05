@@ -27,7 +27,7 @@
         </p-select>
         <label [for]="idPrefix() + '-timezone'">{{ i18n.commonLabels().timezone }}</label>
       </p-floatlabel>
-      <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: i18n.commonLabels().timezone, text: copy.timezoneHint }" />
+      <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().timezone + ': ' + copy.help" [text]="copy.timezoneHint" />
     </div>
     @if (controls.timezone.touched && controls.timezone.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
   </div>
@@ -51,8 +51,4 @@
     }
   </div>
 </div>
-<ng-template #help let-label="label" let-text="text">
-  <button pButton type="button" icon="pi pi-read" severity="secondary" size="small" [text]="true" [rounded]="true"
-    [attr.aria-label]="label + ': ' + copy.help" [pTooltip]="text" tooltipEvent="both" tooltipPosition="top" appendTo="body"></button>
-</ng-template>
 

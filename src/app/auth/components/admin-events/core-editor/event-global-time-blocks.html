@@ -54,7 +54,7 @@
                 [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
               <label [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
             </p-floatlabel>
-            <ng-container [ngTemplateOutlet]="help" [ngTemplateOutletContext]="{ label: copy.requiredGmCount, text: copy.requiredGmHint }" />
+            <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
           </div>
           @if (!savedBase()) {
             <div class="flex-row-end-center flex-none">
@@ -96,7 +96,3 @@
       </div>
     }
 </div>
-<ng-template #help let-label="label" let-text="text">
-  <button pButton type="button" icon="pi pi-read" severity="secondary" size="small" [text]="true" [rounded]="true"
-    [attr.aria-label]="label + ': ' + copy.help" [pTooltip]="text" tooltipEvent="both" tooltipPosition="top" appendTo="body"></button>
-</ng-template>

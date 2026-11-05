@@ -6,6 +6,7 @@ import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-eve
 import type { AdminEventActivityKind } from '../../../../core/interfaces/i-admin-event-activity';
 import type { IGmPublicProfile } from '../../../../core/interfaces/i-gm-public-profile';
 import type { ISessionWithRelations } from '../../../../core/interfaces/i-session';
+import { assertAdminEventTimelineScope } from '../../../../core/reads/events/admin-event-timeline.contract';
 import { GmRead } from '../../../../core/reads/gm/gm-read';
 import { SessionRead } from '../../../../core/reads/sessions/session-read';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
@@ -203,6 +204,9 @@ export class EventManualProgramController {
       this.operation.set({ phase: 'reading', pending });
       return this.admin.getTimeline(pending.command.editionId);
     }).pipe(map(timeline => {
+      const context = this.context();
+      assertEdgeContract(context !== null, 'manualProgramReadback.context', 'the prepared manual programme context');
+      assertAdminEventTimelineScope(timeline, context.edition, pending.command.coreId);
       const occurrence = this.assertIdentity(timeline, pending.command);
       if (pending.kind !== 'confirmed') {
         // Matching input never attributes a concurrent author's row to an uncertain SAVE.

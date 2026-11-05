@@ -1,5 +1,6 @@
 import { EventOccurrenceStatus, EventProgramItemStatus, ParticipantSignupKind } from '../../enums/event';
 import type { AdminEventTimeline, TimelineRow } from '../../interfaces/i-admin-event-timeline';
+import type { IAdminEventDetail } from '../../interfaces/i-event-admin';
 import { assertEdgeContract, readEdgeInteger, readEdgeObject, readEdgeString, readEdgeUuid } from '../../utils/edge-contract';
 import { isValidIsoDate } from '../../utils/date';
 import { isValidTime } from '../../utils/time-format';
@@ -39,6 +40,18 @@ export function assertAdminEventTimeline(timeline: AdminEventTimeline): void {
     if (occurrence.participantSignupOpenedAt !== null) timestamp(occurrence.participantSignupOpenedAt);
     occurrence.rows.forEach(assertRow);
   }
+}
+
+export function assertAdminEventTimelineScope(timeline: AdminEventTimeline, edition: IAdminEventDetail, coreId: string): void {
+  assertEdgeContract(edition.eventCoreId === coreId && timeline.eventId === edition.id && timeline.eventCoreId === coreId,
+    'timeline.scope', 'the requested Edition timeline belonging to the current Core');
+  assertEdgeContract(timeline.occurrences.length === edition.occurrences.length &&
+    new Set(edition.occurrences.map(row => row.id)).size === edition.occurrences.length &&
+    new Set(edition.occurrences.map(row => row.date)).size === edition.occurrences.length &&
+    new Set(timeline.occurrences.map(row => row.occurrenceId)).size === timeline.occurrences.length &&
+    new Set(timeline.occurrences.map(row => row.date)).size === timeline.occurrences.length &&
+    edition.occurrences.every(row => timeline.occurrences.some(day => day.occurrenceId === row.id && day.date === row.date)),
+  'timeline.scope.occurrences', 'the same canonical Edition occurrence identities and dates');
 }
 
 function assertRow(row: TimelineRow): void {

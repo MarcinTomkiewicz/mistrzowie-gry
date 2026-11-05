@@ -1,15 +1,18 @@
 import { EventProgramItemStatus } from '../../../../core/enums/event';
 import type { TimelineRow } from '../../../../core/interfaces/i-admin-event-timeline';
 import { formatTimeLabel } from '../../../../core/utils/time-format';
-import type { createEventAdminTimelineI18n } from './event-admin-timeline.i18n';
+import type { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
+
+export function formatEventTimelineTime(value: string, offset: number, dayOffset: string): string {
+  return formatTimeLabel(value) + (offset ? ` (${dayOffset.replace('{{days}}', String(offset))})` : '');
+}
 
 export function presentEventTimelineRows(rows: readonly TimelineRow[], i18n: ReturnType<typeof createEventAdminTimelineI18n>) {
   const copy = i18n.copy();
   const values = i18n.values();
   const statuses = i18n.entityStatuses();
   const candidateStates = { ...copy.candidateStates, pending: i18n.statusPhrases().awaitingAcceptance };
-  const time = (value: string, offset: number) => formatTimeLabel(value) +
-    (offset ? ` (${copy.dayOffset.replace('{{days}}', String(offset))})` : '');
+  const time = (value: string, offset: number) => formatEventTimelineTime(value, offset, copy.dayOffset);
   return rows.map(row => {
     const activity = row.source === 'manual' ? row.activity : null;
     const rpg = row.session !== null || row.programItemId !== null;

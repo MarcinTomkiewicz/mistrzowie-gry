@@ -13,7 +13,7 @@ import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary
   selector: 'app-event-global-draft-summary',
   imports: [EventGlobalPolicySummary, EventGlobalTimeBlocksSummary],
   templateUrl: './event-global-draft-summary.html',
-  host: { class: 'd-block w-100 min-w-0' },
+  host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })
 export class EventGlobalDraftSummary {
   readonly step = input(6);

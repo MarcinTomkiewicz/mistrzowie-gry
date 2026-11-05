@@ -54,12 +54,10 @@
             />
             @if (group.remainingCount > 0) {
               <div class="flex-row-end-center mt-md">
-                <button pButton type="button" size="small" severity="secondary" [outlined]="true"
-                  [attr.aria-expanded]="group.expanded"
-                  [attr.aria-controls]="'event-program-cards-' + group.key"
-                  (click)="toggleGroup(group.key)">
-                  <span pButtonLabel>{{ group.expanded ? i18n.cta().collapse : i18n.remainingSessions(group.remainingCount) }}</span>
-                </button>
+                <p-button type="button" size="small" severity="secondary" [outlined]="true"
+                  [label]="group.expanded ? i18n.cta().collapse : i18n.remainingSessions(group.remainingCount)"
+                  [pt]="{ root: { 'aria-expanded': group.expanded, 'aria-controls': 'event-program-cards-' + group.key } }"
+                  (onClick)="toggleGroup(group.key)" />
               </div>
             }
           </section>

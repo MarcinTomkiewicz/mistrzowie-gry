@@ -33,115 +33,134 @@
         [label]="i18n.creationSteps().policy" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" />
     </div>
   }
-  <app-event-global-draft-summary [core]="saved.core" [edition]="saved.edition" [calendar]="saved.calendar" [policy]="saved.policy" />
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-    <header class="flex-row-between-center flex-wrap gap-sm w-100">
-      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.program }}</h2>
-      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
-        [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
-    </header>
-    <p class="m-0 muted-text">{{ copy.countsHint }}</p>
-    @for (entry of cities(); track entry.city.editionId) {
-      <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
-        <h3 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">{{ entry.city.city }}</h3>
-        <p class="m-0 muted-text text-wrap-anywhere">
-          {{ entry.city.slug }} - {{ entry.city.timezone }} -
-          {{ entry.city.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().inactive }}
-        </p>
-        @if (entry.dates.length) {
-          <div class="w-100 overflow-x-auto">
-            <p-table [value]="entry.dates" dataKey="key" size="small" class="w-100" tableStyleClass="mg-responsive-table">
-              <ng-template #header>
-                <tr class="hide-down-sm">
-                  <th scope="col" class="small-caps">{{ i18n.commonLabels().date }}</th>
-                  <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
-                  <th scope="col" class="small-caps">{{ copy.pending }}</th>
-                  <th scope="col" class="small-caps">{{ copy.confirmed }}</th>
-                </tr>
-              </ng-template>
-              <ng-template #body let-date>
-                @let occurrenceNotRequired = date.participation === 'excluded' || date.globalStatus === 'cancelled';
-                <tr class="mg-responsive-table__row">
-                  <th scope="row" class="mg-responsive-table__row-heading">
-                    <time [attr.datetime]="date.date">{{ formatDateLabel(date.date) }}</time>
-                  </th>
-                  <td class="mg-responsive-table__cell">
-                    <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
-                    <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
-                      <span>{{ date.participationLabel }}</span>
-                      @if (date.globalStatusLabel) { <small>{{ date.globalStatusLabel }}</small> }
-                      @if (date.occurrenceStatusLabel) { <small>{{ date.occurrenceStatusLabel }}</small> }
-                      @if (!date.counts && !occurrenceNotRequired) {
-                        <small>{{ copy.noOccurrence }}</small>
-                        <p-button type="button" size="small" severity="secondary" [text]="true"
-                          [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
-                      }
-                    </div>
-                  </td>
-                  <td class="mg-responsive-table__cell">
-                    <span class="mg-responsive-table__label small-caps font-bold">{{ copy.pending }}</span>
-                    <span class="mg-responsive-table__value">{{ date.counts ? date.counts.pending : occurrenceNotRequired ? i18n.commonValues().notApplicable : copy.unknown }}</span>
-                  </td>
-                  <td class="mg-responsive-table__cell">
-                    <span class="mg-responsive-table__label small-caps font-bold">{{ copy.confirmed }}</span>
-                    <span class="mg-responsive-table__value">{{ date.counts ? date.counts.confirmed : occurrenceNotRequired ? i18n.commonValues().notApplicable : copy.unknown }}</span>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
-        } @else {
-          <p class="m-0 muted-text" role="status">{{ i18n.occurrences().emptyDescription }}</p>
-          <div class="flex-row-start-center">
-            <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
-              [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
-          </div>
-        }
-      </section>
-    }
-  </section>
-}
-@if (isAdmin()) {
-  @let publishCopy = publicationCopy();
-  <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="publication.isBusy()">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ publicationLabels().title }}</h2>
-    <p class="m-0 muted-text">{{ publishCopy.hint }}</p>
-    @if (publication.verified()) {
-      <p-message severity="success" role="status">
-        {{ publication.result()?.alreadyPublished ? publicationLabels().alreadyPublished : publishCopy.verified }}
-      </p-message>
-    } @else if (hasRelease() && !publication.needsReadback()) {
-      <p class="m-0 muted-text" role="status">{{ publishCopy.alreadyReleased }}</p>
-    }
-    @if (publicationError(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
-    @if (publication.preview(); as preview) {
-      <dl class="mg-grid-2 gap-md m-0">
-        <div><dt class="muted-text">{{ publishCopy.affectedCities }}</dt><dd class="m-0">{{ preview.impact.affectedCityCount }}</dd></div>
-        <div><dt class="muted-text">{{ publishCopy.publishableOccurrences }}</dt><dd class="m-0">{{ preview.impact.publishableOccurrenceCount }}</dd></div>
-        <div><dt class="muted-text">{{ publishCopy.preservedPastDrafts }}</dt><dd class="m-0">{{ preview.impact.preservedPastDraftOccurrences }}</dd></div>
-      </dl>
-      @if (publicationBlockers().length) {
-        <ul class="m-0" role="alert">
-          @for (blocker of publicationBlockers(); track $index) {
-            <li class="text-wrap-anywhere">
-              {{ blocker.message }}
-              @if (blocker.city) { <span> - {{ blocker.city }}</span> }
-              @if (blocker.date) { <span> - {{ formatDateLabel(blocker.date) }}</span> }
-              @if (blocker.blockPosition !== undefined) { <span> - {{ publishCopy.block }}: {{ blocker.blockPosition }}</span> }
-            </li>
+  <app-event-global-draft-summary [core]="saved.core" [edition]="saved.edition" [calendar]="saved.calendar" [policy]="saved.policy">
+    <section summary-program class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <header class="flex-row-between-center flex-wrap gap-sm w-100">
+        <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.program }}</h2>
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
+          [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
+      </header>
+      @if (selectedCity(); as selected) {
+        <div class="flex-row-start-center flex-wrap gap-sm" role="group" [attr.aria-label]="i18n.commonLabels().city">
+          @for (entry of saved.cities; track entry.city.editionId) {
+            <p-button type="button" size="small" severity="secondary" [outlined]="selected.city.editionId !== entry.city.editionId"
+              [disabled]="disabled() || publication.locked()" [label]="entry.city.city"
+              [pt]="{ root: { 'aria-pressed': selected.city.editionId === entry.city.editionId } }"
+              (onClick)="selectedCityId.set(entry.city.editionId)" />
           }
-        </ul>
+        </div>
+        <app-event-program-schedule [timeline]="selected.timeline" [disabled]="disabled() || publication.locked()" />
       }
-    }
-    <div class="flex-row-start-center flex-wrap gap-sm">
-      @if (publication.needsReadback()) {
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-          [label]="i18n.commonActions().retry" [disabled]="publication.isBusy()" (onClick)="retryPublicationReadback()" />
-      } @else if (!hasRelease() && !publication.verified()) {
-        <p-button type="button" size="small" severity="success" icon="pi pi-globe" loadingIcon="pi pi-d20"
-          [label]="publicationLabels().publish" [loading]="publication.isBusy()" [disabled]="!canPublish()" (onClick)="confirmPublication()" />
-        @if (disabled() && !publication.isBusy()) { <small class="muted-text">{{ publicationLabels().saveFirst }}</small> }
-      }
-    </div>
-  </section>
+      <details class="w-100 min-w-0 border-top pt-md">
+        <summary>{{ copy.countsHint }}</summary>
+        @for (entry of cities(); track entry.city.editionId) {
+          <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+            <h3 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">{{ entry.city.city }}</h3>
+            <p class="m-0 muted-text text-wrap-anywhere">
+              {{ entry.city.slug }} - {{ entry.city.timezone }} -
+              {{ entry.city.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().inactive }}
+            </p>
+            @if (entry.dates.length) {
+              <div class="w-100 overflow-x-auto">
+                <p-table [value]="entry.dates" dataKey="key" size="small" class="w-100" tableStyleClass="mg-responsive-table">
+                  <ng-template #header>
+                    <tr class="hide-down-sm">
+                      <th scope="col" class="small-caps">{{ i18n.commonLabels().date }}</th>
+                      <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+                      <th scope="col" class="small-caps">{{ copy.pending }}</th>
+                      <th scope="col" class="small-caps">{{ copy.confirmed }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template #body let-date>
+                    @let occurrenceNotRequired = date.participation === 'excluded' || date.globalStatus === 'cancelled';
+                    <tr class="mg-responsive-table__row">
+                      <th scope="row" class="mg-responsive-table__row-heading">
+                        <time [attr.datetime]="date.date">{{ formatDateLabel(date.date) }}</time>
+                      </th>
+                      <td class="mg-responsive-table__cell">
+                        <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
+                        <div class="mg-responsive-table__value flex-col-start-stretch gap-xs">
+                          <span>{{ date.participationLabel }}</span>
+                          @if (date.globalStatusLabel) { <small>{{ date.globalStatusLabel }}</small> }
+                          @if (date.occurrenceStatusLabel) { <small>{{ date.occurrenceStatusLabel }}</small> }
+                          @if (!date.counts && !occurrenceNotRequired) {
+                            <small>{{ copy.noOccurrence }}</small>
+                            <p-button type="button" size="small" severity="secondary" [text]="true"
+                              [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
+                          }
+                        </div>
+                      </td>
+                      <td class="mg-responsive-table__cell">
+                        <span class="mg-responsive-table__label small-caps font-bold">{{ copy.pending }}</span>
+                        <span class="mg-responsive-table__value">{{ date.counts ? date.counts.pending : occurrenceNotRequired ? i18n.commonValues().notApplicable : copy.unknown }}</span>
+                      </td>
+                      <td class="mg-responsive-table__cell">
+                        <span class="mg-responsive-table__label small-caps font-bold">{{ copy.confirmed }}</span>
+                        <span class="mg-responsive-table__value">{{ date.counts ? date.counts.confirmed : occurrenceNotRequired ? i18n.commonValues().notApplicable : copy.unknown }}</span>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            } @else {
+              <p class="m-0 muted-text" role="status">{{ i18n.occurrences().emptyDescription }}</p>
+              <div class="flex-row-start-center">
+                <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
+                  [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
+              </div>
+            }
+          </section>
+        }
+      </details>
+    </section>
+    <ng-container summary-admin><ng-container [ngTemplateOutlet]="publicationPanel" /></ng-container>
+  </app-event-global-draft-summary>
+} @else {
+  <ng-container [ngTemplateOutlet]="publicationPanel" />
 }
+<ng-template #publicationPanel>
+  @if (isAdmin()) {
+    @let publishCopy = publicationCopy();
+    <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="publication.isBusy()">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ publicationLabels().title }}</h2>
+      <p class="m-0 muted-text">{{ publishCopy.hint }}</p>
+      @if (publication.verified()) {
+        <p-message severity="success" role="status">
+          {{ publication.result()?.alreadyPublished ? publicationLabels().alreadyPublished : publishCopy.verified }}
+        </p-message>
+      } @else if (hasRelease() && !publication.needsReadback()) {
+        <p class="m-0 muted-text" role="status">{{ publishCopy.alreadyReleased }}</p>
+      }
+      @if (publicationError(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
+      @if (publication.preview(); as preview) {
+        <dl class="mg-grid-2 gap-md m-0">
+          <div><dt class="muted-text">{{ publishCopy.affectedCities }}</dt><dd class="m-0">{{ preview.impact.affectedCityCount }}</dd></div>
+          <div><dt class="muted-text">{{ publishCopy.publishableOccurrences }}</dt><dd class="m-0">{{ preview.impact.publishableOccurrenceCount }}</dd></div>
+          <div><dt class="muted-text">{{ publishCopy.preservedPastDrafts }}</dt><dd class="m-0">{{ preview.impact.preservedPastDraftOccurrences }}</dd></div>
+        </dl>
+        @if (publicationBlockers().length) {
+          <ul class="m-0" role="alert">
+            @for (blocker of publicationBlockers(); track $index) {
+              <li class="text-wrap-anywhere">
+                {{ blocker.message }}
+                @if (blocker.city) { <span> - {{ blocker.city }}</span> }
+                @if (blocker.date) { <span> - {{ formatDateLabel(blocker.date) }}</span> }
+                @if (blocker.blockPosition !== undefined) { <span> - {{ publishCopy.block }}: {{ blocker.blockPosition }}</span> }
+              </li>
+            }
+          </ul>
+        }
+      }
+      <div class="flex-row-start-center flex-wrap gap-sm">
+        @if (publication.needsReadback()) {
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+            [label]="i18n.commonActions().retry" [disabled]="publication.isBusy()" (onClick)="retryPublicationReadback()" />
+        } @else if (!hasRelease() && !publication.verified()) {
+          <p-button type="button" size="small" severity="success" icon="pi pi-globe" loadingIcon="pi pi-d20"
+            [label]="publicationLabels().publish" [loading]="publication.isBusy()" [disabled]="!canPublish()" (onClick)="confirmPublication()" />
+          @if (disabled() && !publication.isBusy()) { <small class="muted-text">{{ publicationLabels().saveFirst }}</small> }
+        }
+      </div>
+    </section>
+  }
+</ng-template>

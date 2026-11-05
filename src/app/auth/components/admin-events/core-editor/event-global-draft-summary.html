@@ -86,28 +86,32 @@
     </div>
   }
   @if (step() === 4 || step() === 6) {
-    <section [attr.id]="step() === 6 ? 'global-event-policy' : null" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-      @for (group of policyGroups(); track group.key; let first = $first) {
-        @if (first) {
-          <div class="flex-row-start-center gap-md">
-            <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
-            <h2 class="mg-section__title mg-section__title--md m-0">{{ group.title }}</h2>
-          </div>
-        } @else {
-          <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ group.title }}</h3>
+    <div class="flex-col-start-stretch gap-md min-w-0">
+      <section [attr.id]="step() === 6 ? 'global-event-policy' : null" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+        @for (group of policyGroups(); track group.key; let first = $first) {
+          @if (first) {
+            <div class="flex-row-start-center gap-md">
+              <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
+              <h2 class="mg-section__title mg-section__title--md m-0">{{ group.title }}</h2>
+            </div>
+          } @else {
+            <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ group.title }}</h3>
+          }
+          <app-event-global-policy-summary [policy]="group.values" />
         }
-        <app-event-global-policy-summary [policy]="group.values" />
-      }
-      <dl class="flex-col-start-stretch gap-sm m-0">
-        <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm">
-          <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToPublicEvent }}</dt>
-          <dd class="m-0">{{ policy().appliedToPublicEvent ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
-        </div>
-        <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
-          <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToRegistration }}</dt>
-          <dd class="m-0">{{ policy().appliedToParticipantRegistration ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
-        </div>
-      </dl>
-    </section>
+        <dl class="flex-col-start-stretch gap-sm m-0">
+          <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm">
+            <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToPublicEvent }}</dt>
+            <dd class="m-0">{{ policy().appliedToPublicEvent ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
+          </div>
+          <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm">
+            <dt class="muted-text flex-1 min-w-0">{{ copy.appliedToRegistration }}</dt>
+            <dd class="m-0">{{ policy().appliedToParticipantRegistration ? i18n.commonValues().yes : i18n.commonValues().no }}</dd>
+          </div>
+        </dl>
+      </section>
+      <ng-content select="[summary-admin]" />
+    </div>
   }
 </div>
+<ng-content select="[summary-program]" />

@@ -1,4 +1,4 @@
-import type { AdminEventTimelineOccurrence } from './i-admin-event-timeline';
+import type { AdminEventTimeline, AdminEventTimelineOccurrence } from './i-admin-event-timeline';
 import type { AdminEventPolicyDraft } from './i-admin-event-policy';
 import type { AdminEffectivePolicyResult, AdminGlobalCalendarResult } from './i-admin-global-event';
 import type { IAdminEventDetail, IEventCoreDetail } from './i-event-admin';
@@ -20,5 +20,5 @@ export interface EventGlobalSavedSnapshot {
   policy: AdminEffectivePolicyResult;
   policyDraft: AdminEventPolicyDraft;
   edition: IAdminEventDetail;
-  cities: { city: AdminGlobalCalendarResult['cities'][number]; dates: SavedProgramDate[] }[];
+  cities: { city: AdminGlobalCalendarResult['cities'][number]; dates: SavedProgramDate[]; timeline: AdminEventTimeline }[];
 }

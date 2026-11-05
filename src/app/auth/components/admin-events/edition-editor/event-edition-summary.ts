@@ -11,14 +11,14 @@ import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
 import { formatTimeRangeLabel } from '../../../../core/utils/time-format';
 import { createEventCoreEditorI18n } from '../core-editor/core-editor.i18n';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
-import { presentEventTimelineRows } from '../event-admin-timeline/event-admin-timeline-presenter';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
+import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
 import { resolveParticipantSignupKindLabel } from '../participant-signup-kind-options';
 import { createEventEditionEditorI18n, createEventScheduleEditorI18n } from './edition-editor.i18n';
 
 @Component({
   selector: 'app-event-edition-summary',
-  imports: [ButtonModule, MessageModule],
+  imports: [ButtonModule, MessageModule, EventProgramSchedule],
   templateUrl: './event-edition-summary.html',
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })
@@ -49,15 +49,10 @@ export class EventEditionSummary {
     this.edition().coverImagePath ?? this.core().coverImagePath));
   protected readonly dates = computed(() => {
     const edition = this.edition();
-    return edition.schedule.kind === 'exact_dates' ? edition.schedule.dates.map(date => ({
-      date,
-      status: edition.occurrences.find(occurrence => occurrence.date === date)?.status ?? null,
-    })) : [];
+    const occurrences = new Map(edition.occurrences.map(occurrence => [occurrence.date, occurrence.status]));
+    const dates = edition.schedule.kind === 'exact_dates' ? edition.schedule.dates : edition.occurrences.map(occurrence => occurrence.date);
+    return [...dates].sort().map(date => ({ date, status: occurrences.get(date) ?? null }));
   });
-  protected readonly days = computed(() => this.timeline()?.occurrences.map(occurrence => ({
-    occurrence,
-    rows: presentEventTimelineRows(occurrence.rows, this.timelineI18n),
-  })).sort((a, b) => a.occurrence.date.localeCompare(b.occurrence.date)) ?? []);
   protected readonly timelineErrorMessage = computed(() => this.timelineError() === null ? null
     : resolveEventEditionAdminErrorMessage(this.timelineError(), this.editionI18n.rpcErrors(),
       this.i18n.commonErrors().concurrentModification));

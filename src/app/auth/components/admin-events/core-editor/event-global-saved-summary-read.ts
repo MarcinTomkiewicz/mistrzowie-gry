@@ -38,7 +38,7 @@ export function readEventGlobalSavedSummary(admin: EventAdmin, coreId: string) {
             timeline.occurrences.some(row => row.occurrenceId === occurrence.id && row.date === occurrence.date)),
           'savedSummary.mainOccurrences', 'matching saved main Edition occurrence IDs and dates');
         }
-        return { city, dates: savedProgramDates(calendar, city, timeline) };
+        return { city, dates: savedProgramDates(calendar, city, timeline), timeline };
       });
       return { core, calendar, policy, policyDraft, edition, cities };
     }));

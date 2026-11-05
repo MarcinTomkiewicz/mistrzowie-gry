@@ -161,9 +161,9 @@
       @for (date of selectedDates(field); track date) {
         <span class="tag-badge tag-badge--muted flex-row-start-center gap-xs" role="listitem">
           <time [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
-          <button pButton type="button" size="small" severity="danger" [text]="true" icon="pi pi-demolish"
-            [disabled]="schedule.disabled" [attr.aria-label]="i18n.commonActions().removeItem + ': ' + formatDateLabel(date)"
-            (click)="removeDate(field, date)"></button>
+          <p-button type="button" size="small" severity="danger" [text]="true" icon="pi pi-demolish"
+            [disabled]="schedule.disabled" [ariaLabel]="i18n.commonActions().removeItem + ': ' + formatDateLabel(date)"
+            (onClick)="removeDate(field, date)" />
         </span>
       }
     </div>

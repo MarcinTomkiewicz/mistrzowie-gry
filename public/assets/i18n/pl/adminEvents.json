@@ -599,6 +599,13 @@
     "unknown": "Wystąpił nieoczekiwany błąd podczas operacji na lokalnej edycji."
   },
   "timeline": {
+    "schedule": {
+      "title": "[PH] Harmonogram programu",
+      "track": "[PH] Tor {{number}}",
+      "hint": "[PH] Wybierz dzień i pozycję programu, aby zobaczyć szczegóły. Na węższym ekranie przewiń harmonogram w poziomie.",
+      "assignmentStatus": "[PH] Stan przypisania MG",
+      "timeUnavailable": "[PH] Poniższe pozycje nie mają jednoznacznego przedziału czasu w danych źródłowych. Pokazano ich zapisane godziny bez dopisywania dnia."
+    },
     "manualProgram": {
       "unavailable": "[PH] Przypisanie wymaga prywatnego Global Event, niechronionego planowanego terminu i rzeczywistych bloków. Najpierw zakończ inne operacje oraz rozstrzygnij szkic kalendarza.",
       "block": "[PH] Blok programu",
