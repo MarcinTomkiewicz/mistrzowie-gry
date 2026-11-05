@@ -16,6 +16,7 @@ import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces
 import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
+import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult } from '../../interfaces/i-admin-global-event-publication';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
 import type {
   AddAdminGlobalEventCityPayload,
@@ -113,6 +114,16 @@ export class EventAdmin {
   previewGlobalEventPage(coreId: string): Observable<AdminGlobalEventPagePreview> {
     return this.backend.rpc<AdminGlobalEventPagePreview>(EVENT_RPC.previewGlobalEventPage, {
       p_payload: { coreId },
+    });
+  }
+
+  previewGlobalPublication(coreId: string): Observable<AdminGlobalPublicationPreview> {
+    return this.backend.rpc<AdminGlobalPublicationPreview>(EVENT_RPC.previewGlobalPublication, { p_core_id: coreId });
+  }
+
+  publishGlobalEvent(coreId: string, policyDraftRevision: number): Observable<AdminGlobalPublicationResult> {
+    return this.backend.rpc<AdminGlobalPublicationResult>(EVENT_RPC.publishGlobalEvent, {
+      p_core_id: coreId, p_expected_policy_draft_revision: policyDraftRevision,
     });
   }
 

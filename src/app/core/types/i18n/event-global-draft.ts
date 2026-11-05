@@ -1,5 +1,11 @@
 import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
+import type { AdminGlobalPublicationBlocker } from '../../interfaces/i-admin-global-event-publication';
+
+export type EventGlobalPublicationCopy = Record<
+  'hint' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'verified' | 'alreadyReleased' |
+  'affectedCities' | 'publishableOccurrences' | 'preservedPastDrafts' | 'policyDraft' | 'block', string
+> & { blockers: Record<AdminGlobalPublicationBlocker['code'], string> };
 
 export type EventMetadataCopy = {
   readOnly: string;

@@ -22,6 +22,8 @@ export const EVENT_RPC = {
   previewGlobalBaseTimeBlocks: 'preview_admin_event_global_base_time_blocks',
   saveGlobalBaseTimeBlocks: 'save_admin_event_global_base_time_blocks',
   previewGlobalEventPage: 'preview_admin_global_event_page',
+  previewGlobalPublication: 'preview_admin_event_global_publication',
+  publishGlobalEvent: 'publish_admin_global_event',
   previewDatedTimeBlocks: 'preview_admin_event_dated_time_blocks',
   saveDatedTimeBlocks: 'save_admin_event_dated_time_blocks',
   getEffectivePolicy: 'get_admin_event_effective_policy',

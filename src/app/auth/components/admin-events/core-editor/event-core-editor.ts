@@ -15,6 +15,7 @@ import { distinctUntilChanged, EMPTY, filter, finalize, from, ignoreElements, ma
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
+import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -31,6 +32,7 @@ import { EventCoreEditions } from './event-core-editions';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventGlobalSavedSummary } from './event-global-saved-summary';
+import { EventGlobalPublicationController } from './event-global-publication-controller';
 import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
 import { EventGlobalDiagnostics } from './event-global-diagnostics';
 import { EventDatedBlocksController } from './event-dated-blocks-controller';
@@ -55,7 +57,8 @@ import { EventManualProgramController } from './event-manual-program-controller'
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
-    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualProgramController],
+    EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualProgramController,
+    EventGlobalPublicationController],
 })
 export class EventCoreEditor {
   protected readonly datedBlocks = inject(EventDatedBlocksController);
@@ -63,6 +66,7 @@ export class EventCoreEditor {
   protected readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
   protected readonly policy = inject(EventGlobalPolicyFacade);
   protected readonly program = inject(EventManualProgramController);
+  protected readonly publication = inject(EventGlobalPublicationController);
   private readonly platform = inject(Platform);
   private readonly confirm = inject(UiConfirm);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -86,10 +90,10 @@ export class EventCoreEditor {
   protected readonly isSaving = this.metadata.isBusy;
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
-  protected readonly canCancel = computed(() => !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
+  protected readonly canCancel = computed(() => !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
     this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
-  private readonly otherOperationsLocked = computed(() => this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
+  private readonly otherOperationsLocked = computed(() => this.publication.locked() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
     this.cover.needsReconciliation() || this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
   protected readonly navigationLocked = computed(() => this.otherOperationsLocked() || this.program.locked());
@@ -143,6 +147,7 @@ export class EventCoreEditor {
       this.baseBlocks.reset();
       this.policy.reset();
       this.program.reset();
+      this.publication.reset();
       this.cover.reset();
       this.metadata.reset();
       this.restoreStep(this.route.snapshot.queryParamMap.get('step'));
@@ -240,6 +245,11 @@ export class EventCoreEditor {
   protected goBack(): void {
     if (!this.canCancel()) return;
     void this.router.navigate(['/admin/content/events']);
+  }
+
+  protected acceptPublication(core: IEventCoreDetail): void {
+    this.metadata.load(core);
+    this.cover.reconcile(core);
   }
 
   protected programBlocked(): boolean {

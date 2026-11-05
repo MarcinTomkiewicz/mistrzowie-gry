@@ -97,8 +97,8 @@
                 }
                 <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
                 @if (globalDraft.activeStep() === 6) {
-                  <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="navigationLocked() || cover.dirty()"
-                    (navigateToStep)="goToStep($event)" />
+                  <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="navigationLocked() || programBlocked()"
+                    (navigateToStep)="goToStep($event)" (published)="acceptPublication($event)" />
                 } @else if (globalDraft.activeStep() !== 5) {
                   @if (globalDraft.policy(); as policy) {
                     @if (metadata.edition(); as edition) {
@@ -123,7 +123,7 @@
               }
               @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
                 <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-                  [disabled]="program.locked() || policy.locked() || metadata.locked() || schedule.locked() || baseBlocks.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
+                  [disabled]="publication.locked() || program.locked() || policy.locked() || metadata.locked() || schedule.locked() || baseBlocks.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
                   (navigateToSection)="goToDiagnosticSection($event)" />
               }
             </div>
