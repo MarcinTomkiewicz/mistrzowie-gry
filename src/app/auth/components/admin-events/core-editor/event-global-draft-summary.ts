@@ -7,6 +7,7 @@ import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/inter
 import { formatDateLabel } from '../../../../core/utils/date';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalPolicySummary } from './policy/event-global-policy-summary';
+import { sameScheduleBlocks } from './event-global-schedule-state';
 import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary';
 
 @Component({
@@ -24,7 +25,28 @@ export class EventGlobalDraftSummary {
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly formatDateLabel = formatDateLabel;
   protected readonly locationCity = computed(() => this.calendar().cities.find((city) => city.editionId === this.edition().id));
-  protected readonly dates = computed(() => [...this.calendar().datedTimeBlocks].sort((a, b) => a.date.localeCompare(b.date)));
+  protected readonly dates = computed(() => {
+    const calendar = this.calendar();
+    const datedBlocks = new Map(calendar.datedTimeBlocks.map(day => [day.globalOccurrenceId, day]));
+    return [...calendar.globalDates].sort((a, b) => a.date.localeCompare(b.date)).map(day => {
+      const blocks = datedBlocks.get(day.globalOccurrenceId);
+      return {
+        ...day,
+        blocks,
+        showBlockDetails: blocks !== undefined && !sameScheduleBlocks(blocks.timeBlocks, calendar.timeBlocks),
+        cities: day.cityOccurrences.map(city => {
+          const localBlocks = blocks?.cities.find(local => local.editionId === city.editionId);
+          return {
+            ...city,
+            blocks: localBlocks,
+            // Canonical effective blocks include frozen snapshots, regardless of the override flag.
+            showBlockDetails: blocks !== undefined && localBlocks !== undefined &&
+              !sameScheduleBlocks(localBlocks.timeBlocks, blocks.timeBlocks),
+          };
+        }),
+      };
+    });
+  });
   protected readonly policyGroups = computed(() => [
     { key: 'global', title: this.i18n.creation().policy, values: this.policy().global },
     ...this.policy().editions.filter((edition) => Object.values(edition.override).some(Boolean)).map((edition) => ({

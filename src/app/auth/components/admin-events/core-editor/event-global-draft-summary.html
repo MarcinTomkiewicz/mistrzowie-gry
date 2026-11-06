@@ -61,24 +61,52 @@
             <span class="pi pi-sun-eclipse square-11 flex-none" aria-hidden="true"></span>
             <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
           </div>
-          <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.occurrences().sectionTitle }}</h3>
           <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
             <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
             <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
-            <app-event-global-time-blocks-summary [blocks]="calendar().timeBlocks" />
+            <app-event-global-time-blocks-summary [blocks]="calendar().timeBlocks" [showDayOffsets]="true" />
+          </section>
+          <section class="flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0">
+            <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.occurrences().sectionTitle }}</h3>
+            <p class="m-0 muted-text">{{ i18n.datedBlocks().unchangedDates }}</p>
             @for (day of dates(); track day.globalOccurrenceId) {
-              <details class="w-100 border-top pt-sm">
-                <summary>{{ formatDateLabel(day.date) }} - {{ i18n.datedBlocks().sources[day.source] }}</summary>
-                <div class="flex-col-start-stretch gap-md pt-sm w-100 min-w-0">
-                  <app-event-global-time-blocks-summary [blocks]="day.timeBlocks" />
+              <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
+                <header class="flex-row-between-center flex-wrap gap-sm min-w-0">
+                  <h4 class="m-0"><time [attr.datetime]="day.date">{{ formatDateLabel(day.date) }}</time></h4>
+                  <span class="text-sm muted-text">{{ i18n.savedSummary().calendarStatuses[day.status] }}</span>
+                </header>
+                @if (day.blocks; as blocks) {
+                  <p class="m-0 muted-text text-wrap-anywhere">{{ i18n.datedBlocks().sources[blocks.source] }}</p>
+                  @if (day.showBlockDetails) {
+                    <app-event-global-time-blocks-summary [blocks]="blocks.timeBlocks" [showDayOffsets]="true" />
+                  }
+                }
+                <div class="flex-col-start-stretch gap-sm min-w-0">
                   @for (city of day.cities; track city.editionId) {
-                    <section class="flex-col-start-stretch gap-sm border-top pt-sm w-100 min-w-0">
-                      <h4 class="m-0">{{ city.city }} - {{ city.isOverride ? i18n.datedBlocks().cityOverride : i18n.datedBlocks().fromDate }}</h4>
-                      <app-event-global-time-blocks-summary [blocks]="city.timeBlocks" />
+                    <section class="flex-col-start-stretch gap-xs min-w-0">
+                      <header class="flex-row-between-start flex-col-start-stretch-sm gap-xs min-w-0">
+                        <h5 class="m-0 text-sm text-wrap-anywhere">{{ city.city }}</h5>
+                        <p class="m-0 text-sm text-wrap-anywhere">{{ i18n.savedSummary().participation[city.decision] }}</p>
+                      </header>
+                      @if (city.blocks; as localBlocks) {
+                        <div class="flex-col-start-stretch gap-sm min-w-0">
+                          <div class="flex-row-start-center flex-wrap gap-xs text-sm muted-text min-w-0">
+                            @if (localBlocks.isOverride) { <span class="text-wrap-anywhere">{{ i18n.datedBlocks().cityOverride }}</span> }
+                            @if (localBlocks.publishedSnapshot) {
+                              <span class="text-wrap-anywhere">{{ i18n.datedBlocks().sources.published_snapshot }}</span>
+                            } @else if (!localBlocks.isOverride) {
+                              <span class="text-wrap-anywhere">{{ i18n.datedBlocks().fromDate }}</span>
+                            }
+                          </div>
+                          @if (city.showBlockDetails) {
+                            <app-event-global-time-blocks-summary [blocks]="localBlocks.timeBlocks" [showDayOffsets]="true" />
+                          }
+                        </div>
+                      }
                     </section>
                   }
                 </div>
-              </details>
+              </section>
             }
           </section>
         </section>
