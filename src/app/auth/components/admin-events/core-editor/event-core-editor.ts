@@ -9,11 +9,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { distinctUntilChanged, EMPTY, filter, finalize, map, Observable, of, Subscription, switchMap } from 'rxjs';
+import { distinctUntilChanged, EMPTY, filter, finalize, from, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { CharacterCounter } from '../../../../common/character-counter/character-counter';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { findEventGlobalDraftStepError } from '../../../../core/factories/event-global-draft-form.factory';
 import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { Platform } from '../../../../core/services/platform/platform';
@@ -30,6 +31,8 @@ import { resolveEventCoreAdminErrorMessage, resolveEventEditionAdminErrorMessage
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventCoreEditions } from './event-core-editions';
 import { EventGlobalDraftController } from './event-global-draft-controller';
+import { EventGlobalDraftFields } from './event-global-draft-fields';
+import { EventGlobalDraftReview } from './event-global-draft-review';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventGlobalSavedSummary } from './event-global-saved-summary';
 import { EventGlobalPublicationController } from './event-global-publication-controller';
@@ -55,7 +58,8 @@ import { EventEditionEditor } from '../edition-editor/event-edition-editor';
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule, CharacterCounter,
     ToggleSwitchModule, EventEditionEditor, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
-    LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
+    LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalDraftFields, EventGlobalDraftReview, EventGlobalCityFields,
+    EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
     EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualProgramController,
@@ -63,6 +67,7 @@ import { EventEditionEditor } from '../edition-editor/event-edition-editor';
 })
 export class EventCoreEditor {
   private readonly staffingEditor = viewChild(EventEditionEditor);
+  private readonly draftFields = viewChild(EventGlobalDraftFields);
   protected readonly datedBlocks = inject(EventDatedBlocksController);
   protected readonly schedule = inject(EventGlobalScheduleController);
   protected readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
@@ -78,7 +83,8 @@ export class EventCoreEditor {
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
   private readonly route = inject(ActivatedRoute);
-  private readonly coreId = signal('');
+  private readonly coreId = signal<string | null>(null);
+  protected readonly isNew = computed(() => this.coreId() === '');
   private coreUrl = this.router.url;
   private loadSubscription: Subscription | null = null;
   private saveSubscription: Subscription | null = null;
@@ -89,23 +95,29 @@ export class EventCoreEditor {
   protected readonly scheduleCopy = createScopedObjectI18n<EventGlobalScheduleCopy>('adminEvents', 'editor.schedule');
   protected readonly core = this.metadata.core;
   protected readonly isLoading = signal(true);
-  protected readonly isSaving = this.metadata.isBusy;
+  private readonly creating = signal(false);
+  protected readonly isSaving = computed(() => this.creating() || this.metadata.isBusy());
+  protected readonly scheduleValidationAttempted = signal(false);
+  protected readonly createLabel = computed(() => this.globalDraft.state() === 'created' ? this.i18n.creation().retryRead
+    : this.globalDraft.state() === 'uncertain' ? this.i18n.creation().retryCreation : this.i18n.commonActions().saveDraft);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
-  protected readonly canCancel = computed(() => !this.staffingEditor()?.locked() && !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
+  protected readonly canCancel = computed(() => this.isNew() ? !this.creating() && this.globalDraft.state() !== 'uncertain'
+    : !this.staffingEditor()?.locked() && !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
     this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
   private readonly otherOperationsLocked = computed(() => this.publication.locked() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
     this.cover.needsReconciliation() || this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
-  protected readonly navigationLocked = computed(() => this.otherOperationsLocked() || this.program.locked() || !!this.staffingEditor()?.locked());
+  protected readonly navigationLocked = computed(() => this.isNew() ? this.creating() || this.globalDraft.state() !== 'idle'
+    : this.otherOperationsLocked() || this.program.locked() || !!this.staffingEditor()?.locked());
   protected readonly staffingBlocked = computed(() => {
     this.coreFormEvents();
     return this.otherOperationsLocked() || this.program.locked() || this.form.dirty || this.cover.dirty();
   });
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: this.i18n.commonNav().eventsManagement, path: '/admin/content/events' },
-    { label: this.core()?.name ?? this.i18n.page().editTitle },
+    { label: this.isNew() ? this.i18n.page().createTitle : this.core()?.name ?? this.i18n.page().editTitle },
   ]);
   protected readonly form = this.metadata.coreForm;
   private readonly coreFormEvents = toSignal(this.form.events);
@@ -113,8 +125,11 @@ export class EventCoreEditor {
     const edition = this.globalDraft.selectedEdition();
     return edition !== null && edition.id === this.globalDraft.calendar()?.mainEditionId;
   });
-  protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => (!this.metadata.isGlobal() && !this.globalDraft.staffingEditionId()) || this.globalDraft.activeStep() === 1
-    ? 'core' : this.globalDraft.activeStep() === 2 && this.selectedMainEdition() ? 'edition' : null);
+  protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => {
+    if (this.isNew()) return null;
+    return (!this.metadata.isGlobal() && !this.globalDraft.staffingEditionId()) || this.globalDraft.activeStep() === 1
+      ? 'core' : this.globalDraft.activeStep() === 2 && this.selectedMainEdition() ? 'edition' : null;
+  });
   protected readonly metadataError = computed(() => {
     const target = this.metadataTarget();
     const error = target ? this.metadata.errors()[target] : undefined;
@@ -136,7 +151,7 @@ export class EventCoreEditor {
       distinctUntilChanged(),
       switchMap(coreId => {
         if (coreId === this.coreId()) return EMPTY;
-        const decision = this.coreId() ? this.canDeactivate() : true;
+        const decision = this.coreId() !== null ? this.canDeactivate() : true;
         return (typeof decision === 'boolean' ? of(decision) : decision).pipe(map(accepted => ({ coreId, accepted })));
       }),
       takeUntilDestroyed(this.destroyRef),
@@ -158,19 +173,21 @@ export class EventCoreEditor {
       this.publication.reset();
       this.cover.reset();
       this.metadata.reset();
+      this.scheduleValidationAttempted.set(false);
       this.restoreStep(this.route.snapshot.queryParamMap.get('step'));
       this.loadCore();
     });
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      if (this.route.snapshot.paramMap.get('coreId') === this.coreId()) this.restoreStep(params.get('step'));
+      if ((this.route.snapshot.paramMap.get('coreId') ?? '') === this.coreId()) this.restoreStep(params.get('step'));
     });
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(event => {
-      if (this.route.snapshot.paramMap.get('coreId') === this.coreId()) this.coreUrl = event.urlAfterRedirects;
+      if ((this.route.snapshot.paramMap.get('coreId') ?? '') === this.coreId()) this.coreUrl = event.urlAfterRedirects;
     });
     this.destroyRef.onDestroy(this.platform.onWindow('beforeunload', event => {
+      if (this.isNew() && this.globalDraft.state() === 'created') return;
       if (!this.hasUnsavedChanges() && this.canCancel() && !this.cover.locked()) return;
       event.preventDefault();
       event.returnValue = '';
@@ -179,11 +196,13 @@ export class EventCoreEditor {
 
   protected loadCore(): void {
     this.loadSubscription?.unsubscribe();
+    const coreId = this.coreId();
+    if (!coreId) { this.isLoading.set(false); return; }
     this.isLoading.set(true);
     this.core.set(null);
     this.loadErrorMessage.set(null);
     this.isNotFound.set(false);
-    this.loadSubscription = this.globalDraft.readCore(this.coreId())
+    this.loadSubscription = this.globalDraft.readCore(coreId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
@@ -261,11 +280,24 @@ export class EventCoreEditor {
 
   private restoreStep(value: string | null): void {
     const step = Number(value);
+    if (this.isNew() && step > this.globalDraft.reachedStep()) return;
     if (Number.isInteger(step) && step >= 1 && step <= 6 && !this.navigationLocked() && !this.cover.dirty()) this.globalDraft.activeStep.set(step);
   }
 
   protected goToStep(step: number): void {
     if (!Number.isInteger(step) || step < 1 || step > 6 || this.navigationLocked() || this.cover.dirty()) return;
+    if (this.isNew()) {
+      if (step > this.globalDraft.reachedStep()) {
+        for (let current = 1; current < step; current++) {
+          if (!this.validateDraftStep(current)) return;
+        }
+      }
+      this.globalDraft.reachedStep.update(reached => Math.max(reached, step));
+    }
+    this.showStep(step);
+  }
+
+  private showStep(step: number): void {
     this.globalDraft.activeStep.set(step);
     void this.router.navigate([], {
       relativeTo: this.route, queryParams: { step }, queryParamsHandling: 'merge', replaceUrl: true,
@@ -293,6 +325,17 @@ export class EventCoreEditor {
   }
 
   canDeactivate(nextState?: RouterStateSnapshot): boolean | Observable<boolean> {
+    if (this.isNew()) {
+      if (this.globalDraft.state() === 'created') return true;
+      if (this.creating() || this.globalDraft.state() === 'uncertain') return false;
+      if (this.globalDraft.form.pristine) return true;
+      return this.confirm.modalDecision({
+        header: this.i18n.page().createTitle, icon: 'pi pi-interdiction',
+        message: this.i18n.creation().leaveConfirmation,
+        acceptLabel: this.i18n.creation().discardDraft, acceptIcon: 'pi pi-vacuum-cleaner',
+        rejectLabel: this.i18n.commonActions().cancel,
+      }).pipe(map(accepted => accepted && !this.destroyRef.destroyed && !this.creating() && this.globalDraft.state() === 'idle'));
+    }
     let nextRoute = nextState?.root ?? null;
     while (nextRoute?.firstChild) nextRoute = nextRoute.firstChild;
     // A reused editor resolves the Core transition before resetting its controllers.
@@ -329,8 +372,54 @@ export class EventCoreEditor {
   }
 
   private hasUnsavedChanges(): boolean {
+    if (this.isNew()) return this.globalDraft.form.dirty || this.globalDraft.state() === 'uncertain';
     return !!this.staffingEditor()?.hasUnsavedChanges() || this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
       (this.globalDraft.cityEditing() && this.globalDraft.cityState() !== 'created' && this.globalDraft.cityForm.dirty) ||
       (this.datedBlocks.isDirty() && !this.datedBlocks.readbackPending());
+  }
+
+  protected submitDraft(): void {
+    if (!this.isNew() || this.globalDraft.activeStep() !== 6 || this.creating()) return;
+    if (this.globalDraft.state() === 'idle') {
+      for (let step = 1; step <= 4; step++) {
+        if (!this.validateDraftStep(step)) return;
+      }
+    }
+    this.creating.set(true);
+    this.saveSubscription = this.globalDraft.create().pipe(
+      tap(() => this.toast.success({ summary: this.i18n.toast().saveSuccessSummary, detail: this.i18n.toast().saveSuccessDetail })),
+      switchMap(core => from(this.router.navigate(['/admin/content/events', core.id, 'edit'], {
+        replaceUrl: true, queryParams: { step: this.globalDraft.activeStep() },
+      }))),
+      tap(navigated => {
+        if (!navigated) throw new Error('[EVENT_GLOBAL_DRAFT] Saved Core navigation failed.');
+      }),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.creating.set(false)),
+    ).subscribe({
+      error: (error: unknown) => {
+        const state = this.globalDraft.state();
+        if (state === 'uncertain') this.toast.warn({ summary: this.i18n.creation().uncertain });
+        else this.toast.danger({ summary: this.i18n.toast().saveFailedSummary,
+          detail: state === 'created' ? this.i18n.creation().readbackFailed : resolveEventCoreAdminErrorMessage(
+            error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification),
+        });
+      },
+    });
+  }
+
+  private validateDraftStep(step: number): boolean {
+    if (step === 3) this.scheduleValidationAttempted.set(true);
+    const field = findEventGlobalDraftStepError(this.globalDraft.form, step);
+    if (!field) return true;
+    this.showStep(step);
+    this.toast.danger({ summary: this.i18n.commonForm().invalidSummary, detail: this.i18n.commonForm().invalid });
+    scrollElementIntoViewWhenReady(() => {
+      if (this.destroyRef.destroyed || this.globalDraft.activeStep() !== step) return null;
+      const target = this.draftFields()?.fieldElement(field);
+      target?.focus({ preventScroll: true });
+      return target;
+    }, { block: 'center' });
+    return false;
   }
 }

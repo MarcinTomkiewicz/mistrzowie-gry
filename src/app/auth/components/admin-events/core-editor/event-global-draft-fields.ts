@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, ElementRef, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -29,6 +29,7 @@ import { EventGlobalCityFields } from './event-global-city-fields';
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })
 export class EventGlobalDraftFields {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly form = input.required<EventGlobalDraftForm>();
   readonly step = input.required<number>();
   readonly scheduleValidationAttempted = input(false);
@@ -46,4 +47,26 @@ export class EventGlobalDraftFields {
       : this.initialDate;
     return createTimeZoneOptions(referenceDate);
   });
+
+  fieldElement(field: string): HTMLElement | null {
+    const [name, index, blockField] = field.split('.');
+    const host = this.host.nativeElement;
+    const sharedFieldIds = new Map([
+      ['priceAmount', 'global-event-price-amount'], ['priceCurrency', 'global-event-price-currency'],
+      ['priceBasis', 'global-event-price-basis'], ['participantSignupKind', 'global-event-signup-kind'],
+      ['signupRequired', 'global-event-signup-required'],
+    ]);
+    const sharedId = sharedFieldIds.get(field);
+    const scope = blockField ? host.querySelector<HTMLElement>(`[data-event-base-blocks] [data-event-block="${index}"]`) : host;
+    const control = sharedId ? host.querySelector<HTMLElement>(`#${sharedId}`)
+      : field === 'schedule' ? host.querySelector<HTMLElement>(
+        '[data-event-schedule] .p-invalid, [data-event-schedule] [aria-invalid="true"], [data-event-schedule] .ng-invalid',
+      ) ?? host.querySelector<HTMLElement>('[data-event-schedule] input')
+      : field === 'timeBlocks' ? host.querySelector<HTMLElement>('#global-base-add')
+      : field === 'dateTimeBlocks' || field === 'mainCityDateTimeBlocks' ? host.querySelector<HTMLElement>('[data-event-dated-drafts] input')
+      : Array.from(scope?.querySelectorAll<HTMLElement>('[formControlName], [name]') ?? [])
+        .find(element => (element.getAttribute('formControlName') ?? element.getAttribute('name')) === (blockField ?? name));
+    return control?.matches('input, textarea, button, [tabindex="0"]') ? control
+      : control?.querySelector<HTMLElement>('input, button, [tabindex="0"]') ?? null;
+  }
 }

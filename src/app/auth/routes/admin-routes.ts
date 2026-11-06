@@ -1,5 +1,4 @@
 import type { Routes } from '@angular/router';
-import type { EventGlobalDraftWizard } from '../components/admin-events/core-editor/event-global-draft-wizard';
 import type { EventCoreEditor } from '../components/admin-events/core-editor/event-core-editor';
 
 import { authGuard } from '../../core/guards/auth.guard';
@@ -60,8 +59,6 @@ const loaders = {
     ),
   eventCoreEditorShell: () =>
     import('../components/admin-events/core-editor/event-core-editor-shell').then((m) => m.EventCoreEditorShell),
-  eventGlobalDraftWizard: () =>
-    import('../components/admin-events/core-editor/event-global-draft-wizard').then((m) => m.EventGlobalDraftWizard),
   eventEditionEditor: () =>
     import('../components/admin-events/edition-editor/event-edition-editor').then(
       (m) => m.EventEditionEditor,
@@ -119,8 +116,8 @@ const adminChildren: Routes = [
     children: [
       {
         path: 'content/events/new',
-        loadComponent: loaders.eventGlobalDraftWizard,
-        canDeactivate: [(wizard: EventGlobalDraftWizard) => wizard.canDeactivate()],
+        loadComponent: loaders.eventCoreEditor,
+        canDeactivate: [(editor: EventCoreEditor, _route, _state, nextState) => editor.canDeactivate(nextState)],
       },
       {
         path: 'content/events/:coreId/edit',

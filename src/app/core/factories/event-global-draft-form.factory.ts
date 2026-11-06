@@ -18,6 +18,13 @@ import { createEventGlobalTimeBlocksForm, mapEventGlobalTimeBlocks } from './eve
 
 const requiredText = [Validators.required, requiredTrimmedValidator()];
 const positiveInteger = [integerValidator(), Validators.min(1), Validators.max(2147483647)];
+const STEP_FIELDS = [
+  ['name', 'shortDescription', 'longDescription'],
+  ['city', 'venueName', 'venueAddress', 'timezone', 'facebookLink'],
+  ['schedule', 'timeBlocks', 'dateTimeBlocks', 'mainCityDateTimeBlocks'],
+  ['priceAmount', 'priceCurrency', 'priceBasis', 'isForBeginners', 'participantSignupKind',
+    'signupRequired', 'sessionCapacityCeiling', 'wholeEventCapacity'],
+] as const;
 
 export function createEventGlobalCityControls() {
   return {
@@ -65,6 +72,27 @@ export function createEventGlobalDraftForm() {
 }
 
 export type EventGlobalDraftForm = ReturnType<typeof createEventGlobalDraftForm>;
+
+export function findEventGlobalDraftStepError(form: EventGlobalDraftForm, step: number): string | null {
+  const fields = STEP_FIELDS[step - 1];
+  if (!fields) return null;
+  form.updateValueAndValidity({ emitEvent: false });
+  for (const field of fields) form.controls[field].markAllAsTouched();
+  for (const field of fields) {
+    if (field === 'timeBlocks') {
+      for (const [index, block] of form.controls.timeBlocks.controls.entries()) {
+        for (const name of ['label', 'startTime', 'endTime', 'requiredGmCount'] as const) {
+          if (block.controls[name].invalid) return `timeBlocks.${index}.${name}`;
+        }
+        if (block.hasError('timeRange')) return `timeBlocks.${index}.endTime`;
+      }
+    }
+    if (form.controls[field].invalid) return field;
+    if (field === 'schedule' && form.hasError('globalDates')) return field;
+    if (field === 'dateTimeBlocks' && form.hasError('datedDates')) return field;
+  }
+  return null;
+}
 
 export function mapEventGlobalDraftToPayload(
   form: EventGlobalDraftForm,
