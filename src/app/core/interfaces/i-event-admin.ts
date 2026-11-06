@@ -254,3 +254,26 @@ export interface AdminParticipantSignupState {
   participantSignupOpensAt: string | null;
   participantSignupClosesAt: string | null;
 }
+
+export type EventOfflineSeatsDelta = -1 | 1;
+
+export interface AdminEventProgramOfflineSeatsItem {
+  eventId: string;
+  occurrenceId: string;
+  occurrenceDate: string;
+  programItemId: string;
+  effectiveCapacity: number;
+  activeOnlineBookings: number;
+  offlineOccupiedSeats: number;
+  remainingOnlineSeats: number;
+}
+
+export interface AdminEventProgramOfflineSeats {
+  eventId: string;
+  items: AdminEventProgramOfflineSeatsItem[];
+}
+
+export type AdminEventProgramOfflineSeatsAdjustment = Omit<AdminEventProgramOfflineSeatsItem, 'occurrenceDate'> & {
+  delta: EventOfflineSeatsDelta;
+  changed: true;
+};

@@ -21,6 +21,7 @@ import { readAdminGlobalEventPagePreview } from '../../reads/events/admin-global
 import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult, AdminGlobalScopePublicationPreview,
   AdminGlobalScopePublicationResult, EventGlobalScopePublicationCommand } from '../../interfaces/i-admin-global-event-publication';
 import { assertGlobalScopePublicationCommand, assertGlobalScopePublicationPreview, assertGlobalScopePublicationResult } from '../../reads/events/admin-global-scope-publication.contract';
+import { readAdminEventOfflineSeats, readAdminEventOfflineSeatsAdjustment } from '../../reads/events/admin-event-offline-seats.contract';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, AdminEventPolicySave, PolicyDocument } from '../../interfaces/i-admin-event-policy';
 import type {
   AddAdminGlobalEventCityPayload,
@@ -44,6 +45,9 @@ import type {
 } from '../../interfaces/i-admin-global-event';
 import {
   AdminEventProgramParticipants,
+  AdminEventProgramOfflineSeats,
+  AdminEventProgramOfflineSeatsAdjustment,
+  EventOfflineSeatsDelta,
   AdminParticipantSignupState,
   EventEditionSaveResult,
   EventPublishResult,
@@ -260,6 +264,16 @@ export class EventAdmin {
     return this.backend.rpc<AdminEventProgramParticipants>(EVENT_RPC.getProgramParticipants, {
       p_program_item_id: programItemId,
     });
+  }
+
+  getProgramOfflineSeats(eventId: string): Observable<AdminEventProgramOfflineSeats> {
+    return this.backend.rpc<unknown>(EVENT_RPC.getProgramOfflineSeats, { p_event_id: eventId })
+      .pipe(map(response => readAdminEventOfflineSeats(response, eventId)));
+  }
+
+  adjustProgramOfflineSeats(programItemId: string, delta: EventOfflineSeatsDelta): Observable<AdminEventProgramOfflineSeatsAdjustment> {
+    return this.backend.rpc<unknown>(EVENT_RPC.adjustProgramOfflineSeats, { p_program_item_id: programItemId, p_delta: delta })
+      .pipe(map(response => readAdminEventOfflineSeatsAdjustment(response, programItemId, delta)));
   }
 
   publishStaffingEvent(eventId: string): Observable<EventPublishResult> {

@@ -13,6 +13,31 @@
     "pending": "Oczekuje",
     "inPreparation": "Program w przygotowaniu"
   },
+  "offlineSeats": {
+    "title": "[PH] Miejsca zajęte na miejscu - administrator",
+    "online": "[PH] Zajęte online",
+    "offline": "[PH] Zajęte offline",
+    "remaining": "[PH] Pozostałe miejsca online",
+    "capacity": "[PH] Limit miejsc sesji",
+    "add": "[PH] Zajmij jedno miejsce offline",
+    "remove": "[PH] Zwolnij jedno miejsce offline",
+    "verified": "[PH] Zmiana została potwierdzona. Odczytano aktualne liczniki i odświeżono publiczną dostępność.",
+    "readbackPending": "[PH] Zapis został przyjęty, ale nie udało się potwierdzić aktualnego stanu i publicznej dostępności. Ponów sam odczyt.",
+    "uncertain": "[PH] Nie można potwierdzić, czy zmiana została wykonana. Ponów odczyt aktualnych liczników. Zmiana o jedno miejsce nie zostanie automatycznie powtórzona.",
+    "endReadback": "[PH] Zakończ sprawdzanie wyniku",
+    "endReadbackWarning": "[PH] Zmiana mogła zostać wykonana. Zakończenie sprawdzania odblokuje kolejne działania bez potwierdzenia sukcesu i bez ponowienia zmiany. Sprawdź aktualne liczniki przed kolejną operacją.",
+    "readbackEnded": "[PH] Zakończono sprawdzanie bez potwierdzenia wyniku. Zmiana mogła zostać wykonana i nie została ponowiona.",
+    "errors": {
+      "forbidden": "[PH] Ta operacja wymaga uprawnień administratora.",
+      "invalid": "[PH] Nieprawidłowa sesja lub zmiana liczby miejsc. Dozwolone jest tylko +1 lub -1.",
+      "notFound": "[PH] Nie znaleziono wydarzenia, terminu lub sesji.",
+      "notBookable": "[PH] Ta sesja nie obsługuje teraz zajmowania miejsc offline. Odśwież zapisane dane.",
+      "capacityUnavailable": "[PH] Nie można ustalić dostępnego limitu miejsc tej sesji.",
+      "empty": "[PH] Sesja nie ma zajętych miejsc offline do zwolnienia.",
+      "capacityExceeded": "[PH] Brak wolnego miejsca. Rezerwacje online i miejsca offline wyczerpują limit sesji.",
+      "unknown": "[PH] Nie udało się odczytać spójnego stanu miejsc. Ponów odczyt przed kolejną zmianą."
+    }
+  },
   "participantSignup": {
     "title": "Zapis na sesję",
     "guestNameLabel": "Imię lub pseudonim uczestnika",

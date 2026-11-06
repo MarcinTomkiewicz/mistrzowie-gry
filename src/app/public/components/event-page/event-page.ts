@@ -38,6 +38,7 @@ import { EventPageProgram } from './event-page-program';
 import { EventPageFacade } from './event-page-facade';
 import { EventParticipantAvailability } from './event-participant-availability';
 import { EventParticipantSignupFacade } from './event-participant-signup-facade';
+import { EventProgramOfflineSeats } from './event-program-offline-seats';
 import { createEventPageI18n } from './event-page.i18n';
 
 @Component({
@@ -48,7 +49,7 @@ import { createEventPageI18n } from './event-page.i18n';
   ],
   templateUrl: './event-page.html',
   providers: [
-    EventPageFacade, EventParticipantAvailability, EventParticipantSignupFacade,
+    EventPageFacade, EventParticipantAvailability, EventParticipantSignupFacade, EventProgramOfflineSeats,
     provideTranslocoScope('eventPage', 'common'),
   ],
 })
@@ -61,6 +62,7 @@ export class EventPage implements OnInit {
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly signup = inject(EventParticipantSignupFacade);
+  private readonly offlineSeats = inject(EventProgramOfflineSeats);
 
   protected readonly facade = inject(EventPageFacade);
   protected readonly i18n = createEventPageI18n();
@@ -193,7 +195,7 @@ export class EventPage implements OnInit {
   }
 
   canDeactivate(): boolean {
-    return !this.signup.isSubmitting();
+    return !this.signup.isSubmitting() && !this.offlineSeats.locked();
   }
 
   protected reload(): void {

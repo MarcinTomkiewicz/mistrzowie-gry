@@ -1,4 +1,5 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, computed, inject, input, output, type TemplateRef } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -16,7 +17,7 @@ import { SystemChip } from '../../../common/system-chip/system-chip';
 @Component({
   selector: 'app-event-slots',
   standalone: true,
-  imports: [ButtonModule, SkeletonModule, SystemChip],
+  imports: [NgTemplateOutlet, ButtonModule, SkeletonModule, SystemChip],
   templateUrl: './event-slots.html',
   styleUrl: './event-slots.scss',
   providers: [provideTranslocoScope('sessions', 'common')],
@@ -29,6 +30,7 @@ export class EventSlots {
   readonly isLoading = input<boolean>(false);
   readonly systemBadgeClass = input<string>('');
   readonly participantSignupDisabled = input(false);
+  readonly itemActions = input<TemplateRef<{ $implicit: IEventSlotCardVm }> | null>(null);
 
   readonly slotSelect = output<IEventSlotCardVm>();
   readonly gmSelect = output<IEventSlotCardVm>();

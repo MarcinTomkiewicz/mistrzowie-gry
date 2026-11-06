@@ -1,11 +1,17 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
+import { MessageModule } from 'primeng/message';
+import { finalize } from 'rxjs';
 
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../common/occurrence-switcher/occurrence-switcher';
 import type { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
+import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
+import type { EventPageOfflineSeatsTranslations } from '../../../core/types/i18n/event-page';
+import { RpcError } from '../../../core/types/rpc-error';
 import { formatDateLabel } from '../../../core/utils/date';
 import {
   createPublicEventProgramCards, formatPublicEventProgramTime, groupPublicEventProgramEntries,
@@ -17,12 +23,19 @@ import { EventPageFacade } from './event-page-facade';
 import { EventParticipantSignup } from './event-participant-signup';
 import { EventParticipantSignupFacade } from './event-participant-signup-facade';
 import { EventParticipantAvailability } from './event-participant-availability';
+import { EventProgramOfflineSeats } from './event-program-offline-seats';
 import { createEventPageI18n } from './event-page.i18n';
+
+const offlineErrorKeys: Readonly<Record<string, keyof EventPageOfflineSeatsTranslations['errors']>> = {
+  EFS063_INVALID_ARGUMENT: 'invalid', EFS063_PROGRAM_ITEM_NOT_FOUND: 'notFound', EFS063_OCCURRENCE_NOT_FOUND: 'notFound',
+  EFS063_EVENT_NOT_FOUND: 'notFound', EFS063_TARGET_NOT_BOOKABLE: 'notBookable', EFS063_CAPACITY_UNAVAILABLE: 'capacityUnavailable',
+  EFS063_OFFLINE_SEATS_EMPTY: 'empty', EFS063_OFFLINE_CAPACITY_EXCEEDED: 'capacityExceeded',
+};
 
 @Component({
   selector: 'app-event-page-program',
   imports: [
-    ButtonModule, EventSlots, GmProfileDialog, LoadingOverlay, OccurrenceSwitcher,
+    ButtonModule, MessageModule, EventSlots, GmProfileDialog, LoadingOverlay, OccurrenceSwitcher,
     SessionDialog, EventParticipantSignup,
   ],
   templateUrl: './event-page-program.html',
@@ -30,13 +43,25 @@ import { createEventPageI18n } from './event-page.i18n';
 export class EventPageProgram {
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
+  private readonly confirm = inject(UiConfirm);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly collapsedCardLimit = 6;
   private readonly expandedGroupKeys = signal<ReadonlySet<string>>(new Set());
   protected readonly facade = inject(EventPageFacade);
   protected readonly signup = inject(EventParticipantSignupFacade);
   protected readonly availability = inject(EventParticipantAvailability);
+  protected readonly offline = inject(EventProgramOfflineSeats);
+  protected readonly offlineDecisionPending = signal(false);
   protected readonly i18n = createEventPageI18n();
+  protected readonly formatDateLabel = formatDateLabel;
   protected readonly selectedProgramItemId = signal<string | null>(null);
+  protected readonly offlineErrorMessage = computed(() => {
+    const error = this.offline.error();
+    if (error === null) return null;
+    const copy = this.i18n.offlineSeats().errors;
+    const key = error instanceof RpcError ? offlineErrorKeys[error.message] ?? (error.code === '42501' ? 'forbidden' : 'unknown') : 'unknown';
+    return key === 'unknown' && error instanceof RpcError ? `${copy.unknown} (${error.code}: ${error.message})` : copy[key];
+  });
 
   protected readonly occurrenceOptions = computed(() => {
     const state = this.facade.state();
@@ -113,7 +138,24 @@ export class EventPageProgram {
   }
 
   protected selectOccurrence(index: number): void {
-    if (!this.signup.isSubmitting()) this.facade.selectOccurrence(index);
+    if (!this.signup.isSubmitting() && !this.offline.locked()) this.facade.selectOccurrence(index);
+  }
+
+  protected offlineSessionLabel(programItemId: string): string {
+    const page = this.facade.state();
+    const entry = page.kind === 'ready' ? page.program.find(item => item.kind === 'confirmed' && item.programItemId === programItemId) : null;
+    return entry?.kind === 'confirmed' && entry.session?.title ? entry.session.title : programItemId;
+  }
+
+  protected endOfflineReadback(): void {
+    const operation = this.offline.operation();
+    if (!operation || !this.offline.canEndReadback() || this.offlineDecisionPending()) return;
+    this.offlineDecisionPending.set(true);
+    this.confirm.modalDecision({ header: this.i18n.offlineSeats().title, message: this.i18n.offlineSeats().endReadbackWarning,
+      icon: 'pi pi-exclamation-triangle', acceptLabel: this.i18n.offlineSeats().endReadback, rejectLabel: this.i18n.actions().cancel,
+    }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.offlineDecisionPending.set(false))).subscribe(accepted => {
+      if (accepted && this.offline.operation() === operation) this.offline.endReadback();
+    });
   }
 
   protected selectSession(card: IEventSlotCardVm): void {

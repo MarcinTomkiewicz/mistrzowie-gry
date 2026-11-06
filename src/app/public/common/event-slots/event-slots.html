@@ -195,6 +195,9 @@
               }
             </div>
           }
+          @if (itemActions(); as actions) {
+            <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: item }" />
+          }
         </article>
       }
     </div>

@@ -8,13 +8,44 @@
         <app-occurrence-switcher
           [options]="occurrenceOptions()"
           [selectedIndex]="facade.selectedOccurrenceIndex()"
-          [disabled]="signup.isSubmitting()"
+          [disabled]="signup.isSubmitting() || offline.locked()"
           marginBottomClass=""
           (selectedIndexChange)="selectOccurrence($event)"
         />
       </div>
     }
   </header>
+  @if (offline.isAdmin() && (offline.hasItems() || offline.isBusy() || offline.operation() || offline.error() || offline.verified() || offline.abandoned())) {
+    @let copy = i18n.offlineSeats();
+    <section class="mg-card flex-col-start-stretch gap-sm mb-md" [attr.aria-busy]="offline.isBusy()" [attr.aria-label]="copy.title">
+      <header class="flex-row-between-center flex-wrap gap-sm">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.title }}</h3>
+        @if (!offline.operation()) {
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+            [label]="i18n.actions().refresh" [disabled]="offline.isBusy() || signup.isSubmitting()" (onClick)="offline.refresh()" />
+        }
+      </header>
+      @if (offline.isBusy()) { <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p> }
+      @if (offline.operation(); as operation) {
+        <p class="m-0 text-wrap-anywhere">
+          {{ operation.delta === 1 ? copy.add : copy.remove }} -
+          {{ offlineSessionLabel(operation.item.programItemId) }} - {{ formatDateLabel(operation.item.occurrenceDate) }}
+        </p>
+        @if (!offline.isBusy()) {
+          <p-message severity="warn" role="alert">{{ operation.result ? copy.readbackPending : copy.uncertain }}</p-message>
+        }
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+            [label]="i18n.actions().retry" [disabled]="offline.isBusy() || offlineDecisionPending()" (onClick)="offline.retryReadback()" />
+          <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
+            [label]="copy.endReadback" [disabled]="!offline.canEndReadback() || offlineDecisionPending()" (onClick)="endOfflineReadback()" />
+        </div>
+      }
+      @if (offlineErrorMessage(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
+      @if (offline.verified()) { <p-message severity="success" role="status">{{ copy.verified }}</p-message> }
+      @if (offline.abandoned()) { <p-message severity="warn" role="status">{{ copy.readbackEnded }}</p-message> }
+    </section>
+  }
   @if (signup.released()) {
     @if (signup.hasUncertainResults() && !signup.dialog()) {
       <p role="alert">{{ i18n.signup().unknownResult }}</p>
@@ -47,7 +78,8 @@
               [attr.id]="'event-program-cards-' + group.key"
               [items]="group.visibleCards"
               [slotCount]="0"
-              [participantSignupDisabled]="signup.isSubmitting()"
+              [participantSignupDisabled]="signup.isSubmitting() || offline.locked()"
+              [itemActions]="offlineSeatActions"
               (slotSelect)="selectSession($event)"
               (gmSelect)="facade.openGmProfile($event.id)"
               (participantSignupSelect)="signup.open($event.id)"
@@ -70,6 +102,34 @@
     <div class="mg-card"><p class="m-0">{{ i18n.page().noOccurrences }}</p></div>
   }
 </section>
+
+<ng-template #offlineSeatActions let-card>
+  @if (card.programStatus === 'confirmed' && !card.activity) {
+  @if (offline.forProgramItem(card.id); as seats) {
+    @let copy = i18n.offlineSeats();
+    <div class="flex-col-start-stretch gap-sm border-top pt-sm mt-sm" role="group"
+      [attr.aria-label]="copy.title + ': ' + offlineSessionLabel(seats.programItemId)" [attr.aria-busy]="offline.isBusy()"
+      (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <dl class="flex-col-start-stretch gap-xs m-0">
+        <div class="flex-row-between-center gap-sm"><dt>{{ copy.online }}</dt><dd class="m-0">{{ seats.activeOnlineBookings }}</dd></div>
+        <div class="flex-row-between-center gap-sm"><dt>{{ copy.offline }}</dt><dd class="m-0">{{ seats.offlineOccupiedSeats }}</dd></div>
+        <div class="flex-row-between-center gap-sm"><dt>{{ copy.remaining }}</dt><dd class="m-0">{{ seats.remainingOnlineSeats }}</dd></div>
+        <div class="flex-row-between-center gap-sm"><dt>{{ copy.capacity }}</dt><dd class="m-0">{{ seats.effectiveCapacity }}</dd></div>
+      </dl>
+      <div class="flex-row-start-center flex-wrap gap-sm">
+        <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="copy.add"
+          [ariaLabel]="copy.add + ': ' + offlineSessionLabel(seats.programItemId)"
+          [disabled]="offline.isBusy() || offline.locked() || signup.isSubmitting() || seats.remainingOnlineSeats === 0"
+          (onClick)="offline.adjust(seats.programItemId, 1)" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-minus" [label]="copy.remove"
+          [ariaLabel]="copy.remove + ': ' + offlineSessionLabel(seats.programItemId)"
+          [disabled]="offline.isBusy() || offline.locked() || signup.isSubmitting() || seats.offlineOccupiedSeats === 0"
+          (onClick)="offline.adjust(seats.programItemId, -1)" />
+      </div>
+    </div>
+  }
+  }
+</ng-template>
 
 @if (signup.released()) {
   <app-event-participant-signup />

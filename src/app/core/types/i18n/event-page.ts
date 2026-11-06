@@ -14,6 +14,13 @@ export type EventPageProgramTranslations = {
   inPreparation: string;
 };
 
+export type EventPageOfflineSeatsTranslations = Record<
+  'title' | 'online' | 'offline' | 'remaining' | 'capacity' | 'add' | 'remove' | 'verified' |
+  'readbackPending' | 'uncertain' | 'endReadback' | 'endReadbackWarning' | 'readbackEnded', string
+> & {
+  errors: Record<'forbidden' | 'invalid' | 'notFound' | 'notBookable' | 'capacityUnavailable' | 'empty' | 'capacityExceeded' | 'unknown', string>;
+};
+
 export type EventPageParticipantSignupTranslations = {
   title: string;
   guestNameLabel: string;

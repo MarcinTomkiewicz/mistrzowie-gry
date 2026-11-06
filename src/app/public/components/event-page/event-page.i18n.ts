@@ -15,6 +15,7 @@ import {
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
 import type {
   EventPageProgramTranslations,
+  EventPageOfflineSeatsTranslations,
   EventPageParticipantSignupTranslations,
   EventPageTranslations,
 } from '../../../core/types/i18n/event-page';
@@ -29,6 +30,7 @@ export function createEventPageI18n() {
     signup: createScopedObjectI18n<EventPageParticipantSignupTranslations>(
       'eventPage', 'participantSignup',
     ),
+    offlineSeats: createScopedObjectI18n<EventPageOfflineSeatsTranslations>('eventPage', 'offlineSeats'),
     form: createCommonFormI18n(),
     actions: createCommonActionsI18n(),
     cta: createCommonCtaI18n(),

@@ -2,7 +2,7 @@ import {
   DestroyRef, Injectable, TransferState, afterNextRender, computed, effect, inject,
   makeStateKey, signal, untracked, type StateKey,
 } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
+import { defer, finalize, Observable, Subscription, tap, timer } from 'rxjs';
 
 import { PUBLIC_EVENT_PARTICIPANT_SIGNUP_CORE_KEY } from '../../../core/configs/events.config';
 import { ParticipantSignupKind } from '../../../core/enums/event';
@@ -28,6 +28,7 @@ export class EventParticipantAvailability {
   private readonly platform = inject(Platform);
   private readonly transferState = inject(TransferState);
   private request: Subscription | null = null;
+  private readOwner: object | null = null;
   private readonly availabilityState = signal<AvailabilityState>({ kind: 'idle' });
   private readonly clock = signal(Date.now());
   private readonly clientReady = signal(false);
@@ -43,6 +44,7 @@ export class EventParticipantAvailability {
       const page = this.page.state();
       const released = this.released();
       untracked(() => {
+        this.readOwner = null;
         if (released && page.kind === 'ready') this.load(page.edition.id, true);
         else this.availabilityState.set({ kind: 'idle' });
       });
@@ -97,6 +99,29 @@ export class EventParticipantAvailability {
     }
   }
 
+  refreshForEdition(eventId: string): Observable<IEventParticipantAvailability[]> {
+    return defer(() => {
+      const page = this.page.state();
+      const owner = {};
+      if (page.kind === 'ready' && page.edition.id === eventId) {
+        this.request?.unsubscribe();
+        this.readOwner = owner;
+        this.availabilityState.set({ kind: 'loading' });
+      }
+      return this.participant.getPublicAvailability(eventId).pipe(tap({
+        next: items => {
+          if (this.readOwner === owner) this.availabilityState.set({ kind: 'ready', eventId, items });
+        },
+        error: () => {
+          if (this.readOwner === owner) this.availabilityState.set({ kind: 'error' });
+        },
+      }), finalize(() => {
+        // Cancellation must not leave public signup permanently in a loading state.
+        if (this.readOwner === owner && this.state().kind === 'loading') this.availabilityState.set({ kind: 'error' });
+      }));
+    });
+  }
+
   private sessionStartAt(entry: PublicEventConfirmedEntry, timezone: string): number | null {
     const date = parseIsoDate(entry.occurrenceDate);
     const minutes = parseTimeLabelToMinutes(entry.slot.startTime);
@@ -108,6 +133,7 @@ export class EventParticipantAvailability {
 
   private load(eventId: string, hydrate: boolean): void {
     this.request?.unsubscribe();
+    const owner = this.readOwner = {};
     const key = makeStateKey<AvailabilityState>(`public-event-participant-availability:${eventId}`);
     if (hydrate && this.platform.isBrowser && this.transferState.hasKey(key)) {
       this.availabilityState.set(this.transferState.get(key, { kind: 'error' }));
@@ -116,8 +142,8 @@ export class EventParticipantAvailability {
     }
     this.availabilityState.set({ kind: 'loading' });
     this.request = this.participant.getPublicAvailability(eventId).subscribe({
-      next: (items) => this.setState({ kind: 'ready', eventId, items }, key),
-      error: () => this.setState({ kind: 'error' }, key),
+      next: (items) => { if (this.readOwner === owner) this.setState({ kind: 'ready', eventId, items }, key); },
+      error: () => { if (this.readOwner === owner) this.setState({ kind: 'error' }, key); },
     });
   }
 

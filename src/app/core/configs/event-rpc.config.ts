@@ -41,6 +41,8 @@ export const EVENT_RPC = {
   getActivityKinds: 'get_admin_event_activity_kinds',
   saveManualActivity: 'save_admin_manual_event_activity',
   getProgramParticipants: 'list_admin_event_program_participants',
+  getProgramOfflineSeats: 'get_admin_event_program_offline_seats',
+  adjustProgramOfflineSeats: 'adjust_admin_event_program_offline_seats',
   publishStaffingEvent: 'publish_admin_staffing_event',
   reconcileStaffingEventProgram: 'reconcile_admin_staffing_event_program',
   syncStaffingPrivateEvent: 'sync_admin_staffing_private_event',
