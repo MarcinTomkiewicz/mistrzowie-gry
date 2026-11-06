@@ -5,15 +5,6 @@
 <header class="flex-col-start-stretch gap-sm w-100">
   <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().summary }}</h2>
   <p class="m-0 muted-text">{{ i18n.creation().savedData }}</p>
-  @if (unsavedSteps().length) {
-    <p-message severity="warn" role="status">{{ editionI18n.publication().saveFirst }}</p-message>
-    <div class="flex-row-start-center flex-wrap gap-sm">
-      @for (step of unsavedSteps(); track step.value) {
-        <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-point-left"
-          [label]="step.label" [disabled]="disabled()" (onClick)="navigateToStep.emit(step.value)" />
-      }
-    </div>
-  }
 </header>
 <div class="grid-2-1 grid-items-start gap-md w-100 min-w-0">
   <div class="flex-col-start-stretch gap-md min-w-0">
@@ -23,8 +14,6 @@
           <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
           <h3 class="mg-section__title mg-section__title--md m-0 text-wrap-anywhere">{{ details.name }}</h3>
         </div>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
-          [label]="i18n.creationSteps().event" [disabled]="disabled()" (onClick)="navigateToStep.emit(1)" />
       </header>
       <dl class="flex-col-start-stretch gap-md m-0">
         <div><dt class="muted-text">{{ labels.key }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.key }}</dd></div>
@@ -50,8 +39,6 @@
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
       <header class="flex-row-between-center flex-wrap gap-sm w-100">
         <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h3>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
-          [label]="i18n.creationSteps().location" [disabled]="disabled()" (onClick)="navigateToStep.emit(2)" />
       </header>
       <dl class="mg-grid-2 gap-md m-0">
         <div><dt class="muted-text">{{ labels.city }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.city }}</dd></div>
@@ -71,8 +58,6 @@
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
       <header class="flex-row-between-center flex-wrap gap-sm w-100">
         <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().schedule }}</h3>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
-          [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
       </header>
       <dl class="mg-grid-2 gap-md m-0">
         <div><dt class="muted-text">{{ labels.timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.timezone }}</dd></div>
@@ -95,8 +80,6 @@
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
       <header class="flex-row-between-center flex-wrap gap-sm w-100">
         <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().policy }}</h3>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
-          [label]="i18n.creationSteps().policy" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" />
       </header>
       <dl class="flex-col-start-stretch gap-sm m-0 w-100">
         @for (row of policyRows(); track row.label) {
@@ -107,26 +90,17 @@
         }
       </dl>
     </section>
-    <ng-content />
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100">
+      <h3 class="mg-section__title mg-section__title--md m-0">{{ editionI18n.publication().title }}</h3>
+      <div class="tag-badges">
+        <span class="tag-badge" [class.tag-badge--success]="location.currentlyPublic" [class.tag-badge--muted]="!location.currentlyPublic">
+          {{ location.currentlyPublic ? editionI18n.commonEntityStatuses().public.neuter : editionI18n.commonEntityStatuses().private.neuter }}
+        </span>
+        @if (location.isStaffingConverted) {
+          <span class="tag-badge tag-badge--muted">{{ location.isStaffingReleased ? editionI18n.publication().released : editionI18n.publication().unreleased }}</span>
+        }
+      </div>
+    </section>
   </div>
 </div>
-<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="timelineLoading()">
-  <header class="flex-row-between-center flex-wrap gap-sm w-100">
-    <h3 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().program }}</h3>
-    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
-      [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
-  </header>
-  @if (timelineLoading()) {
-    <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
-  } @else if (timelineErrorMessage(); as error) {
-    <p-message severity="error" role="alert">{{ timelineI18n.copy().loadFailed }}: {{ error }}</p-message>
-    <div class="flex-row-start-center">
-      <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry"
-        [disabled]="disabled()" (onClick)="reloadTimeline.emit()" />
-    </div>
-  } @else if (timeline(); as savedTimeline) {
-    <app-event-program-schedule [timeline]="savedTimeline" [disabled]="disabled()" />
-  } @else {
-    <p class="m-0 muted-text" role="status">{{ values.notProvided }}</p>
-  }
-</section>
+<app-event-admin-timeline [timeline]="timeline()" (reload)="reloadTimeline.emit()" />

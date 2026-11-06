@@ -17,8 +17,7 @@
         </div>
       </div>
     } @else if (timeline(); as data) {
-      <app-event-program-schedule [timeline]="data" [disabled]="disabled()" [participantActions]="participantActions"
-        [detailsBusy]="removingParticipantId() !== null" />
+      <app-event-program-schedule [timeline]="data" [disabled]="disabled()" [participantActions]="participantActions" />
     }
   }
 </section>
@@ -50,7 +49,6 @@
               <tr class="hide-down-sm">
                 <th scope="col" class="small-caps">{{ i18n.labels().name }}</th>
                 <th scope="col" class="small-caps">{{ i18n.labels().phoneNumber }}</th>
-                <th scope="col" class="small-caps text-right w-px-0 text-nowrap">{{ i18n.table().actions }}</th>
               </tr>
             </ng-template>
             <ng-template #body let-participant>
@@ -62,19 +60,10 @@
                     <span class="mg-responsive-table__value text-wrap-anywhere">{{ phone }}</span>
                   }
                 </td>
-                <td class="mg-responsive-table__cell w-px-0 w-px-auto-sm">
-                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.table().actions }}</span>
-                  <div class="mg-responsive-table__value flex-row-end-center">
-                    <p-button type="button" size="small" severity="danger" [outlined]="true"
-                      [label]="i18n.actions().delete" [ariaLabel]="i18n.actions().delete + ' - ' + participant.displayName"
-                      [loading]="removingParticipantId() === participant.registrationId" [disabled]="disabled() || removingParticipantId() !== null"
-                      (onClick)="confirmRemoval($event, programItemId, participant.registrationId)" />
-                  </div>
-                </td>
               </tr>
             </ng-template>
             <ng-template #emptymessage>
-              <tr><td colspan="3"><p class="m-0 muted-text" role="status">{{ copy.participantsEmpty }}</p></td></tr>
+              <tr><td colspan="2"><p class="m-0 muted-text" role="status">{{ copy.participantsEmpty }}</p></td></tr>
             </ng-template>
           </p-table>
         </div>

@@ -1,49 +1,35 @@
 @let loadedCore = core();
 <section id="event-core-editions" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100">
-  @if (!legacyEditing()) {
-    <p-floatlabel variant="on" class="w-px-300 max-w-full">
-      <p-select inputId="global-edition-selection" [options]="editionOptions()" optionLabel="label" optionValue="value" size="small"
-        [ngModel]="globalDraft.selectedEditionId()" (ngModelChange)="selectEdition($event)" [disabled]="selectionDisabled()"
-        [loading]="globalDraft.isReadingEdition()" appendTo="body" class="w-100" />
-      <label for="global-edition-selection">{{ i18n.commonLabels().city }}</label>
-    </p-floatlabel>
-    @if (globalDraft.isReadingEdition()) { <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p> }
-    @if (editionErrorMessage(); as error) {
-      <p-message severity="error" role="alert">{{ error }}</p-message>
-      <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry" icon="pi pi-trail"
-        [disabled]="selectionDisabled()" (onClick)="selectEdition(globalDraft.selectedEditionId())" />
-    }
+  <p-floatlabel variant="on" class="w-px-300 max-w-full">
+    <p-select inputId="global-edition-selection" [options]="editionOptions()" optionLabel="label" optionValue="value" size="small"
+      [ngModel]="readOnly() ? selectedEditionId() : globalDraft.selectedEditionId()" (ngModelChange)="selectEdition($event)" [disabled]="selectionDisabled()"
+      [loading]="!readOnly() && globalDraft.isReadingEdition()" appendTo="body" class="w-100" />
+    <label for="global-edition-selection">{{ i18n.commonLabels().city }}</label>
+  </p-floatlabel>
+  @if (!readOnly() && globalDraft.isReadingEdition()) { <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p> }
+  @if (!readOnly() && editionErrorMessage(); as error) {
+    <p-message severity="error" role="alert">{{ error }}</p-message>
+    <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry" icon="pi pi-trail"
+      [disabled]="selectionDisabled()" (onClick)="selectEdition(globalDraft.selectedEditionId())" />
   }
   <div class="flex-row-between-center flex-wrap gap-sm w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">
       {{ i18n.editions().sectionTitle }}
     </h2>
 
-    @if (legacyEditing()) {
-      <p-button
-        severity="success"
-        [label]="i18n.actions().addEdition"
-        icon="pi pi-plus"
-        [routerLink]="[
-          '/admin/content/events',
-          loadedCore.id,
-          'editions',
-          'new',
-        ]"
-      />
-    } @else {
+    @if (!readOnly()) {
       <p-button id="additional-city-open" type="button" size="small" severity="success" icon="pi pi-plus"
         [label]="i18n.city().action" [disabled]="addCityBlocker() !== null" (onClick)="openCity()" />
     }
   </div>
 
-  @if (!legacyEditing()) {
+  @if (!readOnly()) {
     @if (addCityBlocker(); as blocker) {
       <p id="additional-city-blocker" class="m-0 muted-text" role="status">{{ i18n.city().blockers[blocker] }}</p>
     }
   }
 
-  @if (globalDraft.cityEditing()) {
+  @if (!readOnly() && globalDraft.cityEditing()) {
     <form id="additional-city-form" class="mg-form flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0"
       [formGroup]="globalDraft.cityForm" (ngSubmit)="submitCity()" novalidate>
       <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.city().action }}</h3>
@@ -88,11 +74,6 @@
               <th class="small-caps text-center" scope="col">
                 {{ i18n.occurrenceTable().programItemCount }}
               </th>
-              @if (legacyEditing()) {
-                <th class="small-caps text-right" scope="col">
-                  {{ i18n.commonTable().actions }}
-                </th>
-              }
             </tr>
           </thead>
 
@@ -118,7 +99,7 @@
                 </td>
                 <td class="text-center">
                   {{
-                    (legacyEditing() ? edition.isDefaultPublic : globalDraft.calendar()?.mainEditionId === edition.id)
+                    (readOnly() ? edition.isDefaultPublic : globalDraft.calendar()?.mainEditionId === edition.id)
                       ? i18n.commonValues().yes
                       : i18n.commonValues().no
                   }}
@@ -129,23 +110,6 @@
                 <td class="text-center">
                   {{ edition.programItemCount }}
                 </td>
-                @if (legacyEditing()) {
-                  <td class="text-right">
-                    <p-button
-                      size="small"
-                      severity="secondary"
-                      [label]="i18n.commonActions().edit"
-                      icon="pi pi-scroll-quill"
-                      [routerLink]="[
-                        '/admin/content/events',
-                        loadedCore.id,
-                        'editions',
-                        edition.id,
-                        'edit',
-                      ]"
-                    />
-                  </td>
-                }
               </tr>
             }
           </tbody>

@@ -2,6 +2,7 @@ import {
   StaffingRealizationStatus,
   StaffingRealizationType,
 } from '../types/staffing-realization';
+import type { AdminEffectivePolicyResult, AdminGlobalCalendarResult } from './i-admin-global-event';
 
 export interface AdminStaffingRealizationCore {
   id: string;
@@ -124,26 +125,25 @@ export interface CreateAdminStaffingRealizationResult {
   days: AdminStaffingRealizationDay[];
 }
 
-export interface ConvertAdminStaffingRealizationToEventResult {
-  converted: boolean;
+type StaffingEventConversion = {
   realizationId: string;
   eventCoreId: string;
   eventId: string;
+  calendarLifecycle: 'global';
   occurrences: { date: string; occurrenceId: string }[];
   programItemCount: number;
-  public: false;
-}
+  calendar: AdminGlobalCalendarResult;
+  policy: AdminEffectivePolicyResult;
+};
+
+export type ConvertAdminStaffingRealizationToEventResult = StaffingEventConversion & (
+  | { converted: true; emptySlotCount: number; public: false }
+  | { converted: false; public: boolean }
+);
 
 export interface DeleteAdminStaffingRealizationResult {
   deleted: true;
   realizationId: string;
-}
-
-export interface SyncAdminStaffingPrivateEventResult extends Pick<ConvertAdminStaffingRealizationToEventResult,
-  'realizationId' | 'eventCoreId' | 'eventId' | 'public' | 'occurrences' | 'programItemCount'> {
-  synchronized: true;
-  changed: boolean;
-  slotCount: number;
 }
 
 export interface ArchiveAdminStaffingRealizationResult {

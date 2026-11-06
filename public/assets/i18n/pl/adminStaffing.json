@@ -1,41 +1,4 @@
 {
-  "eventSynchronization": {
-    "title": "[PH] Synchronizacja wydarzenia ze Staffingiem",
-    "inProgress": "[PH] Sprawdzanie i synchronizacja zapisanych danych wydarzenia...",
-    "updated": "[PH] Prywatne wydarzenie zostało zsynchronizowane. Odczyt potwierdził aktualne terminy i program.",
-    "current": "[PH] Odczyt potwierdził aktualne terminy i program wydarzenia.",
-    "failed": "[PH] Staffing zapisany. Powiązane wydarzenie wymaga synchronizacji.",
-    "uncertain": "[PH] Staffing zapisany. Wynik synchronizacji wydarzenia jest niepewny. Ponów sam odczyt, bez powtarzania zapisu.",
-    "readbackFailed": "[PH] Synchronizacja została potwierdzona, ale odczyt wydarzenia nie potwierdził jeszcze całego wyniku. Ponów sam odczyt.",
-    "retry": "[PH] Ponów synchronizację wydarzenia",
-    "retryRead": "[PH] Ponów odczyt wydarzenia",
-    "abandon": "[PH] Zakończ sprawdzanie wyniku",
-    "abandonConfirm": "[PH] Zakończyć sprawdzanie wyniku synchronizacji i odblokować edycję? Zapis mógł zostać wykonany lub zakończyć się później. Ta akcja nie cofa zmian, nie ponawia zapisu ani nie potwierdza spójności wydarzenia.",
-    "abandoned": "[PH] Zakończono sprawdzanie wyniku. Edycja jest odblokowana, ale spójność wydarzenia pozostaje niepotwierdzona. Zapis mógł zostać wykonany lub zakończyć się później.",
-    "dirty": "[PH] Niezapisane zmiany Staffingu nie są objęte tym wynikiem. Zapisz je, aby zsynchronizować wydarzenie.",
-    "occurrences": "[PH] Terminy",
-    "slots": "[PH] Bloki harmonogramu",
-    "programItems": "[PH] Pozycje programu",
-    "openEvent": "[PH] Otwórz wspólny edytor wydarzenia",
-    "errors": {
-      "forbidden": "[PH] Synchronizacja wymaga uprawnień administratora.",
-      "notConverted": "[PH] Wskazana lokalizacja nie jest powiązanym wydarzeniem utworzonym ze Staffingu.",
-      "privateRequired": "[PH] Synchronizacja prywatnego wydarzenia wymaga nieopublikowanego i nieaktywnego Core oraz lokalizacji bez strony publicznej.",
-      "history": "[PH] Wydarzenie ma chronioną historię publikacji, zapisów lub rezerwacji. Prywatna synchronizacja została odrzucona.",
-      "provenance": "[PH] Program zawiera pozycje spoza zapisanego źródła Staffingu. Sprawdź powiązania programu.",
-      "schedule": "[PH] Zapisane dni Staffingu nie spełniają warunków synchronizacji.",
-      "capacity": "[PH] Liczba wymaganych MG, bloków lub przypisań przekracza dozwoloną pojemność dnia.",
-      "slots": "[PH] Harmonogram wymaga co najmniej jednego bloku z poprawnymi godzinami.",
-      "sourceIdentity": "[PH] Powiązania źródłowych dni lub bloków harmonogramu są niespójne.",
-      "sourceChanged": "[PH] Zapisany harmonogram lub finalny plan Staffingu zmienił się podczas synchronizacji. Wynik nie potwierdza spójności wydarzenia z aktualnym źródłem.",
-      "assignment": "[PH] Plan zawiera nieprawidłowe przypisanie MG lub sesji. Sprawdź potwierdzenie udziału i przypisane sesje.",
-      "pastRemoval": "[PH] Synchronizacja nie może usunąć minionego terminu wydarzenia.",
-      "occurrences": "[PH] Terminy wydarzenia nie odpowiadają zapisanym dniom Staffingu.",
-      "identity": "[PH] Powiązanie realizacji, Core i lokalizacji jest niespójne. Nie utworzono zastępczego wydarzenia.",
-      "invalid": "[PH] Nie wskazano poprawnego identyfikatora lokalizacji wydarzenia.",
-      "unknown": "[PH] Nie udało się potwierdzić spójności wydarzenia. Sprawdź błąd i ponów właściwą akcję."
-    }
-  },
   "list": {
     "page": {
       "title": "Lista zleceń",
@@ -163,8 +126,7 @@
         "description": "Określ miejsce i rodzaj zlecenia."
       },
       "event": {
-        "title": "Powiązanie z wydarzeniem",
-        "description": "Powiąż z istniejącym wydarzeniem (opcjonalnie)."
+        "title": "Powiązanie z wydarzeniem"
       }
     },
     "fields": {
@@ -175,7 +137,6 @@
       "venueAddress": "Adres miejsca",
       "timezone": "Strefa czasowa",
       "type": "Typ zlecenia",
-      "event": "Wydarzenie (opcjonalnie)",
       "dateRange": "Zakres dat"
     },
     "validation": {
@@ -199,14 +160,43 @@
       }
     },
     "event": {
-      "placeholder": "Wybierz wydarzenie...",
-      "empty": "Brak wydarzeń do wyboru",
       "privateCreationHint": "[PH] Wydarzenie pozostanie prywatne. Wymagany jest co najmniej jeden blok czasowy; pełna obsada nie jest wymagana.",
-      "saveChangesFirstHint": "[PH] Zapisz zmiany we wszystkich zakładkach przed utworzeniem lub otwarciem wydarzenia."
+      "saveChangesFirstHint": "[PH] Zapisz zmiany we wszystkich zakładkach przed utworzeniem lub otwarciem wydarzenia.",
+      "retryRead": "[PH] Sprawdź wynik importu",
+      "retryImport": "[PH] Ponów import",
+      "uncertain": "[PH] Import mógł zostać wykonany. Sprawdź zapisane powiązanie i dane wydarzenia przed kolejną operacją.",
+      "unlinked": "[PH] Odczyt nie wykazał powiązanego wydarzenia. Możesz świadomie ponowić ten sam idempotentny import.",
+      "readbackFailed": "[PH] Nie udało się potwierdzić pełnych danych wydarzenia. Ponów sprawdzenie wyniku.",
+      "checking": "[PH] Sprawdzanie zapisanego powiązania z wydarzeniem...",
+      "writing": "[PH] Importowanie zlecenia do wydarzenia...",
+      "reading": "[PH] Odczytywanie i potwierdzanie zapisanych danych wydarzenia...",
+      "errors": {
+        "22023": "[PH] Dane wejściowe importu są nieprawidłowe.",
+        "23514": "[PH] Backend zablokował import. Sprawdź daty, bloki i zatwierdzenia planu; dawne konwersje pozostają tylko do odczytu.",
+        "40001": "[PH] Powiązanie zlecenia zmieniło się w trakcie operacji. Odczytaj aktualny stan przed ponowieniem importu.",
+        "42501": "[PH] Tylko administrator może utworzyć wydarzenie ze zlecenia.",
+        "P0002": "[PH] Nie znaleziono zlecenia lub powiązanych danych.",
+        "EFS092_EXISTING_LEGACY_EVENT_LINK": "[PH] Zlecenie ma dawną konwersję. Jej dane są dostępne tylko do odczytu.",
+        "EFS092_INCONSISTENT_LEGACY_LINK": "[PH] Historyczne powiązanie zlecenia z wydarzeniem jest niespójne. Wymaga sprawdzenia przez Migratora.",
+        "EFS092_REALIZATION_NOT_CONVERTIBLE": "[PH] Import wymaga otwartego lub zamkniętego zlecenia.",
+        "EFS092_INVALID_TIMEZONE": "[PH] Zlecenie ma nieprawidłową strefę czasową.",
+        "EFS092_INVALID_DATE_COUNT": "[PH] Import wymaga od 1 do 366 dat zlecenia.",
+        "EFS092_PAST_SOURCE_DATE": "[PH] Zlecenie zawiera minioną datę, której nie można zaimportować.",
+        "EFS092_INCOMPLETE_OR_EXCESSIVE_DAY_SLOTS": "[PH] Liczba bloków lub wymaganych MG w zapisanym harmonogramie jest nieprawidłowa.",
+        "EFS092_INVALID_FINAL_PLAN": "[PH] Finalny plan zawiera nieprawidłowe przypisanie MG lub sesji. Sprawdź potwierdzenia i dane sesji.",
+        "EFS092_DATED_BLOCK_NOT_EDITABLE": "[PH] Blok przypisany do daty jest chroniony przed edycją.",
+        "EFS092_GLOBAL_CREATE_FAILED": "[PH] Backend nie potwierdził utworzenia kanonicznego wydarzenia Global.",
+        "EFS092_GLOBAL_IDENTITY_MISSING": "[PH] W wyniku importu brakuje kanonicznej tożsamości Core lub lokalizacji.",
+        "EFS092_MANUAL_IMPORT_FAILED": "[PH] Backend nie potwierdził importu programu do wydarzenia.",
+        "EFS092_IMPORTED_PROGRAM_ID_MISSING": "[PH] W zaimportowanym programie brakuje identyfikatora pozycji.",
+        "EFS092_SNAPSHOT_IMPORT_FAILED": "[PH] Nie udało się zapisać wymaganych danych sesji w programie.",
+        "EFS092_IMPORT_RECONCILIATION_FAILED": "[PH] Backend nie potwierdził zgodności zaimportowanych terminów i programu."
+      }
     },
     "actions": {
       "createDraft": "Utwórz szkic",
-      "createEvent": "Utwórz wydarzenie"
+      "createEvent": "Utwórz wydarzenie",
+      "openEvent": "Otwórz wydarzenie"
     },
     "toast": {
       "saveSuccessSummary": "Zlecenie zapisane",
@@ -374,16 +364,6 @@
     "saveSuccess": "Plan zapisany",
     "saveFailed": "Nie udało się zapisać planu",
     "saveRejected": "Serwer odrzucił zmianę planu. Przypisań już opublikowanych w wydarzeniu nie można zmieniać ani usuwać. Jeśli zmiana dotyczy takiego przypisania, zachowaj je bez zmian i dodaj osobne przypisanie.",
-    "synchronization": {
-      "inProgress": "Synchronizacja programu wydarzenia",
-      "failed": "Plan zapisany, ale program opublikowanego Eventu nie został potwierdzony jako zaktualizowany",
-      "retry": "Ponów synchronizację",
-      "updated": "Program wydarzenia zaktualizowany",
-      "current": "Program wydarzenia jest aktualny",
-      "created": "Dodane sesje",
-      "promoted": "Opublikowane istniejące sesje",
-      "unchanged": "Sesje bez zmian"
-    },
     "preview": "Podgląd sesji",
     "chooseOtherSession": "Wybierz inną sesję",
     "proposal": {

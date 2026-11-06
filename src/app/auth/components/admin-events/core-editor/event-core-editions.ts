@@ -1,7 +1,6 @@
 import { Component, computed, DestroyRef, ElementRef, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
@@ -20,13 +19,15 @@ import { EventGlobalDraftController } from './event-global-draft-controller';
 
 @Component({
   selector: 'app-event-core-editions',
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, ButtonModule, MessageModule, FloatLabelModule, SelectModule, EventGlobalCityFields],
+  imports: [FormsModule, ReactiveFormsModule, ButtonModule, MessageModule, FloatLabelModule, SelectModule, EventGlobalCityFields],
   templateUrl: './event-core-editions.html',
   host: { class: 'd-block w-100' },
 })
 export class EventCoreEditions {
   readonly core = input.required<IEventCoreDetail>();
-  readonly legacyEditing = input.required<boolean>();
+  readonly readOnly = input(false);
+  readonly selectedEditionId = input<string | null>(null);
+  readonly editionSelected = output<string>();
   readonly addCityDisabledReason = input<'metadata' | 'schedule' | 'policy' | null>(null);
   readonly selectionDisabled = input(false);
   readonly cityAdded = output<IEventCoreDetail>();
@@ -37,9 +38,9 @@ export class EventCoreEditions {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(UiToast);
   private readonly initialDate = new Date();
-  protected readonly editionOptions = computed(() => this.globalDraft.calendar()?.cities.map(city => ({
-    value: city.editionId, label: city.city,
-  })) ?? []);
+  protected readonly editionOptions = computed(() => this.readOnly()
+    ? this.core().editions.map(edition => ({ value: edition.id, label: edition.city }))
+    : this.globalDraft.calendar()?.cities.map(city => ({ value: city.editionId, label: city.city })) ?? []);
   protected readonly editionErrorMessage = computed(() => {
     const error = this.globalDraft.editionReadError();
     return error === null ? null : resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification);
@@ -59,12 +60,13 @@ export class EventCoreEditions {
   });
 
   protected selectEdition(value: unknown): void {
-    if (typeof value !== 'string' || this.legacyEditing() || this.selectionDisabled()) return;
-    this.globalDraft.selectEdition(value);
+    if (typeof value !== 'string' || this.selectionDisabled() || !this.editionOptions().some(option => option.value === value)) return;
+    if (this.readOnly()) this.editionSelected.emit(value);
+    else this.globalDraft.selectEdition(value);
   }
 
   protected openCity(): void {
-    if (this.addCityBlocker() !== null) return;
+    if (this.readOnly() || this.addCityBlocker() !== null) return;
     this.errorMessage.set(null);
     this.globalDraft.openCity(this.core());
     this.focusCityControl('#additional-city-city');
@@ -79,7 +81,7 @@ export class EventCoreEditions {
   }
 
   protected submitCity(): void {
-    if (this.citySaveBlocked()) return;
+    if (this.readOnly() || this.citySaveBlocked()) return;
     this.globalDraft.cityForm.markAllAsTouched();
     if (this.globalDraft.cityState() === 'idle' && this.globalDraft.cityForm.invalid) {
       this.toast.danger({ summary: this.i18n.commonForm().invalidSummary, detail: this.i18n.commonForm().invalid });

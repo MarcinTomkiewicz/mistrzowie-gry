@@ -39,23 +39,20 @@ export class EventCoreMetadataController {
   readonly core = signal<IEventCoreDetail | null>(null);
   readonly edition = signal<IAdminEventDetail | null>(null);
   readonly isGlobal = signal(false);
-  readonly embeddedEditionLocked = signal(false);
   readonly isBusy = signal(false);
   readonly state = signal<'idle' | 'uncertain' | 'saved'>('idle');
   readonly pendingTarget = signal<EventMetadataTarget | null>(null);
   readonly errors = signal<Partial<Record<EventMetadataTarget, unknown>>>({});
   readonly issues = signal<Partial<Record<EventMetadataTarget, 'conflict' | 'protected'>>>({});
   readonly locked = computed(() => this.isBusy() || this.state() !== 'idle');
-  readonly blocked = computed(() => this.embeddedEditionLocked() || this.program.locked() || this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
+  readonly blocked = computed(() => this.program.locked() || this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
     this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() || this.blocks.isBusy() || this.blocks.isDirty() || this.blocks.readbackPending());
   readonly coreForm = new FormGroup({
     key: new FormControl('', { nonNullable: true,
       validators: [Validators.required, requiredTrimmedValidator(), Validators.pattern(/^[a-z0-9-]+$/)] }),
-    name: new FormControl('', { nonNullable: true, validators: [Validators.required, requiredTrimmedValidator()] }),
-    shortDescription: new FormControl('', { nonNullable: true }),
-    longDescription: new FormControl('', { nonNullable: true }),
-    isActive: new FormControl(false, { nonNullable: true }),
-    hasPublicPage: new FormControl(false, { nonNullable: true }),
+    name: new FormControl('', { nonNullable: true, validators: [Validators.required, requiredTrimmedValidator(), Validators.maxLength(140)] }),
+    shortDescription: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500)] }),
+    longDescription: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(12000)] }),
   });
   readonly editionForm = new FormGroup(createEventGlobalCityControls());
   readonly timezones = computed(() => {
@@ -66,9 +63,9 @@ export class EventCoreMetadataController {
     const core = this.core();
     const calendar = this.global.calendar();
     const edition = this.global.mainEdition();
-    return !!core && this.issues().core !== 'protected' && (!this.isGlobal() ||
+    return !!core && this.isGlobal() && this.issues().core !== 'protected' &&
       (!!calendar && !!edition && !edition.currentlyPublic && calendar.calendarLifecycle === 'global' && calendar.coreId === core.id &&
-        calendar.globalDates.every(day => day.cityOccurrences.every(city => !city.protected && !city.publishedAt))));
+        calendar.globalDates.every(day => day.cityOccurrences.every(city => !city.protected && !city.publishedAt)));
   });
   readonly canEditEdition = computed(() => {
     const edition = this.global.mainEdition();
@@ -91,7 +88,6 @@ export class EventCoreMetadataController {
     this.core.set(null);
     this.edition.set(null);
     this.isGlobal.set(false);
-    this.syncCoreValidators();
     this.command = null;
     this.pendingTarget.set(null);
     this.isBusy.set(false);
@@ -106,7 +102,6 @@ export class EventCoreMetadataController {
   load(core: IEventCoreDetail | null): void {
     this.core.set(core);
     this.isGlobal.set(this.global.calendar()?.calendarLifecycle === 'global');
-    this.syncCoreValidators();
     if (core) this.populateCore(core);
     if (this.isGlobal()) this.populateEdition();
     this.syncControls();
@@ -167,12 +162,11 @@ export class EventCoreMetadataController {
   private createCommand(target: EventMetadataTarget, core: IEventCoreDetail): MetadataCommand {
     if (target === 'core') {
       const value = this.coreForm.getRawValue();
-      const managedPublication = this.isGlobal() || this.global.staffingEditionId() !== null;
       return { target, coreId: core.id, payload: {
         id: core.id, key: core.key, name: value.name.trim(),
         shortDescription: normalizeText(value.shortDescription), longDescription: normalizeText(value.longDescription),
-        isActive: managedPublication ? core.isActive : value.isActive,
-        hasPublicPage: managedPublication ? core.hasPublicPage : value.hasPublicPage,
+        isActive: core.isActive,
+        hasPublicPage: core.hasPublicPage,
         displayOrder: core.displayOrder,
       } };
     }
@@ -255,7 +249,7 @@ export class EventCoreMetadataController {
 
   private populateCore(core: IEventCoreDetail): void {
     this.coreForm.reset({ key: core.key, name: core.name, shortDescription: core.shortDescription ?? '',
-      longDescription: core.longDescription ?? '', isActive: core.isActive, hasPublicPage: core.hasPublicPage });
+      longDescription: core.longDescription ?? '' });
   }
 
   private populateEdition(): void {
@@ -266,20 +260,11 @@ export class EventCoreMetadataController {
   }
 
   private syncControls(): void {
-    const coreEnabled = !this.embeddedEditionLocked() && !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditCore();
+    const coreEnabled = !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditCore();
     setControlEnabled(this.coreForm, coreEnabled);
-    setControlEnabled(this.coreForm.controls.isActive, coreEnabled && !this.isGlobal() && !this.global.staffingEditionId());
-    setControlEnabled(this.coreForm.controls.hasPublicPage, coreEnabled && !this.isGlobal() && !this.global.staffingEditionId());
     setControlEnabled(this.editionForm, !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditEdition());
     this.editionForm.controls.city.disable({ emitEvent: false });
     this.editionForm.controls.timezone.disable({ emitEvent: false });
-  }
-
-  private syncCoreValidators(): void {
-    const { name, shortDescription, longDescription } = this.coreForm.controls;
-    name.setValidators([Validators.required, requiredTrimmedValidator(), ...(this.isGlobal() ? [Validators.maxLength(140)] : [])]);
-    shortDescription.setValidators(this.isGlobal() ? Validators.maxLength(500) : null);
-    longDescription.setValidators(this.isGlobal() ? Validators.maxLength(12000) : null);
   }
 
   private clearError(target: EventMetadataTarget): void {

@@ -1,14 +1,12 @@
 @let copy = i18n.finalPlan();
 <section class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0"
-  [class.h-px-200]="isLoading()" [attr.aria-busy]="isLoading() || isSaving() || isReconciling()">
-  <app-loading-overlay [visible]="isLoading() || isSaving() || isReconciling()"
-    [label]="isReconciling() ? copy.synchronization.inProgress : isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+  [class.h-px-200]="isLoading()" [attr.aria-busy]="isLoading() || isSaving()">
+  <app-loading-overlay [visible]="isLoading() || isSaving()"
+    [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
   <header class="flex-col-start-stretch gap-xs">
     <h3 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h3>
     <p class="m-0 muted-text">{{ copy.description }}</p>
   </header>
-  <app-staffing-event-synchronization-status [realizationId]="board().realization.id"
-    [disabled]="isLoading() || isSaving()" [dirty]="hasChanges()" />
   @if (!isLoading()) {
     @if (loadFailed()) {
       <div class="flex-col-start-start gap-sm" role="alert">

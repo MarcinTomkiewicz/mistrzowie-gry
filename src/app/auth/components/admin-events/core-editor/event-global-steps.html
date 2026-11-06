@@ -7,22 +7,14 @@
     }
   </p-step-list>
   <p-step-panels>
-    @if (persistentContent()) {
-      <p-step-panel [value]="activeStep()">
+    @for (step of steps(); track step.value) {
+      <p-step-panel [value]="step.value">
         <ng-template #content>
-          <ng-container [ngTemplateOutlet]="stepContent()" />
+          @if (activeStep() === step.value) {
+            <ng-container [ngTemplateOutlet]="stepContent()" />
+          }
         </ng-template>
       </p-step-panel>
-    } @else {
-      @for (step of steps(); track step.value) {
-        <p-step-panel [value]="step.value">
-          <ng-template #content>
-            @if (activeStep() === step.value) {
-              <ng-container [ngTemplateOutlet]="stepContent()" />
-            }
-          </ng-template>
-        </p-step-panel>
-      }
     }
   </p-step-panels>
 </p-stepper>

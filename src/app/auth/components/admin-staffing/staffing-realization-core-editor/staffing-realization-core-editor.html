@@ -186,7 +186,7 @@
                 [class.active]="form.controls.type.value === 'stationary'"
                 role="radio"
                 [attr.aria-checked]="form.controls.type.value === 'stationary'"
-                [disabled]="isBusy()"
+                [disabled]="isBusy() || importPending()"
                 (click)="selectType('stationary')"
               >
                 <div class="flex-row-start-center gap-md">
@@ -204,7 +204,7 @@
                 [class.active]="form.controls.type.value === 'travel'"
                 role="radio"
                 [attr.aria-checked]="form.controls.type.value === 'travel'"
-                [disabled]="isBusy()"
+                [disabled]="isBusy() || importPending()"
                 (click)="selectType('travel')"
               >
                 <div class="flex-row-start-center gap-md">
@@ -222,35 +222,17 @@
           </div>
         </section>
 
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew">
-          <div class="flex-row-start-center gap-md">
-            <span class="pi pi-knot square-11 flex-none" aria-hidden="true"></span>
-            <div class="flex-col-start-stretch gap-xs">
-              <h2 class="mg-section__title mg-section__title--md m-0">
-                {{ i18n.eventSection().title }}
-              </h2>
-              <p class="mg-section__subtitle mg-section__subtitle--no-margin mg-section__subtitle--full">
-                {{ i18n.eventSection().description }}
-              </p>
+        @if (!isNew) {
+          <section class="mg-card flex-col-start-stretch gap-md p-md w-100">
+            <div class="flex-row-start-center gap-md">
+              <span class="pi pi-knot square-11 flex-none" aria-hidden="true"></span>
+              <div class="flex-col-start-stretch gap-xs">
+                <h2 class="mg-section__title mg-section__title--md m-0">
+                  {{ i18n.eventSection().title }}
+                </h2>
+              </div>
             </div>
-          </div>
-
-          <p-select
-            class="w-100"
-            inputId="staffing-realization-event"
-            formControlName="eventId"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-            [options]="eventOptions()"
-            [showClear]="true"
-            [placeholder]="i18n.event().placeholder"
-            [ariaLabel]="fields.event"
-            [emptyMessage]="i18n.event().empty"
-          />
-
-          @if (!isNew) {
-            @if (!realization()?.eventId) {
+            @if (!realization()?.eventId && !importPending() && !eventActionUnavailable()) {
               <p-message severity="info" icon="pi pi-info-circle">
                 {{ i18n.event().privateCreationHint }}
               </p-message>
@@ -260,20 +242,29 @@
                 {{ i18n.event().saveChangesFirstHint }}
               </p-message>
             }
+            @if (eventActionError(); as error) {
+              <p-message severity="error" role="alert">{{ error }}</p-message>
+            }
+            @if (eventImportMessage(); as message) {
+              <p-message [severity]="readbackOnly() ? 'warn' : 'info'" role="status">{{ message }}</p-message>
+            }
+            @if (eventActionUnavailable(); as reason) {
+              <p-message severity="info" role="status">{{ reason }}</p-message>
+            }
             <div class="flex-row-end-center flex-wrap gap-sm">
               <p-button
                 type="button"
                 severity="secondary"
                 [outlined]="true"
-                [label]="realization()?.eventId ? i18n.commonActions().edit : i18n.actions().createEvent"
-                [icon]="realization()?.eventId ? 'pi pi-scroll-quill' : 'pi pi-plus'"
+                [label]="eventActionLabel()"
+                icon="pi pi-plus"
                 [loading]="isEventActionRunning()"
-                [disabled]="isBusy() || hasUnsavedChanges()"
+                [disabled]="isBusy() || !!eventActionUnavailable() || (!readbackOnly() && hasUnsavedChanges())"
                 (onClick)="openEvent()"
               />
             </div>
-          }
-        </section>
+          </section>
+        }
 
         <div class="flex-row-between-center flex-wrap gap-sm border-top pt-md w-100-sm" [class.w-80]="isNew" [class.w-100]="!isNew">
           <p-button
@@ -291,7 +282,7 @@
             [label]="saveLabel()"
             icon="pi pi-done-it"
             [loading]="isSaving()"
-            [disabled]="isBusy()"
+            [disabled]="isBusy() || importPending()"
           />
         </div>
       </form>

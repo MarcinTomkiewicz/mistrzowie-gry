@@ -24,7 +24,6 @@ import { getStaffingScheduleFormError } from '../staffing-realization-form-error
 import { StaffingRealizationDayEditor } from './staffing-realization-day-editor';
 import { createStaffingRealizationScheduleEditorI18n } from './staffing-realization-schedule-editor.i18n';
 import { StaffingReadinessTarget } from '../staffing-readiness-target';
-import { StaffingEventSynchronizationStatus } from '../staffing-event-synchronization-status';
 
 @Component({
   selector: 'app-staffing-realization-schedule-editor',
@@ -36,7 +35,6 @@ import { StaffingEventSynchronizationStatus } from '../staffing-event-synchroniz
     LoadingOverlay,
     StaffingRealizationDayEditor,
     StaffingReadinessTarget,
-    StaffingEventSynchronizationStatus,
   ],
   templateUrl: './staffing-realization-schedule-editor.html',
   providers: [
@@ -67,12 +65,10 @@ export class StaffingRealizationScheduleEditor {
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
   protected readonly loadFailed = signal(false);
-  protected readonly synchronizationLocked = computed(() => this.editor.eventSynchronization.locked(this.realizationId()));
-  protected readonly synchronizationBusy = computed(() => this.editor.eventSynchronization.busy(this.realizationId()));
 
   constructor() {
     effect(() => {
-      if (this.isLoading() || this.isSaving() || this.synchronizationLocked()) this.form.disable({ emitEvent: false });
+      if (this.isLoading() || this.isSaving()) this.form.disable({ emitEvent: false });
       else this.form.enable({ emitEvent: false });
     });
     this.form.valueChanges
@@ -119,7 +115,7 @@ export class StaffingRealizationScheduleEditor {
   }
 
   protected addDay(): void {
-    if (this.isSaving() || this.synchronizationLocked()) {
+    if (this.isSaving()) {
       return;
     }
 
@@ -127,13 +123,13 @@ export class StaffingRealizationScheduleEditor {
   }
 
   protected cancel(): void {
-    if (this.isSaving() || this.synchronizationLocked()) return;
+    if (this.isSaving()) return;
     this.editor.store.reset();
     this.location.back();
   }
 
   protected saveSchedule(): void {
-    if (this.isLoading() || this.isSaving() || this.synchronizationLocked()) return;
+    if (this.isLoading() || this.isSaving()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
 

@@ -24,7 +24,6 @@ import type {
   EditionValidationCopy,
   EditionRpcErrorsCopy,
   OccurrencesCopy,
-  EditorActionsCopy,
   EditorPageCopy,
   EditorToastCopy,
   OccurrenceTableCopy,
@@ -38,7 +37,6 @@ export function createEventCoreEditorI18n() {
     editions,
     editionTable,
     occurrenceTable,
-    actions,
     toast,
     rpcErrors,
   } = createScopedSectionsI18n<{
@@ -47,7 +45,6 @@ export function createEventCoreEditorI18n() {
     editions: EditionsCopy;
     editionTable: EditionTableCopy;
     occurrenceTable: OccurrenceTableCopy;
-    actions: EditorActionsCopy;
     toast: EditorToastCopy;
     rpcErrors: CoreRpcErrorsCopy;
   }>('adminEvents', {
@@ -56,7 +53,6 @@ export function createEventCoreEditorI18n() {
     editions: 'editor.editions',
     editionTable: 'editor.editionTable',
     occurrenceTable: 'editionEditor.occurrenceTable',
-    actions: 'editor.actions',
     toast: 'editor.toast',
     rpcErrors: 'rpcErrors',
   });
@@ -106,7 +102,6 @@ export function createEventCoreEditorI18n() {
     editions,
     editionTable,
     occurrenceTable,
-    actions,
     toast,
     rpcErrors,
     commonActions: createCommonActionsI18n(),

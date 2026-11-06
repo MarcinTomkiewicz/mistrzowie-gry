@@ -27,11 +27,10 @@ import { formatTimeRangeLabel } from '../../../../core/utils/time-format';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { StaffingFinalPlanAssignmentEditor } from './staffing-final-plan-assignment-editor';
 import { createStaffingFinalPlanEditorI18n } from './staffing-final-plan-editor.i18n';
-import { StaffingEventSynchronizationStatus } from '../staffing-event-synchronization-status';
 
 @Component({
   selector: 'app-staffing-final-plan-editor',
-  imports: [ReactiveFormsModule, ButtonModule, LoadingOverlay, SessionDetails, StaffingFinalPlanAssignmentEditor, StaffingEventSynchronizationStatus],
+  imports: [ReactiveFormsModule, ButtonModule, LoadingOverlay, SessionDetails, StaffingFinalPlanAssignmentEditor],
   templateUrl: './staffing-final-plan-editor.html',
   providers: [provideTranslocoScope('sessions')],
 })
@@ -57,7 +56,6 @@ export class StaffingFinalPlanEditor {
   protected readonly plan = signal<AdminStaffingFinalPlan | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly isSaving = signal(false);
-  protected readonly isReconciling = computed(() => this.facade.eventSynchronization.busy(this.board().realization.id));
   protected readonly saveErrorDetail = signal<string | null>(null);
   protected readonly loadFailed = signal(false);
   protected readonly materialChanges = signal<StaffingFinalPlanMaterialChange[] | null>(null);
@@ -66,7 +64,7 @@ export class StaffingFinalPlanEditor {
     const plan = this.plan();
     return !!plan?.editable && plan.realizationId === this.board().realization.id &&
       this.isCurrentRealization(this.board().realization) &&
-      !this.isLoading() && !this.isSaving() && !this.facade.eventSynchronization.locked(plan.realizationId);
+      !this.isLoading() && !this.isSaving();
   });
   protected readonly hasChanges = computed(() => JSON.stringify(this.draft()) !== this.baseline());
   protected readonly formatDateLabel = formatDateLabel;

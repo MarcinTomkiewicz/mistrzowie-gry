@@ -1,17 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  catchError,
-  defer,
-  map,
-  Observable,
-  of,
-  switchMap,
-  tap,
-  throwError,
-} from 'rxjs';
+import { defer, map, Observable, tap } from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
-import type { SyncAdminStaffingPrivateEventResult } from '../../interfaces/admin-staffing-realization';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
 import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
@@ -48,28 +38,18 @@ import {
   AdminEventProgramOfflineSeats,
   AdminEventProgramOfflineSeatsAdjustment,
   EventOfflineSeatsDelta,
-  AdminParticipantSignupState,
-  EventEditionSaveResult,
-  EventPublishResult,
-  EventProgramReconciliationResult,
   IAdminEventDetail,
   IAdminEventListItem,
-  IAdminOccurrence,
   IEventCoreDetail,
   IEventCoreListItem,
   IEventCoreSavePayload,
-  IEventSavePayload,
-  IOccurrenceSavePayload,
 } from '../../interfaces/i-event-admin';
 import { Backend } from '../backend/backend';
-import { ImageStorage } from '../image-storage/image-storage';
-import { Storage } from '../storage/storage';
+import { assertEdgeContract } from '../../utils/edge-contract';
 
 @Injectable({ providedIn: 'root' })
 export class EventAdmin {
   private readonly backend = inject(Backend);
-  private readonly imageStorage = inject(ImageStorage);
-  private readonly storage = inject(Storage);
 
   getCoreList(): Observable<IEventCoreListItem[]> {
     return this.backend.rpc<IEventCoreListItem[]>(EVENT_RPC.getCoreList);
@@ -234,12 +214,6 @@ export class EventAdmin {
     );
   }
 
-  saveEdition(payload: IEventSavePayload): Observable<IAdminEventDetail> {
-    return this.backend.rpc<IAdminEventDetail>(EVENT_RPC.saveEdition, {
-      p_payload: payload,
-    });
-  }
-
   saveGlobalEditionMetadata(payload: SaveAdminGlobalEventEditionMetadataPayload): Observable<SaveAdminGlobalEventEditionMetadataResult> {
     return this.backend.rpc<SaveAdminGlobalEventEditionMetadataResult>(EVENT_RPC.saveGlobalEditionMetadata, { p_payload: payload });
   }
@@ -260,10 +234,11 @@ export class EventAdmin {
     return this.backend.rpc<ManualActivityResult>(EVENT_RPC.saveManualActivity, { p_payload: payload });
   }
 
-  getProgramParticipants(programItemId: string): Observable<AdminEventProgramParticipants> {
+  getProgramParticipants(programItemId: string, occurrenceId: string): Observable<AdminEventProgramParticipants> {
     return this.backend.rpc<AdminEventProgramParticipants>(EVENT_RPC.getProgramParticipants, {
       p_program_item_id: programItemId,
-    });
+    }).pipe(tap(data => assertEdgeContract(data.programItemId === programItemId && data.occurrenceId === occurrenceId,
+      'programParticipants', 'participants of the selected saved session and occurrence')));
   }
 
   getProgramOfflineSeats(eventId: string): Observable<AdminEventProgramOfflineSeats> {
@@ -274,109 +249,5 @@ export class EventAdmin {
   adjustProgramOfflineSeats(programItemId: string, delta: EventOfflineSeatsDelta): Observable<AdminEventProgramOfflineSeatsAdjustment> {
     return this.backend.rpc<unknown>(EVENT_RPC.adjustProgramOfflineSeats, { p_program_item_id: programItemId, p_delta: delta })
       .pipe(map(response => readAdminEventOfflineSeatsAdjustment(response, programItemId, delta)));
-  }
-
-  publishStaffingEvent(eventId: string): Observable<EventPublishResult> {
-    return this.backend.rpc<EventPublishResult>(EVENT_RPC.publishStaffingEvent, {
-      p_event_id: eventId,
-    });
-  }
-
-  reconcileStaffingEventProgram(eventId: string): Observable<EventProgramReconciliationResult> {
-    return this.backend.rpc<EventProgramReconciliationResult>(EVENT_RPC.reconcileStaffingEventProgram, {
-      p_event_id: eventId,
-    });
-  }
-
-  syncStaffingPrivateEvent(editionId: string): Observable<SyncAdminStaffingPrivateEventResult> {
-    return this.backend.rpc<SyncAdminStaffingPrivateEventResult>(EVENT_RPC.syncStaffingPrivateEvent, {
-      p_event_id: editionId,
-    });
-  }
-
-  saveEditionWithCover(
-    payload: IEventSavePayload,
-    file: File | null,
-    previousCoverPath: string | null,
-  ): Observable<EventEditionSaveResult> {
-    return defer(() => {
-      const coverPath$ = file
-        ? payload.id
-          ? this.imageStorage.transcodeAndUpload(file, {
-              bucket: 'images',
-              folder: `content/events/${payload.id}`,
-              usePublicUrl: false,
-            })
-          : throwError(() => new Error(
-              'Save the Event edition before uploading its cover.',
-            ))
-        : of(payload.coverImagePath);
-
-      return coverPath$.pipe(
-        switchMap((coverImagePath) =>
-          this.saveEdition({ ...payload, coverImagePath }).pipe(
-            map((edition): EventEditionSaveResult => ({
-              status: 'saved',
-              edition,
-              coverCleanupFailed: false,
-            })),
-            catchError((error: unknown) =>
-              of<EventEditionSaveResult>({
-                status: 'failed',
-                phase: 'save',
-                error,
-                coverCleanupFailed: false,
-              }),
-            ),
-            switchMap((result) => {
-              const cleanupPath = result.status === 'saved'
-                ? previousCoverPath !== result.edition.coverImagePath
-                  ? previousCoverPath
-                  : null
-                : file ? coverImagePath : null;
-
-              return this.storage.removeFile(cleanupPath, 'images').pipe(
-                map(() => result),
-                catchError(() => of({ ...result, coverCleanupFailed: true })),
-              );
-            }),
-          ),
-        ),
-      );
-    }).pipe(
-      catchError((error: unknown) =>
-        of<EventEditionSaveResult>({
-          status: 'failed',
-          phase: 'upload',
-          error,
-          coverCleanupFailed: false,
-        }),
-      ),
-    );
-  }
-
-  setEditionActive(
-    eventId: string,
-    isActive: boolean,
-  ): Observable<IAdminEventDetail> {
-    return this.backend.rpc<IAdminEventDetail>(EVENT_RPC.setEditionActive, {
-      p_event_id: eventId,
-      p_is_active: isActive,
-    });
-  }
-
-  saveOccurrence(
-    payload: IOccurrenceSavePayload,
-  ): Observable<IAdminOccurrence> {
-    return this.backend.rpc<IAdminOccurrence>(EVENT_RPC.saveOccurrence, {
-      p_payload: payload,
-    });
-  }
-
-  setParticipantSignupState(occurrenceId: string, open: boolean): Observable<AdminParticipantSignupState> {
-    return this.backend.rpc<AdminParticipantSignupState>(EVENT_RPC.setParticipantSignupState, {
-      p_occurrence_id: occurrenceId,
-      p_open: open,
-    });
   }
 }

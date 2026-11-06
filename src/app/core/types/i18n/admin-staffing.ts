@@ -48,7 +48,7 @@ export type AdminStaffingEditorCopy = {
     basic: AdminStaffingEditorSectionCopy;
     initialDays: AdminStaffingEditorSectionCopy;
     venue: AdminStaffingEditorSectionCopy;
-    event: AdminStaffingEditorSectionCopy;
+    event: Pick<AdminStaffingEditorSectionCopy, 'title'>;
   };
   fields: {
     name: string;
@@ -58,7 +58,6 @@ export type AdminStaffingEditorCopy = {
     venueAddress: string;
     timezone: string;
     type: string;
-    event: string;
     dateRange: string;
   };
   validation: {
@@ -78,14 +77,22 @@ export type AdminStaffingEditorCopy = {
     AdminStaffingRealizationTypeDescriptionCopy
   >;
   event: {
-    placeholder: string;
-    empty: string;
     privateCreationHint: string;
     saveChangesFirstHint: string;
+    retryRead: string;
+    retryImport: string;
+    uncertain: string;
+    unlinked: string;
+    readbackFailed: string;
+    checking: string;
+    writing: string;
+    reading: string;
+    errors: Partial<Record<string, string>> & { EFS092_REALIZATION_NOT_CONVERTIBLE: string };
   };
   actions: {
     createDraft: string;
     createEvent: string;
+    openEvent: string;
   };
   toast: {
     saveSuccessSummary: string;

@@ -135,79 +135,6 @@ export interface AdminEventProgramParticipants {
   registrations: AdminEventProgramParticipant[];
 }
 
-export interface IEventSavePayload {
-  id: string | null;
-  eventCoreId: string;
-  slug: string;
-  city: string;
-  venueName: string | null;
-  venueAddress: string | null;
-  priceAmount: number | null;
-  priceCurrency: string;
-  priceLabel: string | null;
-  coverImagePath: string | null;
-  facebookLink: string | null;
-  isActive: boolean;
-  isDefaultPublic: boolean;
-  displayOrder: number;
-  isForBeginners: boolean;
-  timezone: string;
-  startTime: string;
-  endTime: string;
-  participantSignupKind: ParticipantSignupKind;
-  signupRequired: boolean;
-  defaultSlotCapacity: number;
-  defaultParticipantCapacity: number | null;
-  schedule: IEventSchedule;
-}
-
-export type EventPublishResult =
-  | {
-      published: true;
-      alreadyPublished: false;
-      eventId: string;
-      eventCoreId: string;
-      realizationId: string;
-      public: true;
-      occurrenceCount: number;
-      confirmedProgramItemCount: number;
-      pendingProgramEntryCount: number;
-      hasUpcomingOccurrences: boolean;
-      publishedAt: string;
-    }
-  | {
-      published: false;
-      alreadyPublished: true;
-      eventId: string;
-      eventCoreId: string;
-      realizationId: string;
-      currentlyPublic: boolean;
-      publishedAt: string;
-    };
-
-export interface EventProgramReconciliationResult {
-  reconciled: true;
-  eventId: string;
-  realizationId: string;
-  createdCount: number;
-  promotedCount: number;
-  unchangedCount: number;
-  createdProgramItemIds: string[];
-}
-
-export type EventEditionSaveResult =
-  | {
-      status: 'saved';
-      edition: IAdminEventDetail;
-      coverCleanupFailed: boolean;
-    }
-  | {
-      status: 'failed';
-      phase: 'upload' | 'save';
-      error: unknown;
-      coverCleanupFailed: boolean;
-    };
-
 export interface IAdminOccurrenceListItem {
   id: string;
   date: string;
@@ -226,33 +153,6 @@ export interface IAdminOccurrenceListItem {
   publishedAt: string | null;
   programItemCount: number;
   activeParticipantCount: number;
-}
-
-export interface IOccurrenceSavePayload {
-  id: string;
-  status: EventOccurrenceStatus;
-  slotCapacity: number;
-  participantCapacity: number | null;
-  participantSignupKind: ParticipantSignupKind;
-  hostSignupOpensAt: string | null;
-  hostSignupClosesAt: string | null;
-  participantSignupOpensAt: string | null;
-  participantSignupClosesAt: string | null;
-}
-
-export interface IAdminOccurrence extends IAdminOccurrenceListItem {
-  eventId: string;
-  updatedAt: string;
-}
-
-export interface AdminParticipantSignupState {
-  occurrenceId: string;
-  status: EventOccurrenceStatus;
-  participantSignupKind: ParticipantSignupKind;
-  capacityPolicy: 'legacy_shared' | 'independent';
-  participantSignupOpenedAt: string | null;
-  participantSignupOpensAt: string | null;
-  participantSignupClosesAt: string | null;
 }
 
 export type EventOfflineSeatsDelta = -1 | 1;

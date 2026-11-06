@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { catchError, defer, EMPTY, forkJoin, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { catchError, defer, EMPTY, forkJoin, map, Observable, of, shareReplay, switchMap, tap, throwError, timeout } from 'rxjs';
 
 import { mapStaffingRealizationCoreToDraft } from '../../factories/staffing-realization-core-form.factory';
 import { mapStaffingRealizationScheduleToDraft } from '../../factories/staffing-realization-days-form.factory';
@@ -12,7 +12,6 @@ import type { StaffingCandidateThread } from '../../interfaces/staffing-candidat
 import type { AdminStaffingFinalPlan, StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
 import type { StaffingCandidateSessionOptions } from '../../interfaces/staffing-candidate-session-options';
 import { SessionRead } from '../../reads/sessions/session-read';
-import { EventAdmin } from '../../services/event-admin/event-admin';
 import {
   AdminStaffingRealizationCore,
   AdminStaffingSchedule,
@@ -30,17 +29,22 @@ import { AdminStaffingRealizationRead } from '../../reads/staffing/admin-staffin
 import { AdminStaffingRealization } from '../../services/staffing/admin-staffing-realization';
 import { StaffingRealizationEditorStore } from '../../stores/staffing/staffing-realization-editor-store';
 import { OpenAdminStaffingRealizationResult, StaffingRealizationReadinessResult } from '../../interfaces/staffing-realization-readiness';
-import { StaffingEventSynchronization } from './staffing-event-synchronization';
+import { assertEdgeContract } from '../../utils/edge-contract';
+import { RpcError } from '../../types/rpc-error';
+
+type EventImportState = {
+  phase: 'checking' | 'writing' | 'reading' | 'uncertain' | 'readback' | 'retry';
+  result: ConvertAdminStaffingRealizationToEventResult | null;
+};
 
 @Injectable({ providedIn: 'root' })
 export class StaffingRealizationEditorFacade {
   private readonly read = inject(AdminStaffingRealizationRead);
   private readonly write = inject(AdminStaffingRealization);
   private readonly sessionRead = inject(SessionRead);
-  private readonly eventAdmin = inject(EventAdmin);
+  private readonly eventImports = signal<ReadonlyMap<string, EventImportState>>(new Map());
   private readonly finalPlanCandidates = new Map<string, Observable<StaffingCandidateSessionOptions>>();
   readonly store = inject(StaffingRealizationEditorStore);
-  readonly eventSynchronization = inject(StaffingEventSynchronization);
 
   readonly loadCandidateThread = (candidateId: string): Observable<StaffingCandidateThread> =>
     this.read.getCandidateThread(candidateId);
@@ -53,12 +57,7 @@ export class StaffingRealizationEditorFacade {
   }
 
   saveFinalPlan(realizationId: string, items: StaffingFinalPlanSaveItem[]): Observable<StaffingFinalPlanSaveResult> {
-    return defer(() => {
-      if (this.eventSynchronization.locked(realizationId)) return EMPTY;
-      return this.write.saveFinalPlan(realizationId, items).pipe(
-        tap(() => this.eventSynchronization.start(realizationId, 'finalPlan')),
-      );
-    });
+    return this.write.saveFinalPlan(realizationId, items);
   }
 
   loadFinalPlanCandidate(candidate: StaffingCandidate): Observable<StaffingCandidateSessionOptions> {
@@ -251,36 +250,78 @@ export class StaffingRealizationEditorFacade {
   getOrCreateEvent(
     realization: AdminStaffingRealizationCore,
   ): Observable<Pick<ConvertAdminStaffingRealizationToEventResult, 'eventCoreId' | 'eventId'>> {
-    if (realization.eventId) {
-      return this.eventAdmin.getEditionDetail(realization.eventId).pipe(map((event) => {
-        if (!event) throw new Error('The linked Event edition is unavailable.');
-        return { eventCoreId: event.eventCoreId, eventId: event.id };
-      }));
-    }
-
     const realizationId = realization.id;
-    return this.write.convertToEvent(realizationId).pipe(
-      switchMap((result) => this.read.getDetail(realizationId).pipe(
-        tap((realization) => {
+    return defer(() => {
+      if (this.eventImportBusy(realizationId)) return EMPTY;
+      const previous = this.eventImportState(realizationId);
+      let result = previous?.result ?? null;
+      let writing = false;
+      this.setEventImport(realizationId, { phase: 'checking', result });
+      return this.read.readEventTarget(realizationId, result).pipe(
+        switchMap(target => {
+          if (target) return of(target);
+          // An uncertain attempt is reconciled by GETs before another explicit action.
+          if (previous && previous.phase !== 'retry') {
+            this.setEventImport(realizationId, { phase: 'retry', result: null });
+            throw new Error('[STAFFING_EVENT_IMPORT] No saved link found; an explicit idempotent retry is required.');
+          }
+          writing = true;
+          this.setEventImport(realizationId, { phase: 'writing', result: null });
+          return this.write.convertToEvent(realizationId).pipe(
+            tap(saved => {
+              result = saved;
+              this.setEventImport(realizationId, { phase: 'reading', result });
+            }),
+            switchMap(saved => this.read.readEventTarget(realizationId, saved)),
+          );
+        }),
+        timeout({ first: 30_000 }),
+        map(target => {
+          assertEdgeContract(target !== null, 'staffingConversion.readback', 'a verified saved Event association');
           if (this.store.realizationId() === realizationId) {
             this.store.invalidateReadiness();
-            this.hydrateCore(realization);
+            this.hydrateCore(target.realization);
           }
+          this.setEventImport(realizationId, null);
+          return { eventCoreId: target.eventCoreId, eventId: target.eventId };
         }),
-        map(() => result),
-        catchError(() => of(result)),
-      )),
-    );
+        catchError((error: unknown) => {
+          const refused = error instanceof RpcError && ['42501', '22023', '22P02', 'P0002', '23514', '40001', '23503', '23505'].includes(error.code);
+          if (this.eventImportState(realizationId)?.phase !== 'retry') {
+            this.setEventImport(realizationId, result ? { phase: 'readback', result }
+              : writing && refused ? null : writing || previous ? { phase: 'uncertain', result: null } : null);
+          }
+          return throwError(() => error);
+        }),
+      );
+    }).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  }
+
+  eventImportState(realizationId: string): EventImportState | null {
+    return this.eventImports().get(realizationId) ?? null;
+  }
+
+  eventImportBusy(realizationId: string): boolean {
+    const phase = this.eventImportState(realizationId)?.phase;
+    return phase === 'checking' || phase === 'writing' || phase === 'reading';
+  }
+
+  private setEventImport(realizationId: string, state: EventImportState | null): void {
+    this.eventImports.update(states => {
+      const next = new Map(states);
+      if (state) next.set(realizationId, state);
+      else next.delete(realizationId);
+      return next;
+    });
   }
 
   saveSchedule(realizationId: string, days: SaveAdminStaffingScheduleDayInput[]): Observable<AdminStaffingSchedule> {
-    return defer(() => this.eventSynchronization.locked(realizationId) ? EMPTY : this.write.saveSchedule(realizationId, days)).pipe(
+    return this.write.saveSchedule(realizationId, days).pipe(
       tap((schedule) => {
         if (this.store.realizationId() === realizationId) {
           this.store.invalidateReadiness();
           this.hydrateSchedule(schedule);
         }
-        this.eventSynchronization.start(realizationId, 'schedule');
       }),
     );
   }

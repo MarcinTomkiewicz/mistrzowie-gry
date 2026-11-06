@@ -4,8 +4,8 @@
   <div class="mg-container position-relative flex-col-start-stretch gap-lg min-w-0">
     <app-breadcrumbs [items]="breadcrumbs()" />
     <header class="mg-section__header flex-col-start-center gap-sm w-100 m-0">
-      <h1 class="mg-section__title">{{ creating ? i18n.page().createTitle : metadata.isGlobal() || globalDraft.staffingEditionId() ? loadedCore?.name : i18n.page().editTitle }}</h1>
-      @if (creating || metadata.isGlobal() || globalDraft.staffingEditionId()) {
+      <h1 class="mg-section__title">{{ creating ? i18n.page().createTitle : loadedCore?.name }}</h1>
+      @if (creating || loadedCore) {
         <span class="tag-badge tag-badge--muted">{{ core()?.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().draft }}</span>
       } @else if (!isLoading()) {
         <p class="mg-section__subtitle mg-section__subtitle--full">{{ i18n.page().subtitle }}</p>
@@ -32,26 +32,8 @@
       @if (cover.needsReconciliation()) {
         <p-message severity="warn" role="status">{{ coverCopy().refreshRequired }}</p-message>
       }
-      @if (creating || metadata.isGlobal() || globalDraft.staffingEditionId()) {
-        @if (globalDraft.staffingEditionId(); as editionId) {
-          @if (loadedCore) {
-            <app-event-global-steps [activeStep]="globalDraft.activeStep()" [persistentContent]="true"
-              [disabled]="navigationLocked() || cover.dirty()" [stepContent]="staffingContent" (stepSelected)="goToStep($event)" />
-            <ng-template #staffingContent>
-              <div class="flex-col-start-stretch gap-md w-100 min-w-0">
-                @if (globalDraft.activeStep() === 1) {
-                  <ng-container [ngTemplateOutlet]="coreForm" />
-                  <app-event-core-cover [editionCoverPresent]="!!globalDraft.mainEdition()?.coverImagePath" />
-                }
-                <app-event-edition-editor [embeddedEditionId]="editionId" [coreData]="loadedCore"
-                  [step]="globalDraft.activeStep()" [blocked]="staffingBlocked()"
-                  [coreDirty]="form.dirty || cover.dirty()" [navigationDisabled]="navigationLocked() || cover.dirty()"
-                  (navigateToStep)="goToStep($event)"
-                  (coreChanged)="acceptPublication($event)" (editionChanged)="acceptStaffingEdition($event)" (cancelled)="goBack()" />
-              </div>
-            </ng-template>
-          }
-        } @else if (creating || globalDraft.calendar()) {
+      @if (creating || metadata.isGlobal()) {
+        @if (creating || globalDraft.calendar()) {
           <app-event-global-steps [activeStep]="globalDraft.activeStep()" [reachedStep]="creating ? globalDraft.reachedStep() : 6"
             [disabled]="navigationLocked() || cover.dirty()" [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
           <ng-template #stepContent>
@@ -75,7 +57,7 @@
               } @else if (loadedCore) {
                 @if (globalDraft.calendar(); as calendar) {
                   @if (globalDraft.activeStep() === 2) {
-                    <app-event-core-editions [core]="loadedCore" [legacyEditing]="false"
+                    <app-event-core-editions [core]="loadedCore"
                       [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
                       [addCityDisabledReason]="policy.locked() ? 'policy' : program.locked() || metadata.locked() || cover.needsReconciliation() ? 'metadata'
                         : schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
@@ -191,8 +173,20 @@
           }
         </div>
       } @else if (loadedCore) {
-        <ng-container [ngTemplateOutlet]="coreForm" />
-        <app-event-core-editions [core]="loadedCore" [legacyEditing]="true" />
+        <p-message severity="info" role="status">{{ i18n.metadata().readOnly }}</p-message>
+        <app-event-core-editions [core]="loadedCore" [readOnly]="true" [selectedEditionId]="history.selectedEditionId()"
+          [selectionDisabled]="history.loading()" (editionSelected)="selectHistoryEdition($event)" />
+        @if (history.loading()) {
+          <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
+        } @else if (history.error() !== null) {
+          <p-message severity="error" role="alert">{{ i18n.page().loadErrorTitle }}</p-message>
+          <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry" (onClick)="history.refresh()" />
+        } @else if (history.edition(); as edition) {
+          <app-event-edition-summary [core]="loadedCore" [edition]="edition" [timeline]="history.timeline()"
+            (reloadTimeline)="history.refresh()" />
+        }
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
+          [label]="i18n.commonActions().cancel" (onClick)="goBack()" />
       }
     }
   </div>
@@ -205,7 +199,7 @@
       <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
         <div class="flex-col-start-stretch gap-xs w-100">
           <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
-          <input class="w-100" pInputText pSize="small" id="event-core-name" formControlName="name" autocomplete="off" [maxlength]="metadata.isGlobal() ? 140 : null"
+          <input class="w-100" pInputText pSize="small" id="event-core-name" formControlName="name" autocomplete="off" [maxlength]="140"
             [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
             [attr.aria-describedby]="form.controls.name.touched && form.controls.name.invalid ? 'event-core-name-error' : null" />
           @if (form.controls.name.touched && form.controls.name.invalid) {
@@ -213,7 +207,7 @@
               {{ form.controls.name.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}
             </small>
           }
-          @if (metadata.isGlobal()) { <app-character-counter [value]="form.controls.name.value" [limit]="140" /> }
+          <app-character-counter [value]="form.controls.name.value" [limit]="140" />
         </div>
         <div class="flex-col-start-stretch gap-xs w-100">
           <span class="small-caps">{{ i18n.commonLabels().key }}</span>
@@ -223,35 +217,23 @@
       <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
         <div class="flex-col-start-stretch gap-xs w-100">
           <label for="event-core-short-description">{{ i18n.commonLabels().shortDescription }}</label>
-          <textarea class="w-100" pTextarea pSize="small" id="event-core-short-description" formControlName="shortDescription" rows="3" [maxlength]="metadata.isGlobal() ? 500 : null"
+          <textarea class="w-100" pTextarea pSize="small" id="event-core-short-description" formControlName="shortDescription" rows="3" [maxlength]="500"
             [attr.aria-invalid]="form.controls.shortDescription.touched && form.controls.shortDescription.invalid"></textarea>
           @if (form.controls.shortDescription.touched && form.controls.shortDescription.invalid) {
             <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '500') }}</small>
           }
-          @if (metadata.isGlobal()) { <app-character-counter [value]="form.controls.shortDescription.value" [limit]="500" /> }
+          <app-character-counter [value]="form.controls.shortDescription.value" [limit]="500" />
         </div>
         <div class="flex-col-start-stretch gap-xs w-100">
           <label for="event-core-long-description">{{ i18n.commonLabels().longDescription }}</label>
-          <textarea class="w-100" pTextarea pSize="small" id="event-core-long-description" formControlName="longDescription" rows="6" [maxlength]="metadata.isGlobal() ? 12000 : null"
+          <textarea class="w-100" pTextarea pSize="small" id="event-core-long-description" formControlName="longDescription" rows="6" [maxlength]="12000"
             [attr.aria-invalid]="form.controls.longDescription.touched && form.controls.longDescription.invalid"></textarea>
           @if (form.controls.longDescription.touched && form.controls.longDescription.invalid) {
             <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '12000') }}</small>
           }
-          @if (metadata.isGlobal()) { <app-character-counter [value]="form.controls.longDescription.value" [limit]="12000" /> }
+          <app-character-counter [value]="form.controls.longDescription.value" [limit]="12000" />
         </div>
       </div>
-      @if (!metadata.isGlobal() && !globalDraft.staffingEditionId()) {
-        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
-          <div class="flex-row-start-center gap-md w-100">
-            <p-toggleswitch inputId="event-core-is-active" formControlName="isActive" />
-            <label for="event-core-is-active">{{ i18n.coreStatuses().active }}</label>
-          </div>
-          <div class="flex-row-start-center gap-md w-100">
-            <p-toggleswitch inputId="event-core-has-public-page" formControlName="hasPublicPage" />
-            <label for="event-core-has-public-page">{{ i18n.fields().hasPublicPage }}</label>
-          </div>
-        </div>
-      }
     </section>
     <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: 'core' }" />
   </form>
@@ -269,9 +251,5 @@
     }
     <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-trail"
       [label]="i18n.commonActions().refresh" [disabled]="metadata.locked() || metadata.blocked() || cover.locked()" (onClick)="refreshMetadata(target)" />
-    @if (!metadata.isGlobal() && !globalDraft.staffingEditionId()) {
-      <p-button type="button" severity="warn" size="small" [outlined]="true" icon="pi pi-interdiction"
-        [label]="i18n.commonActions().cancel" [disabled]="metadata.locked()" (onClick)="goBack()" />
-    }
   </div>
 </ng-template>

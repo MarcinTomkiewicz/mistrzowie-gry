@@ -37,8 +37,6 @@ export class EventGlobalDraftController {
   readonly selectedEdition = signal<IAdminEventDetail | null>(null);
   readonly isReadingEdition = signal(false);
   readonly editionReadError = signal<unknown | null>(null);
-  readonly staffingEditionId = signal<string | null>(null);
-  readonly isUnreleasedStaffing = signal(false);
   readonly cityForm = new FormGroup(createEventGlobalCityControls());
   readonly cityEditing = signal(false);
   readonly cityBusy = signal(false);
@@ -66,8 +64,6 @@ export class EventGlobalDraftController {
     this.calendar.set(null);
     this.policy.set(null);
     this.mainEdition.set(null);
-    this.staffingEditionId.set(null);
-    this.isUnreleasedStaffing.set(false);
     this.isChecking.set(false);
     this.cityBusy.set(false);
     this.resetCity();
@@ -85,8 +81,6 @@ export class EventGlobalDraftController {
     return defer(() => {
       if (this.selectionCoreId !== coreId) {
         this.resetEditionSelection();
-        this.staffingEditionId.set(null);
-        this.isUnreleasedStaffing.set(false);
       }
       this.selectionCoreId = coreId;
       this.mainEdition.set(null);
@@ -94,8 +88,6 @@ export class EventGlobalDraftController {
         if (core === null) {
           if (this.cityCommand?.coreId === coreId) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
           this.resetEditionSelection();
-          this.staffingEditionId.set(null);
-          this.isUnreleasedStaffing.set(false);
           this.calendar.set(null);
           this.policy.set(null);
           return of(null);
@@ -103,37 +95,22 @@ export class EventGlobalDraftController {
         if (core.id !== coreId) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Core readback.');
         }
-        if (this.cityCommand?.coreId === core.id) return this.readGlobalCalendar(core);
-        return this.readStaffingEditionId(core).pipe(switchMap((editionId) => {
-          this.staffingEditionId.set(editionId);
-          if (!editionId) return this.readGlobalCalendar(core);
+        // The old conversion flag marks preserved history, never a new Global import.
+        if (core.editions.length !== 1) return this.readGlobalCalendar(core);
+        return this.eventAdmin.getEditionDetail(core.editions[0].id).pipe(switchMap(edition => {
+          assertEdgeContract(edition !== null && edition.id === core.editions[0].id && edition.eventCoreId === core.id,
+            'eventEdition', 'the saved Edition belonging to this Core');
+          if (!edition.isStaffingConverted) {
+            this.mainEdition.set(edition);
+            return this.readGlobalCalendar(core);
+          }
           this.resetEditionSelection();
           this.calendar.set(null);
           this.policy.set(null);
-          this.selectedEditionId.set(editionId);
-          this.selectedEdition.set(this.mainEdition());
           return of(core);
         }));
       }));
     });
-  }
-
-  private readStaffingEditionId(core: IEventCoreDetail): Observable<string | null> {
-    if (core.editions.length !== 1) return of(null);
-    const { id } = core.editions[0];
-    return this.eventAdmin.getEditionDetail(id).pipe(
-      map((edition) => {
-        if (!edition || edition.id !== id || edition.eventCoreId !== core.id) {
-          throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Edition readback.');
-        }
-        const isStaffingConverted = edition.isStaffingConverted === true;
-        assertEdgeContract(!isStaffingConverted || edition.schedule?.kind === 'exact_dates',
-          'staffingEdition', 'the converted Edition with its exact-date schedule');
-        this.mainEdition.set(edition);
-        this.isUnreleasedStaffing.set(isStaffingConverted && !edition.isStaffingReleased);
-        return isStaffingConverted ? edition.id : null;
-      }),
-    );
   }
 
   private readGlobalCalendar(core: IEventCoreDetail): Observable<IEventCoreDetail> {

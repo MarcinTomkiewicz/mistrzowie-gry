@@ -59,10 +59,6 @@ const loaders = {
     ),
   eventCoreEditorShell: () =>
     import('../components/admin-events/core-editor/event-core-editor-shell').then((m) => m.EventCoreEditorShell),
-  eventEditionEditor: () =>
-    import('../components/admin-events/edition-editor/event-edition-editor').then(
-      (m) => m.EventEditionEditor,
-    ),
   staffingRealizationCoreEditor: () =>
     import(
       '../components/admin-staffing/staffing-realization-core-editor/staffing-realization-core-editor'
@@ -125,14 +121,6 @@ const adminChildren: Routes = [
         canDeactivate: [(editor: EventCoreEditor, _route, _state, nextState) => editor.canDeactivate(nextState)],
       },
     ],
-  },
-  {
-    path: 'content/events/:coreId/editions/new',
-    loadComponent: loaders.eventEditionEditor,
-  },
-  {
-    path: 'content/events/:coreId/editions/:eventId/edit',
-    loadComponent: loaders.eventEditionEditor,
   },
   {
     path: 'content/:id/edit',

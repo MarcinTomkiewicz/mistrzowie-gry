@@ -43,13 +43,5 @@ export const EVENT_RPC = {
   getProgramParticipants: 'list_admin_event_program_participants',
   getProgramOfflineSeats: 'get_admin_event_program_offline_seats',
   adjustProgramOfflineSeats: 'adjust_admin_event_program_offline_seats',
-  publishStaffingEvent: 'publish_admin_staffing_event',
-  reconcileStaffingEventProgram: 'reconcile_admin_staffing_event_program',
-  syncStaffingPrivateEvent: 'sync_admin_staffing_private_event',
-  saveEdition: 'save_admin_event',
   saveGlobalEditionMetadata: 'save_admin_global_event_edition_metadata',
-  setEditionActive: 'set_admin_event_active',
-
-  saveOccurrence: 'save_admin_event_occurrence',
-  setParticipantSignupState: 'set_admin_event_participant_signup_state',
 } as const;

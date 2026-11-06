@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { STAFFING_REALIZATION_RPC } from '../../configs/staffing-realization-rpc.config';
 import {
@@ -23,6 +23,7 @@ import { OpenAdminStaffingRealizationResult } from '../../interfaces/staffing-re
 import type { StaffingCandidate } from '../../interfaces/staffing-candidate';
 import type { StaffingCandidateThread } from '../../interfaces/staffing-candidate-thread';
 import type { StaffingFinalPlanSaveItem, StaffingFinalPlanSaveResult } from '../../interfaces/admin-staffing-final-plan';
+import { assertStaffingEventConversion } from '../../reads/staffing/staffing-event-conversion.contract';
 
 @Injectable({ providedIn: 'root' })
 export class AdminStaffingRealization {
@@ -107,7 +108,7 @@ export class AdminStaffingRealization {
     return this.backend.rpc<ConvertAdminStaffingRealizationToEventResult>(
       STAFFING_REALIZATION_RPC.convertAdminToEvent,
       { p_realization_id: realizationId },
-    );
+    ).pipe(tap(result => assertStaffingEventConversion(result, realizationId)));
   }
 
   update(
