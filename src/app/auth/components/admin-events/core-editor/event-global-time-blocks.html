@@ -2,15 +2,16 @@
 <div class="flex-col-start-stretch gap-md w-100 min-w-0" data-event-block-editor>
     @for (block of blocks().controls; track block; let index = $index) {
       <div class="flex-col-start-stretch gap-sm border radius-sm p-md w-100 min-w-0" [formGroup]="block" [attr.data-event-block]="index">
-        <div class="flex-row-start-center flex-wrap gap-sm w-100 min-w-0">
-          <p-floatlabel variant="on" class="flex-1 min-w-200 min-w-0-sm w-100-sm">
+        <div class="flex-row-start-end flex-wrap gap-sm w-100 min-w-0">
+          <div class="flex-col-start-stretch gap-xs flex-none w-px-200 w-100-sm max-w-full min-w-0">
+            <label class="text-sm" [for]="idPrefix() + '-label-' + index">{{ copy.blockLabel }}</label>
             <input pInputText pSize="small" [id]="idPrefix() + '-label-' + index" formControlName="label" class="w-100" maxlength="140" />
-            <label [for]="idPrefix() + '-label-' + index">{{ copy.blockLabel }}</label>
-          </p-floatlabel>
-          <p-floatlabel variant="on" class="flex-none w-px-150 w-100-xs max-w-full min-w-0">
+          </div>
+          <div class="flex-col-start-stretch gap-xs flex-none w-px-150 w-100-xs max-w-full min-w-0">
+            <label class="text-sm" [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
             <p-datepicker #startPicker ngSkipHydration [inputId]="idPrefix() + '-start-' + index" formControlName="startTime" size="small"
               dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-              iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
+              iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
               [invalid]="canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid"
               (onBlur)="normalizeTime(index, 'startTime', $event)" (onClose)="block.controls.startTime.markAsTouched()">
               <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
@@ -25,12 +26,12 @@
                   [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(startPicker)" />
               </ng-template>
             </p-datepicker>
-            <label [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
-          </p-floatlabel>
-          <p-floatlabel variant="on" class="flex-none w-px-150 w-100-xs max-w-full min-w-0">
+          </div>
+          <div class="flex-col-start-stretch gap-xs flex-none w-px-150 w-100-xs max-w-full min-w-0">
+            <label class="text-sm" [for]="idPrefix() + '-end-' + index">{{ i18n.commonLabels().end }}</label>
             <p-datepicker #endPicker ngSkipHydration [inputId]="idPrefix() + '-end-' + index" formControlName="endTime" size="small"
               dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-              iconDisplay="input" appendTo="body" class="w-100" inputStyleClass="w-100"
+              iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
               [invalid]="(canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) || showTimeRangeError(block, startPicker, endPicker)"
               (onBlur)="normalizeTime(index, 'endTime', $event)" (onClose)="block.controls.endTime.markAsTouched()">
               <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
@@ -45,19 +46,18 @@
                   [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(endPicker)" />
               </ng-template>
             </p-datepicker>
-            <label [for]="idPrefix() + '-end-' + index">{{ i18n.commonLabels().end }}</label>
-          </p-floatlabel>
-          <div class="flex-row-start-center gap-xs flex-none w-px-200 w-100-xs max-w-full min-w-0">
-            <p-floatlabel variant="on" class="flex-1 min-w-0">
+          </div>
+          <div class="flex-col-start-stretch gap-xs flex-none w-px-200 w-100-xs max-w-full min-w-0">
+            <label class="text-sm" [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
+            <div class="flex-row-start-center gap-xs min-w-0">
               <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="savedBase() ? 0 : 1"
                 [max]="savedBase() ? 32767 : undefined"
-                [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
-              <label [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
-            </p-floatlabel>
-            <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
+                [useGrouping]="false" size="small" class="flex-1 min-w-0" inputStyleClass="w-100 min-w-0" />
+              <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
+            </div>
           </div>
           @if (!savedBase()) {
-            <div class="flex-row-end-center flex-none">
+            <div class="flex-row-end-center flex-none w-100-xs max-w-full">
               <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
                 [label]="i18n.commonActions().removeItem" [disabled]="blocks().disabled || blocks().length === 1" (onClick)="removeBlock(index)" />
             </div>
