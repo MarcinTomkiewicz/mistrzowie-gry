@@ -252,9 +252,6 @@ export type ScheduleValidationCopy = {
 };
 
 export type ScheduleInfoCopy = {
-  scheduleChange: string;
-  protectedOccurrences: string;
-  conflict: string;
   globalDates: string;
   exclusionRules: string;
 };

@@ -1,13 +1,12 @@
 @let copy = i18n.creation();
 @let controls = fields();
-<div class="mg-grid-2 gap-md w-100">
-  <div class="flex-col-start-stretch gap-xs min-w-0">
-    <p-floatlabel variant="on" class="w-100">
-      <input pInputText pSize="small" [id]="idPrefix() + '-city'" name="city" [formControl]="controls.city" class="w-100" maxlength="120"
-        [attr.aria-invalid]="controls.city.touched && controls.city.invalid"
-        [attr.aria-describedby]="controls.city.touched && controls.city.invalid ? idPrefix() + '-city-error' : null" />
-      <label [for]="idPrefix() + '-city'">{{ i18n.commonLabels().city }}</label>
-    </p-floatlabel>
+<div class="flex-row-start-start flex-wrap gap-sm w-100 min-w-0">
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-250 max-w-full min-w-0">
+    <label class="text-sm" [for]="idPrefix() + '-city'">{{ i18n.commonLabels().city }}</label>
+    <input pInputText pSize="small" [id]="idPrefix() + '-city'" name="city" [formControl]="controls.city" class="w-100 min-w-0"
+      maxlength="120"
+      [attr.aria-invalid]="controls.city.touched && controls.city.invalid"
+      [attr.aria-describedby]="controls.city.touched && controls.city.invalid ? idPrefix() + '-city-error' : null" />
     @if (controls.city.touched && controls.city.invalid) {
       <small [id]="idPrefix() + '-city-error'" class="mg-contact-error">
         @if (controls.city.hasError('required') || controls.city.hasError('requiredTrimmed')) { {{ i18n.commonForm().required }} }
@@ -15,40 +14,41 @@
         @else { {{ i18n.commonForm().maxLength.replace('{{max}}', '120') }} }
       </small>
     }
+    <app-character-counter [value]="controls.city.value" [limit]="120" />
   </div>
-  <div class="flex-col-start-stretch gap-xs min-w-0">
-    <div class="flex-row-start-center gap-xs">
-      <p-floatlabel variant="on" class="flex-1 min-w-0">
-        <p-select [inputId]="idPrefix() + '-timezone'" name="timezone" [formControl]="controls.timezone" [options]="timezones()" [filter]="true"
-          optionLabel="label" optionValue="value" filterBy="label,value"
-          size="small" appendTo="body" class="w-100">
-          <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
-          <ng-template #filtericon><span class="pi pi-spy" aria-hidden="true"></span></ng-template>
-        </p-select>
-        <label [for]="idPrefix() + '-timezone'">{{ i18n.commonLabels().timezone }}</label>
-      </p-floatlabel>
-      <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().timezone + ': ' + copy.help" [text]="copy.timezoneHint" />
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-350 max-w-full min-w-0">
+    <label class="text-sm" [for]="idPrefix() + '-timezone'">{{ i18n.commonLabels().timezone }}</label>
+    <div class="flex-row-start-center gap-xs min-w-0">
+      <p-select [inputId]="idPrefix() + '-timezone'" name="timezone" [formControl]="controls.timezone" [options]="timezoneOptions()" [filter]="true"
+        optionLabel="label" optionValue="value" filterBy="label,value" size="small" appendTo="body" class="flex-1 min-w-0">
+        <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+        <ng-template #filtericon><span class="pi pi-spy" aria-hidden="true"></span></ng-template>
+      </p-select>
+      <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().timezone + ': ' + copy.help" [text]="copy.timezoneHint" />
     </div>
     @if (controls.timezone.touched && controls.timezone.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
   </div>
-  <p-floatlabel variant="on" class="min-w-0 w-100">
-    <input pInputText pSize="small" [id]="idPrefix() + '-venue'" name="venueName" [formControl]="controls.venueName" class="w-100" maxlength="140" />
-    <label [for]="idPrefix() + '-venue'">{{ copy.venueName }}</label>
-  </p-floatlabel>
-  <p-floatlabel variant="on" class="min-w-0 w-100">
-    <input pInputText pSize="small" [id]="idPrefix() + '-address'" name="venueAddress" [formControl]="controls.venueAddress" class="w-100" maxlength="240" />
-    <label [for]="idPrefix() + '-address'">{{ i18n.commonLabels().venueAddress }}</label>
-  </p-floatlabel>
-  <div class="flex-col-start-stretch gap-xs min-w-0">
-    <p-floatlabel variant="on" class="w-100">
-      <input pInputText pSize="small" [id]="idPrefix() + '-facebook'" name="facebookLink" [formControl]="controls.facebookLink" class="w-100" maxlength="500"
-        [attr.aria-invalid]="controls.facebookLink.touched && controls.facebookLink.invalid"
-        [attr.aria-describedby]="controls.facebookLink.touched && controls.facebookLink.invalid ? idPrefix() + '-facebook-error' : null" />
-      <label [for]="idPrefix() + '-facebook'">{{ copy.facebookLink }}</label>
-    </p-floatlabel>
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-350 max-w-full min-w-0">
+    <label class="text-sm" [for]="idPrefix() + '-venue'">{{ copy.venueName }}</label>
+    <input pInputText pSize="small" [id]="idPrefix() + '-venue'" name="venueName" [formControl]="controls.venueName" class="w-100 min-w-0"
+      maxlength="140" />
+    <app-character-counter [value]="controls.venueName.value" [limit]="140" />
+  </div>
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-350 max-w-full min-w-0">
+    <label class="text-sm" [for]="idPrefix() + '-address'">{{ i18n.commonLabels().venueAddress }}</label>
+    <input pInputText pSize="small" [id]="idPrefix() + '-address'" name="venueAddress" [formControl]="controls.venueAddress" class="w-100 min-w-0"
+      maxlength="240" />
+    <app-character-counter [value]="controls.venueAddress.value" [limit]="240" />
+  </div>
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-500 max-w-full min-w-0">
+    <label class="text-sm" [for]="idPrefix() + '-facebook'">{{ copy.facebookLink }}</label>
+    <input pInputText pSize="small" [id]="idPrefix() + '-facebook'" name="facebookLink" [formControl]="controls.facebookLink" class="w-100 min-w-0"
+      maxlength="500" [attr.aria-invalid]="controls.facebookLink.touched && controls.facebookLink.invalid"
+      [attr.aria-describedby]="controls.facebookLink.touched && controls.facebookLink.invalid ? idPrefix() + '-facebook-error' : null" />
     @if (controls.facebookLink.touched && controls.facebookLink.invalid) {
       <small [id]="idPrefix() + '-facebook-error'" class="mg-contact-error">{{ copy.facebookInvalid }}</small>
     }
+    <app-character-counter [value]="controls.facebookLink.value" [limit]="500" />
   </div>
 </div>
 

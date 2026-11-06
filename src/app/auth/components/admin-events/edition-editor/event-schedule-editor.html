@@ -1,18 +1,10 @@
 @let schedule = form();
 @let controls = schedule.controls;
 @let kind = controls.kind.value;
-<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [formGroup]="schedule" data-event-schedule>
+<section class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0" [formGroup]="schedule" data-event-schedule>
   <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().schedule }}</h2>
   @if (globalCalendar()) {
     <p class="m-0 muted-text">{{ i18n.info().globalDates }}</p>
-  } @else {
-    <div class="flex-col-start-stretch gap-xs">
-      <p class="m-0">{{ i18n.info().scheduleChange }}</p>
-      <p class="m-0">{{ i18n.info().protectedOccurrences }}</p>
-      <p class="m-0">{{ i18n.info().conflict }}</p>
-    </div>
-  }
-  @if (globalCalendar()) {
     <div class="mg-grid grid-3-cols grid-1-cols-sm gap-sm w-100" role="radiogroup" [attr.aria-label]="i18n.commonLabels().scheduleKind">
       @for (option of globalKindOptions(); track option.value) {
         @let selected = (kind === 'range' ? 'exact_dates' : kind) === option.value;
@@ -31,7 +23,7 @@
       }
     </div>
     @if (kind === 'range' || kind === 'exact_dates') {
-      <div class="flex-row-start-center flex-wrap gap-md" role="radiogroup" [attr.aria-label]="i18n.fields().dateSelection">
+      <div class="flex-row-start-center flex-wrap gap-sm" role="radiogroup" [attr.aria-label]="i18n.fields().dateSelection">
         <div class="flex-row-start-center gap-xs">
           <p-radiobutton inputId="event-global-date-range" name="event-global-dates-mode" formControlName="kind" value="range" />
           <label for="event-global-date-range">{{ i18n.options().range }}</label>
@@ -43,34 +35,35 @@
       </div>
     }
   }
-  <div class="flex-row-start-center flex-wrap gap-md w-100">
+  <div class="flex-row-start-center flex-wrap gap-sm w-100">
     @if (!globalCalendar()) {
-      <p-floatlabel variant="on" class="w-px-250 max-w-full">
+      <div class="flex-col-start-stretch gap-xs w-px-250 max-w-full">
+        <label for="event-schedule-kind">{{ i18n.commonLabels().scheduleKind }}</label>
         <p-select inputId="event-schedule-kind" formControlName="kind" [options]="scheduleKindOptions()"
           optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
           <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
         </p-select>
-        <label for="event-schedule-kind">{{ i18n.commonLabels().scheduleKind }}</label>
-      </p-floatlabel>
+      </div>
     }
     @if (kind === 'recurring') {
-      <p-floatlabel variant="on" class="w-px-300 max-w-full">
+      <div class="flex-col-start-stretch gap-xs w-px-300 max-w-full">
+        <label for="event-recurrence-kind">{{ i18n.commonLabels().recurrenceKind }}</label>
         <p-select inputId="event-recurrence-kind" formControlName="recurrenceKind" [options]="recurrenceKindOptions()"
           optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
           <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
         </p-select>
-        <label for="event-recurrence-kind">{{ i18n.commonLabels().recurrenceKind }}</label>
-      </p-floatlabel>
-      <p-floatlabel variant="on" class="w-px-150 max-w-full">
+      </div>
+      <div class="flex-col-start-stretch gap-xs w-px-150 max-w-full">
+        <label for="event-recurrence-interval">{{ i18n.commonLabels().interval }}</label>
         <p-inputnumber inputId="event-recurrence-interval" formControlName="interval" size="small" [min]="1"
           [maxFractionDigits]="0" [useGrouping]="false" class="w-100" inputStyleClass="w-100" />
-        <label for="event-recurrence-interval">{{ i18n.commonLabels().interval }}</label>
-      </p-floatlabel>
+      </div>
     }
   </div>
-  <div class="flex-row-start-center flex-wrap gap-md w-100">
+  <div class="flex-row-start-center flex-wrap gap-sm w-100">
     @for (field of dateFields(); track field.name) {
-      <p-floatlabel variant="on" class="w-px-200 max-w-full">
+      <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full">
+        <label [for]="'event-schedule-' + field.name">{{ field.label }}</label>
         <p-datepicker ngSkipHydration [inputId]="'event-schedule-' + field.name" [attr.data-schedule-field]="field.name"
           [ngModel]="controls[field.name].value | isoDateValue" [ngModelOptions]="standaloneModel" (ngModelChange)="setDate(field.name, $event)"
           [disabled]="schedule.disabled" dateFormat="dd.mm.yy" size="small" [readonlyInput]="true" [showIcon]="true"
@@ -84,8 +77,7 @@
             </span>
           </ng-template>
         </p-datepicker>
-        <label [for]="'event-schedule-' + field.name">{{ field.label }}</label>
-      </p-floatlabel>
+      </div>
     }
   </div>
   @if (kind === 'recurring') {
@@ -94,7 +86,7 @@
         <div class="flex-col-start-stretch gap-sm w-100" role="group" [attr.aria-label]="i18n.commonLabels().weekdays"
           [attr.aria-invalid]="canShowError('weeklyDays') && schedule.hasError('weeklyDays')">
           <strong>{{ i18n.commonLabels().weekdays }}</strong>
-          <div class="flex-row-start-center flex-wrap gap-md">
+          <div class="flex-row-start-center flex-wrap gap-sm">
             @for (weekday of weekdayOptions; track weekday.value) {
               <div class="flex-row-start-center gap-xs">
                 <p-checkbox [inputId]="'event-weekday-' + weekday.value" [formControl]="controls.byweekday" [value]="weekday.value" />
@@ -105,32 +97,32 @@
         </div>
       }
       @case ('MONTHLY_NTH_WEEKDAY') {
-        <div class="flex-row-start-center flex-wrap gap-md">
-          <p-floatlabel variant="on" class="w-px-200 max-w-full">
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full">
+            <label for="event-monthly-nth">{{ globalCalendar() ? i18n.fields().monthlyPosition : i18n.commonLabels().dayOfMonth }}</label>
             <p-select inputId="event-monthly-nth" formControlName="monthlyNth" [options]="monthlyNthOptions()"
               optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body"
               [invalid]="canShowError('monthlyNth') && schedule.hasError('monthlyNth')">
               <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
             </p-select>
-            <label for="event-monthly-nth">{{ globalCalendar() ? i18n.fields().monthlyPosition : i18n.commonLabels().dayOfMonth }}</label>
-          </p-floatlabel>
-          <p-floatlabel variant="on" class="w-px-200 max-w-full">
+          </div>
+          <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full">
+            <label for="event-monthly-weekday">{{ i18n.commonLabels().weekday }}</label>
             <p-select inputId="event-monthly-weekday" formControlName="monthlyWeekday" [options]="weekdayOptions"
               optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body"
               [invalid]="canShowError('monthlyWeekday') && schedule.hasError('monthlyWeekday')">
               <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
             </p-select>
-            <label for="event-monthly-weekday">{{ i18n.commonLabels().weekday }}</label>
-          </p-floatlabel>
+          </div>
         </div>
       }
       @case ('MONTHLY_DAY_OF_MONTH') {
-        <p-floatlabel variant="on" class="w-px-200 max-w-full">
+        <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full">
+          <label for="event-day-of-month">{{ i18n.commonLabels().dayOfMonth }}</label>
           <p-inputnumber inputId="event-day-of-month" formControlName="dayOfMonth" [min]="1" [max]="31"
             size="small" [maxFractionDigits]="0" [useGrouping]="false" class="w-100" inputStyleClass="w-100"
             [invalid]="canShowError('dayOfMonth') && schedule.hasError('dayOfMonth')" />
-          <label for="event-day-of-month">{{ i18n.commonLabels().dayOfMonth }}</label>
-        </p-floatlabel>
+        </div>
       }
     }
   }
@@ -140,7 +132,8 @@
     }
     @let field = kind === 'exact_dates' ? 'dates' : 'exdates';
     @let label = kind === 'exact_dates' ? i18n.fields().dates : i18n.commonLabels().excludedDates;
-    <p-floatlabel variant="on" class="w-px-250 max-w-full">
+    <div class="flex-col-start-stretch gap-xs w-px-250 max-w-full">
+      <label [for]="'event-schedule-' + field">{{ label }}</label>
       <p-datepicker ngSkipHydration [inputId]="'event-schedule-' + field" [attr.data-schedule-field]="field"
         [ngModel]="controls[field].value | isoDateValue" [ngModelOptions]="standaloneModel" (ngModelChange)="setDates(field, $event)"
         [disabled]="schedule.disabled" selectionMode="multiple" dateFormat="dd.mm.yy" size="small"
@@ -155,8 +148,7 @@
           </span>
         </ng-template>
       </p-datepicker>
-      <label [for]="'event-schedule-' + field">{{ label }}</label>
-    </p-floatlabel>
+    </div>
     <div class="flex-row-start-center flex-wrap gap-xs" role="list" [attr.aria-label]="label">
       @for (date of selectedDates(field); track date) {
         <span class="tag-badge tag-badge--muted flex-row-start-center gap-xs" role="listitem">
@@ -175,20 +167,20 @@
       @for (rule of controls.exclusionRules.controls; track rule; let index = $index) {
         <div class="flex-col-start-stretch gap-xs" [formGroup]="rule">
           <div class="flex-row-start-center flex-wrap gap-sm">
-            <p-floatlabel variant="on" class="w-px-250 max-w-full">
+            <div class="flex-col-start-stretch gap-xs w-px-250 max-w-full">
+              <label [for]="'event-exclusion-nth-' + index">{{ i18n.fields().monthlyPosition }}</label>
               <p-select [inputId]="'event-exclusion-nth-' + index" formControlName="monthlyNth" [options]="monthlyNthOptions()"
                 optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
                 <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
               </p-select>
-              <label [for]="'event-exclusion-nth-' + index">{{ i18n.fields().monthlyPosition }}</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on" class="w-px-200 max-w-full">
+            </div>
+            <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full">
+              <label [for]="'event-exclusion-weekday-' + index">{{ i18n.commonLabels().weekday }}</label>
               <p-select [inputId]="'event-exclusion-weekday-' + index" formControlName="monthlyWeekday" [options]="weekdayOptions"
                 optionLabel="label" optionValue="value" size="small" class="w-100" appendTo="body">
                 <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
               </p-select>
-              <label [for]="'event-exclusion-weekday-' + index">{{ i18n.commonLabels().weekday }}</label>
-            </p-floatlabel>
+            </div>
             <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-vacuum-cleaner"
               [label]="i18n.commonActions().removeItem" [disabled]="schedule.disabled" (onClick)="removeExclusionRule(index)" />
           </div>

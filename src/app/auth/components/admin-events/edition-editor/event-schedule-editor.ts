@@ -4,7 +4,6 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePicker, DatePickerModule } from 'primeng/datepicker';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectModule } from 'primeng/select';
@@ -30,7 +29,7 @@ const ERROR_FIELDS: Record<string, readonly (keyof EventScheduleFormGroup['contr
 @Component({
   selector: 'app-event-schedule-editor',
   imports: [FormsModule, ReactiveFormsModule, ButtonModule, CheckboxModule, DatePickerModule,
-    FloatLabelModule, InputNumberModule, RadioButtonModule, SelectModule, IsoDateValue],
+    InputNumberModule, RadioButtonModule, SelectModule, IsoDateValue],
   templateUrl: './event-schedule-editor.html',
   host: { class: 'd-block w-100 min-w-0' },
 })

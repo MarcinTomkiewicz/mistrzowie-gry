@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, type RouterStateSnapshot } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
@@ -13,6 +12,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { distinctUntilChanged, EMPTY, filter, finalize, map, Observable, of, Subscription, switchMap } from 'rxjs';
 
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
+import { CharacterCounter } from '../../../../common/character-counter/character-counter';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { IAdminEventDetail, IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
@@ -53,7 +53,7 @@ import { EventEditionEditor } from '../edition-editor/event-edition-editor';
 
 @Component({
   selector: 'app-event-core-editor',
-  imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, IftaLabelModule, InputTextModule, TextareaModule, MessageModule,
+  imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule, CharacterCounter,
     ToggleSwitchModule, EventEditionEditor, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalCityFields, EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',

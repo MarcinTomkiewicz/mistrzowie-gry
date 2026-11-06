@@ -170,51 +170,48 @@
 
 <ng-template #coreForm>
   <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="saveMetadata('core')" novalidate>
-    <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100">
+    <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
       <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
-      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
         <div class="flex-col-start-stretch gap-xs w-100">
-          <p-iftalabel class="w-100">
-            <input class="w-100" pInputText id="event-core-name" formControlName="name" autocomplete="off" [maxlength]="metadata.isGlobal() ? 140 : null"
-              [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
-              [attr.aria-describedby]="form.controls.name.touched && form.controls.name.invalid ? 'event-core-name-error' : null" />
-            <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
-          </p-iftalabel>
+          <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
+          <input class="w-100" pInputText pSize="small" id="event-core-name" formControlName="name" autocomplete="off" [maxlength]="metadata.isGlobal() ? 140 : null"
+            [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
+            [attr.aria-describedby]="form.controls.name.touched && form.controls.name.invalid ? 'event-core-name-error' : null" />
           @if (form.controls.name.touched && form.controls.name.invalid) {
             <small id="event-core-name-error" class="mg-contact-error">
               {{ form.controls.name.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}
             </small>
           }
+          @if (metadata.isGlobal()) { <app-character-counter [value]="form.controls.name.value" [limit]="140" /> }
         </div>
         <div class="flex-col-start-stretch gap-xs w-100">
           <span class="small-caps">{{ i18n.commonLabels().key }}</span>
           <strong class="text-wrap-anywhere">{{ form.controls.key.value }}</strong>
         </div>
       </div>
-      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+      <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
         <div class="flex-col-start-stretch gap-xs w-100">
-          <p-iftalabel class="w-100">
-            <textarea class="w-100" pTextarea id="event-core-short-description" formControlName="shortDescription" rows="4" [maxlength]="metadata.isGlobal() ? 500 : null"
-              [attr.aria-invalid]="form.controls.shortDescription.touched && form.controls.shortDescription.invalid"></textarea>
-            <label for="event-core-short-description">{{ i18n.commonLabels().shortDescription }}</label>
-          </p-iftalabel>
+          <label for="event-core-short-description">{{ i18n.commonLabels().shortDescription }}</label>
+          <textarea class="w-100" pTextarea pSize="small" id="event-core-short-description" formControlName="shortDescription" rows="3" [maxlength]="metadata.isGlobal() ? 500 : null"
+            [attr.aria-invalid]="form.controls.shortDescription.touched && form.controls.shortDescription.invalid"></textarea>
           @if (form.controls.shortDescription.touched && form.controls.shortDescription.invalid) {
             <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '500') }}</small>
           }
+          @if (metadata.isGlobal()) { <app-character-counter [value]="form.controls.shortDescription.value" [limit]="500" /> }
         </div>
         <div class="flex-col-start-stretch gap-xs w-100">
-          <p-iftalabel class="w-100">
-            <textarea class="w-100" pTextarea id="event-core-long-description" formControlName="longDescription" rows="7" [maxlength]="metadata.isGlobal() ? 12000 : null"
-              [attr.aria-invalid]="form.controls.longDescription.touched && form.controls.longDescription.invalid"></textarea>
-            <label for="event-core-long-description">{{ i18n.commonLabels().longDescription }}</label>
-          </p-iftalabel>
+          <label for="event-core-long-description">{{ i18n.commonLabels().longDescription }}</label>
+          <textarea class="w-100" pTextarea pSize="small" id="event-core-long-description" formControlName="longDescription" rows="6" [maxlength]="metadata.isGlobal() ? 12000 : null"
+            [attr.aria-invalid]="form.controls.longDescription.touched && form.controls.longDescription.invalid"></textarea>
           @if (form.controls.longDescription.touched && form.controls.longDescription.invalid) {
             <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '12000') }}</small>
           }
+          @if (metadata.isGlobal()) { <app-character-counter [value]="form.controls.longDescription.value" [limit]="12000" /> }
         </div>
       </div>
       @if (!metadata.isGlobal() && !globalDraft.staffingEditionId()) {
-        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md">
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
           <div class="flex-row-start-center gap-md w-100">
             <p-toggleswitch inputId="event-core-is-active" formControlName="isActive" />
             <label for="event-core-is-active">{{ i18n.coreStatuses().active }}</label>

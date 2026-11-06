@@ -1,0 +1,19 @@
+@let copy = i18n.creation();
+<div class="flex-row-start-end flex-wrap gap-sm w-100 min-w-0">
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-350 max-w-full min-w-0">
+    <label class="text-sm" [for]="idPrefix() + '-kind'">{{ i18n.commonLabels().participantSignupKind }}</label>
+    <div class="flex-row-start-center gap-xs min-w-0">
+      <p-select [inputId]="idPrefix() + '-kind'" [formControl]="kindControl()" [options]="kinds()" optionValue="value" optionLabel="label"
+        size="small" appendTo="body" class="flex-1 min-w-0" [invalid]="kindControl().touched && kindControl().invalid">
+        <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
+      </p-select>
+      <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().participantSignupKind + ': ' + copy.help" [text]="copy.signupKindHint" />
+    </div>
+    @if (kindControl().touched && kindControl().invalid) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().required }}</small> }
+  </div>
+  <div class="flex-row-start-center gap-xs flex-none max-w-full min-w-0">
+    <p-toggleswitch class="flex-none" [inputId]="idPrefix() + '-required'" [formControl]="requiredControl()" />
+    <label class="text-sm" [for]="idPrefix() + '-required'">{{ i18n.commonLabels().signupRequired }}</label>
+    <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().signupRequired + ': ' + copy.help" [text]="copy.signupRequiredHint" />
+  </div>
+</div>

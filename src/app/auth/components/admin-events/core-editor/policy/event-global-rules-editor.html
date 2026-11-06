@@ -1,14 +1,10 @@
 @let global = form.controls.global.controls;
-<section id="global-event-rules-editor" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+<section id="global-event-rules-editor" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
   <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().rulesTitle }}</h2>
   <p class="m-0 muted-text">{{ copy().hint }}</p>
   @if (editor.activeEditor() === 'price') { <p class="m-0 muted-text" role="status">{{ copy().oneSection }}</p> }
-  <ng-container [ngTemplateOutlet]="signupFields" [ngTemplateOutletContext]="{
-    kind: global.participantSignupKind, required: global.signupRequired, id: 'policy-global'
-  }" />
-  <p class="m-0 muted-text">{{ i18n.creation().signupKindHint }}</p>
-  <p class="m-0 muted-text">{{ i18n.creation().signupRequiredHint }}</p>
-  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+  <app-event-signup-fields [kindControl]="global.participantSignupKind" [requiredControl]="global.signupRequired" idPrefix="policy-global" />
+  <div class="flex-row-start-start flex-wrap gap-sm w-100 min-w-0">
     <ng-container [ngTemplateOutlet]="capacityField" [ngTemplateOutletContext]="{
       control: global.sessionCapacityCeiling, id: 'policy-global-session', label: i18n.creation().sessionCapacityCeiling
     }" />
@@ -34,9 +30,8 @@
         <label [for]="id + '-signup-override'">{{ copy().signupOverride }}</label>
       </div>
       @if (controls.signup.controls.enabled.value) {
-        <ng-container [ngTemplateOutlet]="signupFields" [ngTemplateOutletContext]="{
-          kind: controls.signup.controls.value.controls.kind, required: controls.signup.controls.value.controls.required, id: id
-        }" />
+        <app-event-signup-fields [kindControl]="controls.signup.controls.value.controls.kind"
+          [requiredControl]="controls.signup.controls.value.controls.required" [idPrefix]="id" />
       } @else {
         <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
           <ng-container [ngTemplateOutlet]="inheritedValue" [ngTemplateOutletContext]="{
@@ -90,31 +85,12 @@
   </dl>
 </ng-template>
 
-<ng-template #signupFields let-kind="kind" let-required="required" let-id="id">
-  <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
-    <p-floatlabel variant="on" class="w-100 min-w-0">
-      <p-select [inputId]="id + '-kind'" [formControl]="kind" [options]="signupKinds()"
-        optionValue="value" optionLabel="label" size="small" appendTo="body" class="w-100"
-        [invalid]="kind.touched && kind.invalid">
-        <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
-      </p-select>
-      <label [for]="id + '-kind'">{{ i18n.commonLabels().participantSignupKind }}</label>
-    </p-floatlabel>
-    <div class="flex-row-start-center gap-sm">
-      <p-toggleswitch [inputId]="id + '-required'" [formControl]="required" />
-      <label [for]="id + '-required'">{{ i18n.commonLabels().signupRequired }}</label>
-    </div>
-  </div>
-</ng-template>
-
 <ng-template #capacityField let-control="control" let-id="id" let-label="label">
-  <div class="flex-col-start-stretch gap-xs min-w-0 w-100">
-    <p-floatlabel variant="on" class="w-100">
-      <p-inputnumber [inputId]="id" [formControl]="control" [min]="1" [max]="2147483647" [maxFractionDigits]="0"
-        size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="i18n.creation().noAdditionalLimit"
-        class="w-100" [invalid]="control.touched && control.invalid" />
-      <label [for]="id">{{ label }}</label>
-    </p-floatlabel>
+  <div class="flex-col-start-stretch gap-xs flex-none w-px-250 max-w-full min-w-0">
+    <label [for]="id">{{ label }}</label>
+    <p-inputnumber [inputId]="id" [formControl]="control" [min]="1" [max]="2147483647" [maxFractionDigits]="0"
+      size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="i18n.creation().noAdditionalLimit"
+      class="w-100" [invalid]="control.touched && control.invalid" />
     @if (control.touched && control.invalid) { <small class="mg-contact-error" role="alert">{{ copy().capacityInvalid }}</small> }
   </div>
 </ng-template>

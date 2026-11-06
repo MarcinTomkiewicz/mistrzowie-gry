@@ -634,9 +634,6 @@
       "allDatesExcluded": "[PH] Reguły i wybrane daty wykluczają wszystkie terminy cyklu. Zmień wykluczenia lub okres harmonogramu."
     },
     "info": {
-      "scheduleChange": "Zmiana harmonogramu może usunąć przyszłe terminy.",
-      "protectedOccurrences": "Termin zostanie zablokowany.",
-      "conflict": "Konflikt kończy się błędem i harmonogram nie zostanie zapisany.",
       "globalDates": "[PH] Daty i cykl są wspólne dla wszystkich miast.",
       "exclusionRules": "[PH] Reguły dotyczą każdego miesiąca w wybranym okresie. Łączą się z wykluczonymi datami. Po zapisie pozostaje lista konkretnych dat wykluczeń."
     }
