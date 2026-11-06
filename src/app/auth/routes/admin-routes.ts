@@ -1,5 +1,6 @@
 import type { Routes } from '@angular/router';
 import type { EventCoreEditor } from '../components/admin-events/core-editor/event-core-editor';
+import type { EventCoreList } from '../components/admin-events/core-list/event-core-list';
 
 import { authGuard } from '../../core/guards/auth.guard';
 import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
@@ -176,6 +177,7 @@ const adminChildren: Routes = [
         path: 'events',
         pathMatch: 'full',
         loadComponent: loaders.eventList,
+        canDeactivate: [(list: EventCoreList) => list.canDeactivate()],
       },
     ],
   },

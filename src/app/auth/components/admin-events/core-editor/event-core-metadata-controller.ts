@@ -63,7 +63,7 @@ export class EventCoreMetadataController {
     const core = this.core();
     const calendar = this.global.calendar();
     const edition = this.global.mainEdition();
-    return !!core && this.isGlobal() && this.issues().core !== 'protected' &&
+    return !!core && !core.archived && this.isGlobal() && this.issues().core !== 'protected' &&
       (!!calendar && !!edition && !edition.currentlyPublic && calendar.calendarLifecycle === 'global' && calendar.coreId === core.id &&
         calendar.globalDates.every(day => day.cityOccurrences.every(city => !city.protected && !city.publishedAt)));
   });
@@ -71,7 +71,7 @@ export class EventCoreMetadataController {
     const edition = this.global.mainEdition();
     const core = this.core();
     const calendar = this.global.calendar();
-    return !!core && !!edition && !!calendar && calendar.calendarLifecycle === 'global' &&
+    return !!core && !core.archived && !!edition && !!calendar && calendar.calendarLifecycle === 'global' &&
       calendar.coreId === core.id && calendar.mainEditionId === edition.id && edition.eventCoreId === core.id &&
       this.issues().edition !== 'protected' && !edition.isActive &&
       !edition.currentlyPublic && !edition.isStaffingConverted &&
@@ -108,7 +108,7 @@ export class EventCoreMetadataController {
   }
 
   canSave(target: EventMetadataTarget): boolean {
-    return !this.isBusy() && !this.blocked() && this.cover.ready() && (this.pendingTarget() === target || (this.state() === 'idle' &&
+    return this.core()?.archived !== true && !this.isBusy() && !this.blocked() && this.cover.ready() && (this.pendingTarget() === target || (this.state() === 'idle' &&
       !this.issues()[target] && (target === 'core' ? this.canEditCore() : this.canEditEdition())));
   }
 
@@ -201,6 +201,11 @@ export class EventCoreMetadataController {
     const command = this.command;
     return this.global.readCore(coreId).pipe(map(core => {
       assertEdgeContract(core !== null && core.id === coreId, 'eventCoreMetadata', 'an authoritative Core readback');
+      if (core.archived) {
+        this.core.set(core);
+        this.isGlobal.set(false);
+        this.rejectReadback(target, 'protected');
+      }
       if (target === 'edition') {
         const edition = this.global.mainEdition();
         const previous = this.edition();
@@ -227,8 +232,8 @@ export class EventCoreMetadataController {
     }));
   }
 
-  private rejectReadback(target: EventMetadataTarget): never {
-    this.issues.update(issues => ({ ...issues, [target]: 'conflict' }));
+  private rejectReadback(target: EventMetadataTarget, issue: 'conflict' | 'protected' = 'conflict'): never {
+    this.issues.update(issues => ({ ...issues, [target]: issue }));
     this.command = null;
     this.state.set('idle');
     this.pendingTarget.set(null);

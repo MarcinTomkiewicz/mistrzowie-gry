@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 
 import {
@@ -11,13 +11,15 @@ import {
   createCommonTableI18n,
   createCommonValuesI18n,
 } from '../../../../core/translations/common.i18n';
-import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
+import type { EventCoreDispositionAction } from '../../../../core/interfaces/i-event-admin';
 import type {
   CoreRpcErrorsCopy,
   CoreTableCopy,
   ListActionsCopy,
   ListPageCopy,
   ListToastCopy,
+  EventCoreDispositionCopy,
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventCoreListI18n() {
@@ -37,7 +39,13 @@ export function createEventCoreListI18n() {
       rpcErrors: 'rpcErrors',
     });
 
+  const disposition = createScopedObjectI18n<EventCoreDispositionCopy>('adminEvents', 'list.disposition');
+  const commonActions = createCommonActionsI18n();
   return {
+    disposition,
+    dispositionActions: computed<Record<EventCoreDispositionAction, string>>(() => ({
+      delete: commonActions().delete, archive: commonActions().archive, blocked: disposition().unavailable,
+    })),
     page,
     table,
     actions,
@@ -47,7 +55,7 @@ export function createEventCoreListI18n() {
       'adminEvents.list.table.moreLocations',
       { count },
     ),
-    commonActions: createCommonActionsI18n(),
+    commonActions,
     commonErrors: createCommonErrorsI18n(),
     commonEntityStatuses: createCommonEntityStatusesI18n(),
     commonLabels: createCommonLabelsI18n(),

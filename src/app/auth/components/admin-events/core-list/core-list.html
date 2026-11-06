@@ -1,4 +1,5 @@
-<div class="position-relative flex-col-start-stretch gap-md w-100">
+@let copy = i18n.disposition();
+<div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isBusy()">
   <header class="mg-section__header w-100">
     <h2 class="mg-section__title mg-section__title--md">{{ i18n.commonNav().eventsManagement }}</h2>
 
@@ -10,20 +11,67 @@
   <app-loading-overlay
     [visible]="isBusy()"
     [label]="
-      activeActionKey()
+      activeActionKey() || disposition.phase() === 'apply'
         ? i18n.commonStatus().saving
         : i18n.commonStatus().loading
     "
   />
 
-  <div class="flex-row-end-center w-100">
-    <p-button
-      [label]="i18n.actions().createCore"
-      icon="pi pi-plus"
-      [routerLink]="['/admin/content/events/new']"
-      [disabled]="isBusy()"
-    />
+  <div class="flex-row-between-center flex-wrap gap-sm w-100">
+    <div class="flex-row-start-center gap-sm">
+      <p-toggleswitch inputId="event-cores-show-archived" [formControl]="showArchived" />
+      <label for="event-cores-show-archived">{{ copy.showArchived }}</label>
+    </div>
+    <div class="flex-row-end-center flex-wrap gap-sm">
+      <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+        [ariaLabel]="i18n.commonActions().refresh" [pTooltip]="i18n.commonActions().refresh"
+        tooltipEvent="both" [disabled]="locked()" (onClick)="loadCores()" />
+      <p-button [label]="i18n.actions().createCore" icon="pi pi-plus"
+        [routerLink]="['/admin/content/events/new']" [disabled]="locked()" />
+    </div>
   </div>
+
+  @if (rows().length) {
+    <div class="flex-row-between-center flex-wrap gap-sm w-100">
+      <span>{{ copy.selected }}: {{ selectedIds().length }}</span>
+      <p-button type="button" severity="danger" [label]="copy.bulk"
+        [disabled]="locked() || !selectionValid()" (onClick)="previewDisposition()" />
+    </div>
+    @if (selectedIds().length > 100) { <p-message severity="warn" role="alert">{{ copy.selectionLimit }}</p-message> }
+  }
+
+  @if (dispositionError(); as error) {
+    <p-message [severity]="disposition.needsReadback() ? 'warn' : 'error'" role="alert">{{ error }}</p-message>
+  }
+  @if (disposition.needsReadback()) {
+    <p-button type="button" severity="secondary" icon="pi pi-refresh" [disabled]="isBusy()"
+      [label]="disposition.result() ? copy.retryRead : copy.retry" (onClick)="retryDisposition()" />
+  }
+  @if (disposition.preview(); as preview) {
+    @let result = disposition.result();
+    @let verified = disposition.verified();
+    <section #dispositionPreview tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" aria-live="polite">
+      <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.previewTitle }}</h3>
+      @if (verified) {
+        <p class="m-0" role="status">{{ result?.replayed ? copy.replayed : copy.success }}</p>
+      }
+      <dl class="flex-row-start-center flex-wrap gap-md m-0">
+        <div><dt>{{ copy.deleteCount }}</dt><dd class="m-0">{{ verified ? result?.deletedCount : preview.impact.deleteCount }}</dd></div>
+        <div><dt>{{ copy.archiveCount }}</dt><dd class="m-0">{{ verified ? result?.archivedCount : preview.impact.archiveCount }}</dd></div>
+        <div><dt>{{ copy.blockedCount }}</dt><dd class="m-0">{{ verified ? result?.blockedCount : preview.impact.blockedCount }}</dd></div>
+      </dl>
+      <ul class="flex-col-start-stretch gap-sm m-0 pl-md">
+        @for (item of dispositionItems(); track item.id) {
+          <li class="text-wrap-anywhere"><strong>{{ item.key }}</strong> - {{ item.action }}: {{ item.reason }}</li>
+        }
+      </ul>
+      @if (!verified && preview.status === 'blocked') { <p class="m-0 muted-text" role="status">{{ copy.blocked }}</p> }
+      @if (disposition.canApply()) {
+        <p-button type="button" severity="danger" [label]="copy.confirm"
+          [disabled]="locked()" (onClick)="confirmDisposition()" />
+      }
+    </section>
+  }
 
   @if (loadErrorMessage() && !isLoading()) {
     <section
@@ -52,23 +100,30 @@
         tableStyleClass="mg-responsive-table"
       >
         <ng-template #header>
-          <tr class="hide-down-sm">
-            <th class="small-caps" scope="col">
+          <tr>
+            <th class="w-px-50 w-100-sm" scope="col">
+              <div class="flex-row-start-center gap-sm">
+                <p-checkbox [binary]="true" [ngModel]="allSelected()" [indeterminate]="someSelected()"
+                  [ariaLabel]="copy.selectAll" [disabled]="locked()" (onChange)="toggleVisible()" />
+                <span class="mg-responsive-table__label">{{ copy.selectAll }}</span>
+              </div>
+            </th>
+            <th class="small-caps hide-down-sm" scope="col">
               {{ i18n.commonLabels().event }}
             </th>
-            <th class="small-caps" scope="col">
+            <th class="small-caps hide-down-sm" scope="col">
               {{ i18n.commonLabels().nextOccurrence }}
             </th>
-            <th class="small-caps" scope="col">
+            <th class="small-caps hide-down-sm" scope="col">
               {{ i18n.commonLabels().location }}
             </th>
-            <th class="small-caps text-center" scope="col">
+            <th class="small-caps text-center hide-down-sm" scope="col">
               {{ i18n.commonLabels().status }}
             </th>
-            <th class="small-caps text-center" scope="col">
+            <th class="small-caps text-center hide-down-sm" scope="col">
               {{ i18n.commonLabels().publicPage }}
             </th>
-            <th class="small-caps text-right" scope="col">
+            <th class="small-caps text-right hide-down-sm" scope="col">
               {{ i18n.commonTable().actions }}
             </th>
           </tr>
@@ -76,6 +131,13 @@
 
         <ng-template #body let-row>
           <tr class="mg-responsive-table__row">
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label">{{ copy.selected }}</span>
+              <span class="mg-responsive-table__value">
+                <p-checkbox [binary]="true" [ngModel]="selectedIds().includes(row.core.id)" [ariaLabel]="row.selectionLabel"
+                  [disabled]="locked()" (onChange)="toggleCore(row.core.id)" />
+              </span>
+            </td>
             <th scope="row" class="mg-responsive-table__row-heading">
               <strong>{{ row.core.name }}</strong>
             </th>
@@ -118,59 +180,39 @@
                 <span [class]="row.publicPageBadgeClass">{{ row.publicPageLabel }}</span>
               </span>
             </td>
-            <td class="mg-responsive-table__cell">
+            <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
               <span class="mg-responsive-table__label small-caps font-bold">
                 {{ i18n.commonTable().actions }}
               </span>
               <div
-                class="mg-responsive-table__value flex-row-end-center flex-nowrap gap-xs"
+                class="mg-responsive-table__value flex-col-start-end gap-xs min-w-0"
               >
-                <p-button
-                  size="small"
-                  severity="secondary"
-                  styleClass="square-7 p-0"
-                  [ariaLabel]="i18n.commonActions().edit"
-                  [pTooltip]="i18n.commonActions().edit"
-                  tooltipPosition="top"
-                  tooltipEvent="both"
-                  icon="pi pi-scroll-quill"
-                  [routerLink]="['/admin/content/events', row.core.id, 'edit']"
-                  [disabled]="isBusy()"
-                />
-
-                @if (row.core.isActive) {
-                  <p-button
-                    size="small"
-                    severity="danger"
-                    [outlined]="true"
-                    styleClass="square-7 p-0"
-                    [ariaLabel]="i18n.commonActions().deactivate"
-                    [pTooltip]="i18n.commonActions().deactivate"
-                    tooltipPosition="top"
-                    tooltipEvent="both"
-                    icon="pi pi-settle"
-                    [loading]="isActionLoading(row.core.id, 'deactivate')"
-                    [disabled]="
-                      isBusy() && !isActionLoading(row.core.id, 'deactivate')
-                    "
-                    (onClick)="setCoreActive(row.core, false)"
-                  />
-                } @else {
-                  <p-button
-                    size="small"
-                    severity="success"
-                    styleClass="square-7 p-0"
-                    [ariaLabel]="i18n.commonActions().activate"
-                    [pTooltip]="i18n.commonActions().activate"
-                    tooltipPosition="top"
-                    tooltipEvent="both"
-                    icon="pi pi-lever"
-                    [loading]="isActionLoading(row.core.id, 'activate')"
-                    [disabled]="
-                      isBusy() && !isActionLoading(row.core.id, 'activate')
-                    "
-                    (onClick)="setCoreActive(row.core, true)"
-                  />
+                <div class="flex-row-end-center flex-wrap gap-xs">
+                  <p-button type="button" size="small" severity="secondary" styleClass="square-7 p-0" icon="pi pi-scroll-quill"
+                    [ariaLabel]="row.core.archived ? copy.archivedReadOnly : i18n.commonActions().edit"
+                    [pTooltip]="row.core.archived ? copy.archivedReadOnly : i18n.commonActions().edit"
+                    tooltipPosition="top" tooltipEvent="both" [routerLink]="['/admin/content/events', row.core.id, 'edit']"
+                    [disabled]="locked()" />
+                  @if (!row.core.archived) {
+                    <p-button type="button" size="small"
+                      [styleClass]="row.core.isActive ? 'square-7 p-0 icon-flip-x' : 'square-7 p-0'"
+                      [severity]="row.core.isActive ? 'danger' : 'success'" [outlined]="row.core.isActive"
+                      icon="pi pi-lever"
+                      [ariaLabel]="row.core.isActive ? i18n.commonActions().deactivate : i18n.commonActions().activate"
+                      [pTooltip]="row.core.isActive ? i18n.commonActions().deactivate : i18n.commonActions().activate"
+                      tooltipPosition="top" tooltipEvent="both"
+                      [loading]="isActionLoading(row.core.id, row.core.isActive ? 'deactivate' : 'activate')"
+                      [disabled]="locked()" (onClick)="setCoreActive(row.core, !row.core.isActive)" />
+                  }
+                  <p-button type="button" size="small" severity="danger" styleClass="square-7 p-0"
+                    [icon]="row.core.dispositionAction === 'delete' ? 'pi pi-demolish'
+                      : row.core.dispositionAction === 'archive' ? 'pi pi-warehouse' : 'pi pi-lock'"
+                    [ariaLabel]="row.dispositionLabel + ': ' + row.core.name" [pTooltip]="row.dispositionLabel"
+                    tooltipPosition="top" tooltipEvent="both" [disabled]="locked() || row.core.dispositionAction === 'blocked'"
+                    (onClick)="previewDisposition([row.core.id])" />
+                </div>
+                @if (row.core.dispositionAction === 'blocked') {
+                  <small class="muted-text text-wrap-anywhere">{{ row.dispositionReason }}</small>
                 }
               </div>
             </td>
@@ -184,7 +226,7 @@
         {{ i18n.page().emptyTitle }}
       </h2>
 
-      <p class="m-0">{{ i18n.page().emptyDescription }}</p>
+      <p class="m-0">{{ showArchived.value ? i18n.page().emptyDescription : copy.emptyCurrent }}</p>
     </section>
   }
 </div>

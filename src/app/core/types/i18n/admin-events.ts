@@ -1,4 +1,5 @@
 import { EventOccurrenceStatus } from '../../enums/event';
+import type { EventCoreDispositionReason } from '../../interfaces/i-event-admin';
 
 export type ListPageCopy = {
   subtitle: string;
@@ -22,6 +23,34 @@ export type ListToastCopy = {
   deactivateSuccessSummary: string;
   deactivateSuccessDetail: string;
   activationFailedSummary: string;
+};
+
+export type EventCoreDispositionCopy = {
+  showArchived: string;
+  emptyCurrent: string;
+  selectAll: string;
+  selectEvent: string;
+  selected: string;
+  selectionLimit: string;
+  bulk: string;
+  previewTitle: string;
+  confirm: string;
+  confirmation: string;
+  deleteCount: string;
+  archiveCount: string;
+  blockedCount: string;
+  blocked: string;
+  success: string;
+  replayed: string;
+  uncertain: string;
+  readbackFailed: string;
+  retry: string;
+  retryRead: string;
+  archivedReadOnly: string;
+  unavailable: string;
+  outcomes: Record<'deleted' | 'archived' | 'blocked', string>;
+  reasons: Record<EventCoreDispositionReason, string>;
+  errors: { forbidden: string; invalid: string; reused: string; stale: string; protected: string; failed: string };
 };
 
 export type EditorPageCopy = {

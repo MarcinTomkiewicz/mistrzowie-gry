@@ -6,7 +6,7 @@
     <header class="mg-section__header flex-col-start-center gap-sm w-100 m-0">
       <h1 class="mg-section__title">{{ creating ? i18n.page().createTitle : loadedCore?.name }}</h1>
       @if (creating || loadedCore) {
-        <span class="tag-badge tag-badge--muted">{{ core()?.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().draft }}</span>
+        <span class="tag-badge tag-badge--muted">{{ loadedCore?.archived ? i18n.commonValues().archived : loadedCore?.isActive ? i18n.coreStatuses().active : i18n.coreStatuses().draft }}</span>
       } @else if (!isLoading()) {
         <p class="mg-section__subtitle mg-section__subtitle--full">{{ i18n.page().subtitle }}</p>
       }
@@ -32,7 +32,7 @@
       @if (cover.needsReconciliation()) {
         <p-message severity="warn" role="status">{{ coverCopy().refreshRequired }}</p-message>
       }
-      @if (creating || metadata.isGlobal()) {
+      @if (creating || (metadata.isGlobal() && !loadedCore?.archived)) {
         @if (creating || globalDraft.calendar()) {
           <app-event-global-steps [activeStep]="globalDraft.activeStep()" [reachedStep]="creating ? globalDraft.reachedStep() : 6"
             [disabled]="navigationLocked() || cover.dirty()" [stepContent]="stepContent" (stepSelected)="goToStep($event)" />

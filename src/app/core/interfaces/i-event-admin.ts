@@ -16,6 +16,12 @@ export interface IEventCoreListItem {
   displayOrder: number;
   editionCount: number;
   activeEditionCount: number;
+  archived: boolean;
+  archivedAt: string | null;
+  everPublished: boolean;
+  dispositionAction: EventCoreDispositionAction;
+  dispositionReason: ExistingEventCoreDisposition['reason'];
+  dispositionRevision: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +37,11 @@ export interface IEventCoreDetail {
   hasPublicPage: boolean;
   displayOrder: number;
   editions: IEventEditionSummary[];
+  archived: boolean;
+  archivedAt: string | null;
+  archivedBy: string | null;
+  everPublished: boolean;
+  disposition: ExistingEventCoreDisposition;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,6 +57,67 @@ export interface IEventEditionSummary {
   programItemCount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export type EventCoreDispositionAction = 'delete' | 'archive' | 'blocked';
+export type EventCoreDispositionReason = 'NEVER_PUBLISHED' | 'HISTORICALLY_PUBLISHED_OR_PROTECTED' |
+  'ALREADY_ARCHIVED' | 'OFFLINE_SEATS_OCCUPIED' | 'STORAGE_CLEANUP_REQUIRED' |
+  'EXTERNAL_NOTIFICATION_REFERENCES' | 'NOT_FOUND';
+
+export interface ExistingEventCoreDisposition {
+  coreId: string;
+  coreKey: string;
+  action: EventCoreDispositionAction;
+  reason: Exclude<EventCoreDispositionReason, 'NOT_FOUND'>;
+  everPublished: boolean;
+  archived: boolean;
+  archivedAt: string | null;
+  participantHistoryCount: number;
+  legacyReservationCount: number;
+  offlineOccupied: number;
+  storageObjectCount: number;
+  coverReferenceCount: number;
+  notificationReferenceCount: number;
+  linkedStaffingCount: number;
+  revision: string;
+}
+
+export type EventCoreDispositionItem = ExistingEventCoreDisposition | {
+  coreId: string;
+  coreKey: null;
+  action: 'blocked';
+  reason: 'NOT_FOUND';
+  everPublished: null;
+  archived: null;
+  archivedAt: null;
+  revision: null;
+};
+
+export interface AdminEventCoreDispositionPreview {
+  valid: true;
+  status: 'ready' | 'blocked';
+  coreIds: string[];
+  planHash: string;
+  impact: { deleteCount: number; archiveCount: number; blockedCount: number };
+  items: EventCoreDispositionItem[];
+  applied: false;
+}
+
+export interface EventCoreDispositionCommand {
+  requestId: string;
+  coreIds: readonly string[];
+  planHash: string;
+}
+
+export interface AdminEventCoreDispositionResult {
+  applied: true;
+  replayed: boolean;
+  requestId: string;
+  planHash: string;
+  deletedCount: number;
+  archivedCount: number;
+  blockedCount: number;
+  items: { coreId: string; outcome: 'deleted' | 'archived' | 'blocked'; reason: EventCoreDispositionReason }[];
 }
 
 export interface IEventCoreSavePayload {

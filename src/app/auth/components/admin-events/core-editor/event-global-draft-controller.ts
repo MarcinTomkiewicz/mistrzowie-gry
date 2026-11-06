@@ -95,6 +95,12 @@ export class EventGlobalDraftController {
         if (core.id !== coreId) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Core readback.');
         }
+        if (core.archived) {
+          this.resetEditionSelection();
+          this.calendar.set(null);
+          this.policy.set(null);
+          return of(core);
+        }
         // The old conversion flag marks preserved history, never a new Global import.
         if (core.editions.length !== 1) return this.readGlobalCalendar(core);
         return this.eventAdmin.getEditionDetail(core.editions[0].id).pipe(switchMap(edition => {
@@ -226,7 +232,7 @@ export class EventGlobalDraftController {
     }).pipe(
       switchMap((result) => this.readCore(result.coreId)),
       map((core) => {
-        if (!core) throw new Error('[EVENT_GLOBAL_DRAFT] Created Core readback is missing.');
+        if (!core || core.archived) throw new Error('[EVENT_GLOBAL_DRAFT] Created Core readback is missing or archived.');
         return core;
       }),
     );
@@ -293,7 +299,7 @@ export class EventGlobalDraftController {
       return write.pipe(
         switchMap(() => this.readCore(command.coreId)),
         map(loaded => {
-          if (!loaded) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing.');
+          if (!loaded || loaded.archived) throw new Error('[EVENT_GLOBAL_DRAFT] Added city Core readback is missing or archived.');
           this.resetCity();
           return loaded;
         }),

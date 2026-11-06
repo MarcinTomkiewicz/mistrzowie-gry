@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, type RouterStateSnapshot } from '@angular/router';
@@ -121,7 +121,7 @@ export class EventCoreEditor {
     return edition !== null && edition.id === this.globalDraft.calendar()?.mainEditionId;
   });
   protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => {
-    if (this.isNew() || !this.metadata.isGlobal()) return null;
+    if (this.isNew() || this.core()?.archived || !this.metadata.isGlobal()) return null;
     return this.globalDraft.activeStep() === 1
       ? 'core' : this.globalDraft.activeStep() === 2 && this.selectedMainEdition() ? 'edition' : null;
   });
@@ -140,6 +140,11 @@ export class EventCoreEditor {
   });
 
   constructor() {
+    effect(() => {
+      const core = this.core();
+      const global = this.metadata.isGlobal();
+      if (core && (core.archived || !global)) untracked(() => this.history.open(core));
+    });
     this.route.paramMap.pipe(
       map(params => params.get('coreId') ?? ''),
       distinctUntilChanged(),
@@ -205,8 +210,7 @@ export class EventCoreEditor {
       .subscribe({
         next: (core) => {
           this.metadata.load(core);
-          if (core && this.metadata.isGlobal()) this.cover.reconcile(core);
-          else if (core) this.history.open(core);
+          if (core && !core.archived && this.metadata.isGlobal()) this.cover.reconcile(core);
           this.isNotFound.set(core === null);
         },
         error: (error: unknown) => {
@@ -263,7 +267,7 @@ export class EventCoreEditor {
 
   protected selectHistoryEdition(editionId: string): void {
     const core = this.core();
-    if (core && !this.metadata.isGlobal() && !this.history.loading()) this.history.open(core, editionId);
+    if (core && (core.archived || !this.metadata.isGlobal()) && !this.history.loading()) this.history.open(core, editionId);
   }
 
   protected programBlocked(): boolean {

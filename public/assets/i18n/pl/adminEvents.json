@@ -1,5 +1,47 @@
 {
   "list": {
+    "disposition": {
+      "showArchived": "Pokaż zarchiwizowane",
+      "emptyCurrent": "[PH] Brak bieżących wydarzeń. Możesz dodać wydarzenie lub włączyć widok zarchiwizowanych.",
+      "selectAll": "[PH] Zaznacz wszystkie widoczne wydarzenia",
+      "selectEvent": "[PH] Zaznacz wydarzenie: {{name}}",
+      "selected": "[PH] Zaznaczone",
+      "selectionLimit": "[PH] Jedna operacja może obejmować najwyżej 100 wydarzeń. Zmniejsz zaznaczenie.",
+      "bulk": "Usuń / archiwizuj zaznaczone",
+      "previewTitle": "[PH] Usuwanie i archiwizacja wydarzeń",
+      "confirm": "[PH] Potwierdź usunięcie / archiwizację",
+      "confirmation": "[PH] Trwale usunąć {{delete}} wydarzeń i nieodwracalnie zarchiwizować {{archive}} wydarzeń? Zablokowane wydarzenia ({{blocked}}) pozostaną bez zmian. Usuniętych danych nie można odzyskać. Archiwizacja wyłączy widoczność wydarzenia i jego lokalizacji, zachowując historię. Przywracanie zarchiwizowanego wydarzenia nie jest dostępne.",
+      "deleteCount": "[PH] Usunięcie",
+      "archiveCount": "[PH] Archiwizacja",
+      "blockedCount": "[PH] Zablokowane",
+      "blocked": "[PH] Backend zablokował cały wybrany zakres. Nie wykonano zmian.",
+      "success": "[PH] Odczyt potwierdził wynik operacji na wskazanych wydarzeniach.",
+      "replayed": "[PH] Potwierdzono zapisany wynik wcześniejszej operacji, bez ponownego wykonania zmian.",
+      "uncertain": "[PH] Nie można potwierdzić wyniku operacji. Zmiany mogły zostać wykonane. Ponowienie użyje dokładnie tej samej komendy, aby uzyskać jej zapisany wynik.",
+      "readbackFailed": "[PH] Backend potwierdził operację, ale odczyt nie potwierdził jeszcze jej wyniku. Ponów sam odczyt.",
+      "retry": "[PH] Sprawdź wynik tej samej operacji",
+      "retryRead": "[PH] Ponów odczyt wyniku",
+      "archivedReadOnly": "[PH] Otwórz archiwum tylko do odczytu",
+      "unavailable": "[PH] Operacja niedostępna",
+      "outcomes": { "deleted": "[PH] Usunięto", "archived": "[PH] Zarchiwizowano", "blocked": "[PH] Bez zmian" },
+      "reasons": {
+        "NEVER_PUBLISHED": "[PH] Wydarzenie nigdy nie było publikowane i backend dopuścił jego usunięcie.",
+        "HISTORICALLY_PUBLISHED_OR_PROTECTED": "[PH] Publikacja lub chroniona historia wymaga zachowania wydarzenia w archiwum.",
+        "ALREADY_ARCHIVED": "[PH] Wydarzenie jest już zarchiwizowane i pozostaje tylko do odczytu.",
+        "OFFLINE_SEATS_OCCUPIED": "[PH] Wydarzenie ma miejsca zajęte offline.",
+        "STORAGE_CLEANUP_REQUIRED": "[PH] Wydarzenie ma powiązaną okładkę lub pliki wymagające odrębnego uporządkowania.",
+        "EXTERNAL_NOTIFICATION_REFERENCES": "[PH] Wydarzenie ma zewnętrzne powiązania powiadomień.",
+        "NOT_FOUND": "[PH] Wydarzenie nie istnieje."
+      },
+      "errors": {
+        "forbidden": "[PH] Operacja wymaga uprawnień administratora.",
+        "invalid": "[PH] Zakres lub argumenty operacji są nieprawidłowe.",
+        "reused": "[PH] Identyfikator operacji jest już powiązany z inną komendą. Nie wykonano nowej operacji.",
+        "stale": "[PH] Dane wydarzeń zmieniły się. Sprawdź nowy podgląd i ponownie potwierdź zakres przed wykonaniem zmian.",
+        "protected": "[PH] Backend odrzucił operację z powodu ochrony danych. Sprawdź bieżący podgląd i blokady.",
+        "failed": "[PH] Nie udało się potwierdzić operacji. Odśwież dane i sprawdź zgłoszony błąd."
+      }
+    },
     "page": {
       "subtitle": "Tworzenie i zarządzanie wydarzeniami oraz zarządzanie ich dostępnością.",
       "emptyTitle": "Brak wydarzeń",

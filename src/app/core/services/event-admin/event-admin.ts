@@ -6,6 +6,9 @@ import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline
 import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
 import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
+import { readAdminEventCoreDetail, readAdminEventCoreList } from '../../reads/events/admin-event-core.contract';
+import { assertEventCoreDispositionCommand, assertEventCoreDispositionSelection,
+  readAdminEventCoreDispositionPreview, readAdminEventCoreDispositionResult } from '../../reads/events/admin-event-core-disposition.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import { readAdminGlobalEventPagePreview } from '../../reads/events/admin-global-event-preview.contract';
 import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult, AdminGlobalScopePublicationPreview,
@@ -35,6 +38,9 @@ import type {
 } from '../../interfaces/i-admin-global-event';
 import {
   AdminEventProgramParticipants,
+  AdminEventCoreDispositionPreview,
+  AdminEventCoreDispositionResult,
+  EventCoreDispositionCommand,
   AdminEventProgramOfflineSeats,
   AdminEventProgramOfflineSeatsAdjustment,
   EventOfflineSeatsDelta,
@@ -51,15 +57,33 @@ import { assertEdgeContract } from '../../utils/edge-contract';
 export class EventAdmin {
   private readonly backend = inject(Backend);
 
-  getCoreList(): Observable<IEventCoreListItem[]> {
-    return this.backend.rpc<IEventCoreListItem[]>(EVENT_RPC.getCoreList);
+  getCoreList(includeArchived = false): Observable<IEventCoreListItem[]> {
+    return this.backend.rpc<unknown>(EVENT_RPC.getCoreList, { p_include_archived: includeArchived })
+      .pipe(map(value => readAdminEventCoreList(value, includeArchived)));
   }
 
   getCoreDetail(coreId: string): Observable<IEventCoreDetail | null> {
-    return this.backend.rpc<IEventCoreDetail | null>(
+    return this.backend.rpc<unknown>(
       EVENT_RPC.getCoreDetail,
       { p_event_core_id: coreId },
-    );
+    ).pipe(map(value => readAdminEventCoreDetail(value, coreId)));
+  }
+
+  previewCoreDisposition(coreIds: readonly string[]): Observable<AdminEventCoreDispositionPreview> {
+    return defer(() => {
+      assertEventCoreDispositionSelection(coreIds);
+      return this.backend.rpc<unknown>(EVENT_RPC.previewCoreDisposition, { p_core_ids: coreIds });
+    }).pipe(map(value => readAdminEventCoreDispositionPreview(value, coreIds)));
+  }
+
+  applyCoreDisposition(command: EventCoreDispositionCommand,
+    preview: AdminEventCoreDispositionPreview): Observable<AdminEventCoreDispositionResult> {
+    return defer(() => {
+      assertEventCoreDispositionCommand(command, preview);
+      return this.backend.rpc<unknown>(EVENT_RPC.applyCoreDisposition, {
+        p_request_id: command.requestId, p_core_ids: command.coreIds, p_expected_plan_hash: command.planHash,
+      });
+    }).pipe(map(value => readAdminEventCoreDispositionResult(value, command, preview)));
   }
 
   saveCore(payload: IEventCoreSavePayload): Observable<IEventCoreDetail> {
