@@ -2,7 +2,6 @@ import { Component, computed, DestroyRef, effect, inject, input, output, signal,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { Observable } from 'rxjs';
@@ -19,7 +18,7 @@ import { EventGlobalTimeBlocksSummary } from './event-global-time-blocks-summary
 
 @Component({
   selector: 'app-event-dated-blocks-editor',
-  imports: [FormsModule, ReactiveFormsModule, ButtonModule, FloatLabelModule, SelectModule, ToggleSwitchModule,
+  imports: [FormsModule, ReactiveFormsModule, ButtonModule, SelectModule, ToggleSwitchModule,
     EventGlobalTimeBlocks, EventGlobalTimeBlocksSummary],
   templateUrl: './event-dated-blocks-editor.html',
   host: { class: 'd-block w-100 min-w-0' },

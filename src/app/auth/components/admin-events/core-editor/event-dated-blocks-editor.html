@@ -4,17 +4,17 @@
   @if (!dateOptions().length) {
     <p class="m-0 muted-text">{{ copy.noDates }}</p>
   } @else {
-    <div class="flex-row-start-center flex-wrap gap-md">
-      <p-floatlabel variant="on" class="w-px-250 max-w-full">
+    <div class="flex-row-start-end flex-wrap gap-sm w-100 min-w-0">
+      <div class="flex-col-start-stretch gap-xs flex-none w-px-250 max-w-full min-w-0">
+        <label class="text-sm" for="dated-blocks-date">{{ i18n.commonLabels().eventDate }}</label>
         <p-select inputId="dated-blocks-date" [options]="dateOptions()" optionLabel="label" optionValue="value" size="small"
-          [ngModel]="editor.date()" (ngModelChange)="select($event, 'date')" [disabled]="selectionLocked()" appendTo="body" class="w-100" />
-        <label for="dated-blocks-date">{{ i18n.commonLabels().eventDate }}</label>
-      </p-floatlabel>
-      <p-floatlabel variant="on" class="w-px-300 max-w-full">
+          [ngModel]="editor.date()" (ngModelChange)="select($event, 'date')" [disabled]="selectionLocked()" appendTo="body" class="w-100 min-w-0" />
+      </div>
+      <div class="flex-col-start-stretch gap-xs flex-none w-px-300 max-w-full min-w-0">
+        <label class="text-sm" for="dated-blocks-scope">{{ copy.scope }}</label>
         <p-select inputId="dated-blocks-scope" [options]="scopeOptions()" optionLabel="label" optionValue="value" size="small"
-          [ngModel]="editor.editionId() || 'date'" (ngModelChange)="select($event, 'city')" [disabled]="selectionLocked()" appendTo="body" class="w-100" />
-        <label for="dated-blocks-scope">{{ copy.scope }}</label>
-      </p-floatlabel>
+          [ngModel]="editor.editionId() || 'date'" (ngModelChange)="select($event, 'city')" [disabled]="selectionLocked()" appendTo="body" class="w-100 min-w-0" />
+      </div>
     </div>
     @if (editor.isDirty()) { <p class="m-0 muted-text">{{ copy.selectHint }}</p> }
     @if (editor.day(); as day) {
