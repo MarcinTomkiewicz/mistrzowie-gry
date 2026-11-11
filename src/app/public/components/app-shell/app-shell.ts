@@ -1,15 +1,12 @@
 import {
   Component,
-  ComponentRef,
-  OutputEmitterRef,
-  Type,
   computed,
   inject,
   viewChild,
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { LazyMountHost } from '../../../core/directives/lazy-mount-host/lazy-mount-host';
 import { LEGAL_DIALOGS } from '../../../core/configs/legal-dialogs.config';
@@ -25,10 +22,6 @@ import {
 import { LegalDialog } from '../../common/legal-dialog/legal-dialog';
 import { Footer } from '../footer/footer';
 import { Navbar } from '../navbar/navbar';
-
-interface LazyToastHostComponent {
-  ready: OutputEmitterRef<void>;
-}
 
 @Component({
   selector: 'app-app-shell',
@@ -57,100 +50,64 @@ export class AppShell {
   });
   private readonly loadConfirmPopupHost = () =>
     import('../../common/confirm-popup-host/confirm-popup-host').then(
-      ({ ConfirmPopupHost }) => ConfirmPopupHost as Type<object>,
+      ({ ConfirmPopupHost }) => ConfirmPopupHost,
     );
   private readonly loadToastHost = () =>
     import('./toast-host').then(
-      ({ ToastHost }) => ToastHost as Type<LazyToastHostComponent>,
+      ({ ToastHost }) => ToastHost,
     );
-  private confirmPopupRef: ComponentRef<object> | null = null;
-  private confirmPopupMountPromise: Promise<void> | null = null;
-  private toastRef: ComponentRef<LazyToastHostComponent> | null = null;
-  private toastMountPromise: Promise<void> | null = null;
+  private confirmPopupMount: Observable<void> | null = null;
+  private toastMount: Observable<void> | null = null;
 
   constructor() {
     this.uiConfirm.registerHostLoader(() => this.ensureConfirmPopupMounted());
     this.uiToast.registerHostLoader(() => this.ensureToastMounted());
   }
 
-  private ensureConfirmPopupMounted(): Promise<void> {
-    if (this.confirmPopupRef) {
-      return Promise.resolve();
-    }
-
-    if (this.confirmPopupMountPromise) {
-      return this.confirmPopupMountPromise;
-    }
-
+  private ensureConfirmPopupMounted(): Observable<void> {
+    if (this.confirmPopupMount) return this.confirmPopupMount;
     const host = this.confirmPopupHost()?.viewContainerRef;
-    if (!host) {
-      return Promise.resolve();
-    }
+    if (!host) return of(undefined);
 
-    this.confirmPopupMountPromise = firstValueFrom(
-      this.lazyComponentLoader.mount({
-        host,
-        load: this.loadConfirmPopupHost,
-        onMount: (componentRef) => {
-          componentRef.changeDetectorRef.detectChanges();
-          this.confirmPopupRef = componentRef;
-          this.uiConfirm.markHostReady();
-        },
+    this.confirmPopupMount = this.lazyComponentLoader.mount({
+      host,
+      load: this.loadConfirmPopupHost,
+      onMount: componentRef => {
+        componentRef.changeDetectorRef.detectChanges();
+        this.uiConfirm.markHostReady();
+      },
+    }).pipe(
+      map(() => undefined),
+      catchError((error: unknown) => {
+        this.confirmPopupMount = null;
+        return throwError(() => error);
       }),
-    )
-      .then(() => undefined)
-      .finally(() => {
-        if (!this.confirmPopupRef) {
-          this.confirmPopupMountPromise = null;
-        }
-      });
-
-    return this.confirmPopupMountPromise;
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+    return this.confirmPopupMount;
   }
 
-  private ensureToastMounted(): Promise<void> {
-    if (this.toastRef) {
-      return Promise.resolve();
-    }
-
-    if (this.toastMountPromise) {
-      return this.toastMountPromise;
-    }
-
+  private ensureToastMounted(): Observable<void> {
+    if (this.toastMount) return this.toastMount;
     const host = this.toastHost()?.viewContainerRef;
-    if (!host) {
-      return Promise.resolve();
-    }
+    if (!host) return of(undefined);
 
-    this.toastMountPromise = new Promise<void>((resolve, reject) => {
-      let readyHandled = false;
-
-      firstValueFrom(
-        this.lazyComponentLoader.mount({
-          host,
-          load: this.loadToastHost,
-          onMount: (componentRef) => {
-            this.toastRef = componentRef;
-            componentRef.instance.ready.subscribe(() => {
-              if (readyHandled) {
-                return;
-              }
-
-              readyHandled = true;
-              this.uiToast.markHostReady();
-              resolve();
-            });
-            componentRef.changeDetectorRef.detectChanges();
-          },
-        }),
-      ).catch(reject);
-    })
-      .finally(() => {
-        if (!this.toastRef) {
-          this.toastMountPromise = null;
-        }
-      });
-
-    return this.toastMountPromise;
+    this.toastMount = this.lazyComponentLoader.mount({ host, load: this.loadToastHost }).pipe(
+      switchMap(componentRef => new Observable<void>(subscriber => {
+        const ready = componentRef.instance.ready.subscribe(() => {
+          this.uiToast.markHostReady();
+          subscriber.next();
+          subscriber.complete();
+        });
+        componentRef.changeDetectorRef.detectChanges();
+        return () => ready.unsubscribe();
+      })),
+      catchError((error: unknown) => {
+        this.toastMount = null;
+        return throwError(() => error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+    return this.toastMount;
   }
 }

@@ -7,9 +7,9 @@ import { readAdminEventCoreDisposition } from '../../../../core/reads/events/adm
 import { Auth } from '../../../../core/services/auth/auth';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { Platform } from '../../../../core/services/platform/platform';
-import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import type { EventCoreListRow } from '../../../../core/utils/event-admin-list';
+import { isDefiniteEventAdminRpcRejection } from '../event-admin-errors';
 
 type DispositionContext = {
   command: EventCoreDispositionCommand;
@@ -94,8 +94,7 @@ export class EventCoreDispositionController {
 
   private writerFailure(error: unknown, context: DispositionContext): Observable<never> {
     // Only a definite server refusal permits discarding the command. A transport/decoder failure keeps its exact tuple.
-    if (error instanceof RpcError && (/^23[0-9A-Z]{3}$/.test(error.code) ||
-      ['42501', '22023', '22P02', '40001', '40P01', '55000', 'P0001', 'P0002'].includes(error.code))) {
+    if (isDefiniteEventAdminRpcRejection(error)) {
       this.pending.set(null);
       this.preview.set(null);
       if (error.code === '40001' || error.code === '23514') {

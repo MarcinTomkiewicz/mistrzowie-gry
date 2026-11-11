@@ -185,7 +185,8 @@
             <button
               type="button"
               class="link-like-inline"
-              (click)="openPrivacyPolicyDialog()"
+              aria-haspopup="dialog"
+              (click)="legalDialogs.open('privacy-policy')"
             >
               {{ i18n.commonLegal().privacyPolicy }}
             </button>
@@ -249,14 +250,3 @@
     </div>
   </div>
 </section>
-
-@defer (when data.privacyPolicyDialog.visible) {
-  <app-legal-dialog
-    [visible]="data.privacyPolicyDialog.visible"
-    [dialogTitle]="data.privacyPolicyDialog.title"
-    [dialogSubtitle]="data.privacyPolicyDialog.subtitle"
-    [dialogContent]="data.privacyPolicyDialog.content"
-    [closeLabel]="data.privacyPolicyDialog.closeLabel"
-    (visibleChange)="closePrivacyPolicyDialog()"
-  />
-}

@@ -16,7 +16,7 @@ export type EventPageProgramTranslations = {
 
 export type EventPageOfflineSeatsTranslations = Record<
   'title' | 'online' | 'offline' | 'remaining' | 'capacity' | 'add' | 'remove' | 'verified' |
-  'readbackPending' | 'uncertain' | 'endReadback' | 'endReadbackWarning' | 'readbackEnded', string
+  'readbackPending' | 'uncertain' | 'endReadback' | 'endReadbackQuestion' | 'endReadbackWarning' | 'readbackEnded', string
 > & {
   errors: Record<'forbidden' | 'invalid' | 'notFound' | 'notBookable' | 'capacityUnavailable' | 'empty' | 'capacityExceeded' | 'unknown', string>;
 };

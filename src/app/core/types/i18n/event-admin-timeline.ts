@@ -7,17 +7,17 @@ export type EventAdminTimelineCopy = {
     title: string; track: string; hint: string; assignmentStatus: string; timeUnavailable: string;
   };
   manualProgram: {
-    unavailable: string; block: string; position: string; discardConfirm: string; saved: string; failed: string;
+    unavailable: string; block: string; position: string; discardConfirmQuestion: string; discardConfirm: string; saved: string; failed: string;
     uncertain: string; conflict: string; contractFailed: string; intervalInvalid: string; positionTaken: string;
-    abandon: string; abandonConfirm: string; refreshRequired: string;
+    abandon: string; abandonConfirmQuestion: string; abandonConfirm: string; refreshRequired: string;
   };
   manualRpg: {
     action: string; hint: string; gm: string; source: string; session: string; template: string; custom: string;
-    slotLabel: string; capacity: string; capacityHint: string; saveConfirm: string; catalogFailed: string; noSessions: string;
+    slotLabel: string; capacity: string; capacityHint: string; saveConfirmQuestion: string; saveConfirm: string; catalogFailed: string; noSessions: string;
   };
   manualActivity: {
     action: string; hint: string; kind: string; title: string; description: string; presenter: string;
-    capacity: string; capacityHint: string; catalogFailed: string; emptyKinds: string; refreshKinds: string; saveConfirm: string;
+    capacity: string; capacityHint: string; catalogFailed: string; emptyKinds: string; refreshKinds: string; saveConfirmQuestion: string; saveConfirm: string;
   };
   title: string;
   entry: string;

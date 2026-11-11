@@ -28,9 +28,7 @@ import { LegalDialogs } from '../../../core/services/legal-dialogs/legal-dialogs
 import { Seo } from '../../../core/services/seo/seo';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { ContactPayload } from '../../../core/types/contact';
-import { LegalDialogContent } from '../../../core/types/i18n/legal';
 import { createPageStructuredData } from '../../../core/utils/structured-data';
-import { LegalDialog } from '../../common/legal-dialog/legal-dialog';
 import { createContactI18n } from './contact.i18n';
 import { ContactApi } from './contact/contact-api/contact-api';
 
@@ -44,14 +42,13 @@ import { ContactApi } from './contact/contact-api/contact-api';
     SelectModule,
     InputTextModule,
     TextareaModule,
-    LegalDialog,
   ],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
   providers: [provideTranslocoScope('contact', 'common')],
 })
 export class Contact {
-  private readonly legalDialogs = inject(LegalDialogs);
+  protected readonly legalDialogs = inject(LegalDialogs);
   private readonly seo = inject(Seo);
   private readonly formBuilder = inject(FormBuilder);
   private readonly contactApi = inject(ContactApi);
@@ -63,11 +60,6 @@ export class Contact {
 
   readonly form = this.formBuilder.nonNullable.group(CONTACT_FORM_CONFIG);
   private readonly isSubmitting = signal(false);
-  private readonly isPrivacyPolicyDialogVisible = signal(false);
-  private readonly privacyPolicyContent =
-    signal<LegalDialogContent | null>(null);
-  private readonly isPrivacyPolicyLoading = signal(false);
-  private readonly privacyPolicyError = signal('');
 
   private readonly selectedTopic = toSignal(
     this.form.controls.topic.valueChanges,
@@ -106,9 +98,6 @@ export class Contact {
   });
 
   readonly viewModel = computed(() => {
-    const content = this.privacyPolicyContent();
-    const loading = this.isPrivacyPolicyLoading();
-    const error = this.privacyPolicyError();
     const isSubmitting = this.isSubmitting();
 
     return {
@@ -129,14 +118,6 @@ export class Contact {
         accessibility: this.i18n.accessibility(),
         email: PUBLIC_CONTACT_EMAIL,
         phone: PUBLIC_CONTACT_PHONE,
-      },
-      privacyPolicyDialog: {
-        visible: this.isPrivacyPolicyDialogVisible(),
-        title: content?.title || this.i18n.commonLegal().privacyPolicy,
-        subtitle: content?.subtitle ?? '',
-        content: content?.content ??
-          (loading ? this.i18n.status().loading : error || null),
-        closeLabel: this.i18n.commonActions().close,
       },
     };
   });
@@ -189,26 +170,6 @@ export class Contact {
       });
   }
 
-  async openPrivacyPolicyDialog(): Promise<void> {
-    this.isPrivacyPolicyDialogVisible.set(true);
-    this.privacyPolicyError.set('');
-    this.privacyPolicyContent.set(null);
-    this.isPrivacyPolicyLoading.set(true);
-
-    try {
-      const dialog = await this.legalDialogs.load('privacy-policy');
-      this.privacyPolicyContent.set(dialog ?? null);
-
-      if (!dialog) {
-        this.privacyPolicyError.set(this.i18n.commonErrors().notFound);
-      }
-    } catch {
-      this.privacyPolicyError.set(this.i18n.commonErrors().generic);
-    } finally {
-      this.isPrivacyPolicyLoading.set(false);
-    }
-  }
-
   private buildPayload(): ContactPayload | null {
     const value = this.form.getRawValue();
     const topic = this.i18n.topics().find(
@@ -247,9 +208,5 @@ export class Contact {
   showMinMessageError(): boolean {
     const control = this.form.controls.message;
     return control.touched && !!control.errors?.['minlength'];
-  }
-
-  closePrivacyPolicyDialog(): void {
-    this.isPrivacyPolicyDialogVisible.set(false);
   }
 }

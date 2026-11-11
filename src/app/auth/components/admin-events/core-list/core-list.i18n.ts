@@ -19,23 +19,26 @@ import type {
   ListActionsCopy,
   ListPageCopy,
   ListToastCopy,
+  EventCoreActivationReadbackCopy,
   EventCoreDispositionCopy,
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventCoreListI18n() {
   const transloco = inject(TranslocoService);
-  const { page, table, actions, toast, rpcErrors } =
+  const { page, table, actions, toast, activationReadback, rpcErrors } =
     createScopedSectionsI18n<{
       page: ListPageCopy;
       table: CoreTableCopy;
       actions: ListActionsCopy;
       toast: ListToastCopy;
+      activationReadback: EventCoreActivationReadbackCopy;
       rpcErrors: CoreRpcErrorsCopy;
     }>('adminEvents', {
       page: 'list.page',
       table: 'list.table',
       actions: 'list.actions',
       toast: 'list.toast',
+      activationReadback: 'list.activationReadback',
       rpcErrors: 'rpcErrors',
     });
 
@@ -50,6 +53,7 @@ export function createEventCoreListI18n() {
     table,
     actions,
     toast,
+    activationReadback,
     rpcErrors,
     moreLocations: (count: number): string => transloco.translate<string>(
       'adminEvents.list.table.moreLocations',

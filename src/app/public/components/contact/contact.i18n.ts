@@ -2,7 +2,6 @@ import { computed } from '@angular/core';
 
 import {
   createCommonAccessibilityI18n,
-  createCommonActionsI18n,
   createCommonCtaI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
@@ -61,7 +60,6 @@ export function createContactI18n() {
     });
 
   const status = createCommonStatusI18n();
-  const commonActions = createCommonActionsI18n();
   const cta = createCommonCtaI18n();
   const commonErrors = createCommonErrorsI18n();
   const commonForm = createCommonFormI18n();
@@ -89,7 +87,6 @@ export function createContactI18n() {
     formErrors,
     success,
     toast,
-    commonActions,
     commonForm,
     commonLegal,
     legalNotice,

@@ -1,7 +1,8 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal, type TemplateRef } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
-import { Observable } from 'rxjs';
-import {
+import type { ButtonSeverity } from 'primeng/types/button';
+import { asapScheduler, defer, Observable, observeOn, of } from 'rxjs';
+import type {
   BasePopupOptions,
   DecisionPopupOptions,
   ModalDecisionPopupOptions,
@@ -13,20 +14,20 @@ import {
 })
 export class UiConfirm {
   private readonly confirmation = inject(ConfirmationService);
-  private hostLoader: (() => Promise<void>) | null = null;
+  private hostLoader: (() => Observable<void>) | null = null;
   private hostReady = false;
-  private hostPromise: Promise<void> | null = null;
   private modalResult: ((accepted: boolean) => void) | null = null;
   private closeModalHost: (() => void) | null = null;
+  private readonly template = signal<TemplateRef<unknown> | null>(null);
+  readonly modalTemplate = this.template.asReadonly();
   readonly modalDecisionKey = 'ui-modal-decision';
 
-  registerHostLoader(loader: () => Promise<void>): void {
+  registerHostLoader(loader: () => Observable<void>): void {
     this.hostLoader = loader;
   }
 
   markHostReady(): void {
     this.hostReady = true;
-    this.hostPromise = Promise.resolve();
   }
 
   registerModalDialogCloser(close: () => void): () => void {
@@ -43,6 +44,7 @@ export class UiConfirm {
   }
 
   modalDecision(options: ModalDecisionPopupOptions): Observable<boolean> {
+    // PrimeNG emits the decision before hide() finishes; notify callers after its onHide and cleanup.
     return new Observable<boolean>((subscriber) => {
       if (this.modalResult) {
         subscriber.next(false);
@@ -50,156 +52,89 @@ export class UiConfirm {
         return;
       }
       const finish = (accepted: boolean): void => {
-        if (this.modalResult === finish) this.modalResult = null;
+        if (this.modalResult === finish) {
+          this.modalResult = null;
+          this.template.set(null);
+        }
         subscriber.next(accepted);
         subscriber.complete();
       };
       this.modalResult = finish;
-      void this.ensureHost().then(() => {
+      const loading = this.ensureHost().subscribe({ next: () => {
         if (subscriber.closed) return;
         if (!this.hostReady || !this.closeModalHost) {
           finish(false);
           return;
         }
+        const { messageTemplate, acceptSeverity, ...confirmationOptions } = options;
+        this.template.set(messageTemplate ?? null);
         this.confirmation.confirm({
-          ...options,
+          ...confirmationOptions,
           key: this.modalDecisionKey,
-          icon: options.icon ?? 'pi pi-question-circle',
+          acceptIcon: options.acceptIcon,
           closable: true,
           closeOnEscape: true,
           dismissableMask: true,
           defaultFocus: 'reject',
           accept: () => finish(true),
           reject: () => finish(false),
-          acceptButtonProps: { severity: 'info', icon: options.acceptIcon },
-          rejectButtonProps: { severity: 'secondary', icon: 'pi pi-interdiction', outlined: true },
+          acceptButtonProps: { severity: acceptSeverity, icon: options.acceptIcon },
+          rejectButtonProps: { severity: 'secondary', outlined: true },
         });
-      }).catch(() => finish(false));
+      }, error: () => finish(false) });
       return () => {
+        loading.unsubscribe();
         if (this.modalResult !== finish) return;
         this.modalResult = null;
+        this.template.set(null);
         this.closeModalHost?.();
       };
-    });
+    }).pipe(observeOn(asapScheduler));
   }
 
   info(event: PopupTargetEvent, options: BasePopupOptions): void {
-    void this.confirm(event, {
-      message: options.message,
-      icon: options.icon ?? 'pi pi-tied-scroll',
-      rejectVisible: false,
-      accept: options.accept ?? (() => {}),
-      acceptLabel: options.acceptLabel,
-      acceptButtonProps: {
-        severity: 'info',
-        icon: options.acceptIcon,
-      },
-    });
+    this.confirm(event, options, 'info');
   }
 
   warn(event: PopupTargetEvent, options: BasePopupOptions): void {
-    void this.confirm(event, {
-      message: options.message,
-      icon: options.icon ?? 'pi pi-exclamation-triangle',
-      rejectVisible: false,
-      accept: options.accept ?? (() => {}),
-      acceptLabel: options.acceptLabel,
-      acceptButtonProps: {
-        severity: 'warn',
-        icon: options.acceptIcon,
-      },
-    });
+    this.confirm(event, options, 'warn');
   }
 
   danger(event: PopupTargetEvent, options: BasePopupOptions): void {
-    void this.confirm(event, {
-      message: options.message,
-      icon: options.icon ?? 'pi pi-times-circle',
-      rejectVisible: false,
-      accept: options.accept ?? (() => {}),
-      acceptLabel: options.acceptLabel,
-      acceptButtonProps: {
-        severity: 'danger',
-        icon: options.acceptIcon,
-      },
-    });
+    this.confirm(event, options, 'danger');
   }
 
-  /** Reports popup opening; accept/reject callbacks still carry the user's choice. */
-  decision(event: PopupTargetEvent, options: DecisionPopupOptions): Promise<boolean> {
-    return this.confirm(event, {
-      message: options.message,
-      icon: options.icon ?? 'pi pi-question-circle',
-      accept: options.accept ?? (() => {}),
-      reject: options.reject ?? (() => {}),
-      acceptLabel: options.acceptLabel,
-      rejectLabel: options.rejectLabel,
-      acceptButtonProps: {
-        severity: 'info',
-        icon: options.acceptIcon,
-      },
-      rejectButtonProps: {
-        severity: 'secondary',
-        icon: 'pi pi-interdiction',
-        outlined: true,
-      },
-    });
+  decision(event: PopupTargetEvent, options: DecisionPopupOptions): void {
+    this.confirm(event, options, options.acceptSeverity);
   }
 
   dangerDecision(event: PopupTargetEvent, options: DecisionPopupOptions): void {
-    void this.confirm(event, {
-      message: options.message,
-      icon: options.icon ?? 'pi pi-exclamation-triangle',
-      accept: options.accept ?? (() => {}),
-      reject: options.reject ?? (() => {}),
-      acceptLabel: options.acceptLabel,
-      rejectLabel: options.rejectLabel,
-      acceptButtonProps: {
-        severity: 'danger',
-        icon: options.acceptIcon,
-      },
-      rejectButtonProps: {
-        severity: 'secondary',
-        icon: 'pi pi-interdiction',
-        outlined: true,
-      },
-    });
+    this.confirm(event, options, options.acceptSeverity ?? 'danger');
   }
 
-  private async confirm(
+  private confirm(
     event: PopupTargetEvent,
-    config: Record<string, unknown>,
-  ): Promise<boolean> {
+    options: BasePopupOptions | DecisionPopupOptions,
+    severity: ButtonSeverity,
+  ): void {
     const target = event.currentTarget;
-    if (!target) return false;
+    if (!target) return;
 
-    await this.ensureHost();
-
-    if (!this.hostReady || ('isConnected' in target && target.isConnected !== true)) return false;
-
-    this.confirmation.confirm({
-      ...config,
-      target,
+    this.ensureHost().subscribe(() => {
+      if (!this.hostReady || ('isConnected' in target && target.isConnected !== true)) return;
+      const decision = 'rejectLabel' in options ? options : null;
+      this.confirmation.confirm({
+        target, message: options.message, icon: options.icon, acceptIcon: options.acceptIcon,
+        accept: options.accept ?? (() => {}), reject: decision?.reject ?? (() => {}),
+        acceptLabel: options.acceptLabel, rejectLabel: decision?.rejectLabel,
+        rejectVisible: decision !== null,
+        acceptButtonProps: { severity, icon: options.acceptIcon },
+        rejectButtonProps: { severity: 'secondary', outlined: true },
+      });
     });
-    return true;
   }
 
-  private async ensureHost(): Promise<void> {
-    if (this.hostReady) {
-      return;
-    }
-
-    if (!this.hostLoader) {
-      return;
-    }
-
-    if (!this.hostPromise) {
-      this.hostPromise = this.hostLoader().catch((error) => {
-        this.hostPromise = null;
-        throw error;
-      });
-    }
-
-    await this.hostPromise;
+  private ensureHost(): Observable<void> {
+    return defer(() => this.hostReady || !this.hostLoader ? of(undefined) : this.hostLoader());
   }
 }

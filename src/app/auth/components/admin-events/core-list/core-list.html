@@ -25,7 +25,7 @@
     <div class="flex-row-end-center flex-wrap gap-sm">
       <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh"
         [ariaLabel]="i18n.commonActions().refresh" [pTooltip]="i18n.commonActions().refresh"
-        tooltipEvent="both" [disabled]="locked()" (onClick)="loadCores()" />
+        tooltipEvent="both" [disabled]="!isAdmin() || isBusy() || disposition.locked()" (onClick)="loadCores()" />
       <p-button [label]="i18n.actions().createCore" icon="pi pi-plus"
         [routerLink]="['/admin/content/events/new']" [disabled]="locked()" />
     </div>
@@ -33,13 +33,24 @@
 
   @if (rows().length) {
     <div class="flex-row-between-center flex-wrap gap-sm w-100">
-      <span>{{ copy.selected }}: {{ selectedIds().length }}</span>
+      <span>{{ copy.selected }}: {{ selectedCount() }}</span>
       <p-button type="button" severity="danger" [label]="copy.bulk"
         [disabled]="locked() || !selectionValid()" (onClick)="previewDisposition()" />
     </div>
-    @if (selectedIds().length > 100) { <p-message severity="warn" role="alert">{{ copy.selectionLimit }}</p-message> }
+    @if (selectedCount() > 100) { <p-message severity="warn" role="alert">{{ copy.selectionLimit }}</p-message> }
   }
 
+  @if (!isBusy() && pendingActivation(); as activation) {
+    <p-message severity="warn" role="status">
+      {{ activation.phase === 'refresh' ? i18n.activationReadback().ended : i18n.toast().activationUnconfirmedDetail }}
+    </p-message>
+    @if (canEndActivationReadback()) {
+      <div class="flex-row-start-center flex-wrap gap-sm">
+        <p-button type="button" severity="warn" [outlined]="true" icon="pi pi-interdiction"
+          [label]="i18n.activationReadback().end" (onClick)="endActivationReadback()" />
+      </div>
+    }
+  }
   @if (dispositionError(); as error) {
     <p-message [severity]="disposition.needsReadback() ? 'warn' : 'error'" role="alert">{{ error }}</p-message>
   }
@@ -47,30 +58,19 @@
     <p-button type="button" severity="secondary" icon="pi pi-refresh" [disabled]="isBusy()"
       [label]="disposition.result() ? copy.retryRead : copy.retry" (onClick)="retryDisposition()" />
   }
-  @if (disposition.preview(); as preview) {
-    @let result = disposition.result();
-    @let verified = disposition.verified();
-    <section #dispositionPreview tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" aria-live="polite">
-      <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.previewTitle }}</h3>
-      @if (verified) {
-        <p class="m-0" role="status">{{ result?.replayed ? copy.replayed : copy.success }}</p>
-      }
-      <dl class="flex-row-start-center flex-wrap gap-md m-0">
-        <div><dt>{{ copy.deleteCount }}</dt><dd class="m-0">{{ verified ? result?.deletedCount : preview.impact.deleteCount }}</dd></div>
-        <div><dt>{{ copy.archiveCount }}</dt><dd class="m-0">{{ verified ? result?.archivedCount : preview.impact.archiveCount }}</dd></div>
-        <div><dt>{{ copy.blockedCount }}</dt><dd class="m-0">{{ verified ? result?.blockedCount : preview.impact.blockedCount }}</dd></div>
-      </dl>
-      <ul class="flex-col-start-stretch gap-sm m-0 pl-md">
-        @for (item of dispositionItems(); track item.id) {
-          <li class="text-wrap-anywhere"><strong>{{ item.key }}</strong> - {{ item.action }}: {{ item.reason }}</li>
-        }
-      </ul>
-      @if (!verified && preview.status === 'blocked') { <p class="m-0 muted-text" role="status">{{ copy.blocked }}</p> }
-      @if (disposition.canApply()) {
-        <p-button type="button" severity="danger" [label]="copy.confirm"
-          [disabled]="locked()" (onClick)="confirmDisposition()" />
-      }
-    </section>
+  @if (!isBusy() && dispositionBlockers(); as blockers) {
+    <p-message severity="warn" role="alert">
+      @if (disposition.preview()?.status === 'blocked') { {{ copy.blocked }} }
+      {{ blockers }}
+    </p-message>
+  }
+  @if (disposition.verified() && disposition.result(); as result) {
+    <p class="m-0" role="status">
+      {{ result.replayed ? copy.replayed : copy.success }}
+      {{ copy.deleteCount }}: {{ result.deletedCount }}.
+      {{ copy.archiveCount }}: {{ result.archivedCount }}.
+      {{ copy.blockedCount }}: {{ result.blockedCount }}.
+    </p>
   }
 
   @if (loadErrorMessage() && !isLoading()) {
@@ -103,8 +103,8 @@
           <tr>
             <th class="w-px-50 w-100-sm" scope="col">
               <div class="flex-row-start-center gap-sm">
-                <p-checkbox [binary]="true" [ngModel]="allSelected()" [indeterminate]="someSelected()"
-                  [ariaLabel]="copy.selectAll" [disabled]="locked()" (onChange)="toggleVisible()" />
+                <p-checkbox [binary]="true" [formControl]="selectAll" [indeterminate]="someSelected()"
+                  [ariaLabel]="copy.selectAll" (onChange)="toggleVisible()" />
                 <span class="mg-responsive-table__label">{{ copy.selectAll }}</span>
               </div>
             </th>
@@ -134,8 +134,8 @@
             <td class="mg-responsive-table__cell">
               <span class="mg-responsive-table__label">{{ copy.selected }}</span>
               <span class="mg-responsive-table__value">
-                <p-checkbox [binary]="true" [ngModel]="selectedIds().includes(row.core.id)" [ariaLabel]="row.selectionLabel"
-                  [disabled]="locked()" (onChange)="toggleCore(row.core.id)" />
+                <p-checkbox [formControl]="selectedIds" [value]="row.core.id" [ariaLabel]="row.selectionLabel"
+                  (onChange)="selectionChanged(row.core.id)" />
               </span>
             </td>
             <th scope="row" class="mg-responsive-table__row-heading">
@@ -205,13 +205,13 @@
                       [disabled]="locked()" (onClick)="setCoreActive(row.core, !row.core.isActive)" />
                   }
                   <p-button type="button" size="small" severity="danger" styleClass="square-7 p-0"
-                    [icon]="row.core.dispositionAction === 'delete' ? 'pi pi-demolish'
-                      : row.core.dispositionAction === 'archive' ? 'pi pi-warehouse' : 'pi pi-lock'"
+                    [icon]="row.dispositionAction === 'delete' ? 'pi pi-demolish'
+                      : row.dispositionAction === 'archive' ? 'pi pi-warehouse' : 'pi pi-lock'"
                     [ariaLabel]="row.dispositionLabel + ': ' + row.core.name" [pTooltip]="row.dispositionLabel"
-                    tooltipPosition="top" tooltipEvent="both" [disabled]="locked() || row.core.dispositionAction === 'blocked'"
+                    tooltipPosition="top" tooltipEvent="both" [disabled]="locked() || row.dispositionAction === 'blocked'"
                     (onClick)="previewDisposition([row.core.id])" />
                 </div>
-                @if (row.core.dispositionAction === 'blocked') {
+                @if (row.dispositionAction === 'blocked') {
                   <small class="muted-text text-wrap-anywhere">{{ row.dispositionReason }}</small>
                 }
               </div>
@@ -230,3 +230,22 @@
     </section>
   }
 </div>
+
+<ng-template #dispositionMessage>
+  @if (disposition.preview()) {
+    <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+      <ul class="flex-col-start-stretch gap-sm m-0 pl-md pr-sm max-h-350 overflow-y-auto"
+        tabindex="0" [attr.aria-label]="copy.previewHeading">
+        @for (item of dispositionItems(); track item.id) {
+          <li class="text-wrap-anywhere">
+            <div class="flex-row-start-center flex-wrap gap-md">
+              <strong>{{ item.label }}</strong>
+              <span class="tag-badge px-xs py-0" [class]="item.badgeClass">{{ item.action }}</span>
+            </div>
+            <p class="m-0">{{ item.reason }}</p>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</ng-template>

@@ -25,6 +25,7 @@
     "readbackPending": "[PH] Zapis został przyjęty, ale nie udało się potwierdzić aktualnego stanu i publicznej dostępności. Ponów sam odczyt.",
     "uncertain": "[PH] Nie można potwierdzić, czy zmiana została wykonana. Ponów odczyt aktualnych liczników. Zmiana o jedno miejsce nie zostanie automatycznie powtórzona.",
     "endReadback": "[PH] Zakończ sprawdzanie wyniku",
+    "endReadbackQuestion": "[PH] Zakończyć sprawdzanie wyniku zmiany miejsc offline?",
     "endReadbackWarning": "[PH] Zmiana mogła zostać wykonana. Zakończenie sprawdzania odblokuje kolejne działania bez potwierdzenia sukcesu i bez ponowienia zmiany. Sprawdź aktualne liczniki przed kolejną operacją.",
     "readbackEnded": "[PH] Zakończono sprawdzanie bez potwierdzenia wyniku. Zmiana mogła zostać wykonana i nie została ponowiona.",
     "errors": {

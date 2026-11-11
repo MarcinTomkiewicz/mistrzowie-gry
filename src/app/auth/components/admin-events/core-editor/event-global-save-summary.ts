@@ -54,7 +54,7 @@ export class EventGlobalSaveSummary {
     if (invalid) { this.edit(invalid); return; }
     const coreId = this.save.metadata.core()?.id;
     this.deciding.set(true);
-    this.confirm.modalDecision({ header: this.copy().action, message: this.copy().confirm,
+    this.confirm.modalDecision({ header: this.copy().confirmQuestion, message: this.copy().confirm,
       acceptLabel: this.copy().action, rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(switchMap(accepted => accepted && coreId === this.save.metadata.core()?.id && !this.disabled()
       ? this.save.save() : EMPTY), finalize(() => this.deciding.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({

@@ -5,6 +5,11 @@ import {
 import { RpcError } from '../../../core/types/rpc-error';
 import { joinTextParts } from '../../../core/utils/normalize-text';
 
+export function isDefiniteEventAdminRpcRejection(error: unknown): error is RpcError {
+  return error instanceof RpcError && (/^23[0-9A-Z]{3}$/.test(error.code) ||
+    ['42501', '22023', '22P02', '40001', '40P01', '55000', 'P0001', 'P0002'].includes(error.code));
+}
+
 export function resolveEventCoreAdminErrorMessage(
   error: unknown,
   copy: CoreRpcErrorsCopy,

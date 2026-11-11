@@ -128,7 +128,7 @@ export class ArticleEditor {
     this.isNotFound.set(false);
     this.articles
       .getAdminArticleDetail(this.articleId)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (article) => {
           if (!article) {
@@ -208,10 +208,10 @@ export class ArticleEditor {
     const actions = this.i18n.editorActions();
     const decision = article.publishedAt !== null && payload.slug !== article.slug
       ? this.confirm.modalDecision({
-          header: actions.changeUrlHeader,
-          message: actions.changeUrlMessage
+          header: actions.changeUrlMessage
             .replace('{{current}}', `/artykuly/${article.slug}`)
             .replace('{{next}}', `/artykuly/${payload.slug ?? ''}`),
+          message: actions.changeUrlHeader,
           acceptLabel: actions.changeUrlAction,
           rejectLabel: this.i18n.commonActions().cancel,
         })
@@ -292,7 +292,6 @@ export class ArticleEditor {
     return this.imageStorage
       .transcodeAndUpload(file, {
         folder: `content/articles/${this.articleId}`,
-        replacePath: this.form.controls.heroImagePath.getRawValue(),
         usePublicUrl: false,
       })
       .pipe(

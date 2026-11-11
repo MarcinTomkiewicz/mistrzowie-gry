@@ -1,7 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { catchError, finalize, Observable, shareReplay, throwError } from 'rxjs';
 
 import type { LegalDialogContent } from '../../types/i18n/legal';
 import type { LegalDialogId } from '../../types/legal-dialog';
@@ -27,22 +27,24 @@ export class LegalDialogs {
 
   private readonly cache = new Map<
     LegalDialogId,
-    Promise<LegalDialogContent>
+    Observable<LegalDialogContent>
   >();
 
-  async open(dialog: LegalDialogId): Promise<void> {
+  open(dialog: LegalDialogId): void {
     this.activeDialogState.set(dialog);
     this.contentState.set(null);
     this.errorState.set(false);
     this.loadingState.set(true);
-    try {
-      const content = await this.load(dialog);
-      if (this.activeDialog() === dialog) this.contentState.set(content);
-    } catch {
-      if (this.activeDialog() === dialog) this.errorState.set(true);
-    } finally {
+    this.load(dialog).pipe(finalize(() => {
       if (this.activeDialog() === dialog) this.loadingState.set(false);
-    }
+    })).subscribe({
+      next: content => {
+        if (this.activeDialog() === dialog) this.contentState.set(content);
+      },
+      error: () => {
+        if (this.activeDialog() === dialog) this.errorState.set(true);
+      },
+    });
   }
 
   close(): void {
@@ -52,20 +54,21 @@ export class LegalDialogs {
     this.errorState.set(false);
   }
 
-  load(dialog: LegalDialogId): Promise<LegalDialogContent> {
+  load(dialog: LegalDialogId): Observable<LegalDialogContent> {
     const cached = this.cache.get(dialog);
     if (cached) {
       return cached;
     }
 
-    const request = firstValueFrom(
-      this.http.get<LegalDialogContent>(
-        `${this.baseHref}assets/i18n/pl/legal/${dialog}.json`,
-      ),
-    ).catch((error: unknown) => {
-      this.cache.delete(dialog);
-      throw error;
-    });
+    const request = this.http.get<LegalDialogContent>(
+      `${this.baseHref}assets/i18n/pl/legal/${dialog}.json`,
+    ).pipe(
+      catchError((error: unknown) => {
+        this.cache.delete(dialog);
+        return throwError(() => error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
 
     this.cache.set(dialog, request);
     return request;

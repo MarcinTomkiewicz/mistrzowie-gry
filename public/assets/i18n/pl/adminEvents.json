@@ -8,12 +8,15 @@
       "selected": "[PH] Zaznaczone",
       "selectionLimit": "[PH] Jedna operacja może obejmować najwyżej 100 wydarzeń. Zmniejsz zaznaczenie.",
       "bulk": "Usuń / archiwizuj zaznaczone",
-      "previewTitle": "[PH] Usuwanie i archiwizacja wydarzeń",
-      "confirm": "[PH] Potwierdź usunięcie / archiwizację",
-      "confirmation": "[PH] Trwale usunąć {{delete}} wydarzeń i nieodwracalnie zarchiwizować {{archive}} wydarzeń? Zablokowane wydarzenia ({{blocked}}) pozostaną bez zmian. Usuniętych danych nie można odzyskać. Archiwizacja wyłączy widoczność wydarzenia i jego lokalizacji, zachowując historię. Przywracanie zarchiwizowanego wydarzenia nie jest dostępne.",
+      "previewHeading": "Następujące wydarzenia zostaną usunięte lub zarchiwizowane:",
+      "previewDeleteHeading": "[PH] Następujące wydarzenia zostaną usunięte:",
+      "previewArchiveHeading": "[PH] Następujące wydarzenia zostaną zarchiwizowane:",
+      "confirmDelete": "Czy na pewno chcesz usunąć te wydarzenia?",
+      "confirmMixed": "[PH] Czy na pewno chcesz usunąć lub zarchiwizować te wydarzenia?",
+      "confirmArchive": "[PH] Czy na pewno chcesz zarchiwizować te wydarzenia?",
       "deleteCount": "[PH] Usunięcie",
       "archiveCount": "[PH] Archiwizacja",
-      "blockedCount": "[PH] Zablokowane",
+      "blockedCount": "Zablokowane",
       "blocked": "[PH] Backend zablokował cały wybrany zakres. Nie wykonano zmian.",
       "success": "[PH] Odczyt potwierdził wynik operacji na wskazanych wydarzeniach.",
       "replayed": "[PH] Potwierdzono zapisany wynik wcześniejszej operacji, bez ponownego wykonania zmian.",
@@ -23,7 +26,6 @@
       "retryRead": "[PH] Ponów odczyt wyniku",
       "archivedReadOnly": "[PH] Otwórz archiwum tylko do odczytu",
       "unavailable": "[PH] Operacja niedostępna",
-      "outcomes": { "deleted": "[PH] Usunięto", "archived": "[PH] Zarchiwizowano", "blocked": "[PH] Bez zmian" },
       "reasons": {
         "NEVER_PUBLISHED": "[PH] Wydarzenie nigdy nie było publikowane i backend dopuścił jego usunięcie.",
         "HISTORICALLY_PUBLISHED_OR_PROTECTED": "[PH] Publikacja lub chroniona historia wymaga zachowania wydarzenia w archiwum.",
@@ -55,19 +57,28 @@
     "actions": {
       "createCore": "Dodaj wydarzenie"
     },
+    "activationReadback": {
+      "end": "[PH] Zakończ sprawdzanie wyniku",
+      "endQuestion": "[PH] Zakończyć sprawdzanie zmiany aktywności wydarzenia?",
+      "endWarning": "[PH] Nie potwierdzono wyniku zmiany aktywności wydarzenia: {{name}}. Zmiana mogła zostać wykonana. Zakończenie sprawdzania nie potwierdza sukcesu ani odmowy i nie ponawia operacji. Przed dalszymi zmianami wymagany jest świeży odczyt listy.",
+      "ended": "[PH] Zakończono sprawdzanie bez potwierdzenia wyniku zmiany aktywności. Operacja mogła zostać wykonana."
+    },
     "toast": {
       "activateSuccessSummary": "Wydarzenie aktywowane",
       "activateSuccessDetail": "Wydarzenie zostało aktywowane.",
       "deactivateSuccessSummary": "Wydarzenie dezaktywowane",
       "deactivateSuccessDetail": "Wydarzenie zostało dezaktywowane.",
-      "activationFailedSummary": "Nie udało się zmienić aktywności wydarzenia"
+      "activationFailedSummary": "Nie udało się zmienić aktywności wydarzenia",
+      "activationUnconfirmedSummary": "[PH] Niepotwierdzony wynik zmiany aktywności",
+      "activationUnconfirmedDetail": "[PH] Zmiana mogła zostać zapisana, ale nie udało się potwierdzić jej wyniku. Odśwież listę przed kolejną operacją."
     }
   },
   "editor": {
     "saveChanges": {
       "title": "[PH] Zmiany do zapisania",
       "action": "Zapisz zmiany",
-      "confirm": "[PH] Zapisać wskazane zmiany? Sekcje są zapisywane osobno. Jeśli jedna operacja się nie powiedzie, wcześniejsze potwierdzone zapisy pozostaną utrwalone. Publikacja i uruchomienie zapisów uczestników wymagają osobnych akcji.",
+      "confirmQuestion": "[PH] Zapisać wskazane zmiany?",
+      "confirm": "[PH] Sekcje są zapisywane osobno. Jeśli jedna operacja się nie powiedzie, wcześniejsze potwierdzone zapisy pozostaną utrwalone. Publikacja i uruchomienie zapisów uczestników wymagają osobnych akcji.",
       "completed": "[PH] Odczyt potwierdził zapis sekcji",
       "failed": "[PH] Nie potwierdzono zapisu wszystkich zmian. Sprawdź wskazaną sekcję; pozostałe zmiany zachowano w formularzach.",
       "uncertain": "[PH] Zmiana mogła zostać zapisana. Sprawdź jej wynik przez ponowny odczyt. Kolejne sekcje nie będą zapisywane, dopóki wynik nie zostanie rozstrzygnięty.",
@@ -87,7 +98,8 @@
         "previewHint": "[PH] Propozycja dat nie jest potwierdzeniem zmiany kalendarza. Statusy terminów i udział miast pochodzą z zapisanych danych. Wynik zmiany potwierdzi odczyt po zapisie."
       },
       "checked": "[PH] Formularze i dostępne podglądy sekcji nie wykazały błędów. Przy zapisie każda sekcja zostanie ponownie zweryfikowana i odczytana.",
-      "discardConfirm": "[PH] Odrzucić niezapisane zmiany i wczytać aktualne dane? Potwierdzone wcześniej zapisy pozostaną zachowane."
+      "discardConfirmQuestion": "[PH] Odrzucić niezapisane zmiany i wczytać aktualne dane?",
+      "discardConfirm": "[PH] Potwierdzone wcześniej zapisy pozostaną zachowane."
     },
     "page": {
       "createTitle": "Nowe wydarzenie",
@@ -119,7 +131,8 @@
     },
     "globalPublication": {
       "hint": "[PH] Pierwsza publikacja udostępnia przygotowane lokalizacje i terminy. Aktywność wydarzenia, publikacja terminów i otwarcie zapisów uczestników są osobnymi stanami. Ta operacja nie otwiera zapisów.",
-      "confirm": "[PH] Opublikować wydarzenie? Sprawdzenie gotowości obejmuje {{cities}} lokalizacji i {{occurrences}} terminów do publikacji. Minione terminy pozostające szkicami: {{past}}. Publikacja utrwali dane wydawanych terminów. Zapisy uczestników nie zostaną otwarte.",
+      "confirmQuestion": "[PH] Opublikować wydarzenie?",
+      "confirm": "[PH] Sprawdzenie gotowości obejmuje {{cities}} lokalizacji i {{occurrences}} terminów do publikacji. Minione terminy pozostające szkicami: {{past}}. Publikacja utrwali dane wydawanych terminów. Zapisy uczestników nie zostaną otwarte.",
       "blocked": "[PH] Backend odmówił publikacji. Poniżej pokazano wynik ponownego sprawdzenia gotowości.",
       "uncertain": "[PH] Nie można potwierdzić wyniku publikacji. Ponów odczyt zapisanych danych. Operacja publikacji nie zostanie automatycznie powtórzona.",
       "readbackFailed": "[PH] Backend potwierdził publikację, ale nie udało się potwierdzić zapisanego stanu. Ponów sam odczyt.",
@@ -135,7 +148,8 @@
         "hint": "[PH] Wybierz lokalizacje i wspólne daty wydarzenia. Backend sprawdzi wszystkie wybrane połączenia lokalizacji i dat; wykluczone połączenia pozostaną bez zmian. Publikacja nie otwiera zapisów uczestników ani nie publikuje programu.",
         "dates": "[PH] Wspólne daty do publikacji",
         "preview": "[PH] Sprawdź wybrany zakres",
-        "confirm": "[PH] Opublikować wybrany zakres? Lokalizacje: {{cities}}. Wspólne daty: {{dates}}. Terminy do publikacji: {{planned}}; już opublikowane: {{already}}; wykluczone połączenia: {{excluded}}; aktualizacje dawnej polityki pojemności: {{upgrades}}. Lokalizacje do aktywacji: {{activate}}. Pozostałe lokalizacje i daty pozostaną bez zmian. Zapisy uczestników nie zostaną otwarte, a program nie zostanie opublikowany.",
+        "confirmQuestion": "[PH] Opublikować wybrany zakres?",
+        "confirm": "[PH] Lokalizacje: {{cities}}. Wspólne daty: {{dates}}. Terminy do publikacji: {{planned}}; już opublikowane: {{already}}; wykluczone połączenia: {{excluded}}; aktualizacje dawnej polityki pojemności: {{upgrades}}. Lokalizacje do aktywacji: {{activate}}. Pozostałe lokalizacje i daty pozostaną bez zmian. Zapisy uczestników nie zostaną otwarte, a program nie zostanie opublikowany.",
         "alreadyPublishedOccurrences": "[PH] Już opublikowane terminy w zakresie",
         "legacyCapacityUpgrades": "[PH] Aktualizacje dawnej polityki pojemności",
         "excludedSelections": "[PH] Pominięte wykluczone połączenia lokalizacji i dat",
@@ -146,6 +160,7 @@
         "publishedOccurrences": "[PH] Nowo opublikowane terminy",
         "activatedEditions": "[PH] Nowo aktywowane lokalizacje",
         "endReadback": "[PH] Zakończ sprawdzanie wyniku",
+        "endReadbackQuestion": "[PH] Zakończyć sprawdzanie wyniku publikacji?",
         "endReadbackWarning": "[PH] Publikacja mogła zostać wykonana. Zakończenie sprawdzania odblokuje edycję bez potwierdzenia sukcesu i bez ponowienia publikacji. Sprawdź aktualne zapisane dane przed kolejną operacją.",
         "readbackEnded": "[PH] Zakończono sprawdzanie bez potwierdzenia wyniku publikacji. Publikacja mogła zostać wykonana. Operacja nie została ponowiona.",
         "blockers": {
@@ -240,8 +255,10 @@
       "uncertain": "[PH] Nie udało się potwierdzić aktualnej okładki. Ponów odczyt lub wybierz Anuluj, aby zakończyć sprawdzanie wyniku.",
       "cleanupFailed": "[PH] Nie udało się usunąć nieużywanego obrazu. Ponów usuwanie lub wybierz Anuluj, aby zakończyć operację i zachować pozostałe obrazy.",
       "conflict": "[PH] Dane wydarzenia zmieniły się podczas zapisu okładki. Wczytano aktualny stan. Sprawdź go przed ponownym zapisem.",
-      "abandonConfirm": "[PH] Zakończyć sprawdzanie wyniku zapisu okładki? Zapis mógł zostać wykonany lub zakończyć się później. Przesłany obraz pozostanie zachowany. Przed kolejną zmianą trzeba odświeżyć dane wydarzenia.",
-      "abandonCleanupConfirm": "[PH] Zakończyć usuwanie nieużywanego obrazu? Nieusunięte obrazy pozostaną w bibliotece. Zakończenie nie cofa zapisu. Przed kolejną zmianą trzeba odświeżyć dane wydarzenia.",
+      "abandonConfirmQuestion": "[PH] Zakończyć sprawdzanie wyniku zapisu okładki?",
+      "abandonConfirm": "[PH] Zapis mógł zostać wykonany lub zakończyć się później. Przesłany obraz pozostanie zachowany. Przed kolejną zmianą trzeba odświeżyć dane wydarzenia.",
+      "abandonCleanupConfirmQuestion": "[PH] Zakończyć usuwanie nieużywanego obrazu?",
+      "abandonCleanupConfirm": "[PH] Nieusunięte obrazy pozostaną w bibliotece. Zakończenie nie cofa zapisu. Przed kolejną zmianą trzeba odświeżyć dane wydarzenia.",
       "abandonAction": "[PH] Zakończ operację",
       "abandoned": "[PH] Zakończono sprawdzanie wyniku zapisu okładki. Wynik pozostaje niepotwierdzony. Odśwież dane wydarzenia, aby odblokować kolejne zmiany.",
       "cleanupAbandoned": "[PH] Zakończono usuwanie nieużywanych obrazów. Nieusunięte obrazy pozostawiono w bibliotece. Odśwież dane wydarzenia, aby odblokować kolejne zmiany.",
@@ -268,7 +285,8 @@
       "refresh": "[PH] Odśwież dane bez odrzucania formularza",
       "discard": "[PH] Odrzuć lokalne zmiany",
       "discardConfirm": "[PH] Odrzucić wyłącznie lokalne zmiany i wczytać formularz z aktualnych danych? Istniejący szkic w bazie pozostanie bez zmian i nie zostanie zastosowany.",
-      "leave": "[PH] Opuścić edytor harmonogramu? Niezapisane zmiany formularza zostaną utracone. Zapisany szkic pozostanie niezastosowany. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później; opuszczenie edytora jej nie powtarza ani nie cofa.",
+      "leaveQuestion": "[PH] Opuścić edytor harmonogramu?",
+      "leave": "[PH] Niezapisane zmiany formularza zostaną utracone. Zapisany szkic pozostanie niezastosowany. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później; opuszczenie edytora jej nie powtarza ani nie cofa.",
       "added": "[PH] Nowe daty",
       "retired": "[PH] Wycofywane terminy",
       "preserved": "[PH] Zachowane daty historyczne",
@@ -293,7 +311,8 @@
       "refresh": "[PH] Odśwież dane bez odrzucania formularza",
       "discard": "[PH] Odrzuć lokalne zmiany bloków",
       "discardConfirm": "[PH] Odrzucić lokalne zmiany podstawowych bloków i odtworzyć formularz z aktualnego kalendarza? Ta akcja nie zmienia zapisanych danych.",
-      "leave": "[PH] Opuścić edytor podstawowych bloków? Niezapisane dane formularza zostaną utracone. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później. Opuszczenie edytora jej nie powtarza ani nie cofa.",
+      "leaveQuestion": "[PH] Opuścić edytor podstawowych bloków?",
+      "leave": "[PH] Niezapisane dane formularza zostaną utracone. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później. Opuszczenie edytora jej nie powtarza ani nie cofa.",
       "gmRange": "[PH] Podaj całkowitą liczbę MG od 0 do 32767.",
       "duration": "[PH] Koniec bloku musi przypadać po początku.",
       "preservedDateOverrides": "[PH] Zachowane konfiguracje dat",
@@ -335,7 +354,8 @@
       "refresh": "[PH] Odśwież politykę bez odrzucania formularza",
       "discard": "[PH] Odrzuć lokalne zmiany polityki",
       "discardConfirm": "[PH] Odrzucić lokalne zmiany polityki i odtworzyć formularze z aktualnego odczytu? Zapisany szkic pozostanie w bazie i nie zostanie zastosowany.",
-      "leave": "[PH] Opuścić edytor polityki? Niezapisane dane formularzy zostaną utracone. Zapisany szkic pozostanie niezastosowany. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później; opuszczenie edytora jej nie powtarza ani nie cofa."
+      "leaveQuestion": "[PH] Opuścić edytor polityki?",
+      "leave": "[PH] Niezapisane dane formularzy zostaną utracone. Zapisany szkic pozostanie niezastosowany. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później; opuszczenie edytora jej nie powtarza ani nie cofa."
     },
     "metadata": {
       "readOnly": "[PH] Te metadane są dostępne tylko do odczytu.",
@@ -370,7 +390,8 @@
       "uncertain": "[PH] Nie można potwierdzić wyniku zapisu. Zachowano wpisane dane. Ponów ten sam zapis, aby ustalić wynik bez dodawania drugiego miasta. Nie odświeżaj strony.",
       "readbackFailed": "[PH] Miasto zostało zapisane, ale nie udało się odświeżyć danych. Ponów odczyt.",
       "saved": "[PH] Miasto zostało dodane do szkicu.",
-      "leaveConfirmation": "[PH] Opuścić edytor i porzucić niezapisane dane miasta?",
+      "leaveConfirmationQuestion": "[PH] Opuścić edytor i porzucić niezapisane dane miasta?",
+      "leaveConfirmation": "[PH] Niezapisane dane miasta zostaną utracone.",
       "discard": "[PH] Porzuć dane miasta"
     },
     "pagePreview": {
@@ -464,7 +485,8 @@
       },
       "programAfterSave": "[PH] Zapisz szkic wydarzenia, aby zobaczyć dane lokalnego programu.",
       "savedData": "[PH] Podgląd zapisanych danych wydarzenia.",
-      "leaveConfirmation": "[PH] Opuścić kreator i porzucić niezapisane dane wydarzenia?",
+      "leaveConfirmationQuestion": "[PH] Opuścić kreator i porzucić niezapisane dane wydarzenia?",
+      "leaveConfirmation": "[PH] Niezapisane dane wydarzenia zostaną utracone.",
       "discardDraft": "[PH] Porzuć dane",
       "help": "[PH] Wyjaśnienie ustawienia",
       "signupKindHint": "[PH] Wybierz zapisy na sesje, na całe wydarzenie albo oba rodzaje. Każdy rodzaj ma osobną pulę miejsc. Wybór sposobu zapisów nie otwiera rejestracji uczestników.",
@@ -617,7 +639,8 @@
       "unavailable": "[PH] Przypisanie wymaga prywatnego Global Event, niechronionego planowanego terminu i rzeczywistych bloków. Najpierw zakończ inne operacje oraz rozstrzygnij szkic kalendarza.",
       "block": "[PH] Blok programu",
       "position": "[PH] Pozycja slotu",
-      "discardConfirm": "[PH] Odrzucić lokalne dane pozycji programu?",
+      "discardConfirmQuestion": "[PH] Odrzucić lokalne dane pozycji programu?",
+      "discardConfirm": "[PH] Niezapisane dane pozycji programu zostaną odrzucone.",
       "saved": "[PH] Potwierdzono dodanie nieopublikowanej pozycji programu.",
       "failed": "[PH] Nie udało się potwierdzić zapisu pozycji programu.",
       "uncertain": "[PH] Wynik zapisu nie został potwierdzony. Sam zgodny wpis w programie nie potwierdza tej operacji bez identyfikatora zwróconego przez zapis. Ponów wyłącznie odczyt lub świadomie zakończ operację.",
@@ -626,7 +649,8 @@
       "intervalInvalid": "[PH] Godziny i offsety muszą tworzyć dodatni przedział mieszczący się w dokładnie jednym efektywnym bloku tego miasta i terminu. Wybierz ten blok.",
       "positionTaken": "[PH] Ta pozycja slotu jest już zajęta. Wybierz wolną pozycję; istniejące pozycje programu pozostają bez zmian.",
       "abandon": "[PH] Zakończ bez potwierdzenia",
-      "abandonConfirm": "[PH] Zakończyć nierozstrzygniętą operację? Zapis mógł się powieść. Zakończenie nie usuwa pozycji ani nie ponawia zapisu. Przed kolejnym przypisaniem trzeba odświeżyć program i sprawdzić, czy pozycja już istnieje.",
+      "abandonConfirmQuestion": "[PH] Zakończyć sprawdzanie wyniku zapisu pozycji programu?",
+      "abandonConfirm": "[PH] Zapis mógł się powieść. Zakończenie nie usuwa pozycji ani nie ponawia zapisu. Przed kolejnym przypisaniem trzeba odświeżyć program i sprawdzić, czy pozycja już istnieje.",
       "refreshRequired": "[PH] Operację zakończono bez potwierdzenia. Zapis mógł się powieść. Odśwież program i sprawdź istniejące pozycje przed kolejnym przypisaniem."
     },
     "manualRpg": {
@@ -640,7 +664,8 @@
       "slotLabel": "[PH] Etykieta slotu programu",
       "capacity": "[PH] Limit graczy tej pozycji",
       "capacityHint": "[PH] Puste pole zachowuje limit wynikający z sesji i polityki wydarzenia. Jawny limit dotyczy wyłącznie tej pozycji programu.",
-      "saveConfirm": "[PH] Przypisać wybraną sesję MG do programu tego miasta i terminu? Operacja nie publikuje pozycji ani nie otwiera zapisów.",
+      "saveConfirmQuestion": "[PH] Przypisać wybraną sesję MG do programu tego miasta i terminu?",
+      "saveConfirm": "[PH] Operacja nie publikuje pozycji ani nie otwiera zapisów.",
       "catalogFailed": "[PH] Nie udało się odczytać MG lub jego sesji.",
       "noSessions": "[PH] Brak sesji tego rodzaju dla wybranego MG."
     },
@@ -656,7 +681,8 @@
       "catalogFailed": "[PH] Nie udało się odczytać rodzajów aktywności.",
       "emptyKinds": "[PH] Brak aktywnych rodzajów aktywności. Odśwież katalog lub wróć później.",
       "refreshKinds": "[PH] Odśwież rodzaje aktywności",
-      "saveConfirm": "[PH] Zapisać aktywność w programie tego miasta i terminu? Zapis nie publikuje aktywności ani nie otwiera zapisów uczestników."
+      "saveConfirmQuestion": "[PH] Zapisać aktywność w programie tego miasta i terminu?",
+      "saveConfirm": "[PH] Zapis nie publikuje aktywności ani nie otwiera zapisów uczestników."
     },
     "title": "[PH] Program lokalny",
     "entry": "[PH] Pozycja programu",

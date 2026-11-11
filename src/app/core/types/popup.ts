@@ -1,3 +1,6 @@
+import type { TemplateRef } from '@angular/core';
+import type { ButtonSeverity } from 'primeng/types/button';
+
 export type PopupTargetEvent = Pick<Event, 'currentTarget'>;
 
 export type BasePopupOptions = {
@@ -11,8 +14,10 @@ export type BasePopupOptions = {
 export type DecisionPopupOptions = BasePopupOptions & {
   rejectLabel: string;
   reject?: () => void;
+  acceptSeverity?: ButtonSeverity;
 };
 
-export type ModalDecisionPopupOptions = Omit<DecisionPopupOptions, 'accept' | 'reject'> & {
+export type ModalDecisionPopupOptions = Omit<DecisionPopupOptions, 'accept' | 'reject' | 'icon'> & {
   header: string;
+  messageTemplate?: TemplateRef<unknown>;
 };

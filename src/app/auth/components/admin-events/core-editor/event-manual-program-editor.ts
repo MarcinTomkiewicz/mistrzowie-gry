@@ -66,7 +66,7 @@ export class EventManualProgramEditor {
     const operation = this.editor.operation();
     const value = JSON.stringify(this.editor.form.getRawValue());
     this.confirm.modalDecision({
-      header: this.actionCopy().action, message: this.actionCopy().saveConfirm,
+      header: this.actionCopy().saveConfirmQuestion, message: this.actionCopy().saveConfirm,
       acceptLabel: this.actionCopy().action, rejectLabel: this.i18n.actions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
       if (accepted && this.editor.context() === context && this.editor.operation() === operation &&
@@ -79,7 +79,8 @@ export class EventManualProgramEditor {
     const operation = this.editor.operation();
     const abandoning = this.editor.canAbandon();
     this.confirm.modalDecision({
-      header: this.actionCopy().action, message: abandoning ? this.copy().abandonConfirm : this.copy().discardConfirm,
+      header: abandoning ? this.copy().abandonConfirmQuestion : this.copy().discardConfirmQuestion,
+      message: abandoning ? this.copy().abandonConfirm : this.copy().discardConfirm,
       acceptLabel: abandoning ? this.copy().abandon : this.i18n.actions().close, rejectLabel: this.i18n.actions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
       if (accepted && this.editor.operation() === operation) {

@@ -23,6 +23,15 @@ export type ListToastCopy = {
   deactivateSuccessSummary: string;
   deactivateSuccessDetail: string;
   activationFailedSummary: string;
+  activationUnconfirmedSummary: string;
+  activationUnconfirmedDetail: string;
+};
+
+export type EventCoreActivationReadbackCopy = {
+  end: string;
+  endQuestion: string;
+  endWarning: string;
+  ended: string;
 };
 
 export type EventCoreDispositionCopy = {
@@ -33,9 +42,12 @@ export type EventCoreDispositionCopy = {
   selected: string;
   selectionLimit: string;
   bulk: string;
-  previewTitle: string;
-  confirm: string;
-  confirmation: string;
+  previewHeading: string;
+  previewDeleteHeading: string;
+  previewArchiveHeading: string;
+  confirmDelete: string;
+  confirmMixed: string;
+  confirmArchive: string;
   deleteCount: string;
   archiveCount: string;
   blockedCount: string;
@@ -48,7 +60,6 @@ export type EventCoreDispositionCopy = {
   retryRead: string;
   archivedReadOnly: string;
   unavailable: string;
-  outcomes: Record<'deleted' | 'archived' | 'blocked', string>;
   reasons: Record<EventCoreDispositionReason, string>;
   errors: { forbidden: string; invalid: string; reused: string; stale: string; protected: string; failed: string };
 };
@@ -118,7 +129,9 @@ export type CoreCoverCopy = {
   uncertain: string;
   cleanupFailed: string;
   conflict: string;
+  abandonConfirmQuestion: string;
   abandonConfirm: string;
+  abandonCleanupConfirmQuestion: string;
   abandonCleanupConfirm: string;
   abandonAction: string;
   abandoned: string;

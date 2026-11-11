@@ -19,6 +19,7 @@ import { finalize } from 'rxjs';
 import { ImageStorage } from '../../../../core/services/image-storage/image-storage';
 import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { moveFormArrayControl } from '../../../../core/utils/form-controls';
 import {
   ArticleEditorBlockForm,
   ArticleEditorBlocksForm,
@@ -85,7 +86,7 @@ export class ArticleBlocksEditor {
       return;
     }
 
-    this.moveBlock(index, index - 1);
+    moveFormArrayControl(this.blocks(), index, index - 1);
   }
 
   protected moveBlockDown(index: number): void {
@@ -93,7 +94,7 @@ export class ArticleBlocksEditor {
       return;
     }
 
-    this.moveBlock(index, index + 1);
+    moveFormArrayControl(this.blocks(), index, index + 1);
   }
 
   protected imagePreviewUrl(path: string): string | null {
@@ -106,7 +107,6 @@ export class ArticleBlocksEditor {
 
   protected onBlockImageSelected(file: File | null, index: number): void {
     const block = this.blocks().at(index);
-    const previousPath = block.controls.imagePath.getRawValue();
 
     if (!file) {
       block.controls.imagePath.setValue('');
@@ -119,7 +119,6 @@ export class ArticleBlocksEditor {
     this.imageStorage
       .transcodeAndUpload(file, {
         folder: `content/articles/${this.articleId()}`,
-        replacePath: previousPath,
         usePublicUrl: false,
       })
       .pipe(
@@ -147,13 +146,6 @@ export class ArticleBlocksEditor {
     const insertIndex = index === null ? this.blocks().length : index + 1;
 
     this.blocks().insert(insertIndex, block);
-    this.blocks().markAsDirty();
-  }
-
-  private moveBlock(fromIndex: number, toIndex: number): void {
-    const control = this.blocks().at(fromIndex);
-    this.blocks().removeAt(fromIndex);
-    this.blocks().insert(toIndex, control);
     this.blocks().markAsDirty();
   }
 

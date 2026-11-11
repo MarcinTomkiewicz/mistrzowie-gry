@@ -126,7 +126,7 @@ export class EventCoreCover {
     }
     this.isConfirming.set(true);
     this.confirm.modalDecision({
-      header: this.i18n.commonLabels().cover,
+      header: this.cover.state() === 'cleanup' ? this.copy().abandonCleanupConfirmQuestion : this.copy().abandonConfirmQuestion,
       message: this.cover.state() === 'cleanup' ? this.copy().abandonCleanupConfirm : this.copy().abandonConfirm,
       acceptLabel: this.copy().abandonAction, rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isConfirming.set(false))).subscribe(accepted => {

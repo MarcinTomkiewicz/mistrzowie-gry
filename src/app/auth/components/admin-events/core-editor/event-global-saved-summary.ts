@@ -197,7 +197,7 @@ export class EventGlobalSavedSummary {
       .replace('{{planned}}', String(impact.plannedOccurrenceCount)).replace('{{already}}', String(impact.alreadyPublishedOccurrenceCount))
       .replace('{{excluded}}', String(impact.excludedSelections)).replace('{{upgrades}}', String(impact.legacyCapacityUpgrades))
       .replace('{{activate}}', this.scopeActivationCities() || this.i18n.commonValues().notApplicable);
-    this.confirm.modalDecision({ header: this.publicationCopy().scope.title, message,
+    this.confirm.modalDecision({ header: this.publicationCopy().scope.confirmQuestion, message,
       acceptLabel: this.publicationLabels().publish, rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(switchMap(accepted => {
       if (!accepted || coreId !== this.coreId() || !this.isAdmin()) {
@@ -221,7 +221,7 @@ export class EventGlobalSavedSummary {
         .replace('{{occurrences}}', String(preview.impact.publishableOccurrenceCount))
         .replace('{{past}}', String(preview.impact.preservedPastDraftOccurrences));
       return this.confirm.modalDecision({
-        header: this.publicationLabels().title,
+        header: this.publicationCopy().confirmQuestion,
         message: message + (preview.policyDraftRevision > 0 ? ' ' + this.publicationCopy().policyDraft : ''),
         acceptLabel: this.publicationLabels().publish, rejectLabel: this.i18n.commonActions().cancel,
       }).pipe(switchMap(accepted => {
@@ -250,8 +250,8 @@ export class EventGlobalSavedSummary {
     const coreId = this.coreId();
     this.scopeDecisionPending.set(true);
     this.confirm.modalDecision({
-      header: this.publicationCopy().scope.title, message: this.publicationCopy().scope.endReadbackWarning,
-      icon: 'pi pi-exclamation-triangle', acceptLabel: this.publicationCopy().scope.endReadback,
+      header: this.publicationCopy().scope.endReadbackQuestion, message: this.publicationCopy().scope.endReadbackWarning,
+      acceptLabel: this.publicationCopy().scope.endReadback,
       rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.scopeDecisionPending.set(false))).subscribe(accepted => {
       if (accepted && coreId === this.coreId() && this.isAdmin() && this.publication.abandonScopeReadback()) {

@@ -230,7 +230,7 @@ export class EventCoreEditor {
     if (!this.canCancel() || this.saveChanges.pending()) return;
     const coreId = this.coreId();
     this.confirm.modalDecision({
-      header: this.i18n.page().editTitle, message: this.i18n.saveChanges().discardConfirm,
+      header: this.i18n.saveChanges().discardConfirmQuestion, message: this.i18n.saveChanges().discardConfirm,
       acceptLabel: this.i18n.creation().discardDraft, rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
       if (!accepted || coreId !== this.coreId() || !this.canCancel() || this.saveChanges.pending()) return;
@@ -316,7 +316,7 @@ export class EventCoreEditor {
       if (this.creating() || this.globalDraft.state() === 'uncertain') return false;
       if (this.globalDraft.form.pristine) return true;
       return this.confirm.modalDecision({
-        header: this.i18n.page().createTitle, icon: 'pi pi-interdiction',
+        header: this.i18n.creation().leaveConfirmationQuestion,
         message: this.i18n.creation().leaveConfirmation,
         acceptLabel: this.i18n.creation().discardDraft, acceptIcon: 'pi pi-vacuum-cleaner',
         rejectLabel: this.i18n.commonActions().cancel,
@@ -331,10 +331,10 @@ export class EventCoreEditor {
     const endingProgram = this.program.canAbandon();
     const endingCover = this.cover.canAbandon();
     const decision = endingProgram ? this.confirm.modalDecision({
-      header: this.i18n.creationSteps().program, message: this.programCopy().abandonConfirm,
+      header: this.programCopy().abandonConfirmQuestion, message: this.programCopy().abandonConfirm,
       acceptLabel: this.programCopy().abandon, rejectLabel: this.i18n.commonActions().cancel,
     }) : endingCover ? this.confirm.modalDecision({
-      header: this.i18n.commonLabels().cover,
+      header: this.cover.state() === 'cleanup' ? this.coverCopy().abandonCleanupConfirmQuestion : this.coverCopy().abandonConfirmQuestion,
       message: this.cover.state() === 'cleanup' ? this.coverCopy().abandonCleanupConfirm : this.coverCopy().abandonConfirm,
       acceptLabel: this.coverCopy().abandonAction,
       rejectLabel: this.i18n.commonActions().cancel,
@@ -346,9 +346,8 @@ export class EventCoreEditor {
       if (!this.hasUnsavedChanges()) return of(!this.cover.locked());
       const city = this.globalDraft.cityEditing();
       return this.confirm.modalDecision({
-        header: this.program.locked() ? this.i18n.creationSteps().program : this.policy.locked() ? this.i18n.policyEditor().title : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().title
-          : this.schedule.locked() ? this.i18n.commonLabels().schedule : city ? this.i18n.city().action
-          : this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ? this.i18n.page().editTitle : this.i18n.datedBlocks().editTitle,
+        header: this.program.locked() ? this.programCopy().discardConfirmQuestion : this.policy.locked() ? this.i18n.policyEditor().leaveQuestion : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leaveQuestion
+          : this.schedule.locked() ? this.i18n.schedule().leaveQuestion : city ? this.i18n.city().leaveConfirmationQuestion : this.i18n.creation().leaveConfirmationQuestion,
         message: this.program.locked() ? this.programCopy().discardConfirm : this.policy.locked() ? this.i18n.policyEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.i18n.schedule().leave
           : city ? this.i18n.city().leaveConfirmation : this.i18n.creation().leaveConfirmation,
         acceptLabel: this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() ? this.i18n.commonActions().close : city ? this.i18n.city().discard : this.i18n.creation().discardDraft,

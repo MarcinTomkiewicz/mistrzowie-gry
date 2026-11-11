@@ -151,8 +151,8 @@ export class EventPageProgram {
     const operation = this.offline.operation();
     if (!operation || !this.offline.canEndReadback() || this.offlineDecisionPending()) return;
     this.offlineDecisionPending.set(true);
-    this.confirm.modalDecision({ header: this.i18n.offlineSeats().title, message: this.i18n.offlineSeats().endReadbackWarning,
-      icon: 'pi pi-exclamation-triangle', acceptLabel: this.i18n.offlineSeats().endReadback, rejectLabel: this.i18n.actions().cancel,
+    this.confirm.modalDecision({ header: this.i18n.offlineSeats().endReadbackQuestion, message: this.i18n.offlineSeats().endReadbackWarning,
+      acceptLabel: this.i18n.offlineSeats().endReadback, rejectLabel: this.i18n.actions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.offlineDecisionPending.set(false))).subscribe(accepted => {
       if (accepted && this.offline.operation() === operation) this.offline.endReadback();
     });

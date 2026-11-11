@@ -3,20 +3,20 @@ import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, Admin
 import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker } from '../../interfaces/i-admin-global-event-publication';
 import type { ParticipantSignupKind } from '../../enums/event';
 
-export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
-  'retryRead' | 'localChanges' | 'saved' | 'discardConfirm' | 'checked', string> & {
+export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirmQuestion' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
+  'retryRead' | 'localChanges' | 'saved' | 'discardConfirmQuestion' | 'discardConfirm' | 'checked', string> & {
     dates: Record<'saved' | 'added' | 'retained' | 'removed' | 'outside' | 'protected' |
       'savedState' | 'newDateHint' | 'previewNeeded' | 'previewHint', string>;
   };
 
 export type EventGlobalPublicationCopy = Record<
-  'hint' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'verified' | 'alreadyReleased' |
+  'hint' | 'confirmQuestion' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'verified' | 'alreadyReleased' |
   'affectedCities' | 'publishableOccurrences' | 'preservedPastDrafts' | 'policyDraft' | 'block', string
 > & {
   blockers: Record<AdminGlobalPublicationBlocker['code'], string>;
-  scope: Record<'title' | 'hint' | 'dates' | 'preview' | 'confirm' | 'alreadyPublishedOccurrences' | 'legacyCapacityUpgrades' |
+  scope: Record<'title' | 'hint' | 'dates' | 'preview' | 'confirmQuestion' | 'confirm' | 'alreadyPublishedOccurrences' | 'legacyCapacityUpgrades' |
     'excludedSelections' | 'activateEditions' | 'selectionRequired' | 'ready' | 'revision' | 'publishedOccurrences' | 'activatedEditions' |
-    'endReadback' | 'endReadbackWarning' | 'readbackEnded', string> & {
+    'endReadback' | 'endReadbackQuestion' | 'endReadbackWarning' | 'readbackEnded', string> & {
       blockers: Record<AdminGlobalScopePublicationBlocker['code'], string>;
     };
 };
@@ -84,6 +84,7 @@ export type EventGlobalPolicyCopy = {
   refresh: string;
   discard: string;
   discardConfirm: string;
+  leaveQuestion: string;
   leave: string;
 };
 
@@ -105,6 +106,7 @@ export type EventGlobalBaseTimeBlocksCopy = {
   refresh: string;
   discard: string;
   discardConfirm: string;
+  leaveQuestion: string;
   leave: string;
   gmRange: string;
   duration: string;
@@ -132,6 +134,7 @@ export type EventGlobalScheduleCopy = {
   refresh: string;
   discard: string;
   discardConfirm: string;
+  leaveQuestion: string;
   leave: string;
   added: string;
   retired: string;
@@ -162,6 +165,7 @@ export type EventGlobalCityCopy = {
   uncertain: string;
   readbackFailed: string;
   saved: string;
+  leaveConfirmationQuestion: string;
   leaveConfirmation: string;
   discard: string;
 };
@@ -202,6 +206,7 @@ export type EventGlobalDraftCopy = {
   steps: Record<'event' | 'location' | 'schedule' | 'policy' | 'program' | 'summary', string>;
   programAfterSave: string;
   savedData: string;
+  leaveConfirmationQuestion: string;
   leaveConfirmation: string;
   discardDraft: string;
   help: string;
