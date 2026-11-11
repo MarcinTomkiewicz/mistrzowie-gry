@@ -10,7 +10,7 @@ import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { activeScheduleBlocks, EventGlobalScheduleError, type GlobalScheduleCommand, type GlobalScheduleIssue,
-  matchesAppliedSchedule, matchesSavedSchedule, preserveScheduleExclusions, sameScheduleChange,
+  matchesAppliedSchedule, matchesSavedSchedule, preserveScheduleExclusions, sameSchedule, sameScheduleChange,
   validateScheduleContext } from './event-global-schedule-state';
 
 type ScheduleState = 'idle' | 'draft' | 'save-uncertain' | 'save-readback' | 'apply-uncertain' | 'apply-readback' | 'conflict';
@@ -46,8 +46,6 @@ export class EventGlobalScheduleController {
   });
   readonly canApply = computed(() => this.canEdit() && !this.isBusy() && this.state() === 'draft' &&
     this.command() !== null && this.command()?.savedRevision !== null);
-  readonly canDiscard = computed(() => !this.isBusy() && !this.blocked() &&
-    ['idle', 'draft', 'conflict'].includes(this.state()) && (this.dirty() || this.state() !== 'idle'));
 
   constructor() {
     effect(() => {
@@ -93,7 +91,21 @@ export class EventGlobalScheduleController {
       this.recordFailure(error);
     }
     this.restoreForm(calendar);
-    if (calendar.pendingDraft && this.allowed()) this.form.markAsDirty();
+    if (calendar.pendingDraft && this.allowed()) {
+      this.command.set({ coreId: calendar.coreId, ...calendar.pendingDraft, baseline: calendar,
+        savedRevision: calendar.pendingDraft.revision, appliedRevision: null });
+      this.state.set('draft');
+    }
+  }
+
+  acceptBaseReadback(calendar: AdminGlobalCalendarResult): void {
+    const previous = this.editBaseline;
+    assertEdgeContract(previous !== null && previous.coreId === calendar.coreId && this.state() === 'idle' &&
+      sameSchedule(previous.schedule, calendar.schedule) && previous.draftRevision === calendar.draftRevision &&
+      JSON.stringify(previous.pendingDraft) === JSON.stringify(calendar.pendingDraft),
+    'globalSchedule.baseReadback', 'a confirmed base-block save preserving the schedule edit baseline');
+    this.editBaseline = calendar;
+    this.calendar.set(calendar);
   }
 
   previewChanges(): Observable<AdminGlobalCalendarPreview> {
@@ -184,20 +196,9 @@ export class EventGlobalScheduleController {
 
   refresh(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
-      if (this.isBusy() || this.blocked()) return EMPTY;
-      return this.run('read', this.readCurrent(false).pipe(tap(calendar => {
-        if (this.command() && this.state() !== 'idle' && this.state() !== 'conflict') this.reconcile(calendar);
-        else if (this.dirty() && this.editBaseline && (calendar.calendarRevision !== this.editBaseline.calendarRevision ||
-          calendar.draftRevision !== this.editBaseline.draftRevision)) throw new EventGlobalScheduleError('conflict');
-        else if (!this.dirty()) this.restoreForm(calendar);
-        else this.state.set('idle');
-      })));
+      if (this.isBusy() || this.blocked() || !this.command() || !/-(uncertain|readback)$/.test(this.state())) return EMPTY;
+      return this.run('read', this.readCurrent(false).pipe(tap(calendar => this.reconcile(calendar))));
     });
-  }
-
-  discardLocalChanges(): Observable<AdminGlobalCalendarResult> {
-    return defer(() => this.canDiscard()
-      ? this.run('read', this.readCurrent(false).pipe(tap(calendar => this.restoreForm(calendar)))) : EMPTY);
   }
 
   private readCurrent(requireEditable = true): Observable<AdminGlobalCalendarResult> {
@@ -238,15 +239,14 @@ export class EventGlobalScheduleController {
     } else if (this.state().endsWith('uncertain')) {
       this.issue.set('readback');
     } else {
-      this.state.set('conflict');
       this.form.markAsDirty();
-      this.command.set(null);
-      this.issue.set('conflict');
+      this.issue.set('readback');
+      assertEdgeContract(false, 'globalSchedule.readback', 'the exact pending calendar draft or applied schedule');
     }
   }
 
   private run<T>(operation: 'preview' | 'save' | 'apply' | 'read', request: Observable<T>): Observable<T> {
-    if (operation === 'preview' || (operation === 'read' && (this.state() === 'idle' || this.state() === 'conflict'))) {
+    if (operation === 'preview') {
       this.preview.set(null);
       this.command.set(null);
     }

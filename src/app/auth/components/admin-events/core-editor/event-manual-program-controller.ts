@@ -1,6 +1,6 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, defer, EMPTY, finalize, map, Observable, of, Subscription, switchMap, tap, throwError } from 'rxjs';
+import { catchError, defer, EMPTY, finalize, map, merge, Observable, of, Subscription, switchMap, tap, throwError } from 'rxjs';
 
 import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
 import type { AdminEventActivityKind } from '../../../../core/interfaces/i-admin-event-activity';
@@ -17,7 +17,7 @@ import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { formatTimeLabel } from '../../../../core/utils/time-format';
 import {
   assertManualActivitySave, assertManualRpgSave, canAddManualProgram, createManualActivityForm, createManualRpgForm,
-  manualProgramBlocks, manualProgramIntervalValid, mapManualActivity, mapManualRpgSlot, matchesConfirmedManualProgram, readActiveActivityKinds,
+  manualProgramBlocks, manualProgramDayOffsets, manualProgramIntervalValid, mapManualActivity, mapManualRpgSlot, matchesConfirmedManualProgram, readActiveActivityKinds,
   type ConfirmedManualProgramCommand, type ManualProgramCommand, type ManualProgramContext, type ManualProgramKind, type ManualProgramTarget,
 } from './event-manual-program-state';
 
@@ -78,6 +78,14 @@ export class EventManualProgramController {
       setControlEnabled(this.rpgForm, enabled && this.mode() === 'rpg');
       setControlEnabled(this.activityForm, enabled && this.mode() === 'activity');
     });
+    for (const form of [this.rpgForm, this.activityForm]) {
+      merge(form.controls.startTime.valueChanges, form.controls.endTime.valueChanges)
+        .pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+          if (form.disabled || this.blocked() || this.operation().phase !== 'editing') return;
+          const days = manualProgramDayOffsets(form.getRawValue(), this.blocks());
+          if (days) form.patchValue(days, { emitEvent: false });
+        });
+    }
     this.destroyRef.onDestroy(() => this.catalogRequest?.unsubscribe());
   }
 

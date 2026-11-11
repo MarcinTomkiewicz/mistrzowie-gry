@@ -21,6 +21,8 @@ import { EventGlobalPublicationController } from './event-global-publication-con
 import { readEventGlobalSavedSummary } from './event-global-saved-summary-read';
 import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
 import { EventGlobalPagePreview } from './event-global-page-preview';
+import { EventGlobalSaveController } from './event-global-save-controller';
+import { readEventGlobalSummaryChanges } from './event-global-summary-changes';
 
 @Component({
   selector: 'app-event-global-saved-summary',
@@ -38,6 +40,8 @@ export class EventGlobalSavedSummary {
   protected readonly publicationLabels = this.editionI18n.publication;
   protected readonly publication = inject(EventGlobalPublicationController);
   protected readonly publicationCopy = this.i18n.globalPublication;
+  protected readonly save = inject(EventGlobalSaveController);
+  protected readonly changes = computed(() => readEventGlobalSummaryChanges(this.save));
   private readonly auth = inject(Auth);
   private readonly confirm = inject(UiConfirm);
   private readonly destroyRef = inject(DestroyRef);
@@ -65,7 +69,8 @@ export class EventGlobalSavedSummary {
     return calendar?.coreId === this.coreId() ? calendar : this.snapshot()?.calendar ?? null;
   });
   protected readonly scopeDates = computed(() => this.scopeCalendar()?.globalDates.filter(day => day.status === 'scheduled') ?? []);
-  protected readonly canPreviewScope = computed(() => this.browserReady() && this.isAdmin() && this.scoped() && !this.disabled() &&
+  protected readonly unsaved = computed(() => this.save.dirty() || this.save.busy() || this.save.pending());
+  protected readonly canPreviewScope = computed(() => this.browserReady() && this.isAdmin() && this.scoped() && !this.disabled() && !this.unsaved() &&
     !this.loading() && this.error() === null && !this.publication.locked() && this.scopeEditionIds().length > 0 && this.scopeDateIds().length > 0);
   protected readonly scopeSelection = computed(() => {
     const preview = this.publication.scopePreview();
@@ -80,7 +85,7 @@ export class EventGlobalSavedSummary {
   });
   protected readonly scopeActivationCities = computed(() => this.publication.scopePreview()?.impact.willActivateEditionIds
     .map(id => this.scopeCalendar()?.cities.find(city => city.editionId === id)?.city ?? id).join(', ') ?? '');
-  protected readonly canPublish = computed(() => this.browserReady() && this.isAdmin() && !this.disabled() &&
+  protected readonly canPublish = computed(() => this.browserReady() && this.isAdmin() && !this.disabled() && !this.unsaved() &&
     !this.loading() && this.error() === null && this.snapshot()?.core.id === this.coreId() &&
     !this.hasRelease() && !this.publication.locked());
   protected readonly publicationError = computed(() => {
@@ -129,6 +134,12 @@ export class EventGlobalSavedSummary {
   constructor() {
     // Privileged reads run in the browser, following EventGlobalProgram's boundary.
     afterNextRender(() => this.browserReady.set(true));
+    effect(() => {
+      if (!this.save.busy() && (this.save.completed().length || this.save.pending())) {
+        // Refresh the whole view after partial saves without resolving the retained writer operation.
+        untracked(() => this.readAttempt.update(value => value + 1));
+      }
+    });
     effect(onCleanup => {
       const ready = this.browserReady();
       const coreId = this.coreId();

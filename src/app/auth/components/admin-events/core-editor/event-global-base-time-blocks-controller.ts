@@ -11,6 +11,7 @@ import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { assertBaseCalendar, assertBasePreview, assertBaseSave, canEditBaseTimeBlocks,
   type GlobalBaseTimeBlocksCommand, matchesBaseTimeBlocks } from './event-global-base-time-blocks-state';
+import { sameScheduleBlocks } from './event-global-schedule-state';
 
 @Injectable()
 export class EventGlobalBaseTimeBlocksController {
@@ -40,7 +41,6 @@ export class EventGlobalBaseTimeBlocksController {
   readonly canPreview = computed(() => this.canEdit() && !this.isBusy() && this.dirty() && !this.conflicted() && !this.readbackPending());
   readonly canSave = computed(() => this.canPreview() && this.command() !== null && this.preview()?.valid === true &&
     this.preview()?.status === 'preview_ready' && this.preview()?.changed !== false);
-  readonly canDiscard = computed(() => !this.blocked() && !this.isBusy() && !this.readbackPending() && (this.dirty() || this.conflicted()));
 
   constructor() {
     effect(() => {
@@ -99,6 +99,10 @@ export class EventGlobalBaseTimeBlocksController {
           assertBasePreview(preview, command);
           this.preview.set(preview);
           if (preview.valid && preview.status === 'preview_ready') this.command.set(command);
+          if (preview.valid && (preview.status === 'unchanged' || preview.changed === false) && sameScheduleBlocks(calendar.timeBlocks, timeBlocks)) {
+            this.populate(calendar);
+            this.result.set('unchanged');
+          }
         }));
       })));
     });
@@ -132,16 +136,11 @@ export class EventGlobalBaseTimeBlocksController {
     });
   }
 
-  refresh(discard = false): Observable<AdminGlobalCalendarResult> {
+  refresh(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
-      if (this.isBusy() || this.blocked() || (discard && !this.canDiscard())) return EMPTY;
-      if (!this.readbackPending()) this.invalidatePreview();
-      return this.run('read', this.readCurrent().pipe(tap(calendar => {
-        const command = this.command();
-        if (this.readbackPending() && command) this.reconcile(calendar, command);
-        else if (discard || !this.dirty()) this.populate(calendar);
-        else if (calendar.calendarRevision !== this.baseline?.calendarRevision || calendar.draftRevision !== this.baseline.draftRevision) this.conflict();
-      })));
+      const command = this.command();
+      if (this.isBusy() || this.blocked() || !this.readbackPending() || !command) return EMPTY;
+      return this.run('read', this.readCurrent().pipe(tap(calendar => this.reconcile(calendar, command))));
     });
   }
 
@@ -164,8 +163,8 @@ export class EventGlobalBaseTimeBlocksController {
       this.error.set(null);
       this.result.set(outcome === 'unchanged' ? 'unchanged' : 'saved');
     } else if (command.outcome !== null) {
-      this.readbackPending.set(false);
       this.conflict();
+      assertEdgeContract(false, 'globalBaseTimeBlocks.readback', 'the exact pending base blocks and unchanged remaining calendar scope');
     }
   }
 

@@ -1,14 +1,19 @@
 @let copy = i18n.creation();
-@let details = core();
+@let details = coreView();
+@let location = editionView();
+@let changed = changes()?.sections;
 <div [class]="step() === 6 ? 'grid-2-1 grid-items-start gap-md w-100 min-w-0' : 'flex-col-start-stretch gap-md w-100 min-w-0'">
   @if (step() !== 4) {
     <div class="flex-col-start-stretch gap-md min-w-0">
       @if (step() === 1 || step() === 6) {
         <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-          <div class="flex-row-start-center gap-md">
+          <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
             <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
             <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
+            @if (changed?.includes('core')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
+            @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(1)" /> }
           </div>
+          @if (changes()?.invalid?.includes('core')) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small> }
           <dl class="mg-grid-2 gap-md m-0">
             <div><dt class="muted-text">{{ i18n.commonLabels().name }}</dt><dd class="m-0 text-wrap-anywhere"><strong>{{ details.name }}</strong></dd></div>
             <div><dt class="muted-text">{{ i18n.commonLabels().key }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.key }}</dd></div>
@@ -37,18 +42,23 @@
       }
       @if (step() === 2 || step() === 6) {
         <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-          <h2 class="mg-section__title mg-section__title--md m-0">{{ step() === 2 ? edition().city : i18n.creationSteps().location }}</h2>
+          <header class="flex-row-start-center flex-wrap gap-sm">
+            <h2 class="mg-section__title mg-section__title--md m-0">{{ step() === 2 ? location.city : i18n.creationSteps().location }}</h2>
+            @if (changed?.includes('edition')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
+            @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(2)" /> }
+          </header>
+          @if (changes()?.invalid?.includes('edition')) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small> }
           @if (locationCity(); as city) {
             <dl class="mg-grid-2 gap-md m-0">
               <div><dt class="muted-text">{{ step() === 2 ? i18n.commonLabels().city : copy.mainCity }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.city }}</dd></div>
               <div><dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt><dd class="m-0 text-wrap-anywhere">{{ city.timezone }}</dd></div>
-              <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ edition().venueName || i18n.commonValues().notProvided }}</dd></div>
-              <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ edition().venueAddress || i18n.commonValues().notProvided }}</dd></div>
+              <div><dt class="muted-text">{{ copy.venueName }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.venueName || i18n.commonValues().notProvided }}</dd></div>
+              <div><dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt><dd class="m-0 text-wrap-anywhere">{{ location.venueAddress || i18n.commonValues().notProvided }}</dd></div>
             </dl>
             <dl class="m-0">
               <dt class="muted-text">{{ copy.facebookLink }}</dt>
               <dd class="m-0 text-wrap-anywhere">
-                @if (edition().facebookLink; as link) { <a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a> }
+                @if (location.facebookLink; as link) { <a [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a> }
                 @else { {{ i18n.commonValues().notProvided }} }
               </dd>
             </dl>
@@ -57,55 +67,68 @@
       }
       @if (step() === 3 || step() === 6) {
         <section id="global-event-schedule" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-          <div class="flex-row-start-center gap-md">
+          <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
             <span class="pi pi-sun-eclipse square-11 flex-none" aria-hidden="true"></span>
             <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
+            @if (changes()?.scheduleChanged || changed?.includes('base') || changed?.includes('dated')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
+            @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" /> }
           </div>
+          @if (changes()?.invalid?.includes('schedule') || changes()?.invalid?.includes('base') || changes()?.invalid?.includes('dated')) {
+            <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+          }
           <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
             <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blocks }}</h3>
-            <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
-            <app-event-global-time-blocks-summary [blocks]="calendar().timeBlocks" [showDayOffsets]="true" />
+            <app-event-global-time-blocks-summary [blocks]="baseBlocks()" />
           </section>
           <section class="flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0">
+            @let dateCopy = i18n.saveChanges().dates;
             <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.occurrences().sectionTitle }}</h3>
+            @if (changes()?.scheduleChanged && (!changes()?.scheduleReadback || changes()?.scheduleProposal)) {
+              <p class="m-0 muted-text" role="status">{{ changes()?.scheduleProposal ? dateCopy.previewHint : dateCopy.previewNeeded }}</p>
+              @if (changes()?.scheduleProposal?.blocked) { <small class="mg-contact-error" role="alert">{{ i18n.schedule().blocked }}</small> }
+            }
             <p class="m-0 muted-text">{{ i18n.datedBlocks().unchangedDates }}</p>
-            @for (day of dates(); track day.globalOccurrenceId) {
+            @for (entry of dates(); track entry.date) {
               <section class="flex-col-start-stretch gap-sm border-top pt-md w-100 min-w-0">
                 <header class="flex-row-between-center flex-wrap gap-sm min-w-0">
-                  <h4 class="m-0"><time [attr.datetime]="day.date">{{ formatDateLabel(day.date) }}</time></h4>
-                  <span class="text-sm muted-text">{{ i18n.savedSummary().calendarStatuses[day.status] }}</span>
+                  <h4 class="m-0"><time [attr.datetime]="entry.date">{{ formatDateLabel(entry.date) }}</time></h4>
+                  <span class="tag-badge tag-badge--muted">{{ dateCopy[entry.state] }}</span>
                 </header>
-                @if (day.blocks; as blocks) {
-                  <p class="m-0 muted-text text-wrap-anywhere">{{ i18n.datedBlocks().sources[blocks.source] }}</p>
+                @if (entry.protected) { <small class="muted-text">{{ dateCopy.protected }}</small> }
+                @if (entry.saved; as day) {
+                  <p class="m-0 text-sm muted-text">{{ dateCopy.savedState }} - {{ i18n.savedSummary().calendarStatuses[day.status] }}</p>
+                  @if (day.changed) { <small class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</small> }
+                  @if (day.source; as source) { <p class="m-0 muted-text text-wrap-anywhere">{{ i18n.datedBlocks().sources[source] }}</p> }
                   @if (day.showBlockDetails) {
-                    <app-event-global-time-blocks-summary [blocks]="blocks.timeBlocks" [showDayOffsets]="true" />
+                    <app-event-global-time-blocks-summary [blocks]="day.timeBlocks" />
                   }
-                }
-                <div class="flex-col-start-stretch gap-sm min-w-0">
-                  @for (city of day.cities; track city.editionId) {
-                    <section class="flex-col-start-stretch gap-xs min-w-0">
-                      <header class="flex-row-between-start flex-col-start-stretch-sm gap-xs min-w-0">
-                        <h5 class="m-0 text-sm text-wrap-anywhere">{{ city.city }}</h5>
-                        <p class="m-0 text-sm text-wrap-anywhere">{{ i18n.savedSummary().participation[city.decision] }}</p>
-                      </header>
-                      @if (city.blocks; as localBlocks) {
-                        <div class="flex-col-start-stretch gap-sm min-w-0">
-                          <div class="flex-row-start-center flex-wrap gap-xs text-sm muted-text min-w-0">
-                            @if (localBlocks.isOverride) { <span class="text-wrap-anywhere">{{ i18n.datedBlocks().cityOverride }}</span> }
-                            @if (localBlocks.publishedSnapshot) {
-                              <span class="text-wrap-anywhere">{{ i18n.datedBlocks().sources.published_snapshot }}</span>
-                            } @else if (!localBlocks.isOverride) {
-                              <span class="text-wrap-anywhere">{{ i18n.datedBlocks().fromDate }}</span>
+                  <div class="flex-col-start-stretch gap-sm min-w-0">
+                    @for (city of day.cities; track city.editionId) {
+                      <section class="flex-col-start-stretch gap-xs min-w-0">
+                        <header class="flex-row-between-start flex-col-start-stretch-sm gap-xs min-w-0">
+                          <h5 class="m-0 text-sm text-wrap-anywhere">{{ city.city }}</h5>
+                          <p class="m-0 text-sm text-wrap-anywhere">{{ i18n.savedSummary().participation[city.decision] }}</p>
+                        </header>
+                        @if (city.changed) { <small class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</small> }
+                        @if (city.hasBlocks) {
+                          <div class="flex-col-start-stretch gap-sm min-w-0">
+                            <div class="flex-row-start-center flex-wrap gap-xs text-sm muted-text min-w-0">
+                              @if (city.isOverride) { <span class="text-wrap-anywhere">{{ i18n.datedBlocks().cityOverride }}</span> }
+                              @if (city.publishedSnapshot) {
+                                <span class="text-wrap-anywhere">{{ i18n.datedBlocks().sources.published_snapshot }}</span>
+                              } @else if (!city.isOverride) {
+                                <span class="text-wrap-anywhere">{{ i18n.datedBlocks().fromDate }}</span>
+                              }
+                            </div>
+                            @if (city.showBlockDetails) {
+                              <app-event-global-time-blocks-summary [blocks]="city.timeBlocks" />
                             }
                           </div>
-                          @if (city.showBlockDetails) {
-                            <app-event-global-time-blocks-summary [blocks]="localBlocks.timeBlocks" [showDayOffsets]="true" />
-                          }
-                        </div>
-                      }
-                    </section>
-                  }
-                </div>
+                        }
+                      </section>
+                    }
+                  </div>
+                } @else { <p class="m-0 muted-text">{{ dateCopy.newDateHint }}</p> }
               </section>
             }
           </section>
@@ -118,14 +141,30 @@
       <section [attr.id]="step() === 6 ? 'global-event-policy' : null" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
         @for (group of policyGroups(); track group.key; let first = $first) {
           @if (first) {
-            <div class="flex-row-start-center gap-md">
+            <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
               <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
               <h2 class="mg-section__title mg-section__title--md m-0">{{ group.title }}</h2>
+              @if (changed?.includes('policy')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
+              @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" /> }
             </div>
           } @else {
             <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ group.title }}</h3>
           }
           <app-event-global-policy-summary [policy]="group.values" />
+        }
+        @if (changes()?.invalid?.includes('policy')) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small> }
+        @for (city of cityOverrides(); track city.editionId) {
+          @let local = city.overrides;
+          @if (local.price.enabled || local.cover.enabled || local.signup.enabled || local.sessionCapacityCeiling.enabled || local.wholeEventCapacity.enabled) {
+            <section class="flex-col-start-stretch gap-xs border-top pt-sm min-w-0">
+              <h3 class="mg-section__title mg-section__title--sm m-0">{{ cityName(city.editionId) }}</h3>
+              @if (local.price.enabled) { <p class="m-0">{{ i18n.commonLabels().price }}: {{ formatMoney(local.price.value.amount, local.price.value.currency) }} - {{ i18n.priceBases()[local.price.value.basis] }}</p> }
+              @if (local.cover.enabled) { <p class="m-0">{{ i18n.commonLabels().cover }}: {{ local.cover.value ? i18n.commonValues().yes : i18n.commonValues().notProvided }}</p> }
+              @if (local.signup.enabled) { <p class="m-0">{{ signupLabel(local.signup.value.kind) }} - {{ i18n.commonLabels().signupRequired }}: {{ local.signup.value.required ? i18n.commonValues().yes : i18n.commonValues().no }}</p> }
+              @if (local.sessionCapacityCeiling.enabled) { <p class="m-0">{{ copy.sessionCapacityCeiling }}: {{ local.sessionCapacityCeiling.value ?? copy.noAdditionalLimit }}</p> }
+              @if (local.wholeEventCapacity.enabled) { <p class="m-0">{{ copy.wholeEventCapacity }}: {{ local.wholeEventCapacity.value ?? copy.noAdditionalLimit }}</p> }
+            </section>
+          }
         }
         <dl class="flex-col-start-stretch gap-sm m-0">
           <div class="flex-row-between-start flex-col-start-stretch-sm gap-sm border-bottom pb-sm">

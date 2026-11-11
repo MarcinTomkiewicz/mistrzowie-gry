@@ -1,0 +1,27 @@
+@if (save.dirty() || save.pending() || save.completed().length || save.error()) {
+  <section class="flex-col-start-stretch gap-sm w-100 min-w-0" [attr.aria-busy]="save.busy()">
+    @if (save.completed().length) {
+      <p class="m-0" role="status">{{ copy().completed }}:
+        @for (key of save.completed(); track key) { <span class="tag-badge tag-badge--muted">{{ label(key) }}</span> }
+      </p>
+    }
+    @if (save.pending()) { <p-message severity="warn" role="alert">{{ copy().uncertain }}</p-message> }
+    @else if (save.error()) { <p-message severity="error" role="alert">{{ copy().failed }}</p-message> }
+    @else if (save.checked()) { <p-message severity="info" role="status">{{ copy().checked }}</p-message> }
+    @if (save.schedule.state() === 'draft') { <p-message severity="info" role="status">{{ i18n.schedule().draftSaved }}</p-message> }
+    <div class="flex-row-start-center flex-wrap gap-sm">
+      @if (save.pending()) {
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+          [label]="copy().retryRead" [disabled]="save.busy() || deciding()" (onClick)="retryReadback()" />
+      } @else if (save.dirty()) {
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-check"
+          [label]="i18n.diagnostics().action" [loading]="save.checking()"
+          [disabled]="disabled() || save.busy() || deciding()" (onClick)="check()" />
+        <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
+          [label]="copy().action" [disabled]="disabled() || save.busy() || deciding() || !save.checked()" (onClick)="confirmSave()" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="true"
+          [label]="i18n.creation().discardDraft" [disabled]="disabled() || save.busy() || deciding()" (onClick)="discard.emit()" />
+      }
+    </div>
+  </section>
+}

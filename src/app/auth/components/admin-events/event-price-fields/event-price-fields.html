@@ -1,12 +1,12 @@
-<div class="flex-row-start-start flex-wrap gap-sm w-100 min-w-0">
-  <div class="flex-col-start-stretch gap-xs flex-none w-px-150 max-w-full min-w-0">
+<div class="mg-grid grid-3-cols grid-1-cols-sm gap-sm w-100 min-w-0">
+  <div class="flex-col-start-stretch gap-xs min-w-0">
     <label class="text-sm" [for]="idPrefix() + '-amount'">{{ i18n.commonLabels().amount }}</label>
     <p-inputnumber [inputId]="idPrefix() + '-amount'" [formControl]="amount()" size="small" [min]="0" [max]="99999999.99"
       [minFractionDigits]="0" [maxFractionDigits]="2" [useGrouping]="false" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
       [invalid]="amount().touched && amount().invalid" />
     @if (amount().touched && amount().invalid) { <small class="mg-contact-error" role="alert">{{ amountError() }}</small> }
   </div>
-  <div class="flex-col-start-stretch gap-xs flex-none w-px-150 max-w-full min-w-0">
+  <div class="flex-col-start-stretch gap-xs min-w-0">
     <label class="text-sm" [for]="idPrefix() + '-currency'">{{ i18n.commonLabels().currency }}</label>
     <p-select [inputId]="idPrefix() + '-currency'" [formControl]="currency()" [options]="currencies" size="small"
       appendTo="body" class="w-100 min-w-0" [invalid]="currency().touched && currency().invalid">
@@ -14,7 +14,7 @@
     </p-select>
     @if (currency().touched && currency().invalid) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().required }}</small> }
   </div>
-  <div class="flex-col-start-stretch gap-xs flex-none w-px-250 max-w-full min-w-0">
+  <div class="flex-col-start-stretch gap-xs min-w-0">
     <label class="text-sm" [for]="idPrefix() + '-basis'">{{ i18n.commonPrice().editor.fields.perUnit }}</label>
     <p-select [inputId]="idPrefix() + '-basis'" [formControl]="basis()" [options]="priceBases()" optionValue="value" optionLabel="label"
       size="small" appendTo="body" class="w-100 min-w-0" [placeholder]="i18n.commonValues().notProvided" [invalid]="basisInvalid()">

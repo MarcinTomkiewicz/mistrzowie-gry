@@ -64,6 +64,31 @@
     }
   },
   "editor": {
+    "saveChanges": {
+      "title": "[PH] Zmiany do zapisania",
+      "action": "Zapisz zmiany",
+      "confirm": "[PH] Zapisać wskazane zmiany? Sekcje są zapisywane osobno. Jeśli jedna operacja się nie powiedzie, wcześniejsze potwierdzone zapisy pozostaną utrwalone. Publikacja i uruchomienie zapisów uczestników wymagają osobnych akcji.",
+      "completed": "[PH] Odczyt potwierdził zapis sekcji",
+      "failed": "[PH] Nie potwierdzono zapisu wszystkich zmian. Sprawdź wskazaną sekcję; pozostałe zmiany zachowano w formularzach.",
+      "uncertain": "[PH] Zmiana mogła zostać zapisana. Sprawdź jej wynik przez ponowny odczyt. Kolejne sekcje nie będą zapisywane, dopóki wynik nie zostanie rozstrzygnięty.",
+      "retryRead": "[PH] Sprawdź wynik zapisu",
+      "localChanges": "[PH] Inne godziny dla daty lub miasta",
+      "saved": "[PH] Kanoniczne odczyty potwierdziły wszystkie wskazane zmiany.",
+      "dates": {
+        "saved": "[PH] Zapisany termin",
+        "added": "[PH] Proponowana nowa data",
+        "retained": "[PH] Data w proponowanym harmonogramie",
+        "removed": "[PH] Proponowane wycofanie terminu",
+        "outside": "[PH] Poza proponowanym harmonogramem",
+        "protected": "[PH] Zachowany termin chroniony lub historyczny",
+        "savedState": "[PH] Zapisany status i udział miast",
+        "newDateHint": "[PH] Ta propozycja nie ma jeszcze zapisanego terminu ani statusów lokalnych terminów.",
+        "previewNeeded": "[PH] Zmieniono harmonogram. Użyj przycisku Sprawdź błędy na dole, aby zobaczyć proponowane daty. Poniżej są wyłącznie zapisane terminy.",
+        "previewHint": "[PH] Propozycja dat nie jest potwierdzeniem zmiany kalendarza. Statusy terminów i udział miast pochodzą z zapisanych danych. Wynik zmiany potwierdzi odczyt po zapisie."
+      },
+      "checked": "[PH] Formularze i dostępne podglądy sekcji nie wykazały błędów. Przy zapisie każda sekcja zostanie ponownie zweryfikowana i odczytana.",
+      "discardConfirm": "[PH] Odrzucić niezapisane zmiany i wczytać aktualne dane? Potwierdzone wcześniej zapisy pozostaną zachowane."
+    },
     "page": {
       "createTitle": "Nowe wydarzenie",
       "editTitle": "Edycja wydarzenia",
@@ -269,11 +294,8 @@
       "discard": "[PH] Odrzuć lokalne zmiany bloków",
       "discardConfirm": "[PH] Odrzucić lokalne zmiany podstawowych bloków i odtworzyć formularz z aktualnego kalendarza? Ta akcja nie zmienia zapisanych danych.",
       "leave": "[PH] Opuścić edytor podstawowych bloków? Niezapisane dane formularza zostaną utracone. Operacja o niepewnym wyniku mogła zostać wykonana lub zakończyć się później. Opuszczenie edytora jej nie powtarza ani nie cofa.",
-      "startDayOffset": "[PH] Dzień początku (0-7)",
-      "endDayOffset": "[PH] Dzień końca (0-7)",
       "gmRange": "[PH] Podaj całkowitą liczbę MG od 0 do 32767.",
-      "offsetRange": "[PH] Podaj całkowity offset dnia od 0 do 7.",
-      "duration": "[PH] Koniec bloku musi przypadać po początku z uwzględnieniem offsetów. Serwer sprawdzi rzeczywisty czas trwania i zmiany czasu we wszystkich miastach.",
+      "duration": "[PH] Koniec bloku musi przypadać po początku.",
       "preservedDateOverrides": "[PH] Zachowane konfiguracje dat",
       "preservedCityOverrides": "[PH] Zachowane konfiguracje miast"
     },
@@ -288,7 +310,6 @@
       "title": "[PH] Edycja szkicu polityki",
       "rulesTitle": "[PH] Edytuj zasady i limity zapisów",
       "hint": "[PH] Zmieniasz zasady zapisów i limity wspólne lub dla wybranych miast. Ceny, okładki i ustawienie dla początkujących pozostają zachowane. Zapis szkicu nie otwiera rejestracji uczestników.",
-      "oneSection": "[PH] Zapisz lub odrzuć zmiany w aktywnej sekcji przed edycją drugiej sekcji polityki.",
       "compatibilityHint": "[PH] Tryb zapisów na sesje wymaga pustego limitu całego wydarzenia, a tryb na całe wydarzenie - pustego limitu sesji. Wartości nie są czyszczone automatycznie. Zasada dotyczy również ustawień wynikających z dziedziczenia w miastach.",
       "capacityConflict": "[PH] Co najmniej jeden limit wspólny lub wynikowy dla miasta nie pasuje do rodzaju zapisów. Zmień rodzaj zapisów lub świadomie wyczyść niezgodny limit. Wpisane dane zachowano.",
       "capacityInvalid": "[PH] Podaj liczbę całkowitą od 1 do 2147483647 albo pozostaw pole puste.",
@@ -447,6 +468,11 @@
       "discardDraft": "[PH] Porzuć dane",
       "help": "[PH] Wyjaśnienie ustawienia",
       "signupKindHint": "[PH] Wybierz zapisy na sesje, na całe wydarzenie albo oba rodzaje. Każdy rodzaj ma osobną pulę miejsc. Wybór sposobu zapisów nie otwiera rejestracji uczestników.",
+      "signupKindDescriptions": {
+        "program_item": "[PH] Zapis na konkretny punkt programu.",
+        "whole_event": "[PH] Jedno zgłoszenie na wydarzenie.",
+        "both": "[PH] Dwa niezależne rodzaje zapisu."
+      },
       "signupRequiredHint": "[PH] Określa, czy udział wymaga zapisu. Nie otwiera rejestracji i nie publikuje wydarzenia.",
       "mainCity": "[PH] Główna lokalizacja wydarzenia",
       "timezoneHint": "[PH] Przesunięcie UTC uwzględnia czas letni i zimowy dla najwcześniejszej wybranej daty lub początku cyklu, a przed ich wyborem - dla dzisiaj. Wyszukaj miasto, nazwę strefy lub jej kod IANA.",
@@ -462,7 +488,6 @@
       "requiredGmHint": "[PH] Liczba MG potrzebnych do obsadzenia bloku. To plan, nie limit uczestników.",
       "timeInvalid": "[PH] Podaj godzinę od 00:00 do 23:59. Możesz wpisać samo HH, np. 15.",
       "setTime": "Ustaw godzinę",
-      "policy": "[PH] Podstawowe ustawienia wydarzenia",
       "audience": "[PH] Przeznaczenie wydarzenia",
       "registration": "[PH] Zapisy i limity uczestników",
       "priceHint": "[PH] Pusta kwota lub 0 oznacza wydarzenie bezpłatne.",
@@ -639,7 +664,14 @@
     "rpgSession": "[PH] Sesja RPG",
     "programStatus": "[PH] Status pozycji programu",
     "dayOffset": "[PH] dzień +{{days}}",
-    "localHint": "[PH] Program wybranego miasta i rzeczywistego terminu. Sesje RPG i aktywności pozostają nieopublikowane do osobnej publikacji.",
+    "localHint": "[PH] Program wybranego miasta i terminu. Bloki godzinowe określają ramy organizacyjne; sesje RPG i aktywności dodajesz osobno.",
+    "globalProgram": {
+      "empty": "[PH] Ten termin nie ma jeszcze sesji ani aktywności. Same bloki godzinowe nie tworzą pozycji programu.",
+      "saveFirst": "[PH] Zapisz zmiany wydarzenia w kroku Podsumowanie i potwierdź ich odczyt przed edycją programu.",
+      "pendingCalendar": "[PH] Kalendarz ma niezastosowane zmiany. Zakończ ich zapis w kroku Podsumowanie przed dodaniem programu.",
+      "otherOperation": "[PH] Edycja programu jest zablokowana na czas innej operacji w edytorze. Zakończ ją przed dodaniem sesji lub aktywności.",
+      "unavailable": "[PH] Dodawanie programu jest dostępne tylko dla nieopublikowanego, włączonego terminu bez historii zapisów i z zapisanymi blokami godzinowymi. Ten termin nie spełnia tych warunków."
+    },
     "selectOccurrence": "[PH] Data / termin",
     "invalidSelection": "[PH] Wybrane miasto lub termin nie należą do bieżącego wydarzenia. Odśwież dane przed odczytem programu.",
     "source": "[PH] Źródło przypisania",

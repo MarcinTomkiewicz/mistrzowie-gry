@@ -13,7 +13,7 @@
             <p-radiobutton [inputId]="'event-global-kind-' + option.value" name="event-global-kind" [value]="option.value"
               [ngModel]="kind === 'range' ? 'exact_dates' : kind" [ngModelOptions]="standaloneModel"
               [disabled]="schedule.disabled" (ngModelChange)="selectGlobalKind($event)" />
-            <span [class]="option.icon + ' square-8 flex-none'" aria-hidden="true"></span>
+            <span [class]="option.icon + ' square-7 flex-none'" aria-hidden="true"></span>
             <span class="flex-col-start-stretch gap-xs min-w-0">
               <strong>{{ option.label }}</strong>
               <span class="muted-text">{{ option.hint }}</span>
@@ -189,18 +189,18 @@
           }
         </div>
       }
-      <p-button type="button" size="small" [outlined]="true" icon="pi pi-add-plus" [label]="i18n.fields().addExclusionRule"
+      <p-button type="button" size="small" severity="secondary" [text]="true" icon="pi pi-add-plus" [label]="i18n.fields().addExclusionRule"
         [disabled]="schedule.disabled" (onClick)="addExclusionRule()" />
       @let exdates = getEventScheduleExdates(schedule);
       @if (exdates.length) {
-        <details class="w-100">
-          <summary>{{ i18n.fields().allExcludedDates }} ({{ exdates.length }})</summary>
+        <section class="w-100">
+          <h4 class="m-0 text-sm">{{ i18n.fields().allExcludedDates }} ({{ exdates.length }})</h4>
           <div class="flex-row-start-center flex-wrap gap-xs pt-sm">
             @for (date of exdates; track date) {
               <time class="tag-badge tag-badge--muted" [attr.datetime]="date">{{ formatDateLabel(date) }}</time>
             }
           </div>
-        </details>
+        </section>
       }
     </div>
   }

@@ -2,6 +2,7 @@ import type { EventTimelineOrigin } from '../../interfaces/i-admin-event-timelin
 import type { MyStaffingCandidate } from '../../interfaces/my-staffing-realization';
 
 export type EventAdminTimelineCopy = {
+  globalProgram: { empty: string; saveFirst: string; pendingCalendar: string; otherOperation: string; unavailable: string };
   schedule: {
     title: string; track: string; hint: string; assignmentStatus: string; timeUnavailable: string;
   };

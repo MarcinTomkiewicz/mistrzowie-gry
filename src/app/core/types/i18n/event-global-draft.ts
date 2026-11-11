@@ -1,6 +1,13 @@
 import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker } from '../../interfaces/i-admin-global-event-publication';
+import type { ParticipantSignupKind } from '../../enums/event';
+
+export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
+  'retryRead' | 'localChanges' | 'saved' | 'discardConfirm' | 'checked', string> & {
+    dates: Record<'saved' | 'added' | 'retained' | 'removed' | 'outside' | 'protected' |
+      'savedState' | 'newDateHint' | 'previewNeeded' | 'previewHint', string>;
+  };
 
 export type EventGlobalPublicationCopy = Record<
   'hint' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'verified' | 'alreadyReleased' |
@@ -52,7 +59,6 @@ export type EventGlobalPolicyCopy = {
   title: string;
   rulesTitle: string;
   hint: string;
-  oneSection: string;
   compatibilityHint: string;
   capacityConflict: string;
   capacityInvalid: string;
@@ -100,10 +106,7 @@ export type EventGlobalBaseTimeBlocksCopy = {
   discard: string;
   discardConfirm: string;
   leave: string;
-  startDayOffset: string;
-  endDayOffset: string;
   gmRange: string;
-  offsetRange: string;
   duration: string;
   preservedDateOverrides: string;
   preservedCityOverrides: string;
@@ -203,6 +206,7 @@ export type EventGlobalDraftCopy = {
   discardDraft: string;
   help: string;
   signupKindHint: string;
+  signupKindDescriptions: Record<ParticipantSignupKind, string>;
   signupRequiredHint: string;
   mainCity: string;
   venueName: string;
@@ -219,7 +223,6 @@ export type EventGlobalDraftCopy = {
   requiredGmHint: string;
   timeInvalid: string;
   setTime: string;
-  policy: string;
   audience: string;
   registration: string;
   priceHint: string;

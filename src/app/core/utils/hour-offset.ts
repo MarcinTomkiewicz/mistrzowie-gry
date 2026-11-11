@@ -13,9 +13,11 @@ export function formatHourOffsetLabel(
   offset: number,
   totalHours: number = HourOffsetValue.DayTotalHours,
 ): string {
-  const normalizedHour = ((offset % totalHours) + totalHours) % totalHours;
-  const dayOffset = Math.floor(offset / totalHours);
-  const label = `${String(normalizedHour).padStart(2, '0')}:00`;
+  const totalMinutes = totalHours * 60;
+  const minutes = Math.round(offset * 60);
+  const normalized = ((minutes % totalMinutes) + totalMinutes) % totalMinutes;
+  const dayOffset = Math.floor(minutes / totalMinutes);
+  const label = `${String(Math.floor(normalized / 60)).padStart(2, '0')}:${String(normalized % 60).padStart(2, '0')}`;
 
   return dayOffset > 0 ? `${label} (+${dayOffset})` : label;
 }

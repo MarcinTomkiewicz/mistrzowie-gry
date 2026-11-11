@@ -10,8 +10,11 @@ import { SelectModule } from 'primeng/select';
 import { Observable } from 'rxjs';
 
 import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
+import { formatEventGlobalTimeBlockRange } from '../../../../core/factories/event-global-time-block-form.factory';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { setControlValue } from '../../../../core/utils/form-controls';
+import { normalizeTimeInput } from '../../../../core/utils/time-format';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
@@ -38,6 +41,7 @@ export class EventManualProgramEditor {
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly blocks = computed(() => this.editor.blocks().map(block => ({ value: block.position, label: block.label })));
+  protected readonly timeRange = formatEventGlobalTimeBlockRange;
   protected intervalInvalid(): boolean { return !manualProgramIntervalValid(this.editor.form.getRawValue(), this.editor.blocks()); }
   protected readonly message = computed(() => {
     if (this.editor.needsRefresh()) return this.copy().refreshRequired;
@@ -47,6 +51,13 @@ export class EventManualProgramEditor {
     const error = this.editor.error();
     return error === null ? null : resolveEventEditionAdminErrorMessage(error, this.i18n.rpcErrors(), this.copy().conflict);
   });
+
+  protected normalizeTime(field: 'startTime' | 'endTime', event: Event): void {
+    if (!(event.target instanceof HTMLInputElement) || this.editor.form.disabled || this.editor.readbackPending()) return;
+    const value = normalizeTimeInput(event.target.value);
+    const control = this.editor.form.controls[field];
+    if (control.value !== value || event.target.value !== value) setControlValue(control, value);
+  }
 
   protected save(): void {
     this.editor.form.markAllAsTouched();

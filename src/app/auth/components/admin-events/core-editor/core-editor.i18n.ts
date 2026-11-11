@@ -14,7 +14,7 @@ import {
 } from '../../../../core/translations/common.i18n';
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type { EventPriceBasis } from '../../../../core/interfaces/i-admin-global-event';
-import type { EventDatedBlocksCopy, EventGlobalBaseTimeBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy, EventGlobalPagePreviewCopy, EventGlobalPriceCopy, EventGlobalPolicyCopy, EventGlobalPublicationCopy, EventGlobalSavedSummaryCopy, EventMetadataCopy } from '../../../../core/types/i18n/event-global-draft';
+import type { EventDatedBlocksCopy, EventGlobalBaseTimeBlocksCopy, EventGlobalCityCopy, EventGlobalDiagnosticsCopy, EventGlobalDraftCopy, EventGlobalPagePreviewCopy, EventGlobalPriceCopy, EventGlobalPolicyCopy, EventGlobalPublicationCopy, EventGlobalSavedSummaryCopy, EventGlobalSaveCopy, EventGlobalScheduleCopy, EventMetadataCopy } from '../../../../core/types/i18n/event-global-draft';
 import type {
   CoreRpcErrorsCopy,
   EditionTableCopy,
@@ -62,6 +62,8 @@ export function createEventCoreEditorI18n() {
   const commonEntityStatuses = createCommonEntityStatusesI18n();
 
   return {
+    saveChanges: createScopedObjectI18n<EventGlobalSaveCopy>('adminEvents', 'editor.saveChanges'),
+    schedule: createScopedObjectI18n<EventGlobalScheduleCopy>('adminEvents', 'editor.schedule'),
     priceEditor: createScopedObjectI18n<EventGlobalPriceCopy>('adminEvents', 'editor.price'),
     policyEditor: createScopedObjectI18n<EventGlobalPolicyCopy>('adminEvents', 'editor.policy'),
     baseTimeBlocks: createScopedObjectI18n<EventGlobalBaseTimeBlocksCopy>('adminEvents', 'editor.baseTimeBlocks'),

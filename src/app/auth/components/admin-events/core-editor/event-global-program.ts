@@ -1,7 +1,6 @@
 import { afterNextRender, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { Subscription, tap } from 'rxjs';
 
@@ -14,13 +13,14 @@ import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { EventGlobalDraftController } from './event-global-draft-controller';
+import { EventGlobalSaveController } from './event-global-save-controller';
 import { EventManualProgramController } from './event-manual-program-controller';
 import { EventManualProgramEditor } from './event-manual-program-editor';
 import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
 
 @Component({
   selector: 'app-event-global-program',
-  imports: [FormsModule, ButtonModule, FloatLabelModule, SelectModule, EventManualProgramEditor, EventProgramSchedule],
+  imports: [FormsModule, ButtonModule, SelectModule, EventManualProgramEditor, EventProgramSchedule],
   templateUrl: './event-global-program.html',
   host: { class: 'd-block w-100 min-w-0' },
 })
@@ -31,6 +31,7 @@ export class EventGlobalProgram {
   readonly disabled = input(false);
   protected readonly global = inject(EventGlobalDraftController);
   protected readonly manual = inject(EventManualProgramController);
+  private readonly save = inject(EventGlobalSaveController);
   protected readonly selectionLocked = computed(() => this.disabled() || this.manual.locked());
   protected readonly i18n = createEventAdminTimelineI18n();
   private readonly admin = inject(EventAdmin);
@@ -64,6 +65,13 @@ export class EventGlobalProgram {
     return selected ? { timeline, occurrence: selected } : null;
   });
   protected readonly loading = computed(() => this.readingTimeline() || this.global.isReadingEdition());
+  protected readonly blockedMessage = computed(() => {
+    const copy = this.i18n.copy().globalProgram;
+    if (this.save.dirty() || this.save.pending()) return copy.saveFirst;
+    if (this.calendar().pendingDraft) return copy.pendingCalendar;
+    if (this.disabled()) return copy.otherOperation;
+    return this.data() && !this.manual.canOpen() && !this.manual.locked() && !this.manual.needsRefresh() ? copy.unavailable : null;
+  });
   protected readonly errorMessage = computed(() => {
     if (this.calendar().coreId !== this.coreId() || this.calendar().calendarLifecycle !== 'global' ||
       (this.global.selectedEdition() !== null && !this.edition())) return this.i18n.copy().invalidSelection;

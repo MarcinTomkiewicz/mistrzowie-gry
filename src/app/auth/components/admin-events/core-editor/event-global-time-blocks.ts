@@ -2,9 +2,9 @@ import { Component, input } from '@angular/core';
 import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePicker, DatePickerModule } from 'primeng/datepicker';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ContextHelp } from '../../../../common/context-help/context-help';
 import { createEventGlobalTimeBlockForm, type EventGlobalTimeBlocksForm } from '../../../../core/factories/event-global-time-block-form.factory';
@@ -14,8 +14,8 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
 
 @Component({
   selector: 'app-event-global-time-blocks',
-  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule, FloatLabelModule,
-    InputNumberModule, InputTextModule, ContextHelp],
+  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule,
+    InputNumberModule, InputTextModule, TooltipModule, ContextHelp],
   templateUrl: './event-global-time-blocks.html',
   host: { class: 'd-block w-100 min-w-0' },
 })

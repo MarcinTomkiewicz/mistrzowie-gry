@@ -1,9 +1,9 @@
 <section id="global-event-price-editor" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
-  <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().title }}</h2>
-  <p class="m-0 muted-text text-sm">{{ copy().hint }}</p>
-  @if (editor.activeEditor() === 'rules') { <p class="m-0 muted-text" role="status">{{ i18n.policyEditor().oneSection }}</p> }
+  <header class="flex-row-start-center gap-sm">
+    <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy().title }}</h3>
+    <app-context-help [text]="copy().hint + ' ' + copy().amountHint" [ariaLabel]="copy().title + ': ' + i18n.creation().help" />
+  </header>
   <app-event-price-fields [amount]="form.controls.amount" [currency]="form.controls.currency" [basis]="form.controls.basis"
     idPrefix="global-price" [amountError]="copy().amountInvalid"
     [basisInvalid]="editor.validationAttempted() && form.hasError('basis')" />
-  <p class="m-0 muted-text text-sm">{{ copy().amountHint }}</p>
 </section>

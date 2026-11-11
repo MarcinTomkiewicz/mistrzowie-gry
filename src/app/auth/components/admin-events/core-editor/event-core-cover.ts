@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -47,6 +47,8 @@ import { EventCoreMetadataController } from './event-core-metadata-controller';
   `,
 })
 export class EventCoreCover {
+  readonly disabled = input(false);
+  readonly saved = output<void>();
   private readonly storage = inject(Storage);
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
@@ -73,12 +75,12 @@ export class EventCoreCover {
   });
 
   protected canSelect(): boolean {
-    return !this.isConfirming() && this.metadata.canEditCore() && !this.metadata.locked() && !this.metadata.blocked() &&
+    return !this.disabled() && !this.isConfirming() && this.metadata.canEditCore() && !this.metadata.locked() && !this.metadata.blocked() &&
       !this.metadata.coreForm.dirty && !this.metadata.editionForm.dirty && this.cover.ready();
   }
 
   protected canSave(): boolean {
-    if (this.isConfirming() || this.cover.isBusy() || this.metadata.locked() || this.metadata.blocked()) return false;
+    if (this.disabled() || this.isConfirming() || this.cover.isBusy() || this.metadata.locked() || this.metadata.blocked()) return false;
     return this.cover.needsReconciliation() || this.cover.locked() || (this.canSelect() && this.cover.dirty());
   }
 
@@ -100,6 +102,7 @@ export class EventCoreCover {
       next: saved => {
         if (this.metadata.core()?.id !== core.id) return;
         this.syncCore();
+        if (!this.cover.locked() && !this.cover.needsReconciliation()) this.saved.emit();
         if (!this.cover.dirty()) this.imageUpload()?.resetSelection();
         if (refreshing || !saved) return;
         this.toast.success({ summary: this.i18n.toast().saveSuccessSummary, detail: this.copy().saved });

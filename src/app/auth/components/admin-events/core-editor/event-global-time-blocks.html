@@ -1,98 +1,89 @@
 @let copy = i18n.creation();
-<div class="flex-col-start-stretch gap-md w-100 min-w-0" data-event-block-editor>
-    @for (block of blocks().controls; track block; let index = $index) {
-      <div class="flex-col-start-stretch gap-sm border radius-sm p-md w-100 min-w-0" [formGroup]="block" [attr.data-event-block]="index">
-        <div class="flex-row-start-end flex-wrap gap-sm w-100 min-w-0">
-          <div class="flex-col-start-stretch gap-xs flex-none w-px-200 w-100-sm max-w-full min-w-0">
-            <label class="text-sm" [for]="idPrefix() + '-label-' + index">{{ copy.blockLabel }}</label>
-            <input pInputText pSize="small" [id]="idPrefix() + '-label-' + index" formControlName="label" class="w-100" maxlength="140" />
-          </div>
-          <div class="flex-col-start-stretch gap-xs flex-none w-px-150 w-100-xs max-w-full min-w-0">
-            <label class="text-sm" [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
-            <p-datepicker #startPicker ngSkipHydration [inputId]="idPrefix() + '-start-' + index" formControlName="startTime" size="small"
-              dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-              iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
-              [invalid]="canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid"
-              (onBlur)="normalizeTime(index, 'startTime', $event)" (onClose)="block.controls.startTime.markAsTouched()">
-              <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
-              <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
-              <ng-template #inputicon let-clickCallBack="clickCallBack">
-                <span class="flex-row-center-center w-px-16 aspect-square">
-                  <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
-                </span>
-              </ng-template>
-              <ng-template #footer>
-                <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
-                  [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(startPicker)" />
-              </ng-template>
-            </p-datepicker>
-          </div>
-          <div class="flex-col-start-stretch gap-xs flex-none w-px-150 w-100-xs max-w-full min-w-0">
-            <label class="text-sm" [for]="idPrefix() + '-end-' + index">{{ i18n.commonLabels().end }}</label>
-            <p-datepicker #endPicker ngSkipHydration [inputId]="idPrefix() + '-end-' + index" formControlName="endTime" size="small"
-              dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-              iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
-              [invalid]="(canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) || showTimeRangeError(block, startPicker, endPicker)"
-              (onBlur)="normalizeTime(index, 'endTime', $event)" (onClose)="block.controls.endTime.markAsTouched()">
-              <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
-              <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
-              <ng-template #inputicon let-clickCallBack="clickCallBack">
-                <span class="flex-row-center-center w-px-16 aspect-square">
-                  <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
-                </span>
-              </ng-template>
-              <ng-template #footer>
-                <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
-                  [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(endPicker)" />
-              </ng-template>
-            </p-datepicker>
-          </div>
-          <div class="flex-col-start-stretch gap-xs flex-none w-px-200 w-100-xs max-w-full min-w-0">
-            <label class="text-sm" [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
-            <div class="flex-row-start-center gap-xs min-w-0">
-              <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="savedBase() ? 0 : 1"
-                [max]="savedBase() ? 32767 : undefined"
-                [useGrouping]="false" size="small" class="flex-1 min-w-0" inputStyleClass="w-100 min-w-0" />
-              <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
-            </div>
-          </div>
-          @if (!savedBase()) {
-            <div class="flex-row-end-center flex-none w-100-xs max-w-full">
-              <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
-                [label]="i18n.commonActions().removeItem" [disabled]="blocks().disabled || blocks().length === 1" (onClick)="removeBlock(index)" />
-            </div>
-          }
+<div class="flex-col-start-stretch gap-sm w-100 min-w-0" data-event-block-editor>
+  @for (block of blocks().controls; track block; let index = $index) {
+    <div class="flex-col-start-stretch gap-xs border radius-sm p-sm w-100 min-w-0" [formGroup]="block" [attr.data-event-block]="index">
+      <div class="flex-row-start-end flex-nowrap flex-wrap-lg gap-sm w-100 min-w-0">
+        <div class="flex-col-start-stretch gap-xs flex-1 w-100-md min-w-0">
+          <label class="text-sm" [for]="idPrefix() + '-label-' + index">{{ copy.blockLabel }}</label>
+          <input pInputText pSize="small" [id]="idPrefix() + '-label-' + index" formControlName="label" class="w-100" maxlength="140" />
         </div>
-        @if (savedBase()) {
-          <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm w-100">
-            <p-floatlabel variant="on" class="min-w-0 w-100">
-              <p-inputnumber [inputId]="idPrefix() + '-start-day-' + index" formControlName="startDayOffset"
-                [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
-              <label [for]="idPrefix() + '-start-day-' + index">{{ i18n.baseTimeBlocks().startDayOffset }}</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on" class="min-w-0 w-100">
-              <p-inputnumber [inputId]="idPrefix() + '-end-day-' + index" formControlName="endDayOffset"
-                [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
-              <label [for]="idPrefix() + '-end-day-' + index">{{ i18n.baseTimeBlocks().endDayOffset }}</label>
-            </p-floatlabel>
+        <div class="flex-col-start-stretch gap-xs flex-none flex-grow-1-sm flex-shrink-1-sm w-px-150 max-w-full min-w-0">
+          <label class="text-sm" [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
+          <p-datepicker #startPicker ngSkipHydration [inputId]="idPrefix() + '-start-' + index" formControlName="startTime" size="small"
+            dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
+            iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
+            [invalid]="canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid"
+            (onBlur)="normalizeTime(index, 'startTime', $event)" (onClose)="block.controls.startTime.markAsTouched()">
+            <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
+            <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
+            <ng-template #inputicon let-clickCallBack="clickCallBack">
+              <span class="flex-row-center-center w-px-16 aspect-square">
+                <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
+              </span>
+            </ng-template>
+            <ng-template #footer>
+              <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
+                [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(startPicker)" />
+            </ng-template>
+          </p-datepicker>
+        </div>
+        <div class="flex-col-start-stretch gap-xs flex-none flex-grow-1-sm flex-shrink-1-sm w-px-150 max-w-full min-w-0">
+          <label class="text-sm" [for]="idPrefix() + '-end-' + index">
+            {{ i18n.commonLabels().end }}
+            @if (block.controls.endDayOffset.value) { <small>(+{{ block.controls.endDayOffset.value }})</small> }
+          </label>
+          <p-datepicker #endPicker ngSkipHydration [inputId]="idPrefix() + '-end-' + index" formControlName="endTime" size="small"
+            dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
+            iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
+            [invalid]="(canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) || showTimeRangeError(block, startPicker, endPicker)"
+            (onBlur)="normalizeTime(index, 'endTime', $event)" (onClose)="block.controls.endTime.markAsTouched()">
+            <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
+            <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
+            <ng-template #inputicon let-clickCallBack="clickCallBack">
+              <span class="flex-row-center-center w-px-16 aspect-square">
+                <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
+              </span>
+            </ng-template>
+            <ng-template #footer>
+              <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
+                [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(endPicker)" />
+            </ng-template>
+          </p-datepicker>
+        </div>
+        <div class="flex-col-start-stretch gap-xs flex-none flex-grow-1-sm flex-shrink-1-sm w-px-150 max-w-full min-w-0">
+          <div class="flex-row-start-center gap-xs">
+            <label class="text-sm" [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
+            <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
           </div>
-          @if ((validationAttempted() || block.touched) && (block.controls.startDayOffset.invalid || block.controls.endDayOffset.invalid)) {
-            <small class="mg-contact-error" role="alert">{{ i18n.baseTimeBlocks().offsetRange }}</small>
-          }
+          <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="savedBase() ? 0 : 1"
+            [max]="savedBase() ? 32767 : undefined"
+            [useGrouping]="false" size="small" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0" />
+        </div>
+        @if (!savedBase()) {
+          <div class="flex-row-end-center flex-none">
+            <p-button type="button" icon="pi pi-demolish" severity="danger" size="small" [outlined]="true"
+              [ariaLabel]="i18n.commonActions().removeItem + ': ' + (block.controls.label.value || index + 1)"
+              [pTooltip]="i18n.commonActions().removeItem" tooltipPosition="top" appendTo="body"
+              [disabled]="blocks().disabled || blocks().length === 1" (onClick)="removeBlock(index)" />
+          </div>
         }
-        @if (block.controls.label.touched && block.controls.label.invalid) {
-          <small class="mg-contact-error">{{ copy.blockLabel }}: {{ block.controls.label.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}</small>
-        }
-        @if (canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().start }}: {{ copy.timeInvalid }}</small> }
-        @if (canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().end }}: {{ copy.timeInvalid }}</small> }
-        @if (block.controls.requiredGmCount.touched && block.controls.requiredGmCount.invalid) { <small class="mg-contact-error">{{ savedBase() ? i18n.baseTimeBlocks().gmRange : copy.requiredGmCount + ': ' + i18n.commonForm().positiveInteger }}</small> }
-        @if (showTimeRangeError(block, startPicker, endPicker)) { <small class="mg-contact-error">{{ savedBase() ? i18n.baseTimeBlocks().duration : i18n.datedBlocks().blockRange }}</small> }
       </div>
-    }
-    @if (!savedBase()) {
-      <div class="flex-row-start-center">
-        <p-button type="button" icon="pi pi-add-plus" size="small" severity="secondary" [outlined]="true"
-          [id]="idPrefix() + '-add'" [label]="copy.addBlock" [disabled]="blocks().disabled" (onClick)="addBlock()" />
-      </div>
-    }
+      @if ((validationAttempted() || block.touched) && (block.controls.startDayOffset.invalid || block.controls.endDayOffset.invalid)) {
+        <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+      }
+      @if (block.controls.label.touched && block.controls.label.invalid) {
+        <small class="mg-contact-error">{{ copy.blockLabel }}: {{ block.controls.label.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}</small>
+      }
+      @if (canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().start }}: {{ copy.timeInvalid }}</small> }
+      @if (canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) { <small class="mg-contact-error">{{ i18n.commonLabels().end }}: {{ copy.timeInvalid }}</small> }
+      @if (block.controls.requiredGmCount.touched && block.controls.requiredGmCount.invalid) { <small class="mg-contact-error">{{ savedBase() ? i18n.baseTimeBlocks().gmRange : copy.requiredGmCount + ': ' + i18n.commonForm().positiveInteger }}</small> }
+      @if (showTimeRangeError(block, startPicker, endPicker)) { <small class="mg-contact-error">{{ savedBase() ? i18n.baseTimeBlocks().duration : i18n.datedBlocks().blockRange }}</small> }
+    </div>
+  }
+  @if (!savedBase()) {
+    <div class="flex-row-start-center">
+      <p-button type="button" icon="pi pi-add-plus" size="small" severity="secondary" [outlined]="true"
+        [id]="idPrefix() + '-add'" [label]="copy.addBlock" [disabled]="blocks().disabled" (onClick)="addBlock()" />
+    </div>
+  }
 </div>

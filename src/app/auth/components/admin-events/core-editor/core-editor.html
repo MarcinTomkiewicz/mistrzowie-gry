@@ -12,7 +12,7 @@
       }
     </header>
     <app-loading-overlay [visible]="isLoading() || isSaving()"
-      [label]="isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
+      [label]="saveChanges.checking() ? i18n.diagnostics().checking : isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
     @if (loadErrorMessage() && !isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
         <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.page().loadErrorTitle }}</h2>
@@ -56,102 +56,63 @@
                 </form>
               } @else if (loadedCore) {
                 @if (globalDraft.calendar(); as calendar) {
-                  @if (globalDraft.activeStep() === 2) {
-                    <app-event-core-editions [core]="loadedCore"
-                      [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
-                      [addCityDisabledReason]="policy.locked() ? 'policy' : program.locked() || metadata.locked() || cover.needsReconciliation() ? 'metadata'
-                        : schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending() ? 'schedule' : null"
-                      (cityAdded)="core.set($event)" />
-                  }
-                  @if (globalDraft.activeStep() === 1 && metadata.canEditCore()) {
-                    <ng-container [ngTemplateOutlet]="coreForm" />
-                  } @else if (globalDraft.activeStep() === 2 && selectedMainEdition() && metadata.canEditEdition()) {
-                    @if (metadata.edition(); as edition) {
-                      <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="metadata.editionForm"
-                        (ngSubmit)="saveMetadata('edition')" novalidate>
-                        <section id="event-main-edition" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-                          <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h2>
-                          <dl class="m-0">
-                            <dt class="muted-text">{{ i18n.commonLabels().slug }}</dt>
-                            <dd class="m-0 text-wrap-anywhere">{{ edition.slug }}</dd>
-                          </dl>
-                          <app-event-global-city-fields [fields]="metadata.editionForm.controls" idPrefix="main-edition" [timezones]="metadata.timezones()" />
-                          @if ((metadata.editionForm.controls.venueName.touched && metadata.editionForm.controls.venueName.invalid) ||
-                            (metadata.editionForm.controls.venueAddress.touched && metadata.editionForm.controls.venueAddress.invalid)) {
-                            <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
-                          }
-                        </section>
-                        <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: 'edition' }" />
-                      </form>
-                    }
-                  } @else if (globalDraft.activeStep() === 2) {
-                    @if (globalDraft.selectedEdition(); as edition) {
-                      <p class="m-0 muted-text">{{ i18n.metadata().readOnly }}</p>
-                      @if (globalDraft.policy(); as policy) {
-                        <app-event-global-draft-summary [step]="2" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy" />
-                      }
-                      @if (metadataTarget(); as target) {
-                        <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
-                      }
-                    }
-                  } @else {
-                    @if (globalDraft.activeStep() === 5 && !globalDraft.cityEditing()) {
-                      <app-event-global-program [coreId]="loadedCore.id" [core]="loadedCore" [calendar]="calendar" [disabled]="programBlocked()" />
-                    }
-                    @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
-                      <app-event-global-schedule-editor [core]="loadedCore" [calendar]="calendar"
-                        [blocked]="program.locked() || policy.locked() || baseBlocks.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
-                          cover.needsReconciliation() || globalDraft.isChecking() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
-                        (calendarChanged)="globalDraft.calendar.set($event)" (applied)="loadCore()" />
-                      <app-event-global-base-time-blocks-editor [core]="loadedCore" [calendar]="calendar"
-                        [blocked]="program.locked() || policy.locked() || schedule.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty ||
-                          cover.locked() || cover.dirty() || cover.needsReconciliation() || globalDraft.isChecking() ||
-                          datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
-                        (calendarChanged)="globalDraft.calendar.set($event)" (saved)="loadCore()" />
-                    }
-                    @if (globalDraft.activeStep() === 4 && !globalDraft.cityEditing()) {
-                      <app-event-global-policy-editor [core]="loadedCore"
-                        [blocked]="program.locked() || metadata.locked() || form.dirty || metadata.editionForm.dirty || cover.locked() || cover.dirty() ||
-                          cover.needsReconciliation() || globalDraft.isChecking() || globalDraft.cityBusy() || globalDraft.cityState() !== 'idle' ||
-                          schedule.locked() || baseBlocks.locked() || datedBlocks.isBusy() || datedBlocks.isDirty() || datedBlocks.readbackPending()" />
-                    }
-                    <p class="m-0 muted-text">{{ globalDraft.activeStep() < 3 ? i18n.metadata().readOnly : i18n.creation().savedData }}</p>
-                    @if (globalDraft.activeStep() === 6) {
-                      <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="navigationLocked() || programBlocked()"
-                        (navigateToStep)="goToStep($event)" (published)="acceptPublication($event)" />
-                    } @else if (globalDraft.activeStep() !== 5) {
-                      @if (globalDraft.policy(); as policy) {
+                  @switch (globalDraft.activeStep()) {
+                    @case (1) {
+                      @if (metadata.canEditCore()) { <ng-container [ngTemplateOutlet]="coreForm" /> }
+                      @else if (globalDraft.policy(); as policy) {
                         @if (metadata.edition(); as edition) {
-                          <app-event-global-draft-summary [step]="globalDraft.activeStep()" [core]="loadedCore"
-                            [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                          <app-event-global-draft-summary [step]="1" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                        }
+                      }
+                      <app-event-core-cover [disabled]="saveChanges.dirty() || saveChanges.pending() || saveChanges.busy()" (saved)="loadCore()" />
+                    }
+                    @case (2) {
+                      <app-event-core-editions [core]="loadedCore" [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
+                        [addCityDisabledReason]="saveChanges.dirty() ? 'metadata' : navigationLocked() ? 'schedule' : null"
+                        (cityAdded)="loadCore()" />
+                      @if (selectedMainEdition() && metadata.canEditEdition()) {
+                        <div class="mg-form flex-col-start-stretch gap-sm w-100" [formGroup]="metadata.editionForm">
+                          <section id="event-main-edition" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
+                            <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h2>
+                            <app-event-global-city-fields [fields]="metadata.editionForm.controls" idPrefix="main-edition" [timezones]="metadata.timezones()" />
+                            @if ((metadata.editionForm.controls.venueName.touched && metadata.editionForm.controls.venueName.invalid) ||
+                              (metadata.editionForm.controls.venueAddress.touched && metadata.editionForm.controls.venueAddress.invalid)) {
+                              <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
+                            }
+                          </section>
+                        </div>
+                      } @else if (globalDraft.selectedEdition(); as edition) {
+                        @if (globalDraft.policy(); as policy) {
+                          <app-event-global-draft-summary [step]="2" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy" />
                         }
                       }
                     }
-                    @if (metadataTarget(); as target) {
-                      <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
+                    @case (3) {
+                      <app-event-global-schedule-editor />
+                      <app-event-global-base-time-blocks-editor />
+                      <app-event-dated-blocks-editor />
+                    }
+                    @case (4) { <app-event-global-policy-editor /> }
+                    @case (5) {
+                      <app-event-global-program [coreId]="loadedCore.id" [core]="loadedCore" [calendar]="calendar" [disabled]="programBlocked()" />
+                    }
+                    @case (6) {
+                      <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="programBlocked()"
+                        (navigateToStep)="goToStep($event)" (published)="acceptPublication($event)">
+                        <app-event-global-save-summary summary-save-actions [disabled]="navigationLocked() || cover.dirty() || globalDraft.cityEditing()"
+                          (navigateToStep)="goToStep($event)" (saved)="loadCore()" (discard)="discardEditChanges()" />
+                        @if (globalDraft.policy() && !saveChanges.dirty() && !saveChanges.pending()) {
+                          <app-event-global-diagnostics summary-validation [coreId]="loadedCore.id" [cities]="calendar.cities"
+                            [disabled]="programBlocked()" (navigateToSection)="goToDiagnosticSection($event)" />
+                        }
+                      </app-event-global-saved-summary>
                     }
                   }
-                  @if (globalDraft.activeStep() === 3 && !globalDraft.cityEditing()) {
-                    @if (!program.locked() && !policy.locked() && !schedule.locked() && !baseBlocks.locked()) {
-                      <app-event-dated-blocks-editor [calendar]="calendar" (saved)="globalDraft.calendar.set($event)" />
-                    }
-                  }
-                  @if (globalDraft.activeStep() === 1) {
-                    @for (coverCoreId of [loadedCore.id]; track coverCoreId) {
-                      <app-event-core-cover />
-                    }
-                  }
-                  @if (globalDraft.activeStep() === 6 && globalDraft.policy()) {
-                    <app-event-global-diagnostics [coreId]="loadedCore.id" [cities]="calendar.cities"
-                      [disabled]="publication.locked() || program.locked() || policy.locked() || metadata.locked() || schedule.locked() || baseBlocks.locked() || cover.needsReconciliation() || form.dirty || metadata.editionForm.dirty || globalDraft.cityEditing() || datedBlocks.isDirty() || datedBlocks.readbackPending()"
-                      (navigateToSection)="goToDiagnosticSection($event)" />
-                  }
+                  @if (metadataError(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
                 }
               }
             </div>
           </ng-template>
-        } @else if (metadataTarget(); as target) {
-          <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: target }" />
         }
         @if (creating && !isSaving() && globalDraft.state() !== 'idle') {
           <p-message severity="warn" icon="pi pi-biohazard">{{ globalDraft.state() === 'created' ? i18n.creation().created : i18n.creation().uncertain }}</p-message>
@@ -193,7 +154,7 @@
 </section>
 
 <ng-template #coreForm>
-  <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="saveMetadata('core')" novalidate>
+  <div class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form">
     <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
       <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
       <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
@@ -235,21 +196,5 @@
         </div>
       </div>
     </section>
-    <ng-container [ngTemplateOutlet]="metadataActions" [ngTemplateOutletContext]="{ $implicit: 'core' }" />
-  </form>
-</ng-template>
-
-<ng-template #metadataActions let-target>
-  @if (metadataError(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
-  @if (metadata.blocked()) { <p class="m-0 muted-text">{{ i18n.metadata().operationBlocked }}</p> }
-  <div class="flex-row-start-center flex-wrap gap-sm border-top pt-md w-100">
-    @if ((target === 'core' ? metadata.canEditCore() : metadata.canEditEdition()) || metadata.pendingTarget() === target) {
-      <p-button type="button" severity="success" size="small" icon="pi pi-done-it" loadingIcon="pi pi-d20"
-        [label]="metadata.pendingTarget() === target && metadata.state() === 'saved' ? i18n.creation().retryRead
-          : metadata.pendingTarget() === target && metadata.state() === 'uncertain' ? i18n.creation().retryCreation : i18n.commonActions().save"
-        [loading]="isSaving()" [disabled]="isLoading() || !metadata.canSave(target)" (onClick)="saveMetadata(target)" />
-    }
-    <p-button type="button" severity="secondary" size="small" [outlined]="true" icon="pi pi-trail"
-      [label]="i18n.commonActions().refresh" [disabled]="metadata.locked() || metadata.blocked() || cover.locked()" (onClick)="refreshMetadata(target)" />
   </div>
 </ng-template>

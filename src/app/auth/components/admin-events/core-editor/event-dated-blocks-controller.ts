@@ -10,6 +10,8 @@ import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { EventGlobalScheduleController } from './event-global-schedule-controller';
 import { EventGlobalBaseTimeBlocksController } from './event-global-base-time-blocks-controller';
+import { matchesDatedBlocksReadback } from './event-dated-blocks-state';
+import { sameScheduleBlocks } from './event-global-schedule-state';
 
 @Injectable()
 export class EventDatedBlocksController {
@@ -17,6 +19,7 @@ export class EventDatedBlocksController {
   private readonly schedule = inject(EventGlobalScheduleController);
   private readonly baseBlocks = inject(EventGlobalBaseTimeBlocksController);
   private command: EventDatedTimeBlocksCommand | null = null;
+  private writeBaseline: AdminGlobalCalendarResult | null = null;
   private readonly operation = signal<'preview' | 'save' | 'read' | null>(null);
   private savedRevision: number | null = null;
   readonly calendar = signal<AdminGlobalCalendarResult | null>(null);
@@ -24,6 +27,7 @@ export class EventDatedBlocksController {
   readonly editionId = signal('');
   readonly preview = signal<AdminDatedTimeBlocksPreview | null>(null);
   readonly conflicted = signal(false);
+  readonly error = signal<unknown | null>(null);
   readonly readbackPending = signal(false);
   readonly validationAttempted = signal(false);
   readonly form = new FormGroup({
@@ -32,16 +36,19 @@ export class EventDatedBlocksController {
   });
   private readonly formEvents = toSignal(this.form.events);
   readonly isDirty = computed(() => { this.formEvents(); return this.form.dirty; });
+  readonly hasChanges = computed(() => {
+    this.formEvents();
+    const override = this.editionId() ? this.city()?.isOverride : this.day()?.source === 'date_specific';
+    return this.form.dirty && (this.form.invalid || this.form.controls.override.value !== override ||
+      this.form.controls.override.value && !sameScheduleBlocks(mapEventGlobalTimeBlocks(this.form.controls.timeBlocks), this.currentBlocks()));
+  });
   readonly isBusy = computed(() => this.operation() !== null);
-  readonly isPreviewing = computed(() => this.operation() === 'preview');
-  readonly isSaving = computed(() => this.operation() === 'save');
-  readonly isReading = computed(() => this.operation() === 'read');
   readonly day = computed(() => this.calendar()?.datedTimeBlocks.find(row => row.date === this.date()));
   readonly city = computed(() => this.day()?.cities.find(row => row.editionId === this.editionId()));
   readonly currentBlocks = computed(() => this.editionId() ? this.city()?.timeBlocks ?? [] : this.day()?.timeBlocks ?? []);
   readonly canEdit = computed(() => {
     const day = this.day();
-    if (!day || this.schedule.locked() || this.baseBlocks.locked()) return false;
+    if (!day || this.schedule.blocked() || this.baseBlocks.blocked() || this.schedule.isBusy() || this.baseBlocks.isBusy()) return false;
     const occurrence = this.calendar()?.globalDates.find(row => row.globalOccurrenceId === day.globalOccurrenceId && row.date === day.date);
     if (!occurrence || day.source === 'published_snapshot' || occurrence.status !== 'scheduled') return false;
     if (this.editionId() && !this.city()) return false;
@@ -59,12 +66,16 @@ export class EventDatedBlocksController {
   reset(): void {
     this.operation.set(null);
     this.savedRevision = null;
+    this.command = null;
+    this.writeBaseline = null;
     this.calendar.set(null);
     this.readbackPending.set(false);
+    this.error.set(null);
     this.populate('', '');
   }
 
   load(calendar: AdminGlobalCalendarResult): void {
+    if (this.isDirty() || this.readbackPending()) return;
     assertEdgeContract(Array.isArray(calendar.datedTimeBlocks), 'datedTimeBlocks', 'the canonical dated calendar');
     this.calendar.set(calendar);
     const date = calendar.datedTimeBlocks.some(row => row.date === this.date()) ? this.date() : calendar.datedTimeBlocks[0]?.date ?? '';
@@ -74,12 +85,23 @@ export class EventDatedBlocksController {
   }
 
   select(date: string, editionId: string): void {
-    if (this.schedule.locked() || this.baseBlocks.locked() || this.isBusy() || this.isDirty() || this.readbackPending()) return;
+    if (this.schedule.isBusy() || this.baseBlocks.isBusy() || this.isBusy() || this.isDirty() || this.readbackPending()) return;
     this.populate(date, editionId);
+  }
+
+  acceptCalendarReadback(calendar: AdminGlobalCalendarResult): void {
+    const previous = this.calendar();
+    const day = previous?.datedTimeBlocks.find(row => row.date === this.date());
+    const current = calendar.datedTimeBlocks.find(row => row.date === this.date());
+    assertEdgeContract(previous?.coreId === calendar.coreId && (!this.isDirty() || day !== undefined && current !== undefined &&
+      day.globalOccurrenceId === current.globalOccurrenceId), 'datedTimeBlocks.baseline', 'the retained shared date of the local edit');
+    if (this.isDirty()) this.calendar.set(calendar);
+    else this.load(calendar);
   }
 
   previewChanges(): Observable<AdminDatedTimeBlocksPreview> {
     return defer(() => {
+      this.error.set(null);
       this.validationAttempted.set(true);
       this.form.markAllAsTouched();
       if (!this.canEdit() || this.isBusy() || !this.isDirty() || this.form.invalid || this.conflicted() || this.readbackPending()) return EMPTY;
@@ -91,6 +113,7 @@ export class EventDatedBlocksController {
         dateTimeBlocks: this.editionId() ? [] : [row],
         cityDateTimeBlocks: this.editionId() ? [{ ...row, editionId: this.editionId() }] : [],
       };
+      this.writeBaseline = calendar;
       this.invalidatePreview();
       this.operation.set('preview');
       this.form.disable({ emitEvent: false });
@@ -107,18 +130,20 @@ export class EventDatedBlocksController {
 
   save(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
+      this.error.set(null);
       const command = this.command;
       if (!command || !this.preview() || this.isBusy() || !this.canEdit() || this.conflicted() || this.readbackPending()) return EMPTY;
       this.operation.set('save');
+      this.readbackPending.set(true);
       this.form.disable({ emitEvent: false });
       return this.admin.saveDatedTimeBlocks(command).pipe(
         tap(result => {
-          this.readbackPending.set(true);
-          this.invalidatePreview();
+          this.preview.set(null);
           assertEdgeContract(result.status === 'draft_saved' && result.applied === true && result.calendarRevision > command.expectedCalendarRevision,
             'datedTimeBlocksSave', 'a saved draft with an advanced calendar revision');
           this.savedRevision = result.calendarRevision;
         }),
+        tap({ error: error => this.recordFailure(error, true) }),
         switchMap(() => this.readCalendar(command.coreId)),
         tap({ error: error => this.recordFailure(error) }),
         finalize(() => this.finishOperation()),
@@ -128,11 +153,13 @@ export class EventDatedBlocksController {
 
   refresh(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
+      this.error.set(null);
       const calendar = this.calendar();
-      if (!calendar || this.isBusy() || this.schedule.locked() || this.baseBlocks.locked()) return EMPTY;
+      if (!calendar || !this.readbackPending() || !this.command || this.isBusy() || this.schedule.isBusy() || this.baseBlocks.isBusy()) return EMPTY;
       this.operation.set('read');
       this.form.disable({ emitEvent: false });
-      return this.readCalendar(calendar.coreId).pipe(finalize(() => this.finishOperation()));
+      return this.readCalendar(calendar.coreId).pipe(tap({ error: error => this.recordFailure(error) }),
+        finalize(() => this.finishOperation()));
     });
   }
 
@@ -141,9 +168,16 @@ export class EventDatedBlocksController {
       assertEdgeContract(calendar.coreId === coreId && calendar.calendarLifecycle === 'global' &&
         (this.savedRevision === null || calendar.calendarRevision >= this.savedRevision),
       'globalCalendar', 'the canonical calendar after the confirmed draft save');
-      this.load(calendar);
+      if (this.readbackPending()) {
+        assertEdgeContract(this.command !== null && this.writeBaseline !== null &&
+          matchesDatedBlocksReadback(this.writeBaseline, calendar, this.command, this.savedRevision),
+        'datedTimeBlocks.readback', 'the exact saved overrides, inherited blocks and unchanged remaining scope');
+      }
+      this.form.markAsPristine();
       this.readbackPending.set(false);
+      this.load(calendar);
       this.savedRevision = null;
+      this.writeBaseline = null;
     }));
   }
 
@@ -166,10 +200,13 @@ export class EventDatedBlocksController {
 
   private invalidatePreview(): void {
     this.preview.set(null);
-    this.command = null;
+    if (!this.readbackPending()) this.command = null;
   }
 
-  private recordFailure(error: unknown): void {
+  private recordFailure(error: unknown, writeFailure = false): void {
+    this.error.set(error);
+    if (writeFailure && this.readbackPending() && error instanceof RpcError &&
+      ['40001', '42501', '22023', '22P02', '23514', 'P0002'].includes(error.code)) this.readbackPending.set(false);
     this.invalidatePreview();
     if (error instanceof RpcError && error.code === '40001') this.conflicted.set(true);
   }

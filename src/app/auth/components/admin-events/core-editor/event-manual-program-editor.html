@@ -30,23 +30,20 @@
       </p-floatlabel>
       <p-floatlabel variant="on" class="w-100 min-w-0">
         <p-datepicker ngSkipHydration inputId="manual-program-start" formControlName="startTime" dataType="string" hourFormat="24" [timeOnly]="true"
-          [keepInvalid]="true" [showIcon]="true" iconDisplay="input" appendTo="body" size="small" class="w-100" inputStyleClass="w-100" />
+          [keepInvalid]="true" [showIcon]="true" iconDisplay="input" appendTo="body" size="small" class="w-100" inputStyleClass="w-100"
+          (onBlur)="normalizeTime('startTime', $event)" />
         <label for="manual-program-start">{{ i18n.labels().start }}</label>
       </p-floatlabel>
       <p-floatlabel variant="on" class="w-100 min-w-0">
         <p-datepicker ngSkipHydration inputId="manual-program-end" formControlName="endTime" dataType="string" hourFormat="24" [timeOnly]="true"
-          [keepInvalid]="true" [showIcon]="true" iconDisplay="input" appendTo="body" size="small" class="w-100" inputStyleClass="w-100" />
+          [keepInvalid]="true" [showIcon]="true" iconDisplay="input" appendTo="body" size="small" class="w-100" inputStyleClass="w-100"
+          (onBlur)="normalizeTime('endTime', $event)" />
         <label for="manual-program-end">{{ i18n.labels().end }}</label>
       </p-floatlabel>
-      <p-floatlabel variant="on" class="w-100 min-w-0">
-        <p-inputnumber inputId="manual-program-start-day" formControlName="startDayOffset" [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
-        <label for="manual-program-start-day">{{ coreI18n.baseTimeBlocks().startDayOffset }}</label>
-      </p-floatlabel>
-      <p-floatlabel variant="on" class="w-100 min-w-0">
-        <p-inputnumber inputId="manual-program-end-day" formControlName="endDayOffset" [min]="0" [max]="7" [useGrouping]="false" size="small" class="w-100" inputStyleClass="w-100" />
-        <label for="manual-program-end-day">{{ coreI18n.baseTimeBlocks().endDayOffset }}</label>
-      </p-floatlabel>
     </div>
+    @if (timeRange(editor.form.getRawValue()); as range) {
+      <p class="m-0 muted-text" role="status">{{ range }}</p>
+    }
     @if (editor.form.touched && editor.form.invalid) { <small class="mg-contact-error" role="alert">{{ coreI18n.commonForm().invalid }}</small> }
     @if (editor.form.touched && intervalInvalid()) { <small class="mg-contact-error" role="alert">{{ copy.intervalInvalid }}</small> }
     @if (editor.positionTaken()) { <small class="mg-contact-error" role="alert">{{ copy.positionTaken }}</small> }

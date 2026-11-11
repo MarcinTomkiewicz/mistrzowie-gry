@@ -32,10 +32,21 @@ export class EventGlobalPolicyFacade {
   readonly validationAttempted = signal(false);
   readonly form = new FormGroup({ price: createEventPolicyPriceForm(), rules: createEventPolicyRulesForm() });
   private readonly formEvents = toSignal(this.form.events);
-  readonly dirty = computed(() => { this.formEvents(); return this.form.dirty; });
-  readonly activeEditor = computed(() => {
+  readonly sourceDocument = computed(() => {
+    this.draft();
+    return this.baseline ? mapEventPolicyDocument(this.baseline) : null;
+  });
+  readonly document = computed(() => {
     this.formEvents();
-    return this.form.controls.rules.dirty ? 'rules' : this.form.controls.price.dirty ? 'price' : null;
+    const source = this.sourceDocument();
+    if (!source || this.form.invalid) return null;
+    return mapEventPolicyRules(this.form.controls.rules,
+      mapEventPolicyPrice(this.form.controls.price, source));
+  });
+  readonly dirty = computed(() => {
+    this.formEvents();
+    const document = this.document();
+    return this.form.dirty && (!document || !this.baseline || !samePolicyDocument(document, mapEventPolicyDocument(this.baseline)));
   });
   readonly isBusy = computed(() => this.operation() !== null);
   readonly conflicted = computed(() => this.issue() !== null);
@@ -48,7 +59,6 @@ export class EventGlobalPolicyFacade {
   readonly canPreview = computed(() => this.canEdit() && this.dirty() && !this.isBusy() && !this.conflicted() && !this.readbackPending());
   readonly canSave = computed(() => this.canPreview() && this.command() !== null && this.preview()?.valid === true &&
     this.preview()?.status === 'draft_ready');
-  readonly canDiscard = computed(() => !this.blocked() && !this.isBusy() && !this.readbackPending() && (this.dirty() || this.conflicted()));
 
   constructor() {
     effect(() => this.syncControls());
@@ -85,6 +95,19 @@ export class EventGlobalPolicyFacade {
     });
   }
 
+  acceptCalendarReadback(): Observable<AdminEventPolicyDraft> {
+    return defer(() => {
+      const before = this.baseline;
+      return this.run('read', this.readCurrent().pipe(tap(read => {
+        assertEdgeContract(before !== null && !read.baselineChanged && before.coreId === read.coreId &&
+          before.revision === read.revision && before.hasDraft === read.hasDraft &&
+          samePolicyDocument(mapEventPolicyDocument(before), mapEventPolicyDocument(read)),
+        'globalPolicy.calendarReadback', 'unchanged policy data after the confirmed calendar saves');
+        this.baseline = read;
+      })));
+    });
+  }
+
   previewChanges(): Observable<AdminEventPolicyPreview> {
     return defer(() => {
       this.validationAttempted.set(true);
@@ -94,8 +117,8 @@ export class EventGlobalPolicyFacade {
       assertEdgeContract(baseline !== null, 'globalPolicy', 'the authoritative edit baseline');
       const source = mapEventPolicyDocument(baseline);
       const command: GlobalPolicyCommand = { coreId: baseline.coreId, baseline,
-        document: this.activeEditor() === 'rules' ? mapEventPolicyRules(this.form.controls.rules, source)
-          : mapEventPolicyPrice(this.form.controls.price, source), confirmedRevision: null };
+        document: mapEventPolicyRules(this.form.controls.rules, mapEventPolicyPrice(this.form.controls.price, source)),
+        confirmedRevision: null };
       this.invalidatePreview();
       return this.run('preview', this.readCurrent().pipe(switchMap(read => {
         if (read.baselineChanged || !samePolicyBaseline(baseline, read)) {
@@ -159,18 +182,11 @@ export class EventGlobalPolicyFacade {
     });
   }
 
-  refresh(discard = false): Observable<AdminEventPolicyDraft> {
+  refresh(): Observable<AdminEventPolicyDraft> {
     return defer(() => {
-      if (this.isBusy() || this.blocked() || (discard && !this.canDiscard())) return EMPTY;
-      if (!this.readbackPending()) this.invalidatePreview();
-      return this.run('read', this.readCurrent().pipe(tap(read => {
-        const command = this.command();
-        if (this.readbackPending() && command) this.reconcile(read, command);
-        else if (discard || !this.dirty()) this.populate(read);
-        else if (read.baselineChanged || !this.baseline || !samePolicyBaseline(this.baseline, read)) {
-          this.issue.set(read.baselineChanged ? 'baselineChanged' : 'conflict');
-        }
-      })));
+      const command = this.command();
+      if (this.isBusy() || this.blocked() || !this.readbackPending() || !command) return EMPTY;
+      return this.run('read', this.readCurrent().pipe(tap(read => this.reconcile(read, command))));
     });
   }
 
@@ -187,21 +203,13 @@ export class EventGlobalPolicyFacade {
   }
 
   private reconcile(read: AdminEventPolicyDraft, command: GlobalPolicyCommand): void {
-    if (this.saveContractError !== null) {
-      this.readbackPending.set(false);
-      this.command.set(null);
-      this.issue.set('conflict');
-      this.form.markAsDirty();
-      throw this.saveContractError;
-    }
     if (matchesPolicySave(read, command) && this.canEdit()) {
       this.populate(read);
       this.saved.set(true);
-    } else if (command.confirmedRevision !== null) {
-      this.readbackPending.set(false);
-      this.command.set(null);
+    } else {
       this.issue.set(read.baselineChanged ? 'baselineChanged' : 'conflict');
       this.form.markAsDirty();
+      assertEdgeContract(false, 'globalPolicy.readback', 'the exact pending policy document and revision in canonical readback');
     }
   }
 
@@ -233,15 +241,13 @@ export class EventGlobalPolicyFacade {
     const enabled = this.canEdit() && !this.isBusy() && !this.conflicted() && !this.readbackPending();
     setControlEnabled(this.form, enabled);
     const { price, rules } = this.form.controls;
-    const priceEnabled = enabled && this.activeEditor() !== 'rules';
-    const rulesEnabled = enabled && this.activeEditor() !== 'price';
-    setControlEnabled(price, priceEnabled);
-    setControlEnabled(price.controls.basis, priceEnabled && price.controls.amount.value !== null);
-    setControlEnabled(rules, rulesEnabled);
+    setControlEnabled(price, enabled);
+    setControlEnabled(price.controls.basis, enabled && price.controls.amount.value !== null);
+    setControlEnabled(rules, enabled);
     for (const row of rules.controls.cityOverrides.controls) {
       row.controls.editionId.disable({ emitEvent: false });
       for (const group of [row.controls.signup, row.controls.sessionCapacityCeiling, row.controls.wholeEventCapacity]) {
-        setControlEnabled(group.controls.value, rulesEnabled && group.controls.enabled.value);
+        setControlEnabled(group.controls.value, enabled && group.controls.enabled.value);
       }
     }
     rules.updateValueAndValidity({ emitEvent: false });

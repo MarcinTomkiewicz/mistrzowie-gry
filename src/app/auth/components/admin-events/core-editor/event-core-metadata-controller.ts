@@ -46,7 +46,8 @@ export class EventCoreMetadataController {
   readonly issues = signal<Partial<Record<EventMetadataTarget, 'conflict' | 'protected'>>>({});
   readonly locked = computed(() => this.isBusy() || this.state() !== 'idle');
   readonly blocked = computed(() => this.program.locked() || this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
-    this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() || this.blocks.isBusy() || this.blocks.isDirty() || this.blocks.readbackPending());
+    this.policy.isBusy() || this.policy.readbackPending() || this.schedule.isBusy() || this.baseBlocks.isBusy() ||
+    this.baseBlocks.readbackPending() || this.blocks.isBusy() || this.blocks.readbackPending());
   readonly coreForm = new FormGroup({
     key: new FormControl('', { nonNullable: true,
       validators: [Validators.required, requiredTrimmedValidator(), Validators.pattern(/^[a-z0-9-]+$/)] }),
@@ -122,8 +123,10 @@ export class EventCoreMetadataController {
       this.pendingTarget.set(target);
       this.clearError(target);
       this.isBusy.set(true);
+      const needsWrite = this.state() === 'idle';
+      if (needsWrite) this.state.set('uncertain');
       this.syncControls();
-      const write = this.state() === 'saved' ? of(undefined) : this.write(command).pipe(
+      const write = !needsWrite ? of(undefined) : this.write(command).pipe(
         tap(() => this.state.set('saved')),
         tap({ error: error => this.recordWriteFailure(target, error) }),
       );
@@ -157,6 +160,18 @@ export class EventCoreMetadataController {
         finalize(() => { this.isBusy.set(false); this.syncControls(); }),
       );
     });
+  }
+
+  acceptEditionReadback(): Observable<void> {
+    const before = this.edition();
+    assertEdgeContract(before !== null, 'globalEditionMetadata', 'the loaded Edition metadata baseline');
+    return this.admin.getEditionDetail(before.id).pipe(map(current => {
+      assertEdgeContract(current !== null && current.id === before.id && current.eventCoreId === before.eventCoreId &&
+        current.city === before.city && current.slug === before.slug && current.timezone === before.timezone &&
+        current.venueName === before.venueName && current.venueAddress === before.venueAddress && current.facebookLink === before.facebookLink,
+      'globalEditionMetadata.baseline', 'unchanged writable metadata after the confirmed calendar and policy operations');
+      this.edition.set(current);
+    }));
   }
 
   private createCommand(target: EventMetadataTarget, core: IEventCoreDetail): MetadataCommand {
@@ -233,6 +248,10 @@ export class EventCoreMetadataController {
   }
 
   private rejectReadback(target: EventMetadataTarget, issue: 'conflict' | 'protected' = 'conflict'): never {
+    if (this.command && this.state() !== 'idle') {
+      (target === 'core' ? this.coreForm : this.editionForm).markAsDirty();
+      throw new Error('[EVENT_CORE_METADATA] The pending metadata write is not confirmed by canonical readback.');
+    }
     this.issues.update(issues => ({ ...issues, [target]: issue }));
     this.command = null;
     this.state.set('idle');
@@ -265,9 +284,10 @@ export class EventCoreMetadataController {
   }
 
   private syncControls(): void {
-    const coreEnabled = !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditCore();
-    setControlEnabled(this.coreForm, coreEnabled);
-    setControlEnabled(this.editionForm, !this.program.locked() && !this.locked() && !this.policy.locked() && !this.schedule.locked() && !this.baseBlocks.locked() && this.cover.ready() && this.canEditEdition());
+    const enabled = !this.program.locked() && !this.locked() && !this.policy.isBusy() && !this.policy.readbackPending() &&
+      !this.schedule.isBusy() && !this.baseBlocks.isBusy() && this.cover.ready();
+    setControlEnabled(this.coreForm, enabled && this.canEditCore());
+    setControlEnabled(this.editionForm, enabled && this.canEditEdition());
     this.editionForm.controls.city.disable({ emitEvent: false });
     this.editionForm.controls.timezone.disable({ emitEvent: false });
   }

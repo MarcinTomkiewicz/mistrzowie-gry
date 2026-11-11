@@ -1,18 +1,32 @@
 @let copy = i18n.creation();
-<div class="flex-row-start-end flex-wrap gap-sm w-100 min-w-0">
-  <div class="flex-col-start-stretch gap-xs flex-none w-px-350 max-w-full min-w-0">
-    <label class="text-sm" [for]="idPrefix() + '-kind'">{{ i18n.commonLabels().participantSignupKind }}</label>
-    <div class="flex-row-start-center gap-xs min-w-0">
-      <p-select [inputId]="idPrefix() + '-kind'" [formControl]="kindControl()" [options]="kinds()" optionValue="value" optionLabel="label"
-        size="small" appendTo="body" class="flex-1 min-w-0" [invalid]="kindControl().touched && kindControl().invalid">
-        <ng-template #dropdownicon><span class="pi pi-show-down" aria-hidden="true"></span></ng-template>
-      </p-select>
-      <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().participantSignupKind + ': ' + copy.help" [text]="copy.signupKindHint" />
-    </div>
-    @if (kindControl().touched && kindControl().invalid) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().required }}</small> }
+<div class="flex-col-start-stretch gap-sm w-100 min-w-0">
+  <div class="flex-row-start-center gap-xs">
+    <span class="text-sm" [id]="idPrefix() + '-kind-label'">{{ i18n.commonLabels().participantSignupKind }}</span>
+    <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().participantSignupKind + ': ' + copy.help" [text]="copy.signupKindHint" />
   </div>
-  <div class="flex-row-start-center gap-xs flex-none max-w-full min-w-0">
-    <p-toggleswitch class="flex-none" [inputId]="idPrefix() + '-required'" [formControl]="requiredControl()" />
+  <div class="mg-grid grid-3-cols grid-1-cols-sm gap-sm w-100 min-w-0" role="radiogroup"
+    [attr.aria-labelledby]="idPrefix() + '-kind-label'" [attr.aria-invalid]="kindControl().touched && kindControl().invalid"
+    [attr.aria-describedby]="kindControl().touched && kindControl().invalid ? idPrefix() + '-kind-error' : null">
+    @for (option of kinds(); track option.value) {
+      <label class="mg-choice-card w-100 min-w-0 text-left" [class.active]="kindControl().value === option.value"
+        [for]="idPrefix() + '-kind-' + option.value">
+        <span class="flex-row-start-start gap-sm">
+          <p-radiobutton [inputId]="idPrefix() + '-kind-' + option.value" [name]="idPrefix() + '-kind'"
+            [value]="option.value" [formControl]="kindControl()" [invalid]="kindControl().touched && kindControl().invalid" />
+          <span [class]="option.icon + ' square-7 flex-none'" aria-hidden="true"></span>
+          <span class="flex-col-start-stretch gap-xs min-w-0">
+            <strong class="text-wrap-anywhere">{{ option.label }}</strong>
+            <span class="muted-text text-sm">{{ option.hint }}</span>
+          </span>
+        </span>
+      </label>
+    }
+  </div>
+  @if (kindControl().touched && kindControl().invalid) {
+    <small class="mg-contact-error" role="alert" [id]="idPrefix() + '-kind-error'">{{ i18n.commonForm().required }}</small>
+  }
+  <div class="flex-row-start-center gap-xs border-top pt-sm min-w-0">
+    <p-checkbox class="flex-none" [inputId]="idPrefix() + '-required'" [formControl]="requiredControl()" [binary]="true" />
     <label class="text-sm" [for]="idPrefix() + '-required'">{{ i18n.commonLabels().signupRequired }}</label>
     <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().signupRequired + ': ' + copy.help" [text]="copy.signupRequiredHint" />
   </div>

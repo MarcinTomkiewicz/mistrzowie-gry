@@ -91,7 +91,36 @@ export function createManualActivityForm() {
 
 type PlacementValue = Pick<ManualRpgSlotPayload, 'position' | 'startTime' | 'endTime' | 'startDayOffset' | 'endDayOffset'> & { blockPosition: number | null };
 
+export function manualProgramDayOffsets(
+  value: Pick<PlacementValue, 'blockPosition' | 'startTime' | 'endTime'>, blocks: readonly GlobalTimeBlockInput[],
+): Pick<PlacementValue, 'startDayOffset' | 'endDayOffset'> | null {
+  const selected = blocks.filter(block => block.position === value.blockPosition);
+  if (selected.length !== 1) return null;
+  const block = selected[0];
+  const start = parseTimeLabelToMinutes(value.startTime);
+  const end = parseTimeLabelToMinutes(value.endTime);
+  const blockStart = parseTimeLabelToMinutes(formatTimeLabel(block.startTime));
+  const blockEnd = parseTimeLabelToMinutes(formatTimeLabel(block.endTime));
+  if (start === null || end === null || blockStart === null || blockEnd === null) return null;
+  const blockFrom = block.startDayOffset * 1440 + blockStart;
+  const blockTo = block.endDayOffset * 1440 + blockEnd;
+  let match: Pick<PlacementValue, 'startDayOffset' | 'endDayOffset'> | null = null;
+  for (let startDayOffset = block.startDayOffset; startDayOffset <= block.endDayOffset; startDayOffset++) {
+    const from = startDayOffset * 1440 + start;
+    if (from < blockFrom || from >= blockTo) continue;
+    for (let endDayOffset = startDayOffset; endDayOffset <= block.endDayOffset; endDayOffset++) {
+      const to = endDayOffset * 1440 + end;
+      if (to <= from || to > blockTo) continue;
+      if (match !== null) return null;
+      match = { startDayOffset, endDayOffset };
+    }
+  }
+  return match;
+}
+
 export function manualProgramIntervalValid(value: PlacementValue, blocks: GlobalTimeBlockInput[]): boolean {
+  const days = manualProgramDayOffsets(value, blocks);
+  if (!days || value.startDayOffset !== days.startDayOffset || value.endDayOffset !== days.endDayOffset) return false;
   const start = parseTimeLabelToMinutes(value.startTime);
   const end = parseTimeLabelToMinutes(value.endTime);
   if (start === null || end === null) return false;

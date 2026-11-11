@@ -51,8 +51,8 @@
     <div class="flex-row-start-center gap-md">
       <span class="pi pi-sundial square-11 flex-none" aria-hidden="true"></span>
       <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.blocks }}</h2>
+      <app-context-help [text]="copy.blocksHint" [ariaLabel]="copy.blocks + ': ' + copy.help" />
     </div>
-    <p class="m-0 muted-text">{{ copy.blocksHint }}</p>
     <app-event-global-time-blocks [blocks]="controls.timeBlocks" idPrefix="global-base"
       [validationAttempted]="scheduleValidationAttempted()" />
   </section>

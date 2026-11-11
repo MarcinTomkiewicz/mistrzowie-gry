@@ -22,7 +22,6 @@ import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { createScopedObjectI18n } from '../../../../core/translations/scoped.i18n';
 import type { CoreCoverCopy } from '../../../../core/types/i18n/admin-events';
 import type { EventAdminTimelineCopy } from '../../../../core/types/i18n/event-admin-timeline';
-import type { EventGlobalScheduleCopy } from '../../../../core/types/i18n/event-global-draft';
 import { RpcError } from '../../../../core/types/rpc-error';
 import type { BreadcrumbItem } from '../../../../core/types/breadcrumb';
 import { scrollElementIntoViewWhenReady } from '../../../../core/utils/scroll';
@@ -34,6 +33,8 @@ import { EventGlobalDraftFields } from './event-global-draft-fields';
 import { EventGlobalDraftReview } from './event-global-draft-review';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventGlobalSavedSummary } from './event-global-saved-summary';
+import { EventGlobalSaveController } from './event-global-save-controller';
+import { EventGlobalSaveSummary } from './event-global-save-summary';
 import { EventGlobalPublicationController } from './event-global-publication-controller';
 import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
 import { EventGlobalDiagnostics } from './event-global-diagnostics';
@@ -57,15 +58,16 @@ import { EventEditionSummary } from '../edition-editor/event-edition-summary';
 @Component({
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule, CharacterCounter,
-    EventEditionSummary, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
+    EventEditionSummary, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventGlobalSaveSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalDraftFields, EventGlobalDraftReview, EventGlobalCityFields,
     EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
     EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualProgramController,
-    EventGlobalPublicationController, EventEditionHistory],
+    EventGlobalPublicationController, EventEditionHistory, EventGlobalSaveController],
 })
 export class EventCoreEditor {
+  protected readonly saveChanges = inject(EventGlobalSaveController);
   protected readonly history = inject(EventEditionHistory);
   private readonly draftFields = viewChild(EventGlobalDraftFields);
   protected readonly datedBlocks = inject(EventDatedBlocksController);
@@ -92,22 +94,21 @@ export class EventCoreEditor {
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly coverCopy = createScopedObjectI18n<CoreCoverCopy>('adminEvents', 'editor.cover');
   private readonly programCopy = createScopedObjectI18n<EventAdminTimelineCopy['manualProgram']>('adminEvents', 'timeline.manualProgram');
-  protected readonly scheduleCopy = createScopedObjectI18n<EventGlobalScheduleCopy>('adminEvents', 'editor.schedule');
   protected readonly core = this.metadata.core;
   protected readonly isLoading = signal(true);
   private readonly creating = signal(false);
-  protected readonly isSaving = computed(() => this.creating() || this.metadata.isBusy());
+  protected readonly isSaving = computed(() => this.creating() || this.saveChanges.busy());
   protected readonly scheduleValidationAttempted = signal(false);
   protected readonly createLabel = computed(() => this.globalDraft.state() === 'created' ? this.i18n.creation().retryRead
     : this.globalDraft.state() === 'uncertain' ? this.i18n.creation().retryCreation : this.i18n.commonActions().saveDraft);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
   protected readonly canCancel = computed(() => this.isNew() ? !this.creating() && this.globalDraft.state() !== 'uncertain'
-    : !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
+    : !this.saveChanges.busy() && !this.saveChanges.pending() && !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
     this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
-  private readonly otherOperationsLocked = computed(() => this.publication.locked() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
-    this.cover.needsReconciliation() || this.policy.locked() || this.schedule.locked() || this.baseBlocks.locked() ||
+  private readonly otherOperationsLocked = computed(() => this.saveChanges.busy() || this.saveChanges.pending() || this.publication.locked() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
+    this.cover.needsReconciliation() || this.policy.isBusy() || this.schedule.isBusy() || this.baseBlocks.isBusy() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
   protected readonly navigationLocked = computed(() => this.isNew() ? this.creating() || this.globalDraft.state() !== 'idle'
     : this.otherOperationsLocked() || this.program.locked());
@@ -165,6 +166,7 @@ export class EventCoreEditor {
       this.coreUrl = this.router.url;
       if (this.globalDraft.result()?.coreId !== coreId) this.globalDraft.reset();
       this.datedBlocks.reset();
+      this.saveChanges.reset();
       this.schedule.reset();
       this.baseBlocks.reset();
       this.policy.reset();
@@ -204,12 +206,14 @@ export class EventCoreEditor {
     this.isNotFound.set(false);
     this.loadSubscription = this.globalDraft.readCore(coreId)
       .pipe(
+        tap(core => this.metadata.load(core)),
+        switchMap(core => core && !core.archived && this.metadata.isGlobal()
+          ? this.saveChanges.load(core).pipe(map(() => core)) : of(core)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (core) => {
-          this.metadata.load(core);
           if (core && !core.archived && this.metadata.isGlobal()) this.cover.reconcile(core);
           this.isNotFound.set(core === null);
         },
@@ -222,36 +226,21 @@ export class EventCoreEditor {
       });
   }
 
-  protected saveMetadata(target: EventMetadataTarget): void {
-    if (!this.metadata.canSave(target) || this.isLoading()) return;
-    const form = target === 'core' ? this.form : this.metadata.editionForm;
-    if (form.invalid && this.metadata.state() === 'idle') {
-      form.markAllAsTouched();
-      this.toast.danger({ summary: this.i18n.commonForm().invalidSummary, detail: this.i18n.commonForm().invalid });
-      return;
-    }
-    this.saveSubscription = this.metadata.save(target).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => this.toast.success({ summary: this.i18n.toast().saveSuccessSummary, detail: this.i18n.toast().saveSuccessDetail }),
-      error: (error: unknown) => this.toast.danger({
-        summary: this.i18n.toast().saveFailedSummary,
-        detail: this.metadataError() ?? resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification),
-      }),
-    });
-  }
-
-  protected refreshMetadata(target: EventMetadataTarget): void {
-    if (this.metadata.locked() || this.metadata.blocked() || this.cover.locked()) return;
-    const coreId = this.core()?.id;
-    const form = target === 'core' ? this.form : this.metadata.editionForm;
-    const decision = form.dirty ? this.confirm.modalDecision({
-      header: this.i18n.page().editTitle, message: this.i18n.metadata().reloadConfirm,
-      acceptLabel: this.i18n.commonActions().refresh, rejectLabel: this.i18n.commonActions().cancel,
-    }) : of(true);
-    decision.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
-      if (!accepted || this.core()?.id !== coreId || this.metadata.locked() || this.cover.locked()) return;
-      this.saveSubscription = this.metadata.refresh(target).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        error: () => this.toast.danger({ summary: this.i18n.toast().saveFailedSummary, detail: this.metadataError() ?? this.i18n.metadata().readbackFailed }),
-      });
+  protected discardEditChanges(): void {
+    if (!this.canCancel() || this.saveChanges.pending()) return;
+    const coreId = this.coreId();
+    this.confirm.modalDecision({
+      header: this.i18n.page().editTitle, message: this.i18n.saveChanges().discardConfirm,
+      acceptLabel: this.i18n.creation().discardDraft, rejectLabel: this.i18n.commonActions().cancel,
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
+      if (!accepted || coreId !== this.coreId() || !this.canCancel() || this.saveChanges.pending()) return;
+      this.schedule.reset();
+      this.baseBlocks.reset();
+      this.policy.reset();
+      this.datedBlocks.reset();
+      this.metadata.reset();
+      this.saveChanges.reset();
+      this.loadCore();
     });
   }
 
@@ -271,8 +260,8 @@ export class EventCoreEditor {
   }
 
   protected programBlocked(): boolean {
-    return this.otherOperationsLocked() || this.form.dirty || this.metadata.editionForm.dirty ||
-      this.cover.dirty() || this.datedBlocks.isDirty() || this.globalDraft.cityEditing();
+    return this.otherOperationsLocked() || this.saveChanges.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
+      this.cover.dirty() || this.globalDraft.cityEditing();
   }
 
   private restoreStep(value: string | null): void {
@@ -360,7 +349,7 @@ export class EventCoreEditor {
         header: this.program.locked() ? this.i18n.creationSteps().program : this.policy.locked() ? this.i18n.policyEditor().title : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().title
           : this.schedule.locked() ? this.i18n.commonLabels().schedule : city ? this.i18n.city().action
           : this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ? this.i18n.page().editTitle : this.i18n.datedBlocks().editTitle,
-        message: this.program.locked() ? this.programCopy().discardConfirm : this.policy.locked() ? this.i18n.policyEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.scheduleCopy().leave
+        message: this.program.locked() ? this.programCopy().discardConfirm : this.policy.locked() ? this.i18n.policyEditor().leave : this.baseBlocks.locked() ? this.i18n.baseTimeBlocks().leave : this.schedule.locked() ? this.i18n.schedule().leave
           : city ? this.i18n.city().leaveConfirmation : this.i18n.creation().leaveConfirmation,
         acceptLabel: this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() ? this.i18n.commonActions().close : city ? this.i18n.city().discard : this.i18n.creation().discardDraft,
         rejectLabel: this.i18n.commonActions().cancel,
@@ -370,7 +359,7 @@ export class EventCoreEditor {
 
   private hasUnsavedChanges(): boolean {
     if (this.isNew()) return this.globalDraft.form.dirty || this.globalDraft.state() === 'uncertain';
-    return this.program.locked() || this.policy.locked() || this.baseBlocks.locked() || this.schedule.locked() || this.cover.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
+    return this.program.locked() || this.saveChanges.dirty() || this.saveChanges.pending() || this.cover.dirty() ||
       (this.globalDraft.cityEditing() && this.globalDraft.cityState() !== 'created' && this.globalDraft.cityForm.dirty) ||
       (this.datedBlocks.isDirty() && !this.datedBlocks.readbackPending());
   }
