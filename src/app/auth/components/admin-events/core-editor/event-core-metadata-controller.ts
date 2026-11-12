@@ -38,7 +38,6 @@ export class EventCoreMetadataController {
   private command: MetadataCommand | null = null;
   readonly core = signal<IEventCoreDetail | null>(null);
   readonly edition = signal<IAdminEventDetail | null>(null);
-  readonly isGlobal = signal(false);
   readonly isBusy = signal(false);
   readonly state = signal<'idle' | 'uncertain' | 'saved'>('idle');
   readonly pendingTarget = signal<EventMetadataTarget | null>(null);
@@ -64,7 +63,7 @@ export class EventCoreMetadataController {
     const core = this.core();
     const calendar = this.global.calendar();
     const edition = this.global.mainEdition();
-    return !!core && !core.archived && this.isGlobal() && this.issues().core !== 'protected' &&
+    return !!core && !core.archived && this.issues().core !== 'protected' &&
       (!!calendar && !!edition && !edition.currentlyPublic && calendar.calendarLifecycle === 'global' && calendar.coreId === core.id &&
         calendar.globalDates.every(day => day.cityOccurrences.every(city => !city.protected && !city.publishedAt)));
   });
@@ -75,7 +74,7 @@ export class EventCoreMetadataController {
     return !!core && !core.archived && !!edition && !!calendar && calendar.calendarLifecycle === 'global' &&
       calendar.coreId === core.id && calendar.mainEditionId === edition.id && edition.eventCoreId === core.id &&
       this.issues().edition !== 'protected' && !edition.isActive &&
-      !edition.currentlyPublic && !edition.isStaffingConverted &&
+      !edition.currentlyPublic &&
       edition.occurrences.every(row => !row.publishedAt && row.activeParticipantCount === 0) &&
       calendar.globalDates.every(day => day.cityOccurrences.filter(city => city.editionId === edition.id)
         .every(city => !city.protected && !city.publishedAt));
@@ -88,7 +87,6 @@ export class EventCoreMetadataController {
   reset(): void {
     this.core.set(null);
     this.edition.set(null);
-    this.isGlobal.set(false);
     this.command = null;
     this.pendingTarget.set(null);
     this.isBusy.set(false);
@@ -102,9 +100,8 @@ export class EventCoreMetadataController {
 
   load(core: IEventCoreDetail | null): void {
     this.core.set(core);
-    this.isGlobal.set(this.global.calendar()?.calendarLifecycle === 'global');
     if (core) this.populateCore(core);
-    if (this.isGlobal()) this.populateEdition();
+    this.populateEdition();
     this.syncControls();
   }
 
@@ -218,7 +215,6 @@ export class EventCoreMetadataController {
       assertEdgeContract(core !== null && core.id === coreId, 'eventCoreMetadata', 'an authoritative Core readback');
       if (core.archived) {
         this.core.set(core);
-        this.isGlobal.set(false);
         this.rejectReadback(target, 'protected');
       }
       if (target === 'edition') {

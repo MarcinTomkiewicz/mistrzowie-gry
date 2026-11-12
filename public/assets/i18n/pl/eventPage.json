@@ -6,6 +6,7 @@
     "noOccurrences": "Brak terminów dla wybranego miasta."
   },
   "program": {
+    "eventScoped": "[PH] Sesje bez odrębnych godzin",
     "dayOffset": "[PH] dzień +{{days}}",
     "title": "Program wydarzenia",
     "occurrenceLabel": "Termin",

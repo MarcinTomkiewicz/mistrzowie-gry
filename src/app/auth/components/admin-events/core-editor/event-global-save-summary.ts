@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, output, signal, TemplateRef, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -13,13 +13,15 @@ import { EventGlobalSaveController, GLOBAL_SAVE_STEPS, type GlobalSaveSection } 
   selector: 'app-event-global-save-summary',
   imports: [ButtonModule, MessageModule],
   templateUrl: './event-global-save-summary.html',
-  host: { class: 'd-block w-100 min-w-0' },
+  host: { class: 'd-contents' },
 })
 export class EventGlobalSaveSummary {
   readonly disabled = input(false);
   readonly navigateToStep = output<number>();
   readonly saved = output<void>();
   readonly discard = output<void>();
+  readonly secondaryActions = viewChild<TemplateRef<unknown>>('secondaryActions');
+  readonly primaryActions = viewChild<TemplateRef<unknown>>('primaryActions');
   protected readonly save = inject(EventGlobalSaveController);
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly copy = this.i18n.saveChanges;
@@ -42,6 +44,7 @@ export class EventGlobalSaveSummary {
     if (invalid) { this.edit(invalid); return; }
     this.save.check().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => {
+        this.toast.danger({ summary: this.copy().checkChanges, detail: this.i18n.commonErrors().generic });
         const key = this.save.failed();
         if (key) queueMicrotask(() => { if (!this.destroyRef.destroyed) this.edit(key); });
       },
@@ -63,7 +66,8 @@ export class EventGlobalSaveSummary {
         this.saved.emit();
       },
       error: () => {
-        this.toast.danger({ summary: this.i18n.toast().saveFailedSummary,
+        this.toast.show(this.save.pending() ? 'warn' : 'danger', {
+          summary: this.save.pending() ? this.copy().retryRead : this.i18n.toast().saveFailedSummary,
           detail: this.save.pending() ? this.copy().uncertain : this.copy().failed });
         queueMicrotask(() => {
           const key = this.save.failed();
@@ -76,7 +80,9 @@ export class EventGlobalSaveSummary {
   protected retryReadback(): void {
     this.save.retryReadback().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => { if (!this.save.dirty() && !this.save.pending()) this.saved.emit(); },
-      error: () => { /* The retained section and pending state own the inline error. */ },
+      error: () => this.toast.show(this.save.pending() ? 'warn' : 'danger', {
+        summary: this.copy().retryRead, detail: this.save.pending() ? this.copy().uncertain : this.copy().failed,
+      }),
     });
   }
 }

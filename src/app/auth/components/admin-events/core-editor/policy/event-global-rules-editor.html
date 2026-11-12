@@ -31,8 +31,10 @@
       @for (row of form.controls.cityOverrides.controls; track row.controls.editionId.value) {
         @let controls = row.controls;
         @let id = 'policy-city-' + controls.editionId.value;
-        <section class="flex-col-start-stretch gap-sm border-top py-sm w-100 min-w-0">
+        <section [id]="id" tabindex="-1" class="flex-col-start-stretch gap-sm border-top py-sm w-100 min-w-0"
+          [class.border-danger]="cityIssues(controls.editionId.value).length > 0">
           <h4 class="mg-section__title mg-section__title--sm m-0">{{ cityName(controls.editionId.value) }}</h4>
+          <app-event-global-diagnostic-messages [issues]="cityIssues(controls.editionId.value)" />
           <div class="flex-row-start-center gap-sm">
             <p-toggleswitch [inputId]="id + '-signup-override'" [formControl]="controls.signup.controls.enabled" />
             <label [for]="id + '-signup-override'">{{ copy().signupOverride }}</label>

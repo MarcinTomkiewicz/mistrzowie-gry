@@ -1,5 +1,29 @@
 <section id="global-event-schedule-editor" tabindex="-1" class="mg-form flex-col-start-stretch gap-sm w-100 min-w-0">
-  <app-event-schedule-editor [form]="editor.form" [globalCalendar]="true" [validationAttempted]="editor.validationAttempted()" />
+  @if (staffingConverted()) {
+    <div class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
+      <p class="m-0" role="status">{{ copy().staffingSource }}</p>
+      <div class="flex-row-start-center">
+        <p-button type="button" severity="secondary" size="small" [outlined]="true" [label]="copy().staffingAction" routerLink="/admin/staffing" />
+      </div>
+    </div>
+  }
+  @if (editor.contextBlocker()) {
+    <section class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().schedule }}</h2>
+      <p class="m-0">{{ savedScheduleKind() }}</p>
+      <dl class="flex-col-start-stretch gap-xs m-0">
+        @for (day of savedDates(); track day.globalOccurrenceId) {
+          <div class="flex-row-between-start flex-col-start-stretch-sm flex-wrap gap-sm border-bottom pb-xs">
+            <dt><time [attr.datetime]="day.date">{{ formatDateLabel(day.date) }}</time></dt>
+            <dd class="m-0">{{ i18n.savedSummary().calendarStatuses[day.status] }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+  } @else {
+    <app-event-schedule-editor [form]="editor.form" [globalCalendar]="true" [validationAttempted]="editor.validationAttempted()" />
+  }
+  @if (editor.blockingReason(); as reason) { <p class="m-0 muted-text" role="status">{{ copy().blockers[reason] }}</p> }
   @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
   @if (editor.preview(); as preview) {
     @for (error of preview.fieldErrors; track $index) {

@@ -6,14 +6,21 @@
   @if (step() !== 4) {
     <div class="flex-col-start-stretch gap-md min-w-0">
       @if (step() === 1 || step() === 6) {
-        <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+        <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0"
+          [class.border-danger]="issues(['coreDraft']).length > 0">
           <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
             <span class="pi pi-tied-scroll square-11 flex-none" aria-hidden="true"></span>
             <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
             @if (changed?.includes('core')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
-            @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(1)" /> }
+            @if (editableSteps().includes(1)) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(1)" /> }
           </div>
+          <app-event-global-diagnostic-messages [issues]="issues(['coreDraft'])" />
           @if (changes()?.invalid?.includes('core')) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small> }
+          @if (coverUrl(); as image) {
+            <div class="image__preview image__preview--landscape">
+              <img [src]="image" [alt]="details.name" />
+            </div>
+          }
           <dl class="mg-grid-2 gap-md m-0">
             <div><dt class="muted-text">{{ i18n.commonLabels().name }}</dt><dd class="m-0 text-wrap-anywhere"><strong>{{ details.name }}</strong></dd></div>
             <div><dt class="muted-text">{{ i18n.commonLabels().key }}</dt><dd class="m-0 text-wrap-anywhere">{{ details.key }}</dd></div>
@@ -41,12 +48,13 @@
         </section>
       }
       @if (step() === 2 || step() === 6) {
-        <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+        <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [class.border-danger]="locationIssues().length > 0">
           <header class="flex-row-start-center flex-wrap gap-sm">
             <h2 class="mg-section__title mg-section__title--md m-0">{{ step() === 2 ? location.city : i18n.creationSteps().location }}</h2>
             @if (changed?.includes('edition')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
-            @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(2)" /> }
+            @if (editableSteps().includes(2)) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(2)" /> }
           </header>
+          <app-event-global-diagnostic-messages [issues]="locationIssues()" [cities]="calendar().cities" />
           @if (changes()?.invalid?.includes('edition')) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small> }
           @if (locationCity(); as city) {
             <dl class="mg-grid-2 gap-md m-0">
@@ -66,13 +74,15 @@
         </section>
       }
       @if (step() === 3 || step() === 6) {
-        <section id="global-event-schedule" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+        <section id="global-event-schedule" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0"
+          [class.border-danger]="issues(['selectedDate', 'calendarDraft']).length > 0">
           <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
             <span class="pi pi-sun-eclipse square-11 flex-none" aria-hidden="true"></span>
             <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.schedule }}</h2>
             @if (changes()?.scheduleChanged || changed?.includes('base') || changed?.includes('dated')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
-            @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" /> }
+            @if (editableSteps().includes(3)) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" /> }
           </div>
+          <app-event-global-diagnostic-messages [issues]="issues(['selectedDate', 'calendarDraft'])" />
           @if (changes()?.invalid?.includes('schedule') || changes()?.invalid?.includes('base') || changes()?.invalid?.includes('dated')) {
             <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
           }
@@ -138,25 +148,28 @@
   }
   @if (step() === 4 || step() === 6) {
     <div class="flex-col-start-stretch gap-md min-w-0">
-      <section [attr.id]="step() === 6 ? 'global-event-policy' : null" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
+      <section [attr.id]="step() === 6 ? 'global-event-policy' : null" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0"
+        [class.border-danger]="issues(['policy', 'cityOverrides']).length > 0">
         @for (group of policyGroups(); track group.key; let first = $first) {
           @if (first) {
             <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
               <span class="pi pi-settings square-11 flex-none" aria-hidden="true"></span>
               <h2 class="mg-section__title mg-section__title--md m-0">{{ group.title }}</h2>
               @if (changed?.includes('policy')) { <span class="tag-badge tag-badge--muted">{{ i18n.saveChanges().title }}</span> }
-              @if (changes()) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" /> }
+              @if (editableSteps().includes(4)) { <p-button type="button" severity="secondary" [text]="true" size="small" [label]="i18n.commonActions().edit" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" /> }
             </div>
           } @else {
             <h3 class="mg-section__title mg-section__title--sm m-0 border-top pt-md">{{ group.title }}</h3>
           }
           <app-event-global-policy-summary [policy]="group.values" />
         }
+        <app-event-global-diagnostic-messages [issues]="issues(['policy', 'cityOverrides'])" [cities]="calendar().cities" />
         @if (changes()?.invalid?.includes('policy')) { <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small> }
         @for (city of cityOverrides(); track city.editionId) {
           @let local = city.overrides;
           @if (local.price.enabled || local.cover.enabled || local.signup.enabled || local.sessionCapacityCeiling.enabled || local.wholeEventCapacity.enabled) {
-            <section class="flex-col-start-stretch gap-xs border-top pt-sm min-w-0">
+            <section class="flex-col-start-stretch gap-xs border-top pt-sm min-w-0"
+              [class.border-danger]="issues(['cityOverrides'], city.editionId).length > 0">
               <h3 class="mg-section__title mg-section__title--sm m-0">{{ cityName(city.editionId) }}</h3>
               @if (local.price.enabled) { <p class="m-0">{{ i18n.commonLabels().price }}: {{ formatMoney(local.price.value.amount, local.price.value.currency) }} - {{ i18n.priceBases()[local.price.value.basis] }}</p> }
               @if (local.cover.enabled) { <p class="m-0">{{ i18n.commonLabels().cover }}: {{ local.cover.value ? i18n.commonValues().yes : i18n.commonValues().notProvided }}</p> }

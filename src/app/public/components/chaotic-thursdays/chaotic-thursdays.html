@@ -34,13 +34,14 @@
 <app-gm-profile-dialog
   [visible]="isGmDialogVisible()"
   [profile]="selectedProfile()"
+  [showCharacterSheets]="false"
   (visibleChange)="onGmDialogVisibleChange($event)"
 />
 
 <app-session-dialog
   [visible]="isSessionDialogVisible()"
-  [session]="selectedSession()"
-  [gmProfile]="selectedSessionProgramItem()?.host ?? null"
+  [session]="selectedCard()?.sessionDetails ?? null"
+  [gmDisplayName]="selectedCard()?.gmDisplayName ?? null"
   (visibleChange)="onSessionDialogVisibleChange($event)"
 />
 

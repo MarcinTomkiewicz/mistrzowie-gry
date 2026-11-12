@@ -29,8 +29,14 @@ export class EventDatedBlocksEditor {
   })) ?? []);
   protected readonly scopeOptions = computed(() => [
     { value: 'date', label: this.i18n.datedBlocks().dateScope },
-    ...(this.editor.day()?.cities.map(row => ({ value: row.editionId, label: row.city })) ?? []),
+    ...((this.editor.calendar()?.cities.length ?? 0) > 1
+      ? this.editor.day()?.cities.map(row => ({ value: row.editionId, label: row.city })) ?? [] : []),
   ]);
+  protected readonly readOnly = computed(() => this.editor.contextBlocker() !== null);
+  protected readonly showScope = computed(() => this.scopeOptions().length > 1 && this.editor.canEdit() &&
+    !this.editor.isBusy() && !this.editor.readbackPending() && !this.editor.conflicted());
+  protected readonly readOnlyCities = computed(() => this.editor.editionId() ? [] :
+    this.editor.day()?.cities.filter(city => !sameScheduleBlocks(city.timeBlocks, this.editor.currentBlocks())) ?? []);
   protected readonly selectionLocked = computed(() => this.editor.isBusy() || this.editor.isDirty() || this.editor.readbackPending());
   protected readonly errorMessage = computed(() => this.editor.error() === null ? null : resolveEventCoreAdminErrorMessage(
     this.editor.error(), this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification,
@@ -40,7 +46,7 @@ export class EventDatedBlocksEditor {
     return calendar?.datedTimeBlocks.map(day => ({ ...day,
       ownBlocks: !sameScheduleBlocks(day.timeBlocks, calendar.timeBlocks),
       cities: day.cities.filter(city => !sameScheduleBlocks(city.timeBlocks, day.timeBlocks)),
-    })).filter(day => day.ownBlocks || day.cities.length > 0) ?? [];
+    })).filter(day => (day.ownBlocks || day.cities.length > 0) && (!this.readOnly() || day.date !== this.editor.date())) ?? [];
   });
 
   protected select(value: unknown, scope: 'date' | 'city'): void {

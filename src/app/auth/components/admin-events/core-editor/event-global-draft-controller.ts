@@ -95,26 +95,7 @@ export class EventGlobalDraftController {
         if (core.id !== coreId) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent Core readback.');
         }
-        if (core.archived) {
-          this.resetEditionSelection();
-          this.calendar.set(null);
-          this.policy.set(null);
-          return of(core);
-        }
-        // The old conversion flag marks preserved history, never a new Global import.
-        if (core.editions.length !== 1) return this.readGlobalCalendar(core);
-        return this.eventAdmin.getEditionDetail(core.editions[0].id).pipe(switchMap(edition => {
-          assertEdgeContract(edition !== null && edition.id === core.editions[0].id && edition.eventCoreId === core.id,
-            'eventEdition', 'the saved Edition belonging to this Core');
-          if (!edition.isStaffingConverted) {
-            this.mainEdition.set(edition);
-            return this.readGlobalCalendar(core);
-          }
-          this.resetEditionSelection();
-          this.calendar.set(null);
-          this.policy.set(null);
-          return of(core);
-        }));
+        return this.readGlobalCalendar(core);
       }));
     });
   }
@@ -123,16 +104,10 @@ export class EventGlobalDraftController {
     return this.eventAdmin.getGlobalCalendar(core.id).pipe(switchMap((calendar) => {
       const createdHere = this.result()?.coreId === core.id;
       const cityCommand = this.cityCommand?.coreId === core.id ? this.cityCommand : null;
-      if (calendar.coreId !== core.id || ((createdHere || cityCommand) && calendar.calendarLifecycle !== 'global') ||
+      if (calendar.coreId !== core.id || calendar.calendarLifecycle !== 'global' ||
         (createdHere && calendar.mainEditionId !== this.result()?.mainEditionId) ||
         (cityCommand && calendar.mainEditionId !== cityCommand.mainEditionId)) {
         throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent global calendar readback.');
-      }
-      if (calendar.calendarLifecycle !== 'global') {
-        this.resetEditionSelection();
-        this.calendar.set(null);
-        this.policy.set(null);
-        return of(core);
       }
       if (!calendar.cities.some((city) => city.editionId === calendar.mainEditionId && city.isMain)) {
         throw new Error('[EVENT_GLOBAL_DRAFT] Global calendar main city is missing.');
@@ -150,8 +125,7 @@ export class EventGlobalDraftController {
         }
         this.calendar.set(calendar);
         this.policy.set(policy);
-      }), switchMap(() => this.mainEdition()?.id === calendar.mainEditionId
-        ? of(this.mainEdition()) : this.eventAdmin.getEditionDetail(calendar.mainEditionId)), map(edition => {
+      }), switchMap(() => this.eventAdmin.getEditionDetail(calendar.mainEditionId)), map(edition => {
         if (!edition || edition.id !== calendar.mainEditionId || edition.eventCoreId !== core.id) {
           throw new Error('[EVENT_GLOBAL_DRAFT] Inconsistent main Edition readback.');
         }
@@ -239,6 +213,7 @@ export class EventGlobalDraftController {
   }
 
   addCityBlocker(core: IEventCoreDetail): AdminGlobalEventCityBlocker | null {
+    if (core.archived) return 'protectedDates';
     if (this.isChecking()) return 'checking';
     const calendar = this.calendar();
     if (!calendar || calendar.coreId !== core.id || calendar.calendarLifecycle !== 'global' ||
@@ -314,14 +289,8 @@ export class EventGlobalDraftController {
       if (this.isChecking() || this.cityEditing() || this.cityBusy() ||
         calendar?.coreId !== coreId || calendar.calendarLifecycle !== 'global') return EMPTY;
       this.isChecking.set(true);
+      // EventAdmin validates preview results; RPC exceptions propagate unchanged.
       return this.eventAdmin.previewGlobalEventPage(coreId).pipe(
-        tap(result => {
-          const status = result.fieldErrors.length ? 'invalid' : result.blockers.length ? 'blocked' : 'preview_ready';
-          assertEdgeContract(result.coreId === coreId && result.preview === true && result.appliedToPublic === false &&
-            result.status === status && result.valid === (status === 'preview_ready') &&
-            (result.page === null || (result.page.core.id === coreId && result.participantSignupOpened === false)),
-          'globalEventPagePreview', 'a read-only diagnostic result for the selected Core');
-        }),
         finalize(() => this.isChecking.set(false)),
       );
     });

@@ -1,6 +1,5 @@
 import type { ISession, SessionPresentation } from '../interfaces/i-session';
 import type { GmProfilePresentation } from '../interfaces/i-gm-public-profile';
-import type { ISystem } from '../interfaces/i-system';
 
 export type JsonValue = string | number | boolean | null | JsonValue[] |
   { [key: string]: JsonValue };
@@ -11,7 +10,7 @@ type SessionFields = Pick<ISession,
   | 'hasReadyCharacterSheets' | 'allowsScenarioCustomization'
 >;
 
-export type PublicEventSession = {
+type PublicEventSession = {
   [K in keyof SessionFields]: SessionFields[K] | null;
 };
 
@@ -42,16 +41,6 @@ type TimedProgramSlot = {
   blockId?: string | null; blockPosition?: number | null;
 };
 
-export type PublicEventLegacyEntry = ProgramContext & {
-  kind?: never;
-  status?: never;
-  canSignup?: never;
-  programItemId: string;
-  host: ProgramHost;
-  slot: TimedProgramSlot & { label: null };
-  session: PublicEventSession;
-};
-
 export type PublicEventConfirmedEntry<TSession = PublicEventConfirmedSession> = ProgramContext & {
   kind: 'confirmed';
   status: 'confirmed';
@@ -59,9 +48,12 @@ export type PublicEventConfirmedEntry<TSession = PublicEventConfirmedSession> = 
   participantSignupSupported?: false;
   programItemId: string;
   host: ProgramHost;
-  slot: TimedProgramSlot;
   session: TSession;
-};
+} & (
+  | { timeScope: 'timed'; slot: TimedProgramSlot }
+  | { timeScope: 'event'; slot: { label: null; startTime: null; endTime: null; startDayOffset?: never; endDayOffset?: never };
+      canSignup: false; participantSignupSupported: false }
+);
 
 export type PublicEventPendingEntry = ProgramContext & {
   kind: 'pending';
@@ -88,16 +80,15 @@ export type PublicEventActivityEntry = ProgramContext & {
   };
 };
 
-export type PublicEventProgramWireEntry = PublicEventLegacyEntry |
+export type PublicEventProgramWireEntry =
   PublicEventConfirmedEntry<Record<keyof PublicEventConfirmedSession, JsonValue>> |
   PublicEventActivityEntry | PublicEventPendingEntry;
 
-export type PublicEventProgramEntry = PublicEventLegacyEntry |
+export type PublicEventProgramEntry =
   PublicEventConfirmedEntry | PublicEventActivityEntry | PublicEventPendingEntry;
 
 export type PublicEventProgramData = {
   entries: PublicEventProgramEntry[];
-  systems: ISystem[];
 };
 
 export type PublicEventGmProfile = {

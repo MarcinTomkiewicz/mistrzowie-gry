@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, type RouterStateSnapshot } from '@angular/router';
@@ -14,7 +14,7 @@ import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { CharacterCounter } from '../../../../common/character-counter/character-counter';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { findEventGlobalDraftStepError } from '../../../../core/factories/event-global-draft-form.factory';
-import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
+import type { AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
@@ -38,6 +38,7 @@ import { EventGlobalSaveSummary } from './event-global-save-summary';
 import { EventGlobalPublicationController } from './event-global-publication-controller';
 import { EventDatedBlocksEditor } from './event-dated-blocks-editor';
 import { EventGlobalDiagnostics } from './event-global-diagnostics';
+import { EventGlobalDiagnosticMessages, selectEventGlobalDiagnosticIssues } from './event-global-diagnostic-messages';
 import { EventDatedBlocksController } from './event-dated-blocks-controller';
 import { EventGlobalSteps } from './event-global-steps';
 import { EventCoreMetadataController, type EventMetadataTarget } from './event-core-metadata-controller';
@@ -52,23 +53,29 @@ import { EventGlobalPolicyFacade } from './policy/event-global-policy-facade';
 import { EventGlobalPolicyEditor } from './policy/event-global-policy-editor';
 import { EventGlobalProgram } from './event-global-program';
 import { EventManualProgramController } from './event-manual-program-controller';
-import { EventEditionHistory } from '../edition-editor/event-edition-history';
-import { EventEditionSummary } from '../edition-editor/event-edition-summary';
+
+const DIAGNOSTIC_SECTIONS: Record<AdminGlobalEventPageFieldError['field'], { step: number; selector: string }> = {
+  coreDraft: { step: 1, selector: '#global-event-core' },
+  editionDrafts: { step: 2, selector: '#event-core-editions' },
+  selectedDate: { step: 3, selector: '#global-event-schedule-diagnostics' },
+  calendarDraft: { step: 3, selector: '#global-event-schedule-diagnostics' },
+  policy: { step: 4, selector: '#global-event-policy' },
+  cityOverrides: { step: 4, selector: '#global-event-policy' },
+};
 
 @Component({
   selector: 'app-event-core-editor',
   imports: [NgTemplateOutlet, ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule, CharacterCounter,
-    EventEditionSummary, EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventGlobalSaveSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalProgram,
+    EventCoreEditions, EventGlobalDraftSummary, EventGlobalSavedSummary, EventGlobalSaveSummary, EventDatedBlocksEditor, EventGlobalDiagnostics, EventGlobalDiagnosticMessages, EventGlobalProgram,
     LoadingOverlay, Breadcrumbs, EventGlobalSteps, EventGlobalDraftFields, EventGlobalDraftReview, EventGlobalCityFields,
     EventCoreCover, EventGlobalScheduleEditor, EventGlobalBaseTimeBlocksEditor, EventGlobalPolicyEditor],
   templateUrl: './core-editor.html',
   providers: [provideTranslocoScope('adminEvents', 'common'), EventDatedBlocksController, EventCoreMetadataController,
     EventCoreCoverController, EventGlobalScheduleController, EventGlobalBaseTimeBlocksController, EventGlobalPolicyFacade, EventManualProgramController,
-    EventGlobalPublicationController, EventEditionHistory, EventGlobalSaveController],
+    EventGlobalPublicationController, EventGlobalSaveController],
 })
 export class EventCoreEditor {
   protected readonly saveChanges = inject(EventGlobalSaveController);
-  protected readonly history = inject(EventEditionHistory);
   private readonly draftFields = viewChild(EventGlobalDraftFields);
   protected readonly datedBlocks = inject(EventDatedBlocksController);
   protected readonly schedule = inject(EventGlobalScheduleController);
@@ -95,6 +102,19 @@ export class EventCoreEditor {
   protected readonly coverCopy = createScopedObjectI18n<CoreCoverCopy>('adminEvents', 'editor.cover');
   private readonly programCopy = createScopedObjectI18n<EventAdminTimelineCopy['manualProgram']>('adminEvents', 'timeline.manualProgram');
   protected readonly core = this.metadata.core;
+  private readonly diagnosticRead = computed(() => {
+    // Diagnostics cover the whole Core; navigation selections do not change their data context.
+    return [this.coreId(), this.core(), this.globalDraft.calendar(), this.globalDraft.policy(), this.globalDraft.mainEdition(),
+      this.schedule.calendar(), this.baseBlocks.calendar(), this.datedBlocks.calendar(), this.policy.draft(),
+      this.saveChanges.dirty(), this.cover.dirty()] as const;
+  });
+  private diagnosticRequestRead: ReturnType<typeof this.diagnosticRead> | null = null;
+  protected readonly diagnosticResult = linkedSignal<AdminGlobalEventPagePreview | null>(() => {
+    this.diagnosticRead();
+    return null;
+  });
+  protected readonly diagnosticSteps = computed(() => [...new Set(this.diagnosticResult()?.fieldErrors
+    .map(issue => DIAGNOSTIC_SECTIONS[issue.field].step) ?? [])]);
   protected readonly isLoading = signal(true);
   private readonly creating = signal(false);
   protected readonly isSaving = computed(() => this.creating() || this.saveChanges.busy());
@@ -122,7 +142,7 @@ export class EventCoreEditor {
     return edition !== null && edition.id === this.globalDraft.calendar()?.mainEditionId;
   });
   protected readonly metadataTarget = computed<EventMetadataTarget | null>(() => {
-    if (this.isNew() || this.core()?.archived || !this.metadata.isGlobal()) return null;
+    if (this.isNew() || this.core()?.archived) return null;
     return this.globalDraft.activeStep() === 1
       ? 'core' : this.globalDraft.activeStep() === 2 && this.selectedMainEdition() ? 'edition' : null;
   });
@@ -142,9 +162,10 @@ export class EventCoreEditor {
 
   constructor() {
     effect(() => {
-      const core = this.core();
-      const global = this.metadata.isGlobal();
-      if (core && (core.archived || !global)) untracked(() => this.history.open(core));
+      const error = this.globalDraft.editionReadError();
+      if (error !== null) untracked(() => this.toast.danger({
+        summary: resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification),
+      }));
     });
     this.route.paramMap.pipe(
       map(params => params.get('coreId') ?? ''),
@@ -174,7 +195,6 @@ export class EventCoreEditor {
       this.publication.reset();
       this.cover.reset();
       this.metadata.reset();
-      this.history.reset();
       this.scheduleValidationAttempted.set(false);
       this.restoreStep(this.route.snapshot.queryParamMap.get('step'));
       this.loadCore();
@@ -197,6 +217,7 @@ export class EventCoreEditor {
   }
 
   protected loadCore(): void {
+    this.invalidateDiagnostics();
     this.loadSubscription?.unsubscribe();
     const coreId = this.coreId();
     if (!coreId) { this.isLoading.set(false); return; }
@@ -207,14 +228,14 @@ export class EventCoreEditor {
     this.loadSubscription = this.globalDraft.readCore(coreId)
       .pipe(
         tap(core => this.metadata.load(core)),
-        switchMap(core => core && !core.archived && this.metadata.isGlobal()
+        switchMap(core => core && !core.archived
           ? this.saveChanges.load(core).pipe(map(() => core)) : of(core)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (core) => {
-          if (core && !core.archived && this.metadata.isGlobal()) this.cover.reconcile(core);
+          if (core && !core.archived) this.cover.reconcile(core);
           this.isNotFound.set(core === null);
         },
         error: (error: unknown) => {
@@ -250,13 +271,9 @@ export class EventCoreEditor {
   }
 
   protected acceptPublication(core: IEventCoreDetail): void {
+    this.invalidateDiagnostics();
     this.metadata.load(core);
     this.cover.reconcile(core);
-  }
-
-  protected selectHistoryEdition(editionId: string): void {
-    const core = this.core();
-    if (core && (core.archived || !this.metadata.isGlobal()) && !this.history.loading()) this.history.open(core, editionId);
   }
 
   protected programBlocked(): boolean {
@@ -290,21 +307,36 @@ export class EventCoreEditor {
     });
   }
 
-  protected goToDiagnosticSection(field: AdminGlobalEventPageFieldError['field']): void {
-    const steps: Record<AdminGlobalEventPageFieldError['field'], number> = {
-      coreDraft: 1, editionDrafts: 2, selectedDate: 3, calendarDraft: 3, policy: 4, cityOverrides: 4,
-    };
-    this.goToStep(steps[field]);
-    const sections: Record<AdminGlobalEventPageFieldError['field'], string> = {
-      coreDraft: '#global-event-core',
-      editionDrafts: '#event-core-editions',
-      selectedDate: '#global-event-schedule-editor',
-      calendarDraft: '#global-event-schedule-editor',
-      policy: '#global-event-policy',
-      cityOverrides: '#global-event-policy',
-    };
+  protected acceptDiagnostics(result: AdminGlobalEventPagePreview | null): void {
+    if (result === null) {
+      this.diagnosticResult.set(null);
+      this.diagnosticRequestRead = this.diagnosticRead();
+    } else if (result.coreId === this.core()?.id && this.diagnosticRequestRead === this.diagnosticRead()) {
+      this.diagnosticResult.set(result);
+    }
+  }
+
+  protected invalidateDiagnostics(): void {
+    this.diagnosticRequestRead = null;
+    this.diagnosticResult.set(null);
+  }
+
+  protected diagnosticIssues(fields: readonly AdminGlobalEventPageFieldError['field'][], editionId?: string) {
+    return selectEventGlobalDiagnosticIssues(this.diagnosticResult()?.fieldErrors ?? [], fields, editionId);
+  }
+
+  protected goToDiagnosticSection(issue: AdminGlobalEventPageFieldError): void {
+    if (this.navigationLocked() || !this.diagnosticResult()?.fieldErrors.some(value => value === issue)) return;
+    if ('editionId' in issue) {
+      if (!this.globalDraft.calendar()?.cities.some(city => city.editionId === issue.editionId)) return;
+      if (this.globalDraft.selectedEditionId() !== issue.editionId) this.globalDraft.selectEdition(issue.editionId);
+    }
+    const section = DIAGNOSTIC_SECTIONS[issue.field];
+    this.goToStep(section.step);
     scrollElementIntoViewWhenReady(() => {
-      const target = this.host.nativeElement.querySelector<HTMLElement>(sections[field]);
+      if (this.destroyRef.destroyed || this.globalDraft.activeStep() !== section.step) return null;
+      const selector = issue.field === 'cityOverrides' ? '#policy-city-' + issue.editionId : section.selector;
+      const target = this.host.nativeElement.querySelector<HTMLElement>(selector);
       target?.focus({ preventScroll: true });
       return target;
     }, { behavior: 'smooth', block: 'center' });

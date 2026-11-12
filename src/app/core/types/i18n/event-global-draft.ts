@@ -4,7 +4,7 @@ import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker 
 import type { ParticipantSignupKind } from '../../enums/event';
 
 export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirmQuestion' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
-  'retryRead' | 'localChanges' | 'saved' | 'discardConfirmQuestion' | 'discardConfirm' | 'checked', string> & {
+  'retryRead' | 'localChanges' | 'saved' | 'discardConfirmQuestion' | 'discardConfirm' | 'checked' | 'checkChanges', string> & {
     dates: Record<'saved' | 'added' | 'retained' | 'removed' | 'outside' | 'protected' |
       'savedState' | 'newDateHint' | 'previewNeeded' | 'previewHint', string>;
   };
@@ -91,7 +91,6 @@ export type EventGlobalPolicyCopy = {
 export type EventGlobalBaseTimeBlocksCopy = {
   title: string;
   hint: string;
-  protected: string;
   otherOperation: string;
   preview: string;
   previewReady: string;
@@ -115,6 +114,9 @@ export type EventGlobalBaseTimeBlocksCopy = {
 };
 
 export type EventGlobalScheduleCopy = {
+  blockers: Record<'protected' | 'active' | 'pendingDraft' | 'otherOperation', string>;
+  staffingSource: string;
+  staffingAction: string;
   hint: string;
   otherOperation: string;
   protected: string;
@@ -150,7 +152,7 @@ export type EventGlobalDiagnosticsCopy = {
   failed: string;
   savedDataOnly: string;
   readOnly: string;
-  valid: string;
+  errorFields: Record<'code' | 'message' | 'details' | 'hint', string>;
   blockers: string;
   goToSection: string;
   fields: Record<AdminGlobalEventPageFieldError['field'], string>;
@@ -187,7 +189,6 @@ export type EventDatedBlocksCopy = {
   draftOnly: string;
   editTitle: string;
   scope: string;
-  protected: string;
   preview: string;
   previewReady: string;
   save: string;

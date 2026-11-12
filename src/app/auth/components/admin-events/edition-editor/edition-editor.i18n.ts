@@ -10,7 +10,6 @@ import {
 import { createScopedObjectI18n, createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
 import type { EventPublicationCopy } from '../../../../core/types/i18n/event-publication';
 import {
-  EditionFieldsCopy,
   OccurrenceSignupStatusCopy,
   ParticipantKindCopy,
   ScheduleFieldsCopy,
@@ -20,12 +19,10 @@ import {
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventEditionEditorI18n() {
-  const { fields, participantKinds, occurrenceSignupStatuses } = createScopedSectionsI18n<{
-    fields: EditionFieldsCopy;
+  const { participantKinds, occurrenceSignupStatuses } = createScopedSectionsI18n<{
     participantKinds: ParticipantKindCopy;
     occurrenceSignupStatuses: OccurrenceSignupStatusCopy;
   }>('adminEvents', {
-    fields: 'editionEditor.fields',
     participantKinds: 'editionEditor.participantKinds',
     occurrenceSignupStatuses: 'occurrenceEditor.statuses',
   });
@@ -35,7 +32,6 @@ export function createEventEditionEditorI18n() {
 
   return {
     publication: createScopedObjectI18n<EventPublicationCopy>('adminEvents', 'editionEditor.publication'),
-    fields,
     participantKinds,
     occurrenceStatuses: computed(() => ({
       ...occurrenceSignupStatuses(),

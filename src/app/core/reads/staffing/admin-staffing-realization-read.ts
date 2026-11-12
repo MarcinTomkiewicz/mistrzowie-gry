@@ -19,7 +19,6 @@ import { StaffingRealizationReadinessResult } from '../../interfaces/staffing-re
 import { Backend } from '../../services/backend/backend';
 import { EventAdmin } from '../../services/event-admin/event-admin';
 import { assertEdgeContract } from '../../utils/edge-contract';
-import { assertAdminEventTimelineScope } from '../events/admin-event-timeline.contract';
 import { assertStaffingEventImportReadback } from './staffing-event-conversion.contract';
 
 @Injectable({ providedIn: 'root' })
@@ -36,24 +35,17 @@ export class AdminStaffingRealizationRead {
       return this.eventAdmin.getEditionDetail(eventId).pipe(switchMap(edition => {
         assertEdgeContract(edition !== null && edition.id === eventId && (!result || edition.eventCoreId === result.eventCoreId),
           'staffingConversion.edition', 'the Edition referenced by the saved realization');
-        return forkJoin({ core: this.eventAdmin.getCoreDetail(edition.eventCoreId), timeline: this.eventAdmin.getTimeline(eventId) }).pipe(
-          switchMap(({ core, timeline }) => {
-            assertEdgeContract(core !== null && core.id === edition.eventCoreId && core.editions.some(row => row.id === eventId),
-              'staffingConversion.core', 'the canonical Core containing the linked Edition');
-            const target = { realization, eventCoreId: core.id, eventId };
-            if (edition.isStaffingConverted) {
-              assertEdgeContract(result === null, 'staffingConversion.history', 'no Global import confirmation for a historical conversion');
-              assertAdminEventTimelineScope(timeline, edition, core.id);
-              return of(target);
-            }
-            return forkJoin({ calendar: this.eventAdmin.getGlobalCalendar(core.id), policy: this.eventAdmin.getEffectivePolicy(core.id) }).pipe(
-              map(({ calendar, policy }) => {
-                assertStaffingEventImportReadback(core, edition, calendar, policy, timeline, result);
-                return target;
-              }),
-            );
-          }),
-        );
+        return forkJoin({
+          core: this.eventAdmin.getCoreDetail(edition.eventCoreId),
+          timeline: this.eventAdmin.getTimeline(eventId),
+          calendar: this.eventAdmin.getGlobalCalendar(edition.eventCoreId),
+          policy: this.eventAdmin.getEffectivePolicy(edition.eventCoreId),
+        }).pipe(map(({ core, timeline, calendar, policy }) => {
+          assertEdgeContract(core !== null && core.id === edition.eventCoreId && core.editions.some(row => row.id === eventId),
+            'staffingConversion.core', 'the canonical Core containing the linked Edition');
+          assertStaffingEventImportReadback(core, edition, calendar, policy, timeline, result);
+          return { realization, eventCoreId: core.id, eventId };
+        }));
       }));
     }));
   }

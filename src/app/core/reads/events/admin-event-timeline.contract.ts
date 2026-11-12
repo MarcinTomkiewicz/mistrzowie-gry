@@ -3,10 +3,10 @@ import type { AdminEventTimeline, TimelineRow } from '../../interfaces/i-admin-e
 import type { IAdminEventDetail } from '../../interfaces/i-event-admin';
 import { assertEdgeContract, readEdgeInteger, readEdgeObject, readEdgeString, readEdgeUuid } from '../../utils/edge-contract';
 import { isValidIsoDate } from '../../utils/date';
-import { isValidTime } from '../../utils/time-format';
+import { isValidTime, parseTimeLabelToMinutes } from '../../utils/time-format';
 
 const rowKeys = ['source', 'slotId', 'programItemId', 'sourceFinalPlanItemId', 'sourceKind', 'sourceSessionId',
-  'startTime', 'endTime', 'slotLabel', 'position', 'displayOrder', 'status', 'programStatus', 'host', 'session',
+  'timeScope', 'startTime', 'endTime', 'slotLabel', 'position', 'displayOrder', 'status', 'programStatus', 'host', 'session',
   'frozen', 'participantSignupSupported', 'editable', 'activeBookings', 'updatedAt'];
 const manualKeys = ['activity', 'startDayOffset', 'endDayOffset', 'spaceId', 'blockId', 'blockLabel', 'blockPosition', 'spaceName'];
 
@@ -16,7 +16,7 @@ export function assertAdminEventTimeline(timeline: AdminEventTimeline): void {
   readEdgeUuid(timeline.eventCoreId, 'timeline.eventCoreId');
   readEdgeString(timeline.timezone, 'timeline.timezone');
   assertEdgeContract(isValidTime(timeline.eventStartTime) && isValidTime(timeline.eventEndTime) &&
-    ['staffing', 'manual', 'legacy_host'].includes(timeline.origin) && /^[0-9a-f]{32}$/.test(timeline.revision) &&
+    ['staffing', 'manual'].includes(timeline.origin) && /^[0-9a-f]{32}$/.test(timeline.revision) &&
     Array.isArray(timeline.spaces) && Array.isArray(timeline.occurrences), 'timeline', 'the frozen admin timeline root');
   for (const space of timeline.spaces) {
     exactKeys(space, ['spaceId', 'name', 'isActive']);
@@ -24,6 +24,12 @@ export function assertAdminEventTimeline(timeline: AdminEventTimeline): void {
     readEdgeString(space.name, 'timeline.spaces.name');
     assertEdgeContract(typeof space.isActive === 'boolean', 'timeline.spaces.isActive', 'a boolean');
   }
+  assertEdgeContract(new Set(timeline.spaces.map(space => space.spaceId)).size === timeline.spaces.length &&
+    new Set(timeline.occurrences.map(day => day.occurrenceId)).size === timeline.occurrences.length &&
+    new Set(timeline.occurrences.map(day => day.date)).size === timeline.occurrences.length,
+  'timeline.identities', 'unique space and occurrence identities and dates');
+  const programIds = new Set<string>();
+  const slotIds = new Set<string>();
   for (const occurrence of timeline.occurrences) {
     exactKeys(occurrence, ['occurrenceId', 'date', 'status', 'slotCapacity', 'capacityPolicy', 'sessionCapacityCeiling',
       'wholeEventCapacity', 'venueAttendanceCapacity', 'legacySharedParticipantCapacity', 'participantSignupKind',
@@ -39,6 +45,13 @@ export function assertAdminEventTimeline(timeline: AdminEventTimeline): void {
     timestamp(occurrence.updatedAt);
     if (occurrence.participantSignupOpenedAt !== null) timestamp(occurrence.participantSignupOpenedAt);
     occurrence.rows.forEach(assertRow);
+    for (const row of occurrence.rows) {
+      for (const [id, ids] of [[row.programItemId, programIds], [row.source === 'manual' ? row.slotId : null, slotIds]] as const) {
+        if (id === null) continue;
+        assertEdgeContract(!ids.has(id), 'timeline.rows.identity', 'one row per programme item and Manual slot');
+        ids.add(id);
+      }
+    }
   }
 }
 
@@ -57,10 +70,12 @@ export function assertAdminEventTimelineScope(timeline: AdminEventTimeline, edit
 function assertRow(row: TimelineRow): void {
   exactKeys(row, [...rowKeys, ...(row.source === 'manual' ? manualKeys
     : row.source === 'staffing' ? ['candidateState', 'participationEnded'] : [])]);
-  assertEdgeContract(['manual', 'staffing', 'legacy_host'].includes(row.source) &&
+  assertEdgeContract(['manual', 'staffing', 'event_scoped'].includes(row.source) &&
     ['confirmed', 'pending'].includes(row.status) && (row.programStatus === null || Object.values(EventProgramItemStatus).includes(row.programStatus)) &&
     (row.sourceKind === null || ['template', 'custom'].includes(row.sourceKind)) &&
-    isValidTime(row.startTime) && isValidTime(row.endTime) && typeof row.editable === 'boolean' &&
+    (row.source === 'event_scoped'
+      ? row.timeScope === 'event' && row.startTime === null && row.endTime === null
+      : row.timeScope === 'timed' && isValidTime(row.startTime) && isValidTime(row.endTime)) && typeof row.editable === 'boolean' &&
     (row.frozen === null || typeof row.frozen === 'boolean') &&
     (row.participantSignupSupported === null || typeof row.participantSignupSupported === 'boolean'),
   'timeline.row', 'the explicit source, row status and separate programme status');
@@ -77,16 +92,15 @@ function assertRow(row: TimelineRow): void {
   }
   if (row.session !== null) {
     exactKeys(row.session, ['title', 'systemId', 'maxPlayers', 'systemName', 'effectiveCapacity',
-      ...(row.source === 'legacy_host' ? [] : ['gmDeclaredMaxPlayers', 'playerCapacityOverride'])]);
+      ...(row.source === 'event_scoped' ? [] : ['gmDeclaredMaxPlayers', 'playerCapacityOverride'])]);
     nullableString(row.session.title);
     nullableString(row.session.systemName);
     nullableString(row.session.systemId);
     nullableInteger(row.session.effectiveCapacity);
-    if (row.source !== 'legacy_host') nullableInteger(row.session.playerCapacityOverride);
+    if (row.source !== 'event_scoped') nullableInteger(row.session.playerCapacityOverride);
   }
-  if (row.status === 'confirmed') {
-    assertEdgeContract(row.programStatus === EventProgramItemStatus.Published, 'timeline.confirmed', 'a published programme status');
-  }
+  assertEdgeContract(row.status === (row.programStatus === EventProgramItemStatus.Published ? 'confirmed' : 'pending'),
+    'timeline.status', 'a confirmed published item or a pending unpublished item');
   if (row.source === 'manual') assertManual(row);
   else if (row.source === 'staffing') {
     readEdgeUuid(row.slotId, 'timeline.staffing.slotId');
@@ -96,8 +110,8 @@ function assertRow(row: TimelineRow): void {
   } else {
     assertEdgeContract(row.slotId === null && row.slotLabel === null && row.sourceFinalPlanItemId === null &&
       row.programItemId !== null && row.host !== null && row.session !== null && row.sourceKind !== null &&
-      row.programStatus !== null && row.frozen === false && row.editable === false && row.participantSignupSupported === false,
-    'timeline.legacy', 'the Legacy row without Manual or Staffing keys');
+      row.programStatus !== null && typeof row.frozen === 'boolean' && row.editable === false && row.participantSignupSupported === false,
+    'timeline.eventScoped', 'an untimed programme item without Manual or Staffing keys');
   }
 }
 
@@ -106,6 +120,10 @@ function assertManual(row: Extract<TimelineRow, { source: 'manual' }>): void {
   assertEdgeContract(row.sourceFinalPlanItemId === null && row.participantSignupSupported === false &&
     [row.startDayOffset, row.endDayOffset].every(value => Number.isInteger(value) && value >= 0 && value <= 7),
   'timeline.manual', 'the Manual flags and explicit day offsets');
+  const start = parseTimeLabelToMinutes(row.startTime);
+  const end = parseTimeLabelToMinutes(row.endTime);
+  assertEdgeContract(start !== null && end !== null && row.endDayOffset * 1440 + end > row.startDayOffset * 1440 + start,
+    'timeline.manual.interval', 'a positive interval with the explicit server day offsets');
   nullableUuid(row.spaceId);
   nullableUuid(row.blockId);
   nullableString(row.blockLabel);

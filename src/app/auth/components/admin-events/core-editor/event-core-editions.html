@@ -1,13 +1,14 @@
 @let loadedCore = core();
-<section id="event-core-editions" tabindex="-1" class="mg-card flex-col-start-stretch gap-md p-md w-100">
+<section id="event-core-editions" tabindex="-1" class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100"
+  [attr.aria-busy]="globalDraft.isReadingEdition()" [class.border-danger]="fieldErrors().length > 0">
   <p-floatlabel variant="on" class="w-px-300 max-w-full">
     <p-select inputId="global-edition-selection" [options]="editionOptions()" optionLabel="label" optionValue="value" size="small"
-      [ngModel]="readOnly() ? selectedEditionId() : globalDraft.selectedEditionId()" (ngModelChange)="selectEdition($event)" [disabled]="selectionDisabled()"
-      [loading]="!readOnly() && globalDraft.isReadingEdition()" appendTo="body" class="w-100" />
+      [ngModel]="globalDraft.selectedEditionId()" (ngModelChange)="selectEdition($event)" [disabled]="selectionDisabled()"
+      [loading]="globalDraft.isReadingEdition()" appendTo="body" class="w-100" />
     <label for="global-edition-selection">{{ i18n.commonLabels().city }}</label>
   </p-floatlabel>
-  @if (!readOnly() && globalDraft.isReadingEdition()) { <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p> }
-  @if (!readOnly() && editionErrorMessage(); as error) {
+  <app-loading-overlay [visible]="globalDraft.isReadingEdition()" [label]="i18n.commonStatus().loading" />
+  @if (editionErrorMessage(); as error) {
     <p-message severity="error" role="alert">{{ error }}</p-message>
     <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry" icon="pi pi-trail"
       [disabled]="selectionDisabled()" (onClick)="selectEdition(globalDraft.selectedEditionId())" />
@@ -17,19 +18,15 @@
       {{ i18n.editions().sectionTitle }}
     </h2>
 
-    @if (!readOnly()) {
-      <p-button id="additional-city-open" type="button" size="small" severity="success" icon="pi pi-plus"
-        [label]="i18n.city().action" [disabled]="addCityBlocker() !== null" (onClick)="openCity()" />
-    }
+    <p-button id="additional-city-open" type="button" size="small" severity="success" icon="pi pi-plus"
+      [label]="i18n.city().action" [disabled]="addCityBlocker() !== null" (onClick)="openCity()" />
   </div>
 
-  @if (!readOnly()) {
-    @if (addCityBlocker(); as blocker) {
-      <p id="additional-city-blocker" class="m-0 muted-text" role="status">{{ i18n.city().blockers[blocker] }}</p>
-    }
+  @if (addCityBlocker(); as blocker) {
+    <p id="additional-city-blocker" class="m-0 muted-text" role="status">{{ i18n.city().blockers[blocker] }}</p>
   }
 
-  @if (!readOnly() && globalDraft.cityEditing()) {
+  @if (globalDraft.cityEditing()) {
     <form id="additional-city-form" class="mg-form flex-col-start-stretch gap-md border-top pt-md w-100 min-w-0"
       [formGroup]="globalDraft.cityForm" (ngSubmit)="submitCity()" novalidate>
       <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.city().action }}</h3>
@@ -80,7 +77,7 @@
           <tbody class="p-datatable-tbody">
             @for (edition of loadedCore.editions; track edition.id) {
               <tr>
-                <td><strong>{{ edition.city }}</strong></td>
+                <td><strong [class.error-text]="cityHasErrors(edition.id)">{{ edition.city }}</strong></td>
                 <td>{{ edition.slug }}</td>
                 <td class="text-center">
                   <span
@@ -99,7 +96,7 @@
                 </td>
                 <td class="text-center">
                   {{
-                    (readOnly() ? edition.isDefaultPublic : globalDraft.calendar()?.mainEditionId === edition.id)
+                    (globalDraft.calendar()?.mainEditionId === edition.id)
                       ? i18n.commonValues().yes
                       : i18n.commonValues().no
                   }}

@@ -6,15 +6,16 @@
     <div class="flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="loading()">
       <p-message severity="info">{{ copy().hint }}</p-message>
       @if (loading()) { <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p> }
-      @else if (errorMessage(); as error) {
-        <section class="flex-col-start-stretch gap-sm" role="alert">
-          <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy().failed }}</h2>
-          <p-message severity="error">{{ error }}</p-message>
-          <div class="flex-row-start-center">
-            <p-button type="button" size="small" severity="secondary" icon="pi pi-trail"
-              [label]="i18n.commonActions().retry" [disabled]="disabled()" (onClick)="refresh()" />
-          </div>
-        </section>
+      @else if (error() !== null) {
+        <p-message severity="error" role="alert">{{ copy().failed }}</p-message>
+        <dl class="flex-col-start-stretch gap-sm m-0 w-100 min-w-0">
+          @for (field of errorFields(); track field.key) {
+            <div class="min-w-0">
+              <dt class="muted-text">{{ i18n.diagnostics().errorFields[field.key] }}</dt>
+              <dd class="m-0 text-wrap-anywhere"><span class="text-pre-line">{{ field.value }}</span></dd>
+            </div>
+          }
+        </dl>
       } @else if (result(); as preview) {
         @if (!preview.valid) {
           <p-message [severity]="preview.status === 'invalid' ? 'error' : 'warn'">{{ i18n.diagnostics().statuses[preview.status] }}</p-message>
@@ -80,10 +81,12 @@
       }
     </div>
     <ng-template #footer>
-      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-        [label]="i18n.commonActions().refresh" [disabled]="disabled() || loading()" (onClick)="refresh()" />
-      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-times"
-        [label]="i18n.commonActions().close" (onClick)="close()" />
+      <div class="flex-row-end-center flex-wrap gap-sm w-100">
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+          [label]="error() !== null ? i18n.commonActions().retry : i18n.commonActions().refresh" [disabled]="disabled() || loading()" (onClick)="refresh()" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-times"
+          [label]="i18n.commonActions().close" (onClick)="close()" />
+      </div>
     </ng-template>
   </p-dialog>
   @let selected = selectedSession();

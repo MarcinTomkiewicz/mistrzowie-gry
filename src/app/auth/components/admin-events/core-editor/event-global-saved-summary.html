@@ -1,11 +1,10 @@
 @let copy = i18n.savedSummary();
-<section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="loading()">
+<section class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="loading()">
   <header class="flex-row-between-center flex-wrap gap-sm w-100">
     <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().summary }}</h2>
   </header>
-  @if (loading()) {
-    <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
-  } @else if (errorMessage(); as error) {
+  <app-loading-overlay [visible]="loading()" [label]="i18n.commonStatus().loading" />
+  @if (!loading() && errorMessage(); as error) {
     <div class="flex-col-start-stretch gap-sm" role="alert">
       <p-message severity="error">{{ error }}</p-message>
       <p class="m-0">{{ copy.readFailed }}</p>
@@ -15,29 +14,32 @@
 @if (snapshot(); as saved) {
   @if (saved.calendar.pendingDraft) {
     <p-message severity="warn">{{ copy.calendarDraft }}</p-message>
-    <div class="flex-row-start-center">
+    @if (!readOnly()) { <div class="flex-row-start-center">
       <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
         [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
-    </div>
+    </div> }
   }
   @if (saved.policyDraft.hasDraft) {
     <p-message severity="warn">{{ copy.policyDraft }}</p-message>
     @if (saved.policyDraft.baselineChanged) {
       <p-message severity="warn">{{ i18n.policyEditor().baselineChanged }}</p-message>
     }
-    <div class="flex-row-start-center">
+    @if (!readOnly()) { <div class="flex-row-start-center">
       <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
         [label]="i18n.creationSteps().policy" [disabled]="disabled()" (onClick)="navigateToStep.emit(4)" />
-    </div>
+    </div> }
   }
   <app-event-global-draft-summary [core]="saved.core" [edition]="saved.edition" [calendar]="saved.calendar"
-    [policy]="saved.policy" [policyDraft]="saved.policyDraft" [changes]="changes()"
-    [disabled]="save.busy() || save.pending() || publication.locked()" (navigateToStep)="navigateToStep.emit($event)">
+    [policy]="saved.policy" [policyDraft]="readOnly() ? null : saved.policyDraft" [changes]="changes()"
+    [fieldErrors]="fieldErrors()" [editableSteps]="editableSteps()" [disabled]="readOnly() || save.busy() || save.pending() || publication.locked()"
+    (navigateToStep)="navigateToStep.emit($event)">
     <section summary-program class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
       <header class="flex-row-between-center flex-wrap gap-sm w-100">
         <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.program }}</h2>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
-          [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
+        @if (!readOnly()) {
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
+            [label]="i18n.creationSteps().program" [disabled]="disabled()" (onClick)="navigateToStep.emit(5)" />
+        }
       </header>
       @if (selectedCity(); as selected) {
         <div class="flex-row-start-center flex-wrap gap-sm" role="group" [attr.aria-label]="i18n.commonLabels().city">
@@ -48,7 +50,7 @@
               (onClick)="selectedCityId.set(entry.city.editionId)" />
           }
         </div>
-        <app-event-program-schedule [timeline]="selected.timeline" [disabled]="disabled() || publication.locked()" />
+        <app-event-admin-timeline [timeline]="selected.timeline" [disabled]="disabled() || publication.locked()" (reload)="refresh()" />
       }
       <section class="w-100 min-w-0 border-top pt-md">
         <p class="m-0 muted-text">{{ copy.countsHint }}</p>
@@ -84,8 +86,10 @@
                           @if (date.occurrenceStatusLabel) { <small>{{ date.occurrenceStatusLabel }}</small> }
                           @if (!date.counts && !occurrenceNotRequired) {
                             <small>{{ copy.noOccurrence }}</small>
-                            <p-button type="button" size="small" severity="secondary" [text]="true"
-                              [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
+                            @if (!readOnly()) {
+                              <p-button type="button" size="small" severity="secondary" [text]="true"
+                                [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
+                            }
                           }
                         </div>
                       </td>
@@ -103,10 +107,10 @@
               </div>
             } @else {
               <p class="m-0 muted-text" role="status">{{ i18n.occurrences().emptyDescription }}</p>
-              <div class="flex-row-start-center">
+              @if (!readOnly()) { <div class="flex-row-start-center">
                 <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
                   [label]="i18n.creationSteps().schedule" [disabled]="disabled()" (onClick)="navigateToStep.emit(3)" />
-              </div>
+              </div> }
             }
           </section>
         }
@@ -118,46 +122,55 @@
   <ng-container [ngTemplateOutlet]="publicationPanel" />
 }
 <footer class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0">
-  <ng-content select="[summary-validation]" />
+  @let publishCopy = publicationCopy();
   <ng-content select="[summary-save-actions]" />
-  @if (isAdmin()) {
-    @let publishCopy = publicationCopy();
-    @if (scoped() && scopeCalendar()) {
-      <div class="flex-row-start-center flex-wrap gap-sm">
-        @if (publication.scopeConfirmable()) {
-          <p-button type="button" size="small" severity="success" icon="pi pi-globe"
-            [label]="publicationLabels().publish" [disabled]="scopeDecisionPending()" (onClick)="confirmScopePublication()" />
-          <p-button type="button" size="small" severity="secondary" [outlined]="true"
-            [label]="i18n.commonActions().cancel" [disabled]="scopeDecisionPending()" (onClick)="publication.cancelConfirmation()" />
-        } @else if (!publication.needsReadback()) {
-          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-search"
-            [label]="publishCopy.scope.preview" [loading]="publication.isBusy()" [disabled]="!canPreviewScope()" (onClick)="previewScope()" />
-          <p-button type="button" size="small" severity="secondary" [text]="true"
-            [label]="i18n.commonActions().clear" [disabled]="disabled() || publication.locked()" (onClick)="clearScopeSelection()" />
+  <ng-content select="[summary-validation]" />
+  @if (isAdmin() && !readOnly() && disabled() &&
+    (scoped() && scopeCalendar() && !publication.locked() || !scoped() && !hasRelease() && !publication.verified() && !publication.needsReadback() && !publication.isBusy())) {
+    <small class="muted-text">{{ publicationLabels().saveFirst }}</small>
+  }
+  <div class="flex-row-between-center flex-wrap gap-sm w-100 min-w-0">
+    <div class="flex-row-start-center flex-wrap gap-sm min-w-0">
+      <ng-container [ngTemplateOutlet]="diagnostics()?.actions() ?? null" />
+      <ng-container [ngTemplateOutlet]="saveSummary()?.secondaryActions() ?? null" />
+      @if (!readOnly()) { <app-event-global-page-preview [coreId]="coreId()" [disabled]="disabled() || publication.locked()" /> }
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+        [label]="errorMessage() ? i18n.commonActions().retry : i18n.commonActions().refresh"
+        [disabled]="loading() || publication.locked() || save.busy() || save.pending()" (onClick)="refresh()" />
+      @if (isAdmin() && !readOnly()) {
+        @if (scoped() && scopeCalendar()) {
+          @if (publication.scopeConfirmable()) {
+            <p-button type="button" size="small" severity="secondary" [outlined]="true"
+              [label]="i18n.commonActions().cancel" [disabled]="scopeDecisionPending()" (onClick)="publication.cancelConfirmation()" />
+          } @else if (!publication.needsReadback()) {
+            <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-search"
+              [label]="publishCopy.scope.preview" [loading]="publication.isBusy()" [disabled]="!canPreviewScope()" (onClick)="previewScope()" />
+            <p-button type="button" size="small" severity="secondary" [text]="true"
+              [label]="i18n.commonActions().clear" [disabled]="disabled() || publication.locked()" (onClick)="clearScopeSelection()" />
+          }
         }
-      </div>
-      @if (disabled() && !publication.locked()) { <small class="muted-text">{{ publicationLabels().saveFirst }}</small> }
-    }
-    <div class="flex-row-start-center flex-wrap gap-sm">
-      @if (publication.needsReadback()) {
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-          [label]="i18n.commonActions().retry" [disabled]="publication.isBusy() || scopeDecisionPending()" (onClick)="retryPublicationReadback()" />
-        @if (publication.canAbandonScopeReadback()) {
-          <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
-            [label]="publishCopy.scope.endReadback" [disabled]="scopeDecisionPending()" (onClick)="endScopeReadback()" />
+        @if (publication.needsReadback()) {
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+            [label]="i18n.commonActions().retry" [disabled]="publication.isBusy() || scopeDecisionPending()" (onClick)="retryPublicationReadback()" />
+          @if (publication.canAbandonScopeReadback()) {
+            <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
+              [label]="publishCopy.scope.endReadback" [disabled]="scopeDecisionPending()" (onClick)="endScopeReadback()" />
+          }
         }
-      } @else if (!scoped() && !hasRelease() && !publication.verified()) {
-        <p-button type="button" size="small" severity="success" icon="pi pi-globe" loadingIcon="pi pi-d20"
-          [label]="publicationLabels().publish" [loading]="publication.isBusy()" [disabled]="!canPublish()" (onClick)="confirmPublication()" />
-        @if (disabled() && !publication.isBusy()) { <small class="muted-text">{{ publicationLabels().saveFirst }}</small> }
       }
     </div>
-  }
-  <div class="flex-row-start-center flex-wrap gap-sm">
-    <app-event-global-page-preview [coreId]="coreId()" [disabled]="disabled() || publication.locked()" />
-    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-      [label]="errorMessage() ? i18n.commonActions().retry : i18n.commonActions().refresh"
-      [disabled]="loading() || publication.locked() || save.busy() || save.pending()" (onClick)="refresh()" />
+    <div class="flex-row-end-center flex-wrap gap-sm ml-auto min-w-0">
+      <ng-container [ngTemplateOutlet]="saveSummary()?.primaryActions() ?? null" />
+      @if (isAdmin() && !readOnly()) {
+        @if (scoped() && scopeCalendar() && publication.scopeConfirmable()) {
+          <p-button type="button" size="small" severity="success" icon="pi pi-globe"
+            [label]="publicationLabels().publish" [disabled]="scopeDecisionPending()" (onClick)="confirmScopePublication()" />
+        } @else if (!scoped() && !publication.needsReadback() && !hasRelease() && !publication.verified()) {
+          <p-button type="button" size="small" severity="success" icon="pi pi-globe" loadingIcon="pi pi-d20"
+            [label]="publicationLabels().publish" [loading]="publication.isBusy()" [disabled]="!canPublish()" (onClick)="confirmPublication()" />
+        }
+      }
+    </div>
   </div>
 </footer>
 <ng-template #publicationPanel>
@@ -177,7 +190,7 @@
       @if (publication.scopeReadbackAbandoned()) {
         <p-message severity="warn" role="status">{{ publishCopy.scope.readbackEnded }}</p-message>
       }
-      @if (scoped()) {
+      @if (scoped() && !readOnly()) {
         @if (scopeCalendar(); as calendar) {
           <h3 class="mg-section__title mg-section__title--sm m-0">{{ publishCopy.scope.title }}</h3>
           <div class="flex-col-start-stretch gap-sm">

@@ -77,10 +77,10 @@ export class EventPageProgram {
     return state.kind === 'ready'
       ? groupPublicEventProgramEntries(this.facade.selectedProgram()).map((group) => ({
           key: group.key,
-          label: formatPublicEventProgramTime(group, this.i18n.program().dayOffset) ||
+          label: group.eventScoped ? this.i18n.program().eventScoped : formatPublicEventProgramTime(group, this.i18n.program().dayOffset) ||
             this.i18n.program().timeToBeDetermined,
           cards: createPublicEventProgramCards(
-            group.entries, state.systems, this.storage,
+            group.entries, this.storage,
             this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
             state.page.core.name,
           ).map((card) => {

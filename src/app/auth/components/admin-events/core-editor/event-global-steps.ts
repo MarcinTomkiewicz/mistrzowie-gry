@@ -14,6 +14,7 @@ export class EventGlobalSteps {
   readonly activeStep = input.required<number>();
   readonly reachedStep = input(6);
   readonly disabled = input(false);
+  readonly errorSteps = input<readonly number[]>([]);
   readonly stepContent = input.required<TemplateRef<unknown>>();
   readonly stepSelected = output<number>();
   private readonly i18n = createEventCoreEditorI18n();

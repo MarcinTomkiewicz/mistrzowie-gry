@@ -77,6 +77,7 @@
     "saveChanges": {
       "title": "[PH] Zmiany do zapisania",
       "action": "Zapisz zmiany",
+      "checkChanges": "[PH] Sprawdź zmiany przed zapisem",
       "confirmQuestion": "[PH] Zapisać wskazane zmiany?",
       "confirm": "[PH] Sekcje są zapisywane osobno. Jeśli jedna operacja się nie powiedzie, wcześniejsze potwierdzone zapisy pozostaną utrwalone. Publikacja i uruchomienie zapisów uczestników wymagają osobnych akcji.",
       "completed": "[PH] Odczyt potwierdził zapis sekcji",
@@ -94,7 +95,7 @@
         "protected": "[PH] Zachowany termin chroniony lub historyczny",
         "savedState": "[PH] Zapisany status i udział miast",
         "newDateHint": "[PH] Ta propozycja nie ma jeszcze zapisanego terminu ani statusów lokalnych terminów.",
-        "previewNeeded": "[PH] Zmieniono harmonogram. Użyj przycisku Sprawdź błędy na dole, aby zobaczyć proponowane daty. Poniżej są wyłącznie zapisane terminy.",
+        "previewNeeded": "[PH] Zmieniono harmonogram. Użyj przycisku Sprawdź zmiany przed zapisem na dole, aby zobaczyć proponowane daty. Poniżej są wyłącznie zapisane terminy.",
         "previewHint": "[PH] Propozycja dat nie jest potwierdzeniem zmiany kalendarza. Statusy terminów i udział miast pochodzą z zapisanych danych. Wynik zmiany potwierdzi odczyt po zapisie."
       },
       "checked": "[PH] Formularze i dostępne podglądy sekcji nie wykazały błędów. Przy zapisie każda sekcja zostanie ponownie zweryfikowana i odczytana.",
@@ -266,6 +267,14 @@
       "refreshRequired": "[PH] Odśwież dane wydarzenia przed kolejną zmianą."
     },
     "schedule": {
+      "blockers": {
+        "protected": "[PH] Harmonogram lub bloki są chronione przez publikację albo zachowaną historię. Zapisane dane są dostępne tylko do odczytu.",
+        "active": "[PH] Wydarzenie lub jego lokalizacja są aktywne albo mają włączoną stronę publiczną. Zapisany harmonogram i podstawowe bloki są dostępne tylko do odczytu.",
+        "pendingDraft": "[PH] Kalendarz ma niezastosowany szkic. Zakończ jego zapis w kroku Podsumowanie przed dalszą edycją.",
+        "otherOperation": "[PH] Edycję blokuje trwająca operacja. Zakończ ją lub sprawdź jej wynik w kroku Podsumowanie."
+      },
+      "staffingSource": "[PH] Harmonogram tego wydarzenia pochodzi ze Staffingu. Zmiany danych źródłowych wykonaj w module Staffingu; opublikowany program wydarzenia pozostaje chroniony.",
+      "staffingAction": "[PH] Przejdź do Staffingu",
       "hint": "[PH] Edytujesz wyłącznie daty i cykl. Godziny oraz wykluczenia miast dla zachowanych przyszłych terminów pozostają bez zmian. Zapis szkicu nie stosuje harmonogramu i nie publikuje wydarzenia.",
       "otherOperation": "[PH] Zakończ pozostałe operacje i zapisz lub odrzuć zmiany w innych sekcjach przed edycją harmonogramu.",
       "protected": "[PH] Ten harmonogram nie jest dostępny do edycji. Wymagane jest prywatne wydarzenie oraz zachowanie chronionych danych.",
@@ -296,7 +305,6 @@
     "baseTimeBlocks": {
       "title": "[PH] Edytuj podstawowe bloki wydarzenia",
       "hint": "[PH] Zmieniasz istniejące bloki bez dodawania, usuwania ani zmiany ich pozycji. Offset to liczba dni od daty wydarzenia. Zapis zachowuje daty i osobne bloki dat oraz miast. Nie publikuje wydarzenia ani nie otwiera zapisów.",
-      "protected": "[PH] Edycja bazy wymaga prywatnego wydarzenia bez szkicu kalendarza i chronionych danych. Serwer sprawdzi pozostałe zależności oraz czas trwania w strefach miast.",
       "otherOperation": "[PH] Zakończ pozostałe operacje i zapisz lub odrzuć zmiany w innych sekcjach przed edycją podstawowych bloków.",
       "preview": "[PH] Sprawdź podstawowe bloki",
       "previewReady": "[PH] Zmiany sprawdzone. Możesz świadomie zapisać podstawowe bloki.",
@@ -401,13 +409,18 @@
       "unavailable": "[PH] Nie można wyświetlić strony dla niepoprawnego szkicu kalendarza. Popraw wskazane błędy w harmonogramie."
     },
     "diagnostics": {
-      "action": "[PH] Sprawdź błędy",
-      "title": "[PH] Wynik sprawdzenia wydarzenia",
+      "action": "[PH] Sprawdź zapisane dane",
+      "title": "[PH] Diagnostyka zapisanych danych wydarzenia",
       "checking": "[PH] Sprawdzanie zapisanych danych wydarzenia...",
-      "failed": "[PH] Nie udało się sprawdzić wydarzenia",
+      "failed": "[PH] Nie udało się odczytać wyniku diagnostyki zapisanych danych wydarzenia. Wynik sprawdzenia jest niedostępny. Możesz ponowić odczyt.",
       "savedDataOnly": "[PH] Sprawdzenie wymaga zakończenia bieżących operacji oraz zapisania lub odrzucenia zmian w edytorze.",
       "readOnly": "[PH] To wynik sprawdzenia zapisanych danych, nie zgoda na publikację. Sprawdzenie nie zmienia wydarzenia ani nie otwiera zapisów uczestników.",
-      "valid": "[PH] Dane poprawne w tym sprawdzeniu",
+      "errorFields": {
+        "code": "[PH] Kod błędu",
+        "message": "[PH] Komunikat błędu",
+        "details": "[PH] Szczegóły techniczne",
+        "hint": "[PH] Wskazówka serwera"
+      },
       "blockers": "[PH] Blokady zgłoszone przez serwer",
       "goToSection": "[PH] Przejdź do sekcji",
       "fields": {
@@ -460,7 +473,6 @@
       "draftOnly": "[PH] Edycja bloków szkicu",
       "editTitle": "[PH] Edytuj bloki daty lub miasta",
       "scope": "[PH] Zakres zmiany",
-      "protected": "[PH] Ten termin jest chroniony lub wyszedł ze stanu szkicu. Jego bloków nie można edytować.",
       "preview": "[PH] Sprawdź zmiany",
       "previewReady": "[PH] Zmiany sprawdzone. Możesz zapisać szkic. Kolejna edycja wymaga ponownego sprawdzenia.",
       "save": "[PH] Zapisz bloki szkicu",
@@ -530,20 +542,12 @@
     }
   },
   "editionEditor": {
-    "fields": {
-      "coverPreviewAlt": "Podgląd okładki danej lokalizacji",
-      "isDefaultPublic": "Domyślna lokalizacja na stronie wydarzenia",
-      "defaultSlotCapacity": "Domyślna liczba Mistrzów Gry",
-      "defaultParticipantCapacity": "Domyślna liczba uczestników"
-    },
     "validation": {
       "citySlugSource": "[PH] Z podanego miasta nie można utworzyć części slugu lokalizacji. Dodaj co najmniej jedną literę łacińską lub cyfrę."
     },
     "publication": {
       "title": "Publikacja wydarzenia",
       "publish": "Opublikuj wydarzenie",
-      "released": "Wydarzenie było już opublikowane",
-      "unreleased": "Wydarzenie nie było jeszcze opublikowane",
       "saveFirst": "Zapisz zmiany przed publikacją.",
       "alreadyPublished": "Wydarzenie było już opublikowane - bez ponownego wydania",
       "errors": {
@@ -633,7 +637,8 @@
       "track": "[PH] Tor {{number}}",
       "hint": "[PH] Wybierz dzień i pozycję programu, aby zobaczyć szczegóły. Na węższym ekranie przewiń harmonogram w poziomie.",
       "assignmentStatus": "[PH] Stan przypisania MG",
-      "timeUnavailable": "[PH] Poniższe pozycje nie mają jednoznacznego przedziału czasu w danych źródłowych. Pokazano ich zapisane godziny bez dopisywania dnia."
+      "history": "[PH] Historia wycofanych i odrzuconych pozycji",
+      "eventScoped": "[PH] Sesje bez odrębnych godzin"
     },
     "manualProgram": {
       "unavailable": "[PH] Przypisanie wymaga prywatnego Global Event, niechronionego planowanego terminu i rzeczywistych bloków. Najpierw zakończ inne operacje oraz rozstrzygnij szkic kalendarza.",
@@ -707,7 +712,6 @@
     "unassigned": "[PH] Nieobsadzony slot",
     "noHost": "[PH] Brak przypisanego MG",
     "loadFailed": "[PH] Nie udało się odczytać programu",
-    "eventHours": "[PH] Godziny całego wydarzenia w tej lokalizacji",
     "participationEnded": "[PH] Udział MG zakończony",
     "participantsEmpty": "[PH] Brak aktywnych zapisów na tę sesję.",
     "participantRemoveConfirm": "[PH] Usunąć uczestnika z tej sesji? Zwolni to jego miejsce.",
@@ -716,7 +720,7 @@
     "sources": {
       "staffing": "[PH] Plan Staffingu",
       "manual": "[PH] Ręczne przypisanie",
-      "legacy_host": "[PH] Zapisy MG"
+      "event_scoped": "[PH] Sesja bez odrębnych godzin"
     },
     "candidateStates": {
       "draft": "[PH] Zgłoszenie robocze",

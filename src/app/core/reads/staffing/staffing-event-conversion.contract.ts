@@ -28,14 +28,16 @@ export function assertStaffingEventConversion(result: ConvertAdminStaffingRealiz
     'staffingConversion.date', 'chronologically ordered dated occurrences');
   }
   assertStaffingGlobalScope(result.eventCoreId, result.eventId, result.calendar, result.policy);
-  const linked = result.calendar.globalDates.flatMap(day => day.cityOccurrences.filter(city => city.editionId === result.eventId && city.occurrenceId !== null));
-  assertEdgeContract(linked.length === result.occurrences.length && new Set(linked.map(city => city.occurrenceId)).size === linked.length &&
-    result.occurrences.every(row => result.calendar.globalDates.some(day => day.date === row.date &&
-    day.cityOccurrences.some(city => city.editionId === result.eventId && city.occurrenceId === row.occurrenceId))),
-  'staffingConversion.calendar', 'the same local occurrences linked to shared Global dates');
+  const linked = result.calendar.globalDates.flatMap(day => day.cityOccurrences
+    .filter(city => city.editionId === result.eventId && city.occurrenceId !== null)
+    .map(city => ({ occurrenceId: city.occurrenceId, date: day.date })));
+  assertEdgeContract(new Set(linked.map(city => city.occurrenceId)).size === linked.length && linked.every(city =>
+    result.occurrences.some(row => row.occurrenceId === city.occurrenceId && row.date === city.date)),
+  'staffingConversion.calendar', 'matching linked occurrences without discarding unlinked local history');
   if (result.converted) {
     readEdgeNonNegativeInteger(result.emptySlotCount, 'staffingConversion.emptySlotCount');
-    assertEdgeContract(result.public === false && result.occurrences.length >= 1 && result.occurrences.length <= 366 &&
+    assertEdgeContract(linked.length === result.occurrences.length && result.public === false &&
+      result.occurrences.length >= 1 && result.occurrences.length <= 366 &&
       result.policy.global.price.amount === null &&
       result.policy.global.price.basis === null && result.policy.global.price.currency === 'PLN' &&
       result.calendar.schedule.kind === 'exact_dates',
@@ -76,26 +78,28 @@ export function assertStaffingEventImportReadback(core: IEventCoreDetail, editio
     new Set(core.editions.map(row => row.id)).size === core.editions.length &&
     core.editions.length === calendar.cities.length && calendar.cities.every(city =>
       core.editions.some(row => row.id === city.editionId && row.city === city.city && row.slug === city.slug)) &&
-    timeline.origin === 'manual' && edition.occurrences.every(row => calendar.globalDates.some(day => day.date === row.date &&
-      day.cityOccurrences.some(city => city.editionId === edition.id && city.occurrenceId === row.id && city.occurrenceStatus === row.status))),
-  'staffingConversion.readback', 'the authoritative Core, Edition, calendar and manual programme');
+    calendar.globalDates.every(day => day.cityOccurrences.filter(city => city.editionId === edition.id && city.occurrenceId !== null)
+      .every(city => edition.occurrences.some(row => row.id === city.occurrenceId && row.date === day.date && row.status === city.occurrenceStatus))),
+  'staffingConversion.readback', 'the authoritative Global Core, Edition, calendar and programme with retained local history');
   const rows = timeline.occurrences.flatMap(day => day.rows);
   const mainCity = calendar.cities.find(city => city.editionId === edition.id);
   assertEdgeContract(mainCity !== undefined && mainCity.city === edition.city && mainCity.slug === edition.slug &&
     mainCity.timezone === edition.timezone && timeline.timezone === edition.timezone &&
     timeline.occurrences.every(day => edition.occurrences.some(row => row.id === day.occurrenceId && row.status === day.status)),
   'staffingConversion.localScope', 'matching saved city metadata, occurrence statuses and timezone');
-  const slots = rows.flatMap(row => row.slotId === null ? [] : [row.slotId]);
+  const slots = rows.flatMap(row => row.source === 'manual' ? [row.slotId] : []);
   const programs = rows.flatMap(row => row.programItemId === null ? [] : [row.programItemId]);
-  assertEdgeContract(rows.every(row => row.source === 'manual') && new Set(slots).size === slots.length &&
-    new Set(programs).size === programs.length, 'staffingConversion.program', 'unique canonical manual slots and programme items');
+  assertEdgeContract(new Set(slots).size === slots.length && new Set(programs).size === programs.length,
+    'staffingConversion.program', 'unique canonical Manual slots and programme items across all retained sources');
   if (!result) return;
   assertEdgeContract(result.eventCoreId === core.id && result.eventId === edition.id && result.public === core.hasPublicPage &&
     result.occurrences.length === edition.occurrences.length && result.occurrences.every(row =>
       edition.occurrences.some(day => day.id === row.occurrenceId && day.date === row.date)) && result.programItemCount === programs.length,
   'staffingConversion.confirmation', 'the same saved identities, dates, public state and programme count');
   if (result.converted) {
-    assertEdgeContract(!core.isActive && !core.hasPublicPage && !edition.isActive && !edition.currentlyPublic &&
+    assertEdgeContract(timeline.origin === 'manual' && !core.isActive && !core.hasPublicPage && !edition.isActive && !edition.currentlyPublic &&
+      edition.occurrences.every(row => calendar.globalDates.some(day => day.date === row.date &&
+        day.cityOccurrences.some(city => city.editionId === edition.id && city.occurrenceId === row.id))) &&
       edition.occurrences.every(row => row.status === EventOccurrenceStatus.Planned && row.publishedAt === null &&
         row.participantSignupOpenedAt === null && row.activeParticipantCount === 0) &&
       rows.filter(row => row.programItemId === null).length === result.emptySlotCount &&

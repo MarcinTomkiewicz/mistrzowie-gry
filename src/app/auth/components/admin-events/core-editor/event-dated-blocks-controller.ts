@@ -11,7 +11,7 @@ import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { EventGlobalScheduleController } from './event-global-schedule-controller';
 import { EventGlobalBaseTimeBlocksController } from './event-global-base-time-blocks-controller';
 import { matchesDatedBlocksReadback } from './event-dated-blocks-state';
-import { sameScheduleBlocks } from './event-global-schedule-state';
+import { sameScheduleBlocks, type GlobalScheduleBlocker } from './event-global-schedule-state';
 
 @Injectable()
 export class EventDatedBlocksController {
@@ -46,16 +46,20 @@ export class EventDatedBlocksController {
   readonly day = computed(() => this.calendar()?.datedTimeBlocks.find(row => row.date === this.date()));
   readonly city = computed(() => this.day()?.cities.find(row => row.editionId === this.editionId()));
   readonly currentBlocks = computed(() => this.editionId() ? this.city()?.timeBlocks ?? [] : this.day()?.timeBlocks ?? []);
-  readonly canEdit = computed(() => {
+  readonly contextBlocker = computed<GlobalScheduleBlocker | null>(() => {
     const day = this.day();
-    if (!day || this.schedule.blocked() || this.baseBlocks.blocked() || this.schedule.isBusy() || this.baseBlocks.isBusy()) return false;
+    if (!day) return null;
     const occurrence = this.calendar()?.globalDates.find(row => row.globalOccurrenceId === day.globalOccurrenceId && row.date === day.date);
-    if (!occurrence || day.source === 'published_snapshot' || occurrence.status !== 'scheduled') return false;
-    if (this.editionId() && !this.city()) return false;
+    if (!occurrence || day.source === 'published_snapshot' || occurrence.status !== 'scheduled') return 'protected';
+    if (this.editionId() && !this.city()) return 'protected';
     const targets = this.editionId() ? occurrence.cityOccurrences.filter(row => row.editionId === this.editionId()) : occurrence.cityOccurrences;
     return targets.length > 0 && targets.every(row => !row.protected && !row.publishedAt &&
-      (row.occurrenceStatus === null || row.occurrenceStatus === 'planned'));
+      (row.occurrenceStatus === null || row.occurrenceStatus === 'planned')) ? null : 'protected';
   });
+  readonly blockingReason = computed<GlobalScheduleBlocker | null>(() => this.contextBlocker() ??
+    (this.schedule.blocked() || this.baseBlocks.blocked() || this.schedule.isBusy() || this.baseBlocks.isBusy() || this.isBusy() ? 'otherOperation' : null));
+  readonly canEdit = computed(() => !!this.day() && this.contextBlocker() === null && !this.schedule.blocked() &&
+    !this.baseBlocks.blocked() && !this.schedule.isBusy() && !this.baseBlocks.isBusy());
 
   constructor() {
     effect(() => this.syncEnabled());

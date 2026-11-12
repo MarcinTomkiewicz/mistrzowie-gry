@@ -6,6 +6,7 @@ export type EventPageTranslations = {
 };
 
 export type EventPageProgramTranslations = {
+  eventScoped: string;
   dayOffset: string;
   title: string;
   occurrenceLabel: string;

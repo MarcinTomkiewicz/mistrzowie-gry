@@ -107,13 +107,6 @@ export type CoreRpcErrorsCopy = {
   unknown: string;
 };
 
-export type EditionFieldsCopy = {
-  coverPreviewAlt: string;
-  isDefaultPublic: string;
-  defaultSlotCapacity: string;
-  defaultParticipantCapacity: string;
-};
-
 export type EditionValidationCopy = {
   citySlugSource: string;
 };

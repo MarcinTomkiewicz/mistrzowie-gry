@@ -1,5 +1,4 @@
 import type { IEventSlotCardVm } from '../interfaces/i-event-slot-card';
-import type { ISystem } from '../interfaces/i-system';
 import type { IPublicStorageUrlResolver } from '../interfaces/i-storage';
 import type { EventPageProgramTranslations } from '../types/i18n/event-page';
 import type { PublicEventProgramEntry } from '../types/public-event-program';
@@ -9,6 +8,7 @@ import { formatTimeRangeLabel } from './time-format';
 
 type PublicEventProgramGroup = Pick<PublicEventProgramEntry['slot'], 'startTime' | 'endTime' | 'startDayOffset' | 'endDayOffset'> & {
   key: string;
+  eventScoped: boolean;
   entries: PublicEventProgramEntry[];
 };
 
@@ -18,12 +18,13 @@ export function groupPublicEventProgramEntries(
   const groups = new Map<string, PublicEventProgramGroup>();
   for (const entry of entries) {
     const { startTime, endTime } = entry.slot;
-    const key = `${entry.occurrenceId}:${entry.slot.startDayOffset ?? 0}:${startTime ?? ''}:${entry.slot.endDayOffset ?? 0}:${endTime ?? ''}`;
+    const eventScoped = entry.kind === 'confirmed' && 'timeScope' in entry && entry.timeScope === 'event';
+    const key = `${entry.occurrenceId}:${eventScoped ? 'event' : 'slot'}:${entry.slot.startDayOffset ?? 0}:${startTime ?? ''}:${entry.slot.endDayOffset ?? 0}:${endTime ?? ''}`;
     const group = groups.get(key);
     if (group) {
       group.entries.push(entry);
     } else {
-      groups.set(key, { key, startTime, endTime, startDayOffset: entry.slot.startDayOffset, endDayOffset: entry.slot.endDayOffset, entries: [entry] });
+      groups.set(key, { key, eventScoped, startTime, endTime, startDayOffset: entry.slot.startDayOffset, endDayOffset: entry.slot.endDayOffset, entries: [entry] });
     }
   }
 
@@ -38,7 +39,6 @@ export function groupPublicEventProgramEntries(
 
 export function createPublicEventProgramCards(
   entries: readonly PublicEventProgramEntry[],
-  systems: readonly ISystem[],
   storage: IPublicStorageUrlResolver,
   copy: EventPageProgramTranslations,
   missingTitle: string,
@@ -52,9 +52,7 @@ export function createPublicEventProgramCards(
     const session = entry.session;
     const slotLabel = normalizeText(entry.slot.label);
     const title = pending ? copy.pending : activity?.title ?? normalizeText(session?.title) ?? missingTitle;
-    const system = entry.kind === 'confirmed' && entry.session !== null
-      ? entry.session.system
-      : systems.find((system) => system.id === session?.systemId) ?? null;
+    const system = session?.system ?? null;
     return {
       id: 'activityId' in entry ? entry.activityId : entry.programItemId,
       gmProfileId: entry.host?.userId ?? null,

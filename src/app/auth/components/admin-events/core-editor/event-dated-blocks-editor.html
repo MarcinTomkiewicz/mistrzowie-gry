@@ -1,9 +1,11 @@
 @let copy = i18n.datedBlocks();
 @if (dateOptions().length) {
   <section class="mg-card p-md w-100 min-w-0">
-    <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.saveChanges().localChanges }}</h2>
-    <div class="flex-col-start-stretch gap-sm pt-sm w-100 min-w-0">
+    <header class="flex-row-start-center gap-sm">
+      <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.saveChanges().localChanges }}</h2>
       <app-context-help [text]="copy.unchangedDates" [ariaLabel]="copy.editTitle + ': ' + i18n.creation().help" />
+    </header>
+    <div class="flex-col-start-stretch gap-sm pt-sm w-100 min-w-0">
       @for (day of exceptions(); track day.globalOccurrenceId) {
         <section class="flex-col-start-stretch gap-xs border-bottom pb-sm w-100 min-w-0">
           <h3 class="m-0 text-sm"><time [attr.datetime]="day.date">{{ formatDateLabel(day.date) }}</time></h3>
@@ -25,19 +27,32 @@
           <p-select inputId="dated-blocks-date" [options]="dateOptions()" optionLabel="label" optionValue="value" size="small"
             [ngModel]="editor.date()" (ngModelChange)="select($event, 'date')" [disabled]="selectionLocked()" appendTo="body" class="w-100 min-w-0" />
         </div>
-        <div class="flex-col-start-stretch gap-xs flex-none w-px-300 max-w-full min-w-0">
+        @if (showScope()) { <div class="flex-col-start-stretch gap-xs flex-none w-px-300 max-w-full min-w-0">
           <label class="text-sm" for="dated-blocks-scope">{{ copy.scope }}</label>
           <p-select inputId="dated-blocks-scope" [options]="scopeOptions()" optionLabel="label" optionValue="value" size="small"
             [ngModel]="editor.editionId() || 'date'" (ngModelChange)="select($event, 'city')" [disabled]="selectionLocked()" appendTo="body" class="w-100 min-w-0" />
-        </div>
+        </div> }
       </div>
       @if (editor.isDirty()) { <small class="muted-text">{{ i18n.saveChanges().title }}</small> }
       @if (editor.readbackPending()) { <p-message severity="warn" role="status">{{ copy.readbackFailed }}</p-message> }
       @if (editor.conflicted()) { <p-message severity="warn" role="alert">{{ copy.conflict }}</p-message> }
       @if (errorMessage(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
+      @if (editor.blockingReason(); as reason) { <p class="m-0 muted-text" role="status">{{ i18n.schedule().blockers[reason] }}</p> }
       @if (editor.day(); as day) {
-        @if (!editor.canEdit()) {
-          <p class="m-0 muted-text">{{ copy.protected }}</p>
+        @if (readOnly()) {
+          <section class="flex-col-start-stretch gap-sm w-100 min-w-0">
+            <h3 class="m-0 text-sm"><time [attr.datetime]="day.date">{{ formatDateLabel(day.date) }}</time></h3>
+            @if (editor.editionId()) {
+              @if (editor.city(); as city) {
+                <h4 class="m-0 text-sm">{{ city.city }} - {{ city.publishedSnapshot ? copy.sources.published_snapshot : city.isOverride ? copy.cityOverride : copy.fromDate }}</h4>
+              }
+            } @else { <p class="m-0 muted-text">{{ copy.sources[day.source] }}</p> }
+            <app-event-global-time-blocks-summary [blocks]="editor.currentBlocks()" />
+            @for (city of readOnlyCities(); track city.editionId) {
+              <h4 class="m-0 text-sm">{{ city.city }} - {{ city.publishedSnapshot ? copy.sources.published_snapshot : city.isOverride ? copy.cityOverride : copy.fromDate }}</h4>
+              <app-event-global-time-blocks-summary [blocks]="city.timeBlocks" />
+            }
+          </section>
         } @else {
           <div class="mg-form flex-col-start-stretch gap-sm w-100 min-w-0" [formGroup]="editor.form">
             <div class="flex-row-start-center gap-sm">

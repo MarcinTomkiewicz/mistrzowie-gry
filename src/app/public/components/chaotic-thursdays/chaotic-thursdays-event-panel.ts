@@ -21,9 +21,9 @@ import { Storage } from '../../../core/services/storage/storage';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { formatMoney } from '../../../core/utils/pricing';
 import { hasMinimumRole } from '../../../core/utils/roles';
-import { resolvePublicStorageUrl } from '../../../core/utils/storage-url';
 import { formatTimeRangeLabel } from '../../../core/utils/time-format';
-import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
+import { createPublicEventProgramCards } from '../../../core/utils/public-event-program-cards';
+import { createEventPageI18n } from '../event-page/event-page.i18n';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../common/occurrence-switcher/occurrence-switcher';
@@ -49,6 +49,7 @@ export class ChaoticThursdaysEventPanel implements OnInit {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
   private readonly storage = inject(Storage);
+  private readonly programI18n = createEventPageI18n();
 
   readonly facade = inject(ChaoticThursdaysFacade);
   readonly i18n =
@@ -128,34 +129,9 @@ export class ChaoticThursdaysEventPanel implements OnInit {
   readonly slotItems = this.facade.selectedProgramItems;
 
   readonly slotCards = computed<IEventSlotCardVm[]>(() =>
-    this.slotItems().map((item) => ({
-      id: item.id,
-      gmProfileId: item.host.profile.id ?? null,
-      title: item.session.title,
-      imageUrl: resolvePublicStorageUrl(this.storage, item.session.image),
-      gmDisplayName: getGmPublicProfileDisplayName(item.host) || null,
-      system: item.session.system ?? null,
-      languages: item.session.languages ?? [],
-      difficultyLevel: item.session.difficultyLevel,
-      styles: item.session.styles,
-      triggers: item.session.triggers,
-      minAge: item.session.minAge,
-      description: item.session.description,
-      isEmpty: false,
-      canOpenDetails: true,
-      canOpenGmProfile: !!item.host.profile.id,
-    })),
+    createPublicEventProgramCards(this.slotItems(), this.storage, this.programI18n.program(),
+      this.programI18n.values().notProvided, this.programI18n.roles().gm, this.facade.page()?.core.name ?? ''),
   );
-
-  readonly slotCount = computed(() => {
-    const occurrence = this.facade.selectedOccurrence();
-
-    if (occurrence) {
-      return occurrence.slotCapacity;
-    }
-
-    return this.facade.selectedEdition()?.defaultSlotCapacity ?? 0;
-  });
 
   readonly canHostSignup = computed(() =>
     hasMinimumRole(this.auth.user(), 'gm'),

@@ -5,7 +5,8 @@ import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { isValidIsoDate, toIsoDate } from '../../../../core/utils/date';
 import { timestampToTimeZoneDate } from '../../../../core/utils/time-zone';
 
-export type GlobalScheduleIssue = 'protected' | 'offScope' | 'historical' | 'conflict' | 'readback';
+export type GlobalScheduleIssue = 'protected' | 'active' | 'offScope' | 'historical' | 'conflict' | 'readback';
+export type GlobalScheduleBlocker = 'protected' | 'active' | 'pendingDraft' | 'otherOperation';
 
 export class EventGlobalScheduleError extends Error {
   constructor(readonly issue: GlobalScheduleIssue) {
@@ -59,21 +60,24 @@ export function validateScheduleContext(core: IEventCoreDetail, calendar: AdminG
     calendar.draftRevision === (calendar.pendingDraft?.revision ?? 0) &&
     Array.isArray(calendar.timeBlocks) && Array.isArray(calendar.globalDates) && Array.isArray(calendar.datedTimeBlocks),
   'globalSchedule', 'the canonical calendar and its separate numeric revisions');
-  const today = mainCityToday(calendar);
-  if (calendar.calendarLifecycle !== 'global' || core.isActive || core.hasPublicPage ||
-    !calendar.cities.some(city => city.editionId === calendar.mainEditionId && city.isMain) ||
-    calendar.cities.some(city => city.isActive) ||
-    calendar.globalDates.some(day => day.date >= today && day.cityOccurrences.some(city => city.protected || city.publishedAt || city.unlinkedSameDate ||
-      (city.occurrenceStatus !== null && city.occurrenceStatus !== 'planned'))) ||
-    calendar.datedTimeBlocks.some(day => day.date >= today && (day.source === 'published_snapshot' || day.cities.some(city => city.publishedSnapshot)))) {
-    throw new EventGlobalScheduleError('protected');
-  }
+  const blocker = scheduleContextBlocker(core, calendar);
+  if (blocker) throw new EventGlobalScheduleError(blocker);
   const pending = calendar.pendingDraft;
   if (pending && (!Array.isArray(pending.cityExclusions) || !Array.isArray(pending.timeBlocks) ||
     !Array.isArray(pending.candidateDates) || !sameScheduleBlocks(pending.timeBlocks, activeScheduleBlocks(calendar)) ||
     !sameCityExclusions(pending.cityExclusions, activeCityExclusions(calendar).filter(row => pending.candidateDates.includes(row.date))))) {
     throw new EventGlobalScheduleError('offScope');
   }
+}
+
+export function scheduleContextBlocker(core: IEventCoreDetail, calendar: AdminGlobalCalendarResult): 'protected' | 'active' | null {
+  if (calendar.calendarLifecycle !== 'global' ||
+    !calendar.cities.some(city => city.editionId === calendar.mainEditionId && city.isMain)) return 'protected';
+  const today = mainCityToday(calendar);
+  if (calendar.globalDates.some(day => day.date >= today && day.cityOccurrences.some(city => city.protected || city.publishedAt || city.unlinkedSameDate ||
+    (city.occurrenceStatus !== null && city.occurrenceStatus !== 'planned'))) ||
+    calendar.datedTimeBlocks.some(day => day.date >= today && (day.source === 'published_snapshot' || day.cities.some(city => city.publishedSnapshot)))) return 'protected';
+  return core.isActive || core.hasPublicPage || calendar.cities.some(city => city.isActive) ? 'active' : null;
 }
 
 export function preserveScheduleExclusions(calendar: AdminGlobalCalendarResult, candidateDates: string[]): CityExclusion[] {

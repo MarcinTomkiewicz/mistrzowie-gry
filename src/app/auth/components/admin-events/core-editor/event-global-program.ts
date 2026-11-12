@@ -4,23 +4,26 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { Subscription, tap } from 'rxjs';
 
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
 import type { AdminGlobalCalendarResult } from '../../../../core/interfaces/i-admin-global-event';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { assertAdminEventTimelineScope } from '../../../../core/reads/events/admin-event-timeline.contract';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
+import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
+import { getTodayIso, selectUpcomingOrLatestDate } from '../../../../core/utils/date';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventGlobalSaveController } from './event-global-save-controller';
 import { EventManualProgramController } from './event-manual-program-controller';
 import { EventManualProgramEditor } from './event-manual-program-editor';
-import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
+import { EventAdminTimeline } from '../event-admin-timeline/event-admin-timeline';
 
 @Component({
   selector: 'app-event-global-program',
-  imports: [FormsModule, ButtonModule, SelectModule, EventManualProgramEditor, EventProgramSchedule],
+  imports: [FormsModule, ButtonModule, SelectModule, EventManualProgramEditor, EventAdminTimeline, LoadingOverlay],
   templateUrl: './event-global-program.html',
   host: { class: 'd-block w-100 min-w-0' },
 })
@@ -35,6 +38,7 @@ export class EventGlobalProgram {
   protected readonly selectionLocked = computed(() => this.disabled() || this.manual.locked());
   protected readonly i18n = createEventAdminTimelineI18n();
   private readonly admin = inject(EventAdmin);
+  private readonly toast = inject(UiToast);
   private readonly browserReady = signal(false);
   private readonly readAttempt = signal(0);
   private readonly readingTimeline = signal(false);
@@ -97,7 +101,10 @@ export class EventGlobalProgram {
     effect(() => {
       const options = this.occurrences();
       untracked(() => {
-        if (!options.some(option => option.id === this.selectedOccurrenceId())) this.selectedOccurrenceId.set(options[0]?.id ?? null);
+        if (!options.some(option => option.id === this.selectedOccurrenceId())) {
+          const date = selectUpcomingOrLatestDate(options.map(option => option.date), getTodayIso(new Date(), this.edition()?.timezone));
+          this.selectedOccurrenceId.set(options.find(option => option.date === date)?.id ?? null);
+        }
       });
     });
     effect(onCleanup => {
@@ -113,7 +120,11 @@ export class EventGlobalProgram {
           tap(timeline => assertAdminEventTimelineScope(timeline, edition, coreId)),
         ).subscribe({
           next: result => { this.result.set(result); this.readingTimeline.set(false); },
-          error: (error: unknown) => { this.readError.set(error); this.readingTimeline.set(false); },
+          error: (error: unknown) => {
+            this.readError.set(error);
+            this.readingTimeline.set(false);
+            this.toast.danger({ summary: this.i18n.copy().loadFailed, detail: this.errorMessage() ?? undefined });
+          },
         });
         this.readSubscription = subscription;
         onCleanup(() => subscription.unsubscribe());
@@ -151,6 +162,7 @@ export class EventGlobalProgram {
     } catch (error: unknown) {
       this.result.set(null);
       this.readError.set(error);
+      this.toast.danger({ summary: this.i18n.copy().loadFailed, detail: this.errorMessage() ?? undefined });
     }
   }
 

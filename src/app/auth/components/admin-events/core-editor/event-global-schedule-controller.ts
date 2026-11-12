@@ -11,7 +11,7 @@ import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { activeScheduleBlocks, EventGlobalScheduleError, type GlobalScheduleCommand, type GlobalScheduleIssue,
   matchesAppliedSchedule, matchesSavedSchedule, preserveScheduleExclusions, sameSchedule, sameScheduleChange,
-  validateScheduleContext } from './event-global-schedule-state';
+  scheduleContextBlocker, type GlobalScheduleBlocker, validateScheduleContext } from './event-global-schedule-state';
 
 type ScheduleState = 'idle' | 'draft' | 'save-uncertain' | 'save-readback' | 'apply-uncertain' | 'apply-readback' | 'conflict';
 
@@ -37,6 +37,13 @@ export class EventGlobalScheduleController {
   readonly isBusy = computed(() => this.operation() !== null);
   readonly locked = computed(() => this.isBusy() || this.dirty() || this.state() !== 'idle');
   readonly canEdit = computed(() => this.allowed() && !this.blocked());
+  readonly contextBlocker = computed(() => {
+    const core = this.core();
+    const calendar = this.calendar();
+    return core && calendar ? scheduleContextBlocker(core, calendar) : null;
+  });
+  readonly blockingReason = computed<GlobalScheduleBlocker | null>(() => this.contextBlocker() ??
+    (this.calendar()?.pendingDraft ? 'pendingDraft' : this.blocked() || this.isBusy() ? 'otherOperation' : null));
   readonly canPreview = computed(() => this.canEdit() && !this.isBusy() && this.state() === 'idle' && this.dirty());
   readonly canSave = computed(() => {
     const command = this.command();

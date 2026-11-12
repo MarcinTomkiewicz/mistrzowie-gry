@@ -9,14 +9,15 @@ import type { IEventSlotCardVm } from '../../../../core/interfaces/i-event-slot-
 import { Auth } from '../../../../core/services/auth/auth';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { Storage } from '../../../../core/services/storage/storage';
-import { formatDateLabel } from '../../../../core/utils/date';
+import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { formatDateLabel, getTodayIso, selectUpcomingOrLatestDate } from '../../../../core/utils/date';
 import { formatMoney } from '../../../../core/utils/pricing';
 import { createPublicEventProgramCards, formatPublicEventProgramTime, groupPublicEventProgramEntries } from '../../../../core/utils/public-event-program-cards';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
 import { EventSlots } from '../../../../public/common/event-slots/event-slots';
 import { createEventPageI18n } from '../../../../public/components/event-page/event-page.i18n';
 import { SessionDialog } from '../../../../public/components/session-dialog/session-dialog';
-import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
+import { presentEventGlobalPreviewError } from '../event-admin-errors';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 
 @Component({
@@ -36,12 +37,14 @@ export class EventGlobalPagePreview {
   private readonly admin = inject(EventAdmin);
   private readonly auth = inject(Auth);
   private readonly storage = inject(Storage);
+  private readonly toast = inject(UiToast);
   private readonly browserReady = signal(false);
   protected readonly isAdmin = computed(() => this.auth.hasRole('admin'));
   protected readonly visible = signal(false);
   protected readonly loading = signal(false);
   protected readonly result = signal<AdminGlobalEventPagePreview | null>(null);
-  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly error = signal<unknown | null>(null);
+  protected readonly errorFields = computed(() => presentEventGlobalPreviewError(this.error()));
   private readonly selectedEditionId = linkedSignal<string | undefined>(() => { this.coreId(); return undefined; });
   private readonly selectedDate = linkedSignal<string | undefined>(() => { this.coreId(); return undefined; });
   private readonly readAttempt = signal(0);
@@ -67,8 +70,8 @@ export class EventGlobalPagePreview {
     if (!page) return [];
     return groupPublicEventProgramEntries(page.program).map(group => ({
       key: group.key,
-      label: formatPublicEventProgramTime(group, this.publicI18n.program().dayOffset) || this.publicI18n.program().timeToBeDetermined,
-      cards: createPublicEventProgramCards(group.entries, [], this.storage, this.publicI18n.program(),
+      label: group.eventScoped ? this.publicI18n.program().eventScoped : formatPublicEventProgramTime(group, this.publicI18n.program().dayOffset) || this.publicI18n.program().timeToBeDetermined,
+      cards: createPublicEventProgramCards(group.entries, this.storage, this.publicI18n.program(),
         this.i18n.commonValues().notProvided, this.publicI18n.roles().gm, page.core.name ?? '')
         .map(card => ({ ...card, canOpenGmProfile: false })),
     }));
@@ -88,16 +91,33 @@ export class EventGlobalPagePreview {
       this.readAttempt();
       untracked(() => {
         this.result.set(null);
-        this.errorMessage.set(null);
+        this.error.set(null);
         this.sessionId.set(null);
         this.loading.set(false);
         if (!allowed) return;
         this.loading.set(true);
         const request = this.admin.previewGlobalEventPage(coreId, editionId, date).subscribe({
-          next: result => { this.result.set(result); this.loading.set(false); },
+          next: result => {
+            const page = result.page;
+            const city = page?.editions.find(city => city.id === page.selectedEditionId);
+            if (date === undefined && page && city) {
+              const preferred = selectUpcomingOrLatestDate(page.globalDates.filter(day =>
+                day.cities.some(row => row.editionId === city.id && row.includedInPreview)).map(day => day.date),
+              getTodayIso(new Date(), city.timezone));
+              if (preferred !== null && preferred !== page.selectedDate) {
+                this.selectedEditionId.set(city.id);
+                this.selectedDate.set(preferred);
+                return;
+              }
+            }
+            this.result.set(result);
+            this.loading.set(false);
+          },
           error: (error: unknown) => {
             this.loading.set(false);
-            this.errorMessage.set(resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification));
+            this.error.set(error);
+            this.toast.danger({ summary: this.copy().failed,
+              detail: this.errorFields().find(field => field.key === 'message')?.value });
           },
         });
         onCleanup(() => request.unsubscribe());

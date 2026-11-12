@@ -4,7 +4,7 @@ import type {
 } from '../../../../core/interfaces/i-admin-global-event';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
-import { sameSchedule, sameScheduleBlocks } from './event-global-schedule-state';
+import { sameSchedule, sameScheduleBlocks, type GlobalScheduleBlocker } from './event-global-schedule-state';
 
 export interface GlobalBaseTimeBlocksCommand extends EventGlobalBaseTimeBlocksCommand {
   baseline: AdminGlobalCalendarResult;
@@ -21,12 +21,13 @@ export function assertBaseCalendar(core: IEventCoreDetail, calendar: AdminGlobal
   'globalBaseTimeBlocks', 'the canonical calendar with unique block identities and numeric revisions');
 }
 
-export function canEditBaseTimeBlocks(core: IEventCoreDetail, calendar: AdminGlobalCalendarResult): boolean {
-  return calendar.calendarLifecycle === 'global' && !core.isActive && !core.hasPublicPage && calendar.pendingDraft === null &&
-    calendar.draftRevision === 0 && calendar.cities.every(city => !city.isActive) &&
-    calendar.globalDates.every(day => day.cityOccurrences.every(city => !city.protected && !city.publishedAt &&
-      !city.unlinkedSameDate && (city.occurrenceStatus === null || city.occurrenceStatus === 'planned'))) &&
-    calendar.datedTimeBlocks.every(day => day.source !== 'published_snapshot' && day.cities.every(city => !city.publishedSnapshot));
+export function baseTimeBlocksBlocker(core: IEventCoreDetail, calendar: AdminGlobalCalendarResult): GlobalScheduleBlocker | null {
+  if (calendar.calendarLifecycle !== 'global' ||
+    calendar.globalDates.some(day => day.cityOccurrences.some(city => city.protected || city.publishedAt ||
+      city.unlinkedSameDate || (city.occurrenceStatus !== null && city.occurrenceStatus !== 'planned'))) ||
+    calendar.datedTimeBlocks.some(day => day.source === 'published_snapshot' || day.cities.some(city => city.publishedSnapshot))) return 'protected';
+  if (core.isActive || core.hasPublicPage || calendar.cities.some(city => city.isActive)) return 'active';
+  return calendar.pendingDraft !== null || calendar.draftRevision !== 0 ? 'pendingDraft' : null;
 }
 
 export function assertBasePreview(preview: AdminGlobalBaseTimeBlocksPreview, command: EventGlobalBaseTimeBlocksCommand): void {

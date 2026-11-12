@@ -32,10 +32,10 @@
       @if (cover.needsReconciliation()) {
         <p-message severity="warn" role="status">{{ coverCopy().refreshRequired }}</p-message>
       }
-      @if (creating || (metadata.isGlobal() && !loadedCore?.archived)) {
+      @if (creating || !loadedCore?.archived) {
         @if (creating || globalDraft.calendar()) {
           <app-event-global-steps [activeStep]="globalDraft.activeStep()" [reachedStep]="creating ? globalDraft.reachedStep() : 6"
-            [disabled]="navigationLocked() || cover.dirty()" [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
+            [disabled]="navigationLocked() || cover.dirty()" [errorSteps]="diagnosticSteps()" [stepContent]="stepContent" (stepSelected)="goToStep($event)" />
           <ng-template #stepContent>
             <div class="flex-col-start-stretch gap-md w-100 min-w-0">
               @if (creating) {
@@ -61,7 +61,8 @@
                       @if (metadata.canEditCore()) { <ng-container [ngTemplateOutlet]="coreForm" /> }
                       @else if (globalDraft.policy(); as policy) {
                         @if (metadata.edition(); as edition) {
-                          <app-event-global-draft-summary [step]="1" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                          <app-event-global-draft-summary [step]="1" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy"
+                            [fieldErrors]="diagnosticResult()?.fieldErrors ?? []" />
                         }
                       }
                       <app-event-core-cover [disabled]="saveChanges.dirty() || saveChanges.pending() || saveChanges.busy()" (saved)="loadCore()" />
@@ -69,12 +70,15 @@
                     @case (2) {
                       <app-event-core-editions [core]="loadedCore" [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
                         [addCityDisabledReason]="saveChanges.dirty() ? 'metadata' : navigationLocked() ? 'schedule' : null"
-                        (cityAdded)="loadCore()" />
+                        [fieldErrors]="diagnosticIssues(['editionDrafts'])" (cityAdded)="loadCore()" />
                       @if (selectedMainEdition() && metadata.canEditEdition()) {
                         <div class="mg-form flex-col-start-stretch gap-sm w-100" [formGroup]="metadata.editionForm">
-                          <section id="event-main-edition" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
+                          <section id="event-main-edition" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0"
+                            [class.border-danger]="diagnosticIssues(['editionDrafts'], calendar.mainEditionId).length > 0">
                             <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().location }}</h2>
-                            <app-event-global-city-fields [fields]="metadata.editionForm.controls" idPrefix="main-edition" [timezones]="metadata.timezones()" />
+                            <app-event-global-diagnostic-messages [issues]="diagnosticIssues(['editionDrafts'], calendar.mainEditionId)" />
+                            <app-event-global-city-fields [fields]="metadata.editionForm.controls" idPrefix="main-edition" [timezones]="metadata.timezones()"
+                              [validationAttempted]="diagnosticIssues(['editionDrafts'], calendar.mainEditionId).length > 0" />
                             @if ((metadata.editionForm.controls.venueName.touched && metadata.editionForm.controls.venueName.invalid) ||
                               (metadata.editionForm.controls.venueAddress.touched && metadata.editionForm.controls.venueAddress.invalid)) {
                               <small class="mg-contact-error" role="alert">{{ i18n.commonForm().invalid }}</small>
@@ -83,27 +87,34 @@
                         </div>
                       } @else if (globalDraft.selectedEdition(); as edition) {
                         @if (globalDraft.policy(); as policy) {
-                          <app-event-global-draft-summary [step]="2" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy" />
+                          <app-event-global-draft-summary [step]="2" [core]="loadedCore" [edition]="edition" [calendar]="calendar" [policy]="policy"
+                            [fieldErrors]="diagnosticResult()?.fieldErrors ?? []" />
                         }
                       }
                     }
                     @case (3) {
-                      <app-event-global-schedule-editor />
-                      <app-event-global-base-time-blocks-editor />
-                      <app-event-dated-blocks-editor />
+                      @let issues = diagnosticIssues(['selectedDate', 'calendarDraft']);
+                      <section id="global-event-schedule-diagnostics" tabindex="-1" class="flex-col-start-stretch gap-md w-100 min-w-0"
+                        [class.border]="issues.length > 0" [class.border-danger]="issues.length > 0" [class.p-sm]="issues.length > 0">
+                        <app-event-global-diagnostic-messages [issues]="issues" />
+                        <app-event-global-schedule-editor />
+                        <app-event-global-base-time-blocks-editor />
+                        <app-event-dated-blocks-editor />
+                      </section>
                     }
-                    @case (4) { <app-event-global-policy-editor /> }
+                    @case (4) { <app-event-global-policy-editor [fieldErrors]="diagnosticIssues(['policy', 'cityOverrides'])" /> }
                     @case (5) {
                       <app-event-global-program [coreId]="loadedCore.id" [core]="loadedCore" [calendar]="calendar" [disabled]="programBlocked()" />
                     }
                     @case (6) {
                       <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="programBlocked()"
+                        [fieldErrors]="diagnosticResult()?.fieldErrors ?? []" (diagnosticsInvalidated)="invalidateDiagnostics()"
                         (navigateToStep)="goToStep($event)" (published)="acceptPublication($event)">
                         <app-event-global-save-summary summary-save-actions [disabled]="navigationLocked() || cover.dirty() || globalDraft.cityEditing()"
                           (navigateToStep)="goToStep($event)" (saved)="loadCore()" (discard)="discardEditChanges()" />
                         @if (globalDraft.policy() && !saveChanges.dirty() && !saveChanges.pending()) {
                           <app-event-global-diagnostics summary-validation [coreId]="loadedCore.id" [cities]="calendar.cities"
-                            [disabled]="programBlocked()" (navigateToSection)="goToDiagnosticSection($event)" />
+                            [disabled]="programBlocked()" (previewChange)="acceptDiagnostics($event)" (navigateToSection)="goToDiagnosticSection($event)" />
                         }
                       </app-event-global-saved-summary>
                     }
@@ -135,17 +146,7 @@
         </div>
       } @else if (loadedCore) {
         <p-message severity="info" role="status">{{ i18n.metadata().readOnly }}</p-message>
-        <app-event-core-editions [core]="loadedCore" [readOnly]="true" [selectedEditionId]="history.selectedEditionId()"
-          [selectionDisabled]="history.loading()" (editionSelected)="selectHistoryEdition($event)" />
-        @if (history.loading()) {
-          <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
-        } @else if (history.error() !== null) {
-          <p-message severity="error" role="alert">{{ i18n.page().loadErrorTitle }}</p-message>
-          <p-button type="button" size="small" severity="secondary" [label]="i18n.commonActions().retry" (onClick)="history.refresh()" />
-        } @else if (history.edition(); as edition) {
-          <app-event-edition-summary [core]="loadedCore" [edition]="edition" [timeline]="history.timeline()"
-            (reloadTimeline)="history.refresh()" />
-        }
+        <app-event-global-saved-summary [coreId]="loadedCore.id" [readOnly]="true" />
         <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
           [label]="i18n.commonActions().cancel" (onClick)="goBack()" />
       }
@@ -154,16 +155,21 @@
 </section>
 
 <ng-template #coreForm>
+  @let issues = diagnosticIssues(['coreDraft']);
+  @let attempted = issues.length > 0;
   <div class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form">
-    <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0">
+    <section id="global-event-core" tabindex="-1" class="mg-card flex-col-start-stretch gap-sm px-md py-sm w-100 min-w-0"
+      [class.border-danger]="attempted">
       <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.fields().coreSectionTitle }}</h2>
+      <app-event-global-diagnostic-messages [issues]="issues" />
       <div class="mg-grid grid-2-cols grid-1-cols-sm gap-sm">
         <div class="flex-col-start-stretch gap-xs w-100">
           <label for="event-core-name">{{ i18n.commonLabels().name }}</label>
           <input class="w-100" pInputText pSize="small" id="event-core-name" formControlName="name" autocomplete="off" [maxlength]="140"
-            [attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
-            [attr.aria-describedby]="form.controls.name.touched && form.controls.name.invalid ? 'event-core-name-error' : null" />
-          @if (form.controls.name.touched && form.controls.name.invalid) {
+            [class.p-invalid]="form.controls.name.invalid && (form.controls.name.touched || attempted)"
+            [attr.aria-invalid]="(form.controls.name.touched || attempted) && form.controls.name.invalid"
+            [attr.aria-describedby]="(form.controls.name.touched || attempted) && form.controls.name.invalid ? 'event-core-name-error' : null" />
+          @if ((form.controls.name.touched || attempted) && form.controls.name.invalid) {
             <small id="event-core-name-error" class="mg-contact-error">
               {{ form.controls.name.hasError('maxlength') ? i18n.commonForm().maxLength.replace('{{max}}', '140') : i18n.commonForm().required }}
             </small>
@@ -179,8 +185,9 @@
         <div class="flex-col-start-stretch gap-xs w-100">
           <label for="event-core-short-description">{{ i18n.commonLabels().shortDescription }}</label>
           <textarea class="w-100" pTextarea pSize="small" id="event-core-short-description" formControlName="shortDescription" rows="3" [maxlength]="500"
-            [attr.aria-invalid]="form.controls.shortDescription.touched && form.controls.shortDescription.invalid"></textarea>
-          @if (form.controls.shortDescription.touched && form.controls.shortDescription.invalid) {
+            [class.p-invalid]="form.controls.shortDescription.invalid && (form.controls.shortDescription.touched || attempted)"
+            [attr.aria-invalid]="(form.controls.shortDescription.touched || attempted) && form.controls.shortDescription.invalid"></textarea>
+          @if ((form.controls.shortDescription.touched || attempted) && form.controls.shortDescription.invalid) {
             <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '500') }}</small>
           }
           <app-character-counter [value]="form.controls.shortDescription.value" [limit]="500" />
@@ -188,8 +195,9 @@
         <div class="flex-col-start-stretch gap-xs w-100">
           <label for="event-core-long-description">{{ i18n.commonLabels().longDescription }}</label>
           <textarea class="w-100" pTextarea pSize="small" id="event-core-long-description" formControlName="longDescription" rows="6" [maxlength]="12000"
-            [attr.aria-invalid]="form.controls.longDescription.touched && form.controls.longDescription.invalid"></textarea>
-          @if (form.controls.longDescription.touched && form.controls.longDescription.invalid) {
+            [class.p-invalid]="form.controls.longDescription.invalid && (form.controls.longDescription.touched || attempted)"
+            [attr.aria-invalid]="(form.controls.longDescription.touched || attempted) && form.controls.longDescription.invalid"></textarea>
+          @if ((form.controls.longDescription.touched || attempted) && form.controls.longDescription.invalid) {
             <small class="mg-contact-error">{{ i18n.commonForm().maxLength.replace('{{max}}', '12000') }}</small>
           }
           <app-character-counter [value]="form.controls.longDescription.value" [limit]="12000" />

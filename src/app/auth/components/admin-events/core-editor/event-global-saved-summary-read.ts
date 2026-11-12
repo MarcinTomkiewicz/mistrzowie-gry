@@ -1,4 +1,5 @@
 import { forkJoin, map, switchMap } from 'rxjs';
+import { EventProgramItemStatus } from '../../../../core/enums/event';
 
 import type { AdminEventTimeline, AdminEventTimelineOccurrence } from '../../../../core/interfaces/i-admin-event-timeline';
 import type { AdminEventPolicyDraft } from '../../../../core/interfaces/i-admin-event-policy';
@@ -102,6 +103,7 @@ function savedProgramDates(calendar: AdminGlobalCalendarResult, city: SavedCity,
 function countProgram(occurrence: AdminEventTimelineOccurrence): { pending: number; confirmed: number } {
   const counts = { pending: 0, confirmed: 0 };
   for (const row of occurrence.rows) {
+    if (row.programStatus === EventProgramItemStatus.Withdrawn || row.programStatus === EventProgramItemStatus.Rejected) continue;
     if (row.programItemId !== null || row.session !== null || (row.source === 'manual' && row.activity !== null)) {
       counts[row.status]++;
     }

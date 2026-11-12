@@ -45,7 +45,7 @@ export function canAddManualProgram(context: ManualProgramContext): boolean {
   const local = blocks?.cities.find(city => city.editionId === edition.id);
   return calendar.coreId === core.id && calendar.calendarLifecycle === 'global' &&
     edition.eventCoreId === core.id && !!timeline && timeline.eventCoreId === core.id && timeline.eventId === edition.id &&
-    !core.isActive && !core.hasPublicPage && !edition.isActive && !edition.currentlyPublic && !edition.isStaffingConverted &&
+    !core.archived && !core.isActive && !core.hasPublicPage && !edition.isActive && !edition.currentlyPublic &&
     occurrence.status === EventOccurrenceStatus.Planned && !occurrence.publishedAt && occurrence.activeParticipantCount === 0 &&
     !!city && city.decision === 'included' && !city.protected && !city.publishedAt && !city.unlinkedSameDate &&
     timeline.occurrences.some(row => row.occurrenceId === occurrence.id && row.date === occurrence.date &&

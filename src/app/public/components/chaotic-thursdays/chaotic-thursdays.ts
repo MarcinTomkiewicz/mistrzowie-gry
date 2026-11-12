@@ -1,4 +1,5 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -7,10 +8,8 @@ import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { ButtonModule } from 'primeng/button';
 
 import { buildSiteUrl, VENUE_COUNTRY } from '../../../core/config/site';
-import { IEventProgramItemWithDetails } from '../../../core/interfaces/i-event-program-item';
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
-import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
-import { ISessionWithRelations } from '../../../core/interfaces/i-session';
+import type { PublicEventGmProfile } from '../../../core/types/public-event-program';
 import { GmRead } from '../../../core/reads/gm/gm-read';
 import { ResponseStatus } from '../../../core/services/response-status/response-status';
 import { Seo } from '../../../core/services/seo/seo';
@@ -52,13 +51,14 @@ import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
   templateUrl: './chaotic-thursdays.html',
   styleUrl: './chaotic-thursdays.scss',
   providers: [
-    provideTranslocoScope('chaoticThursdays', 'common'),
+    provideTranslocoScope('chaoticThursdays', 'eventPage', 'common'),
     ChaoticThursdaysFacade,
   ],
 })
 export class ChaoticThursdays {
   private readonly facade = inject(ChaoticThursdaysFacade);
   private readonly gmRead = inject(GmRead);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
@@ -71,12 +71,10 @@ export class ChaoticThursdays {
   );
   readonly sparkDice = CHAOTIC_SPARK_DICE;
 
-  readonly selectedProfile = signal<IGmPublicProfile | null>(null);
+  readonly selectedProfile = signal<PublicEventGmProfile | null>(null);
   readonly isGmDialogVisible = signal(false);
 
-  readonly selectedSession = signal<ISessionWithRelations | null>(null);
-  readonly selectedSessionProgramItem =
-    signal<IEventProgramItemWithDetails | null>(null);
+  readonly selectedCard = signal<IEventSlotCardVm | null>(null);
   readonly isSessionDialogVisible = signal(false);
 
   private readonly applySeoEffect = effect(() => {
@@ -116,26 +114,19 @@ export class ChaoticThursdays {
   });
 
   onSlotSelect(slot: IEventSlotCardVm): void {
-    const programItem = this.findProgramItemById(slot.id);
-    const session = programItem?.session ?? null;
-
-    if (!session) {
-      return;
-    }
-
-    this.selectedSessionProgramItem.set(programItem);
-    this.selectedSession.set(session);
+    if (!slot.canOpenDetails || !slot.sessionDetails) return;
+    this.selectedCard.set(slot);
     this.isSessionDialogVisible.set(true);
   }
 
   onGmSelect(slot: IEventSlotCardVm): void {
     const gmProfileId = normalizeText(slot.gmProfileId);
-
-    if (!gmProfileId) {
+    const edition = this.facade.selectedEdition();
+    if (!gmProfileId || !edition) {
       return;
     }
 
-    this.gmRead.getProfileById(gmProfileId).subscribe({
+    this.gmRead.getPublicEventProfile(edition.id, gmProfileId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {
         if (!profile) {
           this.toast.danger({
@@ -169,25 +160,8 @@ export class ChaoticThursdays {
     this.isSessionDialogVisible.set(visible);
 
     if (!visible) {
-      this.selectedSession.set(null);
-      this.selectedSessionProgramItem.set(null);
+      this.selectedCard.set(null);
     }
-  }
-
-  private findProgramItemById(
-    programItemId: string | null | undefined,
-  ): IEventProgramItemWithDetails | null {
-    const normalizedId = normalizeText(programItemId);
-
-    if (!normalizedId) {
-      return null;
-    }
-
-    return (
-      this.facade
-        .selectedProgramItems()
-        .find((item) => item.id === normalizedId) ?? null
-    );
   }
 
   private buildStructuredData(): ISeoStructuredDataNode | undefined {

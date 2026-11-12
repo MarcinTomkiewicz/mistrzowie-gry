@@ -1,10 +1,10 @@
-import type { EventTimelineOrigin } from '../../interfaces/i-admin-event-timeline';
+import type { TimelineRow } from '../../interfaces/i-admin-event-timeline';
 import type { MyStaffingCandidate } from '../../interfaces/my-staffing-realization';
 
 export type EventAdminTimelineCopy = {
   globalProgram: { empty: string; saveFirst: string; pendingCalendar: string; otherOperation: string; unavailable: string };
   schedule: {
-    title: string; track: string; hint: string; assignmentStatus: string; timeUnavailable: string;
+    title: string; track: string; hint: string; assignmentStatus: string; history: string; eventScoped: string;
   };
   manualProgram: {
     unavailable: string; block: string; position: string; discardConfirmQuestion: string; discardConfirm: string; saved: string; failed: string;
@@ -35,12 +35,11 @@ export type EventAdminTimelineCopy = {
   unassigned: string;
   noHost: string;
   loadFailed: string;
-  eventHours: string;
   participationEnded: string;
   participantsEmpty: string;
   participantRemoveConfirm: string;
   participantRemoveFailed: string;
   participantsRefreshFailed: string;
-  sources: Record<EventTimelineOrigin, string>;
+  sources: Record<TimelineRow['source'], string>;
   candidateStates: Record<Exclude<MyStaffingCandidate['state'], 'pending'>, string>;
 };

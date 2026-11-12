@@ -10,6 +10,18 @@ export function isDefiniteEventAdminRpcRejection(error: unknown): error is RpcEr
     ['42501', '22023', '22P02', '40001', '40P01', '55000', 'P0001', 'P0002'].includes(error.code));
 }
 
+export function presentEventGlobalPreviewError(error: unknown) {
+  if (error instanceof RpcError) {
+    return (['code', 'message', 'details', 'hint'] as const)
+      .filter(key => error[key])
+      .map(key => ({ key, value: error[key] }));
+  }
+  if (error instanceof Error || typeof error === 'string') {
+    return [{ key: 'message' as const, value: typeof error === 'string' ? error : error.message }];
+  }
+  return [];
+}
+
 export function resolveEventCoreAdminErrorMessage(
   error: unknown,
   copy: CoreRpcErrorsCopy,

@@ -9,9 +9,9 @@ import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
-import { assertBaseCalendar, assertBasePreview, assertBaseSave, canEditBaseTimeBlocks,
+import { assertBaseCalendar, assertBasePreview, assertBaseSave, baseTimeBlocksBlocker,
   type GlobalBaseTimeBlocksCommand, matchesBaseTimeBlocks } from './event-global-base-time-blocks-state';
-import { sameScheduleBlocks } from './event-global-schedule-state';
+import { sameScheduleBlocks, type GlobalScheduleBlocker } from './event-global-schedule-state';
 
 @Injectable()
 export class EventGlobalBaseTimeBlocksController {
@@ -33,11 +33,14 @@ export class EventGlobalBaseTimeBlocksController {
   readonly dirty = computed(() => { this.formEvents(); return this.form.dirty; });
   readonly isBusy = computed(() => this.operation() !== null);
   readonly locked = computed(() => this.isBusy() || this.dirty() || this.conflicted() || this.readbackPending());
-  readonly canEdit = computed(() => {
+  readonly contextBlocker = computed(() => {
     const core = this.core();
     const calendar = this.calendar();
-    return !this.blocked() && core !== null && calendar !== null && canEditBaseTimeBlocks(core, calendar);
+    return core && calendar ? baseTimeBlocksBlocker(core, calendar) : null;
   });
+  readonly blockingReason = computed<GlobalScheduleBlocker | null>(() => this.contextBlocker() ??
+    (this.blocked() || this.isBusy() ? 'otherOperation' : null));
+  readonly canEdit = computed(() => !this.blocked() && this.core() !== null && this.calendar() !== null && this.contextBlocker() === null);
   readonly canPreview = computed(() => this.canEdit() && !this.isBusy() && this.dirty() && !this.conflicted() && !this.readbackPending());
   readonly canSave = computed(() => this.canPreview() && this.command() !== null && this.preview()?.valid === true &&
     this.preview()?.status === 'preview_ready' && this.preview()?.changed !== false);

@@ -63,7 +63,7 @@
     <div class="flex-row-start-center gap-md">
       <span class="pi pi-cash square-11 flex-none" aria-hidden="true"></span>
       <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.commonLabels().price }}</h2>
-      <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="i18n.commonLabels().price + ': ' + copy.help" [text]="copy.priceHint" />
+      <app-context-help [ariaLabel]="i18n.commonLabels().price + ': ' + copy.help" [text]="copy.priceHint" />
     </div>
     <app-event-price-fields [amount]="controls.priceAmount" [currency]="controls.priceCurrency" [basis]="controls.priceBasis"
       idPrefix="global-event-price" [amountError]="i18n.commonForm().invalid" />
@@ -89,26 +89,22 @@
       @if (controls.sessionCapacityCeiling.enabled) {
         <div class="flex-col-start-stretch gap-xs flex-none w-px-300 max-w-full min-w-0">
           <div class="flex-row-start-center gap-xs">
-            <div class="flex-col-start-stretch gap-xs flex-1 min-w-0">
-              <label for="global-event-session-capacity">{{ copy.sessionCapacityCeiling }}</label>
-              <p-inputnumber inputId="global-event-session-capacity" formControlName="sessionCapacityCeiling" [min]="1"
-                size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
-            </div>
-            <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="copy.sessionCapacityCeiling + ': ' + copy.help" [text]="copy.sessionCapacityHint" />
+            <label for="global-event-session-capacity">{{ copy.sessionCapacityCeiling }}</label>
+            <app-context-help [ariaLabel]="copy.sessionCapacityCeiling + ': ' + copy.help" [text]="copy.sessionCapacityHint" />
           </div>
+          <p-inputnumber inputId="global-event-session-capacity" formControlName="sessionCapacityCeiling" [min]="1"
+            size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
           @if (controls.sessionCapacityCeiling.touched && controls.sessionCapacityCeiling.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
         </div>
       }
       @if (controls.wholeEventCapacity.enabled) {
         <div class="flex-col-start-stretch gap-xs flex-none w-px-300 max-w-full min-w-0">
           <div class="flex-row-start-center gap-xs">
-            <div class="flex-col-start-stretch gap-xs flex-1 min-w-0">
-              <label for="global-event-whole-capacity">{{ copy.wholeEventCapacity }}</label>
-              <p-inputnumber inputId="global-event-whole-capacity" formControlName="wholeEventCapacity" [min]="1"
-                size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
-            </div>
-            <app-context-help icon="pi pi-read" styleClass="" [ariaLabel]="copy.wholeEventCapacity + ': ' + copy.help" [text]="copy.wholeEventCapacityHint" />
+            <label for="global-event-whole-capacity">{{ copy.wholeEventCapacity }}</label>
+            <app-context-help [ariaLabel]="copy.wholeEventCapacity + ': ' + copy.help" [text]="copy.wholeEventCapacityHint" />
           </div>
+          <p-inputnumber inputId="global-event-whole-capacity" formControlName="wholeEventCapacity" [min]="1"
+            size="small" [useGrouping]="false" inputStyleClass="w-100" [placeholder]="copy.noAdditionalLimit" class="w-100" />
           @if (controls.wholeEventCapacity.touched && controls.wholeEventCapacity.invalid) { <small class="mg-contact-error">{{ i18n.commonForm().invalid }}</small> }
         </div>
       }

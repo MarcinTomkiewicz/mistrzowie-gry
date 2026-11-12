@@ -4,7 +4,7 @@ import type {
 import type { SessionSourceKind } from '../types/session-source';
 import type { MyStaffingCandidate } from './my-staffing-realization';
 
-export type EventTimelineOrigin = 'staffing' | 'manual' | 'legacy_host';
+export type EventTimelineOrigin = 'staffing' | 'manual';
 export type TimelineStatus = 'confirmed' | 'pending';
 
 export interface TimelineHost {
@@ -12,7 +12,7 @@ export interface TimelineHost {
   displayName: string;
 }
 
-export interface LegacyTimelineSession {
+export interface EventScopedTimelineSession {
   title: string | null;
   systemId: string | null;
   systemName: string | null;
@@ -20,27 +20,28 @@ export interface LegacyTimelineSession {
   effectiveCapacity: number | null;
 }
 
-export interface TimelineSession extends LegacyTimelineSession {
+export interface TimelineSession extends EventScopedTimelineSession {
   gmDeclaredMaxPlayers: unknown;
   playerCapacityOverride: number | null;
 }
 
 export interface TimelineRowBase {
-  source: EventTimelineOrigin;
+  source: EventTimelineOrigin | 'event_scoped';
+  timeScope: 'event' | 'timed';
   slotId: string | null;
   programItemId: string | null;
   sourceFinalPlanItemId: string | null;
   sourceSessionId: string | null;
   sourceKind: SessionSourceKind | null;
-  startTime: string;
-  endTime: string;
+  startTime: string | null;
+  endTime: string | null;
   slotLabel: string | null;
   position: number | null;
   displayOrder: number | null;
   status: TimelineStatus;
   programStatus: EventProgramItemStatus | null;
   host: TimelineHost | null;
-  session: LegacyTimelineSession | null;
+  session: EventScopedTimelineSession | null;
   editable: boolean;
   activeBookings: number;
   updatedAt: string;
@@ -50,6 +51,9 @@ export interface TimelineRowBase {
 
 export interface StaffingTimelineRow extends TimelineRowBase {
   source: 'staffing';
+  timeScope: 'timed';
+  startTime: string;
+  endTime: string;
   session: TimelineSession | null;
   slotId: string;
   sourceFinalPlanItemId: string | null;
@@ -76,6 +80,9 @@ export interface TimelineActivity {
 
 interface ManualTimelineRowBase extends TimelineRowBase {
   source: 'manual';
+  timeScope: 'timed';
+  startTime: string;
+  endTime: string;
   session: TimelineSession | null;
   slotId: string;
   sourceFinalPlanItemId: null;
@@ -100,9 +107,11 @@ export type ManualTimelineRow = ManualTimelineRowBase & (
       sourceKind: null; sourceSessionId: null; programStatus: null; status: 'pending' }
 );
 
-// Legacy hours describe the Edition, rather than an individual session.
-export interface LegacyHostTimelineRow extends TimelineRowBase {
-  source: 'legacy_host';
+export interface EventScopedTimelineRow extends TimelineRowBase {
+  source: 'event_scoped';
+  timeScope: 'event';
+  startTime: null;
+  endTime: null;
   slotId: null;
   sourceFinalPlanItemId: null;
   sourceKind: SessionSourceKind;
@@ -110,10 +119,10 @@ export interface LegacyHostTimelineRow extends TimelineRowBase {
   programStatus: EventProgramItemStatus;
   slotLabel: null;
   host: TimelineHost;
-  session: LegacyTimelineSession;
+  session: EventScopedTimelineSession;
   candidateState?: never;
   participationEnded?: never;
-  frozen: false;
+  frozen: boolean;
   editable: false;
   participantSignupSupported: false;
   activity?: never;
@@ -121,7 +130,7 @@ export interface LegacyHostTimelineRow extends TimelineRowBase {
   endDayOffset?: never;
 }
 
-export type TimelineRow = StaffingTimelineRow | ManualTimelineRow | LegacyHostTimelineRow;
+export type TimelineRow = StaffingTimelineRow | ManualTimelineRow | EventScopedTimelineRow;
 
 export interface AdminEventTimelineOccurrence {
   occurrenceId: string;

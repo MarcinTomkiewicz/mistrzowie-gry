@@ -2,7 +2,6 @@ import type {
   PublicEventConfirmedSession,
   PublicEventProgramEntry,
   PublicEventProgramWireEntry,
-  PublicEventSession,
 } from '../../types/public-event-program';
 import { SessionDifficultyLevel } from '../../types/sessions';
 import {
@@ -44,7 +43,6 @@ const sessionFieldReaders = {
   allowsScenarioCustomization: readEdgeNullableBoolean,
 };
 
-const readLegacySession = createStrictEdgeObjectReader(sessionFieldReaders);
 const readConfirmedSession = createStrictEdgeObjectReader({
   ...sessionFieldReaders,
   gmDeclaredMaxPlayers: readEdgeNullableInteger,
@@ -91,6 +89,10 @@ export function decodePublicEventProgram(
   entries: readonly (PublicEventProgramWireEntry | PublicEventProgramEntry)[],
 ): PublicEventProgramEntry[] {
   readEdgeArray(entries, 'publicEventProgram');
+  const identities = entries.flatMap(entry => entry.programItemId !== null ? [entry.programItemId]
+    : 'activityId' in entry ? [entry.activityId] : []);
+  assertEdgeContract(new Set(identities).size === identities.length,
+    'publicEventProgram.identities', 'unique programme item and activity identities');
   return entries.map((entry, index): PublicEventProgramEntry => {
     const path = `publicEventProgram[${index}]`;
     const object = readEdgeObject(entry, path);
@@ -112,15 +114,14 @@ export function decodePublicEventProgram(
       return entry;
     }
 
-    assertEdgeContract(typeof entry.slot.startTime === 'string' && typeof entry.slot.endTime === 'string',
-      `${path}.slot`, 'explicit hours for a confirmed programme entry');
     if (entry.programItemId === null) {
       assertProgramKeys(object, ['kind', 'status', 'source', 'activityId', 'programItemId', 'occurrenceId', 'occurrenceDate',
         'displayOrder', 'host', 'session', 'activity', 'slot', 'canSignup', 'participantSignupSupported'], path);
       readEdgeUuid(entry.activityId, `${path}.activityId`);
       readEdgeInteger(entry.displayOrder, `${path}.displayOrder`);
       assertEdgeContract(entry.kind === 'confirmed' && entry.status === 'confirmed' && entry.source === 'manual_activity' &&
-        entry.host === null && entry.session === null && entry.canSignup === false && entry.participantSignupSupported === false,
+        entry.host === null && entry.session === null && entry.canSignup === false && entry.participantSignupSupported === false &&
+        entry.slot.startTime !== null && entry.slot.endTime !== null,
       path, 'a confirmed non-session activity without signup');
       const activity = createStrictEdgeObjectReader({
         kindKey: readEdgeString, kindLabel: readEdgeString, title: readEdgeString, description: readEdgeString,
@@ -134,23 +135,24 @@ export function decodePublicEventProgram(
     }
 
     assertProgramKeys(object, ['programItemId', 'occurrenceId', 'occurrenceDate', 'displayOrder', 'host', 'slot', 'session',
-      ...(entry.kind === 'confirmed' ? ['kind', 'status'] : [])], path,
-    entry.kind === 'confirmed' ? ['canSignup', 'participantSignupSupported'] : []);
+      'kind', 'status', 'timeScope'], path, ['canSignup', 'participantSignupSupported']);
     readEdgeUuid(entry.programItemId, `${path}.programItemId`);
     const host = createStrictEdgeObjectReader({ userId: readEdgeUuid, displayName: readEdgeNullableString })(entry.host, `${path}.host`);
-    if (entry.kind === 'confirmed') {
-      assertEdgeContract(entry.status === 'confirmed', `${path}.status`, 'confirmed');
-      for (const key of ['canSignup', 'participantSignupSupported']) {
-        if (Object.hasOwn(object, key)) readEdgeLiteral(object[key], `${path}.${key}`, [false]);
-      }
-      const session: PublicEventConfirmedSession = readConfirmedSession(entry.session, `${path}.session`);
-      assertEdgeContract(!!session.title?.trim(), `${path}.session.title`, 'non-blank text');
-      return { ...entry, host, session };
+    assertEdgeContract(entry.kind === 'confirmed' && entry.status === 'confirmed', `${path}.status`, 'confirmed');
+    if (entry.timeScope === 'event') {
+      assertProgramKeys(entry.slot, ['label', 'startTime', 'endTime'], `${path}.slot`);
+      assertEdgeContract(entry.slot.label === null && entry.slot.startTime === null && entry.slot.endTime === null &&
+        entry.canSignup === false && entry.participantSignupSupported === false,
+      `${path}.eventScoped`, 'an untimed confirmed session without a slot or participant signup');
+    } else {
+      assertEdgeContract(entry.timeScope === 'timed' && entry.slot.startTime !== null && entry.slot.endTime !== null,
+        `${path}.timeScope`, 'a timed confirmed session with real hours');
     }
-
-    assertProgramKeys(entry.slot, ['label', 'startTime', 'endTime'], `${path}.slot`);
-    assertEdgeContract(entry.slot.label === null, `${path}.slot.label`, 'the Legacy slot without a label');
-    const session: PublicEventSession = readLegacySession(entry.session, `${path}.session`);
+    for (const key of ['canSignup', 'participantSignupSupported']) {
+      if (Object.hasOwn(object, key)) readEdgeLiteral(object[key], `${path}.${key}`, [false]);
+    }
+    const session: PublicEventConfirmedSession = readConfirmedSession(entry.session, `${path}.session`);
+    assertEdgeContract(!!session.title?.trim(), `${path}.session.title`, 'non-blank text');
     return { ...entry, host, session };
   });
 }

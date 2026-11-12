@@ -11,7 +11,8 @@ import { EVENT_KEYS } from '../../../core/configs/events.config';
 import { EventOccurrenceStatus } from '../../../core/enums/event';
 import { IEventOccurrence } from '../../../core/interfaces/i-event-occurence';
 import { IPublicEventPage } from '../../../core/interfaces/i-event-page';
-import { IEventProgramItemWithDetails } from '../../../core/interfaces/i-event-program-item';
+import type { PublicEventProgramEntry } from '../../../core/types/public-event-program';
+import { assertEdgeContract } from '../../../core/utils/edge-contract';
 import { IOccurrenceSwitcherOption } from '../../../core/interfaces/i-occurrence-switcher';
 import { EventProgramRead } from '../../../core/reads/events/event-program-read';
 import { EventRead } from '../../../core/reads/events/event-read';
@@ -20,6 +21,7 @@ import {
   formatDateLabel,
   getEndOfNextMonthIso,
   getTodayIso,
+  selectUpcomingOrLatestDate,
 } from '../../../core/utils/date';
 
 @Injectable()
@@ -28,14 +30,13 @@ export class ChaoticThursdaysFacade {
   private readonly eventProgramRead = inject(EventProgramRead);
   private readonly eventRead = inject(EventRead);
 
-  private readonly rangeStartIso = getTodayIso();
   private readonly rangeEndIso = getEndOfNextMonthIso();
 
   readonly page = signal<IPublicEventPage | null>(null);
   readonly selectedEventId = signal<string | null>(null);
   readonly occurrences = signal<IEventOccurrence[]>([]);
   readonly programsByOccurrenceId = signal<
-    Map<string, IEventProgramItemWithDetails[]>
+    Map<string, PublicEventProgramEntry[]>
   >(new Map());
   readonly selectedOccurrenceIndex = signal(0);
   readonly isLoading = signal(false);
@@ -86,7 +87,7 @@ export class ChaoticThursdaysFacade {
     })),
   );
 
-  readonly selectedProgramItems = computed<IEventProgramItemWithDetails[]>(
+  readonly selectedProgramItems = computed<PublicEventProgramEntry[]>(
     () => {
       const occurrenceId = this.selectedOccurrence()?.id;
 
@@ -197,13 +198,15 @@ export class ChaoticThursdaysFacade {
     this.occurrencesRequest = this.eventRead
       .getOccurrencesInRange(
         edition.id,
-        this.rangeStartIso,
+        getTodayIso(new Date(), edition.timezone),
         this.rangeEndIso,
         [EventOccurrenceStatus.Published],
       )
       .subscribe({
         next: (occurrences) => {
           this.occurrences.set(occurrences);
+          const preferred = selectUpcomingOrLatestDate(occurrences.map(day => day.occurrenceDate), getTodayIso(new Date(), edition.timezone));
+          this.selectedOccurrenceIndex.set(Math.max(0, occurrences.findIndex(day => day.occurrenceDate === preferred)));
 
           if (!occurrences.length) {
             this.finishLoad();
@@ -230,12 +233,13 @@ export class ChaoticThursdaysFacade {
     this.programRequest = forkJoin(
       occurrences.map((occurrence) =>
         this.eventProgramRead
-          .getPublishedProgramItemsByOccurrenceId(occurrence.id)
+          .getPublicProgram(occurrence.eventId, occurrence.id)
           .pipe(
-            map((items) => ({
-              occurrenceId: occurrence.id,
-              items,
-            })),
+            map(({ entries }) => {
+              assertEdgeContract(entries.every(entry => entry.occurrenceDate === occurrence.occurrenceDate),
+                'publicEventProgram.date', 'the requested Occurrence date');
+              return { occurrenceId: occurrence.id, items: entries };
+            }),
           ),
       ),
     ).subscribe({

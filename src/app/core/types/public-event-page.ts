@@ -1,6 +1,5 @@
 import type { IEventOccurrence } from '../interfaces/i-event-occurence';
 import type { PublicEventProgramEntry } from './public-event-program';
-import type { ISystem } from '../interfaces/i-system';
 import type {
   IPublicEventEdition,
   IPublicEventPage,
@@ -17,5 +16,4 @@ export type PublicEventPageState =
       edition: IPublicEventEdition;
       occurrences: readonly PublicEventOccurrence[];
       program: readonly PublicEventProgramEntry[];
-      systems: readonly ISystem[];
     };

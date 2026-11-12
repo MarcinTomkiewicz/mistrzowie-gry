@@ -53,7 +53,7 @@
         <div class="flex-col-start-stretch gap-xs flex-none flex-grow-1-sm flex-shrink-1-sm w-px-150 max-w-full min-w-0">
           <div class="flex-row-start-center gap-xs">
             <label class="text-sm" [for]="idPrefix() + '-gm-' + index">{{ copy.requiredGmCount }}</label>
-            <app-context-help class="flex-none" icon="pi pi-read" styleClass="" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
+            <app-context-help class="flex-none" [ariaLabel]="copy.requiredGmCount + ': ' + copy.help" [text]="copy.requiredGmHint" />
           </div>
           <p-inputnumber [inputId]="idPrefix() + '-gm-' + index" formControlName="requiredGmCount" [min]="savedBase() ? 0 : 1"
             [max]="savedBase() ? 32767 : undefined"

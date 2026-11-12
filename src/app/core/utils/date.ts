@@ -14,8 +14,16 @@ export function getEndOfNextMonthIso(baseDate: Date = new Date()): string {
   return toIsoDate(new Date(baseDate.getFullYear(), baseDate.getMonth() + 2, 0));
 }
 
-export function getTodayIso(baseDate: Date = new Date()): string {
+export function getTodayIso(baseDate: Date = new Date(), timeZone?: string): string {
+  if (timeZone) {
+    return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(baseDate);
+  }
   return toIsoDate(baseDate);
+}
+
+export function selectUpcomingOrLatestDate(dates: readonly string[], fromDate: string): string | null {
+  const sorted = [...dates].sort();
+  return sorted.find(date => date >= fromDate) ?? sorted.at(-1) ?? null;
 }
 
 export function parseIsoDate(value: string | null | undefined): Date | null {

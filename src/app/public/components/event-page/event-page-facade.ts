@@ -24,6 +24,8 @@ import { Platform } from '../../../core/services/platform/platform';
 import type { PublicEventPageState } from '../../../core/types/public-event-page';
 import type { PublicEventGmProfileState } from '../../../core/types/public-event-program';
 import { formatTimeLabel, getTimeRangeBounds, parseTimeLabelToMinutes } from '../../../core/utils/time-format';
+import { getTodayIso, selectUpcomingOrLatestDate } from '../../../core/utils/date';
+import { assertEdgeContract } from '../../../core/utils/edge-contract';
 
 @Injectable()
 export class EventPageFacade {
@@ -63,6 +65,11 @@ export class EventPageFacade {
 
     const program = this.selectedProgram()
       .filter((entry) => entry.occurrenceDate === occurrence.occurrenceDate);
+    const eventHours = getTimeRangeBounds([{
+      startTime: formatTimeLabel(state.edition.startTime), endTime: formatTimeLabel(state.edition.endTime),
+    }]);
+    // Event-scoped sessions never borrow the Event window as their individual hours.
+    if (program.some(entry => entry.kind === 'confirmed' && 'timeScope' in entry && entry.timeScope === 'event')) return eventHours;
     const ranges = program.flatMap(({ slot }) => {
       const { startTime, endTime } = slot;
       if (startTime === null || endTime === null) return [];
@@ -85,10 +92,7 @@ export class EventPageFacade {
     // Date-only pending must not inherit Edition defaults as actual program hours.
     if (program.some((entry) => entry.kind === 'pending' && entry.slot.startTime === null)) return null;
 
-    return getTimeRangeBounds([{
-      startTime: formatTimeLabel(state.edition.startTime),
-      endTime: formatTimeLabel(state.edition.endTime),
-    }]);
+    return eventHours;
   });
 
   constructor() {
@@ -117,7 +121,7 @@ export class EventPageFacade {
     );
 
     if (this.platform.isBrowser && this.transferState.hasKey(stateKey)) {
-      this.pageState.set(this.transferState.get(stateKey, { kind: 'not-found' }));
+      this.acceptState(this.transferState.get(stateKey, { kind: 'not-found' }));
       this.transferState.remove(stateKey);
       return;
     }
@@ -131,7 +135,7 @@ export class EventPageFacade {
         }),
       )
       .subscribe((state) => {
-        this.pageState.set(state);
+        this.acceptState(state);
         if (!this.platform.isBrowser) this.transferState.set(stateKey, state);
       });
   }
@@ -177,11 +181,23 @@ export class EventPageFacade {
       occurrences: this.read.getPublicOccurrences(edition.id),
       program: this.programRead.getPublicProgram(edition.id),
     }).pipe(
-      map(({ occurrences, program }): PublicEventPageState => ({
-        kind: 'ready', page, edition, occurrences,
-        program: program.entries, systems: program.systems,
-      })),
+      map(({ occurrences, program }): PublicEventPageState => {
+        assertEdgeContract(new Set(occurrences.map(day => day.id)).size === occurrences.length &&
+          new Set(occurrences.map(day => day.occurrenceDate)).size === occurrences.length &&
+          program.entries.every(entry => occurrences.some(day => day.id === entry.occurrenceId && day.occurrenceDate === entry.occurrenceDate)),
+        'publicEventProgram.scope', 'unique public Occurrences and matching programme identities and dates');
+        return { kind: 'ready', page, edition, occurrences: [...occurrences].sort((a, b) => a.occurrenceDate.localeCompare(b.occurrenceDate)),
+          program: program.entries };
+      }),
     );
+  }
+
+  private acceptState(state: PublicEventPageState): void {
+    if (state.kind === 'ready') {
+      const date = selectUpcomingOrLatestDate(state.occurrences.map(day => day.occurrenceDate), getTodayIso(new Date(), state.edition.timezone));
+      this.occurrenceIndex.set(Math.max(0, state.occurrences.findIndex(day => day.occurrenceDate === date)));
+    }
+    this.pageState.set(state);
   }
 
   selectOccurrence(index: number): void {

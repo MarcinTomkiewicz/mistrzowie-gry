@@ -19,6 +19,7 @@ export class EventGlobalCityFields {
   readonly fields = input.required<EventGlobalCityControls>();
   readonly idPrefix = input.required<string>();
   readonly timezones = input.required<ISelectOption[]>();
+  readonly validationAttempted = input(false);
   protected readonly i18n = createEventCoreEditorI18n();
 
   protected timezoneOptions(): ISelectOption[] {

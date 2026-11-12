@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, output, signal, TemplateRef, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -8,7 +8,8 @@ import type { AdminGlobalCalendarResult } from '../../../../core/interfaces/i-ad
 import type {
   AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview,
 } from '../../../../core/interfaces/i-admin-global-event-preview';
-import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
+import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { presentEventGlobalPreviewError } from '../event-admin-errors';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 
@@ -16,19 +17,24 @@ import { EventGlobalDraftController } from './event-global-draft-controller';
   selector: 'app-event-global-diagnostics',
   imports: [ButtonModule, DialogModule, MessageModule],
   templateUrl: './event-global-diagnostics.html',
+  host: { class: 'd-contents' },
 })
 export class EventGlobalDiagnostics {
   readonly coreId = input.required<string>();
   readonly cities = input.required<AdminGlobalCalendarResult['cities']>();
   readonly disabled = input(false);
-  readonly navigateToSection = output<AdminGlobalEventPageFieldError['field']>();
+  readonly navigateToSection = output<AdminGlobalEventPageFieldError>();
+  readonly previewChange = output<AdminGlobalEventPagePreview | null>();
+  readonly actions = viewChild<TemplateRef<unknown>>('actions');
   private readonly draft = inject(EventGlobalDraftController);
+  private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
-  private navigation: AdminGlobalEventPageFieldError['field'] | null = null;
+  private navigation: AdminGlobalEventPageFieldError | null = null;
   protected readonly i18n = createEventCoreEditorI18n();
   protected readonly visible = signal(false);
   protected readonly result = signal<AdminGlobalEventPagePreview | null>(null);
-  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly error = signal<unknown | null>(null);
+  protected readonly errorFields = computed(() => presentEventGlobalPreviewError(this.error()));
   protected readonly isChecking = this.draft.isChecking;
   protected readonly groups = computed(() => {
     const fields: AdminGlobalEventPageFieldError['field'][] = [
@@ -36,7 +42,7 @@ export class EventGlobalDiagnostics {
     ];
     const errors = this.result()?.fieldErrors ?? [];
     return fields.map(field => ({
-      field, issues: errors.filter(issue => issue.field === field).map(issue => this.issueView(issue)),
+      field, issues: errors.filter(issue => issue.field === field).map(issue => ({ issue, ...this.issueView(issue) })),
     })).filter(group => group.issues.length);
   });
   protected readonly blockers = computed(() => this.result()?.blockers.map(issue => this.issueView(issue)) ?? []);
@@ -44,14 +50,19 @@ export class EventGlobalDiagnostics {
   protected check(): void {
     if (this.disabled() || this.isChecking() || this.draft.cityEditing()) return;
     this.result.set(null);
-    this.errorMessage.set(null);
-    this.visible.set(true);
+    this.error.set(null);
+    this.previewChange.emit(null);
     this.draft.checkErrors(this.coreId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: result => this.result.set(result),
-      error: (error: unknown) => this.errorMessage.set(resolveEventEditionAdminErrorMessage(
-        error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification,
-      )),
+      next: result => { this.result.set(result); this.previewChange.emit(result); this.visible.set(true); },
+      error: (error: unknown) => {
+        this.error.set(error);
+        this.visible.set(true);
+        this.toast.danger({ summary: this.i18n.diagnostics().failed,
+          detail: this.errorFields().find(field => field.key === 'message')?.value });
+      },
+      complete: () => { if (this.result() === null && this.error() === null) this.visible.set(false); },
     });
+    if (this.isChecking()) this.visible.set(true);
   }
 
   protected close(): void {
@@ -62,14 +73,15 @@ export class EventGlobalDiagnostics {
     if (!visible) this.close();
   }
 
-  protected goToSection(field: AdminGlobalEventPageFieldError['field']): void {
-    this.navigation = field;
+  protected goToSection(issue: AdminGlobalEventPageFieldError): void {
+    if (this.isChecking() || !this.result()?.fieldErrors.some(value => value === issue)) return;
+    this.navigation = issue;
     this.close();
   }
 
   protected onHide(): void {
     this.result.set(null);
-    this.errorMessage.set(null);
+    this.error.set(null);
     if (this.navigation) this.navigateToSection.emit(this.navigation);
     this.navigation = null;
   }

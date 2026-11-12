@@ -1,10 +1,5 @@
 @let copy = i18n.copy();
-<section class="mg-card position-relative flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="loading()">
-  <header class="flex-row-between-center flex-wrap gap-sm w-100">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.title }}</h2>
-    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
-      [label]="i18n.actions().refresh" [disabled]="disabled() || loading()" (onClick)="refresh()" />
-  </header>
+<section class="position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="loading()">
   <app-loading-overlay [visible]="loading()" [label]="i18n.status().loading" />
   @if (!loading()) {
     @if (errorMessage(); as message) {
@@ -17,7 +12,8 @@
         </div>
       </div>
     } @else if (timeline(); as data) {
-      <app-event-program-schedule [timeline]="data" [disabled]="disabled()" [participantActions]="participantActions" />
+      <app-event-program-schedule [timeline]="data" [occurrenceId]="occurrenceId()" (occurrenceIdChange)="occurrenceIdChange.emit($event)"
+        [disabled]="disabled()" [participantActions]="participantActions" />
     }
   }
 </section>

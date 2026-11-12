@@ -3,10 +3,14 @@
     <h2 class="mg-section__title mg-section__title--md m-0">{{ copy().title }}</h2>
     <app-context-help [text]="copy().hint" [ariaLabel]="copy().title + ': ' + i18n.creation().help" />
   </header>
-  @if (!editor.canEdit()) { <p-message severity="warn" role="status">{{ copy().protected }}</p-message> }
+  @if (editor.blockingReason(); as reason) { <p class="m-0 muted-text" role="status">{{ i18n.schedule().blockers[reason] }}</p> }
   @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
-  <app-event-global-time-blocks [blocks]="editor.form.controls.timeBlocks" idPrefix="base-time-blocks"
-    [savedBase]="true" [validationAttempted]="editor.validationAttempted()" />
+  @if (readOnly()) {
+    @if (editor.calendar(); as calendar) { <app-event-global-time-blocks-summary [blocks]="calendar.timeBlocks" /> }
+  } @else {
+    <app-event-global-time-blocks [blocks]="editor.form.controls.timeBlocks" idPrefix="base-time-blocks"
+      [savedBase]="true" [validationAttempted]="editor.validationAttempted()" />
+  }
   @if (editor.preview(); as preview) {
     @if (preview.status === 'invalid') { <p-message severity="error" role="alert">{{ copy().invalid }}</p-message> }
     @if (preview.status === 'blocked') { <p-message severity="warn" role="alert">{{ copy().blocked }}</p-message> }

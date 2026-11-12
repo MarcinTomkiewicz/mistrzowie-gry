@@ -4,7 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
 import type { AdminEventTimeline, AdminEventTimelineOccurrence } from '../../../../core/interfaces/i-admin-event-timeline';
-import { formatDateLabel } from '../../../../core/utils/date';
+import { formatDateLabel, getTodayIso, selectUpcomingOrLatestDate } from '../../../../core/utils/date';
+import { EventProgramItemStatus } from '../../../../core/enums/event';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { presentEventTimelineRows } from './event-program-schedule-presenter';
 import { eventProgramScheduleWindow, layoutEventProgramSchedule } from './event-program-schedule-layout';
@@ -29,13 +30,21 @@ export class EventProgramSchedule {
   protected readonly formatDateLabel = formatDateLabel;
   protected readonly days = computed(() => [...this.timeline().occurrences].sort((a, b) => a.date.localeCompare(b.date)));
   protected readonly day = computed<AdminEventTimelineOccurrence | null>(() =>
-    this.days().find(day => day.occurrenceId === (this.occurrenceId() ?? this.localOccurrenceId())) ?? this.days()[0] ?? null);
+    this.days().find(day => day.occurrenceId === (this.occurrenceId() ?? this.localOccurrenceId())) ??
+    this.days().find(day => day.date === selectUpcomingOrLatestDate(this.days().map(day => day.date),
+      getTodayIso(new Date(), this.timeline().timezone))) ?? null);
   private readonly selectedDayId = computed(() => this.day()?.occurrenceId ?? null);
   private readonly selectedKey = linkedSignal<string | null>(() => { this.editionId(); this.selectedDayId(); return null; });
-  protected readonly entries = computed(() => presentEventTimelineRows(this.day()?.rows ?? [], this.i18n));
+  protected readonly history = linkedSignal(() => { this.editionId(); this.selectedDayId(); return false; });
+  private readonly presented = computed(() => presentEventTimelineRows(this.day()?.rows ?? [], this.i18n));
+  protected readonly historyEntries = computed(() => this.presented().filter(entry =>
+    entry.row.programStatus === EventProgramItemStatus.Withdrawn || entry.row.programStatus === EventProgramItemStatus.Rejected));
+  protected readonly entries = computed(() => this.presented().filter(entry => !this.historyEntries().includes(entry)));
+  protected readonly eventEntries = computed(() => this.entries().filter(entry => entry.row.timeScope === 'event'));
   protected readonly window = computed(() => eventProgramScheduleWindow(this.timeline()));
   protected readonly layout = computed(() => layoutEventProgramSchedule(this.entries(), this.timeline().spaces, this.i18n.copy().dayOffset, this.window()));
-  protected readonly selected = computed(() => this.entries().find(entry => this.entryKey(entry.key) === this.selectedKey()) ?? null);
+  protected readonly selected = computed(() => (this.history() ? this.historyEntries() : this.entries())
+    .find(entry => this.entryKey(entry.key) === this.selectedKey()) ?? null);
 
   protected trackLabel(index: number): string {
     return this.i18n.copy().schedule.track.replace('{{number}}', String(index + 1));

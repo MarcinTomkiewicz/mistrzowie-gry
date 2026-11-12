@@ -9,10 +9,20 @@
         [pt]="{ root: { 'aria-pressed': active } }" (onClick)="selectDay(date.occurrenceId)" />
     }
   </div>
-  @if (day()) {
-    <p class="m-0 muted-text">{{ i18n.labels().timezone }}: {{ timeline().timezone }}</p>
-    @if (timeline().origin === 'legacy_host') { <p class="m-0 muted-text">{{ copy.eventHours }}</p> }
-    @if (layout().lanes.length) {
+  @if (day(); as selectedDay) {
+    <p class="m-0 muted-text">
+      <time [attr.datetime]="selectedDay.date">{{ formatDateLabel(selectedDay.date) }}</time> -
+      {{ i18n.labels().timezone }}: {{ timeline().timezone }}
+    </p>
+    @if (historyEntries().length) {
+      <div class="flex-row-start-center gap-sm" role="group" [attr.aria-label]="copy.title">
+        <p-button type="button" size="small" severity="secondary" [outlined]="history()" [label]="copy.title"
+          [pt]="{ root: { 'aria-pressed': !history() } }" (onClick)="history.set(false)" />
+        <p-button type="button" size="small" severity="secondary" [outlined]="!history()" [label]="copy.schedule.history"
+          [pt]="{ root: { 'aria-pressed': history() } }" (onClick)="history.set(true)" />
+      </div>
+    }
+    @if (!history() && layout().lanes.length) {
       <p class="m-0 muted-text text-sm">{{ copy.schedule.hint }}</p>
       <div class="event-schedule__scroll" [class.event-schedule__scroll--rooms]="layout().hasSpaces"
         tabindex="0" role="region" [attr.aria-label]="copy.schedule.title">
@@ -37,7 +47,7 @@
                 @for (block of lane.entries; track block.entry.key) {
                   @let entry = block.entry;
                   <button type="button" class="event-schedule__block" [class.event-schedule__block--approved]="block.approved"
-                    [class.event-schedule__block--pending]="block.pending" [class.event-schedule__block--inactive]="block.inactive"
+                    [class.event-schedule__block--pending]="block.pending"
                     [style.left.%]="block.left" [style.width.%]="block.width" [disabled]="disabled()"
                     [attr.aria-pressed]="selected()?.key === entry.key"
                     [title]="entry.time + ' - ' + entry.title + ' - ' + entry.host"
@@ -54,14 +64,22 @@
         </div>
       </div>
     }
-    @if (layout().unplaced.length) {
-      <div class="flex-col-start-stretch gap-sm border radius-sm p-sm" role="status">
-        <p class="m-0">{{ copy.schedule.timeUnavailable }}</p>
-        @for (entry of layout().unplaced; track entry.key) {
-          <p-button type="button" severity="secondary" [outlined]="true" [disabled]="disabled()"
-            [label]="entry.time + ' - ' + entry.title" (onClick)="selectEntry(entry.key)" />
+    @if (history() || eventEntries().length) {
+      <section class="flex-col-start-stretch gap-sm w-100 min-w-0">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ history() ? copy.schedule.history : copy.schedule.eventScoped }}</h3>
+        @for (entry of history() ? historyEntries() : eventEntries(); track entry.key) {
+          <article class="mg-card flex-col-start-stretch gap-sm p-md w-100 min-w-0">
+            <h4 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">{{ entry.title }}</h4>
+            <p class="m-0 text-wrap-anywhere">{{ entry.host }}</p>
+            @if (entry.time) { <p class="m-0">{{ entry.time }}</p> }
+            <p class="m-0 text-wrap-anywhere">{{ copy.programStatus }}: {{ entry.programStatus ?? copy.unassigned }}</p>
+            <div class="flex-row-start-center">
+              <p-button type="button" size="small" severity="secondary" [outlined]="true" [disabled]="disabled()"
+                [label]="i18n.actions().preview" [ariaLabel]="i18n.actions().preview + ': ' + entry.title" (onClick)="selectEntry(entry.key)" />
+            </div>
+          </article>
         }
-      </div>
+      </section>
     }
     @if (selected(); as entry) {
       <p-dialog styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="true" [header]="entry.title"
@@ -69,11 +87,10 @@
         (visibleChange)="!$event && closeDetails()">
         <div class="flex-col-start-stretch gap-md w-100 min-w-0">
           @if (day(); as date) { <time [attr.datetime]="date.date">{{ formatDateLabel(date.date) }}</time> }
-          <p class="m-0 text-wrap-anywhere">{{ entry.time }} - {{ entry.host }}</p>
+          <p class="m-0 text-wrap-anywhere">@if (entry.time) { {{ entry.time }} - }{{ entry.host }}</p>
           <p class="m-0 text-wrap-anywhere">{{ entry.kind }} - {{ entry.source }}</p>
           @if (entry.row.slotLabel) { <p class="m-0 text-wrap-anywhere">{{ entry.row.slotLabel }}</p> }
           @if (entry.row.source === 'manual' && entry.row.spaceName) { <p class="m-0">{{ entry.row.spaceName }}</p> }
-          @if (entry.row.source === 'legacy_host') { <p class="m-0 muted-text">{{ copy.eventHours }}</p> }
           @if (entry.row.source === 'manual' && entry.row.activity; as activity) {
             <p class="m-0 pre-line text-wrap-anywhere">{{ activity.description }}</p>
           }
@@ -105,6 +122,6 @@
         </ng-template>
       </p-dialog>
     }
-    @if (!entries().length) { <p class="m-0 muted-text" role="status">{{ copy.noRows }}</p> }
+    @if (!history() && !entries().length) { <p class="m-0 muted-text" role="status">{{ copy.noRows }}</p> }
   } @else { <p class="m-0 muted-text" role="status">{{ copy.noOccurrences }}</p> }
 </div>

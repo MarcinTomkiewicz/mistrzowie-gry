@@ -9,11 +9,12 @@ type Lane = { space: TimedEntry['space']; end: number; entries: TimedEntry[] };
 const DAY_MINUTES = 24 * 60;
 
 function timeRange(row: TimelineRow): { start: number; end: number } | null {
+  if (row.timeScope !== 'timed') return null;
   const startTime = parseTimeLabelToMinutes(row.startTime);
   const endTime = parseTimeLabelToMinutes(row.endTime);
   const start = startTime === null ? null : startTime + (row.source === 'manual' ? row.startDayOffset * DAY_MINUTES : 0);
   const end = endTime === null ? null : endTime + (row.source === 'manual' ? row.endDayOffset * DAY_MINUTES : 0);
-  // Staffing and Legacy do not supply day offsets. Never infer a next-day date.
+  if (row.source === 'staffing' && start !== null && end !== null && end < start) return { start, end: end + DAY_MINUTES };
   return start !== null && end !== null && end > start ? { start, end } : null;
 }
 
@@ -24,7 +25,8 @@ function spaceForRow(row: TimelineRow, spaces: AdminEventTimeline['spaces']): Ti
 }
 
 export function eventProgramScheduleWindow(timeline: AdminEventTimeline) {
-  const rows = timeline.occurrences.flatMap(day => day.rows);
+  const rows = timeline.occurrences.flatMap(day => day.rows).filter(row =>
+    row.programStatus !== EventProgramItemStatus.Withdrawn && row.programStatus !== EventProgramItemStatus.Rejected);
   const ranges = rows.flatMap(row => { const range = timeRange(row); return range ? [range] : []; });
   if (!ranges.length) return null;
   const start = Math.floor(Math.min(...ranges.map(range => range.start)) / 60) * 60;
@@ -39,18 +41,17 @@ export function eventProgramScheduleWindow(timeline: AdminEventTimeline) {
 // Geometry only: every block retains the canonical row and the existing presentation.
 export function layoutEventProgramSchedule(entries: readonly Entry[], spaces: AdminEventTimeline['spaces'], dayOffset: string,
   window: ReturnType<typeof eventProgramScheduleWindow>) {
-  const unplaced: Entry[] = [];
   const timed: TimedEntry[] = [];
   for (const entry of entries) {
     const row = entry.row;
     const range = timeRange(row);
-    if (!range) { unplaced.push(entry); continue; }
+    if (!range) continue;
     timed.push({ entry, ...range, space: spaceForRow(row, spaces) });
   }
   timed.sort((a, b) => a.start - b.start || a.end - b.end ||
     (a.entry.row.position ?? a.entry.row.displayOrder ?? 0) - (b.entry.row.position ?? b.entry.row.displayOrder ?? 0) ||
     a.entry.key.localeCompare(b.entry.key));
-  if (!window) return { lanes: [], ticks: [], unplaced, hasSpaces: false };
+  if (!window) return { lanes: [], ticks: [], hasSpaces: false };
   const { start, end } = window;
   const duration = end - start;
   const percent = (value: number) => (value - start) / duration * 100;
@@ -72,14 +73,13 @@ export function layoutEventProgramSchedule(entries: readonly Entry[], spaces: Ad
     return { minute, left: percent(minute), label: formatEventTimelineTime(value, Math.floor(minute / DAY_MINUTES), dayOffset) };
   });
   return {
-    ticks, unplaced, hasSpaces: timed.some(item => item.space !== null),
+    ticks, hasSpaces: timed.some(item => item.space !== null),
     lanes: lanes.map((lane, index) => ({
       key: index, spaceName: lane.space?.name ?? null,
       entries: lane.entries.map(({ entry, start: itemStart, end: itemEnd }) => ({
         entry, left: percent(itemStart), width: (itemEnd - itemStart) / duration * 100,
         approved: entry.row.programStatus === EventProgramItemStatus.Approved || entry.row.programStatus === EventProgramItemStatus.Published,
         pending: entry.row.programStatus === EventProgramItemStatus.Submitted,
-        inactive: entry.row.programStatus === EventProgramItemStatus.Rejected || entry.row.programStatus === EventProgramItemStatus.Withdrawn,
       })),
     })),
   };

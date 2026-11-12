@@ -6,7 +6,9 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { EventGlobalCityCopy } from '../../../../core/types/i18n/event-global-draft';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { parseIsoDate } from '../../../../core/utils/date';
@@ -16,20 +18,19 @@ import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalCityFields } from './event-global-city-fields';
 import { EventGlobalDraftController } from './event-global-draft-controller';
+import { selectEventGlobalDiagnosticIssues } from './event-global-diagnostic-messages';
 
 @Component({
   selector: 'app-event-core-editions',
-  imports: [FormsModule, ReactiveFormsModule, ButtonModule, MessageModule, FloatLabelModule, SelectModule, EventGlobalCityFields],
+  imports: [FormsModule, ReactiveFormsModule, ButtonModule, MessageModule, FloatLabelModule, SelectModule, EventGlobalCityFields, LoadingOverlay],
   templateUrl: './event-core-editions.html',
   host: { class: 'd-block w-100' },
 })
 export class EventCoreEditions {
   readonly core = input.required<IEventCoreDetail>();
-  readonly readOnly = input(false);
-  readonly selectedEditionId = input<string | null>(null);
-  readonly editionSelected = output<string>();
   readonly addCityDisabledReason = input<'metadata' | 'schedule' | 'policy' | null>(null);
   readonly selectionDisabled = input(false);
+  readonly fieldErrors = input<readonly AdminGlobalEventPageFieldError[]>([]);
   readonly cityAdded = output<IEventCoreDetail>();
   protected readonly globalDraft = inject(EventGlobalDraftController);
   protected readonly i18n = createEventCoreEditorI18n();
@@ -38,9 +39,7 @@ export class EventCoreEditions {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly toast = inject(UiToast);
   private readonly initialDate = new Date();
-  protected readonly editionOptions = computed(() => this.readOnly()
-    ? this.core().editions.map(edition => ({ value: edition.id, label: edition.city }))
-    : this.globalDraft.calendar()?.cities.map(city => ({ value: city.editionId, label: city.city })) ?? []);
+  protected readonly editionOptions = computed(() => this.globalDraft.calendar()?.cities.map(city => ({ value: city.editionId, label: city.city })) ?? []);
   protected readonly editionErrorMessage = computed(() => {
     const error = this.globalDraft.editionReadError();
     return error === null ? null : resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification);
@@ -61,12 +60,15 @@ export class EventCoreEditions {
 
   protected selectEdition(value: unknown): void {
     if (typeof value !== 'string' || this.selectionDisabled() || !this.editionOptions().some(option => option.value === value)) return;
-    if (this.readOnly()) this.editionSelected.emit(value);
-    else this.globalDraft.selectEdition(value);
+    this.globalDraft.selectEdition(value);
+  }
+
+  protected cityHasErrors(editionId: string): boolean {
+    return selectEventGlobalDiagnosticIssues(this.fieldErrors(), ['editionDrafts'], editionId).length > 0;
   }
 
   protected openCity(): void {
-    if (this.readOnly() || this.addCityBlocker() !== null) return;
+    if (this.addCityBlocker() !== null) return;
     this.errorMessage.set(null);
     this.globalDraft.openCity(this.core());
     this.focusCityControl('#additional-city-city');
@@ -81,7 +83,7 @@ export class EventCoreEditions {
   }
 
   protected submitCity(): void {
-    if (this.readOnly() || this.citySaveBlocked()) return;
+    if (this.citySaveBlocked()) return;
     this.globalDraft.cityForm.markAllAsTouched();
     if (this.globalDraft.cityState() === 'idle' && this.globalDraft.cityForm.invalid) {
       this.toast.danger({ summary: this.i18n.commonForm().invalidSummary, detail: this.i18n.commonForm().invalid });

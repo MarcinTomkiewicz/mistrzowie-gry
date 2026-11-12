@@ -1,12 +1,16 @@
 <p-stepper class="d-block w-100 min-w-0" [value]="activeStep()" [linear]="false" (valueChange)="selectStep($event)">
-  <p-step-list class="mg-grid grid-6-cols grid-2-cols-md grid-1-cols-sm gap-xs border-bottom pb-sm w-100">
+  <p-step-list class="gap-xs border-bottom py-xs w-100 min-w-0 overflow-x-auto">
     @for (step of steps(); track step.value) {
-      <p-step class="min-w-0" [value]="step.value" [disabled]="disabled() || step.value > reachedStep()">
-        <span class="text-wrap-anywhere">{{ step.label }}</span>
+      <p-step class="flex-shrink-0" [value]="step.value" [disabled]="disabled() || step.value > reachedStep()"
+        [pt]="{ header: { 'aria-invalid': errorSteps().includes(step.value) } }">
+        <span class="text-nowrap" [class.error-text]="errorSteps().includes(step.value)">
+          @if (errorSteps().includes(step.value)) { <span class="pi pi-biohazard" aria-hidden="true"></span> }
+          {{ step.label }}
+        </span>
       </p-step>
     }
   </p-step-list>
-  <p-step-panels>
+  <p-step-panels class="pt-sm pb-0">
     @for (step of steps(); track step.value) {
       <p-step-panel [value]="step.value">
         <ng-template #content>

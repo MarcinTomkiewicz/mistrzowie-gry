@@ -12,7 +12,7 @@
       [ngModel]="global.selectedEditionId()" (ngModelChange)="selectCity($event)" [disabled]="selectionLocked()"
       [loading]="global.isReadingEdition()" appendTo="body" class="w-100" />
   </div>
-  @if (loading()) { <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p> }
+  <app-loading-overlay [visible]="loading()" [label]="i18n.status().loading" />
   @if (!loading()) {
     @if (manual.canOpen() || manual.locked() || manual.needsRefresh()) {
       <app-event-manual-program-editor (readback)="acceptReadback($event)" />
@@ -29,8 +29,8 @@
       </div>
     } @else if (data(); as selected) {
       @if (!selected.occurrence.rows.length) { <p class="m-0 muted-text">{{ copy.globalProgram.empty }}</p> }
-      <app-event-program-schedule [timeline]="selected.timeline" [occurrenceId]="selectedOccurrenceId()"
-        [disabled]="selectionLocked()" (occurrenceIdChange)="selectOccurrence($event)" />
+      <app-event-admin-timeline [timeline]="selected.timeline" [occurrenceId]="selectedOccurrenceId()"
+        [disabled]="selectionLocked()" (occurrenceIdChange)="selectOccurrence($event)" (reload)="refresh()" />
     } @else { <p class="m-0 muted-text" role="status">{{ copy.noOccurrences }}</p> }
   }
 </section>

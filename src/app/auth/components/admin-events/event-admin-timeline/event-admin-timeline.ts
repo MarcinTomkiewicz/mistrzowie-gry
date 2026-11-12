@@ -7,6 +7,7 @@ import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overl
 import type { AdminEventTimeline } from '../../../../core/interfaces/i-admin-event-timeline';
 import type { AdminEventProgramParticipants } from '../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
+import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventAdminTimelineI18n } from './event-admin-timeline.i18n';
 import { EventProgramSchedule } from '../event-program-schedule/event-program-schedule';
@@ -24,8 +25,11 @@ type ProgramParticipantsState =
 })
 export class EventAdminTimeline {
   private readonly admin = inject(EventAdmin);
+  private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
   readonly timeline = input<AdminEventTimeline | null>(null);
+  readonly occurrenceId = input<string | null>(null);
+  readonly occurrenceIdChange = output<string>();
   readonly loading = input(false);
   readonly error = input<unknown>(null);
   readonly disabled = input(false);
@@ -73,7 +77,10 @@ export class EventAdminTimeline {
         }
       },
       error: (error: unknown) => {
-        if (this.timeline() === timeline) this.setParticipants(programItemId, { kind: 'error', error });
+        if (this.timeline() !== timeline) return;
+        this.setParticipants(programItemId, { kind: 'error', error });
+        this.toast.danger({ summary: this.i18n.labels().participants,
+          detail: resolveEventEditionAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.errors().concurrentModification) });
       },
     });
   }

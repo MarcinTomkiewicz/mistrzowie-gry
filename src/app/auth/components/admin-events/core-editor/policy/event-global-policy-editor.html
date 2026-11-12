@@ -1,12 +1,14 @@
-<div id="global-event-policy" tabindex="-1" class="mg-form flex-col-start-stretch gap-sm w-100 min-w-0" [formGroup]="editor.form">
+<div id="global-event-policy" tabindex="-1" class="mg-form flex-col-start-stretch gap-sm w-100 min-w-0" [formGroup]="editor.form"
+  [class.border]="policyIssues().length > 0" [class.border-danger]="policyIssues().length > 0" [class.p-sm]="policyIssues().length > 0">
   <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.creationSteps().policy }}</h2>
+  <app-event-global-diagnostic-messages [issues]="policyIssues()" />
   @if (editor.draft() && !editor.canEdit() && !editor.conflicted()) {
     <p-message severity="warn" role="status">{{ copy().protected }}</p-message>
   }
   @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
   @if (editor.draft()) {
     <app-event-global-price-editor />
-    <app-event-global-rules-editor />
+    <app-event-global-rules-editor [fieldErrors]="fieldErrors()" />
   }
   @if (editor.preview(); as preview) {
     @for (error of preview.fieldErrors; track $index) {
