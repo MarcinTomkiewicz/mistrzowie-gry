@@ -35,6 +35,9 @@ export type EventCoreActivationReadbackCopy = {
 };
 
 export type EventCoreDispositionCopy = {
+  resultSummary: string;
+  cleanupPartial: string;
+  failureSummaries: Record<'preview' | 'apply' | 'readback', string>;
   showArchived: string;
   emptyCurrent: string;
   selectAll: string;
@@ -62,6 +65,14 @@ export type EventCoreDispositionCopy = {
   unavailable: string;
   reasons: Record<EventCoreDispositionReason, string>;
   errors: { forbidden: string; invalid: string; reused: string; stale: string; protected: string; failed: string };
+};
+
+export type EventCoreCoverCleanupCopy = {
+  progress: string;
+  successDetail: string;
+  retry: string;
+  failedSummary: string;
+  errors: Record<'claim' | 'remove' | 'complete', string>;
 };
 
 export type EditorPageCopy = {

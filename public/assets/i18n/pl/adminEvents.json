@@ -1,6 +1,13 @@
 {
   "list": {
     "disposition": {
+      "resultSummary": "[PH] Wynik operacji na wydarzeniach",
+      "cleanupPartial": "[PH] Usuwanie plików okładek wymaga ponownego sprawdzenia. Potwierdzone zmiany w wydarzeniach pozostają zapisane.",
+      "failureSummaries": {
+        "preview": "[PH] Nie udało się przygotować podglądu operacji",
+        "apply": "[PH] Nie udało się potwierdzić operacji w bazie danych",
+        "readback": "[PH] Nie udało się potwierdzić wyniku przez odczyt"
+      },
       "showArchived": "Pokaż zarchiwizowane",
       "emptyCurrent": "[PH] Brak bieżących wydarzeń. Możesz dodać wydarzenie lub włączyć widok zarchiwizowanych.",
       "selectAll": "[PH] Zaznacz wszystkie widoczne wydarzenia",
@@ -42,6 +49,17 @@
         "stale": "[PH] Dane wydarzeń zmieniły się. Sprawdź nowy podgląd i ponownie potwierdź zakres przed wykonaniem zmian.",
         "protected": "[PH] Backend odrzucił operację z powodu ochrony danych. Sprawdź bieżący podgląd i blokady.",
         "failed": "[PH] Nie udało się potwierdzić operacji. Odśwież dane i sprawdź zgłoszony błąd."
+      }
+    },
+    "cleanup": {
+      "progress": "[PH] Usuwanie plików okładek...",
+      "successDetail": "[PH] Potwierdzono usunięcie obsłużonych plików okładek.",
+      "retry": "[PH] Ponów usuwanie plików okładek",
+      "failedSummary": "[PH] Nie udało się usunąć plików okładek",
+      "errors": {
+        "claim": "[PH] Nie udało się rozpocząć usuwania plików okładek. Spróbuj ponownie.",
+        "remove": "[PH] Nie potwierdzono usunięcia pliku okładki. Spróbuj ponownie później.",
+        "complete": "[PH] Nie potwierdzono wyniku usuwania pliku okładki. Plik mógł zostać usunięty. Spróbuj ponownie później."
       }
     },
     "page": {

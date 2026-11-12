@@ -14,6 +14,7 @@ export const EVENT_RPC = {
   getCoreDetail: 'get_admin_event_core_detail',
   previewCoreDisposition: 'preview_admin_event_core_disposition',
   applyCoreDisposition: 'apply_admin_event_core_disposition',
+  coreCoverCleanupWorker: 'efs095_event_cover_cleanup_worker',
   saveCore: 'save_admin_event_core',
   createGlobalEvent: 'create_admin_global_event',
   addGlobalEventCity: 'add_admin_global_event_city',

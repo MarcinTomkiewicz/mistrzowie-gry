@@ -21,6 +21,7 @@ import type {
   ListToastCopy,
   EventCoreActivationReadbackCopy,
   EventCoreDispositionCopy,
+  EventCoreCoverCleanupCopy,
 } from '../../../../core/types/i18n/admin-events';
 
 export function createEventCoreListI18n() {
@@ -46,6 +47,7 @@ export function createEventCoreListI18n() {
   const commonActions = createCommonActionsI18n();
   return {
     disposition,
+    cleanup: createScopedObjectI18n<EventCoreCoverCleanupCopy>('adminEvents', 'list.cleanup'),
     dispositionActions: computed<Record<EventCoreDispositionAction, string>>(() => ({
       delete: commonActions().delete, archive: commonActions().archive, blocked: disposition().unavailable,
     })),

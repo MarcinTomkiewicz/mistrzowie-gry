@@ -120,6 +120,20 @@ export interface AdminEventCoreDispositionResult {
   items: { coreId: string; outcome: 'deleted' | 'archived' | 'blocked'; reason: EventCoreDispositionReason }[];
 }
 
+export interface EventCoreCoverCleanupJob {
+  jobId: string;
+  claimToken: string;
+  bucket: 'images' | 'event-covers-private';
+  path: string;
+  storageObjectId: string;
+  attempt: number;
+}
+
+export interface EventCoreCoverCleanupReceipt {
+  jobId: string;
+  state: 'done' | 'pending';
+}
+
 export interface IEventCoreSavePayload {
   id?: string | null;
   key: string;

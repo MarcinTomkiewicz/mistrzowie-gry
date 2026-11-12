@@ -1,10 +1,11 @@
 import type {
   AdminEventCoreDispositionPreview, AdminEventCoreDispositionResult, EventCoreDispositionCommand,
   EventCoreDispositionItem,
+  EventCoreCoverCleanupJob, EventCoreCoverCleanupReceipt,
 } from '../../interfaces/i-event-admin';
 import {
   assertEdgeContract, createEdgeArrayReader, createEdgeLiteralReader, readEdgeBoolean, readEdgeNonNegativeInteger,
-  readEdgeNullableTimestamp, readEdgeObject, readEdgeString, readEdgeUuid,
+  readEdgeNullableTimestamp, readEdgeObject, readEdgePositiveInteger, readEdgeString, readEdgeUuid,
 } from '../../utils/edge-contract';
 import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
 
@@ -44,6 +45,49 @@ const readResult = createStrictEdgeObjectReader({
   items: createEdgeArrayReader(createStrictEdgeObjectReader({ coreId: readEdgeUuid,
     outcome: createEdgeLiteralReader(['deleted', 'archived', 'blocked']), reason: readReason })),
 });
+export const readEventCoreCoverCleanupJob = createStrictEdgeObjectReader({
+  jobId: readEdgeUuid, claimToken: readEdgeUuid,
+  bucket: createEdgeLiteralReader(['images', 'event-covers-private']), path: readCleanupPath,
+  storageObjectId: readEdgeUuid, attempt: readEdgePositiveInteger,
+});
+const readCleanupJobs = createEdgeArrayReader(readEventCoreCoverCleanupJob);
+const readCleanupReceipt = createStrictEdgeObjectReader({
+  jobId: readEdgeUuid, state: createEdgeLiteralReader(['done', 'pending']),
+});
+
+function readCleanupPath(value: unknown, path: string): string {
+  const key = readEdgeString(value, path);
+  // Storage.removeFiles must receive the original key without URL/leading-slash/whitespace normalization.
+  assertEdgeContract(key.length > 0 && key === key.trim() && !/^[a-z][a-z\d+.-]*:/i.test(key) &&
+    !/[\\\u0000-\u001f\u007f]/.test(key) && key.split('/').every(part => part !== '' && part !== '.' && part !== '..'),
+  path, 'an exact relative Storage object key');
+  return key;
+}
+
+export function assertEventCoreCoverCleanupLimit(limit: number): void {
+  assertEdgeContract(Number.isInteger(limit) && limit >= 1 && limit <= 100,
+    'disposition.cleanup.limit', 'an integer from 1 to 100');
+}
+
+export function readEventCoreCoverCleanupClaim(value: unknown, limit: number): EventCoreCoverCleanupJob[] {
+  assertEventCoreCoverCleanupLimit(limit);
+  const jobs = readCleanupJobs(value, 'disposition.cleanup.claim');
+  assertEdgeContract(jobs.length <= limit &&
+    new Set(jobs.map(job => job.jobId.toLowerCase())).size === jobs.length &&
+    new Set(jobs.map(job => job.claimToken.toLowerCase())).size === jobs.length &&
+    new Set(jobs.map(job => job.storageObjectId.toLowerCase())).size === jobs.length &&
+    new Set(jobs.map(job => JSON.stringify([job.bucket, job.path]))).size === jobs.length,
+  'disposition.cleanup.claim', 'at most the requested number of distinct jobs, claims and exact Storage objects');
+  return jobs;
+}
+
+export function readEventCoreCoverCleanupReceipt(value: unknown, jobId: string,
+  error: string | null): EventCoreCoverCleanupReceipt {
+  const receipt = readCleanupReceipt(value, 'disposition.cleanup.complete');
+  assertEdgeContract(receipt.jobId === jobId && receipt.state === (error === null ? 'done' : 'pending'),
+    'disposition.cleanup.complete', 'the original job and the state matching the submitted removal result');
+  return receipt;
+}
 
 export function readEventCoreDispositionHash(value: unknown, path: string): string {
   const hash = readEdgeString(value, path);

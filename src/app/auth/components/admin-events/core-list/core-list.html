@@ -1,5 +1,6 @@
 @let copy = i18n.disposition();
-<div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isBusy()">
+@let cleanup = i18n.cleanup();
+<div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isBusy() || disposition.cleanupBusy()">
   <header class="mg-section__header w-100">
     <h2 class="mg-section__title mg-section__title--md">{{ i18n.commonNav().eventsManagement }}</h2>
 
@@ -9,11 +10,12 @@
   </header>
 
   <app-loading-overlay
-    [visible]="isBusy()"
+    [visible]="isBusy() || disposition.cleanupActive()"
     [label]="
-      activeActionKey() || disposition.phase() === 'apply'
-        ? i18n.commonStatus().saving
-        : i18n.commonStatus().loading
+      disposition.cleanupActive() ? cleanup.progress
+        : activeActionKey() || disposition.phase() === 'apply'
+          ? i18n.commonStatus().saving
+          : i18n.commonStatus().loading
     "
   />
 
@@ -51,26 +53,21 @@
       </div>
     }
   }
-  @if (dispositionError(); as error) {
-    <p-message [severity]="disposition.needsReadback() ? 'warn' : 'error'" role="alert">{{ error }}</p-message>
+  @if (disposition.needsReadback() && dispositionError(); as error) {
+    <p-message severity="warn" role="alert">{{ error }}</p-message>
   }
   @if (disposition.needsReadback()) {
     <p-button type="button" severity="secondary" icon="pi pi-refresh" [disabled]="isBusy()"
       [label]="disposition.result() ? copy.retryRead : copy.retry" (onClick)="retryDisposition()" />
   }
-  @if (!isBusy() && dispositionBlockers(); as blockers) {
-    <p-message severity="warn" role="alert">
-      @if (disposition.preview()?.status === 'blocked') { {{ copy.blocked }} }
-      {{ blockers }}
-    </p-message>
-  }
-  @if (disposition.verified() && disposition.result(); as result) {
-    <p class="m-0" role="status">
-      {{ result.replayed ? copy.replayed : copy.success }}
-      {{ copy.deleteCount }}: {{ result.deletedCount }}.
-      {{ copy.archiveCount }}: {{ result.archivedCount }}.
-      {{ copy.blockedCount }}: {{ result.blockedCount }}.
-    </p>
+  @if (cleanupFailures().length && !disposition.cleanupBusy()) {
+    @if (disposition.verified() && disposition.result()?.deletedCount) {
+      <p-message severity="warn" role="alert">{{ copy.cleanupPartial }}</p-message>
+    }
+    <div class="flex-row-start-center flex-wrap gap-sm">
+      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+        [label]="cleanup.retry" [disabled]="locked()" (onClick)="resumeCleanup('retry')" />
+    </div>
   }
 
   @if (loadErrorMessage() && !isLoading()) {
@@ -88,6 +85,7 @@
         severity="secondary"
         [label]="i18n.commonActions().retry"
         icon="pi pi-refresh"
+        [disabled]="!isAdmin() || isBusy() || disposition.locked()"
         (onClick)="loadCores()"
       />
     </section>

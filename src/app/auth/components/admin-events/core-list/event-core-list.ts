@@ -13,7 +13,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { asapScheduler, EMPTY, finalize, map, type Observable, observeOn, Subscription, switchMap, tap } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
-import type { AdminEventCoreDispositionPreview, IEventCoreListItem } from '../../../../core/interfaces/i-event-admin';
+import type { AdminEventCoreDispositionPreview, AdminEventCoreDispositionResult,
+  IEventCoreListItem } from '../../../../core/interfaces/i-event-admin';
 import { readAdminEventCoreRows } from '../../../../core/reads/events/admin-event-core-disposition-read';
 import { Auth } from '../../../../core/services/auth/auth';
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
@@ -68,7 +69,7 @@ export class EventCoreList {
   protected readonly isBusy = computed(() => this.isLoading() || this.activeActionKey() !== null ||
     this.disposition.busy() || this.confirming());
   protected readonly locked = computed(() => !this.isAdmin() || this.isBusy() ||
-    this.disposition.needsReadback() || this.pendingActivation() !== null);
+    this.disposition.needsReadback() || this.disposition.cleanupBusy() || this.pendingActivation() !== null);
   protected readonly canEndActivationReadback = computed(() => {
     const pending = this.pendingActivation();
     return pending?.phase === 'readback' && !this.isBusy() && this.isAdmin() && pending.actorId === this.auth.userId();
@@ -89,6 +90,8 @@ export class EventCoreList {
       : error.code === '23514' ? copy.errors.protected : copy.errors.failed;
     return message + ' (' + error.code + ': ' + error.message + ')';
   });
+  protected readonly cleanupFailures = computed(() => [...new Set(this.disposition.cleanupFailures().map(failure =>
+    this.i18n.cleanup().errors[failure.phase] + (failure.error instanceof RpcError ? ' (' + failure.error.code + ')' : '')))]);
   protected readonly rowVms = computed(() => {
     const status = this.i18n.commonEntityStatuses();
     const values = this.i18n.commonValues();
@@ -141,7 +144,10 @@ export class EventCoreList {
     effect(() => this.selectAll.setValue(this.rows().length > 0 && this.selectedCount() === this.rows().length,
       { emitEvent: false }));
     this.showArchived.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.loadCores());
-    afterNextRender(() => this.loadCores());
+    afterNextRender(() => {
+      this.loadCores();
+      this.resumeCleanup();
+    });
     this.destroyRef.onDestroy(this.platform.onWindow('beforeunload', event => {
       if (this.canDeactivate()) return;
       event.preventDefault();
@@ -236,16 +242,21 @@ export class EventCoreList {
     this.disposition.prepare(coreIds).pipe(
       // The controller releases its preview phase in finalize before the dialog checks canApply.
       observeOn(asapScheduler), switchMap(preview => this.confirmDisposition(preview)),
-      finalize(() => this.confirming.set(false)), takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.confirming.set(false)), observeOn(asapScheduler), takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: rows => this.acceptDisposition(rows),
-      error: () => { /* The controller retains inline errors and any uncertain command. */ },
+      error: () => this.showDispositionFailure(),
     });
   }
 
   private confirmDisposition(preview: AdminEventCoreDispositionPreview): Observable<EventCoreListRow[]> {
-    if (!this.disposition.canApply() || this.disposition.preview() !== preview || !this.isAdmin()) return EMPTY;
+    if (this.disposition.preview() !== preview || !this.isAdmin()) return EMPTY;
     const copy = this.i18n.disposition();
+    if (preview.status === 'blocked') {
+      this.toast.warn({ summary: copy.blocked, detail: this.dispositionBlockers() });
+      return EMPTY;
+    }
+    if (!this.disposition.canApply()) return EMPTY;
     const text = preview.impact.deleteCount > 0
       ? preview.impact.archiveCount > 0
         ? { header: copy.confirmMixed, message: copy.previewHeading }
@@ -266,15 +277,75 @@ export class EventCoreList {
 
   protected retryDisposition(): void {
     if (!this.disposition.needsReadback() || this.isBusy()) return;
-    this.disposition.retry(this.showArchived.value).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: rows => this.acceptDisposition(rows), error: () => { /* Same command replay or receipt-only readback. */ },
+    this.disposition.retry(this.showArchived.value).pipe(observeOn(asapScheduler), takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: rows => this.acceptDisposition(rows), error: () => this.showDispositionFailure(),
     });
   }
 
   private acceptDisposition(rows: EventCoreListRow[]): void {
+    const result = this.disposition.result();
+    assertEdgeContract(result !== null && this.disposition.verified(),
+      'disposition.presentation', 'a confirmed DB receipt before reporting the user operation');
     this.rows.set(rows);
     this.selectedIds.reset();
-    this.toast.success({ summary: this.i18n.commonStatus().success, detail: this.i18n.disposition().success });
+    if (result.deletedCount > 0) this.resumeCleanup(result);
+    else this.showDispositionResult(result);
+  }
+
+  private showDispositionFailure(): void {
+    const phase = this.disposition.errorPhase();
+    if (!phase) return;
+    const options = { summary: this.i18n.disposition().failureSummaries[phase],
+      detail: this.dispositionError() ?? this.i18n.disposition().errors.failed };
+    if (this.disposition.needsReadback()) this.toast.warn(options);
+    else this.toast.danger(options);
+  }
+
+  protected resumeCleanup(operation: AdminEventCoreDispositionResult | 'retry' | null = null): void {
+    if (this.pendingActivation() || this.confirming() || this.activeActionKey() !== null) return;
+    const result = operation === 'retry' ? null : operation;
+    this.disposition.resumeCleanup().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        if (result) this.showDispositionResult(result, this.cleanupFailures().length > 0);
+        else if (operation === 'retry') this.showCleanupResult();
+      },
+      error: () => {
+        if (result) this.showDispositionResult(result, true);
+        else this.showCleanupResult(true);
+      },
+    });
+  }
+
+  private showCleanupResult(requestFailed = false): void {
+    const copy = this.i18n.cleanup();
+    const failures = this.cleanupFailures();
+    const detail = [this.disposition.cleanupRemoved() ? copy.successDetail : '', ...failures].filter(Boolean).join(' ');
+    const options = { summary: copy.failedSummary, detail };
+    if (requestFailed) this.toast.danger(options);
+    else if (failures.length) this.toast.warn(options);
+    else if (this.disposition.cleanupRemoved()) this.toast.success({ summary: this.i18n.commonStatus().success, detail });
+  }
+
+  private showDispositionResult(result: AdminEventCoreDispositionResult, cleanupUnresolved = false): void {
+    const copy = this.i18n.disposition();
+    const cleanup = this.i18n.cleanup();
+    const storageDetail = [
+      result.deletedCount > 0 && this.disposition.cleanupRemoved() ? cleanup.successDetail : '',
+      cleanupUnresolved ? copy.cleanupPartial : '',
+    ].filter(Boolean).join(' ');
+    const detail = [
+      result.replayed ? copy.replayed : copy.success,
+      copy.deleteCount + ': ' + result.deletedCount + '.',
+      copy.archiveCount + ': ' + result.archivedCount + '.',
+      copy.blockedCount + ': ' + result.blockedCount + '.',
+      result.blockedCount > 0 ? this.dispositionBlockers() : '',
+      storageDetail,
+      cleanupUnresolved ? this.cleanupFailures().join(' ') : '',
+    ].filter(Boolean).join(' ');
+    const options = { summary: copy.resultSummary, detail };
+    if (cleanupUnresolved || result.blockedCount > 0) this.toast.warn(options);
+    else if (result.deletedCount > 0) this.toast.info(options);
+    else this.toast.success(options);
   }
 
   protected setCoreActive(core: IEventCoreListItem, isActive: boolean): void {

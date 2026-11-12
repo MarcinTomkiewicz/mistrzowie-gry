@@ -8,7 +8,9 @@ import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResu
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import { readAdminEventCoreDetail, readAdminEventCoreList } from '../../reads/events/admin-event-core.contract';
 import { assertEventCoreDispositionCommand, assertEventCoreDispositionSelection,
-  readAdminEventCoreDispositionPreview, readAdminEventCoreDispositionResult } from '../../reads/events/admin-event-core-disposition.contract';
+  assertEventCoreCoverCleanupLimit, readEventCoreCoverCleanupClaim, readEventCoreCoverCleanupJob,
+  readEventCoreCoverCleanupReceipt, readAdminEventCoreDispositionPreview,
+  readAdminEventCoreDispositionResult } from '../../reads/events/admin-event-core-disposition.contract';
 import type { AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import { readAdminGlobalEventPagePreview } from '../../reads/events/admin-global-event-preview.contract';
 import type { AdminGlobalPublicationPreview, AdminGlobalPublicationResult, AdminGlobalScopePublicationPreview,
@@ -41,6 +43,8 @@ import {
   AdminEventCoreDispositionPreview,
   AdminEventCoreDispositionResult,
   EventCoreDispositionCommand,
+  EventCoreCoverCleanupJob,
+  EventCoreCoverCleanupReceipt,
   AdminEventProgramOfflineSeats,
   AdminEventProgramOfflineSeatsAdjustment,
   EventOfflineSeatsDelta,
@@ -84,6 +88,24 @@ export class EventAdmin {
         p_request_id: command.requestId, p_core_ids: command.coreIds, p_expected_plan_hash: command.planHash,
       });
     }).pipe(map(value => readAdminEventCoreDispositionResult(value, command, preview)));
+  }
+
+  claimCoreCoverCleanup(limit = 20): Observable<EventCoreCoverCleanupJob[]> {
+    return defer(() => {
+      assertEventCoreCoverCleanupLimit(limit);
+      return this.backend.rpc<unknown>(EVENT_RPC.coreCoverCleanupWorker, { p_operation: 'claim', p_limit: limit });
+    }).pipe(map(value => readEventCoreCoverCleanupClaim(value, limit)));
+  }
+
+  completeCoreCoverCleanup(job: EventCoreCoverCleanupJob, error: string | null): Observable<EventCoreCoverCleanupReceipt> {
+    return defer(() => {
+      readEventCoreCoverCleanupJob(job, 'disposition.cleanup.job');
+      assertEdgeContract(error === null || (typeof error === 'string' && error.length <= 500),
+        'disposition.cleanup.error', 'null or a sanitized error of at most 500 characters');
+      return this.backend.rpc<unknown>(EVENT_RPC.coreCoverCleanupWorker, {
+        p_operation: 'complete', p_job_id: job.jobId, p_claim_token: job.claimToken, p_error: error,
+      });
+    }).pipe(map(value => readEventCoreCoverCleanupReceipt(value, job.jobId, error)));
   }
 
   saveCore(payload: IEventCoreSavePayload): Observable<IEventCoreDetail> {
