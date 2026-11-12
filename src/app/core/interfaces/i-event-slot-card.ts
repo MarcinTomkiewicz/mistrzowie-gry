@@ -21,7 +21,6 @@ export interface IEventSlotCardVm {
   canOpenDetails: boolean;
   canOpenGmProfile: boolean;
   programStatus?: 'confirmed' | 'pending';
-  occurrenceDate?: string;
   slotLabel?: string | null;
   timeLabel?: string;
   sessionDetails?: SessionDetailsData | null;

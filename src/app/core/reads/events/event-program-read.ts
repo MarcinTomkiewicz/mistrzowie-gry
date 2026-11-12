@@ -5,7 +5,7 @@ import { EVENT_RPC } from '../../configs/event-rpc.config';
 import { FilterOperator } from '../../enums/filter-operators';
 import { Backend } from '../../services/backend/backend';
 import { ACTIVE_HOST_SIGNUP_STATUSES } from '../../types/event-signup';
-import type { PublicEventProgramData, PublicEventProgramWireEntry } from '../../types/public-event-program';
+import type { PublicEventProgramData } from '../../types/public-event-program';
 import { assertEdgeContract } from '../../utils/edge-contract';
 import { decodePublicEventProgram } from './public-event-program.contract';
 
@@ -14,7 +14,7 @@ export class EventProgramRead {
   private readonly backend = inject(Backend);
 
   getPublicProgram(eventId: string, occurrenceId: string | null = null): Observable<PublicEventProgramData> {
-    return this.backend.rpc<PublicEventProgramWireEntry[]>(EVENT_RPC.getPublicProgram, {
+    return this.backend.rpc<unknown>(EVENT_RPC.getPublicProgram, {
       p_event_id: eventId, p_occurrence_id: occurrenceId,
     }).pipe(
       map(decodePublicEventProgram),

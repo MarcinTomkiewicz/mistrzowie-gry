@@ -131,7 +131,7 @@
 
     <app-event-slots
       [items]="slotCards()"
-      [slotCount]="0"
+      [slotCount]="slotCount()"
       [isLoading]="facade.isLoading()"
       (slotSelect)="slotSelect.emit($event)"
       (gmSelect)="gmSelect.emit($event)"

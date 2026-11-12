@@ -18,6 +18,7 @@ import { buildEventHostSignupRoute } from '../../../core/configs/event-signup.co
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { Auth } from '../../../core/services/auth/auth';
 import { Storage } from '../../../core/services/storage/storage';
+import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { normalizeText } from '../../../core/utils/normalize-text';
 import { formatMoney } from '../../../core/utils/pricing';
 import { hasMinimumRole } from '../../../core/utils/roles';
@@ -49,6 +50,7 @@ export class ChaoticThursdaysEventPanel implements OnInit {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
   private readonly storage = inject(Storage);
+  private readonly toast = inject(UiToast);
   private readonly programI18n = createEventPageI18n();
 
   readonly facade = inject(ChaoticThursdaysFacade);
@@ -127,6 +129,14 @@ export class ChaoticThursdaysEventPanel implements OnInit {
   });
 
   readonly slotItems = this.facade.selectedProgramItems;
+  readonly slotCount = computed(() =>
+    this.facade.selectedOccurrence()?.slotCapacity ?? this.facade.selectedEdition()?.defaultSlotCapacity ?? 0,
+  );
+
+  private readonly loadErrorToastEffect = effect(() => {
+    if (!this.facade.loadError()) return;
+    this.toast.danger({ summary: this.loadErrorMessage() });
+  });
 
   readonly slotCards = computed<IEventSlotCardVm[]>(() =>
     createPublicEventProgramCards(this.slotItems(), this.storage, this.programI18n.program(),

@@ -10,7 +10,6 @@ import { Theme } from '../../../core/services/theme/theme';
 import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { resolveAltDifficultyLevel } from '../../../common/session-difficulty/session-difficulty';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
-import { formatDateLabel } from '../../../core/utils/date';
 import { createEventSlotsI18n } from './event-slots.i18n';
 import { SystemChip } from '../../../common/system-chip/system-chip';
 
@@ -140,7 +139,6 @@ export class EventSlots {
   }
 
   readonly resolveLanguageFlagClass = resolveLanguageFlagClass;
-  readonly formatDateLabel = formatDateLabel;
 
   private createEmptySlot(): IEventSlotCardVm {
     const fallback = this.i18n.commonFallbacks();

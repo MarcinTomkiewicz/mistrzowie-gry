@@ -52,11 +52,8 @@
           (click)="onSlotClick(item)"
           (keydown)="onSlotKeydown($event, item)"
         >
-          @if (item.programStatus) {
+          @if (item.slotLabel || item.timeLabel) {
             <div class="flex-col-start-stretch gap-xs">
-              @if (item.occurrenceDate) {
-                <time class="muted-text" [attr.datetime]="item.occurrenceDate">{{ formatDateLabel(item.occurrenceDate, 'pl-PL', true) }}</time>
-              }
               @if (item.slotLabel) {
                 <strong>{{ item.slotLabel }}</strong>
               }

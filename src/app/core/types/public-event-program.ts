@@ -1,9 +1,6 @@
 import type { ISession, SessionPresentation } from '../interfaces/i-session';
 import type { GmProfilePresentation } from '../interfaces/i-gm-public-profile';
 
-export type JsonValue = string | number | boolean | null | JsonValue[] |
-  { [key: string]: JsonValue };
-
 type SessionFields = Pick<ISession,
   | 'systemId' | 'title' | 'description' | 'image' | 'difficultyLevel'
   | 'minPlayers' | 'maxPlayers' | 'minAge'
@@ -14,7 +11,7 @@ type PublicEventSession = {
   [K in keyof SessionFields]: SessionFields[K] | null;
 };
 
-// The server projects effective minPlayers/maxPlayers for this execution.
+// Every confirmed RPG session uses the same complete public RPC projection.
 export type PublicEventConfirmedSession = PublicEventSession &
   Pick<SessionPresentation, 'styles' | 'triggers' | 'languages'> & {
     gmDeclaredMaxPlayers: number | null;
@@ -41,14 +38,14 @@ type TimedProgramSlot = {
   blockId?: string | null; blockPosition?: number | null;
 };
 
-export type PublicEventConfirmedEntry<TSession = PublicEventConfirmedSession> = ProgramContext & {
+export type PublicEventConfirmedEntry = ProgramContext & {
   kind: 'confirmed';
   status: 'confirmed';
   canSignup?: false;
   participantSignupSupported?: false;
   programItemId: string;
   host: ProgramHost;
-  session: TSession;
+  session: PublicEventConfirmedSession;
 } & (
   | { timeScope: 'timed'; slot: TimedProgramSlot }
   | { timeScope: 'event'; slot: { label: null; startTime: null; endTime: null; startDayOffset?: never; endDayOffset?: never };
@@ -80,10 +77,7 @@ export type PublicEventActivityEntry = ProgramContext & {
   };
 };
 
-export type PublicEventProgramWireEntry =
-  PublicEventConfirmedEntry<Record<keyof PublicEventConfirmedSession, JsonValue>> |
-  PublicEventActivityEntry | PublicEventPendingEntry;
-
+// UI discriminants are normalized by decodePublicEventProgram, not guaranteed by the RPC.
 export type PublicEventProgramEntry =
   PublicEventConfirmedEntry | PublicEventActivityEntry | PublicEventPendingEntry;
 

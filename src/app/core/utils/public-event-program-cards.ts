@@ -72,7 +72,6 @@ export function createPublicEventProgramCards(
       canOpenDetails: !pending && !activity,
       canOpenGmProfile: !pending && !activity,
       programStatus: pending ? 'pending' : 'confirmed',
-      occurrenceDate: entry.occurrenceDate,
       slotLabel: slotLabel?.toLocaleLowerCase('pl-PL') === eventLabel ? null : slotLabel,
       timeLabel: formatPublicEventProgramTime(entry.slot, copy.dayOffset),
       sessionDetails: session ? { ...session, title, ...(system ? { system } : {}) } : null,

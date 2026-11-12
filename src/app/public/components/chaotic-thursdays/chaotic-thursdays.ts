@@ -90,7 +90,7 @@ export class ChaoticThursdays {
       return;
     }
 
-    if (loadError) {
+    if (loadError && loadError.kind !== 'program') {
       const error = this.i18n.commonErrors().server;
 
       this.responseStatus.set(503);

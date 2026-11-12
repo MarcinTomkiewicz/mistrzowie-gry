@@ -1,10 +1,4 @@
-import {
-  computed,
-  DestroyRef,
-  inject,
-  Injectable,
-  signal,
-} from '@angular/core';
+import { computed, DestroyRef, ErrorHandler, inject, Injectable, signal } from '@angular/core';
 import { forkJoin, map, Subscription } from 'rxjs';
 
 import { EVENT_KEYS } from '../../../core/configs/events.config';
@@ -27,6 +21,7 @@ import {
 @Injectable()
 export class ChaoticThursdaysFacade {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly errorHandler = inject(ErrorHandler);
   private readonly eventProgramRead = inject(EventProgramRead);
   private readonly eventRead = inject(EventRead);
 
@@ -116,7 +111,7 @@ export class ChaoticThursdaysFacade {
       .getPublicPage(EVENT_KEYS.chaoticThursdays)
       .subscribe({
         next: (page) => this.handlePage(page),
-        error: (cause) => this.fail({ kind: 'grouped-rpc', cause }),
+        error: (cause: unknown) => this.fail({ kind: 'grouped-rpc', cause }),
       });
   }
 
@@ -215,7 +210,7 @@ export class ChaoticThursdaysFacade {
 
           this.loadProgram(occurrences);
         },
-        error: (cause) => this.fail({ kind: 'occurrences', cause }),
+        error: (cause: unknown) => this.fail({ kind: 'occurrences', cause }),
       });
   }
 
@@ -254,7 +249,7 @@ export class ChaoticThursdaysFacade {
         );
         this.finishLoad();
       },
-      error: (cause) => this.fail({ kind: 'program', cause }),
+      error: (cause: unknown) => this.fail({ kind: 'program', cause }),
     });
   }
 
@@ -271,6 +266,7 @@ export class ChaoticThursdaysFacade {
   private fail(error: ChaoticThursdaysLoadError): void {
     this.loadError.set(error);
     this.isLoading.set(false);
+    if ('cause' in error) this.errorHandler.handleError(error.cause);
   }
 
   private resetPageState(): void {

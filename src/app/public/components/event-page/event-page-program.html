@@ -150,6 +150,5 @@
 <app-gm-profile-dialog
   [profile]="profile()"
   [visible]="profile() !== null"
-  [showCharacterSheets]="false"
   (visibleChange)="!$event && facade.closeGmProfile()"
 />
