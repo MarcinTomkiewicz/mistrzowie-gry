@@ -1,4 +1,4 @@
-@if (save.pending() || save.completed().length || save.error() || save.checked() || save.schedule.state() === 'draft') {
+@if (save.pending() || save.completed().length || save.error() || save.checkIssue() || save.checked() || save.schedule.state() === 'draft') {
   <section class="flex-col-start-stretch gap-sm w-100 min-w-0" [attr.aria-busy]="save.busy()">
     @if (save.completed().length) {
       <p class="m-0" role="status">{{ copy().completed }}:
@@ -6,6 +6,15 @@
       </p>
     }
     @if (save.pending()) { <p-message severity="warn" role="alert">{{ copy().uncertain }}</p-message> }
+    @else if (checkMessage(); as message) {
+      <p-message severity="warn" role="alert">{{ message }}</p-message>
+      @if (checkStep(); as step) {
+        <div class="flex-row-start-center">
+          <p-button type="button" size="small" severity="secondary" [outlined]="true"
+            [label]="i18n.diagnostics().goToSection" [disabled]="save.busy() || deciding()" (onClick)="navigateToStep.emit(step)" />
+        </div>
+      }
+    }
     @else if (save.error()) { <p-message severity="error" role="alert">{{ copy().failed }}</p-message> }
     @else if (save.checked()) { <p-message severity="info" role="status">{{ copy().checked }}</p-message> }
     @if (save.schedule.state() === 'draft') { <p-message severity="info" role="status">{{ i18n.schedule().draftSaved }}</p-message> }
@@ -18,7 +27,7 @@
   } @else if (save.dirty()) {
     <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-check"
       [label]="copy().checkChanges" [loading]="save.checking()"
-      [disabled]="disabled() || save.busy() || deciding()" (onClick)="check()" />
+      [disabled]="save.busy() || deciding()" (onClick)="check()" />
     <p-button type="button" size="small" severity="secondary" [outlined]="true"
       [label]="i18n.creation().discardDraft" [disabled]="disabled() || save.busy() || deciding()" (onClick)="discard.emit()" />
   }

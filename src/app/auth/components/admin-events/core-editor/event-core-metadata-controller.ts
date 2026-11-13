@@ -62,10 +62,8 @@ export class EventCoreMetadataController {
   readonly canEditCore = computed(() => {
     const core = this.core();
     const calendar = this.global.calendar();
-    const edition = this.global.mainEdition();
     return !!core && !core.archived && this.issues().core !== 'protected' &&
-      (!!calendar && !!edition && !edition.currentlyPublic && calendar.calendarLifecycle === 'global' && calendar.coreId === core.id &&
-        calendar.globalDates.every(day => day.cityOccurrences.every(city => !city.protected && !city.publishedAt)));
+      calendar?.calendarLifecycle === 'global' && calendar.coreId === core.id;
   });
   readonly canEditEdition = computed(() => {
     const edition = this.global.mainEdition();
@@ -75,9 +73,7 @@ export class EventCoreMetadataController {
       calendar.coreId === core.id && calendar.mainEditionId === edition.id && edition.eventCoreId === core.id &&
       this.issues().edition !== 'protected' && !edition.isActive &&
       !edition.currentlyPublic &&
-      edition.occurrences.every(row => !row.publishedAt && row.activeParticipantCount === 0) &&
-      calendar.globalDates.every(day => day.cityOccurrences.filter(city => city.editionId === edition.id)
-        .every(city => !city.protected && !city.publishedAt));
+      edition.occurrences.every(row => !row.publishedAt && row.activeParticipantCount === 0);
   });
 
   constructor() {

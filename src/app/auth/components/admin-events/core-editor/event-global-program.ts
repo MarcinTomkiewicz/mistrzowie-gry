@@ -32,10 +32,11 @@ export class EventGlobalProgram {
   readonly core = input.required<IEventCoreDetail>();
   readonly calendar = input.required<AdminGlobalCalendarResult>();
   readonly disabled = input(false);
+  readonly selectionDisabled = input(false);
   protected readonly global = inject(EventGlobalDraftController);
   protected readonly manual = inject(EventManualProgramController);
   private readonly save = inject(EventGlobalSaveController);
-  protected readonly selectionLocked = computed(() => this.disabled() || this.manual.locked());
+  protected readonly selectionLocked = computed(() => this.selectionDisabled() || this.manual.locked());
   protected readonly i18n = createEventAdminTimelineI18n();
   private readonly admin = inject(EventAdmin);
   private readonly toast = inject(UiToast);
@@ -86,7 +87,7 @@ export class EventGlobalProgram {
   constructor() {
     // Admin programme data is fetched only after browser rendering, never during SSR.
     afterNextRender(() => this.browserReady.set(true));
-    effect(() => this.manual.blocked.set(this.disabled()));
+    effect(() => this.manual.blocked.set(this.disabled() || this.save.dirty() || this.save.pending()));
     effect(() => {
       const data = this.data();
       const edition = this.edition();

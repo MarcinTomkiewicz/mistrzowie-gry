@@ -5,6 +5,9 @@ import type { IAdminEventDetail, IEventCoreDetail } from './i-event-admin';
 
 type GlobalDate = AdminGlobalCalendarResult['globalDates'][number];
 
+export type GlobalSaveCheckReason = 'coverPending' | 'coverDirty' | 'program' | 'publication' | 'city' | 'diagnostics' |
+  'busy' | 'pending' | 'unchanged' | 'invalid' | 'section' | 'changed' | 'otherOperation';
+
 export interface SavedProgramDate {
   key: string;
   date: string;

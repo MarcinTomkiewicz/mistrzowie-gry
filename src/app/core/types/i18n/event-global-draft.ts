@@ -2,9 +2,11 @@ import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventC
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
 import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker, GlobalPublicationSignupProgress } from '../../interfaces/i-admin-global-event-publication';
 import type { ParticipantSignupKind } from '../../enums/event';
+import type { GlobalSaveCheckReason } from '../../interfaces/i-event-global-saved-summary';
 
 export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirmQuestion' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
   'retryRead' | 'localChanges' | 'saved' | 'discardConfirmQuestion' | 'discardConfirm' | 'checked' | 'checkChanges', string> & {
+    checkReasons: Record<GlobalSaveCheckReason, string>;
     dates: Record<'saved' | 'added' | 'retained' | 'removed' | 'outside' | 'protected' |
       'savedState' | 'newDateHint' | 'previewNeeded' | 'previewHint', string>;
   };

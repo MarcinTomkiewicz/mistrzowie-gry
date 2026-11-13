@@ -1,10 +1,11 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { AbstractControl } from '@angular/forms';
-import { asapScheduler, catchError, concatMap, defaultIfEmpty, defer, EMPTY, finalize, from, map, merge, Observable, observeOn, of, switchMap, tap, throwError, toArray } from 'rxjs';
+import { asapScheduler, catchError, concatMap, defaultIfEmpty, defer, EMPTY, finalize, from, map, merge, Observable, observeOn, of, switchMap, takeWhile, tap, throwError, toArray } from 'rxjs';
 
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import type { AdminGlobalCalendarResult } from '../../../../core/interfaces/i-admin-global-event';
+import type { GlobalSaveCheckReason } from '../../../../core/interfaces/i-event-global-saved-summary';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { EventCoreMetadataController } from './event-core-metadata-controller';
@@ -48,6 +49,7 @@ export class EventGlobalSaveController {
   readonly completed = signal<GlobalSaveSection[]>([]);
   readonly failed = signal<GlobalSaveSection | null>(null);
   readonly error = signal<unknown | null>(null);
+  readonly checkIssue = signal<{ reason: GlobalSaveCheckReason; section: GlobalSaveSection | null } | null>(null);
   readonly pending = computed(() => this.metadata.pendingTarget() !== null || this.base.readbackPending() ||
     this.dated.readbackPending() || this.policy.readbackPending() || /-(uncertain|readback)$/.test(this.schedule.state()));
   readonly changed = computed(() => {
@@ -57,8 +59,15 @@ export class EventGlobalSaveController {
       this.forms[key].dirty && (key === 'policy' ? this.policy.dirty() : key === 'dated' ? this.dated.hasChanges() : this.value(key) !== baseline[key]));
   });
   readonly dirty = computed(() => this.changed().length > 0);
-  readonly blocked = computed(() => this.cover.locked() || this.cover.dirty() || this.cover.needsReconciliation() ||
-    this.program.locked() || this.publication.locked() || this.global.cityEditing() || this.global.cityBusy() || this.global.isChecking());
+  readonly blockingReason = computed<GlobalSaveCheckReason | null>(() => {
+    if (this.cover.locked() || this.cover.needsReconciliation()) return 'coverPending';
+    if (this.cover.dirty()) return 'coverDirty';
+    if (this.program.locked()) return 'program';
+    if (this.publication.locked()) return 'publication';
+    if (this.global.cityEditing() || this.global.cityBusy()) return 'city';
+    return this.global.isChecking() ? 'diagnostics' : null;
+  });
+  readonly blocked = computed(() => this.blockingReason() !== null);
 
   constructor() {
     effect(() => {
@@ -90,6 +99,7 @@ export class EventGlobalSaveController {
     this.completed.set([]);
     this.failed.set(null);
     this.error.set(null);
+    this.checkIssue.set(null);
   }
 
   load(core: IEventCoreDetail): Observable<unknown> {
@@ -113,20 +123,31 @@ export class EventGlobalSaveController {
       if (key === 'dated') this.dated.validationAttempted.set(true);
       if (key === 'policy') this.policy.validationAttempted.set(true);
       this.forms[key].markAllAsTouched();
-      if (this.forms[key].invalid) return key;
+      if (this.forms[key].invalid || this.forms[key].pending) {
+        this.checkIssue.set({ reason: 'invalid', section: key });
+        return key;
+      }
     }
     return null;
   }
 
-  check(): Observable<void> {
+  check(externallyBlocked = false): Observable<boolean> {
     return defer(() => {
-      if (this.blocked() || this.busy() || this.pending() || !this.dirty()) return EMPTY;
+      const activeSection = sections.find(key => key === 'core' || key === 'edition' ? this.metadata.isBusy() : this[key].isBusy());
+      const reason = this.busy() || activeSection ? 'busy' : this.pending() ? 'pending' : this.blockingReason() ??
+        (externallyBlocked ? 'otherOperation' : !this.dirty() ? 'unchanged' : null);
+      if (reason) {
+        this.checkIssue.set({ reason, section: reason === 'pending' ? this.failed() : activeSection ?? null });
+        return of(false);
+      }
       this.checkedSignature.set(null);
+      this.checkIssue.set(null);
+      this.error.set(null);
       const invalid = this.validate();
-      if (invalid) { this.failed.set(invalid); return EMPTY; }
+      if (invalid) { this.failed.set(invalid); return of(false); }
+      const signature = this.signature();
       this.busy.set(true);
       this.checking.set(true);
-      this.error.set(null);
       return from(this.changed()).pipe(concatMap(key => {
         this.failed.set(key);
         const request: Observable<boolean> = key === 'base' ? this.base.previewChanges().pipe(map(preview => preview.valid))
@@ -135,12 +156,24 @@ export class EventGlobalSaveController {
             : key === 'dated' ? this.dated.previewChanges().pipe(map(preview => preview.valid))
               : key === 'policy' ? this.policy.previewChanges().pipe(map(preview => preview.valid)) : of(this.metadata.canSave(key));
         return request.pipe(observeOn(asapScheduler), defaultIfEmpty(false), tap(valid => {
-          assertEdgeContract(valid, 'globalSave.check', `a valid read-only ${key} preview`);
+          if (!valid) this.checkIssue.set({ reason: 'section', section: key });
         }));
-      }), toArray(), map(() => {
+      }), takeWhile(valid => valid, true), toArray(), map(results => {
+        if (results.some(valid => !valid)) return false;
+        if (signature !== this.signature()) {
+          this.failed.set(null);
+          this.checkIssue.set({ reason: 'changed', section: null });
+          return false;
+        }
         this.failed.set(null);
-        this.checkedSignature.set(this.signature());
-      }), catchError((error: unknown) => { this.error.set(error); return throwError(() => error); }),
+        this.checkIssue.set(null);
+        this.checkedSignature.set(signature);
+        return true;
+      }), catchError((error: unknown) => {
+        this.checkIssue.set({ reason: 'section', section: this.failed() });
+        this.error.set(error);
+        return throwError(() => error);
+      }),
       finalize(() => { this.checking.set(false); this.busy.set(false); }));
     });
   }
@@ -153,6 +186,7 @@ export class EventGlobalSaveController {
       this.busy.set(true);
       this.checkedSignature.set(null);
       this.error.set(null);
+      this.checkIssue.set(null);
       return from(this.changed()).pipe(concatMap(key => {
         this.failed.set(key);
         // Existing controllers release their busy guards in finalize, before the next operation starts.
@@ -172,6 +206,7 @@ export class EventGlobalSaveController {
       if (!key || !this.pending() || this.busy()) return EMPTY;
       this.busy.set(true);
       this.error.set(null);
+      this.checkIssue.set(null);
       const read: Observable<unknown> = key === 'core' || key === 'edition' ? this.metadata.save(key)
         : key === 'base' ? this.base.refresh() : key === 'schedule' ? this.schedule.refresh()
           : key === 'dated' ? this.dated.refresh() : this.policy.refresh();

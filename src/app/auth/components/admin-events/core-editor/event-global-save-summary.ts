@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, output, signal, TemplateRef, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, output, signal, TemplateRef, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -6,6 +6,7 @@ import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
+import { resolveEventCoreAdminErrorMessage, resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalSaveController, GLOBAL_SAVE_STEPS, type GlobalSaveSection } from './event-global-save-controller';
 
@@ -29,6 +30,45 @@ export class EventGlobalSaveSummary {
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly checkStep = computed(() => {
+    const issue = this.save.checkIssue();
+    if (!issue) return null;
+    if (issue.section) return GLOBAL_SAVE_STEPS[issue.section];
+    return issue.reason === 'coverDirty' || issue.reason === 'coverPending' ? 1
+      : issue.reason === 'program' ? 5 : issue.reason === 'city' ? 2 : null;
+  });
+  protected readonly checkMessage = computed(() => {
+    const issue = this.save.checkIssue();
+    if (!issue) return null;
+    const section = issue.section;
+    let detail = this.copy().checkReasons[issue.reason];
+    if (section && issue.reason === 'section') {
+      let sectionDetail: string | null = null;
+      const error = this.save.error() ?? (section === 'core' || section === 'edition' ? this.save.metadata.errors()[section]
+        : this.save[section].error());
+      if (section === 'base' || section === 'schedule' || section === 'dated') {
+        const blocker = this.save[section].blockingReason();
+        if (blocker) sectionDetail = this.i18n.schedule().blockers[blocker];
+        else if (section === 'base' && this.save.base.conflicted()) sectionDetail = this.i18n.baseTimeBlocks().conflict;
+        else if (section === 'dated' && this.save.dated.conflicted()) sectionDetail = this.i18n.datedBlocks().conflict;
+      } else if (section === 'policy') {
+        const policyIssue = this.save.policy.issue();
+        if (policyIssue) sectionDetail = this.i18n.policyEditor()[policyIssue];
+        else if (!this.save.policy.canEdit()) sectionDetail = this.i18n.policyEditor().protected;
+      } else {
+        const metadataIssue = this.save.metadata.issues()[section];
+        if (metadataIssue) sectionDetail = this.i18n.metadata()[metadataIssue];
+        else if (!(section === 'core' ? this.save.metadata.canEditCore() : this.save.metadata.canEditEdition())) {
+          sectionDetail = this.i18n.metadata().protected;
+        }
+      }
+      if (sectionDetail !== null) detail = sectionDetail;
+      else if (error !== null && error !== undefined) detail = section === 'edition'
+        ? resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification)
+        : resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification);
+    }
+    return section ? `${this.label(section)}: ${detail}` : detail;
+  });
 
   protected label(key: GlobalSaveSection): string {
     return { core: this.i18n.creationSteps().event, edition: this.i18n.creationSteps().location,
@@ -39,22 +79,16 @@ export class EventGlobalSaveSummary {
   protected edit(key: GlobalSaveSection): void { this.navigateToStep.emit(GLOBAL_SAVE_STEPS[key]); }
 
   protected check(): void {
-    if (this.disabled() || this.deciding() || this.save.busy() || this.save.pending()) return;
-    const invalid = this.save.validate();
-    if (invalid) { this.edit(invalid); return; }
-    this.save.check().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      error: () => {
-        this.toast.danger({ summary: this.copy().checkChanges, detail: this.i18n.commonErrors().generic });
-        const key = this.save.failed();
-        if (key) queueMicrotask(() => { if (!this.destroyRef.destroyed) this.edit(key); });
-      },
+    this.save.check(this.disabled() || this.deciding()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: valid => { if (!valid) this.showCheckFailure(); },
+      error: () => this.showCheckFailure(),
     });
   }
 
   protected confirmSave(): void {
     if (this.disabled() || this.deciding() || this.save.busy() || this.save.pending() || !this.save.checked()) return;
     const invalid = this.save.validate();
-    if (invalid) { this.edit(invalid); return; }
+    if (invalid) { this.showCheckFailure(); return; }
     const coreId = this.save.metadata.core()?.id;
     this.deciding.set(true);
     this.confirm.modalDecision({ header: this.copy().confirmQuestion, message: this.copy().confirm,
@@ -83,6 +117,17 @@ export class EventGlobalSaveSummary {
       error: () => this.toast.show(this.save.pending() ? 'warn' : 'danger', {
         summary: this.copy().retryRead, detail: this.save.pending() ? this.copy().uncertain : this.copy().failed,
       }),
+    });
+  }
+
+  private showCheckFailure(): void {
+    const issue = this.save.checkIssue();
+    this.toast.show(issue?.reason === 'invalid' || issue?.reason === 'section' ? 'danger' : 'warn', {
+      summary: this.copy().checkChanges, detail: this.checkMessage() ?? this.i18n.commonErrors().generic,
+    });
+    const section = issue?.section;
+    if (section && !this.save.pending()) queueMicrotask(() => {
+      if (!this.destroyRef.destroyed) this.edit(section);
     });
   }
 }

@@ -277,8 +277,12 @@ export class EventCoreEditor {
   }
 
   protected programBlocked(): boolean {
-    return this.otherOperationsLocked() || this.saveChanges.dirty() || this.form.dirty || this.metadata.editionForm.dirty ||
+    return this.otherOperationsLocked() || this.saveChanges.dirty() ||
       this.cover.dirty() || this.globalDraft.cityEditing();
+  }
+
+  protected programReadBlocked(): boolean {
+    return this.otherOperationsLocked() || this.program.locked();
   }
 
   private restoreStep(value: string | null): void {

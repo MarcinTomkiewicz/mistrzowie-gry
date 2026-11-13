@@ -104,7 +104,8 @@
                     }
                     @case (4) { <app-event-global-policy-editor [fieldErrors]="diagnosticIssues(['policy', 'cityOverrides'])" /> }
                     @case (5) {
-                      <app-event-global-program [coreId]="loadedCore.id" [core]="loadedCore" [calendar]="calendar" [disabled]="programBlocked()" />
+                      <app-event-global-program [coreId]="loadedCore.id" [core]="loadedCore" [calendar]="calendar"
+                        [disabled]="programBlocked()" [selectionDisabled]="programReadBlocked()" />
                     }
                     @case (6) {
                       <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="programBlocked()"
