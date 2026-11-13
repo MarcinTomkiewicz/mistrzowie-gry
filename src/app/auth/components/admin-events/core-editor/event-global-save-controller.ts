@@ -52,6 +52,7 @@ export class EventGlobalSaveController {
   readonly checkIssue = signal<{ reason: GlobalSaveCheckReason; section: GlobalSaveSection | null } | null>(null);
   readonly pending = computed(() => this.metadata.pendingTarget() !== null || this.base.readbackPending() ||
     this.dated.readbackPending() || this.policy.readbackPending() || /-(uncertain|readback)$/.test(this.schedule.state()));
+  // Write selection can shrink after a confirmed no-op; it is not the data signature.
   readonly changed = computed(() => {
     this.formEvents();
     const baseline = this.baseline();
@@ -145,10 +146,11 @@ export class EventGlobalSaveController {
       this.error.set(null);
       const invalid = this.validate();
       if (invalid) { this.failed.set(invalid); return of(false); }
+      const changed = this.changed();
       const signature = this.signature();
       this.busy.set(true);
       this.checking.set(true);
-      return from(this.changed()).pipe(concatMap(key => {
+      return from(changed).pipe(concatMap(key => {
         this.failed.set(key);
         const request: Observable<boolean> = key === 'base' ? this.base.previewChanges().pipe(map(preview => preview.valid))
           : key === 'schedule' ? this.schedule.state() === 'draft' ? of(this.schedule.canApply())
@@ -291,6 +293,6 @@ export class EventGlobalSaveController {
 
   private signature(): string {
     this.formEvents();
-    return JSON.stringify(this.changed().map(key => [key, this.value(key), key === 'schedule' ? this.schedule.state() : null]));
+    return JSON.stringify(sections.map(key => [key, this.value(key), key === 'schedule' ? this.schedule.state() : null]));
   }
 }

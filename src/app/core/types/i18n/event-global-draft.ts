@@ -85,6 +85,9 @@ export type EventGlobalPolicyCopy = {
   saved: string;
   conflict: string;
   baselineChanged: string;
+  documentMismatch: string;
+  contractMismatch: string;
+  differenceFields: string;
   readbackPending: string;
   refresh: string;
   discard: string;

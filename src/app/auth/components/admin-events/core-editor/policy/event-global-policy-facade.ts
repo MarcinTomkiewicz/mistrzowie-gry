@@ -4,7 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { catchError, defer, EMPTY, finalize, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 
 import { assertPolicyDocument, createEventPolicyPriceForm, createEventPolicyRulesForm, mapEventPolicyDocument,
-  mapEventPolicyPrice, mapEventPolicyRules, samePolicyDocument } from '../../../../../core/factories/event-policy-form.factory';
+  mapEventPolicyPrice, mapEventPolicyRules, policyDocumentDifferences, samePolicyDocument } from '../../../../../core/factories/event-policy-form.factory';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview } from '../../../../../core/interfaces/i-admin-event-policy';
 import type { IEventCoreDetail } from '../../../../../core/interfaces/i-event-admin';
 import { EventAdmin } from '../../../../../core/services/event-admin/event-admin';
@@ -12,19 +12,20 @@ import { RpcError } from '../../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../../core/utils/edge-contract';
 import { setControlEnabled } from '../../../../../core/utils/form-controls';
 import { assertPolicyPreview, assertPolicyRead, EventGlobalPolicyError, type GlobalPolicyCommand,
-  type GlobalPolicyIssue, matchesPolicySave, samePolicyBaseline } from './event-global-policy-state';
+  type GlobalPolicyIssue, matchesPolicySave, policyBaselineDifferences, samePolicyBaseline } from './event-global-policy-state';
 
 @Injectable()
 export class EventGlobalPolicyFacade {
   private readonly admin = inject(EventAdmin);
   private readonly core = signal<IEventCoreDetail | null>(null);
   private readonly command = signal<GlobalPolicyCommand | null>(null);
-  private baseline: AdminEventPolicyDraft | null = null;
+  private readonly baseline = signal<AdminEventPolicyDraft | null>(null);
   private saveContractError: unknown | null = null;
   private readonly operation = signal<'read' | 'preview' | 'save' | null>(null);
   readonly draft = signal<AdminEventPolicyDraft | null>(null);
   readonly blocked = signal(false);
   readonly issue = signal<GlobalPolicyIssue | null>(null);
+  readonly issueFields = signal<readonly string[]>([]);
   readonly readbackPending = signal(false);
   readonly error = signal<unknown | null>(null);
   readonly preview = signal<AdminEventPolicyPreview | null>(null);
@@ -33,8 +34,8 @@ export class EventGlobalPolicyFacade {
   readonly form = new FormGroup({ price: createEventPolicyPriceForm(), rules: createEventPolicyRulesForm() });
   private readonly formEvents = toSignal(this.form.events);
   readonly sourceDocument = computed(() => {
-    this.draft();
-    return this.baseline ? mapEventPolicyDocument(this.baseline) : null;
+    const baseline = this.baseline();
+    return baseline ? mapEventPolicyDocument(baseline) : null;
   });
   readonly document = computed(() => {
     this.formEvents();
@@ -46,11 +47,13 @@ export class EventGlobalPolicyFacade {
   readonly dirty = computed(() => {
     this.formEvents();
     const document = this.document();
-    return this.form.dirty && (!document || !this.baseline || !samePolicyDocument(document, mapEventPolicyDocument(this.baseline)));
+    const source = this.sourceDocument();
+    return this.form.dirty && (!document || !source || !samePolicyDocument(document, source));
   });
   readonly isBusy = computed(() => this.operation() !== null);
   readonly conflicted = computed(() => this.issue() !== null);
   readonly locked = computed(() => this.isBusy() || this.dirty() || this.issue() === 'conflict' || this.readbackPending());
+  readonly canReload = computed(() => this.conflicted() && !this.isBusy() && !this.blocked() && !this.readbackPending());
   readonly canEdit = computed(() => {
     const core = this.core();
     return !this.blocked() && core !== null && !core.isActive && !core.hasPublicPage &&
@@ -71,13 +74,14 @@ export class EventGlobalPolicyFacade {
   }
 
   reset(): void {
-    this.baseline = null;
+    this.baseline.set(null);
     this.saveContractError = null;
     this.command.set(null);
     this.operation.set(null);
     this.core.set(null);
     this.draft.set(null);
     this.issue.set(null);
+    this.issueFields.set([]);
     this.readbackPending.set(false);
     this.error.set(null);
     this.preview.set(null);
@@ -97,13 +101,13 @@ export class EventGlobalPolicyFacade {
 
   acceptCalendarReadback(): Observable<AdminEventPolicyDraft> {
     return defer(() => {
-      const before = this.baseline;
+      const before = this.baseline();
       return this.run('read', this.readCurrent().pipe(tap(read => {
         assertEdgeContract(before !== null && !read.baselineChanged && before.coreId === read.coreId &&
           before.revision === read.revision && before.hasDraft === read.hasDraft &&
           samePolicyDocument(mapEventPolicyDocument(before), mapEventPolicyDocument(read)),
         'globalPolicy.calendarReadback', 'unchanged policy data after the confirmed calendar saves');
-        this.baseline = read;
+        this.baseline.set(read);
       })));
     });
   }
@@ -113,7 +117,7 @@ export class EventGlobalPolicyFacade {
       this.validationAttempted.set(true);
       this.form.markAllAsTouched();
       if (!this.canPreview() || this.form.invalid) return EMPTY;
-      const baseline = this.baseline;
+      const baseline = this.baseline();
       assertEdgeContract(baseline !== null, 'globalPolicy', 'the authoritative edit baseline');
       const source = mapEventPolicyDocument(baseline);
       const command: GlobalPolicyCommand = { coreId: baseline.coreId, baseline,
@@ -122,8 +126,10 @@ export class EventGlobalPolicyFacade {
       this.invalidatePreview();
       return this.run('preview', this.readCurrent().pipe(switchMap(read => {
         if (read.baselineChanged || !samePolicyBaseline(baseline, read)) {
-          throw new EventGlobalPolicyError(read.baselineChanged ? 'baselineChanged' : 'conflict');
+          throw new EventGlobalPolicyError(read.baselineChanged ? 'baselineChanged' : 'conflict', policyBaselineDifferences(baseline, read));
         }
+        const fields = policyDocumentDifferences(source, mapEventPolicyDocument(read));
+        if (fields.length) throw new EventGlobalPolicyError('documentMismatch', fields);
         if (!this.canEdit()) return EMPTY;
         return this.admin.previewPolicyChange(command.coreId, command.document).pipe(tap(preview => {
           assertPolicyPreview(preview, command);
@@ -158,7 +164,8 @@ export class EventGlobalPolicyFacade {
         } catch (error: unknown) {
           this.saveContractError = error;
           this.error.set(error);
-          this.issue.set('conflict');
+          this.issue.set(error instanceof EventGlobalPolicyError ? error.issue : 'contractMismatch');
+          this.issueFields.set(error instanceof EventGlobalPolicyError ? error.fields : []);
           return null;
         }
         if (!result.saved) {
@@ -190,6 +197,11 @@ export class EventGlobalPolicyFacade {
     });
   }
 
+  reload(): Observable<AdminEventPolicyDraft> {
+    return defer(() => this.canReload()
+      ? this.run('read', this.readCurrent().pipe(tap(read => this.populate(read)))) : EMPTY);
+  }
+
   private readCurrent(): Observable<AdminEventPolicyDraft> {
     const core = this.core();
     assertEdgeContract(core !== null, 'globalPolicy', 'a loaded Core');
@@ -207,14 +219,15 @@ export class EventGlobalPolicyFacade {
       this.populate(read);
       this.saved.set(true);
     } else {
-      this.issue.set(read.baselineChanged ? 'baselineChanged' : 'conflict');
+      this.issue.set(read.baselineChanged ? 'baselineChanged' : 'contractMismatch');
+      this.issueFields.set(policyDocumentDifferences(command.document, mapEventPolicyDocument(read)));
       this.form.markAsDirty();
       assertEdgeContract(false, 'globalPolicy.readback', 'the exact pending policy document and revision in canonical readback');
     }
   }
 
   private populate(read: AdminEventPolicyDraft): void {
-    this.baseline = read;
+    this.baseline.set(read);
     this.saveContractError = null;
     this.error.set(null);
     this.command.set(null);
@@ -222,6 +235,7 @@ export class EventGlobalPolicyFacade {
     this.preview.set(null);
     this.saved.set(false);
     this.issue.set(read.baselineChanged ? 'baselineChanged' : null);
+    this.issueFields.set([]);
     this.validationAttempted.set(false);
     const document = mapEventPolicyDocument(read);
     this.form.controls.price.reset(document.global.price);
@@ -261,8 +275,13 @@ export class EventGlobalPolicyFacade {
       this.error.set(error);
       if (!this.readbackPending()) {
         this.invalidatePreview();
-        if (error instanceof EventGlobalPolicyError) this.issue.set(error.issue);
-        else if (error instanceof RpcError && error.code === '40001') this.issue.set('conflict');
+        if (error instanceof EventGlobalPolicyError) {
+          this.issue.set(error.issue);
+          this.issueFields.set(error.fields);
+        } else if (error instanceof RpcError && error.code === '40001') {
+          this.issue.set('conflict');
+          this.issueFields.set([]);
+        }
       }
     } }), finalize(() => this.operation.set(null)));
   }

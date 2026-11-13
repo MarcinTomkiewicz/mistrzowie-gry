@@ -86,6 +86,15 @@
   color: v.$color-success;
 }
 
+/* WARN */
+.p-toast-message.mg-toast--warn {
+  @include m.semantic-subtle-surface(v.$color-warn);
+  border-color: color-mix(in srgb, v.$color-warn 55%, v.$color-border);
+}
+.p-toast-message.mg-toast--warn .p-toast-summary {
+  color: v.$color-warn;
+}
+
 /* DANGER */
 .p-toast-message.mg-toast--danger {
   @include m.semantic-subtle-surface(v.$color-danger);
@@ -112,6 +121,10 @@ html[data-theme="light"] .p-toast-message.mg-toast--info {
 
 html[data-theme="light"] .p-toast-message.mg-toast--success {
   @include m.semantic-subtle-surface(v.$color-success, white);
+}
+
+html[data-theme="light"] .p-toast-message.mg-toast--warn {
+  @include m.semantic-subtle-surface(v.$color-warn, white);
 }
 
 html[data-theme="light"] .p-toast-message.mg-toast--danger {

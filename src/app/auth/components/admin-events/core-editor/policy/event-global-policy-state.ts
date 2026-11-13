@@ -1,4 +1,4 @@
-import { assertPolicyDocument, mapEventPolicyDocument, samePolicyDocument } from '../../../../../core/factories/event-policy-form.factory';
+import { assertPolicyDocument, mapEventPolicyDocument, policyDocumentDifferences, samePolicyDocument } from '../../../../../core/factories/event-policy-form.factory';
 import type { AdminEventPolicyDraft, AdminEventPolicyPreview, PolicyDocument } from '../../../../../core/interfaces/i-admin-event-policy';
 import type { IEventCoreDetail } from '../../../../../core/interfaces/i-event-admin';
 import { assertEdgeContract, readEdgeUuid } from '../../../../../core/utils/edge-contract';
@@ -10,9 +10,11 @@ export interface GlobalPolicyCommand {
   confirmedRevision: number | null;
 }
 
-export type GlobalPolicyIssue = 'conflict' | 'baselineChanged';
+export type GlobalPolicyIssue = 'conflict' | 'baselineChanged' | 'documentMismatch' | 'contractMismatch';
 export class EventGlobalPolicyError extends Error {
-  constructor(readonly issue: GlobalPolicyIssue) { super(`[GLOBAL_POLICY] ${issue}`); }
+  constructor(readonly issue: GlobalPolicyIssue, readonly fields: readonly string[] = []) {
+    super(`[GLOBAL_POLICY] ${issue}: ${fields.join(', ')}`);
+  }
 }
 
 export function assertPolicyRead(core: IEventCoreDetail, read: AdminEventPolicyDraft): void {
@@ -40,11 +42,15 @@ export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: G
       (preview.valid === false && (preview.status === 'invalid' || preview.status === 'blocked'))),
   'policyPreview', 'an explicit draft preview without publication or participant registration');
   if ('normalizedDocument' in preview) {
-    assertEdgeContract(preview.mainEditionId === command.baseline.canonicalBaseline.mainEditionId,
-      'policyPreview', 'the same main Edition as the edit baseline');
+    assertEdgeContract(preview.mainEditionId === command.baseline.canonicalBaseline.mainEditionId &&
+      typeof preview.baselineFingerprint === 'string' && /^[0-9a-f]{32}$/.test(preview.baselineFingerprint),
+      'policyPreview', 'the same main Edition and a canonical baseline fingerprint');
+    if (preview.baselineFingerprint !== command.baseline.baselineFingerprint) {
+      throw new EventGlobalPolicyError('conflict', ['baselineFingerprint']);
+    }
     assertPolicyDocument(preview.normalizedDocument, command.baseline.canonicalBaseline.editions.map(row => row.editionId));
-    if (preview.baselineFingerprint !== command.baseline.baselineFingerprint ||
-      !samePolicyDocument(preview.normalizedDocument, command.document)) throw new EventGlobalPolicyError('conflict');
+    const fields = policyDocumentDifferences(command.document, preview.normalizedDocument);
+    if (fields.length) throw new EventGlobalPolicyError('documentMismatch', fields);
   } else {
     assertEdgeContract(preview.status === 'invalid' && preview.participantSignupOpened === false,
       'policyPreview', 'the short normalization failure');
@@ -52,8 +58,11 @@ export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: G
 }
 
 export function samePolicyBaseline(left: AdminEventPolicyDraft, right: AdminEventPolicyDraft): boolean {
-  return !right.baselineChanged && left.revision === right.revision && left.hasDraft === right.hasDraft &&
-    left.baselineFingerprint === right.baselineFingerprint && samePolicyDocument(mapEventPolicyDocument(left), mapEventPolicyDocument(right));
+  return !right.baselineChanged && policyBaselineDifferences(left, right).length === 0;
+}
+
+export function policyBaselineDifferences(left: AdminEventPolicyDraft, right: AdminEventPolicyDraft): string[] {
+  return (['revision', 'hasDraft', 'baselineFingerprint'] as const).filter(field => left[field] !== right[field]);
 }
 
 export function matchesPolicySave(read: AdminEventPolicyDraft, command: GlobalPolicyCommand): boolean {

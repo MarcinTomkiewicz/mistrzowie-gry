@@ -154,19 +154,39 @@ function policyPrice(price: Omit<EventGlobalPrice, 'currency'> & { currency: Eve
 }
 
 export function samePolicyDocument(left: PolicyDocument, right: PolicyDocument): boolean {
-  const key = (document: PolicyDocument): string => {
+  return policyDocumentDifferences(left, right).length === 0;
+}
+
+export function policyDocumentDifferences(left: PolicyDocument, right: PolicyDocument): string[] {
+  const fields = (document: PolicyDocument): Map<string, unknown> => {
     const global = document.global;
-    return JSON.stringify([
-      global.price.amount, global.price.currency, global.price.basis, global.coverImagePath, global.isForBeginners,
-      global.participantSignupKind, global.signupRequired, global.sessionCapacityCeiling, global.wholeEventCapacity,
-      [...document.cityOverrides].sort((a, b) => a.editionId.localeCompare(b.editionId)).map(({ editionId, overrides: o }) => [
-        editionId, o.price.enabled, o.price.value === null ? null : [o.price.value.amount, o.price.value.currency, o.price.value.basis],
-        o.cover.enabled, o.cover.value, o.signup.enabled, o.signup.value === null ? null : [o.signup.value.kind, o.signup.value.required],
-        o.sessionCapacityCeiling.enabled, o.sessionCapacityCeiling.value, o.wholeEventCapacity.enabled, o.wholeEventCapacity.value,
-      ]),
+    assertEdgeContract(new Set(document.cityOverrides.map(row => row.editionId)).size === document.cityOverrides.length,
+      'policyDocument.cityOverrides', 'unique Edition identities for canonical comparison');
+    const result = new Map<string, unknown>([
+      ['global.price.amount', global.price.amount], ['global.price.currency', global.price.currency], ['global.price.basis', global.price.basis],
+      ['global.coverImagePath', global.coverImagePath], ['global.isForBeginners', global.isForBeginners],
+      ['global.participantSignupKind', global.participantSignupKind], ['global.signupRequired', global.signupRequired],
+      ['global.sessionCapacityCeiling', global.sessionCapacityCeiling], ['global.wholeEventCapacity', global.wholeEventCapacity],
     ]);
+    for (const { editionId, overrides: o } of document.cityOverrides) {
+      const prefix = `cityOverrides[${editionId}].overrides`;
+      result.set(`${prefix}.price.enabled`, o.price.enabled);
+      result.set(`${prefix}.price.value`, o.price.value === null ? null : JSON.stringify([o.price.value.amount, o.price.value.currency, o.price.value.basis]));
+      result.set(`${prefix}.cover.enabled`, o.cover.enabled);
+      result.set(`${prefix}.cover.value`, o.cover.value);
+      result.set(`${prefix}.signup.enabled`, o.signup.enabled);
+      result.set(`${prefix}.signup.value`, o.signup.value === null ? null : JSON.stringify([o.signup.value.kind, o.signup.value.required]));
+      for (const field of ['sessionCapacityCeiling', 'wholeEventCapacity'] as const) {
+        result.set(`${prefix}.${field}.enabled`, o[field].enabled);
+        result.set(`${prefix}.${field}.value`, o[field].value);
+      }
+    }
+    return result;
   };
-  return key(left) === key(right);
+  const before = fields(left);
+  const after = fields(right);
+  return [...new Set([...before.keys(), ...after.keys()])].filter(field =>
+    !before.has(field) || !after.has(field) || before.get(field) !== after.get(field)).sort();
 }
 
 export function assertPolicyDocument(document: PolicyDocument, editionIds: readonly string[]): void {

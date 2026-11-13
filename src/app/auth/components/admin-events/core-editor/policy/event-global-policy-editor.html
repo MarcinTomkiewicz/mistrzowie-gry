@@ -6,6 +6,20 @@
     <p-message severity="warn" role="status">{{ copy().protected }}</p-message>
   }
   @if (errorMessage(); as message) { <p-message severity="warn" role="alert">{{ message }}</p-message> }
+  @if (editor.issueFields().length) {
+    <div class="flex-col-start-stretch gap-xs w-100 min-w-0" role="status">
+      <span>{{ copy().differenceFields }}</span>
+      <ul class="m-0 text-sm text-wrap-anywhere">
+        @for (field of editor.issueFields(); track field) { <li>{{ field }}</li> }
+      </ul>
+    </div>
+  }
+  @if (editor.conflicted() && !editor.readbackPending()) {
+    <div class="flex-row-start-center flex-wrap gap-sm">
+      <p-button severity="secondary" [outlined]="true" [label]="copy().discard" icon="pi pi-trail"
+        [disabled]="!editor.canReload() || deciding()" [loading]="editor.isBusy()" (onClick)="reload()" />
+    </div>
+  }
   @if (editor.draft()) {
     <app-event-global-price-editor />
     <app-event-global-rules-editor [fieldErrors]="fieldErrors()" />

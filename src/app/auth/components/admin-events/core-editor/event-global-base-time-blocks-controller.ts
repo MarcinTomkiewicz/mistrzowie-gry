@@ -85,6 +85,7 @@ export class EventGlobalBaseTimeBlocksController {
       if (!this.canPreview() || this.form.invalid) return EMPTY;
       const baseline = this.baseline;
       assertEdgeContract(baseline !== null, 'globalBaseTimeBlocks', 'the edit baseline');
+      const formValue = JSON.stringify(this.form.getRawValue());
       const timeBlocks = mapEventGlobalTimeBlocks(this.form.controls.timeBlocks, 'saved-base');
       assertEdgeContract(timeBlocks.length === baseline.timeBlocks.length &&
         new Set(timeBlocks.map(block => block.position)).size === timeBlocks.length && timeBlocks.every(block =>
@@ -100,10 +101,11 @@ export class EventGlobalBaseTimeBlocksController {
         if (!this.canEdit()) return EMPTY;
         return this.admin.previewGlobalBaseTimeBlocks(command).pipe(tap(preview => {
           assertBasePreview(preview, command);
+          if (formValue !== JSON.stringify(this.form.getRawValue())) { this.invalidatePreview(); return; }
           this.preview.set(preview);
           if (preview.valid && preview.status === 'preview_ready') this.command.set(command);
           if (preview.valid && (preview.status === 'unchanged' || preview.changed === false) && sameScheduleBlocks(calendar.timeBlocks, timeBlocks)) {
-            this.populate(calendar);
+            this.populate(calendar, preview);
             this.result.set('unchanged');
           }
         }));
@@ -171,15 +173,15 @@ export class EventGlobalBaseTimeBlocksController {
     }
   }
 
-  private populate(calendar: AdminGlobalCalendarResult): void {
+  private populate(calendar: AdminGlobalCalendarResult, unchangedPreview: AdminGlobalBaseTimeBlocksPreview | null = null): void {
     this.baseline = calendar;
     this.command.set(null);
-    this.preview.set(null);
+    this.preview.set(unchangedPreview);
     this.conflicted.set(false);
     this.readbackPending.set(false);
     this.result.set(null);
     this.validationAttempted.set(false);
-    this.form.setControl('timeBlocks', createEventGlobalTimeBlocksForm(calendar.timeBlocks, 'saved-base'));
+    if (!unchangedPreview) this.form.setControl('timeBlocks', createEventGlobalTimeBlocksForm(calendar.timeBlocks, 'saved-base'));
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
