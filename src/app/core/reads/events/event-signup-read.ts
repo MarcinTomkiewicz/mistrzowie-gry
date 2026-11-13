@@ -56,12 +56,13 @@ export class EventSignupRead {
         return forkJoin(
           occurrences.map((occurrence) =>
             this.getSignupData(editionId, occurrence.id).pipe(
-              map(({ signupCount, mySignup }) => {
+              map(({ signupCount, mySignup, available }) => {
                 const accessState = this.resolveAccessState(
                   occurrence,
                   user,
                   signupCount,
                   mySignup,
+                  available,
                 );
 
                 return {
@@ -161,6 +162,7 @@ export class EventSignupRead {
               user,
               signup.signupCount,
               signup.mySignup,
+              signup.available,
             );
             const page = {
               core,
@@ -215,6 +217,7 @@ export class EventSignupRead {
 
   private getSignupData(editionId: string, occurrenceId: string) {
     return forkJoin({
+      available: this.eventSignup.isAvailableForHost(occurrenceId),
       signupCount:
         this.eventProgramRead.getActiveHostSignupCountByOccurrenceId(
           occurrenceId,
@@ -290,8 +293,9 @@ export class EventSignupRead {
     user: IUser | null,
     signupCount: number,
     mySignup: IEventProgramItem | null,
+    available: boolean,
   ): EventSignupAccessState {
-    if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status)) {
+    if (!HOST_SIGNUP_OCCURRENCE_STATUSES.includes(occurrence.status) || !available) {
       return 'closed';
     }
 

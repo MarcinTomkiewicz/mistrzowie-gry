@@ -7,9 +7,10 @@ import {
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { distinctUntilChanged, EMPTY, filter, map, of, switchMap, type Observable } from 'rxjs';
 
 import { Breadcrumbs } from '../../../common/breadcrumbs/breadcrumbs';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
@@ -63,6 +64,8 @@ export class EventPage implements OnInit {
   private readonly storage = inject(Storage);
   private readonly signup = inject(EventParticipantSignupFacade);
   private readonly offlineSeats = inject(EventProgramOfflineSeats);
+  private routeContext: readonly [string, string | null] | null = null;
+  private contextUrl = this.router.url;
 
   protected readonly facade = inject(EventPageFacade);
   protected readonly i18n = createEventPageI18n();
@@ -189,17 +192,41 @@ export class EventPage implements OnInit {
   });
 
   ngOnInit(): void {
-    this.route.paramMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.reload());
+    this.route.paramMap.pipe(
+      map(params => [params.get('eventKey') ?? '', params.get('editionSlug')] as const),
+      distinctUntilChanged((left, right) => left[0] === right[0] && left[1] === right[1]),
+      switchMap(context => {
+        if (context[0] === this.routeContext?.[0] && context[1] === this.routeContext?.[1]) return EMPTY;
+        const decision = this.routeContext === null ? of(true)
+          : this.offlineSeats.locked() ? of(false) : this.signup.confirmContextChange();
+        return decision.pipe(map(accepted => ({ context, accepted })));
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(({ context, accepted }) => {
+      if (!accepted) {
+        void this.router.navigateByUrl(this.contextUrl, { replaceUrl: true });
+        return;
+      }
+      this.routeContext = context;
+      this.contextUrl = this.router.url;
+      this.reload();
+    });
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(event => {
+      const params = this.route.snapshot.paramMap;
+      if (params.get('eventKey') === this.routeContext?.[0] && params.get('editionSlug') === this.routeContext?.[1]) {
+        this.contextUrl = event.urlAfterRedirects;
+      }
+    });
   }
 
-  canDeactivate(): boolean {
-    return !this.signup.isSubmitting() && !this.offlineSeats.locked();
+  canDeactivate(): boolean | Observable<boolean> {
+    return this.offlineSeats.locked() ? false : this.signup.canDeactivate();
   }
 
   protected reload(): void {
-    const params = this.route.snapshot.paramMap;
-    this.facade.load(params.get('eventKey') ?? '', params.get('editionSlug'));
+    if (this.routeContext !== null) this.facade.load(...this.routeContext);
   }
 }

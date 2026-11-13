@@ -5,8 +5,11 @@ export const EVENT_RPC = {
   getPublicGmProfile: 'get_public_event_gm_profile',
   getPublicParticipantAvailability: 'get_public_event_participant_availability',
   getHostCatalog: 'get_host_event_catalog',
+  isAvailableForHost: 'is_event_edition_available_for_host',
 
   registerParticipant: 'register_event_participant',
+  registerWholeEventParticipant: 'register_whole_event_participant',
+  setParticipantSignupState: 'set_admin_event_participant_signup_state',
   getMyParticipant: 'get_my_event_participant',
   cancelMyParticipant: 'cancel_my_event_participant',
 

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -8,7 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 
 import { formatDateLabel } from '../../../core/utils/date';
 import { normalizePolishPhoneNumber } from '../../../core/utils/phone';
-import { formatTimeRangeLabel } from '../../../core/utils/time-format';
+import { formatPublicEventProgramTime } from '../../../core/utils/public-event-program-cards';
 import { polishPhoneNumberValidator } from '../../../core/validators/polish-phone-number.validator';
 import { requiredTrimmedValidator } from '../../../core/validators/required-trimmed.validator';
 import { createEventPageI18n } from './event-page.i18n';
@@ -22,11 +22,12 @@ import { EventParticipantSignupFacade } from './event-participant-signup-facade'
 export class EventParticipantSignup {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly signup = inject(EventParticipantSignupFacade);
+  private readonly selection = computed(() => this.signup.dialog()?.selection);
   protected readonly i18n = createEventPageI18n();
   protected readonly formatDateLabel = formatDateLabel;
-  protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
+  protected readonly formatProgramTime = formatPublicEventProgramTime;
   protected readonly form = inject(FormBuilder).nonNullable.group({
-    guestName: ['', requiredTrimmedValidator()],
+    guestName: ['', [requiredTrimmedValidator(), Validators.maxLength(120)]],
     guestPhone: ['', [Validators.required, polishPhoneNumberValidator()]],
   });
 
@@ -34,7 +35,7 @@ export class EventParticipantSignup {
     this.form.controls.guestPhone.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((phone) => this.signup.setGuestPhone(phone));
     effect(() => {
-      this.signup.dialog()?.selection;
+      this.selection();
       untracked(() => this.form.reset());
     });
   }

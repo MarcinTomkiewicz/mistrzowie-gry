@@ -12,6 +12,7 @@ export const ACTIVE_HOST_SIGNUP_STATUSES: readonly EventProgramItemStatus[] = [
 export const HOST_SIGNUP_OCCURRENCE_STATUSES: readonly EventOccurrenceStatus[] = [
   EventOccurrenceStatus.HostSignupOpen,
   EventOccurrenceStatus.Published,
+  EventOccurrenceStatus.ParticipantSignupOpen,
 ] as const;
 
 export type EventSignupAccessState =

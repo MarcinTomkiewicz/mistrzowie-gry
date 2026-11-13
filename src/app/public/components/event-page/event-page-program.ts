@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../common/occurrence-switcher/occurrence-switcher';
 import type { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
+import type { IEventParticipantAvailability } from '../../../core/interfaces/i-event-participant';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
@@ -85,11 +86,11 @@ export class EventPageProgram {
             state.page.core.name,
           ).map((card) => {
             const availability = this.availability.forProgramItem(card.id);
-            return availability && availability.remainingSeats !== null ? {
+            return availability ? {
               ...card,
               participantSignup: {
                 canSignup: availability.canSignup && !this.signup.hasUncertainResult(card.id),
-                remainingSeatsLabel: this.i18n.remainingSeats(availability.remainingSeats),
+                remainingSeatsLabel: this.availabilityLabel(availability),
               },
             } : card;
           }),
@@ -138,7 +139,13 @@ export class EventPageProgram {
   }
 
   protected selectOccurrence(index: number): void {
-    if (!this.signup.isSubmitting() && !this.offline.locked()) this.facade.selectOccurrence(index);
+    if (!this.signup.isSubmitting() && !this.offline.locked()) this.signup.selectOccurrence(index);
+  }
+
+  protected availabilityLabel(item: IEventParticipantAvailability): string {
+    if (item.availabilityStatus !== 'available') return this.i18n.signup().availabilityStatuses[item.availabilityStatus];
+    return item.isUnlimited ? this.i18n.signup().unlimitedSeats : item.remainingSeats !== null
+      ? this.i18n.remainingSeats(item.remainingSeats) : this.i18n.signup().availabilityStatuses[item.availabilityStatus];
   }
 
   protected offlineSessionLabel(programItemId: string): string {

@@ -9,9 +9,6 @@ export const EVENT_KEYS = {
   pga: 'pga-x-nocne-retro-granie',
 } as const;
 
-// Frontend signup is released only for this Core; backend canSignup remains authoritative.
-export const PUBLIC_EVENT_PARTICIPANT_SIGNUP_CORE_KEY = EVENT_KEYS.pga;
-
 export const EVENT_PARTICIPANT_CONTACT_PHONES: Readonly<Partial<Record<string, string>>> = {
   [EVENT_KEYS.pga]: '792 314 240',
 };

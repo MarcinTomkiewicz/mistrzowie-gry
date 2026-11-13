@@ -28,6 +28,10 @@ export interface AdminGlobalPublicationOccurrence {
   date: string;
 }
 
+export type GlobalPublicationSignupProgress = AdminGlobalPublicationOccurrence & {
+  state: 'pending' | 'confirmed' | 'failed';
+};
+
 export interface AdminGlobalPublicationPreview {
   coreId: string;
   valid: boolean;

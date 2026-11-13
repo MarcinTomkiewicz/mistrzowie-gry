@@ -2,7 +2,7 @@ import { forkJoin, map } from 'rxjs';
 
 import { EventOccurrenceStatus, ParticipantSignupKind } from '../../enums/event';
 import type {
-  AdminGlobalScopePublicationPreview, AdminGlobalScopePublicationResult, AdminGlobalScopePublicationSnapshot,
+  AdminGlobalPublicationOccurrence, AdminGlobalScopePublicationPreview, AdminGlobalScopePublicationResult, AdminGlobalScopePublicationSnapshot,
   EventGlobalScopePublicationCommand,
 } from '../../interfaces/i-admin-global-event-publication';
 import type { AdminGlobalCalendarResult } from '../../interfaces/i-admin-global-event';
@@ -145,7 +145,7 @@ export function assertScopeReadinessSnapshot(context: GlobalScopePublicationCont
 }
 
 export function assertScopedPublicationReadback(context: GlobalScopePublicationContext, current: AdminGlobalScopePublicationSnapshot,
-  result: AdminGlobalScopePublicationResult | null): void {
+  result: AdminGlobalScopePublicationResult | null): AdminGlobalPublicationOccurrence[] {
   const before = context.snapshot;
   const selectedDays = new Set(context.command.globalDateIds);
   const selectedEditions = new Set(context.command.editionIds);
@@ -170,7 +170,7 @@ export function assertScopedPublicationReadback(context: GlobalScopePublicationC
       saved.occurrenceCount === edition.occurrenceCount && saved.programItemCount === edition.programItemCount,
     'scopePublication.coreEditions', 'unchanged default flags and occurrence/programme counts for every Core Edition');
   }
-  const newlyPublished = new Set<string>();
+  const newlyPublished = new Map<string, AdminGlobalPublicationOccurrence>();
   const selectedPublished = new Set<string>();
   for (const day of before.calendar.globalDates) {
     const saved = current.calendar.globalDates.find(row => row.globalOccurrenceId === day.globalOccurrenceId);
@@ -187,7 +187,9 @@ export function assertScopedPublicationReadback(context: GlobalScopePublicationC
           : actual.occurrenceStatus === local.occurrenceStatus && actual.publishedAt === local.publishedAt && actual.protected === local.protected),
       'scopePublication.pairReadback', 'the exact persisted selected releases and unchanged excluded or unselected city/date combinations');
       if (selected && actual.occurrenceId) selectedPublished.add(actual.occurrenceId);
-      if (released && actual.occurrenceId) newlyPublished.add(actual.occurrenceId);
+      if (released && actual.occurrenceId) newlyPublished.set(actual.occurrenceId, {
+        occurrenceId: actual.occurrenceId, editionId: actual.editionId, date: saved.date,
+      });
     }
   }
   for (const edition of before.editions) {
@@ -238,6 +240,7 @@ export function assertScopedPublicationReadback(context: GlobalScopePublicationC
       (result.alreadyPublished ? sameGlobalScopePublicationImpact(result.impact, replayImpact)
         : sameGlobalScopePublicationImpact(result.impact, impact))),
   'scopePublication.reconciled', 'the exact persisted released scope, Edition activations and full original writer/replay reply');
+  return [...newlyPublished.values()];
 }
 
 function assertPublishedMarkers(actual: IAdminOccurrenceListItem, before: IAdminOccurrenceListItem): void {

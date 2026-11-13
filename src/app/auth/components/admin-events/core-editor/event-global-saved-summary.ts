@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
-import { EMPTY, finalize, switchMap } from 'rxjs';
+import { EMPTY, finalize, map, of, switchMap } from 'rxjs';
 
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
@@ -108,6 +108,7 @@ export class EventGlobalSavedSummary {
   protected readonly publicationError = computed(() => {
     const error = this.publication.error();
     if (error === null) return null;
+    if (this.publication.publicationConfirmed()) return this.publicationCopy().signupRelease.partial;
     if (this.publication.needsReadback()) return this.publication.result() || this.publication.scopeResult()
       ? this.publicationCopy().readbackFailed : this.publicationCopy().uncertain;
     if (error instanceof RpcError && error.code === '40001') return this.i18n.commonErrors().concurrentModification;
@@ -115,6 +116,11 @@ export class EventGlobalSavedSummary {
     if (error instanceof RpcError && error.code === '42501') return this.publicationLabels().errors.forbidden;
     return resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification);
   });
+  protected readonly signupProgress = computed(() => this.publication.signupProgress().map(row => ({
+    ...row,
+    city: this.scopeCalendar()?.cities.find(city => city.editionId === row.editionId)?.city ?? row.editionId,
+    label: this.publicationCopy().signupRelease.states[row.state],
+  })));
   protected readonly publicationBlockers = computed(() => this.publication.preview()?.blockers.map(blocker => ({
     ...blocker,
     message: this.publicationCopy().blockers[blocker.code],
@@ -168,8 +174,13 @@ export class EventGlobalSavedSummary {
         if (!this.publication.locked()) this.publication.scopeCalendar.set(null);
         if (!ready) return;
         this.diagnosticsInvalidated.emit();
-        const subscription = readEventGlobalSavedSummary(this.admin, coreId).subscribe({
-          next: snapshot => { this.snapshot.set(snapshot); this.loading.set(false); },
+        const subscription = readEventGlobalSavedSummary(this.admin, coreId).pipe(switchMap(snapshot =>
+          (this.readOnly() ? of(undefined) : this.publication.restoreSignup(snapshot)).pipe(map(() => snapshot)),
+        )).subscribe({
+          next: snapshot => {
+            this.snapshot.set(snapshot);
+            this.loading.set(false);
+          },
           error: (error: unknown) => {
             this.error.set(error);
             this.loading.set(false);
@@ -305,6 +316,8 @@ export class EventGlobalSavedSummary {
   }
 
   private acceptPublication(core: IEventCoreDetail): void {
+    if (!this.publication.verified()) return;
+    this.toast.success({ summary: this.publicationCopy().signupRelease.verified });
     this.scopeEditionIds.set([]);
     this.scopeDateIds.set([]);
     this.published.emit(core);

@@ -17,6 +17,8 @@ import {
   createEdgeNullableReader,
   readEdgeBoolean,
   readEdgeNonNegativeInteger,
+  readEdgeNullableString,
+  readEdgeObject,
   readEdgeUuid,
 } from '../../utils/edge-contract';
 import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
@@ -49,24 +51,22 @@ export class EventParticipant {
     return this.backend.rpc<unknown>(EVENT_RPC.getPublicParticipantAvailability, {
       p_event_id: eventId,
     }).pipe(map((response) => {
-      const items = readAvailability(response, 'participantAvailability')
-        .filter((item) => item.scope === 'program_item');
+      const items = readAvailability(response, 'participantAvailability');
       assertEdgeContract(
         items.every((item) => !item.canSignup ||
-          (item.availabilityStatus === 'available' && item.remainingSeats !== null && item.remainingSeats > 0)),
-        'participantAvailability', 'available status and positive remaining seats when signup is allowed',
+          (item.availabilityStatus === 'available' && (item.isUnlimited || (item.remainingSeats !== null && item.remainingSeats > 0)))),
+        'participantAvailability', 'available status and unlimited or positive remaining seats when signup is allowed',
       );
-      return items.map((item) => {
+      return items.map((item): IEventParticipantAvailability => {
+        if (item.scope === 'whole_event') {
+          assertEdgeContract(item.programItemId === null, 'participantAvailability.programItemId', 'null for whole_event scope');
+          return { ...item, scope: 'whole_event', programItemId: null };
+        }
         assertEdgeContract(
           item.programItemId !== null,
           'participantAvailability.programItemId', 'a UUID for program_item scope',
         );
-        return {
-          programItemId: item.programItemId,
-          occurrenceId: item.occurrenceId,
-          canSignup: item.canSignup,
-          remainingSeats: item.remainingSeats,
-        };
+        return { ...item, scope: 'program_item', programItemId: item.programItemId };
       });
     }));
   }
@@ -74,14 +74,38 @@ export class EventParticipant {
   register(
     request: IEventParticipantRegisterRequest,
   ): Observable<IEventParticipantRegisterResult> {
-    return this.backend.rpc<IEventParticipantRegisterResult>(
-      EVENT_RPC.registerParticipant,
+    return this.backend.rpc<unknown>(
+      request.scope === 'program_item' ? EVENT_RPC.registerParticipant : EVENT_RPC.registerWholeEventParticipant,
       {
-        p_program_item_id: request.programItemId,
+        ...(request.scope === 'program_item' ? { p_program_item_id: request.programItemId } : { p_occurrence_id: request.occurrenceId }),
         p_guest_name: request.mode === 'guest' ? request.guestName : null,
         p_guest_phone: request.mode === 'guest' ? request.guestPhone : null,
       },
-    );
+    ).pipe(map(response => this.readRegistration(response)));
+  }
+
+  private readRegistration(response: unknown): IEventParticipantRegisterResult {
+    const object = readEdgeObject(response, 'participantRegistration');
+    if (object['registered'] === false) {
+      const result = createStrictEdgeObjectReader({ registered: readEdgeBoolean,
+        status: createEdgeLiteralReader(['unavailable']),
+      })(response, 'participantRegistration');
+      assertEdgeContract(result.registered === false, 'participantRegistration.registered', 'false');
+      return { ...result, registered: false };
+    }
+    const result = createStrictEdgeObjectReader({
+      registered: readEdgeBoolean, status: createEdgeLiteralReader(['confirmed']),
+      registrationId: readEdgeUuid, occurrenceId: readEdgeUuid,
+      eventProgramItemId: createEdgeNullableReader(readEdgeUuid),
+      scope: createEdgeLiteralReader(['program_item', 'whole_event']), confirmationCode: readEdgeNullableString,
+    })(response, 'participantRegistration');
+    assertEdgeContract(result.registered === true, 'participantRegistration.registered', 'true');
+    if (result.scope === 'program_item') {
+      assertEdgeContract(result.eventProgramItemId !== null, 'participantRegistration.eventProgramItemId', 'a session UUID');
+      return { ...result, registered: true, scope: 'program_item', eventProgramItemId: result.eventProgramItemId };
+    }
+    assertEdgeContract(result.eventProgramItemId === null, 'participantRegistration.eventProgramItemId', 'null for whole_event');
+    return { ...result, registered: true, scope: 'whole_event', eventProgramItemId: null };
   }
 
   getMy(

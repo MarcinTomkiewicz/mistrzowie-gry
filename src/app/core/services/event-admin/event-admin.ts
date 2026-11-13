@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { defer, map, Observable, tap } from 'rxjs';
 
 import { EVENT_RPC } from '../../configs/event-rpc.config';
+import { EventOccurrenceStatus, ParticipantSignupKind } from '../../enums/event';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
 import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
 import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
@@ -55,7 +56,8 @@ import {
   IEventCoreSavePayload,
 } from '../../interfaces/i-event-admin';
 import { Backend } from '../backend/backend';
-import { assertEdgeContract } from '../../utils/edge-contract';
+import { assertEdgeContract, createEdgeLiteralReader, readEdgeNullableString, readEdgeUuid } from '../../utils/edge-contract';
+import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
 
 @Injectable({ providedIn: 'root' })
 export class EventAdmin {
@@ -171,6 +173,25 @@ export class EventAdmin {
     return defer(() => this.backend.rpc<AdminGlobalScopePublicationResult>(
       EVENT_RPC.publishGlobalScope, this.scopePublicationArgs(command),
     )).pipe(tap(result => assertGlobalScopePublicationResult(result, command)));
+  }
+
+  openSignup(occurrenceId: string): Observable<void> {
+    return this.backend.rpc<unknown>(EVENT_RPC.setParticipantSignupState, {
+      p_occurrence_id: occurrenceId, p_open: true,
+    }).pipe(map(response => {
+      const result = createStrictEdgeObjectReader({
+        occurrenceId: readEdgeUuid,
+        status: createEdgeLiteralReader(Object.values(EventOccurrenceStatus)),
+        participantSignupKind: createEdgeLiteralReader(Object.values(ParticipantSignupKind)),
+        capacityPolicy: createEdgeLiteralReader(['independent', 'legacy_shared']),
+        participantSignupOpenedAt: readEdgeNullableString,
+        participantSignupOpensAt: readEdgeNullableString,
+        participantSignupClosesAt: readEdgeNullableString,
+      })(response, 'participantSignupState');
+      assertEdgeContract(result.occurrenceId === occurrenceId && result.status === EventOccurrenceStatus.ParticipantSignupOpen &&
+        result.participantSignupOpenedAt !== null && Number.isFinite(Date.parse(result.participantSignupOpenedAt)),
+      'participantSignupState', 'the requested occurrence with confirmed signup opening');
+    }));
   }
 
   private scopePublicationArgs(command: EventGlobalScopePublicationCommand) {

@@ -1,6 +1,6 @@
 import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
-import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker } from '../../interfaces/i-admin-global-event-publication';
+import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker, GlobalPublicationSignupProgress } from '../../interfaces/i-admin-global-event-publication';
 import type { ParticipantSignupKind } from '../../enums/event';
 
 export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirmQuestion' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
@@ -10,9 +10,12 @@ export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirmQuestion' 
   };
 
 export type EventGlobalPublicationCopy = Record<
-  'hint' | 'confirmQuestion' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'verified' | 'alreadyReleased' |
+  'hint' | 'confirmQuestion' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'alreadyReleased' |
   'affectedCities' | 'publishableOccurrences' | 'preservedPastDrafts' | 'policyDraft' | 'block', string
 > & {
+  signupRelease: Record<'title' | 'partial' | 'retry' | 'verified', string> & {
+    states: Record<GlobalPublicationSignupProgress['state'], string>;
+  };
   blockers: Record<AdminGlobalPublicationBlocker['code'], string>;
   scope: Record<'title' | 'hint' | 'dates' | 'preview' | 'confirmQuestion' | 'confirm' | 'alreadyPublishedOccurrences' | 'legacyCapacityUpgrades' |
     'excludedSelections' | 'activateEditions' | 'selectionRequired' | 'ready' | 'revision' | 'publishedOccurrences' | 'activatedEditions' |

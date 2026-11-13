@@ -1,23 +1,30 @@
+@let dialog = signup.dialog();
 <p-dialog styleClass="mg-dialog mg-dialog--md" appendTo="body"
   [modal]="true" [draggable]="false" [resizable]="false"
-  [header]="i18n.signup().title" [visible]="signup.dialog() !== null"
-  [closable]="!signup.isSubmitting()" [closeOnEscape]="!signup.isSubmitting()"
+  [header]="dialog && dialog.selection.target.scope === 'whole_event' ? i18n.signup().wholeEventTitle : i18n.signup().title" [visible]="dialog !== null"
+  [closable]="!signup.isSubmitting() && !signup.hasGuestReceipt()" [closeOnEscape]="!signup.isSubmitting() && !signup.hasGuestReceipt()"
   [dismissableMask]="false" (visibleChange)="!$event && signup.close()">
-  @if (signup.dialog(); as dialog) {
+  @if (dialog) {
     @let details = dialog.selection;
     @let entry = details.entry;
     <form class="mg-form flex-col-start-stretch gap-md w-100" [formGroup]="form"
       [attr.aria-busy]="signup.isSubmitting()" (ngSubmit)="submit()" novalidate>
       <div class="flex-col-start-stretch gap-xs">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ entry.session.title }}</h3>
-        <time [attr.datetime]="entry.occurrenceDate">{{ formatDateLabel(entry.occurrenceDate, 'pl-PL', true) }}</time>
-        <span>{{ formatTimeRangeLabel(entry.slot.startTime, entry.slot.endTime) }}</span>
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ entry ? entry.session.title : details.eventName }}</h3>
+        <time [attr.datetime]="details.occurrence.occurrenceDate">{{ formatDateLabel(details.occurrence.occurrenceDate, 'pl-PL', true) }}</time>
+        @if (entry) {
+          @if (formatProgramTime(entry.slot, i18n.program().dayOffset); as timeLabel) { <span>{{ timeLabel }}</span> }
+        }
       </div>
       @if (dialog.result; as result) {
-        @if (result === 'confirmed') {
+        @if (result.registered) {
           <section class="mg-card flex-col-start-stretch gap-md w-100">
-            <p class="m-0" role="status">{{ i18n.signup().confirmedSession }}</p>
+            <p class="m-0" role="status">{{ result.scope === 'whole_event' ? i18n.signup().confirmedWholeEvent : i18n.signup().confirmedSession }}</p>
             <dl class="m-0 flex-col-start-stretch gap-sm">
+              <div><dt>{{ i18n.signup().registrationNumber }}</dt><dd class="m-0 text-wrap-anywhere">{{ result.registrationId }}</dd></div>
+              @if (result.confirmationCode; as code) {
+                <div><dt>{{ i18n.signup().confirmationCodeLabel }}</dt><dd class="m-0 text-wrap-anywhere">{{ code }}</dd></div>
+              }
               <div class="flex-col-start-stretch gap-xs">
                 <dt>{{ i18n.labels().event }}</dt>
                 <dd class="m-0">{{ details.eventName }} - {{ details.edition.city }}</dd>
@@ -33,12 +40,13 @@
                 </div>
               }
             </dl>
+            @if (result.confirmationCode) { <p class="m-0">{{ i18n.signup().confirmationCodeInstructions }}</p> }
             @if (signup.cancellationPhone(); as phone) {
               <p class="m-0">{{ i18n.cancellationContact(phone) }}</p>
             }
           </section>
         } @else {
-          <p class="m-0" role="status">{{ i18n.signup().unavailable }}</p>
+          <p class="m-0" role="status">{{ details.target.scope === 'whole_event' ? i18n.signup().wholeEventUnavailable : i18n.signup().unavailable }}</p>
         }
       } @else {
         @if (signup.isAuthenticated()) {
@@ -49,7 +57,7 @@
             <div class="flex-col-start-stretch gap-xs">
               <p-floatlabel variant="on">
                 <input pInputText id="event-participant-name" class="w-100" type="text" autocomplete="name"
-                  formControlName="guestName" required
+                  formControlName="guestName" required maxlength="120"
                   [attr.aria-invalid]="form.controls.guestName.touched && form.controls.guestName.invalid"
                   [attr.aria-describedby]="form.controls.guestName.touched && form.controls.guestName.invalid ? 'event-participant-name-error' : null" />
                 <label for="event-participant-name">{{ i18n.signup().guestNameLabel }}</label>
@@ -75,16 +83,18 @@
             </div>
           </fieldset>
         }
-        <p class="muted-text text-sm m-0">{{ i18n.signup().privacyNotice }}</p>
-        @if (signup.hasUncertainResults()) {
+        <p class="muted-text text-sm m-0">{{ details.target.scope === 'whole_event' ? i18n.signup().wholeEventPrivacyNotice : i18n.signup().privacyNotice }}</p>
+        @if (dialog.failure === 'rejected') {
+          <p class="m-0" role="alert">{{ i18n.signup().rejected }}</p>
+        } @else if (signup.hasUncertainResults()) {
           <p class="m-0" role="alert">{{ i18n.signup().unknownResult }}</p>
         } @else if (!signup.canSubmit() && !signup.isSubmitting()) {
-          <p class="m-0" role="status">{{ i18n.signup().unavailable }}</p>
+          <p class="m-0" role="status">{{ details.target.scope === 'whole_event' ? i18n.signup().wholeEventUnavailable : i18n.signup().unavailable }}</p>
         }
       }
       <div class="p-dialog-footer flex-row-end-center flex-wrap gap-sm w-100">
         <p-button type="button" severity="secondary" [outlined]="true"
-          [label]="i18n.actions().close" [disabled]="signup.isSubmitting()" (onClick)="signup.close()" />
+          [label]="i18n.actions().close" [disabled]="signup.isSubmitting() || signup.isReceiptDecisionPending()" (onClick)="signup.close()" />
         @if (!dialog.result) {
           <p-button type="submit" severity="success" [label]="i18n.cta().signUp"
             [loading]="signup.isSubmitting()"

@@ -8,7 +8,7 @@
         <app-occurrence-switcher
           [options]="occurrenceOptions()"
           [selectedIndex]="facade.selectedOccurrenceIndex()"
-          [disabled]="signup.isSubmitting() || offline.locked()"
+          [disabled]="signup.isSubmitting() || signup.isReceiptDecisionPending() || offline.locked()"
           marginBottomClass=""
           (selectedIndexChange)="selectOccurrence($event)"
         />
@@ -46,21 +46,32 @@
       @if (offline.abandoned()) { <p-message severity="warn" role="status">{{ copy.readbackEnded }}</p-message> }
     </section>
   }
-  @if (signup.released()) {
-    @if (signup.hasUncertainResults() && !signup.dialog()) {
-      <p role="alert">{{ i18n.signup().unknownResult }}</p>
-    }
-    @if (availability.state().kind === 'loading') {
-      <p class="muted-text" role="status">{{ i18n.status().loading }}</p>
-    } @else if (availability.state().kind === 'error') {
-      <div class="mg-card flex-col-start-stretch gap-sm mb-md" role="alert">
-        <p class="m-0">{{ i18n.signup().availabilityError }}</p>
-        <p-button type="button" size="small" severity="secondary" [outlined]="true"
-          [label]="i18n.actions().retry" (onClick)="availability.refresh()" />
-      </div>
-    }
+  @if (signup.hasUncertainResults() && !signup.dialog()) {
+    <p role="alert">{{ i18n.signup().unknownResult }}</p>
+  }
+  @if (availability.state().kind === 'loading') {
+    <p class="muted-text" role="status">{{ i18n.status().loading }}</p>
+  } @else if (availability.state().kind === 'error') {
+    <div class="mg-card flex-col-start-stretch gap-sm mb-md" role="alert">
+      <p class="m-0">{{ i18n.signup().availabilityReadFailed }}</p>
+      <p-button type="button" size="small" severity="secondary" [outlined]="true"
+        [label]="i18n.actions().retry" (onClick)="availability.refresh()" />
+    </div>
   }
   @if (occurrenceOptions().length) {
+    @if (availability.forWholeEvent(); as wholeEvent) {
+      <section class="mg-card flex-col-start-stretch gap-sm mb-md">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.signup().wholeEventTitle }}</h3>
+        <p class="m-0 muted-text" role="status">{{ availabilityLabel(wholeEvent) }}</p>
+        @if (wholeEvent.canSignup) {
+          <div class="flex-row-start-center">
+            <p-button type="button" size="small" severity="success" [label]="i18n.cta().signUp"
+              [disabled]="signup.isSubmitting() || offline.locked() || signup.hasUncertainWholeEventResult()"
+              (onClick)="signup.openWholeEvent()" />
+          </div>
+        }
+      </section>
+    }
     @if (programGroups.length) {
       <div class="flex-col-start-stretch gap-xl">
         @for (group of programGroups; track group.key) {
@@ -131,9 +142,7 @@
   }
 </ng-template>
 
-@if (signup.released()) {
-  <app-event-participant-signup />
-}
+<app-event-participant-signup />
 
 @let selected = selectedCard();
 <app-session-dialog

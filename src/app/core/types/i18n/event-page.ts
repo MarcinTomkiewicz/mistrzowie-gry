@@ -1,3 +1,5 @@
+import type { IEventParticipantAvailability } from '../../interfaces/i-event-participant';
+
 export type EventPageTranslations = {
   placeLabel: string;
   addressLabel: string;
@@ -23,6 +25,14 @@ export type EventPageOfflineSeatsTranslations = Record<
 };
 
 export type EventPageParticipantSignupTranslations = {
+  wholeEventTitle: string;
+  confirmedWholeEvent: string;
+  wholeEventUnavailable: string;
+  wholeEventPrivacyNotice: string;
+  rejected: string;
+  unlimitedSeats: string;
+  availabilityReadFailed: string;
+  availabilityStatuses: Record<IEventParticipantAvailability['availabilityStatus'], string>;
   title: string;
   guestNameLabel: string;
   phoneHint: string;
@@ -30,7 +40,6 @@ export type EventPageParticipantSignupTranslations = {
   accountNotice: string;
   privacyNotice: string;
   remainingSeats: string;
-  availabilityError: string;
   confirmed: string;
   confirmedSession: string;
   cancellationContact: string;
@@ -44,5 +53,5 @@ export type EventPageParticipantSignupTranslations = {
   ownReadError: string;
   cancelled: string;
   leaveConfirmation: string;
-  discardHiddenReceiptConfirmation: string;
+  discardReceiptConfirmation: string;
 };

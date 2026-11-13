@@ -149,13 +149,23 @@
       "saveFailedSummary": "Nie udało się zapisać wydarzenia"
     },
     "globalPublication": {
-      "hint": "[PH] Pierwsza publikacja udostępnia przygotowane lokalizacje i terminy. Aktywność wydarzenia, publikacja terminów i otwarcie zapisów uczestników są osobnymi stanami. Ta operacja nie otwiera zapisów.",
+      "signupRelease": {
+        "title": "[PH] Otwarcie zapisów po publikacji",
+        "partial": "[PH] Publikacja została potwierdzona. Obsługa zapisów nie została zakończona dla całego zakresu. Ponów sprawdzenie; wykonane operacje nie zostaną powtórzone.",
+        "retry": "[PH] Sprawdź i dokończ otwarcie zapisów",
+        "verified": "[PH] Potwierdzono publikację i wynik obsługi zapisów dla wskazanych terminów.",
+        "states": {
+          "pending": "[PH] Oczekuje na potwierdzenie",
+          "confirmed": "[PH] Otwarcie zapisów potwierdzone",
+          "failed": "[PH] Wymaga ponowienia sprawdzenia"
+        }
+      },
+      "hint": "[PH] Operacja publikuje przygotowane lokalizacje i terminy, a następnie otwiera kwalifikowane zapisy uczestników. Publikacja i otwarcie zapisów są potwierdzane oddzielnie. Przy częściowym wykonaniu można dokończyć brakujące operacje.",
       "confirmQuestion": "[PH] Opublikować wydarzenie?",
-      "confirm": "[PH] Sprawdzenie gotowości obejmuje {{cities}} lokalizacji i {{occurrences}} terminów do publikacji. Minione terminy pozostające szkicami: {{past}}. Publikacja utrwali dane wydawanych terminów. Zapisy uczestników nie zostaną otwarte.",
+      "confirm": "[PH] Sprawdzenie gotowości obejmuje {{cities}} lokalizacji i {{occurrences}} terminów do publikacji. Minione terminy pozostające szkicami: {{past}}. Publikacja utrwali dane wydawanych terminów. Po jej potwierdzeniu zostaną otwarte kwalifikowane zapisy uczestników.",
       "blocked": "[PH] Backend odmówił publikacji. Poniżej pokazano wynik ponownego sprawdzenia gotowości.",
-      "uncertain": "[PH] Nie można potwierdzić wyniku publikacji. Ponów odczyt zapisanych danych. Operacja publikacji nie zostanie automatycznie powtórzona.",
-      "readbackFailed": "[PH] Backend potwierdził publikację, ale nie udało się potwierdzić zapisanego stanu. Ponów sam odczyt.",
-      "verified": "[PH] Potwierdzono publikację w zapisanych danych wydarzenia.",
+      "uncertain": "[PH] Nie można potwierdzić wyniku publikacji. Ponów sprawdzenie zapisanych danych. Publikacja nie zostanie powtórzona. Po jej potwierdzeniu zostaną dokończone brakujące otwarcia zapisów.",
+      "readbackFailed": "[PH] Backend potwierdził publikację, ale nie udało się potwierdzić zapisanego stanu. Ponów sprawdzenie; po potwierdzeniu publikacji zostaną dokończone brakujące otwarcia zapisów.",
       "alreadyReleased": "[PH] Wydarzenie ma już opublikowane terminy. Pierwsza publikacja nie służy do wydawania kolejnych miast lub dat.",
       "affectedCities": "[PH] Lokalizacje objęte publikacją",
       "publishableOccurrences": "[PH] Terminy do publikacji",
@@ -164,11 +174,11 @@
       "block": "[PH] Pozycja bloku",
       "scope": {
         "title": "[PH] Publikacja wybranych lokalizacji i dat",
-        "hint": "[PH] Wybierz lokalizacje i wspólne daty wydarzenia. Backend sprawdzi wszystkie wybrane połączenia lokalizacji i dat; wykluczone połączenia pozostaną bez zmian. Publikacja nie otwiera zapisów uczestników ani nie publikuje programu.",
+        "hint": "[PH] Wybierz lokalizacje i wspólne daty wydarzenia. Backend sprawdzi wszystkie wybrane połączenia lokalizacji i dat; wykluczone połączenia pozostaną bez zmian. Po potwierdzonej publikacji zostaną otwarte kwalifikowane zapisy uczestników. Operacja nie publikuje programu.",
         "dates": "[PH] Wspólne daty do publikacji",
         "preview": "[PH] Sprawdź wybrany zakres",
         "confirmQuestion": "[PH] Opublikować wybrany zakres?",
-        "confirm": "[PH] Lokalizacje: {{cities}}. Wspólne daty: {{dates}}. Terminy do publikacji: {{planned}}; już opublikowane: {{already}}; wykluczone połączenia: {{excluded}}; aktualizacje dawnej polityki pojemności: {{upgrades}}. Lokalizacje do aktywacji: {{activate}}. Pozostałe lokalizacje i daty pozostaną bez zmian. Zapisy uczestników nie zostaną otwarte, a program nie zostanie opublikowany.",
+        "confirm": "[PH] Lokalizacje: {{cities}}. Wspólne daty: {{dates}}. Terminy do publikacji: {{planned}}; już opublikowane: {{already}}; wykluczone połączenia: {{excluded}}; aktualizacje dawnej polityki pojemności: {{upgrades}}. Lokalizacje do aktywacji: {{activate}}. Po potwierdzeniu publikacji zostaną otwarte kwalifikowane zapisy uczestników dla nowo opublikowanych terminów. Zapisy wcześniej opublikowanych terminów pozostaną bez zmian. Program nie zostanie opublikowany.",
         "alreadyPublishedOccurrences": "[PH] Już opublikowane terminy w zakresie",
         "legacyCapacityUpgrades": "[PH] Aktualizacje dawnej polityki pojemności",
         "excludedSelections": "[PH] Pominięte wykluczone połączenia lokalizacji i dat",
@@ -467,7 +477,8 @@
         "GLOBAL_CALENDAR_WRITE_NOT_RELEASED": "[PH] Zastosowanie szkicu wspólnego kalendarza nie jest dostępne.",
         "NO_UPCOMING_DATE_FOR_SELECTED_CITY": "[PH] Wybrane miasto nie ma dostępnego obecnego ani przyszłego terminu.",
         "EDITION_EFFECTIVE_POLICY_MISSING": "[PH] Brakuje ustawień obowiązujących w tej lokalizacji.",
-        "PROTECTED_PARTICIPANT_POLICY": "[PH] Zmiana ustawień zapisów lub limitów dotyczy lokalizacji z otwartymi zapisami albo historią uczestników."
+        "PROTECTED_PARTICIPANT_POLICY": "[PH] Zmiana ustawień zapisów lub limitów dotyczy lokalizacji z otwartymi zapisami albo historią uczestników.",
+        "STAFFING_PROGRAM_PREVIEW_UNAVAILABLE": "[PH] Program tej lokalizacji pochodzi ze starszej konwersji realizacji. Nie można wyświetlić jego podglądu."
       }
     },
     "datedBlocks": {

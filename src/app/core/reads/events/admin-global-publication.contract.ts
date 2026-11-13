@@ -98,17 +98,22 @@ export function assertFirstPublishedScope(context: FirstGlobalPublicationContext
     for (const occurrence of edition.occurrences) {
       const entry = scope.get(occurrence.id);
       const published = released.has(occurrence.id);
-      const status = published ? EventOccurrenceStatus.Published : EventOccurrenceStatus.Planned;
+      const status = occurrence.status;
       const day = calendar.globalDates.find(row => row.date === occurrence.date);
       const local = day?.cityOccurrences.find(row => row.editionId === edition.id && row.occurrenceId === occurrence.id);
       const operational = timeline.occurrences.find(row => row.occurrenceId === occurrence.id && row.date === occurrence.date);
       assertEdgeContract(!seen.has(occurrence.id) &&
         (entry === undefined || (entry.editionId === edition.id && entry.date === occurrence.date && local !== undefined)) &&
-        occurrence.status === status && operational?.status === status && operational.participantSignupOpenedAt === null &&
+        (published ? [EventOccurrenceStatus.Published, EventOccurrenceStatus.ParticipantSignupOpen,
+          EventOccurrenceStatus.ParticipantSignupClosed].includes(status) : status === EventOccurrenceStatus.Planned) &&
+        operational?.status === status && operational.participantSignupOpenedAt === occurrence.participantSignupOpenedAt &&
+        (published || occurrence.participantSignupOpenedAt === null) &&
+        (status !== EventOccurrenceStatus.ParticipantSignupOpen || occurrence.participantSignupOpenedAt !== null &&
+          Number.isFinite(Date.parse(occurrence.participantSignupOpenedAt))) &&
         (local === undefined || (local.occurrenceStatus === status && local.publishedAt === occurrence.publishedAt)) &&
         (published ? occurrence.publishedAt !== null && Number.isFinite(Date.parse(occurrence.publishedAt)) &&
           day?.status === 'scheduled' && local?.decision === 'included' : occurrence.publishedAt === null),
-      'globalPublication.occurrence', 'the same server-selected identity in Calendar, Edition and Timeline, with its exact status and no participant signup history');
+      'globalPublication.occurrence', 'the same released identity in Calendar, Edition and Timeline with consistent publication and subsequent signup markers');
       seen.add(occurrence.id);
     }
   }

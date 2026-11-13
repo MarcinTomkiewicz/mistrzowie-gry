@@ -149,9 +149,10 @@
               [label]="i18n.commonActions().clear" [disabled]="disabled() || publication.locked()" (onClick)="clearScopeSelection()" />
           }
         }
-        @if (publication.needsReadback()) {
+        @if (publication.needsReadback() && !publication.publicationConfirmed()) {
           <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
-            [label]="i18n.commonActions().retry" [disabled]="publication.isBusy() || scopeDecisionPending()" (onClick)="retryPublicationReadback()" />
+            [label]="i18n.commonActions().retry"
+            [disabled]="publication.isBusy() || scopeDecisionPending()" (onClick)="retryPublicationReadback()" />
           @if (publication.canAbandonScopeReadback()) {
             <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
               [label]="publishCopy.scope.endReadback" [disabled]="scopeDecisionPending()" (onClick)="endScopeReadback()" />
@@ -176,12 +177,32 @@
 <ng-template #publicationPanel>
   @if (isAdmin()) {
     @let publishCopy = publicationCopy();
+    @if (signupProgress().length) {
+      <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" aria-live="polite" [attr.aria-busy]="publication.isBusy()">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ publishCopy.signupRelease.title }}</h3>
+        @if (publication.publicationConfirmed() && !publication.verified() && !publication.isBusy()) {
+          <p-message severity="warn">{{ publishCopy.signupRelease.partial }}</p-message>
+        }
+        <ul class="m-0">
+          @for (row of signupProgress(); track row.occurrenceId) {
+            <li>{{ row.city }} - {{ formatDateLabel(row.date) }} - {{ row.label }}</li>
+          }
+        </ul>
+        @if (publication.needsReadback() && !readOnly()) {
+          <div class="flex-row-start-center">
+            <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+              [label]="publishCopy.signupRelease.retry" [disabled]="loading() || publication.isBusy() || scopeDecisionPending()"
+              (onClick)="retryPublicationReadback()" />
+          </div>
+        }
+      </section>
+    }
     <section class="mg-card flex-col-start-stretch gap-md p-md w-100 min-w-0" [attr.aria-busy]="publication.isBusy()">
       <h2 class="mg-section__title mg-section__title--md m-0">{{ publicationLabels().title }}</h2>
       <p class="m-0 muted-text">{{ scoped() ? publishCopy.scope.hint : publishCopy.hint }}</p>
       @if (publication.verified()) {
         <p-message severity="success" role="status">
-          {{ publication.scopeResult()?.alreadyPublished || publication.result()?.alreadyPublished ? publicationLabels().alreadyPublished : publishCopy.verified }}
+          {{ publishCopy.signupRelease.verified }}
         </p-message>
       } @else if (!scoped() && hasRelease() && !publication.needsReadback()) {
         <p class="m-0 muted-text" role="status">{{ publishCopy.alreadyReleased }}</p>

@@ -26,6 +26,8 @@ import { Backend } from '../backend/backend';
 import { EventProgramRead } from '../../reads/events/event-program-read';
 import { GmSessions } from '../gm-sessions/gm-sessions';
 import { SessionRead } from '../../reads/sessions/session-read';
+import { EVENT_RPC } from '../../configs/event-rpc.config';
+import { readEdgeBoolean } from '../../utils/edge-contract';
 
 @Injectable({ providedIn: 'root' })
 export class EventSignup {
@@ -34,6 +36,13 @@ export class EventSignup {
   private readonly eventProgramRead = inject(EventProgramRead);
   private readonly gmSessions = inject(GmSessions);
   private readonly sessionRead = inject(SessionRead);
+
+  isAvailableForHost(occurrenceId: string, requireOpen = true): Observable<boolean> {
+    if (!this.auth.userId()) return of(false);
+    return this.backend.rpc<unknown>(EVENT_RPC.isAvailableForHost, {
+      p_occurrence_id: occurrenceId, p_require_open: requireOpen,
+    }).pipe(map(value => readEdgeBoolean(value, 'hostSignup.available')));
+  }
 
   getMySignup(
     selection: IEventSignupSelection,
@@ -83,15 +92,15 @@ export class EventSignup {
     }
 
     return this.getOwnedSignup(signupId, userId).pipe(
-      switchMap((signup) =>
-        this.backend.update<IEventProgramItem>(
+      switchMap((signup) => this.isAvailableForHost(signup.occurrenceId, false).pipe(
+        switchMap(available => available && this.auth.userId() === userId ? this.backend.update<IEventProgramItem>(
           'event_program_items',
           signup.id,
           {
             status: EventProgramItemStatus.Withdrawn,
           },
-        ),
-      ),
+        ) : throwError(() => new Error('Host withdrawal is closed.'))),
+      )),
       map(() => void 0),
     );
   }
@@ -307,10 +316,10 @@ export class EventSignup {
               return throwError(() => new Error('Host signup is closed.'));
             }
 
-            return of({
-              occurrence,
-              canOverrideCapacity: hasMinimumRole(user, 'admin'),
-            });
+            return this.isAvailableForHost(occurrence.id).pipe(map(available => {
+              if (!available || this.auth.userId() !== userId) throw new Error('Host signup is closed.');
+              return { occurrence, canOverrideCapacity: hasMinimumRole(user, 'admin') };
+            }));
           }),
         ),
       ),

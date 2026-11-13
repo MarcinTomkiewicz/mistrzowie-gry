@@ -36,8 +36,10 @@ export function readAdminGlobalEventPagePreview(
     readEdgeLiteral(blocker.code, 'globalPagePreview.blocker.code', [
       'STALE_SAVED_POLICY_DRAFT', 'PUBLISHED_POLICY_WRITE_NOT_RELEASED', 'STALE_SAVED_CALENDAR_DRAFT',
       'GLOBAL_CALENDAR_WRITE_NOT_RELEASED', 'NO_UPCOMING_DATE_FOR_SELECTED_CITY', 'EDITION_EFFECTIVE_POLICY_MISSING', 'PROTECTED_PARTICIPANT_POLICY',
+      'STAFFING_PROGRAM_PREVIEW_UNAVAILABLE',
     ]);
-    keys(blocker, ['code', ...(['EDITION_EFFECTIVE_POLICY_MISSING', 'PROTECTED_PARTICIPANT_POLICY'].includes(blocker.code) ? ['editionId'] : [])]);
+    keys(blocker, ['code', ...(['EDITION_EFFECTIVE_POLICY_MISSING', 'PROTECTED_PARTICIPANT_POLICY',
+      'STAFFING_PROGRAM_PREVIEW_UNAVAILABLE'].includes(blocker.code) ? ['editionId'] : [])]);
     if ('editionId' in blocker) readEdgeUuid(blocker.editionId, 'globalPagePreview.blocker.editionId');
   }
   const status = result.fieldErrors.length ? 'invalid' : result.blockers.length ? 'blocked' : 'preview_ready';
