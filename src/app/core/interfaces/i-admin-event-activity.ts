@@ -30,3 +30,13 @@ export interface ManualActivityResult {
   blockPosition: number | null;
   participantSignupSupported: false;
 }
+
+export interface ManualActivityPublicationResult {
+  published: true;
+  slotId: string;
+  occurrenceId: string;
+  kindKey: string;
+  kindLabel: string;
+  status: 'confirmed';
+  participantSignupSupported: false;
+}

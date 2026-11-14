@@ -1,21 +1,102 @@
-import { EventOccurrenceStatus } from '../../enums/event';
+import { EventOccurrenceStatus, EventProgramItemStatus, ParticipantSignupKind } from '../../enums/event';
 import { mapEventPolicyDocument, samePolicyDocument } from '../../factories/event-policy-form.factory';
 import { GLOBAL_PUBLICATION_BLOCKER_CODES, type AdminGlobalPublicationOccurrence, type AdminGlobalPublicationPreview,
-  type AdminGlobalPublicationResult } from '../../interfaces/i-admin-global-event-publication';
+  type AdminGlobalPublicationResult, type GlobalPublicationSignupReadback } from '../../interfaces/i-admin-global-event-publication';
+import type { IEventParticipantAvailability } from '../../interfaces/i-event-participant';
 import type { IAdminEventDetail, IEventCoreDetail } from '../../interfaces/i-event-admin';
 import type { AdminEffectivePolicyResult, AdminGlobalCalendarResult } from '../../interfaces/i-admin-global-event';
 import type { AdminEventPolicyDraft } from '../../interfaces/i-admin-event-policy';
-import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
+import type { AdminEventTimeline, ManualTimelineRow } from '../../interfaces/i-admin-event-timeline';
 import type { EventGlobalSavedSnapshot } from '../../interfaces/i-event-global-saved-summary';
+import type { PublicEventProgramEntry } from '../../types/public-event-program';
+import type { ManualRpgPublicationResult } from '../../interfaces/i-event-program-item';
+import type { ManualActivityPublicationResult } from '../../interfaces/i-admin-event-activity';
 import { isValidIsoDate } from '../../utils/date';
-import { assertEdgeContract, readEdgeObject, readEdgeUuid } from '../../utils/edge-contract';
+import { assertEdgeContract, createEdgeLiteralReader, readEdgeNonBlankString, readEdgeObject, readEdgeUuid } from '../../utils/edge-contract';
+import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
 
 export type FirstGlobalPublicationContext = Pick<AdminGlobalPublicationResult, 'coreId' | 'mainEditionId'> & {
   snapshot: EventGlobalSavedSnapshot;
   readiness: AdminGlobalPublicationPreview;
 };
 
-export function assertGlobalPublicationPreview(preview: AdminGlobalPublicationPreview, coreId: string): void {
+export class EventGlobalProgramReadbackError extends Error {
+  constructor(readonly context: Pick<ManualTimelineRow, 'slotId' | 'programItemId' | 'programStatus' | 'status'> & { publicVisible: boolean }) {
+    super(`[GLOBAL_PROGRAM_READBACK] ${JSON.stringify(context)}`);
+  }
+}
+
+export class EventGlobalSignupAvailabilityError extends Error {
+  constructor(readonly availability: GlobalPublicationSignupReadback) {
+    super(`[GLOBAL_SIGNUP_AVAILABILITY] ${availability.outcome}`);
+  }
+}
+
+export function classifyGlobalSignupAvailability(occurrenceId: string, kind: ParticipantSignupKind,
+  availability: readonly IEventParticipantAvailability[]): GlobalPublicationSignupReadback {
+  const items = availability.filter(item => item.occurrenceId === occurrenceId &&
+    (kind === ParticipantSignupKind.Both || item.scope === kind));
+  const scopes = items.filter(item => item.availabilityStatus !== 'unavailable');
+  const outcome = scopes.some(item => item.availabilityStatus === 'available' && item.canSignup) ? 'available'
+    : scopes.some(item => item.availabilityStatus === 'full' ||
+      item.availabilityStatus === 'available' && item.venueAttendance.atCapacityForNewIdentity) ? 'full'
+    : scopes.some(item => item.availabilityStatus === 'scheduled') ? 'scheduled'
+    : scopes.length === 0 ? 'no_scope'
+    : scopes.every(item => item.availabilityStatus === 'past') ? 'past' : 'denied';
+  return { outcome, items };
+}
+
+const publicationFields = {
+  published: createEdgeLiteralReader([true]), slotId: readEdgeUuid, occurrenceId: readEdgeUuid,
+  status: createEdgeLiteralReader(['confirmed']),
+};
+const readRpgPublication = createStrictEdgeObjectReader({ ...publicationFields, programItemId: readEdgeUuid });
+const readActivityPublication = createStrictEdgeObjectReader({ ...publicationFields, kindKey: readEdgeNonBlankString,
+  kindLabel: readEdgeNonBlankString, participantSignupSupported: createEdgeLiteralReader([false]) });
+
+export function readManualRpgPublication(value: unknown, slotId: string, occurrenceId: string, programItemId: string): ManualRpgPublicationResult {
+  const result = readRpgPublication(value, 'manualRpgPublication');
+  assertEdgeContract(result.slotId === slotId && result.occurrenceId === occurrenceId && result.programItemId === programItemId,
+    'manualRpgPublication.identity', 'the exact requested Manual slot, Occurrence and ProgramItem');
+  return result;
+}
+
+export function readManualActivityPublication(value: unknown, slotId: string, occurrenceId: string, kindKey: string): ManualActivityPublicationResult {
+  const result = readActivityPublication(value, 'manualActivityPublication');
+  assertEdgeContract(result.slotId === slotId && result.occurrenceId === occurrenceId && result.kindKey === kindKey,
+    'manualActivityPublication.identity', 'the exact requested Manual activity and Occurrence');
+  return result;
+}
+
+export function assertGlobalPublishedProgram(coreId: string, target: AdminGlobalPublicationOccurrence,
+  timeline: AdminEventTimeline, program: readonly PublicEventProgramEntry[]): void {
+  const occurrence = readGlobalProgramOccurrence(coreId, target, timeline, program);
+  for (const row of occurrence.rows) {
+    if (row.source !== 'manual' || row.programStatus !== EventProgramItemStatus.Approved && row.programStatus !== EventProgramItemStatus.Published) continue;
+    assertPublishedManualProgram(row, program);
+  }
+}
+
+export function readGlobalProgramOccurrence(coreId: string, target: AdminGlobalPublicationOccurrence,
+  timeline: AdminEventTimeline, program: readonly PublicEventProgramEntry[]) {
+  const occurrence = timeline.occurrences.find(row => row.occurrenceId === target.occurrenceId && row.date === target.date);
+  assertEdgeContract(timeline.eventCoreId === coreId && timeline.eventId === target.editionId && occurrence !== undefined &&
+    program.every(entry => entry.occurrenceId === target.occurrenceId && entry.occurrenceDate === target.date),
+  'publication.program.scope', 'the same canonical local Occurrence in the admin and public program reads');
+  return occurrence;
+}
+
+export function assertPublishedManualProgram(row: ManualTimelineRow, program: readonly PublicEventProgramEntry[]): void {
+  const publicVisible = program.some(entry => entry.kind === 'confirmed' && (row.activity !== null
+    ? 'activityId' in entry && entry.activityId === row.slotId
+    : entry.session !== null && entry.programItemId === row.programItemId));
+  if (row.programStatus !== EventProgramItemStatus.Published || row.status !== 'confirmed' || !publicVisible) {
+    throw new EventGlobalProgramReadbackError({ slotId: row.slotId, programItemId: row.programItemId,
+      programStatus: row.programStatus, status: row.status, publicVisible });
+  }
+}
+
+export function assertGlobalPublicationPreview(preview: AdminGlobalPublicationPreview, coreId: string, snapshot: EventGlobalSavedSnapshot | null): void {
   const impact = preview.impact;
   assertEdgeContract(preview.coreId === coreId && typeof preview.valid === 'boolean' && Array.isArray(preview.blockers) &&
     preview.status === (preview.valid ? 'draft_ready' : 'blocked') && preview.valid === (preview.blockers.length === 0) &&
@@ -41,6 +122,17 @@ export function assertGlobalPublicationPreview(preview: AdminGlobalPublicationPr
       assertEdgeContract(value === undefined || Array.isArray(value), 'globalPublication.policyIssues', 'an optional array');
     }
   }
+  if (!preview.valid) return;
+  assertEdgeContract(snapshot !== null && !snapshot.core.isActive && !snapshot.core.hasPublicPage &&
+    snapshot.calendar.pendingDraft === null && preview.policyDraftRevision === snapshot.policyDraft.revision &&
+    !snapshot.policyDraft.baselineChanged && impact.affectedCityCount === snapshot.calendar.cities.length &&
+    snapshot.calendar.cities.every(city => impact.publishableOccurrences.some(row => row.editionId === city.editionId)) &&
+    [...impact.publishableOccurrences, ...impact.preservedPastDraftOccurrenceEntries].every(entry => {
+      const day = snapshot.calendar.globalDates.find(row => row.date === entry.date);
+      return day?.status === 'scheduled' && day.cityOccurrences.some(local => local.editionId === entry.editionId &&
+        local.occurrenceId === entry.occurrenceId && local.decision === 'included' && !local.unlinkedSameDate &&
+        local.occurrenceStatus === EventOccurrenceStatus.Planned && local.publishedAt === null);
+    }), 'globalPublication.scope', 'the exact server-selected planned identities and policy draft in the fresh saved snapshot');
 }
 
 export function assertGlobalPublicationResult(result: AdminGlobalPublicationResult, context: FirstGlobalPublicationContext): void {

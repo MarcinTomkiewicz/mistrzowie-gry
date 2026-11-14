@@ -1,11 +1,11 @@
 import type { AdminDatedTimeBlocks, AdminGlobalCalendarResult, AdminGlobalEventCityBlocker } from '../../interfaces/i-admin-global-event';
 import type { AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../interfaces/i-admin-global-event-preview';
-import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker, GlobalPublicationSignupProgress } from '../../interfaces/i-admin-global-event-publication';
+import type { AdminGlobalPublicationBlocker, AdminGlobalScopePublicationBlocker, GlobalPublicationStep, GlobalPublicationStepProgress, GlobalPublicationSignupReadback } from '../../interfaces/i-admin-global-event-publication';
 import type { ParticipantSignupKind } from '../../enums/event';
-import type { GlobalSaveCheckReason } from '../../interfaces/i-event-global-saved-summary';
+import type { EventGlobalSaveFailure, EventGlobalSaveGuard, EventGlobalSavePhase, GlobalSaveCheckReason } from '../../interfaces/i-event-global-saved-summary';
 
 export type EventGlobalSaveCopy = Record<'title' | 'action' | 'confirmQuestion' | 'confirm' | 'completed' | 'failed' | 'uncertain' |
-  'retryRead' | 'localChanges' | 'saved' | 'discardConfirmQuestion' | 'discardConfirm' | 'checked' | 'checkChanges', string> & {
+  'retryRead' | 'localChanges' | 'saved' | 'unchanged' | 'discardConfirmQuestion' | 'discardConfirm' | 'checked' | 'checkChanges', string> & {
     checkReasons: Record<GlobalSaveCheckReason, string>;
     dates: Record<'saved' | 'added' | 'retained' | 'removed' | 'outside' | 'protected' |
       'savedState' | 'newDateHint' | 'previewNeeded' | 'previewHint', string>;
@@ -15,12 +15,16 @@ export type EventGlobalPublicationCopy = Record<
   'hint' | 'confirmQuestion' | 'confirm' | 'blocked' | 'uncertain' | 'readbackFailed' | 'alreadyReleased' |
   'affectedCities' | 'publishableOccurrences' | 'preservedPastDrafts' | 'policyDraft' | 'block', string
 > & {
-  signupRelease: Record<'title' | 'partial' | 'retry' | 'verified', string> & {
-    states: Record<GlobalPublicationSignupProgress['state'], string>;
+  signupRelease: Record<'title' | 'partial' | 'retry' | 'retryAll' | 'verified' | 'uncertain' | 'unconfirmed' | 'programUnpublished' | 'programMissing', string> & {
+    states: Record<GlobalPublicationStepProgress['state'], string>;
+    steps: Record<GlobalPublicationStep, string>;
+    availability: Record<GlobalPublicationSignupReadback['outcome'], string>;
+    errors: Record<'eventState' | 'emptySlot' | 'sessionNotEligible' | 'sourceChanged' | 'activityNotReady' | 'activityKindInactive' |
+      'concurrentActivity' | 'sourceNotOwned' | 'unsupportedSource' | 'archived' | 'slotNotFound' | 'slotIdRequired' | 'sourceIdRequired', string>;
   };
   blockers: Record<AdminGlobalPublicationBlocker['code'], string>;
   scope: Record<'title' | 'hint' | 'dates' | 'preview' | 'confirmQuestion' | 'confirm' | 'alreadyPublishedOccurrences' | 'legacyCapacityUpgrades' |
-    'excludedSelections' | 'activateEditions' | 'selectionRequired' | 'ready' | 'revision' | 'publishedOccurrences' | 'activatedEditions' |
+    'excludedSelections' | 'activateEditions' | 'selectionRequired' | 'revision' | 'publishedOccurrences' | 'activatedEditions' |
     'endReadback' | 'endReadbackQuestion' | 'endReadbackWarning' | 'readbackEnded', string> & {
       blockers: Record<AdminGlobalScopePublicationBlocker['code'], string>;
     };
@@ -37,7 +41,6 @@ export type EventMetadataCopy = {
 };
 
 export type EventGlobalSavedSummaryCopy = {
-  readFailed: string;
   calendarDraft: string;
   policyDraft: string;
   program: string;
@@ -154,6 +157,20 @@ export type EventGlobalScheduleCopy = {
 };
 
 export type EventGlobalDiagnosticsCopy = {
+  operationTitle: string;
+  technical: string;
+  noField: string;
+  noReason: string;
+  readbackDifference: string;
+  fieldLabels: Record<'startDayOffset' | 'endDayOffset' | 'revision' | 'baselineFingerprint' | 'baselineChanged' | 'hasDraft', string>;
+  failures: Record<EventGlobalSaveFailure, string>;
+  guards: Record<EventGlobalSaveGuard, string>;
+  phases: Record<EventGlobalSavePhase, string>;
+  rules: Record<'required' | 'requiredTrimmed' | 'min' | 'max' | 'maxlength' | 'minlength' | 'pattern' | 'integer' |
+    'timeFormat' | 'timeRange' | 'pricePrecision' | 'basis' | 'policyCapacity' | 'currency' | 'signupKind' | 'validDate' | 'futureDate' |
+    'dateTimeRange' | 'isoDate' | 'singleDate' | 'exactDatesRequired' | 'exactDatesInvalid' | 'exactDatesDuplicate' | 'scheduleKind' |
+    'recurrenceDates' | 'recurrenceDateRange' | 'dateRangeLength' | 'weeklyDays' | 'monthlyNth' | 'monthlyWeekday' |
+    'dayOfMonth' | 'recurrenceKind' | 'allDatesExcluded' | 'unknown', string>;
   action: string;
   title: string;
   checking: string;

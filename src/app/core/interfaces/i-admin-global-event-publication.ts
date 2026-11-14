@@ -1,5 +1,6 @@
 import type { AdminEffectivePolicyResult, AdminGlobalCalendarResult } from './i-admin-global-event';
 import type { IAdminEventDetail, IEventCoreDetail } from './i-event-admin';
+import type { IEventParticipantAvailability } from './i-event-participant';
 
 export const GLOBAL_PUBLICATION_BLOCKER_CODES = [
   'GLOBAL_CALENDAR_REQUIRED', 'CORE_NOT_PRIVATE_DRAFT', 'STAFFING_PUBLICATION_IS_SEPARATE',
@@ -28,9 +29,20 @@ export interface AdminGlobalPublicationOccurrence {
   date: string;
 }
 
-export type GlobalPublicationSignupProgress = AdminGlobalPublicationOccurrence & {
-  state: 'pending' | 'confirmed' | 'failed';
+export type GlobalPublicationStep = 'publication' | 'program' | 'signup';
+
+export interface GlobalPublicationSignupReadback {
+  outcome: 'available' | 'full' | 'no_scope' | 'scheduled' | 'past' | 'denied';
+  items: readonly IEventParticipantAvailability[];
+}
+
+export type GlobalPublicationStepProgress = {
+  state: 'not_started' | 'running' | 'confirmed' | 'rejected' | 'uncertain' | 'not_required';
+  error: unknown | null;
+  availability?: GlobalPublicationSignupReadback;
 };
+
+export type GlobalPublicationOccurrenceProgress = AdminGlobalPublicationOccurrence & Record<GlobalPublicationStep, GlobalPublicationStepProgress>;
 
 export interface AdminGlobalPublicationPreview {
   coreId: string;

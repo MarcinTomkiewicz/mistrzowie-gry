@@ -8,6 +8,28 @@ type GlobalDate = AdminGlobalCalendarResult['globalDates'][number];
 export type GlobalSaveCheckReason = 'coverPending' | 'coverDirty' | 'program' | 'publication' | 'city' | 'diagnostics' |
   'busy' | 'pending' | 'unchanged' | 'invalid' | 'section' | 'changed' | 'otherOperation';
 
+export type EventGlobalSaveFailure = 'unavailable' | 'empty' | 'previewRejected' | 'writeRejected' | 'unconfirmed';
+export type EventGlobalSaveGuard = 'notLoaded' | 'busy' | 'pending' | 'conflict' | 'blocked' | 'protected' |
+  'invalid' | 'unchanged' | 'previewRequired' | 'previewMismatch' | 'draftRequired' | 'draftPending';
+export type EventGlobalSavePhase = 'check' | 'prepare' | 'preview' | 'save' | 'apply' | 'readback';
+
+export interface EventGlobalDiagnosticIssue {
+  field: string | null;
+  location: string | null;
+  message: string;
+  code: string | null;
+  technical: string | null;
+}
+
+export interface EventGlobalDiagnosticGroup {
+  key: string;
+  title: string;
+  phase: string;
+  step: number;
+  issues: EventGlobalDiagnosticIssue[];
+  technical: { label: string; value: string }[];
+}
+
 export interface SavedProgramDate {
   key: string;
   date: string;

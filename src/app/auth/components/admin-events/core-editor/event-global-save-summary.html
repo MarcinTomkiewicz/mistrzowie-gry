@@ -1,24 +1,26 @@
-@if (save.pending() || save.completed().length || save.error() || save.checkIssue() || save.checked() || save.schedule.state() === 'draft') {
+@if (save.pending() || save.completed().length || save.schedule.state() === 'draft') {
   <section class="flex-col-start-stretch gap-sm w-100 min-w-0" [attr.aria-busy]="save.busy()">
     @if (save.completed().length) {
       <p class="m-0" role="status">{{ copy().completed }}:
         @for (key of save.completed(); track key) { <span class="tag-badge tag-badge--muted">{{ label(key) }}</span> }
       </p>
     }
-    @if (save.pending()) { <p-message severity="warn" role="alert">{{ copy().uncertain }}</p-message> }
-    @else if (checkMessage(); as message) {
-      <p-message severity="warn" role="alert">{{ message }}</p-message>
-      @if (checkStep(); as step) {
-        <div class="flex-row-start-center">
-          <p-button type="button" size="small" severity="secondary" [outlined]="true"
-            [label]="i18n.diagnostics().goToSection" [disabled]="save.busy() || deciding()" (onClick)="navigateToStep.emit(step)" />
-        </div>
-      }
-    }
-    @else if (save.error()) { <p-message severity="error" role="alert">{{ copy().failed }}</p-message> }
-    @else if (save.checked()) { <p-message severity="info" role="status">{{ copy().checked }}</p-message> }
+    @if (save.pending()) { <p-message severity="warn" role="alert">{{ failureMessage() }}</p-message> }
     @if (save.schedule.state() === 'draft') { <p-message severity="info" role="status">{{ i18n.schedule().draftSaved }}</p-message> }
   </section>
+}
+@if (save.metadata.core(); as core) {
+  @if (save.schedule.calendar(); as calendar) {
+    <app-event-global-diagnostics [coreId]="core.id" [cities]="calendar.cities" [operationGroups]="diagnosticGroups()"
+      [disabled]="save.busy() || save.pending() || deciding()" (navigateToStep)="navigateToStep.emit($event)" />
+  }
+}
+@if ((!diagnosticGroups().length || !save.checkIssue()?.section) && !save.pending() && checkMessage(); as message) {
+  <p-message severity="warn" role="alert">{{ message }}</p-message>
+  @if (checkStep(); as step) {
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" [label]="i18n.diagnostics().goToSection"
+      [disabled]="save.busy() || deciding()" (onClick)="navigateToStep.emit(step)" />
+  }
 }
 <ng-template #secondaryActions>
   @if (save.pending()) {

@@ -8,7 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
-import { distinctUntilChanged, EMPTY, filter, finalize, from, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, filter, finalize, from, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 
 import { Breadcrumbs } from '../../../../common/breadcrumbs/breadcrumbs';
 import { CharacterCounter } from '../../../../common/character-counter/character-counter';
@@ -16,6 +16,7 @@ import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overl
 import { findEventGlobalDraftStepError } from '../../../../core/factories/event-global-draft-form.factory';
 import type { AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
+import type { EventGlobalSavedSnapshot } from '../../../../core/interfaces/i-event-global-saved-summary';
 import { Platform } from '../../../../core/services/platform/platform';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
@@ -124,10 +125,10 @@ export class EventCoreEditor {
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly isNotFound = signal(false);
   protected readonly canCancel = computed(() => this.isNew() ? !this.creating() && this.globalDraft.state() !== 'uncertain'
-    : !this.saveChanges.busy() && !this.saveChanges.pending() && !this.publication.locked() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
+    : !this.saveChanges.busy() && !this.saveChanges.pending() && !this.publication.isBusy() && !this.program.isBusy() && (!this.program.readbackPending() || this.program.canAbandon()) && !this.metadata.locked() && !this.globalDraft.isChecking() && !this.globalDraft.cityBusy() &&
     this.globalDraft.cityState() !== 'uncertain' && !this.policy.isBusy() && !this.datedBlocks.isBusy() && !this.schedule.isBusy() && !this.baseBlocks.isBusy() &&
     (!this.cover.locked() || this.cover.canAbandon()));
-  private readonly otherOperationsLocked = computed(() => this.saveChanges.busy() || this.saveChanges.pending() || this.publication.locked() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
+  private readonly otherOperationsLocked = computed(() => this.isLoading() && this.core() !== null || this.saveChanges.busy() || this.saveChanges.pending() || this.publication.isBusy() || this.cover.locked() || this.metadata.locked() || this.globalDraft.isChecking() || this.globalDraft.cityBusy() ||
     this.cover.needsReconciliation() || this.policy.isBusy() || this.schedule.isBusy() || this.baseBlocks.isBusy() ||
     this.globalDraft.cityState() !== 'idle' || this.datedBlocks.isBusy() || this.datedBlocks.readbackPending());
   protected readonly navigationLocked = computed(() => this.isNew() ? this.creating() || this.globalDraft.state() !== 'idle'
@@ -162,6 +163,11 @@ export class EventCoreEditor {
 
   constructor() {
     effect(() => {
+      if (!this.saveChanges.busy() && this.saveChanges.failed() && (this.saveChanges.completed().length || this.saveChanges.pending())) {
+        untracked(() => this.loadCore(undefined, false));
+      }
+    });
+    effect(() => {
       const error = this.globalDraft.editionReadError();
       if (error !== null) untracked(() => this.toast.danger({
         summary: resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification),
@@ -186,15 +192,10 @@ export class EventCoreEditor {
       this.coreId.set(coreId);
       this.coreUrl = this.router.url;
       if (this.globalDraft.result()?.coreId !== coreId) this.globalDraft.reset();
-      this.datedBlocks.reset();
       this.saveChanges.reset();
-      this.schedule.reset();
-      this.baseBlocks.reset();
-      this.policy.reset();
       this.program.reset();
       this.publication.reset();
       this.cover.reset();
-      this.metadata.reset();
       this.scheduleValidationAttempted.set(false);
       this.restoreStep(this.route.snapshot.queryParamMap.get('step'));
       this.loadCore();
@@ -216,31 +217,43 @@ export class EventCoreEditor {
     }));
   }
 
-  protected loadCore(): void {
+  protected loadCore(saved?: EventGlobalSavedSnapshot, hydrateForms = true): void {
     this.invalidateDiagnostics();
     this.loadSubscription?.unsubscribe();
     const coreId = this.coreId();
     if (!coreId) { this.isLoading.set(false); return; }
     this.isLoading.set(true);
-    this.core.set(null);
+    if (hydrateForms) this.core.set(null);
     this.loadErrorMessage.set(null);
     this.isNotFound.set(false);
-    this.loadSubscription = this.globalDraft.readCore(coreId)
+    const recovering = !saved && hydrateForms && (!this.publication.needsReadback() || this.publication.needsRecovery());
+    this.loadSubscription = (saved ? of(saved) : recovering ? this.publication.recover(coreId) : this.publication.readSnapshot(coreId))
       .pipe(
-        tap(core => this.metadata.load(core)),
-        switchMap(core => core && !core.archived
-          ? this.saveChanges.load(core).pipe(map(() => core)) : of(core)),
+        catchError((error: unknown) => {
+          const snapshot = this.publication.snapshot();
+          if (!recovering || !snapshot) throw error;
+          this.toast.warn({ summary: this.i18n.globalPublication().readbackFailed });
+          return of(snapshot);
+        }),
+        switchMap(snapshot => {
+          if (snapshot) this.acceptSavedReadback(snapshot);
+          if (hydrateForms) this.metadata.load(snapshot?.core ?? null);
+          if (!snapshot) return of(null);
+          return snapshot.core.archived || !hydrateForms ? of(snapshot.core)
+            : this.saveChanges.load(snapshot.core, snapshot.policyDraft).pipe(map(() => snapshot.core));
+        }),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (core) => {
+          if (core === null) this.core.set(null);
           if (core && !core.archived) this.cover.reconcile(core);
           this.isNotFound.set(core === null);
         },
         error: (error: unknown) => {
           const detail = resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification);
-          this.core.set(null);
+          if (hydrateForms) this.core.set(null);
           this.loadErrorMessage.set(detail);
           this.toast.danger({ summary: this.i18n.page().loadErrorTitle, detail });
         },
@@ -255,11 +268,6 @@ export class EventCoreEditor {
       acceptLabel: this.i18n.creation().discardDraft, rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
       if (!accepted || coreId !== this.coreId() || !this.canCancel() || this.saveChanges.pending()) return;
-      this.schedule.reset();
-      this.baseBlocks.reset();
-      this.policy.reset();
-      this.datedBlocks.reset();
-      this.metadata.reset();
       this.saveChanges.reset();
       this.loadCore();
     });
@@ -271,18 +279,30 @@ export class EventCoreEditor {
   }
 
   protected acceptPublication(core: IEventCoreDetail): void {
+    const snapshot = this.publication.snapshot();
+    if (!snapshot || snapshot.core.id !== core.id) return;
+    if (this.saveChanges.dirty()) {
+      this.acceptSavedReadback(snapshot);
+      this.cover.reconcile(core);
+    }
+    else this.loadCore(snapshot);
+  }
+
+  protected acceptSavedReadback(snapshot: EventGlobalSavedSnapshot): void {
+    if (snapshot.core.id !== this.coreId()) return;
+    this.core.set(snapshot.core);
+    this.globalDraft.calendar.set(snapshot.calendar);
+    this.globalDraft.policy.set(snapshot.policy);
+    this.globalDraft.mainEdition.set(snapshot.edition);
+    const selectedId = this.globalDraft.selectedEditionId();
+    if (!snapshot.calendar.cities.some(city => city.editionId === selectedId)) this.globalDraft.syncEditionSelection(snapshot.calendar, snapshot.edition);
+    else if (selectedId === snapshot.edition.id) this.globalDraft.selectedEdition.set(snapshot.edition);
     this.invalidateDiagnostics();
-    this.metadata.load(core);
-    this.cover.reconcile(core);
   }
 
   protected programBlocked(): boolean {
-    return this.otherOperationsLocked() || this.saveChanges.dirty() ||
+    return this.otherOperationsLocked() || this.loadErrorMessage() !== null || this.publication.needsReadback() || this.saveChanges.dirty() ||
       this.cover.dirty() || this.globalDraft.cityEditing();
-  }
-
-  protected programReadBlocked(): boolean {
-    return this.otherOperationsLocked() || this.program.locked();
   }
 
   private restoreStep(value: string | null): void {

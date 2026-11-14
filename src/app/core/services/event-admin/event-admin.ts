@@ -4,8 +4,9 @@ import { defer, map, Observable, tap } from 'rxjs';
 import { EVENT_RPC } from '../../configs/event-rpc.config';
 import { EventOccurrenceStatus, ParticipantSignupKind } from '../../enums/event';
 import type { AdminEventTimeline } from '../../interfaces/i-admin-event-timeline';
-import type { ManualRpgSlotPayload, ManualRpgSlotResult } from '../../interfaces/i-event-program-item';
-import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult } from '../../interfaces/i-admin-event-activity';
+import type { ManualRpgSlotPayload, ManualRpgSlotResult, ManualRpgPublicationResult } from '../../interfaces/i-event-program-item';
+import type { AdminEventActivityKinds, ManualActivityPayload, ManualActivityResult, ManualActivityPublicationResult } from '../../interfaces/i-admin-event-activity';
+import { readManualActivityPublication, readManualRpgPublication } from '../../reads/events/admin-global-publication.contract';
 import { assertAdminEventTimeline } from '../../reads/events/admin-event-timeline.contract';
 import { readAdminEventCoreDetail, readAdminEventCoreList } from '../../reads/events/admin-event-core.contract';
 import { assertEventCoreDispositionCommand, assertEventCoreDispositionSelection,
@@ -164,15 +165,11 @@ export class EventAdmin {
   }
 
   previewGlobalScopePublication(command: EventGlobalScopePublicationCommand): Observable<AdminGlobalScopePublicationPreview> {
-    return defer(() => this.backend.rpc<AdminGlobalScopePublicationPreview>(
-      EVENT_RPC.previewGlobalScopePublication, this.scopePublicationArgs(command),
-    )).pipe(tap(preview => assertGlobalScopePublicationPreview(preview, command)));
+    return this.scopePublication(EVENT_RPC.previewGlobalScopePublication, command, assertGlobalScopePublicationPreview);
   }
 
   publishGlobalScope(command: EventGlobalScopePublicationCommand): Observable<AdminGlobalScopePublicationResult> {
-    return defer(() => this.backend.rpc<AdminGlobalScopePublicationResult>(
-      EVENT_RPC.publishGlobalScope, this.scopePublicationArgs(command),
-    )).pipe(tap(result => assertGlobalScopePublicationResult(result, command)));
+    return this.scopePublication(EVENT_RPC.publishGlobalScope, command, assertGlobalScopePublicationResult);
   }
 
   openSignup(occurrenceId: string): Observable<void> {
@@ -194,10 +191,13 @@ export class EventAdmin {
     }));
   }
 
-  private scopePublicationArgs(command: EventGlobalScopePublicationCommand) {
-    assertGlobalScopePublicationCommand(command);
-    return { p_core_id: command.coreId, p_expected_calendar_revision: command.expectedCalendarRevision,
-      p_edition_ids: command.editionIds, p_global_date_ids: command.globalDateIds };
+  private scopePublication<T>(rpc: typeof EVENT_RPC.previewGlobalScopePublication | typeof EVENT_RPC.publishGlobalScope,
+    command: EventGlobalScopePublicationCommand, assertResult: (result: T, command: EventGlobalScopePublicationCommand) => void): Observable<T> {
+    return defer(() => {
+      assertGlobalScopePublicationCommand(command);
+      return this.backend.rpc<T>(rpc, { p_core_id: command.coreId, p_expected_calendar_revision: command.expectedCalendarRevision,
+        p_edition_ids: command.editionIds, p_global_date_ids: command.globalDateIds });
+    }).pipe(tap(result => assertResult(result, command)));
   }
 
   previewGlobalBaseTimeBlocks(command: EventGlobalBaseTimeBlocksCommand): Observable<AdminGlobalBaseTimeBlocksPreview> {
@@ -293,12 +293,22 @@ export class EventAdmin {
     return this.backend.rpc<ManualRpgSlotResult>(EVENT_RPC.saveManualRpgSlot, { p_payload: payload });
   }
 
+  publishManualRpgSlot(slotId: string, occurrenceId: string, programItemId: string): Observable<ManualRpgPublicationResult> {
+    return this.backend.rpc<unknown>(EVENT_RPC.publishManualRpgSlot, { p_slot_id: slotId })
+      .pipe(map(value => readManualRpgPublication(value, slotId, occurrenceId, programItemId)));
+  }
+
   getActivityKinds(): Observable<AdminEventActivityKinds> {
     return this.backend.rpc<AdminEventActivityKinds>(EVENT_RPC.getActivityKinds);
   }
 
   saveManualActivity(payload: ManualActivityPayload): Observable<ManualActivityResult> {
     return this.backend.rpc<ManualActivityResult>(EVENT_RPC.saveManualActivity, { p_payload: payload });
+  }
+
+  publishManualActivity(slotId: string, occurrenceId: string, kindKey: string): Observable<ManualActivityPublicationResult> {
+    return this.backend.rpc<unknown>(EVENT_RPC.publishManualActivity, { p_slot_id: slotId })
+      .pipe(map(value => readManualActivityPublication(value, slotId, occurrenceId, kindKey)));
   }
 
   getProgramParticipants(programItemId: string, occurrenceId: string): Observable<AdminEventProgramParticipants> {

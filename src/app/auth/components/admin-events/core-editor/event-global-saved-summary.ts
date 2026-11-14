@@ -1,27 +1,27 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, Component, computed, contentChild, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { afterNextRender, Component, computed, contentChild, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
-import { EMPTY, finalize, map, of, switchMap } from 'rxjs';
+import { EMPTY, finalize, Observable, switchMap } from 'rxjs';
 
-import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin';
 import type { AdminGlobalEventPageFieldError } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { EventGlobalSavedSnapshot } from '../../../../core/interfaces/i-event-global-saved-summary';
+import type { GlobalPublicationStep, GlobalPublicationStepProgress } from '../../../../core/interfaces/i-admin-global-event-publication';
+import { EventGlobalProgramReadbackError, EventGlobalSignupAvailabilityError } from '../../../../core/reads/events/admin-global-publication.contract';
 import { Auth } from '../../../../core/services/auth/auth';
-import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { RpcError } from '../../../../core/types/rpc-error';
+import { EventProgramItemStatus } from '../../../../core/enums/event';
 import { formatDateLabel } from '../../../../core/utils/date';
-import { resolveEventCoreAdminErrorMessage } from '../event-admin-errors';
+import { presentEventGlobalPreviewError, resolveEventCoreAdminErrorMessage, resolveEventEditionAdminErrorMessage, resolveEventProgramPublicationError } from '../event-admin-errors';
 import { createEventEditionEditorI18n } from '../edition-editor/edition-editor.i18n';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
 import { EventGlobalDraftSummary } from './event-global-draft-summary';
 import { EventGlobalPublicationController } from './event-global-publication-controller';
-import { readEventGlobalSavedSummary } from './event-global-saved-summary-read';
 import { EventAdminTimeline } from '../event-admin-timeline/event-admin-timeline';
 import { EventGlobalPagePreview } from './event-global-page-preview';
 import { EventGlobalSaveController } from './event-global-save-controller';
@@ -31,17 +31,19 @@ import { EventGlobalSaveSummary } from './event-global-save-summary';
 
 @Component({
   selector: 'app-event-global-saved-summary',
-  imports: [NgTemplateOutlet, ButtonModule, MessageModule, TableModule, EventGlobalDraftSummary, EventAdminTimeline, EventGlobalPagePreview, LoadingOverlay],
+  imports: [NgTemplateOutlet, ButtonModule, MessageModule, TableModule, EventGlobalDraftSummary, EventAdminTimeline, EventGlobalPagePreview],
   templateUrl: './event-global-saved-summary.html',
   host: { class: 'flex-col-start-stretch gap-md w-100 min-w-0' },
 })
 export class EventGlobalSavedSummary {
   readonly coreId = input.required<string>();
   readonly disabled = input(false);
+  readonly selectionDisabled = input(false);
   readonly readOnly = input(false);
   readonly navigateToStep = output<number>();
   readonly published = output<IEventCoreDetail>();
-  readonly diagnosticsInvalidated = output<void>();
+  readonly readback = output<EventGlobalSavedSnapshot>();
+  readonly refreshRequested = output<void>();
   readonly fieldErrors = input<readonly AdminGlobalEventPageFieldError[]>([]);
   protected readonly i18n = createEventCoreEditorI18n();
   private readonly editionI18n = createEventEditionEditorI18n();
@@ -64,12 +66,8 @@ export class EventGlobalSavedSummary {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly isAdmin = computed(() => this.auth.hasRole('admin'));
   protected readonly formatDateLabel = formatDateLabel;
-  protected readonly loading = signal(true);
-  protected readonly snapshot = signal<EventGlobalSavedSnapshot | null>(null);
-  private readonly error = signal<unknown | null>(null);
-  private readonly admin = inject(EventAdmin);
+  protected readonly snapshot = this.publication.snapshot.asReadonly();
   private readonly browserReady = signal(false);
-  private readonly readAttempt = signal(0);
   protected readonly selectedCityId = signal<string | null>(null);
   protected readonly selectedCity = computed<EventGlobalSavedSnapshot['cities'][number] | null>(() => {
     const cities = this.snapshot()?.cities ?? [];
@@ -81,14 +79,13 @@ export class EventGlobalSavedSummary {
   protected readonly scopeEditionIds = signal<string[]>([]);
   protected readonly scopeDateIds = signal<string[]>([]);
   protected readonly scopeDecisionPending = signal(false);
-  protected readonly scopeCalendar = computed(() => {
-    const calendar = this.publication.scopeCalendar();
-    return calendar?.coreId === this.coreId() ? calendar : this.snapshot()?.calendar ?? null;
-  });
+  protected readonly scopeCalendar = this.publication.scopeCalendar.asReadonly();
   protected readonly scopeDates = computed(() => this.scopeCalendar()?.globalDates.filter(day => day.status === 'scheduled') ?? []);
   protected readonly unsaved = computed(() => this.save.dirty() || this.save.busy() || this.save.pending());
-  protected readonly canPreviewScope = computed(() => !this.readOnly() && this.snapshot()?.core.archived === false && this.browserReady() && this.isAdmin() && this.scoped() && !this.disabled() && !this.unsaved() &&
-    !this.loading() && this.error() === null && !this.publication.locked() && this.scopeEditionIds().length > 0 && this.scopeDateIds().length > 0);
+  private readonly canPrepare = computed(() => !this.readOnly() && this.snapshot()?.core.archived === false && this.browserReady() &&
+    this.isAdmin() && !this.disabled() && !this.unsaved() && !this.publication.locked());
+  protected readonly canPreviewScope = computed(() => this.canPrepare() && this.scoped() &&
+    this.scopeEditionIds().length > 0 && this.scopeDateIds().length > 0);
   protected readonly scopeSelection = computed(() => {
     const preview = this.publication.scopePreview();
     const calendar = this.scopeCalendar();
@@ -102,9 +99,7 @@ export class EventGlobalSavedSummary {
   });
   protected readonly scopeActivationCities = computed(() => this.publication.scopePreview()?.impact.willActivateEditionIds
     .map(id => this.scopeCalendar()?.cities.find(city => city.editionId === id)?.city ?? id).join(', ') ?? '');
-  protected readonly canPublish = computed(() => !this.readOnly() && this.snapshot()?.core.archived === false && this.browserReady() && this.isAdmin() && !this.disabled() && !this.unsaved() &&
-    !this.loading() && this.error() === null && this.snapshot()?.core.id === this.coreId() &&
-    !this.hasRelease() && !this.publication.locked());
+  protected readonly canPublish = computed(() => this.canPrepare() && !this.hasRelease());
   protected readonly publicationError = computed(() => {
     const error = this.publication.error();
     if (error === null) return null;
@@ -116,10 +111,14 @@ export class EventGlobalSavedSummary {
     if (error instanceof RpcError && error.code === '42501') return this.publicationLabels().errors.forbidden;
     return resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification);
   });
-  protected readonly signupProgress = computed(() => this.publication.signupProgress().map(row => ({
+  protected readonly publicationErrorFields = computed(() => this.publication.occurrenceProgress().some(row =>
+    (['publication', 'program', 'signup'] as const).some(step => row[step].error === this.publication.error()))
+    ? [] : this.technicalFields(this.publication.error()));
+  protected readonly occurrenceProgress = computed(() => this.publication.occurrenceProgress().map(row => ({
     ...row,
     city: this.scopeCalendar()?.cities.find(city => city.editionId === row.editionId)?.city ?? row.editionId,
-    label: this.publicationCopy().signupRelease.states[row.state],
+    remaining: row.program.state !== 'confirmed' || !['confirmed', 'not_required'].includes(row.signup.state),
+    steps: (['publication', 'program', 'signup'] as const).map(step => this.presentStep(step, row[step])),
   })));
   protected readonly publicationBlockers = computed(() => this.publication.preview()?.blockers.map(blocker => ({
     ...blocker,
@@ -137,9 +136,6 @@ export class EventGlobalSavedSummary {
       date: day?.date, unresolvedId: day ? null : 'globalDateId' in blocker ? blocker.globalDateId : 'occurrenceId' in blocker ? blocker.occurrenceId : null,
       blockPosition: 'blockPosition' in blocker ? blocker.blockPosition : null };
   }) ?? []);
-  protected readonly errorMessage = computed(() => this.error() === null ? null : resolveEventCoreAdminErrorMessage(
-    this.error(), this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification,
-  ));
   protected readonly cities = computed(() => {
     const copy = this.i18n.savedSummary();
     const statuses = this.editionI18n.occurrenceStatuses();
@@ -157,46 +153,36 @@ export class EventGlobalSavedSummary {
   constructor() {
     // Privileged reads run in the browser, following EventGlobalProgram's boundary.
     afterNextRender(() => this.browserReady.set(true));
-    effect(() => {
-      if (!this.save.busy() && (this.save.completed().length || this.save.pending())) {
-        // Refresh the whole view after partial saves without resolving the retained writer operation.
-        untracked(() => this.readAttempt.update(value => value + 1));
-      }
-    });
-    effect(onCleanup => {
-      const ready = this.browserReady();
-      const coreId = this.coreId();
-      this.readAttempt();
-      untracked(() => {
-        this.snapshot.set(null);
-        this.error.set(null);
-        this.loading.set(true);
-        if (!this.publication.locked()) this.publication.scopeCalendar.set(null);
-        if (!ready) return;
-        this.diagnosticsInvalidated.emit();
-        const subscription = readEventGlobalSavedSummary(this.admin, coreId).pipe(switchMap(snapshot =>
-          (this.readOnly() ? of(undefined) : this.publication.restoreSignup(snapshot)).pipe(map(() => snapshot)),
-        )).subscribe({
-          next: snapshot => {
-            this.snapshot.set(snapshot);
-            this.loading.set(false);
-          },
-          error: (error: unknown) => {
-            this.error.set(error);
-            this.loading.set(false);
-            this.toast.danger({ summary: this.i18n.savedSummary().readFailed, detail: this.errorMessage() ?? undefined });
-          },
-        });
-        onCleanup(() => subscription.unsubscribe());
-      });
-    });
   }
 
   protected refresh(): void {
-    if (!this.loading() && !this.publication.locked()) {
+    if (!this.selectionDisabled() && !this.publication.isBusy()) {
       this.clearScopeSelection();
-      this.readAttempt.update(value => value + 1);
+      this.refreshRequested.emit();
     }
+  }
+
+  private technicalFields(error: unknown) {
+    return presentEventGlobalPreviewError(error).map(field => ({ label: this.i18n.diagnostics().errorFields[field.key], value: field.value }));
+  }
+
+  private presentStep(step: GlobalPublicationStep, progress: GlobalPublicationStepProgress) {
+    const copy = this.publicationCopy().signupRelease;
+    const error = progress.error;
+    const availabilityMessage = progress.availability ? copy.availability[progress.availability.outcome] : null;
+    const showAvailability = error === null ? progress.state !== 'uncertain' : progress.availability?.outcome !== 'available';
+    const fallbackMessage = showAvailability && availabilityMessage !== null ? availabilityMessage : error === null ? null : copy.unconfirmed;
+    const message = error instanceof EventGlobalSignupAvailabilityError ? copy.availability[error.availability.outcome]
+      : error instanceof EventGlobalProgramReadbackError
+      ? copy[error.context.programStatus === EventProgramItemStatus.Approved ? 'programUnpublished' : 'programMissing']
+      : error instanceof RpcError ? resolveEventProgramPublicationError(error, copy.errors) ??
+        resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification)
+        : fallbackMessage;
+    return { step, name: copy.steps[step], label: copy.states[progress.state],
+      message, uncertainDetail: progress.state === 'uncertain' ? copy.uncertain : null,
+      errorFields: [...this.technicalFields(error), ...(progress.availability && (error !== null || progress.state === 'uncertain') ? [{
+        label: this.i18n.diagnostics().errorFields.details, value: JSON.stringify(progress.availability, null, 2),
+      }] : [])] };
   }
 
   protected toggleScope(kind: 'edition' | 'date', id: string): void {
@@ -228,37 +214,19 @@ export class EventGlobalSavedSummary {
   protected confirmScopePublication(): void {
     const preview = this.publication.scopePreview();
     if (!this.publication.scopeConfirmable() || !preview?.valid || this.scopeDecisionPending()) return;
-    this.scopeDecisionPending.set(true);
-    const coreId = this.coreId();
     const impact = preview.impact;
     const selection = this.scopeSelection();
     const message = this.publicationCopy().scope.confirm.replace('{{cities}}', selection.cities).replace('{{dates}}', selection.dates)
       .replace('{{planned}}', String(impact.plannedOccurrenceCount)).replace('{{already}}', String(impact.alreadyPublishedOccurrenceCount))
       .replace('{{excluded}}', String(impact.excludedSelections)).replace('{{upgrades}}', String(impact.legacyCapacityUpgrades))
       .replace('{{activate}}', this.scopeActivationCities() || this.i18n.commonValues().notApplicable);
-    this.confirm.modalDecision({ header: this.publicationCopy().scope.confirmQuestion, message,
-      acceptLabel: this.publicationLabels().publish, rejectLabel: this.i18n.commonActions().cancel,
-    }).pipe(switchMap(accepted => {
-      if (!accepted || coreId !== this.coreId() || !this.isAdmin()) {
-        this.publication.cancelConfirmation();
-        return EMPTY;
-      }
-      return this.publication.publish();
-    }), finalize(() => this.scopeDecisionPending.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: core => {
-        if (core) this.acceptPublication(core);
-        else this.toast.danger({ summary: this.publicationError() ?? this.publicationCopy().blocked });
-      },
-      error: () => this.toast.show(this.publication.needsReadback() ? 'warn' : 'danger', {
-        summary: this.publicationError() ?? this.i18n.commonErrors().generic,
-      }),
-    });
+    this.observePublication(this.confirmRelease(message, true));
   }
 
   protected confirmPublication(): void {
     if (!this.canPublish()) return;
     const coreId = this.coreId();
-    this.publication.prepare(coreId).pipe(switchMap(preview => {
+    this.observePublication(this.publication.prepare(coreId).pipe(switchMap(preview => {
       if (!preview.valid) {
         this.toast.warn({ summary: this.i18n.diagnostics().statuses.blocked,
           detail: this.publicationBlockers().map(blocker => blocker.message).join(' ') });
@@ -268,36 +236,42 @@ export class EventGlobalSavedSummary {
         .replace('{{cities}}', String(preview.impact.affectedCityCount))
         .replace('{{occurrences}}', String(preview.impact.publishableOccurrenceCount))
         .replace('{{past}}', String(preview.impact.preservedPastDraftOccurrences));
-      return this.confirm.modalDecision({
-        header: this.publicationCopy().confirmQuestion,
-        message: message + (preview.policyDraftRevision > 0 ? ' ' + this.publicationCopy().policyDraft : ''),
-        acceptLabel: this.publicationLabels().publish, rejectLabel: this.i18n.commonActions().cancel,
-      }).pipe(switchMap(accepted => {
-        if (!accepted || coreId !== this.coreId() || !this.isAdmin()) {
-          this.publication.cancelConfirmation();
-          return EMPTY;
-        }
-        return this.publication.publish();
-      }));
-    }), takeUntilDestroyed(this.destroyRef)).subscribe({
+      return this.confirmRelease(message + (preview.policyDraftRevision > 0 ? ' ' + this.publicationCopy().policyDraft : ''), false);
+    })));
+  }
+
+  private confirmRelease(message: string, scoped: boolean): Observable<IEventCoreDetail | null> {
+    const coreId = this.coreId();
+    this.scopeDecisionPending.set(true);
+    return this.confirm.modalDecision({
+      header: scoped ? this.publicationCopy().scope.confirmQuestion : this.publicationCopy().confirmQuestion,
+      message, acceptLabel: this.publicationLabels().publish, rejectLabel: this.i18n.commonActions().cancel,
+    }).pipe(switchMap(accepted => {
+      if (accepted && coreId === this.coreId() && this.isAdmin()) return this.publication.publish();
+      this.publication.cancelConfirmation();
+      return EMPTY;
+    }), finalize(() => this.scopeDecisionPending.set(false)));
+  }
+
+  private observePublication(request: Observable<IEventCoreDetail | null>): void {
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: core => {
         if (core) this.acceptPublication(core);
         else this.toast.danger({ summary: this.publicationError() ?? this.publicationCopy().blocked });
       },
-      error: () => this.toast.show(this.publication.needsReadback() ? 'warn' : 'danger', {
-        summary: this.publicationError() ?? this.i18n.commonErrors().generic,
-      }),
+      error: () => {
+        const snapshot = this.snapshot();
+        if (snapshot) this.readback.emit(snapshot);
+        this.toast.show(this.publication.resultUncertain() ? 'warn' : 'danger', {
+          summary: this.publicationError() ?? this.i18n.commonErrors().generic,
+        });
+      },
     });
   }
 
-  protected retryPublicationReadback(): void {
+  protected retryPublicationReadback(occurrenceId?: string): void {
     if (this.scopeDecisionPending()) return;
-    this.publication.retryReadback().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: core => this.acceptPublication(core),
-      error: () => this.toast.show(this.publication.needsReadback() ? 'warn' : 'danger', {
-        summary: this.publicationError() ?? this.i18n.commonErrors().generic,
-      }),
-    });
+    this.observePublication(this.publication.retryReadback(occurrenceId));
   }
 
   protected endScopeReadback(): void {
@@ -310,17 +284,20 @@ export class EventGlobalSavedSummary {
       rejectLabel: this.i18n.commonActions().cancel,
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.scopeDecisionPending.set(false))).subscribe(accepted => {
       if (accepted && coreId === this.coreId() && this.isAdmin() && this.publication.abandonScopeReadback()) {
-        this.readAttempt.update(value => value + 1);
+        this.refreshRequested.emit();
       }
     });
   }
 
   private acceptPublication(core: IEventCoreDetail): void {
-    if (!this.publication.verified()) return;
+    if (!this.publication.verified()) {
+      const snapshot = this.snapshot();
+      if (snapshot) this.readback.emit(snapshot);
+      return;
+    }
     this.toast.success({ summary: this.publicationCopy().signupRelease.verified });
     this.scopeEditionIds.set([]);
     this.scopeDateIds.set([]);
     this.published.emit(core);
-    this.readAttempt.update(value => value + 1);
   }
 }

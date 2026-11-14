@@ -1,27 +1,68 @@
 @let copy = i18n.diagnostics();
-@if (disabled() && !isChecking()) { <p class="m-0 muted-text">{{ copy.savedDataOnly }}</p> }
-<ng-template #actions>
-  <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-check"
-    [label]="copy.action" [loading]="isChecking()" loadingIcon="pi pi-d20"
-    [disabled]="disabled() || isChecking()" (onClick)="check()" />
-</ng-template>
+@if (operationGroups() !== null) {
+  @if (operationViews().length) {
+    <section class="flex-col-start-stretch gap-sm w-100 min-w-0" aria-live="polite">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ copy.operationTitle }}</h2>
+      @for (group of operationViews(); track group.key) {
+        <section class="mg-card flex-col-start-stretch gap-sm p-md w-100 min-w-0">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ group.title }}</h3>
+          <p class="m-0 muted-text">{{ group.phase }}</p>
+          @for (field of group.fields; track $index) {
+            <div class="flex-col-start-stretch gap-xs border-bottom pb-sm min-w-0">
+              <strong>{{ field.context.field ?? copy.noField }}</strong>
+              @if (field.context.location) { <span>{{ i18n.commonLabels().city }}: {{ field.context.location }}</span> }
+              <ul class="m-0">
+                @for (issue of field.issues; track $index) {
+                  <li class="text-wrap-anywhere">
+                    {{ issue.message }}
+                    @if (issue.code) { <small class="d-block muted-text">{{ copy.errorFields.code }}: {{ issue.code }}</small> }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          <div class="flex-row-start-center">
+            <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-right"
+              [label]="copy.goToSection" [disabled]="disabled()" (onClick)="navigateToStep.emit(group.step)" />
+          </div>
+        </section>
+      }
+      @if (technicalGroups().length) {
+        <div class="flex-row-start-center">
+          <p-button type="button" size="small" severity="secondary" [outlined]="true"
+            [label]="copy.technical" (onClick)="visible.set(true)" />
+        </div>
+      }
+    </section>
+  }
+} @else {
+  @if (disabled() && !isChecking()) { <p class="m-0 muted-text">{{ copy.savedDataOnly }}</p> }
+  <ng-template #actions>
+    <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-check"
+      [label]="copy.action" [loading]="isChecking()" loadingIcon="pi pi-d20"
+      [disabled]="disabled() || isChecking()" (onClick)="check()" />
+  </ng-template>
+}
 
-<p-dialog class="d-contents" styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="visible()" [header]="copy.title"
+<p-dialog class="d-contents" styleClass="mg-dialog mg-dialog--lg" [modal]="true" [visible]="visible()" [header]="operationGroups() === null ? copy.title : copy.technical"
   [closable]="!isChecking()" [closeOnEscape]="!isChecking()" [dismissableMask]="false" [draggable]="false"
   (visibleChange)="onVisibleChange($event)" (onHide)="onHide()">
   <div class="flex-col-start-stretch gap-md w-100 min-w-0" [attr.aria-busy]="isChecking()" aria-live="polite">
-    @if (isChecking()) {
+    @if (operationGroups() !== null || !isChecking() && error() !== null) {
+      @if (operationGroups() === null) { <p-message severity="error" role="alert">{{ copy.failed }}</p-message> }
+      @for (group of technicalGroups(); track $index) {
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ group.title }}</h3>
+        <dl class="flex-col-start-stretch gap-sm m-0 w-100 min-w-0">
+          @for (field of group.fields; track $index) {
+            <div class="min-w-0">
+              <dt class="muted-text">{{ field.label }}</dt>
+              <dd class="m-0 text-wrap-anywhere"><span class="text-pre-line">{{ field.value }}</span></dd>
+            </div>
+          }
+        </dl>
+      }
+    } @else if (isChecking()) {
       <p class="m-0 muted-text" role="status">{{ copy.checking }}</p>
-    } @else if (error() !== null) {
-      <p-message severity="error" role="alert">{{ copy.failed }}</p-message>
-      <dl class="flex-col-start-stretch gap-sm m-0 w-100 min-w-0">
-        @for (field of errorFields(); track field.key) {
-          <div class="min-w-0">
-            <dt class="muted-text">{{ copy.errorFields[field.key] }}</dt>
-            <dd class="m-0 text-wrap-anywhere"><span class="text-pre-line">{{ field.value }}</span></dd>
-          </div>
-        }
-      </dl>
     } @else if (result(); as checked) {
       @switch (checked.status) {
         @case ('preview_ready') { <p-message severity="success" role="status">{{ copy.statuses.preview_ready }}</p-message> }
@@ -64,8 +105,9 @@
   </div>
   <ng-template #footer>
     <div class="flex-row-end-center flex-wrap gap-sm w-100">
-      <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
+      @if (operationGroups() === null) { <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-trail"
         [label]="i18n.commonActions().retry" [disabled]="disabled() || isChecking()" (onClick)="check()" />
+      }
       <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-times"
         [label]="i18n.commonActions().close" [disabled]="isChecking()" (onClick)="close()" />
     </div>

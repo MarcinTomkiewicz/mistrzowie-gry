@@ -27,53 +27,96 @@
           </ul>
         }
         @if (page(); as page) {
-          <div class="flex-row-start-center flex-wrap gap-sm" role="group" [attr.aria-label]="i18n.commonLabels().city">
-            @for (city of page.editions; track city.id) {
-              <p-button type="button" severity="secondary" size="small" [outlined]="city.id !== page.selectedEditionId"
-                [label]="city.city" [disabled]="disabled()" [pt]="{ root: { 'aria-pressed': city.id === page.selectedEditionId } }"
-                (onClick)="selectCity(city.id)" />
-            }
-          </div>
-          <div class="flex-row-start-center flex-wrap gap-sm" role="group" [attr.aria-label]="publicI18n.program().occurrenceLabel">
-            @for (day of dates(); track day.date) {
-              <p-button type="button" severity="secondary" size="small" [outlined]="day.date !== page.selectedDate"
-                [label]="formatDateLabel(day.date)" [disabled]="disabled() || !day.included"
-                [pt]="{ root: { 'aria-pressed': day.date === page.selectedDate } }" (onClick)="selectDate(day.date)" />
-            }
-          </div>
           @if (edition(); as city) {
             <article class="flex-col-start-stretch gap-lg w-100 min-w-0">
               <header class="mg-section__header m-0">
-                <h2 class="mg-section__title mg-section__title--md m-0 text-wrap-anywhere">{{ page.core.name }} - {{ city.city }}</h2>
+                <h2 class="mg-section__title mg-section__title--md m-0 text-wrap-anywhere">{{ page.core.name }}</h2>
                 @if (page.core.shortDescription) { <p class="mg-section__subtitle mg-section__subtitle--full text-wrap-anywhere">{{ page.core.shortDescription }}</p> }
                 @if (cover(); as image) {
                   <div class="image__preview image__preview--landscape my-lg"><img [src]="image" [alt]="page.core.name ?? city.city" /></div>
                 }
               </header>
-              <section class="mg-card">
+              @if (page.editions.length > 1) {
+                <nav [attr.aria-label]="publicI18n.labels().city">
+                  <p-tabs [value]="page.selectedEditionId" (valueChange)="selectCity($event)">
+                    <div class="hide-down-sm">
+                      <p-tablist>
+                        @for (edition of page.editions; track edition.id) {
+                          <p-tab [value]="edition.id" [disabled]="disabled() || loading()">
+                            <span class="flex-row-center-center gap-xs">
+                              <i class="pi pi-map-marker" aria-hidden="true"></i>
+                              <span>{{ edition.city }}</span>
+                            </span>
+                          </p-tab>
+                        }
+                      </p-tablist>
+                    </div>
+                    <div class="show-down-sm">
+                      <p-select [options]="page.editions" [formControl]="selectedEditionControl" optionLabel="city" optionValue="id"
+                        appendTo="body" class="w-100" [ariaLabel]="publicI18n.labels().city"
+                        (onChange)="selectCity(selectedEditionControl.value)">
+                        <ng-template #selectedItem let-option>
+                          @if (option) {
+                            <span class="flex-row-start-center gap-xs">
+                              <i class="pi pi-map-marker" aria-hidden="true"></i><span>{{ option.city }}</span>
+                            </span>
+                          }
+                        </ng-template>
+                        <ng-template #item let-option>
+                          <span class="flex-row-start-center gap-xs">
+                            <i class="pi pi-map-marker" aria-hidden="true"></i><span>{{ option.city }}</span>
+                          </span>
+                        </ng-template>
+                      </p-select>
+                    </div>
+                  </p-tabs>
+                </nav>
+              }
+              <section class="mg-card flex-col-start-stretch gap-sm">
+                <h2 class="mg-section__title mg-section__title--sm">{{ city.city }}</h2>
                 <ul class="flex-col m-0 px-md">
-                  @if (page.selectedDate) { <li><strong>{{ i18n.commonLabels().date }}:</strong> {{ formatDateLabel(page.selectedDate) }}</li> }
+                  @if (page.selectedDate) {
+                    <li><strong>{{ publicI18n.labels().date }}:</strong>
+                      <time [attr.datetime]="page.selectedDate">{{ formatDateLabel(page.selectedDate, 'pl-PL', true) }}</time>
+                    </li>
+                  }
                   @if (city.venueName) { <li><strong>{{ publicI18n.page().placeLabel }}:</strong> {{ city.venueName }}</li> }
                   @if (city.venueAddress) { <li><strong>{{ publicI18n.page().addressLabel }}:</strong> {{ city.venueAddress }}</li> }
-                  <li><strong>{{ i18n.commonLabels().timezone }}:</strong> {{ city.timezone }}</li>
-                  @for (block of timeBlocks(); track block.position) {
-                    <li><strong>{{ i18n.commonLabels().hours }}:</strong> {{ block.label }} - {{ formatProgramTime(block, publicI18n.program().dayOffset) }}</li>
+                  @if (timeRange(); as hours) {
+                    <li><strong>{{ publicI18n.labels().hours }}:</strong> {{ formatProgramTime(hours, publicI18n.program().dayOffset) }}</li>
                   }
-                  <li><strong>{{ i18n.commonLabels().price }}:</strong> {{ price() }}</li>
-                  @if (city.isForBeginners) { <li>{{ i18n.commonLabels().forBeginners }}</li> }
+                  <li><strong>{{ publicI18n.labels().price }}:</strong> {{ price() }}</li>
+                  @if (city.isForBeginners) { <li>{{ publicI18n.labels().forBeginners }}</li> }
                 </ul>
               </section>
-              @if (page.core.longDescription) { <p class="m-0 pre-line text-wrap-anywhere">{{ page.core.longDescription }}</p> }
-              <section class="flex-col-start-stretch gap-md w-100 min-w-0">
-                <h2 class="mg-section__title mg-section__title--md m-0">{{ publicI18n.program().title }}</h2>
-                @for (group of groups(); track group.key) {
-                  <section class="flex-col-start-stretch gap-sm w-100 min-w-0">
-                    <h3 class="mg-section__title mg-section__title--sm m-0">{{ group.label }}</h3>
-                    <app-event-slots [items]="group.cards" [slotCount]="0" [participantSignupDisabled]="true" (slotSelect)="selectSession($event)" />
-                  </section>
-                } @empty {
-                  <p class="m-0 muted-text" role="status">{{ page.selectedOccurrenceId ? publicI18n.program().inPreparation : publicI18n.page().noOccurrences }}</p>
-                }
+              @if (page.core.longDescription) {
+                <section>
+                  <h2 class="mg-section__title mg-section__title--sm">{{ publicI18n.labels().description }}</h2>
+                  <p class="m-0 text-md lh-18 color-text text-pre-line text-wrap-anywhere">{{ page.core.longDescription }}</p>
+                </section>
+              }
+              <section class="position-relative w-100 min-w-0">
+                <header class="mg-section__header mb-md">
+                  <h2 class="mg-section__title mg-section__title--md m-0">{{ publicI18n.program().title }}</h2>
+                  @if (occurrenceOptions().length > 1) {
+                    <div class="flex-row-center-center flex-wrap gap-sm mt-sm" role="group" [attr.aria-label]="publicI18n.program().occurrenceLabel">
+                      <span class="small-caps muted-text">{{ publicI18n.program().occurrenceLabel }}</span>
+                      <app-occurrence-switcher [options]="occurrenceOptions()" [selectedIndex]="selectedOccurrenceIndex()"
+                        [disabled]="disabled() || loading()" marginBottomClass="" (selectedIndexChange)="selectOccurrence($event)" />
+                    </div>
+                  }
+                </header>
+                <div class="flex-col-start-stretch gap-xl">
+                  @for (group of groups(); track group.key) {
+                    <section class="w-100 min-w-0" [attr.aria-labelledby]="'preview-program-group-' + group.key">
+                      <h3 class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md"
+                        [id]="'preview-program-group-' + group.key">{{ group.label }}</h3>
+                      <app-event-slots [items]="group.cards" [slotCount]="0" [participantSignupDisabled]="true" (slotSelect)="selectSession($event)" />
+                    </section>
+                  } @empty {
+                    <p class="m-0 muted-text" role="status">{{ page.selectedOccurrenceId ? publicI18n.program().inPreparation : publicI18n.page().noOccurrences }}</p>
+                  }
+                </div>
               </section>
             </article>
           }

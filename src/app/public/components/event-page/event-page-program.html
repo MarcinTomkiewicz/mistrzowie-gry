@@ -75,16 +75,11 @@
     @if (programGroups.length) {
       <div class="flex-col-start-stretch gap-xl">
         @for (group of programGroups; track group.key) {
-          <section
-            [attr.aria-labelledby]="programGroups.length > 1 ? 'event-program-group-' + group.key : null"
-            [attr.aria-label]="programGroups.length === 1 ? group.label : null"
-          >
-            @if (programGroups.length > 1) {
-              <h3 [id]="'event-program-group-' + group.key"
-                class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">
-                {{ group.label }}
-              </h3>
-            }
+          <section [attr.aria-labelledby]="'event-program-group-' + group.key">
+            <h3 [id]="'event-program-group-' + group.key"
+              class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">
+              {{ group.label }}
+            </h3>
             <app-event-slots
               [attr.id]="'event-program-cards-' + group.key"
               [items]="group.visibleCards"

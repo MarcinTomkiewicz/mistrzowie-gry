@@ -1,4 +1,4 @@
-import { forkJoin, map, switchMap } from 'rxjs';
+import { forkJoin, map, of, switchMap } from 'rxjs';
 import { EventOccurrenceStatus, EventProgramItemStatus, ParticipantSignupKind } from '../../../../core/enums/event';
 
 import type { AdminEventTimeline, AdminEventTimelineOccurrence } from '../../../../core/interfaces/i-admin-event-timeline';
@@ -18,13 +18,12 @@ type SavedCity = AdminGlobalCalendarResult['cities'][number];
 
 // An independent read must not reset the editor's selected city or unsaved forms.
 export function readEventGlobalSavedSummary(admin: EventAdmin, coreId: string) {
-  return forkJoin({
-    core: admin.getCoreDetail(coreId),
+  return admin.getCoreDetail(coreId).pipe(switchMap(core => core === null ? of(null) : forkJoin({
     calendar: admin.getGlobalCalendar(coreId),
     policy: admin.getEffectivePolicy(coreId),
     policyDraft: admin.getPolicyDraft(coreId),
-  }).pipe(switchMap(({ core, calendar, policy, policyDraft }) => {
-    assertEdgeContract(core !== null && core.id === coreId, 'savedSummary.core', 'the requested saved Core');
+  }).pipe(switchMap(({ calendar, policy, policyDraft }) => {
+    assertEdgeContract(core.id === coreId, 'savedSummary.core', 'the requested saved Core');
     validateCalendar(core, calendar, policy, policyDraft);
     return forkJoin({
       edition: admin.getEditionDetail(calendar.mainEditionId),
@@ -47,15 +46,16 @@ export function readEventGlobalSavedSummary(admin: EventAdmin, coreId: string) {
       });
       return { core, calendar, policy, policyDraft, edition, cities };
     }));
-  }));
+  }))));
 }
 
-export function selectGlobalSignupRecovery(snapshot: EventGlobalSavedSnapshot,
+export function selectGlobalSignupRecovery(calendar: AdminGlobalCalendarResult, timelines: readonly AdminEventTimeline[],
   availability: ReadonlyMap<string, readonly IEventParticipantAvailability[]>, now: number): AdminGlobalPublicationOccurrence[] {
-  return snapshot.calendar.globalDates.filter(day => day.status === 'scheduled').flatMap(day =>
+  return calendar.globalDates.filter(day => day.status === 'scheduled').flatMap(day =>
     day.cityOccurrences.flatMap(local => {
-      const city = snapshot.cities.find(entry => entry.city.editionId === local.editionId && entry.city.isActive);
-      const occurrence = city?.timeline.occurrences.find(row => row.occurrenceId === local.occurrenceId && row.date === day.date);
+      const city = calendar.cities.find(entry => entry.editionId === local.editionId && entry.isActive);
+      const occurrence = timelines.find(timeline => timeline.eventId === local.editionId)?.occurrences
+        .find(row => row.occurrenceId === local.occurrenceId && row.date === day.date);
       if (!city || !occurrence || local.decision !== 'included' || local.unlinkedSameDate || local.occurrenceId === null ||
         local.publishedAt === null || local.occurrenceStatus !== EventOccurrenceStatus.Published ||
         occurrence.status !== EventOccurrenceStatus.Published || occurrence.capacityPolicy !== 'independent' ||
@@ -65,17 +65,30 @@ export function selectGlobalSignupRecovery(snapshot: EventGlobalSavedSnapshot,
           !['not_open', 'scheduled', 'available', 'full'].includes(item.availabilityStatus) ||
           (occurrence.participantSignupKind !== ParticipantSignupKind.Both && item.scope !== occurrence.participantSignupKind)) return false;
         if (item.scope === 'whole_event') {
-          const blocks = snapshot.calendar.datedTimeBlocks.find(row => row.globalOccurrenceId === day.globalOccurrenceId)
+          const blocks = calendar.datedTimeBlocks.find(row => row.globalOccurrenceId === day.globalOccurrenceId)
             ?.cities.find(row => row.editionId === local.editionId && row.publishedSnapshot)?.timeBlocks;
           return blocks !== undefined && blocks.length > 0 && blocks.every(block =>
-            startsInFuture(day.date, block.startTime, block.startDayOffset, city.city.timezone, now));
+            startsInFuture(day.date, block.startTime, block.startDayOffset, city.timezone, now));
         }
         return occurrence.rows.some(row => row.source === 'manual' && row.activity === null && row.session !== null &&
           row.status === 'confirmed' && row.programItemId === item.programItemId &&
-          (row.programStatus === EventProgramItemStatus.Approved || row.programStatus === EventProgramItemStatus.Published) &&
-          startsInFuture(day.date, row.startTime, row.startDayOffset, city.city.timezone, now));
+          row.programStatus === EventProgramItemStatus.Published &&
+          startsInFuture(day.date, row.startTime, row.startDayOffset, city.timezone, now));
       });
       return recoverable ? [{ editionId: local.editionId, occurrenceId: local.occurrenceId, date: day.date }] : [];
+    }));
+}
+
+export function selectGlobalProgramRecovery(snapshot: EventGlobalSavedSnapshot): AdminGlobalPublicationOccurrence[] {
+  return snapshot.calendar.globalDates.filter(day => day.status === 'scheduled').flatMap(day =>
+    day.cityOccurrences.flatMap(local => {
+      const city = snapshot.cities.find(entry => entry.city.editionId === local.editionId && entry.city.isActive);
+      const occurrence = city?.timeline.occurrences.find(row => row.occurrenceId === local.occurrenceId && row.date === day.date);
+      if (!city || !occurrence || local.decision !== 'included' || local.unlinkedSameDate || local.occurrenceId === null ||
+        local.publishedAt === null || local.occurrenceStatus !== occurrence.status ||
+        ![EventOccurrenceStatus.Published, EventOccurrenceStatus.ParticipantSignupClosed].includes(occurrence.status)) return [];
+      return occurrence.rows.some(row => row.source === 'manual' && row.programStatus === EventProgramItemStatus.Approved)
+        ? [{ editionId: local.editionId, occurrenceId: local.occurrenceId, date: day.date }] : [];
     }));
 }
 

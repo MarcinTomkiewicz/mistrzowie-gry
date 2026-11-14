@@ -13,7 +13,7 @@
     </header>
     <app-loading-overlay [visible]="isLoading() || isSaving()"
       [label]="saveChanges.checking() ? i18n.diagnostics().checking : isSaving() ? i18n.commonStatus().saving : i18n.commonStatus().loading" />
-    @if (loadErrorMessage() && !isLoading()) {
+    @if (loadErrorMessage() && !loadedCore && !isLoading()) {
       <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
         <h2 class="mg-section__title mg-section__title--sm m-0">{{ i18n.page().loadErrorTitle }}</h2>
         <p class="m-0">{{ loadErrorMessage() }}</p>
@@ -28,7 +28,7 @@
         <p class="m-0">{{ i18n.rpcErrors().notFound }}</p>
         <p-button severity="warn" [outlined]="true" [label]="i18n.commonActions().cancel" icon="pi pi-interdiction" (onClick)="goBack()" />
       </section>
-    } @else if (!isLoading() && (creating || loadedCore)) {
+    } @else if ((!isLoading() || loadedCore) && (creating || loadedCore)) {
       @if (cover.needsReconciliation()) {
         <p-message severity="warn" role="status">{{ coverCopy().refreshRequired }}</p-message>
       }
@@ -65,11 +65,11 @@
                             [fieldErrors]="diagnosticResult()?.fieldErrors ?? []" />
                         }
                       }
-                      <app-event-core-cover [disabled]="saveChanges.dirty() || saveChanges.pending() || saveChanges.busy()" (saved)="loadCore()" />
+                      <app-event-core-cover [disabled]="loadErrorMessage() !== null || saveChanges.dirty() || saveChanges.pending() || saveChanges.busy() || publication.locked()" (saved)="loadCore()" />
                     }
                     @case (2) {
                       <app-event-core-editions [core]="loadedCore" [selectionDisabled]="navigationLocked() || globalDraft.cityEditing()"
-                        [addCityDisabledReason]="saveChanges.dirty() ? 'metadata' : navigationLocked() ? 'schedule' : null"
+                        [addCityDisabledReason]="saveChanges.dirty() ? 'metadata' : navigationLocked() || publication.locked() ? 'schedule' : null"
                         [fieldErrors]="diagnosticIssues(['editionDrafts'])" (cityAdded)="loadCore()" />
                       @if (selectedMainEdition() && metadata.canEditEdition()) {
                         <div class="mg-form flex-col-start-stretch gap-sm w-100" [formGroup]="metadata.editionForm">
@@ -105,17 +105,19 @@
                     @case (4) { <app-event-global-policy-editor [fieldErrors]="diagnosticIssues(['policy', 'cityOverrides'])" /> }
                     @case (5) {
                       <app-event-global-program [coreId]="loadedCore.id" [core]="loadedCore" [calendar]="calendar"
-                        [disabled]="programBlocked()" [selectionDisabled]="programReadBlocked()" />
+                        [disabled]="programBlocked()" [selectionDisabled]="navigationLocked()" />
                     }
                     @case (6) {
                       <app-event-global-saved-summary [coreId]="loadedCore.id" [disabled]="programBlocked()"
-                        [fieldErrors]="diagnosticResult()?.fieldErrors ?? []" (diagnosticsInvalidated)="invalidateDiagnostics()"
-                        (navigateToStep)="goToStep($event)" (published)="acceptPublication($event)">
-                        <app-event-global-save-summary summary-save-actions [disabled]="navigationLocked() || cover.dirty() || globalDraft.cityEditing()"
+                        [selectionDisabled]="navigationLocked()"
+                        [fieldErrors]="diagnosticResult()?.fieldErrors ?? []"
+                        (navigateToStep)="goToStep($event)" (published)="acceptPublication($event)"
+                        (readback)="acceptSavedReadback($event)" (refreshRequested)="loadCore(undefined, false)">
+                        <app-event-global-save-summary summary-save-actions [disabled]="loadErrorMessage() !== null || navigationLocked() || cover.dirty() || globalDraft.cityEditing()"
                           (navigateToStep)="goToStep($event)" (saved)="loadCore()" (discard)="discardEditChanges()" />
                         @if (globalDraft.policy() && !saveChanges.dirty() && !saveChanges.pending()) {
                           <app-event-global-diagnostics summary-validation [coreId]="loadedCore.id" [cities]="calendar.cities"
-                            [disabled]="programBlocked()" (previewChange)="acceptDiagnostics($event)" (navigateToSection)="goToDiagnosticSection($event)" />
+                            [disabled]="navigationLocked()" (previewChange)="acceptDiagnostics($event)" (navigateToSection)="goToDiagnosticSection($event)" />
                         }
                       </app-event-global-saved-summary>
                     }
@@ -147,7 +149,8 @@
         </div>
       } @else if (loadedCore) {
         <p-message severity="info" role="status">{{ i18n.metadata().readOnly }}</p-message>
-        <app-event-global-saved-summary [coreId]="loadedCore.id" [readOnly]="true" />
+        <app-event-global-saved-summary [coreId]="loadedCore.id" [readOnly]="true"
+          (refreshRequested)="loadCore(undefined, false)" />
         <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-point-left"
           [label]="i18n.commonActions().cancel" (onClick)="goBack()" />
       }

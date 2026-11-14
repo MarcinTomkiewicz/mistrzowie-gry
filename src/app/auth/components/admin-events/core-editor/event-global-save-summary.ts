@@ -6,13 +6,19 @@ import { EMPTY, finalize, switchMap } from 'rxjs';
 
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { resolveEventCoreAdminErrorMessage, resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
+import type { EventGlobalDiagnosticGroup, EventGlobalDiagnosticIssue } from '../../../../core/interfaces/i-event-global-saved-summary';
+import { RpcError } from '../../../../core/types/rpc-error';
+import { EventGlobalSaveError, presentEventGlobalPreviewError, resolveEventCoreAdminErrorMessage, resolveEventEditionAdminErrorMessage } from '../event-admin-errors';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
+import { EventGlobalDiagnostics } from './event-global-diagnostics';
+import { eventGlobalDiagnosticField, eventGlobalServerIssue, eventGlobalValidationIssues } from './event-global-diagnostic-messages';
 import { EventGlobalSaveController, GLOBAL_SAVE_STEPS, type GlobalSaveSection } from './event-global-save-controller';
+import { EventGlobalScheduleError } from './event-global-schedule-state';
+import { EventGlobalPolicyError } from './policy/event-global-policy-state';
 
 @Component({
   selector: 'app-event-global-save-summary',
-  imports: [ButtonModule, MessageModule],
+  imports: [ButtonModule, MessageModule, EventGlobalDiagnostics],
   templateUrl: './event-global-save-summary.html',
   host: { class: 'd-contents' },
 })
@@ -41,33 +47,43 @@ export class EventGlobalSaveSummary {
     const issue = this.save.checkIssue();
     if (!issue) return null;
     const section = issue.section;
-    let detail = this.copy().checkReasons[issue.reason];
-    if (section && issue.reason === 'section') {
-      let sectionDetail: string | null = null;
-      const error = this.save.error() ?? (section === 'core' || section === 'edition' ? this.save.metadata.errors()[section]
-        : this.save[section].error());
-      if (section === 'base' || section === 'schedule' || section === 'dated') {
-        const blocker = this.save[section].blockingReason();
-        if (blocker) sectionDetail = this.i18n.schedule().blockers[blocker];
-        else if (section === 'base' && this.save.base.conflicted()) sectionDetail = this.i18n.baseTimeBlocks().conflict;
-        else if (section === 'dated' && this.save.dated.conflicted()) sectionDetail = this.i18n.datedBlocks().conflict;
-      } else if (section === 'policy') {
-        const policyIssue = this.save.policy.issue();
-        if (policyIssue) sectionDetail = this.i18n.policyEditor()[policyIssue];
-        else if (!this.save.policy.canEdit()) sectionDetail = this.i18n.policyEditor().protected;
-      } else {
-        const metadataIssue = this.save.metadata.issues()[section];
-        if (metadataIssue) sectionDetail = this.i18n.metadata()[metadataIssue];
-        else if (!(section === 'core' ? this.save.metadata.canEditCore() : this.save.metadata.canEditEdition())) {
-          sectionDetail = this.i18n.metadata().protected;
-        }
-      }
-      if (sectionDetail !== null) detail = sectionDetail;
-      else if (error !== null && error !== undefined) detail = section === 'edition'
-        ? resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.commonErrors().concurrentModification)
-        : resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification);
-    }
+    const detail = this.copy().checkReasons[issue.reason];
+    if (section && issue.reason === 'section') return `${this.label(section)}: ${this.operationMessage(this.save.error())}`;
     return section ? `${this.label(section)}: ${detail}` : detail;
+  });
+  protected readonly failureMessage = computed(() => {
+    const check = this.checkMessage();
+    if (!this.save.pending() && check) return check;
+    const section = this.save.failed();
+    const detail = this.operationMessage(this.save.error());
+    return section ? `${this.label(section)}: ${detail}` : detail;
+  });
+  protected readonly diagnosticGroups = computed<EventGlobalDiagnosticGroup[]>(() => {
+    const section = this.save.failed() ?? this.save.checkIssue()?.section;
+    const error = this.save.error();
+    if (!section || this.save.busy() || !error && this.save.checkIssue()?.reason !== 'invalid') return [];
+    const cities = this.save.schedule.calendar()?.cities ?? [];
+    const invalid = this.save.checkIssue()?.reason === 'invalid' || error instanceof EventGlobalSaveError && error.guard === 'invalid';
+    const issues = invalid ? eventGlobalValidationIssues(this.save.forms[section], this.i18n, cities) : [];
+    issues.push(this.generalIssue(this.operationMessage(error)));
+    const preview = section === 'base' || section === 'schedule' || section === 'policy' ? this.save[section].preview() : null;
+    if (preview && !preview.valid && error instanceof EventGlobalSaveError &&
+      (error.reason === 'previewRejected' || error.reason === 'writeRejected')) {
+      issues.push(...[...preview.fieldErrors, ...preview.blockers].map(value => eventGlobalServerIssue(value, this.i18n, cities)));
+      if (!preview.fieldErrors.length && !preview.blockers.length) issues.push(this.generalIssue(this.i18n.diagnostics().noReason));
+    }
+    const fields = error instanceof EventGlobalPolicyError ? error.fields
+      : section === 'policy' && error !== null && error === this.save.policy.error() ? this.save.policy.issueFields() : [];
+    for (const field of fields) issues.push({
+      field: eventGlobalDiagnosticField(field, this.i18n),
+      location: cities.find(city => field.includes(city.editionId))?.city ?? null,
+      message: this.i18n.diagnostics().readbackDifference, code: null, technical: field,
+    });
+    const technical = presentEventGlobalPreviewError(error).map(field => ({
+      label: this.i18n.diagnostics().errorFields[field.key], value: field.value,
+    }));
+    return [{ key: section, title: this.label(section), phase: this.i18n.diagnostics().phases[this.save.phase()],
+      step: GLOBAL_SAVE_STEPS[section], issues, technical }];
   });
 
   protected label(key: GlobalSaveSection): string {
@@ -76,11 +92,12 @@ export class EventGlobalSaveSummary {
       dated: this.copy().localChanges, policy: this.i18n.creationSteps().policy }[key];
   }
 
-  protected edit(key: GlobalSaveSection): void { this.navigateToStep.emit(GLOBAL_SAVE_STEPS[key]); }
-
   protected check(): void {
     this.save.check(this.disabled() || this.deciding()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: valid => { if (!valid) this.showCheckFailure(); },
+      next: valid => {
+        if (valid) this.toast.success({ summary: this.copy().checkChanges, detail: this.copy().checked });
+        else this.showCheckFailure();
+      },
       error: () => this.showCheckFailure(),
     });
   }
@@ -96,27 +113,18 @@ export class EventGlobalSaveSummary {
     }).pipe(switchMap(accepted => accepted && coreId === this.save.metadata.core()?.id && !this.disabled()
       ? this.save.save() : EMPTY), finalize(() => this.deciding.set(false)), takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.toast.success({ summary: this.i18n.toast().saveSuccessSummary, detail: this.copy().saved });
+        this.toast.success({ summary: this.i18n.toast().saveSuccessSummary,
+          detail: this.save.completed().length ? this.copy().saved : this.copy().unchanged });
         this.saved.emit();
       },
-      error: () => {
-        this.toast.show(this.save.pending() ? 'warn' : 'danger', {
-          summary: this.save.pending() ? this.copy().retryRead : this.i18n.toast().saveFailedSummary,
-          detail: this.save.pending() ? this.copy().uncertain : this.copy().failed });
-        queueMicrotask(() => {
-          const key = this.save.failed();
-          if (key && !this.save.pending() && !this.destroyRef.destroyed) this.edit(key);
-        });
-      },
+      error: () => this.showSaveFailure(),
     });
   }
 
   protected retryReadback(): void {
     this.save.retryReadback().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => { if (!this.save.dirty() && !this.save.pending()) this.saved.emit(); },
-      error: () => this.toast.show(this.save.pending() ? 'warn' : 'danger', {
-        summary: this.copy().retryRead, detail: this.save.pending() ? this.copy().uncertain : this.copy().failed,
-      }),
+      error: () => this.showSaveFailure(),
     });
   }
 
@@ -125,9 +133,29 @@ export class EventGlobalSaveSummary {
     this.toast.show(issue?.reason === 'invalid' || issue?.reason === 'section' ? 'danger' : 'warn', {
       summary: this.copy().checkChanges, detail: this.checkMessage() ?? this.i18n.commonErrors().generic,
     });
-    const section = issue?.section;
-    if (section && !this.save.pending()) queueMicrotask(() => {
-      if (!this.destroyRef.destroyed) this.edit(section);
+  }
+
+  private showSaveFailure(): void {
+    this.toast.show(this.save.pending() ? 'warn' : 'danger', {
+      summary: this.save.pending() ? this.copy().retryRead : this.i18n.toast().saveFailedSummary,
+      detail: this.failureMessage(),
     });
+  }
+
+  private generalIssue(message: string): EventGlobalDiagnosticIssue {
+    return { field: null, location: null, message, code: null, technical: null };
+  }
+
+  private operationMessage(error: unknown): string {
+    if (error instanceof EventGlobalSaveError) return error.guard
+      ? this.i18n.diagnostics().guards[error.guard] : this.i18n.diagnostics().failures[error.reason];
+    if (error instanceof EventGlobalPolicyError) return this.i18n.policyEditor()[error.issue];
+    if (error instanceof EventGlobalScheduleError) return error.issue === 'active'
+      ? this.i18n.schedule().blockers.active : this.i18n.schedule()[error.issue];
+    if (error instanceof RpcError) return this.save.failed() === 'edition'
+      ? resolveEventEditionAdminErrorMessage(error, this.i18n.editionRpcErrors(), this.i18n.metadata().conflict)
+      : resolveEventCoreAdminErrorMessage(error, this.i18n.rpcErrors(), this.i18n.commonErrors().concurrentModification);
+    if (this.save.checkIssue()?.reason === 'invalid') return this.copy().checkReasons.invalid;
+    return this.save.pending() ? this.i18n.diagnostics().failures.unconfirmed : this.i18n.diagnostics().noReason;
   }
 }

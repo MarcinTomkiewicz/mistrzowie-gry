@@ -41,7 +41,10 @@ export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: G
     ((preview.valid === true && preview.status === 'draft_ready' && !preview.fieldErrors.length && !preview.blockers.length) ||
       (preview.valid === false && (preview.status === 'invalid' || preview.status === 'blocked'))),
   'policyPreview', 'an explicit draft preview without publication or participant registration');
-  if ('normalizedDocument' in preview) {
+  if (!preview.valid) {
+    if (!('normalizedDocument' in preview)) assertEdgeContract(preview.participantSignupOpened === false,
+      'policyPreview', 'the short normalization failure without participant registration');
+  } else {
     assertEdgeContract(preview.mainEditionId === command.baseline.canonicalBaseline.mainEditionId &&
       typeof preview.baselineFingerprint === 'string' && /^[0-9a-f]{32}$/.test(preview.baselineFingerprint),
       'policyPreview', 'the same main Edition and a canonical baseline fingerprint');
@@ -51,9 +54,6 @@ export function assertPolicyPreview(preview: AdminEventPolicyPreview, command: G
     assertPolicyDocument(preview.normalizedDocument, command.baseline.canonicalBaseline.editions.map(row => row.editionId));
     const fields = policyDocumentDifferences(command.document, preview.normalizedDocument);
     if (fields.length) throw new EventGlobalPolicyError('documentMismatch', fields);
-  } else {
-    assertEdgeContract(preview.status === 'invalid' && preview.participantSignupOpened === false,
-      'policyPreview', 'the short normalization failure');
   }
 }
 

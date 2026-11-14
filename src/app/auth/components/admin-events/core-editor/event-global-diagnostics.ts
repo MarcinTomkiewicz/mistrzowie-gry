@@ -5,6 +5,7 @@ import { DialogModule } from 'primeng/dialog';
 import { MessageModule } from 'primeng/message';
 
 import type { AdminGlobalCalendarResult } from '../../../../core/interfaces/i-admin-global-event';
+import type { EventGlobalDiagnosticGroup, EventGlobalDiagnosticIssue } from '../../../../core/interfaces/i-event-global-saved-summary';
 import type {
   AdminGlobalEventPageBlocker, AdminGlobalEventPageFieldError, AdminGlobalEventPagePreview,
 } from '../../../../core/interfaces/i-admin-global-event-preview';
@@ -23,6 +24,8 @@ export class EventGlobalDiagnostics {
   readonly coreId = input.required<string>();
   readonly cities = input.required<AdminGlobalCalendarResult['cities']>();
   readonly disabled = input(false);
+  readonly operationGroups = input<readonly EventGlobalDiagnosticGroup[] | null>(null);
+  readonly navigateToStep = output<number>();
   readonly navigateToSection = output<AdminGlobalEventPageFieldError>();
   readonly previewChange = output<AdminGlobalEventPagePreview | null>();
   readonly actions = viewChild<TemplateRef<unknown>>('actions');
@@ -46,9 +49,29 @@ export class EventGlobalDiagnostics {
     })).filter(group => group.issues.length);
   });
   protected readonly blockers = computed(() => this.result()?.blockers.map(issue => this.issueView(issue)) ?? []);
+  protected readonly operationViews = computed(() => (this.operationGroups() ?? []).map(group => {
+    const fields = new Map<string, { context: EventGlobalDiagnosticIssue; issues: EventGlobalDiagnosticIssue[] }>();
+    for (const issue of group.issues) {
+      const key = JSON.stringify([issue.field, issue.location]);
+      const field = fields.get(key);
+      if (field) field.issues.push(issue);
+      else fields.set(key, { context: issue, issues: [issue] });
+    }
+    return { ...group, fields: [...fields.values()] };
+  }));
+  protected readonly technicalGroups = computed(() => {
+    const operation = this.operationGroups();
+    return operation === null ? [{ title: this.i18n.diagnostics().technical, fields: this.errorFields().map(field => ({
+      label: this.i18n.diagnostics().errorFields[field.key], value: field.value,
+    })) }] : operation.map(group => ({ title: group.title, fields: [...group.technical,
+      ...group.issues.flatMap(issue => issue.technical === null ? [] : [{
+        label: issue.field ?? this.i18n.diagnostics().noField, value: issue.technical,
+      }]),
+    ] })).filter(group => group.fields.length);
+  });
 
   protected check(): void {
-    if (this.disabled() || this.isChecking() || this.draft.cityEditing()) return;
+    if (this.operationGroups() !== null || this.disabled() || this.isChecking() || this.draft.cityEditing()) return;
     this.result.set(null);
     this.error.set(null);
     this.previewChange.emit(null);
@@ -57,8 +80,7 @@ export class EventGlobalDiagnostics {
       error: (error: unknown) => {
         this.error.set(error);
         this.visible.set(true);
-        this.toast.danger({ summary: this.i18n.diagnostics().failed,
-          detail: this.errorFields().find(field => field.key === 'message')?.value });
+        this.toast.danger({ summary: this.i18n.diagnostics().title, detail: this.i18n.commonErrors().generic });
       },
       complete: () => { if (this.result() === null && this.error() === null) this.visible.set(false); },
     });

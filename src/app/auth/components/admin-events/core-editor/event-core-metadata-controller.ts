@@ -1,6 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { defer, EMPTY, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { defer, EMPTY, finalize, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 
 import { createEventGlobalCityControls } from '../../../../core/factories/event-global-draft-form.factory';
 import type { SaveAdminGlobalEventEditionMetadataPayload } from '../../../../core/interfaces/i-admin-global-event';
@@ -11,6 +11,7 @@ import { assertEdgeContract } from '../../../../core/utils/edge-contract';
 import { setControlEnabled } from '../../../../core/utils/form-controls';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
+import { EventGlobalSaveError } from '../event-admin-errors';
 import { EventDatedBlocksController } from './event-dated-blocks-controller';
 import { EventGlobalDraftController } from './event-global-draft-controller';
 import { EventCoreCoverController } from './event-core-cover-controller';
@@ -46,7 +47,7 @@ export class EventCoreMetadataController {
   readonly locked = computed(() => this.isBusy() || this.state() !== 'idle');
   readonly blocked = computed(() => this.program.locked() || this.global.isChecking() || this.global.cityEditing() || this.global.cityBusy() ||
     this.policy.isBusy() || this.policy.readbackPending() || this.schedule.isBusy() || this.baseBlocks.isBusy() ||
-    this.baseBlocks.readbackPending() || this.blocks.isBusy() || this.blocks.readbackPending());
+    this.baseBlocks.readbackPending() || this.blocks.isBusy() || this.blocks.readbackPending() || !this.cover.ready());
   readonly coreForm = new FormGroup({
     key: new FormControl('', { nonNullable: true,
       validators: [Validators.required, requiredTrimmedValidator(), Validators.pattern(/^[a-z0-9-]+$/)] }),
@@ -91,26 +92,35 @@ export class EventCoreMetadataController {
     this.issues.set({});
     this.coreForm.reset();
     this.editionForm.reset();
-    this.syncControls();
   }
 
   load(core: IEventCoreDetail | null): void {
     this.core.set(core);
     if (core) this.populateCore(core);
     this.populateEdition();
-    this.syncControls();
   }
 
   canSave(target: EventMetadataTarget): boolean {
-    return this.core()?.archived !== true && !this.isBusy() && !this.blocked() && this.cover.ready() && (this.pendingTarget() === target || (this.state() === 'idle' &&
+    return this.core() !== null && this.core()?.archived !== true && !this.isBusy() && !this.blocked() && (this.pendingTarget() === target || (this.state() === 'idle' &&
       !this.issues()[target] && (target === 'core' ? this.canEditCore() : this.canEditEdition())));
+  }
+
+  saveUnavailableError(target: EventMetadataTarget): EventGlobalSaveError {
+    return new EventGlobalSaveError('unavailable', !this.core() ? 'notLoaded' : this.isBusy() ? 'busy'
+      : this.pendingTarget() !== null ? 'pending' : this.issues()[target] === 'conflict' ? 'conflict'
+        : this.blocked() ? 'blocked'
+          : !(target === 'core' ? this.canEditCore() : this.canEditEdition()) ? 'protected'
+          : (target === 'core' ? this.coreForm : this.editionForm).invalid ? 'invalid' : 'protected', {
+      target, canSave: this.canSave(target), isBusy: this.isBusy(), blocked: this.blocked(),
+      pendingTarget: this.pendingTarget(), state: this.state(), issue: this.issues()[target], hasCommand: this.command !== null,
+    });
   }
 
   save(target: EventMetadataTarget): Observable<IEventCoreDetail> {
     return defer(() => {
       const core = this.core();
       const form = target === 'core' ? this.coreForm : this.editionForm;
-      if (!core || !this.canSave(target) || (!this.command && form.invalid)) return EMPTY;
+      if (!core || !this.canSave(target) || (!this.command && form.invalid)) return throwError(() => this.saveUnavailableError(target));
       this.command ??= this.createCommand(target, core);
       const command = this.command;
       this.pendingTarget.set(target);
@@ -118,7 +128,6 @@ export class EventCoreMetadataController {
       this.isBusy.set(true);
       const needsWrite = this.state() === 'idle';
       if (needsWrite) this.state.set('uncertain');
-      this.syncControls();
       const write = !needsWrite ? of(undefined) : this.write(command).pipe(
         tap(() => this.state.set('saved')),
         tap({ error: error => this.recordWriteFailure(target, error) }),
@@ -131,7 +140,7 @@ export class EventCoreMetadataController {
           this.pendingTarget.set(null);
         }),
         tap({ error: error => this.errors.update(errors => ({ ...errors, [target]: error })) }),
-        finalize(() => { this.isBusy.set(false); this.syncControls(); }),
+        finalize(() => this.isBusy.set(false)),
       );
     });
   }
@@ -139,9 +148,8 @@ export class EventCoreMetadataController {
   refresh(target: EventMetadataTarget): Observable<IEventCoreDetail> {
     return defer(() => {
       const core = this.core();
-      if (!core || this.locked() || this.blocked() || this.cover.locked()) return EMPTY;
+      if (!core || this.locked() || this.blocked()) return EMPTY;
       this.isBusy.set(true);
-      this.syncControls();
       return this.readback(target, core.id).pipe(
         tap(() => {
           const issues = { ...this.issues() };
@@ -150,7 +158,7 @@ export class EventCoreMetadataController {
           this.clearError(target);
         }),
         tap({ error: error => this.errors.update(errors => ({ ...errors, [target]: error })) }),
-        finalize(() => { this.isBusy.set(false); this.syncControls(); }),
+        finalize(() => this.isBusy.set(false)),
       );
     });
   }
@@ -240,15 +248,14 @@ export class EventCoreMetadataController {
   }
 
   private rejectReadback(target: EventMetadataTarget, issue: 'conflict' | 'protected' = 'conflict'): never {
+    (target === 'core' ? this.coreForm : this.editionForm).markAsDirty();
     if (this.command && this.state() !== 'idle') {
-      (target === 'core' ? this.coreForm : this.editionForm).markAsDirty();
       throw new Error('[EVENT_CORE_METADATA] The pending metadata write is not confirmed by canonical readback.');
     }
     this.issues.update(issues => ({ ...issues, [target]: issue }));
     this.command = null;
     this.state.set('idle');
     this.pendingTarget.set(null);
-    (target === 'core' ? this.coreForm : this.editionForm).markAsDirty();
     throw new Error('[EVENT_CORE_METADATA] Authoritative readback differs from the submitted metadata.');
   }
 
@@ -276,12 +283,10 @@ export class EventCoreMetadataController {
   }
 
   private syncControls(): void {
-    const enabled = !this.program.locked() && !this.locked() && !this.policy.isBusy() && !this.policy.readbackPending() &&
-      !this.schedule.isBusy() && !this.baseBlocks.isBusy() && this.cover.ready();
-    setControlEnabled(this.coreForm, enabled && this.canEditCore());
-    setControlEnabled(this.editionForm, enabled && this.canEditEdition());
-    this.editionForm.controls.city.disable({ emitEvent: false });
-    this.editionForm.controls.timezone.disable({ emitEvent: false });
+    setControlEnabled(this.coreForm, !this.locked() && this.canSave('core'));
+    setControlEnabled(this.editionForm, !this.locked() && this.canSave('edition'));
+    setControlEnabled(this.editionForm.controls.city, false);
+    setControlEnabled(this.editionForm.controls.timezone, false);
   }
 
   private clearError(target: EventMetadataTarget): void {

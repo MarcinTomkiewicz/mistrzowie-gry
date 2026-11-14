@@ -26,6 +26,14 @@ export interface ManualRpgSlotResult {
   effectivePlayerCapacity: number | null;
 }
 
+export interface ManualRpgPublicationResult {
+  published: true;
+  slotId: string;
+  occurrenceId: string;
+  programItemId: string;
+  status: 'confirmed';
+}
+
 export interface IEventProgramItem {
   id: string;
   occurrenceId: string;

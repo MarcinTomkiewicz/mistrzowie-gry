@@ -45,21 +45,21 @@ export function formatTimeRangeLabel(
 }
 
 export function getTimeRangeBounds(
-  ranges: readonly { startTime: string | null; endTime: string | null }[],
-): { startTime: string; endTime: string } | null {
-  return ranges.reduce<{ startTime: string; endTime: string } | null>(
-    (bounds, { startTime, endTime }) => {
-      if (!isValidTime(startTime) || !isValidTime(endTime) || startTime >= endTime) {
-        return bounds;
-      }
-
-      return {
-        startTime: bounds && bounds.startTime < startTime ? bounds.startTime : startTime,
-        endTime: bounds && bounds.endTime > endTime ? bounds.endTime : endTime,
-      };
-    },
-    null,
-  );
+  ranges: readonly { startTime: string | null; endTime: string | null; startDayOffset?: number; endDayOffset?: number }[],
+): { startTime: string; endTime: string; startDayOffset: number; endDayOffset: number } | null {
+  const timed = ranges.flatMap(({ startTime, endTime, startDayOffset = 0, endDayOffset = 0 }) => {
+    if (startTime === null || endTime === null) return [];
+    const start = parseTimeLabelToMinutes(startTime);
+    const end = parseTimeLabelToMinutes(endTime);
+    if (start === null || end === null) return [];
+    const startMinute = startDayOffset * 1440 + start;
+    const endMinute = endDayOffset * 1440 + end;
+    return endMinute > startMinute ? [{ startTime, endTime, startDayOffset, endDayOffset, startMinute, endMinute }] : [];
+  });
+  if (!timed.length) return null;
+  const first = timed.reduce((first, range) => range.startMinute < first.startMinute ? range : first);
+  const last = timed.reduce((last, range) => range.endMinute > last.endMinute ? range : last);
+  return { startTime: first.startTime, endTime: last.endTime, startDayOffset: first.startDayOffset, endDayOffset: last.endDayOffset };
 }
 
 export function formatDateTimeAsTimeLabel(date: Date): string {

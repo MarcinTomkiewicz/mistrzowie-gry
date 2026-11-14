@@ -1,9 +1,13 @@
 import { afterNextRender, Component, computed, effect, inject, input, linkedSignal, signal, untracked } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { MessageModule } from 'primeng/message';
+import { SelectModule } from 'primeng/select';
+import { TabsModule } from 'primeng/tabs';
 
+import { OccurrenceSwitcher } from '../../../../common/occurrence-switcher/occurrence-switcher';
 import type { AdminGlobalEventPagePreview } from '../../../../core/interfaces/i-admin-global-event-preview';
 import type { IEventSlotCardVm } from '../../../../core/interfaces/i-event-slot-card';
 import { Auth } from '../../../../core/services/auth/auth';
@@ -12,8 +16,9 @@ import { Storage } from '../../../../core/services/storage/storage';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { formatDateLabel, getTodayIso, selectUpcomingOrLatestDate } from '../../../../core/utils/date';
 import { formatMoney } from '../../../../core/utils/pricing';
-import { createPublicEventProgramCards, formatPublicEventProgramTime, groupPublicEventProgramEntries } from '../../../../core/utils/public-event-program-cards';
+import { createPublicEventProgramCards, formatPublicEventProgramTime, getPublicEventProgramTimeRange, groupPublicEventProgramEntries } from '../../../../core/utils/public-event-program-cards';
 import { resolvePublicStorageUrl } from '../../../../core/utils/storage-url';
+import { getTimeRangeBounds } from '../../../../core/utils/time-format';
 import { EventSlots } from '../../../../public/common/event-slots/event-slots';
 import { createEventPageI18n } from '../../../../public/components/event-page/event-page.i18n';
 import { SessionDialog } from '../../../../public/components/session-dialog/session-dialog';
@@ -22,7 +27,7 @@ import { createEventCoreEditorI18n } from './core-editor.i18n';
 
 @Component({
   selector: 'app-event-global-page-preview',
-  imports: [ButtonModule, DialogModule, MessageModule, EventSlots, SessionDialog],
+  imports: [ReactiveFormsModule, ButtonModule, DialogModule, MessageModule, SelectModule, TabsModule, OccurrenceSwitcher, EventSlots, SessionDialog],
   providers: [provideTranslocoScope('eventPage', 'common')],
   templateUrl: './event-global-page-preview.html',
 })
@@ -47,6 +52,7 @@ export class EventGlobalPagePreview {
   protected readonly errorFields = computed(() => presentEventGlobalPreviewError(this.error()));
   private readonly selectedEditionId = linkedSignal<string | undefined>(() => { this.coreId(); return undefined; });
   private readonly selectedDate = linkedSignal<string | undefined>(() => { this.coreId(); return undefined; });
+  protected readonly selectedEditionControl = new FormControl('', { nonNullable: true });
   private readonly readAttempt = signal(0);
   private readonly sessionId = signal<string | null>(null);
   protected readonly page = computed(() => this.result()?.page ?? null);
@@ -60,19 +66,29 @@ export class EventGlobalPagePreview {
     const amount = formatMoney(edition.priceAmount, edition.priceCurrency);
     return edition.priceBasis ? `${amount} / ${this.i18n.priceBases()[edition.priceBasis]}` : amount;
   });
-  protected readonly timeBlocks = computed(() => this.page()?.globalDates.find(day => day.date === this.page()?.selectedDate)
-    ?.cities.find(city => city.editionId === this.page()?.selectedEditionId)?.timeBlocks ?? []);
-  protected readonly dates = computed(() => this.page()?.globalDates.map(day => ({
-    date: day.date, included: day.cities.some(city => city.editionId === this.page()?.selectedEditionId && city.includedInPreview),
-  })) ?? []);
+  protected readonly timeRange = computed(() => {
+    const page = this.page();
+    if (!page?.selectedDate) return null;
+    const blocks = page.globalDates.find(day => day.date === page.selectedDate)
+      ?.cities.find(city => city.editionId === page.selectedEditionId)?.timeBlocks ?? [];
+    return getPublicEventProgramTimeRange(page.program, getTimeRangeBounds(blocks));
+  });
+  protected readonly occurrenceOptions = computed(() => {
+    const page = this.page();
+    return page?.globalDates.filter(day => day.cities.some(city => city.editionId === page.selectedEditionId && city.includedInPreview))
+      .sort((left, right) => left.date.localeCompare(right.date))
+      .map(day => ({ id: day.date, occurrenceDate: day.date, label: formatDateLabel(day.date, 'pl-PL', true) })) ?? [];
+  });
+  protected readonly selectedOccurrenceIndex = computed(() =>
+    Math.max(0, this.occurrenceOptions().findIndex(day => day.occurrenceDate === this.page()?.selectedDate)));
   protected readonly groups = computed(() => {
     const page = this.page();
     if (!page) return [];
-    return groupPublicEventProgramEntries(page.program).map(group => ({
+    return groupPublicEventProgramEntries(page.program, this.publicI18n.program(), page.core.name ?? '').map(group => ({
       key: group.key,
-      label: group.eventScoped ? this.publicI18n.program().eventScoped : formatPublicEventProgramTime(group, this.publicI18n.program().dayOffset) || this.publicI18n.program().timeToBeDetermined,
+      label: group.label,
       cards: createPublicEventProgramCards(group.entries, this.storage, this.publicI18n.program(),
-        this.i18n.commonValues().notProvided, this.publicI18n.roles().gm, page.core.name ?? '')
+        this.i18n.commonValues().notProvided, this.publicI18n.roles().gm, page.core.name ?? '', group)
         .map(card => ({ ...card, canOpenGmProfile: false })),
     }));
   });
@@ -110,6 +126,7 @@ export class EventGlobalPagePreview {
                 return;
               }
             }
+            if (page) this.selectedEditionControl.setValue(page.selectedEditionId, { emitEvent: false });
             this.result.set(result);
             this.loading.set(false);
           },
@@ -138,14 +155,15 @@ export class EventGlobalPagePreview {
     this.sessionId.set(null);
   }
 
-  protected selectCity(id: string): void {
-    if (this.disabled() || this.loading() || !this.page()?.editions.some(city => city.id === id) || this.page()?.selectedEditionId === id) return;
+  protected selectCity(id: string | number | undefined): void {
+    if (typeof id !== 'string' || this.disabled() || this.loading() || !this.page()?.editions.some(city => city.id === id) || this.page()?.selectedEditionId === id) return;
     this.selectedEditionId.set(id);
     this.selectedDate.set(undefined);
   }
 
-  protected selectDate(date: string): void {
-    if (this.disabled() || this.loading() || !this.dates().some(day => day.date === date && day.included) || this.page()?.selectedDate === date) return;
+  protected selectOccurrence(index: number): void {
+    const date = this.occurrenceOptions()[index]?.occurrenceDate;
+    if (!date || this.disabled() || this.loading() || this.page()?.selectedDate === date) return;
     this.selectedEditionId.set(this.page()?.selectedEditionId);
     this.selectedDate.set(date);
   }

@@ -9,6 +9,7 @@ import type { IEventCoreDetail } from '../../../../core/interfaces/i-event-admin
 import { EventAdmin } from '../../../../core/services/event-admin/event-admin';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { assertEdgeContract } from '../../../../core/utils/edge-contract';
+import { EventGlobalSaveError } from '../event-admin-errors';
 import { assertBaseCalendar, assertBasePreview, assertBaseSave, baseTimeBlocksBlocker,
   type GlobalBaseTimeBlocksCommand, matchesBaseTimeBlocks } from './event-global-base-time-blocks-state';
 import { sameScheduleBlocks, type GlobalScheduleBlocker } from './event-global-schedule-state';
@@ -18,7 +19,7 @@ export class EventGlobalBaseTimeBlocksController {
   private readonly admin = inject(EventAdmin);
   private readonly core = signal<IEventCoreDetail | null>(null);
   private readonly command = signal<GlobalBaseTimeBlocksCommand | null>(null);
-  private baseline: AdminGlobalCalendarResult | null = null;
+  private readonly baseline = signal<AdminGlobalCalendarResult | null>(null);
   private readonly operation = signal<'preview' | 'save' | 'read' | null>(null);
   readonly calendar = signal<AdminGlobalCalendarResult | null>(null);
   readonly blocked = signal(false);
@@ -30,7 +31,12 @@ export class EventGlobalBaseTimeBlocksController {
   readonly result = signal<'saved' | 'unchanged' | null>(null);
   readonly form = new FormGroup({ timeBlocks: createEventGlobalTimeBlocksForm([], 'saved-base') });
   private readonly formEvents = toSignal(this.form.events);
-  readonly dirty = computed(() => { this.formEvents(); return this.form.dirty; });
+  readonly dirty = computed(() => {
+    this.formEvents();
+    const baseline = this.baseline();
+    return baseline !== null && (this.form.invalid ||
+      !sameScheduleBlocks(mapEventGlobalTimeBlocks(this.form.controls.timeBlocks, 'saved-base'), baseline.timeBlocks));
+  });
   readonly isBusy = computed(() => this.operation() !== null);
   readonly locked = computed(() => this.isBusy() || this.dirty() || this.conflicted() || this.readbackPending());
   readonly contextBlocker = computed(() => {
@@ -45,6 +51,17 @@ export class EventGlobalBaseTimeBlocksController {
   readonly canSave = computed(() => this.canPreview() && this.command() !== null && this.preview()?.valid === true &&
     this.preview()?.status === 'preview_ready' && this.preview()?.changed !== false);
 
+  saveUnavailableError(): EventGlobalSaveError {
+    return new EventGlobalSaveError('unavailable', !this.core() || !this.calendar() ? 'notLoaded'
+      : this.conflicted() ? 'conflict' : this.readbackPending() ? 'pending' : this.blocked() ? 'blocked'
+        : !this.canEdit() ? 'protected' : this.isBusy() ? 'busy' : this.form.invalid ? 'invalid'
+          : !this.dirty() ? 'unchanged' : !this.command() || !this.preview() ? 'previewRequired' : 'previewMismatch', {
+      canSave: this.canSave(), canPreview: this.canPreview(), isBusy: this.isBusy(), blockingReason: this.blockingReason(),
+      readbackPending: this.readbackPending(), dirty: this.dirty(), hasCommand: this.command() !== null,
+      expectedRevision: this.command()?.expectedCalendarRevision, calendarRevision: this.calendar()?.calendarRevision, preview: this.preview(),
+    });
+  }
+
   constructor() {
     effect(() => {
       if (this.canEdit() && !this.isBusy() && !this.readbackPending() && !this.conflicted()) this.form.enable({ emitEvent: false });
@@ -54,7 +71,7 @@ export class EventGlobalBaseTimeBlocksController {
   }
 
   reset(): void {
-    this.baseline = null;
+    this.baseline.set(null);
     this.command.set(null);
     this.operation.set(null);
     this.core.set(null);
@@ -80,10 +97,13 @@ export class EventGlobalBaseTimeBlocksController {
 
   previewChanges(): Observable<AdminGlobalBaseTimeBlocksPreview> {
     return defer(() => {
+      if (this.isBusy() || this.readbackPending()) return throwError(() => this.saveUnavailableError());
       this.validationAttempted.set(true);
       this.form.markAllAsTouched();
-      if (!this.canPreview() || this.form.invalid) return EMPTY;
-      const baseline = this.baseline;
+      this.error.set(null);
+      this.invalidatePreview();
+      if (!this.canPreview() || this.form.invalid) return throwError(() => this.saveUnavailableError());
+      const baseline = this.baseline();
       assertEdgeContract(baseline !== null, 'globalBaseTimeBlocks', 'the edit baseline');
       const formValue = JSON.stringify(this.form.getRawValue());
       const timeBlocks = mapEventGlobalTimeBlocks(this.form.controls.timeBlocks, 'saved-base');
@@ -92,13 +112,12 @@ export class EventGlobalBaseTimeBlocksController {
         baseline.timeBlocks.some(row => row.position === block.position)), 'globalBaseTimeBlocks', 'unchanged block positions and count');
       const command: GlobalBaseTimeBlocksCommand = { coreId: baseline.coreId,
         expectedCalendarRevision: baseline.calendarRevision, timeBlocks, baseline, outcome: null };
-      this.invalidatePreview();
       return this.run('preview', this.readCurrent().pipe(switchMap(calendar => {
         if (calendar.calendarRevision !== baseline.calendarRevision || calendar.draftRevision !== baseline.draftRevision) {
           this.conflict();
-          return EMPTY;
+          return throwError(() => this.saveUnavailableError());
         }
-        if (!this.canEdit()) return EMPTY;
+        if (!this.canEdit()) return throwError(() => this.saveUnavailableError());
         return this.admin.previewGlobalBaseTimeBlocks(command).pipe(tap(preview => {
           assertBasePreview(preview, command);
           if (formValue !== JSON.stringify(this.form.getRawValue())) { this.invalidatePreview(); return; }
@@ -116,7 +135,7 @@ export class EventGlobalBaseTimeBlocksController {
   save(): Observable<AdminGlobalCalendarResult> {
     return defer(() => {
       const command = this.command();
-      if (!command || !this.canSave()) return EMPTY;
+      if (!command || !this.canSave()) return throwError(() => this.saveUnavailableError());
       this.readbackPending.set(true);
       this.preview.set(null);
       const write = this.admin.saveGlobalBaseTimeBlocks(command).pipe(tap(saved => {
@@ -136,7 +155,7 @@ export class EventGlobalBaseTimeBlocksController {
         }
         return of(null);
       }));
-      return this.run('save', write.pipe(switchMap(saved => saved?.saved === false ? EMPTY
+      return this.run('save', write.pipe(switchMap(saved => saved?.saved === false ? throwError(() => new EventGlobalSaveError('writeRejected'))
         : this.readCurrent().pipe(tap(calendar => this.reconcile(calendar, command))))));
     });
   }
@@ -174,7 +193,7 @@ export class EventGlobalBaseTimeBlocksController {
   }
 
   private populate(calendar: AdminGlobalCalendarResult, unchangedPreview: AdminGlobalBaseTimeBlocksPreview | null = null): void {
-    this.baseline = calendar;
+    this.baseline.set(calendar);
     this.command.set(null);
     this.preview.set(unchangedPreview);
     this.conflicted.set(false);
@@ -204,6 +223,7 @@ export class EventGlobalBaseTimeBlocksController {
     this.result.set(null);
     return request.pipe(tap({ error: error => {
       this.error.set(error);
+      if (error instanceof EventGlobalSaveError) return;
       if (!this.readbackPending()) {
         this.invalidatePreview();
         if (error instanceof RpcError && error.code === '40001') this.conflict();

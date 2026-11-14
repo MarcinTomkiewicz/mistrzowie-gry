@@ -79,10 +79,6 @@ export class EventGlobalDraftController {
 
   readCore(coreId: string): Observable<IEventCoreDetail | null> {
     return defer(() => {
-      if (this.selectionCoreId !== coreId) {
-        this.resetEditionSelection();
-      }
-      this.selectionCoreId = coreId;
       this.mainEdition.set(null);
       return this.eventAdmin.getCoreDetail(coreId).pipe(switchMap((core) => {
         if (core === null) {
@@ -169,7 +165,9 @@ export class EventGlobalDraftController {
     this.editionReadError.set(null);
   }
 
-  private syncEditionSelection(calendar: AdminGlobalCalendarResult, mainEdition: IAdminEventDetail): void {
+  syncEditionSelection(calendar: AdminGlobalCalendarResult, mainEdition: IAdminEventDetail): void {
+    if (this.selectionCoreId !== calendar.coreId) this.resetEditionSelection();
+    this.selectionCoreId = calendar.coreId;
     const selectedId = this.selectedEditionId();
     if (selectedId !== null && selectedId !== mainEdition.id && calendar.cities.some(city => city.editionId === selectedId)) {
       this.selectEdition(selectedId);

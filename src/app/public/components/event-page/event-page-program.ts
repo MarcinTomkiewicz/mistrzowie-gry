@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ErrorHandler, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -15,7 +15,7 @@ import type { EventPageOfflineSeatsTranslations } from '../../../core/types/i18n
 import { RpcError } from '../../../core/types/rpc-error';
 import { formatDateLabel } from '../../../core/utils/date';
 import {
-  createPublicEventProgramCards, formatPublicEventProgramTime, groupPublicEventProgramEntries,
+  createPublicEventProgramCards, groupPublicEventProgramEntries,
 } from '../../../core/utils/public-event-program-cards';
 import { EventSlots } from '../../common/event-slots/event-slots';
 import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
@@ -44,6 +44,7 @@ const offlineErrorKeys: Readonly<Record<string, keyof EventPageOfflineSeatsTrans
 export class EventPageProgram {
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
+  private readonly errorHandler = inject(ErrorHandler);
   private readonly confirm = inject(UiConfirm);
   private readonly destroyRef = inject(DestroyRef);
   private readonly collapsedCardLimit = 6;
@@ -61,7 +62,7 @@ export class EventPageProgram {
     if (error === null) return null;
     const copy = this.i18n.offlineSeats().errors;
     const key = error instanceof RpcError ? offlineErrorKeys[error.message] ?? (error.code === '42501' ? 'forbidden' : 'unknown') : 'unknown';
-    return key === 'unknown' && error instanceof RpcError ? `${copy.unknown} (${error.code}: ${error.message})` : copy[key];
+    return copy[key];
   });
 
   protected readonly occurrenceOptions = computed(() => {
@@ -76,14 +77,13 @@ export class EventPageProgram {
   protected readonly groups = computed(() => {
     const state = this.facade.state();
     return state.kind === 'ready'
-      ? groupPublicEventProgramEntries(this.facade.selectedProgram()).map((group) => ({
+      ? groupPublicEventProgramEntries(this.facade.selectedProgram(), this.i18n.program(), state.page.core.name).map((group) => ({
           key: group.key,
-          label: group.eventScoped ? this.i18n.program().eventScoped : formatPublicEventProgramTime(group, this.i18n.program().dayOffset) ||
-            this.i18n.program().timeToBeDetermined,
+          label: group.label,
           cards: createPublicEventProgramCards(
             group.entries, this.storage,
             this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
-            state.page.core.name,
+            state.page.core.name, group,
           ).map((card) => {
             const availability = this.availability.forProgramItem(card.id);
             return availability ? {
@@ -118,6 +118,11 @@ export class EventPageProgram {
     this.facade.selectedOccurrence();
     this.selectedProgramItemId.set(null);
     this.expandedGroupKeys.set(new Set());
+  });
+
+  private readonly offlineErrorEffect = effect(() => {
+    const error = this.offline.error();
+    if (error !== null) this.errorHandler.handleError(error);
   });
 
   protected toggleGroup(key: string): void {

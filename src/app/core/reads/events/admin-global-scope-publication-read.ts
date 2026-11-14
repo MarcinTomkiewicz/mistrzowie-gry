@@ -1,4 +1,4 @@
-import { forkJoin, map } from 'rxjs';
+import { forkJoin, map, of, switchMap } from 'rxjs';
 
 import { EventOccurrenceStatus, ParticipantSignupKind } from '../../enums/event';
 import type {
@@ -8,6 +8,9 @@ import type {
 import type { AdminGlobalCalendarResult } from '../../interfaces/i-admin-global-event';
 import type { IAdminOccurrenceListItem } from '../../interfaces/i-event-admin';
 import type { EventAdmin } from '../../services/event-admin/event-admin';
+import type { EventRead } from './event-read';
+import { assertFirstAppliedPolicy, assertFirstPublishedScope, type FirstGlobalPublicationContext } from './admin-global-publication.contract';
+import type { AdminGlobalPublicationResult } from '../../interfaces/i-admin-global-event-publication';
 import { isValidIsoDate } from '../../utils/date';
 import { assertEdgeContract, readEdgeUuid } from '../../utils/edge-contract';
 import { sameGlobalScopePublicationImpact } from './admin-global-scope-publication.contract';
@@ -56,8 +59,9 @@ export function assertScopeCalendar(calendar: AdminGlobalCalendarResult, coreId:
   }
 }
 
-export function readGlobalScopePublicationSnapshot(admin: EventAdmin, command: EventGlobalScopePublicationCommand) {
-  return forkJoin({ core: admin.getCoreDetail(command.coreId), calendar: admin.getGlobalCalendar(command.coreId),
+export function readGlobalScopePublicationSnapshot(admin: EventAdmin,
+  command: Pick<EventGlobalScopePublicationCommand, 'coreId' | 'editionIds'>, calendar?: AdminGlobalCalendarResult) {
+  return forkJoin({ core: admin.getCoreDetail(command.coreId), calendar: calendar ? of(calendar) : admin.getGlobalCalendar(command.coreId),
     policy: admin.getEffectivePolicy(command.coreId), editions: forkJoin(command.editionIds.map(id => admin.getEditionDetail(id))),
   }).pipe(map(({ core, calendar, policy, editions }): AdminGlobalScopePublicationSnapshot => {
     assertScopeCalendar(calendar, command.coreId);
@@ -77,7 +81,7 @@ export function readGlobalScopePublicationSnapshot(admin: EventAdmin, command: E
       const city = calendar.cities.find(row => row.editionId === command.editionIds[index]);
       assertEdgeContract(edition !== null && city !== undefined && edition.id === city.editionId && edition.eventCoreId === core.id &&
         edition.slug === city.slug && edition.city === city.city && edition.timezone === city.timezone &&
-        edition.isActive === city.isActive && edition.isDefaultPublic === city.isDefaultPublicLegacy && !edition.isStaffingConverted &&
+        edition.isActive === city.isActive && edition.isDefaultPublic === city.isDefaultPublicLegacy &&
         new Set(edition.occurrences.map(row => row.id)).size === edition.occurrences.length &&
         new Set(edition.occurrences.map(row => row.date)).size === edition.occurrences.length &&
         policy.editions.some(row => row.editionId === edition.id),
@@ -105,6 +109,25 @@ export function readGlobalScopePublicationSnapshot(admin: EventAdmin, command: E
     'scopePublication.occurrences', 'unique local occurrence identities across selected Editions');
     return { core, calendar, policy, editions: saved };
   }));
+}
+
+export function readFirstGlobalPublicationSnapshot(admin: EventAdmin, publicRead: EventRead,
+  context: FirstGlobalPublicationContext, result: AdminGlobalPublicationResult | null) {
+  return readGlobalScopePublicationSnapshot(admin, {
+    coreId: context.coreId, editionIds: context.snapshot.calendar.cities.map(city => city.editionId),
+  }).pipe(switchMap(snapshot => forkJoin({
+    timelines: forkJoin(snapshot.editions.map(edition => admin.getTimeline(edition.id))),
+    policyDraft: admin.getPolicyDraft(context.coreId), page: publicRead.getPublicPage(snapshot.core.key),
+  }).pipe(map(({ timelines, policyDraft, page }) => {
+    assertFirstPublishedScope(context, snapshot.core, snapshot.calendar, snapshot.editions, timelines);
+    assertFirstAppliedPolicy(context, policyDraft, snapshot.policy, result);
+    assertEdgeContract(snapshot.core.key === context.snapshot.core.key && page !== null && page.core.id === snapshot.core.id &&
+      page.core.key === snapshot.core.key && page.defaultEventId === context.mainEditionId &&
+      page.editions.length === context.readiness.impact.affectedCityCount && snapshot.editions.every(edition =>
+        page.editions.some(row => row.id === edition.id && row.slug === edition.slug)),
+    'globalPublication.publicRead', 'independent public visibility of the Core, default Edition and all published cities');
+    return snapshot;
+  }))));
 }
 
 export function assertScopeReadinessSnapshot(context: GlobalScopePublicationContext): void {
@@ -243,7 +266,7 @@ export function assertScopedPublicationReadback(context: GlobalScopePublicationC
   return [...newlyPublished.values()];
 }
 
-function assertPublishedMarkers(actual: IAdminOccurrenceListItem, before: IAdminOccurrenceListItem): void {
+export function assertPublishedMarkers(actual: IAdminOccurrenceListItem, before: IAdminOccurrenceListItem = actual): void {
   const openedAt = actual.participantSignupOpenedAt;
   const laterOpening = before.participantSignupOpenedAt === null && validTimestamp(openedAt) &&
     actual.publishedAt !== null && openedAt !== null && Date.parse(openedAt) > Date.parse(actual.publishedAt) &&
