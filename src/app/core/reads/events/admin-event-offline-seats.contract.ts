@@ -1,7 +1,7 @@
 import type {
   AdminEventProgramOfflineSeats, AdminEventProgramOfflineSeatsAdjustment, EventOfflineSeatsDelta,
 } from '../../interfaces/i-event-admin';
-import type { PublicEventPageState } from '../../types/public-event-page';
+import type { PublicEventProgramState } from '../../types/public-event-page';
 import { isValidIsoDate } from '../../utils/date';
 import {
   assertEdgeContract, createEdgeArrayReader, createEdgeLiteralReader, readEdgeNonNegativeInteger, readEdgeString, readEdgeUuid,
@@ -42,10 +42,10 @@ export function readAdminEventOfflineSeatsAdjustment(value: unknown, programItem
 }
 
 export function assertOfflineSeatsPublicScope(inventory: AdminEventProgramOfflineSeats,
-  page: Extract<PublicEventPageState, { kind: 'ready' }>): void {
-  assertEdgeContract(inventory.eventId === page.edition.id && inventory.items.every(item =>
-    page.occurrences.some(day => day.id === item.occurrenceId && day.occurrenceDate === item.occurrenceDate) &&
-    page.program.some(entry => entry.kind === 'confirmed' && entry.session !== null && entry.programItemId === item.programItemId &&
+  program: Extract<PublicEventProgramState, { kind: 'ready' }>): void {
+  assertEdgeContract(inventory.eventId === program.eventId && inventory.items.every(item =>
+    program.occurrences.some(day => day.id === item.occurrenceId && day.occurrenceDate === item.occurrenceDate) &&
+    program.program.some(entry => entry.kind === 'confirmed' && entry.session !== null && entry.programItemId === item.programItemId &&
       entry.occurrenceId === item.occurrenceId && entry.occurrenceDate === item.occurrenceDate)),
   'offlineSeats.programme', 'only canonical confirmed sessions of the public Edition, with matching occurrence IDs and dates');
 }

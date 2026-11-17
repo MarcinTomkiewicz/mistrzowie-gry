@@ -1,7 +1,20 @@
-@let programGroups = displayGroups();
-<section class="position-relative">
+@let program = facade.programState();
+@let programGroups = groups();
+@let loading = availability.isLoading();
+<section class="position-relative" [attr.aria-busy]="program.kind === 'loading' || loading">
   <header class="mg-section__header mb-md">
-    <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.program().title }}</h2>
+    <div class="flex-row-between-center flex-wrap gap-sm">
+      <h2 class="mg-section__title mg-section__title--md m-0">{{ i18n.program().title }}</h2>
+      @if (!loading && availability.state().kind === 'error') {
+        <p-button type="button" size="small" severity="secondary" [outlined]="true"
+          [label]="i18n.actions().retry" [disabled]="offline.locked()" (onClick)="availability.refresh()" />
+      }
+      @if (offline.isAdmin()) {
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+          [label]="i18n.actions().refresh" [loading]="offline.isBusy()"
+          [disabled]="program.kind !== 'ready' || offline.isBusy() || offline.locked() || signup.isSubmitting()" (onClick)="offline.refresh()" />
+      }
+    </div>
     @if (occurrenceOptions().length > 1) {
       <div class="flex-row-center-center flex-wrap gap-sm mt-sm" role="group" [attr.aria-label]="i18n.program().occurrenceLabel">
         <span class="small-caps muted-text">{{ i18n.program().occurrenceLabel }}</span>
@@ -10,130 +23,146 @@
           [selectedIndex]="facade.selectedOccurrenceIndex()"
           [disabled]="signup.isSubmitting() || signup.isReceiptDecisionPending() || offline.locked()"
           marginBottomClass=""
-          (selectedIndexChange)="selectOccurrence($event)"
+          (selectedIndexChange)="!offline.locked() && signup.selectOccurrence($event)"
         />
       </div>
     }
   </header>
-  @if (offline.isAdmin() && (offline.hasItems() || offline.isBusy() || offline.operation() || offline.error() || offline.verified() || offline.abandoned())) {
-    @let copy = i18n.offlineSeats();
-    <section class="mg-card flex-col-start-stretch gap-sm mb-md" [attr.aria-busy]="offline.isBusy()" [attr.aria-label]="copy.title">
-      <header class="flex-row-between-center flex-wrap gap-sm">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.title }}</h3>
-        @if (!offline.operation()) {
-          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
-            [label]="i18n.actions().refresh" [disabled]="offline.isBusy() || signup.isSubmitting()" (onClick)="offline.refresh()" />
-        }
-      </header>
-      @if (offline.isBusy()) { <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p> }
-      @if (offline.operation(); as operation) {
-        <p class="m-0 text-wrap-anywhere">
-          {{ operation.delta === 1 ? copy.add : copy.remove }} -
-          {{ offlineSessionLabel(operation.item.programItemId) }} - {{ formatDateLabel(operation.item.occurrenceDate) }}
-        </p>
-        @if (!offline.isBusy()) {
-          <p-message severity="warn" role="alert">{{ operation.result ? copy.readbackPending : copy.uncertain }}</p-message>
-        }
-        <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
-            [label]="i18n.actions().retry" [disabled]="offline.isBusy() || offlineDecisionPending()" (onClick)="offline.retryReadback()" />
-          <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
-            [label]="copy.endReadback" [disabled]="!offline.canEndReadback() || offlineDecisionPending()" (onClick)="endOfflineReadback()" />
-        </div>
-      }
-      @if (offlineErrorMessage(); as error) { <p-message severity="error" role="alert">{{ error }}</p-message> }
-      @if (offline.verified()) { <p-message severity="success" role="status">{{ copy.verified }}</p-message> }
-      @if (offline.abandoned()) { <p-message severity="warn" role="status">{{ copy.readbackEnded }}</p-message> }
-    </section>
-  }
   @if (signup.hasUncertainResults() && !signup.dialog()) {
     <p role="alert">{{ i18n.signup().unknownResult }}</p>
   }
-  @if (availability.state().kind === 'loading') {
-    <p class="muted-text" role="status">{{ i18n.status().loading }}</p>
-  } @else if (availability.state().kind === 'error') {
+  @if (program.kind === 'loading') {
+    <p class="m-0 muted-text" role="status">{{ i18n.status().loading }}</p>
+  } @else if (program.kind === 'error') {
     <div class="mg-card flex-col-start-stretch gap-sm mb-md" role="alert">
-      <p class="m-0">{{ i18n.signup().availabilityReadFailed }}</p>
+      <p class="m-0">{{ i18n.program().loadFailed }}</p>
       <p-button type="button" size="small" severity="secondary" [outlined]="true"
-        [label]="i18n.actions().retry" (onClick)="availability.refresh()" />
+        [label]="i18n.actions().retry" [disabled]="offline.locked() || signup.isSubmitting()" (onClick)="facade.loadProgram()" />
     </div>
-  }
-  @if (occurrenceOptions().length) {
-    @if (availability.forWholeEvent(); as wholeEvent) {
-      <section class="mg-card flex-col-start-stretch gap-sm mb-md">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.signup().wholeEventTitle }}</h3>
-        <p class="m-0 muted-text" role="status">{{ availabilityLabel(wholeEvent) }}</p>
-        @if (wholeEvent.canSignup) {
-          <div class="flex-row-start-center">
-            <p-button type="button" size="small" severity="success" [label]="i18n.cta().signUp"
-              [disabled]="signup.isSubmitting() || offline.locked() || signup.hasUncertainWholeEventResult()"
-              (onClick)="signup.openWholeEvent()" />
-          </div>
-        }
-      </section>
-    }
-    @if (programGroups.length) {
-      <div class="flex-col-start-stretch gap-xl">
-        @for (group of programGroups; track group.key) {
-          <section [attr.aria-labelledby]="'event-program-group-' + group.key">
-            <h3 [id]="'event-program-group-' + group.key"
-              class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">
-              {{ group.label }}
-            </h3>
-            <app-event-slots
-              [attr.id]="'event-program-cards-' + group.key"
-              [items]="group.visibleCards"
-              [slotCount]="0"
-              [participantSignupDisabled]="signup.isSubmitting() || offline.locked()"
-              [itemActions]="offlineSeatActions"
-              (slotSelect)="selectSession($event)"
-              (gmSelect)="facade.openGmProfile($event.id)"
-              (participantSignupSelect)="signup.open($event.id)"
-            />
-            @if (group.remainingCount > 0) {
-              <div class="flex-row-end-center mt-md">
-                <p-button type="button" size="small" severity="secondary" [outlined]="true"
-                  [label]="group.expanded ? i18n.cta().collapse : i18n.remainingSessions(group.remainingCount)"
-                  [pt]="{ root: { 'aria-expanded': group.expanded, 'aria-controls': 'event-program-cards-' + group.key } }"
-                  (onClick)="toggleGroup(group.key)" />
-              </div>
-            }
-          </section>
-        }
-      </div>
-    } @else {
-      <div class="mg-card"><p class="m-0">{{ i18n.program().inPreparation }}</p></div>
-    }
   } @else {
-    <div class="mg-card"><p class="m-0">{{ i18n.page().noOccurrences }}</p></div>
+    @if (facade.selectedOccurrence(); as occurrence) {
+      @if (availability.forTarget({ scope: 'whole_event', occurrenceId: occurrence.id }); as wholeEvent) {
+        <section class="mg-card flex-col-start-stretch gap-sm mb-md">
+          <h3 class="mg-section__title mg-section__title--sm m-0">{{ i18n.signup().wholeEventTitle }}</h3>
+          <p class="m-0 muted-text" role="status">{{ availabilityLabel(wholeEvent) }}</p>
+          @if (wholeEvent.canSignup) {
+            <div class="flex-row-start-center">
+              <p-button type="button" size="small" severity="success" [label]="i18n.cta().signUp"
+                [disabled]="signup.isSubmitting() || offline.locked() || signup.hasUncertainWholeEventResult()"
+                (onClick)="signup.openWholeEvent()" />
+            </div>
+          }
+        </section>
+      }
+      @if (programGroups.length) {
+        <div class="flex-col-start-stretch gap-xl">
+          @for (group of programGroups; track group.key) {
+            <section [attr.aria-labelledby]="'event-program-group-' + group.key">
+              <h3 [id]="'event-program-group-' + group.key"
+                class="mg-section__title mg-section__title--sm mg-section__title--no-margin mb-md">
+                {{ group.label }}
+              </h3>
+              <app-event-slots
+                [attr.id]="'event-program-cards-' + group.key"
+                [items]="group.visibleCards"
+                [isLoading]="availability.clientReady() && loading && group.sessionCount > 0"
+                [slotCount]="availability.clientReady() && loading ? group.sessionCount : 0"
+                [participantSignupDisabled]="signup.isSubmitting() || offline.locked()"
+                [itemActions]="sessionActions"
+                (slotSelect)="selectedProgramItemId.set($event.id)"
+                (gmSelect)="facade.openGmProfile($event.id)"
+                (participantSignupSelect)="signup.open($event.id)"
+              />
+              @if (!loading && group.remainingCount > 0) {
+                <div class="flex-row-end-center mt-md">
+                  <p-button type="button" size="small" severity="secondary" [outlined]="true"
+                    [disabled]="offline.locked()"
+                    [label]="group.expanded ? i18n.cta().collapse : i18n.remainingSessions(group.remainingCount)"
+                    [pt]="{ root: { 'aria-expanded': group.expanded, 'aria-controls': 'event-program-cards-' + group.key } }"
+                    (onClick)="toggleGroup(group.key)" />
+                </div>
+              }
+              @if (offline.isAdmin()) {
+                @let copy = i18n.offlineSeats();
+                @let operation = offline.operation();
+                @let feedback = offline.feedback();
+                @for (card of group.cards; track card.id ?? $index) {
+                  @if (card.id !== null && (operation?.item?.programItemId === card.id || offline.error()?.programItemId === card.id || feedback?.programItemId === card.id)) {
+                    <div class="mg-card flex-col-start-stretch gap-sm mt-md" role="group"
+                      [attr.aria-label]="copy.title + ': ' + card.title" [attr.aria-busy]="offline.isBusy() && operation?.item?.programItemId === card.id">
+                      <strong>{{ card.title }}</strong>
+                      @if (operation && operation.item.programItemId === card.id) {
+                        <p class="m-0">{{ operation.delta === 1 ? copy.add : copy.remove }}</p>
+                        @if (!offline.isBusy()) {
+                          <p-message severity="warn" role="alert">{{ operation.result ? copy.readbackPending : copy.uncertain }}</p-message>
+                        }
+                        <div class="flex-row-start-center flex-wrap gap-sm">
+                          <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+                            [label]="i18n.actions().retry" [disabled]="offline.isBusy() || offlineDecisionPending()" (onClick)="offline.retryReadback()" />
+                          <p-button type="button" size="small" severity="warn" [outlined]="true" icon="pi pi-interdiction"
+                            [label]="copy.endReadback" [disabled]="!offline.canEndReadback() || offlineDecisionPending()" (onClick)="endOfflineReadback()" />
+                        </div>
+                      }
+                      @if (offline.error()?.programItemId === card.id && offlineErrorMessage(); as error) {
+                        <p-message severity="error" role="alert">{{ error }}</p-message>
+                      }
+                      @if (feedback && feedback.programItemId === card.id) {
+                        <p-message [severity]="feedback.kind === 'verified' ? 'success' : 'warn'" role="status">
+                          {{ feedback.kind === 'verified' ? copy.verified : copy.readbackEnded }}
+                        </p-message>
+                      }
+                    </div>
+                  }
+                }
+              }
+            </section>
+          }
+        </div>
+      } @else {
+        <div class="mg-card"><p class="m-0">{{ i18n.program().inPreparation }}</p></div>
+      }
+    } @else {
+      <div class="mg-card"><p class="m-0">{{ i18n.page().noOccurrences }}</p></div>
+    }
   }
 </section>
 
-<ng-template #offlineSeatActions let-card>
-  @if (card.programStatus === 'confirmed' && !card.activity) {
-  @if (offline.forProgramItem(card.id); as seats) {
-    @let copy = i18n.offlineSeats();
-    <div class="flex-col-start-stretch gap-sm border-top pt-sm mt-sm" role="group"
-      [attr.aria-label]="copy.title + ': ' + offlineSessionLabel(seats.programItemId)" [attr.aria-busy]="offline.isBusy()"
-      (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <dl class="flex-col-start-stretch gap-xs m-0">
-        <div class="flex-row-between-center gap-sm"><dt>{{ copy.online }}</dt><dd class="m-0">{{ seats.activeOnlineBookings }}</dd></div>
-        <div class="flex-row-between-center gap-sm"><dt>{{ copy.offline }}</dt><dd class="m-0">{{ seats.offlineOccupiedSeats }}</dd></div>
-        <div class="flex-row-between-center gap-sm"><dt>{{ copy.remaining }}</dt><dd class="m-0">{{ seats.remainingOnlineSeats }}</dd></div>
-        <div class="flex-row-between-center gap-sm"><dt>{{ copy.capacity }}</dt><dd class="m-0">{{ seats.effectiveCapacity }}</dd></div>
-      </dl>
-      <div class="flex-row-start-center flex-wrap gap-sm">
-        <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="copy.add"
-          [ariaLabel]="copy.add + ': ' + offlineSessionLabel(seats.programItemId)"
-          [disabled]="offline.isBusy() || offline.locked() || signup.isSubmitting() || seats.remainingOnlineSeats === 0"
-          (onClick)="offline.adjust(seats.programItemId, 1)" />
-        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-minus" [label]="copy.remove"
-          [ariaLabel]="copy.remove + ': ' + offlineSessionLabel(seats.programItemId)"
-          [disabled]="offline.isBusy() || offline.locked() || signup.isSubmitting() || seats.offlineOccupiedSeats === 0"
-          (onClick)="offline.adjust(seats.programItemId, -1)" />
+<ng-template #sessionActions let-card>
+  @if (card.eventCapacity; as event) {
+    <dl class="flex-col-start-stretch gap-xs m-0">
+      <div class="flex-row-between-center gap-sm">
+        <dt>{{ i18n.sessionCapacity().capacity }}</dt><dd class="m-0">{{ event.effectiveCapacity ?? i18n.values().notProvided }}</dd>
       </div>
-    </div>
-  }
+      @if (event.remainingSeats != null) {
+        <div class="flex-row-between-center gap-sm">
+          <dt>{{ i18n.sessionCapacity().remainingSeats }}</dt><dd class="m-0">{{ event.remainingSeats }}</dd>
+        </div>
+      }
+    </dl>
+    @if (offline.isAdmin()) {
+      @let copy = i18n.offlineSeats();
+      @if (offline.forProgramItem(card.id); as seats) {
+        <div class="flex-col-start-stretch gap-sm border-top pt-sm mt-sm" role="group"
+          [attr.aria-label]="copy.title + ': ' + card.title"
+          (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+          <dl class="flex-col-start-stretch gap-xs m-0">
+            <div class="flex-row-between-center gap-sm"><dt>{{ copy.online }}</dt><dd class="m-0">{{ seats.activeOnlineBookings }}</dd></div>
+            <div class="flex-row-between-center gap-sm"><dt>{{ copy.offline }}</dt><dd class="m-0">{{ seats.offlineOccupiedSeats }}</dd></div>
+            <div class="flex-row-between-center gap-sm"><dt>{{ copy.remaining }}</dt><dd class="m-0">{{ seats.remainingOnlineSeats }}</dd></div>
+          </dl>
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <p-button type="button" size="small" severity="secondary" icon="pi pi-plus" [label]="copy.add"
+              [ariaLabel]="copy.add + ': ' + card.title"
+              [disabled]="offline.isBusy() || offline.locked() || signup.isSubmitting() || seats.remainingOnlineSeats === 0"
+              (onClick)="offline.adjust(seats.programItemId, 1)" />
+            <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-minus" [label]="copy.remove"
+              [ariaLabel]="copy.remove + ': ' + card.title"
+              [disabled]="offline.isBusy() || offline.locked() || signup.isSubmitting() || seats.offlineOccupiedSeats === 0"
+              (onClick)="offline.adjust(seats.programItemId, -1)" />
+          </div>
+        </div>
+      }
+    }
   }
 </ng-template>
 
@@ -142,6 +171,7 @@
 @let selected = selectedCard();
 <app-session-dialog
   [session]="selected?.sessionDetails ?? null"
+  [eventCapacity]="selected?.eventCapacity"
   [gmDisplayName]="selected?.gmDisplayName ?? null"
   [visible]="selected !== null"
   (visibleChange)="!$event && selectedProgramItemId.set(null)"
@@ -151,8 +181,9 @@
   [visible]="facade.profileState().kind === 'loading'"
   [label]="i18n.status().loading"
 />
+@let profile = facade.profileState();
 <app-gm-profile-dialog
-  [profile]="profile()"
-  [visible]="profile() !== null"
+  [profile]="profile.kind === 'ready' ? profile.profile : null"
+  [visible]="profile.kind === 'ready'"
   (visibleChange)="!$event && facade.closeGmProfile()"
 />

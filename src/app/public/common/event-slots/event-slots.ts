@@ -7,7 +7,6 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 
 import { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { Theme } from '../../../core/services/theme/theme';
-import { SessionDifficultyLevel } from '../../../core/types/sessions';
 import { resolveAltDifficultyLevel } from '../../../common/session-difficulty/session-difficulty';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
 import { createEventSlotsI18n } from './event-slots.i18n';
@@ -69,10 +68,6 @@ export class EventSlots {
     ),
   );
 
-  resolveImageSrc(item: IEventSlotCardVm): string {
-    return item.imageUrl || this.placeholderImageSrc;
-  }
-
   onSlotClick(item: IEventSlotCardVm): void {
     if (!item.canOpenDetails || item.isEmpty) {
       return;
@@ -114,30 +109,7 @@ export class EventSlots {
     this.participantSignupSelect.emit(item);
   }
 
-  difficultyBadgeClass(
-    difficulty: SessionDifficultyLevel | null | undefined,
-  ): string {
-    return resolveAltDifficultyLevel(
-      difficulty,
-      this.i18n.difficulty(),
-      this.i18n.commonEmpty().title,
-    ).badgeClass;
-  }
-
-  difficultyLabel(
-    difficulty: SessionDifficultyLevel | null | undefined,
-  ): string {
-    return resolveAltDifficultyLevel(
-      difficulty,
-      this.i18n.difficulty(),
-      this.i18n.commonEmpty().title,
-    ).label;
-  }
-
-  trackBySlot(index: number, item: IEventSlotCardVm): string {
-    return item.id ?? `empty-${index}`;
-  }
-
+  readonly resolveAltDifficultyLevel = resolveAltDifficultyLevel;
   readonly resolveLanguageFlagClass = resolveLanguageFlagClass;
 
   private createEmptySlot(): IEventSlotCardVm {
@@ -145,7 +117,6 @@ export class EventSlots {
 
     return {
       id: null,
-      gmProfileId: null,
       title: fallback.emptySession,
       imageUrl: null,
       gmDisplayName: this.i18n.commonValues().notAvailable,
@@ -154,7 +125,6 @@ export class EventSlots {
       languages: [],
       styles: [],
       triggers: [],
-      minAge: null,
       description: null,
       isEmpty: true,
       canOpenDetails: false,

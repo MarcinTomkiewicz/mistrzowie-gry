@@ -1,6 +1,6 @@
-import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
@@ -58,12 +58,12 @@ import { createChaoticThursdaysI18n } from './chaotic-thursdays.i18n';
 export class ChaoticThursdays {
   private readonly facade = inject(ChaoticThursdaysFacade);
   private readonly gmRead = inject(GmRead);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly responseStatus = inject(ResponseStatus);
   private readonly seo = inject(Seo);
   private readonly storage = inject(Storage);
   private readonly toast = inject(UiToast);
   private readonly pageUrl = buildSiteUrl('/chaotyczne-czwartki');
+  private gmProfileRequest: Subscription | null = null;
 
   readonly i18n = createChaoticThursdaysI18n(
     CHAOTIC_HIGHLIGHT_ICONS,
@@ -76,6 +76,12 @@ export class ChaoticThursdays {
 
   readonly selectedCard = signal<IEventSlotCardVm | null>(null);
   readonly isSessionDialogVisible = signal(false);
+
+  private readonly gmProfileContextEffect = effect((onCleanup) => {
+    this.facade.selectedEdition();
+    this.facade.selectedOccurrence();
+    onCleanup(() => this.onGmDialogVisibleChange(false));
+  });
 
   private readonly applySeoEffect = effect(() => {
     const seo = this.i18n.seo();
@@ -120,14 +126,17 @@ export class ChaoticThursdays {
   }
 
   onGmSelect(slot: IEventSlotCardVm): void {
-    const gmProfileId = normalizeText(slot.gmProfileId);
+    this.onGmDialogVisibleChange(false);
+    const gmUserId = this.facade.selectedProgramItems().find(entry => entry.programItemId === slot.id)?.host?.userId;
     const edition = this.facade.selectedEdition();
-    if (!gmProfileId || !edition) {
+    const occurrence = this.facade.selectedOccurrence();
+    if (!gmUserId || !edition || !occurrence) {
       return;
     }
 
-    this.gmRead.getPublicEventProfile(edition.id, gmProfileId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.gmProfileRequest = this.gmRead.getPublicEventProfile(edition.id, gmUserId).subscribe({
       next: (profile) => {
+        if (this.facade.selectedEdition() !== edition || this.facade.selectedOccurrence() !== occurrence) return;
         if (!profile) {
           this.toast.danger({
             summary: this.i18n.errors().gmProfile,
@@ -140,6 +149,7 @@ export class ChaoticThursdays {
         this.isGmDialogVisible.set(true);
       },
       error: () => {
+        if (this.facade.selectedEdition() !== edition || this.facade.selectedOccurrence() !== occurrence) return;
         this.toast.danger({
           summary: this.i18n.errors().gmProfile,
           detail: this.i18n.commonErrors().generic,
@@ -152,6 +162,8 @@ export class ChaoticThursdays {
     this.isGmDialogVisible.set(visible);
 
     if (!visible) {
+      this.gmProfileRequest?.unsubscribe();
+      this.gmProfileRequest = null;
       this.selectedProfile.set(null);
     }
   }

@@ -51,7 +51,7 @@ import { createEventPageI18n } from './event-page.i18n';
   templateUrl: './event-page.html',
   providers: [
     EventPageFacade, EventParticipantAvailability, EventParticipantSignupFacade, EventProgramOfflineSeats,
-    provideTranslocoScope('eventPage', 'common'),
+    provideTranslocoScope('eventPage', 'common', 'sessions'),
   ],
 })
 export class EventPage implements OnInit {

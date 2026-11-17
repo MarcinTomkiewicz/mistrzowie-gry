@@ -1,4 +1,4 @@
-import { DestroyRef, ErrorHandler, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { DestroyRef, ErrorHandler, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { defer, finalize, map, of, tap, type Observable } from 'rxjs';
 
@@ -33,7 +33,7 @@ type SignupSelection = {
 type SignupDialog = {
   selection: SignupSelection;
   result: IEventParticipantRegisterResult | null;
-  failure: 'rejected' | 'uncertain' | null;
+  failure: 'rejected' | null;
 };
 type UncertainRequest = { actorKey: string; eventId: string; target: EventParticipantSignupTarget };
 
@@ -56,13 +56,6 @@ export class EventParticipantSignupFacade {
   private readonly uncertainRequests = signal<readonly UncertainRequest[]>([]);
   private readonly guestPhone = signal<string | null>(null);
   private readonly guestHistoryActorKey = signal<string | null>(null);
-  private readonly currentUncertainRequests = computed(() => {
-    const page = this.page.state();
-    const userId = this.auth.userId();
-    const actorKey = userId !== null ? 'user:' + userId : this.guestHistoryActorKey();
-    return this.auth.isReady() && page.kind === 'ready'
-      ? this.uncertainRequests().filter(item => item.eventId === page.edition.id && item.actorKey === actorKey) : [];
-  });
 
   readonly isSubmitting = this.submitting.asReadonly();
   readonly isReceiptDecisionPending = this.receiptDecisionPending.asReadonly();
@@ -76,28 +69,28 @@ export class EventParticipantSignupFacade {
     const page = this.page.state();
     return page.kind === 'ready' ? EVENT_PARTICIPANT_CONTACT_PHONES[page.page.core.key] ?? null : null;
   });
-  readonly hasUncertainResults = computed(() => this.currentUncertainRequests().length > 0);
+  readonly hasUncertainResults = computed(() => {
+    const page = this.page.state();
+    const userId = this.auth.userId();
+    const actorKey = userId !== null ? 'user:' + userId : this.guestHistoryActorKey();
+    return this.auth.isReady() && page.kind === 'ready' &&
+      this.uncertainRequests().some(item => item.eventId === page.edition.id && item.actorKey === actorKey);
+  });
   readonly dialog = computed(() => {
     const dialog = this.dialogState();
     return dialog && (this.hasGuestReceipt() || this.isSelectionCurrent(dialog.selection)) ? dialog : null;
   });
   readonly canSubmit = computed(() => {
     const dialog = this.dialog();
-    return !!dialog && this.isSelectionCurrent(dialog.selection) && !this.isSubmitting() && !this.receiptDecisionPending() && !dialog.result &&
-      !this.hasUncertainTarget(dialog.selection.target) && this.targetAvailability(dialog.selection.target)?.canSignup === true;
+    return !!dialog && !dialog.result && !this.isSubmitting() && !this.receiptDecisionPending() &&
+      !this.hasUncertainTarget(dialog.selection.target) && this.availability.forTarget(dialog.selection.target)?.canSignup === true;
   });
 
   constructor() {
     effect(() => {
-      this.page.state();
-      this.page.selectedOccurrence();
-      this.auth.userId();
-      const actorReady = this.auth.isReady();
       const dialog = this.dialogState();
-      const keepReceipt = this.hasGuestReceipt() || this.isSubmitting();
-      untracked(() => {
-        if (dialog && actorReady && !keepReceipt && !this.isSelectionCurrent(dialog.selection)) this.clearDialog();
-      });
+      if (dialog && this.auth.isReady() && !this.hasGuestReceipt() && !this.isSubmitting() &&
+        !this.isSelectionCurrent(dialog.selection)) this.clearDialog();
     });
   }
 
@@ -134,9 +127,10 @@ export class EventParticipantSignupFacade {
 
   selectOccurrence(index: number): void {
     const page = this.page.state();
-    if (page.kind !== 'ready' || !page.occurrences[index] || index === this.page.selectedOccurrenceIndex()) return;
+    const program = this.page.programState();
+    if (page.kind !== 'ready' || program.kind !== 'ready' || !program.occurrences[index] || index === this.page.selectedOccurrenceIndex()) return;
     this.confirmContextChange().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accepted => {
-      if (accepted && this.page.state() === page) this.page.selectOccurrence(index);
+      if (accepted && this.page.state() === page && this.page.programState() === program) this.page.selectOccurrence(index);
     });
   }
 
@@ -169,7 +163,7 @@ export class EventParticipantSignupFacade {
       request = { ...target, mode: 'guest', guestName: guest.guestName, guestPhone };
     }
     const actorKey = this.actorKey();
-    if (!actorKey || !this.canSubmit()) return;
+    if (!actorKey) return;
     const context: UncertainRequest = { actorKey, eventId: edition.id, target };
     this.submitting.set(true);
     this.participant.register(request).pipe(
@@ -200,7 +194,7 @@ export class EventParticipantSignupFacade {
         this.errorHandler.handleError(error);
         const rejected = error instanceof RpcError && ['22023', '22P02', '23514', '23505', '42501', 'P0002', 'P0001'].includes(error.code);
         if (!rejected) this.uncertainRequests.update(items => [...items, context]);
-        if (this.dialog()?.selection === selection) this.dialogState.set({ selection, result: null, failure: rejected ? 'rejected' : 'uncertain' });
+        if (this.dialog()?.selection === selection) this.dialogState.set({ selection, result: null, failure: rejected ? 'rejected' : null });
         this.toast.show(rejected ? 'danger' : 'warn', { summary: rejected
           ? this.i18n.signup().rejected : this.i18n.signup().unknownResult });
         this.availability.refresh();
@@ -212,7 +206,7 @@ export class EventParticipantSignupFacade {
     const page = this.page.state();
     const occurrence = this.page.selectedOccurrence();
     if (!this.platform.isBrowser || this.isSubmitting() || this.receiptDecisionPending() || this.dialogState()?.result || page.kind !== 'ready' || !occurrence ||
-      this.hasUncertainTarget(target) || !this.targetAvailability(target)?.canSignup) return;
+      this.hasUncertainTarget(target) || !this.availability.forTarget(target)?.canSignup) return;
     const entry = target.scope === 'program_item' ? this.page.selectedProgram().find(
       (item): item is PublicEventConfirmedEntry => item.kind === 'confirmed' && item.session !== null && item.programItemId === target.programItemId,
     ) ?? null : null;
@@ -220,10 +214,6 @@ export class EventParticipantSignupFacade {
     this.clearDialog();
     this.dialogState.set({ selection: { target, entry, occurrence, edition: page.edition,
       eventName: page.page.core.name, actorId: this.auth.userId() }, result: null, failure: null });
-  }
-
-  private targetAvailability(target: EventParticipantSignupTarget) {
-    return target.scope === 'program_item' ? this.availability.forProgramItem(target.programItemId) : this.availability.forWholeEvent();
   }
 
   private hasUncertainTarget(target: EventParticipantSignupTarget): boolean {

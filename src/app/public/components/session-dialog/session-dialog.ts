@@ -1,27 +1,17 @@
 import {
   Component,
-  computed,
-  effect,
-  inject,
   input,
   output,
-  signal,
 } from '@angular/core';
 
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { catchError, finalize, of } from 'rxjs';
-
-import { IGmPublicProfile } from '../../../core/interfaces/i-gm-public-profile';
 import type { SessionDetailsData } from '../../../core/interfaces/i-session';
-import { GmRead } from '../../../core/reads/gm/gm-read';
+import type { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import { resolveLanguageFlagClass } from '../../../core/utils/language';
-import { normalizeText } from '../../../core/utils/normalize-text';
-import { getGmPublicProfileDisplayName } from '../../../core/utils/user-display';
 import { SessionDetails } from '../../../common/session-details/session-details';
-import { GmProfileDialog } from '../gm-profile-dialog/gm-profile-dialog';
 import { createSessionDialogI18n } from './session-dialog.i18n';
 
 @Component({
@@ -31,118 +21,20 @@ import { createSessionDialogI18n } from './session-dialog.i18n';
     DialogModule,
     ButtonModule,
     SessionDetails,
-    GmProfileDialog,
   ],
   templateUrl: './session-dialog.html',
   styleUrl: './session-dialog.scss',
-  providers: [provideTranslocoScope('auth', 'common')],
+  providers: [provideTranslocoScope('common')],
 })
 export class SessionDialog {
-  private readonly gmRead = inject(GmRead);
-
   readonly visible = input(false);
   readonly session = input<SessionDetailsData | null>(null);
-  readonly gmProfile = input<IGmPublicProfile | null>(null);
-  readonly gmProfileId = input<string | null>(null);
+  readonly eventCapacity = input<IEventSlotCardVm['eventCapacity']>();
   readonly gmDisplayName = input<string | null>(null);
-  readonly showCharacterSheets = input(true);
 
   readonly visibleChange = output<boolean>();
 
   readonly i18n = createSessionDialogI18n();
 
-  readonly selectedProfile = signal<IGmPublicProfile | null>(null);
-  readonly isGmDialogVisible = signal(false);
-  readonly isGmProfileLoading = signal(false);
-
-  readonly header = computed(() => this.session()?.title ?? '');
-  readonly languageFlags = computed(() =>
-    (this.session()?.languages ?? [])
-      .map((language) => ({
-        id: language.id,
-        label: language.label,
-        className: resolveLanguageFlagClass(language.flagCode),
-      }))
-      .filter((language) => !!language.className),
-  );
-  readonly resolvedGmDisplayName = computed(() => {
-    const explicitDisplayName = normalizeText(this.gmDisplayName());
-
-    if (explicitDisplayName) {
-      return explicitDisplayName;
-    }
-
-    const profile = this.selectedProfile();
-
-    if (!profile) {
-      return null;
-    }
-
-    return getGmPublicProfileDisplayName(profile) || null;
-  });
-
-  readonly canOpenGmProfile = computed(() => !!this.selectedProfile()?.profile.id);
-
-  constructor() {
-    effect((onCleanup) => {
-      const isVisible = this.visible();
-      const initialProfile = this.gmProfile();
-      const gmProfileId = normalizeText(this.gmProfileId());
-
-      this.selectedProfile.set(initialProfile);
-      this.isGmDialogVisible.set(false);
-      this.isGmProfileLoading.set(false);
-
-      if (!isVisible || initialProfile) {
-        return;
-      }
-
-      if (!gmProfileId) {
-        return;
-      }
-
-      this.isGmProfileLoading.set(true);
-
-      const subscription = this.gmRead
-        .getProfileById(gmProfileId)
-        .pipe(
-          catchError(() => of(null)),
-          finalize(() => this.isGmProfileLoading.set(false)),
-        )
-        .subscribe((profile) => {
-          this.selectedProfile.set(profile);
-        });
-
-      onCleanup(() => subscription.unsubscribe());
-    });
-  }
-
-  onVisibleChange(next: boolean): void {
-    if (!next) {
-      this.resetState();
-    }
-
-    this.visibleChange.emit(next);
-  }
-
-  close(): void {
-    this.resetState();
-    this.visibleChange.emit(false);
-  }
-
-  openGmProfile(): void {
-    if (!this.selectedProfile()) {
-      return;
-    }
-
-    this.isGmDialogVisible.set(true);
-  }
-
-  onGmDialogVisibleChange(visible: boolean): void {
-    this.isGmDialogVisible.set(visible);
-  }
-
-  private resetState(): void {
-    this.isGmDialogVisible.set(false);
-  }
+  readonly resolveLanguageFlagClass = resolveLanguageFlagClass;
 }

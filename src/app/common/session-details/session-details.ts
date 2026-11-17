@@ -1,15 +1,14 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
 
 import { provideTranslocoScope } from '@jsverse/transloco';
 
 import type { SessionDetailsData } from '../../core/interfaces/i-session';
+import type { IEventSlotCardVm } from '../../core/interfaces/i-event-slot-card';
 import type { IPdfPreview } from '../../core/interfaces/i-pdf';
 import { Storage } from '../../core/services/storage/storage';
 import { resolveAltDifficultyLevel } from '../session-difficulty/session-difficulty';
-import { normalizeText } from '../../core/utils/normalize-text';
 import { resolvePublicStorageUrl } from '../../core/utils/storage-url';
 import { PdfThumbnail } from '../pdf-thumbnail/pdf-thumbnail';
 import { PdfViewerDialog } from '../pdf-viewer-dialog/pdf-viewer-dialog';
@@ -19,7 +18,7 @@ import { SystemChip } from '../system-chip/system-chip';
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [ButtonModule, ImageModule, PdfThumbnail, PdfViewerDialog, SystemChip],
+  imports: [ImageModule, PdfThumbnail, PdfViewerDialog, SystemChip],
   templateUrl: './session-details.html',
   styleUrl: './session-details.scss',
   providers: [provideTranslocoScope('sessions', 'common')],
@@ -28,41 +27,24 @@ export class SessionDetails {
   private readonly storage = inject(Storage);
 
   readonly session = input.required<SessionDetailsData>();
+  readonly eventCapacity = input<IEventSlotCardVm['eventCapacity']>();
   readonly gmDisplayName = input<string | null>(null);
-  readonly canOpenGmProfile = input(false);
-  readonly isGmProfileLoading = input(false);
   readonly enablePdfPreviews = input(true);
   readonly showCharacterSheets = input(true);
-
-  readonly gmProfileSelect = output<void>();
 
   readonly i18n = createSessionDetailsI18n();
   readonly characterSheetPreview = signal<IPdfPreview | null>(null);
 
   readonly imageUrl = computed(() => resolvePublicStorageUrl(this.storage, this.session().image));
 
-  readonly difficultyLabel = computed(() => {
-    const difficultyVm = resolveAltDifficultyLevel(
-      this.session().difficultyLevel,
-      this.i18n.difficulty(),
-      this.i18n.commonEmpty().title,
-    );
-
-    return difficultyVm.label;
-  });
-
-  readonly difficultyBadgeClass = computed(() => {
-    const difficultyVm = resolveAltDifficultyLevel(
-      this.session().difficultyLevel,
-      this.i18n.difficulty(),
-      this.i18n.commonEmpty().title,
-    );
-
-    return difficultyVm.badgeClass;
-  });
+  readonly difficulty = computed(() => resolveAltDifficultyLevel(
+    this.session().difficultyLevel, this.i18n.difficulty(), this.i18n.commonEmpty().title,
+  ));
 
   readonly playersLabel = computed(() => {
-    const { minPlayers, maxPlayers } = this.session();
+    const { minPlayers } = this.session();
+    const event = this.eventCapacity();
+    const maxPlayers = event ? event.gmDeclaredMaxPlayers : this.session().maxPlayers;
 
     if (minPlayers == null && maxPlayers == null) {
       return this.i18n.commonEmpty().title;
@@ -88,43 +70,6 @@ export class SessionDetails {
 
     return `${minAge}+`;
   });
-
-  readonly resolvedGmDisplayName = computed(() => {
-    const displayName = normalizeText(this.gmDisplayName());
-
-    if (displayName) {
-      return displayName;
-    }
-
-    if (this.isGmProfileLoading()) {
-      return '...';
-    }
-
-    return this.i18n.commonEmpty().title;
-  });
-
-  onGmProfileSelect(): void {
-    if (!this.canOpenGmProfile()) {
-      return;
-    }
-
-    this.gmProfileSelect.emit();
-  }
-
-  openCharacterSheetPreview(url: string | null, title: string): void {
-    if (!url) {
-      return;
-    }
-
-    this.characterSheetPreview.set({
-      title,
-      url,
-    });
-  }
-
-  closeCharacterSheetPreview(): void {
-    this.characterSheetPreview.set(null);
-  }
 
   resolveCharacterSheetUrl(path: string): string | null {
     return this.storage.getPublicUrl(path, 'docs');

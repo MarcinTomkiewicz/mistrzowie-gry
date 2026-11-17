@@ -24,8 +24,8 @@
       </span>
 
       <div class="flex-1 min-w-0 text-right">
-        <span [class]="'tag-badge ' + difficultyBadgeClass()">
-          {{ difficultyLabel() }}
+        <span [class]="'tag-badge ' + difficulty().badgeClass">
+          {{ difficulty().label }}
         </span>
       </div>
     </div>
@@ -36,29 +36,32 @@
       </span>
 
       <div class="flex-1 min-w-0 text-right">
-        @if (canOpenGmProfile()) {
-          <p-button
-            [label]="resolvedGmDisplayName()"
-            styleClass="arcane"
-            size="small"
-            [outlined]="true"
-            (onClick)="onGmProfileSelect()"
-          />
-        } @else {
-          <strong>{{ resolvedGmDisplayName() }}</strong>
-        }
+        <strong>{{ gmDisplayName()?.trim() || i18n.commonEmpty().title }}</strong>
       </div>
     </div>
 
     <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
       <span class="status-text status-text--muted basis-50 flex-shrink-0">
-        {{ i18n.list().playersHeaderLabel }}
+        {{ eventCapacity() ? i18n.eventCapacity().sourcePlayers : i18n.list().playersHeaderLabel }}
       </span>
 
       <div class="flex-1 min-w-0 text-right">
         <strong>{{ playersLabel() }}</strong>
       </div>
     </div>
+
+    @if (eventCapacity(); as event) {
+      <div class="flex-row-between-center gap-sm">
+        <span class="status-text status-text--muted basis-50 flex-shrink-0">{{ i18n.eventCapacity().capacity }}</span>
+        <strong class="text-right">{{ event.effectiveCapacity ?? i18n.commonValues().notProvided }}</strong>
+      </div>
+      @if (event.remainingSeats != null) {
+        <div class="flex-row-between-center gap-sm">
+          <span class="status-text status-text--muted basis-50 flex-shrink-0">{{ i18n.eventCapacity().remainingSeats }}</span>
+          <strong class="text-right">{{ event.remainingSeats }}</strong>
+        </div>
+      }
+    }
 
     <div class="flex-row-between-center flex-row-between-center-sm gap-sm">
       <span class="status-text status-text--muted basis-50 flex-shrink-0">
@@ -202,8 +205,8 @@
                   class="mg-card flex-col-start-stretch gap-sm p-sm cursor-pointer"
                   role="button"
                   tabindex="0"
-                  (click)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
-                  (keyup.enter)="openCharacterSheetPreview(sheetUrl, sheet.fileName)"
+                  (click)="characterSheetPreview.set({ url: sheetUrl, title: sheet.fileName })"
+                  (keyup.enter)="characterSheetPreview.set({ url: sheetUrl, title: sheet.fileName })"
                 >
                   @if (enablePdfPreviews()) {
                     <app-pdf-thumbnail
@@ -239,6 +242,6 @@
 @defer (when characterSheetPreview()) {
   <app-pdf-viewer-dialog
     [preview]="characterSheetPreview()"
-    (closed)="closeCharacterSheetPreview()"
+    (closed)="characterSheetPreview.set(null)"
   />
 }

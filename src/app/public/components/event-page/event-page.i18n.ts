@@ -13,6 +13,7 @@ import {
   createCommonAppRolesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
+import type { SessionEventCapacityTranslations } from '../../../core/types/i18n/sessions';
 import type {
   EventPageProgramTranslations,
   EventPageOfflineSeatsTranslations,
@@ -24,6 +25,7 @@ export function createEventPageI18n() {
   const transloco = inject(TranslocoService);
   return {
     page: createScopedObjectI18n<EventPageTranslations>('eventPage', 'page'),
+    sessionCapacity: createScopedObjectI18n<SessionEventCapacityTranslations>('sessions', 'eventCapacity'),
     program: createScopedObjectI18n<EventPageProgramTranslations>(
       'eventPage', 'program',
     ),

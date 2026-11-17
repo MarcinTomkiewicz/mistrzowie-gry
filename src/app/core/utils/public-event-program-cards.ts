@@ -72,7 +72,6 @@ export function createPublicEventProgramCards(
     const system = session?.system ?? null;
     return {
       id: 'activityId' in entry ? entry.activityId : entry.programItemId,
-      gmProfileId: entry.host?.userId ?? null,
       title,
       imageUrl: resolvePublicStorageUrl(storage, session?.image),
       gmDisplayName: entry.host ? entry.host.displayName || gmLabel : null,
@@ -83,7 +82,6 @@ export function createPublicEventProgramCards(
         languages: entry.session.languages,
       } : {}),
       difficultyLevel: session?.difficultyLevel ?? null,
-      minAge: session?.minAge ?? null,
       description: pending ? copy.inPreparation : null,
       isEmpty: pending,
       canOpenDetails: !pending && !activity,
@@ -92,6 +90,7 @@ export function createPublicEventProgramCards(
       slotLabel: slotKey === eventLabel || group && (slotKey === sharedLabel || slotKey === normalizeText(title)?.toLocaleLowerCase('pl-PL')) ? null : slotLabel,
       timeLabel: group ? undefined : formatPublicEventProgramTime(entry.slot, copy.dayOffset),
       sessionDetails: session ? { ...session, title, ...(system ? { system } : {}) } : null,
+      ...(session ? { eventCapacity: { effectiveCapacity: session.effectiveCapacity, gmDeclaredMaxPlayers: session.gmDeclaredMaxPlayers } } : {}),
       ...(activity ? { activity } : {}),
     };
   });

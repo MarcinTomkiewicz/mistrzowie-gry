@@ -14,6 +14,13 @@ export type PublicEventPageState =
       kind: 'ready';
       page: IPublicEventPage;
       edition: IPublicEventEdition;
+    };
+
+export type PublicEventProgramState =
+  | { kind: 'loading' | 'error' }
+  | {
+      kind: 'ready';
+      eventId: string;
       occurrences: readonly PublicEventOccurrence[];
       program: readonly PublicEventProgramEntry[];
     };

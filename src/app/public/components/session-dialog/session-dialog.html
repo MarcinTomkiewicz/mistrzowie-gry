@@ -7,30 +7,29 @@
   [closable]="true"
   appendTo="body"
   [styleClass]="'mg-dialog mg-dialog--xl'"
-  (visibleChange)="onVisibleChange($event)"
+  (visibleChange)="visibleChange.emit($event)"
 >
   @if (session(); as currentSession) {
     <app-session-details
       [session]="currentSession"
-      [gmDisplayName]="resolvedGmDisplayName()"
-      [canOpenGmProfile]="canOpenGmProfile()"
-      [isGmProfileLoading]="isGmProfileLoading()"
-      [showCharacterSheets]="showCharacterSheets()"
-      (gmProfileSelect)="openGmProfile()"
+      [eventCapacity]="eventCapacity()"
+      [gmDisplayName]="gmDisplayName()"
     />
   }
   <ng-template pTemplate="header">
     <div class="flex-row-start-center flex-wrap gap-xs">
       <h2 class="mg-section__title mg-section__title--md m-0">
-        {{ header() }}
+        {{ session()?.title ?? '' }}
       </h2>
 
-      @for (language of languageFlags(); track language.id) {
-        <i
-          [class]="language.className"
-          [attr.aria-label]="language.label"
-          [title]="language.label"
-        ></i>
+      @for (language of session()?.languages ?? []; track language.id) {
+        @if (resolveLanguageFlagClass(language.flagCode); as flagClass) {
+          <i
+            [class]="flagClass"
+            [attr.aria-label]="language.label"
+            [title]="language.label"
+          ></i>
+        }
       }
     </div>
   </ng-template>
@@ -40,15 +39,9 @@
         [label]="i18n.actions().close"
         severity="secondary"
         [outlined]="true"
-        (onClick)="close()"
+        (onClick)="visibleChange.emit(false)"
         class="mt-md"
       />
     </div>
   </ng-template>
 </p-dialog>
-
-<app-gm-profile-dialog
-  [visible]="isGmDialogVisible()"
-  [profile]="selectedProfile()"
-  (visibleChange)="onGmDialogVisibleChange($event)"
-/>

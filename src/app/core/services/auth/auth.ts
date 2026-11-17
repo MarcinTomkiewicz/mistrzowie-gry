@@ -52,12 +52,14 @@ export class Auth {
 
   private readonly _user = signal<IUser | null>(null);
   private readonly _isReady = signal(false);
+  private readonly _loadError = signal<AppAuthError | null>(null);
   private principalId: string | null | undefined;
   private principalSyncOwner: object = {};
   private principalSync$: Observable<IUser | null> | null = null;
 
-  readonly user = computed(() => this._user());
-  readonly isReady = computed(() => this._isReady());
+  readonly user = this._user.asReadonly();
+  readonly isReady = this._isReady.asReadonly();
+  readonly loadError = this._loadError.asReadonly();
   readonly isAuthenticated = computed(() => !!this._user());
   readonly appRole = computed<AppRole | null>(
     () => this._user()?.appRole ?? null,
@@ -215,10 +217,6 @@ export class Auth {
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
-  private loadProfile(id: string): Observable<IUser | null> {
-    return this.backend.getById<IUser>('users', id);
-  }
-
   private synchronizePrincipal(
     principalId?: string,
   ): Observable<IUser | null> {
@@ -233,6 +231,7 @@ export class Auth {
     this.principalSyncOwner = owner;
     this.principalSync$ = null;
     this._isReady.set(false);
+    this._loadError.set(null);
 
     if (principalId !== undefined) {
       if (principalId !== this.principalId) {
@@ -274,7 +273,7 @@ export class Auth {
 
         return nextPrincipalId === null
           ? of(null)
-          : this.loadProfile(nextPrincipalId);
+          : this.backend.getById<IUser>('users', nextPrincipalId);
       }),
       map((user) =>
         this.principalSyncOwner === owner ? user : this._user(),
@@ -295,6 +294,7 @@ export class Auth {
           : mapAuthError(error);
 
         this._user.set(null);
+        this._loadError.set(authError);
         this.authSession.refresh();
         return throwError(() => authError);
       }),
@@ -315,6 +315,7 @@ export class Auth {
     this.principalSync$ = null;
     this.principalId = user.id;
     this._user.set(user);
+    this._loadError.set(null);
     this.authSession.setHasSessionCookie(true);
     this._isReady.set(true);
   }
@@ -324,6 +325,7 @@ export class Auth {
     this.principalSync$ = null;
     this.principalId = null;
     this._user.set(null);
+    this._loadError.set(null);
     this.authSession.setHasSessionCookie(false);
     this._isReady.set(true);
   }

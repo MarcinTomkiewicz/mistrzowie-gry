@@ -7,6 +7,7 @@ import {
 import { createScopedSectionsI18n } from '../../core/translations/scoped.i18n';
 import {
   SessionFormTranslations,
+  SessionEventCapacityTranslations,
   SessionListLabelsTranslations,
   SessionSlotDifficultyTranslations,
   SessionSlotFallbacksTranslations,
@@ -18,16 +19,19 @@ export function createSessionDetailsI18n() {
     difficulty,
     list,
     commonFallbacks,
+    eventCapacity,
   } = createScopedSectionsI18n<{
     sessionForm: SessionFormTranslations;
     difficulty: SessionSlotDifficultyTranslations;
     list: SessionListLabelsTranslations;
     commonFallbacks: SessionSlotFallbacksTranslations;
+    eventCapacity: SessionEventCapacityTranslations;
   }>('sessions', {
     sessionForm: 'form',
     difficulty: 'slots.difficulty',
     list: 'list',
     commonFallbacks: 'slots.fallbacks',
+    eventCapacity: 'eventCapacity',
   });
 
   return {
@@ -35,6 +39,7 @@ export function createSessionDetailsI18n() {
     difficulty,
     list,
     commonFallbacks,
+    eventCapacity,
     commonAppRoles: createCommonAppRolesI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonLabels: createCommonLabelsI18n(),

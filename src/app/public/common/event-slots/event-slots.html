@@ -43,7 +43,7 @@
     </div>
   } @else {
     <div class="mg-grid-3 grid-content-center">
-      @for (item of displayItems(); track trackBySlot($index, item)) {
+      @for (item of displayItems(); track item.id ?? 'empty-' + $index) {
         <article
           class="mg-card flex-col-start-stretch gap-sm h-100 max-w-363"
           [class.cursor-pointer]="item.canOpenDetails"
@@ -88,11 +88,12 @@
             </div>
 
             @if (item.programStatus !== 'pending' && !item.activity) {
+              @let difficulty = resolveAltDifficultyLevel(item.difficultyLevel, i18n.difficulty(), i18n.commonEmpty().title);
               <div
                 class="tag-badge"
-                [class]="difficultyBadgeClass(item.difficultyLevel)"
+                [class]="difficulty.badgeClass"
               >
-                {{ difficultyLabel(item.difficultyLevel) }}
+                {{ difficulty.label }}
               </div>
             }
           </header>
@@ -108,7 +109,7 @@
             <div class="event-slot-card__image-wrap">
               <img
                 class="event-slot-card__image"
-                [src]="resolveImageSrc(item)"
+                [src]="item.imageUrl || placeholderImageSrc"
                 [alt]="item.title"
                 width="640"
                 height="360"

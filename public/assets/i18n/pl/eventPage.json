@@ -13,14 +13,14 @@
     "occurrenceLabel": "Termin",
     "timeToBeDetermined": "Godzina do ustalenia",
     "pending": "Oczekuje",
-    "inPreparation": "Program w przygotowaniu"
+    "inPreparation": "Program w przygotowaniu",
+    "loadFailed": "Nie możemy teraz pobrać terminów i programu wydarzenia. Spróbuj ponownie."
   },
   "offlineSeats": {
     "title": "Miejsca zajęte na miejscu",
     "online": "Miejsca zarezerwowane przez stronę",
     "offline": "Miejsca zajęte na miejscu",
     "remaining": "Wolne miejsca na stronie",
-    "capacity": "Łączna liczba miejsc",
     "add": "Zajmij miejsce",
     "remove": "Zwolnij miejsce",
     "verified": "Udało Ci się zmienić liczbę zajętych miejsc. Aktualna liczba wolnych miejsc jest już widoczna na stronie.",

@@ -6,7 +6,6 @@ import { finalize } from 'rxjs';
 
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { OccurrenceSwitcher } from '../../../common/occurrence-switcher/occurrence-switcher';
-import type { IEventSlotCardVm } from '../../../core/interfaces/i-event-slot-card';
 import type { IEventParticipantAvailability } from '../../../core/interfaces/i-event-participant';
 import { Storage } from '../../../core/services/storage/storage';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
@@ -55,60 +54,50 @@ export class EventPageProgram {
   protected readonly offline = inject(EventProgramOfflineSeats);
   protected readonly offlineDecisionPending = signal(false);
   protected readonly i18n = createEventPageI18n();
-  protected readonly formatDateLabel = formatDateLabel;
   protected readonly selectedProgramItemId = signal<string | null>(null);
   protected readonly offlineErrorMessage = computed(() => {
-    const error = this.offline.error();
-    if (error === null) return null;
+    const failure = this.offline.error();
+    if (failure === null) return null;
+    const error = failure.cause;
     const copy = this.i18n.offlineSeats().errors;
     const key = error instanceof RpcError ? offlineErrorKeys[error.message] ?? (error.code === '42501' ? 'forbidden' : 'unknown') : 'unknown';
     return copy[key];
   });
-
   protected readonly occurrenceOptions = computed(() => {
-    const state = this.facade.state();
-    return state.kind === 'ready'
-      ? state.occurrences.map((occurrence) => ({
-          ...occurrence,
-          label: formatDateLabel(occurrence.occurrenceDate, 'pl-PL', true),
-        }))
-      : [];
+    const program = this.facade.programState();
+    return program.kind === 'ready' ? program.occurrences.map(occurrence => ({
+      ...occurrence, label: formatDateLabel(occurrence.occurrenceDate, 'pl-PL', true),
+    })) : [];
   });
   protected readonly groups = computed(() => {
     const state = this.facade.state();
-    return state.kind === 'ready'
-      ? groupPublicEventProgramEntries(this.facade.selectedProgram(), this.i18n.program(), state.page.core.name).map((group) => ({
-          key: group.key,
-          label: group.label,
-          cards: createPublicEventProgramCards(
-            group.entries, this.storage,
-            this.i18n.program(), this.i18n.values().notProvided, this.i18n.roles().gm,
-            state.page.core.name, group,
-          ).map((card) => {
-            const availability = this.availability.forProgramItem(card.id);
-            return availability ? {
-              ...card,
-              participantSignup: {
-                canSignup: availability.canSignup && !this.signup.hasUncertainResult(card.id),
-                remainingSeatsLabel: this.availabilityLabel(availability),
-              },
-            } : card;
-          }),
-        }))
-      : [];
-  });
-  protected readonly displayGroups = computed(() => this.groups().map((group) => {
-    const expanded = this.expandedGroupKeys().has(group.key);
-    return {
-      ...group,
-      expanded,
-      remainingCount: Math.max(0, group.cards.length - this.collapsedCardLimit),
-      visibleCards: expanded ? group.cards : group.cards.slice(0, this.collapsedCardLimit),
-    };
-  }));
-  protected readonly profile = computed(() => {
-    const state = this.facade.profileState();
-    return state.kind === 'ready' ? state.profile : null;
+    if (state.kind !== 'ready') return [];
+    const read = this.availability.state();
+    const items = new Map(read.kind === 'ready' && !this.availability.isLoading()
+      ? read.items.map(item => [item.programItemId, item] as const) : []);
+    return groupPublicEventProgramEntries(this.facade.selectedProgram(), this.i18n.program(), state.page.core.name).map(group => {
+      const cards = createPublicEventProgramCards(group.entries, this.storage, this.i18n.program(),
+        this.i18n.values().notProvided, this.i18n.roles().gm, state.page.core.name, group).map((card, index) => {
+        const entry = group.entries[index];
+        if (entry.kind !== 'confirmed' || entry.session === null || entry.timeScope !== 'timed') return card;
+        const item = items.get(entry.programItemId);
+        if (!item || item.occurrenceId !== entry.occurrenceId) return card;
+        const uncertain = this.signup.hasUncertainResult(card.id);
+        return { ...card,
+          eventCapacity: card.eventCapacity ? { ...card.eventCapacity, remainingSeats: item.remainingSeats } : undefined,
+          participantSignup: {
+            canSignup: item.canSignup && !uncertain,
+            remainingSeatsLabel: uncertain ? this.i18n.signup().unknownResult : this.i18n.signup().availabilityStatuses[item.availabilityStatus],
+          },
+        };
+      });
+      const expanded = this.expandedGroupKeys().has(group.key);
+      return { key: group.key, label: group.label, cards, expanded,
+        sessionCount: cards.reduce((count, card) => count + (card.eventCapacity ? 1 : 0), 0),
+        remainingCount: Math.max(0, cards.length - this.collapsedCardLimit),
+        visibleCards: expanded ? cards : cards.slice(0, this.collapsedCardLimit),
+      };
+    });
   });
   protected readonly selectedCard = computed(() => this.groups().flatMap(group => group.cards).find(card =>
     card.id === this.selectedProgramItemId() && card.canOpenDetails,
@@ -122,17 +111,28 @@ export class EventPageProgram {
 
   private readonly offlineErrorEffect = effect(() => {
     const error = this.offline.error();
-    if (error !== null) this.errorHandler.handleError(error);
+    if (error !== null) {
+      this.errorHandler.handleError(error.cause);
+      if (error.programItemId === null) this.toast.danger({ summary: this.offlineErrorMessage() ?? this.i18n.errors().generic });
+    }
+  });
+
+  private readonly availabilityErrorEffect = effect(() => {
+    const state = this.availability.state();
+    if (state.kind === 'error') {
+      this.errorHandler.handleError(state.cause);
+      this.toast.danger({ summary: this.i18n.signup().availabilityReadFailed });
+    }
   });
 
   protected toggleGroup(key: string): void {
     const group = this.groups().find((group) => group.key === key);
     if (!group || group.cards.length <= this.collapsedCardLimit) return;
 
-    const expanded = this.expandedGroupKeys().has(key);
+    const expanded = group.expanded;
     const selectedId = this.selectedProgramItemId();
-    if (expanded && selectedId !== null && group.cards.slice(this.collapsedCardLimit)
-      .some((card) => card.id === selectedId)) {
+    if (expanded && selectedId !== null && group.cards
+      .some((card, index) => index >= this.collapsedCardLimit && card.id === selectedId)) {
       this.selectedProgramItemId.set(null);
     }
     this.expandedGroupKeys.update((current) => {
@@ -143,20 +143,10 @@ export class EventPageProgram {
     });
   }
 
-  protected selectOccurrence(index: number): void {
-    if (!this.signup.isSubmitting() && !this.offline.locked()) this.signup.selectOccurrence(index);
-  }
-
   protected availabilityLabel(item: IEventParticipantAvailability): string {
     if (item.availabilityStatus !== 'available') return this.i18n.signup().availabilityStatuses[item.availabilityStatus];
     return item.isUnlimited ? this.i18n.signup().unlimitedSeats : item.remainingSeats !== null
       ? this.i18n.remainingSeats(item.remainingSeats) : this.i18n.signup().availabilityStatuses[item.availabilityStatus];
-  }
-
-  protected offlineSessionLabel(programItemId: string): string {
-    const page = this.facade.state();
-    const entry = page.kind === 'ready' ? page.program.find(item => item.kind === 'confirmed' && item.programItemId === programItemId) : null;
-    return entry?.kind === 'confirmed' && entry.session?.title ? entry.session.title : programItemId;
   }
 
   protected endOfflineReadback(): void {
@@ -168,10 +158,6 @@ export class EventPageProgram {
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.offlineDecisionPending.set(false))).subscribe(accepted => {
       if (accepted && this.offline.operation() === operation) this.offline.endReadback();
     });
-  }
-
-  protected selectSession(card: IEventSlotCardVm): void {
-    if (card.canOpenDetails && card.sessionDetails && card.id) this.selectedProgramItemId.set(card.id);
   }
 
   private readonly profileErrorEffect = effect(() => {

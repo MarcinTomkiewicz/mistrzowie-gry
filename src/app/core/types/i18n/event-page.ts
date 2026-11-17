@@ -15,10 +15,11 @@ export type EventPageProgramTranslations = {
   timeToBeDetermined: string;
   pending: string;
   inPreparation: string;
+  loadFailed: string;
 };
 
 export type EventPageOfflineSeatsTranslations = Record<
-  'title' | 'online' | 'offline' | 'remaining' | 'capacity' | 'add' | 'remove' | 'verified' |
+  'title' | 'online' | 'offline' | 'remaining' | 'add' | 'remove' | 'verified' |
   'readbackPending' | 'uncertain' | 'endReadback' | 'endReadbackQuestion' | 'endReadbackWarning' | 'readbackEnded', string
 > & {
   errors: Record<'forbidden' | 'invalid' | 'notFound' | 'notBookable' | 'capacityUnavailable' | 'empty' | 'capacityExceeded' | 'unknown', string>;
