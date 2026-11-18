@@ -1,0 +1,67 @@
+name: Supabase PostgreSQL contract snapshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      application_schemas:
+        description: Comma-separated application schemas; unexpected non-platform schemas block publication
+        required: true
+        default: public
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout snapshot scripts
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Export and validate read-only contract
+        shell: bash
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLICATION_SCHEMAS: ${{ inputs.application_schemas }}
+          SNAPSHOT_DIRECTORY: ${{ runner.temp }}/db-contract-snapshot
+          PGCONNECT_TIMEOUT: "15"
+          PGSSLMODE: require
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          node scripts/db-contract-snapshot.mjs
+
+      # upload-artifact packages this validated directory into one downloadable ZIP.
+      - name: Publish validated snapshot ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-contract-snapshot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/db-contract-snapshot/
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Report result
+        if: always()
+        shell: bash
+        env:
+          SNAPSHOT_JOB_STATUS: ${{ job.status }}
+        run: |
+          if [[ "$SNAPSHOT_JOB_STATUS" == "success" ]]; then
+            echo "PASS: Complete, validated contract snapshot published."
+            echo "PASS: Download the snapshot ZIP from this run's Artifacts section." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "FAIL: Contract snapshot was not published successfully."
+            echo "FAIL: See the safe export diagnostics; do not use a failed run as a complete snapshot." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
