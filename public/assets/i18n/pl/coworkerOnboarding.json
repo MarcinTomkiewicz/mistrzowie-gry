@@ -2,10 +2,16 @@
   "adminList": {
     "title": "Onboarding współpracowników",
     "subtitle": "Rozpoczynaj onboarding i sprawdzaj postęp dokumentów współpracowników. [PH]",
-    "startDescription": "Wybierz współpracownika z rolą Mistrz Gry lub wyższą, który nie ma aktywnego onboardingu. [PH]",
-    "noCandidates": "Brak współpracowników z rolą Mistrz Gry lub wyższą dostępnych do rozpoczęcia onboardingu. [PH]",
     "empty": "Nie rozpoczęto jeszcze żadnego onboardingu.",
-    "loadError": "Nie udało się pobrać listy onboardingów."
+    "loadError": "Nie udało się pobrać listy onboardingów.",
+    "filteredEmpty": "Brak onboardingów pasujących do filtrów.",
+    "notStarted": "Nie rozpoczęto [PH]",
+    "filters": {
+      "searchLabel": "Szukaj po imieniu, pseudonimie lub e-mailu",
+      "allStatuses": "Wszystkie statusy",
+      "pendingOnly": "Tylko z oczekującymi działaniami",
+      "showCompleted": "Pokaż zakończone"
+    }
   },
   "adminDetail": {
     "title": "Szczegóły onboardingu",
@@ -58,7 +64,7 @@
     "acknowledgement": "Potwierdzam zapoznanie się z dokumentem."
   },
   "actions": {
-    "start": "Rozpocznij onboarding",
+    "start": "Rozpocznij",
     "open": "Otwórz",
     "download": "Pobierz",
     "previewSigned": "Podgląd podpisanej kopii",

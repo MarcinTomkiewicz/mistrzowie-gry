@@ -8,7 +8,7 @@ const loaders = {
   onboardingList: () =>
     import(
       '../components/admin-coworker-onboarding/onboarding-list/onboarding-list'
-    ).then((m) => m.CoworkerOnboardingList),
+    ).then((m) => m.OnboardingList),
   onboardingDetail: () =>
     import(
       '../components/admin-coworker-onboarding/onboarding-detail/coworker-onboarding-detail'

@@ -1,4 +1,8 @@
-<div class="flex-col-start-stretch gap-lg w-100 position-relative">
+@let copy = i18n.adminList();
+@let copyReady = !!(copy.filters && i18n.statuses().onboarding);
+
+<div class="flex-col-start-stretch gap-md w-100 min-w-0 position-relative"
+  [attr.aria-busy]="loading() || saving() || !copyReady">
   <header class="mg-section__header w-100">
     <h2 class="mg-section__title mg-section__title--md">
       {{ i18n.adminList().title }}
@@ -9,110 +13,123 @@
   </header>
 
   <app-loading-overlay
-    [visible]="loading() || saving()"
+    [visible]="loading() || saving() || !copyReady"
     [label]="saving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
   />
 
-  <section class="mg-card flex-col-start-stretch gap-md w-100">
-    <div class="flex-col-start-stretch gap-xs">
-      <h3 class="mg-section__title mg-section__title--sm m-0">
-        {{ i18n.actions().start }}
-      </h3>
-      <p class="m-0 muted-text">{{ i18n.adminList().startDescription }}</p>
-    </div>
-
-    @if (candidateOptions().length) {
-      <div class="flex-row-start-end flex-wrap gap-sm w-100">
-        <p-iftalabel class="w-100 max-w-500">
-          <p-select
-            class="w-100"
-            inputId="coworker-onboarding-user"
-            [formControl]="coworkerControl"
-            [options]="candidateOptions()"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-          />
-          <label for="coworker-onboarding-user">{{ i18n.commonLabels().coworker }}</label>
-        </p-iftalabel>
-
-        <p-button
-          [label]="i18n.actions().start"
-          icon="pi pi-play"
-          [disabled]="!coworkerControl.value || saving()"
-          (onClick)="start()"
-        />
-      </div>
-    } @else if (!loading() && !loadFailed()) {
-      <p class="m-0 muted-text">{{ i18n.adminList().noCandidates }}</p>
-    }
-  </section>
-
-  @if (loadFailed()) {
-    <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+  @if (copyReady && loadFailed()) {
+    <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
       <p class="m-0 error-text">{{ i18n.adminList().loadError }}</p>
       <p-button
+        type="button"
         severity="secondary"
         icon="pi pi-refresh"
         [label]="i18n.commonActions().retry"
         (onClick)="load()"
       />
     </section>
-  } @else if (onboardings().length) {
+  } @else if (copyReady && rows().length) {
+    <form [formGroup]="filterForm" novalidate
+      class="mg-card flex-row-start-center flex-wrap gap-sm p-md w-100">
+      <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
+        <input pInputText pSize="small" type="search" class="w-100" id="onboarding-search"
+          formControlName="searchText" />
+        <label for="onboarding-search">{{ i18n.adminList().filters.searchLabel }}</label>
+      </p-floatlabel>
+      <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
+        inputId="onboarding-status" formControlName="status"
+        [options]="statusOptions()" optionLabel="label" optionValue="value" appendTo="body"
+        [ariaLabel]="i18n.commonLabels().status" (onChange)="onStatusChange()" />
+      <div class="flex-row-start-center gap-sm flex-none w-100-sm">
+        <p-toggleswitch inputId="onboarding-pending-only" formControlName="pendingOnly" />
+        <label for="onboarding-pending-only">{{ i18n.adminList().filters.pendingOnly }}</label>
+      </div>
+      <div class="flex-row-start-center gap-sm flex-none w-100-sm">
+        <p-toggleswitch inputId="onboarding-show-completed" formControlName="showCompleted"
+          (onChange)="onShowCompletedChange()" />
+        <label for="onboarding-show-completed">{{ i18n.adminList().filters.showCompleted }}</label>
+      </div>
+    </form>
+
     <div class="w-100 overflow-x-auto">
-      <p-table [value]="onboardings()" dataKey="onboarding_id" class="w-100 min-w-500">
+      <p-table class="w-100" [value]="filteredRows()" dataKey="id" tableStyleClass="mg-responsive-table"
+        [customSort]="true" [sortField]="sortField()" [sortOrder]="sortOrder()" (sortFunction)="onSort($event)">
         <ng-template #header>
-          <tr>
-            <th>{{ i18n.commonLabels().coworker }}</th>
-            <th>{{ i18n.commonLabels().status }}</th>
-            <th>{{ i18n.fields().startedAt }}</th>
-            <th>{{ i18n.fields().completedAt }}</th>
-            <th class="text-center">{{ i18n.fields().documents }}</th>
-            <th class="text-center">{{ i18n.fields().pendingActions }}</th>
-            <th class="text-right">{{ i18n.commonTable().actions }}</th>
+          <tr class="hide-down-sm">
+            <th scope="col" class="small-caps" pSortableColumn="displayName">
+              {{ i18n.commonLabels().coworker }} <p-sortIcon field="displayName" />
+            </th>
+            <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+            <th scope="col" class="small-caps">{{ i18n.fields().startedAt }}</th>
+            <th scope="col" class="small-caps">{{ i18n.fields().completedAt }}</th>
+            <th scope="col" class="small-caps text-center">{{ i18n.fields().documents }}</th>
+            <th scope="col" class="small-caps text-center" pSortableColumn="pendingActions">
+              {{ i18n.fields().pendingActions }} <p-sortIcon field="pendingActions" />
+            </th>
+            <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
           </tr>
         </ng-template>
-
+        <ng-template #sorticon let-sortOrder>
+          <i class="pi warn-text" [class.pi-ascending]="sortOrder === 1"
+            [class.pi-descending]="sortOrder !== 1" aria-hidden="true"></i>
+        </ng-template>
         <ng-template #body let-row>
-          <tr>
-            <td>
+          <tr class="mg-responsive-table__row">
+            <th scope="row" class="mg-responsive-table__row-heading">
               <div class="flex-col-start-start gap-xs">
-                <strong>
-                  {{
-                    getUserDisplayName({
-                      firstName: row.first_name,
-                      nickname: row.nickname,
-                      useNickname: row.use_nickname,
-                    }) || row.email
-                  }}
-                </strong>
-                <small>{{ row.email }}</small>
+                <strong>{{ row.displayName }}</strong>
+                <small>{{ row.person.email }}</small>
               </div>
-            </td>
-            <td>
-              @let status = asOnboardingStatus(row.status);
-              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[status]">
-                {{ i18n.statuses().onboarding[status] }}
+            </th>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
+              <span class="mg-responsive-table__value">
+                <span [class]="row.statusBadgeClass">{{ row.statusLabel }}</span>
               </span>
             </td>
-            <td>{{ formatTimestampLabel(row.started_at) }}</td>
-            <td>{{ formatTimestampLabel(row.completed_at) }}</td>
-            <td class="text-center">{{ row.private_document_count }}</td>
-            <td class="text-center">{{ row.pending_private_action_count }}</td>
-            <td class="text-right">
-              <p-button
-                size="small"
-                icon="pi pi-arrow-right"
-                [label]="i18n.actions().open"
-                (onClick)="open(row.onboarding_id)"
-              />
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().startedAt }}</span>
+              <span class="mg-responsive-table__value">{{ row.startedAtLabel }}</span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().completedAt }}</span>
+              <span class="mg-responsive-table__value">{{ row.completedAtLabel }}</span>
+            </td>
+            <td class="mg-responsive-table__cell text-center">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().documents }}</span>
+              <span class="mg-responsive-table__value">{{ row.documentCount }}</span>
+            </td>
+            <td class="mg-responsive-table__cell text-center">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().pendingActions }}</span>
+              <span class="mg-responsive-table__value">{{ row.pendingActions }}</span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+              <div class="mg-responsive-table__value flex-col-start-end gap-xs">
+                @if (row.onboarding) {
+                  <p-button type="button" size="small" icon="pi pi-horus" styleClass="w-100"
+                    [label]="i18n.actions().open" [disabled]="loading() || saving()"
+                    (onClick)="open(row.onboarding.onboarding_id)" />
+                } @else {
+                  <p-button type="button" size="small" icon="pi pi-settings" styleClass="w-100"
+                    [label]="i18n.actions().start" [disabled]="loading() || saving()"
+                    (onClick)="start(row.person.user_id)" />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="7">
+              <p class="m-0 muted-text" role="status">{{ i18n.adminList().filteredEmpty }}</p>
             </td>
           </tr>
         </ng-template>
       </p-table>
     </div>
-  } @else if (!loading()) {
-    <section class="mg-card w-100">
+  } @else if (copyReady && !loading()) {
+    <section class="mg-card w-100" role="status">
       <p class="m-0 muted-text">{{ i18n.adminList().empty }}</p>
     </section>
   }

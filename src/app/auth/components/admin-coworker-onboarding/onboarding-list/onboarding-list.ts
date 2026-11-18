@@ -1,12 +1,16 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
+import type { SortEvent } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { IftaLabelModule } from 'primeng/iftalabel';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
-import { finalize, forkJoin } from 'rxjs';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { finalize, forkJoin, map } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import type {
@@ -24,51 +28,144 @@ import { formatTimestampLabel } from '../../../../core/utils/date';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 
+type OnboardingListRow = {
+  readonly id: string;
+  readonly person: IAdminCoworkerOnboardingRow | IAdminCoworkerOnboardingCandidate;
+  readonly onboarding: IAdminCoworkerOnboardingRow | null;
+  readonly displayName: string;
+  readonly status: CoworkerOnboardingLifecycleStatus | 'not_started';
+  readonly statusLabel: string;
+  readonly statusBadgeClass: string;
+  readonly startedAtLabel: string | null;
+  readonly completedAtLabel: string | null;
+  readonly documentCount: number;
+  readonly pendingActions: number;
+};
+
 @Component({
   selector: 'app-coworker-onboarding-list',
   standalone: true,
   imports: [
     ReactiveFormsModule,
     ButtonModule,
-    IftaLabelModule,
+    FloatLabelModule,
+    InputTextModule,
     SelectModule,
     TableModule,
+    ToggleSwitchModule,
     LoadingOverlay,
   ],
   templateUrl: './onboarding-list.html',
   providers: [provideTranslocoScope(COWORKER_ONBOARDING_SCOPE, 'common')],
 })
-export class CoworkerOnboardingList {
+export class OnboardingList {
   private readonly api = inject(AdminCoworkerOnboarding);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
 
   protected readonly i18n = createCoworkerOnboardingI18n();
-  protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
-  protected readonly formatTimestampLabel = formatTimestampLabel;
-  protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly onboardings = signal<IAdminCoworkerOnboardingRow[]>([]);
   protected readonly candidates =
     signal<readonly IAdminCoworkerOnboardingCandidate[]>([]);
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly loadFailed = signal(false);
-  protected readonly coworkerControl = new FormControl<string | null>(null);
-
-  protected readonly candidateOptions = computed(() =>
-    this.candidates().map((candidate) => ({
-      value: candidate.user_id,
-      label:
-        getUserDisplayName({
-          firstName: candidate.first_name,
-          nickname: candidate.nickname,
-          useNickname: candidate.use_nickname,
-        }) || candidate.email,
-    })),
+  protected readonly sortField = signal<'displayName' | 'pendingActions'>('displayName');
+  protected readonly sortOrder = signal<1 | -1>(1);
+  protected readonly filterForm = new FormGroup({
+    searchText: new FormControl('', { nonNullable: true }),
+    status: new FormControl<OnboardingListRow['status'] | 'all'>('all', {
+      nonNullable: true,
+    }),
+    pendingOnly: new FormControl(false, { nonNullable: true }),
+    showCompleted: new FormControl(true, { nonNullable: true }),
+  });
+  private readonly filterValue = toSignal(
+    this.filterForm.valueChanges.pipe(map(() => this.filterForm.getRawValue())),
+    { initialValue: this.filterForm.getRawValue() },
   );
+
+  protected readonly statusOptions = computed(() => [
+    { value: 'all', label: this.i18n.adminList().filters.allStatuses },
+    { value: 'not_started', label: this.i18n.adminList().notStarted },
+    ...(['in_progress', 'completed', 'cancelled'] as const).map((value) => ({
+      value,
+      label: this.i18n.statuses().onboarding[value],
+    })),
+  ]);
+
+  protected readonly rows = computed(() => {
+    const onboardings = this.onboardings();
+    const onboardingUsers = new Set(onboardings.map((row) => row.user_id));
+
+    return [
+      ...onboardings.map((row) => this.createRowVm(row, row)),
+      ...this.candidates()
+        .filter((candidate) => !onboardingUsers.has(candidate.user_id))
+        .map((candidate) => this.createRowVm(candidate, null)),
+    ];
+  });
+
+  protected readonly filteredRows = computed(() => {
+    const filters = this.filterValue();
+    const query = filters.searchText.trim().toLowerCase();
+    const field = this.sortField();
+    const direction = this.sortOrder();
+
+    return this.rows()
+      .filter(
+        (row) =>
+          (!query ||
+            [row.person.first_name, row.person.nickname, row.person.email].some((value) =>
+              value?.toLowerCase().includes(query),
+            )) &&
+          (filters.status === 'all' || row.status === filters.status) &&
+          (!filters.pendingOnly || row.pendingActions > 0) &&
+          (filters.showCompleted || row.status !== 'completed'),
+      )
+      .sort((left, right) => {
+        const byName = left.displayName.localeCompare(right.displayName, 'pl');
+        const primary =
+          field === 'pendingActions'
+            ? left.pendingActions - right.pendingActions
+            : byName;
+
+        return (
+          primary * direction ||
+          byName ||
+          left.id.localeCompare(right.id, 'en')
+        );
+      });
+  });
 
   constructor() {
     this.load();
+  }
+
+  protected onSort(event: SortEvent): void {
+    if (
+      (event.field === 'displayName' || event.field === 'pendingActions') &&
+      (event.order === 1 || event.order === -1)
+    ) {
+      this.sortField.set(event.field);
+      this.sortOrder.set(event.order);
+    }
+  }
+
+  protected onStatusChange(): void {
+    const { status, showCompleted } = this.filterForm.controls;
+
+    if (status.value === 'completed' && !showCompleted.value) {
+      showCompleted.setValue(true);
+    }
+  }
+
+  protected onShowCompletedChange(): void {
+    const { status, showCompleted } = this.filterForm.controls;
+
+    if (!showCompleted.value && status.value === 'completed') {
+      status.setValue('all');
+    }
   }
 
   protected load(): void {
@@ -87,16 +184,13 @@ export class CoworkerOnboardingList {
         },
         error: () => {
           this.candidates.set([]);
-          this.coworkerControl.reset();
           this.loadFailed.set(true);
         },
       });
   }
 
-  protected start(): void {
-    const userId = this.coworkerControl.value;
-
-    if (!userId) {
+  protected start(userId: string): void {
+    if (this.loading() || this.saving()) {
       return;
     }
 
@@ -117,10 +211,31 @@ export class CoworkerOnboardingList {
     void this.router.navigate(['/admin/coworkers/onboarding', onboardingId]);
   }
 
-  protected asOnboardingStatus(
-    status: CoworkerOnboardingLifecycleStatus,
-  ): CoworkerOnboardingLifecycleStatus {
-    return status;
+  private createRowVm(
+    person: OnboardingListRow['person'],
+    onboarding: IAdminCoworkerOnboardingRow | null,
+  ): OnboardingListRow {
+    return {
+      id: onboarding?.onboarding_id ?? `candidate:${person.user_id}`,
+      person,
+      onboarding,
+      displayName: getUserDisplayName({
+        firstName: person.first_name,
+        nickname: person.nickname,
+        useNickname: person.use_nickname,
+      }) || person.email || '',
+      status: onboarding?.status ?? 'not_started',
+      statusLabel: onboarding
+        ? this.i18n.statuses().onboarding[onboarding.status]
+        : this.i18n.adminList().notStarted,
+      statusBadgeClass: `tag-badge ${
+        onboarding ? STATUS_BADGE_CLASS[onboarding.status] : 'tag-badge--muted'
+      }`,
+      startedAtLabel: formatTimestampLabel(onboarding?.started_at),
+      completedAtLabel: formatTimestampLabel(onboarding?.completed_at),
+      documentCount: onboarding?.private_document_count ?? 0,
+      pendingActions: onboarding?.pending_private_action_count ?? 0,
+    };
   }
 
   private showSuccess(): void {

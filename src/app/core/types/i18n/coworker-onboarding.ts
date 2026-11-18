@@ -6,10 +6,16 @@ import type {
 export interface CoworkerOnboardingAdminListTranslations {
   title: string;
   subtitle: string;
-  startDescription: string;
-  noCandidates: string;
   empty: string;
   loadError: string;
+  filteredEmpty: string;
+  notStarted: string;
+  filters: {
+    searchLabel: string;
+    allStatuses: string;
+    pendingOnly: string;
+    showCompleted: string;
+  };
 }
 
 export interface CoworkerOnboardingAdminDetailTranslations {
