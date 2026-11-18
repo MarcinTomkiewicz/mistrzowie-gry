@@ -11,7 +11,7 @@ import { openSnapshot, runSafe, SnapshotFailure } from './db-contract-process.mj
 const PLATFORM_SCHEMAS = new Set([
   'auth', 'storage', 'extensions', 'graphql', 'graphql_public', 'realtime',
   'supabase_functions', 'supabase_migrations', 'vault', 'pgsodium', 'pgsodium_masks',
-  'net', 'cron', '_analytics', '_realtime', '_supavisor', 'supavisor',
+  'net', 'cron', '_analytics', '_realtime', '_supavisor', 'supavisor', 'pgbouncer',
 ]);
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const readSql = (name) => readFileSync(join(scriptDirectory, name), 'utf8');

@@ -6,7 +6,7 @@ on:
       application_schemas:
         description: Comma-separated application schemas; unexpected non-platform schemas block publication
         required: true
-        default: public
+        default: public,private
         type: string
 
 permissions:
