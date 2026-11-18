@@ -1,0 +1,45 @@
+name: Test Supabase PostgreSQL connection
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  test-db-connection:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+
+    steps:
+      - name: Test PostgreSQL authentication (read-only)
+        shell: bash
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGCONNECT_TIMEOUT: "15"
+          PGSSLMODE: require
+        run: |
+          set +x
+          set -euo pipefail
+
+          if [[ -z "$SUPABASE_DB_URL" ]]; then
+            echo "FAIL: GitHub Secret SUPABASE_DB_URL is missing or empty."
+            exit 1
+          fi
+
+          if ! command -v psql >/dev/null 2>&1; then
+            echo "FAIL: PostgreSQL client (psql) is unavailable."
+            exit 1
+          fi
+
+          if timeout 30s psql \
+            --dbname="$SUPABASE_DB_URL" \
+            --no-psqlrc \
+            --no-password \
+            --set=ON_ERROR_STOP=1 \
+            --command='BEGIN READ ONLY; SELECT 1; ROLLBACK;' \
+            >/dev/null 2>&1; then
+            echo "PASS: PostgreSQL authentication and read-only query succeeded."
+          else
+            echo "FAIL: PostgreSQL connection or read-only query failed. Connection details are hidden."
+            exit 1
+          fi
