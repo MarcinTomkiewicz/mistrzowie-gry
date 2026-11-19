@@ -17,7 +17,7 @@ const FORBIDDEN_CONTENT = [
   /\b(?:password|passwd|api[_-]?key|secret|token)\s*(?:=|:=|:)\s*["'][^"']{4,}["']/i,
 ];
 
-export function verifyNoCredentials(text, connection) {
+export function verifyNoCredentials(text, connection, source) {
   const url = new URL(connection);
   const password = decodeURIComponent(url.password);
   const querySecrets = [...url.searchParams].filter(([key]) => /password|secret|token|key/i.test(key)).map(([, value]) => value);
@@ -26,8 +26,12 @@ export function verifyNoCredentials(text, connection) {
     value, JSON.stringify(value).slice(1, -1), value.replaceAll("'", "''"),
     Buffer.from(value).toString('base64'), Buffer.from(value).toString('hex'),
   ]);
-  if (variants.some((value) => text.includes(value)) || FORBIDDEN_CONTENT.some((rule) => rule.test(text))) {
-    throw new SnapshotFailure('Credential/connection-string check failed; nothing will be published.');
+  if (variants.some((value) => text.includes(value))) {
+    throw new SnapshotFailure(`${source}: actual credential value detected.`);
+  }
+  const ruleIndex = FORBIDDEN_CONTENT.findIndex((rule) => rule.test(text));
+  if (ruleIndex !== -1) {
+    throw new SnapshotFailure(`${source}: heuristic rule ${ruleIndex + 1} matched.`);
   }
 }
 
@@ -44,9 +48,14 @@ export async function sealArtifact(directory, manifest, connection) {
   const expectedHashes = new Map(files.sort().map((name) => [name, sha256(name)]));
   writeFileSync(`${directory}/SHA256SUMS.txt`, [...expectedHashes].map(([name, hash]) => `${hash}  ${name}\n`).join(''), { mode: 0o600 });
 
+  const diagnosticNames = new Set([
+    'schema.sql', 'schema-inventory.json', 'manifest.json',
+    ...Object.keys(manifest.recordCounts).map((name) => `${name}.json`),
+  ]);
   for (const name of readdirSync(directory)) {
     if (!lstatSync(`${directory}/${name}`).isFile()) throw new SnapshotFailure('Unexpected artifact entry.');
-    verifyNoCredentials(readFileSync(`${directory}/${name}`, 'utf8'), connection);
+    const source = diagnosticNames.has(name) ? name : 'artifact validation';
+    verifyNoCredentials(readFileSync(`${directory}/${name}`, 'utf8'), connection, source);
   }
 
   await runSafe('docker', ['pull', '--quiet', SCANNER_IMAGE], 'Secret scanner installation');

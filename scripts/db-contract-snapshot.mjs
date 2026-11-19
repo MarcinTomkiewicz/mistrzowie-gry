@@ -58,7 +58,7 @@ async function exportSchema(connection, inventory, schemas, major) {
     ...schemas.map((name) => `--schema="${name}"`), '--schema=auth', '--schema=storage',
   ], 'Schema export (all warnings are fatal)');
   if (!schemaSql.includes('PostgreSQL database dump complete')) throw new SnapshotFailure('Schema export is incomplete.');
-  verifyNoCredentials(schemaSql, connection);
+  verifyNoCredentials(schemaSql, connection, 'schema.sql');
   return { schemaSql, clientVersion };
 }
 
@@ -130,8 +130,11 @@ async function main() {
 main().catch((error) => {
   let message = error instanceof SnapshotFailure ? error.message : 'Unexpected export failure; raw diagnostics suppressed.';
   if (process.env.SUPABASE_DB_URL) {
-    try { verifyNoCredentials(message, process.env.SUPABASE_DB_URL); }
-    catch { message = 'Export failed; sensitive diagnostics suppressed.'; }
+    try { verifyNoCredentials(message, process.env.SUPABASE_DB_URL, 'error diagnostics'); }
+    catch (scanError) {
+      message = scanError instanceof SnapshotFailure
+        ? scanError.message : 'Export failed; sensitive diagnostics suppressed.';
+    }
   }
   console.error(`FAIL: ${message}`);
   process.exitCode = 1;
