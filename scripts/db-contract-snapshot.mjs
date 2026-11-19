@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, w
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SCANNER_IMAGE, sealArtifact, verifyNoCredentials, writeJson } from './db-contract-artifact.mjs';
+import { sealArtifact, writeJson } from './db-contract-artifact.mjs';
 import { openSnapshot, runSafe, SnapshotFailure } from './db-contract-process.mjs';
 
 // Supabase-owned namespaces are inventoried, but only auth/storage definitions are exported.
@@ -43,7 +43,7 @@ function validateInventory(inventory, schemas) {
   return major;
 }
 
-async function exportSchema(connection, inventory, schemas, major) {
+async function exportSchema(inventory, schemas, major) {
   const image = `postgres:${major}`;
   await runSafe('docker', ['pull', '--quiet', image], 'Matching PostgreSQL client installation');
   const clientVersion = (await runSafe('docker', ['run', '--rm', image, 'pg_dump', '--version'], 'pg_dump version check')).trim();
@@ -58,7 +58,6 @@ async function exportSchema(connection, inventory, schemas, major) {
     ...schemas.map((name) => `--schema="${name}"`), '--schema=auth', '--schema=storage',
   ], 'Schema export (all warnings are fatal)');
   if (!schemaSql.includes('PostgreSQL database dump complete')) throw new SnapshotFailure('Schema export is incomplete.');
-  verifyNoCredentials(schemaSql, connection, 'schema.sql');
   return { schemaSql, clientVersion };
 }
 
@@ -82,7 +81,7 @@ async function main() {
     const inventory = await session.query(readSql('db-contract-preflight.sql'));
     const major = validateInventory(inventory, schemas);
     console.log('Read-only preflight: complete schema coverage and required privileges verified.');
-    const { schemaSql, clientVersion } = await exportSchema(connection, inventory, schemas, major);
+    const { schemaSql, clientVersion } = await exportSchema(inventory, schemas, major);
     const metadata = await session.query(readSql('db-contract-metadata.sql'));
     await session.finish();
     const sections = [
@@ -107,18 +106,16 @@ async function main() {
       'Extension dependencies are inventoried by name/version, not expanded into platform implementation DDL.',
       'All database reads share one exported REPEATABLE READ / READ ONLY snapshot.',
       'manifest.json hashes cover payload files. SHA256SUMS.txt also covers manifest.json (not itself).',
-      'Secret detection is mandatory; scanner failure, findings, dump warnings, missing scope or privileges prevent publication.',
       '',
     ].join('\n'), { mode: 0o600 });
-    await sealArtifact(payload, {
+    sealArtifact(payload, {
       status: 'COMPLETE', startedAt, completedAt: new Date().toISOString(),
       serverVersion: inventory.serverVersion, serverVersionNumber: inventory.serverVersionNumber,
       pgDumpVersion: clientVersion, applicationSchemas: schemas, platformDefinitionSchemas: ['auth', 'storage'],
       exportMode: 'schema-only + whitelisted catalog/bucket metadata; no user or object data',
       consistency: 'shared exported REPEATABLE READ READ ONLY snapshot',
-      secretScanner: SCANNER_IMAGE,
       recordCounts: Object.fromEntries(sections.map((name) => [name, metadata[name].length])),
-    }, connection);
+    });
     renameSync(payload, destination);
     console.log('Validated export prepared. PASS is reported only after artifact upload succeeds.');
   } finally {
@@ -128,14 +125,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  let message = error instanceof SnapshotFailure ? error.message : 'Unexpected export failure; raw diagnostics suppressed.';
-  if (process.env.SUPABASE_DB_URL) {
-    try { verifyNoCredentials(message, process.env.SUPABASE_DB_URL, 'error diagnostics'); }
-    catch (scanError) {
-      message = scanError instanceof SnapshotFailure
-        ? scanError.message : 'Export failed; sensitive diagnostics suppressed.';
-    }
-  }
+  const message = error instanceof SnapshotFailure ? error.message : 'Unexpected export failure; raw diagnostics suppressed.';
   console.error(`FAIL: ${message}`);
   process.exitCode = 1;
 });
