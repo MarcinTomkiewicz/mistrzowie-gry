@@ -3,6 +3,7 @@
     "title": "Wdrożenie współpracowników",
     "subtitle": "Rozpoczynaj wdrożenie nowych współpracowników i sprawdzaj postęp ich dokumentów oraz potwierdzeń.",
     "empty": "Nie rozpoczęto jeszcze wdrożenia żadnego współpracownika.",
+    "emptyVisible": "Nie ma wdrożeń do wyświetlenia. [PH]",
     "loadError": "Nie udało się wczytać listy wdrożeń współpracowników. Spróbuj ponownie.",
     "filteredEmpty": "Żaden współpracownik nie pasuje do wybranych filtrów.",
     "notStarted": "Nie rozpoczęto",
@@ -87,6 +88,7 @@
     "reject": "Odrzuć",
     "removeDocument": "Usuń dokument",
     "complete": "Zakończ wdrożenie",
+    "cancelOnboarding": "Anuluj wdrożenie [PH]",
     "uploadDocuments": "Prześlij dokumenty",
     "uploadSigned": "Prześlij podpisany dokument",
     "saveShared": "Dodaj dokument",
@@ -110,6 +112,7 @@
     "rejectionDescription": "Wyjaśnij, dlaczego odrzucasz przesłaną kopię. Współpracownik zobaczy podany powód.",
     "removeMessage": "Czy na pewno chcesz usunąć ten dokument wraz z jego plikami?",
     "completeMessage": "Czy na pewno chcesz zakończyć wdrożenie tego współpracownika?",
+    "cancelOnboardingMessage": "Czy na pewno chcesz anulować wdrożenie tego współpracownika? Anulowanego wdrożenia nie można wznowić. Oczekujące przypisania dokumentów zostaną wycofane. Dokumenty, konto i historia zostaną zachowane. [PH]",
     "archiveMessage": "Czy na pewno chcesz zarchiwizować ten dokument wspólny?"
   },
   "toast": {

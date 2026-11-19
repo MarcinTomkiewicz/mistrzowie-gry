@@ -25,7 +25,10 @@ import {
   COWORKER_ONBOARDING_SCOPE,
   createCoworkerOnboardingI18n,
 } from '../../../../core/translations/coworker-onboarding.i18n';
-import type { CoworkerDocumentReviewDecision } from '../../../../core/types/coworker-onboarding';
+import type {
+  CoworkerDocumentDownloadTarget,
+  CoworkerDocumentReviewDecision,
+} from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { stablePartition } from '../../../../core/utils/stable-partition';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
@@ -61,7 +64,8 @@ export class CoworkerOnboardingDetail {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly batch = viewChild(PrivateDocumentBatch);
-  private onboardingId: string | null = null;
+  private readonly onboardingId = signal<string | null>(null);
+  private readonly pendingMutationIds = signal<readonly string[]>([]);
   private loadSubscription: Subscription | null = null;
 
   protected readonly i18n = createCoworkerOnboardingI18n();
@@ -70,7 +74,10 @@ export class CoworkerOnboardingDetail {
   protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly detail = signal<IAdminCoworkerOnboardingDetail | null>(null);
   protected readonly loading = signal(true);
-  protected readonly busy = signal(false);
+  protected readonly busy = computed(() => {
+    const onboardingId = this.onboardingId();
+    return onboardingId !== null && this.pendingMutationIds().includes(onboardingId);
+  });
   protected readonly loadFailed = signal(false);
   protected readonly preview = signal<IPdfPreview | null>(null);
   protected readonly rejectionAssignmentId = signal<string | null>(null);
@@ -97,13 +104,13 @@ export class CoworkerOnboardingDetail {
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const onboardingId = params.get('onboarding_id');
-      if (this.onboardingId !== onboardingId) {
+      if (this.onboardingId() !== onboardingId) {
+        this.onboardingId.set(onboardingId);
         this.detail.set(null);
         this.preview.set(null);
         this.closeRejection();
         this.batch()?.reset();
       }
-      this.onboardingId = onboardingId;
       this.load();
     });
 
@@ -120,7 +127,8 @@ export class CoworkerOnboardingDetail {
 
   protected load(): void {
     this.loadSubscription?.unsubscribe();
-    if (!this.onboardingId) {
+    const onboardingId = this.onboardingId();
+    if (!onboardingId) {
       this.loading.set(false);
       this.showLoadError();
       return;
@@ -129,7 +137,7 @@ export class CoworkerOnboardingDetail {
     this.loading.set(true);
     this.loadFailed.set(false);
     this.loadSubscription = this.api
-      .getOnboarding(this.onboardingId)
+      .getOnboarding(onboardingId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loading.set(false)),
@@ -140,38 +148,39 @@ export class CoworkerOnboardingDetail {
       });
   }
 
-  protected previewSource(document: IAdminCoworkerOnboardingDocument): void {
-    const versionId = this.getDocumentVersionId(document);
-    if (!this.onboardingId || !versionId) return;
-    this.prepareDownload(
-      this.api.getPrivateSourceDownload(versionId, this.onboardingId),
-      true,
-    );
-  }
+  protected openDocument(
+    document: IAdminCoworkerOnboardingDocument,
+    target: CoworkerDocumentDownloadTarget,
+    showPreview: boolean,
+  ): void {
+    const onboardingId = this.onboardingId();
+    const targetId = target === 'source'
+      ? this.getDocumentVersionId(document)
+      : document.assignment_id;
+    if (!onboardingId || !targetId) return;
 
-  protected downloadSource(document: IAdminCoworkerOnboardingDocument): void {
-    const versionId = this.getDocumentVersionId(document);
-    if (!this.onboardingId || !versionId) return;
-    this.prepareDownload(
-      this.api.getPrivateSourceDownload(versionId, this.onboardingId),
-      false,
-    );
-  }
-
-  protected previewSigned(document: IAdminCoworkerOnboardingDocument): void {
-    if (!document.assignment_id || !this.onboardingId) return;
-    this.prepareDownload(
-      this.api.getSignedDownload(document.assignment_id, this.onboardingId),
-      true,
-    );
-  }
-
-  protected downloadSigned(document: IAdminCoworkerOnboardingDocument): void {
-    if (!document.assignment_id || !this.onboardingId) return;
-    this.prepareDownload(
-      this.api.getSignedDownload(document.assignment_id, this.onboardingId),
-      false,
-    );
+    const request: Observable<ICoworkerDocumentDownload> = target === 'source'
+      ? this.api.getPrivateSourceDownload(targetId, onboardingId)
+      : this.api.getSignedDownload(targetId, onboardingId);
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ({ url, filename }) => {
+        if (this.onboardingId() !== onboardingId) return;
+        if (showPreview) {
+          this.preview.set({ url, title: filename });
+        } else {
+          this.platform.openNewTab(url);
+        }
+      },
+      error: (error: unknown) => {
+        if (this.onboardingId() !== onboardingId) return;
+        this.toast.danger({
+          summary: this.i18n.toast().downloadFailedSummary,
+          detail: getOnboardingErrorMessage(
+            error, this.i18n.toast().errors, this.i18n.toast().downloadFailedDetail,
+          ),
+        });
+      },
+    });
   }
 
   protected accept(document: IAdminCoworkerOnboardingDocument): void {
@@ -209,28 +218,51 @@ export class CoworkerOnboardingDetail {
     this.review(assignmentId, 'rejected', this.rejectionReason.value.trim());
   }
 
-  protected confirmRemove(event: Event, documentId: string): void {
+  protected confirmRemove(event: Event, onboardingId: string, documentId: string): void {
     this.confirm.dangerDecision(event, {
       message: this.i18n.dialogs().removeMessage,
       acceptLabel: this.i18n.commonActions().delete,
       rejectLabel: this.i18n.commonActions().cancel,
-      accept: () => this.remove(documentId),
+      accept: () => {
+        if (this.canMutateOnboarding(onboardingId)) {
+          this.runMutation(this.api.removePrivateDocument(documentId));
+        }
+      },
     });
   }
 
-  protected confirmComplete(event: Event): void {
+  protected confirmComplete(event: Event, onboardingId: string): void {
     this.confirm.decision(event, {
       message: this.i18n.dialogs().completeMessage,
       acceptLabel: this.i18n.actions().complete,
       rejectLabel: this.i18n.commonActions().cancel,
-      accept: () => this.complete(),
+      accept: () => {
+        if (this.canMutateOnboarding(onboardingId)) {
+          this.runMutation(this.api.completeOnboarding(onboardingId));
+        }
+      },
+    });
+  }
+
+  protected confirmCancel(event: Event, onboardingId: string): void {
+    this.confirm.dangerDecision(event, {
+      message: this.i18n.dialogs().cancelOnboardingMessage,
+      acceptLabel: this.i18n.actions().cancelOnboarding,
+      acceptIcon: 'pi pi-interdiction',
+      rejectLabel: this.i18n.commonActions().close,
+      accept: () => {
+        if (this.canMutateOnboarding(onboardingId)) {
+          this.runMutation(this.api.cancelOnboarding(onboardingId));
+        }
+      },
     });
   }
 
   protected upload(documents: readonly IAdminPrivateDocumentUpload[]): void {
-    if (!this.onboardingId) return;
+    const onboardingId = this.onboardingId();
+    if (!onboardingId) return;
     this.runMutation(
-      this.api.uploadPrivateDocuments(this.onboardingId, documents),
+      this.api.uploadPrivateDocuments(onboardingId, documents),
       () => this.batch()?.reset(),
     );
   }
@@ -246,13 +278,17 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  private remove(documentId: string): void {
-    this.runMutation(this.api.removePrivateDocument(documentId));
-  }
-
-  private complete(): void {
-    if (!this.onboardingId) return;
-    this.runMutation(this.api.completeOnboarding(this.onboardingId));
+  private canMutateOnboarding(onboardingId: string): boolean {
+    const onboarding = this.detail()?.onboarding;
+    return (
+      !this.destroyRef.destroyed &&
+      !this.loading() &&
+      !this.loadFailed() &&
+      !this.busy() &&
+      this.onboardingId() === onboardingId &&
+      onboarding?.onboarding_id === onboardingId &&
+      onboarding.status === 'in_progress'
+    );
   }
 
   private getDocumentVersionId(
@@ -271,12 +307,18 @@ export class CoworkerOnboardingDetail {
   }
 
   private runMutation(request: Observable<unknown>, after?: () => void): void {
-    this.busy.set(true);
+    const onboardingId = this.onboardingId();
+    if (!onboardingId || this.busy()) return;
+
+    this.pendingMutationIds.update((ids) => [...ids, onboardingId]);
     request.pipe(
       takeUntilDestroyed(this.destroyRef),
-      finalize(() => this.busy.set(false)),
+      finalize(() => {
+        this.pendingMutationIds.update((ids) => ids.filter((id) => id !== onboardingId));
+      }),
     ).subscribe({
       next: () => {
+        if (this.onboardingId() !== onboardingId) return;
         after?.();
         this.toast.success({
           summary: this.i18n.toast().mutationSuccessSummary,
@@ -284,29 +326,10 @@ export class CoworkerOnboardingDetail {
         });
         this.load();
       },
-      error: (error: unknown) =>
-        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
-    });
-  }
-
-  private prepareDownload(
-    request: Observable<ICoworkerDocumentDownload>,
-    showPreview: boolean,
-  ): void {
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: ({ url, filename }) => {
-        if (showPreview) {
-          this.preview.set({ url, title: filename });
-        } else {
-          this.platform.openNewTab(url);
-        }
+      error: (error: unknown) => {
+        if (this.onboardingId() !== onboardingId) return;
+        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast()));
       },
-      error: (error: unknown) => this.toast.danger({
-        summary: this.i18n.toast().downloadFailedSummary,
-        detail: getOnboardingErrorMessage(
-          error, this.i18n.toast().errors, this.i18n.toast().downloadFailedDetail,
-        ),
-      }),
     });
   }
 }

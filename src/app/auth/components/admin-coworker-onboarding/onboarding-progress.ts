@@ -6,6 +6,16 @@ import type {
   CoworkerOnboardingStatusesTranslations,
 } from '../../../core/types/i18n/coworker-onboarding';
 
+export function countAdminOnboardingPendingActions(
+  onboarding: Pick<
+    IAdminCoworkerOnboardingRow,
+    'pending_private_action_count' | 'shared_pending_acknowledgement_count'
+  >,
+): number {
+  // The private aggregate already includes pending, submitted and rejected assignments.
+  return onboarding.pending_private_action_count + onboarding.shared_pending_acknowledgement_count;
+}
+
 export function createAdminOnboardingProgress(
   onboarding: IAdminCoworkerOnboardingRow,
   fields: CoworkerOnboardingFieldsTranslations,
@@ -30,8 +40,7 @@ export function createAdminOnboardingProgress(
   ] as const;
 
   return {
-    // The private aggregate already includes pending, submitted and rejected assignments.
-    pendingActions: onboarding.pending_private_action_count + onboarding.shared_pending_acknowledgement_count,
+    pendingActions: countAdminOnboardingPendingActions(onboarding),
     questionnaire: questionnaire.map(({ key, label, value }) => ({
       key, label, value: value ? values.yes : values.no,
       badgeClass: `tag-badge ${STATUS_BADGE_CLASS[value ? 'completed' : 'pending']}`,

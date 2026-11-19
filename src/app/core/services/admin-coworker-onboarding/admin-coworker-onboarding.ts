@@ -10,6 +10,7 @@ import type {
   IAdminSharedDocument,
   IAdminSharedDocumentAssignment,
   IArchiveSharedDocumentResult,
+  ICancelCoworkerOnboardingResult,
   ICompleteCoworkerOnboardingResult,
   IRegisterAdminPrivateDocumentResult,
   IRegisterSharedDocumentResult,
@@ -98,6 +99,15 @@ export class AdminCoworkerOnboarding {
   ): Observable<ICompleteCoworkerOnboardingResult> {
     return this.invoke({
       action: 'completeOnboarding',
+      onboarding_id: onboardingId,
+    });
+  }
+
+  cancelOnboarding(
+    onboardingId: string,
+  ): Observable<ICancelCoworkerOnboardingResult> {
+    return this.invoke({
+      action: 'cancelOnboarding',
       onboarding_id: onboardingId,
     });
   }

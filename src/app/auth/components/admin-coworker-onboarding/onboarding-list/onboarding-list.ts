@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { finalize, forkJoin, map, tap } from 'rxjs';
+import { finalize, forkJoin, map, type Observable, tap } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import type {
@@ -18,6 +18,7 @@ import type {
   IAdminCoworkerOnboardingRow,
 } from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import { AdminCoworkerOnboarding } from '../../../../core/services/admin-coworker-onboarding/admin-coworker-onboarding';
+import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import {
   COWORKER_ONBOARDING_SCOPE,
@@ -31,14 +32,18 @@ import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { ContextHelp } from '../../../../common/context-help/context-help';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
-import { createAdminOnboardingProgress } from '../onboarding-progress';
+import { countAdminOnboardingPendingActions } from '../onboarding-progress';
+
+type VisibleOnboardingRow = IAdminCoworkerOnboardingRow & {
+  readonly status: Exclude<CoworkerOnboardingLifecycleStatus, 'cancelled'>;
+};
 
 type OnboardingListRow = {
   readonly id: string;
-  readonly person: IAdminCoworkerOnboardingRow | IAdminCoworkerOnboardingCandidate;
-  readonly onboarding: IAdminCoworkerOnboardingRow | null;
+  readonly person: VisibleOnboardingRow | IAdminCoworkerOnboardingCandidate;
+  readonly onboarding: VisibleOnboardingRow | null;
   readonly displayName: string;
-  readonly status: CoworkerOnboardingLifecycleStatus | 'not_started';
+  readonly status: VisibleOnboardingRow['status'] | 'not_started';
   readonly statusLabel: string;
   readonly statusBadgeClass: string;
   readonly statusDateLabel: string | null;
@@ -53,7 +58,6 @@ const ONBOARDING_STATUS_ORDER = {
   not_started: 0,
   in_progress: 1,
   completed: 2,
-  cancelled: 3,
 } as const satisfies Record<OnboardingListRow['status'], number>;
 
 @Component({
@@ -75,6 +79,7 @@ const ONBOARDING_STATUS_ORDER = {
 })
 export class OnboardingList {
   private readonly api = inject(AdminCoworkerOnboarding);
+  private readonly confirm = inject(UiConfirm);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
@@ -110,7 +115,7 @@ export class OnboardingList {
   protected readonly statusOptions = computed(() => [
     { value: 'all', label: this.i18n.adminList().filters.allStatuses },
     { value: 'not_started', label: this.i18n.adminList().notStarted },
-    ...(['in_progress', 'completed', 'cancelled'] as const).map((value) => ({
+    ...(['in_progress', 'completed'] as const).map((value) => ({
       value,
       label: this.i18n.statuses().onboarding[value],
     })),
@@ -121,7 +126,9 @@ export class OnboardingList {
     const onboardingUsers = new Set(onboardings.map((row) => row.user_id));
 
     return [
-      ...onboardings.map((row) => this.createRowVm(row, row)),
+      ...onboardings
+        .filter((row): row is VisibleOnboardingRow => row.status !== 'cancelled')
+        .map((row) => this.createRowVm(row, row)),
       ...this.candidates()
         .filter((candidate) => !onboardingUsers.has(candidate.user_id))
         .map((candidate) => this.createRowVm(candidate, null)),
@@ -169,7 +176,8 @@ export class OnboardingList {
   protected onSort(event: SortEvent): void {
     if (
       (event.field === 'displayName' || event.field === 'status' || event.field === 'pendingActions') &&
-      (event.order === 1 || event.order === -1)
+      (event.order === 1 || event.order === -1) &&
+      (event.field !== this.sortField() || event.order !== this.sortOrder())
     ) {
       this.sortField.set(event.field);
       this.sortOrder.set(event.order);
@@ -209,6 +217,12 @@ export class OnboardingList {
         next: ({ onboardings, candidates }) => {
           this.onboardings.set([...onboardings]);
           this.candidates.set(candidates);
+          if (this.first() > 0) {
+            const pageSize = this.pageSize();
+            const lastIndex = Math.max(0, this.filteredRows().length - 1);
+            const lastPageStart = Math.floor(lastIndex / pageSize) * pageSize;
+            this.first.update((first) => Math.min(first, lastPageStart));
+          }
         },
         error: (error: unknown) => {
           this.candidates.set([]);
@@ -227,45 +241,69 @@ export class OnboardingList {
       return;
     }
 
-    this.saving.set(true);
-    this.api
-      .startOnboarding(userId)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.saving.set(false)),
-      )
-      .subscribe({
-        next: ({ onboarding_id }) => {
-          this.toast.success({
-            summary: this.i18n.toast().mutationSuccessSummary,
-            detail: this.i18n.commonStatus().changesSaved,
-          });
-          void this.router.navigate(['/admin/coworkers/onboarding', onboarding_id]);
-        },
-        error: (error: unknown) =>
-          this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
-      });
+    this.runMutation(this.api.startOnboarding(userId), ({ onboarding_id }) => this.open(onboarding_id));
   }
 
   protected open(onboardingId: string): void {
     void this.router.navigate(['/admin/coworkers/onboarding', onboardingId]);
   }
 
+  protected confirmCancel(event: Event, onboardingId: string): void {
+    if (!this.canCancel(onboardingId)) return;
+
+    this.confirm.dangerDecision(event, {
+      message: this.i18n.dialogs().cancelOnboardingMessage,
+      acceptLabel: this.i18n.actions().cancelOnboarding,
+      acceptIcon: 'pi pi-interdiction',
+      rejectLabel: this.i18n.commonActions().close,
+      accept: () => {
+        if (!this.canCancel(onboardingId)) return;
+
+        const refresh = () => this.load();
+        this.runMutation(this.api.cancelOnboarding(onboardingId), refresh, refresh);
+      },
+    });
+  }
+
+  private canCancel(onboardingId: string): boolean {
+    return !this.loading() && !this.saving() && !this.loadFailed() &&
+      this.onboardings().some((row) => row.onboarding_id === onboardingId && row.status === 'in_progress');
+  }
+
+  private runMutation<TResult>(
+    request: Observable<TResult>,
+    onSuccess: (result: TResult) => void,
+    onError?: () => void,
+  ): void {
+    this.saving.set(true);
+    request
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.saving.set(false)),
+      )
+      .subscribe({
+        next: (result) => {
+          this.toast.success({
+            summary: this.i18n.toast().mutationSuccessSummary,
+            detail: this.i18n.commonStatus().changesSaved,
+          });
+          onSuccess(result);
+        },
+        error: (error: unknown) => {
+          this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast()));
+          onError?.();
+        },
+      });
+  }
+
   private createRowVm(
     person: OnboardingListRow['person'],
-    onboarding: IAdminCoworkerOnboardingRow | null,
+    onboarding: OnboardingListRow['onboarding'],
   ): OnboardingListRow {
     const fields = this.i18n.fields();
-    const progress = onboarding
-      ? createAdminOnboardingProgress(
-          onboarding, fields, this.i18n.statuses().assignment,
-          this.i18n.commonValues(),
-        )
-      : null;
     const statusDate = onboarding ? {
       in_progress: onboarding.started_at,
       completed: onboarding.completed_at,
-      cancelled: onboarding.cancelled_at,
     }[onboarding.status] : null;
     const questionnaireStage = !onboarding
       ? { label: this.i18n.commonValues().notApplicable, badgeClass: STATUS_BADGE_CLASS.closed }
@@ -299,7 +337,7 @@ export class OnboardingList {
       privateAcceptedCount: onboarding?.private_accepted_count ?? null,
       sharedAcknowledgedCount: onboarding?.status === 'completed'
         ? onboarding.shared_acknowledged_count : null,
-      pendingActions: progress?.pendingActions ?? 0,
+      pendingActions: onboarding ? countAdminOnboardingPendingActions(onboarding) : 0,
     };
   }
 }

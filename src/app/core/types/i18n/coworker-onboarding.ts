@@ -9,6 +9,7 @@ export interface CoworkerOnboardingAdminListTranslations {
   title: string;
   subtitle: string;
   empty: string;
+  emptyVisible: string;
   loadError: string;
   filteredEmpty: string;
   notStarted: string;
@@ -99,6 +100,7 @@ export interface CoworkerOnboardingActionsTranslations {
   reject: string;
   removeDocument: string;
   complete: string;
+  cancelOnboarding: string;
   uploadDocuments: string;
   uploadSigned: string;
   saveShared: string;
@@ -124,6 +126,7 @@ export interface CoworkerOnboardingDialogsTranslations {
   rejectionDescription: string;
   removeMessage: string;
   completeMessage: string;
+  cancelOnboardingMessage: string;
   archiveMessage: string;
 }
 

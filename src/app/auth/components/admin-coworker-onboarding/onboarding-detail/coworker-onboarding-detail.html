@@ -148,7 +148,7 @@
                 severity="secondary"
                 icon="pi pi-eye"
                 [label]="i18n.commonActions().preview"
-                (onClick)="previewSource(document)"
+                (onClick)="openDocument(document, 'source', true)"
               />
               <p-button
                 size="small"
@@ -156,7 +156,7 @@
                 [outlined]="true"
                 icon="pi pi-download"
                 [label]="i18n.actions().download"
-                (onClick)="downloadSource(document)"
+                (onClick)="openDocument(document, 'source', false)"
               />
             }
             @if (document.signed_original_filename) {
@@ -165,7 +165,7 @@
                 severity="secondary"
                 icon="pi pi-eye"
                 [label]="i18n.actions().previewSigned"
-                (onClick)="previewSigned(document)"
+                (onClick)="openDocument(document, 'signed', true)"
               />
               <p-button
                 size="small"
@@ -173,7 +173,7 @@
                 [outlined]="true"
                 icon="pi pi-download"
                 [label]="i18n.actions().downloadSigned"
-                (onClick)="downloadSigned(document)"
+                (onClick)="openDocument(document, 'signed', false)"
               />
             }
             @if (currentVersion && document.assignment_status === 'submitted') {
@@ -204,7 +204,7 @@
                 [text]="true"
                 icon="pi pi-trash"
                 [label]="i18n.actions().removeDocument"
-                (onClick)="confirmRemove($event, document.document_id)"
+                (onClick)="confirmRemove($event, data.onboarding.onboarding_id, document.document_id)"
               />
             }
           </div>
@@ -231,11 +231,22 @@
           </h3>
           <p class="m-0 muted-text">{{ i18n.adminDetail().completeDescription }}</p>
         </div>
-        <div>
+        <div class="flex-row-start-center flex-wrap gap-sm">
           <p-button
+            type="button"
             icon="pi pi-check-circle"
             [label]="i18n.actions().complete"
-            (onClick)="confirmComplete($event)"
+            [disabled]="loading() || busy()"
+            (onClick)="confirmComplete($event, data.onboarding.onboarding_id)"
+          />
+          <p-button
+            type="button"
+            severity="danger"
+            [outlined]="true"
+            icon="pi pi-interdiction"
+            [label]="i18n.actions().cancelOnboarding"
+            [disabled]="loading() || busy()"
+            (onClick)="confirmCancel($event, data.onboarding.onboarding_id)"
           />
         </div>
       </section>
