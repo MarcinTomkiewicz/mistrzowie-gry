@@ -26,6 +26,16 @@ export interface IAdminCoworkerOnboardingRow
   readonly use_nickname: boolean;
   readonly private_document_count: number;
   readonly pending_private_action_count: number;
+  readonly questionnaire_exists: boolean;
+  readonly questionnaire_complete: boolean;
+  readonly questionnaire_validated: boolean;
+  readonly private_pending_signature_count: number;
+  readonly private_pending_acknowledgement_count: number;
+  readonly private_submitted_count: number;
+  readonly private_rejected_count: number;
+  readonly private_accepted_count: number;
+  readonly shared_pending_acknowledgement_count: number;
+  readonly shared_acknowledged_count: number;
 }
 
 export interface IAdminCoworkerOnboardingDocumentRow {
@@ -57,6 +67,7 @@ export interface IAdminCoworkerOnboardingDocumentRow {
   readonly document_created_at: string;
   readonly assignment_created_at: string | null;
   readonly assignment_updated_at: string | null;
+  readonly required_action: CoworkerDocumentRequiredAction | null;
 }
 
 export interface IAdminSharedDocumentRow {

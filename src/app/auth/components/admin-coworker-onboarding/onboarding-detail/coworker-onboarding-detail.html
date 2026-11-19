@@ -1,3 +1,5 @@
+@let copyReady = !!(i18n.statuses().assignment && i18n.statuses().requiredAction);
+
 <div class="flex-col-start-stretch gap-lg w-100 position-relative">
   <header class="mg-section__header w-100">
     <h2 class="mg-section__title mg-section__title--md">
@@ -9,11 +11,11 @@
   </header>
 
   <app-loading-overlay
-    [visible]="loading() || busy()"
+    [visible]="loading() || busy() || !copyReady"
     [label]="busy() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
   />
 
-  @if (loadFailed()) {
+  @if (copyReady && loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
       <p class="m-0 error-text">{{ i18n.adminDetail().loadError }}</p>
       <p-button
@@ -23,7 +25,7 @@
         (onClick)="load()"
       />
     </section>
-  } @else if (detail(); as data) {
+  } @else if (copyReady && detail(); as data) {
     <section class="mg-card flex-col-start-stretch gap-md w-100">
       <h3 class="mg-section__title mg-section__title--sm m-0">
         {{ i18n.commonLabels().coworker }}
@@ -54,6 +56,31 @@
         </div>
       </div>
     </section>
+
+    @if (progress(); as summary) {
+      <section class="mg-card flex-col-start-stretch gap-md w-100">
+        <strong>{{ i18n.fields().pendingActions }}: {{ summary.pendingActions }}</strong>
+        <div class="mg-grid grid-3-cols grid-1-cols-sm gap-md">
+          @for (group of [
+            { title: i18n.adminDetail().questionnaireBadge, stats: summary.questionnaire },
+            { title: i18n.commonNav().privateDocuments, stats: summary.privateDocuments },
+            { title: i18n.commonNav().sharedDocuments, stats: summary.sharedDocuments }
+          ]; track group.title) {
+            <div class="flex-col-start-stretch gap-sm">
+              <h3 class="mg-section__title mg-section__title--sm m-0">{{ group.title }}</h3>
+              <dl class="flex-col-start-stretch gap-xs m-0">
+                @for (stat of group.stats; track stat.key) {
+                  <div class="flex-row-between-center gap-sm">
+                    <dt>{{ stat.label }}</dt>
+                    <dd class="m-0"><span [class]="stat.badgeClass">{{ stat.value }}</span></dd>
+                  </div>
+                }
+              </dl>
+            </div>
+          }
+        </div>
+      </section>
+    }
 
     <section class="flex-col-start-stretch gap-md w-100">
       <h3 class="mg-section__title mg-section__title--sm m-0">
@@ -91,7 +118,17 @@
                     {{ i18n.statuses().assignment[status] }}
                   </span>
                 }
+                @if (document.required_action; as action) {
+                  <span class="tag-badge tag-badge--muted">
+                    {{ i18n.fields().requiredAction }}: {{ i18n.statuses().requiredAction[action] }}
+                  </span>
+                } @else {
+                  <span class="tag-badge tag-badge--muted">{{ i18n.fields().noAssignment }}</span>
+                }
               </div>
+              <small class="muted-text">
+                {{ i18n.fields().defaultAction }}: {{ i18n.statuses().requiredAction[document.default_action] }}
+              </small>
             </div>
             @if (document.version_number) {
               <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>

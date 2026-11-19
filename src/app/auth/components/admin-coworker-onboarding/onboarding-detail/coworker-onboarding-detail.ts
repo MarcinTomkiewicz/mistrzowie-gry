@@ -15,6 +15,7 @@ import type {
   IAdminCoworkerOnboardingDetail,
   IAdminPrivateDocumentUpload,
 } from '../../../../core/interfaces/i-admin-coworker-onboarding';
+import type { ICoworkerDocumentDownload } from '../../../../core/interfaces/i-coworker-onboarding';
 import type { IPdfPreview } from '../../../../core/interfaces/i-pdf';
 import { AdminCoworkerOnboarding } from '../../../../core/services/admin-coworker-onboarding/admin-coworker-onboarding';
 import { Platform } from '../../../../core/services/platform/platform';
@@ -28,8 +29,11 @@ import type { CoworkerDocumentReviewDecision } from '../../../../core/types/cowo
 import { formatTimestampLabel } from '../../../../core/utils/date';
 import { stablePartition } from '../../../../core/utils/stable-partition';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
+import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
+import { createAdminOnboardingProgress } from '../onboarding-progress';
 import { PrivateDocumentBatch } from '../private-document-batch/private-document-batch';
 
 @Component({
@@ -72,7 +76,7 @@ export class CoworkerOnboardingDetail {
   protected readonly rejectionAssignmentId = signal<string | null>(null);
   protected readonly rejectionReason = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, Validators.maxLength(1000)],
+    validators: [requiredTrimmedValidator(), Validators.maxLength(1000)],
   });
   protected readonly documents = computed(() =>
     stablePartition(
@@ -80,6 +84,15 @@ export class CoworkerOnboardingDetail {
       (document) => this.isCurrentDocumentVersion(document),
     ),
   );
+  protected readonly progress = computed(() => {
+    const onboarding = this.detail()?.onboarding;
+    return onboarding
+      ? createAdminOnboardingProgress(
+          onboarding, this.i18n.fields(), this.i18n.statuses().assignment,
+          this.i18n.commonValues(),
+        )
+      : null;
+  });
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -109,7 +122,7 @@ export class CoworkerOnboardingDetail {
     this.loadSubscription?.unsubscribe();
     if (!this.onboardingId) {
       this.loading.set(false);
-      this.loadFailed.set(true);
+      this.showLoadError();
       return;
     }
 
@@ -123,7 +136,7 @@ export class CoworkerOnboardingDetail {
       )
       .subscribe({
         next: (detail) => this.detail.set(detail),
-        error: () => this.loadFailed.set(true),
+        error: (error: unknown) => this.showLoadError(error),
       });
   }
 
@@ -248,23 +261,39 @@ export class CoworkerOnboardingDetail {
     return document.source_version_id ?? document.current_version_id;
   }
 
+  private showLoadError(error?: unknown): void {
+    this.loadFailed.set(true);
+    const fallback = this.i18n.commonErrors().generic;
+    this.toast.danger({
+      summary: this.i18n.adminDetail().loadError ?? fallback,
+      detail: getOnboardingErrorMessage(error, this.i18n.toast().errors, fallback),
+    });
+  }
+
   private runMutation(request: Observable<unknown>, after?: () => void): void {
     this.busy.set(true);
-    request.pipe(finalize(() => this.busy.set(false))).subscribe({
+    request.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.busy.set(false)),
+    ).subscribe({
       next: () => {
         after?.();
-        this.showMutationSuccess();
+        this.toast.success({
+          summary: this.i18n.toast().mutationSuccessSummary,
+          detail: this.i18n.commonStatus().changesSaved,
+        });
         this.load();
       },
-      error: () => this.showMutationError(),
+      error: (error: unknown) =>
+        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
     });
   }
 
   private prepareDownload(
-    request: ReturnType<AdminCoworkerOnboarding['getPrivateSourceDownload']>,
+    request: Observable<ICoworkerDocumentDownload>,
     showPreview: boolean,
   ): void {
-    request.subscribe({
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ url, filename }) => {
         if (showPreview) {
           this.preview.set({ url, title: filename });
@@ -272,24 +301,12 @@ export class CoworkerOnboardingDetail {
           this.platform.openNewTab(url);
         }
       },
-      error: () => this.toast.danger({
+      error: (error: unknown) => this.toast.danger({
         summary: this.i18n.toast().downloadFailedSummary,
-        detail: this.i18n.toast().downloadFailedDetail,
+        detail: getOnboardingErrorMessage(
+          error, this.i18n.toast().errors, this.i18n.toast().downloadFailedDetail,
+        ),
       }),
-    });
-  }
-
-  private showMutationSuccess(): void {
-    this.toast.success({
-      summary: this.i18n.toast().mutationSuccessSummary,
-      detail: this.i18n.commonStatus().changesSaved,
-    });
-  }
-
-  private showMutationError(): void {
-    this.toast.danger({
-      summary: this.i18n.toast().mutationFailedSummary,
-      detail: this.i18n.toast().mutationFailedDetail,
     });
   }
 }

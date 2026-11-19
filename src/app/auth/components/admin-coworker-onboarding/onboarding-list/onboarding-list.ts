@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { finalize, forkJoin, map } from 'rxjs';
+import { finalize, forkJoin, map, tap } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import type {
@@ -25,8 +25,13 @@ import {
 } from '../../../../core/translations/coworker-onboarding.i18n';
 import type { CoworkerOnboardingLifecycleStatus } from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
+import { setControlValue } from '../../../../core/utils/form-controls';
+import { normalizeText } from '../../../../core/utils/normalize-text';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
+import { ContextHelp } from '../../../../common/context-help/context-help';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
+import { createAdminOnboardingProgress } from '../onboarding-progress';
 
 type OnboardingListRow = {
   readonly id: string;
@@ -36,11 +41,20 @@ type OnboardingListRow = {
   readonly status: CoworkerOnboardingLifecycleStatus | 'not_started';
   readonly statusLabel: string;
   readonly statusBadgeClass: string;
-  readonly startedAtLabel: string | null;
-  readonly completedAtLabel: string | null;
-  readonly documentCount: number;
+  readonly statusDateLabel: string | null;
+  readonly questionnaireLabel: string;
+  readonly questionnaireBadgeClass: string;
+  readonly privateAcceptedCount: number | null;
+  readonly sharedAcknowledgedCount: number | null;
   readonly pendingActions: number;
 };
+
+const ONBOARDING_STATUS_ORDER = {
+  not_started: 0,
+  in_progress: 1,
+  completed: 2,
+  cancelled: 3,
+} as const satisfies Record<OnboardingListRow['status'], number>;
 
 @Component({
   selector: 'app-coworker-onboarding-list',
@@ -53,6 +67,7 @@ type OnboardingListRow = {
     SelectModule,
     TableModule,
     ToggleSwitchModule,
+    ContextHelp,
     LoadingOverlay,
   ],
   templateUrl: './onboarding-list.html',
@@ -62,6 +77,7 @@ export class OnboardingList {
   private readonly api = inject(AdminCoworkerOnboarding);
   private readonly router = inject(Router);
   private readonly toast = inject(UiToast);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly onboardings = signal<IAdminCoworkerOnboardingRow[]>([]);
@@ -70,7 +86,10 @@ export class OnboardingList {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly loadFailed = signal(false);
-  protected readonly sortField = signal<'displayName' | 'pendingActions'>('displayName');
+  protected readonly first = signal(0);
+  protected readonly pageSize = signal(10);
+  protected readonly rowsPerPageOptions = [10, 25, 50];
+  protected readonly sortField = signal<'displayName' | 'status' | 'pendingActions'>('displayName');
   protected readonly sortOrder = signal<1 | -1>(1);
   protected readonly filterForm = new FormGroup({
     searchText: new FormControl('', { nonNullable: true }),
@@ -81,7 +100,10 @@ export class OnboardingList {
     showCompleted: new FormControl(true, { nonNullable: true }),
   });
   private readonly filterValue = toSignal(
-    this.filterForm.valueChanges.pipe(map(() => this.filterForm.getRawValue())),
+    this.filterForm.valueChanges.pipe(
+      map(() => this.filterForm.getRawValue()),
+      tap(() => this.first.set(0)),
+    ),
     { initialValue: this.filterForm.getRawValue() },
   );
 
@@ -108,7 +130,7 @@ export class OnboardingList {
 
   protected readonly filteredRows = computed(() => {
     const filters = this.filterValue();
-    const query = filters.searchText.trim().toLowerCase();
+    const query = normalizeText(filters.searchText)?.toLocaleLowerCase('pl');
     const field = this.sortField();
     const direction = this.sortOrder();
 
@@ -117,7 +139,7 @@ export class OnboardingList {
         (row) =>
           (!query ||
             [row.person.first_name, row.person.nickname, row.person.email].some((value) =>
-              value?.toLowerCase().includes(query),
+              value?.toLocaleLowerCase('pl').includes(query),
             )) &&
           (filters.status === 'all' || row.status === filters.status) &&
           (!filters.pendingOnly || row.pendingActions > 0) &&
@@ -126,9 +148,11 @@ export class OnboardingList {
       .sort((left, right) => {
         const byName = left.displayName.localeCompare(right.displayName, 'pl');
         const primary =
-          field === 'pendingActions'
-            ? left.pendingActions - right.pendingActions
-            : byName;
+          field === 'status'
+            ? ONBOARDING_STATUS_ORDER[left.status] - ONBOARDING_STATUS_ORDER[right.status]
+            : field === 'pendingActions'
+              ? left.pendingActions - right.pendingActions
+              : byName;
 
         return (
           primary * direction ||
@@ -144,11 +168,12 @@ export class OnboardingList {
 
   protected onSort(event: SortEvent): void {
     if (
-      (event.field === 'displayName' || event.field === 'pendingActions') &&
+      (event.field === 'displayName' || event.field === 'status' || event.field === 'pendingActions') &&
       (event.order === 1 || event.order === -1)
     ) {
       this.sortField.set(event.field);
       this.sortOrder.set(event.order);
+      this.first.set(0);
     }
   }
 
@@ -156,7 +181,7 @@ export class OnboardingList {
     const { status, showCompleted } = this.filterForm.controls;
 
     if (status.value === 'completed' && !showCompleted.value) {
-      showCompleted.setValue(true);
+      setControlValue(showCompleted, true);
     }
   }
 
@@ -164,7 +189,7 @@ export class OnboardingList {
     const { status, showCompleted } = this.filterForm.controls;
 
     if (!showCompleted.value && status.value === 'completed') {
-      status.setValue('all');
+      setControlValue(status, 'all');
     }
   }
 
@@ -176,15 +201,23 @@ export class OnboardingList {
       onboardings: this.api.getOnboardings(),
       candidates: this.api.getOnboardingCandidates(),
     })
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false)),
+      )
       .subscribe({
         next: ({ onboardings, candidates }) => {
           this.onboardings.set([...onboardings]);
           this.candidates.set(candidates);
         },
-        error: () => {
+        error: (error: unknown) => {
           this.candidates.set([]);
           this.loadFailed.set(true);
+          const fallback = this.i18n.commonErrors().generic;
+          this.toast.danger({
+            summary: this.i18n.adminList().loadError ?? fallback,
+            detail: getOnboardingErrorMessage(error, this.i18n.toast().errors, fallback),
+          });
         },
       });
   }
@@ -197,13 +230,20 @@ export class OnboardingList {
     this.saving.set(true);
     this.api
       .startOnboarding(userId)
-      .pipe(finalize(() => this.saving.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.saving.set(false)),
+      )
       .subscribe({
         next: ({ onboarding_id }) => {
-          this.showSuccess();
+          this.toast.success({
+            summary: this.i18n.toast().mutationSuccessSummary,
+            detail: this.i18n.commonStatus().changesSaved,
+          });
           void this.router.navigate(['/admin/coworkers/onboarding', onboarding_id]);
         },
-        error: () => this.showMutationError(),
+        error: (error: unknown) =>
+          this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
       });
   }
 
@@ -215,6 +255,28 @@ export class OnboardingList {
     person: OnboardingListRow['person'],
     onboarding: IAdminCoworkerOnboardingRow | null,
   ): OnboardingListRow {
+    const fields = this.i18n.fields();
+    const progress = onboarding
+      ? createAdminOnboardingProgress(
+          onboarding, fields, this.i18n.statuses().assignment,
+          this.i18n.commonValues(),
+        )
+      : null;
+    const statusDate = onboarding ? {
+      in_progress: onboarding.started_at,
+      completed: onboarding.completed_at,
+      cancelled: onboarding.cancelled_at,
+    }[onboarding.status] : null;
+    const questionnaireStage = !onboarding
+      ? { label: this.i18n.commonValues().notApplicable, badgeClass: STATUS_BADGE_CLASS.closed }
+      : !onboarding.questionnaire_exists
+        ? { label: this.i18n.commonValues().notAvailable, badgeClass: STATUS_BADGE_CLASS.closed }
+        : !onboarding.questionnaire_complete
+          ? { label: fields.questionnaireExists, badgeClass: STATUS_BADGE_CLASS.in_progress }
+          : onboarding.questionnaire_validated
+            ? { label: fields.questionnaireValidated, badgeClass: STATUS_BADGE_CLASS.completed }
+            : { label: fields.questionnaireComplete, badgeClass: STATUS_BADGE_CLASS.pending };
+
     return {
       id: onboarding?.onboarding_id ?? `candidate:${person.user_id}`,
       person,
@@ -231,24 +293,13 @@ export class OnboardingList {
       statusBadgeClass: `tag-badge ${
         onboarding ? STATUS_BADGE_CLASS[onboarding.status] : 'tag-badge--muted'
       }`,
-      startedAtLabel: formatTimestampLabel(onboarding?.started_at),
-      completedAtLabel: formatTimestampLabel(onboarding?.completed_at),
-      documentCount: onboarding?.private_document_count ?? 0,
-      pendingActions: onboarding?.pending_private_action_count ?? 0,
+      statusDateLabel: formatTimestampLabel(statusDate),
+      questionnaireLabel: questionnaireStage.label,
+      questionnaireBadgeClass: `tag-badge ${questionnaireStage.badgeClass}`,
+      privateAcceptedCount: onboarding?.private_accepted_count ?? null,
+      sharedAcknowledgedCount: onboarding?.status === 'completed'
+        ? onboarding.shared_acknowledged_count : null,
+      pendingActions: progress?.pendingActions ?? 0,
     };
-  }
-
-  private showSuccess(): void {
-    this.toast.success({
-      summary: this.i18n.toast().mutationSuccessSummary,
-      detail: this.i18n.commonStatus().changesSaved,
-    });
-  }
-
-  private showMutationError(): void {
-    this.toast.danger({
-      summary: this.i18n.toast().mutationFailedSummary,
-      detail: this.i18n.toast().mutationFailedDetail,
-    });
   }
 }

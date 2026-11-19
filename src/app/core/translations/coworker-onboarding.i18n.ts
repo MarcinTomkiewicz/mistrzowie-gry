@@ -3,6 +3,7 @@ import { computed } from '@angular/core';
 import {
   createCommonActionsI18n,
   createCommonEntityStatusesI18n,
+  createCommonErrorsI18n,
   createCommonFormI18n,
   createCommonLabelsI18n,
   createCommonNavI18n,
@@ -65,6 +66,7 @@ export function createCoworkerOnboardingI18n() {
     fileUploadTexts,
     commonActions: createCommonActionsI18n(),
     commonEntityStatuses: createCommonEntityStatusesI18n(),
+    commonErrors: createCommonErrorsI18n(),
     commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),
     commonNav: createCommonNavI18n(),

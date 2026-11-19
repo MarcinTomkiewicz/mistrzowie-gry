@@ -1,5 +1,7 @@
 import type {
+  CoworkerDocumentApiErrorCode,
   CoworkerDocumentAssignmentStatus,
+  CoworkerDocumentRequiredAction,
   CoworkerOnboardingLifecycleStatus,
 } from '../coworker-onboarding';
 
@@ -10,6 +12,11 @@ export interface CoworkerOnboardingAdminListTranslations {
   loadError: string;
   filteredEmpty: string;
   notStarted: string;
+  privateDocuments: string;
+  sharedDocuments: string;
+  pendingActions: string;
+  privateDocumentsHint: string;
+  sharedDocumentsHint: string;
   filters: {
     searchLabel: string;
     allStatuses: string;
@@ -71,6 +78,15 @@ export interface CoworkerOnboardingFieldsTranslations {
   acknowledgedAssignments: string;
   autoAssign: string;
   acknowledgement: string;
+  questionnaireExists: string;
+  questionnaireComplete: string;
+  questionnaireValidated: string;
+  pendingSignatures: string;
+  pendingAcknowledgements: string;
+  awaitingAdminReview: string;
+  requiredAction: string;
+  defaultAction: string;
+  noAssignment: string;
 }
 
 export interface CoworkerOnboardingActionsTranslations {
@@ -115,11 +131,15 @@ export interface CoworkerOnboardingToastTranslations {
   mutationSuccessSummary: string;
   mutationFailedSummary: string;
   mutationFailedDetail: string;
+  mutationUncertainSummary: string;
+  mutationUncertainDetail: string;
   downloadFailedSummary: string;
   downloadFailedDetail: string;
+  errors: Record<CoworkerDocumentApiErrorCode, string>;
 }
 
 export interface CoworkerOnboardingStatusesTranslations {
   onboarding: Record<CoworkerOnboardingLifecycleStatus, string>;
   assignment: Record<CoworkerDocumentAssignmentStatus, string>;
+  requiredAction: Record<CoworkerDocumentRequiredAction, string>;
 }

@@ -52,21 +52,39 @@
     </form>
 
     <div class="w-100 overflow-x-auto">
-      <p-table class="w-100" [value]="filteredRows()" dataKey="id" tableStyleClass="mg-responsive-table"
+      <p-table class="w-100" size="small" [value]="filteredRows()" dataKey="id"
+        tableStyleClass="mg-responsive-table mg-responsive-table--fixed"
+        [paginator]="true" [rows]="pageSize()" [rowsPerPageOptions]="rowsPerPageOptions"
+        [alwaysShowPaginator]="false" [first]="first()" (firstChange)="first.set($event)"
+        (rowsChange)="pageSize.set($event)"
         [customSort]="true" [sortField]="sortField()" [sortOrder]="sortOrder()" (sortFunction)="onSort($event)">
         <ng-template #header>
           <tr class="hide-down-sm">
-            <th scope="col" class="small-caps" pSortableColumn="displayName">
+            <th scope="col" class="small-caps w-20" pSortableColumn="displayName">
               {{ i18n.commonLabels().coworker }} <p-sortIcon field="displayName" />
             </th>
-            <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
-            <th scope="col" class="small-caps">{{ i18n.fields().startedAt }}</th>
-            <th scope="col" class="small-caps">{{ i18n.fields().completedAt }}</th>
-            <th scope="col" class="small-caps text-center">{{ i18n.fields().documents }}</th>
-            <th scope="col" class="small-caps text-center" pSortableColumn="pendingActions">
-              {{ i18n.fields().pendingActions }} <p-sortIcon field="pendingActions" />
+            <th scope="col" class="small-caps w-px-150" pSortableColumn="status">
+              {{ i18n.commonLabels().status }} <p-sortIcon field="status" />
             </th>
-            <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
+            <th scope="col" class="small-caps">{{ i18n.adminDetail().questionnaireBadge }}</th>
+            <th scope="col" class="small-caps text-center">
+              <div class="flex-row-center-center flex-nowrap gap-xs">
+                <span class="text-nowrap">{{ copy.privateDocuments }}</span>
+                <app-context-help class="flex-none" icon="pi pi-read" styleClass="square-7 p-0 cursor-pointer"
+                  [ariaLabel]="copy.privateDocumentsHint" [text]="copy.privateDocumentsHint" />
+              </div>
+            </th>
+            <th scope="col" class="small-caps text-center">
+              <div class="flex-row-center-center flex-nowrap gap-xs">
+                <span class="text-nowrap">{{ copy.sharedDocuments }}</span>
+                <app-context-help class="flex-none" icon="pi pi-read" styleClass="square-7 p-0 cursor-pointer"
+                  [ariaLabel]="copy.sharedDocumentsHint" [text]="copy.sharedDocumentsHint" />
+              </div>
+            </th>
+            <th scope="col" class="small-caps text-center" pSortableColumn="pendingActions">
+              {{ copy.pendingActions }} <p-sortIcon field="pendingActions" />
+            </th>
+            <th scope="col" class="small-caps text-right w-px-150">{{ i18n.commonTable().actions }}</th>
           </tr>
         </ng-template>
         <ng-template #sorticon let-sortOrder>
@@ -76,34 +94,63 @@
         <ng-template #body let-row>
           <tr class="mg-responsive-table__row">
             <th scope="row" class="mg-responsive-table__row-heading">
-              <div class="flex-col-start-start gap-xs">
+              <div class="flex-col-start-start gap-xs text-wrap-anywhere">
                 <strong>{{ row.displayName }}</strong>
                 <small>{{ row.person.email }}</small>
               </div>
             </th>
             <td class="mg-responsive-table__cell">
               <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
-              <span class="mg-responsive-table__value">
-                <span [class]="row.statusBadgeClass">{{ row.statusLabel }}</span>
+              <span class="mg-responsive-table__value flex-col-start-start gap-xs">
+                <span [class]="row.statusBadgeClass + ' text-wrap'">{{ row.statusLabel }}</span>
+                @if (row.statusDateLabel) {
+                  <small>{{ row.statusDateLabel }}</small>
+                }
               </span>
             </td>
             <td class="mg-responsive-table__cell">
-              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().startedAt }}</span>
-              <span class="mg-responsive-table__value">{{ row.startedAtLabel }}</span>
-            </td>
-            <td class="mg-responsive-table__cell">
-              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().completedAt }}</span>
-              <span class="mg-responsive-table__value">{{ row.completedAtLabel }}</span>
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.adminDetail().questionnaireBadge }}</span>
+              <span class="mg-responsive-table__value">
+                <span [class]="row.questionnaireBadgeClass + ' text-wrap'">{{ row.questionnaireLabel }}</span>
+              </span>
             </td>
             <td class="mg-responsive-table__cell text-center">
-              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().documents }}</span>
-              <span class="mg-responsive-table__value">{{ row.documentCount }}</span>
+              <span class="mg-responsive-table__label small-caps font-bold">
+                <span class="flex-row-start-center flex-wrap gap-xs">
+                  {{ copy.privateDocuments }}
+                  <app-context-help icon="pi pi-read" styleClass="square-7 p-0 cursor-pointer"
+                    [ariaLabel]="copy.privateDocumentsHint" [text]="copy.privateDocumentsHint" />
+                </span>
+              </span>
+              <span class="mg-responsive-table__value">
+                @if (row.privateAcceptedCount !== null) {
+                  {{ row.privateAcceptedCount }}
+                } @else {
+                  <span [attr.aria-label]="i18n.commonValues().notApplicable">-</span>
+                }
+              </span>
             </td>
             <td class="mg-responsive-table__cell text-center">
-              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().pendingActions }}</span>
+              <span class="mg-responsive-table__label small-caps font-bold">
+                <span class="flex-row-start-center flex-wrap gap-xs">
+                  {{ copy.sharedDocuments }}
+                  <app-context-help icon="pi pi-read" styleClass="square-7 p-0 cursor-pointer"
+                    [ariaLabel]="copy.sharedDocumentsHint" [text]="copy.sharedDocumentsHint" />
+                </span>
+              </span>
+              <span class="mg-responsive-table__value">
+                @if (row.sharedAcknowledgedCount !== null) {
+                  {{ row.sharedAcknowledgedCount }}
+                } @else {
+                  <span [attr.aria-label]="i18n.commonValues().notApplicable">-</span>
+                }
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell text-center">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ copy.pendingActions }}</span>
               <span class="mg-responsive-table__value">{{ row.pendingActions }}</span>
             </td>
-            <td class="mg-responsive-table__cell">
+            <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
               <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
               <div class="mg-responsive-table__value flex-col-start-end gap-xs">
                 @if (row.onboarding) {

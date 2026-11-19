@@ -5,7 +5,12 @@
     "empty": "Nie rozpoczęto jeszcze żadnego onboardingu.",
     "loadError": "Nie udało się pobrać listy onboardingów.",
     "filteredEmpty": "Brak onboardingów pasujących do filtrów.",
-    "notStarted": "Nie rozpoczęto [PH]",
+    "notStarted": "Nie rozpoczęto",
+    "privateDocuments": "Prywatne",
+    "sharedDocuments": "Wspólne",
+    "pendingActions": "Oczekujące",
+    "privateDocumentsHint": "Liczba zaakceptowanych przypisań dokumentów prywatnych.",
+    "sharedDocumentsHint": "Liczba potwierdzonych przypisań dokumentów wspólnych. Przed zakończeniem onboardingu licznik nie jest prezentowany.",
     "filters": {
       "searchLabel": "Szukaj po imieniu, pseudonimie lub e-mailu",
       "allStatuses": "Wszystkie statusy",
@@ -61,7 +66,16 @@
     "pendingAssignments": "Oczekujące",
     "acknowledgedAssignments": "Potwierdzone",
     "autoAssign": "Przydzielaj po zakończeniu onboardingu",
-    "acknowledgement": "Potwierdzam zapoznanie się z dokumentem."
+    "acknowledgement": "Potwierdzam zapoznanie się z dokumentem.",
+    "questionnaireExists": "Zapisany",
+    "questionnaireComplete": "Uzupełniony",
+    "questionnaireValidated": "Poprawny",
+    "pendingSignatures": "Oczekujące podpisy współpracownika [PH]",
+    "pendingAcknowledgements": "Oczekujące potwierdzenia współpracownika [PH]",
+    "awaitingAdminReview": "Do weryfikacji administratora [PH]",
+    "requiredAction": "Akcja przypisania [PH]",
+    "defaultAction": "Domyślna akcja dokumentu [PH]",
+    "noAssignment": "Brak przypisania [PH]"
   },
   "actions": {
     "start": "Rozpocznij",
@@ -102,8 +116,19 @@
     "mutationSuccessSummary": "Zapisano",
     "mutationFailedSummary": "Nie udało się zapisać",
     "mutationFailedDetail": "Sprawdź dane i spróbuj ponownie.",
+    "mutationUncertainSummary": "Nie udało się potwierdzić zapisu [PH]",
+    "mutationUncertainDetail": "Odśwież widok i sprawdź aktualny stan przed ponowieniem operacji. [PH]",
     "downloadFailedSummary": "Nie udało się przygotować pliku",
-    "downloadFailedDetail": "Spróbuj pobrać dokument ponownie."
+    "downloadFailedDetail": "Spróbuj pobrać dokument ponownie.",
+    "errors": {
+      "UNAUTHENTICATED": "Sesja wygasła. Zaloguj się ponownie. [PH]",
+      "ACCESS_DENIED": "Nie masz uprawnień do tej operacji. [PH]",
+      "VALIDATION_FAILED": "Sprawdź poprawność danych i aktualny stan onboardingu lub dokumentu. [PH]",
+      "NOT_FOUND": "Nie znaleziono onboardingu lub dokumentu. Odśwież widok. [PH]",
+      "CONFLICT": "Stan onboardingu lub dokumentu uległ zmianie albo nie pozwala na tę operację. Odśwież widok. [PH]",
+      "UPLOAD_FAILED": "Nie udało się przesłać pliku. Spróbuj ponownie. [PH]",
+      "INTERNAL_ERROR": "Usługa dokumentów jest chwilowo niedostępna. Spróbuj ponownie później. [PH]"
+    }
   },
   "statuses": {
     "onboarding": {
@@ -119,6 +144,11 @@
       "rejected": "Odrzucony",
       "acknowledged": "Potwierdzony",
       "revoked": "Wycofany"
+    },
+    "requiredAction": {
+      "none": "Bez wymaganej akcji [PH]",
+      "upload_signed": "Podpisana kopia od współpracownika [PH]",
+      "acknowledge": "Potwierdzenie współpracownika [PH]"
     }
   }
 }
