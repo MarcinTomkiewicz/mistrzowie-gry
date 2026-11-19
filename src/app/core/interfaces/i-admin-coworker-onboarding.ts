@@ -185,6 +185,15 @@ export interface ICompleteCoworkerOnboardingResult {
   readonly already_completed: boolean;
 }
 
+export interface ICancelCoworkerOnboardingResult {
+  readonly onboarding_id: string;
+  readonly user_id: string;
+  readonly status: 'cancelled';
+  readonly cancelled_at: string;
+  readonly cancelled_by: string;
+  readonly revoked_pending_assignments: number;
+}
+
 export interface IRegisterSharedDocumentResult {
   readonly document_id: string;
   readonly version_id: string;

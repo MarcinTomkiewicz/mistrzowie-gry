@@ -25,6 +25,7 @@ export function parseAdminJsonRequest(value: unknown) {
       return { action } as const;
     case "getOnboarding":
     case "completeOnboarding":
+    case "cancelOnboarding":
       return {
         action,
         onboarding_id: readUuid(source["onboarding_id"]),

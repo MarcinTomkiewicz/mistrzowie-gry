@@ -233,6 +233,7 @@ function mapSqlState(sqlState: string | null): {
         message: "Request is invalid for the current state.",
       };
     case "23514":
+    case "40001":
       return {
         status: 409,
         code: "CONFLICT",

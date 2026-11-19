@@ -7,6 +7,7 @@ import type {
   IAdminSharedDocumentAssignmentRow,
   IAdminSharedDocumentRow,
   IArchiveSharedDocumentResult,
+  ICancelCoworkerOnboardingResult,
   ICompleteCoworkerOnboardingResult,
   IRemovePrivateDocumentResult,
   IReviewCoworkerSignedSubmissionResult,
@@ -31,6 +32,7 @@ const RPC = {
   archiveSharedDocument: "archive_shared_document",
   listSharedAssignments: "list_admin_shared_document_assignments",
   completeOnboarding: "complete_coworker_onboarding",
+  cancelOnboarding: "cancel_coworker_onboarding",
 } as const;
 
 export async function handleAdminAction(
@@ -104,6 +106,12 @@ export async function handleAdminAction(
       return await callSingleCoworkerRpc<ICompleteCoworkerOnboardingResult>(
         client,
         RPC.completeOnboarding,
+        { p_onboarding_id: request.onboarding_id },
+      );
+    case "cancelOnboarding":
+      return await callSingleCoworkerRpc<ICancelCoworkerOnboardingResult>(
+        client,
+        RPC.cancelOnboarding,
         { p_onboarding_id: request.onboarding_id },
       );
   }
