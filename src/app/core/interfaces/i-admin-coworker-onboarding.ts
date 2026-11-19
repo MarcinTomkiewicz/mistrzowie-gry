@@ -68,6 +68,7 @@ export interface IAdminCoworkerOnboardingDocumentRow {
   readonly assignment_created_at: string | null;
   readonly assignment_updated_at: string | null;
   readonly required_action: CoworkerDocumentRequiredAction | null;
+  readonly category: string | null;
 }
 
 export interface IAdminSharedDocumentRow {
@@ -157,10 +158,10 @@ export interface IRegisterQuestionnairePrivateDocumentResult {
 export interface IRegisterAdminPrivateDocumentResult {
   readonly document_id: string;
   readonly version_id: string;
-  readonly assignment_id: string;
+  readonly assignment_id: string | null;
   readonly title: string;
   readonly required_action: CoworkerDocumentRequiredAction;
-  readonly assignment_status: CoworkerDocumentAssignmentStatus;
+  readonly assignment_status: CoworkerDocumentAssignmentStatus | null;
 }
 
 export interface IReviewCoworkerSignedSubmissionResult {

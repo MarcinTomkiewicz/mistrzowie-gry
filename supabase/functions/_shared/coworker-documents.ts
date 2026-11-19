@@ -50,6 +50,13 @@ export class CoworkerDocumentNotFoundError extends Error {
   }
 }
 
+export class CoworkerDocumentConflictError extends Error {
+  constructor() {
+    super("Coworker document request conflicts with the current state.");
+    this.name = "CoworkerDocumentConflictError";
+  }
+}
+
 class CoworkerDocumentContractError extends Error {
   constructor() {
     super("Coworker document backend returned an invalid result.");
@@ -199,6 +206,10 @@ export function documentErrorResponse(
   }
   if (error instanceof CoworkerDocumentNotFoundError) {
     return errorResponse(404, "NOT_FOUND", "Resource was not found.");
+  }
+  if (error instanceof CoworkerDocumentConflictError) {
+    const { status, code, message } = mapSqlState("23514");
+    return errorResponse(status, code, message);
   }
   if (error instanceof CoworkerDocumentStorageError) {
     logError(requestId, error.code, error);

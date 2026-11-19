@@ -33,6 +33,11 @@ const RPC = {
   listSharedAssignments: "list_admin_shared_document_assignments",
   completeOnboarding: "complete_coworker_onboarding",
   cancelOnboarding: "cancel_coworker_onboarding",
+  listDocumentCategories: "list_admin_coworker_document_categories",
+  saveDocumentCategory: "save_admin_coworker_document_category",
+  retireDocumentCategory: "retire_admin_coworker_document_category",
+  setDocumentCategory: "set_admin_coworker_document_category",
+  listDocumentCategoryHistory: "list_admin_coworker_document_category_history",
 } as const;
 
 export async function handleAdminAction(
@@ -114,13 +119,46 @@ export async function handleAdminAction(
         RPC.cancelOnboarding,
         { p_onboarding_id: request.onboarding_id },
       );
+    case "listDocumentCategories":
+      return await callCoworkerRpc(client, RPC.listDocumentCategories);
+    case "saveDocumentCategory":
+      return await callSingleCoworkerRpc(client, RPC.saveDocumentCategory, {
+        p_category_key: request.category_key,
+        p_name: request.name,
+      });
+    case "retireDocumentCategory":
+      return await callSingleCoworkerRpc(client, RPC.retireDocumentCategory, {
+        p_category_key: request.category_key,
+      });
+    case "setDocumentCategory":
+      return await callSingleCoworkerRpc(client, RPC.setDocumentCategory, {
+        p_document_id: request.document_id,
+        p_category_key: request.category_key,
+      });
+    case "listDocumentCategoryHistory":
+      return await callCoworkerRpc(client, RPC.listDocumentCategoryHistory, {
+        p_category_key: request.category_key,
+      });
   }
 }
 
-export function listAdminOnboardings(
+function listAdminOnboardings(
   client: SupabaseClient,
 ): Promise<IAdminCoworkerOnboardingRow[]> {
   return callCoworkerRpc(client, RPC.listOnboardings);
+}
+
+export async function getAdminOnboarding(
+  client: SupabaseClient,
+  onboardingId: string,
+): Promise<IAdminCoworkerOnboardingRow> {
+  const canonicalId = onboardingId.toLowerCase();
+  const onboardings = await listAdminOnboardings(client);
+  const onboarding = onboardings.find((row) =>
+    row.onboarding_id === canonicalId
+  );
+  if (onboarding === undefined) throw new CoworkerDocumentNotFoundError();
+  return onboarding;
 }
 
 export function listAdminOnboardingDocuments(
@@ -159,14 +197,10 @@ async function getOnboarding(
     >
   >;
 }> {
-  const [onboardings, documents] = await Promise.all([
-    listAdminOnboardings(client),
+  const [onboarding, documents] = await Promise.all([
+    getAdminOnboarding(client, onboardingId),
     listAdminOnboardingDocuments(client, onboardingId),
   ]);
-  const onboarding = onboardings.find((row) =>
-    row.onboarding_id === onboardingId
-  );
-  if (onboarding === undefined) throw new CoworkerDocumentNotFoundError();
   return { onboarding, documents: documents.map(withoutPrivateStoragePaths) };
 }
 

@@ -11,20 +11,23 @@ import {
 import {
   callCoworkerRpc,
   callSingleCoworkerRpc,
+  CoworkerDocumentConflictError,
   CoworkerDocumentNotFoundError,
   readPdfFile,
   removeDocumentPaths,
   uploadPdf,
 } from "../_shared/coworker-documents.ts";
-import {
-  listAdminOnboardingDocuments,
-  listAdminSharedDocuments,
-} from "./actions.ts";
+import { getAdminOnboarding, listAdminSharedDocuments } from "./actions.ts";
 
 const RPC = {
   registerPrivateDocuments: "register_admin_private_documents",
   registerSharedDocument: "register_shared_document",
 } as const;
+
+type PrivateUploadRequest = Extract<
+  ReturnType<typeof parseAdminMultipartRequest>,
+  { action: "uploadPrivateDocuments" }
+>;
 
 export async function handleAdminUpload(
   client: SupabaseClient,
@@ -39,28 +42,35 @@ export async function handleAdminUpload(
 async function uploadPrivateDocuments(
   client: SupabaseClient,
   storageClient: SupabaseClient,
-  request: Extract<
-    ReturnType<typeof parseAdminMultipartRequest>,
-    { action: "uploadPrivateDocuments" }
-  >,
+  request: PrivateUploadRequest,
 ): Promise<IRegisterAdminPrivateDocumentResult[]> {
-  await listAdminOnboardingDocuments(client, request.onboarding_id);
+  const onboarding = await getAdminOnboarding(client, request.onboarding_id);
+  const completed = onboarding.status === "completed";
+  if (
+    onboarding.status !== "in_progress" &&
+    (!completed ||
+      request.documents.some((document) => document.requires_signed_upload))
+  ) {
+    throw new CoworkerDocumentConflictError();
+  }
+  const storageDirectory = completed
+    ? `private/by-user/${onboarding.user_id}`
+    : `private/${onboarding.onboarding_id}`;
   const uploadedPaths: string[] = [];
-  const documents: Array<{
-    title: string;
-    requires_signed_upload: boolean;
-    storage_path: string;
-    original_filename: string;
-    mime_type: string;
-    size_bytes: number;
-  }> = [];
+  const documents: Array<
+    PrivateUploadRequest["documents"][number] & {
+      storage_path: string;
+      original_filename: string;
+      mime_type: string;
+      size_bytes: number;
+    }
+  > = [];
   try {
     for (let index = 0; index < request.documents.length; index += 1) {
       const metadata = request.documents[index];
       const file = request.files[index];
       const bytes = await readPdfFile(file);
-      const storagePath =
-        `private/${request.onboarding_id}/${crypto.randomUUID()}.pdf`;
+      const storagePath = `${storageDirectory}/${crypto.randomUUID()}.pdf`;
       await uploadPdf(storageClient, storagePath, bytes);
       uploadedPaths.push(storagePath);
       documents.push({
@@ -75,12 +85,12 @@ async function uploadPrivateDocuments(
       client,
       RPC.registerPrivateDocuments,
       {
-        p_onboarding_id: request.onboarding_id,
+        p_onboarding_id: onboarding.onboarding_id,
         p_documents: documents,
       },
     );
   } catch (error) {
-    await removeDocumentPaths(storageClient, uploadedPaths);
+    await cleanupFailedUpload(storageClient, uploadedPaths, request.action);
     throw error;
   }
 }
@@ -121,7 +131,24 @@ async function uploadSharedDocument(
       },
     );
   } catch (error) {
-    await removeDocumentPaths(storageClient, [storagePath]);
+    await cleanupFailedUpload(storageClient, [storagePath], request.action);
     throw error;
+  }
+}
+
+async function cleanupFailedUpload(
+  storageClient: SupabaseClient,
+  storagePaths: readonly string[],
+  operation: ReturnType<typeof parseAdminMultipartRequest>["action"],
+): Promise<void> {
+  try {
+    await removeDocumentPaths(storageClient, storagePaths);
+  } catch (error) {
+    console.error(JSON.stringify({
+      code: "UPLOAD_STORAGE_CLEANUP_FAILED",
+      operation,
+      storagePaths,
+      errorType: error instanceof Error ? error.name : "UnknownError",
+    }));
   }
 }

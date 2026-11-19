@@ -6,6 +6,7 @@ import {
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REJECTION_REASON_MAX_LENGTH = 1_000;
+const CATEGORY_NAME_MAX_LENGTH = 80;
 
 export class CoworkerDocumentRequestError extends Error {
   constructor() {
@@ -22,7 +23,34 @@ export function parseAdminJsonRequest(value: unknown) {
     case "listOnboardingCandidates":
     case "listOnboardings":
     case "listSharedDocuments":
+    case "listDocumentCategories":
       return { action } as const;
+    case "saveDocumentCategory":
+      return {
+        action,
+        category_key: source["category_key"] === null
+          ? null
+          : readCategoryKey(source["category_key"]),
+        name: readCategoryName(source["name"]),
+      } as const;
+    case "retireDocumentCategory":
+      return {
+        action,
+        category_key: readCategoryKey(source["category_key"]),
+      } as const;
+    case "setDocumentCategory":
+      return {
+        action,
+        document_id: readUuid(source["document_id"]),
+        category_key: readCategoryKey(source["category_key"]),
+      } as const;
+    case "listDocumentCategoryHistory":
+      return {
+        action,
+        category_key: source["category_key"] == null
+          ? null
+          : readCategoryKey(source["category_key"]),
+      } as const;
     case "getOnboarding":
     case "completeOnboarding":
     case "cancelOnboarding":
@@ -183,12 +211,16 @@ function readPrivateDocumentMetadata(formData: FormData) {
   return parsed.map((item) => {
     const source = readObject(item);
     const requiresSignedUpload = source["requires_signed_upload"];
+    const category = source["category"];
     if (typeof requiresSignedUpload !== "boolean") {
       throw invalid();
     }
     return {
       title: readText(source["title"]),
       requires_signed_upload: requiresSignedUpload,
+      ...(category === undefined
+        ? {}
+        : { category: readCategoryKey(category) }),
     };
   });
 }
@@ -205,6 +237,21 @@ function readText(value: unknown): string {
     throw invalid();
   }
   return value.trim();
+}
+
+function readCategoryKey(value: unknown): string {
+  if (typeof value !== "string" || value.trim() === "") {
+    throw invalid();
+  }
+  return value;
+}
+
+function readCategoryName(value: unknown): string {
+  const name = readText(value);
+  if ([...name].length > CATEGORY_NAME_MAX_LENGTH || /\p{Cc}/u.test(name)) {
+    throw invalid();
+  }
+  return name;
 }
 
 function readNullableString(
