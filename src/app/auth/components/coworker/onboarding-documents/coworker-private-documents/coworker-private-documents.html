@@ -1,0 +1,117 @@
+@if (!rows().length) {
+  @if (!hasOnboarding()) {
+    <section class="mg-card w-100">
+      <p class="m-0 muted-text">{{ i18n.coworkerPrivate().noOnboarding }}</p>
+    </section>
+  } @else if (!questionnaireComplete()) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100">
+      <p class="m-0">{{ i18n.coworkerPrivate().questionnaireRequired }}</p>
+      <div>
+        <p-button routerLink="/auth/coworker/questionnaire" icon="pi pi-id-card"
+          [label]="i18n.actions().goToQuestionnaire" />
+      </div>
+    </section>
+  } @else {
+    <section class="mg-card w-100">
+      <p class="m-0 muted-text">{{ i18n.coworkerPrivate().empty }}</p>
+    </section>
+  }
+} @else {
+  <p-tabs [(value)]="activeCategory" [scrollable]="true">
+    <p-tablist>
+      @for (category of categories(); track category.key) {
+        <p-tab [value]="category.key">
+          {{ category.label }}
+          @if (category.status === 'retired') { ({{ i18n.categories().retired }}) }
+        </p-tab>
+      }
+    </p-tablist>
+    <p-tabpanels>
+      @for (category of categories(); track category.key) {
+        <p-tabpanel [value]="category.key">
+          @if (activeCategory() === category.key) {
+            <div class="flex-col-start-stretch gap-md">
+              @for (row of category.rows; track row.document.assignment_id) {
+                @let document = row.document;
+                @let assignmentId = document.assignment_id;
+                <article class="mg-card flex-col-start-stretch gap-md w-100">
+                  <div class="flex-row-between-start flex-wrap gap-sm w-100">
+                    <div class="flex-col-start-start gap-xs">
+                      <strong>{{ document.title }}</strong>
+                      @if (row.historical) {
+                        <span class="tag-badge tag-badge--muted">{{ i18n.fields().historicalVersion }}</span>
+                      }
+                      @if (i18n.statuses().assignment; as statuses) {
+                        <span [class]="'tag-badge ' + (row.historical ? 'tag-badge--muted' : STATUS_BADGE_CLASS[document.assignment_status])">
+                          {{ statuses[document.assignment_status] }}
+                        </span>
+                      }
+                    </div>
+                    <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>
+                  </div>
+                  @if (document.rejection_reason) {
+                    <p class="m-0 error-text">
+                      {{ i18n.commonLabels().rejectionReason }}: {{ document.rejection_reason }}
+                    </p>
+                  }
+
+                  <div class="flex-row-start-center flex-wrap gap-xs">
+                    <p-button size="small" severity="secondary" icon="pi pi-horus"
+                      [label]="i18n.commonActions().preview"
+                      (onClick)="fileRequested.emit({ assignmentId, target: 'source', preview: true })" />
+                    <p-button size="small" severity="secondary" [outlined]="true" icon="pi pi-missile-swarm"
+                      [label]="i18n.actions().download"
+                      (onClick)="fileRequested.emit({ assignmentId, target: 'source', preview: false })" />
+                    @if (document.signed_original_filename) {
+                      <p-button size="small" severity="secondary" icon="pi pi-evil-book"
+                        [label]="i18n.actions().previewSigned"
+                        (onClick)="fileRequested.emit({ assignmentId, target: 'signed', preview: true })" />
+                      <p-button size="small" severity="secondary" [outlined]="true" icon="pi pi-missile-swarm"
+                        [label]="i18n.actions().downloadSigned"
+                        (onClick)="fileRequested.emit({ assignmentId, target: 'signed', preview: false })" />
+                    }
+                  </div>
+
+                  @if (declarationControls().controls[assignmentId]; as declaration) {
+                    <div class="flex-col-start-stretch gap-sm w-100">
+                      <app-file-upload [options]="uploadOptions()" [texts]="i18n.fileUploadTexts()"
+                        (filesSelected)="signedFilesSelected.emit({ assignmentId, files: $event })" />
+                      @if (selectedFiles().get(assignmentId); as file) {
+                        <small class="tag-badge tag-badge--muted">
+                          {{ i18n.upload().selected }}: {{ file.name }}
+                        </small>
+                      }
+                      <div class="flex-row-start-center gap-sm">
+                        <p-checkbox [binary]="true" [inputId]="'signed-declaration-' + assignmentId"
+                          [formControl]="declaration" />
+                        <label [for]="'signed-declaration-' + assignmentId">
+                          {{ i18n.coworkerPrivate().declaration }}
+                        </label>
+                      </div>
+                      <div>
+                        <p-button icon="pi pi-jetpack" [label]="i18n.actions().uploadSigned"
+                          [loading]="activeMutationKey() === assignmentId"
+                          [disabled]="activeMutationKey() !== null || !selectedFiles().has(assignmentId) || !declaration.value"
+                          (onClick)="signatureSubmitted.emit(assignmentId)" />
+                      </div>
+                    </div>
+                  }
+
+                  @if (acknowledgementControls().controls[assignmentId]; as acknowledgement) {
+                    <div class="flex-row-start-center gap-sm">
+                      <p-checkbox [binary]="true" [inputId]="'private-acknowledgement-' + assignmentId"
+                        [formControl]="acknowledgement" [disabled]="activeMutationKey() !== null" />
+                      <label [for]="'private-acknowledgement-' + assignmentId">
+                        {{ i18n.fields().acknowledgement }}
+                      </label>
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          }
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
+}

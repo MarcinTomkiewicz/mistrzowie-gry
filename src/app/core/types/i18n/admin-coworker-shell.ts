@@ -4,4 +4,5 @@ export interface AdminCoworkerShellTranslations {
 
 export interface AdminCoworkerShellTabsTranslations {
   onboarding: string;
+  documentCategories: string;
 }

@@ -20,6 +20,9 @@
     }
   },
   "adminDetail": {
+    "documentSearch": "Szukaj po tytule [PH]",
+    "hideRejected": "Ukryj odrzucone [PH]",
+    "emptyFilteredDocuments": "Żaden dokument nie pasuje do wybranych filtrów. [PH]",
     "title": "Wdrożenie współpracownika",
     "subtitle": "Sprawdzaj dokumenty tej osoby, dodawaj potrzebne pliki i zakończ wdrożenie po dopełnieniu wymaganych formalności.",
     "uploadSection": "Dodaj dokumenty dla współpracownika",
@@ -38,6 +41,27 @@
     "empty": "Nie dodano jeszcze żadnych dokumentów wspólnych.",
     "emptyConfirmations": "Ten dokument nie został jeszcze nikomu przydzielony.",
     "loadError": "Nie udało się wczytać dokumentów wspólnych. Spróbuj ponownie."
+  },
+  "categories": {
+    "label": "Kategoria",
+    "all": "Wszystkie kategorie",
+    "add": "Dodaj kategorię",
+    "rename": "Zmień nazwę kategorii",
+    "change": "Zmień kategorię",
+    "retired": "Wycofana",
+    "retire": "Wycofaj",
+    "retireMessage": "Wycofać kategorię „{{name}}”? Dokumenty zachowają tę kategorię. Nie będzie można przypisać jej do kolejnych dokumentów.",
+    "loadError": "Nie udało się wczytać kategorii dokumentów.",
+    "empty": "Brak kategorii dokumentów.",
+    "history": "Historia kategorii",
+    "historyLoadError": "Nie udało się wczytać historii kategorii.",
+    "historyEmpty": "Brak zmian w historii kategorii.",
+    "events": {
+      "created": "Utworzono kategorię",
+      "renamed": "Zmieniono nazwę kategorii",
+      "retired": "Wycofano kategorię",
+      "assigned": "Przypisano kategorię do dokumentu"
+    }
   },
   "coworkerPrivate": {
     "subtitle": "Sprawdź dokumenty przygotowane dla Ciebie. W zależności od dokumentu prześlij podpisaną kopię albo potwierdź zapoznanie się z jego treścią.",

@@ -5,5 +5,6 @@ export type PrivateDocumentRowForm = FormGroup<{
   preset: FormControl<string | null>;
   title: FormControl<string>;
   required_action: FormControl<CoworkerDocumentRequiredAction>;
+  category: FormControl<string>;
   file: FormControl<File | null>;
 }>;

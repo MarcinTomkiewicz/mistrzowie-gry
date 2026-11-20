@@ -1,0 +1,137 @@
+@let copy = i18n.categories();
+
+<div class="flex-col-start-stretch gap-md w-100 min-w-0 position-relative" [attr.aria-busy]="busy()">
+  <header class="mg-section__header w-100">
+    <h2 class="mg-section__title mg-section__title--md">{{ tabs().documentCategories }}</h2>
+  </header>
+
+  <app-loading-overlay
+    [visible]="busy()"
+    [label]="saving() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
+  />
+
+  @if (loadFailed()) {
+    <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
+      <p class="m-0 error-text">{{ copy.loadError }}</p>
+      <p-button severity="secondary" icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry" (onClick)="load()" />
+    </section>
+  } @else {
+    <section #categoryEditor class="mg-card flex-col-start-stretch gap-md w-100">
+      <h3 class="mg-section__title mg-section__title--sm m-0">
+        {{ editingCategory() ? copy.rename : copy.add }}
+      </h3>
+      <form class="flex-col-start-stretch gap-sm w-100" [formGroup]="form"
+        (ngSubmit)="saveCategory()" novalidate>
+        <p-iftalabel class="w-100">
+          <input id="document-category-name" pInputText class="w-100" maxlength="80"
+            formControlName="name" [readOnly]="busy()" />
+          <label for="document-category-name">{{ i18n.commonLabels().name }}</label>
+        </p-iftalabel>
+        <div class="flex-row-end-center flex-wrap gap-sm">
+          @if (editingCategory()) {
+            <p-button type="button" severity="secondary" [outlined]="true"
+              [label]="i18n.commonActions().cancel" [disabled]="busy()" (onClick)="resetName()" />
+          }
+          <p-button type="submit"
+            [label]="editingCategory() ? i18n.commonActions().save : i18n.commonActions().add"
+            [loading]="saving()"
+            [disabled]="busy() || name.invalid || name.value.trim() === editingCategory()?.category_name"
+          />
+        </div>
+      </form>
+    </section>
+
+    @if (categories().length) {
+      <div class="flex-row-end-center">
+        <app-document-operations [items]="catalogOperations()" [label]="copy.history"
+          [disabled]="busy()" />
+      </div>
+      <div class="w-100 overflow-x-auto">
+        <p-table size="small" [value]="rows()" dataKey="category.category_key"
+          tableStyleClass="mg-responsive-table">
+          <ng-template #header>
+            <tr class="hide-down-sm">
+              <th scope="col" class="small-caps">{{ i18n.commonLabels().name }}</th>
+              <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+              <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-row>
+            @let category = row.category;
+            <tr class="mg-responsive-table__row">
+              <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">
+                {{ category.category_name }}
+              </th>
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
+                <span class="mg-responsive-table__value">
+                  @if (category.status === 'active') {
+                    <span [class]="'tag-badge ' + STATUS_BADGE_CLASS.active">
+                      {{ i18n.commonEntityStatuses().active.feminine }}
+                    </span>
+                  } @else {
+                    <span [class]="'tag-badge ' + STATUS_BADGE_CLASS.archived">{{ copy.retired }}</span>
+                  }
+                </span>
+              </td>
+              <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
+                <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+                <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
+                  @if (category.status === 'active') {
+                    <p-button size="small" severity="secondary" icon="pi pi-scroll-quill"
+                      [label]="i18n.commonActions().edit" [disabled]="busy()"
+                      (onClick)="editCategory(category)" />
+                  }
+                  <app-document-operations [items]="row.menu" [disabled]="busy()"
+                    [label]="i18n.commonTable().actions + ' - ' + category.category_name" />
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    } @else if (!loading()) {
+      <section class="mg-card w-100" role="status">
+        <p class="m-0 muted-text">{{ copy.empty }}</p>
+      </section>
+    }
+
+    @if (historyKey() !== undefined) {
+      <section #categoryHistory class="flex-col-start-stretch gap-sm w-100">
+        <h3 class="mg-section__title mg-section__title--sm m-0">
+          {{ copy.history }}
+          @if (historyKey(); as key) {
+            ({{ categoriesByKey().get(key)?.category_name }})
+          }
+        </h3>
+        @if (historyLoading()) {
+          <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
+        } @else if (historyFailed()) {
+          <p class="m-0 error-text" role="alert">{{ copy.historyLoadError }}</p>
+          <p-button severity="secondary" icon="pi pi-refresh"
+            [label]="i18n.commonActions().retry" (onClick)="loadHistory(historyKey() ?? null)" />
+        } @else {
+          @for (event of history(); track event.event_id) {
+            @let previous = historyValue(event, event.previous_value);
+            @let current = historyValue(event, event.current_value);
+            <article class="mg-card flex-col-start-stretch gap-xs w-100">
+              <strong>{{ copy.events[event.event_type] }}</strong>
+              <span>{{ categoriesByKey().get(event.category_key)?.category_name }}</span>
+              @if (previous || current) {
+                <span class="text-wrap-anywhere">
+                  {{ previous }}
+                  @if (previous && current) { → }
+                  {{ current }}
+                </span>
+              }
+              <small>{{ formatTimestampLabel(event.occurred_at) }}</small>
+            </article>
+          } @empty {
+            <p class="m-0 muted-text">{{ copy.historyEmpty }}</p>
+          }
+        }
+      </section>
+    }
+  }
+</div>

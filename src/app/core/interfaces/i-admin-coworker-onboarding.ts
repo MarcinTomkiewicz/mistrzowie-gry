@@ -1,6 +1,8 @@
 import type { AppRole } from '../types/app-role';
 import type {
   CoworkerDocumentAssignmentStatus,
+  CoworkerDocumentCategoryEventType,
+  CoworkerDocumentCategoryStatus,
   CoworkerDocumentLifecycleStatus,
   CoworkerDocumentRequiredAction,
   CoworkerDocumentReviewDecision,
@@ -133,7 +135,39 @@ export interface IAdminCoworkerOnboardingDetail {
 export interface IAdminPrivateDocumentUpload {
   readonly title: string;
   readonly required_action: CoworkerDocumentRequiredAction;
+  readonly category: string;
   readonly file: File;
+}
+
+export interface IAdminCoworkerDocumentCategory {
+  readonly category_key: string;
+  readonly category_name: string;
+  readonly status: CoworkerDocumentCategoryStatus;
+  readonly created_at: string;
+  readonly created_by: string | null;
+  readonly updated_at: string;
+  readonly updated_by: string | null;
+  readonly retired_at: string | null;
+  readonly retired_by: string | null;
+  readonly document_count: number;
+}
+
+export interface IAdminCoworkerDocumentCategoryEvent {
+  readonly event_id: string;
+  readonly category_key: string;
+  readonly event_type: CoworkerDocumentCategoryEventType;
+  readonly actor_user_id: string;
+  readonly document_id: string | null;
+  readonly previous_value: string | null;
+  readonly current_value: string | null;
+  readonly occurred_at: string;
+}
+
+export interface ISetAdminCoworkerDocumentCategoryResult {
+  readonly document_id: string;
+  readonly category_key: string;
+  readonly previous_category_key: string | null;
+  readonly updated_at: string;
 }
 
 export interface IStartCoworkerOnboardingResult {

@@ -1,12 +1,12 @@
 @use "sass:map";
 @use "../abstracts/custom-icons" as ci;
 
-ul {
-    padding: 0;
-    text-align: start;
+ul:where(.mg-content-list) {
+  padding: 0;
+  text-align: start;
 }
 
-ul li {
+ul:where(.mg-content-list) > li {
   position: relative;
   padding-left: 1.5rem;
   line-height: 1.9;
@@ -27,7 +27,6 @@ ul li {
     -webkit-mask-size: contain;
     mask-size: contain;
 
-    /* default bullet = d20 */
     -webkit-mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd10')}");
     mask-image: url("/icons/#{map.get(ci.$custom-icons, 'd10')}");
   }
@@ -35,17 +34,4 @@ ul li {
 
 .li--unset {
   all: unset;
-
-  &::before {
-    all: unset;
-  }
-}
-
-@each $name, $file in ci.$custom-icons {
-  .li--bullet-#{$name}::before {
-    content: "";
-    font-family: unset;
-    -webkit-mask-image: url("/icons/#{$file}");
-    mask-image: url("/icons/#{$file}");
-  }
 }

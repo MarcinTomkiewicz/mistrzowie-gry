@@ -151,11 +151,11 @@
         @if (publication.publicationConfirmed() && !publication.verified() && !publication.isBusy()) {
           <p-message severity="warn">{{ publishCopy.signupRelease.partial }}</p-message>
         }
-        <ul class="m-0">
+        <ul class="mg-content-list m-0">
           @for (row of occurrenceProgress(); track row.occurrenceId) {
             <li class="text-wrap-anywhere">
               <strong>{{ row.city }} - {{ formatDateLabel(row.date) }}</strong>
-              <ul>
+              <ul class="mg-content-list">
                 @for (step of row.steps; track step.step) {
                   <li>
                     {{ step.name }} - {{ step.label }}
@@ -232,7 +232,7 @@
             <div><dt class="muted-text">{{ publishCopy.scope.activateEditions }}</dt><dd class="m-0 text-wrap-anywhere">{{ scopeActivationCities() || i18n.commonValues().notApplicable }}</dd></div>
           </dl>
           @if (scopeBlockers().length) {
-            <ul class="m-0" role="alert">
+            <ul class="mg-content-list m-0" role="alert">
               @for (blocker of scopeBlockers(); track $index) {
                 <li class="text-wrap-anywhere">
                   {{ blocker.message }}
@@ -259,7 +259,7 @@
           <div><dt class="muted-text">{{ publishCopy.preservedPastDrafts }}</dt><dd class="m-0">{{ preview.impact.preservedPastDraftOccurrences }}</dd></div>
         </dl>
         @if (publicationBlockers().length) {
-          <ul class="m-0" role="alert">
+          <ul class="mg-content-list m-0" role="alert">
             @for (blocker of publicationBlockers(); track $index) {
               <li class="text-wrap-anywhere">
                 {{ blocker.message }}

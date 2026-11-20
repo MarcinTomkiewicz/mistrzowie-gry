@@ -45,7 +45,7 @@
             {{ i18n.publication().validationIssues }}
           </h3>
 
-          <ul class="m-0">
+          <ul class="mg-content-list m-0">
             @for (issue of issues(); track $index) {
               <li>
                 {{ ("common." + issue.messageKey) | transloco }}

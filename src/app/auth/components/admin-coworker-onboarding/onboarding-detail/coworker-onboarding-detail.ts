@@ -1,19 +1,15 @@
 import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { IftaLabelModule } from 'primeng/iftalabel';
-import { TextareaModule } from 'primeng/textarea';
 import { finalize, Observable, Subscription } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
 import type {
-  IAdminCoworkerOnboardingDocument,
+  IAdminCoworkerDocumentCategory,
   IAdminCoworkerOnboardingDetail,
-  IAdminPrivateDocumentUpload,
 } from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import type { ICoworkerDocumentDownload } from '../../../../core/interfaces/i-coworker-onboarding';
 import type { IPdfPreview } from '../../../../core/interfaces/i-pdf';
@@ -25,32 +21,29 @@ import {
   COWORKER_ONBOARDING_SCOPE,
   createCoworkerOnboardingI18n,
 } from '../../../../core/translations/coworker-onboarding.i18n';
-import type {
-  CoworkerDocumentDownloadTarget,
-  CoworkerDocumentReviewDecision,
-} from '../../../../core/types/coworker-onboarding';
 import { formatTimestampLabel } from '../../../../core/utils/date';
-import { stablePartition } from '../../../../core/utils/stable-partition';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
-import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { OnboardingDetailTab } from '../../admin-coworkers/admin-coworker-shell/onboarding-detail-tab';
+import { getDocumentVersionId } from '../document-version';
 import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
 import { createAdminOnboardingProgress } from '../onboarding-progress';
-import { PrivateDocumentBatch } from '../private-document-batch/private-document-batch';
+import {
+  PrivateDocuments,
+  type PrivateDocumentFileOperation,
+  type PrivateDocumentMutation,
+} from '../private-documents/private-documents';
 
 @Component({
   selector: 'app-coworker-onboarding-detail',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
+    AccordionModule,
     ButtonModule,
-    DialogModule,
-    IftaLabelModule,
-    TextareaModule,
     LoadingOverlay,
     PdfViewerDialog,
-    PrivateDocumentBatch,
+    PrivateDocuments,
   ],
   templateUrl: './coworker-onboarding-detail.html',
   providers: [provideTranslocoScope(COWORKER_ONBOARDING_SCOPE, 'common')],
@@ -63,7 +56,8 @@ export class CoworkerOnboardingDetail {
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly batch = viewChild(PrivateDocumentBatch);
+  private readonly detailTab = inject(OnboardingDetailTab);
+  private readonly privateDocuments = viewChild(PrivateDocuments);
   private readonly onboardingId = signal<string | null>(null);
   private readonly pendingMutationIds = signal<readonly string[]>([]);
   private loadSubscription: Subscription | null = null;
@@ -71,13 +65,17 @@ export class CoworkerOnboardingDetail {
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   protected readonly formatTimestampLabel = formatTimestampLabel;
-  protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly detail = signal<IAdminCoworkerOnboardingDetail | null>(null);
+  protected readonly coworkerName = computed(() => {
+    const person = this.detail()?.onboarding;
+    return person ? getUserDisplayName({
+      firstName: person.first_name,
+      nickname: person.nickname,
+      useNickname: person.use_nickname,
+    }) || person.email || '' : '';
+  });
   protected readonly onboardingInProgress = computed(() =>
     this.detail()?.onboarding.status === 'in_progress',
-  );
-  protected readonly canUploadPrivateDocuments = computed(() =>
-    this.onboardingInProgress() || this.detail()?.onboarding.status === 'completed',
   );
   protected readonly loading = signal(true);
   protected readonly busy = computed(() => {
@@ -86,17 +84,9 @@ export class CoworkerOnboardingDetail {
   });
   protected readonly loadFailed = signal(false);
   protected readonly preview = signal<IPdfPreview | null>(null);
-  protected readonly rejectionAssignmentId = signal<string | null>(null);
-  protected readonly rejectionReason = new FormControl('', {
-    nonNullable: true,
-    validators: [requiredTrimmedValidator(), Validators.maxLength(1000)],
-  });
-  protected readonly documents = computed(() =>
-    stablePartition(
-      this.detail()?.documents ?? [],
-      (document) => this.isCurrentDocumentVersion(document),
-    ),
-  );
+  protected readonly categories = signal<readonly IAdminCoworkerDocumentCategory[]>([]);
+  protected readonly categoriesLoading = signal(false);
+  protected readonly categoriesLoadFailed = signal(false);
   protected readonly progress = computed(() => {
     const onboarding = this.detail()?.onboarding;
     return onboarding
@@ -108,14 +98,16 @@ export class CoworkerOnboardingDetail {
   });
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.detailTab.current.set(null));
+    this.loadCategories();
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const onboardingId = params.get('onboarding_id')?.toLowerCase() ?? null;
+      const routeId = params.get('onboarding_id');
+      const onboardingId = routeId?.toLowerCase() ?? null;
+      this.detailTab.current.set(routeId ? { id: routeId } : null);
       if (this.onboardingId() !== onboardingId) {
         this.onboardingId.set(onboardingId);
         this.detail.set(null);
         this.preview.set(null);
-        this.closeRejection();
-        this.batch()?.reset();
       }
       this.load();
     });
@@ -126,6 +118,7 @@ export class CoworkerOnboardingDetail {
         sameUrlNavigationId = event.url === this.router.url ? event.id : null;
       } else if (event instanceof NavigationEnd && event.id === sameUrlNavigationId) {
         sameUrlNavigationId = null;
+        this.loadCategories();
         this.load();
       }
     });
@@ -142,28 +135,63 @@ export class CoworkerOnboardingDetail {
 
     this.loading.set(true);
     this.loadFailed.set(false);
-    this.loadSubscription = this.api
-      .getOnboarding(onboardingId)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loading.set(false)),
-      )
-      .subscribe({
-        next: (detail) => this.detail.set(detail),
-        error: (error: unknown) => this.showLoadError(error),
-      });
+    this.loadSubscription = this.api.getOnboarding(onboardingId).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.loading.set(false)),
+    ).subscribe({
+      next: (detail) => {
+        if (this.onboardingId() !== onboardingId) return;
+        this.detail.set(detail);
+        this.detailTab.setName(this.coworkerName());
+      },
+      error: (error: unknown) => this.showLoadError(error),
+    });
   }
 
-  protected openDocument(
-    document: IAdminCoworkerOnboardingDocument,
-    target: CoworkerDocumentDownloadTarget,
-    showPreview: boolean,
-  ): void {
+  protected loadCategories(): void {
+    if (this.categoriesLoading()) return;
+    this.categoriesLoading.set(true);
+    this.categoriesLoadFailed.set(false);
+    this.api.getDocumentCategories().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.categoriesLoading.set(false)),
+    ).subscribe({
+      next: (categories) => this.categories.set(categories),
+      error: () => this.categoriesLoadFailed.set(true),
+    });
+  }
+
+  protected mutatePrivateDocuments(mutation: PrivateDocumentMutation, onboardingId: string): void {
+    const status = this.detail()?.onboarding.status;
+    const allowed = mutation.kind === 'review' || status === 'in_progress' ||
+      (mutation.kind !== 'remove' && status === 'completed');
+    if (!this.canMutateOnboarding(onboardingId, allowed)) return;
+
+    let request: Observable<unknown>;
+    switch (mutation.kind) {
+      case 'upload':
+        request = this.api.uploadPrivateDocuments(onboardingId, mutation.documents);
+        break;
+      case 'remove':
+        request = this.api.removePrivateDocument(mutation.documentId);
+        break;
+      case 'review':
+        request = this.api.reviewSignedDocument(mutation.assignmentId, mutation.decision, mutation.reason);
+        break;
+      case 'reclassify':
+        request = this.api.setDocumentCategory(mutation.documentId, mutation.categoryKey);
+        break;
+    }
+    this.runMutation(request, () => this.privateDocuments()?.mutationSucceeded(mutation.kind));
+  }
+
+  protected openDocument(operation: PrivateDocumentFileOperation, expectedId: string): void {
     const onboardingId = this.onboardingId();
+    const { document, target, kind } = operation;
     const targetId = target === 'source'
-      ? this.getDocumentVersionId(document)
+      ? getDocumentVersionId(document)
       : document.assignment_id;
-    if (!onboardingId || !targetId) return;
+    if (onboardingId !== expectedId || !targetId) return;
 
     const request: Observable<ICoworkerDocumentDownload> = target === 'source'
       ? this.api.getPrivateSourceDownload(targetId, onboardingId)
@@ -171,7 +199,7 @@ export class CoworkerOnboardingDetail {
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ url, filename }) => {
         if (this.onboardingId() !== onboardingId) return;
-        if (showPreview) {
+        if (kind === 'preview') {
           this.preview.set({ url, title: filename });
         } else {
           this.platform.openNewTab(url);
@@ -185,54 +213,6 @@ export class CoworkerOnboardingDetail {
             error, this.i18n.toast().errors, this.i18n.toast().downloadFailedDetail,
           ),
         });
-      },
-    });
-  }
-
-  protected accept(document: IAdminCoworkerOnboardingDocument): void {
-    if (!document.assignment_id || !this.isCurrentDocumentVersion(document)) {
-      return;
-    }
-    this.review(document.assignment_id, 'accepted', null);
-  }
-
-  protected openRejection(document: IAdminCoworkerOnboardingDocument): void {
-    if (!document.assignment_id || !this.isCurrentDocumentVersion(document)) {
-      return;
-    }
-    this.rejectionReason.reset();
-    this.rejectionAssignmentId.set(document.assignment_id);
-  }
-
-  protected isCurrentDocumentVersion(
-    document: IAdminCoworkerOnboardingDocument,
-  ): boolean {
-    const versionId = this.getDocumentVersionId(document);
-    return versionId !== null && versionId === document.current_version_id;
-  }
-
-  protected closeRejection(): void {
-    this.rejectionAssignmentId.set(null);
-    this.rejectionReason.reset();
-  }
-
-  protected reject(): void {
-    const assignmentId = this.rejectionAssignmentId();
-    this.rejectionReason.markAsTouched();
-
-    if (!assignmentId || this.rejectionReason.invalid) return;
-    this.review(assignmentId, 'rejected', this.rejectionReason.value.trim());
-  }
-
-  protected confirmRemove(event: Event, onboardingId: string, documentId: string): void {
-    this.confirm.dangerDecision(event, {
-      message: this.i18n.dialogs().removeMessage,
-      acceptLabel: this.i18n.commonActions().delete,
-      rejectLabel: this.i18n.commonActions().cancel,
-      accept: () => {
-        if (this.canMutateOnboarding(onboardingId)) {
-          this.runMutation(this.api.removePrivateDocument(documentId));
-        }
       },
     });
   }
@@ -264,28 +244,6 @@ export class CoworkerOnboardingDetail {
     });
   }
 
-  protected upload(
-    documents: readonly IAdminPrivateDocumentUpload[],
-    onboardingId: string,
-  ): void {
-    if (!this.canMutateOnboarding(onboardingId, this.canUploadPrivateDocuments())) return;
-    this.runMutation(
-      this.api.uploadPrivateDocuments(onboardingId, documents),
-      () => this.batch()?.reset(),
-    );
-  }
-
-  private review(
-    assignmentId: string,
-    decision: CoworkerDocumentReviewDecision,
-    rejectionReason: string | null,
-  ): void {
-    this.runMutation(
-      this.api.reviewSignedDocument(assignmentId, decision, rejectionReason),
-      () => this.closeRejection(),
-    );
-  }
-
   private canMutateOnboarding(
     onboardingId: string,
     statusAllowsMutation = this.onboardingInProgress(),
@@ -301,14 +259,9 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  private getDocumentVersionId(
-    document: IAdminCoworkerOnboardingDocument,
-  ): string | null {
-    return document.source_version_id ?? document.current_version_id;
-  }
-
   private showLoadError(error?: unknown): void {
     this.loadFailed.set(true);
+    this.detailTab.setName('');
     const fallback = this.i18n.commonErrors().generic;
     this.toast.danger({
       summary: this.i18n.adminDetail().loadError ?? fallback,

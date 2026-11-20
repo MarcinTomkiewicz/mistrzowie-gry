@@ -9,7 +9,7 @@
   @if (editor.issueFields().length) {
     <div class="flex-col-start-stretch gap-xs w-100 min-w-0" role="status">
       <span>{{ copy().differenceFields }}</span>
-      <ul class="m-0 text-sm text-wrap-anywhere">
+      <ul class="mg-content-list m-0 text-sm text-wrap-anywhere">
         @for (field of editor.issueFields(); track field) { <li>{{ field }}</li> }
       </ul>
     </div>

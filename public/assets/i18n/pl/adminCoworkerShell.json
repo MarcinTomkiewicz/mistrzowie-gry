@@ -3,6 +3,7 @@
     "subtitle": "Zarządzaj prywatnymi i wspólnymi dokumentami współpracowników."
   },
   "tabs": {
-    "onboarding": "Onboarding"
+    "onboarding": "Onboarding",
+    "documentCategories": "Kategorie dokumentów"
   }
 }

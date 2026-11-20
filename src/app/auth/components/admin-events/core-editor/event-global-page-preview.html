@@ -19,7 +19,7 @@
       } @else if (result(); as preview) {
         @if (!preview.valid) {
           <p-message [severity]="preview.status === 'invalid' ? 'error' : 'warn'">{{ i18n.diagnostics().statuses[preview.status] }}</p-message>
-          <ul class="m-0" role="alert">
+          <ul class="mg-content-list m-0" role="alert">
             @for (issue of preview.fieldErrors; track $index) {
               <li>{{ i18n.diagnostics().messages[issue.code] }} @if ('detail' in issue) { {{ issue.detail }} }</li>
             }
@@ -74,7 +74,7 @@
               }
               <section class="mg-card flex-col-start-stretch gap-sm">
                 <h2 class="mg-section__title mg-section__title--sm">{{ city.city }}</h2>
-                <ul class="flex-col m-0 px-md">
+                <ul class="mg-content-list flex-col m-0 px-md">
                   @if (page.selectedDate) {
                     <li><strong>{{ publicI18n.labels().date }}:</strong>
                       <time [attr.datetime]="page.selectedDate">{{ formatDateLabel(page.selectedDate, 'pl-PL', true) }}</time>

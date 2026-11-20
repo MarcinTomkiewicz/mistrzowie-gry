@@ -1,5 +1,6 @@
 import type {
   CoworkerDocumentAssignmentStatus,
+  CoworkerDocumentCategoryStatus,
   CoworkerDocumentLifecycleStatus,
   CoworkerDocumentRequiredAction,
   CoworkerDocumentSource,
@@ -21,6 +22,9 @@ export interface ICoworkerOnboardingRow {
 }
 
 export interface ICoworkerPrivateDocumentRow {
+  readonly category: string;
+  readonly category_name: string;
+  readonly category_status: CoworkerDocumentCategoryStatus;
   readonly assignment_id: string;
   readonly document_id: string;
   readonly onboarding_id: string | null;

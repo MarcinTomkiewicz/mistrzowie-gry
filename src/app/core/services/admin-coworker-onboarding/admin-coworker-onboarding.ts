@@ -3,6 +3,8 @@ import { map, Observable } from 'rxjs';
 
 import { COWORKER_EDGE_FUNCTION } from '../../configs/coworker-edge-functions.config';
 import type {
+  IAdminCoworkerDocumentCategory,
+  IAdminCoworkerDocumentCategoryEvent,
   IAdminCoworkerOnboardingCandidate,
   IAdminCoworkerOnboardingDetail,
   IAdminCoworkerOnboardingRow,
@@ -16,6 +18,7 @@ import type {
   IRegisterSharedDocumentResult,
   IRemovePrivateDocumentResult,
   IReviewCoworkerSignedSubmissionResult,
+  ISetAdminCoworkerDocumentCategoryResult,
   IStartCoworkerOnboardingResult,
 } from '../../interfaces/i-admin-coworker-onboarding';
 import type {
@@ -62,15 +65,56 @@ export class AdminCoworkerOnboarding {
     body.append(
       'documents',
       JSON.stringify(
-        documents.map(({ title, required_action }) => ({
+        documents.map(({ title, required_action, category }) => ({
           title,
           required_action,
+          category,
           requires_signed_upload: required_action === 'upload_signed',
         })),
       ),
     );
     documents.forEach(({ file }) => body.append('files', file));
     return this.invoke(body);
+  }
+
+  getDocumentCategories(): Observable<readonly IAdminCoworkerDocumentCategory[]> {
+    return this.invoke({ action: 'listDocumentCategories' });
+  }
+
+  saveDocumentCategory(
+    categoryKey: string | null,
+    name: string,
+  ): Observable<Pick<
+    IAdminCoworkerDocumentCategory,
+    'category_key' | 'category_name' | 'status' | 'updated_at'
+  >> {
+    return this.invoke({ action: 'saveDocumentCategory', category_key: categoryKey, name });
+  }
+
+  retireDocumentCategory(
+    categoryKey: string,
+  ): Observable<Pick<
+    IAdminCoworkerDocumentCategory,
+    'category_key' | 'status' | 'retired_at' | 'document_count'
+  >> {
+    return this.invoke({ action: 'retireDocumentCategory', category_key: categoryKey });
+  }
+
+  setDocumentCategory(
+    documentId: string,
+    categoryKey: string,
+  ): Observable<ISetAdminCoworkerDocumentCategoryResult> {
+    return this.invoke({
+      action: 'setDocumentCategory',
+      document_id: documentId,
+      category_key: categoryKey,
+    });
+  }
+
+  getDocumentCategoryHistory(
+    categoryKey: string | null,
+  ): Observable<readonly IAdminCoworkerDocumentCategoryEvent[]> {
+    return this.invoke({ action: 'listDocumentCategoryHistory', category_key: categoryKey });
   }
 
   removePrivateDocument(

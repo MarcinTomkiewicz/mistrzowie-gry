@@ -11,8 +11,14 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
-import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
-import type { IAdminPrivateDocumentUpload } from '../../../../core/interfaces/i-admin-coworker-onboarding';
+import {
+  COWORKER_PDF_UPLOAD_OPTIONS,
+  DEFAULT_COWORKER_DOCUMENT_CATEGORY,
+} from '../../../../core/configs/coworker-onboarding.config';
+import type {
+  IAdminCoworkerDocumentCategory,
+  IAdminPrivateDocumentUpload,
+} from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import { createCoworkerOnboardingI18n } from '../../../../core/translations/coworker-onboarding.i18n';
 import {
   COWORKER_DOCUMENT_REQUIRED_ACTIONS,
@@ -20,6 +26,7 @@ import {
 } from '../../../../core/types/coworker-onboarding';
 import type { PrivateDocumentRowForm } from '../../../../core/types/private-document-row-form';
 import { FileUpload } from '../../../../common/file-upload/file-upload';
+import { PdfThumbnail } from '../../../../common/pdf-thumbnail/pdf-thumbnail';
 
 @Component({
   selector: 'app-private-document-batch',
@@ -31,11 +38,13 @@ import { FileUpload } from '../../../../common/file-upload/file-upload';
     InputTextModule,
     SelectModule,
     FileUpload,
+    PdfThumbnail,
   ],
   templateUrl: './private-document-batch.html',
 })
 export class PrivateDocumentBatch {
   readonly busy = input(false);
+  readonly categories = input.required<IAdminCoworkerDocumentCategory[]>();
   readonly upload = output<readonly IAdminPrivateDocumentUpload[]>();
 
   protected readonly i18n = createCoworkerOnboardingI18n();
@@ -45,7 +54,12 @@ export class PrivateDocumentBatch {
   protected readonly form = new FormGroup({ documents: this.rows });
   protected readonly uploadOptions = computed(() => ({
     ...COWORKER_PDF_UPLOAD_OPTIONS,
+    clearAfterSelect: false,
     disabled: this.busy(),
+  }));
+  protected readonly uploadTexts = computed(() => ({
+    ...this.i18n.fileUploadTexts(),
+    clearLabel: this.i18n.commonActions().clear,
   }));
   protected readonly presetOptions = computed(() => [
     {
@@ -75,6 +89,9 @@ export class PrivateDocumentBatch {
       label: this.i18n.statuses().requiredAction[value],
     })),
   );
+  protected readonly categoryKeys = computed(() =>
+    new Set(this.categories().map(({ category_key }) => category_key)),
+  );
 
   protected addRow(): void {
     this.rows.push(this.createRow());
@@ -102,7 +119,7 @@ export class PrivateDocumentBatch {
   protected submit(): void {
     this.rows.markAllAsTouched();
 
-    if (this.rows.invalid) {
+    if (this.busy() || this.rows.invalid) {
       return;
     }
 
@@ -111,13 +128,14 @@ export class PrivateDocumentBatch {
     for (const row of this.rows.controls) {
       const value = row.getRawValue();
 
-      if (!value.file) {
+      if (!value.file || !this.categoryKeys().has(value.category)) {
         return;
       }
 
       documents.push({
         title: value.title,
         required_action: value.required_action,
+        category: value.category,
         file: value.file,
       });
     }
@@ -140,6 +158,7 @@ export class PrivateDocumentBatch {
       required_action: new FormControl<CoworkerDocumentRequiredAction>('acknowledge', {
         nonNullable: true,
       }),
+      category: new FormControl<string>(DEFAULT_COWORKER_DOCUMENT_CATEGORY, { nonNullable: true }),
       file: new FormControl<File | null>(null, Validators.required),
     });
   }

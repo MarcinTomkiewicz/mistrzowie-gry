@@ -4,6 +4,8 @@ import {
 } from './coworker-document.config';
 import type { FileUploadOptions } from '../types/file-upload';
 
+export const DEFAULT_COWORKER_DOCUMENT_CATEGORY = 'other';
+
 export const COWORKER_PDF_UPLOAD_OPTIONS = {
   mode: 'files',
   accept: COWORKER_DOCUMENT_PDF_MIME_TYPE,
@@ -13,6 +15,6 @@ export const COWORKER_PDF_UPLOAD_OPTIONS = {
   previewShape: 'landscape',
   multiple: false,
   clearAfterSelect: true,
-  chooseIcon: 'pi pi-file-pdf',
-  emptyIcon: 'pi pi-file-pdf',
+  chooseIcon: 'pi pi-report-spy',
+  emptyIcon: 'pi pi-report-spy',
 } satisfies FileUploadOptions;

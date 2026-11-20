@@ -1,0 +1,97 @@
+<div class="flex-col-start-stretch gap-md min-w-0">
+  @if (documents().length) {
+    <form [formGroup]="filterForm" novalidate
+      class="mg-card flex-row-start-center flex-wrap gap-sm p-md w-100">
+      <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
+        <input pInputText pSize="small" type="search" class="w-100" id="private-document-search"
+          formControlName="searchText" />
+        <label for="private-document-search">{{ i18n.adminDetail().documentSearch }}</label>
+      </p-floatlabel>
+      <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
+        inputId="private-document-category-filter" formControlName="category"
+        [options]="categoryOptions()" optionLabel="label" optionValue="value"
+        [placeholder]="i18n.categories().all" [ariaLabel]="i18n.categories().label"
+        [showClear]="true" [loading]="categoryLoading()" appendTo="body" />
+      <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
+        inputId="private-document-status-filter" formControlName="status"
+        [options]="statusOptions()" optionLabel="label" optionValue="value"
+        [placeholder]="i18n.adminList().filters.allStatuses" [ariaLabel]="i18n.commonLabels().status"
+        [showClear]="true" appendTo="body" (onChange)="onStatusChange()" />
+      <div class="flex-row-start-center gap-sm flex-none w-100-sm">
+        <p-toggleswitch inputId="private-document-hide-rejected" formControlName="hideRejected"
+          (onChange)="onHideRejectedChange()" />
+        <label for="private-document-hide-rejected">{{ i18n.adminDetail().hideRejected }}</label>
+      </div>
+    </form>
+  }
+
+  @if (rows().length) {
+    <div class="w-100 overflow-x-auto">
+      <p-table size="small" [value]="rows()" tableStyleClass="mg-responsive-table">
+        <ng-template #header>
+          <tr class="hide-down-sm">
+            <th scope="col" class="small-caps">{{ i18n.commonLabels().title }}</th>
+            <th scope="col" class="small-caps">{{ i18n.categories().label }}</th>
+            <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+            <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-row>
+          @let document = row.document;
+          <tr class="mg-responsive-table__row">
+            <th scope="row" class="mg-responsive-table__row-heading">
+              <div class="flex-col-start-start gap-xs text-wrap-anywhere">
+                <strong>{{ document.title }}</strong>
+                @if (document.version_number) {
+                  <small>
+                    {{ i18n.fields().version }} {{ document.version_number }}
+                    @if (!row.current) { ({{ i18n.fields().historicalVersion }}) }
+                  </small>
+                }
+              </div>
+            </th>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.categories().label }}</span>
+              <span class="mg-responsive-table__value text-wrap-anywhere">
+                {{ row.category ?? i18n.commonValues().notAvailable }}
+              </span>
+            </td>
+            <td class="mg-responsive-table__cell">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
+              <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                <span [class]="row.statusClass">{{ row.statusLabel }}</span>
+                @if (row.actionLabel) {
+                  <small>{{ row.actionLabel }}</small>
+                }
+                @if (document.rejection_reason) {
+                  <small class="error-text text-wrap-anywhere">
+                    {{ i18n.commonLabels().rejectionReason }}: {{ document.rejection_reason }}
+                  </small>
+                }
+              </div>
+            </td>
+            <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
+              <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+              <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
+                @if (document.original_filename) {
+                  <p-button type="button" size="small" severity="warn" icon="pi pi-horus"
+                    [label]="i18n.commonActions().preview" (onClick)="preview(document)" />
+                }
+                @if (row.menu.length) {
+                  <app-document-operations [items]="row.menu" [disabled]="busy()"
+                    [label]="i18n.commonTable().actions + ' - ' + document.title" />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  } @else {
+    <section class="mg-card w-100" role="status">
+      <p class="m-0 muted-text">
+        {{ documents().length ? i18n.adminDetail().emptyFilteredDocuments : i18n.adminDetail().emptyDocuments }}
+      </p>
+    </section>
+  }
+</div>

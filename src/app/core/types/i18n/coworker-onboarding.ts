@@ -1,6 +1,7 @@
 import type {
   CoworkerDocumentApiErrorCode,
   CoworkerDocumentAssignmentStatus,
+  CoworkerDocumentCategoryEventType,
   CoworkerDocumentRequiredAction,
   CoworkerOnboardingLifecycleStatus,
 } from '../coworker-onboarding';
@@ -27,6 +28,9 @@ export interface CoworkerOnboardingAdminListTranslations {
 }
 
 export interface CoworkerOnboardingAdminDetailTranslations {
+  documentSearch: string;
+  hideRejected: string;
+  emptyFilteredDocuments: string;
   title: string;
   subtitle: string;
   uploadSection: string;
@@ -46,6 +50,23 @@ export interface CoworkerOnboardingAdminSharedTranslations {
   empty: string;
   emptyConfirmations: string;
   loadError: string;
+}
+
+export interface CoworkerOnboardingCategoriesTranslations {
+  label: string;
+  all: string;
+  add: string;
+  rename: string;
+  change: string;
+  retired: string;
+  retire: string;
+  retireMessage: string;
+  loadError: string;
+  empty: string;
+  history: string;
+  historyLoadError: string;
+  historyEmpty: string;
+  events: Record<CoworkerDocumentCategoryEventType, string>;
 }
 
 export interface CoworkerOnboardingPrivateTranslations {

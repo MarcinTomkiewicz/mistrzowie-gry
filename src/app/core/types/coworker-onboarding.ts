@@ -30,6 +30,8 @@ export type CoworkerDocumentAssignmentStatus =
   | 'acknowledged'
   | 'revoked';
 export type CoworkerDocumentSource = 'uploaded' | 'generated';
+export type CoworkerDocumentCategoryStatus = 'active' | 'retired';
+export type CoworkerDocumentCategoryEventType = 'created' | 'renamed' | 'retired' | 'assigned';
 export type CoworkerDocumentReviewDecision =
   (typeof COWORKER_DOCUMENT_REVIEW_DECISIONS)[number];
 export type CoworkerDocumentDownloadTarget =

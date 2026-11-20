@@ -102,9 +102,10 @@ export class FileUpload {
     }
 
     if (!this.isImageMode()) {
-      this.filesSelected.emit(files);
+      const { clearAfterSelect } = this.resolvedOptions();
+      this.filesSelected.emit(clearAfterSelect ? files : [...event.currentFiles]);
 
-      if (this.resolvedOptions().clearAfterSelect) {
+      if (clearAfterSelect) {
         this.uploader()?.clear();
       }
 
@@ -122,6 +123,10 @@ export class FileUpload {
 
   onRemove(event: FileRemoveEvent): void {
     if (!this.isImageMode()) {
+      const files = this.uploader()?.files;
+      if (files && !this.resolvedOptions().clearAfterSelect) {
+        this.filesSelected.emit(files.filter((file) => file !== event.file));
+      }
       return;
     }
 
@@ -131,11 +136,12 @@ export class FileUpload {
   }
 
   onClear(): void {
-    if (this.isResettingUploader || !this.isImageMode()) {
-      return;
+    if (this.isResettingUploader) return;
+    if (this.isImageMode()) {
+      this.clearSelectedFile('clear');
+    } else if (!this.resolvedOptions().clearAfterSelect) {
+      this.filesSelected.emit([]);
     }
-
-    this.clearSelectedFile('clear');
   }
 
   onCropCancel(): void {

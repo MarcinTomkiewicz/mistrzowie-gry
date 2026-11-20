@@ -232,7 +232,7 @@
 <ng-template #dispositionMessage>
   @if (disposition.preview()) {
     <div class="flex-col-start-stretch gap-md w-100 min-w-0">
-      <ul class="flex-col-start-stretch gap-sm m-0 pl-md pr-sm max-h-350 overflow-y-auto"
+      <ul class="mg-content-list flex-col-start-stretch gap-sm m-0 pl-md pr-sm max-h-350 overflow-y-auto"
         tabindex="0" [attr.aria-label]="copy.previewHeading">
         @for (item of dispositionItems(); track item.id) {
           <li class="text-wrap-anywhere">

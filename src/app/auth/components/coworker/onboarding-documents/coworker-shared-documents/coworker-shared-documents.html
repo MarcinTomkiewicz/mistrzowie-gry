@@ -1,0 +1,48 @@
+@if (!onboardingCompleted()) {
+  <section class="mg-card w-100">
+    <p class="m-0 muted-text">{{ i18n.coworkerShared().onboardingRequired }}</p>
+  </section>
+} @else {
+  @for (document of documents(); track document.assignment_id) {
+    @let assignmentId = document.assignment_id;
+    <article class="mg-card flex-col-start-stretch gap-md w-100">
+      <div class="flex-row-between-start flex-wrap gap-sm w-100">
+        <div class="flex-col-start-start gap-xs">
+          <strong>{{ document.title }}</strong>
+          @if (i18n.statuses().assignment; as statuses) {
+            <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.assignment_status]">
+              {{ statuses[document.assignment_status] }}
+            </span>
+          }
+        </div>
+        <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>
+      </div>
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        <p-button size="small" severity="secondary" icon="pi pi-horus"
+          [label]="i18n.commonActions().preview"
+          (onClick)="fileRequested.emit({ assignmentId, target: 'source', preview: true })" />
+        <p-button size="small" severity="secondary" [outlined]="true" icon="pi pi-missile-swarm"
+          [label]="i18n.actions().download"
+          (onClick)="fileRequested.emit({ assignmentId, target: 'source', preview: false })" />
+      </div>
+      @if (acknowledgementControls().controls[assignmentId]; as acknowledgement) {
+        <div class="flex-row-start-center gap-sm">
+          <p-checkbox [binary]="true" [inputId]="'shared-acknowledgement-' + assignmentId"
+            [formControl]="acknowledgement" [disabled]="busy()" />
+          <label [for]="'shared-acknowledgement-' + assignmentId">
+            {{ i18n.fields().acknowledgement }}
+          </label>
+        </div>
+      } @else if (document.acknowledged_at) {
+        <small>
+          {{ i18n.coworkerShared().acknowledgedAt }}:
+          {{ formatTimestampLabel(document.acknowledged_at) }}
+        </small>
+      }
+    </article>
+  } @empty {
+    <section class="mg-card w-100">
+      <p class="m-0 muted-text">{{ i18n.coworkerShared().empty }}</p>
+    </section>
+  }
+}

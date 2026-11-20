@@ -16,7 +16,11 @@ const loaders = {
   sharedDocuments: () =>
     import(
       '../components/admin-coworker-onboarding/shared-documents/shared-documents'
-    ).then((m) => m.AdminSharedDocuments),
+    ).then((m) => m.SharedDocuments),
+  documentCategories: () =>
+    import(
+      '../components/admin-coworker-onboarding/document-categories/document-categories'
+    ).then((m) => m.DocumentCategories),
 } as const;
 
 export const adminCoworkerRoutes: Routes = [
@@ -36,6 +40,10 @@ export const adminCoworkerRoutes: Routes = [
       {
         path: 'shared-documents',
         loadComponent: loaders.sharedDocuments,
+      },
+      {
+        path: 'document-categories',
+        loadComponent: loaders.documentCategories,
       },
     ],
   },

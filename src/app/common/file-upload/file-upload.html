@@ -48,7 +48,7 @@
         let-clearCallback="clearCallback"
       >
         <div class="flex-row-center-center gap-sm w-100">
-          <div class="flex-row-center-center gap-sm">
+          <div class="flex-row-center-center flex-wrap gap-sm">
             <p-button
               type="button"
               severity="secondary"
@@ -59,11 +59,7 @@
               (onClick)="chooseCallback()"
             />
 
-            @if (
-              isImageMode() &&
-              (files?.length ||
-                (resolvedOptions().clearCurrent && previewUrl()))
-            ) {
+            @if (files?.length || (isImageMode() && resolvedOptions().clearCurrent && previewUrl())) {
               <p-button
                 type="button"
                 styleClass="arcane"
@@ -83,7 +79,7 @@
         let-files
         let-removeFileCallback="removeFileCallback"
       >
-        @if (isImageMode() && files?.length) {
+        @if (files?.length) {
           <div class="flex-col-start-stretch gap-sm pt-sm">
             @for (
               file of files;
@@ -92,7 +88,7 @@
             ) {
               <div class="flex-row-between-center gap-sm w-100">
                 <div class="flex-row-start-center gap-sm min-w-0">
-                  <span class="tag-badge tag-badge--muted">
+                  <span class="tag-badge tag-badge--muted max-w-full text-wrap-anywhere">
                     {{ file.name }}
                   </span>
                 </div>
@@ -103,7 +99,7 @@
                   icon="pi pi-times"
                   [rounded]="true"
                   [text]="true"
-                  [ariaLabel]="resolvedTexts().cropCancelLabel"
+                  [ariaLabel]="resolvedTexts().clearLabel"
                   [disabled]="resolvedOptions().disabled"
                   (onClick)="removeFileCallback($event, index)"
                 />
@@ -116,8 +112,8 @@
       <ng-template #file></ng-template>
 
       <ng-template #empty>
-        <div class="flex-col-center-center gap-xs py-md">
-          <i [class]="resolvedOptions().emptyIcon + ' text-4xl'"></i>
+        <div class="flex-col-center-center gap-xs py-md text-center">
+          <i [class]="resolvedOptions().emptyIcon + ' text-4xl'" aria-hidden="true"></i>
           <span>{{ resolvedTexts().dropLabel }}</span>
           <small>{{ resolvedTexts().formatsLabel }}</small>
         </div>

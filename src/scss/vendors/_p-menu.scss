@@ -1,0 +1,40 @@
+@use "sass:map";
+@use "../abstracts/variables" as v;
+
+.p-menu.mg-operation-menu {
+  background: v.$color-bg-surface;
+  color: v.$color-text;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  box-shadow: v.$shadow-soft;
+
+  .p-menu-list {
+    padding: map.get(v.$spacings, "xs");
+  }
+
+  .p-menu-item-content {
+    color: v.$color-text;
+  }
+
+  .p-menu-item-icon {
+    color: inherit;
+  }
+
+  .p-menu-item-label {
+    line-height: 1.4;
+  }
+
+  .p-menu-item.p-focus > .p-menu-item-content,
+  .p-menu-item:not(.p-disabled) > .p-menu-item-content:hover {
+    background: v.$color-form-bg-hover;
+    color: v.$color-text;
+
+    .p-menu-item-icon {
+      color: inherit;
+    }
+  }
+
+  .p-menu-item.p-focus > .p-menu-item-content {
+    box-shadow: inset 0 0 0 2px v.$color-form-ring;
+  }
+}

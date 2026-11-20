@@ -43,7 +43,7 @@
           {{ footerCopy.shortcutTitle }}
         </h3>
 
-        <ul class="flex-col-center-center-md m-0 p-0">
+        <ul class="mg-content-list flex-col-center-center-md m-0 p-0">
           @for (l of footerLinks.shortcuts; track l.path) {
             <li class="w-30-md w-50-sm w-70-xs">
               <a [routerLink]="l.path">
@@ -60,7 +60,7 @@
             {{ i18n.commonNav().contact }}
           </h3>
 
-          <ul class="flex-col-center-center-md m-0 p-0">
+          <ul class="mg-content-list flex-col-center-center-md m-0 p-0">
             <li class="w-30-md w-50-sm w-70-xs">
               <strong>{{ commonLabels.phone }}:</strong>
               <a [href]="contact.phoneHref">
@@ -82,7 +82,7 @@
             {{ footerCopy.legalInformationTitle }}
           </h3>
 
-          <ul class="flex-col-center-center-md m-0 p-0">
+          <ul class="mg-content-list flex-col-center-center-md m-0 p-0">
             @for (l of footerLinks.legalInformation; track l.dialog) {
               <li class="w-30-md w-50-sm w-70-xs">
                 <button

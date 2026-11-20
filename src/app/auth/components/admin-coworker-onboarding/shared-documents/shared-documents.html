@@ -1,4 +1,4 @@
-<div class="flex-col-start-stretch gap-lg w-100 position-relative">
+<div class="flex-col-start-stretch gap-lg w-100 min-w-0 position-relative">
   <header class="mg-section__header w-100">
     <h2 class="mg-section__title mg-section__title--md">
       {{ i18n.commonNav().sharedDocuments }}
@@ -13,7 +13,7 @@
     [label]="busy() ? i18n.commonStatus().saving : i18n.commonStatus().loading"
   />
 
-  <section class="mg-card flex-col-start-stretch gap-md w-100">
+  <section #sharedDocumentEditor class="mg-card flex-col-start-stretch gap-md w-100">
     <div class="flex-row-between-center flex-wrap gap-sm">
       <h3 class="mg-section__title mg-section__title--sm m-0">
         {{ editedDocument() ? i18n.adminShared().formTitleReplace : i18n.adminShared().formTitleNew }}
@@ -23,6 +23,7 @@
           severity="secondary"
           [outlined]="true"
           [label]="i18n.commonActions().cancel"
+          [disabled]="busy()"
           icon="pi pi-interdiction"
           (onClick)="cancelEdit()"
         />
@@ -66,7 +67,7 @@
       <div class="flex-row-end-center">
         <p-button
           type="submit"
-          icon="pi pi-upload"
+          [icon]="editedDocument() ? 'pi pi-equip' : 'pi pi-jetpack'"
           [label]="editedDocument() ? i18n.actions().replaceShared : i18n.actions().saveShared"
           [loading]="busy()"
         />
@@ -89,95 +90,87 @@
           (onClick)="load()"
         />
       </section>
-    } @else {
-      @for (document of documents(); track document.document_id) {
-        <article class="mg-card flex-col-start-stretch gap-md w-100">
-          <div class="flex-row-between-start flex-wrap gap-sm w-100">
-            <div class="flex-col-start-start gap-xs">
-              <strong>{{ document.title }}</strong>
-              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[document.status]">
-                {{ document.status === 'active' ? i18n.commonEntityStatuses().active.masculine : i18n.commonValues().archived }}
-              </span>
-            </div>
-            <div class="flex-row-start-center flex-wrap gap-md">
-              <span>{{ i18n.fields().version }}: {{ document.version_number }}</span>
-              <span>{{ i18n.fields().assignments }}: {{ document.assignment_count }}</span>
-              <span>{{ i18n.fields().pendingAssignments }}: {{ document.pending_assignment_count }}</span>
-              <span>{{ i18n.fields().acknowledgedAssignments }}: {{ document.acknowledged_assignment_count }}</span>
-            </div>
-          </div>
-
-          <div class="flex-row-start-center flex-wrap gap-xs">
-            @if (document.current_version_id) {
-              <p-button
-                size="small"
-                severity="secondary"
-                icon="pi pi-eye"
-                [label]="i18n.commonActions().preview"
-                (onClick)="previewDocument(document)"
-              />
-              <p-button
-                size="small"
-                severity="secondary"
-                [outlined]="true"
-                icon="pi pi-download"
-                [label]="i18n.actions().download"
-                (onClick)="download(document)"
-              />
-            }
-            <p-button
-              size="small"
-              severity="secondary"
-              [outlined]="true"
-              icon="pi pi-users"
-              [label]="i18n.actions().showConfirmations"
-              (onClick)="showAssignments(document)"
-            />
-            @if (document.status === 'active') {
-              <p-button
-                size="small"
-                severity="secondary"
-                icon="pi pi-upload"
-                [label]="i18n.actions().replaceShared"
-                (onClick)="edit(document)"
-              />
-              <p-button
-                size="small"
-                severity="danger"
-                [text]="true"
-                icon="pi pi-box"
-                [label]="i18n.commonActions().archive"
-                (onClick)="confirmArchive($event, document.document_id)"
-              />
-            }
-          </div>
-        </article>
-      } @empty {
-        @if (!loading()) {
-          <section class="mg-card w-100">
-            <p class="m-0 muted-text">{{ i18n.adminShared().empty }}</p>
-          </section>
-        }
-      }
+    } @else if (rows().length) {
+      <div class="w-100 overflow-x-auto">
+        <p-table size="small" [value]="rows()" dataKey="document.document_id"
+          tableStyleClass="mg-responsive-table">
+          <ng-template #header>
+            <tr class="hide-down-sm">
+              <th scope="col" class="small-caps">{{ i18n.commonLabels().title }}</th>
+              <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+              <th scope="col" class="small-caps">{{ i18n.fields().assignments }}</th>
+              <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-row>
+            @let document = row.document;
+            <tr class="mg-responsive-table__row">
+              <th scope="row" class="mg-responsive-table__row-heading">
+                <div class="flex-col-start-start gap-xs text-wrap-anywhere">
+                  <strong>{{ document.title }}</strong>
+                  @if (document.version_number) {
+                    <small>{{ i18n.fields().version }} {{ document.version_number }}</small>
+                  }
+                </div>
+              </th>
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().status }}</span>
+                <span class="mg-responsive-table__value"><span [class]="row.statusClass">{{ row.status }}</span></span>
+              </td>
+              <td class="mg-responsive-table__cell">
+                <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.fields().assignments }}</span>
+                <div class="mg-responsive-table__value flex-col-start-start gap-xs">
+                  <strong>{{ document.assignment_count }}</strong>
+                  <small>{{ i18n.fields().acknowledgedAssignments }}: {{ document.acknowledged_assignment_count }}</small>
+                  <small>{{ i18n.fields().pendingAssignments }}: {{ document.pending_assignment_count }}</small>
+                </div>
+              </td>
+              <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
+                <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonTable().actions }}</span>
+                <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
+                  <p-button type="button" size="small" severity="warn" icon="pi pi-horus"
+                    [label]="i18n.actions().showConfirmations" [disabled]="loading() || busy()"
+                    (onClick)="showAssignments(document)" />
+                  @if (row.menu.length) {
+                    <app-document-operations [items]="row.menu" [disabled]="loading() || busy()"
+                      [label]="i18n.commonTable().actions + ' - ' + document.title" />
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    } @else if (!loading()) {
+      <section class="mg-card w-100" role="status">
+        <p class="m-0 muted-text">{{ i18n.adminShared().empty }}</p>
+      </section>
     }
   </section>
 </div>
 
 <p-dialog
+  styleClass="mg-dialog mg-dialog--lg"
+  appendTo="body"
+  [draggable]="false"
+  [resizable]="false"
+  [closeAriaLabel]="i18n.commonActions().close"
   [header]="i18n.adminShared().confirmationsTitle"
   [visible]="assignmentsDocument() !== null"
   [modal]="true"
-  [style]="{ width: 'min(60rem, 95vw)' }"
   (visibleChange)="$event ? null : closeAssignments()"
 >
+  @if (assignmentsDocument(); as document) {
+    <p class="mt-0"><strong>{{ document.title }}</strong></p>
+  }
   @if (assignmentsLoading()) {
     <div class="flex-col-center-center gap-sm py-lg" role="status">
       <i class="pi pi-d20 mg-spin-cw"></i>
       <span>{{ i18n.commonStatus().loading }}</span>
     </div>
-  } @else if (assignments().length) {
+  } @else if (assignmentRows().length) {
     <div class="w-100 overflow-x-auto">
-      <p-table [value]="assignments()" dataKey="assignment_id" class="w-100 min-w-500">
+      <p-table [value]="assignmentRows()" dataKey="id" size="small" class="w-100 min-w-500">
         <ng-template #header>
           <tr>
             <th>{{ i18n.commonLabels().coworker }}</th>
@@ -188,24 +181,13 @@
         <ng-template #body let-assignment>
           <tr>
             <td>
-              <strong>
-                {{
-                  getUserDisplayName({
-                    firstName: assignment.first_name,
-                    nickname: assignment.nickname,
-                    useNickname: assignment.use_nickname,
-                  }) || assignment.email
-                }}
-              </strong>
+              <strong>{{ assignment.name }}</strong>
               <small class="d-block">{{ assignment.email }}</small>
             </td>
             <td>
-              @let status = asAssignmentStatus(assignment.status);
-              <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[status]">
-                {{ i18n.statuses().assignment[status] }}
-              </span>
+              <span [class]="assignment.statusClass">{{ assignment.status }}</span>
             </td>
-            <td>{{ formatTimestampLabel(assignment.acknowledged_at) }}</td>
+            <td>{{ assignment.acknowledgedAt }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -218,6 +200,6 @@
 @defer (when preview()) {
   <app-pdf-viewer-dialog
     [preview]="preview()"
-    (closed)="preview.set(null)"
+    (closed)="closePreview()"
   />
 }

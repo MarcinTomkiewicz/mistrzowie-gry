@@ -1,0 +1,43 @@
+<section class="flex-col-start-stretch gap-md w-100">
+  <h3 class="mg-section__title mg-section__title--sm m-0">
+    {{ i18n.commonNav().privateDocuments }}
+  </h3>
+  @if (categoryLoadFailed()) {
+    <div class="mg-card flex-row-between-center flex-wrap gap-sm w-100" role="alert">
+      <p class="m-0 error-text">{{ i18n.categories().loadError }}</p>
+      <p-button severity="secondary" icon="pi pi-refresh"
+        [label]="i18n.commonActions().retry" (onClick)="retryCategories.emit()" />
+    </div>
+  }
+  <app-private-document-list
+    [onboardingId]="onboarding().onboarding_id"
+    [documents]="detail().documents"
+    [categories]="categories()"
+    [categoryLoading]="categoryLoading()"
+    [categoryEditingEnabled]="canReclassify()"
+    [onboardingStatus]="onboarding().status"
+    [busy]="busy()"
+    (operation)="onOperation($event)"
+  />
+</section>
+
+@if (canUpload()) {
+  <section class="flex-col-start-stretch gap-md w-100">
+    <h3 class="mg-section__title mg-section__title--sm m-0">
+      {{ i18n.adminDetail().uploadSection }}
+    </h3>
+    <app-private-document-batch [busy]="busy() || categoryLoading()"
+      [categories]="activeCategories()" (upload)="upload($event)" />
+  </section>
+}
+
+@if (editor(); as selection) {
+  <app-private-document-editor
+    [kind]="selection.kind"
+    [document]="selection.document"
+    [categories]="activeCategories()"
+    [saving]="saving()"
+    (closed)="editor.set(null)"
+    (submitted)="saveDocumentChange($event)"
+  />
+}

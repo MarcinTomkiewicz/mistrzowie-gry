@@ -37,32 +37,56 @@
           </p-iftalabel>
         </div>
 
-        <p-iftalabel class="w-100">
-          <p-select
-            class="w-100"
-            [inputId]="'private-document-action-' + index"
-            formControlName="required_action"
-            [options]="actionOptions()"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-          />
-          <label [for]="'private-document-action-' + index">
-            {{ i18n.fields().requiredAction }}
-          </label>
-        </p-iftalabel>
+        <div class="mg-grid grid-2-cols grid-1-cols-sm gap-md w-100">
+          <p-iftalabel class="w-100">
+            <p-select
+              class="w-100"
+              [inputId]="'private-document-action-' + index"
+              formControlName="required_action"
+              [options]="actionOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            />
+            <label [for]="'private-document-action-' + index">
+              {{ i18n.fields().requiredAction }}
+            </label>
+          </p-iftalabel>
+          <div class="flex-col-start-stretch gap-xs">
+            <p-iftalabel class="w-100">
+              <p-select
+                class="w-100"
+                [inputId]="'private-document-category-' + index"
+                formControlName="category"
+                [options]="categories()"
+                optionLabel="category_name"
+                optionValue="category_key"
+                appendTo="body"
+              />
+              <label [for]="'private-document-category-' + index">
+                {{ i18n.categories().label }}
+              </label>
+            </p-iftalabel>
+            @if (row.controls.category.touched && !categoryKeys().has(row.controls.category.value)) {
+              <small class="error-text">{{ i18n.commonForm().required }}</small>
+            }
+          </div>
+        </div>
 
+        @if (row.controls.file.value; as file) {
+          <div class="flex-col-center-center gap-sm w-100">
+            <div class="image__preview w-100 max-w-300">
+              <app-pdf-thumbnail [src]="file" [title]="file.name" />
+            </div>
+          </div>
+        }
         <app-file-upload
           [options]="uploadOptions()"
-          [texts]="i18n.fileUploadTexts()"
+          [texts]="uploadTexts()"
           (filesSelected)="selectFile(index, $event)"
         />
 
-        @if (row.controls.file.value; as file) {
-          <small class="tag-badge tag-badge--muted">
-            {{ i18n.upload().selected }}: {{ file.name }}
-          </small>
-        } @else if (row.controls.file.touched) {
+        @if (!row.controls.file.value && row.controls.file.touched) {
           <small class="error-text">{{ i18n.upload().missingFile }}</small>
         }
 
@@ -95,9 +119,10 @@
     />
     <p-button
       type="submit"
-      icon="pi pi-upload"
+      icon="pi pi-jetpack"
       [label]="i18n.actions().uploadDocuments"
       [loading]="busy()"
+      [disabled]="!categories().length"
     />
   </div>
 </form>

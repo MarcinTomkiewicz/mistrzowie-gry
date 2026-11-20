@@ -1,9 +1,8 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   ElementRef,
   PLATFORM_ID,
-  computed,
   effect,
   inject,
   input,
@@ -15,8 +14,6 @@ import { renderPdfPageToCanvas, reportPdfError } from '../../core/utils/pdf';
 
 @Component({
   selector: 'app-pdf-thumbnail',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './pdf-thumbnail.html',
   styleUrl: './pdf-thumbnail.scss',
 })
@@ -24,32 +21,29 @@ export class PdfThumbnail {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
-  readonly src = input<string | null>(null);
+  readonly src = input<string | File | null>(null);
   readonly title = input('');
   readonly targetWidth = input(320);
 
   readonly isLoading = signal(false);
   readonly hasError = signal(false);
-  readonly canRender = computed(
-    () =>
-      isPlatformBrowser(this.platformId) &&
-      !!this.src() &&
-      !!this.canvas(),
-  );
 
   constructor() {
     effect((onCleanup) => {
-      if (!this.canRender()) {
+      const source = this.src();
+      const canvas = this.canvas()?.nativeElement;
+      if (!isPlatformBrowser(this.platformId) || !source || !canvas) {
         return;
       }
 
+      const url = typeof source === 'string' ? source : URL.createObjectURL(source);
       this.isLoading.set(true);
       this.hasError.set(false);
 
       const subscription = renderPdfPageToCanvas(
-        this.src()!,
+        url,
         1,
-        this.canvas()!.nativeElement,
+        canvas,
         this.targetWidth(),
       ).subscribe({
         next: () => {
@@ -62,7 +56,10 @@ export class PdfThumbnail {
         },
       });
 
-      onCleanup(() => subscription.unsubscribe());
+      onCleanup(() => {
+        subscription.unsubscribe();
+        if (typeof source !== 'string') URL.revokeObjectURL(url);
+      });
     });
   }
 }

@@ -24,7 +24,7 @@
             <dd class="m-0">
               {{ i18n.recruitmentPolicy().stationaryScopes[candidate.scope.mode] }}
               @if (candidate.scope.mode === 'selected_days') {
-                <ul class="m-0">
+                <ul class="mg-content-list m-0">
                   @for (day of candidateDays(); track day.id) {
                     <li>{{ formatDateLabel(day.date, 'pl-PL', true) }}</li>
                   }

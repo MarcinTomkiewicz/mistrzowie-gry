@@ -11,7 +11,7 @@
             <div class="flex-col-start-stretch gap-xs border-bottom pb-sm min-w-0">
               <strong>{{ field.context.field ?? copy.noField }}</strong>
               @if (field.context.location) { <span>{{ i18n.commonLabels().city }}: {{ field.context.location }}</span> }
-              <ul class="m-0">
+              <ul class="mg-content-list m-0">
                 @for (issue of field.issues; track $index) {
                   <li class="text-wrap-anywhere">
                     {{ issue.message }}
@@ -73,7 +73,7 @@
       @for (group of groups(); track group.field) {
         <section class="mg-card flex-col-start-stretch gap-sm border-danger bg-danger-subtle p-md">
           <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.fields[group.field] }}</h3>
-          <ul class="m-0">
+          <ul class="mg-content-list m-0">
             @for (entry of group.issues; track $index) {
               <li class="text-wrap-anywhere">
                 @if (entry.city) { <strong>{{ i18n.commonLabels().city }}: {{ entry.city }} - </strong> }
@@ -91,7 +91,7 @@
       @if (blockers().length) {
         <section class="mg-card flex-col-start-stretch gap-sm p-md">
           <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.blockers }}</h3>
-          <ul class="m-0">
+          <ul class="mg-content-list m-0">
             @for (issue of blockers(); track $index) {
               <li class="text-wrap-anywhere">
                 @if (issue.city) { <strong>{{ i18n.commonLabels().city }}: {{ issue.city }} - </strong> }

@@ -17,6 +17,7 @@ import type {
   CoworkerOnboardingAdminDetailTranslations,
   CoworkerOnboardingAdminListTranslations,
   CoworkerOnboardingAdminSharedTranslations,
+  CoworkerOnboardingCategoriesTranslations,
   CoworkerOnboardingDialogsTranslations,
   CoworkerOnboardingFieldsTranslations,
   CoworkerOnboardingPrivateTranslations,
@@ -33,6 +34,7 @@ export function createCoworkerOnboardingI18n() {
     adminList: CoworkerOnboardingAdminListTranslations;
     adminDetail: CoworkerOnboardingAdminDetailTranslations;
     adminShared: CoworkerOnboardingAdminSharedTranslations;
+    categories: CoworkerOnboardingCategoriesTranslations;
     coworkerPrivate: CoworkerOnboardingPrivateTranslations;
     coworkerShared: CoworkerOnboardingSharedTranslations;
     fields: CoworkerOnboardingFieldsTranslations;
@@ -45,6 +47,7 @@ export function createCoworkerOnboardingI18n() {
     adminList: 'adminList',
     adminDetail: 'adminDetail',
     adminShared: 'adminShared',
+    categories: 'categories',
     coworkerPrivate: 'coworkerPrivate',
     coworkerShared: 'coworkerShared',
     fields: 'fields',

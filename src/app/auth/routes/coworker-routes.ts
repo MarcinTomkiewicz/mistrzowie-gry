@@ -14,7 +14,7 @@ const loaders = {
   onboardingDocuments: () =>
     import(
       '../components/coworker/onboarding-documents/onboarding-documents'
-    ).then((m) => m.CoworkerOnboardingDocuments),
+    ).then((m) => m.OnboardingDocuments),
 } as const;
 
 export const coworkerRoutes: Routes = [

@@ -1,0 +1,50 @@
+@let rejecting = kind() === 'reject';
+
+<p-dialog
+  styleClass="mg-dialog mg-dialog--sm"
+  [header]="rejecting ? i18n.dialogs().rejectionTitle : i18n.categories().change"
+  [visible]="true"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving()"
+  [closeOnEscape]="!saving()"
+  [closeAriaLabel]="i18n.commonActions().close"
+  appendTo="body"
+  (visibleChange)="$event ? null : closed.emit()"
+>
+  <form class="flex-col-start-stretch gap-md w-100" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    @if (rejecting) {
+      <p class="m-0 muted-text">{{ i18n.dialogs().rejectionDescription }}</p>
+      <p-iftalabel class="w-100">
+        <textarea pTextarea class="w-100" id="coworker-document-rejection-reason"
+          rows="5" maxlength="1000" formControlName="rejectionReason" [readOnly]="saving()"></textarea>
+        <label for="coworker-document-rejection-reason">{{ i18n.commonLabels().rejectionReason }}</label>
+      </p-iftalabel>
+      @if (rejectionReason.touched && rejectionReason.invalid) {
+        <small class="error-text">
+          {{ rejectionReason.hasError('maxlength') ? i18n.commonForm().invalid : i18n.commonForm().required }}
+        </small>
+      }
+    } @else {
+      <strong>{{ document().title }}</strong>
+      <p-iftalabel class="w-100">
+        <p-select class="w-100" inputId="private-document-assigned-category"
+          formControlName="categoryKey" [options]="categories()"
+          optionLabel="category_name" optionValue="category_key" appendTo="body" />
+        <label for="private-document-assigned-category">{{ i18n.categories().label }}</label>
+      </p-iftalabel>
+    }
+    <div class="flex-row-end-center gap-sm">
+      <p-button type="button" severity="secondary" [outlined]="true"
+        [label]="i18n.commonActions().cancel" icon="pi pi-interdiction"
+        [disabled]="saving()" (onClick)="closed.emit()" />
+      <p-button type="submit" [severity]="rejecting ? 'danger' : undefined"
+        [icon]="rejecting ? 'pi pi-times' : 'pi pi-check'"
+        [label]="rejecting ? i18n.actions().reject : i18n.commonActions().save"
+        [loading]="saving()"
+        [disabled]="saving() || (!rejecting && !canReclassify())"
+      />
+    </div>
+  </form>
+</p-dialog>

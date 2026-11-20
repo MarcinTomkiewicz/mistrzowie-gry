@@ -47,7 +47,7 @@
     }
 
     @case ('unordered-list') {
-      <ul class="m-0 lh-16">
+      <ul class="mg-content-list m-0 lh-16">
         @for (item of block.items; track $index) {
           <li [class.mt-xs]="!!$index">
             <ng-container

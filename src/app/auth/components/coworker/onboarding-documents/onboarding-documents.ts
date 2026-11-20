@@ -1,19 +1,14 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormRecord, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormRecord } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { finalize, map } from 'rxjs';
+import { finalize, map, type Observable, type Subscription } from 'rxjs';
 
-import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
-import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
-import type {
-  ICoworkerDocumentPortal,
-  ICoworkerPrivateDocument,
-  ICoworkerSharedDocument,
-} from '../../../../core/interfaces/i-coworker-onboarding';
+import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
+import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
+import type { ICoworkerDocumentPortal } from '../../../../core/interfaces/i-coworker-onboarding';
 import type { IPdfPreview } from '../../../../core/interfaces/i-pdf';
 import { CoworkerOnboarding } from '../../../../core/services/coworker-onboarding/coworker-onboarding';
 import { Platform } from '../../../../core/services/platform/platform';
@@ -22,85 +17,65 @@ import {
   COWORKER_ONBOARDING_SCOPE,
   createCoworkerOnboardingI18n,
 } from '../../../../core/translations/coworker-onboarding.i18n';
-import type { CoworkerDocumentDownloadTarget } from '../../../../core/types/coworker-onboarding';
-import { formatTimestampLabel } from '../../../../core/utils/date';
 import { stablePartition } from '../../../../core/utils/stable-partition';
-import { FileUpload } from '../../../../common/file-upload/file-upload';
-import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
-import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
+import { CoworkerPrivateDocuments } from './coworker-private-documents/coworker-private-documents';
+import { CoworkerSharedDocuments } from './coworker-shared-documents/coworker-shared-documents';
+import type { DocumentFileRequest, PrivateDocumentRow } from './onboarding-document-view';
 
 @Component({
   selector: 'app-coworker-onboarding-documents',
-  standalone: true,
   imports: [
-    RouterLink,
-    ReactiveFormsModule,
     ButtonModule,
-    CheckboxModule,
-    FileUpload,
     LoadingOverlay,
     PdfViewerDialog,
+    CoworkerPrivateDocuments,
+    CoworkerSharedDocuments,
   ],
   templateUrl: './onboarding-documents.html',
   providers: [provideTranslocoScope(COWORKER_ONBOARDING_SCOPE, 'common')],
 })
-export class CoworkerOnboardingDocuments {
+export class OnboardingDocuments {
   private readonly api = inject(CoworkerOnboarding);
   private readonly platform = inject(Platform);
   private readonly toast = inject(UiToast);
+  private readonly destroyRef = inject(DestroyRef);
+  private loadRequest?: Subscription;
+
   protected readonly sharedView =
     inject(ActivatedRoute).snapshot.routeConfig?.path === 'shared-documents';
-
   protected readonly i18n = createCoworkerOnboardingI18n();
-  protected readonly STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
-  protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly portal = signal<ICoworkerDocumentPortal | null>(null);
   protected readonly loading = signal(true);
   protected readonly loadFailed = signal(false);
   protected readonly activeMutationKey = signal<string | null>(null);
-  protected readonly selectedFiles =
-    signal<ReadonlyMap<string, File>>(new Map());
-  protected readonly declarationControls =
-    new FormRecord<FormControl<boolean>>({});
-  protected readonly acknowledgementControls =
-    new FormRecord<FormControl<boolean>>({});
+  protected readonly selectedFiles = signal<ReadonlyMap<string, File>>(new Map());
+  protected readonly declarationControls = new FormRecord<FormControl<boolean>>({});
+  protected readonly acknowledgementControls = new FormRecord<FormControl<boolean>>({});
   protected readonly acknowledgedAssignmentIds = toSignal(
     this.acknowledgementControls.valueChanges.pipe(
-      map((values) =>
-        Object.keys(values).filter((assignmentId) => values[assignmentId]),
-      ),
+      map((values) => Object.keys(values).filter((assignmentId) => values[assignmentId])),
     ),
     { initialValue: [] },
   );
   protected readonly preview = signal<IPdfPreview | null>(null);
-  protected readonly uploadOptions = computed(() => ({
-    ...COWORKER_PDF_UPLOAD_OPTIONS,
-    disabled: this.activeMutationKey() !== null,
-  }));
-  private readonly latestPrivateVersionByDocumentId = computed(() => {
-    const latestVersions = new Map<string, number>();
-    for (const document of this.portal()?.private_assignments ?? []) {
-      latestVersions.set(
-        document.document_id,
-        Math.max(
-          latestVersions.get(document.document_id) ?? 0,
-          document.version_number,
-        ),
-      );
-    }
-    return latestVersions;
-  });
-  protected readonly privateDocuments = computed(() => {
+  protected readonly privateRows = computed<PrivateDocumentRow[]>(() => {
     const portal = this.portal();
-    if (!portal) return [];
+    if (!portal || this.sharedView) return [];
+
+    const latestVersions = new Map<string, number>();
+    for (const { document_id, version_number } of portal.private_assignments) {
+      latestVersions.set(document_id, Math.max(latestVersions.get(document_id) ?? 0, version_number));
+    }
 
     const onboardingDocumentsAvailable = portal.onboarding !== null && portal.questionnaire_complete;
-    return stablePartition(
-      portal.private_assignments.filter(
-        (document) => document.onboarding_id === null || onboardingDocumentsAvailable,
-      ),
-      (document) => !this.isHistoricalPrivateDocument(document),
-    );
+    const rows = portal.private_assignments
+      .filter((document) => document.onboarding_id === null || onboardingDocumentsAvailable)
+      .map((document) => ({
+        document,
+        historical: document.version_number <
+          (latestVersions.get(document.document_id) ?? document.version_number),
+      }));
+    return stablePartition(rows, (row) => !row.historical);
   });
 
   constructor() {
@@ -108,139 +83,88 @@ export class CoworkerOnboardingDocuments {
   }
 
   protected load(): void {
+    this.loadRequest?.unsubscribe();
     this.loading.set(true);
     this.loadFailed.set(false);
-    this.api
-      .getPortal()
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: (portal) => {
-          this.portal.set(portal);
-          this.syncSelectionControls(portal);
-        },
-        error: () => this.loadFailed.set(true),
-      });
-  }
-
-  protected selectSignedFile(
-    assignmentId: string,
-    files: readonly File[],
-  ): void {
-    const file = files[0];
-    if (!file) return;
-    this.selectedFiles.update((current) => {
-      const next = new Map(current);
-      next.set(assignmentId, file);
-      return next;
+    this.loadRequest = this.api.getPortal().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.loading.set(false)),
+    ).subscribe({
+      next: (portal) => {
+        this.portal.set(portal);
+        this.syncSelectionControls(portal);
+      },
+      error: () => this.loadFailed.set(true),
     });
   }
 
-  protected uploadSigned(document: ICoworkerPrivateDocument): void {
-    if (
-      this.activeMutationKey() !== null ||
-      this.isHistoricalPrivateDocument(document)
-    ) {
-      return;
-    }
+  protected selectSignedFile(assignmentId: string, files: readonly File[]): void {
+    const file = files[0];
+    if (!file) return;
 
-    const file = this.selectedFiles().get(document.assignment_id);
-    if (
-      !file ||
-      !this.declarationControls.controls[document.assignment_id].value
-    ) {
-      return;
-    }
+    this.selectedFiles.update((current) => new Map(current).set(assignmentId, file));
+  }
 
-    this.activeMutationKey.set(document.assignment_id);
-    this.api
-      .uploadSignedDocument(document.assignment_id, file)
-      .pipe(finalize(() => this.activeMutationKey.set(null)))
-      .subscribe({
-        next: () => {
-          this.selectedFiles.update((current) => {
-            const next = new Map(current);
-            next.delete(document.assignment_id);
-            return next;
-          });
-          this.declarationControls.controls[document.assignment_id].reset();
-          this.showMutationSuccess();
-          this.load();
-        },
-        error: () => this.showMutationError(),
+  protected uploadSigned(assignmentId: string): void {
+    const declaration = this.declarationControls.controls[assignmentId];
+    const file = this.selectedFiles().get(assignmentId);
+    if (this.activeMutationKey() !== null || !file || !declaration?.value) return;
+
+    this.runMutation(assignmentId, this.api.uploadSignedDocument(assignmentId, file), () => {
+      this.selectedFiles.update((current) => {
+        const next = new Map(current);
+        next.delete(assignmentId);
+        return next;
       });
+      declaration.reset();
+    });
   }
 
   protected acknowledge(): void {
-    if (this.activeMutationKey() !== null) return;
-
     const assignmentIds = this.acknowledgedAssignmentIds();
-    if (!assignmentIds.length) return;
+    if (this.activeMutationKey() !== null || !assignmentIds.length) return;
 
-    this.activeMutationKey.set('acknowledge');
-    this.api
-      .acknowledgeDocuments(assignmentIds)
-      .pipe(finalize(() => this.activeMutationKey.set(null)))
-      .subscribe({
-        next: () => {
-          this.acknowledgementControls.reset();
-          this.showMutationSuccess();
-          this.load();
-        },
-        error: () => this.showMutationError(),
-      });
+    this.runMutation('acknowledge', this.api.acknowledgeDocuments(assignmentIds), () => {
+      this.acknowledgementControls.reset();
+    });
   }
 
-  protected previewDocument(
-    document: ICoworkerPrivateDocument | ICoworkerSharedDocument,
-    target: CoworkerDocumentDownloadTarget,
-  ): void {
-    this.prepareDownload(document.assignment_id, target, true);
-  }
-
-  protected download(
-    document: ICoworkerPrivateDocument | ICoworkerSharedDocument,
-    target: CoworkerDocumentDownloadTarget,
-  ): void {
-    this.prepareDownload(document.assignment_id, target, false);
-  }
-
-  protected isHistoricalPrivateDocument(
-    document: ICoworkerPrivateDocument,
-  ): boolean {
-    return (
-      document.version_number <
-      (this.latestPrivateVersionByDocumentId().get(document.document_id) ??
-        document.version_number)
-    );
+  protected openDocument({ assignmentId, target, preview }: DocumentFileRequest): void {
+    this.api.getDownload(assignmentId, target).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: ({ url, filename }) => {
+        if (preview) {
+          this.preview.set({ url, title: filename });
+        } else {
+          this.platform.openNewTab(url);
+        }
+      },
+      error: () => this.toast.danger({
+        summary: this.i18n.toast().downloadFailedSummary,
+        detail: this.i18n.toast().downloadFailedDetail,
+      }),
+    });
   }
 
   private syncSelectionControls(portal: ICoworkerDocumentPortal): void {
-    const privateDocuments = this.privateDocuments();
+    const currentPrivate = this.privateRows().filter((row) => !row.historical).map((row) => row.document);
     this.syncSelectionRecord(
       this.declarationControls,
-      privateDocuments
-        .filter(
-          (document) =>
-            !this.isHistoricalPrivateDocument(document) &&
-            document.required_action === 'upload_signed' &&
-            (document.assignment_status === 'pending' ||
-              document.assignment_status === 'rejected'),
-        )
-        .map((document) => document.assignment_id),
+      currentPrivate.filter((document) =>
+        document.required_action === 'upload_signed' &&
+        (document.assignment_status === 'pending' || document.assignment_status === 'rejected'),
+      ).map((document) => document.assignment_id),
     );
+
+    const pendingAcknowledgements = this.sharedView
+      ? portal.shared_assignments
+      : currentPrivate.filter((document) => document.required_action === 'acknowledge');
     this.syncSelectionRecord(
       this.acknowledgementControls,
-      [
-        ...privateDocuments.filter(
-          (document) =>
-            !this.isHistoricalPrivateDocument(document) &&
-            document.required_action === 'acknowledge' &&
-            document.assignment_status === 'pending',
-        ),
-        ...portal.shared_assignments.filter(
-          (document) => document.assignment_status === 'pending',
-        ),
-      ].map((document) => document.assignment_id),
+      pendingAcknowledgements
+        .filter((document) => document.assignment_status === 'pending')
+        .map((document) => document.assignment_id),
     );
   }
 
@@ -269,38 +193,24 @@ export class CoworkerOnboardingDocuments {
     form.updateValueAndValidity();
   }
 
-  private prepareDownload(
-    assignmentId: string,
-    target: CoworkerDocumentDownloadTarget,
-    showPreview: boolean,
-  ): void {
-    this.api.getDownload(assignmentId, target).subscribe({
-      next: ({ url, filename }) => {
-        if (showPreview) {
-          this.preview.set({ url, title: filename });
-        } else {
-          this.platform.openNewTab(url);
-        }
+  private runMutation(key: string, request: Observable<unknown>, after: () => void): void {
+    this.activeMutationKey.set(key);
+    request.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.activeMutationKey.set(null)),
+    ).subscribe({
+      next: () => {
+        after();
+        this.toast.success({
+          summary: this.i18n.toast().mutationSuccessSummary,
+          detail: this.i18n.commonStatus().changesSaved,
+        });
+        this.load();
       },
-      error: () =>
-        this.toast.danger({
-          summary: this.i18n.toast().downloadFailedSummary,
-          detail: this.i18n.toast().downloadFailedDetail,
-        }),
-    });
-  }
-
-  private showMutationSuccess(): void {
-    this.toast.success({
-      summary: this.i18n.toast().mutationSuccessSummary,
-      detail: this.i18n.commonStatus().changesSaved,
-    });
-  }
-
-  private showMutationError(): void {
-    this.toast.danger({
-      summary: this.i18n.toast().mutationFailedSummary,
-      detail: this.i18n.toast().mutationFailedDetail,
+      error: () => this.toast.danger({
+        summary: this.i18n.toast().mutationFailedSummary,
+        detail: this.i18n.toast().mutationFailedDetail,
+      }),
     });
   }
 }
