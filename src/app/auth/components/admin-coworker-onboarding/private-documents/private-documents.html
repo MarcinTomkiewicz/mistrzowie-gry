@@ -17,7 +17,10 @@
     [categoryEditingEnabled]="canReclassify()"
     [onboardingStatus]="onboarding().status"
     [busy]="busy()"
+    [zipProgress]="zipProgress()"
     (operation)="onOperation($event)"
+    (bulkCategoryRequested)="editCategory($event)"
+    (zipRequested)="zipRequested.emit($event)"
   />
 </section>
 
@@ -34,9 +37,9 @@
 @if (editor(); as selection) {
   <app-private-document-editor
     [kind]="selection.kind"
-    [document]="selection.document"
+    [documents]="selection.documents"
     [categories]="activeCategories()"
-    [saving]="saving()"
+    [saving]="busy()"
     (closed)="editor.set(null)"
     (submitted)="saveDocumentChange($event)"
   />

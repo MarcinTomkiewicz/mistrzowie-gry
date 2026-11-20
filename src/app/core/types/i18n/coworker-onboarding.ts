@@ -39,6 +39,16 @@ export interface CoworkerOnboardingAdminDetailTranslations {
   emptyDocuments: string;
   loadError: string;
   questionnaireBadge: string;
+  bulk: {
+    selected: string;
+    selectVisible: string;
+    downloadOriginals: string;
+    downloadSigned: string;
+    missingSigned: string;
+    zipProgress: string;
+    zipFailed: string;
+    categoryResult: string;
+  };
 }
 
 export interface CoworkerOnboardingAdminSharedTranslations {

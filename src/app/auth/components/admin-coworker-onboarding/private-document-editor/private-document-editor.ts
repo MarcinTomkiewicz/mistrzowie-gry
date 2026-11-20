@@ -6,6 +6,7 @@ import { IftaLabelModule } from 'primeng/iftalabel';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
+import { DEFAULT_COWORKER_DOCUMENT_CATEGORY } from '../../../../core/configs/coworker-onboarding.config';
 import type {
   IAdminCoworkerDocumentCategory,
   IAdminCoworkerOnboardingDocument,
@@ -21,7 +22,7 @@ export type PrivateDocumentEditKind = 'reject' | 'reclassify';
   templateUrl: './private-document-editor.html',
 })
 export class PrivateDocumentEditor implements OnChanges {
-  readonly document = input.required<IAdminCoworkerOnboardingDocument>();
+  readonly documents = input.required<readonly IAdminCoworkerOnboardingDocument[]>();
   readonly kind = input.required<PrivateDocumentEditKind>();
   readonly categories = input.required<IAdminCoworkerDocumentCategory[]>();
   readonly saving = input(false);
@@ -40,19 +41,23 @@ export class PrivateDocumentEditor implements OnChanges {
   });
 
   ngOnChanges(changes: SimpleChanges<PrivateDocumentEditor>): void {
-    if (!changes.kind && !changes.document) return;
+    if (!changes.kind && !changes.documents) return;
 
     const rejecting = this.kind() === 'reject';
+    const documents = this.documents();
+    const currentCategory = !rejecting && documents.length === 1
+      ? documents[0].category ?? DEFAULT_COWORKER_DOCUMENT_CATEGORY
+      : null;
     this.form.reset({
       rejectionReason: { value: '', disabled: !rejecting },
-      categoryKey: { value: rejecting ? null : this.document().category, disabled: rejecting },
+      categoryKey: { value: currentCategory, disabled: rejecting },
     });
   }
 
   protected canReclassify(): boolean {
     const key = this.categoryKey.value;
-    return this.categoryKey.valid && key !== this.document().category &&
-      this.categories().some((category) => category.category_key === key);
+    return this.documents().length > 0 && this.categoryKey.valid &&
+      this.categories().some((category) => category.category_key === key && category.status === 'active');
   }
 
   protected save(): void {

@@ -22,8 +22,10 @@ import {
 } from '../private-document-editor/private-document-editor';
 import {
   PrivateDocumentList,
+  type PrivateDocumentDownloadBatch,
   type PrivateDocumentOperation,
 } from '../private-document-list/private-document-list';
+import type { PrivateDocumentZipProgress } from '../private-document-zip';
 
 export type PrivateDocumentFileOperation = Extract<PrivateDocumentOperation, { kind: 'preview' | 'download' }>;
 
@@ -31,7 +33,7 @@ export type PrivateDocumentMutation =
   | { kind: 'upload'; documents: readonly IAdminPrivateDocumentUpload[] }
   | { kind: 'remove'; documentId: string }
   | { kind: 'review'; assignmentId: string; decision: CoworkerDocumentReviewDecision; reason: string | null }
-  | { kind: 'reclassify'; documentId: string; categoryKey: string };
+  | { kind: 'reclassify'; documentIds: readonly string[]; categoryKey: string };
 
 @Component({
   selector: 'app-admin-private-documents',
@@ -50,10 +52,12 @@ export class PrivateDocuments implements OnChanges {
   readonly categoryLoadFailed = input.required<boolean>();
   readonly loading = input.required<boolean>();
   readonly saving = input.required<boolean>();
+  readonly zipProgress = input<PrivateDocumentZipProgress | null>(null);
 
   readonly retryCategories = output<void>();
   readonly fileRequested = output<PrivateDocumentFileOperation>();
   readonly mutationRequested = output<PrivateDocumentMutation>();
+  readonly zipRequested = output<PrivateDocumentDownloadBatch>();
 
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly onboarding = computed(() => this.detail().onboarding);
@@ -61,16 +65,16 @@ export class PrivateDocuments implements OnChanges {
     const { status } = this.onboarding();
     return status === 'in_progress' || status === 'completed';
   });
-  protected readonly busy = computed(() => this.loading() || this.saving());
+  protected readonly busy = computed(() => this.loading() || this.saving() || this.zipProgress() !== null);
   protected readonly activeCategories = computed(() =>
     this.categoryLoadFailed() ? [] : this.categories().filter(({ status }) => status === 'active'),
   );
   protected readonly canReclassify = computed(() =>
-    this.canUpload() && !this.categoryLoading() && this.activeCategories().length > 0,
+    !this.categoryLoading() && this.activeCategories().length > 0,
   );
   protected readonly editor = signal<{
     kind: PrivateDocumentEditKind;
-    document: IAdminCoworkerOnboardingDocument;
+    documents: readonly IAdminCoworkerOnboardingDocument[];
   } | null>(null);
 
   ngOnChanges(changes: SimpleChanges<PrivateDocuments>): void {
@@ -95,15 +99,19 @@ export class PrivateDocuments implements OnChanges {
         this.confirmRemove(document.document_id);
       }
     } else if (kind === 'reclassify') {
-      if (this.canReclassify() && document.category !== null && document.document_status === 'active') {
-        this.editor.set({ kind, document });
-      }
+      if (document.document_status === 'active') this.editCategory([document]);
     } else if (document.assignment_id && document.assignment_status === 'submitted') {
       if (kind === 'accept') {
         this.requestReview(document.assignment_id, 'accepted', null);
       } else {
-        this.editor.set({ kind, document });
+        this.editor.set({ kind, documents: [document] });
       }
+    }
+  }
+
+  protected editCategory(documents: readonly IAdminCoworkerOnboardingDocument[]): void {
+    if (!this.busy() && this.canReclassify() && documents.length > 0) {
+      this.editor.set({ kind: 'reclassify', documents });
     }
   }
 
@@ -112,12 +120,13 @@ export class PrivateDocuments implements OnChanges {
     if (!editor || this.busy()) return;
 
     if (editor.kind === 'reject') {
-      if (editor.document.assignment_id) {
-        this.requestReview(editor.document.assignment_id, 'rejected', value);
-      }
+      const assignmentId = editor.documents[0]?.assignment_id;
+      if (assignmentId) this.requestReview(assignmentId, 'rejected', value);
     } else if (this.canReclassify()) {
       this.mutationRequested.emit({
-        kind: 'reclassify', documentId: editor.document.document_id, categoryKey: value,
+        kind: 'reclassify',
+        documentIds: editor.documents.map(({ document_id }) => document_id),
+        categoryKey: value,
       });
     }
   }

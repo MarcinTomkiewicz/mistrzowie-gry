@@ -90,9 +90,11 @@
       [categoryLoadFailed]="categoriesLoadFailed()"
       [loading]="loading()"
       [saving]="busy()"
+      [zipProgress]="zipProgress()"
       (retryCategories)="loadCategories()"
       (fileRequested)="openDocument($event, data.onboarding.onboarding_id)"
       (mutationRequested)="mutatePrivateDocuments($event, data.onboarding.onboarding_id)"
+      (zipRequested)="downloadPrivateDocuments($event, data.onboarding.onboarding_id)"
     />
 
     @if (onboardingInProgress()) {
@@ -108,7 +110,7 @@
             type="button"
             icon="pi pi-check-circle"
             [label]="i18n.actions().complete"
-            [disabled]="loading() || busy()"
+            [disabled]="loading() || busy() || zipProgress() !== null"
             (onClick)="confirmComplete($event, data.onboarding.onboarding_id)"
           />
           <p-button
@@ -117,7 +119,7 @@
             [outlined]="true"
             icon="pi pi-interdiction"
             [label]="i18n.actions().cancelOnboarding"
-            [disabled]="loading() || busy()"
+            [disabled]="loading() || busy() || zipProgress() !== null"
             (onClick)="confirmCancel($event, data.onboarding.onboarding_id)"
           />
         </div>

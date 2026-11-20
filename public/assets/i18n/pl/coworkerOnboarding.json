@@ -30,7 +30,17 @@
     "completeDescription": "Zakończ wdrożenie, gdy kwestionariusz został sprawdzony, a wszystkie wymagane dokumenty, podpisane kopie i potwierdzenia zostały rozpatrzone.",
     "emptyDocuments": "Nie dodano jeszcze żadnych dokumentów prywatnych dla tego współpracownika.",
     "loadError": "Nie udało się wczytać danych wdrożenia. Spróbuj ponownie.",
-    "questionnaireBadge": "Kwestionariusz"
+    "questionnaireBadge": "Kwestionariusz",
+    "bulk": {
+      "selected": "Zaznaczone dokumenty [PH]",
+      "selectVisible": "Zaznacz wszystkie widoczne dokumenty [PH]",
+      "downloadOriginals": "Pobierz zaznaczone [PH]",
+      "downloadSigned": "Pobierz zaznaczone podpisane kopie [PH]",
+      "missingSigned": "Brakujące podpisane kopie [PH]",
+      "zipProgress": "Pobrano {{completed}} z {{total}} plików [PH]",
+      "zipFailed": "Nie udało się pobrać archiwum ZIP. Spróbuj ponownie. [PH]",
+      "categoryResult": "Zmieniono kategorię: {{changed}}. Bez zmian: {{unchanged}}. [PH]"
+    }
   },
   "adminShared": {
     "subtitle": "Zarządzaj dokumentami wspólnymi, które współpracownicy mogą otrzymać po zakończeniu wdrożenia. Dodawaj nowe dokumenty, zastępuj ich pliki i archiwizuj nieaktualne.",

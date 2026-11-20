@@ -42,7 +42,8 @@ export function parseAdminJsonRequest(value: unknown) {
     case "setDocumentCategory":
       return {
         action,
-        document_id: readUuid(source["document_id"]),
+        onboarding_id: readUuid(source["onboarding_id"]),
+        document_ids: readUuidArray(source["document_ids"]),
         category_key: readCategoryKey(source["category_key"]),
       } as const;
     case "listDocumentCategoryHistory":
@@ -304,7 +305,7 @@ function readUuidArray(value: unknown): string[] {
     }
     return validateUuid(item.trim());
   });
-  if (new Set(ids).size !== ids.length) {
+  if (new Set(ids.map((id) => id.toLowerCase())).size !== ids.length) {
     throw invalid();
   }
   return ids;

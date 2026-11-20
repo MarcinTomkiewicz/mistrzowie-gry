@@ -27,10 +27,14 @@
         </small>
       }
     } @else {
-      <strong>{{ document().title }}</strong>
+      @if (documents().length === 1) {
+        <strong>{{ documents()[0].title }}</strong>
+      } @else {
+        <strong>{{ i18n.adminDetail().bulk.selected }}: {{ documents().length }}</strong>
+      }
       <p-iftalabel class="w-100">
         <p-select class="w-100" inputId="private-document-assigned-category"
-          formControlName="categoryKey" [options]="categories()"
+          formControlName="categoryKey" [options]="categories()" [readonly]="saving()"
           optionLabel="category_name" optionValue="category_key" appendTo="body" />
         <label for="private-document-assigned-category">{{ i18n.categories().label }}</label>
       </p-iftalabel>

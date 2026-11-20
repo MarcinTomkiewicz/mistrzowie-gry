@@ -164,10 +164,11 @@ export interface IAdminCoworkerDocumentCategoryEvent {
 }
 
 export interface ISetAdminCoworkerDocumentCategoryResult {
-  readonly document_id: string;
+  readonly onboarding_id: string;
   readonly category_key: string;
-  readonly previous_category_key: string | null;
-  readonly updated_at: string;
+  readonly requested_count: number;
+  readonly changed_count: number;
+  readonly unchanged_count: number;
 }
 
 export interface IStartCoworkerOnboardingResult {

@@ -29,6 +29,8 @@ import { OnboardingDetailTab } from '../../admin-coworkers/admin-coworker-shell/
 import { getDocumentVersionId } from '../document-version';
 import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../../../common/onboarding-error';
 import { createAdminOnboardingProgress } from '../onboarding-progress';
+import type { PrivateDocumentDownloadBatch } from '../private-document-list/private-document-list';
+import { PrivateDocumentZip } from '../private-document-zip';
 import {
   PrivateDocuments,
   type PrivateDocumentFileOperation,
@@ -52,6 +54,7 @@ export class CoworkerOnboardingDetail {
   private readonly api = inject(AdminCoworkerOnboarding);
   private readonly confirm = inject(UiConfirm);
   private readonly platform = inject(Platform);
+  private readonly documentZip = new PrivateDocumentZip(this.platform);
   private readonly toast = inject(UiToast);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
@@ -78,6 +81,7 @@ export class CoworkerOnboardingDetail {
     this.detail()?.onboarding.status === 'in_progress',
   );
   protected readonly loading = signal(true);
+  protected readonly zipProgress = this.documentZip.progress;
   protected readonly busy = computed(() => {
     const onboardingId = this.onboardingId();
     return onboardingId !== null && this.pendingMutationIds().includes(onboardingId);
@@ -98,13 +102,17 @@ export class CoworkerOnboardingDetail {
   });
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.detailTab.current.set(null));
+    this.destroyRef.onDestroy(() => {
+      this.documentZip.cancel();
+      this.detailTab.current.set(null);
+    });
     this.loadCategories();
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const routeId = params.get('onboarding_id');
       const onboardingId = routeId?.toLowerCase() ?? null;
       this.detailTab.current.set(routeId ? { id: routeId } : null);
       if (this.onboardingId() !== onboardingId) {
+        this.documentZip.cancel();
         this.onboardingId.set(onboardingId);
         this.detail.set(null);
         this.preview.set(null);
@@ -163,8 +171,8 @@ export class CoworkerOnboardingDetail {
 
   protected mutatePrivateDocuments(mutation: PrivateDocumentMutation, onboardingId: string): void {
     const status = this.detail()?.onboarding.status;
-    const allowed = mutation.kind === 'review' || status === 'in_progress' ||
-      (mutation.kind !== 'remove' && status === 'completed');
+    const allowed = mutation.kind === 'review' || mutation.kind === 'reclassify' ||
+      status === 'in_progress' || (mutation.kind === 'upload' && status === 'completed');
     if (!this.canMutateOnboarding(onboardingId, allowed)) return;
 
     let request: Observable<unknown>;
@@ -179,8 +187,16 @@ export class CoworkerOnboardingDetail {
         request = this.api.reviewSignedDocument(mutation.assignmentId, mutation.decision, mutation.reason);
         break;
       case 'reclassify':
-        request = this.api.setDocumentCategory(mutation.documentId, mutation.categoryKey);
-        break;
+        this.runMutation(
+          this.api.setDocumentCategory(onboardingId, mutation.documentIds, mutation.categoryKey),
+          ({ changed_count, unchanged_count }) => {
+            this.privateDocuments()?.mutationSucceeded(mutation.kind);
+            return this.i18n.adminDetail().bulk.categoryResult
+              .replace('{{changed}}', String(changed_count))
+              .replace('{{unchanged}}', String(unchanged_count));
+          },
+        );
+        return;
     }
     this.runMutation(request, () => this.privateDocuments()?.mutationSucceeded(mutation.kind));
   }
@@ -193,10 +209,7 @@ export class CoworkerOnboardingDetail {
       : document.assignment_id;
     if (onboardingId !== expectedId || !targetId) return;
 
-    const request: Observable<ICoworkerDocumentDownload> = target === 'source'
-      ? this.api.getPrivateSourceDownload(targetId, onboardingId)
-      : this.api.getSignedDownload(targetId, onboardingId);
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.getDocumentDownload(target, targetId, onboardingId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ url, filename }) => {
         if (this.onboardingId() !== onboardingId) return;
         if (kind === 'preview') {
@@ -215,6 +228,28 @@ export class CoworkerOnboardingDetail {
         });
       },
     });
+  }
+
+  protected async downloadPrivateDocuments(batch: PrivateDocumentDownloadBatch, onboardingId: string): Promise<void> {
+    if (!this.platform.isBrowser || !this.canMutateOnboarding(onboardingId, true)) return;
+
+    const { documents, target } = batch;
+    const ids = documents.map((document) => target === 'source'
+      ? getDocumentVersionId(document)
+      : document.signed_original_filename ? document.assignment_id : null,
+    ).filter((id): id is string => !!id);
+
+    try {
+      if (target === 'source' && ids.length !== documents.length) {
+        throw new Error('A source version is missing from the ZIP selection.');
+      }
+      const filename = target === 'source' ? 'dokumenty-prywatne.zip' : 'podpisane-dokumenty-prywatne.zip';
+      await this.documentZip.download(ids, (id) => this.getDocumentDownload(target, id, onboardingId), filename);
+    } catch (error) {
+      if (this.destroyRef.destroyed || this.onboardingId() !== onboardingId) return;
+      const fallback = this.i18n.adminDetail().bulk.zipFailed;
+      this.toast.danger({ summary: getOnboardingErrorMessage(error, this.i18n.toast().errors, fallback) });
+    }
   }
 
   protected confirmComplete(event: Event, onboardingId: string): void {
@@ -253,10 +288,21 @@ export class CoworkerOnboardingDetail {
       !this.loading() &&
       !this.loadFailed() &&
       !this.busy() &&
+      this.zipProgress() === null &&
       this.onboardingId() === onboardingId &&
       this.detail()?.onboarding.onboarding_id === onboardingId &&
       statusAllowsMutation
     );
+  }
+
+  private getDocumentDownload(
+    target: PrivateDocumentFileOperation['target'],
+    id: string,
+    onboardingId: string,
+  ): Observable<ICoworkerDocumentDownload> {
+    return target === 'source'
+      ? this.api.getPrivateSourceDownload(id, onboardingId)
+      : this.api.getSignedDownload(id, onboardingId);
   }
 
   private showLoadError(error?: unknown): void {
@@ -269,7 +315,7 @@ export class CoworkerOnboardingDetail {
     });
   }
 
-  private runMutation(request: Observable<unknown>, after?: () => void): void {
+  private runMutation<T>(request: Observable<T>, after?: (result: T) => string | void): void {
     const onboardingId = this.onboardingId();
     if (!onboardingId || this.busy()) return;
 
@@ -280,12 +326,11 @@ export class CoworkerOnboardingDetail {
         this.pendingMutationIds.update((ids) => ids.filter((id) => id !== onboardingId));
       }),
     ).subscribe({
-      next: () => {
+      next: (result) => {
         if (this.onboardingId() !== onboardingId) return;
-        after?.();
         this.toast.success({
           summary: this.i18n.toast().mutationSuccessSummary,
-          detail: this.i18n.commonStatus().changesSaved,
+          detail: after?.(result) ?? this.i18n.commonStatus().changesSaved,
         });
         this.load();
       },

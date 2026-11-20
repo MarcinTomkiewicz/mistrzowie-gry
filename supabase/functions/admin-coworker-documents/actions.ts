@@ -11,6 +11,7 @@ import type {
   ICompleteCoworkerOnboardingResult,
   IRemovePrivateDocumentResult,
   IReviewCoworkerSignedSubmissionResult,
+  ISetAdminCoworkerDocumentCategoryResult,
   IStartCoworkerOnboardingResult,
 } from "../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
 import type { parseAdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
@@ -131,10 +132,15 @@ export async function handleAdminAction(
         p_category_key: request.category_key,
       });
     case "setDocumentCategory":
-      return await callSingleCoworkerRpc(client, RPC.setDocumentCategory, {
-        p_document_id: request.document_id,
-        p_category_key: request.category_key,
-      });
+      return await callSingleCoworkerRpc<ISetAdminCoworkerDocumentCategoryResult>(
+        client,
+        RPC.setDocumentCategory,
+        {
+          p_onboarding_id: request.onboarding_id,
+          p_document_ids: request.document_ids,
+          p_category_key: request.category_key,
+        },
+      );
     case "listDocumentCategoryHistory":
       return await callCoworkerRpc(client, RPC.listDocumentCategoryHistory, {
         p_category_key: request.category_key,

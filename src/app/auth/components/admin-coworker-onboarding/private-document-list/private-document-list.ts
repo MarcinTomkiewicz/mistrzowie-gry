@@ -1,16 +1,19 @@
-import { Component, computed, input, output, type OnChanges, type SimpleChanges } from '@angular/core';
+import { Component, computed, input, linkedSignal, output, type OnChanges, type SimpleChanges } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import type { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { map } from 'rxjs';
 
 import { STATUS_BADGE_CLASS } from '../../../../core/configs/badge-class.config';
+import { DEFAULT_COWORKER_DOCUMENT_CATEGORY } from '../../../../core/configs/coworker-onboarding.config';
 import type {
   IAdminCoworkerDocumentCategory,
   IAdminCoworkerOnboardingDocument,
@@ -26,6 +29,7 @@ import { normalizeText } from '../../../../core/utils/normalize-text';
 import { stablePartition } from '../../../../core/utils/stable-partition';
 import { DocumentOperations } from '../../../common/document-operations/document-operations';
 import { isCurrentDocumentVersion } from '../document-version';
+import type { PrivateDocumentZipProgress } from '../private-document-zip';
 
 export type PrivateDocumentOperation = {
   readonly document: IAdminCoworkerOnboardingDocument;
@@ -34,11 +38,16 @@ export type PrivateDocumentOperation = {
   | { readonly kind: 'accept' | 'reject' | 'remove' | 'reclassify' }
 );
 
+export interface PrivateDocumentDownloadBatch {
+  readonly documents: readonly IAdminCoworkerOnboardingDocument[];
+  readonly target: CoworkerDocumentDownloadTarget;
+}
+
 @Component({
   selector: 'app-private-document-list',
   imports: [
-    ReactiveFormsModule, ButtonModule, FloatLabelModule, InputTextModule,
-    SelectModule, TableModule, ToggleSwitchModule, DocumentOperations,
+    FormsModule, ReactiveFormsModule, ButtonModule, CheckboxModule, FloatLabelModule, InputTextModule,
+    ProgressBarModule, SelectModule, TableModule, ToggleSwitchModule, DocumentOperations,
   ],
   templateUrl: './private-document-list.html',
 })
@@ -50,7 +59,10 @@ export class PrivateDocumentList implements OnChanges {
   readonly busy = input(false);
   readonly categoryLoading = input(false);
   readonly categoryEditingEnabled = input(false);
+  readonly zipProgress = input<PrivateDocumentZipProgress | null>(null);
   readonly operation = output<PrivateDocumentOperation>();
+  readonly bulkCategoryRequested = output<readonly IAdminCoworkerOnboardingDocument[]>();
+  readonly zipRequested = output<PrivateDocumentDownloadBatch>();
 
   protected readonly i18n = createCoworkerOnboardingI18n();
   protected readonly filterForm = new FormGroup({
@@ -80,7 +92,7 @@ export class PrivateDocumentList implements OnChanges {
     const { assignment, requiredAction } = this.i18n.statuses();
     const documents = this.documents().filter((document) =>
       (!query || document.title.toLocaleLowerCase('pl').includes(query)) &&
-      (!category || document.category === category) &&
+      (!category || (document.category ?? DEFAULT_COWORKER_DOCUMENT_CATEGORY) === category) &&
       (!status || (document.assignment_status ?? 'unassigned') === status) &&
       (!hideRejected || document.assignment_status !== 'rejected'),
     );
@@ -90,7 +102,8 @@ export class PrivateDocumentList implements OnChanges {
       return {
         document,
         current,
-        category: document.category === null ? null : categoryNames.get(document.category),
+        selectable: current && document.document_status === 'active',
+        category: categoryNames.get(document.category ?? DEFAULT_COWORKER_DOCUMENT_CATEGORY),
         statusLabel: status ? assignment?.[status] : this.i18n.fields().noAssignment,
         statusClass: status ? 'tag-badge text-wrap ' + STATUS_BADGE_CLASS[status] : '',
         actionLabel: document.required_action ? requiredAction?.[document.required_action] : null,
@@ -98,6 +111,33 @@ export class PrivateDocumentList implements OnChanges {
       };
     });
     return stablePartition(rows, (row) => row.current);
+  });
+  protected readonly selectable = computed(() => new Map(
+    this.rows().filter((row) => row.selectable).map(({ document }) => [document.document_id, document]),
+  ));
+  protected readonly selection = linkedSignal({
+    source: () => ({ onboardingId: this.onboardingId(), documents: this.selectable() }),
+    computation: ({ onboardingId, documents }, previous): ReadonlySet<string> =>
+      previous?.source.onboardingId === onboardingId
+        ? new Set([...previous.value].filter((id) => documents.has(id)))
+        : new Set<string>(),
+  });
+  protected readonly selectedDocuments = computed(() =>
+    [...this.selectable().values()].filter(({ document_id }) => this.selection().has(document_id)),
+  );
+  protected readonly allSelected = computed(() =>
+    this.selectable().size > 0 && this.selection().size === this.selectable().size,
+  );
+  protected readonly missingSigned = computed(() =>
+    this.selectedDocuments().filter(({ assignment_id, signed_original_filename }) =>
+      !assignment_id || !signed_original_filename,
+    ).length,
+  );
+  protected readonly zipProgressLabel = computed(() => {
+    const progress = this.zipProgress();
+    return progress ? this.i18n.adminDetail().bulk.zipProgress
+      .replace('{{completed}}', String(progress.completed))
+      .replace('{{total}}', String(progress.total)) : '';
   });
 
   ngOnChanges(changes: SimpleChanges<PrivateDocumentList>): void {
@@ -116,6 +156,26 @@ export class PrivateDocumentList implements OnChanges {
 
   protected preview(document: IAdminCoworkerOnboardingDocument): void {
     this.operation.emit({ document, kind: 'preview', target: 'source' });
+  }
+
+  protected toggleDocument(documentId: string, checked: boolean): void {
+    if (this.busy() || !this.selectable().has(documentId)) return;
+
+    const selection = new Set(this.selection());
+    if (checked) selection.add(documentId);
+    else selection.delete(documentId);
+    this.selection.set(selection);
+  }
+
+  protected toggleVisible(checked: boolean): void {
+    if (!this.busy()) this.selection.set(new Set(checked ? this.selectable().keys() : []));
+  }
+
+  protected downloadSelected(target: CoworkerDocumentDownloadTarget): void {
+    const documents = this.selectedDocuments();
+    if (this.busy() || !documents.length ||
+        (target === 'signed' && this.missingSigned() === documents.length)) return;
+    this.zipRequested.emit({ documents, target });
   }
 
   private createOperations(document: IAdminCoworkerOnboardingDocument, current: boolean): MenuItem[] {
@@ -151,8 +211,7 @@ export class PrivateDocumentList implements OnChanges {
         },
       );
     }
-    if (current && document.category !== null && document.document_status === 'active' &&
-        this.categoryEditingEnabled()) {
+    if (current && document.document_status === 'active' && this.categoryEditingEnabled()) {
       items.push({
         label: this.i18n.categories().change, icon: 'pi pi-quill',
         command: () => this.operation.emit({ document, kind: 'reclassify' }),

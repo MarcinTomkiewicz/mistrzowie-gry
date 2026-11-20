@@ -101,12 +101,14 @@ export class AdminCoworkerOnboarding {
   }
 
   setDocumentCategory(
-    documentId: string,
+    onboardingId: string,
+    documentIds: readonly string[],
     categoryKey: string,
   ): Observable<ISetAdminCoworkerDocumentCategoryResult> {
     return this.invoke({
       action: 'setDocumentCategory',
-      document_id: documentId,
+      onboarding_id: onboardingId,
+      document_ids: documentIds,
       category_key: categoryKey,
     });
   }
