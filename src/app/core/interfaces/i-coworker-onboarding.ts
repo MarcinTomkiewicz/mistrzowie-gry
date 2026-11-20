@@ -23,7 +23,7 @@ export interface ICoworkerOnboardingRow {
 export interface ICoworkerPrivateDocumentRow {
   readonly assignment_id: string;
   readonly document_id: string;
-  readonly onboarding_id: string;
+  readonly onboarding_id: string | null;
   readonly source_version_id: string;
   readonly title: string;
   readonly document_status: CoworkerDocumentLifecycleStatus;

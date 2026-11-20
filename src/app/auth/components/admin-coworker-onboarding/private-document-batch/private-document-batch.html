@@ -37,15 +37,20 @@
           </p-iftalabel>
         </div>
 
-        <div class="flex-row-start-center gap-sm">
-          <p-toggleswitch
-            [inputId]="'private-document-signed-' + index"
-            formControlName="requires_signed_upload"
+        <p-iftalabel class="w-100">
+          <p-select
+            class="w-100"
+            [inputId]="'private-document-action-' + index"
+            formControlName="required_action"
+            [options]="actionOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
           />
-          <label [for]="'private-document-signed-' + index">
-            {{ i18n.fields().requiresSignedUpload }}
+          <label [for]="'private-document-action-' + index">
+            {{ i18n.fields().requiredAction }}
           </label>
-        </div>
+        </p-iftalabel>
 
         <app-file-upload
           [options]="uploadOptions()"

@@ -65,11 +65,12 @@ export class CoworkerShell {
 
   private readonly privateDocumentsAvailable = computed(() => {
     const state = this.portalState();
+    if (state.status !== 'loaded') return false;
 
+    const { onboarding, questionnaire_complete, private_assignments } = state.portal;
     return (
-      state.status === 'loaded' &&
-      !!state.portal.onboarding &&
-      state.portal.questionnaire_complete
+      (onboarding !== null && questionnaire_complete) ||
+      private_assignments.some((document) => document.onboarding_id === null)
     );
   });
 

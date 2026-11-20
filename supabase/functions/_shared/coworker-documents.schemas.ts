@@ -1,5 +1,6 @@
 import {
   COWORKER_DOCUMENT_DOWNLOAD_TARGETS,
+  COWORKER_DOCUMENT_REQUIRED_ACTIONS,
   COWORKER_DOCUMENT_REVIEW_DECISIONS,
 } from "../../../src/app/core/types/coworker-onboarding.ts";
 
@@ -211,13 +212,23 @@ function readPrivateDocumentMetadata(formData: FormData) {
   return parsed.map((item) => {
     const source = readObject(item);
     const requiresSignedUpload = source["requires_signed_upload"];
+    const requiredAction = source["required_action"] === undefined
+      ? undefined
+      : readEnum(source["required_action"], COWORKER_DOCUMENT_REQUIRED_ACTIONS);
     const category = source["category"];
-    if (typeof requiresSignedUpload !== "boolean") {
+    if (
+      typeof requiresSignedUpload !== "boolean" ||
+      (requiredAction !== undefined &&
+        requiresSignedUpload !== (requiredAction === "upload_signed"))
+    ) {
       throw invalid();
     }
     return {
       title: readText(source["title"]),
       requires_signed_upload: requiresSignedUpload,
+      ...(requiredAction === undefined
+        ? {}
+        : { required_action: requiredAction }),
       ...(category === undefined
         ? {}
         : { category: readCategoryKey(category) }),

@@ -132,7 +132,7 @@ export interface IAdminCoworkerOnboardingDetail {
 
 export interface IAdminPrivateDocumentUpload {
   readonly title: string;
-  readonly requires_signed_upload: boolean;
+  readonly required_action: CoworkerDocumentRequiredAction;
   readonly file: File;
 }
 
@@ -158,10 +158,10 @@ export interface IRegisterQuestionnairePrivateDocumentResult {
 export interface IRegisterAdminPrivateDocumentResult {
   readonly document_id: string;
   readonly version_id: string;
-  readonly assignment_id: string | null;
+  readonly assignment_id: string;
   readonly title: string;
   readonly required_action: CoworkerDocumentRequiredAction;
-  readonly assignment_status: CoworkerDocumentAssignmentStatus | null;
+  readonly assignment_status: CoworkerDocumentAssignmentStatus;
 }
 
 export interface IReviewCoworkerSignedSubmissionResult {

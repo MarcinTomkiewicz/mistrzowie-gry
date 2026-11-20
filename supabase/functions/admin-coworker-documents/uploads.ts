@@ -46,11 +46,7 @@ async function uploadPrivateDocuments(
 ): Promise<IRegisterAdminPrivateDocumentResult[]> {
   const onboarding = await getAdminOnboarding(client, request.onboarding_id);
   const completed = onboarding.status === "completed";
-  if (
-    onboarding.status !== "in_progress" &&
-    (!completed ||
-      request.documents.some((document) => document.requires_signed_upload))
-  ) {
+  if (onboarding.status !== "in_progress" && !completed) {
     throw new CoworkerDocumentConflictError();
   }
   const storageDirectory = completed

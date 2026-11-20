@@ -10,11 +10,14 @@ import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 import { COWORKER_PDF_UPLOAD_OPTIONS } from '../../../../core/configs/coworker-onboarding.config';
 import type { IAdminPrivateDocumentUpload } from '../../../../core/interfaces/i-admin-coworker-onboarding';
 import { createCoworkerOnboardingI18n } from '../../../../core/translations/coworker-onboarding.i18n';
+import {
+  COWORKER_DOCUMENT_REQUIRED_ACTIONS,
+  type CoworkerDocumentRequiredAction,
+} from '../../../../core/types/coworker-onboarding';
 import type { PrivateDocumentRowForm } from '../../../../core/types/private-document-row-form';
 import { FileUpload } from '../../../../common/file-upload/file-upload';
 
@@ -27,7 +30,6 @@ import { FileUpload } from '../../../../common/file-upload/file-upload';
     IftaLabelModule,
     InputTextModule,
     SelectModule,
-    ToggleSwitchModule,
     FileUpload,
   ],
   templateUrl: './private-document-batch.html',
@@ -67,6 +69,12 @@ export class PrivateDocumentBatch {
       title: this.i18n.upload().protocolPreset,
     },
   ]);
+  protected readonly actionOptions = computed(() =>
+    COWORKER_DOCUMENT_REQUIRED_ACTIONS.map((value) => ({
+      value,
+      label: this.i18n.statuses().requiredAction[value],
+    })),
+  );
 
   protected addRow(): void {
     this.rows.push(this.createRow());
@@ -109,7 +117,7 @@ export class PrivateDocumentBatch {
 
       documents.push({
         title: value.title,
-        requires_signed_upload: value.requires_signed_upload,
+        required_action: value.required_action,
         file: value.file,
       });
     }
@@ -129,7 +137,9 @@ export class PrivateDocumentBatch {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      requires_signed_upload: new FormControl(false, { nonNullable: true }),
+      required_action: new FormControl<CoworkerDocumentRequiredAction>('acknowledge', {
+        nonNullable: true,
+      }),
       file: new FormControl<File | null>(null, Validators.required),
     });
   }

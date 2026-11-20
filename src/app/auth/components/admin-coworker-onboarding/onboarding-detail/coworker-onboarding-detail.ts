@@ -73,6 +73,12 @@ export class CoworkerOnboardingDetail {
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly getUserDisplayName = getUserDisplayName;
   protected readonly detail = signal<IAdminCoworkerOnboardingDetail | null>(null);
+  protected readonly onboardingInProgress = computed(() =>
+    this.detail()?.onboarding.status === 'in_progress',
+  );
+  protected readonly canUploadPrivateDocuments = computed(() =>
+    this.onboardingInProgress() || this.detail()?.onboarding.status === 'completed',
+  );
   protected readonly loading = signal(true);
   protected readonly busy = computed(() => {
     const onboardingId = this.onboardingId();
@@ -103,7 +109,7 @@ export class CoworkerOnboardingDetail {
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const onboardingId = params.get('onboarding_id');
+      const onboardingId = params.get('onboarding_id')?.toLowerCase() ?? null;
       if (this.onboardingId() !== onboardingId) {
         this.onboardingId.set(onboardingId);
         this.detail.set(null);
@@ -258,9 +264,11 @@ export class CoworkerOnboardingDetail {
     });
   }
 
-  protected upload(documents: readonly IAdminPrivateDocumentUpload[]): void {
-    const onboardingId = this.onboardingId();
-    if (!onboardingId) return;
+  protected upload(
+    documents: readonly IAdminPrivateDocumentUpload[],
+    onboardingId: string,
+  ): void {
+    if (!this.canMutateOnboarding(onboardingId, this.canUploadPrivateDocuments())) return;
     this.runMutation(
       this.api.uploadPrivateDocuments(onboardingId, documents),
       () => this.batch()?.reset(),
@@ -278,16 +286,18 @@ export class CoworkerOnboardingDetail {
     );
   }
 
-  private canMutateOnboarding(onboardingId: string): boolean {
-    const onboarding = this.detail()?.onboarding;
+  private canMutateOnboarding(
+    onboardingId: string,
+    statusAllowsMutation = this.onboardingInProgress(),
+  ): boolean {
     return (
       !this.destroyRef.destroyed &&
       !this.loading() &&
       !this.loadFailed() &&
       !this.busy() &&
       this.onboardingId() === onboardingId &&
-      onboarding?.onboarding_id === onboardingId &&
-      onboarding.status === 'in_progress'
+      this.detail()?.onboarding.onboarding_id === onboardingId &&
+      statusAllowsMutation
     );
   }
 

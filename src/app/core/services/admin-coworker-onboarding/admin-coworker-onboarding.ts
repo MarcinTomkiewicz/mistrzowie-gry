@@ -62,9 +62,10 @@ export class AdminCoworkerOnboarding {
     body.append(
       'documents',
       JSON.stringify(
-        documents.map(({ title, requires_signed_upload }) => ({
+        documents.map(({ title, required_action }) => ({
           title,
-          requires_signed_upload,
+          required_action,
+          requires_signed_upload: required_action === 'upload_signed',
         })),
       ),
     );

@@ -8,15 +8,19 @@ export const COWORKER_DOCUMENT_DOWNLOAD_TARGETS = [
   'signed',
 ] as const;
 
+export const COWORKER_DOCUMENT_REQUIRED_ACTIONS = [
+  'none',
+  'acknowledge',
+  'upload_signed',
+] as const;
+
 export type CoworkerOnboardingLifecycleStatus =
   | 'in_progress'
   | 'completed'
   | 'cancelled';
 export type CoworkerDocumentLifecycleStatus = 'active' | 'archived';
 export type CoworkerDocumentRequiredAction =
-  | 'none'
-  | 'upload_signed'
-  | 'acknowledge';
+  (typeof COWORKER_DOCUMENT_REQUIRED_ACTIONS)[number];
 export type CoworkerDocumentAssignmentStatus =
   | 'available'
   | 'pending'

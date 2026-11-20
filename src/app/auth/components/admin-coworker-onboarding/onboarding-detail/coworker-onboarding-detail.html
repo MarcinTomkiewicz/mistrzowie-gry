@@ -216,14 +216,19 @@
       }
     </section>
 
-    @if (data.onboarding.status === 'in_progress') {
+    @if (canUploadPrivateDocuments()) {
       <section class="flex-col-start-stretch gap-md w-100">
         <h3 class="mg-section__title mg-section__title--sm m-0">
           {{ i18n.adminDetail().uploadSection }}
         </h3>
-        <app-private-document-batch [busy]="busy()" (upload)="upload($event)" />
+        <app-private-document-batch
+          [busy]="busy()"
+          (upload)="upload($event, data.onboarding.onboarding_id)"
+        />
       </section>
+    }
 
+    @if (onboardingInProgress()) {
       <section class="mg-card flex-col-start-stretch gap-md w-100">
         <div class="flex-col-start-stretch gap-xs">
           <h3 class="mg-section__title mg-section__title--sm m-0">

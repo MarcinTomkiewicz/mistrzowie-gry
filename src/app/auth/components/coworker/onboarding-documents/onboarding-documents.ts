@@ -90,12 +90,18 @@ export class CoworkerOnboardingDocuments {
     }
     return latestVersions;
   });
-  protected readonly privateDocuments = computed(() =>
-    stablePartition(
-      this.portal()?.private_assignments ?? [],
+  protected readonly privateDocuments = computed(() => {
+    const portal = this.portal();
+    if (!portal) return [];
+
+    const onboardingDocumentsAvailable = portal.onboarding !== null && portal.questionnaire_complete;
+    return stablePartition(
+      portal.private_assignments.filter(
+        (document) => document.onboarding_id === null || onboardingDocumentsAvailable,
+      ),
       (document) => !this.isHistoricalPrivateDocument(document),
-    ),
-  );
+    );
+  });
 
   constructor() {
     this.load();
@@ -209,9 +215,10 @@ export class CoworkerOnboardingDocuments {
   }
 
   private syncSelectionControls(portal: ICoworkerDocumentPortal): void {
+    const privateDocuments = this.privateDocuments();
     this.syncSelectionRecord(
       this.declarationControls,
-      portal.private_assignments
+      privateDocuments
         .filter(
           (document) =>
             !this.isHistoricalPrivateDocument(document) &&
@@ -224,7 +231,7 @@ export class CoworkerOnboardingDocuments {
     this.syncSelectionRecord(
       this.acknowledgementControls,
       [
-        ...portal.private_assignments.filter(
+        ...privateDocuments.filter(
           (document) =>
             !this.isHistoricalPrivateDocument(document) &&
             document.required_action === 'acknowledge' &&
