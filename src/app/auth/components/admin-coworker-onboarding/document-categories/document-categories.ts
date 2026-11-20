@@ -27,8 +27,8 @@ import { formatTimestampLabel } from '../../../../core/utils/date';
 import { scrollElementIntoViewWhenReady } from '../../../../core/utils/scroll';
 import { requiredTrimmedValidator } from '../../../../core/validators/required-trimmed.validator';
 import { createAdminCoworkerShellI18n } from '../../admin-coworkers/admin-coworker-shell/admin-coworker-shell.i18n';
-import { DocumentOperations } from '../document-operations/document-operations';
-import { getOnboardingMutationErrorToast } from '../onboarding-error';
+import { DocumentOperations } from '../../../common/document-operations/document-operations';
+import { getOnboardingMutationErrorToast } from '../../../common/onboarding-error';
 
 @Component({
   selector: 'app-document-categories',

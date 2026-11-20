@@ -66,20 +66,21 @@ export class UiConfirm {
           finish(false);
           return;
         }
-        const { messageTemplate, acceptSeverity, ...confirmationOptions } = options;
+        const { messageTemplate, acceptSeverity, acceptIcon, rejectIcon, ...confirmationOptions } = options;
         this.template.set(messageTemplate ?? null);
         this.confirmation.confirm({
           ...confirmationOptions,
           key: this.modalDecisionKey,
-          acceptIcon: options.acceptIcon,
+          acceptIcon,
+          rejectIcon,
           closable: true,
           closeOnEscape: true,
           dismissableMask: true,
           defaultFocus: 'reject',
           accept: () => finish(true),
           reject: () => finish(false),
-          acceptButtonProps: { severity: acceptSeverity, icon: options.acceptIcon },
-          rejectButtonProps: { severity: 'secondary', outlined: true },
+          acceptButtonProps: { severity: acceptSeverity, icon: acceptIcon },
+          rejectButtonProps: { severity: 'secondary', outlined: true, icon: rejectIcon },
         });
       }, error: () => finish(false) });
       return () => {

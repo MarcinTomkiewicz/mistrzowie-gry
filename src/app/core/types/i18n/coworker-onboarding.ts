@@ -76,6 +76,11 @@ export interface CoworkerOnboardingPrivateTranslations {
   empty: string;
   declaration: string;
   loadError: string;
+  searchByTitle: string;
+  actionRequiredOnly: string;
+  filteredEmpty: string;
+  versionHistory: string;
+  collapseUpload: string;
 }
 
 export interface CoworkerOnboardingSharedTranslations {
@@ -88,6 +93,7 @@ export interface CoworkerOnboardingSharedTranslations {
 export interface CoworkerOnboardingFieldsTranslations {
   startedAt: string;
   completedAt: string;
+  document: string;
   documents: string;
   pendingActions: string;
   preset: string;
@@ -127,6 +133,7 @@ export interface CoworkerOnboardingActionsTranslations {
   replaceShared: string;
   showConfirmations: string;
   acknowledge: string;
+  acknowledgeDocument: string;
   goToQuestionnaire: string;
 }
 
@@ -164,5 +171,6 @@ export interface CoworkerOnboardingToastTranslations {
 export interface CoworkerOnboardingStatusesTranslations {
   onboarding: Record<CoworkerOnboardingLifecycleStatus, string>;
   assignment: Record<CoworkerDocumentAssignmentStatus, string>;
+  pendingAcknowledgement: string;
   requiredAction: Record<CoworkerDocumentRequiredAction, string>;
 }

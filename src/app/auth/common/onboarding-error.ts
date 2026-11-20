@@ -1,7 +1,7 @@
-import { EdgeFunctionError } from '../../../core/types/edge-function-error';
-import type { CoworkerOnboardingToastTranslations } from '../../../core/types/i18n/coworker-onboarding';
-import type { ToastOptions } from '../../../core/types/toast';
-import { isEdgeMutationResultUncertain } from '../../../core/utils/edge-function-error-mapping';
+import { EdgeFunctionError } from '../../core/types/edge-function-error';
+import type { CoworkerOnboardingToastTranslations } from '../../core/types/i18n/coworker-onboarding';
+import type { ToastOptions } from '../../core/types/toast';
+import { isEdgeMutationResultUncertain } from '../../core/utils/edge-function-error-mapping';
 
 export function getOnboardingErrorMessage(
   error: unknown,

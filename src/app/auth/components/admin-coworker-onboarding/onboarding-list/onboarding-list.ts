@@ -31,7 +31,7 @@ import { normalizeText } from '../../../../core/utils/normalize-text';
 import { getUserDisplayName } from '../../../../core/utils/user-display';
 import { ContextHelp } from '../../../../common/context-help/context-help';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
-import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
+import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../../../common/onboarding-error';
 import { countAdminOnboardingPendingActions } from '../onboarding-progress';
 
 type VisibleOnboardingRow = IAdminCoworkerOnboardingRow & {

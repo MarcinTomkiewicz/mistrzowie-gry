@@ -24,9 +24,9 @@
         <app-coworker-shared-documents
           [documents]="data.shared_assignments"
           [onboardingCompleted]="data.onboarding?.status === 'completed'"
-          [acknowledgementControls]="acknowledgementControls"
-          [busy]="activeMutationKey() !== null"
+          [busy]="busy()"
           (fileRequested)="openDocument($event)"
+          (acknowledgementRequested)="confirmAcknowledgement($event)"
         />
       } @else {
         <app-coworker-private-documents
@@ -34,23 +34,16 @@
           [hasOnboarding]="data.onboarding !== null"
           [questionnaireComplete]="data.questionnaire_complete"
           [declarationControls]="declarationControls"
-          [acknowledgementControls]="acknowledgementControls"
           [selectedFiles]="selectedFiles()"
           [activeMutationKey]="activeMutationKey()"
+          [busy]="busy()"
           (fileRequested)="openDocument($event)"
           (signedFilesSelected)="selectSignedFile($event.assignmentId, $event.files)"
           (signatureSubmitted)="uploadSigned($event)"
+          (acknowledgementRequested)="confirmAcknowledgement($event)"
         />
       }
     </section>
-
-    @if (acknowledgedAssignmentIds().length) {
-      <div class="flex-row-end-center">
-        <p-button icon="pi pi-check" [label]="i18n.actions().acknowledge"
-          [loading]="activeMutationKey() === 'acknowledge'" [disabled]="activeMutationKey() !== null"
-          (onClick)="acknowledge()" />
-      </div>
-    }
   }
 </div>
 

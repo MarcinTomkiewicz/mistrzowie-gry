@@ -27,7 +27,7 @@ import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overl
 import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { OnboardingDetailTab } from '../../admin-coworkers/admin-coworker-shell/onboarding-detail-tab';
 import { getDocumentVersionId } from '../document-version';
-import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
+import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../../../common/onboarding-error';
 import { createAdminOnboardingProgress } from '../onboarding-progress';
 import {
   PrivateDocuments,

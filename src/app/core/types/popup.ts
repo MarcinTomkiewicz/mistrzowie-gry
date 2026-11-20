@@ -19,5 +19,6 @@ export type DecisionPopupOptions = BasePopupOptions & {
 
 export type ModalDecisionPopupOptions = Omit<DecisionPopupOptions, 'accept' | 'reject' | 'icon'> & {
   header: string;
+  rejectIcon?: string;
   messageTemplate?: TemplateRef<unknown>;
 };

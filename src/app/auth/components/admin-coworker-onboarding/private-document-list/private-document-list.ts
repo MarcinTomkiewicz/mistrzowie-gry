@@ -24,7 +24,7 @@ import type {
 import { setControlValue } from '../../../../core/utils/form-controls';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { stablePartition } from '../../../../core/utils/stable-partition';
-import { DocumentOperations } from '../document-operations/document-operations';
+import { DocumentOperations } from '../../../common/document-operations/document-operations';
 import { isCurrentDocumentVersion } from '../document-version';
 
 export type PrivateDocumentOperation = {

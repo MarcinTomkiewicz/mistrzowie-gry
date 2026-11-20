@@ -38,8 +38,8 @@ import { FileUpload } from '../../../../common/file-upload/file-upload';
 import { LoadingOverlay } from '../../../../common/loading-overlay/loading-overlay';
 import { PdfThumbnail } from '../../../../common/pdf-thumbnail/pdf-thumbnail';
 import { PdfViewerDialog } from '../../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
-import { DocumentOperations } from '../document-operations/document-operations';
-import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../onboarding-error';
+import { DocumentOperations } from '../../../common/document-operations/document-operations';
+import { getOnboardingErrorMessage, getOnboardingMutationErrorToast } from '../../../common/onboarding-error';
 
 @Component({
   selector: 'app-admin-shared-documents',
@@ -174,7 +174,8 @@ export class SharedDocuments {
       next: (assignments) => this.assignments.set(assignments),
       error: (error: unknown) => {
         this.closeAssignments();
-        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast()));
+        const summary = getOnboardingErrorMessage(error, this.i18n.toast().errors, this.i18n.adminShared().loadError);
+        this.toast.danger({ summary });
       },
     });
   }

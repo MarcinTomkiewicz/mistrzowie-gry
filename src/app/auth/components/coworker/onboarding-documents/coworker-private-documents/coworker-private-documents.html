@@ -17,101 +17,189 @@
     </section>
   }
 } @else {
-  <p-tabs [(value)]="activeCategory" [scrollable]="true">
-    <p-tablist>
-      @for (category of categories(); track category.key) {
-        <p-tab [value]="category.key">
-          {{ category.label }}
-          @if (category.status === 'retired') { ({{ i18n.categories().retired }}) }
-        </p-tab>
-      }
-    </p-tablist>
-    <p-tabpanels>
-      @for (category of categories(); track category.key) {
-        <p-tabpanel [value]="category.key">
-          @if (activeCategory() === category.key) {
-            <div class="flex-col-start-stretch gap-md">
-              @for (row of category.rows; track row.document.assignment_id) {
-                @let document = row.document;
-                @let assignmentId = document.assignment_id;
-                <article class="mg-card flex-col-start-stretch gap-md w-100">
-                  <div class="flex-row-between-start flex-wrap gap-sm w-100">
-                    <div class="flex-col-start-start gap-xs">
-                      <strong>{{ document.title }}</strong>
-                      @if (row.historical) {
-                        <span class="tag-badge tag-badge--muted">{{ i18n.fields().historicalVersion }}</span>
-                      }
-                      @if (i18n.statuses().assignment; as statuses) {
-                        <span [class]="'tag-badge ' + (row.historical ? 'tag-badge--muted' : STATUS_BADGE_CLASS[document.assignment_status])">
-                          {{ statuses[document.assignment_status] }}
-                        </span>
-                      }
-                    </div>
-                    <small>{{ i18n.fields().version }}: {{ document.version_number }}</small>
-                  </div>
-                  @if (document.rejection_reason) {
-                    <p class="m-0 error-text">
-                      {{ i18n.commonLabels().rejectionReason }}: {{ document.rejection_reason }}
-                    </p>
-                  }
+  <div class="flex-col-start-stretch gap-md w-100 min-w-0">
+    <form [formGroup]="filterForm" novalidate
+      class="mg-card flex-row-start-center flex-wrap gap-sm p-md w-100">
+      <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
+        <input pInputText pSize="small" type="search" class="w-100" id="coworker-private-document-search"
+          formControlName="searchText" />
+        <label for="coworker-private-document-search">{{ i18n.coworkerPrivate().searchByTitle }}</label>
+      </p-floatlabel>
+      <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
+        inputId="coworker-private-document-category" formControlName="category"
+        [options]="categoryOptions()" optionLabel="label" optionValue="value"
+        [placeholder]="i18n.categories().all" [ariaLabel]="i18n.categories().label"
+        [showClear]="true" appendTo="body" />
+      <div class="flex-row-start-center gap-sm flex-none w-100-sm">
+        <p-toggleswitch inputId="coworker-private-document-action-required" formControlName="actionRequiredOnly" />
+        <label for="coworker-private-document-action-required">{{ i18n.coworkerPrivate().actionRequiredOnly }}</label>
+      </div>
+    </form>
 
-                  <div class="flex-row-start-center flex-wrap gap-xs">
-                    <p-button size="small" severity="secondary" icon="pi pi-horus"
-                      [label]="i18n.commonActions().preview"
-                      (onClick)="fileRequested.emit({ assignmentId, target: 'source', preview: true })" />
-                    <p-button size="small" severity="secondary" [outlined]="true" icon="pi pi-missile-swarm"
-                      [label]="i18n.actions().download"
-                      (onClick)="fileRequested.emit({ assignmentId, target: 'source', preview: false })" />
-                    @if (document.signed_original_filename) {
-                      <p-button size="small" severity="secondary" icon="pi pi-evil-book"
-                        [label]="i18n.actions().previewSigned"
-                        (onClick)="fileRequested.emit({ assignmentId, target: 'signed', preview: true })" />
-                      <p-button size="small" severity="secondary" [outlined]="true" icon="pi pi-missile-swarm"
-                        [label]="i18n.actions().downloadSigned"
-                        (onClick)="fileRequested.emit({ assignmentId, target: 'signed', preview: false })" />
-                    }
-                  </div>
+    @let documents = visible();
+    @if (documents.current.length) {
+      <ng-container [ngTemplateOutlet]="documentsList" [ngTemplateOutletContext]="{ $implicit: documents.current }" />
+    }
 
-                  @if (declarationControls().controls[assignmentId]; as declaration) {
-                    <div class="flex-col-start-stretch gap-sm w-100">
-                      <app-file-upload [options]="uploadOptions()" [texts]="i18n.fileUploadTexts()"
-                        (filesSelected)="signedFilesSelected.emit({ assignmentId, files: $event })" />
-                      @if (selectedFiles().get(assignmentId); as file) {
-                        <small class="tag-badge tag-badge--muted">
-                          {{ i18n.upload().selected }}: {{ file.name }}
-                        </small>
-                      }
-                      <div class="flex-row-start-center gap-sm">
-                        <p-checkbox [binary]="true" [inputId]="'signed-declaration-' + assignmentId"
-                          [formControl]="declaration" />
-                        <label [for]="'signed-declaration-' + assignmentId">
-                          {{ i18n.coworkerPrivate().declaration }}
-                        </label>
-                      </div>
-                      <div>
-                        <p-button icon="pi pi-jetpack" [label]="i18n.actions().uploadSigned"
-                          [loading]="activeMutationKey() === assignmentId"
-                          [disabled]="activeMutationKey() !== null || !selectedFiles().has(assignmentId) || !declaration.value"
-                          (onClick)="signatureSubmitted.emit(assignmentId)" />
-                      </div>
-                    </div>
-                  }
+    @if (documents.history.length) {
+      <p-accordion>
+        <p-accordion-panel value="private-document-history">
+          <p-accordion-header>{{ i18n.coworkerPrivate().versionHistory }} ({{ documents.history.length }})</p-accordion-header>
+          <p-accordion-content>
+            <ng-container [ngTemplateOutlet]="documentsList" [ngTemplateOutletContext]="{ $implicit: documents.history }" />
+          </p-accordion-content>
+        </p-accordion-panel>
+      </p-accordion>
+    } @else if (!documents.current.length) {
+      <section class="mg-card w-100" role="status">
+        <p class="m-0 muted-text">{{ i18n.coworkerPrivate().filteredEmpty }}</p>
+      </section>
+    }
+  </div>
+}
 
-                  @if (acknowledgementControls().controls[assignmentId]; as acknowledgement) {
-                    <div class="flex-row-start-center gap-sm">
-                      <p-checkbox [binary]="true" [inputId]="'private-acknowledgement-' + assignmentId"
-                        [formControl]="acknowledgement" [disabled]="activeMutationKey() !== null" />
-                      <label [for]="'private-acknowledgement-' + assignmentId">
-                        {{ i18n.fields().acknowledgement }}
-                      </label>
-                    </div>
-                  }
-                </article>
+<ng-template #documentsList let-rows>
+  <div class="w-100 overflow-x-auto hide-down-sm">
+    <p-table size="small" [value]="rows" dataKey="document.assignment_id" rowExpandMode="single"
+      tableStyleClass="mg-responsive-table">
+      <ng-template #header>
+        <tr>
+          <th scope="col" class="small-caps">{{ i18n.fields().document }}</th>
+          <th scope="col" class="small-caps">{{ i18n.categories().label }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
+          <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row let-expanded="expanded">
+        @let assignmentId = row.document.assignment_id;
+        <tr class="mg-responsive-table__row">
+          <th scope="row" class="mg-responsive-table__row-heading">
+            <ng-container [ngTemplateOutlet]="documentTitle" [ngTemplateOutletContext]="{ $implicit: row.document }" />
+          </th>
+          <td class="text-wrap-anywhere">{{ row.categoryLabel }}</td>
+          <td>
+            <div class="flex-col-start-start gap-xs">
+              <ng-container [ngTemplateOutlet]="documentBadge" [ngTemplateOutletContext]="{ $implicit: row }" />
+              <ng-container [ngTemplateOutlet]="documentStatusDetails" [ngTemplateOutletContext]="{ $implicit: row }" />
+            </div>
+          </td>
+          <td>
+            <div class="flex-row-end-center flex-wrap gap-xs">
+              @if (row.pendingAction === 'upload_signed') {
+                <button pButton type="button" size="small" severity="secondary" [outlined]="true"
+                  [pRowToggler]="row" [disabled]="busy()" class="text-wrap max-w-full"
+                  [attr.aria-expanded]="expanded"
+                  [attr.aria-controls]="expanded ? 'private-signature-table-' + assignmentId : null">
+                  <i pButtonIcon [class]="expanded ? 'pi pi-chevron-up' : 'pi pi-jetpack'" aria-hidden="true"></i>
+                  <span pButtonLabel>
+                    {{ expanded ? i18n.coworkerPrivate().collapseUpload : i18n.actions().uploadSigned }}
+                  </span>
+                </button>
+              }
+              <ng-container [ngTemplateOutlet]="documentActions" [ngTemplateOutletContext]="{ $implicit: row }" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #expandedrow let-row>
+        @if (row.pendingAction === 'upload_signed') {
+          @let assignmentId = row.document.assignment_id;
+          <tr>
+            <td colspan="4">
+              <ng-container [ngTemplateOutlet]="signatureForm"
+                [ngTemplateOutletContext]="{ $implicit: assignmentId, formId: 'private-signature-table-' + assignmentId }" />
+            </td>
+          </tr>
+        }
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="w-100 show-down-sm">
+    <p-accordion #mobileDocuments>
+      @for (row of rows; track row.document.assignment_id) {
+        @let assignmentId = row.document.assignment_id;
+        <p-accordion-panel [value]="assignmentId">
+          <p-accordion-header>
+            <div class="flex-col-start-start gap-xs w-100 min-w-0 pr-sm">
+              <ng-container [ngTemplateOutlet]="documentTitle" [ngTemplateOutletContext]="{ $implicit: row.document }" />
+              <ng-container [ngTemplateOutlet]="documentBadge" [ngTemplateOutletContext]="{ $implicit: row }" />
+            </div>
+          </p-accordion-header>
+          <p-accordion-content>
+            <div class="flex-col-start-stretch gap-sm">
+              <div class="flex-col-start-start gap-xs text-wrap-anywhere">
+                <span>{{ row.categoryLabel }}</span>
+                <ng-container [ngTemplateOutlet]="documentStatusDetails" [ngTemplateOutletContext]="{ $implicit: row }" />
+              </div>
+              <div class="flex-row-end-center flex-wrap gap-xs">
+                <ng-container [ngTemplateOutlet]="documentActions" [ngTemplateOutletContext]="{ $implicit: row }" />
+              </div>
+              @if (row.pendingAction === 'upload_signed' && mobileDocuments.value() === assignmentId) {
+                <ng-container [ngTemplateOutlet]="signatureForm"
+                  [ngTemplateOutletContext]="{ $implicit: assignmentId, formId: 'private-signature-mobile-' + assignmentId }" />
               }
             </div>
-          }
-        </p-tabpanel>
+          </p-accordion-content>
+        </p-accordion-panel>
       }
-    </p-tabpanels>
-  </p-tabs>
-}
+    </p-accordion>
+  </div>
+</ng-template>
+
+<ng-template #documentTitle let-document>
+  <div class="flex-col-start-start gap-xs text-wrap-anywhere">
+    <strong>{{ document.title }}</strong>
+    <small>{{ i18n.fields().version }} {{ document.version_number }}</small>
+  </div>
+</ng-template>
+
+<ng-template #documentBadge let-row>
+  @if (row.statusLabel) {
+    <span [class]="'tag-badge text-wrap ' + row.statusClass">{{ row.statusLabel }}</span>
+  }
+</ng-template>
+
+<ng-template #documentStatusDetails let-row>
+  <small>{{ row.actionLabel }}</small>
+  @if (row.document.rejection_reason) {
+    <small class="error-text text-wrap-anywhere">
+      {{ i18n.commonLabels().rejectionReason }}: {{ row.document.rejection_reason }}
+    </small>
+  }
+</ng-template>
+
+<ng-template #documentActions let-row>
+  <p-button type="button" size="small" severity="warn" icon="pi pi-horus"
+    [label]="i18n.commonActions().preview" [disabled]="busy()"
+    (onClick)="fileRequested.emit({ assignmentId: row.document.assignment_id, target: 'source', preview: true })" />
+  <app-document-operations [items]="row.menu" [disabled]="busy()"
+    [label]="i18n.commonTable().actions + ' - ' + row.document.title" />
+</ng-template>
+
+<ng-template #signatureForm let-assignmentId let-formId="formId">
+  @if (declarationControls().controls[assignmentId]; as declaration) {
+    <div class="flex-col-start-stretch gap-sm" [id]="formId">
+      <app-file-upload [options]="uploadOptions()" [texts]="i18n.fileUploadTexts()"
+        (filesSelected)="signedFilesSelected.emit({ assignmentId, files: $event })" />
+      @if (selectedFiles().get(assignmentId); as file) {
+        <div>
+          <small class="tag-badge tag-badge--muted text-wrap-anywhere max-w-full">
+            {{ i18n.upload().selected }}: {{ file.name }}
+          </small>
+        </div>
+      }
+      <div class="flex-row-start-center gap-xs">
+        <p-checkbox [binary]="true" [inputId]="formId + '-declaration'" [ngModel]="declaration.value"
+          [disabled]="busy()" (ngModelChange)="declaration.setValue($event)" />
+        <label [for]="formId + '-declaration'">{{ i18n.coworkerPrivate().declaration }}</label>
+      </div>
+      <div class="flex-row-end-center">
+        <p-button type="button" size="small" icon="pi pi-jetpack" styleClass="text-wrap max-w-full"
+          [label]="i18n.actions().uploadSigned" [loading]="activeMutationKey() === assignmentId"
+          [disabled]="busy() || !selectedFiles().has(assignmentId) || !declaration.value"
+          (onClick)="signatureSubmitted.emit(assignmentId)" />
+      </div>
+    </div>
+  }
+</ng-template>
