@@ -1,28 +1,28 @@
 {
   "page": {
-    "subtitle": "Sprawdź dostępne zlecenia, otrzymane propozycje, swoje zgłoszenia i potwierdzony udział.",
-    "loadErrorTitle": "Nie udało się załadować zleceń"
+    "subtitle": "Zobacz dostępne zlecenia, propozycje udziału, swoje zgłoszenia i potwierdzone zlecenia.",
+    "loadErrorTitle": "Nie udało się wczytać zleceń"
   },
   "sections": {
     "available": {
       "title": "Dostępne zlecenia",
-      "emptyDescription": "Brak zleceń dostępnych do zgłoszenia."
+      "emptyDescription": "Nie ma obecnie zleceń, do których możesz się zgłosić."
     },
     "proposals": {
       "title": "Otrzymane propozycje",
-      "emptyDescription": "Brak propozycji do rozpatrzenia."
+      "emptyDescription": "Nie masz propozycji do rozpatrzenia."
     },
     "myApplications": {
       "title": "Moje zgłoszenia",
-      "emptyDescription": "Brak aktywnych zgłoszeń."
+      "emptyDescription": "Nie masz aktywnych zgłoszeń."
     },
     "confirmed": {
       "title": "Potwierdzone zlecenia",
-      "emptyDescription": "Brak potwierdzonych zleceń."
+      "emptyDescription": "Nie masz potwierdzonych zleceń."
     }
   },
   "card": {
-    "candidateStatus": "Udział"
+    "candidateStatus": "Status udziału"
   },
   "sessionSelector": {
     "sourceLabel": "Rodzaj sesji",
@@ -38,8 +38,8 @@
       "template": "Brak sesji standardowych do wyboru.",
       "custom": "Brak sesji jednorazowych do wyboru."
     },
-    "loadFailed": "Nie udało się załadować listy sesji",
-    "formLoadFailed": "Nie udało się załadować formularza sesji."
+    "loadFailed": "Nie udało się wczytać listy sesji.",
+    "formLoadFailed": "Nie udało się otworzyć formularza sesji."
   },
   "detail": {
     "title": "Szczegóły zlecenia",
@@ -55,13 +55,13 @@
       "travelTerms": "Nie określono jeszcze warunków wyjazdu."
     },
     "errors": {
-      "loadFailed": "Nie udało się załadować szczegółów zlecenia",
-      "notFound": "Nie znaleziono zlecenia lub nie masz dostępu do jego szczegółów.",
-      "actionFailed": "Nie udało się wykonać działania"
+      "loadFailed": "Nie udało się wczytać szczegółów zlecenia",
+      "notFound": "Nie znaleziono tego zlecenia lub nie masz do niego dostępu.",
+      "actionFailed": "Nie udało się wykonać tej czynności"
     },
     "fields": {
       "selfApplicationEnabled": "Możliwość zgłoszenia",
-      "origin": "Źródło",
+      "origin": "Sposób zgłoszenia",
       "scope": "Zakres udziału",
       "gmDecision": "Twoja decyzja",
       "adminDecision": "Decyzja koordynatora",
@@ -79,7 +79,7 @@
       "accepted": "Zaakceptowano",
       "rejected": "Odrzucono"
     },
-    "archivedCandidateHint": "Zlecenie jest zarchiwizowane. Poniższe informacje o udziale mają charakter historyczny.",
+    "archivedCandidateHint": "To zlecenie zostało zarchiwizowane. Informacje o Twoim udziale są dostępne do wglądu.",
     "tabs": {
       "information": "Informacje",
       "travelTerms": "Warunki wyjazdu",
@@ -91,35 +91,35 @@
       "withdraw": "Wycofaj zgłoszenie",
       "scopeTitle": "Zakres zgłoszenia",
       "draftHint": "Masz zapisany szkic zgłoszenia. Uzupełnij zakres udziału i wyślij zgłoszenie. Sesje zaproponujesz po potwierdzeniu udziału.",
-      "pendingHint": "Twoje zgłoszenie oczekuje na decyzję koordynatora.",
-      "unavailableHint": "Zgłoszenia do tego zlecenia są obecnie niedostępne.",
+      "pendingHint": "Twoje zgłoszenie czeka na decyzję koordynatora.",
+      "unavailableHint": "Nie można teraz zgłosić się do tego zlecenia.",
       "withdrawConfirm": "Wycofać zgłoszenie?",
-      "createSuccess": "Utworzono szkic zgłoszenia",
-      "submitSuccess": "Zgłoszenie wysłane",
-      "withdrawSuccess": "Zgłoszenie wycofane"
+      "createSuccess": "Zapisano szkic zgłoszenia",
+      "submitSuccess": "Wysłano zgłoszenie",
+      "withdrawSuccess": "Wycofano zgłoszenie"
     },
     "proposal": {
       "accept": "Przyjmij propozycję",
       "reject": "Odrzuć propozycję",
-      "acceptConfirm": "Przyjąć propozycję udziału w podanym zakresie?",
+      "acceptConfirm": "Przyjąć propozycję udziału w tym zakresie?",
       "rejectConfirm": "Odrzucić propozycję udziału?",
-      "acceptSuccess": "Propozycja przyjęta. Udział potwierdzony",
-      "rejectSuccess": "Propozycja odrzucona"
+      "acceptSuccess": "Przyjęto propozycję. Twój udział został potwierdzony.",
+      "rejectSuccess": "Odrzucono propozycję"
     },
     "participation": {
       "endedAt": "Data zakończenia udziału",
       "endReason": "Powód zakończenia udziału",
       "withdraw": "Wycofaj udział",
-      "startedHint": "Zlecenie już się rozpoczęło. Nie możesz wycofać potwierdzonego udziału.",
+      "startedHint": "Zlecenie już się rozpoczęło, dlatego nie możesz wycofać potwierdzonego udziału.",
       "replacementLabel": "Mistrz Gry na zastępstwo",
       "replacementRequiredHint": "Do rozpoczęcia zlecenia pozostało mniej niż 72 godziny. Wskaż Mistrza Gry na zastępstwo.",
-      "replacementOptionalHint": "Do rozpoczęcia zlecenia pozostały co najmniej 72 godziny. Możesz wskazać zastępstwo.",
-      "replacementHint": "Wskazany Mistrz Gry otrzyma propozycję udziału w tym samym zakresie. Zastępstwo wymaga jego potwierdzenia.",
-      "replacementLoadFailed": "Nie udało się załadować listy Mistrzów Gry",
-      "withdrawConfirm": "Wycofać udział bez wskazania zastępstwa?",
+      "replacementOptionalHint": "Do rozpoczęcia zlecenia zostały co najmniej 72 godziny. Możesz zaproponować zastępstwo.",
+      "replacementHint": "Wskazany Mistrz Gry otrzyma propozycję zastępstwa i sam zdecyduje, czy ją przyjąć.",
+      "replacementLoadFailed": "Nie udało się wczytać listy Mistrzów Gry.",
+      "withdrawConfirm": "Wycofać udział bez wskazywania zastępstwa?",
       "withdrawWithReplacementConfirm": "Wycofać udział? Wskazany Mistrz Gry otrzyma propozycję zastępstwa.",
-      "withdrawSuccess": "Udział wycofany",
-      "withdrawWithReplacementSuccess": "Udział wycofany. Propozycja zastępstwa została wysłana"
+      "withdrawSuccess": "Wycofano Twój udział",
+      "withdrawWithReplacementSuccess": "Wycofano Twój udział i wysłano propozycję zastępstwa."
     },
     "participationEndReasons": {
       "gm_withdrawal": "Wycofanie przez Mistrza Gry",
@@ -127,19 +127,19 @@
     },
     "sessionProposals": {
       "title": "Propozycje sesji",
-      "hint": "Wskaż wymaganą liczbę sesji dla każdego bloku objętego Twoim udziałem. Możesz zapisać również niekompletne propozycje.",
+      "hint": "Zaproponuj wymaganą liczbę sesji dla każdego bloku, w którym bierzesz udział. Możesz zapisać także niekompletną listę.",
       "requiredPerSlot": "Minimum propozycji na blok",
       "selectedCount": "Wybrane sesje",
       "complete": "Kompletne",
       "incomplete": "Niekompletne",
-      "unsavedHint": "Masz niezapisane zmiany. Po zapisie sprawdzimy kompletność propozycji.",
-      "readOnly": "Propozycje sesji są teraz dostępne tylko do odczytu.",
+      "unsavedHint": "Masz niezapisane zmiany. Po zapisaniu sprawdzimy, czy liczba propozycji jest wystarczająca.",
+      "readOnly": "Nie możesz teraz zmieniać propozycji sesji.",
       "add": "Dodaj propozycję",
-      "emptyMappings": "Brak propozycji sesji dla tego bloku.",
+      "emptyMappings": "Nie zaproponowano jeszcze sesji dla tego bloku.",
       "emptySlots": "Brak bloków wymagających propozycji sesji.",
-      "loadFailed": "Nie udało się załadować propozycji sesji",
-      "saveFailed": "Nie udało się zapisać propozycji sesji",
-      "saveSuccess": "Propozycje sesji zapisane"
+      "loadFailed": "Nie udało się wczytać propozycji sesji.",
+      "saveFailed": "Nie udało się zapisać propozycji sesji.",
+      "saveSuccess": "Zapisano propozycje sesji"
     },
     "sessionProposalHint": "Sesje proponujesz po potwierdzeniu udziału, osobno dla każdego bloku."
   }

@@ -2,11 +2,11 @@
   "list": {
     "page": {
       "title": "Lista zleceń",
-      "subtitle": "Terminy, statusy i obsada zleceń.",
-      "summaryHint": "Obsada sumuje miejsca we wszystkich dniach zlecenia. Ten sam Mistrz Gry może być liczony w kilku dniach.",
+      "subtitle": "Sprawdź terminy, statusy i obsadę zleceń.",
+      "summaryHint": "Obsada sumuje miejsca ze wszystkich dni zlecenia. Ten sam Mistrz Gry jest liczony osobno w każdym dniu.",
       "emptyTitle": "Brak zleceń",
       "emptyDescription": "Utwórz pierwsze zlecenie, aby ustalić terminy i obsadę.",
-      "loadErrorTitle": "Nie udało się załadować listy zleceń"
+      "loadErrorTitle": "Nie udało się wczytać listy zleceń"
     },
     "table": {
       "dates": "Daty",
@@ -19,53 +19,53 @@
     },
     "filters": {
       "search": "Szukaj po nazwie lub mieście",
-      "noResults": "Brak zleceń pasujących do filtrów.",
+      "noResults": "Nie znaleziono zleceń pasujących do filtrów.",
       "showArchivedLabel": "Pokaż zarchiwizowane"
     },
     "confirmation": {
-      "delete": "Usunąć szkic zlecenia „{{name}}” wraz z jego ustawieniami? Tej operacji nie można cofnąć.",
-      "archive": "Zarchiwizować zlecenie „{{name}}”? Historia zlecenia zostanie zachowana."
+      "delete": "Usunąć szkic zlecenia {{name}} wraz z jego ustawieniami? Nie można tego cofnąć.",
+      "archive": "Zarchiwizować zlecenie {{name}}? Historia pozostanie dostępna."
     },
     "toast": {
-      "deleteSuccessSummary": "Szkic zlecenia usunięty",
+      "deleteSuccessSummary": "Usunięto szkic zlecenia",
       "deleteFailedSummary": "Nie udało się usunąć szkicu zlecenia",
-      "archiveSuccessSummary": "Zlecenie zarchiwizowane",
+      "archiveSuccessSummary": "Zarchiwizowano zlecenie",
       "archiveFailedSummary": "Nie udało się zarchiwizować zlecenia"
     }
   },
   "finalization": {
-    "validate": "Sprawdź poprawność danych",
+    "validate": "Sprawdź dane",
     "open": "Zatwierdź i uruchom",
     "issuesTitle": "Do poprawy",
-    "saveDraftsFirst": "Najpierw zapisz zmiany. Sprawdzenie danych i uruchomienie zlecenia obejmują tylko zapisane informacje.",
-    "ready": "Dane są poprawne. Zlecenie jest gotowe do uruchomienia.",
-    "validateFailed": "Nie udało się sprawdzić poprawności danych",
-    "openFailed": "Nie udało się zatwierdzić i uruchomić zlecenia",
-    "openFailedDetail": "Odśwież zlecenie i spróbuj ponownie. Jego status mógł się zmienić.",
-    "openSuccess": "Zlecenie zatwierdzone i uruchomione",
+    "saveDraftsFirst": "Najpierw zapisz zmiany. Sprawdzenie danych i uruchomienie zlecenia uwzględniają tylko zapisane informacje.",
+    "ready": "Dane są poprawne. Możesz uruchomić zlecenie.",
+    "validateFailed": "Nie udało się sprawdzić danych",
+    "openFailed": "Nie udało się uruchomić zlecenia",
+    "openFailedDetail": "Odśwież dane i sprawdź status zlecenia, zanim spróbujesz ponownie.",
+    "openSuccess": "Uruchomiono zlecenie",
     "issues": {
       "core": {
         "name_invalid": "Podaj prawidłową nazwę zlecenia.",
         "timezone_invalid": "Podaj prawidłową strefę czasową.",
         "type_invalid": "Wybierz prawidłowy typ zlecenia.",
         "coordinator_invalid": "Koordynator zlecenia musi mieć uprawnienia administratora.",
-        "event_reference_invalid": "Wybierz istniejącą edycję wydarzenia lub usuń powiązanie."
+        "event_reference_invalid": "Wybierz istniejące wydarzenie lub usuń powiązanie ze zleceniem."
       },
       "schedule": {
         "days_missing": "Dodaj co najmniej jeden dzień zlecenia.",
         "day_demand_invalid": "W każdym dniu wymagany jest co najmniej jeden Mistrz Gry.",
         "slot_label_invalid": "Podaj prawidłową nazwę bloku.",
-        "slot_time_invalid": "Godzina zakończenia bloku musi być późniejsza niż rozpoczęcia, w obrębie tego samego dnia.",
+        "slot_time_invalid": "Godzina zakończenia bloku musi być późniejsza niż godzina rozpoczęcia. Blok musi się zakończyć tego samego dnia.",
         "slot_position_invalid": "Ustal prawidłową kolejność bloków.",
         "slot_position_duplicate": "Każdy blok musi mieć inną pozycję w kolejności dnia.",
         "slot_overlap": "Godziny bloków w tym dniu nakładają się na siebie."
       },
       "travel_terms": {
         "missing": "Zapisz warunki wyjazdu.",
-        "unexpected_for_stationary": "Zlecenie stacjonarne ma zapisane warunki wyjazdu.",
+        "unexpected_for_stationary": "W tym zleceniu zapisano warunki wyjazdu, choć jest ono stacjonarne. Usuń je lub zmień typ zlecenia.",
         "transport_mode_invalid": "Wybierz prawidłowy sposób organizacji transportu.",
         "reimbursement_mode_invalid": "Wybierz prawidłowe zasady zwrotu kosztów.",
-        "mileage_rate_invalid": "Popraw stawkę kilometrówki.",
+        "mileage_rate_invalid": "Popraw stawkę za przejechany kilometr.",
         "lodging_invalid": "Popraw warunki noclegu i liczbę noclegów.",
         "work_time_scope_invalid": "Wybierz prawidłowy zakres czasu pracy.",
         "work_time_note_invalid": "Opisz niestandardowy zakres czasu pracy.",
@@ -73,7 +73,7 @@
       },
       "recruitment_policy": {
         "missing": "Zapisz zasady zgłoszeń.",
-        "stationary_scope_invalid": "Wybierz zakres zgłoszeń odpowiedni dla typu zlecenia.",
+        "stationary_scope_invalid": "Wybrany zakres zgłoszeń nie odpowiada typowi zlecenia. Wybierz właściwy.",
         "session_selection_mode_invalid": "Wybierz prawidłowy sposób wyboru sesji."
       }
     }
@@ -106,9 +106,9 @@
     "page": {
       "createTitle": "Nowe zlecenie",
       "editTitle": "Edycja zlecenia",
-      "subtitle": "Uzupełnij dane potrzebne do zaplanowania zlecenia.",
-      "loadErrorTitle": "Nie udało się załadować zlecenia",
-      "loadErrorDescription": "Dane zlecenia lub wydarzeń są chwilowo niedostępne. Spróbuj ponownie."
+      "subtitle": "Uzupełnij informacje potrzebne do zaplanowania zlecenia.",
+      "loadErrorTitle": "Nie udało się wczytać zlecenia",
+      "loadErrorDescription": "Nie udało się wczytać danych zlecenia lub powiązanego wydarzenia. Spróbuj ponownie."
     },
     "sections": {
       "basic": {
@@ -117,7 +117,7 @@
       },
       "initialDays": {
         "title": "Termin i zapotrzebowanie",
-        "description": "Wybierz daty i podaj liczbę Mistrzów Gry potrzebnych każdego dnia."
+        "description": "Wybierz dni zlecenia i liczbę Mistrzów Gry potrzebnych każdego dnia."
       },
       "venue": {
         "title": "Miejsce i typ zlecenia",
@@ -130,7 +130,7 @@
     "fields": {
       "name": "Nazwa zlecenia",
       "description": "Opis zlecenia",
-      "operationalNotes": "Informacje operacyjne",
+      "operationalNotes": "Uwagi organizacyjne",
       "type": "Typ zlecenia",
       "dateRange": "Zakres dat"
     },
@@ -144,7 +144,7 @@
     "summary": {
       "dayCount": "Liczba dni",
       "requiredGmCount": "Zapotrzebowanie",
-      "dailyGmUnit": "MG dziennie"
+      "dailyGmUnit": "Mistrzów Gry dziennie"
     },
     "types": {
       "stationary": {
@@ -155,37 +155,37 @@
       }
     },
     "event": {
-      "privateCreationHint": "[PH] Wydarzenie pozostanie prywatne. Wymagany jest co najmniej jeden blok czasowy; pełna obsada nie jest wymagana.",
-      "saveChangesFirstHint": "[PH] Zapisz zmiany we wszystkich zakładkach przed utworzeniem lub otwarciem wydarzenia.",
-      "retryRead": "[PH] Sprawdź wynik importu",
-      "retryImport": "[PH] Ponów import",
-      "uncertain": "[PH] Import mógł zostać wykonany. Sprawdź zapisane powiązanie i dane wydarzenia przed kolejną operacją.",
-      "unlinked": "[PH] Odczyt nie wykazał powiązanego wydarzenia. Możesz świadomie ponowić ten sam idempotentny import.",
-      "readbackFailed": "[PH] Nie udało się potwierdzić pełnych danych wydarzenia. Ponów sprawdzenie wyniku.",
-      "checking": "[PH] Sprawdzanie zapisanego powiązania z wydarzeniem...",
-      "writing": "[PH] Importowanie zlecenia do wydarzenia...",
-      "reading": "[PH] Odczytywanie i potwierdzanie zapisanych danych wydarzenia...",
+      "privateCreationHint": "Nowe wydarzenie nie będzie od razu widoczne publicznie. Wystarczy co najmniej jeden blok w harmonogramie, a pełną obsadę możesz uzupełnić później.",
+      "saveChangesFirstHint": "Zapisz zmiany we wszystkich zakładkach przed utworzeniem lub otwarciem wydarzenia.",
+      "retryRead": "Sprawdź wydarzenie",
+      "retryImport": "Ponów tworzenie",
+      "uncertain": "Nie udało się sprawdzić, czy wydarzenie zostało utworzone. Sprawdź zapisane dane, zanim spróbujesz utworzyć je ponownie.",
+      "unlinked": "Nie znaleziono wydarzenia powiązanego z tym zleceniem. Możesz spróbować utworzyć je ponownie.",
+      "readbackFailed": "Nie udało się sprawdzić wszystkich danych wydarzenia. Ponów sprawdzenie, zanim spróbujesz utworzyć je ponownie.",
+      "checking": "Sprawdzamy, czy zlecenie ma już powiązane wydarzenie.",
+      "writing": "Tworzymy wydarzenie na podstawie zlecenia.",
+      "reading": "Sprawdzamy zapisane dane wydarzenia.",
       "errors": {
-        "22023": "[PH] Dane wejściowe importu są nieprawidłowe.",
-        "23514": "[PH] Backend zablokował import. Sprawdź daty, bloki i zatwierdzenia planu; dawne konwersje pozostają tylko do odczytu.",
-        "40001": "[PH] Powiązanie zlecenia zmieniło się w trakcie operacji. Odczytaj aktualny stan przed ponowieniem importu.",
-        "42501": "[PH] Tylko administrator może utworzyć wydarzenie ze zlecenia.",
-        "P0002": "[PH] Nie znaleziono zlecenia lub powiązanych danych.",
-        "EFS092_EXISTING_LEGACY_EVENT_LINK": "[PH] Zlecenie ma dawną konwersję. Jej dane są dostępne tylko do odczytu.",
-        "EFS092_INCONSISTENT_LEGACY_LINK": "[PH] Historyczne powiązanie zlecenia z wydarzeniem jest niespójne. Wymaga sprawdzenia przez Migratora.",
-        "EFS092_REALIZATION_NOT_CONVERTIBLE": "[PH] Import wymaga otwartego lub zamkniętego zlecenia.",
-        "EFS092_INVALID_TIMEZONE": "[PH] Zlecenie ma nieprawidłową strefę czasową.",
-        "EFS092_INVALID_DATE_COUNT": "[PH] Import wymaga od 1 do 366 dat zlecenia.",
-        "EFS092_PAST_SOURCE_DATE": "[PH] Zlecenie zawiera minioną datę, której nie można zaimportować.",
-        "EFS092_INCOMPLETE_OR_EXCESSIVE_DAY_SLOTS": "[PH] Liczba bloków lub wymaganych MG w zapisanym harmonogramie jest nieprawidłowa.",
-        "EFS092_INVALID_FINAL_PLAN": "[PH] Finalny plan zawiera nieprawidłowe przypisanie MG lub sesji. Sprawdź potwierdzenia i dane sesji.",
-        "EFS092_DATED_BLOCK_NOT_EDITABLE": "[PH] Blok przypisany do daty jest chroniony przed edycją.",
-        "EFS092_GLOBAL_CREATE_FAILED": "[PH] Backend nie potwierdził utworzenia kanonicznego wydarzenia Global.",
-        "EFS092_GLOBAL_IDENTITY_MISSING": "[PH] W wyniku importu brakuje kanonicznej tożsamości Core lub lokalizacji.",
-        "EFS092_MANUAL_IMPORT_FAILED": "[PH] Backend nie potwierdził importu programu do wydarzenia.",
-        "EFS092_IMPORTED_PROGRAM_ID_MISSING": "[PH] W zaimportowanym programie brakuje identyfikatora pozycji.",
-        "EFS092_SNAPSHOT_IMPORT_FAILED": "[PH] Nie udało się zapisać wymaganych danych sesji w programie.",
-        "EFS092_IMPORT_RECONCILIATION_FAILED": "[PH] Backend nie potwierdził zgodności zaimportowanych terminów i programu."
+        "22023": "Nie można utworzyć wydarzenia z podanych danych. Sprawdź informacje o zleceniu.",
+        "23514": "Nie można utworzyć wydarzenia z tymi danymi. Sprawdź terminy, bloki i zatwierdzony plan. Wcześniej utworzonych wydarzeń starszego typu nie można w ten sposób zmieniać.",
+        "40001": "Dane powiązania zlecenia z wydarzeniem zmieniły się podczas zapisu. Odśwież stronę i sprawdź je przed ponowieniem.",
+        "42501": "Nie masz uprawnień do utworzenia wydarzenia na podstawie zlecenia.",
+        "P0002": "Nie znaleziono zlecenia lub danych potrzebnych do utworzenia wydarzenia.",
+        "EFS092_EXISTING_LEGACY_EVENT_LINK": "To zlecenie jest już powiązane z wydarzeniem utworzonym wcześniej. Możesz przeglądać jego dane, ale nie możesz ponownie utworzyć wydarzenia z tego zlecenia.",
+        "EFS092_INCONSISTENT_LEGACY_LINK": "Dane wcześniejszego powiązania zlecenia z wydarzeniem nie zgadzają się. Przed dalszą pracą trzeba sprawdzić to powiązanie.",
+        "EFS092_REALIZATION_NOT_CONVERTIBLE": "Wydarzenie można utworzyć tylko z otwartego lub zamkniętego zlecenia. Najpierw uruchom zlecenie.",
+        "EFS092_INVALID_TIMEZONE": "Zlecenie ma nieprawidłową strefę czasową. Popraw ją w danych podstawowych.",
+        "EFS092_INVALID_DATE_COUNT": "Aby utworzyć wydarzenie, zlecenie musi obejmować od 1 do 366 dni.",
+        "EFS092_PAST_SOURCE_DATE": "Zlecenie zawiera datę z przeszłości. Aby utworzyć wydarzenie, popraw terminy.",
+        "EFS092_INCOMPLETE_OR_EXCESSIVE_DAY_SLOTS": "Harmonogram ma nieprawidłową liczbę bloków lub potrzebnych Mistrzów Gry. Sprawdź dni i bloki.",
+        "EFS092_INVALID_FINAL_PLAN": "W planie sesji lub obsady są nieprawidłowe przypisania. Sprawdź, czy udział Mistrzów Gry jest potwierdzony i czy sesje są poprawnie wybrane.",
+        "EFS092_DATED_BLOCK_NOT_EDITABLE": "Nie możesz zmienić bloku przypisanego już do terminu wydarzenia.",
+        "EFS092_GLOBAL_CREATE_FAILED": "Nie udało się potwierdzić utworzenia wydarzenia. Sprawdź, czy zostało zapisane, zanim spróbujesz ponownie.",
+        "EFS092_GLOBAL_IDENTITY_MISSING": "Nie udało się potwierdzić wszystkich danych nowego wydarzenia lub miejsca realizacji. Sprawdź wydarzenie przed ponowieniem.",
+        "EFS092_MANUAL_IMPORT_FAILED": "Nie udało się potwierdzić przeniesienia programu ze zlecenia do wydarzenia. Sprawdź jego program przed ponowieniem.",
+        "EFS092_IMPORTED_PROGRAM_ID_MISSING": "Brakuje informacji potrzebnych do rozpoznania jednej z pozycji programu wydarzenia. Sprawdź program przed ponowieniem.",
+        "EFS092_SNAPSHOT_IMPORT_FAILED": "Nie udało się zapisać szczegółów sesji w programie wydarzenia. Sprawdź zapisane dane przed ponowieniem.",
+        "EFS092_IMPORT_RECONCILIATION_FAILED": "Nie udało się potwierdzić zgodności terminów i programu wydarzenia z danymi zlecenia. Sprawdź je przed ponowieniem."
       }
     },
     "actions": {
@@ -196,7 +196,7 @@
     "toast": {
       "saveSuccessSummary": "Zlecenie zapisane",
       "saveFailedSummary": "Nie udało się zapisać zlecenia",
-      "eventActionFailedSummary": "[PH] Nie udało się utworzyć lub otworzyć wydarzenia"
+      "eventActionFailedSummary": "Nie udało się utworzyć lub otworzyć wydarzenia"
     }
   },
   "shell": {
@@ -254,30 +254,30 @@
   },
   "board": {
     "title": "Obsada i kandydaci",
-    "description": "Zgłoszenia, potwierdzenia i obsada zlecenia.",
-    "persistedHint": "Podsumowanie obejmuje zapisane dane. Zapisz wprowadzone zmiany, aby je odświeżyć.",
-    "loadFailed": "Nie udało się załadować obsady zlecenia",
+    "description": "Sprawdź zgłoszenia Mistrzów Gry, potwierdź ich udział i zaplanuj obsadę.",
+    "persistedHint": "Podsumowanie uwzględnia zapisane dane. Zapisz wprowadzone zmiany, aby zobaczyć aktualne informacje.",
+    "loadFailed": "Nie udało się wczytać obsady zlecenia",
     "candidatesTitle": "Kandydaci",
     "emptyCandidates": "Brak kandydatów.",
     "outsideRoster": "Poza listą dostępności",
     "confirmedRoster": {
       "title": "Potwierdzona obsada",
-      "empty": "Brak potwierdzonych Mistrzów Gry.",
-      "removeConfirm": "Zakończyć udział tego Mistrza Gry w zleceniu? Potwierdzenie udziału pozostanie w historii.",
-      "removeSuccess": "Udział Mistrza Gry zakończony",
+      "empty": "Nie ma jeszcze potwierdzonych Mistrzów Gry.",
+      "removeConfirm": "Zakończyć udział tego Mistrza Gry? Informacje o jego udziale pozostaną w historii.",
+      "removeSuccess": "Zakończono udział Mistrza Gry",
       "removeFailed": "Nie udało się zakończyć udziału Mistrza Gry"
     },
     "proposal": {
-      "action": "Zaproponuj Mistrza Gry",
+      "action": "Zaproponuj udział",
       "title": "Propozycja dla Mistrza Gry",
       "daysLabel": "Dni udziału",
-      "successSummary": "Propozycja udziału utworzona",
+      "successSummary": "Wysłano propozycję udziału",
       "failedSummary": "Nie udało się utworzyć propozycji udziału"
     },
     "candidateDetail": {
       "title": "Szczegóły kandydata",
       "show": "Szczegóły",
-      "endedBy": "Udział zakończony przez (ID)",
+      "endedBy": "Udział zakończony przez",
       "sessionProposals": {
         "title": "Propozycje sesji",
         "preview": "Podgląd sesji",
@@ -287,32 +287,32 @@
       }
     },
     "selfApplicationDecision": {
-      "accept": "Akceptuj",
-      "acceptConfirm": "Zaakceptować zgłoszenie i potwierdzić udział Mistrza Gry w zleceniu?",
+      "accept": "Zaakceptuj",
+      "acceptConfirm": "Zaakceptować zgłoszenie i potwierdzić udział Mistrza Gry?",
       "rejectConfirm": "Odrzucić zgłoszenie Mistrza Gry?",
-      "acceptSuccess": "Zgłoszenie zaakceptowane",
-      "rejectSuccess": "Zgłoszenie odrzucone",
+      "acceptSuccess": "Zaakceptowano zgłoszenie",
+      "rejectSuccess": "Odrzucono zgłoszenie",
       "failedSummary": "Nie udało się zapisać decyzji o zgłoszeniu"
     },
     "fields": {
-      "origin": "Źródło",
+      "origin": "Sposób zgłoszenia",
       "scope": "Zakres",
-      "gmDecision": "Decyzja MG",
-      "adminDecision": "Decyzja admina",
+      "gmDecision": "Decyzja Mistrza Gry",
+      "adminDecision": "Decyzja koordynatora",
       "participation": "Udział",
       "availability": "Dostępność",
       "slot": "Blok"
     },
     "availability": {
       "title": "Dostępność Mistrzów Gry",
-      "hint": "Dostępność obejmuje cały zapisany harmonogram w strefie czasowej zlecenia. Nie potwierdza udziału ani przypisania do bloku.",
+      "hint": "Dostępność jest sprawdzana dla wszystkich bloków w strefie czasowej zlecenia. Nie oznacza jeszcze potwierdzenia udziału ani przypisania do bloku.",
       "showSlots": "Dostępność w blokach",
-      "emptyRoster": "Brak Mistrzów Gry na liście dostępności.",
-      "noSchedule": "Brak bloków w harmonogramie. Nie można ocenić dostępności.",
+      "emptyRoster": "Nie ma Mistrzów Gry na liście dostępności.",
+      "noSchedule": "Dodaj bloki do harmonogramu, aby sprawdzić dostępność Mistrzów Gry.",
       "statuses": {
         "partial": "Częściowo dostępny",
         "conflict": "Konflikt",
-        "no_declared_availability": "Brak deklaracji",
+        "no_declared_availability": "Nie podano dostępności",
         "no_schedule": "Brak bloków"
       }
     }
@@ -320,35 +320,35 @@
   "finalPlan": {
     "title": "Plan sesji i obsady",
     "description": "Przypisz potwierdzonych Mistrzów Gry i sesje do poszczególnych bloków.",
-    "readOnly": "Na tym etapie plan jest dostępny tylko do odczytu.",
+    "readOnly": "Nie można teraz zmieniać planu. Możesz go przeglądać.",
     "noDays": "Brak dni w harmonogramie.",
     "noSlots": "Brak bloków w tym dniu.",
     "unfilled": "Nieobsadzony",
     "assignments": "Przypisania",
-    "hasConflicts": "W planie występują konflikty udziału.",
+    "hasConflicts": "W planie są przypisania wymagające poprawy.",
     "conflicts": {
-      "candidate_not_confirmed": "Udział Mistrza Gry nie został potwierdzony",
-      "participation_ended": "Udział Mistrza Gry został zakończony"
+      "candidate_not_confirmed": "Udział wybranego Mistrza Gry nie został potwierdzony",
+      "participation_ended": "Udział wybranego Mistrza Gry został zakończony"
     },
     "provenance": {
       "saved": "Przypisanie:",
-      "proposed": "Sesja z propozycji MG",
+      "proposed": "Z propozycji Mistrza Gry",
       "coordinator": "Sesja wybrana przez koordynatora"
     },
     "addAssignment": "Przypisz Mistrza Gry",
     "save": "Zapisz plan",
-    "invalid": "Wybierz Mistrza Gry i sesję w każdym przypisaniu oraz popraw błędne dane.",
+    "invalid": "W każdym przypisaniu wybierz Mistrza Gry i sesję. Popraw także wskazane błędy.",
     "validation": {
       "duplicateCandidatePerSlot": "Ten sam Mistrz Gry może być przypisany tylko raz do jednego bloku.",
       "effectivePlayersRange": "Po zmianach minimalna liczba graczy nie może przekraczać maksymalnej."
     },
     "loadFailed": "Nie udało się załadować planu",
-    "candidateLoadFailed": "Nie udało się załadować sesji i propozycji Mistrza Gry",
-    "noCandidates": "Brak aktywnych, potwierdzonych Mistrzów Gry na ten dzień",
-    "noSessions": "Ten Mistrz Gry nie ma sesji tego rodzaju",
+    "candidateLoadFailed": "Nie udało się wczytać sesji i propozycji wybranego Mistrza Gry",
+    "noCandidates": "Brak Mistrzów Gry z potwierdzonym udziałem na ten dzień.",
+    "noSessions": "Wybrany Mistrz Gry nie ma sesji tego rodzaju.",
     "saveSuccess": "Plan zapisany",
     "saveFailed": "Nie udało się zapisać planu",
-    "saveRejected": "Serwer odrzucił zmianę planu. Przypisań już opublikowanych w wydarzeniu nie można zmieniać ani usuwać. Jeśli zmiana dotyczy takiego przypisania, zachowaj je bez zmian i dodaj osobne przypisanie.",
+    "saveRejected": "Nie można zmienić ani usunąć przypisania już opublikowanego w wydarzeniu. Pozostaw je bez zmian i dodaj osobne przypisanie, jeśli chcesz wprowadzić zmianę.",
     "preview": "Podgląd sesji",
     "chooseOtherSession": "Wybierz inną sesję",
     "proposal": {
@@ -360,8 +360,8 @@
     },
     "override": {
       "title": "Dostosuj sesję do zlecenia",
-      "hint": "Uzupełnij tylko zmieniane pola. Pozostałe zachowają dane sesji. Katalog sesji i propozycje Mistrza Gry pozostaną bez zmian.",
-      "inherit": "Użyj wartości zapisanej sesji",
+      "hint": "Wpisz tylko te informacje, które chcesz zmienić dla tego zlecenia. Pozostałe zostaną pobrane z sesji. Jej dane w katalogu i propozycje Mistrza Gry nie zmienią się.",
+      "inherit": "Zachowaj dane sesji",
       "image": "Obraz sesji"
     },
     "changes": {
@@ -383,7 +383,7 @@
     "page": {
       "description": "Ustal transport, nocleg, wyżywienie i czas pracy podczas wyjazdu.",
       "stationaryHint": "Warunki wyjazdu dotyczą zleceń wyjazdowych.",
-      "saveCoreTypeHint": "Najpierw zapisz typ „Wyjazdowa” w Danych podstawowych."
+      "saveCoreTypeHint": "Najpierw wybierz typ zlecenia \"Wyjazdowe\" w zakładce \"Dane podstawowe\" i zapisz zmianę."
     },
     "sections": {
       "logistics": "Transport, nocleg i wyżywienie",
@@ -404,7 +404,7 @@
       "dinnerProvided": "Kolacja",
       "mealAllowanceApplicable": "Ryczałt na wyżywienie",
       "workTimeScope": "Zakres czasu pracy",
-      "workTimeNote": "Opis niestandardowego czasu pracy",
+      "workTimeNote": "Dodatkowe zasady liczenia czasu pracy",
       "travelNote": "Dodatkowe informacje o wyjeździe"
     },
     "validation": {
