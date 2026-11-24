@@ -19,8 +19,9 @@ import {
 } from '../../../../core/factories/staffing-realization-days-form.factory';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { getStaffingScheduleFormError } from '../staffing-realization-form-errors';
+import { createStaffingSaveLabel } from '../staffing-realization-save-label';
 import { StaffingRealizationDayEditor } from './staffing-realization-day-editor';
 import { createStaffingRealizationScheduleEditorI18n } from './staffing-realization-schedule-editor.i18n';
 import { StaffingReadinessTarget } from '../staffing-readiness-target';

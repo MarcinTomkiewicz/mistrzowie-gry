@@ -12,7 +12,7 @@
     <p-floatlabel variant="on" class="w-100 min-w-0">
       <p-select inputId="manual-rpg-gm" formControlName="gmUserId" [options]="profiles()" optionValue="value" optionLabel="label"
         size="small" [filter]="true" filterBy="label" appendTo="body" class="w-100" (onChange)="editor.loadSessions()" />
-      <label for="manual-rpg-gm">{{ copy.gm }}</label>
+      <label for="manual-rpg-gm">{{ commonAppRoles().gm }}</label>
     </p-floatlabel>
     <p-floatlabel variant="on" class="w-100 min-w-0">
       <p-select inputId="manual-rpg-source" formControlName="sessionKind" [options]="sources()" optionValue="value" optionLabel="label"

@@ -34,7 +34,7 @@ export type PriceEditorTranslations = {
     amountMin: string;
   };
   types: Record<PriceType, string>;
-  billingUnits: Record<Exclude<BillingUnit, 'event' | 'session'>, string>;
+  billingUnits: Record<Exclude<BillingUnit, 'event' | 'session' | 'day' | 'facilitator'>, string>;
   percentageBases: Pick<Record<PercentageBasis, string>, 'base_service'>;
   actualCostBases: Record<ActualCostBasis, string>;
 };

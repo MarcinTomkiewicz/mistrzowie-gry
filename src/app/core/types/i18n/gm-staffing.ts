@@ -7,7 +7,6 @@ import type { SessionSourceKind } from '../session-source';
 
 export type StaffingSessionSelectorCopy = {
   sourceLabel: string;
-  sessionLabel: string;
   sources: Record<SessionSourceKind, string>;
   createTitles: Record<SessionSourceKind, string>;
   emptyDescriptions: Record<SessionSourceKind, string>;
@@ -87,8 +86,6 @@ export type GmStaffingDetailCopy = {
     rejectSuccess: string;
   };
   participation: {
-    active: string;
-    ended: string;
     endedAt: string;
     endReason: string;
     withdraw: string;

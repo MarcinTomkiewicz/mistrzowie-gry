@@ -1,4 +1,5 @@
 @let copy = i18n.categories();
+@let withdrawn = i18n.commonEntityStatuses().withdrawn;
 
 <div class="flex-col-start-stretch gap-md w-100 min-w-0 position-relative" [attr.aria-busy]="busy()">
   <header class="mg-section__header w-100">
@@ -12,7 +13,7 @@
 
   @if (loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
-      <p class="m-0 error-text">{{ copy.loadError }}</p>
+      <p class="m-0 error-text">{{ i18n.loadErrors().documentCategories }}</p>
       <p-button severity="secondary" icon="pi pi-refresh"
         [label]="i18n.commonActions().retry" (onClick)="load()" />
     </section>
@@ -71,7 +72,7 @@
                       {{ i18n.commonEntityStatuses().active.feminine }}
                     </span>
                   } @else {
-                    <span [class]="'tag-badge ' + STATUS_BADGE_CLASS.archived">{{ copy.retired }}</span>
+                    <span [class]="'tag-badge ' + STATUS_BADGE_CLASS.archived">{{ withdrawn && withdrawn.feminine }}</span>
                   }
                 </span>
               </td>
@@ -93,7 +94,7 @@
       </div>
     } @else if (!loading()) {
       <section class="mg-card w-100" role="status">
-        <p class="m-0 muted-text">{{ copy.empty }}</p>
+        <p class="m-0 muted-text">{{ i18n.emptyStates().documentCategories }}</p>
       </section>
     }
 
@@ -108,7 +109,7 @@
         @if (historyLoading()) {
           <p class="m-0 muted-text" role="status">{{ i18n.commonStatus().loading }}</p>
         } @else if (historyFailed()) {
-          <p class="m-0 error-text" role="alert">{{ copy.historyLoadError }}</p>
+          <p class="m-0 error-text" role="alert">{{ i18n.loadErrors().documentCategoryHistory }}</p>
           <p-button severity="secondary" icon="pi pi-refresh"
             [label]="i18n.commonActions().retry" (onClick)="loadHistory(historyKey() ?? null)" />
         } @else {
@@ -128,7 +129,7 @@
               <small>{{ formatTimestampLabel(event.occurred_at) }}</small>
             </article>
           } @empty {
-            <p class="m-0 muted-text">{{ copy.historyEmpty }}</p>
+            <p class="m-0 muted-text">{{ i18n.emptyStates().documentCategoryHistory }}</p>
           }
         }
       </section>

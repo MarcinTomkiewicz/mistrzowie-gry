@@ -41,7 +41,6 @@ export class StaffingConfirmedRoster {
   protected readonly rows = computed(() => {
     const board = this.board();
     const gms = new Map(board.availability.gms.map(gm => [gm.userId, gm]));
-    const availability = this.i18n.copy().availability.statuses;
     const scopes = this.i18n.scopes();
     return board.candidates.filter(candidate => candidate.state === 'confirmed' && candidate.participation.active === true)
       .map(candidate => {
@@ -51,7 +50,7 @@ export class StaffingConfirmedRoster {
           gm,
           scopeLabel: scopes[candidate.scope.mode],
           days: board.schedule.days.filter(day => candidate.scope.dayIds.includes(day.id)),
-          availabilityLabel: gm ? availability[gm.status] : null,
+          availabilityLabel: gm ? this.i18n.availabilityStatusLabel(gm.status) : null,
           availabilityBadgeClass: gm ? STAFFING_AVAILABILITY_BADGE_CLASS[gm.status] : null,
         };
       });
@@ -62,7 +61,7 @@ export class StaffingConfirmedRoster {
     const copy = this.i18n.copy().confirmedRoster;
     this.confirm.dangerDecision(event, {
       message: copy.removeConfirm,
-      acceptLabel: copy.remove,
+      acceptLabel: this.i18n.commonActions().delete,
       acceptIcon: 'pi pi-demolish',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => {

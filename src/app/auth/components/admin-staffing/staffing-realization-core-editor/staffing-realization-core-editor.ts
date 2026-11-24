@@ -28,12 +28,13 @@ import {
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { AdminStaffingRealizationCore } from '../../../../core/interfaces/admin-staffing-realization';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationType } from '../../../../core/types/staffing-realization';
 import { RpcError } from '../../../../core/types/rpc-error';
 import { setControlEnabled, setControlValue } from '../../../../core/utils/form-controls';
 import { normalizeText } from '../../../../core/utils/normalize-text';
 import { getStaffingCoreFormError } from '../staffing-realization-form-errors';
+import { createStaffingSaveLabel } from '../staffing-realization-save-label';
 import { createStaffingRealizationCoreEditorI18n } from './staffing-realization-core-editor.i18n';
 import { StaffingRealizationDatesAndDemand } from './staffing-realization-dates-and-demand';
 import { StaffingReadinessTarget } from '../staffing-readiness-target';
@@ -174,10 +175,8 @@ export class StaffingRealizationCoreEditor {
     setControlValue(typeControl, type);
   }
 
-  protected currentStatusLabel(): string {
-    return this.i18n.realizationStatuses()[
-      this.realization()?.status ?? 'draft'
-    ];
+  protected currentStatusLabel(): string | null {
+    return this.i18n.realizationStatusLabel(this.realization()?.status ?? 'draft');
   }
 
   protected save(): void {

@@ -14,12 +14,8 @@ export type StaffingAvailabilityStatus =
 
 export type StaffingSlotAvailabilityStatus = Exclude<StaffingAvailabilityStatus, 'no_schedule'>;
 
-export type StaffingRealizationStatus =
-  | 'draft'
-  | 'open'
-  | 'closed'
-  | 'completed'
-  | 'archived';
+export const STAFFING_REALIZATION_STATUSES = ['draft', 'open', 'closed', 'completed', 'archived'] as const;
+export type StaffingRealizationStatus = typeof STAFFING_REALIZATION_STATUSES[number];
 
 export type StaffingTransportMode =
   | 'organizer_provided'

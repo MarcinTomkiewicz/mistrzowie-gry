@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
 import { SessionDetails } from '../../../../common/session-details/session-details';
+import { createCommonAppRolesI18n } from '../../../../core/translations/common.i18n';
 import { getGmPublicProfileDisplayName } from '../../../../core/utils/user-display';
 import { createEventAdminTimelineI18n } from '../event-admin-timeline/event-admin-timeline.i18n';
 import { createEventCoreEditorI18n } from './core-editor.i18n';
@@ -21,6 +22,7 @@ import { EventManualProgramController } from './event-manual-program-controller'
 export class EventManualRpgEditor {
   protected readonly editor = inject(EventManualProgramController);
   protected readonly i18n = createEventAdminTimelineI18n();
+  protected readonly commonAppRoles = createCommonAppRolesI18n();
   protected readonly coreI18n = createEventCoreEditorI18n();
   protected readonly copy = computed(() => this.i18n.copy().manualRpg);
   private readonly value = toSignal(this.editor.rpgForm.valueChanges);

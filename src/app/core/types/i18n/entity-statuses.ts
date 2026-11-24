@@ -13,6 +13,9 @@ export type CommonEntityStatusesTranslations = Record<
   | 'planned'
   | 'draft'
   | 'pending'
+  | 'available'
+  | 'completed'
+  | 'cancelled'
   | 'submitted'
   | 'sent'
   | 'accepted'
@@ -28,6 +31,10 @@ export type CommonEntityStatusesTranslations = Record<
 >;
 
 export type CommonStatusPhrasesTranslations = {
+  inProgress: string;
+  requiresAction: string;
+  submittedForReview: string;
+  acknowledged: string;
   awaitingAcceptance: string;
   awaitingDecision: string;
   editable: string;

@@ -87,8 +87,8 @@ export class EventGlobalSaveSummary {
   });
 
   protected label(key: GlobalSaveSection): string {
-    return { core: this.i18n.creationSteps().event, edition: this.i18n.creationSteps().location,
-      base: this.i18n.creation().blocks, schedule: this.i18n.creationSteps().schedule,
+    return { core: this.i18n.commonLabels().event, edition: this.i18n.creationSteps().location,
+      base: this.i18n.creation().blocks, schedule: this.i18n.commonLabels().schedule,
       dated: this.copy().localChanges, policy: this.i18n.creationSteps().policy }[key];
   }
 

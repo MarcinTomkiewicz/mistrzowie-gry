@@ -229,7 +229,7 @@ export type EventDatedBlocksCopy = {
 };
 
 export type EventGlobalDraftCopy = {
-  steps: Record<'event' | 'location' | 'schedule' | 'policy' | 'program' | 'summary', string>;
+  steps: Record<'location' | 'policy' | 'program', string>;
   programAfterSave: string;
   savedData: string;
   leaveConfirmationQuestion: string;

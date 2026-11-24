@@ -10,11 +10,11 @@
           <dd class="m-0">{{ data.city ?? i18n.commonValues().notProvided }}</dd>
         </div>
         <div class="flex-col-start-stretch gap-xs">
-          <dt class="muted-text">{{ i18n.coreFields().venueName }}</dt>
+          <dt class="muted-text">{{ i18n.commonLabels().venueName }}</dt>
           <dd class="m-0">{{ data.venueName ?? i18n.commonValues().notProvided }}</dd>
         </div>
         <div class="flex-col-start-stretch gap-xs">
-          <dt class="muted-text">{{ i18n.coreFields().venueAddress }}</dt>
+          <dt class="muted-text">{{ i18n.commonLabels().venueAddress }}</dt>
           <dd class="m-0">{{ data.venueAddress ?? i18n.commonValues().notProvided }}</dd>
         </div>
         <div class="flex-col-start-stretch gap-xs">
@@ -34,11 +34,11 @@
         <div class="flex-col-start-start gap-xs">
           <dt class="muted-text">{{ i18n.commonLabels().status }}</dt>
           <dd [class]="'tag-badge m-0 ' + statusBadgeClass[data.status]">
-            {{ i18n.realizationStatuses()[data.status] }}
+            {{ i18n.realizationStatusLabel(data.status) }}
           </dd>
         </div>
         <div class="flex-col-start-stretch gap-xs">
-          <dt class="muted-text">{{ i18n.coreFields().timezone }}</dt>
+          <dt class="muted-text">{{ i18n.commonLabels().timezone }}</dt>
           <dd class="m-0">{{ data.timezone }}</dd>
         </div>
       </dl>

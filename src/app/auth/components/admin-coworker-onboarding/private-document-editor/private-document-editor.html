@@ -36,7 +36,7 @@
         <p-select class="w-100" inputId="private-document-assigned-category"
           formControlName="categoryKey" [options]="categories()" [readonly]="saving()"
           optionLabel="category_name" optionValue="category_key" appendTo="body" />
-        <label for="private-document-assigned-category">{{ i18n.categories().label }}</label>
+        <label for="private-document-assigned-category">{{ i18n.commonLabels().category }}</label>
       </p-iftalabel>
     }
     <div class="flex-row-end-center gap-sm">
@@ -45,7 +45,7 @@
         [disabled]="saving()" (onClick)="closed.emit()" />
       <p-button type="submit" [severity]="rejecting ? 'danger' : undefined"
         [icon]="rejecting ? 'pi pi-times' : 'pi pi-check'"
-        [label]="rejecting ? i18n.actions().reject : i18n.commonActions().save"
+        [label]="rejecting ? i18n.commonActions().reject : i18n.commonActions().save"
         [loading]="saving()"
         [disabled]="saving() || (!rejecting && !canReclassify())"
       />

@@ -8,8 +8,8 @@ import { finalize } from 'rxjs';
 import { STAFFING_READINESS_SECTIONS, STAFFING_READINESS_TAB_PATHS } from '../../../../core/configs/staffing-readiness.config';
 import { StaffingRealizationEditorFacade } from '../../../../core/facades/staffing/staffing-realization-editor-facade';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { createStaffingSaveLabel } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationReadinessSection } from '../../../../core/types/staffing-realization-readiness';
+import { createStaffingSaveLabel } from '../staffing-realization-save-label';
 import { createStaffingRealizationFinalizationI18n } from './staffing-realization-finalization.i18n';
 
 @Component({
@@ -30,14 +30,14 @@ export class StaffingRealizationFinalization {
 
   protected readonly i18n = createStaffingRealizationFinalizationI18n();
   protected readonly store = this.editor.store;
-  protected readonly saveLabel = createStaffingSaveLabel(
-    () => this.store.realization()?.status,
-    () => this.i18n.commonActions().save,
-  );
   protected readonly tabPaths = STAFFING_READINESS_TAB_PATHS;
   protected readonly operation = signal<'validate' | 'open' | null>(null);
   protected readonly busy = computed(() => this.isSaving() || this.operation() !== null);
   protected readonly isDraft = computed(() => this.store.realization()?.status === 'draft');
+  protected readonly saveLabel = createStaffingSaveLabel(
+    () => this.store.realization()?.status,
+    () => this.i18n.commonActions().save,
+  );
   protected readonly canOpen = computed(() => this.isDraft() &&
     !this.store.hasUnsavedChanges() && this.store.readiness()?.ready === true);
   protected readonly groups = computed(() => STAFFING_READINESS_SECTIONS.map((section) => ({

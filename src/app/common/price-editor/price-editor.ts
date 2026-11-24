@@ -50,7 +50,7 @@ export class PriceEditor {
 
     return BILLING_UNITS.map((value) => ({
       value,
-      label: value === 'event' || value === 'session'
+      label: value === 'event' || value === 'session' || value === 'day' || value === 'facilitator'
         ? this.labels()[value]
         : labels[value],
     }));
@@ -62,7 +62,7 @@ export class PriceEditor {
       value,
       label: value === 'base_service'
         ? editor.percentageBases.base_service
-        : editor.billingUnits[value],
+        : value === 'facilitator' ? this.labels().facilitator : editor.billingUnits[value],
     }));
   });
   protected readonly actualCostBasisOptions = computed(() => {

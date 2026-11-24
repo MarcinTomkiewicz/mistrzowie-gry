@@ -28,18 +28,16 @@ export class StaffingRealizationAvailability {
   protected readonly formatDateLabel = formatDateLabel;
   protected readonly formatTimeRangeLabel = formatTimeRangeLabel;
   protected readonly gmRows = computed(() => {
-    const statuses = this.i18n.copy().availability.statuses;
     return this.availability().gms.map((gm) => ({
       gm,
-      statusLabel: statuses[gm.status],
+      statusLabel: this.i18n.availabilityStatusLabel(gm.status),
       statusBadgeClass: STAFFING_AVAILABILITY_BADGE_CLASS[gm.status],
     }));
   });
   protected readonly slotRows = computed(() => {
-    const statuses = this.i18n.copy().availability.statuses;
     return this.selectedGm()?.slots.map((slot) => ({
       slot,
-      statusLabel: statuses[slot.status],
+      statusLabel: this.i18n.availabilityStatusLabel(slot.status),
       statusBadgeClass: STAFFING_AVAILABILITY_BADGE_CLASS[slot.status],
     })) ?? [];
   });

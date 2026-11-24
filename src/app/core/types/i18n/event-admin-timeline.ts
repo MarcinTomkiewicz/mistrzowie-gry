@@ -12,11 +12,11 @@ export type EventAdminTimelineCopy = {
     abandon: string; abandonConfirmQuestion: string; abandonConfirm: string; refreshRequired: string;
   };
   manualRpg: {
-    action: string; hint: string; gm: string; source: string; session: string; template: string; custom: string;
+    action: string; hint: string; source: string; session: string; template: string; custom: string;
     slotLabel: string; capacity: string; capacityHint: string; saveConfirmQuestion: string; saveConfirm: string; catalogFailed: string; noSessions: string;
   };
   manualActivity: {
-    action: string; hint: string; kind: string; title: string; description: string; presenter: string;
+    action: string; hint: string; kind: string; presenter: string;
     capacity: string; capacityHint: string; catalogFailed: string; emptyKinds: string; refreshKinds: string; saveConfirmQuestion: string; saveConfirm: string;
   };
   title: string;

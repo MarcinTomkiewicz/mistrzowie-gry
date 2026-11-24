@@ -11,8 +11,7 @@
     "offer": "Rodzaj rezerwacji",
     "system": "System",
     "slot": "Termin",
-    "addons": "Opcjonalne dodatki do rezerwacji",
-    "summary": "Podsumowanie"
+    "addons": "Opcjonalne dodatki do rezerwacji"
   },
   "labels": {
     "flowMode": "Co chcesz wybrać najpierw?",

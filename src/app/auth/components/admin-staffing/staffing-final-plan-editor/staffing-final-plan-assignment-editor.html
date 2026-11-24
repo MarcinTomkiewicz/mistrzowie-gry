@@ -1,5 +1,4 @@
 @let copy = i18n.finalPlan();
-@let fields = i18n.copy().fields;
 @let controls = form().controls;
 <div class="position-relative flex-col-start-stretch gap-sm border radius-sm p-sm w-100 min-w-0"
   [class.border-danger]="assignment()?.conflict" [class.bg-warn-subtle]="assignment()?.conflict"
@@ -20,7 +19,8 @@
   <div class="flex-row-between-center flex-col-start-stretch-sm gap-sm">
     <p-select formControlName="candidateId" [options]="candidateOptions()" optionLabel="label" optionValue="value"
       optionDisabled="disabled" size="small" class="w-50 w-100-sm min-w-0" appendTo="body" [filter]="true" filterBy="label"
-      [placeholder]="fields.gm" [ariaLabel]="fields.gm" [emptyMessage]="copy.noCandidates" (onChange)="resetSession()" />
+      [placeholder]="i18n.commonAppRoles().gm" [ariaLabel]="i18n.commonAppRoles().gm"
+      [emptyMessage]="copy.noCandidates" (onChange)="resetSession()" />
     @if (editable()) {
       <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-demolish"
         class="flex-none w-100-sm" styleClass="w-100"
@@ -105,7 +105,7 @@
             (onChange)="resetSession()" />
           <p-select formControlName="sessionId" [options]="sessionOptions()" optionLabel="label" optionValue="value"
             size="small" class="flex-1 min-w-0 w-100-sm" appendTo="body" [filter]="true" filterBy="label"
-            [placeholder]="i18n.sessionSelector().sessionLabel" [ariaLabel]="i18n.sessionSelector().sessionLabel"
+            [placeholder]="i18n.commonLabels().session" [ariaLabel]="i18n.commonLabels().session"
             [emptyMessage]="copy.noSessions" [readonly]="isLoading() || loadFailed() || !selectedCandidate()"
             (onChange)="resetOverride()" />
         </div>

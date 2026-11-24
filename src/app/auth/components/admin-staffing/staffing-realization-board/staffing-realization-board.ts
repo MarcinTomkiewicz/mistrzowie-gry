@@ -67,7 +67,7 @@ export class StaffingRealizationBoard {
     const copy = this.i18n.summary();
     return [
       { key: 'required', label: copy.required, value: board.summary.required, badgeClass: 'tag-badge--info' },
-      { key: 'confirmed', label: copy.confirmed, value: board.summary.confirmed, badgeClass: 'tag-badge--success' },
+      { key: 'confirmed', label: this.i18n.commonEntityStatuses().confirmed?.pluralNonMasculinePersonal, value: board.summary.confirmed, badgeClass: 'tag-badge--success' },
       { key: 'vacancies', label: copy.vacancies, value: board.summary.vacancies, badgeClass: 'tag-badge--danger' },
     ];
   });
@@ -79,7 +79,6 @@ export class StaffingRealizationBoard {
     const origins = this.i18n.candidateOrigins();
     const scopes = this.i18n.scopes();
     const decisions = this.i18n.candidateDecisions();
-    const states = this.i18n.candidateStates();
     const endReasons = this.i18n.participationEndReasons();
     return board.candidates.map((candidate) => {
       const gm = gms.get(candidate.gmUserId);
@@ -88,10 +87,10 @@ export class StaffingRealizationBoard {
         gm,
         originLabel: origins[candidate.origin],
         scopeLabel: scopes[candidate.scope.mode],
-        stateLabel: states[candidate.state],
+        stateLabel: this.i18n.candidateStateLabel(candidate.state),
         stateBadgeClass: STATUS_BADGE_CLASS[candidate.state],
         endReasonLabel: candidate.participation.endReason ? endReasons[candidate.participation.endReason] : null,
-        availabilityLabel: gm ? copy.availability.statuses[gm.status] : null,
+        availabilityLabel: gm ? this.i18n.availabilityStatusLabel(gm.status) : null,
         availabilityBadgeClass: gm ? STAFFING_AVAILABILITY_BADGE_CLASS[gm.status] : null,
         days: board.schedule.days.filter((day) => candidate.scope.dayIds.includes(day.id)),
         decisions: [
@@ -108,7 +107,7 @@ export class StaffingRealizationBoard {
   );
   protected readonly currentCandidateRows = computed(() => {
     const ids = new Set(selectCurrentStaffingCandidates(this.board()?.candidates ?? []).map(candidate => candidate.id));
-    const endedLabel = this.i18n.participation().ended;
+    const endedLabel = this.i18n.commonEntityStatuses().completed?.masculine;
     return this.candidateRows().filter(row => ids.has(row.candidate.id) &&
       !(row.candidate.state === 'confirmed' && row.candidate.participation.active === true))
       .map(row => row.candidate.state === 'confirmed' && row.candidate.participation.active === false
@@ -144,7 +143,7 @@ export class StaffingRealizationBoard {
     const copy = this.i18n.copy().selfApplicationDecision;
     const options = {
       message: decision === 'accepted' ? copy.acceptConfirm : copy.rejectConfirm,
-      acceptLabel: decision === 'accepted' ? copy.accept : copy.reject,
+      acceptLabel: decision === 'accepted' ? copy.accept : this.i18n.commonActions().reject,
       acceptIcon: decision === 'accepted' ? 'pi pi-done-it' : 'pi pi-interdiction',
       rejectLabel: this.i18n.commonActions().cancel,
       accept: () => {

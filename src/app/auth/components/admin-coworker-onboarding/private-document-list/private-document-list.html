@@ -5,12 +5,12 @@
       <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
         <input pInputText pSize="small" type="search" class="w-100" id="private-document-search"
           formControlName="searchText" />
-        <label for="private-document-search">{{ i18n.adminDetail().documentSearch }}</label>
+        <label for="private-document-search">{{ i18n.commonLabels().searchDocumentByTitle }}</label>
       </p-floatlabel>
       <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
         inputId="private-document-category-filter" formControlName="category"
         [options]="categoryOptions()" optionLabel="label" optionValue="value"
-        [placeholder]="i18n.categories().all" [ariaLabel]="i18n.categories().label"
+        [placeholder]="i18n.categories().all" [ariaLabel]="i18n.commonLabels().category"
         [showClear]="true" [loading]="categoryLoading()" appendTo="body" />
       <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
         inputId="private-document-status-filter" formControlName="status"
@@ -40,7 +40,7 @@
             </div>
           </th>
           <th scope="col" class="small-caps hide-down-sm">{{ i18n.commonLabels().title }}</th>
-          <th scope="col" class="small-caps hide-down-sm">{{ i18n.categories().label }}</th>
+          <th scope="col" class="small-caps hide-down-sm">{{ i18n.commonLabels().category }}</th>
           <th scope="col" class="small-caps hide-down-sm">{{ i18n.commonLabels().status }}</th>
           <th scope="col" class="small-caps text-right hide-down-sm">{{ i18n.commonTable().actions }}</th>
         </tr>
@@ -64,14 +64,14 @@
               <strong>{{ document.title }}</strong>
               @if (document.version_number) {
                 <small>
-                  {{ i18n.fields().version }} {{ document.version_number }}
+                  {{ i18n.commonLabels().version }} {{ document.version_number }}
                   @if (!row.current) { ({{ i18n.fields().historicalVersion }}) }
                 </small>
               }
             </div>
           </th>
           <td class="mg-responsive-table__cell">
-            <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.categories().label }}</span>
+            <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.commonLabels().category }}</span>
             <span class="mg-responsive-table__value text-wrap-anywhere">
               {{ row.category ?? i18n.commonValues().notAvailable }}
             </span>
@@ -110,7 +110,7 @@
         <tr class="mg-responsive-table__row">
           <td colspan="5">
             <p class="m-0 muted-text" role="status">
-              {{ documents().length ? i18n.adminDetail().emptyFilteredDocuments : i18n.adminDetail().emptyDocuments }}
+              {{ documents().length ? i18n.emptyStates().filteredDocuments : i18n.emptyStates().adminPrivateDocuments }}
             </p>
           </td>
         </tr>

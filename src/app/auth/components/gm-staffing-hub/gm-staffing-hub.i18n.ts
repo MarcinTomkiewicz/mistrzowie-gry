@@ -12,7 +12,7 @@ import { createStaffingI18n, GM_STAFFING_SCOPE } from '../../../core/translation
 import type { GmStaffingHubCopy } from '../../../core/types/i18n/gm-staffing';
 
 export function createGmStaffingHubI18n() {
-  const { realizationStatuses, realizationTypes, candidateStates } = createStaffingI18n();
+  const { realizationStatusLabel, realizationTypes, candidateStateLabel } = createStaffingI18n();
 
   return {
     ...createScopedSectionsI18n<GmStaffingHubCopy>(GM_STAFFING_SCOPE, {
@@ -20,9 +20,9 @@ export function createGmStaffingHubI18n() {
       sections: 'sections',
       card: 'card',
     }),
-    realizationStatuses,
+    realizationStatusLabel,
     realizationTypes,
-    candidateStates,
+    candidateStateLabel,
     commonActions: createCommonActionsI18n(),
     commonCta: createCommonCtaI18n(),
     commonErrors: createCommonErrorsI18n(),

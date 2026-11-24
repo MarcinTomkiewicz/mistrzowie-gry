@@ -31,13 +31,11 @@
     "playersHeaderLabel": "Gracze"
   },
   "eventCapacity": {
-    "capacity": "Liczba uczestników",
     "remainingSeats": "Wolne miejsca",
     "sourcePlayers": "Liczba graczy według Mistrza Gry"
   },
   "slots": {
     "activity": {
-      "presenter": "[PH] Prowadzący",
       "capacity": "[PH] Liczba miejsc"
     },
     "difficulty": {

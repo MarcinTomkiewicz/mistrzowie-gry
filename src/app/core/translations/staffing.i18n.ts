@@ -1,6 +1,4 @@
-import { computed } from '@angular/core';
-import { translateSignal } from '@jsverse/transloco';
-
+import type { MyStaffingCandidate } from '../interfaces/my-staffing-realization';
 import type { StaffingRealizationStatus } from '../types/staffing-realization';
 import type {
   StaffingCandidateStateTranslations,
@@ -11,21 +9,16 @@ import type {
   StaffingTransportModeTranslations,
   StaffingWorkTimeScopeTranslations,
 } from '../types/i18n/staffing';
+import { createCommonEntityStatusesI18n, createCommonStatusPhrasesI18n } from './common.i18n';
 import { createScopedSectionsI18n } from './scoped.i18n';
 
 export const STAFFING_SCOPE = 'staffing';
 export const GM_STAFFING_SCOPE = 'gmStaffing';
 
-export function createStaffingSaveLabel(
-  getStatus: () => StaffingRealizationStatus | undefined,
-  getSaveLabel: () => string,
-) {
-  const saveDraft = translateSignal('schedule.actions.saveDraft', {}, { scope: 'adminStaffing' });
-  return computed(() => getStatus() === 'draft' ? saveDraft() : getSaveLabel());
-}
-
 export function createStaffingI18n() {
-  return createScopedSectionsI18n<{
+  const commonEntityStatuses = createCommonEntityStatusesI18n();
+  const commonStatusPhrases = createCommonStatusPhrasesI18n();
+  const { realizationStatuses, candidateStates, ...sections } = createScopedSectionsI18n<{
     realizationStatuses: StaffingRealizationStatusTranslations;
     realizationTypes: StaffingRealizationTypeTranslations;
     candidateStates: StaffingCandidateStateTranslations;
@@ -42,4 +35,17 @@ export function createStaffingI18n() {
     reimbursementModes: 'reimbursementModes',
     workTimeScopes: 'workTimeScopes',
   });
+
+  return {
+    ...sections,
+    commonEntityStatuses,
+    realizationStatusLabel: (status: StaffingRealizationStatus): string | null =>
+      status === 'completed' || status === 'archived'
+        ? commonEntityStatuses()[status]?.feminine ?? null
+        : realizationStatuses()[status] ?? null,
+    candidateStateLabel: (state: MyStaffingCandidate['state']): string | null =>
+      state === 'pending'
+        ? commonStatusPhrases().awaitingDecision ?? null
+        : candidateStates()[state] ?? null,
+  };
 }

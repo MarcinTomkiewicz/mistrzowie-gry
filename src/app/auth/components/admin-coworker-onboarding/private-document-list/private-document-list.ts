@@ -76,20 +76,24 @@ export class PrivateDocumentList implements OnChanges {
     { initialValue: this.filterForm.getRawValue() },
   );
   protected readonly statusOptions = computed(() => [
-    ...Object.entries(this.i18n.statuses().assignment ?? {}).map(([value, label]) => ({ value, label })),
+    ...Object.entries(this.i18n.assignmentStatuses() ?? {}).map(([value, label]) => ({ value, label })),
     { value: 'unassigned', label: this.i18n.fields().noAssignment },
   ]);
-  protected readonly categoryOptions = computed(() => this.categories().map((category) => ({
-    value: category.category_key,
-    label: category.status === 'retired'
-      ? `${category.category_name} (${this.i18n.categories().retired})`
-      : category.category_name,
-  })));
+  protected readonly categoryOptions = computed(() => {
+    const retiredLabel = this.i18n.commonEntityStatuses().withdrawn?.feminine;
+    return this.categories().map(category => ({
+      value: category.category_key,
+      label: category.status === 'retired' && retiredLabel
+        ? `${category.category_name} (${retiredLabel})`
+        : category.category_name,
+    }));
+  });
   protected readonly rows = computed(() => {
     const categoryNames = new Map(this.categoryOptions().map(({ value, label }) => [value, label]));
     const { searchText, category, status, hideRejected } = this.filters();
     const query = normalizeText(searchText)?.toLocaleLowerCase('pl');
-    const { assignment, requiredAction } = this.i18n.statuses();
+    const assignment = this.i18n.assignmentStatuses();
+    const { requiredAction } = this.i18n.statuses();
     const documents = this.documents().filter((document) =>
       (!query || document.title.toLocaleLowerCase('pl').includes(query)) &&
       (!category || (document.category ?? DEFAULT_COWORKER_DOCUMENT_CATEGORY) === category) &&
@@ -104,7 +108,7 @@ export class PrivateDocumentList implements OnChanges {
         current,
         selectable: current && document.document_status === 'active',
         category: categoryNames.get(document.category ?? DEFAULT_COWORKER_DOCUMENT_CATEGORY),
-        statusLabel: status ? assignment?.[status] : this.i18n.fields().noAssignment,
+        statusLabel: status ? assignment && assignment[status] : this.i18n.fields().noAssignment,
         statusClass: status ? 'tag-badge text-wrap ' + STATUS_BADGE_CLASS[status] : '',
         actionLabel: document.required_action ? requiredAction?.[document.required_action] : null,
         menu: this.createOperations(document, current),
@@ -183,7 +187,7 @@ export class PrivateDocumentList implements OnChanges {
     const items: MenuItem[] = [];
     if (document.original_filename) {
       items.push({
-        label: actions.download, icon: 'pi pi-missile-swarm',
+        label: this.i18n.commonActions().download, icon: 'pi pi-missile-swarm',
         command: () => this.operation.emit({ document, kind: 'download', target: 'source' }),
       });
     }
@@ -202,11 +206,11 @@ export class PrivateDocumentList implements OnChanges {
     if (current && document.assignment_id && document.assignment_status === 'submitted') {
       items.push(
         {
-          label: actions.accept, icon: 'pi pi-check',
+          label: this.i18n.commonActions().accept, icon: 'pi pi-check',
           command: () => this.operation.emit({ document, kind: 'accept' }),
         },
         {
-          label: actions.reject, icon: 'pi pi-times',
+          label: this.i18n.commonActions().reject, icon: 'pi pi-times',
           command: () => this.operation.emit({ document, kind: 'reject' }),
         },
       );

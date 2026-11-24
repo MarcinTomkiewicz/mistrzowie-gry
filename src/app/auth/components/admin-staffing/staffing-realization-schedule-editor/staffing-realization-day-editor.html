@@ -16,7 +16,7 @@
           [disabled]="isSaving()"
           (click)="datePopover.toggle($event)"
         >
-          {{ i18n.labels().day }} {{ index + 1 }}
+          {{ i18n.commonLabels().day }} {{ index + 1 }}
           @if (dayDateLabel(); as dateLabel) {
             - {{ dateLabel }}
           }

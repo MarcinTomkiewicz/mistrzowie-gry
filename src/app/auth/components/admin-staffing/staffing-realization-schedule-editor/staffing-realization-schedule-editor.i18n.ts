@@ -4,6 +4,7 @@ import {
   createCommonActionsI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
+  createCommonLabelsI18n,
   createCommonStatusI18n,
 } from '../../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../../core/translations/scoped.i18n';
@@ -15,7 +16,6 @@ export function createStaffingRealizationScheduleEditorI18n() {
     ...createScopedSectionsI18n<{
       page: AdminStaffingScheduleEditorCopy['page'];
       section: AdminStaffingScheduleEditorCopy['section'];
-      labels: AdminStaffingScheduleEditorCopy['labels'];
       fields: AdminStaffingScheduleEditorCopy['fields'];
       actions: AdminStaffingScheduleEditorCopy['actions'];
       summary: AdminStaffingScheduleEditorCopy['summary'];
@@ -24,7 +24,6 @@ export function createStaffingRealizationScheduleEditorI18n() {
     }>('adminStaffing', {
       page: 'schedule.page',
       section: 'schedule.section',
-      labels: 'schedule.labels',
       fields: 'schedule.fields',
       actions: 'schedule.actions',
       summary: 'schedule.summary',
@@ -36,6 +35,7 @@ export function createStaffingRealizationScheduleEditorI18n() {
     commonActions: createCommonActionsI18n(),
     commonErrors: createCommonErrorsI18n(),
     commonForm: createCommonFormI18n(),
+    commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),
   };
 }

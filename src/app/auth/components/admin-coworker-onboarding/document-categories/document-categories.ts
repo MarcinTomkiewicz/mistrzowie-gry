@@ -200,7 +200,7 @@ export class DocumentCategories {
         if (historyKey !== undefined) this.loadHistory(historyKey);
       },
       error: (error: unknown) =>
-        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
+        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n)),
     });
   }
 }

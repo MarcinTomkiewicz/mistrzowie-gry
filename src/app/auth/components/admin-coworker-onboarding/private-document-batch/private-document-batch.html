@@ -64,7 +64,7 @@
                 appendTo="body"
               />
               <label [for]="'private-document-category-' + index">
-                {{ i18n.categories().label }}
+                {{ i18n.commonLabels().category }}
               </label>
             </p-iftalabel>
             @if (row.controls.category.touched && !categoryKeys().has(row.controls.category.value)) {

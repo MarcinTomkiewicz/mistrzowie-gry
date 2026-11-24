@@ -1,4 +1,4 @@
-@let copyReady = !!(i18n.statuses().assignment && i18n.statuses().requiredAction);
+@let copyReady = !!(i18n.assignmentStatuses() && i18n.statuses().requiredAction && i18n.commonEntityStatuses().completed);
 
 <div class="flex-col-start-stretch gap-lg w-100 position-relative">
   <header class="mg-section__header w-100">
@@ -17,7 +17,7 @@
 
   @if (copyReady && loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
-      <p class="m-0 error-text">{{ i18n.adminDetail().loadError }}</p>
+      <p class="m-0 error-text">{{ i18n.loadErrors().onboardingDetail }}</p>
       <p-button
         severity="secondary"
         icon="pi pi-refresh"
@@ -39,7 +39,7 @@
         <div class="flex-col-start-start gap-xs">
           <small>{{ i18n.commonLabels().status }}</small>
           <span [class]="'tag-badge ' + STATUS_BADGE_CLASS[data.onboarding.status]">
-            {{ i18n.statuses().onboarding[data.onboarding.status] }}
+            {{ i18n.onboardingStatusLabel(data.onboarding.status) }}
           </span>
         </div>
         <div class="flex-col-start-start gap-xs">
@@ -101,7 +101,7 @@
       <section class="mg-card flex-col-start-stretch gap-md w-100">
         <div class="flex-col-start-stretch gap-xs">
           <h3 class="mg-section__title mg-section__title--sm m-0">
-            {{ i18n.adminDetail().completeSection }}
+            {{ i18n.actions().complete }}
           </h3>
           <p class="m-0 muted-text">{{ i18n.adminDetail().completeDescription }}</p>
         </div>

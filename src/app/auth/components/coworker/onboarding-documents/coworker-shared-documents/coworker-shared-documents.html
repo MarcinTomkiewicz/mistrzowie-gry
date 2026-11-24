@@ -1,13 +1,13 @@
 @if (!onboardingCompleted()) {
   <section class="mg-card w-100">
-    <p class="m-0 muted-text">{{ i18n.coworkerShared().onboardingRequired }}</p>
+    <p class="m-0 muted-text">{{ i18n.emptyStates().sharedDocumentsRequireCompletedOnboarding }}</p>
   </section>
 } @else if (rows().length) {
   <div class="w-100 overflow-x-auto">
     <p-table size="small" [value]="rows()" dataKey="document.assignment_id" tableStyleClass="mg-responsive-table">
       <ng-template #header>
         <tr class="hide-down-sm">
-          <th scope="col" class="small-caps">{{ i18n.fields().document }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonLabels().document }}</th>
           <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
           <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
         </tr>
@@ -19,7 +19,7 @@
           <th scope="row" class="mg-responsive-table__row-heading">
             <div class="flex-col-start-start gap-xs text-wrap-anywhere">
               <strong>{{ document.title }}</strong>
-              <small>{{ i18n.fields().version }} {{ document.version_number }}</small>
+              <small>{{ i18n.commonLabels().version }} {{ document.version_number }}</small>
             </div>
           </th>
           <td class="mg-responsive-table__cell">
@@ -31,7 +31,7 @@
               <small>{{ row.actionLabel }}</small>
               @if (document.acknowledged_at) {
                 <small class="muted-text">
-                  {{ i18n.coworkerShared().acknowledgedAt }}: {{ formatTimestampLabel(document.acknowledged_at) }}
+                  {{ i18n.commonStatusPhrases().acknowledged }}: {{ formatTimestampLabel(document.acknowledged_at) }}
                 </small>
               }
             </div>
@@ -52,6 +52,6 @@
   </div>
 } @else {
   <section class="mg-card w-100">
-    <p class="m-0 muted-text">{{ i18n.coworkerShared().empty }}</p>
+    <p class="m-0 muted-text">{{ i18n.emptyStates().coworkerSharedDocuments }}</p>
   </section>
 }

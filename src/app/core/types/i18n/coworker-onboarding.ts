@@ -1,20 +1,13 @@
 import type {
   CoworkerDocumentApiErrorCode,
-  CoworkerDocumentAssignmentStatus,
   CoworkerDocumentCategoryEventType,
   CoworkerDocumentRequiredAction,
-  CoworkerOnboardingLifecycleStatus,
 } from '../coworker-onboarding';
 
 export interface CoworkerOnboardingAdminListTranslations {
   title: string;
   subtitle: string;
-  empty: string;
-  emptyVisible: string;
-  loadError: string;
-  filteredEmpty: string;
   notStarted: string;
-  privateDocuments: string;
   sharedDocuments: string;
   pendingActions: string;
   privateDocumentsHint: string;
@@ -28,16 +21,11 @@ export interface CoworkerOnboardingAdminListTranslations {
 }
 
 export interface CoworkerOnboardingAdminDetailTranslations {
-  documentSearch: string;
   hideRejected: string;
-  emptyFilteredDocuments: string;
   title: string;
   subtitle: string;
   uploadSection: string;
-  completeSection: string;
   completeDescription: string;
-  emptyDocuments: string;
-  loadError: string;
   questionnaireBadge: string;
   bulk: {
     selected: string;
@@ -57,58 +45,37 @@ export interface CoworkerOnboardingAdminSharedTranslations {
   formTitleReplace: string;
   listTitle: string;
   confirmationsTitle: string;
-  empty: string;
-  emptyConfirmations: string;
-  loadError: string;
 }
 
 export interface CoworkerOnboardingCategoriesTranslations {
-  label: string;
   all: string;
   add: string;
   rename: string;
   change: string;
-  retired: string;
   retire: string;
   retireMessage: string;
-  loadError: string;
-  empty: string;
   history: string;
-  historyLoadError: string;
-  historyEmpty: string;
   events: Record<CoworkerDocumentCategoryEventType, string>;
 }
 
 export interface CoworkerOnboardingPrivateTranslations {
   subtitle: string;
-  noOnboarding: string;
-  questionnaireRequired: string;
-  empty: string;
   declaration: string;
-  loadError: string;
-  searchByTitle: string;
   actionRequiredOnly: string;
-  filteredEmpty: string;
   versionHistory: string;
   collapseUpload: string;
 }
 
 export interface CoworkerOnboardingSharedTranslations {
   subtitle: string;
-  onboardingRequired: string;
-  empty: string;
-  acknowledgedAt: string;
 }
 
 export interface CoworkerOnboardingFieldsTranslations {
   startedAt: string;
   completedAt: string;
-  document: string;
-  documents: string;
   pendingActions: string;
   preset: string;
   noPreset: string;
-  version: string;
   historicalVersion: string;
   assignments: string;
   pendingAssignments: string;
@@ -128,12 +95,8 @@ export interface CoworkerOnboardingFieldsTranslations {
 
 export interface CoworkerOnboardingActionsTranslations {
   start: string;
-  open: string;
-  download: string;
   previewSigned: string;
   downloadSigned: string;
-  accept: string;
-  reject: string;
   removeDocument: string;
   complete: string;
   cancelOnboarding: string;
@@ -167,6 +130,38 @@ export interface CoworkerOnboardingDialogsTranslations {
   archiveMessage: string;
 }
 
+export interface CoworkerOnboardingErrorsTranslations {
+  load: {
+    adminOnboardings: string;
+    onboardingDetail: string;
+    sharedDocuments: string;
+    documentCategories: string;
+    documentCategoryHistory: string;
+    coworkerPrivateDocuments: string;
+  };
+  api: Record<
+    Exclude<CoworkerDocumentApiErrorCode, 'UNAUTHENTICATED' | 'ACCESS_DENIED' | 'INTERNAL_ERROR'>,
+    string
+  >;
+}
+
+export interface CoworkerOnboardingEmptyStatesTranslations {
+  adminOnboardings: string;
+  visibleAdminOnboardings: string;
+  filteredAdminOnboardings: string;
+  adminPrivateDocuments: string;
+  filteredDocuments: string;
+  adminSharedDocuments: string;
+  sharedDocumentConfirmations: string;
+  documentCategories: string;
+  documentCategoryHistory: string;
+  coworkerOnboarding: string;
+  privateDocumentsRequireQuestionnaire: string;
+  coworkerPrivateDocuments: string;
+  sharedDocumentsRequireCompletedOnboarding: string;
+  coworkerSharedDocuments: string;
+}
+
 export interface CoworkerOnboardingToastTranslations {
   mutationSuccessSummary: string;
   mutationFailedSummary: string;
@@ -175,12 +170,9 @@ export interface CoworkerOnboardingToastTranslations {
   mutationUncertainDetail: string;
   downloadFailedSummary: string;
   downloadFailedDetail: string;
-  errors: Record<CoworkerDocumentApiErrorCode, string>;
 }
 
 export interface CoworkerOnboardingStatusesTranslations {
-  onboarding: Record<CoworkerOnboardingLifecycleStatus, string>;
-  assignment: Record<CoworkerDocumentAssignmentStatus, string>;
   pendingAcknowledgement: string;
   requiredAction: Record<CoworkerDocumentRequiredAction, string>;
 }

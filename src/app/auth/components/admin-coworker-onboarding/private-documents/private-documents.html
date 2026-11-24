@@ -4,7 +4,7 @@
   </h3>
   @if (categoryLoadFailed()) {
     <div class="mg-card flex-row-between-center flex-wrap gap-sm w-100" role="alert">
-      <p class="m-0 error-text">{{ i18n.categories().loadError }}</p>
+      <p class="m-0 error-text">{{ i18n.loadErrors().documentCategories }}</p>
       <p-button severity="secondary" icon="pi pi-refresh"
         [label]="i18n.commonActions().retry" (onClick)="retryCategories.emit()" />
     </div>

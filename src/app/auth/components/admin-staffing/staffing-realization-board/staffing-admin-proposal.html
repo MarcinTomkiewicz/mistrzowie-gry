@@ -10,7 +10,7 @@
     <div class="flex-col-start-stretch gap-xs w-100">
       <p-select inputId="staffing-proposal-gm" size="small" class="w-100" formControlName="gmUserId"
         [options]="gmOptions()" optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
-        [placeholder]="copy.fields.gm" [ariaLabel]="copy.fields.gm" [emptyMessage]="copy.availability.emptyRoster"
+        [placeholder]="i18n.commonAppRoles().gm" [ariaLabel]="i18n.commonAppRoles().gm" [emptyMessage]="copy.availability.emptyRoster"
         [readonly]="isSaving()" appendTo="body" [class.p-invalid]="controls.gmUserId.touched && controls.gmUserId.invalid" />
       @if (controls.gmUserId.touched && controls.gmUserId.invalid) {
         <small class="mg-contact-error">{{ i18n.commonForm().required }}</small>

@@ -18,7 +18,7 @@ export type AdminStaffingRealizationListCopy = {
     type: string;
     staffingSummary: string;
   };
-  summary: Record<keyof AdminStaffingRealizationListItem['staffingSummary'], string>;
+  summary: Record<Exclude<keyof AdminStaffingRealizationListItem['staffingSummary'], 'confirmed' | 'pending'>, string>;
   filters: {
     search: string;
     noResults: string;
@@ -54,9 +54,6 @@ export type AdminStaffingEditorCopy = {
     name: string;
     description: string;
     operationalNotes: string;
-    venueName: string;
-    venueAddress: string;
-    timezone: string;
     type: string;
     dateRange: string;
   };
@@ -116,13 +113,8 @@ export type AdminStaffingScheduleEditorCopy = {
     travelHint: string;
   };
   section: AdminStaffingEditorSectionCopy;
-  labels: {
-    day: string;
-  };
   fields: {
     label: string;
-    startTime: string;
-    endTime: string;
   };
   actions: {
     addDay: string;
@@ -227,7 +219,6 @@ export type AdminStaffingBoardCopy = {
   confirmedRoster: {
     title: string;
     empty: string;
-    remove: string;
     removeConfirm: string;
     removeSuccess: string;
     removeFailed: string;
@@ -242,7 +233,6 @@ export type AdminStaffingBoardCopy = {
   candidateDetail: {
     title: string;
     show: string;
-    participationActive: string;
     endedBy: string;
     sessionProposals: {
       title: string;
@@ -254,7 +244,6 @@ export type AdminStaffingBoardCopy = {
   };
   selfApplicationDecision: {
     accept: string;
-    reject: string;
     acceptConfirm: string;
     rejectConfirm: string;
     acceptSuccess: string;
@@ -262,7 +251,6 @@ export type AdminStaffingBoardCopy = {
     failedSummary: string;
   };
   fields: {
-    gm: string;
     origin: string;
     scope: string;
     gmDecision: string;
@@ -277,6 +265,6 @@ export type AdminStaffingBoardCopy = {
     showSlots: string;
     emptyRoster: string;
     noSchedule: string;
-    statuses: Record<StaffingAvailabilityStatus, string>;
+    statuses: Record<Exclude<StaffingAvailabilityStatus, 'available'>, string>;
   };
 };

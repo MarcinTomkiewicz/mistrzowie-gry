@@ -4,7 +4,7 @@
   @if (loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
       <p class="m-0 error-text">
-        {{ sharedView ? i18n.adminShared().loadError : i18n.coworkerPrivate().loadError }}
+        {{ sharedView ? i18n.loadErrors().sharedDocuments : i18n.loadErrors().coworkerPrivateDocuments }}
       </p>
       <p-button severity="secondary" icon="pi pi-refresh"
         [label]="i18n.commonActions().retry" (onClick)="load()" />

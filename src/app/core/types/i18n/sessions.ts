@@ -33,7 +33,7 @@ export interface SessionListLabelsTranslations {
   playersHeaderLabel: string;
 }
 
-export type SessionEventCapacityTranslations = Record<'capacity' | 'remainingSeats' | 'sourcePlayers', string>;
+export type SessionEventCapacityTranslations = Record<'remainingSeats' | 'sourcePlayers', string>;
 
 export type SessionSlotDifficultyTranslations = {
   beginner: string;

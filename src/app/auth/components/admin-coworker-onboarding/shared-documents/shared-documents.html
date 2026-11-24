@@ -82,7 +82,7 @@
 
     @if (loadFailed()) {
       <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
-        <p class="m-0 error-text">{{ i18n.adminShared().loadError }}</p>
+        <p class="m-0 error-text">{{ i18n.loadErrors().sharedDocuments }}</p>
         <p-button
           severity="secondary"
           icon="pi pi-refresh"
@@ -109,7 +109,7 @@
                 <div class="flex-col-start-start gap-xs text-wrap-anywhere">
                   <strong>{{ document.title }}</strong>
                   @if (document.version_number) {
-                    <small>{{ i18n.fields().version }} {{ document.version_number }}</small>
+                    <small>{{ i18n.commonLabels().version }} {{ document.version_number }}</small>
                   }
                 </div>
               </th>
@@ -143,7 +143,7 @@
       </div>
     } @else if (!loading()) {
       <section class="mg-card w-100" role="status">
-        <p class="m-0 muted-text">{{ i18n.adminShared().empty }}</p>
+        <p class="m-0 muted-text">{{ i18n.emptyStates().adminSharedDocuments }}</p>
       </section>
     }
   </section>
@@ -175,7 +175,7 @@
           <tr>
             <th>{{ i18n.commonLabels().coworker }}</th>
             <th>{{ i18n.commonLabels().status }}</th>
-            <th>{{ i18n.coworkerShared().acknowledgedAt }}</th>
+            <th>{{ i18n.commonStatusPhrases().acknowledged }}</th>
           </tr>
         </ng-template>
         <ng-template #body let-assignment>
@@ -193,7 +193,7 @@
       </p-table>
     </div>
   } @else {
-    <p class="m-0 muted-text">{{ i18n.adminShared().emptyConfirmations }}</p>
+    <p class="m-0 muted-text">{{ i18n.emptyStates().sharedDocumentConfirmations }}</p>
   }
 </p-dialog>
 

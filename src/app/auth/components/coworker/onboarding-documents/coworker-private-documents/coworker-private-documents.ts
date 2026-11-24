@@ -63,11 +63,11 @@ export class CoworkerPrivateDocuments {
     { initialValue: this.filterForm.getRawValue() },
   );
   private readonly categoryLabels = computed(() => {
-    const retiredLabel = this.i18n.categories().retired;
+    const retiredLabel = this.i18n.commonEntityStatuses().withdrawn?.feminine;
     const labels = new Map<string, string>();
     for (const { document } of this.rows()) {
       const { category, category_name: name, category_status: status } = document;
-      labels.set(category, status === 'retired' ? `${name} (${retiredLabel})` : name);
+      labels.set(category, status === 'retired' && retiredLabel ? `${name} (${retiredLabel})` : name);
     }
     return labels;
   });
@@ -86,18 +86,21 @@ export class CoworkerPrivateDocuments {
     );
 
     const labels = this.i18n.actions();
-    const { assignment, requiredAction, pendingAcknowledgement } = this.i18n.statuses();
+    const downloadLabel = this.i18n.commonActions().download;
+    const assignment = this.i18n.assignmentStatuses();
+    const { requiredAction, pendingAcknowledgement } = this.i18n.statuses();
     const categoryLabels = this.categoryLabels();
     const rows = matches.map((row) => ({
       ...row,
       categoryLabel: categoryLabels.get(row.document.category),
       statusLabel: row.pendingAction === 'acknowledge'
-        ? pendingAcknowledgement : assignment?.[row.document.assignment_status],
+        ? pendingAcknowledgement : assignment && assignment[row.document.assignment_status],
       statusClass: row.historical ? 'tag-badge--muted' : STATUS_BADGE_CLASS[row.document.assignment_status],
       actionLabel: requiredAction?.[row.document.required_action],
       menu: createDocumentMenu(
         row.document,
         labels,
+        downloadLabel,
         (event) => this.fileRequested.emit(event),
         row.pendingAction === 'acknowledge' ? (id) => this.acknowledgementRequested.emit(id) : undefined,
       ),

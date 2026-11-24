@@ -1,6 +1,7 @@
 import {
   createCommonActionsI18n,
   createCommonDurationUnitI18n,
+  createCommonEntityStatusesI18n,
   createCommonFormI18n,
   createCommonLabelsI18n,
   createCommonStatusI18n,
@@ -48,6 +49,7 @@ export function createAdminCommercialConstantsI18n() {
     ...translations,
     navigation: createAdminCommercialPagesNavigationI18n(),
     commonActions: createCommonActionsI18n(),
+    commonEntityStatuses: createCommonEntityStatusesI18n(),
     durationUnit: createCommonDurationUnitI18n(),
     commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),

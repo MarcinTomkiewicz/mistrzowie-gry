@@ -19,6 +19,10 @@
   },
 
   "actions": {
+    "open": "Otwórz",
+    "download": "Pobierz",
+    "accept": "Zaakceptuj",
+    "reject": "Odrzuć",
     "close": "Zamknij",
     "cancel": "Anuluj",
     "confirm": "Potwierdź",
@@ -67,6 +71,11 @@
   },
 
   "labels": {
+    "document": "Dokument",
+    "documents": "Dokumenty",
+    "version": "Wersja",
+    "category": "Kategoria",
+    "searchDocumentByTitle": "Szukaj dokumentu po tytule",
     "name": "Nazwa",
     "city": "Miasto",
     "status": "Status",
@@ -154,10 +163,12 @@
     "eventDate": "Data wydarzenia",
     "gmCount": "Liczba Mistrzów Gry",
     "schedule": "Harmonogram",
+    "day": "Dzień",
     "dayOfMonth": "Dzień miesiąca",
     "weekday": "Dzień tygodnia",
     "weekdays": "Dni tygodnia",
     "gm": "Prowadzący MG",
+    "facilitator": "Prowadzący",
     "editability": "Edytowalność",
     "summary": "Podsumowanie",
     "start": "Początek",
@@ -307,8 +318,11 @@
     "notFound": "Nie znaleziono.",
     "forbidden": "Brak dostępu.",
     "unauthorized": "Wymagane logowanie.",
+    "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
+    "accessDenied": "Nie masz uprawnień do wykonania tej czynności.",
     "timeout": "Przekroczono czas oczekiwania. Spróbuj ponownie.",
     "server": "Błąd serwera. Spróbuj później.",
+    "internalError": "Nie możemy teraz obsłużyć tej czynności. Spróbuj ponownie później.",
     "articleLoadFailed": "Nie udało się załadować artykułu",
     "articlesLoadFailed": "Nie udało się załadować artykułów",
     "articleNotFound": "Nie znaleziono artykułu",
@@ -386,10 +400,8 @@
         "package": "Pakiet",
         "table": "Stół",
         "table_hour": "Stół za godzinę",
-        "facilitator": "Prowadzący",
         "participant": "Uczestnik",
         "piece": "Sztuka",
-        "day": "Dzień",
         "half_day": "Pół dnia",
         "night": "Noc",
         "kilometer": "Kilometr"
@@ -520,6 +532,27 @@
   },
 
   "entityStatuses": {
+    "available": {
+      "masculine": "Dostępny",
+      "feminine": "Dostępna",
+      "neuter": "Dostępne",
+      "pluralMasculinePersonal": "Dostępni",
+      "pluralNonMasculinePersonal": "Dostępne"
+    },
+    "completed": {
+      "masculine": "Zakończony",
+      "feminine": "Zakończona",
+      "neuter": "Zakończone",
+      "pluralMasculinePersonal": "Zakończeni",
+      "pluralNonMasculinePersonal": "Zakończone"
+    },
+    "cancelled": {
+      "masculine": "Anulowany",
+      "feminine": "Anulowana",
+      "neuter": "Anulowane",
+      "pluralMasculinePersonal": "Anulowani",
+      "pluralNonMasculinePersonal": "Anulowane"
+    },
     "active": {
       "masculine": "Aktywny",
       "feminine": "Aktywna",
@@ -635,6 +668,10 @@
   },
 
   "statusPhrases": {
+    "inProgress": "W toku",
+    "requiresAction": "Wymaga działania",
+    "submittedForReview": "Przesłany do sprawdzenia",
+    "acknowledged": "Potwierdzono zapoznanie się",
     "awaitingAcceptance": "Oczekuje na akceptację",
     "awaitingDecision": "Oczekuje na decyzję",
     "editable": "Możliwa edycja",

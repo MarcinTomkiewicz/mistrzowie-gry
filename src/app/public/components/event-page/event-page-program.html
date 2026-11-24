@@ -131,7 +131,7 @@
   @if (card.eventCapacity; as event) {
     <dl class="flex-col-start-stretch gap-xs m-0">
       <div class="flex-row-between-center gap-sm">
-        <dt>{{ i18n.sessionCapacity().capacity }}</dt><dd class="m-0">{{ event.effectiveCapacity ?? i18n.values().notProvided }}</dd>
+        <dt>{{ i18n.labels().participantCount }}</dt><dd class="m-0">{{ event.effectiveCapacity ?? i18n.values().notProvided }}</dd>
       </div>
       @if (event.remainingSeats != null) {
         <div class="flex-row-between-center gap-sm">

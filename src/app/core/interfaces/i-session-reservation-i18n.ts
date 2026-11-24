@@ -20,7 +20,6 @@ export interface ISessionReservationI18nSections extends Record<string, unknown>
     system: string;
     slot: string;
     addons: string;
-    summary: string;
   };
   labels: {
     flowMode: string;

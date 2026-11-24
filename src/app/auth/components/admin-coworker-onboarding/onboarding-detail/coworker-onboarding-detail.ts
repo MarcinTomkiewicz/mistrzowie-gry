@@ -93,9 +93,10 @@ export class CoworkerOnboardingDetail {
   protected readonly categoriesLoadFailed = signal(false);
   protected readonly progress = computed(() => {
     const onboarding = this.detail()?.onboarding;
-    return onboarding
+    const { accepted, rejected } = this.i18n.commonEntityStatuses();
+    return onboarding && accepted && rejected
       ? createAdminOnboardingProgress(
-          onboarding, this.i18n.fields(), this.i18n.statuses().assignment,
+          onboarding, this.i18n.fields(), { accepted, rejected },
           this.i18n.commonValues(),
         )
       : null;
@@ -223,7 +224,7 @@ export class CoworkerOnboardingDetail {
         this.toast.danger({
           summary: this.i18n.toast().downloadFailedSummary,
           detail: getOnboardingErrorMessage(
-            error, this.i18n.toast().errors, this.i18n.toast().downloadFailedDetail,
+            error, this.i18n, this.i18n.toast().downloadFailedDetail,
           ),
         });
       },
@@ -248,7 +249,9 @@ export class CoworkerOnboardingDetail {
     } catch (error) {
       if (this.destroyRef.destroyed || this.onboardingId() !== onboardingId) return;
       const fallback = this.i18n.adminDetail().bulk.zipFailed;
-      this.toast.danger({ summary: getOnboardingErrorMessage(error, this.i18n.toast().errors, fallback) });
+      this.toast.danger({
+        summary: getOnboardingErrorMessage(error, this.i18n, fallback),
+      });
     }
   }
 
@@ -310,8 +313,8 @@ export class CoworkerOnboardingDetail {
     this.detailTab.setName('');
     const fallback = this.i18n.commonErrors().generic;
     this.toast.danger({
-      summary: this.i18n.adminDetail().loadError ?? fallback,
-      detail: getOnboardingErrorMessage(error, this.i18n.toast().errors, fallback),
+      summary: this.i18n.loadErrors().onboardingDetail ?? fallback,
+      detail: getOnboardingErrorMessage(error, this.i18n, fallback),
     });
   }
 
@@ -336,7 +339,7 @@ export class CoworkerOnboardingDetail {
       },
       error: (error: unknown) => {
         if (this.onboardingId() !== onboardingId) return;
-        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast()));
+        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n));
       },
     });
   }

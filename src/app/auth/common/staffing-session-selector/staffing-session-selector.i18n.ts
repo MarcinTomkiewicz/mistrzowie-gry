@@ -2,6 +2,7 @@ import {
   createCommonActionsI18n,
   createCommonCtaI18n,
   createCommonErrorsI18n,
+  createCommonLabelsI18n,
   createCommonStatusI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
@@ -17,6 +18,7 @@ export function createStaffingSessionSelectorI18n() {
     commonActions: createCommonActionsI18n(),
     commonCta: createCommonCtaI18n(),
     commonErrors: createCommonErrorsI18n(),
+    commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),
   };
 }

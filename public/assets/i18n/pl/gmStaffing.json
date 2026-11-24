@@ -26,7 +26,6 @@
   },
   "sessionSelector": {
     "sourceLabel": "Rodzaj sesji",
-    "sessionLabel": "Sesja",
     "sources": {
       "template": "Sesje standardowe",
       "custom": "Sesje jednorazowe"
@@ -108,8 +107,6 @@
       "rejectSuccess": "Propozycja odrzucona"
     },
     "participation": {
-      "active": "Aktywny",
-      "ended": "Zakończony",
       "endedAt": "Data zakończenia udziału",
       "endReason": "Powód zakończenia udziału",
       "withdraw": "Wycofaj udział",

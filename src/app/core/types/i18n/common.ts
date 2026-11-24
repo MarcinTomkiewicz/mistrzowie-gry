@@ -21,6 +21,10 @@ export type CommonCtaTranslations = {
 };
 
 export type CommonActionsTranslations = {
+  open: string;
+  download: string;
+  accept: string;
+  reject: string;
   close: string;
   cancel: string;
   confirm: string;
@@ -69,6 +73,11 @@ export type CommonValuesTranslations = {
 };
 
 export type CommonLabelsTranslations = {
+  document: string;
+  documents: string;
+  version: string;
+  category: string;
+  searchDocumentByTitle: string;
   name: string;
   city: string;
   status: string;
@@ -156,10 +165,12 @@ export type CommonLabelsTranslations = {
   eventDate: string;
   gmCount: string;
   schedule: string;
+  day: string;
   dayOfMonth: string;
   weekday: string;
   weekdays: string;
   gm: string;
+  facilitator: string;
   editability: string;
   summary: string;
   start: string;
@@ -283,8 +294,11 @@ export type CommonErrorsTranslations = {
   notFound: string;
   forbidden: string;
   unauthorized: string;
+  sessionExpired: string;
+  accessDenied: string;
   timeout: string;
   server: string;
+  internalError: string;
   articleLoadFailed: string;
   articlesLoadFailed: string;
   articleNotFound: string;

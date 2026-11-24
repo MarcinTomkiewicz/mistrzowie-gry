@@ -26,7 +26,7 @@
         <input pInputText pSize="small" id="manual-activity-title" formControlName="title" maxlength="140" class="w-100"
           [attr.aria-invalid]="controls.title.touched && controls.title.invalid"
           [attr.aria-describedby]="controls.title.touched && controls.title.invalid ? 'manual-activity-title-error' : null" />
-        <label for="manual-activity-title">{{ copy.title }}</label>
+        <label for="manual-activity-title">{{ i18n.labels().title }}</label>
       </p-floatlabel>
       @if (controls.title.touched && controls.title.invalid) {
         <small id="manual-activity-title-error" class="mg-contact-error" role="alert">
@@ -58,7 +58,7 @@
       <textarea pTextarea id="manual-activity-description" formControlName="description" maxlength="12000" rows="4" class="w-100"
         [attr.aria-invalid]="controls.description.touched && controls.description.invalid"
         [attr.aria-describedby]="controls.description.touched && controls.description.invalid ? 'manual-activity-description-error' : null"></textarea>
-      <label for="manual-activity-description">{{ copy.description }}</label>
+      <label for="manual-activity-description">{{ i18n.labels().description }}</label>
     </p-floatlabel>
     @if (controls.description.touched && controls.description.invalid) {
       <small id="manual-activity-description-error" class="mg-contact-error" role="alert">

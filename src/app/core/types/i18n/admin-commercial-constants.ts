@@ -39,7 +39,6 @@ export type AdminCommercialConstantsActionTranslations = {
 };
 
 export type AdminCommercialConstantsStatusTranslations = {
-  published: string;
   unpublished: string;
   draftChanged: string;
   draftCurrent: string;

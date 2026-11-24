@@ -9,7 +9,7 @@
       [readonly]="isBusy()" />
     <p-select [formControl]="sessionControl"
       [options]="sessionOptions()" optionLabel="label" optionValue="value" size="small" appendTo="body"
-      class="flex-1 min-w-250 min-w-0-sm w-100-sm" [placeholder]="copy.sessionLabel" [ariaLabel]="copy.sessionLabel"
+      class="flex-1 min-w-250 min-w-0-sm w-100-sm" [placeholder]="i18n.commonLabels().session" [ariaLabel]="i18n.commonLabels().session"
       [filter]="true" filterBy="label" [emptyMessage]="copy.emptyDescriptions[source()]" [readonly]="isBusy()" />
     <p-button type="button" size="small" severity="success" icon="pi pi-creation"
       class="flex-none w-100-sm" styleClass="w-100" [label]="i18n.sessionActions().addLabel"

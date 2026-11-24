@@ -7,7 +7,7 @@
       [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
       <ng-template #header>
         <tr class="hide-down-sm">
-          <th scope="col" class="small-caps">{{ fields.gm }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonAppRoles().gm }}</th>
           <th scope="col" class="small-caps">{{ fields.scope }}</th>
           <th scope="col" class="small-caps">{{ fields.availability }}</th>
           <th scope="col" class="small-caps text-right w-px-0 text-nowrap">{{ i18n.commonTable().actions }}</th>
@@ -55,7 +55,7 @@
                 (onClick)="candidateSelected.emit(candidate.id)" />
               @if (canRemove()) {
                 <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-demolish"
-                  styleClass="w-100-sm" [label]="copy.confirmedRoster.remove" [disabled]="removingCandidateId() !== null"
+                  styleClass="w-100-sm" [label]="i18n.commonActions().delete" [disabled]="removingCandidateId() !== null"
                   [loading]="removingCandidateId() === candidate.id" (onClick)="confirmRemoval($event, candidate)" />
               }
             </div>

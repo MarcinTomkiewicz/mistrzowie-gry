@@ -84,7 +84,7 @@ export class SharedDocuments {
       nickname: assignment.nickname,
       useNickname: assignment.use_nickname,
     }) || assignment.email,
-    status: this.i18n.statuses().assignment?.[assignment.status],
+    status: this.i18n.assignmentStatuses()?.[assignment.status],
     statusClass: 'tag-badge ' + STATUS_BADGE_CLASS[assignment.status],
     acknowledgedAt: formatTimestampLabel(assignment.acknowledged_at),
   })));
@@ -174,7 +174,9 @@ export class SharedDocuments {
       next: (assignments) => this.assignments.set(assignments),
       error: (error: unknown) => {
         this.closeAssignments();
-        const summary = getOnboardingErrorMessage(error, this.i18n.toast().errors, this.i18n.adminShared().loadError);
+        const summary = getOnboardingErrorMessage(
+          error, this.i18n, this.i18n.loadErrors().sharedDocuments,
+        );
         this.toast.danger({ summary });
       },
     });
@@ -201,7 +203,7 @@ export class SharedDocuments {
           command: () => this.openFile(document, 'preview'),
         },
         {
-          label: actions.download, icon: 'pi pi-missile-swarm',
+          label: this.i18n.commonActions().download, icon: 'pi pi-missile-swarm',
           command: () => this.openFile(document, 'download'),
         },
       );
@@ -272,7 +274,7 @@ export class SharedDocuments {
         const copy = this.i18n.toast();
         this.toast.danger({
           summary: copy.downloadFailedSummary,
-          detail: getOnboardingErrorMessage(error, copy.errors, copy.downloadFailedDetail),
+          detail: getOnboardingErrorMessage(error, this.i18n, copy.downloadFailedDetail),
         });
       },
     });
@@ -294,7 +296,8 @@ export class SharedDocuments {
         });
         this.load();
       },
-      error: (error: unknown) => this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
+      error: (error: unknown) =>
+        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n)),
     });
   }
 }

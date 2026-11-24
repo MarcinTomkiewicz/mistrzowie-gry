@@ -8,10 +8,12 @@ import {
   createCommonLabelsI18n,
   createCommonNavI18n,
   createCommonStatusI18n,
+  createCommonStatusPhrasesI18n,
   createCommonTableI18n,
   createCommonValuesI18n,
 } from './common.i18n';
 import { createScopedSectionsI18n } from './scoped.i18n';
+import type { CoworkerDocumentAssignmentStatus, CoworkerOnboardingLifecycleStatus } from '../types/coworker-onboarding';
 import type {
   CoworkerOnboardingActionsTranslations,
   CoworkerOnboardingAdminDetailTranslations,
@@ -19,6 +21,8 @@ import type {
   CoworkerOnboardingAdminSharedTranslations,
   CoworkerOnboardingCategoriesTranslations,
   CoworkerOnboardingDialogsTranslations,
+  CoworkerOnboardingEmptyStatesTranslations,
+  CoworkerOnboardingErrorsTranslations,
   CoworkerOnboardingFieldsTranslations,
   CoworkerOnboardingPrivateTranslations,
   CoworkerOnboardingSharedTranslations,
@@ -41,6 +45,9 @@ export function createCoworkerOnboardingI18n() {
     actions: CoworkerOnboardingActionsTranslations;
     upload: CoworkerOnboardingUploadTranslations;
     dialogs: CoworkerOnboardingDialogsTranslations;
+    loadErrors: CoworkerOnboardingErrorsTranslations['load'];
+    apiErrors: CoworkerOnboardingErrorsTranslations['api'];
+    emptyStates: CoworkerOnboardingEmptyStatesTranslations;
     toast: CoworkerOnboardingToastTranslations;
     statuses: CoworkerOnboardingStatusesTranslations;
   }>(COWORKER_ONBOARDING_SCOPE, {
@@ -54,6 +61,9 @@ export function createCoworkerOnboardingI18n() {
     actions: 'actions',
     upload: 'upload',
     dialogs: 'dialogs',
+    loadErrors: 'errors.load',
+    apiErrors: 'errors.api',
+    emptyStates: 'emptyStates',
     toast: 'toast',
     statuses: 'statuses',
   });
@@ -63,12 +73,36 @@ export function createCoworkerOnboardingI18n() {
     dropLabel: sections.upload().drop,
     formatsLabel: sections.upload().formats,
   }));
+  const commonEntityStatuses = createCommonEntityStatusesI18n();
+  const commonStatusPhrases = createCommonStatusPhrasesI18n();
+  const assignmentStatuses = computed<Record<CoworkerDocumentAssignmentStatus, string> | null>(() => {
+    const { available, accepted, rejected, withdrawn } = commonEntityStatuses();
+    const { requiresAction, submittedForReview, acknowledged } = commonStatusPhrases();
+    if (!available || !accepted || !rejected || !withdrawn || !requiresAction || !submittedForReview || !acknowledged) {
+      return null;
+    }
+    return {
+      available: available.masculine,
+      pending: requiresAction,
+      submitted: submittedForReview,
+      accepted: accepted.masculine,
+      rejected: rejected.masculine,
+      acknowledged,
+      revoked: withdrawn.masculine,
+    };
+  });
 
   return {
     ...sections,
+    assignmentStatuses,
+    onboardingStatusLabel: (status: CoworkerOnboardingLifecycleStatus): string | null =>
+      status === 'in_progress'
+        ? commonStatusPhrases().inProgress ?? null
+        : commonEntityStatuses()[status]?.neuter ?? null,
     fileUploadTexts,
     commonActions: createCommonActionsI18n(),
-    commonEntityStatuses: createCommonEntityStatusesI18n(),
+    commonEntityStatuses,
+    commonStatusPhrases,
     commonErrors: createCommonErrorsI18n(),
     commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),

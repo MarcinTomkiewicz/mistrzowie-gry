@@ -152,7 +152,7 @@ export class OnboardingDocuments {
         const copy = this.i18n.toast();
         this.toast.danger({
           summary: copy.downloadFailedSummary,
-          detail: getOnboardingErrorMessage(error, copy.errors, copy.downloadFailedDetail),
+          detail: getOnboardingErrorMessage(error, this.i18n, copy.downloadFailedDetail),
         });
       },
     });
@@ -220,7 +220,8 @@ export class OnboardingDocuments {
         });
         this.load();
       },
-      error: (error: unknown) => this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast())),
+      error: (error: unknown) =>
+        this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n)),
     });
   }
 }

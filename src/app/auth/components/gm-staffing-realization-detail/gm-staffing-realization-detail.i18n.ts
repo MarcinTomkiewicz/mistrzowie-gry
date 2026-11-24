@@ -18,7 +18,7 @@ import type {
 import type { GmStaffingDetailCopy } from '../../../core/types/i18n/gm-staffing';
 
 export function createGmStaffingRealizationDetailI18n() {
-  const { realizationStatuses, realizationTypes, candidateStates, staffingLabels } = createStaffingI18n();
+  const { realizationStatusLabel, realizationTypes, candidateStateLabel, staffingLabels, commonEntityStatuses } = createStaffingI18n();
 
   return {
     copy: createScopedObjectI18n<GmStaffingDetailCopy>(GM_STAFFING_SCOPE, 'detail'),
@@ -36,12 +36,13 @@ export function createGmStaffingRealizationDetailI18n() {
       schedule: 'schedule',
       recruitmentPolicy: 'recruitmentPolicy',
     }),
-    realizationStatuses,
+    realizationStatusLabel,
     realizationTypes,
-    candidateStates,
+    candidateStateLabel,
     staffingLabels,
     commonActions: createCommonActionsI18n(),
     commonCta: createCommonCtaI18n(),
+    commonEntityStatuses,
     commonErrors: createCommonErrorsI18n(),
     commonForm: createCommonFormI18n(),
     commonLabels: createCommonLabelsI18n(),

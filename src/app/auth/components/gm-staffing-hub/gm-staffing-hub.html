@@ -59,7 +59,7 @@
                       {{ i18n.realizationTypes()[item.type] }}
                     </span>
                     <span [class]="'tag-badge ' + statusBadgeClass[item.status]">
-                      {{ i18n.realizationStatuses()[item.status] }}
+                      {{ i18n.realizationStatusLabel(item.status) }}
                     </span>
                   </div>
 
@@ -79,7 +79,7 @@
                       <div class="flex-row-start-center flex-wrap gap-xs">
                         <strong>{{ i18n.card().candidateStatus }}:</strong>
                         <span [class]="'tag-badge ' + statusBadgeClass[candidate.state]">
-                          {{ i18n.candidateStates()[candidate.state] }}
+                          {{ i18n.candidateStateLabel(candidate.state) }}
                         </span>
                       </div>
                     }

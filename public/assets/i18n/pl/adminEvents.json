@@ -648,12 +648,9 @@
     },
     "creation": {
       "steps": {
-        "event": "Wydarzenie",
         "location": "Główna lokalizacja",
-        "schedule": "Harmonogram",
         "policy": "Cena i zapisy",
-        "program": "Program lokalny",
-        "summary": "Podsumowanie"
+        "program": "Program lokalny"
       },
       "programAfterSave": "[PH] Zapisz szkic wydarzenia, aby zobaczyć dane lokalnego programu.",
       "savedData": "[PH] Podgląd zapisanych danych wydarzenia.",
@@ -821,7 +818,6 @@
     "manualRpg": {
       "action": "[PH] Dodaj do programu",
       "hint": "[PH] Wybierz istniejącą sesję MG i określ jej miejsce w programie tego miasta i terminu. Pozycja pozostanie nieopublikowana.",
-      "gm": "[PH] Mistrz Gry",
       "source": "[PH] Rodzaj sesji",
       "session": "[PH] Istniejąca sesja MG",
       "template": "[PH] Sesja katalogowa",
@@ -838,8 +834,6 @@
       "action": "[PH] Dodaj aktywność",
       "hint": "[PH] Dodaj panel lub inną aktywność do programu tego miasta i terminu. Pozycja pozostanie nieopublikowana.",
       "kind": "[PH] Rodzaj aktywności",
-      "title": "[PH] Tytuł",
-      "description": "[PH] Opis",
       "presenter": "[PH] Prowadzący (opcjonalnie)",
       "capacity": "[PH] Pojemność aktywności (opcjonalnie)",
       "capacityHint": "[PH] Opcjonalna informacja o pojemności aktywności. Nie zmienia zapisów uczestników.",

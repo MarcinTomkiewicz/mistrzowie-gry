@@ -2,12 +2,7 @@
   "adminList": {
     "title": "Wdrożenia współpracowników",
     "subtitle": "Rozpocznij wdrożenie współpracownika albo sprawdź stan jego kwestionariusza, dokumentów i wymaganych potwierdzeń.",
-    "empty": "Nie rozpoczęto jeszcze wdrożenia żadnego współpracownika.",
-    "emptyVisible": "Nie ma obecnie współpracowników do wyświetlenia. Anulowane wdrożenia nie są pokazywane na tej liście.",
-    "loadError": "Nie udało się wczytać listy współpracowników. Spróbuj ponownie.",
-    "filteredEmpty": "Nie znaleziono współpracowników pasujących do wyszukiwania lub wybranych filtrów.",
     "notStarted": "Nie rozpoczęto",
-    "privateDocuments": "Prywatne",
     "sharedDocuments": "Wspólne",
     "pendingActions": "Do załatwienia",
     "privateDocumentsHint": "Liczba dokumentów prywatnych tego współpracownika zaakceptowanych przez administratora.",
@@ -20,16 +15,11 @@
     }
   },
   "adminDetail": {
-    "documentSearch": "Szukaj dokumentu po tytule",
     "hideRejected": "Ukryj odrzucone dokumenty",
-    "emptyFilteredDocuments": "Nie znaleziono dokumentów pasujących do wyszukiwania lub wybranych filtrów.",
     "title": "Wdrożenie współpracownika",
     "subtitle": "Sprawdź dokumenty współpracownika, dodaj potrzebne pliki i rozpatrz przesłane podpisane kopie. Na tej stronie możesz też zakończyć lub anulować wdrożenie.",
     "uploadSection": "Dodaj dokumenty dla współpracownika",
-    "completeSection": "Zakończ wdrożenie",
     "completeDescription": "Zakończ wdrożenie, gdy kwestionariusz został sprawdzony, a wszystkie wymagane dokumenty, podpisane kopie i potwierdzenia zostały rozpatrzone.",
-    "emptyDocuments": "Nie dodano jeszcze żadnych dokumentów prywatnych dla tego współpracownika.",
-    "loadError": "Nie udało się wczytać danych wdrożenia. Spróbuj ponownie.",
     "questionnaireBadge": "Kwestionariusz",
     "bulk": {
       "selected": "Zaznaczone dokumenty [PH]",
@@ -47,25 +37,16 @@
     "formTitleNew": "Dodaj dokument wspólny",
     "formTitleReplace": "Zastąp plik dokumentu wspólnego",
     "listTitle": "Lista dokumentów wspólnych",
-    "confirmationsTitle": "Status potwierdzeń zapoznania się z dokumentem",
-    "empty": "Nie dodano jeszcze żadnych dokumentów wspólnych.",
-    "emptyConfirmations": "Nie przydzielono jeszcze tego dokumentu żadnemu współpracownikowi.",
-    "loadError": "Nie udało się wczytać dokumentów wspólnych. Spróbuj ponownie."
+    "confirmationsTitle": "Status potwierdzeń zapoznania się z dokumentem"
   },
   "categories": {
-    "label": "Kategoria",
     "all": "Wszystkie kategorie",
     "add": "Dodaj kategorię",
     "rename": "Zmień nazwę kategorii",
     "change": "Zmień kategorię",
-    "retired": "Wycofana",
     "retire": "Wycofaj kategorię",
     "retireMessage": "Czy na pewno chcesz wycofać kategorię {{name}}? Dokumenty, którym już ją przypisano, zachowają tę kategorię. Nie będzie można wybierać jej dla nowych dokumentów.",
-    "loadError": "Nie udało się wczytać kategorii dokumentów. Spróbuj ponownie.",
-    "empty": "Nie dodano jeszcze żadnych kategorii dokumentów.",
     "history": "Historia zmian kategorii",
-    "historyLoadError": "Nie udało się wczytać historii zmian kategorii. Spróbuj ponownie.",
-    "historyEmpty": "Nie ma jeszcze zapisanych zmian w kategoriach dokumentów.",
     "events": {
       "created": "Utworzono kategorię",
       "renamed": "Zmieniono nazwę kategorii",
@@ -75,32 +56,20 @@
   },
   "coworkerPrivate": {
     "subtitle": "Tutaj znajdziesz dokumenty przygotowane dla Ciebie. Niektóre musisz podpisać i odesłać, przy innych wystarczy potwierdzić zapoznanie się z treścią.",
-    "noOnboarding": "Twoje wdrożenie nie zostało jeszcze rozpoczęte.",
-    "questionnaireRequired": "Aby uzyskać dostęp do dokumentów, najpierw uzupełnij i zakończ kwestionariusz osobowy.",
-    "empty": "Nie przydzielono Ci jeszcze żadnych dokumentów prywatnych.",
     "declaration": "Potwierdzam, że przesyłam dokument podpisany przeze mnie.",
-    "loadError": "Nie udało się wczytać Twoich dokumentów prywatnych. Spróbuj ponownie.",
-    "searchByTitle": "Szukaj dokumentu po tytule",
     "actionRequiredOnly": "Pokaż tylko dokumenty wymagające Twojego działania",
-    "filteredEmpty": "Nie znaleziono dokumentów pasujących do wyszukiwania lub wybranych filtrów.",
     "versionHistory": "Historia wersji dokumentu",
     "collapseUpload": "Zwiń formularz przesyłania podpisanej kopii"
   },
   "coworkerShared": {
-    "subtitle": "Zapoznaj się z przydzielonymi Ci dokumentami wspólnymi i potwierdź zapoznanie się z każdym z nich.",
-    "onboardingRequired": "Dokumenty wspólne będą dostępne po zakończeniu Twojego wdrożenia.",
-    "empty": "Nie przydzielono Ci jeszcze żadnych dokumentów wspólnych.",
-    "acknowledgedAt": "Potwierdzono zapoznanie się"
+    "subtitle": "Zapoznaj się z przydzielonymi Ci dokumentami wspólnymi i potwierdź zapoznanie się z każdym z nich."
   },
   "fields": {
     "startedAt": "Rozpoczęto",
     "completedAt": "Zakończono",
-    "document": "Dokument",
-    "documents": "Dokumenty",
     "pendingActions": "Sprawy wymagające działania",
     "preset": "Rodzaj dokumentu",
     "noPreset": "Inny dokument",
-    "version": "Wersja",
     "historicalVersion": "Starsza wersja",
     "assignments": "Przydzielono współpracownikom",
     "pendingAssignments": "Czekają na potwierdzenie",
@@ -119,12 +88,8 @@
   },
   "actions": {
     "start": "Rozpocznij wdrożenie",
-    "open": "Otwórz",
-    "download": "Pobierz",
     "previewSigned": "Zobacz podpisaną kopię",
     "downloadSigned": "Pobierz podpisaną kopię",
-    "accept": "Zaakceptuj",
-    "reject": "Odrzuć",
     "removeDocument": "Usuń dokument",
     "complete": "Zakończ wdrożenie",
     "cancelOnboarding": "Anuluj wdrożenie",
@@ -155,6 +120,38 @@
     "cancelOnboardingMessage": "Czy na pewno chcesz anulować wdrożenie tego współpracownika? Anulowanego wdrożenia nie będzie można wznowić. Niewykonane jeszcze czynności dotyczące dokumentów zostaną wycofane. Dokumenty, konto współpracownika i historia wdrożenia pozostaną zachowane.",
     "archiveMessage": "Czy na pewno chcesz zarchiwizować ten dokument wspólny?"
   },
+  "errors": {
+    "load": {
+      "adminOnboardings": "Nie udało się wczytać listy współpracowników. Spróbuj ponownie.",
+      "onboardingDetail": "Nie udało się wczytać danych wdrożenia. Spróbuj ponownie.",
+      "sharedDocuments": "Nie udało się wczytać dokumentów wspólnych. Spróbuj ponownie.",
+      "documentCategories": "Nie udało się wczytać kategorii dokumentów. Spróbuj ponownie.",
+      "documentCategoryHistory": "Nie udało się wczytać historii zmian kategorii. Spróbuj ponownie.",
+      "coworkerPrivateDocuments": "Nie udało się wczytać Twoich dokumentów prywatnych. Spróbuj ponownie."
+    },
+    "api": {
+      "VALIDATION_FAILED": "Nie możemy wykonać tej czynności. Sprawdź wprowadzone dane oraz to, czy obecny stan dokumentu lub wdrożenia pozwala na zmianę.",
+      "NOT_FOUND": "Nie znaleziono wskazanego dokumentu lub wdrożenia. Odśwież widok.",
+      "CONFLICT": "Dane dokumentu lub wdrożenia zmieniły się albo ich obecny status nie pozwala na tę czynność. Odśwież widok i sprawdź aktualny stan przed ponowną próbą.",
+      "UPLOAD_FAILED": "Nie udało się przesłać pliku. Spróbuj ponownie."
+    }
+  },
+  "emptyStates": {
+    "adminOnboardings": "Nie rozpoczęto jeszcze wdrożenia żadnego współpracownika.",
+    "visibleAdminOnboardings": "Nie ma obecnie współpracowników do wyświetlenia. Anulowane wdrożenia nie są pokazywane na tej liście.",
+    "filteredAdminOnboardings": "Nie znaleziono współpracowników pasujących do wyszukiwania lub wybranych filtrów.",
+    "adminPrivateDocuments": "Nie dodano jeszcze żadnych dokumentów prywatnych dla tego współpracownika.",
+    "filteredDocuments": "Nie znaleziono dokumentów pasujących do wyszukiwania lub wybranych filtrów.",
+    "adminSharedDocuments": "Nie dodano jeszcze żadnych dokumentów wspólnych.",
+    "sharedDocumentConfirmations": "Nie przydzielono jeszcze tego dokumentu żadnemu współpracownikowi.",
+    "documentCategories": "Nie dodano jeszcze żadnych kategorii dokumentów.",
+    "documentCategoryHistory": "Nie ma jeszcze zapisanych zmian w kategoriach dokumentów.",
+    "coworkerOnboarding": "Twoje wdrożenie nie zostało jeszcze rozpoczęte.",
+    "privateDocumentsRequireQuestionnaire": "Aby uzyskać dostęp do dokumentów, najpierw uzupełnij i zakończ kwestionariusz osobowy.",
+    "coworkerPrivateDocuments": "Nie przydzielono Ci jeszcze żadnych dokumentów prywatnych.",
+    "sharedDocumentsRequireCompletedOnboarding": "Dokumenty wspólne będą dostępne po zakończeniu Twojego wdrożenia.",
+    "coworkerSharedDocuments": "Nie przydzielono Ci jeszcze żadnych dokumentów wspólnych."
+  },
   "toast": {
     "mutationSuccessSummary": "Zmiany zapisane",
     "mutationFailedSummary": "Nie udało się zapisać zmian",
@@ -162,32 +159,9 @@
     "mutationUncertainSummary": "Nie możemy potwierdzić, czy zmiana została zapisana",
     "mutationUncertainDetail": "Zmiana mogła zostać wykonana mimo błędu. Zanim ponowisz tę czynność, odśwież dane i sprawdź jej wynik.",
     "downloadFailedSummary": "Nie udało się wyświetlić lub pobrać dokumentu",
-    "downloadFailedDetail": "Spróbuj ponownie za chwilę.",
-    "errors": {
-      "UNAUTHENTICATED": "Twoja sesja wygasła. Zaloguj się ponownie.",
-      "ACCESS_DENIED": "Nie masz uprawnień do wykonania tej czynności.",
-      "VALIDATION_FAILED": "Nie możemy wykonać tej czynności. Sprawdź wprowadzone dane oraz to, czy obecny stan dokumentu lub wdrożenia pozwala na zmianę.",
-      "NOT_FOUND": "Nie znaleziono wskazanego dokumentu lub wdrożenia. Odśwież widok.",
-      "CONFLICT": "Dane dokumentu lub wdrożenia zmieniły się albo ich obecny status nie pozwala na tę czynność. Odśwież widok i sprawdź aktualny stan przed ponowną próbą.",
-      "UPLOAD_FAILED": "Nie udało się przesłać pliku. Spróbuj ponownie.",
-      "INTERNAL_ERROR": "Nie możemy teraz obsłużyć tej czynności. Spróbuj ponownie później."
-    }
+    "downloadFailedDetail": "Spróbuj ponownie za chwilę."
   },
   "statuses": {
-    "onboarding": {
-      "in_progress": "W toku",
-      "completed": "Zakończone",
-      "cancelled": "Anulowane"
-    },
-    "assignment": {
-      "available": "Dostępny",
-      "pending": "Wymaga działania",
-      "submitted": "Przesłany do sprawdzenia",
-      "accepted": "Zaakceptowany",
-      "rejected": "Odrzucony",
-      "acknowledged": "Potwierdzono zapoznanie się",
-      "revoked": "Wycofany"
-    },
     "pendingAcknowledgement": "Wymaga potwierdzenia zapoznania się",
     "requiredAction": {
       "none": "Brak dodatkowych działań",

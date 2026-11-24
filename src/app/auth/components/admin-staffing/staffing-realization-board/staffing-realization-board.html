@@ -22,7 +22,7 @@
           </p>
           <div class="flex-row-start-center flex-wrap gap-xs">
             <span [class]="'tag-badge ' + statusBadgeClass[data.realization.status]">
-              {{ i18n.realizationStatuses()[data.realization.status] }}
+              {{ i18n.realizationStatusLabel(data.realization.status) }}
             </span>
             <span class="tag-badge" [class.tag-badge--info]="data.realization.type === 'travel'"
               [class.tag-badge--golden]="data.realization.type === 'stationary'">
@@ -64,7 +64,7 @@
             [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
             <ng-template #header>
               <tr class="hide-down-sm">
-                <th scope="col" class="small-caps">{{ fields.gm }}</th>
+                <th scope="col" class="small-caps">{{ i18n.commonAppRoles().gm }}</th>
                 <th scope="col" class="small-caps">{{ fields.origin }}</th>
                 <th scope="col" class="small-caps">{{ fields.scope }}</th>
                 <th scope="col" class="small-caps">{{ fields.gmDecision }}</th>
@@ -171,7 +171,7 @@
           @let days = candidate.scope.mode === 'whole_realization' ? data.schedule.days : detail.days;
           <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
             <div class="flex-col-start-stretch gap-xs">
-              <dt class="muted-text">{{ fields.gm }}</dt>
+              <dt class="muted-text">{{ i18n.commonAppRoles().gm }}</dt>
               <dd class="m-0 text-wrap-anywhere">
                 @if (detail.gm; as gm) {
                   <strong>{{ getUserDisplayName(gm) || gm.userId }}</strong>
@@ -212,7 +212,8 @@
               </div>
             }
             <div class="flex-col-start-start gap-xs">
-              <dt class="muted-text">{{ copy.candidateDetail.participationActive }}</dt>
+              @let active = i18n.commonEntityStatuses().active;
+              <dt class="muted-text">{{ active && active.masculine }}</dt>
               <dd class="tag-badge m-0" [class.tag-badge--success]="candidate.participation.active"
                 [class.tag-badge--muted]="!candidate.participation.active">
                 {{ candidate.participation.active ? i18n.commonValues().yes : i18n.commonValues().no }}
@@ -258,7 +259,7 @@
 <ng-template #candidateDecisionActions let-candidate>
   @if (canDecideSelfApplication(candidate)) {
     <p-button type="button" severity="danger" size="small" [outlined]="true" icon="pi pi-interdiction"
-      styleClass="w-100-sm" [label]="copy.selfApplicationDecision.reject" [disabled]="isDeciding()"
+      styleClass="w-100-sm" [label]="i18n.commonActions().reject" [disabled]="isDeciding()"
       (onClick)="confirmSelfApplicationDecision($event, candidate, 'rejected')" />
     <p-button type="button" severity="success" size="small" icon="pi pi-done-it"
       styleClass="w-100-sm" [label]="copy.selfApplicationDecision.accept" [disabled]="isDeciding()"

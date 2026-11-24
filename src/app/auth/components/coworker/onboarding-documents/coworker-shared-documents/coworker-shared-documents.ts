@@ -31,18 +31,21 @@ export class CoworkerSharedDocuments {
   protected readonly formatTimestampLabel = formatTimestampLabel;
   protected readonly rows = computed(() => {
     const labels = this.i18n.actions();
-    const { assignment, requiredAction, pendingAcknowledgement } = this.i18n.statuses();
+    const downloadLabel = this.i18n.commonActions().download;
+    const assignment = this.i18n.assignmentStatuses();
+    const { requiredAction, pendingAcknowledgement } = this.i18n.statuses();
     const rows = this.documents().map((document) => {
       const requiresAcknowledgement = getPendingDocumentAction(document) === 'acknowledge';
       return {
         document,
         requiresAcknowledgement,
-        statusLabel: requiresAcknowledgement ? pendingAcknowledgement : assignment?.[document.assignment_status],
+        statusLabel: requiresAcknowledgement ? pendingAcknowledgement : assignment && assignment[document.assignment_status],
         statusClass: STATUS_BADGE_CLASS[document.assignment_status],
         actionLabel: requiredAction?.[document.required_action],
         menu: createDocumentMenu(
           document,
           labels,
+          downloadLabel,
           (event) => this.fileRequested.emit(event),
           requiresAcknowledgement ? (id) => this.acknowledgementRequested.emit(id) : undefined,
         ),

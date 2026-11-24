@@ -52,7 +52,7 @@
 
     @if (eventCapacity(); as event) {
       <div class="flex-row-between-center gap-sm">
-        <span class="status-text status-text--muted basis-50 flex-shrink-0">{{ i18n.eventCapacity().capacity }}</span>
+        <span class="status-text status-text--muted basis-50 flex-shrink-0">{{ i18n.commonLabels().participantCount }}</span>
         <strong class="text-right">{{ event.effectiveCapacity ?? i18n.commonValues().notProvided }}</strong>
       </div>
       @if (event.remainingSeats != null) {

@@ -11,7 +11,7 @@
             {{ i18n.copy().sections.candidate }}
           </h2>
           <span [class]="'tag-badge ' + statusBadgeClass[candidate.state]">
-            {{ i18n.candidateStates()[candidate.state] }}
+            {{ i18n.candidateStateLabel(candidate.state) }}
           </span>
         </div>
         <dl class="mg-grid grid-2-cols grid-1-cols-sm gap-md m-0">
@@ -58,7 +58,8 @@
             <div>
               <span class="tag-badge" [class.tag-badge--success]="candidate.participation.active"
                 [class.tag-badge--muted]="!candidate.participation.active">
-                {{ candidate.participation.active ? i18n.copy().participation.active : i18n.copy().participation.ended }}
+                @let status = candidate.participation.active ? i18n.commonEntityStatuses().active : i18n.commonEntityStatuses().completed;
+                {{ status && status.masculine }}
               </span>
             </div>
             @if (candidate.participation.endedAt; as endedAt) {

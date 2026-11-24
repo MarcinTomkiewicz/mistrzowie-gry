@@ -2,6 +2,7 @@ import {
   createCommonAppRolesI18n,
   createCommonCtaI18n,
   createCommonEmptyI18n,
+  createCommonLabelsI18n,
   createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedSectionsI18n } from '../../../core/translations/scoped.i18n';
@@ -12,7 +13,7 @@ import {
 
 export function createEventSlotsI18n() {
   const { difficulty, commonFallbacks, activity } = createScopedSectionsI18n<{
-    activity: Record<'presenter' | 'capacity', string>;
+    activity: { capacity: string };
     difficulty: SessionSlotDifficultyTranslations;
     commonFallbacks: SessionSlotFallbacksTranslations;
   }>('sessions', {
@@ -27,6 +28,7 @@ export function createEventSlotsI18n() {
     commonFallbacks,
     commonAppRoles: createCommonAppRolesI18n(),
     cta: createCommonCtaI18n(),
+    labels: createCommonLabelsI18n(),
     commonEmpty: createCommonEmptyI18n(),
     commonValues: createCommonValuesI18n(),
   };

@@ -19,8 +19,9 @@ export class EventGlobalSteps {
   readonly stepSelected = output<number>();
   private readonly i18n = createEventCoreEditorI18n();
   protected readonly steps = computed(() => {
-    const labels = this.i18n.creationSteps();
-    return [labels.event, labels.location, labels.schedule, labels.policy, labels.program, labels.summary]
+    const { location, policy, program } = this.i18n.creationSteps();
+    const { event, schedule, summary } = this.i18n.commonLabels();
+    return [event, location, schedule, policy, program, summary]
       .map((label, index) => ({ value: index + 1, label }));
   });
 

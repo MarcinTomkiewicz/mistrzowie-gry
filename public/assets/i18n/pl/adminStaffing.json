@@ -15,8 +15,6 @@
     },
     "summary": {
       "required": "Wymagane",
-      "confirmed": "Potwierdzone",
-      "pending": "Oczekujące",
       "vacancies": "Wolne"
     },
     "filters": {
@@ -133,9 +131,6 @@
       "name": "Nazwa zlecenia",
       "description": "Opis zlecenia",
       "operationalNotes": "Informacje operacyjne",
-      "venueName": "Nazwa miejsca",
-      "venueAddress": "Adres miejsca",
-      "timezone": "Strefa czasowa",
       "type": "Typ zlecenia",
       "dateRange": "Zakres dat"
     },
@@ -221,13 +216,8 @@
       "title": "Dni i bloki",
       "description": "Dodaj dni, określ liczbę potrzebnych Mistrzów Gry i godziny bloków."
     },
-    "labels": {
-      "day": "Dzień"
-    },
     "fields": {
-      "label": "Nazwa bloku",
-      "startTime": "Godzina rozpoczęcia",
-      "endTime": "Godzina zakończenia"
+      "label": "Nazwa bloku"
     },
     "actions": {
       "addDay": "Dodaj dzień",
@@ -273,7 +263,6 @@
     "confirmedRoster": {
       "title": "Potwierdzona obsada",
       "empty": "Brak potwierdzonych Mistrzów Gry.",
-      "remove": "Usuń",
       "removeConfirm": "Zakończyć udział tego Mistrza Gry w zleceniu? Potwierdzenie udziału pozostanie w historii.",
       "removeSuccess": "Udział Mistrza Gry zakończony",
       "removeFailed": "Nie udało się zakończyć udziału Mistrza Gry"
@@ -288,7 +277,6 @@
     "candidateDetail": {
       "title": "Szczegóły kandydata",
       "show": "Szczegóły",
-      "participationActive": "Aktywny",
       "endedBy": "Udział zakończony przez (ID)",
       "sessionProposals": {
         "title": "Propozycje sesji",
@@ -300,7 +288,6 @@
     },
     "selfApplicationDecision": {
       "accept": "Akceptuj",
-      "reject": "Odrzuć",
       "acceptConfirm": "Zaakceptować zgłoszenie i potwierdzić udział Mistrza Gry w zleceniu?",
       "rejectConfirm": "Odrzucić zgłoszenie Mistrza Gry?",
       "acceptSuccess": "Zgłoszenie zaakceptowane",
@@ -308,7 +295,6 @@
       "failedSummary": "Nie udało się zapisać decyzji o zgłoszeniu"
     },
     "fields": {
-      "gm": "Mistrz Gry",
       "origin": "Źródło",
       "scope": "Zakres",
       "gmDecision": "Decyzja MG",
@@ -324,7 +310,6 @@
       "emptyRoster": "Brak Mistrzów Gry na liście dostępności.",
       "noSchedule": "Brak bloków w harmonogramie. Nie można ocenić dostępności.",
       "statuses": {
-        "available": "Dostępny",
         "partial": "Częściowo dostępny",
         "conflict": "Konflikt",
         "no_declared_availability": "Brak deklaracji",

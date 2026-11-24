@@ -15,7 +15,7 @@
       [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [alwaysShowPaginator]="false">
       <ng-template #header>
         <tr class="hide-down-sm">
-          <th scope="col" class="small-caps">{{ copy.fields.gm }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonAppRoles().gm }}</th>
           <th scope="col" class="small-caps">{{ copy.fields.availability }}</th>
           <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
         </tr>
@@ -52,7 +52,7 @@
     <div class="flex-col-start-stretch gap-md w-100 min-w-0">
       <div class="flex-row-start-center flex-wrap gap-sm">
         <strong>{{ getUserDisplayName(gm) || gm.userId }}</strong>
-        <span [class]="'tag-badge ' + badgeClass[gm.status]">{{ availabilityCopy.statuses[gm.status] }}</span>
+        <span [class]="'tag-badge ' + badgeClass[gm.status]">{{ i18n.availabilityStatusLabel(gm.status) }}</span>
         <span class="muted-text">{{ availability().timezone }}</span>
       </div>
       @if (availability().slotCount === 0) {

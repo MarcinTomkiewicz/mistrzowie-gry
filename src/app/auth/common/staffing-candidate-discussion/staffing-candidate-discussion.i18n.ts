@@ -1,5 +1,6 @@
 import {
   createCommonActionsI18n,
+  createCommonCtaI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
   createCommonStatusI18n,
@@ -12,6 +13,7 @@ export function createStaffingCandidateDiscussionI18n() {
   return {
     copy: createScopedObjectI18n<StaffingCandidateThreadCopy>(STAFFING_SCOPE, 'candidateThread'),
     commonActions: createCommonActionsI18n(),
+    commonCta: createCommonCtaI18n(),
     commonErrors: createCommonErrorsI18n(),
     commonForm: createCommonFormI18n(),
     commonStatus: createCommonStatusI18n(),

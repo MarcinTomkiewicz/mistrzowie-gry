@@ -33,13 +33,14 @@ export function getPendingDocumentAction(
 export function createDocumentMenu(
   document: Pick<ICoworkerPrivateDocument, 'assignment_id'> &
     Partial<Pick<ICoworkerPrivateDocument, 'signed_original_filename'>>,
-  labels: Pick<CoworkerOnboardingActionsTranslations, 'download' | 'previewSigned' | 'downloadSigned' | 'acknowledgeDocument'>,
+  labels: Pick<CoworkerOnboardingActionsTranslations, 'previewSigned' | 'downloadSigned' | 'acknowledgeDocument'>,
+  downloadLabel: string,
   requestFile: (event: DocumentFileRequest) => void,
   requestAcknowledgement?: (assignmentId: string) => void,
 ): MenuItem[] {
   const assignmentId = document.assignment_id;
   const menu: MenuItem[] = [{
-    label: labels.download, icon: 'pi pi-missile-swarm',
+    label: downloadLabel, icon: 'pi pi-missile-swarm',
     command: () => requestFile({ assignmentId, target: 'source', preview: false }),
   }];
 

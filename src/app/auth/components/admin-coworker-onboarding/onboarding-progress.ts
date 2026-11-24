@@ -1,10 +1,8 @@
 import { STATUS_BADGE_CLASS } from '../../../core/configs/badge-class.config';
 import type { IAdminCoworkerOnboardingRow } from '../../../core/interfaces/i-admin-coworker-onboarding';
 import type { CommonValuesTranslations } from '../../../core/types/i18n/common';
-import type {
-  CoworkerOnboardingFieldsTranslations,
-  CoworkerOnboardingStatusesTranslations,
-} from '../../../core/types/i18n/coworker-onboarding';
+import type { CommonEntityStatusesTranslations } from '../../../core/types/i18n/entity-statuses';
+import type { CoworkerOnboardingFieldsTranslations } from '../../../core/types/i18n/coworker-onboarding';
 
 export function countAdminOnboardingPendingActions(
   onboarding: Pick<
@@ -19,7 +17,7 @@ export function countAdminOnboardingPendingActions(
 export function createAdminOnboardingProgress(
   onboarding: IAdminCoworkerOnboardingRow,
   fields: CoworkerOnboardingFieldsTranslations,
-  assignments: CoworkerOnboardingStatusesTranslations['assignment'],
+  statuses: Pick<CommonEntityStatusesTranslations, 'accepted' | 'rejected'>,
   values: Pick<CommonValuesTranslations, 'yes' | 'no'>,
 ) {
   const questionnaire = [
@@ -31,8 +29,8 @@ export function createAdminOnboardingProgress(
     { key: 'signatures', label: fields.pendingSignatures, value: onboarding.private_pending_signature_count, status: 'pending' },
     { key: 'acknowledgements', label: fields.pendingAcknowledgements, value: onboarding.private_pending_acknowledgement_count, status: 'pending' },
     { key: 'submitted', label: fields.awaitingAdminReview, value: onboarding.private_submitted_count, status: 'submitted' },
-    { key: 'rejected', label: assignments.rejected, value: onboarding.private_rejected_count, status: 'rejected' },
-    { key: 'accepted', label: assignments.accepted, value: onboarding.private_accepted_count, status: 'accepted' },
+    { key: 'rejected', label: statuses.rejected.masculine, value: onboarding.private_rejected_count, status: 'rejected' },
+    { key: 'accepted', label: statuses.accepted.masculine, value: onboarding.private_accepted_count, status: 'accepted' },
   ] as const;
   const sharedDocuments = [
     { key: 'pending', label: fields.pendingAcknowledgements, value: onboarding.shared_pending_acknowledgement_count, status: 'pending' },

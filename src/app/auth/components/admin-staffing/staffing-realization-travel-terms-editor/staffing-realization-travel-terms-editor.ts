@@ -28,12 +28,13 @@ import {
   syncStaffingRealizationTravelTermsForm,
 } from '../../../../core/factories/staffing-realization-travel-terms-form.factory';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
-import { createStaffingSaveLabel, STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
 import { StaffingRealizationTravelTermsForm } from '../../../../core/types/staffing-realization-form';
 import {
   getStaffingTravelTermsFieldError,
   getStaffingTravelTermsFormError,
 } from '../staffing-realization-form-errors';
+import { createStaffingSaveLabel } from '../staffing-realization-save-label';
 import { createStaffingRealizationTravelTermsEditorI18n } from './staffing-realization-travel-terms-editor.i18n';
 import { StaffingReadinessTarget } from '../staffing-readiness-target';
 

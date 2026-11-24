@@ -1,11 +1,11 @@
 @if (!rows().length) {
   @if (!hasOnboarding()) {
     <section class="mg-card w-100">
-      <p class="m-0 muted-text">{{ i18n.coworkerPrivate().noOnboarding }}</p>
+      <p class="m-0 muted-text">{{ i18n.emptyStates().coworkerOnboarding }}</p>
     </section>
   } @else if (!questionnaireComplete()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100">
-      <p class="m-0">{{ i18n.coworkerPrivate().questionnaireRequired }}</p>
+      <p class="m-0">{{ i18n.emptyStates().privateDocumentsRequireQuestionnaire }}</p>
       <div>
         <p-button routerLink="/auth/coworker/questionnaire" icon="pi pi-id-card"
           [label]="i18n.actions().goToQuestionnaire" />
@@ -13,7 +13,7 @@
     </section>
   } @else {
     <section class="mg-card w-100">
-      <p class="m-0 muted-text">{{ i18n.coworkerPrivate().empty }}</p>
+      <p class="m-0 muted-text">{{ i18n.emptyStates().coworkerPrivateDocuments }}</p>
     </section>
   }
 } @else {
@@ -23,12 +23,12 @@
       <p-floatlabel variant="on" class="flex-1 min-w-250 min-w-0-sm w-100-sm">
         <input pInputText pSize="small" type="search" class="w-100" id="coworker-private-document-search"
           formControlName="searchText" />
-        <label for="coworker-private-document-search">{{ i18n.coworkerPrivate().searchByTitle }}</label>
+        <label for="coworker-private-document-search">{{ i18n.commonLabels().searchDocumentByTitle }}</label>
       </p-floatlabel>
       <p-select size="small" class="flex-none w-100 max-w-200 max-w-none-sm"
         inputId="coworker-private-document-category" formControlName="category"
         [options]="categoryOptions()" optionLabel="label" optionValue="value"
-        [placeholder]="i18n.categories().all" [ariaLabel]="i18n.categories().label"
+        [placeholder]="i18n.categories().all" [ariaLabel]="i18n.commonLabels().category"
         [showClear]="true" appendTo="body" />
       <div class="flex-row-start-center gap-sm flex-none w-100-sm">
         <p-toggleswitch inputId="coworker-private-document-action-required" formControlName="actionRequiredOnly" />
@@ -52,7 +52,7 @@
       </p-accordion>
     } @else if (!documents.current.length) {
       <section class="mg-card w-100" role="status">
-        <p class="m-0 muted-text">{{ i18n.coworkerPrivate().filteredEmpty }}</p>
+        <p class="m-0 muted-text">{{ i18n.emptyStates().filteredDocuments }}</p>
       </section>
     }
   </div>
@@ -64,8 +64,8 @@
       tableStyleClass="mg-responsive-table">
       <ng-template #header>
         <tr>
-          <th scope="col" class="small-caps">{{ i18n.fields().document }}</th>
-          <th scope="col" class="small-caps">{{ i18n.categories().label }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonLabels().document }}</th>
+          <th scope="col" class="small-caps">{{ i18n.commonLabels().category }}</th>
           <th scope="col" class="small-caps">{{ i18n.commonLabels().status }}</th>
           <th scope="col" class="small-caps text-right">{{ i18n.commonTable().actions }}</th>
         </tr>
@@ -150,7 +150,7 @@
 <ng-template #documentTitle let-document>
   <div class="flex-col-start-start gap-xs text-wrap-anywhere">
     <strong>{{ document.title }}</strong>
-    <small>{{ i18n.fields().version }} {{ document.version_number }}</small>
+    <small>{{ i18n.commonLabels().version }} {{ document.version_number }}</small>
   </div>
 </ng-template>
 

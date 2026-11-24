@@ -55,7 +55,6 @@
       "deleteUnavailable": "Używanej stałej nie można usunąć."
     },
     "status": {
-      "published": "Opublikowana",
       "unpublished": "Nieopublikowana",
       "draftChanged": "Draft zmieniony",
       "draftCurrent": "Draft zgodny z publikacją"

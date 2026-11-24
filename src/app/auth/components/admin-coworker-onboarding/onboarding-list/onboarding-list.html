@@ -1,5 +1,5 @@
 @let copy = i18n.adminList();
-@let copyReady = !!(copy.filters && i18n.statuses().onboarding);
+@let copyReady = !!(copy.filters && i18n.commonStatusPhrases().inProgress && i18n.commonEntityStatuses().completed);
 
 <div class="flex-col-start-stretch gap-md w-100 min-w-0 position-relative"
   [attr.aria-busy]="loading() || saving() || !copyReady">
@@ -19,7 +19,7 @@
 
   @if (copyReady && loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm p-md w-100" role="alert">
-      <p class="m-0 error-text">{{ i18n.adminList().loadError }}</p>
+      <p class="m-0 error-text">{{ i18n.loadErrors().adminOnboardings }}</p>
       <p-button
         type="button"
         severity="secondary"
@@ -69,7 +69,7 @@
             <th scope="col" class="small-caps">{{ i18n.adminDetail().questionnaireBadge }}</th>
             <th scope="col" class="small-caps text-center">
               <div class="flex-row-center-center flex-nowrap gap-xs">
-                <span class="text-nowrap">{{ copy.privateDocuments }}</span>
+                <span class="text-nowrap">{{ i18n.commonEntityStatuses().private.neuter }}</span>
                 <app-context-help class="flex-none" icon="pi pi-read" styleClass="square-7 p-0 cursor-pointer"
                   [ariaLabel]="copy.privateDocumentsHint" [text]="copy.privateDocumentsHint" />
               </div>
@@ -117,7 +117,7 @@
             <td class="mg-responsive-table__cell text-center">
               <span class="mg-responsive-table__label small-caps font-bold">
                 <span class="flex-row-start-center flex-wrap gap-xs">
-                  {{ copy.privateDocuments }}
+                  {{ i18n.commonEntityStatuses().private.neuter }}
                   <app-context-help icon="pi pi-read" styleClass="square-7 p-0 cursor-pointer"
                     [ariaLabel]="copy.privateDocumentsHint" [text]="copy.privateDocumentsHint" />
                 </span>
@@ -156,7 +156,7 @@
                 @if (row.onboarding) {
                   <p-button type="button" size="small" severity="success" icon="pi pi-horus"
                     class="w-px-100 max-w-full" styleClass="w-100"
-                    [label]="i18n.actions().open" [disabled]="loading() || saving()"
+                    [label]="i18n.commonActions().open" [disabled]="loading() || saving()"
                     (onClick)="open(row.onboarding.onboarding_id)" />
                   @if (row.onboarding.status === 'in_progress') {
                     <p-button type="button" size="small" severity="danger" icon="pi pi-interdiction"
@@ -177,7 +177,7 @@
         <ng-template #emptymessage>
           <tr>
             <td colspan="7">
-              <p class="m-0 muted-text" role="status">{{ i18n.adminList().filteredEmpty }}</p>
+              <p class="m-0 muted-text" role="status">{{ i18n.emptyStates().filteredAdminOnboardings }}</p>
             </td>
           </tr>
         </ng-template>
@@ -185,7 +185,7 @@
     </div>
   } @else if (copyReady && !loading()) {
     <section class="mg-card w-100" role="status">
-      <p class="m-0 muted-text">{{ onboardings().length ? copy.emptyVisible : copy.empty }}</p>
+      <p class="m-0 muted-text">{{ onboardings().length ? i18n.emptyStates().visibleAdminOnboardings : i18n.emptyStates().adminOnboardings }}</p>
     </section>
   }
 </div>

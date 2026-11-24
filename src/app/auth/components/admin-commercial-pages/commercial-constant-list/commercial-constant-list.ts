@@ -59,6 +59,7 @@ export class CommercialConstantList {
   protected readonly rowVms = computed(() => {
     const values = this.i18n.commonValues();
     const status = this.i18n.status();
+    const published = this.i18n.commonEntityStatuses().published?.feminine;
     const units = this.i18n.durationUnit();
 
     return this.rows().map((constant) => ({
@@ -82,7 +83,7 @@ export class CommercialConstantList {
         units.minutesShort,
       ),
       publicationLabel: constant.isPublished
-        ? status.published
+        ? published
         : status.unpublished,
       publicationClass: constant.isPublished
         ? 'tag-badge tag-badge--success'

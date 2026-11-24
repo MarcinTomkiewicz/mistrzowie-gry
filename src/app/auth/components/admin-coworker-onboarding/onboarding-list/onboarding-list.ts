@@ -44,7 +44,7 @@ type OnboardingListRow = {
   readonly onboarding: VisibleOnboardingRow | null;
   readonly displayName: string;
   readonly status: VisibleOnboardingRow['status'] | 'not_started';
-  readonly statusLabel: string;
+  readonly statusLabel: string | null;
   readonly statusBadgeClass: string;
   readonly statusDateLabel: string | null;
   readonly questionnaireLabel: string;
@@ -117,7 +117,7 @@ export class OnboardingList {
     { value: 'not_started', label: this.i18n.adminList().notStarted },
     ...(['in_progress', 'completed'] as const).map((value) => ({
       value,
-      label: this.i18n.statuses().onboarding[value],
+      label: this.i18n.onboardingStatusLabel(value),
     })),
   ]);
 
@@ -229,8 +229,8 @@ export class OnboardingList {
           this.loadFailed.set(true);
           const fallback = this.i18n.commonErrors().generic;
           this.toast.danger({
-            summary: this.i18n.adminList().loadError ?? fallback,
-            detail: getOnboardingErrorMessage(error, this.i18n.toast().errors, fallback),
+            summary: this.i18n.loadErrors().adminOnboardings ?? fallback,
+            detail: getOnboardingErrorMessage(error, this.i18n, fallback),
           });
         },
       });
@@ -290,7 +290,7 @@ export class OnboardingList {
           onSuccess(result);
         },
         error: (error: unknown) => {
-          this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n.toast()));
+          this.toast.danger(getOnboardingMutationErrorToast(error, this.i18n));
           onError?.();
         },
       });
@@ -326,7 +326,7 @@ export class OnboardingList {
       }) || person.email || '',
       status: onboarding?.status ?? 'not_started',
       statusLabel: onboarding
-        ? this.i18n.statuses().onboarding[onboarding.status]
+        ? this.i18n.onboardingStatusLabel(onboarding.status)
         : this.i18n.adminList().notStarted,
       statusBadgeClass: `tag-badge ${
         onboarding ? STATUS_BADGE_CLASS[onboarding.status] : 'tag-badge--muted'

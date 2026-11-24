@@ -39,7 +39,7 @@
         [keepInvalid]="true"
         [inputId]="'staffing-slot-start-' + day + '-' + index"
         formControlName="startTime"
-        [ariaLabel]="fields.startTime"
+        [ariaLabel]="i18n.commonLabels().startTime"
         [invalid]="slotForm.controls.startTime.touched && slotForm.controls.startTime.invalid"
         (onBlur)="normalizeTime('startTime', $event)"
       />
@@ -59,7 +59,7 @@
         [keepInvalid]="true"
         [inputId]="'staffing-slot-end-' + day + '-' + index"
         formControlName="endTime"
-        [ariaLabel]="fields.endTime"
+        [ariaLabel]="i18n.commonLabels().endTime"
         [invalid]="slotForm.controls.endTime.touched && slotForm.controls.endTime.invalid"
         (onBlur)="normalizeTime('endTime', $event)"
       />

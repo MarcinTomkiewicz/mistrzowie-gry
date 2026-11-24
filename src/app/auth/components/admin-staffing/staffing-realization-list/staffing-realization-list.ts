@@ -20,6 +20,7 @@ import { AdminStaffingRealization } from '../../../../core/services/staffing/adm
 import { UiConfirm } from '../../../../core/services/ui-confirm/ui-confirm';
 import { UiToast } from '../../../../core/services/ui-toast/ui-toast';
 import { STAFFING_SCOPE } from '../../../../core/translations/staffing.i18n';
+import { STAFFING_REALIZATION_STATUSES } from '../../../../core/types/staffing-realization';
 import { StaffingRealizationListFilters } from '../../../../core/types/staffing-realization-list';
 import { formatDateLabel } from '../../../../core/utils/date';
 import {
@@ -82,14 +83,17 @@ export class StaffingRealizationList {
     Object.entries(this.i18n.realizationTypes()).map(([value, label]) => ({ value, label })),
   );
   protected readonly statusOptions = computed(() =>
-    Object.entries(this.i18n.realizationStatuses())
-      .filter(([value]) => this.filterValue().showArchived || value !== 'archived')
-      .map(([value, label]) => ({ value, label })),
+    STAFFING_REALIZATION_STATUSES
+      .filter(value => this.filterValue().showArchived || value !== 'archived')
+      .flatMap(value => {
+        const label = this.i18n.realizationStatusLabel(value);
+        return label === null ? [] : [{ value, label }];
+      }),
   );
   protected readonly rowVms = computed(() => {
     const values = this.i18n.commonValues();
     const summary = this.i18n.copy().summary;
-    const statuses = this.i18n.realizationStatuses();
+    const entityStatuses = this.i18n.commonEntityStatuses();
     const types = this.i18n.realizationTypes();
 
     return this.filteredRows().map((item) => ({
@@ -97,14 +101,14 @@ export class StaffingRealizationList {
       cityLabel: item.city ?? values.notProvided,
       startDateLabel: item.startDate ? formatDateLabel(item.startDate) : values.notAvailable,
       endDateLabel: item.endDate && item.endDate !== item.startDate ? formatDateLabel(item.endDate) : null,
-      statusLabel: statuses[item.status],
+      statusLabel: this.i18n.realizationStatusLabel(item.status),
       statusBadgeClass: `tag-badge ${STATUS_BADGE_CLASS[item.status]}`,
       typeLabel: types[item.type],
       typeBadgeClass: item.type === 'travel' ? 'tag-badge tag-badge--info' : 'tag-badge tag-badge--golden',
       summary: [
         { key: 'required', label: summary.required, value: item.staffingSummary.required, badgeClass: 'tag-badge tag-badge--info' },
-        { key: 'confirmed', label: summary.confirmed, value: item.staffingSummary.confirmed, badgeClass: 'tag-badge tag-badge--success' },
-        { key: 'pending', label: summary.pending, value: item.staffingSummary.pending,
+        { key: 'confirmed', label: entityStatuses.confirmed?.pluralNonMasculinePersonal, value: item.staffingSummary.confirmed, badgeClass: 'tag-badge tag-badge--success' },
+        { key: 'pending', label: entityStatuses.pending?.pluralNonMasculinePersonal, value: item.staffingSummary.pending,
           badgeClass: 'tag-badge tag-badge--warn' },
         { key: 'vacancies', label: summary.vacancies, value: item.staffingSummary.vacancies,
           badgeClass: 'tag-badge tag-badge--danger' },

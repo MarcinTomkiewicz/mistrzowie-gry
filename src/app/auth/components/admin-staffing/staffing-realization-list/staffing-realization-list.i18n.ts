@@ -13,14 +13,15 @@ import { createStaffingI18n } from '../../../../core/translations/staffing.i18n'
 import { AdminStaffingRealizationListCopy } from '../../../../core/types/i18n/admin-staffing';
 
 export function createStaffingRealizationListI18n() {
-  const { realizationStatuses, realizationTypes } = createStaffingI18n();
+  const { realizationStatusLabel, realizationTypes, commonEntityStatuses } = createStaffingI18n();
 
   return {
     copy: createScopedObjectI18n<AdminStaffingRealizationListCopy>('adminStaffing', 'list'),
     createLabel: translateSignal('editor.page.createTitle', {}, { scope: 'adminStaffing' }),
-    realizationStatuses,
+    realizationStatusLabel,
     realizationTypes,
     commonActions: createCommonActionsI18n(),
+    commonEntityStatuses,
     commonErrors: createCommonErrorsI18n(),
     commonLabels: createCommonLabelsI18n(),
     commonStatus: createCommonStatusI18n(),

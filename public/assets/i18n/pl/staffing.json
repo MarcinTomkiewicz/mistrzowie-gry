@@ -2,9 +2,7 @@
   "realizationStatuses": {
     "draft": "Szkic",
     "open": "Otwarta",
-    "closed": "Zamknięta",
-    "completed": "Zakończona",
-    "archived": "Zarchiwizowana"
+    "closed": "Zamknięta"
   },
   "realizationTypes": {
     "stationary": "Stacjonarna",
@@ -12,7 +10,6 @@
   },
   "candidateStates": {
     "draft": "[PH] Szkic zgłoszenia",
-    "pending": "[PH] Oczekuje na decyzję",
     "confirmed": "[PH] Udział potwierdzony",
     "rejected": "[PH] Odrzucono",
     "withdrawn": "[PH] Wycofano"
@@ -25,7 +22,6 @@
     "empty": "[PH] Brak wiadomości w tej rozmowie.",
     "readOnly": "[PH] Ta rozmowa jest dostępna tylko do odczytu.",
     "bodyLabel": "[PH] Wiadomość",
-    "send": "[PH] Wyślij wiadomość",
     "loadFailed": "[PH] Nie udało się załadować wiadomości",
     "sendSuccess": "[PH] Wiadomość została wysłana",
     "sendFailed": "[PH] Nie udało się wysłać wiadomości"

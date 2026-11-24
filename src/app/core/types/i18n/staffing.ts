@@ -8,7 +8,7 @@ import type {
 } from '../staffing-realization';
 
 export type StaffingRealizationStatusTranslations = Record<
-  StaffingRealizationStatus,
+  Exclude<StaffingRealizationStatus, 'completed' | 'archived'>,
   string
 >;
 
@@ -18,7 +18,7 @@ export type StaffingRealizationTypeTranslations = Record<
 >;
 
 export type StaffingCandidateStateTranslations = Record<
-  MyStaffingCandidate['state'],
+  Exclude<MyStaffingCandidate['state'], 'pending'>,
   string
 >;
 
@@ -31,7 +31,6 @@ export type StaffingCandidateThreadCopy = {
   empty: string;
   readOnly: string;
   bodyLabel: string;
-  send: string;
   loadFailed: string;
   sendSuccess: string;
   sendFailed: string;
