@@ -2,9 +2,9 @@
   "page": {
     "title": "Przegląd czasu pracy Mistrzów Gry",
     "subtitle": "Sprawdź zapisany czas pracy zespołu w wybranym miesiącu i pobierz zestawienie.",
-    "payrollExportIncomplete": "Nie wszystkie osoby znajdą się w pliku. Dla części brakuje imienia lub nazwiska albo nie udało się odczytać tych danych.",
+    "payrollExportIncomplete": "Nie wszystkie osoby znajdą się w pobieranym zestawieniu. Dla części brakuje imienia lub nazwiska albo nie udało się odczytać tych danych.",
     "emptyStateTitle": "Brak danych o czasie pracy",
-    "emptyStateDescription": "Nie ma jeszcze danych o czasie pracy za wybrany miesiąc.",
+    "emptyStateDescription": "Nie ma obecnie osób, których czas pracy można wyświetlić.",
     "emptyUserTitle": "Brak wpisów dla tej osoby",
     "emptyUserDescription": "Nie ma zapisanych godzin pracy tej osoby za wybrany miesiąc."
   },
@@ -13,7 +13,7 @@
     "exportXlsLabel": "Pobierz Excel"
   },
   "toast": {
-    "loadFailedSummary": "Nie udało się wczytać czasu pracy",
-    "loadFailedDetail": "Nie udało się pobrać listy osób lub zapisanych godzin. Spróbuj ponownie."
+    "loadFailedSummary": "Nie udało się wczytać ewidencji czasu pracy",
+    "loadFailedDetail": "Nie udało się pobrać informacji o osobach lub ich godzinach pracy. Spróbuj ponownie."
   }
 }

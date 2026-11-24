@@ -39,7 +39,7 @@
   },
   "workTimeScopes": {
     "on_site_only": "Tylko praca na miejscu",
-    "including_travel": "Praca na miejscu i czas dojazdu",
+    "including_travel": "Praca na miejscu i czas przejazdu",
     "custom": "Inne zasady liczenia czasu pracy"
   }
 }

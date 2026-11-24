@@ -3,7 +3,7 @@
     "page": {
       "title": "Lista zleceń",
       "subtitle": "Sprawdź terminy, statusy i obsadę zleceń.",
-      "summaryHint": "Obsada sumuje miejsca ze wszystkich dni zlecenia. Ten sam Mistrz Gry jest liczony osobno w każdym dniu.",
+      "summaryHint": "Liczba miejsc do obsadzenia obejmuje wszystkie dni zlecenia. Jeśli ten sam Mistrz Gry pracuje przez kilka dni, jest liczony osobno w każdym z nich.",
       "emptyTitle": "Brak zleceń",
       "emptyDescription": "Utwórz pierwsze zlecenie, aby ustalić terminy i obsadę.",
       "loadErrorTitle": "Nie udało się wczytać listy zleceń"
@@ -56,8 +56,8 @@
         "day_demand_invalid": "W każdym dniu wymagany jest co najmniej jeden Mistrz Gry.",
         "slot_label_invalid": "Podaj prawidłową nazwę bloku.",
         "slot_time_invalid": "Godzina zakończenia bloku musi być późniejsza niż godzina rozpoczęcia. Blok musi się zakończyć tego samego dnia.",
-        "slot_position_invalid": "Ustal prawidłową kolejność bloków.",
-        "slot_position_duplicate": "Każdy blok musi mieć inną pozycję w kolejności dnia.",
+        "slot_position_invalid": "Ustal kolejność bloków w tym dniu.",
+        "slot_position_duplicate": "Dwa bloki mają to samo miejsce w kolejności dnia. Ustal ich kolejność.",
         "slot_overlap": "Godziny bloków w tym dniu nakładają się na siebie."
       },
       "travel_terms": {
@@ -68,7 +68,7 @@
         "mileage_rate_invalid": "Popraw stawkę za przejechany kilometr.",
         "lodging_invalid": "Popraw warunki noclegu i liczbę noclegów.",
         "work_time_scope_invalid": "Wybierz prawidłowy zakres czasu pracy.",
-        "work_time_note_invalid": "Opisz niestandardowy zakres czasu pracy.",
+        "work_time_note_invalid": "Wyjaśnij, jak ma być liczony czas pracy podczas wyjazdu.",
         "note_invalid": "Popraw informacje o wyjeździe."
       },
       "recruitment_policy": {
@@ -82,7 +82,7 @@
     "description": "Ustal zasady zgłoszeń Mistrzów Gry i wyboru sesji.",
     "travelHint": "Zgłoszenie do zlecenia wyjazdowego obejmuje cały wyjazd.",
     "saveCoreTypeHint": "Najpierw zapisz zmianę typu zlecenia w Danych podstawowych.",
-    "sessionsHint": "Po potwierdzeniu udziału Mistrz Gry zgłasza na każdy blok co najmniej wymaganą liczbę propozycji sesji.",
+    "sessionsHint": "Po potwierdzeniu udziału Mistrz Gry proponuje w każdym bloku tyle sesji, ile określono w zleceniu.",
     "fields": {
       "selfApplicationEnabled": "Mistrzowie Gry mogą zgłaszać udział",
       "stationaryScopePolicy": "Zakres zgłoszenia",
@@ -94,7 +94,7 @@
     },
     "sessionModes": {
       "gm_selects": "Sesje wybiera Mistrz Gry",
-      "realization_assigns": "Sesje przypisuje koordynator"
+      "realization_assigns": "Sesje wybiera koordynator"
     },
     "toast": {
       "loadFailedSummary": "Nie udało się załadować zasad zgłoszeń",
@@ -178,12 +178,12 @@
         "EFS092_INVALID_DATE_COUNT": "Aby utworzyć wydarzenie, zlecenie musi obejmować od 1 do 366 dni.",
         "EFS092_PAST_SOURCE_DATE": "Zlecenie zawiera datę z przeszłości. Aby utworzyć wydarzenie, popraw terminy.",
         "EFS092_INCOMPLETE_OR_EXCESSIVE_DAY_SLOTS": "Harmonogram ma nieprawidłową liczbę bloków lub potrzebnych Mistrzów Gry. Sprawdź dni i bloki.",
-        "EFS092_INVALID_FINAL_PLAN": "W planie sesji lub obsady są nieprawidłowe przypisania. Sprawdź, czy udział Mistrzów Gry jest potwierdzony i czy sesje są poprawnie wybrane.",
-        "EFS092_DATED_BLOCK_NOT_EDITABLE": "Nie możesz zmienić bloku przypisanego już do terminu wydarzenia.",
+        "EFS092_INVALID_FINAL_PLAN": "Nie można utworzyć wydarzenia z obecnym planem sesji. Sprawdź, czy wybrani Mistrzowie Gry potwierdzili udział i czy dla każdego wybrano sesję.",
+        "EFS092_DATED_BLOCK_NOT_EDITABLE": "Nie możesz zmienić tego bloku, ponieważ jest już uwzględniony w programie wydarzenia w wybranym terminie.",
         "EFS092_GLOBAL_CREATE_FAILED": "Nie udało się potwierdzić utworzenia wydarzenia. Sprawdź, czy zostało zapisane, zanim spróbujesz ponownie.",
-        "EFS092_GLOBAL_IDENTITY_MISSING": "Nie udało się potwierdzić wszystkich danych nowego wydarzenia lub miejsca realizacji. Sprawdź wydarzenie przed ponowieniem.",
+        "EFS092_GLOBAL_IDENTITY_MISSING": "Nie udało się sprawdzić wszystkich danych nowo utworzonego wydarzenia i miejsca jego realizacji. Sprawdź, czy wydarzenie zostało zapisane, zanim spróbujesz ponownie.",
         "EFS092_MANUAL_IMPORT_FAILED": "Nie udało się potwierdzić przeniesienia programu ze zlecenia do wydarzenia. Sprawdź jego program przed ponowieniem.",
-        "EFS092_IMPORTED_PROGRAM_ID_MISSING": "Brakuje informacji potrzebnych do rozpoznania jednej z pozycji programu wydarzenia. Sprawdź program przed ponowieniem.",
+        "EFS092_IMPORTED_PROGRAM_ID_MISSING": "Nie udało się sprawdzić jednej z sesji lub aktywności w programie wydarzenia. Sprawdź zapisany program przed ponowną próbą.",
         "EFS092_SNAPSHOT_IMPORT_FAILED": "Nie udało się zapisać szczegółów sesji w programie wydarzenia. Sprawdź zapisane dane przed ponowieniem.",
         "EFS092_IMPORT_RECONCILIATION_FAILED": "Nie udało się potwierdzić zgodności terminów i programu wydarzenia z danymi zlecenia. Sprawdź je przed ponowieniem."
       }
@@ -229,7 +229,7 @@
       "title": "Podsumowanie harmonogramu",
       "dayCount": "Liczba dni",
       "slotCount": "Liczba bloków",
-      "dailyStaffingPositions": "Suma miejsc w obsadzie",
+      "dailyStaffingPositions": "Miejsca do obsadzenia",
       "conflictCount": "Liczba konfliktów"
     },
     "emptySlots": "Brak bloków w tym dniu.",
@@ -255,7 +255,7 @@
   "board": {
     "title": "Obsada i kandydaci",
     "description": "Sprawdź zgłoszenia Mistrzów Gry, potwierdź ich udział i zaplanuj obsadę.",
-    "persistedHint": "Podsumowanie uwzględnia zapisane dane. Zapisz wprowadzone zmiany, aby zobaczyć aktualne informacje.",
+    "persistedHint": "Podsumowanie pokazuje ostatnio zapisane dane. Zapisz zmiany, aby uwzględnić je w wynikach.",
     "loadFailed": "Nie udało się wczytać obsady zlecenia",
     "candidatesTitle": "Kandydaci",
     "emptyCandidates": "Brak kandydatów.",
@@ -277,7 +277,7 @@
     "candidateDetail": {
       "title": "Szczegóły kandydata",
       "show": "Szczegóły",
-      "endedBy": "Udział zakończony przez",
+      "endedBy": "Udział zakończył",
       "sessionProposals": {
         "title": "Propozycje sesji",
         "preview": "Podgląd sesji",
@@ -305,7 +305,7 @@
     },
     "availability": {
       "title": "Dostępność Mistrzów Gry",
-      "hint": "Dostępność jest sprawdzana dla wszystkich bloków w strefie czasowej zlecenia. Nie oznacza jeszcze potwierdzenia udziału ani przypisania do bloku.",
+      "hint": "Sprawdzamy dostępność Mistrzów Gry w terminach i strefie czasowej zlecenia. Sama dostępność nie oznacza jeszcze potwierdzenia udziału.",
       "showSlots": "Dostępność w blokach",
       "emptyRoster": "Nie ma Mistrzów Gry na liście dostępności.",
       "noSchedule": "Dodaj bloki do harmonogramu, aby sprawdzić dostępność Mistrzów Gry.",
@@ -319,27 +319,27 @@
   },
   "finalPlan": {
     "title": "Plan sesji i obsady",
-    "description": "Przypisz potwierdzonych Mistrzów Gry i sesje do poszczególnych bloków.",
+    "description": "Dla każdego bloku wybierz Mistrzów Gry, którzy poprowadzą sesje. Uwzględnij osoby z potwierdzonym udziałem.",
     "readOnly": "Nie można teraz zmieniać planu. Możesz go przeglądać.",
     "noDays": "Brak dni w harmonogramie.",
     "noSlots": "Brak bloków w tym dniu.",
     "unfilled": "Nieobsadzony",
-    "assignments": "Przypisania",
-    "hasConflicts": "W planie są przypisania wymagające poprawy.",
+    "assignments": "Obsada",
+    "hasConflicts": "W planie są problemy z obsadą. Sprawdź oznaczonych Mistrzów Gry.",
     "conflicts": {
       "candidate_not_confirmed": "Udział wybranego Mistrza Gry nie został potwierdzony",
       "participation_ended": "Udział wybranego Mistrza Gry został zakończony"
     },
     "provenance": {
-      "saved": "Przypisanie:",
+      "saved": "Wybór sesji:",
       "proposed": "Z propozycji Mistrza Gry",
       "coordinator": "Sesja wybrana przez koordynatora"
     },
-    "addAssignment": "Przypisz Mistrza Gry",
+    "addAssignment": "Dodaj sesję",
     "save": "Zapisz plan",
-    "invalid": "W każdym przypisaniu wybierz Mistrza Gry i sesję. Popraw także wskazane błędy.",
+    "invalid": "Uzupełnij brakujących Mistrzów Gry i sesje oraz popraw wskazane błędy.",
     "validation": {
-      "duplicateCandidatePerSlot": "Ten sam Mistrz Gry może być przypisany tylko raz do jednego bloku.",
+      "duplicateCandidatePerSlot": "Nie możesz wybrać tego samego Mistrza Gry dwa razy w jednym bloku.",
       "effectivePlayersRange": "Po zmianach minimalna liczba graczy nie może przekraczać maksymalnej."
     },
     "loadFailed": "Nie udało się załadować planu",
@@ -348,7 +348,7 @@
     "noSessions": "Wybrany Mistrz Gry nie ma sesji tego rodzaju.",
     "saveSuccess": "Plan zapisany",
     "saveFailed": "Nie udało się zapisać planu",
-    "saveRejected": "Nie można zmienić ani usunąć przypisania już opublikowanego w wydarzeniu. Pozostaw je bez zmian i dodaj osobne przypisanie, jeśli chcesz wprowadzić zmianę.",
+    "saveRejected": "Nie możesz zmienić ani usunąć z planu sesji, która została już opublikowana w programie wydarzenia. Pozostaw ją bez zmian. Kolejną sesję możesz dodać osobno.",
     "preview": "Podgląd sesji",
     "chooseOtherSession": "Wybierz inną sesję",
     "proposal": {
@@ -360,7 +360,7 @@
     },
     "override": {
       "title": "Dostosuj sesję do zlecenia",
-      "hint": "Wpisz tylko te informacje, które chcesz zmienić dla tego zlecenia. Pozostałe zostaną pobrane z sesji. Jej dane w katalogu i propozycje Mistrza Gry nie zmienią się.",
+      "hint": "Uzupełnij tylko pola, które chcesz zmienić w tym zleceniu. Pozostałe zachowają dane zapisanej sesji. Zmiany nie wpłyną na katalog sesji ani na propozycje Mistrza Gry.",
       "inherit": "Zachowaj dane sesji",
       "image": "Obraz sesji"
     },
@@ -370,12 +370,12 @@
       "before": "Przed zapisem",
       "after": "Po zapisie",
       "types": {
-        "assignment_added": "Dodano przypisanie",
-        "assignment_removed": "Usunięto przypisanie",
+        "assignment_added": "Dodano prowadzącego i sesję",
+        "assignment_removed": "Usunięto prowadzącego i sesję z planu",
         "gm_changed": "Zmieniono Mistrza Gry",
-        "slot_changed": "Zmieniono blok",
+        "slot_changed": "Przeniesiono sesję do innego bloku",
         "session_changed": "Zmieniono sesję",
-        "session_override_changed": "Zmieniono dane sesji dla zlecenia"
+        "session_override_changed": "Zmieniono szczegóły sesji"
       }
     }
   },

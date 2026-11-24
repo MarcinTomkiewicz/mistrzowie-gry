@@ -1,12 +1,12 @@
 {
   "adminList": {
     "title": "Wdrożenia współpracowników",
-    "subtitle": "Rozpocznij wdrożenie współpracownika albo sprawdź jego kwestionariusz, dokumenty i zadania do wykonania.",
+    "subtitle": "Rozpocznij wdrożenie współpracownika lub sprawdź jego dokumenty, kwestionariusz i zadania, które pozostały do wykonania.",
     "notStarted": "Nie rozpoczęto",
     "sharedDocuments": "Wspólne",
     "pendingActions": "Do wykonania",
-    "privateDocumentsHint": "Liczba dokumentów prywatnych tego współpracownika zaakceptowanych przez administratora.",
-    "sharedDocumentsHint": "Liczba dokumentów wspólnych, których przeczytanie potwierdził współpracownik. Informacja jest dostępna po zakończeniu wdrożenia.",
+    "privateDocumentsHint": "Liczba dokumentów prywatnych zaakceptowanych dla tego współpracownika.",
+    "sharedDocumentsHint": "Liczba dokumentów wspólnych, których przeczytanie potwierdził współpracownik. Wynik pojawi się po zakończeniu wdrożenia.",
     "filters": {
       "searchLabel": "Szukaj po imieniu, pseudonimie lub adresie e-mail",
       "allStatuses": "Wszystkie statusy",
@@ -17,19 +17,19 @@
   "adminDetail": {
     "hideRejected": "Ukryj odrzucone dokumenty",
     "title": "Wdrożenie współpracownika",
-    "subtitle": "Sprawdź dokumenty współpracownika, dodaj nowe i rozpatrz przesłane podpisane kopie. Możesz też zakończyć lub anulować wdrożenie.",
+    "subtitle": "Tutaj dodasz dokumenty współpracownika i sprawdzisz odesłane podpisane kopie. Możesz też zakończyć lub anulować jego wdrożenie.",
     "uploadSection": "Dodaj dokumenty dla współpracownika",
     "completeDescription": "Zakończ wdrożenie dopiero po sprawdzeniu kwestionariusza oraz rozpatrzeniu wszystkich dokumentów wymagających podpisu lub potwierdzenia.",
     "questionnaireBadge": "Kwestionariusz",
     "bulk": {
       "selected": "Zaznaczone",
-      "selectVisible": "Zaznacz widoczne dokumenty",
+      "selectVisible": "Zaznacz wszystkie widoczne",
       "downloadOriginals": "Pobierz dokumenty",
       "downloadSigned": "Pobierz podpisane kopie",
       "missingSigned": "Bez podpisanej kopii",
       "zipProgress": "Przygotowano {{completed}} z {{total}} plików",
       "zipFailed": "Nie udało się przygotować pliku z dokumentami. Spróbuj ponownie.",
-      "categoryResult": "Zapisano kategorię dla zaznaczonych dokumentów."
+      "categoryResult": "Zapisano kategorię dokumentów."
     }
   },
   "adminShared": {
@@ -37,7 +37,7 @@
     "formTitleNew": "Dodaj dokument wspólny",
     "formTitleReplace": "Zastąp plik dokumentu",
     "listTitle": "Dokumenty wspólne",
-    "confirmationsTitle": "Status dokumentu u współpracowników"
+    "confirmationsTitle": "Potwierdzenia przeczytania dokumentu"
   },
   "categories": {
     "all": "Wszystkie kategorie",
@@ -45,7 +45,7 @@
     "rename": "Zmień nazwę kategorii",
     "change": "Zmień kategorię",
     "retire": "Usuń kategorię",
-    "retireMessage": "Usunąć kategorię {{name}}? Nie będzie można przypisywać jej kolejnym dokumentom. Dokumenty, które już mają tę kategorię, zachowają ją.",
+    "retireMessage": "Usunąć kategorię {{name}}? Nie będzie można przypisać jej do kolejnych dokumentów. Wcześniej oznaczone dokumenty zachowają tę kategorię.",
     "history": "Historia zmian",
     "events": {
       "created": "Utworzono kategorię",
@@ -55,14 +55,14 @@
     }
   },
   "coworkerPrivate": {
-    "subtitle": "Tutaj znajdziesz swoje dokumenty. Niektóre trzeba podpisać i odesłać, przy innych wystarczy potwierdzić, że znasz ich treść.",
+    "subtitle": "Znajdziesz tu dokumenty do przeczytania. Niektóre trzeba podpisać i odesłać, a przy innych wystarczy potwierdzić przeczytanie.",
     "declaration": "Potwierdzam, że przesyłany dokument jest przeze mnie podpisany.",
-    "actionRequiredOnly": "Tylko wymagające działania",
+    "actionRequiredOnly": "Tylko wymagające mojego działania",
     "versionHistory": "Historia wersji",
     "collapseUpload": "Zwiń"
   },
   "coworkerShared": {
-    "subtitle": "Przeczytaj udostępnione Ci dokumenty i potwierdź, że znasz ich treść."
+    "subtitle": "Przeczytaj udostępnione dokumenty, a następnie potwierdź, że znasz ich treść."
   },
   "fields": {
     "startedAt": "Rozpoczęto",
@@ -72,7 +72,7 @@
     "noPreset": "Inny dokument",
     "historicalVersion": "Starsza wersja",
     "assignments": "Przydzielono",
-    "pendingAssignments": "Oczekują na potwierdzenie",
+    "pendingAssignments": "Do potwierdzenia",
     "acknowledgedAssignments": "Potwierdzono",
     "autoAssign": "Przydzielaj automatycznie po zakończeniu wdrożenia",
     "acknowledgement": "Potwierdzam, że znam treść dokumentu.",
@@ -82,8 +82,8 @@
     "pendingSignatures": "Czekają na podpisane kopie",
     "pendingAcknowledgements": "Do potwierdzenia",
     "awaitingAdminReview": "Do sprawdzenia",
-    "requiredAction": "Wymagane działanie",
-    "defaultAction": "Wymóg dla dokumentu",
+    "requiredAction": "Co ma zrobić współpracownik?",
+    "defaultAction": "Wymagane od współpracownika",
     "noAssignment": "Nieprzydzielony"
   },
   "actions": {
@@ -114,7 +114,7 @@
   },
   "dialogs": {
     "rejectionTitle": "Odrzuć podpisaną kopię",
-    "rejectionDescription": "Podaj powód odrzucenia. Współpracownik zobaczy go przy dokumencie.",
+    "rejectionDescription": "Podaj powód odrzucenia. Współpracownik zobaczy go przy odrzuconym dokumencie.",
     "removeMessage": "Usunąć ten dokument wraz z jego plikami?",
     "completeMessage": "Zakończyć wdrożenie tego współpracownika? Po zakończeniu otrzyma dostęp do przydzielonych dokumentów wspólnych.",
     "cancelOnboardingMessage": "Anulować wdrożenie tego współpracownika? Nie będzie można go wznowić. Oczekujące działania dotyczące dokumentów zostaną anulowane, ale dokumenty, konto i historia wdrożenia pozostaną zachowane.",
@@ -130,9 +130,9 @@
       "coworkerPrivateDocuments": "Nie udało się wczytać Twoich dokumentów. Spróbuj ponownie."
     },
     "api": {
-      "VALIDATION_FAILED": "Nie można wykonać tej czynności. Sprawdź podane informacje i aktualny stan dokumentu lub wdrożenia.",
+      "VALIDATION_FAILED": "Nie można teraz wykonać tej czynności. Sprawdź wprowadzone informacje i aktualny status dokumentu lub wdrożenia.",
       "NOT_FOUND": "Nie znaleziono dokumentu lub wdrożenia. Odśwież stronę i spróbuj ponownie.",
-      "CONFLICT": "Dokument lub wdrożenie zmieniły się albo nie pozwalają już na tę czynność. Odśwież dane i sprawdź ich stan.",
+      "CONFLICT": "Dane zmieniły się albo ta czynność nie jest już dostępna. Odśwież stronę i sprawdź aktualny status.",
       "UPLOAD_FAILED": "Nie udało się przesłać pliku. Spróbuj ponownie."
     }
   },
@@ -157,7 +157,7 @@
     "mutationFailedSummary": "Nie udało się zapisać zmian",
     "mutationFailedDetail": "Sprawdź dane i spróbuj ponownie.",
     "mutationUncertainSummary": "Wystąpił problem podczas zapisu",
-    "mutationUncertainDetail": "Zmiana mogła zostać zapisana. Sprawdź aktualne dane, zanim spróbujesz ponownie.",
+    "mutationUncertainDetail": "Nie wiemy, czy zmiana została zapisana. Odśwież stronę i sprawdź wynik przed kolejną próbą.",
     "downloadFailedSummary": "Nie udało się otworzyć lub pobrać dokumentu",
     "downloadFailedDetail": "Spróbuj ponownie za chwilę."
   },
@@ -165,7 +165,7 @@
     "pendingAcknowledgement": "Do potwierdzenia",
     "requiredAction": {
       "none": "Nie wymaga działania",
-      "upload_signed": "Przesłanie podpisanej kopii",
+      "upload_signed": "Podpisanie i odesłanie",
       "acknowledge": "Potwierdzenie przeczytania"
     }
   }

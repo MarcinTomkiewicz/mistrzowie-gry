@@ -1,6 +1,6 @@
 {
   "page": {
-    "subtitle": "Zobacz dostępne zlecenia, propozycje udziału, swoje zgłoszenia i potwierdzone zlecenia.",
+    "subtitle": "Sprawdź dostępne zlecenia, otrzymane propozycje, swoje zgłoszenia i potwierdzony udział.",
     "loadErrorTitle": "Nie udało się wczytać zleceń"
   },
   "sections": {
@@ -79,7 +79,7 @@
       "accepted": "Zaakceptowano",
       "rejected": "Odrzucono"
     },
-    "archivedCandidateHint": "To zlecenie zostało zarchiwizowane. Informacje o Twoim udziale są dostępne do wglądu.",
+    "archivedCandidateHint": "Zlecenie zostało zarchiwizowane. Możesz sprawdzić wcześniejsze informacje o swoim udziale.",
     "tabs": {
       "information": "Informacje",
       "travelTerms": "Warunki wyjazdu",
@@ -90,7 +90,7 @@
       "submit": "Wyślij zgłoszenie",
       "withdraw": "Wycofaj zgłoszenie",
       "scopeTitle": "Zakres zgłoszenia",
-      "draftHint": "Masz zapisany szkic zgłoszenia. Uzupełnij zakres udziału i wyślij zgłoszenie. Sesje zaproponujesz po potwierdzeniu udziału.",
+      "draftHint": "Zgłoszenie zostało zapisane, ale jeszcze go nie wysłano. Sprawdź zakres swojego udziału i wyślij zgłoszenie. Sesje zaproponujesz po potwierdzeniu udziału.",
       "pendingHint": "Twoje zgłoszenie czeka na decyzję koordynatora.",
       "unavailableHint": "Nie można teraz zgłosić się do tego zlecenia.",
       "withdrawConfirm": "Wycofać zgłoszenie?",
@@ -112,8 +112,8 @@
       "withdraw": "Wycofaj udział",
       "startedHint": "Zlecenie już się rozpoczęło, dlatego nie możesz wycofać potwierdzonego udziału.",
       "replacementLabel": "Mistrz Gry na zastępstwo",
-      "replacementRequiredHint": "Do rozpoczęcia zlecenia pozostało mniej niż 72 godziny. Wskaż Mistrza Gry na zastępstwo.",
-      "replacementOptionalHint": "Do rozpoczęcia zlecenia zostały co najmniej 72 godziny. Możesz zaproponować zastępstwo.",
+      "replacementRequiredHint": "Do rozpoczęcia zlecenia pozostało mniej niż 72 godziny. Wskaż Mistrza Gry, któremu mamy zaproponować zastępstwo.",
+      "replacementOptionalHint": "Do rozpoczęcia zlecenia pozostały co najmniej 72 godziny. Możesz wskazać Mistrza Gry, któremu zaproponujemy zastępstwo.",
       "replacementHint": "Wskazany Mistrz Gry otrzyma propozycję zastępstwa i sam zdecyduje, czy ją przyjąć.",
       "replacementLoadFailed": "Nie udało się wczytać listy Mistrzów Gry.",
       "withdrawConfirm": "Wycofać udział bez wskazywania zastępstwa?",
@@ -127,20 +127,20 @@
     },
     "sessionProposals": {
       "title": "Propozycje sesji",
-      "hint": "Zaproponuj wymaganą liczbę sesji dla każdego bloku, w którym bierzesz udział. Możesz zapisać także niekompletną listę.",
-      "requiredPerSlot": "Minimum propozycji na blok",
-      "selectedCount": "Wybrane sesje",
-      "complete": "Kompletne",
-      "incomplete": "Niekompletne",
-      "unsavedHint": "Masz niezapisane zmiany. Po zapisaniu sprawdzimy, czy liczba propozycji jest wystarczająca.",
+      "hint": "Dla każdego bloku, w którym bierzesz udział, zaproponuj wymaganą liczbę sesji. Możesz zapisać dotychczasowe propozycje i uzupełnić je później.",
+      "requiredPerSlot": "Wymagane propozycje",
+      "selectedCount": "Zaproponowane sesje",
+      "complete": "Gotowe",
+      "incomplete": "Do uzupełnienia",
+      "unsavedHint": "Masz niezapisane propozycje sesji. Po zapisie sprawdzimy, czy jest ich wystarczająco dużo w każdym bloku.",
       "readOnly": "Nie możesz teraz zmieniać propozycji sesji.",
       "add": "Dodaj propozycję",
-      "emptyMappings": "Nie zaproponowano jeszcze sesji dla tego bloku.",
-      "emptySlots": "Brak bloków wymagających propozycji sesji.",
+      "emptyMappings": "Nie zaproponowano jeszcze żadnej sesji w tym bloku.",
+      "emptySlots": "Nie ma bloków, dla których musisz zaproponować sesje.",
       "loadFailed": "Nie udało się wczytać propozycji sesji.",
       "saveFailed": "Nie udało się zapisać propozycji sesji.",
       "saveSuccess": "Zapisano propozycje sesji"
     },
-    "sessionProposalHint": "Sesje proponujesz po potwierdzeniu udziału, osobno dla każdego bloku."
+    "sessionProposalHint": "Po potwierdzeniu udziału możesz proponować sesje osobno dla każdego bloku."
   }
 }
