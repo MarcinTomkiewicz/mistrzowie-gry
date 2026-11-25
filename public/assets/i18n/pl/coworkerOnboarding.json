@@ -103,11 +103,6 @@
     "goToQuestionnaire": "Przejdź do kwestionariusza"
   },
   "upload": {
-    "choose": "Wybierz plik PDF",
-    "drop": "Przeciągnij plik PDF tutaj albo wybierz go z urządzenia.",
-    "formats": "PDF, maksymalnie 25 MB.",
-    "selected": "Wybrany plik",
-    "missingFile": "Wybierz plik PDF.",
     "contractPreset": "Umowa",
     "annexPreset": "Załącznik",
     "protocolPreset": "Protokół"

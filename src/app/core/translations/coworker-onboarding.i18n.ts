@@ -7,6 +7,7 @@ import {
   createCommonFormI18n,
   createCommonLabelsI18n,
   createCommonNavI18n,
+  createCommonPdfUploadI18n,
   createCommonStatusI18n,
   createCommonStatusPhrasesI18n,
   createCommonTableI18n,
@@ -68,11 +69,6 @@ export function createCoworkerOnboardingI18n() {
     statuses: 'statuses',
   });
 
-  const fileUploadTexts = computed(() => ({
-    chooseLabel: sections.upload().choose,
-    dropLabel: sections.upload().drop,
-    formatsLabel: sections.upload().formats,
-  }));
   const commonEntityStatuses = createCommonEntityStatusesI18n();
   const commonStatusPhrases = createCommonStatusPhrasesI18n();
   const assignmentStatuses = computed<Record<CoworkerDocumentAssignmentStatus, string> | null>(() => {
@@ -94,12 +90,12 @@ export function createCoworkerOnboardingI18n() {
 
   return {
     ...sections,
+    ...createCommonPdfUploadI18n(),
     assignmentStatuses,
     onboardingStatusLabel: (status: CoworkerOnboardingLifecycleStatus): string | null =>
       status === 'in_progress'
         ? commonStatusPhrases().inProgress ?? null
         : commonEntityStatuses()[status]?.neuter ?? null,
-    fileUploadTexts,
     commonActions: createCommonActionsI18n(),
     commonEntityStatuses,
     commonStatusPhrases,

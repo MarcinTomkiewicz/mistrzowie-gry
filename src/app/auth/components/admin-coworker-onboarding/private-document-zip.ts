@@ -1,9 +1,9 @@
 import { signal } from '@angular/core';
 import { firstValueFrom, fromEvent, takeUntil, type Observable } from 'rxjs';
 
-import { environment } from '../../../../env/environment';
 import type { ICoworkerDocumentDownload } from '../../../core/interfaces/i-coworker-onboarding';
 import type { Platform } from '../../../core/services/platform/platform';
+import { fetchPrivatePdf } from '../../../core/utils/private-pdf';
 
 export interface PrivateDocumentZipProgress {
   readonly completed: number;
@@ -38,7 +38,7 @@ export class PrivateDocumentZip {
           signal.throwIfAborted();
           const download = await firstValueFrom(getDownload(id).pipe(takeUntil(aborted)));
           signal.throwIfAborted();
-          const pdf = await fetchPdf(download.url, signal);
+          const pdf = await fetchPrivatePdf(download.url, '/storage/v1/object/sign/coworker-documents/', signal);
           await writer.add(archiveEntryName(download.filename, index), new BlobReader(pdf), { signal });
           signal.throwIfAborted();
           this.state.set({ completed: index + 1, total: ids.length });
@@ -65,26 +65,6 @@ export class PrivateDocumentZip {
     this.active = null;
     this.state.set(null);
   }
-}
-
-async function fetchPdf(signedUrl: string, signal: AbortSignal): Promise<Blob> {
-  const url = new URL(signedUrl);
-  const storage = new URL('/storage/v1/object/sign/coworker-documents/', environment.supabase.url);
-  if (url.origin !== storage.origin || !url.pathname.startsWith(storage.pathname) ||
-      url.username || url.password || !url.searchParams.get('token')) {
-    throw new Error('Invalid private document download URL.');
-  }
-
-  const response = await fetch(url, { signal, credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer' });
-  if (response.status !== 200) {
-    await response.body?.cancel();
-    throw new Error('Private document download failed.');
-  }
-  const pdf = await response.blob();
-  if (await pdf.slice(0, 5).text() !== '%PDF-') {
-    throw new Error('Invalid private document PDF.');
-  }
-  return pdf;
 }
 
 function archiveEntryName(filename: string, index: number): string {

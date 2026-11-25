@@ -1,3 +1,5 @@
+import { computed } from '@angular/core';
+
 import {
   CommonAccessibilityTranslations,
   CommonActionsTranslations,
@@ -5,6 +7,7 @@ import {
   CommonDurationUnitTranslations,
   CommonEmptyTranslations,
   CommonErrorsTranslations,
+  CommonFormFileUploadTranslations,
   CommonFormTranslations,
   CommonInfoTranslations,
   CommonLabelsTranslations,
@@ -67,6 +70,18 @@ export function createCommonErrorsI18n() {
 
 export function createCommonFormI18n() {
   return createCommonScopeSignal<CommonFormTranslations>('form');
+}
+
+export function createCommonPdfUploadI18n() {
+  const pdfUpload = createCommonScopeSignal<CommonFormFileUploadTranslations['pdf']>('form.fileUpload.pdf');
+
+  return {
+    pdfUpload,
+    fileUploadTexts: computed(() => {
+      const { choose, drop, formats } = pdfUpload();
+      return { chooseLabel: choose, dropLabel: drop, formatsLabel: formats };
+    }),
+  };
 }
 
 export function createCommonInfoI18n() {

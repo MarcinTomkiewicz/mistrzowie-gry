@@ -2,6 +2,7 @@ import type { Routes } from '@angular/router';
 import type { EventCoreEditor } from '../components/admin-events/core-editor/event-core-editor';
 import type { EventCoreList } from '../components/admin-events/core-list/event-core-list';
 
+import { ADMIN_CONTRACTS_ROUTE } from '../../core/configs/admin-contract-templates.config';
 import { authGuard } from '../../core/guards/auth.guard';
 import { minimumRoleGuard } from '../../core/guards/minimum-role.guard';
 
@@ -14,6 +15,10 @@ const loaders = {
     import(
       '../components/admin-staffing/staffing-realization-list/staffing-realization-list'
     ).then((m) => m.StaffingRealizationList),
+  contractTemplateCatalog: () =>
+    import('../components/admin-contract-templates/contract-template-catalog').then(
+      (m) => m.ContractTemplateCatalog,
+    ),
   staffingRecruitmentPolicyEditor: () =>
     import(
       '../components/admin-staffing/staffing-recruitment-policy-editor/staffing-recruitment-policy-editor'
@@ -95,6 +100,10 @@ const managementGuards = [
 ];
 
 const adminChildren: Routes = [
+  {
+    path: ADMIN_CONTRACTS_ROUTE,
+    loadComponent: loaders.contractTemplateCatalog,
+  },
   {
     path: 'content/offers/constants',
     loadComponent: loaders.commercialConstantList,

@@ -1,0 +1,33 @@
+{
+  "catalog": {
+    "title": "Wzory umów",
+    "addTitle": "Dodaj wzór",
+    "family": "[PH] Rodzina umowy",
+    "sourceUrl": "[PH] Adres dokumentu Google Docs",
+    "sourceLink": "[PH] Otwórz dokument źródłowy",
+    "hash": "SHA-256",
+    "families": {
+      "ddd": "DDD",
+      "parent_school": "Rodzic/szkoła",
+      "institution": "Placówka"
+    },
+    "statuses": {
+      "staged": "[PH] Oczekuje na aktywację"
+    },
+    "activation": {
+      "title": "[PH] Aktywuj wzór",
+      "message": "[PH] Aktywacja wycofa dotychczasowy aktywny wzór tej rodziny, jeśli istnieje.",
+      "reference": "[PH] Referencja akceptacji"
+    },
+    "empty": "[PH] W katalogu nie ma jeszcze wzorów umów.",
+    "loadFailed": "[PH] Nie udało się odczytać katalogu wzorów.",
+    "sourceInvalid": "[PH] Podaj adres HTTPS dokumentu Google Docs.",
+    "uploaded": "[PH] Dodano wzór. Możesz go aktywować z listy.",
+    "activated": "[PH] Wzór został aktywowany.",
+    "uploadFailed": "[PH] Nie udało się dodać wzoru.",
+    "activationFailed": "[PH] Nie udało się aktywować wzoru.",
+    "fileFailed": "[PH] Nie udało się pobrać pliku PDF.",
+    "uploadUncertain": "[PH] Wynik dodawania wzoru jest nieznany. Sprawdź odświeżony katalog przed kolejną próbą.",
+    "activationUncertain": "[PH] Wynik aktywacji jest nieznany. Sprawdź aktualny status wzoru w katalogu."
+  }
+}

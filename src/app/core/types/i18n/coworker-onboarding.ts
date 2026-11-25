@@ -111,11 +111,6 @@ export interface CoworkerOnboardingActionsTranslations {
 }
 
 export interface CoworkerOnboardingUploadTranslations {
-  choose: string;
-  drop: string;
-  formats: string;
-  selected: string;
-  missingFile: string;
   contractPreset: string;
   annexPreset: string;
   protocolPreset: string;

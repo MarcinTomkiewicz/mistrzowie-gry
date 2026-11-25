@@ -240,6 +240,7 @@ export type CommonNavTranslations = {
   gmAvailabilityOverview: string;
   workLogOverview: string;
   adminCoworkerRecords: string;
+  adminContracts: string;
   usersManagement: string;
   sharedDocuments: string;
   privateDocuments: string;
@@ -318,6 +319,13 @@ export type CommonFormConsentTranslations = {
 };
 
 export type CommonFormFileUploadTranslations = {
+  pdf: {
+    choose: string;
+    drop: string;
+    formats: string;
+    selected: string;
+    missingFile: string;
+  };
   chooseImage: string;
   dropImage: string;
   imageFormats: string;

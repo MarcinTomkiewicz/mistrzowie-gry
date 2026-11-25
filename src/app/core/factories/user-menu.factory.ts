@@ -1,5 +1,6 @@
 import type { IUserMenuSection } from '../interfaces/i-user-menu';
 import type { BuildUserMenuArgs } from '../types/user-menu';
+import { ADMIN_CONTRACTS_ROUTE } from '../configs/admin-contract-templates.config';
 import { EVENT_SIGNUP_SELECTION_ROUTE } from '../configs/event-signup.config';
 import { GM_STAFFING_HUB_ROUTE } from '../configs/staffing-realization.config';
 
@@ -84,6 +85,11 @@ export function buildUserMenu(args: BuildUserMenuArgs): IUserMenuSection[] {
         id: 'admin-coworker-records',
         label: args.adminCoworkerRecordsLabel,
         path: '/admin/coworkers',
+      },
+      {
+        id: 'admin-contracts',
+        label: args.adminContractsLabel,
+        path: `/admin/${ADMIN_CONTRACTS_ROUTE}`,
       },
     );
   }

@@ -46,6 +46,7 @@ export class UserMenuPanel {
       adminStaffingLabel: this.i18n.commonNav().staffingManagement,
       adminCoworkerRecordsLabel:
         this.i18n.commonNav().adminCoworkerRecords,
+      adminContractsLabel: this.i18n.commonNav().adminContracts,
       adminUsersLabel: this.i18n.commonNav().usersAdministration,
       canSeeCoworker: hasMinimumRole(this.auth.user(), 'gm'),
       canSeeGmZone: hasMinimumRole(this.auth.user(), 'gm'),

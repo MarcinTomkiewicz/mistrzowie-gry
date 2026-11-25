@@ -9,6 +9,7 @@ export type UserMenuItemId =
   | 'admin-content'
   | 'admin-staffing'
   | 'admin-coworker-records'
+  | 'admin-contracts'
   | 'admin-users';
 
 export type UserMenuSectionId =
@@ -32,6 +33,7 @@ export type BuildUserMenuArgs = {
   adminContentLabel: string;
   adminStaffingLabel: string;
   adminCoworkerRecordsLabel: string;
+  adminContractsLabel: string;
   adminUsersLabel: string;
   canSeeCoworker: boolean;
   canSeeGmZone: boolean;

@@ -58,10 +58,10 @@
 
       @if (form.controls.file.value; as file) {
         <small class="tag-badge tag-badge--muted">
-          {{ i18n.upload().selected }}: {{ file.name }}
+          {{ i18n.pdfUpload().selected }}: {{ file.name }}
         </small>
       } @else if (form.controls.file.touched) {
-        <small class="error-text">{{ i18n.upload().missingFile }}</small>
+        <small class="error-text">{{ i18n.pdfUpload().missingFile }}</small>
       }
 
       <div class="flex-row-end-center">

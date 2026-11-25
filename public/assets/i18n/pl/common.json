@@ -253,6 +253,7 @@
     "gmAvailabilityOverview": "Przegląd dyspozycyjności",
     "workLogOverview": "Przegląd czasu pracy",
     "adminCoworkerRecords": "Akta współpracowników",
+    "adminContracts": "Umowy",
     "usersManagement": "Zarządzanie użytkownikami",
     "sharedDocuments": "Dokumenty wspólne",
     "privateDocuments": "Dokumenty prywatne"
@@ -295,7 +296,14 @@
       "cropPreviewLabel": "Podgląd wyniku",
       "cropPreviewLandscapeLabel": "Kadr poziomy",
       "cropPreviewCircleLabel": "W kółku",
-      "cropPreviewSquareLabel": "W kwadracie"
+      "cropPreviewSquareLabel": "W kwadracie",
+      "pdf": {
+        "choose": "Wybierz plik PDF",
+        "drop": "Przeciągnij plik PDF tutaj albo wybierz go z urządzenia.",
+        "formats": "PDF, maksymalnie 25 MB.",
+        "selected": "Wybrany plik",
+        "missingFile": "Wybierz plik PDF."
+      }
     },
     "consent": {
       "label": "Wyrażam zgodę na kontakt w sprawie zapytania.",
