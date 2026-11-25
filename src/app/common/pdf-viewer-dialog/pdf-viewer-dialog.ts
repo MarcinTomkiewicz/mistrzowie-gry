@@ -11,7 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { catchError, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, map, of, switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -38,6 +38,7 @@ export class PdfViewerDialog {
   private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly viewport = viewChild(PdfViewerViewport);
+  private documentLoad?: AbortController;
 
   readonly preview = input<IPdfPreview | null>(null);
   readonly closed = output<void>();
@@ -81,19 +82,22 @@ export class PdfViewerDialog {
   });
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.documentLoad?.abort());
     toObservable(this.preview)
       .pipe(
         map((preview) => preview?.url ?? null),
         distinctUntilChanged(),
         switchMap((url) => {
+          this.documentLoad?.abort();
+          this.documentLoad = undefined;
+          this.document.set(null);
+          this.pageCount.set(0);
           this.pageNumber.set(1);
           this.zoom.set(1);
           this.viewport()?.resetToTop();
           this.viewport()?.clearInteraction();
 
           if (!url || !isPlatformBrowser(this.platformId)) {
-            this.document.set(null);
-            this.pageCount.set(0);
             this.hasError.set(false);
             this.isLoading.set(false);
             return of(null);
@@ -102,11 +106,12 @@ export class PdfViewerDialog {
           this.isLoading.set(true);
           this.hasError.set(false);
 
-          return loadPdfDocument(url).pipe(
+          const controller = new AbortController();
+          this.documentLoad = controller;
+          return loadPdfDocument(url, controller.signal).pipe(
             catchError((error: unknown) => {
+              controller.abort();
               reportPdfError('dialog-load', error);
-              this.document.set(null);
-              this.pageCount.set(0);
               this.hasError.set(true);
               this.isLoading.set(false);
               return of(null);
@@ -149,7 +154,9 @@ export class PdfViewerDialog {
             targetHeight,
             request.zoom,
           ).pipe(
+            filter(() => this.document() === request.document),
             catchError((error: unknown) => {
+              if (this.document() !== request.document) return of(null);
               reportPdfError('dialog-render', error);
               this.hasError.set(true);
               this.isLoading.set(false);

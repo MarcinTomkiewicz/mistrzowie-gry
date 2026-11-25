@@ -32,5 +32,22 @@
     "fileFailed": "[PH] Nie udało się pobrać pliku PDF.",
     "uploadUncertain": "[PH] Wynik dodawania wzoru jest nieznany. Sprawdź odświeżony katalog przed kolejną próbą.",
     "activationUncertain": "[PH] Wynik aktywacji jest nieznany. Sprawdź aktualny status wzoru w katalogu."
+  },
+  "preparation": {
+    "title": "[PH] Przygotuj umowę",
+    "noActiveTemplate": "[PH] Brak aktywnego wzoru dla tego rodzaju umowy.",
+    "fieldMapMissing": "[PH] Dla aktywnego wzoru brakuje zgodnej mapy pól.",
+    "loadFailed": "[PH] Nie udało się wczytać aktywnego wzoru.",
+    "formUnavailable": "[PH] Formularz dla tego rodzaju umowy nie jest jeszcze dostępny.",
+    "generating": "[PH] Przygotowywanie PDF...",
+    "missingData": "[PH] Uzupełnij dane umowy.",
+    "generationFailed": "[PH] Nie udało się przygotować PDF.",
+    "fieldErrors": {
+      "unknown-field": "[PH] Tego pola nie ma w mapie wzoru.",
+      "invalid-area": "[PH] Obszar pola jest poza stroną lub ma nieprawidłowe wymiary.",
+      "invalid-font": "[PH] Czcionka pola jest niedostępna lub nieprawidłowa.",
+      "unsupported-character": "[PH] Czcionka nie obsługuje jednego ze znaków w polu.",
+      "text-overflow": "[PH] Tekst nie mieści się w polu przy minimalnym rozmiarze czcionki."
+    }
   }
 }

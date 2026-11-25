@@ -1,0 +1,34 @@
+@let title = i18n.nav().adminContracts;
+@let catalogTitle = i18n.copy().title;
+@let preparationTitle = i18n.preparation().title;
+@let copyReady = !!(title && catalogTitle && preparationTitle);
+
+<section class="mg-section mg-section--full">
+  <div class="mg-container position-relative flex-col-start-stretch gap-lg w-100 min-w-0"
+    [attr.aria-busy]="!copyReady">
+    <app-loading-overlay [visible]="!copyReady" [label]="i18n.status().loading" />
+
+    @if (copyReady) {
+      <header class="mg-section__header w-100">
+        <h1 class="mg-section__title">{{ title }}</h1>
+      </header>
+
+      <p-tabs #tabs value="templates" [scrollable]="true" class="w-100 min-w-0">
+        <p-tablist>
+          <p-tab value="templates">{{ catalogTitle }}</p-tab>
+          <p-tab value="prepare" [disabled]="catalog.busy()">{{ preparationTitle }}</p-tab>
+        </p-tablist>
+        <p-tabpanels>
+          <p-tabpanel value="templates">
+            <app-contract-template-catalog />
+          </p-tabpanel>
+          <p-tabpanel value="prepare">
+            @if (tabs.value() === 'prepare') {
+              <app-contract-preparation />
+            }
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    }
+  </div>
+</section>

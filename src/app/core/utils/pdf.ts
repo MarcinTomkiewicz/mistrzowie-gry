@@ -1,4 +1,4 @@
-import { from, map, Observable, of, switchMap } from 'rxjs';
+import { EMPTY, from, map, Observable, of, switchMap } from 'rxjs';
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
@@ -6,15 +6,20 @@ import { IPdfLoadResult, IPdfRenderResult } from '../interfaces/i-pdf';
 
 let workerConfigured = false;
 
-export function loadPdfDocument(src: string): Observable<IPdfLoadResult> {
+export function loadPdfDocument(src: string, signal?: AbortSignal): Observable<IPdfLoadResult> {
   return from(import('pdfjs-dist')).pipe(
     switchMap((pdfjs) => {
+      if (signal?.aborted) return EMPTY;
       if (!workerConfigured) {
         pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js?v=${encodeURIComponent(pdfjs.version)}`;
         workerConfigured = true;
       }
 
-      return from(pdfjs.getDocument(src).promise).pipe(
+      const task = pdfjs.getDocument(src);
+      signal?.addEventListener('abort', () => {
+        void task.destroy().catch(() => undefined);
+      }, { once: true });
+      return from(task.promise).pipe(
         map((document) => ({
           document,
           pageCount: document.numPages,

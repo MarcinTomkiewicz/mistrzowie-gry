@@ -15,9 +15,9 @@ const loaders = {
     import(
       '../components/admin-staffing/staffing-realization-list/staffing-realization-list'
     ).then((m) => m.StaffingRealizationList),
-  contractTemplateCatalog: () =>
-    import('../components/admin-contract-templates/contract-template-catalog').then(
-      (m) => m.ContractTemplateCatalog,
+  adminContracts: () =>
+    import('../components/admin-contract-templates/admin-contracts').then(
+      (m) => m.AdminContracts,
     ),
   staffingRecruitmentPolicyEditor: () =>
     import(
@@ -102,7 +102,7 @@ const managementGuards = [
 const adminChildren: Routes = [
   {
     path: ADMIN_CONTRACTS_ROUTE,
-    loadComponent: loaders.contractTemplateCatalog,
+    loadComponent: loaders.adminContracts,
   },
   {
     path: 'content/offers/constants',

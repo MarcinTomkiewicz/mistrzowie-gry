@@ -1,7 +1,6 @@
 import { Component, computed, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { provideTranslocoScope } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { SelectModule } from 'primeng/select';
@@ -14,14 +13,13 @@ import { PdfViewerDialog } from '../../../common/pdf-viewer-dialog/pdf-viewer-di
 import { STATUS_BADGE_CLASS } from '../../../core/configs/badge-class.config';
 import {
   type ContractTemplateFamily,
-  CONTRACT_TEMPLATE_FAMILIES,
   CONTRACT_TEMPLATE_PDF_MAX_BYTES,
   CONTRACT_TEMPLATE_PDF_MIME,
 } from '../../../core/configs/admin-contract-templates.config';
 import type { ContractTemplate } from '../../../core/services/admin-contract-templates/admin-contract-templates.contract';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import type { FileUploadOptions } from '../../../core/types/file-upload';
-import { ADMIN_CONTRACT_TEMPLATES_SCOPE, createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
+import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 import { ContractTemplatesFacade } from './contract-templates-facade';
 
 @Component({
@@ -31,7 +29,6 @@ import { ContractTemplatesFacade } from './contract-templates-facade';
     FileUpload, LoadingOverlay, PdfViewerDialog,
   ],
   templateUrl: './contract-template-catalog.html',
-  providers: [ContractTemplatesFacade, provideTranslocoScope(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'common')],
 })
 export class ContractTemplateCatalog {
   private readonly destroyRef = inject(DestroyRef);
@@ -47,10 +44,6 @@ export class ContractTemplateCatalog {
         file.type === CONTRACT_TEMPLATE_PDF_MIME && file.name.toLowerCase().endsWith('.pdf')
       ) ? null : { pdf: true };
     }]),
-  });
-  protected readonly familyOptions = computed(() => {
-    const labels = this.i18n.copy().families;
-    return labels ? CONTRACT_TEMPLATE_FAMILIES.map((value) => ({ value, label: labels[value] })) : [];
   });
   protected readonly rows = computed(() => {
     const { families, statuses } = this.i18n.copy();
