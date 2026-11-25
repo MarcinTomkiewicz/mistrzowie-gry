@@ -1,16 +1,16 @@
 import { withSupabase } from "npm:@supabase/server@^1";
 
 import {
-  CoworkerDocumentRequestError,
   parseCoworkerJsonRequest,
   parseCoworkerMultipartRequest,
 } from "../_shared/coworker-documents.schemas.ts";
 import {
-  CoworkerDocumentAuthenticationError,
+  DocumentAuthenticationError,
   documentErrorResponse,
+  DocumentRequestError,
   normalizeDocumentResponse,
   successResponse,
-} from "../_shared/coworker-documents.ts";
+} from "../_shared/document-api.ts";
 import { readFormData, readJson } from "../_shared/http.ts";
 import { handleCoworkerAction } from "./actions.ts";
 import { getCoworkerDownload } from "./downloads.ts";
@@ -22,17 +22,17 @@ const authenticatedFetch = withSupabase(
     const requestId = crypto.randomUUID();
     try {
       if (request.method !== "POST") {
-        throw new CoworkerDocumentRequestError();
+        throw new DocumentRequestError();
       }
       const userId = context.userClaims?.id;
       if (typeof userId !== "string" || userId === "") {
-        throw new CoworkerDocumentAuthenticationError();
+        throw new DocumentAuthenticationError();
       }
 
       const contentType = request.headers.get("content-type") ?? "";
       if (contentType.startsWith("multipart/form-data")) {
         const upload = parseCoworkerMultipartRequest(
-          await readFormData(request, CoworkerDocumentRequestError),
+          await readFormData(request, DocumentRequestError),
         );
         return successResponse(
           await uploadSignedDocument(
@@ -44,7 +44,7 @@ const authenticatedFetch = withSupabase(
       }
 
       const action = parseCoworkerJsonRequest(
-        await readJson(request, CoworkerDocumentRequestError),
+        await readJson(request, DocumentRequestError),
       );
       if (action.action === "getDownloadUrl") {
         return successResponse(

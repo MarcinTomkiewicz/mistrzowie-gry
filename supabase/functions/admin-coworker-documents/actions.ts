@@ -15,12 +15,12 @@ import type {
   IStartCoworkerOnboardingResult,
 } from "../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
 import type { parseAdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
+import { coworkerPdfStorage } from "../_shared/coworker-documents.ts";
 import {
-  callCoworkerRpc,
-  callSingleCoworkerRpc,
-  CoworkerDocumentNotFoundError,
-  removeDocumentPaths,
-} from "../_shared/coworker-documents.ts";
+  DocumentNotFoundError,
+  readDocumentRpc,
+  readSingleDocumentRpc,
+} from "../_shared/document-api.ts";
 
 const RPC = {
   listOnboardingCandidates: "list_admin_coworker_onboarding_candidates",
@@ -51,28 +51,31 @@ export async function handleAdminAction(
 ): Promise<unknown> {
   switch (request.action) {
     case "listOnboardingCandidates":
-      return await callCoworkerRpc<IAdminCoworkerOnboardingCandidate[]>(
-        client,
+      return await readDocumentRpc<IAdminCoworkerOnboardingCandidate[]>(
         RPC.listOnboardingCandidates,
+        client.rpc(RPC.listOnboardingCandidates),
       );
     case "listOnboardings":
       return await listAdminOnboardings(client);
     case "getOnboarding":
       return await getOnboarding(client, request.onboarding_id);
     case "startOnboarding":
-      return await callSingleCoworkerRpc<IStartCoworkerOnboardingResult>(
-        client,
+      return await readSingleDocumentRpc<IStartCoworkerOnboardingResult>(
         RPC.startOnboarding,
-        { p_user_id: request.user_id },
+        client.rpc(RPC.startOnboarding, { p_user_id: request.user_id }),
       );
     case "removePrivateDocument": {
-      const result = await callSingleCoworkerRpc<IRemovePrivateDocumentResult>(
-        client,
+      const result = await readSingleDocumentRpc<IRemovePrivateDocumentResult>(
         RPC.removePrivateDocument,
-        { p_document_id: request.document_id },
+        client.rpc(RPC.removePrivateDocument, {
+          p_document_id: request.document_id,
+        }),
       );
       try {
-        await removeDocumentPaths(storageClient, result.storage_paths);
+        await coworkerPdfStorage.removeDocumentPaths(
+          storageClient,
+          result.storage_paths,
+        );
       } catch (error) {
         console.error(JSON.stringify({
           code: "POST_COMMIT_STORAGE_CLEANUP_FAILED",
@@ -85,13 +88,16 @@ export async function handleAdminAction(
       return response;
     }
     case "reviewSignedDocument": {
-      const result = await callSingleCoworkerRpc<
+      const result = await readSingleDocumentRpc<
         IReviewCoworkerSignedSubmissionResult
-      >(client, RPC.reviewSignedDocument, {
-        p_assignment_id: request.assignment_id,
-        p_decision: request.decision,
-        p_rejection_reason: request.rejection_reason,
-      });
+      >(
+        RPC.reviewSignedDocument,
+        client.rpc(RPC.reviewSignedDocument, {
+          p_assignment_id: request.assignment_id,
+          p_decision: request.decision,
+          p_rejection_reason: request.rejection_reason,
+        }),
+      );
       const { signed_storage_path: _signedStoragePath, ...response } = result;
       return response;
     }
@@ -100,58 +106,74 @@ export async function handleAdminAction(
         withoutSharedDocumentPath,
       );
     case "archiveSharedDocument":
-      return await callSingleCoworkerRpc<IArchiveSharedDocumentResult>(
-        client,
+      return await readSingleDocumentRpc<IArchiveSharedDocumentResult>(
         RPC.archiveSharedDocument,
-        { p_document_id: request.document_id },
+        client.rpc(RPC.archiveSharedDocument, {
+          p_document_id: request.document_id,
+        }),
       );
     case "listSharedDocumentAssignments":
       return (await listAdminSharedAssignments(client, request.document_id))
         .map(withoutSharedAssignmentPath);
     case "completeOnboarding":
-      return await callSingleCoworkerRpc<ICompleteCoworkerOnboardingResult>(
-        client,
+      return await readSingleDocumentRpc<ICompleteCoworkerOnboardingResult>(
         RPC.completeOnboarding,
-        { p_onboarding_id: request.onboarding_id },
+        client.rpc(RPC.completeOnboarding, {
+          p_onboarding_id: request.onboarding_id,
+        }),
       );
     case "cancelOnboarding":
-      return await callSingleCoworkerRpc<ICancelCoworkerOnboardingResult>(
-        client,
+      return await readSingleDocumentRpc<ICancelCoworkerOnboardingResult>(
         RPC.cancelOnboarding,
-        { p_onboarding_id: request.onboarding_id },
+        client.rpc(RPC.cancelOnboarding, {
+          p_onboarding_id: request.onboarding_id,
+        }),
       );
     case "listDocumentCategories":
-      return await callCoworkerRpc(client, RPC.listDocumentCategories);
+      return await readDocumentRpc(
+        RPC.listDocumentCategories,
+        client.rpc(RPC.listDocumentCategories),
+      );
     case "saveDocumentCategory":
-      return await callSingleCoworkerRpc(client, RPC.saveDocumentCategory, {
-        p_category_key: request.category_key,
-        p_name: request.name,
-      });
+      return await readSingleDocumentRpc(
+        RPC.saveDocumentCategory,
+        client.rpc(RPC.saveDocumentCategory, {
+          p_category_key: request.category_key,
+          p_name: request.name,
+        }),
+      );
     case "retireDocumentCategory":
-      return await callSingleCoworkerRpc(client, RPC.retireDocumentCategory, {
-        p_category_key: request.category_key,
-      });
+      return await readSingleDocumentRpc(
+        RPC.retireDocumentCategory,
+        client.rpc(RPC.retireDocumentCategory, {
+          p_category_key: request.category_key,
+        }),
+      );
     case "setDocumentCategory":
-      return await callSingleCoworkerRpc<ISetAdminCoworkerDocumentCategoryResult>(
-        client,
+      return await readSingleDocumentRpc<
+        ISetAdminCoworkerDocumentCategoryResult
+      >(
         RPC.setDocumentCategory,
-        {
+        client.rpc(RPC.setDocumentCategory, {
           p_onboarding_id: request.onboarding_id,
           p_document_ids: request.document_ids,
           p_category_key: request.category_key,
-        },
+        }),
       );
     case "listDocumentCategoryHistory":
-      return await callCoworkerRpc(client, RPC.listDocumentCategoryHistory, {
-        p_category_key: request.category_key,
-      });
+      return await readDocumentRpc(
+        RPC.listDocumentCategoryHistory,
+        client.rpc(RPC.listDocumentCategoryHistory, {
+          p_category_key: request.category_key,
+        }),
+      );
   }
 }
 
 function listAdminOnboardings(
   client: SupabaseClient,
 ): Promise<IAdminCoworkerOnboardingRow[]> {
-  return callCoworkerRpc(client, RPC.listOnboardings);
+  return readDocumentRpc(RPC.listOnboardings, client.rpc(RPC.listOnboardings));
 }
 
 export async function getAdminOnboarding(
@@ -163,7 +185,7 @@ export async function getAdminOnboarding(
   const onboarding = onboardings.find((row) =>
     row.onboarding_id === canonicalId
   );
-  if (onboarding === undefined) throw new CoworkerDocumentNotFoundError();
+  if (onboarding === undefined) throw new DocumentNotFoundError();
   return onboarding;
 }
 
@@ -171,24 +193,33 @@ export function listAdminOnboardingDocuments(
   client: SupabaseClient,
   onboardingId: string,
 ): Promise<IAdminCoworkerOnboardingDocumentRow[]> {
-  return callCoworkerRpc(client, RPC.listOnboardingDocuments, {
-    p_onboarding_id: onboardingId,
-  });
+  return readDocumentRpc(
+    RPC.listOnboardingDocuments,
+    client.rpc(RPC.listOnboardingDocuments, {
+      p_onboarding_id: onboardingId,
+    }),
+  );
 }
 
 export function listAdminSharedDocuments(
   client: SupabaseClient,
 ): Promise<IAdminSharedDocumentRow[]> {
-  return callCoworkerRpc(client, RPC.listSharedDocuments);
+  return readDocumentRpc(
+    RPC.listSharedDocuments,
+    client.rpc(RPC.listSharedDocuments),
+  );
 }
 
 export function listAdminSharedAssignments(
   client: SupabaseClient,
   documentId: string,
 ): Promise<IAdminSharedDocumentAssignmentRow[]> {
-  return callCoworkerRpc(client, RPC.listSharedAssignments, {
-    p_document_id: documentId,
-  });
+  return readDocumentRpc(
+    RPC.listSharedAssignments,
+    client.rpc(RPC.listSharedAssignments, {
+      p_document_id: documentId,
+    }),
+  );
 }
 
 async function getOnboarding(

@@ -4,19 +4,16 @@ import type {
   IRegisterAdminPrivateDocumentResult,
   IRegisterSharedDocumentResult,
 } from "../../../src/app/core/interfaces/i-admin-coworker-onboarding.ts";
+import type { parseAdminMultipartRequest } from "../_shared/coworker-documents.schemas.ts";
+import { coworkerPdfStorage } from "../_shared/coworker-documents.ts";
 import {
-  CoworkerDocumentRequestError,
-  type parseAdminMultipartRequest,
-} from "../_shared/coworker-documents.schemas.ts";
-import {
-  callCoworkerRpc,
-  callSingleCoworkerRpc,
-  CoworkerDocumentConflictError,
-  CoworkerDocumentNotFoundError,
-  readPdfFile,
-  removeDocumentPaths,
-  uploadPdf,
-} from "../_shared/coworker-documents.ts";
+  DocumentConflictError,
+  DocumentNotFoundError,
+  DocumentRequestError,
+  readDocumentRpc,
+  readSingleDocumentRpc,
+  shouldCompensateDocumentRegistration,
+} from "../_shared/document-api.ts";
 import { getAdminOnboarding, listAdminSharedDocuments } from "./actions.ts";
 
 const RPC = {
@@ -47,7 +44,7 @@ async function uploadPrivateDocuments(
   const onboarding = await getAdminOnboarding(client, request.onboarding_id);
   const completed = onboarding.status === "completed";
   if (onboarding.status !== "in_progress" && !completed) {
-    throw new CoworkerDocumentConflictError();
+    throw new DocumentConflictError();
   }
   const storageDirectory = completed
     ? `private/by-user/${onboarding.user_id}`
@@ -65,9 +62,9 @@ async function uploadPrivateDocuments(
     for (let index = 0; index < request.documents.length; index += 1) {
       const metadata = request.documents[index];
       const file = request.files[index];
-      const bytes = await readPdfFile(file);
+      const bytes = await coworkerPdfStorage.readPdfFile(file);
       const storagePath = `${storageDirectory}/${crypto.randomUUID()}.pdf`;
-      await uploadPdf(storageClient, storagePath, bytes);
+      await coworkerPdfStorage.uploadPdf(storageClient, storagePath, bytes);
       uploadedPaths.push(storagePath);
       documents.push({
         ...metadata,
@@ -77,16 +74,28 @@ async function uploadPrivateDocuments(
         size_bytes: file.size,
       });
     }
-    return await callCoworkerRpc<IRegisterAdminPrivateDocumentResult[]>(
-      client,
-      RPC.registerPrivateDocuments,
-      {
-        p_onboarding_id: onboarding.onboarding_id,
-        p_documents: documents,
-      },
-    );
   } catch (error) {
     await cleanupFailedUpload(storageClient, uploadedPaths, request.action);
+    throw error;
+  }
+
+  try {
+    return await readDocumentRpc<IRegisterAdminPrivateDocumentResult[]>(
+      RPC.registerPrivateDocuments,
+      client.rpc(RPC.registerPrivateDocuments, {
+        p_onboarding_id: onboarding.onboarding_id,
+        p_documents: documents,
+      }),
+    );
+  } catch (error) {
+    if (
+      shouldCompensateDocumentRegistration(error, {
+        operation: request.action,
+        storagePaths: uploadedPaths,
+      })
+    ) {
+      await cleanupFailedUpload(storageClient, uploadedPaths, request.action);
+    }
     throw error;
   }
 }
@@ -104,19 +113,18 @@ async function uploadSharedDocument(
     const document = documents.find((row) =>
       row.document_id === request.document_id
     );
-    if (document === undefined) throw new CoworkerDocumentNotFoundError();
+    if (document === undefined) throw new DocumentNotFoundError();
     if (document.status !== "active") {
-      throw new CoworkerDocumentRequestError();
+      throw new DocumentRequestError();
     }
   }
-  const bytes = await readPdfFile(request.file);
+  const bytes = await coworkerPdfStorage.readPdfFile(request.file);
   const storagePath = `shared/${crypto.randomUUID()}.pdf`;
+  await coworkerPdfStorage.uploadPdf(storageClient, storagePath, bytes);
   try {
-    await uploadPdf(storageClient, storagePath, bytes);
-    return await callSingleCoworkerRpc<IRegisterSharedDocumentResult>(
-      client,
+    return await readSingleDocumentRpc<IRegisterSharedDocumentResult>(
       RPC.registerSharedDocument,
-      {
+      client.rpc(RPC.registerSharedDocument, {
         p_document_id: request.document_id,
         p_title: request.title,
         p_storage_path: storagePath,
@@ -124,10 +132,18 @@ async function uploadSharedDocument(
         p_mime_type: request.file.type,
         p_size_bytes: request.file.size,
         p_assign_after_onboarding: request.assign_after_onboarding,
-      },
+      }),
     );
   } catch (error) {
-    await cleanupFailedUpload(storageClient, [storagePath], request.action);
+    const storagePaths = [storagePath];
+    if (
+      shouldCompensateDocumentRegistration(error, {
+        operation: request.action,
+        storagePaths,
+      })
+    ) {
+      await cleanupFailedUpload(storageClient, storagePaths, request.action);
+    }
     throw error;
   }
 }
@@ -138,7 +154,7 @@ async function cleanupFailedUpload(
   operation: ReturnType<typeof parseAdminMultipartRequest>["action"],
 ): Promise<void> {
   try {
-    await removeDocumentPaths(storageClient, storagePaths);
+    await coworkerPdfStorage.removeDocumentPaths(storageClient, storagePaths);
   } catch (error) {
     console.error(JSON.stringify({
       code: "UPLOAD_STORAGE_CLEANUP_FAILED",

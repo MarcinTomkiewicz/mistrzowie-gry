@@ -3,17 +3,14 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 import type {
   IRegisterCoworkerSignedSubmissionResult,
 } from "../../../src/app/core/interfaces/i-coworker-onboarding.ts";
+import type { parseCoworkerMultipartRequest } from "../_shared/coworker-documents.schemas.ts";
+import { coworkerPdfStorage } from "../_shared/coworker-documents.ts";
 import {
-  CoworkerDocumentRequestError,
-  type parseCoworkerMultipartRequest,
-} from "../_shared/coworker-documents.schemas.ts";
-import {
-  callSingleCoworkerRpc,
-  CoworkerDocumentNotFoundError,
-  readPdfFile,
-  removeDocumentPaths,
-  uploadPdf,
-} from "../_shared/coworker-documents.ts";
+  DocumentNotFoundError,
+  DocumentRequestError,
+  readSingleDocumentRpc,
+  shouldCompensateDocumentRegistration,
+} from "../_shared/document-api.ts";
 import { listCoworkerPrivateDocuments } from "./actions.ts";
 
 const RPC = "register_coworker_signed_submission";
@@ -32,38 +29,49 @@ export async function uploadSignedDocument(
   const assignment = assignments.find((row) =>
     row.assignment_id === request.assignment_id
   );
-  if (assignment === undefined) throw new CoworkerDocumentNotFoundError();
+  if (assignment === undefined) throw new DocumentNotFoundError();
   if (
     assignment.required_action !== "upload_signed" ||
     (assignment.assignment_status !== "pending" &&
       assignment.assignment_status !== "rejected")
   ) {
-    throw new CoworkerDocumentRequestError();
+    throw new DocumentRequestError();
   }
-  const bytes = await readPdfFile(request.file);
+  const bytes = await coworkerPdfStorage.readPdfFile(request.file);
   const storagePath =
     `signed/${request.assignment_id}/${crypto.randomUUID()}.pdf`;
+  await coworkerPdfStorage.uploadPdf(storageClient, storagePath, bytes);
   let result: IRegisterCoworkerSignedSubmissionResult;
   try {
-    await uploadPdf(storageClient, storagePath, bytes);
-    result = await callSingleCoworkerRpc<
+    result = await readSingleDocumentRpc<
       IRegisterCoworkerSignedSubmissionResult
-    >(client, RPC, {
-      p_assignment_id: request.assignment_id,
-      p_storage_path: storagePath,
-      p_original_filename: request.file.name,
-      p_mime_type: request.file.type,
-      p_size_bytes: request.file.size,
-      p_declared_at: new Date().toISOString(),
-    });
+    >(
+      RPC,
+      client.rpc(RPC, {
+        p_assignment_id: request.assignment_id,
+        p_storage_path: storagePath,
+        p_original_filename: request.file.name,
+        p_mime_type: request.file.type,
+        p_size_bytes: request.file.size,
+        p_declared_at: new Date().toISOString(),
+      }),
+    );
   } catch (error) {
-    await removeDocumentPaths(storageClient, [storagePath]);
+    const storagePaths = [storagePath];
+    if (
+      shouldCompensateDocumentRegistration(error, {
+        operation: RPC,
+        storagePaths,
+      })
+    ) {
+      await coworkerPdfStorage.removeDocumentPaths(storageClient, storagePaths);
+    }
     throw error;
   }
 
   if (result.replaced_signed_storage_path !== null) {
     try {
-      await removeDocumentPaths(storageClient, [
+      await coworkerPdfStorage.removeDocumentPaths(storageClient, [
         result.replaced_signed_storage_path,
       ]);
     } catch (error) {

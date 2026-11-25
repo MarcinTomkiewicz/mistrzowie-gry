@@ -8,13 +8,13 @@ import type {
   ICoworkerOnboardingRow,
   ICoworkerPrivateDocumentRow,
 } from "../../../../src/app/core/interfaces/i-coworker-onboarding.ts";
+import { coworkerPdfStorage } from "../coworker-documents.ts";
 import {
-  callCoworkerRpc,
-  callSingleCoworkerRpc,
-  CoworkerDocumentStorageError,
-  removeDocumentPaths,
-  uploadPdf,
-} from "../coworker-documents.ts";
+  readDocumentRpc,
+  readSingleDocumentRpc,
+  shouldCompensateDocumentRegistration,
+} from "../document-api.ts";
+import { DocumentStorageError } from "../private-pdf-storage.ts";
 import type {
   QuestionnaireEnvelope,
   QuestionnairePayload,
@@ -54,9 +54,9 @@ export async function ensureQuestionnaireDocument(
   }
 
   const onboarding = resolvedOnboarding ??
-    (await callCoworkerRpc<ICoworkerOnboardingRow[]>(
-      userClient,
+    (await readDocumentRpc<ICoworkerOnboardingRow[]>(
       GET_ONBOARDING_RPC,
+      userClient.rpc(GET_ONBOARDING_RPC),
     ))[0];
   if (onboarding === undefined || onboarding.status !== "in_progress") {
     throw new QuestionnaireOnboardingStateError();
@@ -76,9 +76,9 @@ export async function ensureQuestionnaireDocument(
   const storagePath =
     `questionnaire/${onboarding.onboarding_id}/${crypto.randomUUID()}.pdf`;
   try {
-    await uploadPdf(adminClient, storagePath, pdfBytes);
+    await coworkerPdfStorage.uploadPdf(adminClient, storagePath, pdfBytes);
   } catch (error) {
-    if (error instanceof CoworkerDocumentStorageError) {
+    if (error instanceof DocumentStorageError) {
       throw new QuestionnaireDocumentStorageError();
     }
     throw error;
@@ -86,30 +86,43 @@ export async function ensureQuestionnaireDocument(
 
   let result: IRegisterQuestionnairePrivateDocumentResult;
   try {
-    result = await callSingleCoworkerRpc<
+    result = await readSingleDocumentRpc<
       IRegisterQuestionnairePrivateDocumentResult
-    >(adminClient, REGISTER_DOCUMENT_RPC, {
-      p_onboarding_id: onboarding.onboarding_id,
-      p_title: QUESTIONNAIRE_TITLE,
-      p_storage_path: storagePath,
-      p_original_filename: originalFilename,
-      p_mime_type: COWORKER_DOCUMENT_PDF_MIME_TYPE,
-      p_size_bytes: pdfBytes.byteLength,
-      p_questionnaire_revision:
-        questionnaire.currentDeclaration.questionnaireRevision,
-    });
+    >(
+      REGISTER_DOCUMENT_RPC,
+      adminClient.rpc(REGISTER_DOCUMENT_RPC, {
+        p_onboarding_id: onboarding.onboarding_id,
+        p_title: QUESTIONNAIRE_TITLE,
+        p_storage_path: storagePath,
+        p_original_filename: originalFilename,
+        p_mime_type: COWORKER_DOCUMENT_PDF_MIME_TYPE,
+        p_size_bytes: pdfBytes.byteLength,
+        p_questionnaire_revision:
+          questionnaire.currentDeclaration.questionnaireRevision,
+      }),
+    );
   } catch (error) {
-    try {
-      await removeDocumentPaths(adminClient, [storagePath]);
-    } catch {
-      throw new QuestionnaireDocumentStorageError();
+    const storagePaths = [storagePath];
+    if (
+      shouldCompensateDocumentRegistration(error, {
+        operation: REGISTER_DOCUMENT_RPC,
+        storagePaths,
+      })
+    ) {
+      try {
+        await coworkerPdfStorage.removeDocumentPaths(adminClient, storagePaths);
+      } catch {
+        throw new QuestionnaireDocumentStorageError();
+      }
     }
     throw error;
   }
 
   if (result.replaced_storage_path !== null) {
     try {
-      await removeDocumentPaths(adminClient, [result.replaced_storage_path]);
+      await coworkerPdfStorage.removeDocumentPaths(adminClient, [
+        result.replaced_storage_path,
+      ]);
     } catch (error) {
       console.error(JSON.stringify({
         code: "POST_COMMIT_STORAGE_CLEANUP_FAILED",
@@ -136,13 +149,13 @@ export async function reconcileQuestionnaireDocument(
   }
 
   const [onboardingRows, privateDocuments] = await Promise.all([
-    callCoworkerRpc<ICoworkerOnboardingRow[]>(
-      userClient,
+    readDocumentRpc<ICoworkerOnboardingRow[]>(
       GET_ONBOARDING_RPC,
+      userClient.rpc(GET_ONBOARDING_RPC),
     ),
-    callCoworkerRpc<ICoworkerPrivateDocumentRow[]>(
-      userClient,
+    readDocumentRpc<ICoworkerPrivateDocumentRow[]>(
       LIST_PRIVATE_DOCUMENTS_RPC,
+      userClient.rpc(LIST_PRIVATE_DOCUMENTS_RPC),
     ),
   ]);
   const onboarding = onboardingRows[0];

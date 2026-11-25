@@ -3,18 +3,20 @@ import {
   COWORKER_DOCUMENT_REQUIRED_ACTIONS,
   COWORKER_DOCUMENT_REVIEW_DECISIONS,
 } from "../../../src/app/core/types/coworker-onboarding.ts";
+import { DocumentRequestError } from "./document-api.ts";
+import {
+  readEnum,
+  readFiles,
+  readObject,
+  readSingleFile,
+  readText,
+  readUuid,
+} from "./document-request.ts";
 
-const UUID_PATTERN =
+const COWORKER_UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REJECTION_REASON_MAX_LENGTH = 1_000;
 const CATEGORY_NAME_MAX_LENGTH = 80;
-
-export class CoworkerDocumentRequestError extends Error {
-  constructor() {
-    super("Coworker document request validation failed.");
-    this.name = "CoworkerDocumentRequestError";
-  }
-}
 
 export function parseAdminJsonRequest(value: unknown) {
   const source = readObject(value);
@@ -42,7 +44,7 @@ export function parseAdminJsonRequest(value: unknown) {
     case "setDocumentCategory":
       return {
         action,
-        onboarding_id: readUuid(source["onboarding_id"]),
+        onboarding_id: readCoworkerUuid(source["onboarding_id"]),
         document_ids: readUuidArray(source["document_ids"]),
         category_key: readCategoryKey(source["category_key"]),
       } as const;
@@ -58,20 +60,23 @@ export function parseAdminJsonRequest(value: unknown) {
     case "cancelOnboarding":
       return {
         action,
-        onboarding_id: readUuid(source["onboarding_id"]),
+        onboarding_id: readCoworkerUuid(source["onboarding_id"]),
       } as const;
     case "startOnboarding":
-      return { action, user_id: readUuid(source["user_id"]) } as const;
+      return { action, user_id: readCoworkerUuid(source["user_id"]) } as const;
     case "removePrivateDocument":
     case "archiveSharedDocument":
     case "listSharedDocumentAssignments":
-      return { action, document_id: readUuid(source["document_id"]) } as const;
+      return {
+        action,
+        document_id: readCoworkerUuid(source["document_id"]),
+      } as const;
     case "reviewSignedDocument":
       return parseReviewRequest(source);
     case "getDownloadUrl":
       return parseAdminDownloadRequest(source);
     default:
-      throw invalid();
+      throw new DocumentRequestError();
   }
 }
 
@@ -90,11 +95,11 @@ export function parseCoworkerJsonRequest(value: unknown) {
     case "getDownloadUrl":
       return {
         action,
-        assignment_id: readUuid(source["assignment_id"]),
+        assignment_id: readCoworkerUuid(source["assignment_id"]),
         target: readEnum(source["target"], COWORKER_DOCUMENT_DOWNLOAD_TARGETS),
       } as const;
     default:
-      throw invalid();
+      throw new DocumentRequestError();
   }
 }
 
@@ -106,11 +111,11 @@ export function parseAdminMultipartRequest(
     const documents = readPrivateDocumentMetadata(formData);
     const files = readFiles(formData, "files");
     if (documents.length !== files.length) {
-      throw invalid();
+      throw new DocumentRequestError();
     }
     return {
       action,
-      onboarding_id: readUuid(formData.get("onboarding_id")),
+      onboarding_id: readCoworkerUuid(formData.get("onboarding_id")),
       documents,
       files,
     } as const;
@@ -126,21 +131,21 @@ export function parseAdminMultipartRequest(
       file: readSingleFile(formData, "file"),
     } as const;
   }
-  throw invalid();
+  throw new DocumentRequestError();
 }
 
 export function parseCoworkerMultipartRequest(
   formData: FormData,
 ) {
   if (readText(formData.get("action")) !== "uploadSignedDocument") {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   if (readText(formData.get("signed_declared")) !== "true") {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return {
     action: "uploadSignedDocument",
-    assignment_id: readUuid(formData.get("assignment_id")),
+    assignment_id: readCoworkerUuid(formData.get("assignment_id")),
     file: readSingleFile(formData, "file"),
   } as const;
 }
@@ -151,19 +156,18 @@ function parseReviewRequest(source: Record<string, unknown>) {
     COWORKER_DOCUMENT_REVIEW_DECISIONS,
   );
   const rejectionReason = readNullableString(
-    source,
-    "rejection_reason",
+    source["rejection_reason"],
     REJECTION_REASON_MAX_LENGTH,
   );
   if (decision === "accepted" && rejectionReason !== null) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   if (decision === "rejected" && rejectionReason === null) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return {
     action: "reviewSignedDocument",
-    assignment_id: readUuid(source["assignment_id"]),
+    assignment_id: readCoworkerUuid(source["assignment_id"]),
     decision,
     rejection_reason: rejectionReason,
   } as const;
@@ -180,22 +184,22 @@ function parseAdminDownloadRequest(source: Record<string, unknown>) {
       return {
         action: "getDownloadUrl",
         target,
-        version_id: readUuid(source["version_id"]),
+        version_id: readCoworkerUuid(source["version_id"]),
         onboarding_id: onboardingId,
       } as const;
     }
     return {
       action: "getDownloadUrl",
       target,
-      document_id: readUuid(source["document_id"]),
+      document_id: readCoworkerUuid(source["document_id"]),
       onboarding_id: null,
     } as const;
   }
   return {
     action: "getDownloadUrl",
     target,
-    assignment_id: readUuid(source["assignment_id"]),
-    onboarding_id: readUuid(source["onboarding_id"]),
+    assignment_id: readCoworkerUuid(source["assignment_id"]),
+    onboarding_id: readCoworkerUuid(source["onboarding_id"]),
   } as const;
 }
 
@@ -203,12 +207,12 @@ function readPrivateDocumentMetadata(formData: FormData) {
   const value = readText(formData.get("documents"));
   let parsed: unknown;
   try {
-    parsed = JSON.parse(value) as unknown;
+    parsed = JSON.parse(value);
   } catch {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   if (!Array.isArray(parsed) || parsed.length === 0) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return parsed.map((item) => {
     const source = readObject(item);
@@ -222,7 +226,7 @@ function readPrivateDocumentMetadata(formData: FormData) {
       (requiredAction !== undefined &&
         requiresSignedUpload !== (requiredAction === "upload_signed"))
     ) {
-      throw invalid();
+      throw new DocumentRequestError();
     }
     return {
       title: readText(source["title"]),
@@ -237,23 +241,9 @@ function readPrivateDocumentMetadata(formData: FormData) {
   });
 }
 
-function readObject(value: unknown): Record<string, unknown> {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    throw invalid();
-  }
-  return value as Record<string, unknown>;
-}
-
-function readText(value: unknown): string {
-  if (typeof value !== "string" || value.trim() === "") {
-    throw invalid();
-  }
-  return value.trim();
-}
-
 function readCategoryKey(value: unknown): string {
   if (typeof value !== "string" || value.trim() === "") {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return value;
 }
@@ -261,93 +251,44 @@ function readCategoryKey(value: unknown): string {
 function readCategoryName(value: unknown): string {
   const name = readText(value);
   if ([...name].length > CATEGORY_NAME_MAX_LENGTH || /\p{Cc}/u.test(name)) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return name;
 }
 
-function readNullableString(
-  source: Record<string, unknown>,
-  key: string,
-  maxLength: number,
-): string | null {
-  const value = source[key];
+function readNullableString(value: unknown, maxLength: number): string | null {
   if (value === null) return null;
-  if (typeof value !== "string" || value.trim() === "") {
-    throw invalid();
-  }
-  const normalized = value.trim();
+  const normalized = readText(value);
   if (normalized.length > maxLength) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return normalized;
 }
 
-function readUuid(value: unknown): string {
-  return validateUuid(readText(value));
+function readCoworkerUuid(value: unknown): string {
+  return readUuid(value, COWORKER_UUID_PATTERN);
 }
 
 function readNullableUuid(value: unknown): string | null {
   if (value === null || value === "") return null;
-  if (typeof value !== "string") {
-    throw invalid();
-  }
-  return validateUuid(value.trim());
+  return readCoworkerUuid(value);
 }
 
 function readUuidArray(value: unknown): string[] {
   if (!Array.isArray(value) || value.length === 0) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
-  const ids = value.map((item) => {
-    if (typeof item !== "string") {
-      throw invalid();
-    }
-    return validateUuid(item.trim());
-  });
+  const ids = value.map(readCoworkerUuid);
   if (new Set(ids.map((id) => id.toLowerCase())).size !== ids.length) {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return ids;
-}
-
-function readEnum<const Values extends readonly string[]>(
-  value: unknown,
-  values: Values,
-): Values[number] {
-  if (typeof value !== "string" || !values.includes(value)) {
-    throw invalid();
-  }
-  return value as Values[number];
 }
 
 function readBooleanText(value: unknown): boolean {
   value = readText(value);
   if (value !== "true" && value !== "false") {
-    throw invalid();
+    throw new DocumentRequestError();
   }
   return value === "true";
-}
-
-function readFiles(formData: FormData, key: string): File[] {
-  const files = formData.getAll(key);
-  if (files.length === 0 || files.some((value) => !(value instanceof File))) {
-    throw invalid();
-  }
-  return files as File[];
-}
-
-function readSingleFile(formData: FormData, key: string): File {
-  const files = readFiles(formData, key);
-  if (files.length !== 1) throw invalid();
-  return files[0];
-}
-
-function validateUuid(value: string): string {
-  if (!UUID_PATTERN.test(value)) throw invalid();
-  return value;
-}
-
-function invalid(): CoworkerDocumentRequestError {
-  return new CoworkerDocumentRequestError();
 }

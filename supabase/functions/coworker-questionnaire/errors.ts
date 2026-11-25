@@ -3,15 +3,15 @@ import {
   CryptoConfigurationError,
   CryptoOperationError,
   loggedErrorResponse,
-  questionnaireHttpErrorResponse,
   QuestionnaireDocumentStorageError,
+  questionnaireHttpErrorResponse,
   QuestionnaireOnboardingStateError,
   QuestionnairePdfGenerationError,
   QuestionnaireValidationError,
-  rpcError,
   RpcCallError,
+  rpcError,
 } from "../_shared/coworker-questionnaire/errors.ts";
-import { CoworkerDocumentRpcError } from "../_shared/coworker-documents.ts";
+import { DocumentRpcError } from "../_shared/document-api.ts";
 
 const ALLOWED_METHODS = "GET, PUT";
 
@@ -37,7 +37,7 @@ export function createErrorResponse(
   if (error instanceof RpcCallError) {
     return rpcErrorResponse(error, requestId);
   }
-  if (error instanceof CoworkerDocumentRpcError) {
+  if (error instanceof DocumentRpcError) {
     return documentRpcErrorResponse(error, requestId);
   }
   if (error instanceof CryptoConfigurationError) {
@@ -158,7 +158,7 @@ function rpcErrorResponse(
 }
 
 function documentRpcErrorResponse(
-  error: CoworkerDocumentRpcError,
+  error: DocumentRpcError,
   requestId: string,
 ): Response {
   switch (error.sqlState) {

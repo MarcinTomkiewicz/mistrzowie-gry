@@ -1,10 +1,8 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import type { parseAdminJsonRequest } from "../_shared/coworker-documents.schemas.ts";
-import {
-  CoworkerDocumentNotFoundError,
-  createDocumentDownload,
-} from "../_shared/coworker-documents.ts";
+import { coworkerPdfStorage } from "../_shared/coworker-documents.ts";
+import { DocumentNotFoundError } from "../_shared/document-api.ts";
 import {
   listAdminOnboardingDocuments,
   listAdminSharedDocuments,
@@ -21,8 +19,8 @@ export async function getAdminDownload(
   const target = request.target === "signed"
     ? await findSignedTarget(client, request)
     : await findSourceTarget(client, request);
-  if (target === null) throw new CoworkerDocumentNotFoundError();
-  return await createDocumentDownload(
+  if (target === null) throw new DocumentNotFoundError();
+  return await coworkerPdfStorage.createDocumentDownload(
     storageClient,
     target.path,
     target.filename,

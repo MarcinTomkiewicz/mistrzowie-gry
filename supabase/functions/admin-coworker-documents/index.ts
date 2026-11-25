@@ -1,15 +1,15 @@
 import { withSupabase } from "npm:@supabase/server@^1";
 
 import {
-  CoworkerDocumentRequestError,
   parseAdminJsonRequest,
   parseAdminMultipartRequest,
 } from "../_shared/coworker-documents.schemas.ts";
 import {
   documentErrorResponse,
+  DocumentRequestError,
   normalizeDocumentResponse,
   successResponse,
-} from "../_shared/coworker-documents.ts";
+} from "../_shared/document-api.ts";
 import { readFormData, readJson } from "../_shared/http.ts";
 import { handleAdminAction } from "./actions.ts";
 import { getAdminDownload } from "./downloads.ts";
@@ -21,13 +21,13 @@ const authenticatedFetch = withSupabase(
     const requestId = crypto.randomUUID();
     try {
       if (request.method !== "POST") {
-        throw new CoworkerDocumentRequestError();
+        throw new DocumentRequestError();
       }
 
       const contentType = request.headers.get("content-type") ?? "";
       if (contentType.startsWith("multipart/form-data")) {
         const upload = parseAdminMultipartRequest(
-          await readFormData(request, CoworkerDocumentRequestError),
+          await readFormData(request, DocumentRequestError),
         );
         return successResponse(
           await handleAdminUpload(
@@ -39,7 +39,7 @@ const authenticatedFetch = withSupabase(
       }
 
       const action = parseAdminJsonRequest(
-        await readJson(request, CoworkerDocumentRequestError),
+        await readJson(request, DocumentRequestError),
       );
       if (action.action === "getDownloadUrl") {
         return successResponse(

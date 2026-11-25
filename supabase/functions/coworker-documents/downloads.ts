@@ -1,10 +1,8 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import type { parseCoworkerJsonRequest } from "../_shared/coworker-documents.schemas.ts";
-import {
-  CoworkerDocumentNotFoundError,
-  createDocumentDownload,
-} from "../_shared/coworker-documents.ts";
+import { coworkerPdfStorage } from "../_shared/coworker-documents.ts";
+import { DocumentNotFoundError } from "../_shared/document-api.ts";
 import {
   listCoworkerPrivateDocuments,
   listCoworkerSharedDocuments,
@@ -33,21 +31,25 @@ export async function getCoworkerDownload(
       ? privateDocument.original_filename
       : privateDocument.signed_original_filename;
     if (path === null || filename === null) {
-      throw new CoworkerDocumentNotFoundError();
+      throw new DocumentNotFoundError();
     }
-    return await createDocumentDownload(storageClient, path, filename);
+    return await coworkerPdfStorage.createDocumentDownload(
+      storageClient,
+      path,
+      filename,
+    );
   }
 
   if (request.target === "signed") {
-    throw new CoworkerDocumentNotFoundError();
+    throw new DocumentNotFoundError();
   }
   const sharedDocument = sharedDocuments.find((row) =>
     row.assignment_id === request.assignment_id
   );
   if (sharedDocument === undefined) {
-    throw new CoworkerDocumentNotFoundError();
+    throw new DocumentNotFoundError();
   }
-  return await createDocumentDownload(
+  return await coworkerPdfStorage.createDocumentDownload(
     storageClient,
     sharedDocument.storage_path,
     sharedDocument.original_filename,

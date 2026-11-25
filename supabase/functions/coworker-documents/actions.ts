@@ -9,9 +9,9 @@ import type {
 import { getQuestionnaireEnvelope } from "../_shared/coworker-questionnaire/rpc.ts";
 import type { parseCoworkerJsonRequest } from "../_shared/coworker-documents.schemas.ts";
 import {
-  callCoworkerRpc,
-  callSingleCoworkerRpc,
-} from "../_shared/coworker-documents.ts";
+  readDocumentRpc,
+  readSingleDocumentRpc,
+} from "../_shared/document-api.ts";
 
 const RPC = {
   getOnboarding: "get_coworker_onboarding",
@@ -33,24 +33,33 @@ export async function handleCoworkerAction(
     case "getPortal":
       return await getPortal(client, adminClient, userId);
     case "acknowledgeDocuments":
-      return await callSingleCoworkerRpc<
+      return await readSingleDocumentRpc<
         IAcknowledgeCoworkerDocumentsResult
-      >(client, RPC.acknowledgeDocuments, {
-        p_assignment_ids: request.assignment_ids,
-      });
+      >(
+        RPC.acknowledgeDocuments,
+        client.rpc(RPC.acknowledgeDocuments, {
+          p_assignment_ids: request.assignment_ids,
+        }),
+      );
   }
 }
 
 export function listCoworkerPrivateDocuments(
   client: SupabaseClient,
 ): Promise<ICoworkerPrivateDocumentRow[]> {
-  return callCoworkerRpc(client, RPC.listPrivateDocuments);
+  return readDocumentRpc(
+    RPC.listPrivateDocuments,
+    client.rpc(RPC.listPrivateDocuments),
+  );
 }
 
 export function listCoworkerSharedDocuments(
   client: SupabaseClient,
 ): Promise<ICoworkerSharedDocumentRow[]> {
-  return callCoworkerRpc(client, RPC.listSharedDocuments);
+  return readDocumentRpc(
+    RPC.listSharedDocuments,
+    client.rpc(RPC.listSharedDocuments),
+  );
 }
 
 async function getPortal(
@@ -60,7 +69,10 @@ async function getPortal(
 ) {
   const [onboardingRows, privateRows, sharedRows, questionnaire] = await Promise
     .all([
-      callCoworkerRpc<ICoworkerOnboardingRow[]>(client, RPC.getOnboarding),
+      readDocumentRpc<ICoworkerOnboardingRow[]>(
+        RPC.getOnboarding,
+        client.rpc(RPC.getOnboarding),
+      ),
       listCoworkerPrivateDocuments(client),
       listCoworkerSharedDocuments(client),
       getQuestionnaireEnvelope(adminClient, userId),
