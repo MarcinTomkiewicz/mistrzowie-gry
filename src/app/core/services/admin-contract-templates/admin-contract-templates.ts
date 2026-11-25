@@ -15,6 +15,8 @@ import {
   readTemplates,
 } from './admin-contract-templates.contract';
 
+type ContractTemplateArtifact = 'template' | 'active_template';
+
 @Injectable({ providedIn: 'root' })
 export class AdminContractTemplates {
   private readonly backend = inject(Backend);
@@ -55,16 +57,16 @@ export class AdminContractTemplates {
     }));
   }
 
-  getDownloadUrl(templateId: string) {
+  getDownloadUrl(templateId: string, artifactType: ContractTemplateArtifact = 'template') {
     return this.invoke({
       action: 'getDownloadUrl',
-      artifact_type: 'template',
+      artifact_type: artifactType,
       artifact_id: templateId,
     }, readTemplateDownload);
   }
 
-  downloadPdf(templateId: string) {
-    return this.getDownloadUrl(templateId).pipe(switchMap(({ url, filename }) => {
+  downloadPdf(templateId: string, artifactType: ContractTemplateArtifact = 'template') {
+    return this.getDownloadUrl(templateId, artifactType).pipe(switchMap(({ url, filename }) => {
       const controller = new AbortController();
       return from(fetchPrivatePdf(url, CONTRACT_TEMPLATE_PDF_PATH_PREFIX, controller.signal)).pipe(
         map((blob) => ({ blob, filename })),
