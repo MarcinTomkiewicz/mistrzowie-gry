@@ -9,6 +9,7 @@ import { Backend } from '../backend/backend';
 import {
   type ContractTemplateUpload,
   readActiveTemplate,
+  readDeletedTemplate,
   readStagedTemplate,
   readTemplateDownload,
   readTemplates,
@@ -22,11 +23,10 @@ export class AdminContractTemplates {
     return this.invoke({ action: 'listTemplates' }, readTemplates);
   }
 
-  upload({ family, sourceUrl, file }: ContractTemplateUpload) {
+  upload({ family, file }: ContractTemplateUpload) {
     const body = new FormData();
     body.append('action', 'uploadTemplate');
     body.append('family', family);
-    body.append('source_document_url', sourceUrl);
     body.append('file', file);
     return this.invoke(body, readStagedTemplate).pipe(map((result) => {
       assertEdgeContract(result.family === family, 'response.data.family', 'the requested family');
@@ -34,12 +34,22 @@ export class AdminContractTemplates {
     }));
   }
 
-  approve(templateId: string, approvalReference: string) {
+  approve(templateId: string) {
     return this.invoke({
       action: 'approveTemplate',
       template_id: templateId,
-      approval_reference: approvalReference,
     }, readActiveTemplate).pipe(map((result) => {
+      assertEdgeContract(result.template_id === templateId, 'response.data.template_id', 'the requested template');
+      return result;
+    }));
+  }
+
+  deleteTemplate(templateId: string, confirmActive: boolean) {
+    return this.invoke({
+      action: 'deleteTemplate',
+      template_id: templateId,
+      confirm_active: confirmActive,
+    }, readDeletedTemplate).pipe(map((result) => {
       assertEdgeContract(result.template_id === templateId, 'response.data.template_id', 'the requested template');
       return result;
     }));

@@ -12,7 +12,11 @@ import {
 import { readFormData, readJson } from "../_shared/http.ts";
 import { type ClientContractsDatabase, RPC } from "./contracts.ts";
 import { parseJsonRequest, parseUploadRequest } from "./requests.ts";
-import { getContractDownload, storeContractPdf } from "./storage.ts";
+import {
+  deleteContractTemplate,
+  getContractDownload,
+  storeContractPdf,
+} from "./storage.ts";
 
 const authenticatedFetch = withSupabase(
   { auth: "user" },
@@ -62,8 +66,17 @@ const authenticatedFetch = withSupabase(
               RPC.approveTemplate,
               client.rpc(RPC.approveTemplate, {
                 p_template_id: action.templateId,
-                p_approval_reference: action.approvalReference,
               }),
+            ),
+          );
+        case "deleteTemplate":
+          return successResponse(
+            await deleteContractTemplate(
+              client,
+              context.supabaseAdmin,
+              action.templateId,
+              action.confirmActive,
+              requestId,
             ),
           );
         case "getDownloadUrl":

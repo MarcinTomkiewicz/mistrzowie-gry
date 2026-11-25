@@ -21,11 +21,24 @@ export function parseJsonRequest(value: unknown) {
     case "listAgreements":
       return { action } as const;
     case "approveTemplate":
+      if (Object.keys(source).length !== 2) throw new DocumentRequestError();
       return {
         action,
         templateId: readUuid(source["template_id"]).toLowerCase(),
-        approvalReference: readText(source["approval_reference"]),
       } as const;
+    case "deleteTemplate": {
+      const confirmActive = source["confirm_active"];
+      if (
+        typeof confirmActive !== "boolean" || Object.keys(source).length !== 3
+      ) {
+        throw new DocumentRequestError();
+      }
+      return {
+        action,
+        templateId: readUuid(source["template_id"]).toLowerCase(),
+        confirmActive,
+      } as const;
+    }
     case "getDownloadUrl":
       return {
         action,
@@ -42,13 +55,11 @@ export function parseUploadRequest(form: FormData) {
   const action = form.get("action");
   switch (action) {
     case "uploadTemplate":
+      if ([...form.keys()].length !== 3) throw new DocumentRequestError();
       return {
         action,
         file,
         family: readEnum(form.get("family"), TEMPLATE_FAMILIES),
-        sourceDocumentUrl: readSourceDocumentUrl(
-          form.get("source_document_url"),
-        ),
       } as const;
     case "saveAgreement": {
       const partyLabel = readText(form.get("party_label"));
@@ -74,24 +85,6 @@ export function parseUploadRequest(form: FormData) {
     default:
       throw new DocumentRequestError();
   }
-}
-
-function readSourceDocumentUrl(value: unknown): string {
-  const text = readText(value);
-  let url: URL;
-  try {
-    url = new URL(text);
-  } catch {
-    throw new DocumentRequestError();
-  }
-  if (
-    url.origin !== "https://docs.google.com" ||
-    url.username !== "" || url.password !== "" ||
-    !url.pathname.startsWith("/document/") || url.pathname === "/document/"
-  ) {
-    throw new DocumentRequestError();
-  }
-  return text;
 }
 
 function readOptionalText(value: FormDataEntryValue | null): string | null {

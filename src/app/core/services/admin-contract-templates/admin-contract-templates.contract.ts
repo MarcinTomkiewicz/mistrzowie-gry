@@ -4,13 +4,12 @@ import {
   CONTRACT_TEMPLATE_PDF_PATH_PREFIX,
 } from '../../configs/admin-contract-templates.config';
 import type { EdgeReader, EdgeReaderResult } from '../../types/edge-contract';
-import { isContractTemplateSourceUrl } from '../../utils/contract-template-source';
 import {
   assertEdgeContract,
   createEdgeArrayReader,
   createEdgeLiteralReader,
+  readEdgeBoolean,
   readEdgeNonBlankString,
-  readEdgeNullableString,
   readEdgeNullableTimestamp,
   readEdgePositiveInteger,
   readEdgeTimestamp,
@@ -27,11 +26,6 @@ const templateIdentity = {
 const readTemplate = createStrictEdgeObjectReader({
   ...templateIdentity,
   status: createEdgeLiteralReader(['staged', 'active', 'retired']),
-  source_document_url: (value: unknown, path: string) => {
-    const url = readEdgeNonBlankString(value, path);
-    assertEdgeContract(isContractTemplateSourceUrl(url), path, 'a Google Docs URL');
-    return url;
-  },
   original_filename: readEdgeNonBlankString,
   pdf_sha256: (value: unknown, path: string) => {
     const hash = readEdgeNonBlankString(value, path);
@@ -41,13 +35,12 @@ const readTemplate = createStrictEdgeObjectReader({
   size_bytes: readEdgePositiveInteger,
   created_at: readEdgeTimestamp,
   approved_at: readEdgeNullableTimestamp,
-  approval_reference: readEdgeNullableString,
+  can_delete: readEdgeBoolean,
 });
 
 export type ContractTemplate = EdgeReaderResult<typeof readTemplate>;
 export type ContractTemplateUpload = {
   family: ContractTemplateFamily;
-  sourceUrl: string;
   file: File;
 };
 
@@ -59,6 +52,9 @@ export const readStagedTemplate = readDocumentData(createStrictEdgeObjectReader(
 export const readActiveTemplate = readDocumentData(createStrictEdgeObjectReader({
   ...templateIdentity,
   status: createEdgeLiteralReader(['active']),
+}));
+export const readDeletedTemplate = readDocumentData(createStrictEdgeObjectReader({
+  template_id: readEdgeUuid,
 }));
 export const readTemplateDownload = readDocumentData(createStrictEdgeObjectReader({
   url: readSignedTemplateUrl,

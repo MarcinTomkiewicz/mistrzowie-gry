@@ -30,17 +30,6 @@
             }
           </div>
 
-          <div class="flex-col-start-stretch gap-xs">
-            <p-iftalabel class="w-100">
-              <input pInputText type="url" class="w-100" id="contract-template-source" formControlName="sourceUrl"
-                [readOnly]="!catalog.canAct()" />
-              <label for="contract-template-source">{{ copy.sourceUrl }}</label>
-            </p-iftalabel>
-            @if (upload.sourceUrl.touched && upload.sourceUrl.invalid) {
-              <small class="error-text">{{ copy.sourceInvalid }}</small>
-            }
-          </div>
-
           <app-file-upload [options]="uploadOptions()"
             [texts]="i18n.fileUploadTexts()"
             (filesSelected)="selectFile($event)" />
@@ -64,6 +53,19 @@
         <section class="mg-card w-100" role="status"><p class="m-0">{{ notice }}</p></section>
       }
 
+      @for (deletion of catalog.pendingDeletions(); track deletion.templateId) {
+        <section class="mg-card flex-col-start-stretch gap-sm w-100">
+          <div role="status">
+            <strong class="text-wrap-anywhere">{{ deletion.filename }}</strong>
+            <p class="m-0">{{ deletion.outcome === 'cleanupFailed' ? copy.deletion.cleanupFailed : copy.deletion.unknown }}</p>
+          </div>
+          <div class="flex-row-end-center">
+            <p-button type="button" severity="secondary" icon="pi pi-refresh" [label]="actions.retry"
+              [disabled]="catalog.busy()" (onClick)="catalog.retryDeletion(deletion)" />
+          </div>
+        </section>
+      }
+
       @if (catalog.loadFailed()) {
         <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
           <p class="m-0 error-text">{{ copy.loadFailed }}</p>
@@ -82,8 +84,8 @@
                 <ng-template #header>
                   <tr class="hide-down-sm">
                     <th scope="col" class="small-caps">{{ labels.document }}</th>
+                    <th scope="col" class="small-caps">{{ copy.family }}</th>
                     <th scope="col" class="small-caps">{{ labels.status }}</th>
-                    <th scope="col" class="small-caps">{{ copy.hash }}</th>
                     <th scope="col" class="small-caps text-right">{{ i18n.table().actions }}</th>
                   </tr>
                 </ng-template>
@@ -91,33 +93,34 @@
                   @let template = row.template;
                   <tr class="mg-responsive-table__row">
                     <th scope="row" class="mg-responsive-table__row-heading">
-                      <div class="flex-col-start-start gap-xs text-wrap-anywhere">
-                        <strong>{{ template.original_filename }}</strong>
-                        <small>{{ row.familyLabel }}</small>
-                        <a [href]="template.source_document_url" target="_blank" rel="noopener noreferrer">{{ copy.sourceLink }}</a>
-                      </div>
+                      <strong class="text-wrap-anywhere">{{ template.original_filename }}</strong>
                     </th>
+                    <td class="mg-responsive-table__cell">
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ copy.family }}</span>
+                      <span class="mg-responsive-table__value">{{ row.familyLabel }}</span>
+                    </td>
                     <td class="mg-responsive-table__cell">
                       <span class="mg-responsive-table__label small-caps font-bold">{{ labels.status }}</span>
                       <div class="mg-responsive-table__value">
                         <span [class]="row.statusClass">{{ row.statusLabel }}</span>
                       </div>
                     </td>
-                    <td class="mg-responsive-table__cell">
-                      <span class="mg-responsive-table__label small-caps font-bold">{{ copy.hash }}</span>
-                      <code class="mg-responsive-table__value text-wrap-anywhere">{{ template.pdf_sha256 }}</code>
-                    </td>
                     <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
                       <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.table().actions }}</span>
                       <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
                         @if (template.status === 'staged') {
                           <p-button type="button" size="small" severity="success" icon="pi pi-check" [label]="actions.activate"
-                            [disabled]="!catalog.canAct()" (onClick)="startActivation(template)" />
-                        } @else if (template.status === 'active') {
+                            [disabled]="!catalog.canAct()" (onClick)="confirmActivation(template)" />
+                        }
+                        @if (template.status === 'staged' || template.status === 'active') {
                           <p-button type="button" size="small" severity="secondary" icon="pi pi-horus" [label]="actions.preview"
                             [disabled]="!catalog.canAct()" (onClick)="catalog.openFile(template.template_id, true)" />
                           <p-button type="button" size="small" severity="secondary" icon="pi pi-missile-swarm" [label]="actions.download"
                             [disabled]="!catalog.canAct()" (onClick)="catalog.openFile(template.template_id, false)" />
+                        }
+                        @if (template.can_delete) {
+                          <p-button type="button" size="small" severity="danger" icon="pi pi-demolish" [label]="actions.delete"
+                            [outlined]="true" [disabled]="!catalog.canAct()" (onClick)="confirmDeletion(template)" />
                         }
                       </div>
                     </td>
@@ -135,29 +138,6 @@
     }
   </div>
 </section>
-
-@if (selectedForActivation(); as template) {
-  <p-dialog styleClass="mg-dialog mg-dialog--sm" [header]="copy.activation.title"
-    [visible]="true" [modal]="true" [draggable]="false" [resizable]="false" [closeAriaLabel]="actions.close"
-    appendTo="body" (visibleChange)="$event ? null : selectedForActivation.set(null)">
-    <form class="flex-col-start-stretch gap-md w-100" [formGroup]="activationForm" (ngSubmit)="activateTemplate()" novalidate>
-      <strong class="text-wrap-anywhere">{{ template.original_filename }}</strong>
-      <p class="m-0 muted-text">{{ copy.activation.message }}</p>
-      <p-iftalabel class="w-100">
-        <input pInputText class="w-100" id="contract-template-approval" formControlName="approvalReference" />
-        <label for="contract-template-approval">{{ copy.activation.reference }}</label>
-      </p-iftalabel>
-      @if (approvalReference.touched && approvalReference.invalid) {
-        <small class="error-text">{{ i18n.form().required }}</small>
-      }
-      <div class="flex-row-end-center gap-sm">
-        <p-button type="button" severity="secondary" [outlined]="true" [label]="actions.cancel"
-          (onClick)="selectedForActivation.set(null)" />
-        <p-button type="submit" severity="success" icon="pi pi-check" [label]="actions.activate" />
-      </div>
-    </form>
-  </p-dialog>
-}
 
 @defer (when catalog.preview()) {
   <app-pdf-viewer-dialog [preview]="catalog.preview()" (closed)="catalog.closePreview()" />

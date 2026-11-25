@@ -4,7 +4,7 @@ import {
   InvalidPdfError,
 } from "./private-pdf-storage.ts";
 
-const REGISTRATION_REJECTION_CODES = new Set([
+const CONFIRMED_RPC_REJECTION_CODES = new Set([
   "42501",
   "22023",
   "P0002",
@@ -17,7 +17,10 @@ const REGISTRATION_REJECTION_CODES = new Set([
 
 type DocumentWriteOutcomeCode =
   | "UPLOAD_OUTCOME_UNKNOWN"
-  | "REGISTRATION_OUTCOME_UNKNOWN";
+  | "REGISTRATION_OUTCOME_UNKNOWN"
+  | "DELETE_OUTCOME_UNKNOWN";
+
+const POST_COMMIT_STORAGE_CLEANUP_FAILED = "POST_COMMIT_STORAGE_CLEANUP_FAILED";
 
 type DocumentApiErrorCode =
   | "UNAUTHENTICATED"
@@ -27,6 +30,7 @@ type DocumentApiErrorCode =
   | "CONFLICT"
   | "UPLOAD_FAILED"
   | "INTERNAL_ERROR"
+  | typeof POST_COMMIT_STORAGE_CLEANUP_FAILED
   | DocumentWriteOutcomeCode;
 
 export class DocumentRequestError extends Error {
@@ -78,18 +82,29 @@ export class DocumentWriteOutcomeUnknownError extends Error {
   }
 }
 
+export class DocumentPostCommitCleanupError extends Error {
+  readonly code = POST_COMMIT_STORAGE_CLEANUP_FAILED;
+
+  constructor() {
+    super(
+      "Document change committed, but Storage cleanup could not be confirmed.",
+    );
+    this.name = "DocumentPostCommitCleanupError";
+  }
+}
+
+export function isConfirmedDocumentRpcRejection(error: unknown): boolean {
+  return error instanceof DocumentRpcError && error.sqlState !== null &&
+    CONFIRMED_RPC_REJECTION_CODES.has(error.sqlState);
+}
+
 export function shouldCompensateDocumentRegistration(
   error: unknown,
   context:
     | { requestId: string; storagePath: string }
     | { operation: string; storagePaths: readonly string[] },
 ): boolean {
-  if (
-    error instanceof DocumentRpcError && error.sqlState !== null &&
-    REGISTRATION_REJECTION_CODES.has(error.sqlState)
-  ) {
-    return true;
-  }
+  if (isConfirmedDocumentRpcRejection(error)) return true;
   console.error(
     JSON.stringify({ code: "REGISTRATION_OUTCOME_UNKNOWN", ...context }),
   );
@@ -179,7 +194,10 @@ export function documentErrorResponse(
     const { status, code, message } = mapSqlState("23514");
     return errorResponse(status, code, message);
   }
-  if (error instanceof DocumentWriteOutcomeUnknownError) {
+  if (
+    error instanceof DocumentWriteOutcomeUnknownError ||
+    error instanceof DocumentPostCommitCleanupError
+  ) {
     return errorResponse(502, error.code, error.message);
   }
   if (error instanceof DocumentStorageError) {

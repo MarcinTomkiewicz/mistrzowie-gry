@@ -12,7 +12,16 @@ import { isEdgeMutationResultUncertain } from '../../../core/utils/edge-function
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 
 type CatalogStatus = 'initial' | 'loading' | 'ready' | 'error';
-type TemplateMutation = 'upload' | 'activation';
+type TemplateChange = 'upload' | 'activation';
+type TemplateDeletion = {
+  templateId: string;
+  filename: string;
+  confirmActive: boolean;
+};
+type TemplateMutation =
+  | { kind: TemplateChange }
+  | { kind: 'delete'; deletion: TemplateDeletion };
+type PendingTemplateDeletion = TemplateDeletion & { outcome: 'unknown' | 'cleanupFailed' };
 
 @Injectable()
 export class ContractTemplatesFacade {
@@ -24,17 +33,19 @@ export class ContractTemplatesFacade {
 
   private readonly status = signal<CatalogStatus>('initial');
   private readonly rows = signal<ContractTemplate[]>([]);
-  private readonly mutation = signal<TemplateMutation | null>(null);
+  private readonly mutating = signal(false);
   private readonly fileLoading = signal(false);
   private readonly currentPreview = signal<IPdfPreview | null>(null);
-  private readonly uncertainMutation = signal<TemplateMutation | null>(null);
+  private readonly uncertainMutation = signal<TemplateChange | null>(null);
+  private readonly incompleteDeletions = signal<PendingTemplateDeletion[]>([]);
 
   readonly templates = this.rows.asReadonly();
-  readonly saving = computed(() => this.mutation() !== null);
+  readonly saving = this.mutating.asReadonly();
   readonly loading = computed(() => this.status() === 'initial' || this.status() === 'loading');
   readonly loadFailed = computed(() => this.status() === 'error');
   readonly busy = computed(() => this.loading() || this.saving() || this.fileLoading());
   readonly canAct = computed(() => this.status() === 'ready' && !this.busy());
+  readonly pendingDeletions = this.incompleteDeletions.asReadonly();
   readonly preview = this.currentPreview.asReadonly();
   readonly notice = computed(() => {
     const copy = this.i18n.copy();
@@ -52,18 +63,32 @@ export class ContractTemplatesFacade {
   }
 
   upload(upload: ContractTemplateUpload): Observable<void> {
-    return this.mutate('upload', () => this.api.upload(upload));
+    return this.mutate({ kind: 'upload' }, () => this.api.upload(upload));
   }
 
-  activate(templateId: string, approvalReference: string): Observable<void> {
+  activate(templateId: string): Observable<void> {
     return defer(() => {
-      if (!this.hasStatus(templateId, 'staged')) return EMPTY;
-      return this.mutate('activation', () => this.api.approve(templateId, approvalReference));
+      if (this.findTemplate(templateId)?.status !== 'staged') return EMPTY;
+      return this.mutate({ kind: 'activation' }, () => this.api.approve(templateId));
     });
   }
 
+  deleteTemplate(template: ContractTemplate): Observable<void> {
+    if (!this.findTemplate(template.template_id)?.can_delete) return EMPTY;
+    return this.runDeletion({
+      templateId: template.template_id,
+      filename: template.original_filename,
+      confirmActive: template.status === 'active',
+    });
+  }
+
+  retryDeletion(deletion: PendingTemplateDeletion): void {
+    this.runDeletion(deletion).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+  }
+
   openFile(templateId: string, preview: boolean): void {
-    if (!this.canAct() || !this.hasStatus(templateId, 'active')) return;
+    const status = this.findTemplate(templateId)?.status;
+    if (!this.canAct() || (status !== 'staged' && status !== 'active')) return;
     this.fileLoading.set(true);
     const request: Observable<unknown> = preview
       ? this.api.getDownloadUrl(templateId).pipe(tap(({ url, filename }) =>
@@ -93,36 +118,64 @@ export class ContractTemplatesFacade {
     });
   }
 
-  private mutate(kind: TemplateMutation, request: () => Observable<unknown>): Observable<void> {
+  private runDeletion(deletion: TemplateDeletion): Observable<void> {
+    return this.mutate({ kind: 'delete', deletion }, () =>
+      this.api.deleteTemplate(deletion.templateId, deletion.confirmActive));
+  }
+
+  private mutate(mutation: TemplateMutation, request: () => Observable<unknown>): Observable<void> {
     return defer(() => {
-      if (!this.canAct()) return EMPTY;
-      this.mutation.set(kind);
-      this.uncertainMutation.set(null);
+      const { kind } = mutation;
+      if (kind === 'delete' ? this.busy() : !this.canAct()) return EMPTY;
+      this.mutating.set(true);
+      if (kind !== 'delete') this.uncertainMutation.set(null);
       return defer(request).pipe(
         map(() => {
-          const copy = this.i18n.copy();
-          this.toast.success({ summary: kind === 'upload' ? copy.uploaded : copy.activated });
+          const { uploaded, activated, deleted } = this.i18n.copy();
+          if (kind === 'delete') {
+            this.incompleteDeletions.update((deletions) =>
+              deletions.filter(({ templateId }) => templateId !== mutation.deletion.templateId));
+          }
+          this.toast.success({ summary: { upload: uploaded, activation: activated, delete: deleted }[kind] });
           this.readCatalog();
         }),
         catchError((error: unknown) => {
-          const copy = this.i18n.copy();
-          if (!(error instanceof EdgeFunctionError) ||
-              (error.code !== 'UPLOAD_FAILED' && isEdgeMutationResultUncertain(error))) {
-            this.uncertainMutation.set(kind);
-          } else {
-            const fallback = kind === 'upload' ? copy.uploadFailed : copy.activationFailed;
-            this.toast.danger({ summary: this.errorMessage(error, fallback) });
-          }
+          this.handleMutationFailure(mutation, error);
           this.readCatalog();
           return EMPTY;
         }),
-        finalize(() => this.mutation.set(null)),
+        finalize(() => this.mutating.set(false)),
       );
     });
   }
 
-  private hasStatus(templateId: string, status: ContractTemplate['status']): boolean {
-    return this.rows().some((template) => template.template_id === templateId && template.status === status);
+  private handleMutationFailure(mutation: TemplateMutation, error: unknown): void {
+    const { kind } = mutation;
+    const uncertain = !(error instanceof EdgeFunctionError) ||
+      (error.code !== 'UPLOAD_FAILED' && isEdgeMutationResultUncertain(error));
+    if (kind === 'delete') {
+      const cleanupFailed = error instanceof EdgeFunctionError && error.code === 'POST_COMMIT_STORAGE_CLEANUP_FAILED';
+      if (cleanupFailed || uncertain) {
+        const { deletion } = mutation;
+        this.incompleteDeletions.update((deletions) => {
+          const previous = deletions.find(({ templateId }) => templateId === deletion.templateId);
+          const outcome = cleanupFailed || previous?.outcome === 'cleanupFailed' ? 'cleanupFailed' : 'unknown';
+          return [...deletions.filter(({ templateId }) => templateId !== deletion.templateId), { ...deletion, outcome }];
+        });
+        return;
+      }
+    } else if (uncertain) {
+      this.uncertainMutation.set(kind);
+      return;
+    }
+
+    const { uploadFailed, activationFailed, deleteFailed } = this.i18n.copy();
+    const fallback = { upload: uploadFailed, activation: activationFailed, delete: deleteFailed }[kind];
+    this.toast.danger({ summary: this.errorMessage(error, fallback) });
+  }
+
+  private findTemplate(templateId: string): ContractTemplate | undefined {
+    return this.rows().find((template) => template.template_id === templateId);
   }
 
   private errorMessage(error: unknown, fallback: string): string {

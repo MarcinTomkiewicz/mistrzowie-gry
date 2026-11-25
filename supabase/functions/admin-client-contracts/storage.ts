@@ -2,7 +2,9 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
 
 import {
   DocumentContractError,
+  DocumentPostCommitCleanupError,
   DocumentWriteOutcomeUnknownError,
+  isConfirmedDocumentRpcRejection,
   readSingleDocumentRpc,
   shouldCompensateDocumentRegistration,
 } from "../_shared/document-api.ts";
@@ -15,12 +17,19 @@ import {
   CLIENT_CONTRACT_PDF_MAX_BYTES,
   CLIENT_CONTRACTS_BUCKET,
   type ClientContractsDatabase,
+  type ContractFileLocation,
   RPC,
+  TEMPLATE_FAMILIES,
 } from "./contracts.ts";
 import type { parseUploadRequest } from "./requests.ts";
 
 const { readPdfFile, uploadPdf, removeDocumentPaths, createDocumentDownload } =
   privatePdfStorage(CLIENT_CONTRACTS_BUCKET, CLIENT_CONTRACT_PDF_MAX_BYTES);
+const TEMPLATE_PATH = new RegExp(
+  String.raw`^templates/(?:${
+    TEMPLATE_FAMILIES.join("|")
+  })/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.pdf$`,
+);
 
 type ContractClient = SupabaseClient<ClientContractsDatabase>;
 type UploadRequest = ReturnType<typeof parseUploadRequest>;
@@ -32,7 +41,7 @@ export async function storeContractPdf(
   requestId: string,
 ) {
   if (request.action === "saveAgreement") {
-    await getContractFile(client, "template", request.templateId);
+    await getContractFile(client, "active_template", request.templateId);
   }
 
   const bytes = await readPdfFile(request.file);
@@ -66,7 +75,6 @@ export async function storeContractPdf(
         client.rpc(RPC.registerTemplate, {
           ...metadata,
           p_family: request.family,
-          p_source_document_url: request.sourceDocumentUrl,
         }),
       );
     }
@@ -106,6 +114,54 @@ export async function storeContractPdf(
   }
 }
 
+export async function deleteContractTemplate(
+  client: ContractClient,
+  storageClient: SupabaseClient,
+  templateId: string,
+  confirmActive: boolean,
+  requestId: string,
+): Promise<{ template_id: string }> {
+  let target;
+  try {
+    target = await readSingleDocumentRpc(
+      RPC.deleteTemplate,
+      client.rpc(RPC.deleteTemplate, {
+        p_template_id: templateId,
+        p_confirm_active: confirmActive,
+      }),
+    );
+    if (
+      !isTemplateLocation(target, templateId) ||
+      typeof target.already_deleted !== "boolean"
+    ) {
+      throw new DocumentContractError();
+    }
+  } catch (error) {
+    if (isConfirmedDocumentRpcRejection(error)) throw error;
+    const outcome = new DocumentWriteOutcomeUnknownError(
+      "DELETE_OUTCOME_UNKNOWN",
+    );
+    console.error(
+      JSON.stringify({ code: outcome.code, requestId, templateId }),
+    );
+    throw outcome;
+  }
+
+  try {
+    await removeDocumentPaths(storageClient, [target.storage_path]);
+  } catch {
+    const failure = new DocumentPostCommitCleanupError();
+    console.error(JSON.stringify({
+      code: failure.code,
+      requestId,
+      templateId,
+      storagePath: target.storage_path,
+    }));
+    throw failure;
+  }
+  return { template_id: templateId };
+}
+
 export async function getContractDownload(
   client: ContractClient,
   storageClient: SupabaseClient,
@@ -129,15 +185,22 @@ async function getContractFile(
     RPC.getFile,
     client.rpc(RPC.getFile, { p_artifact_type: type, p_artifact_id: id }),
   );
-  const directory = type === "template" ? "templates/" : "agreements/";
-  if (
-    file.bucket_id !== CLIENT_CONTRACTS_BUCKET ||
-    !file.storage_path.startsWith(directory) ||
-    (type === "template" && file.template_id !== id)
-  ) {
-    throw new DocumentContractError();
-  }
+  const validLocation = type === "agreement"
+    ? file.bucket_id === CLIENT_CONTRACTS_BUCKET &&
+      file.storage_path.startsWith("agreements/")
+    : isTemplateLocation(file, id);
+  if (!validLocation) throw new DocumentContractError();
   return file;
+}
+
+function isTemplateLocation(
+  file: ContractFileLocation,
+  templateId: string,
+): boolean {
+  return file.template_id === templateId &&
+    file.bucket_id === CLIENT_CONTRACTS_BUCKET &&
+    typeof file.storage_path === "string" &&
+    TEMPLATE_PATH.test(file.storage_path);
 }
 
 function safePdfFilename(
@@ -152,5 +215,7 @@ function safePdfFilename(
     .slice(0, 200)
     .replace(/^[. -]+|[. -]+$/g, "");
   const reserved = /^(?:con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\.|$)/i.test(stem);
-  return `${reserved ? "_" : ""}${stem || artifactType}.pdf`;
+  return `${reserved ? "_" : ""}${
+    stem || (artifactType === "agreement" ? "agreement" : "template")
+  }.pdf`;
 }

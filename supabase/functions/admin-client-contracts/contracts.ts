@@ -13,7 +13,11 @@ export const LINK_KINDS = [
   "customer_entitlement",
   "staffing_realization",
 ] as const;
-export const ARTIFACT_TYPES = ["template", "agreement"] as const;
+export const ARTIFACT_TYPES = [
+  "template",
+  "active_template",
+  "agreement",
+] as const;
 
 type TemplateFamily = typeof TEMPLATE_FAMILIES[number];
 type PartyKind = typeof PARTY_KINDS[number];
@@ -24,6 +28,7 @@ export const RPC = {
   registerTemplate: "register_admin_contract_template",
   approveTemplate: "approve_admin_contract_template",
   listTemplates: "list_admin_contract_templates",
+  deleteTemplate: "delete_admin_contract_template",
   registerAgreement: "register_admin_client_contract",
   listAgreements: "list_admin_client_contracts",
   getFile: "get_admin_contract_file",
@@ -48,11 +53,16 @@ type TemplateState = {
 };
 
 type TemplateRow = TemplateState & PdfMetadata & {
-  source_document_url: string;
   original_filename: string;
   created_at: string;
   approved_at: string | null;
-  approval_reference: string | null;
+  can_delete: boolean;
+};
+
+export type ContractFileLocation = {
+  template_id: string;
+  bucket_id: string;
+  storage_path: string;
 };
 
 type AgreementRegistration = {
@@ -72,24 +82,24 @@ type AgreementRow = AgreementRegistration & PdfMetadata & {
 
 type Rpc<Args, Row> = { Args: Args; Returns: Row[] };
 
-// The Edge client uses the six public functions in the UKL-014 frozen DB contract.
 export type ClientContractsDatabase = {
   public: {
     Tables: Record<never, never>;
     Views: Record<never, never>;
     Functions: {
       [RPC.registerTemplate]: Rpc<
-        StoredPdfArgs & {
-          p_family: TemplateFamily;
-          p_source_document_url: string;
-        },
+        StoredPdfArgs & { p_family: TemplateFamily },
         TemplateState
       >;
       [RPC.approveTemplate]: Rpc<
-        { p_template_id: string; p_approval_reference: string },
+        { p_template_id: string },
         TemplateState
       >;
       [RPC.listTemplates]: Rpc<never, TemplateRow>;
+      [RPC.deleteTemplate]: Rpc<
+        { p_template_id: string; p_confirm_active: boolean },
+        ContractFileLocation & { already_deleted: boolean }
+      >;
       [RPC.registerAgreement]: Rpc<
         StoredPdfArgs & {
           p_template_id: string;
@@ -104,12 +114,7 @@ export type ClientContractsDatabase = {
       [RPC.listAgreements]: Rpc<never, AgreementRow>;
       [RPC.getFile]: Rpc<
         { p_artifact_type: ArtifactType; p_artifact_id: string },
-        PdfMetadata & {
-          bucket_id: string;
-          storage_path: string;
-          original_filename: string;
-          template_id: string;
-        }
+        ContractFileLocation & PdfMetadata & { original_filename: string }
       >;
     };
   };
