@@ -36,6 +36,7 @@ export function createAdminContractTemplatesI18n() {
     deleteFailed: string;
     fileFailed: string;
     uploadUncertain: string;
+    familiesTitle: string;
   }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'catalog');
 
   const i18n = {
@@ -59,8 +60,6 @@ export function createAdminContractTemplatesI18n() {
       renameFamilyConflict: string;
       renameFamilyUnknown: string;
       renameFamilyFailed: string;
-      filterFamily: string;
-      emptyFamily: string;
       familyUncertain: string;
       familyCreated: string;
       familyFailed: string;

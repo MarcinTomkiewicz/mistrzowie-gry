@@ -2,6 +2,7 @@ import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { MenuItem } from 'primeng/api';
+import { AutoFocus } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -28,10 +29,12 @@ import { ContractConfigurationEditor } from './contract-configuration-editor';
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 import { ContractTemplatesFacade } from './contract-templates-facade';
 
+type FamilyDialog = { mode: 'list' | 'create' } | { mode: 'rename'; family: ContractFamily };
+
 @Component({
   selector: 'app-contract-template-catalog',
   imports: [
-    ReactiveFormsModule, ButtonModule, IftaLabelModule, SelectModule, TableModule,
+    ReactiveFormsModule, AutoFocus, ButtonModule, IftaLabelModule, SelectModule, TableModule,
     FileUpload, LoadingOverlay, PdfViewerDialog, DialogModule, InputTextModule, ContractConfigurationEditor, DocumentOperations,
   ],
   templateUrl: './contract-template-catalog.html',
@@ -52,15 +55,15 @@ export class ContractTemplateCatalog {
     }]),
   });
   protected readonly editing = signal<ContractTemplate | null>(null);
-  protected readonly familyDialog = signal<{ family: ContractFamily | null } | null>(null);
+  protected readonly familyDialog = signal<FamilyDialog | null>(null);
+  protected readonly families = computed(() => Array.from(this.catalog.familiesByKey().values()));
   protected readonly familyName = new FormControl('', { nonNullable: true });
   protected readonly familyForm = new FormGroup({ name: this.familyName });
-  protected readonly familyFilter = new FormControl<string | null>(null);
-  protected readonly filteredFamily = toSignal(this.familyFilter.valueChanges, { initialValue: null });
   private readonly familyNameValue = toSignal(this.familyName.valueChanges, { initialValue: '' });
-  private readonly familyLabel = computed(() => this.familyDialog()?.family
+  private readonly renamingFamily = computed(() => this.familyDialog()?.mode === 'rename');
+  private readonly familyLabel = computed(() => this.renamingFamily()
     ? trimContractFamilyLabel(this.familyNameValue()) : this.familyNameValue().trim());
-  protected readonly familyLabelValid = computed(() => this.familyDialog()?.family
+  protected readonly familyLabelValid = computed(() => this.renamingFamily()
     ? isContractFamilyLabel(this.familyLabel()) : isContractLabel(this.familyLabel()));
   private readonly proposedFamilyKey = computed(() => {
     if (!this.familyLabelValid()) return null;
@@ -74,24 +77,17 @@ export class ContractTemplateCatalog {
     }
     return family;
   });
-  protected readonly selectedFamily = computed(() => this.catalog.familiesByKey().get(this.filteredFamily() ?? ''));
-  protected readonly familyOperations = computed<MenuItem[]>(() => {
-    const family = this.selectedFamily();
-    return family ? [{
-      label: this.i18n.editor().renameFamily,
-      icon: 'pi pi-scroll-quill',
-      command: () => this.openFamilyDialog(family),
-    }] : [];
-  });
   protected readonly familyForRename = computed(() => {
-    const family = this.familyDialog()?.family;
-    if (!family || !this.catalog.renameIssue()) return family;
+    const dialog = this.familyDialog();
+    if (dialog?.mode !== 'rename') return undefined;
+    const { family } = dialog;
+    if (!this.catalog.renameIssue()) return family;
     return this.catalog.canAct() ? this.catalog.familiesByKey().get(family.family) : undefined;
   });
   protected readonly canSaveFamily = computed(() => {
     const dialog = this.familyDialog();
-    if (!dialog || !this.catalog.canAct() || !this.familyLabelValid()) return false;
-    if (!dialog.family) return this.proposedFamilyKey() !== null;
+    if (!dialog || dialog.mode === 'list' || !this.catalog.canAct() || !this.familyLabelValid()) return false;
+    if (dialog.mode === 'create') return this.proposedFamilyKey() !== null;
     const current = this.familyForRename();
     return !!current && this.familyLabel() !== current.label;
   });
@@ -110,8 +106,7 @@ export class ContractTemplateCatalog {
       active: STATUS_BADGE_CLASS.active,
       retired: STATUS_BADGE_CLASS.withdrawn,
     };
-    const family = this.filteredFamily();
-    return this.catalog.templates().filter((template) => family === null || template.family === family).map((template) => ({
+    return this.catalog.templates().map((template) => ({
       template,
       familyLabel: families.get(template.family)?.label,
       statusLabel: statusLabels[template.status],
@@ -145,11 +140,11 @@ export class ContractTemplateCatalog {
     ).subscribe(() => this.uploadForm.controls.file.reset());
   }
 
-  protected openFamilyDialog(family: ContractFamily | null = null): void {
-    if (!this.catalog.canAct()) return;
+  protected openFamilyDialog(dialog: FamilyDialog = { mode: 'list' }): void {
+    if (dialog.mode === 'list' ? this.catalog.saving() : !this.catalog.canAct()) return;
     this.catalog.clearRenameIssue();
-    this.familyName.reset(family?.label ?? '');
-    this.familyDialog.set({ family });
+    this.familyName.reset(dialog.mode === 'rename' ? dialog.family.label : '');
+    this.familyDialog.set(dialog);
   }
 
   protected closeFamilyDialog(): void {

@@ -3,6 +3,7 @@
     "title": "Wzory umów",
     "addTitle": "Dodaj wzór",
     "family": "Rodzaj umowy",
+    "familiesTitle": "Rodzaje umów",
     "statuses": {
       "staged": "[PH] Oczekuje na aktywację"
     },
@@ -51,8 +52,6 @@
     "renameFamilyConflict": "[PH] Nazwa rodzaju zmieniła się w bazie. Sprawdź aktualną nazwę przed ponownym zapisem.",
     "renameFamilyUnknown": "[PH] Wynik zmiany nazwy jest nieznany. Sprawdź aktualną nazwę przed ponownym zapisem.",
     "renameFamilyFailed": "[PH] Nie udało się zmienić nazwy rodzaju umowy.",
-    "filterFamily": "[PH] Filtruj według rodzaju",
-    "emptyFamily": "[PH] Wybrany rodzaj nie ma wzorów w katalogu.",
     "familyUncertain": "[PH] Wynik dodawania rodzaju jest nieznany. Sprawdź odświeżony katalog.",
     "familyCreated": "[PH] Rodzaj umowy został dodany.",
     "familyFailed": "[PH] Nie udało się dodać rodzaju umowy.",

@@ -1,6 +1,8 @@
 @let copy = i18n.copy();
 @let actions = i18n.actions();
 @let labels = i18n.labels();
+@let table = i18n.table();
+@let editor = i18n.editor();
 @let upload = uploadForm.controls;
 
 <div class="position-relative flex-col-start-stretch gap-lg w-100 min-w-0" [attr.aria-busy]="catalog.busy()">
@@ -12,12 +14,10 @@
 
     <form class="mg-form flex-col-start-stretch gap-sm w-100" [formGroup]="uploadForm" (ngSubmit)="addTemplate()" novalidate>
       <div class="flex-col-start-stretch gap-xs w-px-250 w-100-sm min-w-0">
-        <p-iftalabel class="w-100">
-          <p-select class="w-100" size="small" inputId="contract-template-family" formControlName="family"
-            [options]="catalog.familyOptions()" optionLabel="label" optionValue="value"
-            [placeholder]="actions.select" [readonly]="!catalog.canAct()" appendTo="body" />
-          <label for="contract-template-family">{{ copy.family }}</label>
-        </p-iftalabel>
+        <label id="contract-template-family-label" for="contract-template-family">{{ copy.family }}</label>
+        <p-select class="w-100" size="small" inputId="contract-template-family" formControlName="family"
+          ariaLabelledBy="contract-template-family-label" [options]="catalog.familyOptions()" optionLabel="label" optionValue="value"
+          [placeholder]="actions.select" [readonly]="!catalog.canAct()" appendTo="body" />
         @if (upload.family.touched && upload.family.invalid) {
           <small class="error-text">{{ i18n.form().required }}</small>
         }
@@ -36,8 +36,8 @@
       }
 
       <div class="flex-row-end-center flex-wrap gap-sm">
-        <p-button type="button" size="small" severity="secondary" [label]="i18n.editor().addFamily"
-          [disabled]="!catalog.canAct()" (onClick)="openFamilyDialog()" />
+        <p-button type="button" size="small" severity="secondary" [label]="editor.addFamily"
+          [disabled]="!catalog.canAct()" (onClick)="openFamilyDialog({ mode: 'create' })" />
         <p-button type="submit" size="small" severity="success" icon="pi pi-plus" [label]="copy.addTitle"
           [disabled]="!catalog.canAct()" />
       </div>
@@ -69,16 +69,9 @@
     </section>
   } @else if (!catalog.loading()) {
     <section class="flex-col-start-stretch gap-md w-100">
-      <div class="flex-row-between-center flex-wrap gap-sm">
-        <div class="flex-row-start-center gap-xs min-w-0 w-100-sm">
-          <p-select size="small" class="w-px-250 w-100-sm min-w-0" [formControl]="familyFilter" [options]="catalog.familyOptions()"
-            optionLabel="label" optionValue="value" [showClear]="true"
-            [placeholder]="i18n.editor().filterFamily" [ariaLabel]="i18n.editor().filterFamily" appendTo="body" />
-          @if (selectedFamily(); as family) {
-            <app-document-operations [items]="familyOperations()" [disabled]="!catalog.canAct()"
-              [label]="i18n.table().actions + ' - ' + family.label" />
-          }
-        </div>
+      <div class="flex-row-end-center flex-wrap gap-sm">
+        <p-button type="button" size="small" severity="secondary" [label]="copy.familiesTitle"
+          [disabled]="!catalog.canAct()" (onClick)="openFamilyDialog()" />
         <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh" [label]="actions.refresh"
           [disabled]="!catalog.canAct()" (onClick)="catalog.refresh()" />
       </div>
@@ -87,11 +80,21 @@
           <p-table size="small" [value]="rows()" dataKey="template.template_id" tableStyleClass="mg-responsive-table">
             <ng-template #header>
               <tr class="hide-down-sm">
-                <th scope="col" class="small-caps">{{ labels.document }}</th>
-                <th scope="col" class="small-caps">{{ copy.family }}</th>
-                <th scope="col" class="small-caps">{{ labels.status }}</th>
-                <th scope="col" class="small-caps text-right">{{ i18n.table().actions }}</th>
+                <th scope="col" class="small-caps" pSortableColumn="template.original_filename">
+                  {{ labels.document }} <p-sortIcon field="template.original_filename" />
+                </th>
+                <th scope="col" class="small-caps" pSortableColumn="familyLabel">
+                  {{ copy.family }} <p-sortIcon field="familyLabel" />
+                </th>
+                <th scope="col" class="small-caps" pSortableColumn="statusLabel">
+                  {{ labels.status }} <p-sortIcon field="statusLabel" />
+                </th>
+                <th scope="col" class="small-caps text-right">{{ table.actions }}</th>
               </tr>
+            </ng-template>
+            <ng-template #sorticon let-sortOrder>
+              <i class="pi warn-text" [class.pi-ascending]="sortOrder === 1"
+                [class.pi-descending]="sortOrder !== 1" aria-hidden="true"></i>
             </ng-template>
             <ng-template #body let-row>
               @let template = row.template;
@@ -110,10 +113,10 @@
                   </div>
                 </td>
                 <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
-                  <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.table().actions }}</span>
+                  <span class="mg-responsive-table__label small-caps font-bold">{{ table.actions }}</span>
                   <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
                     <app-document-operations [items]="row.menu" [disabled]="!catalog.canAct()"
-                      [label]="i18n.table().actions + ' - ' + template.original_filename" />
+                      [label]="table.actions + ' - ' + template.original_filename" />
                   </div>
                 </td>
               </tr>
@@ -122,7 +125,7 @@
         </div>
       } @else {
         <section class="mg-card w-100" role="status">
-          <p class="m-0 muted-text">{{ filteredFamily() ? i18n.editor().emptyFamily : copy.empty }}</p>
+          <p class="m-0 muted-text">{{ copy.empty }}</p>
         </section>
       }
     </section>
@@ -138,41 +141,87 @@
 }
 
 @if (familyDialog(); as dialog) {
-  @let editor = i18n.editor();
-  <p-dialog [visible]="true" [modal]="true" [header]="dialog.family ? editor.renameFamily : editor.addFamily" appendTo="body"
+  @let renaming = dialog.mode === 'rename';
+  <p-dialog [visible]="true" [modal]="true" appendTo="body"
+    [header]="dialog.mode === 'list' ? copy.familiesTitle : (renaming ? editor.renameFamily : editor.addFamily)"
     styleClass="mg-dialog mg-dialog--sm" [draggable]="false" [closable]="!catalog.saving()"
     [closeOnEscape]="!catalog.saving()" (visibleChange)="$event ? null : closeFamilyDialog()">
-    <form class="mg-form flex-col-start-stretch gap-sm" [formGroup]="familyForm" (ngSubmit)="saveFamily()" novalidate>
-      @if (dialog.family && catalog.renameIssue(); as issue) {
+    <div class="flex-col-start-stretch gap-sm min-w-0" [attr.aria-busy]="catalog.busy()">
+      @if (catalog.loading()) {
+        <p class="m-0" role="status">{{ i18n.status().loading }}</p>
+      } @else if (catalog.loadFailed()) {
         <div class="flex-col-start-stretch gap-xs" role="alert">
-          <p class="m-0 error-text">{{ issue === 'conflict' ? editor.renameFamilyConflict : editor.renameFamilyUnknown }}</p>
-          @if (catalog.loading()) {
-            <p class="m-0">{{ i18n.status().loading }}</p>
-          } @else if (catalog.loadFailed()) {
-            <p class="m-0 error-text">{{ copy.loadFailed }}</p>
-            <div><p-button type="button" size="small" severity="secondary" [label]="actions.retry" (onClick)="catalog.refresh()" /></div>
-          } @else if (familyForRename(); as current) {
-            <p class="m-0 text-wrap-anywhere">{{ editor.currentFamilyName }}: <strong>{{ current.label }}</strong></p>
-          } @else if (!catalog.saving()) {
-            <p class="m-0 error-text">{{ i18n.errors().notFound }}</p>
-          }
+          <p class="m-0 error-text">{{ copy.loadFailed }}</p>
+          <div><p-button type="button" size="small" severity="secondary" [label]="actions.retry" (onClick)="catalog.refresh()" /></div>
         </div>
       }
-      <p-iftalabel class="w-px-300 w-100-sm min-w-0">
-        <input pInputText pSize="small" id="contract-family-label" class="w-100" formControlName="name"
-          [attr.maxlength]="dialog.family ? null : 200" [readOnly]="catalog.saving()"
-          [attr.aria-invalid]="familyName.dirty && !familyLabelValid()" required />
-        <label for="contract-family-label">{{ labels.name }}</label>
-      </p-iftalabel>
-      @if (familyName.dirty && !familyLabelValid()) {
-        <small class="error-text">{{ i18n.form().invalid }}</small>
+      @if (dialog.mode === 'list') {
+        @if (!catalog.loading() && !catalog.loadFailed()) {
+          @if (families().length) {
+            <div class="w-100 overflow-x-auto">
+              <p-table size="small" [value]="families()" dataKey="family" tableStyleClass="mg-responsive-table">
+                <ng-template #header>
+                  <tr class="hide-down-sm">
+                    <th scope="col" class="small-caps">{{ labels.name }}</th>
+                    <th scope="col" class="small-caps text-right">{{ table.actions }}</th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-family>
+                  <tr class="mg-responsive-table__row">
+                    <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">{{ family.label }}</th>
+                    <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ table.actions }}</span>
+                      <div class="mg-responsive-table__value flex-row-end-center">
+                        <p-button type="button" size="small" severity="secondary" icon="pi pi-scroll-quill"
+                          [label]="actions.edit" [ariaLabel]="actions.edit + ' - ' + family.label" [disabled]="!catalog.canAct()"
+                          (onClick)="openFamilyDialog({ mode: 'rename', family })" />
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          } @else {
+            <p class="m-0 muted-text" role="status">{{ i18n.empty().title }}</p>
+          }
+        }
+        <div class="flex-row-end-center flex-wrap gap-sm">
+          <p-button type="button" size="small" severity="secondary" [label]="actions.close"
+            [pAutoFocus]="true" (onClick)="closeFamilyDialog()" />
+          <p-button type="button" size="small" severity="success" [label]="editor.addFamily"
+            [disabled]="!catalog.canAct()" (onClick)="openFamilyDialog({ mode: 'create' })" />
+        </div>
+      } @else {
+        <form class="mg-form flex-col-start-stretch gap-sm" [formGroup]="familyForm" (ngSubmit)="saveFamily()" novalidate>
+          @if (renaming && catalog.renameIssue(); as issue) {
+            <div class="flex-col-start-stretch gap-xs" role="alert">
+              <p class="m-0 error-text">{{ issue === 'conflict' ? editor.renameFamilyConflict : editor.renameFamilyUnknown }}</p>
+              @if (catalog.canAct()) {
+                @if (familyForRename(); as current) {
+                  <p class="m-0 text-wrap-anywhere">{{ editor.currentFamilyName }}: <strong>{{ current.label }}</strong></p>
+                } @else {
+                  <p class="m-0 error-text">{{ i18n.errors().notFound }}</p>
+                }
+              }
+            </div>
+          }
+          <p-iftalabel class="w-px-300 w-100-sm min-w-0">
+            <input pInputText pSize="small" id="contract-family-label" class="w-100" formControlName="name"
+              [pAutoFocus]="true" [attr.maxlength]="renaming ? null : 200" [readOnly]="catalog.saving()"
+              [attr.aria-invalid]="familyName.dirty && !familyLabelValid()" required />
+            <label for="contract-family-label">{{ labels.name }}</label>
+          </p-iftalabel>
+          @if (familyName.dirty && !familyLabelValid()) {
+            <small class="error-text">{{ i18n.form().invalid }}</small>
+          }
+          <div class="flex-row-end-center gap-sm">
+            <p-button type="button" size="small" severity="secondary" [label]="actions.cancel"
+              [disabled]="catalog.saving()" (onClick)="openFamilyDialog()" />
+            <p-button type="submit" size="small" severity="success" [label]="renaming ? actions.save : actions.add"
+              [disabled]="!canSaveFamily()" [loading]="catalog.saving()" />
+          </div>
+        </form>
       }
-      <div class="flex-row-end-center gap-sm">
-        <p-button type="button" size="small" severity="secondary" [label]="actions.cancel"
-          [disabled]="catalog.saving()" (onClick)="closeFamilyDialog()" />
-        <p-button type="submit" size="small" severity="success" [label]="dialog.family ? actions.save : actions.add"
-          [disabled]="!canSaveFamily()" [loading]="catalog.saving()" />
-      </div>
-    </form>
+    </div>
   </p-dialog>
 }
