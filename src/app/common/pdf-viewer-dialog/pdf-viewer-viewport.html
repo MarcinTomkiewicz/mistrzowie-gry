@@ -9,5 +9,12 @@
   (pointerup)="onPointerUp($event)"
   (pointercancel)="onPointerUp($event)"
 >
-  <canvas #canvas class="mx-auto shadow-sm"></canvas>
+  <div class="pdf-viewer-dialog__page position-relative mx-auto">
+    <canvas #canvas class="d-block shadow-sm"></canvas>
+    @if (surface(); as page) {
+      @if (overlay(); as template) {
+        <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ $implicit: page }" />
+      }
+    }
+  </div>
 </div>

@@ -1,0 +1,20 @@
+<div class="position-absolute inset-0 overflow-hidden touch-action-none"
+  (pointerdown)="begin($event, 'draw')">
+  @for (item of onPage(); track item.index) {
+    @let box = position(item.area);
+    <div class="position-absolute border" [class.border-secondary]="selected() === item.index"
+      [style.left.%]="box.left" [style.top.%]="box.top" [style.width.%]="box.width" [style.height.%]="box.height"
+      (pointerdown)="begin($event, 'move', item.index)">
+      @if (editable() && selected() === item.index) {
+        <button type="button" class="position-absolute right-0 bottom-0 cursor-pointer"
+          [attr.aria-label]="i18n.editor().resize"
+          (pointerdown)="begin($event, 'resize', item.index)">↘</button>
+      }
+    </div>
+  }
+  @if (pending(); as area) {
+    @let box = position(area);
+    <div class="position-absolute border border-secondary pointer-events-none"
+      [style.left.%]="box.left" [style.top.%]="box.top" [style.width.%]="box.width" [style.height.%]="box.height"></div>
+  }
+</div>

@@ -1,0 +1,205 @@
+@let copy = i18n.editor();
+@let actions = i18n.actions();
+@let state = facade.loaded();
+@let draft = facade.draft();
+
+<p-dialog [header]="copy.configuration" [visible]="true" [modal]="true" [draggable]="false"
+  [closable]="!facade.pending() && !facade.dirty()" [closeOnEscape]="!facade.pending() && !facade.dirty()" appendTo="body"
+  styleClass="mg-dialog mg-dialog--xl" (visibleChange)="$event ? null : close()">
+  <div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0">
+    <app-loading-overlay [visible]="facade.pending()" [label]="i18n.status().loading" />
+    <strong class="text-wrap-anywhere">{{ template().original_filename }}</strong>
+    @if (facade.readFailed()) {
+      <div class="flex-col-start-stretch gap-sm" role="alert">
+        <p class="m-0 error-text">{{ copy.readFailed }}</p>
+        <div><p-button type="button" severity="secondary" [label]="actions.retry" (onClick)="reload()" /></div>
+      </div>
+    }
+    @if (facade.failed()) {
+      <div class="mg-card flex-col-start-stretch gap-sm" role="alert">
+        <p class="m-0 error-text">{{ facade.conflict() ? copy.revisionConflict : copy.reconciliation }}</p>
+        @if (facade.remote(); as remote) {
+          <p class="m-0">{{ copy.databaseVersion }} {{ remote.configuration_revision }} · {{ remote.status === 'staged' ? i18n.copy().statuses.staged : remote.status === 'active' ? i18n.entityStatuses().active.masculine : i18n.entityStatuses().withdrawn.masculine }}</p>
+          @if (remote.configuration; as configuration) {
+            <ul class="m-0">
+              @for (field of configuration.fields; track field.id) {
+              <li>{{ field.label }} · {{ i18n.fieldKindLabel(field.kind) }}</li>
+              }
+            </ul>
+          }
+        }
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-button type="button" severity="secondary" [label]="actions.refresh" (onClick)="reload()" />
+          @if (facade.remote()?.status === 'staged') {
+            <p-button type="button" severity="warn" [label]="copy.keepDraft" (onClick)="facade.keepDraft()" />
+          }
+        </div>
+      </div>
+    }
+    @if (state && draft) {
+      @if (facade.editable()) {
+        <section class="mg-card flex-col-start-stretch gap-sm">
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            <p-select [ngModel]="sourceId()" (ngModelChange)="sourceId.set($event)" [options]="sources()"
+              optionLabel="original_filename" optionValue="template_id" [ariaLabel]="copy.copySource" [placeholder]="copy.copySource"
+              appendTo="body" [showClear]="true" />
+            <p-button type="button" severity="secondary" [label]="copy.copyDraft"
+              [disabled]="!sourceId() || !facade.canWrite()" (onClick)="copyFromSource()" />
+          </div>
+          @if (facade.sourceUnavailable()) {
+            <p class="m-0 error-text" role="alert">{{ copy.sourceUnavailable }}</p>
+          }
+        </section>
+      }
+
+      <section class="mg-card flex-col-start-stretch gap-md">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.fields }}</h3>
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <p-select [ngModel]="fieldId()" (ngModelChange)="selectField($event)" [options]="fields()"
+            [ariaLabel]="copy.field" [placeholder]="copy.field" optionLabel="label" optionValue="id" appendTo="body" />
+          @if (facade.editable()) {
+            <p-button type="button" severity="secondary" [label]="copy.addField"
+              [disabled]="fields().length >= limits.fields" (onClick)="addField()" />
+            @if (field()) {
+              <p-button type="button" severity="secondary" [label]="actions.moveItemUp"
+                [disabled]="index() <= 0" (onClick)="moveField(-1)" />
+              <p-button type="button" severity="secondary" [label]="actions.moveItemDown"
+                [disabled]="index() >= fields().length - 1" (onClick)="moveField(1)" />
+              <p-button type="button" severity="danger" [label]="actions.delete" (onClick)="removeField()" />
+            }
+          }
+        </div>
+        @if (field(); as selectedField) {
+          <app-contract-field-editor [field]="selectedField" [earlier]="earlier()" [editable]="facade.editable()"
+            (changed)="applyField($event)" />
+        }
+      </section>
+
+      <section class="mg-card flex-col-start-stretch gap-md">
+        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.placements }}</h3>
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          @if (state.document) {
+            <p-button type="button" severity="secondary" icon="pi pi-file-pdf" [label]="copy.layout"
+              (onClick)="layoutOpen.set(true)" />
+          }
+          @if (facade.editable() && field()?.kind === 'select') {
+            <p-select [ngModel]="drawOption()" (ngModelChange)="drawOption.set($event)" [options]="field()?.options ?? []"
+              optionLabel="label" optionValue="value" [showClear]="true" appendTo="body"
+              [ariaLabel]="copy.checkboxOption" [placeholder]="copy.checkboxOption" />
+          }
+        </div>
+        @if (draft.placements.length) {
+          <ol class="m-0">
+            @for (position of draft.placements; track $index) {
+              <li>
+                <p-button type="button" size="small" [text]="placementIndex() !== $index"
+                  [label]="placementLabel(position)"
+                  (onClick)="selectPlacement($index)" />
+              </li>
+            }
+          </ol>
+        }
+        @if (placement(); as selected) {
+          <div class="flex-row-start-center flex-wrap gap-sm">
+            @if (selected.kind === 'text') {
+              <div class="flex-col-start-stretch gap-xs">
+                <label for="contract-font-size">{{ copy.fontSize }}</label>
+                <p-inputnumber inputId="contract-font-size" [ngModel]="selected.font.sizePt" [disabled]="!facade.editable()"
+                  (ngModelChange)="font('sizePt', $event)" [maxFractionDigits]="2" />
+              </div>
+              <div class="flex-col-start-stretch gap-xs">
+                <label for="contract-min-font-size">{{ copy.minFontSize }}</label>
+                <p-inputnumber inputId="contract-min-font-size" [ngModel]="selected.font.minSizePt" [disabled]="!facade.editable()"
+                  (ngModelChange)="font('minSizePt', $event)" [maxFractionDigits]="2" />
+              </div>
+              <p-checkbox inputId="contract-placement-multiline" [ngModel]="selected.multiline"
+                (ngModelChange)="multiline($event)" [binary]="true" [disabled]="!facade.editable() || field()?.kind === 'multiline'" />
+              <label for="contract-placement-multiline">{{ copy.kinds.multiline }}</label>
+            } @else if (placementOptions().length) {
+              <p-select [ngModel]="selected.optionValue" (ngModelChange)="placementOption($event)" [options]="placementOptions()"
+                optionLabel="label" optionValue="value" [ariaLabel]="copy.checkboxOption"
+                [disabled]="!facade.editable()" appendTo="body" />
+            }
+            @if (facade.editable()) {
+              <p-button type="button" severity="danger" [label]="actions.delete" (onClick)="removePlacement()" />
+            }
+          </div>
+        }
+      </section>
+
+      @if (!facade.structural()) {
+        <p class="m-0 error-text" role="alert">{{ copy.invalidDraft }}</p>
+      }
+      @if (facade.issues().length) {
+        <ul class="m-0 error-text">
+          @for (issue of facade.issues(); track $index) {
+            <li>{{ copy.issues[issue.code] }} @if ('fieldId' in issue) { {{ labels()[issue.fieldId] }} }</li>
+          }
+        </ul>
+      }
+
+      @if (facade.editable()) {
+        <div class="flex-row-end-center">
+          <p-button type="button" severity="success" [label]="actions.save"
+            [disabled]="!facade.canWrite() || !facade.structural()" (onClick)="facade.save()" />
+        </div>
+      }
+
+      @if (state.document; as snapshot) {
+        @if (state.revision.configuration; as configuration) {
+          @if (facade.canPreview()) {
+            <section class="mg-card flex-col-start-stretch gap-md">
+              <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.previewValues }}</h3>
+              <app-contract-values-form [configuration]="configuration" [busy]="facade.generation.generating()"
+                [submitLabel]="actions.preview" (valuesChange)="facade.generation.invalidate()"
+                (submitted)="facade.generation.generate(snapshot, $event)" />
+              <app-contract-generated-pdf />
+            </section>
+          }
+        }
+      }
+      @if (facade.editable()) {
+        <div class="flex-row-end-center">
+          <p-button type="button" severity="success" [label]="actions.activate" [disabled]="!facade.activationPreview()"
+            (onClick)="activate()" />
+        </div>
+      }
+    }
+  </div>
+  <ng-template #footer>
+    <p-button type="button" severity="secondary" [label]="actions.close" [disabled]="facade.pending()" (onClick)="close()" />
+  </ng-template>
+</p-dialog>
+
+@if (layoutPreview(); as preview) {
+  <app-pdf-viewer-dialog [preview]="preview" [overlay]="layoutOverlay" [toolbar]="layoutToolbar"
+    (closed)="layoutOpen.set(false)" />
+}
+
+<ng-template #layoutToolbar>
+  @if (facade.editable()) {
+    <div class="flex-row-start-center flex-wrap gap-sm p-sm">
+      <p-button type="button" severity="secondary" [label]="drawMode() ? copy.pan : copy.draw"
+        (onClick)="drawMode.set(!drawMode())" />
+      <p-select [ngModel]="fieldId()" (ngModelChange)="selectField($event)" [options]="fields()"
+        [ariaLabel]="copy.field" [placeholder]="copy.field" optionLabel="label" optionValue="id" appendTo="body" />
+      @if (field()?.kind === 'select') {
+        <p-select [ngModel]="drawOption()" (ngModelChange)="drawOption.set($event)" [options]="field()?.options ?? []"
+          optionLabel="label" optionValue="value" [showClear]="true" appendTo="body"
+          [ariaLabel]="copy.checkboxOption" [placeholder]="copy.checkboxOption" />
+      }
+    </div>
+  }
+</ng-template>
+
+<ng-template #layoutOverlay let-surface>
+  @if (facade.loaded()?.document?.pages?.[surface.page - 1]; as page) {
+    @if (page.width === surface.width && page.height === surface.height) {
+      <app-contract-placement-overlay [surface]="surface" [page]="page" [placements]="draft?.placements ?? []"
+        [selected]="placementIndex()" [editable]="facade.editable() && drawMode()" [canDraw]="canDraw()"
+        (selectedChange)="selectPlacement($event)" (geometryChange)="geometry($event)" />
+    } @else {
+      <p class="position-absolute inset-0 error-text" role="alert">{{ copy.geometryMismatch }}</p>
+    }
+  }
+</ng-template>

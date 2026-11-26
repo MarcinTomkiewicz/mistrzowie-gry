@@ -1,16 +1,19 @@
 @let copy = i18n.preparation();
 @let actions = i18n.actions();
 @let template = facade.template();
-@let generation = facade.generation();
 
-<section class="mg-card position-relative flex-col-start-stretch gap-md w-100" [attr.aria-busy]="facade.busy()">
-  <app-loading-overlay [visible]="facade.busy()"
+<section class="mg-card position-relative flex-col-start-stretch gap-md w-100" [attr.aria-busy]="facade.busy() || catalog.loading()">
+  <app-loading-overlay [visible]="facade.busy() || catalog.loading()"
     [label]="facade.generating() ? copy.generating : i18n.status().loading" />
 
+  @if (catalog.loadFailed()) {
+    <p class="m-0 error-text" role="alert">{{ i18n.copy().loadFailed }}</p>
+    <div><p-button type="button" severity="secondary" [label]="actions.retry" (onClick)="catalog.refresh()" /></div>
+  }
   <p-iftalabel class="w-100">
     <p-select class="w-100" inputId="contract-preparation-family" [formControl]="family"
-      [options]="i18n.familyOptions()" optionLabel="label" optionValue="value"
-      [readonly]="facade.busy()" appendTo="body" />
+      [options]="catalog.familyOptions()" optionLabel="label" optionValue="value"
+      [readonly]="catalog.loading()" appendTo="body" />
     <label for="contract-preparation-family">{{ i18n.copy().family }}</label>
   </p-iftalabel>
 
@@ -18,11 +21,8 @@
     @case ('no-active-template') {
       <p class="m-0 muted-text" role="status">{{ copy.noActiveTemplate }}</p>
     }
-    @case ('field-map-missing') {
-      <div class="flex-col-start-stretch gap-xs" role="status">
-        <strong class="text-wrap-anywhere">{{ template.template.original_filename }}</strong>
-        <p class="m-0 muted-text">{{ copy.fieldMapMissing }}</p>
-      </div>
+    @case ('invalid-configuration') {
+      <p class="m-0 error-text" role="alert">{{ copy.invalidConfiguration }}</p>
     }
     @case ('load-failed') {
       <div class="flex-col-start-stretch gap-sm" role="alert">
@@ -34,43 +34,13 @@
       </div>
     }
     @case ('ready') {
-      <strong class="text-wrap-anywhere">{{ template.template.original_filename }}</strong>
-      @if (generation.status === 'idle') {
-        <p class="m-0 muted-text" role="status">{{ copy.formUnavailable }}</p>
+      <strong class="text-wrap-anywhere">{{ template.snapshot.template.original_filename }}</strong>
+      @if (template.snapshot.revision.configuration; as configuration) {
+        <app-contract-values-form [configuration]="configuration" [busy]="facade.generating()"
+          [submitLabel]="copy.generate" (valuesChange)="facade.invalidate()"
+          (submitted)="facade.generate(template.snapshot, $event)" />
       }
     }
   }
-
-  @switch (generation.status) {
-    @case ('missing-data') {
-      <p class="m-0 error-text" role="alert">{{ copy.missingData }}</p>
-    }
-    @case ('failed') {
-      <p class="m-0 error-text" role="alert">{{ copy.generationFailed }}</p>
-    }
-    @case ('invalid-fields') {
-      <ul class="m-0 error-text" role="alert">
-        @for (error of generation.errors; track error.fieldId) {
-          <li>
-            <strong>{{ error.label }}</strong> -
-            {{ error.code === 'invalid-value' ? i18n.form().invalid : copy.fieldErrors[error.code] }}
-          </li>
-        }
-      </ul>
-    }
-    @case ('filled') {
-      <div class="flex-row-end-center flex-wrap gap-sm">
-        <p-button type="button" severity="secondary" icon="pi pi-horus" [label]="actions.preview"
-          (onClick)="facade.openPreview()" />
-        <p-button type="button" severity="success" icon="pi pi-missile-swarm" [label]="actions.download"
-          (onClick)="facade.download()" />
-      </div>
-    }
-  }
+  <app-contract-generated-pdf />
 </section>
-
-@defer (when facade.preview()) {
-  @if (facade.preview(); as preview) {
-    <app-pdf-viewer-dialog [preview]="preview" (closed)="facade.closePreview()" />
-  }
-}

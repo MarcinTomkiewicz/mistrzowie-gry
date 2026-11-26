@@ -1,7 +1,9 @@
-import { Component, ElementRef, computed, input, output, signal, viewChild } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, ElementRef, computed, input, output, signal, type TemplateRef, viewChild } from '@angular/core';
 
 import type {
   IPdfPinchGesture,
+  IPdfPageSurface,
   IPdfPointerPosition,
   IPdfViewportAnchor,
 } from '../../core/interfaces/i-pdf';
@@ -12,12 +14,15 @@ import {
 
 @Component({
   selector: 'app-pdf-viewer-viewport',
+  imports: [NgTemplateOutlet],
   templateUrl: './pdf-viewer-viewport.html',
   styleUrl: './pdf-viewer-viewport.scss',
 })
 export class PdfViewerViewport {
   readonly zoom = input.required<number>();
   readonly zoomChange = output<number>();
+  readonly surface = input<IPdfPageSurface | null>(null);
+  readonly overlay = input<TemplateRef<{ $implicit: IPdfPageSurface }> | null>(null);
 
   private readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>(
     'canvas',
@@ -87,11 +92,11 @@ export class PdfViewerViewport {
     if (!canvas) return;
     viewport.scrollTo({
       left:
-        canvas.offsetLeft +
+        canvas.getBoundingClientRect().left - viewport.getBoundingClientRect().left + viewport.scrollLeft +
         anchor.contentLeft * canvas.offsetWidth -
         anchor.viewportLeft,
       top:
-        canvas.offsetTop +
+        canvas.getBoundingClientRect().top - viewport.getBoundingClientRect().top + viewport.scrollTop +
         anchor.contentTop * canvas.offsetHeight -
         anchor.viewportTop,
     });
@@ -249,10 +254,10 @@ export class PdfViewerViewport {
   ): IPdfViewportAnchor {
     return {
       contentLeft:
-        (viewport.scrollLeft + viewportLeft - canvas.offsetLeft) /
+        (viewport.getBoundingClientRect().left + viewportLeft - canvas.getBoundingClientRect().left) /
         canvas.offsetWidth,
       contentTop:
-        (viewport.scrollTop + viewportTop - canvas.offsetTop) /
+        (viewport.getBoundingClientRect().top + viewportTop - canvas.getBoundingClientRect().top) /
         canvas.offsetHeight,
       viewportLeft,
       viewportTop,

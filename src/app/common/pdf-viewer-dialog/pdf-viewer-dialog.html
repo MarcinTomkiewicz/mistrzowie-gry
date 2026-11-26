@@ -87,6 +87,9 @@
     </ng-template>
 
     <div class="position-relative w-100">
+      @if (toolbar(); as tools) {
+        <ng-container *ngTemplateOutlet="tools" />
+      }
       @if (hasError() && !document()) {
         <div class="w-100 h-px-400 flex-col-center-center gap-sm text-center">
           <i class="pi pi-file-pdf text-5xl"></i>
@@ -95,6 +98,8 @@
       } @else {
         <app-pdf-viewer-viewport
           [zoom]="zoom()"
+          [surface]="surface()"
+          [overlay]="overlay()"
           (zoomChange)="setZoom($event)"
         />
 

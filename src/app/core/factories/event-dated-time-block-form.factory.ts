@@ -3,7 +3,7 @@ import { FormArray, FormControl, FormGroup, ValidationErrors, Validators } from 
 import type { EventDateTimeBlocks } from '../interfaces/i-admin-global-event';
 import type { EventScheduleFormGroup } from '../types/event-admin-form';
 import { isEventScheduleDateCandidate } from '../utils/event-schedule';
-import { isoDateValidator } from '../validators/event-admin.validator';
+import { isoDateValidator } from '../validators/form-value.validator';
 import { mapEventScheduleFormToPayload } from './event-schedule-form.factory';
 import { createEventGlobalTimeBlocksForm, mapEventGlobalTimeBlocks } from './event-global-time-block-form.factory';
 

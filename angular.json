@@ -30,6 +30,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "{Lato-Regular.ttf,OFL.txt}",
+                "input": "supabase/functions/coworker-questionnaire/assets",
+                "output": "assets/contract-fonts"
               }
             ],
             "stylePreprocessorOptions": {

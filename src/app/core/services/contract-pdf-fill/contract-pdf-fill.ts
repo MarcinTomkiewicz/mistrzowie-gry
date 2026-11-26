@@ -1,121 +1,119 @@
+import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
 import type { Font } from '@pdf-lib/fontkit';
 import type { PDFFont, PDFPage } from 'pdf-lib';
 
-import type { ContractTemplateFieldMap } from '../../types/contract-template-field-map';
+import type { ContractArea, ContractField, ContractPlacement, ContractValue, ContractValues } from '../../types/contract-template-configuration';
+import { openStaticContractPdf } from '../../utils/contract-pdf-geometry';
 import { fitContractPdfText } from '../../utils/contract-pdf-text';
-import type { ContractTemplateLoadResult } from '../admin-contract-templates/contract-template-library';
+import { formatNumber } from '../../utils/number-format';
+import { hasCompleteConfiguration, type VerifiedContractTemplate } from '../admin-contract-templates/contract-template-library';
 import { Platform } from '../platform/platform';
 
-type ReadyTemplate = Extract<ContractTemplateLoadResult, { status: 'ready' }>;
-type Field = ContractTemplateFieldMap['fields'][string];
-type FieldErrorCode =
-  | 'unknown-field'
-  | 'invalid-area'
-  | 'invalid-value'
-  | 'invalid-font'
-  | 'unsupported-character'
-  | 'text-overflow';
-type EmbeddedFont = { readonly font: Font; readonly pdfFont: PDFFont };
-
+type FieldErrorCode = 'unknown-field' | 'invalid-area' | 'invalid-value' | 'invalid-font' | 'unsupported-character' | 'text-overflow';
 export type ContractPdfFillResult =
   | { readonly status: 'filled'; readonly pdfBytes: Uint8Array }
+  | { readonly status: 'missing-data' }
   | {
       readonly status: 'invalid-fields';
-      readonly errors: readonly { readonly fieldId: string; readonly code: FieldErrorCode }[];
+      readonly errors: readonly { readonly fieldId: string; readonly code: FieldErrorCode; readonly placementIndex: number }[];
     };
+
+type EmbeddedFont = { font: Font; pdfFont: PDFFont };
 
 @Injectable({ providedIn: 'root' })
 export class ContractPdfFill {
   private readonly platform = inject(Platform);
+  private readonly document = inject(DOCUMENT);
 
-  /** Font bytes are supplied locally, keyed by the family name in the field map. */
-  async fill(
-    template: ReadyTemplate,
-    values: Readonly<Record<string, string | boolean>>,
-    fontFiles: ReadonlyMap<string, Uint8Array>,
-  ): Promise<ContractPdfFillResult> {
+  async fill(snapshot: VerifiedContractTemplate, values: ContractValues): Promise<ContractPdfFillResult> {
     if (!this.platform.isBrowser) throw new Error('Contracts can only be filled in the browser.');
+    const config = snapshot.revision.configuration;
+    if (config === null || !hasCompleteConfiguration(snapshot)) throw new Error('Incomplete PDF configuration.');
 
-    const [{ PDFDocument, PDFName }, { default: fontkit }] = await Promise.all([
-      import('pdf-lib'),
-      import('@pdf-lib/fontkit'),
-    ]);
-    const pdf = await PDFDocument.load(template.pdfBytes, {
-      updateMetadata: false,
-      throwOnInvalidObject: true,
+    const placements = config.placements.flatMap((placement, placementIndex) => {
+      const value = Object.hasOwn(values, placement.fieldId) ? values[placement.fieldId] : null;
+      if (value === null || value === '') return [];
+      if (placement.kind === 'checkbox' && value !== (placement.optionValue ?? true)) return [];
+      return [{ placement, placementIndex, value }];
     });
-    const form = pdf.catalog.getAcroForm();
-    if (form && (form.dict.has(PDFName.of('XFA')) || (form.Fields()?.size() ?? 0) > 0)) {
-      throw new Error('Contract templates must be static PDFs.');
+    if (!placements.length) return { status: 'missing-data' };
+
+    const { pdf, pages, areas } = await openStaticContractPdf(snapshot.pdfBytes);
+    const fields = new Map(config.fields.map((field) => [field.id, field]));
+    const errors: Extract<ContractPdfFillResult, { status: 'invalid-fields' }>['errors'][number][] = [];
+    const fontPlacementIndex = config.placements.findIndex(({ kind }) => kind === 'text');
+    const font = fontPlacementIndex === -1 ? null : await this.embedFont(pdf);
+    if (fontPlacementIndex !== -1 && !font) {
+      return invalidFont(config.placements[fontPlacementIndex], fontPlacementIndex);
     }
 
-    const fonts = new Map<string, EmbeddedFont | null>();
-    const getFont = async (family: string): Promise<EmbeddedFont | null> => {
-      const cached = fonts.get(family);
-      if (cached !== undefined) return cached;
-      const bytes = fontFiles.get(family);
-      if (bytes === undefined) return null;
-      let result: EmbeddedFont | null;
+    for (const { placementIndex, placement, value } of placements) {
+      const field = fields.get(placement.fieldId);
+      const page = pages[placement.page - 1];
+      const area = areas[placement.page - 1];
+      const code = !field ? 'unknown-field' : !page || !area ? 'invalid-area' :
+        drawPlacement(page, area, placement, field, value, font);
+      if (code !== undefined) errors.push({ fieldId: placement.fieldId, placementIndex, code });
+    }
+    if (errors.length) return { status: 'invalid-fields', errors };
+
+    if (font) {
       try {
-        const font = fontkit.create(bytes);
-        pdf.registerFontkit({ create: () => font });
-        result = { font, pdfFont: await pdf.embedFont(bytes, { subset: true }) };
+        await font.pdfFont.embed();
       } catch {
-        result = null;
+        return invalidFont(config.placements[fontPlacementIndex], fontPlacementIndex);
       }
-      fonts.set(family, result);
-      return result;
-    };
-
-    const pages = pdf.getPages();
-    const fields = template.fieldMap.fields;
-    const errors: { fieldId: string; code: FieldErrorCode }[] = [];
-    for (const [fieldId, value] of Object.entries(values)) {
-      const code = Object.hasOwn(fields, fieldId)
-        ? await drawField(pages, fields[fieldId], value, getFont)
-        : 'unknown-field';
-      if (code !== undefined) errors.push({ fieldId, code });
     }
-    if (errors.length > 0) return { status: 'invalid-fields', errors };
+    return { status: 'filled', pdfBytes: await pdf.save({ addDefaultPage: false, updateFieldAppearances: false }) };
+  }
 
-    return {
-      status: 'filled',
-      pdfBytes: await pdf.save({ addDefaultPage: false, updateFieldAppearances: false }),
-    };
+  private async embedFont(pdf: Awaited<ReturnType<typeof openStaticContractPdf>>['pdf']): Promise<EmbeddedFont | null> {
+    try {
+      const [response, { default: fontkit }] = await Promise.all([
+        fetch(new URL('assets/contract-fonts/Lato-Regular.ttf', this.document.baseURI), { credentials: 'omit' }),
+        import('@pdf-lib/fontkit'),
+      ]);
+      if (!response.ok) return null;
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      const font = fontkit.create(bytes);
+      pdf.registerFontkit({ create: () => font });
+      const pdfFont = await pdf.embedFont(bytes, { subset: true });
+      // Keep the subset valid even when the sample only draws checkboxes.
+      pdfFont.encodeText(' ');
+      return { font, pdfFont };
+    } catch {
+      return null;
+    }
   }
 }
 
-async function drawField(
-  pages: readonly PDFPage[],
-  field: Field,
-  value: string | boolean,
-  getFont: (family: string) => Promise<EmbeddedFont | null>,
-): Promise<FieldErrorCode | undefined> {
-  const page = pages[field.page - 1];
-  if (page === undefined) return 'invalid-area';
-  const origin = readFieldOrigin(page, field);
-  if (origin === null) return 'invalid-area';
+function invalidFont({ fieldId }: ContractPlacement, placementIndex: number): ContractPdfFillResult {
+  return { status: 'invalid-fields', errors: [{ fieldId, placementIndex, code: 'invalid-font' }] };
+}
 
-  if (field.kind === 'checkbox') {
-    if (typeof value !== 'boolean') return 'invalid-value';
-    if (value) drawCheck(page, origin.x, origin.y, field.width, field.height);
+function drawPlacement(
+  page: PDFPage,
+  area: ContractArea,
+  placement: ContractPlacement,
+  field: ContractField,
+  value: Exclude<ContractValue, null>,
+  embedded: EmbeddedFont | null,
+): FieldErrorCode | undefined {
+  const x = area.x + placement.x;
+  const y = area.y + placement.y;
+  if (placement.kind === 'checkbox') {
+    drawCheck(page, x, y, placement.width, placement.height);
     return undefined;
   }
 
-  if (typeof value !== 'string') return 'invalid-value';
-  const text = value.replace(/\r\n?/g, '\n').normalize('NFC');
-  if ((!field.multiline && text.includes('\n')) || /[\p{Cc}\u2028\u2029]/u.test(text.replaceAll('\n', ''))) {
+  const formatted = formatValue(field, value);
+  if (formatted === null) return 'invalid-value';
+  const text = formatted.replace(/\r\n?/g, '\n').normalize('NFC');
+  if ((!placement.multiline && text.includes('\n')) || /[\p{Cc}\u2028\u2029]/u.test(text.replaceAll('\n', ''))) {
     return 'invalid-value';
   }
-  if (text.trim() === '') return undefined;
-
-  const { family, sizePt, minSizePt } = field.font;
-  if (!Number.isFinite(sizePt) || !Number.isFinite(minSizePt) || minSizePt <= 0 || sizePt < minSizePt) {
-    return 'invalid-font';
-  }
-  const embedded = await getFont(family);
-  if (embedded === null) return 'invalid-font';
+  if (!embedded) return 'invalid-font';
   for (const character of text) {
     const codePoint = character.codePointAt(0);
     if (character !== '\n' && (codePoint === undefined || !embedded.font.hasGlyphForCodePoint(codePoint))) {
@@ -123,36 +121,27 @@ async function drawField(
     }
   }
 
-  const layout = fitContractPdfText(text, field, embedded.font);
+  const layout = fitContractPdfText(text, placement, embedded.font);
   if (layout === null) return 'text-overflow';
   for (const line of layout.lines) {
-    if (line.text === '') continue;
-    page.drawText(line.text, {
-      x: origin.x + line.x,
-      y: origin.y + line.y,
-      size: layout.size,
-      font: embedded.pdfFont,
-    });
+    if (line.text) page.drawText(line.text, { x: x + line.x, y: y + line.y, size: layout.size, font: embedded.pdfFont });
   }
   return undefined;
 }
 
-function readFieldOrigin(page: PDFPage, field: Field): { x: number; y: number } | null {
-  const { x, y, width, height } = field;
-  const crop = page.getCropBox();
-  const media = page.getMediaBox();
-  const left = Math.max(crop.x, media.x);
-  const bottom = Math.max(crop.y, media.y);
-  const right = Math.min(crop.x + crop.width, media.x + media.width);
-  const top = Math.min(crop.y + crop.height, media.y + media.height);
-  if (
-    ![x, y, width, height, left, bottom, right, top].every(Number.isFinite) ||
-    x < 0 || y < 0 || width <= 0 || height <= 0 ||
-    x + width > right - left || y + height > top - bottom
-  ) {
-    return null;
+function formatValue(field: ContractField, value: Exclude<ContractValue, null>): string | null {
+  switch (field.kind) {
+    case 'select': return field.options.find((option) => option.value === value)?.label ?? null;
+    case 'date': return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.split('-').reverse().join('.') : null;
+    case 'integer':
+    case 'decimal': {
+      const places = field.rules.decimalPlaces ?? 0;
+      return typeof value === 'number' ? formatNumber(value, 'pl-PL', {
+        minimumFractionDigits: places, maximumFractionDigits: places, useGrouping: false,
+      }) : null;
+    }
+    default: return typeof value === 'string' ? value : null;
   }
-  return { x: left + x, y: bottom + y };
 }
 
 function drawCheck(page: PDFPage, x: number, y: number, width: number, height: number): void {
@@ -161,14 +150,6 @@ function drawCheck(page: PDFPage, x: number, y: number, width: number, height: n
   const bottom = y + (height - size) / 2;
   const corner = { x: left + size * 0.4, y: bottom + size * 0.25 };
   const thickness = size * 0.08;
-  page.drawLine({
-    start: { x: left + size * 0.16, y: bottom + size * 0.48 },
-    end: corner,
-    thickness,
-  });
-  page.drawLine({
-    start: corner,
-    end: { x: left + size * 0.84, y: bottom + size * 0.76 },
-    thickness,
-  });
+  page.drawLine({ start: { x: left + size * 0.16, y: bottom + size * 0.48 }, end: corner, thickness });
+  page.drawLine({ start: corner, end: { x: left + size * 0.84, y: bottom + size * 0.76 }, thickness });
 }

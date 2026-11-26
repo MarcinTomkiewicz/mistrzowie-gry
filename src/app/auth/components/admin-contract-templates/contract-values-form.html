@@ -1,0 +1,53 @@
+<form [formGroup]="form()" class="mg-form flex-col-start-stretch gap-md w-100" autocomplete="off" novalidate
+  (ngSubmit)="submit()">
+  <div class="mg-grid grid-cols-2 grid-cols-1-sm gap-md w-100">
+    @for (field of visible(); track field.id) {
+      @let control = form().controls[field.id];
+      @let invalid = control.touched && control.invalid;
+      @let inputId = 'contract-value-' + field.id;
+      <div class="flex-col-start-stretch gap-xs min-w-0">
+        @if (field.kind === 'checkbox') {
+          <div class="flex-row-start-start gap-sm">
+            <p-checkbox [inputId]="inputId" [formControl]="control" [binary]="true" />
+            <label [for]="inputId">{{ field.label }}</label>
+          </div>
+        } @else {
+          <p-iftalabel class="w-100">
+            @switch (field.kind) {
+              @case ('select') {
+                <p-select class="w-100" [inputId]="inputId" [formControl]="control"
+                  [options]="field.options" optionLabel="label" optionValue="value" [showClear]="!field.required"
+                  [ariaLabel]="field.label" [invalid]="invalid" appendTo="body" />
+              }
+              @case ('multiline') {
+                <textarea pTextarea class="w-100" [id]="inputId" [formControl]="control" [invalid]="invalid" rows="3"></textarea>
+              }
+              @case ('integer') {
+                <p-inputnumber class="w-100" inputStyleClass="w-100" [inputId]="inputId" [formControl]="control"
+                  locale="pl-PL" [maxFractionDigits]="0" [invalid]="invalid" />
+              }
+              @case ('decimal') {
+                <p-inputnumber class="w-100" inputStyleClass="w-100" [inputId]="inputId" [formControl]="control"
+                  locale="pl-PL" [maxFractionDigits]="field.rules.decimalPlaces" [invalid]="invalid" />
+              }
+              @default {
+                <input pInputText class="w-100" [id]="inputId" [formControl]="control" [invalid]="invalid"
+                  [type]="field.kind === 'date' ? 'date' : field.kind === 'email' ? 'email' : 'text'" autocomplete="off" />
+              }
+            }
+            <label [for]="inputId">{{ field.label }}</label>
+          </p-iftalabel>
+        }
+        @if (invalid) {
+          <small class="error-text">
+            {{ control.hasError('required') || control.hasError('requiredTrimmed')
+              ? i18n.form().required : control.hasError('email') ? i18n.form().invalidEmail : i18n.form().invalid }}
+          </small>
+        }
+      </div>
+    }
+  </div>
+  <div class="flex-row-end-center">
+    <p-button type="submit" severity="success" [label]="submitLabel()" [disabled]="busy()" />
+  </div>
+</form>

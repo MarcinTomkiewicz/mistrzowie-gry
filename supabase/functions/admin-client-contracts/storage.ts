@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@^2";
+import { CONTRACT_FAMILY_KEY } from "../../../src/app/core/types/contract-template-configuration.ts";
 
 import {
   DocumentContractError,
@@ -19,7 +20,6 @@ import {
   type ClientContractsDatabase,
   type ContractFileLocation,
   RPC,
-  TEMPLATE_FAMILIES,
 } from "./contracts.ts";
 import type { parseUploadRequest } from "./requests.ts";
 
@@ -27,7 +27,7 @@ const { readPdfFile, uploadPdf, removeDocumentPaths, createDocumentDownload } =
   privatePdfStorage(CLIENT_CONTRACTS_BUCKET, CLIENT_CONTRACT_PDF_MAX_BYTES);
 const TEMPLATE_PATH = new RegExp(
   String.raw`^templates/(?:${
-    TEMPLATE_FAMILIES.join("|")
+    CONTRACT_FAMILY_KEY.source.slice(1, -1)
   })/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.pdf$`,
 );
 

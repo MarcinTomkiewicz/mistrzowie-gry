@@ -3,11 +3,6 @@
     "title": "Wzory umów",
     "addTitle": "Dodaj wzór",
     "family": "Rodzaj umowy",
-    "families": {
-      "ddd": "DDD",
-      "parent_school": "Rodzic/szkoła",
-      "institution": "Placówka"
-    },
     "statuses": {
       "staged": "[PH] Oczekuje na aktywację"
     },
@@ -23,31 +18,95 @@
     },
     "empty": "[PH] W katalogu nie ma jeszcze wzorów umów.",
     "loadFailed": "[PH] Nie udało się odczytać katalogu wzorów.",
-    "uploaded": "[PH] Dodano wzór. Możesz go aktywować z listy.",
+    "uploaded": "[PH] Dodano wzór. Skonfiguruj go przed aktywacją.",
     "activated": "[PH] Wzór został aktywowany.",
     "deleted": "[PH] Wzór i jego plik PDF zostały usunięte.",
     "uploadFailed": "[PH] Nie udało się dodać wzoru.",
-    "activationFailed": "[PH] Nie udało się aktywować wzoru.",
     "deleteFailed": "[PH] Nie udało się usunąć wzoru.",
     "fileFailed": "[PH] Nie udało się pobrać pliku PDF.",
-    "uploadUncertain": "[PH] Wynik dodawania wzoru jest nieznany. Sprawdź odświeżony katalog przed kolejną próbą.",
-    "activationUncertain": "[PH] Wynik aktywacji jest nieznany. Sprawdź aktualny status wzoru w katalogu."
+    "uploadUncertain": "[PH] Wynik dodawania wzoru jest nieznany. Sprawdź odświeżony katalog przed kolejną próbą."
   },
   "preparation": {
     "title": "[PH] Przygotuj umowę",
     "noActiveTemplate": "[PH] Brak aktywnego wzoru dla tego rodzaju umowy.",
-    "fieldMapMissing": "[PH] Dla aktywnego wzoru brakuje zgodnej mapy pól.",
     "loadFailed": "[PH] Nie udało się wczytać aktywnego wzoru.",
-    "formUnavailable": "[PH] Formularz dla tego rodzaju umowy nie jest jeszcze dostępny.",
     "generating": "[PH] Przygotowywanie PDF...",
     "missingData": "[PH] Uzupełnij dane umowy.",
     "generationFailed": "[PH] Nie udało się przygotować PDF.",
+    "previewFailed": "[PH] Nie udało się wyświetlić podglądu PDF. Otwórz go ponownie.",
     "fieldErrors": {
       "unknown-field": "[PH] Tego pola nie ma w mapie wzoru.",
       "invalid-area": "[PH] Obszar pola jest poza stroną lub ma nieprawidłowe wymiary.",
       "invalid-font": "[PH] Czcionka pola jest niedostępna lub nieprawidłowa.",
       "unsupported-character": "[PH] Czcionka nie obsługuje jednego ze znaków w polu.",
       "text-overflow": "[PH] Tekst nie mieści się w polu przy minimalnym rozmiarze czcionki."
+    },
+    "generate": "[PH] Przygotuj PDF",
+    "invalidConfiguration": "[PH] Konfiguracja aktywnego wzoru jest niekompletna lub nie pasuje do stron PDF."
+  },
+  "editor": {
+    "addFamily": "[PH] Dodaj rodzaj umowy",
+    "filterFamily": "[PH] Filtruj według rodzaju",
+    "emptyFamily": "[PH] Wybrany rodzaj nie ma wzorów w katalogu.",
+    "familyUncertain": "[PH] Wynik dodawania rodzaju jest nieznany. Sprawdź odświeżony katalog.",
+    "familyCreated": "[PH] Rodzaj umowy został dodany.",
+    "familyFailed": "[PH] Nie udało się dodać rodzaju umowy.",
+    "configure": "[PH] Skonfiguruj",
+    "configuration": "[PH] Konfiguracja wzoru",
+    "readFailed": "[PH] Nie udało się wczytać konfiguracji lub PDF. Sprawdź, czy PDF jest statyczny i ma obsługiwane strony.",
+    "reconciliation": "[PH] Operacja nie została potwierdzona. Robocza konfiguracja jest nadal dostępna. Sprawdź stan w bazie przed następnym zapisem.",
+    "revisionConflict": "[PH] Baza odrzuciła operację z powodu konfliktu. Robocza konfiguracja jest nadal dostępna.",
+    "geometryMismatch": "[PH] Wymiary strony w podglądzie różnią się od zweryfikowanych wymiarów PDF.",
+    "databaseVersion": "[PH] Rewizja w bazie",
+    "keepDraft": "[PH] Zachowaj zmiany względem tej rewizji",
+    "copySource": "[PH] Wzór źródłowy",
+    "copyDraft": "[PH] Kopiuj konfigurację",
+    "copyWarning": "[PH] Kopiowanie zastąpi bieżącą konfigurację roboczą. Skopiować ustawienia wybranego wzoru?",
+    "discardDraft": "[PH] Opuścić bieżącą konfigurację roboczą? Niezapisane zmiany zostaną utracone.",
+    "sourceUnavailable": "[PH] Wybrany wzór źródłowy nie ma zapisanej konfiguracji.",
+    "fields": "[PH] Pola formularza",
+    "field": "[PH] Pole",
+    "addField": "[PH] Dodaj pole",
+    "optionLabel": "[PH] Etykieta opcji",
+    "addOption": "[PH] Dodaj opcję",
+    "kind": "[PH] Typ pola",
+    "required": "[PH] Pole wymagane",
+    "visibleWhen": "[PH] Pokaż zależnie od pola",
+    "equals": "[PH] Wartość warunku",
+    "invalidOrder": "[PH] Pole zależne musi występować po polu warunku.",
+    "placements": "[PH] Rozmieszczenie na PDF",
+    "layout": "[PH] Otwórz PDF",
+    "checkboxOption": "[PH] Opcja zaznaczana na PDF",
+    "page": "[PH] Strona",
+    "fontSize": "[PH] Rozmiar czcionki (pt)",
+    "minFontSize": "[PH] Minimalny rozmiar czcionki (pt)",
+    "invalidDraft": "[PH] Popraw strukturę konfiguracji. Sprawdź nazwy, wartości reguł oraz rozmieszczenia.",
+    "previewValues": "[PH] Dane do podglądu",
+    "previewConfirmation": "[PH] Potwierdzasz poprawność wypełnionego podglądu tej wersji wzoru?",
+    "pan": "[PH] Przesuwaj PDF",
+    "draw": "[PH] Rozmieszczaj pola",
+    "resize": "[PH] Zmień rozmiar obszaru",
+    "kinds": {
+      "text": "[PH] Tekst",
+      "multiline": "[PH] Tekst wielowierszowy",
+      "select": "[PH] Lista wyboru",
+      "checkbox": "[PH] Pole wyboru",
+      "integer": "[PH] Liczba całkowita",
+      "decimal": "[PH] Liczba dziesiętna"
+    },
+    "rules": {
+      "minLength": "[PH] Minimalna długość",
+      "maxLength": "[PH] Maksymalna długość",
+      "min": "[PH] Wartość minimalna",
+      "max": "[PH] Wartość maksymalna",
+      "decimalPlaces": "[PH] Miejsca po przecinku"
+    },
+    "issues": {
+      "empty": "[PH] Dodaj pola i ich rozmieszczenia przed podglądem.",
+      "unmapped-field": "[PH] Brak miejsca dla pola.",
+      "unmapped-option": "[PH] Brakuje miejsc dla części opcji pola.",
+      "empty-options": "[PH] Pole listy nie ma opcji.",
+      "outside-page": "[PH] Obszar wychodzi poza stronę PDF."
     }
   }
 }

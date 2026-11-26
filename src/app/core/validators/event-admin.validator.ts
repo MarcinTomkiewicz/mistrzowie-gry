@@ -113,14 +113,6 @@ export function eventScheduleValidator(
   return Object.keys(errors).length ? errors : null;
 }
 
-export function isoDateValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = normalizeText(control.value);
-
-    return !value || isValidIsoDate(value) ? null : { isoDate: true };
-  };
-}
-
 export function storagePathValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = normalizeText(control.value);

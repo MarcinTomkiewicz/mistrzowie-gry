@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  type TemplateRef,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -18,7 +19,7 @@ import { DialogModule } from 'primeng/dialog';
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-import type { IPdfPreview } from '../../core/interfaces/i-pdf';
+import type { IPdfPageSurface, IPdfPreview, IPdfPreviewResult } from '../../core/interfaces/i-pdf';
 import { createCommonActionsI18n } from '../../core/translations/common.i18n';
 import { loadPdfDocument, renderPdfPageToCanvas, reportPdfError } from '../../core/utils/pdf';
 import {
@@ -39,17 +40,23 @@ export class PdfViewerDialog {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly viewport = viewChild(PdfViewerViewport);
   private documentLoad?: AbortController;
+  private readonly loadedDocument = signal<{ url: string; document: PDFDocumentProxy } | null>(null);
 
   readonly preview = input<IPdfPreview | null>(null);
+  readonly overlay = input<TemplateRef<{ $implicit: IPdfPageSurface }> | null>(null);
+  readonly toolbar = input<TemplateRef<unknown> | null>(null);
   readonly closed = output<void>();
+  readonly previewResult = output<IPdfPreviewResult>();
   protected readonly commonActions = createCommonActionsI18n();
 
-  readonly document = signal<PDFDocumentProxy | null>(null);
+  private readonly previewUrl = computed(() => this.preview()?.url ?? null);
+  readonly document = computed(() => this.loadedDocument()?.document ?? null);
   readonly pageNumber = signal(1);
   readonly pageCount = signal(0);
   readonly zoom = signal(1);
   readonly isLoading = signal(false);
   readonly hasError = signal(false);
+  protected readonly surface = signal<IPdfPageSurface | null>(null);
   readonly canGoPrevious = computed(() => this.pageNumber() > 1);
   readonly canGoNext = computed(() => this.pageNumber() < this.pageCount());
   readonly canZoomOut = computed(() => this.zoom() > PDF_VIEWER_ZOOM_MIN);
@@ -58,14 +65,14 @@ export class PdfViewerDialog {
     () => !!this.document() || this.isLoading(),
   );
   readonly renderRequest = computed(() => {
-    const document = this.document();
+    const loaded = this.loadedDocument();
     const viewport = this.viewport();
     const canvasElement = viewport?.canvasElement();
     const viewportElement = viewport?.viewportElement();
 
     if (
       !isPlatformBrowser(this.platformId) ||
-      !document ||
+      !loaded || loaded.url !== this.previewUrl() ||
       !canvasElement ||
       !viewportElement
     ) {
@@ -73,7 +80,7 @@ export class PdfViewerDialog {
     }
 
     return {
-      document,
+      ...loaded,
       canvas: canvasElement,
       viewport: viewportElement,
       pageNumber: this.pageNumber(),
@@ -83,14 +90,14 @@ export class PdfViewerDialog {
 
   constructor() {
     this.destroyRef.onDestroy(() => this.documentLoad?.abort());
-    toObservable(this.preview)
+    toObservable(this.previewUrl)
       .pipe(
-        map((preview) => preview?.url ?? null),
         distinctUntilChanged(),
         switchMap((url) => {
           this.documentLoad?.abort();
           this.documentLoad = undefined;
-          this.document.set(null);
+          this.loadedDocument.set(null);
+          this.surface.set(null);
           this.pageCount.set(0);
           this.pageNumber.set(1);
           this.zoom.set(1);
@@ -109,11 +116,15 @@ export class PdfViewerDialog {
           const controller = new AbortController();
           this.documentLoad = controller;
           return loadPdfDocument(url, controller.signal).pipe(
+            filter(() => this.previewUrl() === url && this.documentLoad === controller),
+            map((result) => ({ ...result, url })),
             catchError((error: unknown) => {
               controller.abort();
+              if (this.previewUrl() !== url || this.documentLoad !== controller) return of(null);
               reportPdfError('dialog-load', error);
               this.hasError.set(true);
               this.isLoading.set(false);
+              this.previewResult.emit({ url, status: 'load-failed' });
               return of(null);
             }),
           );
@@ -126,7 +137,7 @@ export class PdfViewerDialog {
             return;
           }
 
-          this.document.set(result.document);
+          this.loadedDocument.set({ url: result.url, document: result.document });
           this.pageCount.set(result.pageCount);
           this.pageNumber.set(1);
           this.isLoading.set(false);
@@ -142,6 +153,8 @@ export class PdfViewerDialog {
 
           this.isLoading.set(true);
           this.hasError.set(false);
+          this.surface.set(null);
+          this.previewResult.emit({ url: request.url, status: 'rendering' });
 
           const targetWidth = request.viewport.clientWidth - 32 || 1080;
           const targetHeight = request.viewport.clientHeight - 32 || undefined;
@@ -154,12 +167,14 @@ export class PdfViewerDialog {
             targetHeight,
             request.zoom,
           ).pipe(
-            filter(() => this.document() === request.document),
+            filter(() => this.renderRequest() === request),
+            map((result) => ({ result, request })),
             catchError((error: unknown) => {
-              if (this.document() !== request.document) return of(null);
+              if (this.renderRequest() !== request) return of(null);
               reportPdfError('dialog-render', error);
               this.hasError.set(true);
               this.isLoading.set(false);
+              this.previewResult.emit({ url: request.url, status: 'render-failed' });
               return of(null);
             }),
           );
@@ -167,15 +182,20 @@ export class PdfViewerDialog {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (result) => {
-          if (!result) {
+        next: (completed) => {
+          if (!completed) {
             return;
           }
 
+          const { result, request } = completed;
           this.pageCount.set(result.pageCount);
           this.pageNumber.set(result.pageNumber);
+          this.surface.set(result.surface);
           this.isLoading.set(false);
-          queueMicrotask(() => this.viewport()?.applyPendingAnchor());
+          this.previewResult.emit({ url: request.url, status: 'rendered' });
+          queueMicrotask(() => {
+            if (this.renderRequest() === request) this.viewport()?.applyPendingAnchor();
+          });
         },
       });
   }

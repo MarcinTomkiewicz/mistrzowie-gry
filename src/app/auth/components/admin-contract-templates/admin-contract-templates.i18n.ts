@@ -1,9 +1,4 @@
-import { computed } from '@angular/core';
-
-import {
-  CONTRACT_TEMPLATE_FAMILIES,
-  type ContractTemplateFamily,
-} from '../../../core/configs/admin-contract-templates.config';
+import type { ConfigurationIssue, ContractFieldKind, ContractFieldRules } from '../../../core/types/contract-template-configuration';
 import type { ContractPdfFillResult } from '../../../core/services/contract-pdf-fill/contract-pdf-fill';
 import {
   createCommonActionsI18n,
@@ -27,7 +22,6 @@ export function createAdminContractTemplatesI18n() {
     title: string;
     addTitle: string;
     family: string;
-    families: Record<ContractTemplateFamily, string>;
     statuses: { staged: string };
     activation: { title: string; message: string };
     deletion: { confirm: string; confirmActive: string; cleanupFailed: string; unknown: string };
@@ -37,30 +31,71 @@ export function createAdminContractTemplatesI18n() {
     activated: string;
     deleted: string;
     uploadFailed: string;
-    activationFailed: string;
     deleteFailed: string;
     fileFailed: string;
     uploadUncertain: string;
-    activationUncertain: string;
   }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'catalog');
 
-  return {
+  const i18n = {
     copy,
-    familyOptions: computed(() => {
-      const labels = copy().families;
-      return labels ? CONTRACT_TEMPLATE_FAMILIES.map((value) => ({ value, label: labels[value] })) : [];
-    }),
     preparation: createScopedObjectI18n<{
       title: string;
       noActiveTemplate: string;
-      fieldMapMissing: string;
       loadFailed: string;
-      formUnavailable: string;
       generating: string;
       missingData: string;
       generationFailed: string;
+      previewFailed: string;
+      generate: string;
+      invalidConfiguration: string;
       fieldErrors: Record<Exclude<FieldErrorCode, 'invalid-value'>, string>;
     }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'preparation'),
+    editor: createScopedObjectI18n<{
+      addFamily: string;
+      filterFamily: string;
+      emptyFamily: string;
+      familyUncertain: string;
+      familyCreated: string;
+      familyFailed: string;
+      configure: string;
+      configuration: string;
+      readFailed: string;
+      reconciliation: string;
+      revisionConflict: string;
+      geometryMismatch: string;
+      databaseVersion: string;
+      keepDraft: string;
+      copySource: string;
+      copyDraft: string;
+      copyWarning: string;
+      discardDraft: string;
+      sourceUnavailable: string;
+      fields: string;
+      field: string;
+      addField: string;
+      optionLabel: string;
+      addOption: string;
+      kind: string;
+      required: string;
+      visibleWhen: string;
+      equals: string;
+      invalidOrder: string;
+      placements: string;
+      layout: string;
+      checkboxOption: string;
+      page: string;
+      fontSize: string;
+      minFontSize: string;
+      invalidDraft: string;
+      previewValues: string;
+      previewConfirmation: string;
+      pan: string;
+      draw: string;
+      resize: string;
+      kinds: Record<Exclude<ContractFieldKind, 'date' | 'email'>, string>;
+      rules: Record<keyof ContractFieldRules, string>;
+      issues: Record<ConfigurationIssue['code'], string>;
+    }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'editor'),
     ...createCommonPdfUploadI18n(),
     actions: createCommonActionsI18n(),
     entityStatuses: createCommonEntityStatusesI18n(),
@@ -70,5 +105,11 @@ export function createAdminContractTemplatesI18n() {
     nav: createCommonNavI18n(),
     status: createCommonStatusI18n(),
     table: createCommonTableI18n(),
+  };
+
+  return {
+    ...i18n,
+    fieldKindLabel: (kind: ContractFieldKind) => kind === 'date' || kind === 'email'
+      ? i18n.labels()[kind] : i18n.editor().kinds[kind],
   };
 }

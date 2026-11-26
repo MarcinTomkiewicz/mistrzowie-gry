@@ -3,6 +3,15 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 export interface IPdfRenderResult {
   pageCount: number;
   pageNumber: number;
+  surface: IPdfPageSurface;
+}
+
+export interface IPdfPageSurface {
+  readonly page: number;
+  readonly width: number;
+  readonly height: number;
+  toPdfPoint(xRatio: number, yRatio: number): IPdfPointerPosition;
+  toViewportPoint(x: number, y: number): IPdfPointerPosition;
 }
 
 export interface IPdfLoadResult {
@@ -13,6 +22,11 @@ export interface IPdfLoadResult {
 export interface IPdfPreview {
   readonly title: string;
   readonly url: string;
+}
+
+export interface IPdfPreviewResult {
+  readonly url: string;
+  readonly status: 'rendering' | 'rendered' | 'load-failed' | 'render-failed';
 }
 
 export interface IPdfPointerPosition {

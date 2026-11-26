@@ -3,13 +3,20 @@ import { finalize, from, map, switchMap } from 'rxjs';
 
 import { CONTRACT_TEMPLATE_PDF_PATH_PREFIX } from '../../configs/admin-contract-templates.config';
 import type { EdgeReader } from '../../types/edge-contract';
+import type {
+  ConfigurationMode, ContractPage, ContractTemplateConfiguration,
+} from '../../types/contract-template-configuration';
 import { assertEdgeContract } from '../../utils/edge-contract';
 import { fetchPrivatePdf } from '../../utils/private-pdf';
 import { Backend } from '../backend/backend';
 import {
   type ContractTemplateUpload,
+  type ContractConfiguration,
   readActiveTemplate,
+  readConfiguration,
+  readCreatedFamily,
   readDeletedTemplate,
+  readFamilies,
   readStagedTemplate,
   readTemplateDownload,
   readTemplates,
@@ -25,6 +32,40 @@ export class AdminContractTemplates {
     return this.invoke({ action: 'listTemplates' }, readTemplates);
   }
 
+  listFamilies() {
+    return this.invoke({ action: 'listFamilies' }, readFamilies);
+  }
+
+  createFamily(family: string, label: string) {
+    return this.invoke({ action: 'createFamily', family, label }, readCreatedFamily).pipe(map((result) => {
+      assertEdgeContract(result.family === family && result.label === label, 'response.data', 'the created family');
+      return result;
+    }));
+  }
+
+  getConfiguration(templateId: string, mode: ConfigurationMode) {
+    return this.invoke({ action: 'getTemplateConfiguration', template_id: templateId, mode }, readConfiguration)
+      .pipe(map((row) => {
+        assertEdgeContract(row.template_id === templateId &&
+          (mode === 'catalog' || (row.status === 'active' && row.configuration !== null)),
+        'response.data', 'the requested template configuration');
+        return row;
+      }));
+  }
+
+  saveConfiguration(target: ContractConfiguration, configuration: ContractTemplateConfiguration) {
+    return this.changeConfiguration(target, { action: 'saveTemplateConfiguration', configuration });
+  }
+
+  copyConfiguration(target: ContractConfiguration, source: ContractConfiguration, pages: ContractPage[]) {
+    return this.changeConfiguration(target, {
+      action: 'copyTemplateConfiguration',
+      source_template_id: source.template_id,
+      source_revision: source.configuration_revision,
+      pages,
+    });
+  }
+
   upload({ family, file }: ContractTemplateUpload) {
     const body = new FormData();
     body.append('action', 'uploadTemplate');
@@ -36,14 +77,34 @@ export class AdminContractTemplates {
     }));
   }
 
-  approve(templateId: string) {
+  approve(target: ContractConfiguration, confirmPreview: boolean) {
     return this.invoke({
       action: 'approveTemplate',
-      template_id: templateId,
+      ...this.revisionArgs(target),
+      confirm_preview: confirmPreview,
     }, readActiveTemplate).pipe(map((result) => {
-      assertEdgeContract(result.template_id === templateId, 'response.data.template_id', 'the requested template');
+      assertEdgeContract(result.template_id === target.template_id && result.family === target.family,
+        'response.data', 'the approved template');
       return result;
     }));
+  }
+
+  private changeConfiguration(target: ContractConfiguration, request: object) {
+    return this.invoke({ ...request, ...this.revisionArgs(target) }, readConfiguration).pipe(map((row) => {
+      assertEdgeContract(row.template_id === target.template_id && row.family === target.family &&
+        row.pdf_sha256 === target.pdf_sha256 && row.status === 'staged' && row.configuration !== null &&
+        row.configuration_revision === target.configuration_revision + 1,
+      'response.data', 'the next configuration revision');
+      return row;
+    }));
+  }
+
+  private revisionArgs(target: ContractConfiguration) {
+    return {
+      template_id: target.template_id,
+      pdf_sha256: target.pdf_sha256,
+      expected_revision: target.configuration_revision,
+    };
   }
 
   deleteTemplate(templateId: string, confirmActive: boolean) {

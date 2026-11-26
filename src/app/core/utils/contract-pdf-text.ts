@@ -1,8 +1,8 @@
 import type { Font } from '@pdf-lib/fontkit';
 
-import type { ContractTemplateFieldMap } from '../types/contract-template-field-map';
+import type { ContractPlacement } from '../types/contract-template-configuration';
 
-type TextField = Extract<ContractTemplateFieldMap['fields'][string], { kind: 'text' }>;
+type TextField = Extract<ContractPlacement, { kind: 'text' }>;
 type MeasuredLine = {
   readonly left: number;
   readonly width: number;

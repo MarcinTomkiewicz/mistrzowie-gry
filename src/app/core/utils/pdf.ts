@@ -6,7 +6,7 @@ import { IPdfLoadResult, IPdfRenderResult } from '../interfaces/i-pdf';
 
 let workerConfigured = false;
 
-export function loadPdfDocument(src: string, signal?: AbortSignal): Observable<IPdfLoadResult> {
+export function loadPdfDocument(src: string | Uint8Array, signal?: AbortSignal): Observable<IPdfLoadResult> {
   return from(import('pdfjs-dist')).pipe(
     switchMap((pdfjs) => {
       if (signal?.aborted) return EMPTY;
@@ -119,6 +119,19 @@ export function renderPdfPageToCanvas(
             map(() => ({
               pageCount: document.numPages,
               pageNumber: resolvePageNumber(document, pageNumber),
+              surface: {
+                page: resolvePageNumber(document, pageNumber),
+                width: page.view[2] - page.view[0],
+                height: page.view[3] - page.view[1],
+                toPdfPoint(xRatio: number, yRatio: number) {
+                  const [x, y] = viewport.convertToPdfPoint(xRatio * viewport.width, yRatio * viewport.height);
+                  return { x: x - page.view[0], y: y - page.view[1] };
+                },
+                toViewportPoint(x: number, y: number) {
+                  const [left, top] = viewport.convertToViewportPoint(x + page.view[0], y + page.view[1]);
+                  return { x: left / viewport.width, y: top / viewport.height };
+                },
+              },
             })),
           );
         }),

@@ -14,7 +14,7 @@
       <div class="flex-col-start-stretch gap-xs">
         <p-iftalabel class="w-100">
           <p-select class="w-100" inputId="contract-template-family" formControlName="family"
-            [options]="i18n.familyOptions()" optionLabel="label" optionValue="value"
+            [options]="catalog.familyOptions()" optionLabel="label" optionValue="value"
             [readonly]="!catalog.canAct()" appendTo="body" />
           <label for="contract-template-family">{{ copy.family }}</label>
         </p-iftalabel>
@@ -35,7 +35,9 @@
         <small class="error-text">{{ upload.file.hasError('required') ? i18n.pdfUpload().missingFile : i18n.form().invalid }}</small>
       }
 
-      <div class="flex-row-end-center">
+      <div class="flex-row-end-center flex-wrap gap-sm">
+        <p-button type="button" severity="secondary" [label]="i18n.editor().addFamily"
+          [disabled]="!catalog.canAct()" (onClick)="familyDialog.set(true)" />
         <p-button type="submit" severity="success" icon="pi pi-plus" [label]="copy.addTitle"
           [disabled]="!catalog.canAct()" />
       </div>
@@ -67,7 +69,10 @@
     </section>
   } @else if (!catalog.loading()) {
     <section class="flex-col-start-stretch gap-md w-100">
-      <div class="flex-row-end-center">
+      <div class="flex-row-between-center flex-wrap gap-sm">
+        <p-select [formControl]="familyFilter" [options]="catalog.familyOptions()"
+          optionLabel="label" optionValue="value" [showClear]="true"
+          [placeholder]="i18n.editor().filterFamily" [ariaLabel]="i18n.editor().filterFamily" appendTo="body" />
         <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh" [label]="actions.refresh"
           [disabled]="!catalog.canAct()" (onClick)="catalog.refresh()" />
       </div>
@@ -101,10 +106,9 @@
                 <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
                   <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.table().actions }}</span>
                   <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
-                    @if (template.status === 'staged') {
-                      <p-button type="button" size="small" severity="success" icon="pi pi-check" [label]="actions.activate"
-                        [disabled]="!catalog.canAct()" (onClick)="confirmActivation(template)" />
-                    }
+                    <p-button type="button" size="small" severity="secondary"
+                      [label]="template.status === 'staged' ? i18n.editor().configure : i18n.editor().configuration"
+                      [disabled]="!catalog.canAct()" (onClick)="editing.set(template)" />
                     @if (template.status === 'staged' || template.status === 'active') {
                       <p-button type="button" size="small" severity="secondary" icon="pi pi-horus" [label]="actions.preview"
                         [disabled]="!catalog.canAct()" (onClick)="catalog.openFile(template.template_id, true)" />
@@ -123,7 +127,7 @@
         </div>
       } @else {
         <section class="mg-card w-100" role="status">
-          <p class="m-0 muted-text">{{ copy.empty }}</p>
+        <p class="m-0 muted-text">{{ filteredFamily() ? i18n.editor().emptyFamily : copy.empty }}</p>
         </section>
       }
     </section>
@@ -132,4 +136,24 @@
 
 @defer (when catalog.preview()) {
   <app-pdf-viewer-dialog [preview]="catalog.preview()" (closed)="catalog.closePreview()" />
+}
+
+@if (editing(); as template) {
+  <app-contract-configuration-editor [template]="template" (closed)="editing.set(null)" />
+}
+
+@if (familyDialog()) {
+  <p-dialog [visible]="true" [modal]="true" [header]="i18n.editor().addFamily" appendTo="body"
+    styleClass="mg-dialog mg-dialog--sm" [draggable]="false" (visibleChange)="$event ? null : familyDialog.set(false)">
+    <form class="flex-col-start-stretch gap-md" (ngSubmit)="addFamily()" novalidate>
+      <p-iftalabel class="w-100">
+        <input pInputText id="contract-family-label" class="w-100" [formControl]="familyName" maxlength="200" required />
+        <label for="contract-family-label">{{ i18n.labels().name }}</label>
+      </p-iftalabel>
+      <div class="flex-row-end-center gap-sm">
+        <p-button type="button" severity="secondary" [label]="actions.cancel" (onClick)="familyDialog.set(false)" />
+        <p-button type="submit" severity="success" [label]="actions.add" [disabled]="!proposedFamilyKey()" />
+      </div>
+    </form>
+  </p-dialog>
 }

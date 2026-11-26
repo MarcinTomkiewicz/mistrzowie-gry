@@ -1,7 +1,9 @@
-import { Component, computed, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -12,13 +14,15 @@ import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay'
 import { PdfViewerDialog } from '../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { STATUS_BADGE_CLASS } from '../../../core/configs/badge-class.config';
 import {
-  type ContractTemplateFamily,
   CONTRACT_TEMPLATE_PDF_MAX_BYTES,
   CONTRACT_TEMPLATE_PDF_MIME,
 } from '../../../core/configs/admin-contract-templates.config';
 import type { ContractTemplate } from '../../../core/services/admin-contract-templates/admin-contract-templates.contract';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import type { FileUploadOptions } from '../../../core/types/file-upload';
+import { isContractLabel } from '../../../core/types/contract-template-configuration';
+import { stringToSlug } from '../../../core/utils/normalize-text';
+import { ContractConfigurationEditor } from './contract-configuration-editor';
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 import { ContractTemplatesFacade } from './contract-templates-facade';
 
@@ -26,7 +30,7 @@ import { ContractTemplatesFacade } from './contract-templates-facade';
   selector: 'app-contract-template-catalog',
   imports: [
     ReactiveFormsModule, ButtonModule, IftaLabelModule, SelectModule, TableModule,
-    FileUpload, LoadingOverlay, PdfViewerDialog,
+    FileUpload, LoadingOverlay, PdfViewerDialog, DialogModule, InputTextModule, ContractConfigurationEditor,
   ],
   templateUrl: './contract-template-catalog.html',
 })
@@ -36,7 +40,7 @@ export class ContractTemplateCatalog {
   protected readonly catalog = inject(ContractTemplatesFacade);
   protected readonly i18n = createAdminContractTemplatesI18n();
   protected readonly uploadForm = new FormGroup({
-    family: new FormControl<ContractTemplateFamily | null>(null, Validators.required),
+    family: new FormControl<string | null>(null, Validators.required),
     file: new FormControl<File | null>(null, [Validators.required, (control) => {
       const file: File | null = control.value;
       return file === null || (
@@ -45,9 +49,29 @@ export class ContractTemplateCatalog {
       ) ? null : { pdf: true };
     }]),
   });
+  protected readonly editing = signal<ContractTemplate | null>(null);
+  protected readonly familyDialog = signal(false);
+  protected readonly familyName = new FormControl('', { nonNullable: true });
+  protected readonly familyFilter = new FormControl<string | null>(null);
+  protected readonly filteredFamily = toSignal(this.familyFilter.valueChanges, { initialValue: null });
+  private readonly familyLabel = toSignal(this.familyName.valueChanges, { initialValue: '' });
+  protected readonly proposedFamilyKey = computed(() => {
+    const label = this.familyLabel().trim();
+    if (!isContractLabel(label)) return null;
+    const slug = stringToSlug(label).replaceAll('-', '_');
+    const base = (/^[a-z]/.test(slug) ? slug : 'rodzaj_' + slug).slice(0, 64).replace(/_+$/, '');
+    const keys = new Set(this.catalog.families().map(({ family }) => family));
+    let family = base;
+    for (let index = 2; keys.has(family); index++) {
+      const suffix = '_' + index;
+      family = base.slice(0, 64 - suffix.length) + suffix;
+    }
+    return family;
+  });
   protected readonly rows = computed(() => {
-    const { families, statuses } = this.i18n.copy();
-    if (!families || !statuses) return [];
+    const { statuses } = this.i18n.copy();
+    if (!statuses) return [];
+    const families = new Map(this.catalog.families().map(({ family, label }) => [family, label]));
     const { active, withdrawn } = this.i18n.entityStatuses();
     const statusLabels = {
       staged: statuses.staged,
@@ -59,9 +83,10 @@ export class ContractTemplateCatalog {
       active: STATUS_BADGE_CLASS.active,
       retired: STATUS_BADGE_CLASS.withdrawn,
     };
-    return this.catalog.templates().map((template) => ({
+    const family = this.filteredFamily();
+    return this.catalog.templates().filter((template) => family === null || template.family === family).map((template) => ({
       template,
-      familyLabel: families[template.family],
+      familyLabel: families.get(template.family),
       statusLabel: statusLabels[template.status],
       statusClass: `tag-badge ${statusClasses[template.status]}`,
     }));
@@ -92,21 +117,13 @@ export class ContractTemplateCatalog {
     ).subscribe(() => this.uploadForm.controls.file.reset());
   }
 
-  protected confirmActivation(template: ContractTemplate): void {
-    if (!this.catalog.canAct() || template.status !== 'staged') return;
-    const { activation } = this.i18n.copy();
-    const { activate, cancel } = this.i18n.actions();
-    this.confirm.modalDecision({
-      header: activation.title,
-      message: activation.message.replace('{{filename}}', () => template.original_filename),
-      acceptLabel: activate,
-      rejectLabel: cancel,
-      acceptSeverity: 'success',
-    }).pipe(
-      filter(Boolean),
-      switchMap(() => this.catalog.activate(template.template_id)),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe();
+  protected addFamily(): void {
+    const label = this.familyName.value.trim();
+    const family = this.proposedFamilyKey();
+    if (!this.catalog.canAct() || family === null || !isContractLabel(label)) return;
+    this.familyDialog.set(false);
+    this.catalog.createFamily(family, label).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.familyName.reset());
   }
 
   protected confirmDeletion(template: ContractTemplate): void {

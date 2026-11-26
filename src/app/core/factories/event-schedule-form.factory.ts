@@ -5,8 +5,8 @@ import type { EventGlobalSchedule } from '../interfaces/i-admin-global-event';
 import type { EventScheduleExclusionRuleFormGroup, EventScheduleFormGroup } from '../types/event-admin-form';
 import type { EventMonthlyNth, EventRecurrenceKind, EventScheduleMode } from '../types/event';
 import { buildEventScheduleExdates, excludesEveryEventRecurrenceCandidate, expandEventDateRange, getEventDateRangeLength } from '../utils/event-schedule';
-import { eventMonthlyWeekdayRuleValidator, eventScheduleValidator, isoDateValidator } from '../validators/event-admin.validator';
-import { integerValidator } from '../validators/form-value.validator';
+import { eventMonthlyWeekdayRuleValidator, eventScheduleValidator } from '../validators/event-admin.validator';
+import { integerValidator, isoDateValidator } from '../validators/form-value.validator';
 
 export function createEventScheduleForm(globalCalendar = false): EventScheduleFormGroup {
   const form: EventScheduleFormGroup = new FormGroup(

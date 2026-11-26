@@ -1,10 +1,10 @@
 import { afterNextRender, computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, defer, EMPTY, finalize, map, type Observable, tap } from 'rxjs';
+import { catchError, defer, EMPTY, finalize, forkJoin, map, type Observable, tap } from 'rxjs';
 
 import type { IPdfPreview } from '../../../core/interfaces/i-pdf';
 import { AdminContractTemplates } from '../../../core/services/admin-contract-templates/admin-contract-templates';
-import type { ContractTemplate, ContractTemplateUpload } from '../../../core/services/admin-contract-templates/admin-contract-templates.contract';
+import type { ContractFamily, ContractTemplate, ContractTemplateUpload } from '../../../core/services/admin-contract-templates/admin-contract-templates.contract';
 import { Platform } from '../../../core/services/platform/platform';
 import { UiToast } from '../../../core/services/ui-toast/ui-toast';
 import { EdgeFunctionError } from '../../../core/types/edge-function-error';
@@ -12,7 +12,7 @@ import { isEdgeMutationResultUncertain } from '../../../core/utils/edge-function
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 
 type CatalogStatus = 'initial' | 'loading' | 'ready' | 'error';
-type TemplateChange = 'upload' | 'activation';
+type TemplateChange = 'upload' | 'family';
 type TemplateDeletion = {
   templateId: string;
   filename: string;
@@ -33,6 +33,7 @@ export class ContractTemplatesFacade {
 
   private readonly status = signal<CatalogStatus>('initial');
   private readonly rows = signal<ContractTemplate[]>([]);
+  private readonly familyRows = signal<ContractFamily[]>([]);
   private readonly mutating = signal(false);
   private readonly fileLoading = signal(false);
   private readonly currentPreview = signal<IPdfPreview | null>(null);
@@ -40,6 +41,8 @@ export class ContractTemplatesFacade {
   private readonly incompleteDeletions = signal<PendingTemplateDeletion[]>([]);
 
   readonly templates = this.rows.asReadonly();
+  readonly families = this.familyRows.asReadonly();
+  readonly familyOptions = computed(() => this.families().map(({ family, label }) => ({ value: family, label })));
   readonly saving = this.mutating.asReadonly();
   readonly loading = computed(() => this.status() === 'initial' || this.status() === 'loading');
   readonly loadFailed = computed(() => this.status() === 'error');
@@ -50,7 +53,7 @@ export class ContractTemplatesFacade {
   readonly notice = computed(() => {
     const copy = this.i18n.copy();
     const outcome = this.uncertainMutation();
-    return outcome === 'upload' ? copy.uploadUncertain : outcome === 'activation' ? copy.activationUncertain : null;
+    return outcome === 'upload' ? copy.uploadUncertain : outcome === 'family' ? this.i18n.editor().familyUncertain : null;
   });
 
   constructor() {
@@ -66,11 +69,8 @@ export class ContractTemplatesFacade {
     return this.mutate({ kind: 'upload' }, () => this.api.upload(upload));
   }
 
-  activate(templateId: string): Observable<void> {
-    return defer(() => {
-      if (this.findTemplate(templateId)?.status !== 'staged') return EMPTY;
-      return this.mutate({ kind: 'activation' }, () => this.api.approve(templateId));
-    });
+  createFamily(family: string, label: string): Observable<void> {
+    return this.mutate({ kind: 'family' }, () => this.api.createFamily(family, label));
   }
 
   deleteTemplate(template: ContractTemplate): Observable<void> {
@@ -109,8 +109,15 @@ export class ContractTemplatesFacade {
 
   private readCatalog(): void {
     this.status.set('loading');
-    this.api.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (templates) => {
+    forkJoin({ templates: this.api.list(), families: this.api.listFamilies() })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: ({ templates, families }) => {
+        const keys = new Set(families.map(({ family }) => family));
+        if (keys.size !== families.length || templates.some(({ family }) => !keys.has(family))) {
+          this.status.set('error');
+          return;
+        }
+        this.familyRows.set(families);
         this.rows.set(templates);
         this.status.set('ready');
       },
@@ -131,12 +138,12 @@ export class ContractTemplatesFacade {
       if (kind !== 'delete') this.uncertainMutation.set(null);
       return defer(request).pipe(
         map(() => {
-          const { uploaded, activated, deleted } = this.i18n.copy();
+          const { uploaded, deleted } = this.i18n.copy();
           if (kind === 'delete') {
             this.incompleteDeletions.update((deletions) =>
               deletions.filter(({ templateId }) => templateId !== mutation.deletion.templateId));
           }
-          this.toast.success({ summary: { upload: uploaded, activation: activated, delete: deleted }[kind] });
+          this.toast.success({ summary: { upload: uploaded, family: this.i18n.editor().familyCreated, delete: deleted }[kind] });
           this.readCatalog();
         }),
         catchError((error: unknown) => {
@@ -169,8 +176,8 @@ export class ContractTemplatesFacade {
       return;
     }
 
-    const { uploadFailed, activationFailed, deleteFailed } = this.i18n.copy();
-    const fallback = { upload: uploadFailed, activation: activationFailed, delete: deleteFailed }[kind];
+    const { uploadFailed, deleteFailed } = this.i18n.copy();
+    const fallback = { upload: uploadFailed, family: this.i18n.editor().familyFailed, delete: deleteFailed }[kind];
     this.toast.danger({ summary: this.errorMessage(error, fallback) });
   }
 

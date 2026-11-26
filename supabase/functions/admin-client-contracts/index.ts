@@ -28,10 +28,19 @@ const authenticatedFetch = withSupabase(
 
       const contentType = request.headers.get("content-type")?.toLowerCase();
       if (contentType?.startsWith("multipart/form-data")) {
-        await readDocumentRpc(RPC.listTemplates, client.rpc(RPC.listTemplates));
+        const families = await readDocumentRpc(
+          RPC.listFamilies,
+          client.rpc(RPC.listFamilies),
+        );
         const upload = parseUploadRequest(
           await readFormData(request, DocumentRequestError),
         );
+        if (
+          upload.action === "uploadTemplate" &&
+          !families.some(({ family }) => family === upload.family)
+        ) {
+          throw new DocumentRequestError();
+        }
         return successResponse(
           await storeContractPdf(
             client,
@@ -46,6 +55,23 @@ const authenticatedFetch = withSupabase(
         await readJson(request, DocumentRequestError),
       );
       switch (action.action) {
+        case "listFamilies":
+          return successResponse(
+            await readDocumentRpc(
+              RPC.listFamilies,
+              client.rpc(RPC.listFamilies),
+            ),
+          );
+        case "createFamily":
+        case "getTemplateConfiguration":
+        case "saveTemplateConfiguration":
+        case "copyTemplateConfiguration":
+          return successResponse(
+            await readSingleDocumentRpc(
+              RPC[action.action],
+              client.rpc(RPC[action.action], action.args),
+            ),
+          );
         case "listTemplates":
           return successResponse(
             await readDocumentRpc(
@@ -64,9 +90,7 @@ const authenticatedFetch = withSupabase(
           return successResponse(
             await readSingleDocumentRpc(
               RPC.approveTemplate,
-              client.rpc(RPC.approveTemplate, {
-                p_template_id: action.templateId,
-              }),
+              client.rpc(RPC.approveTemplate, action.args),
             ),
           );
         case "deleteTemplate":

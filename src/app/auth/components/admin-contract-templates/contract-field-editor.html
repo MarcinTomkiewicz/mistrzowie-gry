@@ -1,0 +1,59 @@
+@let copy = i18n.editor();
+@let actions = i18n.actions();
+<div class="mg-grid grid-cols-2 grid-cols-1-sm gap-sm">
+  <label class="flex-col-start-stretch gap-xs">
+    {{ i18n.labels().name }}
+    <input pInputText [ngModel]="field().label" (ngModelChange)="patch({ label: $event })" [readonly]="!editable()" maxlength="200" />
+  </label>
+  <div class="flex-col-start-stretch gap-xs">
+    <label for="contract-field-kind">{{ copy.kind }}</label>
+    <p-select inputId="contract-field-kind" [ngModel]="field().kind" (ngModelChange)="setKind($event)"
+      [options]="kinds()" optionLabel="label" optionValue="value" [disabled]="!editable()" appendTo="body" />
+  </div>
+  <div class="flex-row-start-center gap-sm">
+    <p-checkbox inputId="contract-field-required" [ngModel]="field().required" [binary]="true" [disabled]="!editable()"
+      (ngModelChange)="patch({ required: $event })" />
+    <label for="contract-field-required">{{ copy.required }}</label>
+  </div>
+  @for (rule of rules(); track rule) {
+    <div class="flex-col-start-stretch gap-xs">
+      <label [for]="'contract-rule-' + rule">{{ copy.rules[rule] }}</label>
+      <p-inputnumber [inputId]="'contract-rule-' + rule" [ngModel]="field().rules[rule] ?? null" [disabled]="!editable()"
+        (ngModelChange)="setRule(rule, $event)" [maxFractionDigits]="rule === 'min' || rule === 'max' ? 4 : 0" />
+    </div>
+  }
+  <div class="flex-col-start-stretch gap-xs">
+    <label for="contract-visibility-field">{{ copy.visibleWhen }}</label>
+    <p-select inputId="contract-visibility-field" [ngModel]="field().visibleWhen?.fieldId ?? null"
+      (ngModelChange)="condition($event)" [options]="sources()" [showClear]="editable()" [disabled]="!editable()"
+      optionLabel="label" optionValue="id" appendTo="body" />
+  </div>
+  @if (field().visibleWhen; as condition) {
+    <div class="flex-col-start-stretch gap-xs">
+      <label for="contract-visibility-value">{{ copy.equals }}</label>
+      <p-select inputId="contract-visibility-value" [ngModel]="condition.equals" (ngModelChange)="conditionValue($event)"
+        [options]="conditionOptions()" optionLabel="label" optionValue="value" [disabled]="!editable()" appendTo="body" />
+    </div>
+  }
+</div>
+@if (field().kind === 'select') {
+  <div class="flex-col-start-stretch gap-sm">
+    @for (option of field().options; track option.value; let index = $index) {
+      <div class="flex-row-start-center flex-wrap gap-xs">
+        <input pInputText [ngModel]="option.label" (ngModelChange)="optionLabel(index, $event)"
+          [attr.aria-label]="copy.optionLabel" [readonly]="!editable()" />
+        @if (editable()) {
+        <p-button type="button" size="small" severity="secondary" [label]="actions.moveItemUp" [disabled]="index === 0"
+          (onClick)="moveOption(index, -1)" />
+        <p-button type="button" size="small" severity="secondary" [label]="actions.moveItemDown"
+          [disabled]="index === field().options.length - 1" (onClick)="moveOption(index, 1)" />
+        <p-button type="button" size="small" severity="danger" [label]="actions.delete" (onClick)="removeOption(index)" />
+        }
+      </div>
+    }
+    @if (editable()) {
+    <div><p-button type="button" severity="secondary" [label]="copy.addOption"
+      [disabled]="field().options.length >= limits.options" (onClick)="addOption()" /></div>
+    }
+  </div>
+}

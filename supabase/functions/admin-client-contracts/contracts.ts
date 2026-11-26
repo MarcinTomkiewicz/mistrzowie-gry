@@ -1,11 +1,12 @@
+import type {
+  ConfigurationMode,
+  ContractPage,
+  ContractTemplateConfiguration,
+} from "../../../src/app/core/types/contract-template-configuration.ts";
+
 export const CLIENT_CONTRACTS_BUCKET = "client-contracts";
 export const CLIENT_CONTRACT_PDF_MAX_BYTES = 26_214_400;
 
-export const TEMPLATE_FAMILIES = [
-  "ddd",
-  "parent_school",
-  "institution",
-] as const;
 export const PARTY_KINDS = ["individual", "institution"] as const;
 export const LINK_KINDS = [
   "none",
@@ -19,12 +20,16 @@ export const ARTIFACT_TYPES = [
   "agreement",
 ] as const;
 
-type TemplateFamily = typeof TEMPLATE_FAMILIES[number];
 type PartyKind = typeof PARTY_KINDS[number];
 type LinkKind = typeof LINK_KINDS[number];
 export type ArtifactType = typeof ARTIFACT_TYPES[number];
 
 export const RPC = {
+  listFamilies: "list_admin_contract_families",
+  createFamily: "create_admin_contract_family",
+  getTemplateConfiguration: "get_admin_contract_template_configuration",
+  saveTemplateConfiguration: "save_admin_contract_template_configuration",
+  copyTemplateConfiguration: "copy_admin_contract_template_configuration",
   registerTemplate: "register_admin_contract_template",
   approveTemplate: "approve_admin_contract_template",
   listTemplates: "list_admin_contract_templates",
@@ -48,7 +53,7 @@ type StoredPdfArgs = {
 
 type TemplateState = {
   template_id: string;
-  family: TemplateFamily;
+  family: string;
   status: "staged" | "active" | "retired";
 };
 
@@ -72,7 +77,7 @@ type AgreementRegistration = {
 };
 
 type AgreementRow = AgreementRegistration & PdfMetadata & {
-  template_family: TemplateFamily;
+  template_family: string;
   party_kind: PartyKind;
   party_label: string;
   party_email: string | null;
@@ -82,17 +87,48 @@ type AgreementRow = AgreementRegistration & PdfMetadata & {
 
 type Rpc<Args, Row> = { Args: Args; Returns: Row[] };
 
+type FamilyRow = { family: string; label: string; created_at: string };
+type ConfigurationRow = TemplateState & {
+  pdf_sha256: string;
+  configuration_revision: number;
+  configuration: ContractTemplateConfiguration | null;
+  configuration_updated_at: string | null;
+};
+type RevisionArgs = {
+  p_template_id: string;
+  p_pdf_sha256: string;
+  p_expected_revision: number;
+};
+
 export type ClientContractsDatabase = {
   public: {
     Tables: Record<never, never>;
     Views: Record<never, never>;
     Functions: {
+      [RPC.listFamilies]: Rpc<never, FamilyRow>;
+      [RPC.createFamily]: Rpc<{ p_family: string; p_label: string }, FamilyRow>;
+      [RPC.getTemplateConfiguration]: Rpc<
+        { p_template_id: string; p_mode: ConfigurationMode },
+        ConfigurationRow
+      >;
+      [RPC.saveTemplateConfiguration]: Rpc<
+        RevisionArgs & { p_configuration: ContractTemplateConfiguration },
+        ConfigurationRow
+      >;
+      [RPC.copyTemplateConfiguration]: Rpc<
+        RevisionArgs & {
+          p_source_template_id: string;
+          p_source_revision: number;
+          p_pages: ContractPage[];
+        },
+        ConfigurationRow
+      >;
       [RPC.registerTemplate]: Rpc<
-        StoredPdfArgs & { p_family: TemplateFamily },
+        StoredPdfArgs & { p_family: string },
         TemplateState
       >;
       [RPC.approveTemplate]: Rpc<
-        { p_template_id: string },
+        RevisionArgs & { p_confirm_preview: boolean },
         TemplateState
       >;
       [RPC.listTemplates]: Rpc<never, TemplateRow>;

@@ -1,6 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-import { isValidDate } from '../utils/date';
+import { isValidDate, isValidIsoDate } from '../utils/date';
 import { normalizeText, stringToSlug } from '../utils/normalize-text';
 import { isValidTime, parseTimeLabelToMinutes } from '../utils/time-format';
 import { timeZoneDateToTimestamp } from '../utils/time-zone';
@@ -70,6 +70,14 @@ export function futureDateValidator(): ValidatorFn {
     }
 
     return value.getTime() > Date.now() ? null : { futureDate: true };
+  };
+}
+
+export function isoDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = normalizeText(control.value);
+
+    return !value || isValidIsoDate(value) ? null : { isoDate: true };
   };
 }
 
