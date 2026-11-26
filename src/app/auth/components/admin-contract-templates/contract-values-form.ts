@@ -1,13 +1,15 @@
 import { Component, effect, input, output, signal } from '@angular/core';
-import { FormControl, FormRecord, ReactiveFormsModule, Validators, type ValidatorFn } from '@angular/forms';
+import { FormControl, FormRecord, FormsModule, ReactiveFormsModule, Validators, type ValidatorFn } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DatePickerModule } from 'primeng/datepicker';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
+import { IsoDateValue } from '../../../common/iso-date-value/iso-date-value';
 import {
   type ContractField, type ContractTemplateConfiguration, type ContractValue, type ContractValues,
   isTextFieldKind, matchesDecimalPrecision,
@@ -15,26 +17,29 @@ import {
 import { isoDateValidator } from '../../../core/validators/form-value.validator';
 import { requiredTrimmedValidator } from '../../../core/validators/required-trimmed.validator';
 import { normalizeText } from '../../../core/utils/normalize-text';
+import { isValidDate, toIsoDate } from '../../../core/utils/date';
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 
 @Component({
   selector: 'app-contract-values-form',
   imports: [
-    ReactiveFormsModule, ButtonModule, CheckboxModule, IftaLabelModule,
-    InputNumberModule, InputTextModule, SelectModule, TextareaModule,
+    FormsModule, ReactiveFormsModule, ButtonModule, CheckboxModule, DatePickerModule, IftaLabelModule,
+    InputNumberModule, InputTextModule, IsoDateValue, SelectModule, TextareaModule,
   ],
   templateUrl: './contract-values-form.html',
 })
 export class ContractValuesForm {
   readonly configuration = input.required<ContractTemplateConfiguration>();
   readonly busy = input(false);
-  readonly submitLabel = input.required<string>();
+  readonly formId = input<string | null>(null);
+  readonly submitLabel = input<string | null>(null);
   readonly valuesChange = output<void>();
   readonly submitted = output<ContractValues>();
 
   protected readonly i18n = createAdminContractTemplatesI18n();
   protected readonly form = signal(new FormRecord<FormControl<ContractValue>>({}));
   protected readonly visible = signal<readonly ContractField[]>([]);
+  protected readonly standaloneModel = { standalone: true };
 
   constructor() {
     effect((cleanup) => {
@@ -61,6 +66,12 @@ export class ContractValuesForm {
       const value = form.controls[id].value;
       return [id, isTextFieldKind(kind) ? normalizeText(value) : value];
     })));
+  }
+
+  protected setDate(control: FormControl<ContractValue>, value: unknown): void {
+    if (control.disabled) return;
+    control.markAsDirty();
+    control.setValue(isValidDate(value) ? toIsoDate(value) : null);
   }
 
   private syncVisibility(form: FormRecord<FormControl<ContractValue>>, fields: readonly ContractField[]): void {

@@ -64,7 +64,12 @@ export class ContractPreparationFacade {
   }
 
   async generate(snapshot: VerifiedContractTemplate, values: ContractValues): Promise<void> {
-    if (this.destroyRef.destroyed || !this.platform.isBrowser) return;
+    if (this.destroyRef.destroyed || !this.platform.isBrowser || this.preview() || this.generating()) return;
+    const current = this.generation();
+    if (current.status === 'filled' && current.snapshot === snapshot) {
+      this.openPreview(current.pdf);
+      return;
+    }
     this.invalidate();
     const version = this.generationVersion;
     this.generationState.set({ status: 'generating' });
@@ -85,7 +90,7 @@ export class ContractPreparationFacade {
       }
       const pdf = new Blob([Uint8Array.from(result.pdfBytes)], { type: CONTRACT_TEMPLATE_PDF_MIME });
       this.generationState.set({ status: 'filled', pdf, snapshot });
-      this.openPreview();
+      this.openPreview(pdf);
     } catch {
       if (version === this.generationVersion) this.generationState.set({ status: 'failed' });
     }
@@ -98,11 +103,9 @@ export class ContractPreparationFacade {
     this.generationState.set({ status: 'idle' });
   }
 
-  openPreview(): void {
-    const result = this.generation();
-    if (!this.platform.isBrowser || result.status !== 'filled' || this.preview() !== null) return;
+  private openPreview(pdf: Blob): void {
     this.viewerResult.set(null);
-    this.activePreview.set({ url: URL.createObjectURL(result.pdf), title: 'umowa.pdf' });
+    this.activePreview.set({ url: URL.createObjectURL(pdf), title: 'umowa.pdf' });
   }
 
   recordPreviewResult(result: IPdfPreviewResult): void {

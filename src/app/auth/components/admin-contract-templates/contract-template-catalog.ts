@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import type { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -22,6 +23,7 @@ import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import type { FileUploadOptions } from '../../../core/types/file-upload';
 import { isContractLabel } from '../../../core/types/contract-template-configuration';
 import { stringToSlug } from '../../../core/utils/normalize-text';
+import { DocumentOperations } from '../../common/document-operations/document-operations';
 import { ContractConfigurationEditor } from './contract-configuration-editor';
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 import { ContractTemplatesFacade } from './contract-templates-facade';
@@ -30,7 +32,7 @@ import { ContractTemplatesFacade } from './contract-templates-facade';
   selector: 'app-contract-template-catalog',
   imports: [
     ReactiveFormsModule, ButtonModule, IftaLabelModule, SelectModule, TableModule,
-    FileUpload, LoadingOverlay, PdfViewerDialog, DialogModule, InputTextModule, ContractConfigurationEditor,
+    FileUpload, LoadingOverlay, PdfViewerDialog, DialogModule, InputTextModule, ContractConfigurationEditor, DocumentOperations,
   ],
   templateUrl: './contract-template-catalog.html',
 })
@@ -89,6 +91,7 @@ export class ContractTemplateCatalog {
       familyLabel: families.get(template.family),
       statusLabel: statusLabels[template.status],
       statusClass: `tag-badge ${statusClasses[template.status]}`,
+      menu: this.createOperations(template),
     }));
   });
   protected readonly uploadOptions = computed<Partial<FileUploadOptions>>(() => ({
@@ -126,7 +129,26 @@ export class ContractTemplateCatalog {
       .subscribe(() => this.familyName.reset());
   }
 
-  protected confirmDeletion(template: ContractTemplate): void {
+  private createOperations(template: ContractTemplate): MenuItem[] {
+    const { preview, download, configure, delete: deleteLabel } = this.i18n.actions();
+    const menu: MenuItem[] = [{
+      label: template.status === 'staged' ? configure : this.i18n.editor().configuration,
+      icon: 'pi pi-blacksmith',
+      command: () => { if (this.catalog.canAct()) this.editing.set(template); },
+    }];
+    if (template.status === 'staged' || template.status === 'active') {
+      menu.push(
+        { label: preview, icon: 'pi pi-horus', command: () => this.catalog.openFile(template.template_id, true) },
+        { label: download, icon: 'pi pi-missile-swarm', command: () => this.catalog.openFile(template.template_id, false) },
+      );
+    }
+    if (template.can_delete) {
+      menu.push({ label: deleteLabel, icon: 'pi pi-demolish', command: () => this.confirmDeletion(template) });
+    }
+    return menu;
+  }
+
+  private confirmDeletion(template: ContractTemplate): void {
     if (!this.catalog.canAct() || !template.can_delete) return;
     const { deletion } = this.i18n.copy();
     const actions = this.i18n.actions();

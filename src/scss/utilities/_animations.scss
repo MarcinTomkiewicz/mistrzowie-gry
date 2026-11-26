@@ -24,6 +24,37 @@
   animation-name: mg-enter-fade-up-soft;
 }
 
+.animate-grid-size {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition-property: none;
+
+  > .animate-grid-content {
+    min-height: 0;
+  }
+
+  &.animate-grid-leave {
+    grid-template-rows: 0fr;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: grid-template-rows 240ms ease-in-out;
+
+    &:is(.animate-grid-enter, .animate-grid-leave) > .animate-grid-content {
+      overflow: hidden;
+    }
+
+    @starting-style {
+      grid-template-rows: 0fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .floating-dragon {
   animation: mg-floating-dragon 3s ease-in-out infinite;
 }

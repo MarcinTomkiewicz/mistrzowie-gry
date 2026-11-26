@@ -11,16 +11,9 @@
           <label class="text-sm" [for]="idPrefix() + '-start-' + index">{{ i18n.commonLabels().start }}</label>
           <p-datepicker #startPicker ngSkipHydration [inputId]="idPrefix() + '-start-' + index" formControlName="startTime" size="small"
             dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-            iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
+            iconDisplay="input" appendTo="body" class="mg-datepicker--time w-100 min-w-0" inputStyleClass="w-100 min-w-0"
             [invalid]="canShowScheduleError(block.controls.startTime, startPicker) && block.controls.startTime.invalid"
             (onBlur)="normalizeTime(index, 'startTime', $event)" (onClose)="block.controls.startTime.markAsTouched()">
-            <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
-            <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
-            <ng-template #inputicon let-clickCallBack="clickCallBack">
-              <span class="flex-row-center-center w-px-16 aspect-square">
-                <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
-              </span>
-            </ng-template>
             <ng-template #footer>
               <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
                 [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(startPicker)" />
@@ -34,16 +27,9 @@
           </label>
           <p-datepicker #endPicker ngSkipHydration [inputId]="idPrefix() + '-end-' + index" formControlName="endTime" size="small"
             dataType="string" hourFormat="24" [timeOnly]="true" [keepInvalid]="true" [showIcon]="true"
-            iconDisplay="input" appendTo="body" class="w-100 min-w-0" inputStyleClass="w-100 min-w-0"
+            iconDisplay="input" appendTo="body" class="mg-datepicker--time w-100 min-w-0" inputStyleClass="w-100 min-w-0"
             [invalid]="(canShowScheduleError(block.controls.endTime, endPicker) && block.controls.endTime.invalid) || showTimeRangeError(block, startPicker, endPicker)"
             (onBlur)="normalizeTime(index, 'endTime', $event)" (onClose)="block.controls.endTime.markAsTouched()">
-            <ng-template #incrementicon><span class="pi pi-ascending" aria-hidden="true"></span></ng-template>
-            <ng-template #decrementicon><span class="pi pi-descending" aria-hidden="true"></span></ng-template>
-            <ng-template #inputicon let-clickCallBack="clickCallBack">
-              <span class="flex-row-center-center w-px-16 aspect-square">
-                <span class="pi pi-sundial w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
-              </span>
-            </ng-template>
             <ng-template #footer>
               <p-button type="button" size="small" severity="success" icon="pi pi-done-it"
                 [label]="copy.setTime" [disabled]="blocks().disabled" (onClick)="confirmTime(endPicker)" />

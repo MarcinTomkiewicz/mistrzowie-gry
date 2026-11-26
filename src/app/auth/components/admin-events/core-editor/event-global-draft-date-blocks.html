@@ -8,7 +8,7 @@
       <label class="text-sm" for="global-blocks-date">{{ i18n.commonLabels().eventDate }}</label>
       <p-datepicker ngSkipHydration inputId="global-blocks-date" [ngModel]="selectedDate() | isoDateValue"
         [ngModelOptions]="{ standalone: true }" (ngModelChange)="selectDate($event)" [disabled]="draft.disabled || draft.controls.schedule.invalid"
-        dateFormat="dd.mm.yy" [readonlyInput]="true" size="small" appendTo="body" class="w-100" inputStyleClass="w-100"
+        [readonlyInput]="true" size="small" appendTo="body" class="w-100" inputStyleClass="w-100"
         [invalid]="!!selectedDate() && !dateAllowed(selectedDate())" />
     </div>
     @if (draft.controls.schedule.controls.kind.value === 'recurring') {

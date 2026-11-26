@@ -2,6 +2,7 @@ import type { ConfigurationIssue, ContractFieldKind, ContractFieldRules } from '
 import type { ContractPdfFillResult } from '../../../core/services/contract-pdf-fill/contract-pdf-fill';
 import {
   createCommonActionsI18n,
+  createCommonEmptyI18n,
   createCommonEntityStatusesI18n,
   createCommonErrorsI18n,
   createCommonFormI18n,
@@ -10,6 +11,7 @@ import {
   createCommonPdfUploadI18n,
   createCommonStatusI18n,
   createCommonTableI18n,
+  createCommonValuesI18n,
 } from '../../../core/translations/common.i18n';
 import { createScopedObjectI18n } from '../../../core/translations/scoped.i18n';
 
@@ -57,7 +59,6 @@ export function createAdminContractTemplatesI18n() {
       familyUncertain: string;
       familyCreated: string;
       familyFailed: string;
-      configure: string;
       configuration: string;
       readFailed: string;
       reconciliation: string;
@@ -65,14 +66,20 @@ export function createAdminContractTemplatesI18n() {
       geometryMismatch: string;
       databaseVersion: string;
       keepDraft: string;
-      copySource: string;
       copyDraft: string;
       copyWarning: string;
       discardDraft: string;
+      discardChanges: string;
       sourceUnavailable: string;
       fields: string;
-      field: string;
-      addField: string;
+      fieldProperties: string;
+      unnamedField: string;
+      validation: string;
+      conditions: string;
+      conditionHint: string;
+      noConditionSources: string;
+      options: string;
+      option: string;
       optionLabel: string;
       addOption: string;
       kind: string;
@@ -81,9 +88,8 @@ export function createAdminContractTemplatesI18n() {
       equals: string;
       invalidOrder: string;
       placements: string;
-      layout: string;
+      placementProperties: string;
       checkboxOption: string;
-      page: string;
       fontSize: string;
       minFontSize: string;
       invalidDraft: string;
@@ -91,6 +97,9 @@ export function createAdminContractTemplatesI18n() {
       previewConfirmation: string;
       pan: string;
       draw: string;
+      selectFieldHint: string;
+      drawHint: string;
+      panHint: string;
       resize: string;
       kinds: Record<Exclude<ContractFieldKind, 'date' | 'email'>, string>;
       rules: Record<keyof ContractFieldRules, string>;
@@ -98,6 +107,7 @@ export function createAdminContractTemplatesI18n() {
     }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'editor'),
     ...createCommonPdfUploadI18n(),
     actions: createCommonActionsI18n(),
+    empty: createCommonEmptyI18n(),
     entityStatuses: createCommonEntityStatusesI18n(),
     errors: createCommonErrorsI18n(),
     form: createCommonFormI18n(),
@@ -105,11 +115,13 @@ export function createAdminContractTemplatesI18n() {
     nav: createCommonNavI18n(),
     status: createCommonStatusI18n(),
     table: createCommonTableI18n(),
+    values: createCommonValuesI18n(),
   };
 
   return {
     ...i18n,
     fieldKindLabel: (kind: ContractFieldKind) => kind === 'date' || kind === 'email'
       ? i18n.labels()[kind] : i18n.editor().kinds[kind],
+    fieldLabel: (label: string) => label.trim() ? label : i18n.editor().unnamedField,
   };
 }

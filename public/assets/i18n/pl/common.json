@@ -20,6 +20,8 @@
 
   "actions": {
     "open": "Otwórz",
+    "openPdf": "Otwórz PDF",
+    "configure": "Konfiguruj",
     "download": "Pobierz",
     "accept": "Zaakceptuj",
     "reject": "Odrzuć",
@@ -46,6 +48,7 @@
     "select": "Wybierz",
     "saveDraft": "Zapisz wersję roboczą",
     "addItem": "Dodaj pozycję",
+    "addField": "Dodaj pole",
     "addSection": "Dodaj sekcję",
     "preview": "Podgląd",
     "clearDay": "Wyczyść dzień",
@@ -72,6 +75,9 @@
 
   "labels": {
     "document": "Dokument",
+    "field": "Pole",
+    "sourceTemplate": "Wzór źródłowy",
+    "page": "Strona",
     "documents": "Dokumenty",
     "version": "Wersja",
     "category": "Kategoria",
@@ -317,7 +323,39 @@
   "empty": {
     "title": "Brak danych",
     "description": "Nie ma tu jeszcze nic do wyświetlenia.",
-    "articles": "Brak artykułów"
+    "articles": "Brak artykułów",
+    "noResults": "Brak wyników",
+    "sourceTemplates": "Brak wzorów źródłowych"
+  },
+
+  "primeNg": {
+    "firstDayOfWeek": 1,
+    "dateFormat": "dd.mm.yy",
+    "dayNames": ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"],
+    "dayNamesShort": ["niedz.", "pon.", "wt.", "śr.", "czw.", "pt.", "sob."],
+    "dayNamesMin": ["Nd", "Pn", "Wt", "Śr", "Cz", "Pt", "So"],
+    "monthNames": ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"],
+    "monthNamesShort": ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"],
+    "today": "Dzisiaj",
+    "weekHeader": "Tydz.",
+    "chooseYear": "Wybierz rok",
+    "chooseMonth": "Wybierz miesiąc",
+    "chooseDate": "Wybierz datę",
+    "prevDecade": "Poprzednia dekada",
+    "nextDecade": "Następna dekada",
+    "prevYear": "Poprzedni rok",
+    "nextYear": "Następny rok",
+    "prevMonth": "Poprzedni miesiąc",
+    "nextMonth": "Następny miesiąc",
+    "prevHour": "Poprzednia godzina",
+    "nextHour": "Następna godzina",
+    "prevMinute": "Poprzednia minuta",
+    "nextMinute": "Następna minuta",
+    "prevSecond": "Poprzednia sekunda",
+    "nextSecond": "Następna sekunda",
+    "searchMessage": "Liczba wyników: {0}",
+    "selectionMessage": "Liczba wybranych pozycji: {0}",
+    "emptySelectionMessage": "Nie wybrano żadnej pozycji"
   },
 
   "errors": {

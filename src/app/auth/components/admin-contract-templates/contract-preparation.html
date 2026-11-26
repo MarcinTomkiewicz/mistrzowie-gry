@@ -10,10 +10,10 @@
     <p class="m-0 error-text" role="alert">{{ i18n.copy().loadFailed }}</p>
     <div><p-button type="button" severity="secondary" [label]="actions.retry" (onClick)="catalog.refresh()" /></div>
   }
-  <p-iftalabel class="w-100">
-    <p-select class="w-100" inputId="contract-preparation-family" [formControl]="family"
+  <p-iftalabel class="w-px-250 w-100-sm min-w-0">
+    <p-select class="w-100" size="small" inputId="contract-preparation-family" [formControl]="family"
       [options]="catalog.familyOptions()" optionLabel="label" optionValue="value"
-      [readonly]="catalog.loading()" appendTo="body" />
+      [placeholder]="actions.select" [readonly]="catalog.loading()" appendTo="body" />
     <label for="contract-preparation-family">{{ i18n.copy().family }}</label>
   </p-iftalabel>
 

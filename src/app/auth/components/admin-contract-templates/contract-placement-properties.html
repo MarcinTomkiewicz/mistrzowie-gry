@@ -1,0 +1,38 @@
+@let copy = i18n.editor();
+@let selected = placement();
+
+<section class="mg-card flex-col-start-stretch gap-md min-w-0">
+  <h3 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">
+    {{ copy.placementProperties }} - {{ fieldLabel() }} · {{ i18n.labels().page }} {{ selected.page }}
+  </h3>
+  @if (selected.kind === 'text') {
+    <div class="flex-row-start-end flex-wrap gap-md">
+      <div class="flex-col-start-stretch gap-xs w-px-150 max-w-full">
+        <label for="contract-font-size">{{ copy.fontSize }}</label>
+        <p-inputnumber size="small" inputStyleClass="w-100 min-w-0" inputId="contract-font-size" suffix=" pt"
+          [ngModel]="selected.font.sizePt" [disabled]="!editable()"
+          (ngModelChange)="font('sizePt', $event)" [maxFractionDigits]="2" />
+      </div>
+      <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full">
+        <label for="contract-min-font-size">{{ copy.minFontSize }}</label>
+        <p-inputnumber size="small" inputStyleClass="w-100 min-w-0" inputId="contract-min-font-size" suffix=" pt"
+          [ngModel]="selected.font.minSizePt" [disabled]="!editable()"
+          (ngModelChange)="font('minSizePt', $event)" [maxFractionDigits]="2" />
+      </div>
+    </div>
+    <div class="flex-row-start-center gap-xs">
+      <p-checkbox size="small" inputId="contract-placement-multiline" [ngModel]="selected.multiline"
+        (ngModelChange)="multiline($event)" [binary]="true" [disabled]="!editable() || field()?.kind === 'multiline'" />
+      <label for="contract-placement-multiline">{{ copy.kinds.multiline }}</label>
+    </div>
+  } @else if (selected.optionValue !== null && options().length) {
+    <p-select size="small" class="w-px-250 w-100-sm min-w-0" [ngModel]="selected.optionValue"
+      (ngModelChange)="option($event)" [options]="options()" [placeholder]="copy.checkboxOption"
+      optionLabel="label" optionValue="value" [ariaLabel]="copy.checkboxOption" [disabled]="!editable()" appendTo="body" />
+  }
+  @if (editable()) {
+    <div class="flex-row-end-center">
+      <p-button type="button" size="small" severity="danger" [label]="i18n.actions().delete" (onClick)="removed.emit()" />
+    </div>
+  }
+</section>

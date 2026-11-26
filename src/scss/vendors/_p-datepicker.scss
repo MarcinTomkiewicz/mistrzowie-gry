@@ -1,4 +1,7 @@
+@use "sass:map";
+@use "../abstracts/custom-icons" as ci;
 @use "../abstracts/variables" as v;
+@use "./p-custom-icons";
 
 .p-datepicker,
 .p-datepicker-panel {
@@ -53,5 +56,25 @@
 .p-datepicker-time-picker {
   .p-button {
     color: v.$color-secondary;
+  }
+}
+
+// Keep PrimeNG's SVG trigger and navigation controls, replacing only their glyphs.
+@each $selector, $icon in (
+  '.p-datepicker svg[data-p-icon="calendar"]': "report-spy",
+  '.mg-datepicker--time svg[data-p-icon="calendar"]': "sundial",
+  '.p-datepicker-prev-button svg[data-p-icon="chevron-left"]': "point-left",
+  '.p-datepicker-next-button svg[data-p-icon="chevron-right"]': "point-right",
+  '.p-datepicker-increment-button svg[data-p-icon="chevron-up"]': "ascending",
+  '.p-datepicker-decrement-button svg[data-p-icon="chevron-down"]': "descending"
+) {
+  #{$selector} {
+    @extend .pi--svg;
+    -webkit-mask-image: url("/icons/#{map.get(ci.$custom-icons, $icon)}");
+    mask-image: url("/icons/#{map.get(ci.$custom-icons, $icon)}");
+
+    > * {
+      visibility: hidden;
+    }
   }
 }

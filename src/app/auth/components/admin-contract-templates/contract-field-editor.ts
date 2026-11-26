@@ -6,16 +6,17 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
+import { ItemEditorActions } from '../../../common/item-editor-actions/item-editor-actions';
 import {
   CONFIGURATION_LIMITS, CONTRACT_FIELD_KINDS, type ContractField, type ContractFieldKind,
   type ContractFieldRules, type ContractVisibility, isTextFieldKind,
 } from '../../../core/types/contract-template-configuration';
-import { createCommonValuesI18n } from '../../../core/translations/common.i18n';
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
+import { contractConditionOptions } from './contract-configuration-fields';
 
 @Component({
   selector: 'app-contract-field-editor',
-  imports: [FormsModule, ButtonModule, CheckboxModule, InputNumberModule, InputTextModule, SelectModule],
+  imports: [FormsModule, ButtonModule, CheckboxModule, InputNumberModule, InputTextModule, SelectModule, ItemEditorActions],
   templateUrl: './contract-field-editor.html',
 })
 export class ContractFieldEditor {
@@ -24,19 +25,16 @@ export class ContractFieldEditor {
   readonly editable = input(true);
   readonly changed = output<ContractField>();
   protected readonly i18n = createAdminContractTemplatesI18n();
-  private readonly booleans = createCommonValuesI18n();
   protected readonly limits = CONFIGURATION_LIMITS;
   protected readonly kinds = computed(() => CONTRACT_FIELD_KINDS.map((value) => ({
     value, label: this.i18n.fieldKindLabel(value),
   })));
   protected readonly sources = computed(() => this.earlier().filter((field) =>
     field.kind === 'checkbox' || (field.kind === 'select' && field.options.length > 0)));
-  protected readonly conditionOptions = computed(() => {
-    const source = this.sources().find(({ id }) => id === this.field().visibleWhen?.fieldId);
-    return source?.kind === 'checkbox' ? [
-      { value: true, label: this.booleans().yes }, { value: false, label: this.booleans().no },
-    ] : source?.options ?? [];
-  });
+  protected readonly sourceOptions = computed(() => this.sources().map(({ id, label }) => ({ id, label: this.i18n.fieldLabel(label) })));
+  protected readonly conditionOptions = computed(() => contractConditionOptions(
+    this.sources().find(({ id }) => id === this.field().visibleWhen?.fieldId), this.i18n.values(),
+  ));
   protected readonly rules = computed((): (keyof ContractFieldRules)[] => {
     const kind = this.field().kind;
     if (isTextFieldKind(kind)) return ['minLength', 'maxLength'];

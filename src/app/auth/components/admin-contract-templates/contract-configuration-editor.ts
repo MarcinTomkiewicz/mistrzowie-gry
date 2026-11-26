@@ -1,13 +1,13 @@
-import { Component, computed, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input, output, signal, untracked, type AnimationCallbackEvent } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
 import { filter } from 'rxjs';
 
+import { ItemEditorActions } from '../../../common/item-editor-actions/item-editor-actions';
 import { LoadingOverlay } from '../../../common/loading-overlay/loading-overlay';
 import { PdfViewerDialog } from '../../../common/pdf-viewer-dialog/pdf-viewer-dialog';
 import { CONTRACT_TEMPLATE_PDF_MIME } from '../../../core/configs/admin-contract-templates.config';
@@ -19,18 +19,22 @@ import {
 } from '../../../core/types/contract-template-configuration';
 import { createAdminContractTemplatesI18n } from './admin-contract-templates.i18n';
 import { ContractConfigurationFacade } from './contract-configuration-facade';
+import { contractDependencyLabels, contractPlacementRows, updateContractFields } from './contract-configuration-fields';
 import { ContractFieldEditor } from './contract-field-editor';
 import { ContractGeneratedPdf } from './contract-generated-pdf';
 import { ContractPlacementOverlay } from './contract-placement-overlay';
+import { ContractPlacementProperties } from './contract-placement-properties';
 import { ContractPreparationFacade } from './contract-preparation-facade';
 import { ContractTemplatesFacade } from './contract-templates-facade';
 import { ContractValuesForm } from './contract-values-form';
 
+type PropertiesPanel = { kind: 'field'; id: string } | { kind: 'placement'; index: number };
+
 @Component({
   selector: 'app-contract-configuration-editor',
   imports: [
-    FormsModule, ButtonModule, CheckboxModule, DialogModule, InputNumberModule, SelectModule,
-    LoadingOverlay, PdfViewerDialog, ContractFieldEditor, ContractGeneratedPdf, ContractPlacementOverlay, ContractValuesForm,
+    FormsModule, ButtonModule, DialogModule, SelectModule, TableModule, ItemEditorActions, LoadingOverlay, PdfViewerDialog,
+    ContractFieldEditor, ContractGeneratedPdf, ContractPlacementOverlay, ContractPlacementProperties, ContractValuesForm,
   ],
   providers: [ContractConfigurationFacade, ContractPreparationFacade],
   templateUrl: './contract-configuration-editor.html',
@@ -45,33 +49,50 @@ export class ContractConfigurationEditor {
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
 
-  protected readonly fieldId = signal<string | null>(null);
-  protected readonly placementIndex = signal<number | null>(null);
+  private readonly properties = signal<PropertiesPanel | null>(null);
+  protected readonly drawFieldId = signal<string | null>(null);
+  protected readonly pdfPlacementIndex = signal<number | null>(null);
   protected readonly sourceId = signal<string | null>(null);
   protected readonly drawOption = signal<string | null>(null);
   protected readonly drawMode = signal(true);
+  protected readonly previewFormId = 'contract-example-values';
   protected readonly limits = CONFIGURATION_LIMITS;
   protected readonly layoutOpen = signal(false);
+  protected readonly layoutInitialPage = signal(1);
   protected readonly fields = computed(() => this.facade.draft()?.fields ?? []);
-  protected readonly labels = computed(() => Object.fromEntries(this.fields().map(({ id, label }) => [id, label])));
-  protected readonly index = computed(() => this.fields().findIndex(({ id }) => id === this.fieldId()));
-  protected readonly field = computed<ContractField | undefined>(() =>
-    this.index() < 0 ? undefined : this.fields()[this.index()]);
-  protected readonly earlier = computed(() => this.fields().slice(0, this.index()));
+  protected readonly fieldOptions = computed(() => this.fields().map(({ id, label }) => ({
+    id, label: this.i18n.fieldLabel(label),
+  })));
+  protected readonly labels = computed(() => Object.fromEntries(this.fieldOptions().map(({ id, label }) => [id, label])));
+  protected readonly dependencies = computed(() => contractDependencyLabels(this.fields(), this.labels(), this.i18n.values()));
+  protected readonly fieldId = computed(() => {
+    const panel = this.properties();
+    return panel?.kind === 'field' ? panel.id : null;
+  });
+  protected readonly placementIndex = computed(() => {
+    const panel = this.properties();
+    return panel?.kind === 'placement' ? panel.index : null;
+  });
+  private readonly fieldIndex = computed(() => this.fields().findIndex(({ id }) => id === this.fieldId()));
+  protected readonly field = computed<ContractField | undefined>(() => this.fields()[this.fieldIndex()]);
+  protected readonly drawField = computed(() => this.fields().find(({ id }) => id === this.drawFieldId()));
+  protected readonly earlier = computed(() => this.fields().slice(0, this.fieldIndex()));
+  protected readonly trackField = (_index: number, field: ContractField) => field.id;
+  protected readonly placementRows = computed(() => contractPlacementRows(
+    this.facade.draft()?.placements ?? [], this.fields(), this.labels(), this.i18n.values().notProvided,
+  ));
+  protected readonly hasPlacementOptions = computed(() => this.placementRows().some(({ optionLabel }) => !!optionLabel));
+  protected readonly trackPlacement = (_index: number, row: { index: number }) => row.index;
   protected readonly placement = computed(() => {
     const index = this.placementIndex();
     return index === null ? null : this.facade.draft()?.placements[index] ?? null;
   });
-  protected readonly placementOptions = computed(() => {
-    const position = this.placement();
-    return position?.kind === 'checkbox' && position.optionValue !== null
-      ? this.fields().find(({ id }) => id === position.fieldId)?.options ?? [] : [];
-  });
+  protected readonly placementField = computed(() => this.fields().find(({ id }) => id === this.placement()?.fieldId));
   protected readonly sources = computed(() => this.catalog.templates().filter((row) =>
     row.family === this.template().family && row.template_id !== this.template().template_id));
   protected readonly layoutPreview = signal<{ url: string; title: string } | null>(null);
   protected readonly canDraw = computed(() =>
-    this.facade.editable() && this.drawMode() && !!this.field() &&
+    this.facade.editable() && this.drawMode() && !!this.drawField() &&
     (this.facade.draft()?.placements.length ?? 0) < this.limits.placements);
 
   constructor() {
@@ -91,36 +112,64 @@ export class ContractConfigurationEditor {
     });
   }
 
-  protected selectField(id: string | null): void {
-    this.fieldId.set(id);
+  protected toggleProperties(panel: PropertiesPanel, event?: Event): void {
+    if (event instanceof KeyboardEvent) {
+      event.preventDefault();
+      if (event.repeat) return;
+    }
+    const expanded = panel.kind === 'field' ? this.fieldId() === panel.id : this.placementIndex() === panel.index;
+    this.properties.set(expanded ? null : panel);
+  }
+
+  protected collapseProperties({ target, animationComplete }: AnimationCallbackEvent): void {
+    target.setAttribute('inert', '');
+    target.removeAttribute('id');
+    target.classList.add('animate-grid-leave');
+    void Promise.allSettled(target.getAnimations().map((animation) => animation.finished)).then(() => animationComplete());
+  }
+
+  protected selectDrawField(id: string | null): void {
+    if (this.drawFieldId() === id) return;
+    this.drawFieldId.set(id);
     this.drawOption.set(null);
-    this.placementIndex.set(null);
+  }
+
+  protected selectPdfPlacement(index: number): void {
+    this.pdfPlacementIndex.set(index);
+  }
+
+  protected openLayout(): void {
+    const index = this.placementIndex() ?? this.pdfPlacementIndex();
+    const placement = index === null ? undefined : this.facade.draft()?.placements[index];
+    this.pdfPlacementIndex.set(index);
+    this.layoutInitialPage.set(placement?.page ?? 1);
+    this.layoutOpen.set(true);
   }
 
   protected addField(): void {
     const draft = this.facade.draft();
-    if (!draft || draft.fields.length >= this.limits.fields) return;
+    if (!draft || !this.facade.editable() || this.facade.pending() || draft.fields.length >= this.limits.fields) return;
     let sequence = draft.fields.length + 1;
     while (draft.fields.some(({ id }) => id === 'field_' + sequence)) sequence++;
     const id = 'field_' + sequence;
     this.updateFields([...draft.fields, { id, label: '', kind: 'text',
       required: false, options: [], visibleWhen: null, rules: {} }]);
-    this.selectField(id);
+    this.properties.set({ kind: 'field', id });
   }
 
   protected applyField(field: ContractField): void {
     this.updateFields(this.fields().map((item) => item.id === field.id ? field : item));
   }
 
-  protected removeField(): void {
-    this.updateFields(this.fields().filter(({ id }) => id !== this.fieldId()));
-    this.selectField(null);
+  protected removeField(fieldId: string): void {
+    this.updateFields(this.fields().filter(({ id }) => id !== fieldId));
   }
 
-  protected moveField(delta: number): void {
-    const index = this.index();
-    const other = index + delta;
+  protected moveField(fieldId: string, delta: number): void {
+    if (!this.facade.editable() || this.facade.pending()) return;
     const fields = [...this.fields()];
+    const index = fields.findIndex(({ id }) => id === fieldId);
+    const other = index + delta;
     if (index < 0 || other < 0 || other >= fields.length) return;
     [fields[index], fields[other]] = [fields[other], fields[index]];
     if (fields.some((field, position) => field.visibleWhen !== null &&
@@ -133,12 +182,13 @@ export class ContractConfigurationEditor {
 
   protected geometry(change: { index: number | null; area: ContractArea; page: number }): void {
     const draft = this.facade.draft();
-    if (!draft || !this.facade.editable()) return;
+    if (!draft || !this.facade.editable() || this.facade.pending()) return;
     if (change.index !== null) {
-      this.patchPlacement(change.index, { ...change.area });
+      const placement = draft.placements[change.index];
+      if (placement) this.replacePlacement(change.index, { ...placement, ...change.area });
       return;
     }
-    const field = this.field();
+    const field = this.drawField();
     if (!field || !this.canDraw()) return;
     const base = { ...change.area, fieldId: field.id, page: change.page };
     const option = this.drawOption();
@@ -146,51 +196,20 @@ export class ContractConfigurationEditor {
       ? { ...base, kind: 'checkbox', optionValue: field.kind === 'checkbox' ? null : option }
       : { ...base, kind: 'text', multiline: field.kind === 'multiline', font: { family: 'regular', sizePt: 11, minSizePt: 8 } };
     this.facade.update({ ...draft, placements: [...draft.placements, placement] });
-    this.placementIndex.set(draft.placements.length);
+    this.selectPdfPlacement(draft.placements.length);
   }
 
-  protected selectPlacement(index: number): void {
-    const placement = this.facade.draft()?.placements[index];
-    if (!placement) return;
-    this.selectField(placement.fieldId);
-    this.placementIndex.set(index);
-  }
-
-  protected font(key: 'sizePt' | 'minSizePt', value: number | null): void {
+  protected updatePlacement(placement: ContractPlacement): void {
     const index = this.placementIndex();
-    const placement = this.placement();
-    if (index !== null && placement?.kind === 'text' && value !== null) {
-      this.replacePlacement(index, { ...placement, font: { ...placement.font, [key]: value } });
-    }
-  }
-
-  protected multiline(value: boolean): void {
-    const index = this.placementIndex();
-    const placement = this.placement();
-    if (index !== null && placement?.kind === 'text') this.replacePlacement(index, { ...placement, multiline: value });
-  }
-
-  protected placementOption(value: string): void {
-    const index = this.placementIndex();
-    const placement = this.placement();
-    if (index !== null && placement?.kind === 'checkbox' && this.placementOptions().some((option) => option.value === value)) {
-      this.replacePlacement(index, { ...placement, optionValue: value });
-    }
-  }
-
-  protected placementLabel(position: ContractPlacement): string {
-    const field = this.fields().find(({ id }) => id === position.fieldId);
-    const option = position.kind === 'checkbox' && position.optionValue !== null
-      ? field?.options.find(({ value }) => value === position.optionValue) : undefined;
-    return [this.i18n.editor().page + ' ' + position.page, field?.label, option?.label].filter(Boolean).join(' · ');
+    if (index !== null) this.replacePlacement(index, placement);
   }
 
   protected removePlacement(): void {
     const index = this.placementIndex();
     const draft = this.facade.draft();
-    if (!draft || index === null) return;
+    if (!draft || index === null || !this.facade.editable() || this.facade.pending()) return;
+    this.remapPlacementSelection([...draft.placements.keys()].filter((position) => position !== index));
     this.facade.update({ ...draft, placements: draft.placements.filter((_, position) => index !== position) });
-    this.placementIndex.set(null);
   }
 
   protected copyFromSource(): void {
@@ -198,7 +217,7 @@ export class ContractConfigurationEditor {
     if (!source) return;
     const copy = () => {
       void this.facade.copy(source).then((copied) => {
-        if (copied) this.selectField(null);
+        if (copied) this.resetSelection();
       });
     };
     if (this.facade.loaded()?.revision.configuration || this.facade.dirty()) {
@@ -209,8 +228,8 @@ export class ContractConfigurationEditor {
   }
 
   protected reload(): void {
-    const load = () => { this.selectField(null); void this.facade.load(this.template().template_id); };
-    if (this.facade.dirty()) this.confirmAction(this.i18n.editor().discardDraft, this.i18n.actions().refresh, load);
+    const load = () => { this.resetSelection(); void this.facade.load(this.template().template_id); };
+    if (this.facade.dirty()) this.confirmDiscard(load);
     else load();
   }
 
@@ -226,13 +245,13 @@ export class ContractConfigurationEditor {
           this.toast.success({ summary: this.i18n.copy().activated });
           this.closed.emit();
         });
-      }, copy.title);
+      }, { header: copy.title });
   }
 
   protected close(): void {
     if (this.facade.pending()) return;
     if (this.facade.dirty()) {
-      this.confirmAction(this.i18n.editor().discardDraft, this.i18n.actions().close, () => this.closed.emit());
+      this.confirmDiscard(() => this.closed.emit());
     } else {
       this.closed.emit();
     }
@@ -240,34 +259,33 @@ export class ContractConfigurationEditor {
 
   private updateFields(fields: ContractField[]): void {
     const draft = this.facade.draft();
-    if (!draft) return;
-    const byId = new Map(fields.map((field) => [field.id, field]));
-    const selected = byId.get(this.fieldId() ?? '');
-    if (selected?.kind !== 'select' || !selected.options.some(({ value }) => value === this.drawOption())) {
-      this.drawOption.set(null);
-    }
-    const placements = draft.placements.flatMap<ContractPlacement>((p) => {
-      const field = byId.get(p.fieldId);
-      if (!field) return [];
-      if (p.kind === 'text') return field.kind === 'checkbox' ? [] :
-        [{ ...p, multiline: field.kind === 'multiline' || p.multiline }];
-      return (field.kind === 'checkbox' && p.optionValue === null) ||
-        (field.kind === 'select' && field.options.some(({ value }) => value === p.optionValue)) ? [p] : [];
-    });
-    const updated = fields.map((field) => {
-      const condition = field.visibleWhen;
-      const source = condition ? byId.get(condition.fieldId) : undefined;
-      if (!condition || (source?.kind === 'checkbox' && typeof condition.equals === 'boolean') ||
-        (source?.kind === 'select' && source.options.some(({ value }) => value === condition.equals))) return field;
-      return { ...field, visibleWhen: null };
-    });
-    if (placements.length !== draft.placements.length) this.placementIndex.set(null);
-    this.facade.update({ ...draft, fields: updated, placements });
+    if (!draft || !this.facade.editable() || this.facade.pending()) return;
+    const { configuration, retainedIndices } = updateContractFields(draft, fields);
+    if (this.fieldId() !== null && !fields.some(({ id }) => id === this.fieldId())) this.properties.set(null);
+    const target = fields.find(({ id }) => id === this.drawFieldId());
+    if (!target) this.selectDrawField(null);
+    if (target?.kind !== 'select' || !target.options.some(({ value }) => value === this.drawOption())) this.drawOption.set(null);
+    this.remapPlacementSelection(retainedIndices);
+    this.facade.update(configuration);
   }
 
-  private patchPlacement(index: number, area: ContractArea): void {
-    const old = this.facade.draft()?.placements[index];
-    if (old) this.replacePlacement(index, { ...old, ...area });
+  private remapPlacementSelection(retainedIndices: readonly number[]): void {
+    const panel = this.placementIndex();
+    if (panel !== null) {
+      const index = retainedIndices.indexOf(panel);
+      this.properties.set(index < 0 ? null : { kind: 'placement', index });
+    }
+    const selected = this.pdfPlacementIndex();
+    if (selected !== null) {
+      const index = retainedIndices.indexOf(selected);
+      this.pdfPlacementIndex.set(index < 0 ? null : index);
+    }
+  }
+
+  private resetSelection(): void {
+    this.properties.set(null);
+    this.selectDrawField(null);
+    this.pdfPlacementIndex.set(null);
   }
 
   private replacePlacement(index: number, position: ContractPlacement): void {
@@ -275,9 +293,16 @@ export class ContractConfigurationEditor {
     if (draft) this.facade.update({ ...draft, placements: draft.placements.map((p, i) => i === index ? position : p) });
   }
 
-  private confirmAction(message: string, acceptLabel: string, action: () => void, header = acceptLabel): void {
+  private confirmDiscard(action: () => void): void {
+    const copy = this.i18n.editor();
+    this.confirmAction(copy.discardDraft, copy.discardChanges, action, { acceptSeverity: 'danger' });
+  }
+
+  private confirmAction(message: string, acceptLabel: string, action: () => void,
+    { header = acceptLabel, acceptSeverity = 'success' }: { header?: string; acceptSeverity?: 'success' | 'danger' } = {},
+  ): void {
     this.confirm.modalDecision({ header, message, acceptLabel, rejectLabel: this.i18n.actions().cancel,
-      acceptSeverity: 'success' }).pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef)).subscribe(action);
+      acceptSeverity }).pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef)).subscribe(action);
   }
 
   private readonly destroyRef = inject(DestroyRef);

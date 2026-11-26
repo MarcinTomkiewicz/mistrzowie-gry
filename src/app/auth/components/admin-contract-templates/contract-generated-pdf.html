@@ -20,14 +20,12 @@
     </ul>
   }
   @case ('filled') {
-    <div class="flex-row-end-center flex-wrap gap-sm">
-      <p-button type="button" severity="secondary" icon="pi pi-horus" [label]="actions.preview"
-        (onClick)="facade.openPreview()" />
-      @if (generation.snapshot.revision.status === 'active') {
-        <p-button type="button" severity="success" icon="pi pi-missile-swarm" [label]="actions.download"
+    @if (generation.snapshot.revision.status === 'active') {
+      <div class="flex-row-end-center">
+        <p-button type="button" size="small" severity="success" icon="pi pi-missile-swarm" [label]="actions.download"
           (onClick)="facade.download()" />
-      }
-    </div>
+      </div>
+    }
   }
 }
 @defer (when facade.preview()) {

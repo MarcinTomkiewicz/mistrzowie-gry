@@ -17,6 +17,7 @@ import { SUPABASE_CONFIG } from './core/configs/supabase.config';
 import { environment } from '../env/environment';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { provideImageKitLoader } from '@angular/common';
+import { actions, empty, primeNg } from '../../public/assets/i18n/pl/common.json';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -41,6 +42,13 @@ export const appConfig: ApplicationConfig = {
       loader: TranslocoHttpLoader,
     }),
     providePrimeNG({
+      translation: {
+        ...primeNg,
+        clear: actions.clear,
+        emptyMessage: empty.title,
+        emptyFilterMessage: empty.noResults,
+        emptySearchMessage: empty.noResults,
+      },
       theme: {
         preset: MgPrimePreset,
         options: {

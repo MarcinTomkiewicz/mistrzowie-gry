@@ -1,12 +1,12 @@
-<div class="position-absolute inset-0 overflow-hidden touch-action-none"
+<div class="position-absolute inset-0 overflow-hidden touch-action-none" [class.cursor-crosshair]="canDraw()"
   (pointerdown)="begin($event, 'draw')">
   @for (item of onPage(); track item.index) {
     @let box = position(item.area);
-    <div class="position-absolute border" [class.border-secondary]="selected() === item.index"
+    <div class="position-absolute border" [class.border-secondary]="selected() === item.index" [class.cursor-move]="editable()"
       [style.left.%]="box.left" [style.top.%]="box.top" [style.width.%]="box.width" [style.height.%]="box.height"
       (pointerdown)="begin($event, 'move', item.index)">
       @if (editable() && selected() === item.index) {
-        <button type="button" class="position-absolute right-0 bottom-0 cursor-pointer"
+        <button type="button" class="position-absolute right-0 bottom-0 cursor-nwse-resize"
           [attr.aria-label]="i18n.editor().resize"
           (pointerdown)="begin($event, 'resize', item.index)">↘</button>
       }

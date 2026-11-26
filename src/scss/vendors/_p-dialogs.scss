@@ -119,6 +119,12 @@
     background: v.$color-bg-surface;
     border-bottom-left-radius: v.$radius-lg;
     border-bottom-right-radius: v.$radius-lg;
+    padding: map.get(v.$spacings, "sm") map.get(v.$spacings, "md");
+    gap: map.get(v.$spacings, "sm");
+
+    @include m.down("xs") {
+      padding-inline: map.get(v.$spacings, "sm");
+    }
   }
 
   &.mg-dialog--info {

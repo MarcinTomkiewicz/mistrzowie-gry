@@ -9,7 +9,7 @@
   (pointerup)="onPointerUp($event)"
   (pointercancel)="onPointerUp($event)"
 >
-  <div class="pdf-viewer-dialog__page position-relative mx-auto">
+  <div class="pdf-viewer-dialog__page position-relative mx-auto" (wheel)="onWheel($event)">
     <canvas #canvas class="d-block shadow-sm"></canvas>
     @if (surface(); as page) {
       @if (overlay(); as template) {

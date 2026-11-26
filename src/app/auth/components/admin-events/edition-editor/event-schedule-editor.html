@@ -66,17 +66,9 @@
         <label [for]="'event-schedule-' + field.name">{{ field.label }}</label>
         <p-datepicker ngSkipHydration [inputId]="'event-schedule-' + field.name" [attr.data-schedule-field]="field.name"
           [ngModel]="controls[field.name].value | isoDateValue" [ngModelOptions]="standaloneModel" (ngModelChange)="setDate(field.name, $event)"
-          [disabled]="schedule.disabled" dateFormat="dd.mm.yy" size="small" [readonlyInput]="true" [showIcon]="true"
+          [disabled]="schedule.disabled" size="small" [readonlyInput]="true" [showIcon]="true"
           iconDisplay="input" appendTo="body" class="w-px-200 max-w-full" inputStyleClass="w-100" [invalid]="dateInvalid(field.name)"
-          (onClose)="controls[field.name].markAsTouched()">
-          <ng-template #previousicon><span class="pi pi-point-left" aria-hidden="true"></span></ng-template>
-          <ng-template #nexticon><span class="pi pi-point-right" aria-hidden="true"></span></ng-template>
-          <ng-template #inputicon let-clickCallBack="clickCallBack">
-            <span class="flex-row-center-center w-px-16 aspect-square">
-              <span class="pi pi-report-spy w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
-            </span>
-          </ng-template>
-        </p-datepicker>
+          (onClose)="controls[field.name].markAsTouched()" />
       </div>
     }
   </div>
@@ -136,18 +128,10 @@
       <label [for]="'event-schedule-' + field">{{ label }}</label>
       <p-datepicker ngSkipHydration [inputId]="'event-schedule-' + field" [attr.data-schedule-field]="field"
         [ngModel]="controls[field].value | isoDateValue" [ngModelOptions]="standaloneModel" (ngModelChange)="setDates(field, $event)"
-        [disabled]="schedule.disabled" selectionMode="multiple" dateFormat="dd.mm.yy" size="small"
+        [disabled]="schedule.disabled" selectionMode="multiple" size="small"
         [readonlyInput]="true" [showIcon]="true" iconDisplay="input" appendTo="body" class="w-px-250 max-w-full" inputStyleClass="w-100"
         [invalid]="(canShowError('exactDatesRequired') && (schedule.hasError('exactDatesRequired') || schedule.hasError('exactDatesInvalid'))) || showExternalError()"
-        (onClose)="controls[field].markAsTouched()">
-        <ng-template #previousicon><span class="pi pi-point-left" aria-hidden="true"></span></ng-template>
-        <ng-template #nexticon><span class="pi pi-point-right" aria-hidden="true"></span></ng-template>
-        <ng-template #inputicon let-clickCallBack="clickCallBack">
-          <span class="flex-row-center-center w-px-16 aspect-square">
-            <span class="pi pi-report-spy w-100 h-100" aria-hidden="true" (click)="clickCallBack($event)"></span>
-          </span>
-        </ng-template>
-      </p-datepicker>
+        (onClose)="controls[field].markAsTouched()" />
     </div>
     <div class="flex-row-start-center flex-wrap gap-xs" role="list" [attr.aria-label]="label">
       @for (date of selectedDates(field); track date) {

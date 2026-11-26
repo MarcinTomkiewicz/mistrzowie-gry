@@ -10,7 +10,10 @@ import type {
 import {
   PDF_VIEWER_ZOOM_MAX,
   PDF_VIEWER_ZOOM_MIN,
+  PDF_VIEWER_ZOOM_STEP,
 } from './pdf-viewer.config';
+
+type PointerPan = { id: number; start: IPdfPointerPosition; scrollLeft: number; scrollTop: number };
 
 @Component({
   selector: 'app-pdf-viewer-viewport',
@@ -21,30 +24,23 @@ import {
 export class PdfViewerViewport {
   readonly zoom = input.required<number>();
   readonly zoomChange = output<number>();
+  readonly panEnabled = input(true);
   readonly surface = input<IPdfPageSurface | null>(null);
   readonly overlay = input<TemplateRef<{ $implicit: IPdfPageSurface }> | null>(null);
 
-  private readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>(
-    'canvas',
-  );
-  private readonly viewportRef = viewChild<ElementRef<HTMLDivElement>>(
-    'viewport',
-  );
+  private readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly viewportRef = viewChild<ElementRef<HTMLDivElement>>('viewport');
   private readonly touchPointers = new Map<number, IPdfPointerPosition>();
   private pendingAnchor: IPdfViewportAnchor | 'top' | null = null;
   private pinchGesture: IPdfPinchGesture | null = null;
-  private activePointerId: number | null = null;
-  private pointerStartX = 0;
-  private pointerStartY = 0;
-  private pointerStartScrollLeft = 0;
-  private pointerStartScrollTop = 0;
+  private pan: PointerPan | null = null;
 
   protected readonly isPanning = signal(false);
   protected readonly canPan = computed(() => {
     const viewport = this.viewportElement();
     const canvas = this.canvasElement();
 
-    if (!viewport || !canvas) return false;
+    if (!this.panEnabled() || !this.surface() || !viewport || !canvas) return false;
 
     return this.zoom() > 1 ||
       canvas.width > viewport.clientWidth - 32 ||
@@ -78,10 +74,8 @@ export class PdfViewerViewport {
 
   applyPendingAnchor(): void {
     const anchor = this.pendingAnchor;
-    if (!anchor) return;
-
     const viewport = this.viewportElement();
-    if (!viewport) return;
+    if (!anchor || !viewport) return;
     if (anchor === 'top') {
       viewport.scrollTo({ left: 0, top: 0 });
       this.pendingAnchor = null;
@@ -90,23 +84,44 @@ export class PdfViewerViewport {
 
     const canvas = this.canvasElement();
     if (!canvas) return;
+    const canvasBounds = canvas.getBoundingClientRect();
+    const viewportBounds = viewport.getBoundingClientRect();
     viewport.scrollTo({
-      left:
-        canvas.getBoundingClientRect().left - viewport.getBoundingClientRect().left + viewport.scrollLeft +
-        anchor.contentLeft * canvas.offsetWidth -
-        anchor.viewportLeft,
-      top:
-        canvas.getBoundingClientRect().top - viewport.getBoundingClientRect().top + viewport.scrollTop +
-        anchor.contentTop * canvas.offsetHeight -
-        anchor.viewportTop,
+      left: canvasBounds.left - viewportBounds.left + viewport.scrollLeft +
+        anchor.contentLeft * canvasBounds.width - anchor.viewportLeft,
+      top: canvasBounds.top - viewportBounds.top + viewport.scrollTop +
+        anchor.contentTop * canvasBounds.height - anchor.viewportTop,
     });
     this.pendingAnchor = null;
   }
 
   clearInteraction(): void {
+    const viewport = this.viewportElement();
+    if (viewport) {
+      for (const id of this.touchPointers.keys()) this.releasePointer(viewport, id);
+      if (this.pan) this.releasePointer(viewport, this.pan.id);
+    }
     this.touchPointers.clear();
     this.pinchGesture = null;
     this.clearPointerPan();
+  }
+
+  protected onWheel(event: WheelEvent): void {
+    const viewport = this.viewportElement();
+    const canvas = this.canvasElement();
+    if (!viewport || !canvas || !event.deltaY) return;
+
+    event.preventDefault();
+    const zoom = clampZoom(this.zoom() - Math.sign(event.deltaY) * PDF_VIEWER_ZOOM_STEP);
+    if (zoom === this.zoom() || !canvas.offsetWidth || !canvas.offsetHeight) return;
+    const bounds = viewport.getBoundingClientRect();
+    const left = event.clientX - bounds.left;
+    const top = event.clientY - bounds.top;
+    const anchor = this.pendingAnchor;
+    if (!anchor || anchor === 'top' || anchor.viewportLeft !== left || anchor.viewportTop !== top) {
+      this.pendingAnchor = this.createAnchor(viewport, canvas, left, top);
+    }
+    this.zoomChange.emit(zoom);
   }
 
   protected onPointerDown(event: PointerEvent): void {
@@ -114,17 +129,19 @@ export class PdfViewerViewport {
     if (!viewport || event.button !== 0) return;
 
     if (event.pointerType === 'touch') {
-      this.touchPointers.set(event.pointerId, this.pointerPosition(event));
-    } else if (!this.canPan()) {
-      return;
+      this.touchPointers.set(event.pointerId, pointerPosition(event));
+      if (this.touchPointers.size >= 2) {
+        // Taking capture cancels any single-finger gesture in a page overlay.
+        for (const id of this.touchPointers.keys()) viewport.setPointerCapture(id);
+        if (this.touchPointers.size === 2) this.startPinch();
+        event.preventDefault();
+        return;
+      }
     }
 
+    if (!this.canPan()) return;
     viewport.setPointerCapture(event.pointerId);
-    if (this.touchPointers.size === 2) {
-      this.startPinch();
-    } else if (this.touchPointers.size < 2) {
-      this.startPan(event.pointerId, this.pointerPosition(event));
-    }
+    this.startPan(event.pointerId, pointerPosition(event));
     event.preventDefault();
   }
 
@@ -133,7 +150,7 @@ export class PdfViewerViewport {
     if (!viewport) return;
 
     if (this.touchPointers.has(event.pointerId)) {
-      this.touchPointers.set(event.pointerId, this.pointerPosition(event));
+      this.touchPointers.set(event.pointerId, pointerPosition(event));
       if (this.touchPointers.size >= 2) {
         this.updatePinch();
         event.preventDefault();
@@ -141,12 +158,10 @@ export class PdfViewerViewport {
       }
     }
 
-    if (this.activePointerId !== event.pointerId) return;
-
-    viewport.scrollLeft =
-      this.pointerStartScrollLeft - (event.clientX - this.pointerStartX);
-    viewport.scrollTop =
-      this.pointerStartScrollTop - (event.clientY - this.pointerStartY);
+    const pan = this.pan;
+    if (!this.panEnabled() || pan?.id !== event.pointerId) return;
+    viewport.scrollLeft = pan.scrollLeft - (event.clientX - pan.start.x);
+    viewport.scrollTop = pan.scrollTop - (event.clientY - pan.start.y);
     event.preventDefault();
   }
 
@@ -156,12 +171,10 @@ export class PdfViewerViewport {
       this.clearInteraction();
       return;
     }
-    if (viewport.hasPointerCapture(event.pointerId)) {
-      viewport.releasePointerCapture(event.pointerId);
-    }
+    this.releasePointer(viewport, event.pointerId);
 
     if (!this.touchPointers.delete(event.pointerId)) {
-      this.clearPointerPan();
+      if (this.pan?.id === event.pointerId) this.clearPointerPan();
       return;
     }
 
@@ -179,6 +192,10 @@ export class PdfViewerViewport {
     }
   }
 
+  private releasePointer(viewport: HTMLDivElement, id: number): void {
+    if (viewport.hasPointerCapture(id)) viewport.releasePointerCapture(id);
+  }
+
   private startPan(pointerId: number, position: IPdfPointerPosition): void {
     if (!this.canPan()) {
       this.clearPointerPan();
@@ -187,22 +204,16 @@ export class PdfViewerViewport {
 
     const viewport = this.viewportElement();
     if (!viewport) return;
-    this.activePointerId = pointerId;
-    this.pointerStartX = position.x;
-    this.pointerStartY = position.y;
-    this.pointerStartScrollLeft = viewport.scrollLeft;
-    this.pointerStartScrollTop = viewport.scrollTop;
+    this.pan = { id: pointerId, start: position, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
     this.isPanning.set(true);
   }
 
   private startPinch(): void {
-    const pointers = this.pinchPointers();
-    if (!pointers) return;
-
+    const measurement = this.pinchMeasurement();
     const viewport = this.viewportElement();
     const canvas = this.canvasElement();
-    if (!viewport || !canvas) return;
-    const center = this.pointerCenter(...pointers);
+    if (!measurement || !viewport || !canvas) return;
+    const { center, distance } = measurement;
     const bounds = viewport.getBoundingClientRect();
 
     this.clearPointerPan();
@@ -213,37 +224,30 @@ export class PdfViewerViewport {
         center.x - bounds.left,
         center.y - bounds.top,
       ),
-      distance: this.pointerDistance(...pointers),
+      distance,
       zoom: this.zoom(),
     };
   }
 
   private updatePinch(): void {
-    const pointers = this.pinchPointers();
+    const measurement = this.pinchMeasurement();
     const gesture = this.pinchGesture;
-    if (!pointers || !gesture || gesture.distance === 0) return;
-
     const viewport = this.viewportElement();
-    if (!viewport) return;
-    const center = this.pointerCenter(...pointers);
+    if (!measurement || !gesture || !gesture.distance || !viewport) return;
+    const { center, distance } = measurement;
     const bounds = viewport.getBoundingClientRect();
-    const zoom = Math.min(
-      PDF_VIEWER_ZOOM_MAX,
-      Math.max(
-        PDF_VIEWER_ZOOM_MIN,
-        +(
-          (gesture.zoom * this.pointerDistance(...pointers)) /
-          gesture.distance
-        ).toFixed(2),
-      ),
-    );
+    const zoom = clampZoom(gesture.zoom * distance / gesture.distance);
 
     this.pendingAnchor = {
       ...gesture.anchor,
       viewportLeft: center.x - bounds.left,
       viewportTop: center.y - bounds.top,
     };
-    this.zoomChange.emit(zoom);
+    if (zoom === this.zoom() && this.surface()) {
+      this.applyPendingAnchor();
+    } else {
+      this.zoomChange.emit(zoom);
+    }
   }
 
   private createAnchor(
@@ -264,37 +268,25 @@ export class PdfViewerViewport {
     };
   }
 
-  private pinchPointers(): readonly [
-    IPdfPointerPosition,
-    IPdfPointerPosition,
-  ] | null {
+  private pinchMeasurement() {
     const [first, second] = this.touchPointers.values();
-    return first && second ? [first, second] : null;
-  }
-
-  private pointerPosition(event: PointerEvent): IPdfPointerPosition {
-    return { x: event.clientX, y: event.clientY };
-  }
-
-  private pointerCenter(
-    first: IPdfPointerPosition,
-    second: IPdfPointerPosition,
-  ): IPdfPointerPosition {
+    if (!first || !second) return null;
     return {
-      x: (first.x + second.x) / 2,
-      y: (first.y + second.y) / 2,
+      center: { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 },
+      distance: Math.hypot(second.x - first.x, second.y - first.y),
     };
   }
 
-  private pointerDistance(
-    first: IPdfPointerPosition,
-    second: IPdfPointerPosition,
-  ): number {
-    return Math.hypot(second.x - first.x, second.y - first.y);
-  }
-
   private clearPointerPan(): void {
-    this.activePointerId = null;
+    this.pan = null;
     this.isPanning.set(false);
   }
+}
+
+function pointerPosition(event: PointerEvent): IPdfPointerPosition {
+  return { x: event.clientX, y: event.clientY };
+}
+
+function clampZoom(value: number): number {
+  return Math.min(PDF_VIEWER_ZOOM_MAX, Math.max(PDF_VIEWER_ZOOM_MIN, +value.toFixed(2)));
 }

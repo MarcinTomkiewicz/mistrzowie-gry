@@ -7,15 +7,15 @@
   <app-loading-overlay [visible]="catalog.loading() || catalog.saving()"
     [label]="catalog.saving() ? i18n.status().saving : i18n.status().loading" />
 
-  <section class="mg-card flex-col-start-stretch gap-md w-100">
+  <section class="mg-card flex-col-start-stretch gap-sm w-100">
     <h2 class="mg-section__title mg-section__title--sm m-0">{{ copy.addTitle }}</h2>
 
-    <form class="flex-col-start-stretch gap-md w-100" [formGroup]="uploadForm" (ngSubmit)="addTemplate()" novalidate>
-      <div class="flex-col-start-stretch gap-xs">
+    <form class="mg-form flex-col-start-stretch gap-sm w-100" [formGroup]="uploadForm" (ngSubmit)="addTemplate()" novalidate>
+      <div class="flex-col-start-stretch gap-xs w-px-250 w-100-sm min-w-0">
         <p-iftalabel class="w-100">
-          <p-select class="w-100" inputId="contract-template-family" formControlName="family"
+          <p-select class="w-100" size="small" inputId="contract-template-family" formControlName="family"
             [options]="catalog.familyOptions()" optionLabel="label" optionValue="value"
-            [readonly]="!catalog.canAct()" appendTo="body" />
+            [placeholder]="actions.select" [readonly]="!catalog.canAct()" appendTo="body" />
           <label for="contract-template-family">{{ copy.family }}</label>
         </p-iftalabel>
         @if (upload.family.touched && upload.family.invalid) {
@@ -36,9 +36,9 @@
       }
 
       <div class="flex-row-end-center flex-wrap gap-sm">
-        <p-button type="button" severity="secondary" [label]="i18n.editor().addFamily"
+        <p-button type="button" size="small" severity="secondary" [label]="i18n.editor().addFamily"
           [disabled]="!catalog.canAct()" (onClick)="familyDialog.set(true)" />
-        <p-button type="submit" severity="success" icon="pi pi-plus" [label]="copy.addTitle"
+        <p-button type="submit" size="small" severity="success" icon="pi pi-plus" [label]="copy.addTitle"
           [disabled]="!catalog.canAct()" />
       </div>
     </form>
@@ -55,7 +55,7 @@
         <p class="m-0">{{ deletion.outcome === 'cleanupFailed' ? copy.deletion.cleanupFailed : copy.deletion.unknown }}</p>
       </div>
       <div class="flex-row-end-center">
-        <p-button type="button" severity="secondary" icon="pi pi-refresh" [label]="actions.retry"
+        <p-button type="button" size="small" severity="secondary" icon="pi pi-refresh" [label]="actions.retry"
           [disabled]="catalog.busy()" (onClick)="catalog.retryDeletion(deletion)" />
       </div>
     </section>
@@ -64,16 +64,16 @@
   @if (catalog.loadFailed()) {
     <section class="mg-card flex-col-start-stretch gap-sm w-100" role="alert">
       <p class="m-0 error-text">{{ copy.loadFailed }}</p>
-      <p-button type="button" severity="secondary" icon="pi pi-refresh" [label]="actions.retry"
+      <p-button type="button" size="small" severity="secondary" icon="pi pi-refresh" [label]="actions.retry"
         (onClick)="catalog.refresh()" />
     </section>
   } @else if (!catalog.loading()) {
     <section class="flex-col-start-stretch gap-md w-100">
       <div class="flex-row-between-center flex-wrap gap-sm">
-        <p-select [formControl]="familyFilter" [options]="catalog.familyOptions()"
+        <p-select size="small" class="w-px-250 w-100-sm min-w-0" [formControl]="familyFilter" [options]="catalog.familyOptions()"
           optionLabel="label" optionValue="value" [showClear]="true"
           [placeholder]="i18n.editor().filterFamily" [ariaLabel]="i18n.editor().filterFamily" appendTo="body" />
-        <p-button type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh" [label]="actions.refresh"
+        <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh" [label]="actions.refresh"
           [disabled]="!catalog.canAct()" (onClick)="catalog.refresh()" />
       </div>
       @if (rows().length) {
@@ -106,19 +106,8 @@
                 <td class="mg-responsive-table__cell mg-responsive-table__cell--actions">
                   <span class="mg-responsive-table__label small-caps font-bold">{{ i18n.table().actions }}</span>
                   <div class="mg-responsive-table__value flex-row-end-center flex-wrap gap-xs">
-                    <p-button type="button" size="small" severity="secondary"
-                      [label]="template.status === 'staged' ? i18n.editor().configure : i18n.editor().configuration"
-                      [disabled]="!catalog.canAct()" (onClick)="editing.set(template)" />
-                    @if (template.status === 'staged' || template.status === 'active') {
-                      <p-button type="button" size="small" severity="secondary" icon="pi pi-horus" [label]="actions.preview"
-                        [disabled]="!catalog.canAct()" (onClick)="catalog.openFile(template.template_id, true)" />
-                      <p-button type="button" size="small" severity="secondary" icon="pi pi-missile-swarm" [label]="actions.download"
-                        [disabled]="!catalog.canAct()" (onClick)="catalog.openFile(template.template_id, false)" />
-                    }
-                    @if (template.can_delete) {
-                      <p-button type="button" size="small" severity="danger" icon="pi pi-demolish" [label]="actions.delete"
-                        [outlined]="true" [disabled]="!catalog.canAct()" (onClick)="confirmDeletion(template)" />
-                    }
+                    <app-document-operations [items]="row.menu" [disabled]="!catalog.canAct()"
+                      [label]="i18n.table().actions + ' - ' + template.original_filename" />
                   </div>
                 </td>
               </tr>
@@ -127,7 +116,7 @@
         </div>
       } @else {
         <section class="mg-card w-100" role="status">
-        <p class="m-0 muted-text">{{ filteredFamily() ? i18n.editor().emptyFamily : copy.empty }}</p>
+          <p class="m-0 muted-text">{{ filteredFamily() ? i18n.editor().emptyFamily : copy.empty }}</p>
         </section>
       }
     </section>
@@ -145,14 +134,14 @@
 @if (familyDialog()) {
   <p-dialog [visible]="true" [modal]="true" [header]="i18n.editor().addFamily" appendTo="body"
     styleClass="mg-dialog mg-dialog--sm" [draggable]="false" (visibleChange)="$event ? null : familyDialog.set(false)">
-    <form class="flex-col-start-stretch gap-md" (ngSubmit)="addFamily()" novalidate>
-      <p-iftalabel class="w-100">
-        <input pInputText id="contract-family-label" class="w-100" [formControl]="familyName" maxlength="200" required />
+    <form class="mg-form flex-col-start-stretch gap-sm" (ngSubmit)="addFamily()" novalidate>
+      <p-iftalabel class="w-px-300 w-100-sm min-w-0">
+        <input pInputText pSize="small" id="contract-family-label" class="w-100" [formControl]="familyName" maxlength="200" required />
         <label for="contract-family-label">{{ i18n.labels().name }}</label>
       </p-iftalabel>
       <div class="flex-row-end-center gap-sm">
-        <p-button type="button" severity="secondary" [label]="actions.cancel" (onClick)="familyDialog.set(false)" />
-        <p-button type="submit" severity="success" [label]="actions.add" [disabled]="!proposedFamilyKey()" />
+        <p-button type="button" size="small" severity="secondary" [label]="actions.cancel" (onClick)="familyDialog.set(false)" />
+        <p-button type="submit" size="small" severity="success" [label]="actions.add" [disabled]="!proposedFamilyKey()" />
       </div>
     </form>
   </p-dialog>

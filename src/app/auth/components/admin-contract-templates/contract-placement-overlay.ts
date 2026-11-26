@@ -16,6 +16,7 @@ type Gesture = { pointerId: number; index: number | null; mode: 'draw' | 'move' 
     '(pointermove)': 'move($event)',
     '(pointerup)': 'finish($event)',
     '(pointercancel)': 'finish($event, true)',
+    '(lostpointercapture)': 'finish($event, true)',
   },
 })
 export class ContractPlacementOverlay {
@@ -44,7 +45,7 @@ export class ContractPlacementOverlay {
 
   protected begin(event: PointerEvent, mode: Gesture['mode'], index: number | null = null): void {
     if (!this.editable() || event.button !== 0 || this.gesture) return;
-    event.stopPropagation();
+    if (event.pointerType !== 'touch') event.stopPropagation();
     event.preventDefault();
     if (index === null && !this.canDraw()) return;
     const start = this.point(event);
@@ -57,7 +58,7 @@ export class ContractPlacementOverlay {
 
   protected move(event: PointerEvent): void {
     if (!this.editable()) return;
-    event.stopPropagation();
+    if (event.pointerType !== 'touch') event.stopPropagation();
     const gesture = this.gesture;
     if (gesture?.pointerId !== event.pointerId) return;
     const { mode, start, original } = gesture;
@@ -78,15 +79,14 @@ export class ContractPlacementOverlay {
   }
 
   protected finish(event: PointerEvent, cancelled = false): void {
-    if (!this.editable()) return;
-    event.stopPropagation();
+    if (this.editable() && event.pointerType !== 'touch') event.stopPropagation();
     const gesture = this.gesture;
     if (gesture?.pointerId !== event.pointerId) return;
     const area = this.pending();
     this.gesture = undefined;
     this.pending.set(null);
     if (this.host.hasPointerCapture(event.pointerId)) this.host.releasePointerCapture(event.pointerId);
-    if (!cancelled && area && area.width >= 0.01 && area.height >= 0.01) {
+    if (!cancelled && this.editable() && area && area.width >= 0.01 && area.height >= 0.01) {
       this.geometryChange.emit({ index: gesture.index, area, page: this.surface().page });
     }
   }

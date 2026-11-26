@@ -22,6 +22,8 @@ export type CommonCtaTranslations = {
 
 export type CommonActionsTranslations = {
   open: string;
+  openPdf: string;
+  configure: string;
   download: string;
   accept: string;
   reject: string;
@@ -48,6 +50,7 @@ export type CommonActionsTranslations = {
   select: string;
   saveDraft: string;
   addItem: string;
+  addField: string;
   addSection: string;
   preview: string;
   clearDay: string;
@@ -74,6 +77,9 @@ export type CommonValuesTranslations = {
 
 export type CommonLabelsTranslations = {
   document: string;
+  field: string;
+  sourceTemplate: string;
+  page: string;
   documents: string;
   version: string;
   category: string;
@@ -283,6 +289,8 @@ export type CommonEmptyTranslations = {
   title: string;
   description: string;
   articles: string;
+  noResults: string;
+  sourceTemplates: string;
 };
 
 export type CommonInfoTranslations = {

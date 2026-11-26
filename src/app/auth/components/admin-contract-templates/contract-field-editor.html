@@ -1,59 +1,79 @@
 @let copy = i18n.editor();
 @let actions = i18n.actions();
-<div class="mg-grid grid-cols-2 grid-cols-1-sm gap-sm">
-  <label class="flex-col-start-stretch gap-xs">
-    {{ i18n.labels().name }}
-    <input pInputText [ngModel]="field().label" (ngModelChange)="patch({ label: $event })" [readonly]="!editable()" maxlength="200" />
-  </label>
-  <div class="flex-col-start-stretch gap-xs">
-    <label for="contract-field-kind">{{ copy.kind }}</label>
-    <p-select inputId="contract-field-kind" [ngModel]="field().kind" (ngModelChange)="setKind($event)"
-      [options]="kinds()" optionLabel="label" optionValue="value" [disabled]="!editable()" appendTo="body" />
-  </div>
-  <div class="flex-row-start-center gap-sm">
-    <p-checkbox inputId="contract-field-required" [ngModel]="field().required" [binary]="true" [disabled]="!editable()"
-      (ngModelChange)="patch({ required: $event })" />
-    <label for="contract-field-required">{{ copy.required }}</label>
-  </div>
-  @for (rule of rules(); track rule) {
-    <div class="flex-col-start-stretch gap-xs">
-      <label [for]="'contract-rule-' + rule">{{ copy.rules[rule] }}</label>
-      <p-inputnumber [inputId]="'contract-rule-' + rule" [ngModel]="field().rules[rule] ?? null" [disabled]="!editable()"
-        (ngModelChange)="setRule(rule, $event)" [maxFractionDigits]="rule === 'min' || rule === 'max' ? 4 : 0" />
+<div class="flex-col-start-stretch gap-md min-w-0">
+  <div class="flex-row-start-end flex-wrap gap-md min-w-0">
+    <label class="flex-col-start-stretch gap-xs w-px-300 w-100-sm min-w-0">
+      {{ i18n.labels().name }}
+      <input pInputText pSize="small" class="w-100" [ngModel]="field().label" (ngModelChange)="patch({ label: $event })"
+        [readonly]="!editable()" maxlength="200" />
+    </label>
+    <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full min-w-0">
+      <label for="contract-field-kind">{{ copy.kind }}</label>
+      <p-select size="small" inputId="contract-field-kind" [ngModel]="field().kind" (ngModelChange)="setKind($event)"
+        [options]="kinds()" optionLabel="label" optionValue="value" [disabled]="!editable()" [placeholder]="copy.kind" appendTo="body" />
     </div>
-  }
-  <div class="flex-col-start-stretch gap-xs">
-    <label for="contract-visibility-field">{{ copy.visibleWhen }}</label>
-    <p-select inputId="contract-visibility-field" [ngModel]="field().visibleWhen?.fieldId ?? null"
-      (ngModelChange)="condition($event)" [options]="sources()" [showClear]="editable()" [disabled]="!editable()"
-      optionLabel="label" optionValue="id" appendTo="body" />
   </div>
-  @if (field().visibleWhen; as condition) {
-    <div class="flex-col-start-stretch gap-xs">
-      <label for="contract-visibility-value">{{ copy.equals }}</label>
-      <p-select inputId="contract-visibility-value" [ngModel]="condition.equals" (ngModelChange)="conditionValue($event)"
-        [options]="conditionOptions()" optionLabel="label" optionValue="value" [disabled]="!editable()" appendTo="body" />
+
+  <section class="flex-col-start-stretch gap-sm border-top pt-md">
+    <h4 class="text-sm font-bold m-0">{{ copy.validation }}</h4>
+    <div class="flex-row-start-center gap-sm">
+      <p-checkbox size="small" inputId="contract-field-required" [ngModel]="field().required" [binary]="true" [disabled]="!editable()"
+        (ngModelChange)="patch({ required: $event })" />
+      <label for="contract-field-required">{{ copy.required }}</label>
     </div>
-  }
-</div>
-@if (field().kind === 'select') {
-  <div class="flex-col-start-stretch gap-sm">
-    @for (option of field().options; track option.value; let index = $index) {
-      <div class="flex-row-start-center flex-wrap gap-xs">
-        <input pInputText [ngModel]="option.label" (ngModelChange)="optionLabel(index, $event)"
-          [attr.aria-label]="copy.optionLabel" [readonly]="!editable()" />
-        @if (editable()) {
-        <p-button type="button" size="small" severity="secondary" [label]="actions.moveItemUp" [disabled]="index === 0"
-          (onClick)="moveOption(index, -1)" />
-        <p-button type="button" size="small" severity="secondary" [label]="actions.moveItemDown"
-          [disabled]="index === field().options.length - 1" (onClick)="moveOption(index, 1)" />
-        <p-button type="button" size="small" severity="danger" [label]="actions.delete" (onClick)="removeOption(index)" />
+    @if (rules().length) {
+      <div class="flex-row-start-end flex-wrap gap-md">
+        @for (rule of rules(); track rule) {
+          <div class="flex-col-start-stretch gap-xs w-px-200 max-w-full min-w-0">
+            <label [for]="'contract-rule-' + rule">{{ copy.rules[rule] }}</label>
+            <p-inputnumber size="small" inputStyleClass="w-100 min-w-0" [inputId]="'contract-rule-' + rule"
+              [ngModel]="field().rules[rule] ?? null" [disabled]="!editable()"
+              (ngModelChange)="setRule(rule, $event)" [maxFractionDigits]="rule === 'min' || rule === 'max' ? 4 : 0" />
+          </div>
         }
       </div>
     }
-    @if (editable()) {
-    <div><p-button type="button" severity="secondary" [label]="copy.addOption"
-      [disabled]="field().options.length >= limits.options" (onClick)="addOption()" /></div>
-    }
-  </div>
-}
+  </section>
+
+  <section class="flex-col-start-stretch gap-sm border-top pt-md">
+    <h4 class="text-sm font-bold m-0">{{ copy.conditions }}</h4>
+    @let hasSources = sourceOptions().length > 0;
+    <p class="m-0 text-sm muted-text">{{ hasSources ? copy.conditionHint : copy.noConditionSources }}</p>
+    <div class="flex-row-start-end flex-wrap gap-md">
+      <div class="flex-col-start-stretch gap-xs w-px-250 w-100-sm min-w-0">
+        <label for="contract-visibility-field">{{ copy.visibleWhen }}</label>
+        <p-select size="small" inputId="contract-visibility-field" [ngModel]="field().visibleWhen?.fieldId ?? null"
+          (ngModelChange)="condition($event)" [options]="sourceOptions()" [showClear]="editable()" [disabled]="!editable() || !hasSources"
+          [placeholder]="actions.select" optionLabel="label" optionValue="id" appendTo="body" />
+      </div>
+      @if (field().visibleWhen; as condition) {
+        <div class="flex-col-start-stretch gap-xs w-px-250 w-100-sm min-w-0">
+          <label for="contract-visibility-value">{{ copy.equals }}</label>
+          <p-select size="small" inputId="contract-visibility-value" [ngModel]="condition.equals" (ngModelChange)="conditionValue($event)"
+            [options]="conditionOptions()" optionLabel="label" optionValue="value" [disabled]="!editable()"
+            [placeholder]="actions.select" appendTo="body" />
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (field().kind === 'select') {
+    <section class="flex-col-start-stretch gap-sm border-top pt-md">
+      <h4 class="text-sm font-bold m-0">{{ copy.options }}</h4>
+      @for (option of field().options; track option.value; let index = $index) {
+        <div class="flex-row-start-center flex-wrap gap-sm">
+          <input pInputText pSize="small" class="w-px-250 w-100-sm min-w-0" [ngModel]="option.label" (ngModelChange)="optionLabel(index, $event)"
+            [attr.aria-label]="copy.optionLabel" [readonly]="!editable()" />
+          @if (editable()) {
+            <app-item-editor-actions [index]="index" [itemCount]="field().options.length" [compact]="true" removeIcon="pi pi-demolish"
+              (moveUp)="moveOption(index, -1)" (moveDown)="moveOption(index, 1)" (remove)="removeOption(index)" />
+          }
+        </div>
+      }
+      @if (editable()) {
+        <div><p-button type="button" size="small" severity="secondary" [label]="copy.addOption"
+          [disabled]="field().options.length >= limits.options" (onClick)="addOption()" /></div>
+      }
+    </section>
+  }
+</div>

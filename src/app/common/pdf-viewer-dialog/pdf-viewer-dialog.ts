@@ -25,6 +25,7 @@ import { loadPdfDocument, renderPdfPageToCanvas, reportPdfError } from '../../co
 import {
   PDF_VIEWER_ZOOM_MAX,
   PDF_VIEWER_ZOOM_MIN,
+  PDF_VIEWER_ZOOM_STEP,
 } from './pdf-viewer.config';
 import { PdfViewerViewport } from './pdf-viewer-viewport';
 
@@ -43,6 +44,8 @@ export class PdfViewerDialog {
   private readonly loadedDocument = signal<{ url: string; document: PDFDocumentProxy } | null>(null);
 
   readonly preview = input<IPdfPreview | null>(null);
+  readonly initialPage = input(1);
+  readonly panEnabled = input(true);
   readonly overlay = input<TemplateRef<{ $implicit: IPdfPageSurface }> | null>(null);
   readonly toolbar = input<TemplateRef<unknown> | null>(null);
   readonly closed = output<void>();
@@ -139,7 +142,8 @@ export class PdfViewerDialog {
 
           this.loadedDocument.set({ url: result.url, document: result.document });
           this.pageCount.set(result.pageCount);
-          this.pageNumber.set(1);
+          const initialPage = this.initialPage();
+          this.pageNumber.set(Number.isInteger(initialPage) ? Math.max(1, Math.min(initialPage, result.pageCount)) : 1);
           this.isLoading.set(false);
         },
       });
@@ -225,14 +229,14 @@ export class PdfViewerDialog {
 
     this.viewport()?.rememberCenter();
     this.zoom.update((value) =>
-      Math.max(PDF_VIEWER_ZOOM_MIN, +(value - 0.25).toFixed(2)),
+      Math.max(PDF_VIEWER_ZOOM_MIN, +(value - PDF_VIEWER_ZOOM_STEP).toFixed(2)),
     );
   }
 
   zoomIn(): void {
     this.viewport()?.rememberCenter();
     this.zoom.update((value) =>
-      Math.min(PDF_VIEWER_ZOOM_MAX, +(value + 0.25).toFixed(2)),
+      Math.min(PDF_VIEWER_ZOOM_MAX, +(value + PDF_VIEWER_ZOOM_STEP).toFixed(2)),
     );
   }
 

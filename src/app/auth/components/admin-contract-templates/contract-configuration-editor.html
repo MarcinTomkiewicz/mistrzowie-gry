@@ -1,18 +1,20 @@
 @let copy = i18n.editor();
 @let actions = i18n.actions();
+@let commonLabels = i18n.labels();
+@let table = i18n.table();
 @let state = facade.loaded();
 @let draft = facade.draft();
 
 <p-dialog [header]="copy.configuration" [visible]="true" [modal]="true" [draggable]="false"
   [closable]="!facade.pending() && !facade.dirty()" [closeOnEscape]="!facade.pending() && !facade.dirty()" appendTo="body"
   styleClass="mg-dialog mg-dialog--xl" (visibleChange)="$event ? null : close()">
-  <div class="position-relative flex-col-start-stretch gap-md w-100 min-w-0">
+  <div class="mg-form position-relative flex-col-start-stretch gap-md w-100 min-w-0">
     <app-loading-overlay [visible]="facade.pending()" [label]="i18n.status().loading" />
     <strong class="text-wrap-anywhere">{{ template().original_filename }}</strong>
     @if (facade.readFailed()) {
       <div class="flex-col-start-stretch gap-sm" role="alert">
         <p class="m-0 error-text">{{ copy.readFailed }}</p>
-        <div><p-button type="button" severity="secondary" [label]="actions.retry" (onClick)="reload()" /></div>
+        <div><p-button type="button" size="small" severity="secondary" [label]="actions.retry" (onClick)="reload()" /></div>
       </div>
     }
     @if (facade.failed()) {
@@ -29,9 +31,9 @@
           }
         }
         <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-button type="button" severity="secondary" [label]="actions.refresh" (onClick)="reload()" />
+          <p-button type="button" size="small" severity="secondary" [label]="actions.refresh" (onClick)="reload()" />
           @if (facade.remote()?.status === 'staged') {
-            <p-button type="button" severity="warn" [label]="copy.keepDraft" (onClick)="facade.keepDraft()" />
+            <p-button type="button" size="small" severity="warn" [label]="copy.keepDraft" (onClick)="facade.keepDraft()" />
           }
         </div>
       </div>
@@ -40,11 +42,13 @@
       @if (facade.editable()) {
         <section class="mg-card flex-col-start-stretch gap-sm">
           <div class="flex-row-start-center flex-wrap gap-sm">
-            <p-select [ngModel]="sourceId()" (ngModelChange)="sourceId.set($event)" [options]="sources()"
-              optionLabel="original_filename" optionValue="template_id" [ariaLabel]="copy.copySource" [placeholder]="copy.copySource"
+            <p-select size="small" class="w-px-300 w-100-sm min-w-0" [ngModel]="sourceId()"
+              (ngModelChange)="sourceId.set($event)" [options]="sources()" [disabled]="!sources().length"
+              optionLabel="original_filename" optionValue="template_id" [ariaLabel]="commonLabels.sourceTemplate"
+              [placeholder]="sources().length ? commonLabels.sourceTemplate : i18n.empty().sourceTemplates"
               appendTo="body" [showClear]="true" />
-            <p-button type="button" severity="secondary" [label]="copy.copyDraft"
-              [disabled]="!sourceId() || !facade.canWrite()" (onClick)="copyFromSource()" />
+            <p-button type="button" size="small" severity="secondary" [label]="copy.copyDraft"
+              [disabled]="!sources().length || !sourceId() || !facade.canWrite()" (onClick)="copyFromSource()" />
           </div>
           @if (facade.sourceUnavailable()) {
             <p class="m-0 error-text" role="alert">{{ copy.sourceUnavailable }}</p>
@@ -52,80 +56,132 @@
         </section>
       }
 
-      <section class="mg-card flex-col-start-stretch gap-md">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.fields }}</h3>
-        <div class="flex-row-start-center flex-wrap gap-sm">
-          <p-select [ngModel]="fieldId()" (ngModelChange)="selectField($event)" [options]="fields()"
-            [ariaLabel]="copy.field" [placeholder]="copy.field" optionLabel="label" optionValue="id" appendTo="body" />
-          @if (facade.editable()) {
-            <p-button type="button" severity="secondary" [label]="copy.addField"
-              [disabled]="fields().length >= limits.fields" (onClick)="addField()" />
-            @if (field()) {
-              <p-button type="button" severity="secondary" [label]="actions.moveItemUp"
-                [disabled]="index() <= 0" (onClick)="moveField(-1)" />
-              <p-button type="button" severity="secondary" [label]="actions.moveItemDown"
-                [disabled]="index() >= fields().length - 1" (onClick)="moveField(1)" />
-              <p-button type="button" severity="danger" [label]="actions.delete" (onClick)="removeField()" />
-            }
-          }
-        </div>
-        @if (field(); as selectedField) {
-          <app-contract-field-editor [field]="selectedField" [earlier]="earlier()" [editable]="facade.editable()"
-            (changed)="applyField($event)" />
-        }
-      </section>
-
-      <section class="mg-card flex-col-start-stretch gap-md">
-        <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.placements }}</h3>
-        <div class="flex-row-start-center flex-wrap gap-sm">
-          @if (state.document) {
-            <p-button type="button" severity="secondary" icon="pi pi-file-pdf" [label]="copy.layout"
-              (onClick)="layoutOpen.set(true)" />
-          }
-          @if (facade.editable() && field()?.kind === 'select') {
-            <p-select [ngModel]="drawOption()" (ngModelChange)="drawOption.set($event)" [options]="field()?.options ?? []"
-              optionLabel="label" optionValue="value" [showClear]="true" appendTo="body"
-              [ariaLabel]="copy.checkboxOption" [placeholder]="copy.checkboxOption" />
-          }
-        </div>
-        @if (draft.placements.length) {
-          <ol class="m-0">
-            @for (position of draft.placements; track $index) {
-              <li>
-                <p-button type="button" size="small" [text]="placementIndex() !== $index"
-                  [label]="placementLabel(position)"
-                  (onClick)="selectPlacement($index)" />
-              </li>
-            }
-          </ol>
-        }
-        @if (placement(); as selected) {
-          <div class="flex-row-start-center flex-wrap gap-sm">
-            @if (selected.kind === 'text') {
-              <div class="flex-col-start-stretch gap-xs">
-                <label for="contract-font-size">{{ copy.fontSize }}</label>
-                <p-inputnumber inputId="contract-font-size" [ngModel]="selected.font.sizePt" [disabled]="!facade.editable()"
-                  (ngModelChange)="font('sizePt', $event)" [maxFractionDigits]="2" />
-              </div>
-              <div class="flex-col-start-stretch gap-xs">
-                <label for="contract-min-font-size">{{ copy.minFontSize }}</label>
-                <p-inputnumber inputId="contract-min-font-size" [ngModel]="selected.font.minSizePt" [disabled]="!facade.editable()"
-                  (ngModelChange)="font('minSizePt', $event)" [maxFractionDigits]="2" />
-              </div>
-              <p-checkbox inputId="contract-placement-multiline" [ngModel]="selected.multiline"
-                (ngModelChange)="multiline($event)" [binary]="true" [disabled]="!facade.editable() || field()?.kind === 'multiline'" />
-              <label for="contract-placement-multiline">{{ copy.kinds.multiline }}</label>
-            } @else if (placementOptions().length) {
-              <p-select [ngModel]="selected.optionValue" (ngModelChange)="placementOption($event)" [options]="placementOptions()"
-                optionLabel="label" optionValue="value" [ariaLabel]="copy.checkboxOption"
-                [disabled]="!facade.editable()" appendTo="body" />
-            }
+      <div class="min-w-0">
+        <section class="mg-card flex-col-start-stretch gap-md min-w-0">
+          <div class="flex-row-between-center flex-wrap gap-sm">
+            <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.fields }}</h3>
             @if (facade.editable()) {
-              <p-button type="button" severity="danger" [label]="actions.delete" (onClick)="removePlacement()" />
+              <p-button type="button" size="small" severity="secondary" icon="pi pi-add-plus" [label]="actions.addField"
+                [disabled]="fields().length >= limits.fields" (onClick)="addField()" />
             }
           </div>
+          @if (fields().length) {
+            <div class="w-100 overflow-x-auto">
+              <p-table size="small" [value]="fields()" dataKey="id" [rowTrackBy]="trackField" tableStyleClass="mg-responsive-table">
+                <ng-template #header>
+                  <tr class="hide-down-sm">
+                    <th scope="col" class="small-caps">{{ commonLabels.name }}</th>
+                    <th scope="col" class="small-caps">{{ copy.kind }}</th>
+                    <th scope="col" class="small-caps">{{ copy.required }}</th>
+                    <th scope="col" class="small-caps">{{ copy.conditions }}</th>
+                    @if (facade.editable()) { <th scope="col" class="small-caps text-right">{{ table.actions }}</th> }
+                  </tr>
+                </ng-template>
+                <ng-template #body let-row let-rowIndex="rowIndex">
+                  @let expanded = fieldId() === row.id;
+                  <tr class="mg-responsive-table__row cursor-pointer" tabindex="0" [class.bg-info-subtle]="expanded"
+                    [attr.aria-expanded]="expanded" [attr.aria-controls]="expanded ? 'contract-field-properties' : null"
+                    (click)="toggleProperties({ kind: 'field', id: row.id })"
+                    (keydown.enter)="toggleProperties({ kind: 'field', id: row.id }, $event)"
+                    (keydown.space)="toggleProperties({ kind: 'field', id: row.id }, $event)">
+                    <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">{{ labels()[row.id] }}</th>
+                    <td class="mg-responsive-table__cell">
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ copy.kind }}</span>
+                      <span class="mg-responsive-table__value">{{ i18n.fieldKindLabel(row.kind) }}</span>
+                    </td>
+                    <td class="mg-responsive-table__cell">
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ copy.required }}</span>
+                      <span class="mg-responsive-table__value">{{ row.required ? i18n.values().yes : i18n.values().no }}</span>
+                    </td>
+                    <td class="mg-responsive-table__cell">
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ copy.conditions }}</span>
+                      <span class="mg-responsive-table__value text-wrap-anywhere">{{ dependencies()[row.id] ?? '-' }}</span>
+                    </td>
+                    @if (facade.editable()) {
+                      <td class="mg-responsive-table__cell mg-responsive-table__cell--actions" (click)="$event.stopPropagation()"
+                        (keydown.enter)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
+                        <span class="mg-responsive-table__label small-caps font-bold">{{ table.actions }}</span>
+                        <app-item-editor-actions class="mg-responsive-table__value" [index]="rowIndex" [itemCount]="fields().length"
+                          [compact]="true" [disabled]="facade.pending()" removeIcon="pi pi-demolish"
+                          (moveUp)="moveField(row.id, -1)" (moveDown)="moveField(row.id, 1)" (remove)="removeField(row.id)" />
+                      </td>
+                    }
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          }
+        </section>
+        @if (field(); as selectedField) {
+          <div id="contract-field-properties" class="animate-grid-size"
+            animate.enter="animate-grid-enter" (animate.leave)="collapseProperties($event)">
+            <div class="animate-grid-content flex-col-start-stretch min-w-0">
+              <section class="mg-card flex-col-start-stretch flex-none gap-md min-w-0 mt-md">
+                <h3 class="mg-section__title mg-section__title--sm m-0 text-wrap-anywhere">
+                  {{ copy.fieldProperties }} - {{ labels()[selectedField.id] }}
+                </h3>
+                <app-contract-field-editor [field]="selectedField" [earlier]="earlier()" [editable]="facade.editable()"
+                  (changed)="applyField($event)" />
+              </section>
+            </div>
+          </div>
         }
-      </section>
+      </div>
+
+      <div class="min-w-0">
+        <section class="mg-card flex-col-start-stretch gap-md min-w-0">
+          <div class="flex-row-between-center flex-wrap gap-sm">
+            <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.placements }}</h3>
+            @if (state.document) {
+              <p-button type="button" size="small" severity="secondary" icon="pi pi-report-spy" [label]="actions.openPdf"
+                (onClick)="openLayout()" />
+            }
+          </div>
+          @if (placementRows().length) {
+            <div class="w-100 overflow-x-auto">
+              <p-table size="small" [value]="placementRows()" dataKey="index" [rowTrackBy]="trackPlacement" tableStyleClass="mg-responsive-table">
+                <ng-template #header>
+                  <tr class="hide-down-sm">
+                    <th scope="col" class="small-caps">{{ commonLabels.field }}</th>
+                    <th scope="col" class="small-caps w-px-100">{{ commonLabels.page }}</th>
+                    @if (hasPlacementOptions()) { <th scope="col" class="small-caps">{{ copy.option }}</th> }
+                  </tr>
+                </ng-template>
+                <ng-template #body let-row>
+                  @let expanded = placementIndex() === row.index;
+                  <tr class="mg-responsive-table__row cursor-pointer" tabindex="0" [class.bg-info-subtle]="expanded"
+                    [attr.aria-expanded]="expanded" [attr.aria-controls]="expanded ? 'contract-placement-properties' : null"
+                    (click)="toggleProperties({ kind: 'placement', index: row.index })"
+                    (keydown.enter)="toggleProperties({ kind: 'placement', index: row.index }, $event)"
+                    (keydown.space)="toggleProperties({ kind: 'placement', index: row.index }, $event)">
+                    <th scope="row" class="mg-responsive-table__row-heading text-wrap-anywhere">{{ row.fieldLabel }}</th>
+                    <td class="mg-responsive-table__cell">
+                      <span class="mg-responsive-table__label small-caps font-bold">{{ commonLabels.page }}</span>
+                      <span class="mg-responsive-table__value">{{ row.page }}</span>
+                    </td>
+                    @if (hasPlacementOptions()) {
+                      <td class="mg-responsive-table__cell" [class.hide-down-sm]="!row.optionLabel">
+                        <span class="mg-responsive-table__label small-caps font-bold">{{ copy.option }}</span>
+                        <span class="mg-responsive-table__value text-wrap-anywhere">{{ row.optionLabel }}</span>
+                      </td>
+                    }
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          }
+        </section>
+        @if (placement(); as selected) {
+          <div id="contract-placement-properties" class="animate-grid-size"
+            animate.enter="animate-grid-enter" (animate.leave)="collapseProperties($event)">
+            <div class="animate-grid-content flex-col-start-stretch min-w-0">
+              <app-contract-placement-properties class="flex-none mt-md" [placement]="selected" [field]="placementField()"
+                [fieldLabel]="labels()[selected.fieldId]" [editable]="facade.editable()"
+                (changed)="updatePlacement($event)" (removed)="removePlacement()" />
+            </div>
+          </div>
+        }
+      </div>
 
       @if (!facade.structural()) {
         <p class="m-0 error-text" role="alert">{{ copy.invalidDraft }}</p>
@@ -138,56 +194,74 @@
         </ul>
       }
 
-      @if (facade.editable()) {
-        <div class="flex-row-end-center">
-          <p-button type="button" severity="success" [label]="actions.save"
-            [disabled]="!facade.canWrite() || !facade.structural()" (onClick)="facade.save()" />
-        </div>
-      }
-
-      @if (state.document; as snapshot) {
-        @if (state.revision.configuration; as configuration) {
-          @if (facade.canPreview()) {
-            <section class="mg-card flex-col-start-stretch gap-md">
-              <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.previewValues }}</h3>
-              <app-contract-values-form [configuration]="configuration" [busy]="facade.generation.generating()"
-                [submitLabel]="actions.preview" (valuesChange)="facade.generation.invalidate()"
-                (submitted)="facade.generation.generate(snapshot, $event)" />
-              <app-contract-generated-pdf />
-            </section>
-          }
+      @if (facade.canPreview() && state.revision.configuration; as configuration) {
+        @if (state.document; as snapshot) {
+          <section class="mg-card flex-col-start-stretch gap-sm">
+            <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.previewValues }}</h3>
+            <app-contract-values-form [configuration]="configuration" [busy]="facade.generation.generating()"
+              [formId]="previewFormId" (valuesChange)="facade.generation.invalidate()"
+              (submitted)="facade.generation.generate(snapshot, $event)" />
+            <app-contract-generated-pdf />
+          </section>
         }
-      }
-      @if (facade.editable()) {
-        <div class="flex-row-end-center">
-          <p-button type="button" severity="success" [label]="actions.activate" [disabled]="!facade.activationPreview()"
-            (onClick)="activate()" />
-        </div>
       }
     }
   </div>
   <ng-template #footer>
-    <p-button type="button" severity="secondary" [label]="actions.close" [disabled]="facade.pending()" (onClick)="close()" />
+    <div class="flex-row-between-center flex-wrap gap-sm w-100">
+      <p-button type="button" size="small" [outlined]="true" [severity]="facade.dirty() ? 'danger' : 'secondary'"
+        [label]="facade.dirty() ? actions.cancel : actions.close"
+        [disabled]="facade.pending()" (onClick)="close()" />
+      <div class="flex-row-end-center flex-wrap gap-sm ml-auto">
+        @if (facade.editable()) {
+          <p-button type="button" size="small" severity="secondary" [outlined]="true" [label]="actions.save"
+            [disabled]="!facade.canWrite() || !facade.structural()" (onClick)="facade.save()" />
+        }
+        @if (facade.canPreview()) {
+          <button pButton type="submit" size="small" severity="help" [attr.form]="previewFormId"
+            [disabled]="facade.generation.generating()">
+            <span pButtonLabel>{{ actions.preview }}</span>
+          </button>
+        }
+        @if (facade.editable()) {
+          <p-button type="button" size="small" severity="success" [label]="actions.activate"
+            [disabled]="!facade.activationPreview()" (onClick)="activate()" />
+        }
+      </div>
+    </div>
   </ng-template>
 </p-dialog>
 
 @if (layoutPreview(); as preview) {
   <app-pdf-viewer-dialog [preview]="preview" [overlay]="layoutOverlay" [toolbar]="layoutToolbar"
+    [initialPage]="layoutInitialPage()"
+    [panEnabled]="!facade.editable() || !drawMode()"
     (closed)="layoutOpen.set(false)" />
 }
 
 <ng-template #layoutToolbar>
   @if (facade.editable()) {
-    <div class="flex-row-start-center flex-wrap gap-sm p-sm">
-      <p-button type="button" severity="secondary" [label]="drawMode() ? copy.pan : copy.draw"
-        (onClick)="drawMode.set(!drawMode())" />
-      <p-select [ngModel]="fieldId()" (ngModelChange)="selectField($event)" [options]="fields()"
-        [ariaLabel]="copy.field" [placeholder]="copy.field" optionLabel="label" optionValue="id" appendTo="body" />
-      @if (field()?.kind === 'select') {
-        <p-select [ngModel]="drawOption()" (ngModelChange)="drawOption.set($event)" [options]="field()?.options ?? []"
-          optionLabel="label" optionValue="value" [showClear]="true" appendTo="body"
-          [ariaLabel]="copy.checkboxOption" [placeholder]="copy.checkboxOption" />
-      }
+    <div class="mg-form flex-col-start-stretch gap-xs p-sm">
+      <div class="flex-row-start-center flex-wrap gap-sm">
+        <button pButton type="button" size="small" severity="secondary" [outlined]="!drawMode()"
+          [attr.aria-pressed]="drawMode()" (click)="drawMode.set(true)"><span pButtonLabel>{{ copy.draw }}</span></button>
+        <button pButton type="button" size="small" severity="secondary" [outlined]="drawMode()"
+          [attr.aria-pressed]="!drawMode()" (click)="drawMode.set(false)"><span pButtonLabel>{{ copy.pan }}</span></button>
+        @if (drawMode()) {
+          <p-select size="small" class="w-px-250 w-100-sm min-w-0" [ngModel]="drawFieldId()"
+            (ngModelChange)="selectDrawField($event)" [options]="fieldOptions()" optionLabel="label" optionValue="id"
+            [ariaLabel]="commonLabels.field" [placeholder]="commonLabels.field" appendTo="body" />
+          @if (drawField()?.kind === 'select') {
+            <p-select size="small" class="w-px-250 w-100-sm min-w-0" [ngModel]="drawOption()"
+              (ngModelChange)="drawOption.set($event)" [options]="drawField()?.options ?? []"
+              optionLabel="label" optionValue="value" [showClear]="true" appendTo="body"
+              [ariaLabel]="copy.checkboxOption" [placeholder]="copy.checkboxOption" />
+          }
+        }
+      </div>
+      <p class="m-0 text-sm muted-text" role="status">
+        {{ drawMode() ? (drawField() ? copy.drawHint : copy.selectFieldHint) : copy.panHint }}
+      </p>
     </div>
   }
 </ng-template>
@@ -196,8 +270,8 @@
   @if (facade.loaded()?.document?.pages?.[surface.page - 1]; as page) {
     @if (page.width === surface.width && page.height === surface.height) {
       <app-contract-placement-overlay [surface]="surface" [page]="page" [placements]="draft?.placements ?? []"
-        [selected]="placementIndex()" [editable]="facade.editable() && drawMode()" [canDraw]="canDraw()"
-        (selectedChange)="selectPlacement($event)" (geometryChange)="geometry($event)" />
+        [selected]="pdfPlacementIndex()" [editable]="facade.editable() && drawMode()" [canDraw]="canDraw()"
+        (selectedChange)="selectPdfPlacement($event)" (geometryChange)="geometry($event)" />
     } @else {
       <p class="position-absolute inset-0 error-text" role="alert">{{ copy.geometryMismatch }}</p>
     }
