@@ -54,6 +54,11 @@ export function createAdminContractTemplatesI18n() {
     }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'preparation'),
     editor: createScopedObjectI18n<{
       addFamily: string;
+      renameFamily: string;
+      currentFamilyName: string;
+      renameFamilyConflict: string;
+      renameFamilyUnknown: string;
+      renameFamilyFailed: string;
       filterFamily: string;
       emptyFamily: string;
       familyUncertain: string;

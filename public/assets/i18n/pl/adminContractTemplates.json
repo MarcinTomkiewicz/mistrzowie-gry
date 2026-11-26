@@ -46,6 +46,11 @@
   },
   "editor": {
     "addFamily": "[PH] Dodaj rodzaj umowy",
+    "renameFamily": "[PH] Zmień nazwę rodzaju umowy",
+    "currentFamilyName": "[PH] Aktualna nazwa",
+    "renameFamilyConflict": "[PH] Nazwa rodzaju zmieniła się w bazie. Sprawdź aktualną nazwę przed ponownym zapisem.",
+    "renameFamilyUnknown": "[PH] Wynik zmiany nazwy jest nieznany. Sprawdź aktualną nazwę przed ponownym zapisem.",
+    "renameFamilyFailed": "[PH] Nie udało się zmienić nazwy rodzaju umowy.",
     "filterFamily": "[PH] Filtruj według rodzaju",
     "emptyFamily": "[PH] Wybrany rodzaj nie ma wzorów w katalogu.",
     "familyUncertain": "[PH] Wynik dodawania rodzaju jest nieznany. Sprawdź odświeżony katalog.",

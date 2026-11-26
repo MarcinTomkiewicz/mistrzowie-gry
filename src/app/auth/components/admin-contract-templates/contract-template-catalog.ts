@@ -18,10 +18,10 @@ import {
   CONTRACT_TEMPLATE_PDF_MAX_BYTES,
   CONTRACT_TEMPLATE_PDF_MIME,
 } from '../../../core/configs/admin-contract-templates.config';
-import type { ContractTemplate } from '../../../core/services/admin-contract-templates/admin-contract-templates.contract';
+import type { ContractFamily, ContractTemplate } from '../../../core/services/admin-contract-templates/admin-contract-templates.contract';
 import { UiConfirm } from '../../../core/services/ui-confirm/ui-confirm';
 import type { FileUploadOptions } from '../../../core/types/file-upload';
-import { isContractLabel } from '../../../core/types/contract-template-configuration';
+import { isContractFamilyLabel, isContractLabel, trimContractFamilyLabel } from '../../../core/types/contract-template-configuration';
 import { stringToSlug } from '../../../core/utils/normalize-text';
 import { DocumentOperations } from '../../common/document-operations/document-operations';
 import { ContractConfigurationEditor } from './contract-configuration-editor';
@@ -52,17 +52,21 @@ export class ContractTemplateCatalog {
     }]),
   });
   protected readonly editing = signal<ContractTemplate | null>(null);
-  protected readonly familyDialog = signal(false);
+  protected readonly familyDialog = signal<{ family: ContractFamily | null } | null>(null);
   protected readonly familyName = new FormControl('', { nonNullable: true });
+  protected readonly familyForm = new FormGroup({ name: this.familyName });
   protected readonly familyFilter = new FormControl<string | null>(null);
   protected readonly filteredFamily = toSignal(this.familyFilter.valueChanges, { initialValue: null });
-  private readonly familyLabel = toSignal(this.familyName.valueChanges, { initialValue: '' });
-  protected readonly proposedFamilyKey = computed(() => {
-    const label = this.familyLabel().trim();
-    if (!isContractLabel(label)) return null;
-    const slug = stringToSlug(label).replaceAll('-', '_');
+  private readonly familyNameValue = toSignal(this.familyName.valueChanges, { initialValue: '' });
+  private readonly familyLabel = computed(() => this.familyDialog()?.family
+    ? trimContractFamilyLabel(this.familyNameValue()) : this.familyNameValue().trim());
+  protected readonly familyLabelValid = computed(() => this.familyDialog()?.family
+    ? isContractFamilyLabel(this.familyLabel()) : isContractLabel(this.familyLabel()));
+  private readonly proposedFamilyKey = computed(() => {
+    if (!this.familyLabelValid()) return null;
+    const slug = stringToSlug(this.familyLabel()).replaceAll('-', '_');
     const base = (/^[a-z]/.test(slug) ? slug : 'rodzaj_' + slug).slice(0, 64).replace(/_+$/, '');
-    const keys = new Set(this.catalog.families().map(({ family }) => family));
+    const keys = this.catalog.familiesByKey();
     let family = base;
     for (let index = 2; keys.has(family); index++) {
       const suffix = '_' + index;
@@ -70,10 +74,31 @@ export class ContractTemplateCatalog {
     }
     return family;
   });
+  protected readonly selectedFamily = computed(() => this.catalog.familiesByKey().get(this.filteredFamily() ?? ''));
+  protected readonly familyOperations = computed<MenuItem[]>(() => {
+    const family = this.selectedFamily();
+    return family ? [{
+      label: this.i18n.editor().renameFamily,
+      icon: 'pi pi-scroll-quill',
+      command: () => this.openFamilyDialog(family),
+    }] : [];
+  });
+  protected readonly familyForRename = computed(() => {
+    const family = this.familyDialog()?.family;
+    if (!family || !this.catalog.renameIssue()) return family;
+    return this.catalog.canAct() ? this.catalog.familiesByKey().get(family.family) : undefined;
+  });
+  protected readonly canSaveFamily = computed(() => {
+    const dialog = this.familyDialog();
+    if (!dialog || !this.catalog.canAct() || !this.familyLabelValid()) return false;
+    if (!dialog.family) return this.proposedFamilyKey() !== null;
+    const current = this.familyForRename();
+    return !!current && this.familyLabel() !== current.label;
+  });
   protected readonly rows = computed(() => {
     const { statuses } = this.i18n.copy();
     if (!statuses) return [];
-    const families = new Map(this.catalog.families().map(({ family, label }) => [family, label]));
+    const families = this.catalog.familiesByKey();
     const { active, withdrawn } = this.i18n.entityStatuses();
     const statusLabels = {
       staged: statuses.staged,
@@ -88,7 +113,7 @@ export class ContractTemplateCatalog {
     const family = this.filteredFamily();
     return this.catalog.templates().filter((template) => family === null || template.family === family).map((template) => ({
       template,
-      familyLabel: families.get(template.family),
+      familyLabel: families.get(template.family)?.label,
       statusLabel: statusLabels[template.status],
       statusClass: `tag-badge ${statusClasses[template.status]}`,
       menu: this.createOperations(template),
@@ -120,13 +145,30 @@ export class ContractTemplateCatalog {
     ).subscribe(() => this.uploadForm.controls.file.reset());
   }
 
-  protected addFamily(): void {
-    const label = this.familyName.value.trim();
+  protected openFamilyDialog(family: ContractFamily | null = null): void {
+    if (!this.catalog.canAct()) return;
+    this.catalog.clearRenameIssue();
+    this.familyName.reset(family?.label ?? '');
+    this.familyDialog.set({ family });
+  }
+
+  protected closeFamilyDialog(): void {
+    if (!this.catalog.saving()) this.familyDialog.set(null);
+  }
+
+  protected saveFamily(): void {
+    if (!this.canSaveFamily()) return;
+    const label = this.familyLabel();
+    const current = this.familyForRename();
+    if (current) {
+      this.catalog.renameFamily(current, label).pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.familyDialog.set(null));
+      return;
+    }
     const family = this.proposedFamilyKey();
-    if (!this.catalog.canAct() || family === null || !isContractLabel(label)) return;
-    this.familyDialog.set(false);
-    this.catalog.createFamily(family, label).pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.familyName.reset());
+    if (family === null) return;
+    this.closeFamilyDialog();
+    this.catalog.createFamily(family, label).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   private createOperations(template: ContractTemplate): MenuItem[] {

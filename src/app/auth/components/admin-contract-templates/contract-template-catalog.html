@@ -37,7 +37,7 @@
 
       <div class="flex-row-end-center flex-wrap gap-sm">
         <p-button type="button" size="small" severity="secondary" [label]="i18n.editor().addFamily"
-          [disabled]="!catalog.canAct()" (onClick)="familyDialog.set(true)" />
+          [disabled]="!catalog.canAct()" (onClick)="openFamilyDialog()" />
         <p-button type="submit" size="small" severity="success" icon="pi pi-plus" [label]="copy.addTitle"
           [disabled]="!catalog.canAct()" />
       </div>
@@ -70,9 +70,15 @@
   } @else if (!catalog.loading()) {
     <section class="flex-col-start-stretch gap-md w-100">
       <div class="flex-row-between-center flex-wrap gap-sm">
-        <p-select size="small" class="w-px-250 w-100-sm min-w-0" [formControl]="familyFilter" [options]="catalog.familyOptions()"
-          optionLabel="label" optionValue="value" [showClear]="true"
-          [placeholder]="i18n.editor().filterFamily" [ariaLabel]="i18n.editor().filterFamily" appendTo="body" />
+        <div class="flex-row-start-center gap-xs min-w-0 w-100-sm">
+          <p-select size="small" class="w-px-250 w-100-sm min-w-0" [formControl]="familyFilter" [options]="catalog.familyOptions()"
+            optionLabel="label" optionValue="value" [showClear]="true"
+            [placeholder]="i18n.editor().filterFamily" [ariaLabel]="i18n.editor().filterFamily" appendTo="body" />
+          @if (selectedFamily(); as family) {
+            <app-document-operations [items]="familyOperations()" [disabled]="!catalog.canAct()"
+              [label]="i18n.table().actions + ' - ' + family.label" />
+          }
+        </div>
         <p-button type="button" size="small" severity="secondary" [outlined]="true" icon="pi pi-refresh" [label]="actions.refresh"
           [disabled]="!catalog.canAct()" (onClick)="catalog.refresh()" />
       </div>
@@ -131,17 +137,41 @@
   <app-contract-configuration-editor [template]="template" (closed)="editing.set(null)" />
 }
 
-@if (familyDialog()) {
-  <p-dialog [visible]="true" [modal]="true" [header]="i18n.editor().addFamily" appendTo="body"
-    styleClass="mg-dialog mg-dialog--sm" [draggable]="false" (visibleChange)="$event ? null : familyDialog.set(false)">
-    <form class="mg-form flex-col-start-stretch gap-sm" (ngSubmit)="addFamily()" novalidate>
+@if (familyDialog(); as dialog) {
+  @let editor = i18n.editor();
+  <p-dialog [visible]="true" [modal]="true" [header]="dialog.family ? editor.renameFamily : editor.addFamily" appendTo="body"
+    styleClass="mg-dialog mg-dialog--sm" [draggable]="false" [closable]="!catalog.saving()"
+    [closeOnEscape]="!catalog.saving()" (visibleChange)="$event ? null : closeFamilyDialog()">
+    <form class="mg-form flex-col-start-stretch gap-sm" [formGroup]="familyForm" (ngSubmit)="saveFamily()" novalidate>
+      @if (dialog.family && catalog.renameIssue(); as issue) {
+        <div class="flex-col-start-stretch gap-xs" role="alert">
+          <p class="m-0 error-text">{{ issue === 'conflict' ? editor.renameFamilyConflict : editor.renameFamilyUnknown }}</p>
+          @if (catalog.loading()) {
+            <p class="m-0">{{ i18n.status().loading }}</p>
+          } @else if (catalog.loadFailed()) {
+            <p class="m-0 error-text">{{ copy.loadFailed }}</p>
+            <div><p-button type="button" size="small" severity="secondary" [label]="actions.retry" (onClick)="catalog.refresh()" /></div>
+          } @else if (familyForRename(); as current) {
+            <p class="m-0 text-wrap-anywhere">{{ editor.currentFamilyName }}: <strong>{{ current.label }}</strong></p>
+          } @else if (!catalog.saving()) {
+            <p class="m-0 error-text">{{ i18n.errors().notFound }}</p>
+          }
+        </div>
+      }
       <p-iftalabel class="w-px-300 w-100-sm min-w-0">
-        <input pInputText pSize="small" id="contract-family-label" class="w-100" [formControl]="familyName" maxlength="200" required />
-        <label for="contract-family-label">{{ i18n.labels().name }}</label>
+        <input pInputText pSize="small" id="contract-family-label" class="w-100" formControlName="name"
+          [attr.maxlength]="dialog.family ? null : 200" [readOnly]="catalog.saving()"
+          [attr.aria-invalid]="familyName.dirty && !familyLabelValid()" required />
+        <label for="contract-family-label">{{ labels.name }}</label>
       </p-iftalabel>
+      @if (familyName.dirty && !familyLabelValid()) {
+        <small class="error-text">{{ i18n.form().invalid }}</small>
+      }
       <div class="flex-row-end-center gap-sm">
-        <p-button type="button" size="small" severity="secondary" [label]="actions.cancel" (onClick)="familyDialog.set(false)" />
-        <p-button type="submit" size="small" severity="success" [label]="actions.add" [disabled]="!proposedFamilyKey()" />
+        <p-button type="button" size="small" severity="secondary" [label]="actions.cancel"
+          [disabled]="catalog.saving()" (onClick)="closeFamilyDialog()" />
+        <p-button type="submit" size="small" severity="success" [label]="dialog.family ? actions.save : actions.add"
+          [disabled]="!canSaveFamily()" [loading]="catalog.saving()" />
       </div>
     </form>
   </p-dialog>

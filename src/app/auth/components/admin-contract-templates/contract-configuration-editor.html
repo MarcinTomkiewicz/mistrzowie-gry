@@ -10,7 +10,12 @@
   styleClass="mg-dialog mg-dialog--xl" (visibleChange)="$event ? null : close()">
   <div class="mg-form position-relative flex-col-start-stretch gap-md w-100 min-w-0">
     <app-loading-overlay [visible]="facade.pending()" [label]="i18n.status().loading" />
-    <strong class="text-wrap-anywhere">{{ template().original_filename }}</strong>
+    <div class="flex-col-start-stretch gap-xs text-wrap-anywhere">
+      <strong>{{ template().original_filename }}</strong>
+      @if (familyLabel(); as label) {
+        <span>{{ i18n.copy().family }}: {{ label }}</span>
+      }
+    </div>
     @if (facade.readFailed()) {
       <div class="flex-col-start-stretch gap-sm" role="alert">
         <p class="m-0 error-text">{{ copy.readFailed }}</p>

@@ -46,6 +46,7 @@ export class ContractConfigurationEditor {
   protected readonly facade = inject(ContractConfigurationFacade);
   protected readonly i18n = createAdminContractTemplatesI18n();
   private readonly catalog = inject(ContractTemplatesFacade);
+  protected readonly familyLabel = computed(() => this.catalog.familiesByKey().get(this.template().family)?.label);
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
 

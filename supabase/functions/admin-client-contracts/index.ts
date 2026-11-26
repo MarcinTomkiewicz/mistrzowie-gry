@@ -63,6 +63,7 @@ const authenticatedFetch = withSupabase(
             ),
           );
         case "createFamily":
+        case "renameFamily":
         case "getTemplateConfiguration":
         case "saveTemplateConfiguration":
         case "copyTemplateConfiguration":

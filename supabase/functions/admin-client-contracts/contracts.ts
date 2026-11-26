@@ -27,6 +27,7 @@ export type ArtifactType = typeof ARTIFACT_TYPES[number];
 export const RPC = {
   listFamilies: "list_admin_contract_families",
   createFamily: "create_admin_contract_family",
+  renameFamily: "rename_admin_contract_family",
   getTemplateConfiguration: "get_admin_contract_template_configuration",
   saveTemplateConfiguration: "save_admin_contract_template_configuration",
   copyTemplateConfiguration: "copy_admin_contract_template_configuration",
@@ -107,6 +108,10 @@ export type ClientContractsDatabase = {
     Functions: {
       [RPC.listFamilies]: Rpc<never, FamilyRow>;
       [RPC.createFamily]: Rpc<{ p_family: string; p_label: string }, FamilyRow>;
+      [RPC.renameFamily]: Rpc<
+        { p_family: string; p_expected_label: string; p_label: string },
+        FamilyRow
+      >;
       [RPC.getTemplateConfiguration]: Rpc<
         { p_template_id: string; p_mode: ConfigurationMode },
         ConfigurationRow

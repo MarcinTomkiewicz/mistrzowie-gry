@@ -38,8 +38,20 @@ const FIELD_ID = /^[a-z][a-zA-Z0-9_]{0,63}$/u;
 const OPTION_VALUE = /^[a-z0-9][a-z0-9_-]{0,63}$/u;
 
 export function isContractLabel(value: unknown): value is string {
-  return typeof value === 'string' && value.trim() === value &&
-    value.length > 0 && [...value].length <= 200 && !/\p{Cc}/u.test(value);
+  return isBoundedLabel(value) && value.trim() === value;
+}
+
+export function trimContractFamilyLabel(value: string): string {
+  // PostgreSQL btrim(text) removes only spaces by default.
+  return value.replace(/^ +| +$/g, '');
+}
+
+export function isContractFamilyLabel(value: unknown): value is string {
+  return isBoundedLabel(value) && trimContractFamilyLabel(value) === value;
+}
+
+function isBoundedLabel(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0 && [...value].length <= 200 && !/\p{Cc}/u.test(value);
 }
 
 export function isContractConfiguration(value: unknown): value is ContractTemplateConfiguration {

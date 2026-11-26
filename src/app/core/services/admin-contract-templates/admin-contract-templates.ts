@@ -3,8 +3,8 @@ import { finalize, from, map, switchMap } from 'rxjs';
 
 import { CONTRACT_TEMPLATE_PDF_PATH_PREFIX } from '../../configs/admin-contract-templates.config';
 import type { EdgeReader } from '../../types/edge-contract';
-import type {
-  ConfigurationMode, ContractPage, ContractTemplateConfiguration,
+import {
+  type ConfigurationMode, type ContractPage, type ContractTemplateConfiguration, trimContractFamilyLabel,
 } from '../../types/contract-template-configuration';
 import { assertEdgeContract } from '../../utils/edge-contract';
 import { fetchPrivatePdf } from '../../utils/private-pdf';
@@ -12,17 +12,21 @@ import { Backend } from '../backend/backend';
 import {
   type ContractTemplateUpload,
   type ContractConfiguration,
+  type ContractFamily,
   readActiveTemplate,
   readConfiguration,
-  readCreatedFamily,
   readDeletedTemplate,
   readFamilies,
+  readFamily,
   readStagedTemplate,
   readTemplateDownload,
   readTemplates,
 } from './admin-contract-templates.contract';
 
 type ContractTemplateArtifact = 'template' | 'active_template';
+type FamilyWrite = { family: string; label: string } & (
+  { action: 'createFamily' } | { action: 'renameFamily'; expected_label: string }
+);
 
 @Injectable({ providedIn: 'root' })
 export class AdminContractTemplates {
@@ -37,10 +41,16 @@ export class AdminContractTemplates {
   }
 
   createFamily(family: string, label: string) {
-    return this.invoke({ action: 'createFamily', family, label }, readCreatedFamily).pipe(map((result) => {
-      assertEdgeContract(result.family === family && result.label === label, 'response.data', 'the created family');
-      return result;
-    }));
+    return this.writeFamily({ action: 'createFamily', family, label });
+  }
+
+  renameFamily(current: ContractFamily, label: string) {
+    return this.writeFamily({
+      action: 'renameFamily',
+      family: current.family,
+      expected_label: current.label,
+      label: trimContractFamilyLabel(label),
+    });
   }
 
   getConfiguration(templateId: string, mode: ConfigurationMode) {
@@ -133,6 +143,14 @@ export class AdminContractTemplates {
         map((blob) => ({ blob, filename })),
         finalize(() => controller.abort()),
       );
+    }));
+  }
+
+  private writeFamily(request: FamilyWrite) {
+    return this.invoke(request, readFamily).pipe(map((result) => {
+      assertEdgeContract(result.family === request.family && result.label === request.label,
+        'response.data', 'the requested family key and label');
+      return result;
     }));
   }
 

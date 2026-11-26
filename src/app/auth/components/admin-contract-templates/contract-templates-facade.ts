@@ -20,6 +20,7 @@ type TemplateDeletion = {
 };
 type TemplateMutation =
   | { kind: TemplateChange }
+  | { kind: 'renameFamily' }
   | { kind: 'delete'; deletion: TemplateDeletion };
 type PendingTemplateDeletion = TemplateDeletion & { outcome: 'unknown' | 'cleanupFailed' };
 
@@ -39,10 +40,12 @@ export class ContractTemplatesFacade {
   private readonly currentPreview = signal<IPdfPreview | null>(null);
   private readonly uncertainMutation = signal<TemplateChange | null>(null);
   private readonly incompleteDeletions = signal<PendingTemplateDeletion[]>([]);
+  private readonly familyRenameFailure = signal<'conflict' | 'unknown' | null>(null);
 
   readonly templates = this.rows.asReadonly();
-  readonly families = this.familyRows.asReadonly();
-  readonly familyOptions = computed(() => this.families().map(({ family, label }) => ({ value: family, label })));
+  readonly familiesByKey = computed(() => new Map(this.familyRows().map((family) => [family.family, family])));
+  readonly familyOptions = computed(() => this.familyRows().map(({ family, label }) => ({ value: family, label })));
+  readonly renameIssue = this.familyRenameFailure.asReadonly();
   readonly saving = this.mutating.asReadonly();
   readonly loading = computed(() => this.status() === 'initial' || this.status() === 'loading');
   readonly loadFailed = computed(() => this.status() === 'error');
@@ -71,6 +74,14 @@ export class ContractTemplatesFacade {
 
   createFamily(family: string, label: string): Observable<void> {
     return this.mutate({ kind: 'family' }, () => this.api.createFamily(family, label));
+  }
+
+  renameFamily(current: ContractFamily, label: string): Observable<void> {
+    return this.mutate({ kind: 'renameFamily' }, () => this.api.renameFamily(current, label));
+  }
+
+  clearRenameIssue(): void {
+    this.familyRenameFailure.set(null);
   }
 
   deleteTemplate(template: ContractTemplate): Observable<void> {
@@ -143,7 +154,13 @@ export class ContractTemplatesFacade {
             this.incompleteDeletions.update((deletions) =>
               deletions.filter(({ templateId }) => templateId !== mutation.deletion.templateId));
           }
-          this.toast.success({ summary: { upload: uploaded, family: this.i18n.editor().familyCreated, delete: deleted }[kind] });
+          const message = {
+            upload: uploaded,
+            family: this.i18n.editor().familyCreated,
+            renameFamily: this.i18n.status().changesSaved,
+            delete: deleted,
+          }[kind];
+          this.toast.success({ summary: message });
           this.readCatalog();
         }),
         catchError((error: unknown) => {
@@ -171,13 +188,23 @@ export class ContractTemplatesFacade {
         });
         return;
       }
+    } else if (kind === 'renameFamily') {
+      if (uncertain) {
+        this.familyRenameFailure.set('unknown');
+        return;
+      }
+      if (error instanceof EdgeFunctionError && error.status === 409) {
+        this.familyRenameFailure.set('conflict');
+        return;
+      }
     } else if (uncertain) {
       this.uncertainMutation.set(kind);
       return;
     }
 
     const { uploadFailed, deleteFailed } = this.i18n.copy();
-    const fallback = { upload: uploadFailed, family: this.i18n.editor().familyFailed, delete: deleteFailed }[kind];
+    const { familyFailed, renameFamilyFailed } = this.i18n.editor();
+    const fallback = { upload: uploadFailed, family: familyFailed, renameFamily: renameFamilyFailed, delete: deleteFailed }[kind];
     this.toast.danger({ summary: this.errorMessage(error, fallback) });
   }
 

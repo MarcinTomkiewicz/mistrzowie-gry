@@ -3,7 +3,7 @@ import {
   CONTRACT_FAMILY_KEY,
   type ContractTemplateConfiguration,
   isContractConfiguration,
-  isContractLabel,
+  isContractFamilyLabel,
 } from '../../types/contract-template-configuration';
 import type { EdgeReader, EdgeReaderResult } from '../../types/edge-contract';
 import {
@@ -22,7 +22,7 @@ import { createStrictEdgeObjectReader } from '../../utils/strict-edge-contract';
 
 const templateIdentity = {
   template_id: readEdgeUuid,
-  family: readFamily,
+  family: readFamilyKey,
 };
 const readStatus = createEdgeLiteralReader(['staged', 'active', 'retired']);
 
@@ -44,9 +44,9 @@ export type ContractTemplateUpload = {
 };
 
 const readFamilyRow = createStrictEdgeObjectReader({
-  family: readFamily,
+  family: readFamilyKey,
   label: (value: unknown, path: string): string => {
-    assertEdgeContract(isContractLabel(value), path, 'a valid contract label');
+    assertEdgeContract(isContractFamilyLabel(value), path, 'a valid contract family label');
     return value;
   },
   created_at: readEdgeTimestamp,
@@ -70,7 +70,7 @@ const readConfigurationRow = createStrictEdgeObjectReader({
 export type ContractFamily = EdgeReaderResult<typeof readFamilyRow>;
 export type ContractConfiguration = EdgeReaderResult<typeof readConfigurationRow>;
 export const readFamilies = readDocumentData(createEdgeArrayReader(readFamilyRow));
-export const readCreatedFamily = readDocumentData(readFamilyRow);
+export const readFamily = readDocumentData(readFamilyRow);
 export const readConfiguration = readDocumentData((value, path) => {
   const row = readConfigurationRow(value, path);
   assertEdgeContract(row.configuration === null
@@ -114,7 +114,7 @@ function readSignedTemplateUrl(value: unknown, path: string): string {
   return url.href;
 }
 
-function readFamily(value: unknown, path: string): string {
+function readFamilyKey(value: unknown, path: string): string {
   assertEdgeContract(typeof value === 'string' && CONTRACT_FAMILY_KEY.test(value), path, 'a contract family key');
   return value;
 }

@@ -2,8 +2,10 @@ import {
   CONFIGURATION_MODES,
   CONTRACT_FAMILY_KEY,
   isContractConfiguration,
+  isContractFamilyLabel,
   isContractLabel,
   isContractPages,
+  trimContractFamilyLabel,
 } from "../../../src/app/core/types/contract-template-configuration.ts";
 
 import { DocumentRequestError } from "../_shared/document-api.ts";
@@ -35,6 +37,16 @@ export function parseJsonRequest(value: unknown) {
         args: { p_family: readFamily(source["family"]), p_label: label },
       } as const;
     }
+    case "renameFamily":
+      requireKeys(source, ["family", "expected_label", "label"]);
+      return {
+        action,
+        args: {
+          p_family: readFamily(source["family"]),
+          p_expected_label: readFamilyLabel(source["expected_label"]),
+          p_label: readFamilyLabel(source["label"]),
+        },
+      } as const;
     case "getTemplateConfiguration":
       requireKeys(source, ["template_id", "mode"]);
       return {
@@ -188,6 +200,13 @@ function readFamily(value: unknown): string {
     throw new DocumentRequestError();
   }
   return value;
+}
+
+function readFamilyLabel(value: unknown): string {
+  if (typeof value !== "string") throw new DocumentRequestError();
+  const label = trimContractFamilyLabel(value);
+  if (!isContractFamilyLabel(label)) throw new DocumentRequestError();
+  return label;
 }
 
 function readOptionalText(value: FormDataEntryValue | null): string | null {
