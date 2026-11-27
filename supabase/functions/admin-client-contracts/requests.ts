@@ -96,6 +96,20 @@ export function parseJsonRequest(value: unknown) {
         args: { ...readRevisionArgs(source), p_confirm_preview: confirmed },
       } as const;
     }
+    case "reassignTemplate":
+      requireKeys(source, [
+        ...REVISION_KEYS,
+        "expected_family",
+        "target_family",
+      ]);
+      return {
+        action,
+        args: {
+          ...readRevisionArgs(source),
+          p_expected_family: readFamily(source["expected_family"]),
+          p_target_family: readFamily(source["target_family"]),
+        },
+      } as const;
     case "deleteTemplate": {
       const confirmActive = source["confirm_active"];
       if (

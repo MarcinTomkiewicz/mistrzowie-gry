@@ -31,6 +31,7 @@ export const RPC = {
   getTemplateConfiguration: "get_admin_contract_template_configuration",
   saveTemplateConfiguration: "save_admin_contract_template_configuration",
   copyTemplateConfiguration: "copy_admin_contract_template_configuration",
+  reassignTemplate: "reassign_admin_contract_template",
   registerTemplate: "register_admin_contract_template",
   approveTemplate: "approve_admin_contract_template",
   listTemplates: "list_admin_contract_templates",
@@ -126,6 +127,10 @@ export type ClientContractsDatabase = {
           p_source_revision: number;
           p_pages: ContractPage[];
         },
+        ConfigurationRow
+      >;
+      [RPC.reassignTemplate]: Rpc<
+        RevisionArgs & { p_expected_family: string; p_target_family: string },
         ConfigurationRow
       >;
       [RPC.registerTemplate]: Rpc<

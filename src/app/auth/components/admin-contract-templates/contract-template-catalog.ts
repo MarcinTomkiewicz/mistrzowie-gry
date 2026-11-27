@@ -59,6 +59,16 @@ export class ContractTemplateCatalog {
   protected readonly families = computed(() => Array.from(this.catalog.familiesByKey().values()));
   protected readonly familyName = new FormControl('', { nonNullable: true });
   protected readonly familyForm = new FormGroup({ name: this.familyName });
+  protected readonly reassignmentTarget = new FormControl<string | null>(null);
+  protected readonly reassignmentForm = new FormGroup({ family: this.reassignmentTarget });
+  protected readonly reassignmentTargetValue = toSignal(this.reassignmentTarget.valueChanges, { initialValue: null });
+  protected readonly reassignmentTargets = computed(() => {
+    const change = this.catalog.reassignment();
+    const source = change?.state === 'ready' ? change.snapshot.family : change?.template.family;
+    return this.catalog.familyOptions().filter(({ value }) => value !== source);
+  });
+  protected readonly canSaveReassignment = computed(() => this.catalog.canChooseReassignment() &&
+    this.reassignmentTargets().some(({ value }) => value === this.reassignmentTargetValue()));
   private readonly familyNameValue = toSignal(this.familyName.valueChanges, { initialValue: '' });
   private readonly renamingFamily = computed(() => this.familyDialog()?.mode === 'rename');
   private readonly familyLabel = computed(() => this.renamingFamily()
@@ -178,6 +188,13 @@ export class ContractTemplateCatalog {
         { label: preview, icon: 'pi pi-horus', command: () => this.catalog.openFile(template.template_id, true) },
         { label: download, icon: 'pi pi-missile-swarm', command: () => this.catalog.openFile(template.template_id, false) },
       );
+    }
+    if (template.status === 'staged') {
+      menu.push({ label: this.i18n.reassignment().title, icon: 'pi pi-trade', command: () => {
+        if (!this.catalog.canAct()) return;
+        this.reassignmentTarget.reset();
+        this.catalog.openReassignment(template);
+      } });
     }
     if (template.can_delete) {
       menu.push({ label: deleteLabel, icon: 'pi pi-demolish', command: () => this.confirmDeletion(template) });

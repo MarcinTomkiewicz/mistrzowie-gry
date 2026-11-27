@@ -67,6 +67,7 @@ const authenticatedFetch = withSupabase(
         case "getTemplateConfiguration":
         case "saveTemplateConfiguration":
         case "copyTemplateConfiguration":
+        case "reassignTemplate":
           return successResponse(
             await readSingleDocumentRpc(
               RPC[action.action],

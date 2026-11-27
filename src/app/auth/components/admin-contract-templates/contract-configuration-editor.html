@@ -24,7 +24,9 @@
     }
     @if (facade.failed()) {
       <div class="mg-card flex-col-start-stretch gap-sm" role="alert">
-        <p class="m-0 error-text">{{ facade.conflict() ? copy.revisionConflict : copy.reconciliation }}</p>
+        <p class="m-0 error-text">
+          {{ facade.familyChanged() ? copy.familyChanged : (facade.conflict() ? copy.revisionConflict : copy.reconciliation) }}
+        </p>
         @if (facade.remote(); as remote) {
           <p class="m-0">{{ copy.databaseVersion }} {{ remote.configuration_revision }} · {{ remote.status === 'staged' ? i18n.copy().statuses.staged : remote.status === 'active' ? i18n.entityStatuses().active.masculine : i18n.entityStatuses().withdrawn.masculine }}</p>
           @if (remote.configuration; as configuration) {
@@ -37,7 +39,7 @@
         }
         <div class="flex-row-start-center flex-wrap gap-sm">
           <p-button type="button" size="small" severity="secondary" [label]="actions.refresh" (onClick)="reload()" />
-          @if (facade.remote()?.status === 'staged') {
+          @if (!facade.familyChanged() && facade.remote()?.status === 'staged') {
             <p-button type="button" size="small" severity="warn" [label]="copy.keepDraft" (onClick)="facade.keepDraft()" />
           }
         </div>
@@ -137,7 +139,7 @@
         <section class="mg-card flex-col-start-stretch gap-md min-w-0">
           <div class="flex-row-between-center flex-wrap gap-sm">
             <h3 class="mg-section__title mg-section__title--sm m-0">{{ copy.placements }}</h3>
-            @if (state.document) {
+            @if (state.document && !facade.familyChanged()) {
               <p-button type="button" size="small" severity="secondary" icon="pi pi-report-spy" [label]="actions.openPdf"
                 (onClick)="openLayout()" />
             }

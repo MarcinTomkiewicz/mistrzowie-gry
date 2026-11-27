@@ -41,6 +41,19 @@ export function createAdminContractTemplatesI18n() {
 
   const i18n = {
     copy,
+    reassignment: createScopedObjectI18n<{
+      title: string;
+      description: string;
+      targetFamily: string;
+      changed: string;
+      conflict: string;
+      unknown: string;
+      unavailable: string;
+      alreadyAssigned: string;
+      noTargets: string;
+      readFailed: string;
+      failed: string;
+    }>(ADMIN_CONTRACT_TEMPLATES_SCOPE, 'reassignment'),
     preparation: createScopedObjectI18n<{
       title: string;
       noActiveTemplate: string;
@@ -67,6 +80,7 @@ export function createAdminContractTemplatesI18n() {
       readFailed: string;
       reconciliation: string;
       revisionConflict: string;
+      familyChanged: string;
       geometryMismatch: string;
       databaseVersion: string;
       keepDraft: string;

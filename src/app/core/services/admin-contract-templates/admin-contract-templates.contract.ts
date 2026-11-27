@@ -74,7 +74,7 @@ export const readFamily = readDocumentData(readFamilyRow);
 export const readConfiguration = readDocumentData((value, path) => {
   const row = readConfigurationRow(value, path);
   assertEdgeContract(row.configuration === null
-    ? row.configuration_revision === 0 && row.configuration_updated_at === null
+    ? row.configuration_updated_at === null
     : row.configuration_revision > 0 && row.configuration_updated_at !== null,
     path, 'consistent configuration and revision');
   return row;

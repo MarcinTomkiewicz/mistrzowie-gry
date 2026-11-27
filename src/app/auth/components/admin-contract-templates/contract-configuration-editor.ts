@@ -46,7 +46,10 @@ export class ContractConfigurationEditor {
   protected readonly facade = inject(ContractConfigurationFacade);
   protected readonly i18n = createAdminContractTemplatesI18n();
   private readonly catalog = inject(ContractTemplatesFacade);
-  protected readonly familyLabel = computed(() => this.catalog.familiesByKey().get(this.template().family)?.label);
+  protected readonly familyLabel = computed(() => {
+    const revision = this.facade.remote() ?? this.facade.loaded()?.revision;
+    return revision ? this.catalog.familiesByKey().get(revision.family)?.label : undefined;
+  });
   private readonly confirm = inject(UiConfirm);
   private readonly toast = inject(UiToast);
 
@@ -89,8 +92,11 @@ export class ContractConfigurationEditor {
     return index === null ? null : this.facade.draft()?.placements[index] ?? null;
   });
   protected readonly placementField = computed(() => this.fields().find(({ id }) => id === this.placement()?.fieldId));
-  protected readonly sources = computed(() => this.catalog.templates().filter((row) =>
-    row.family === this.template().family && row.template_id !== this.template().template_id));
+  protected readonly sources = computed(() => {
+    const revision = this.facade.loaded()?.revision;
+    return revision ? this.catalog.templates().filter((row) =>
+      row.family === revision.family && row.template_id !== revision.template_id) : [];
+  });
   protected readonly layoutPreview = signal<{ url: string; title: string } | null>(null);
   protected readonly canDraw = computed(() =>
     this.facade.editable() && this.drawMode() && !!this.drawField() &&
@@ -103,7 +109,7 @@ export class ContractConfigurationEditor {
     });
     effect((cleanup) => {
       const snapshot = this.facade.loaded()?.document;
-      if (!this.layoutOpen() || !snapshot) {
+      if (!this.layoutOpen() || !snapshot || this.facade.familyChanged()) {
         this.layoutPreview.set(null);
         return;
       }
@@ -229,7 +235,14 @@ export class ContractConfigurationEditor {
   }
 
   protected reload(): void {
-    const load = () => { this.resetSelection(); void this.facade.load(this.template().template_id); };
+    if (this.facade.pending()) return;
+    const load = () => {
+      this.resetSelection();
+      this.sourceId.set(null);
+      this.layoutOpen.set(false);
+      this.catalog.refresh();
+      void this.facade.load(this.template().template_id);
+    };
     if (this.facade.dirty()) this.confirmDiscard(load);
     else load();
   }

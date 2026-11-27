@@ -31,7 +31,11 @@ export class ContractConfigurationFacade {
   readonly sourceUnavailable = signal(false);
   readonly remote = signal<ContractConfiguration | null>(null);
 
-  readonly editable = computed(() => this.loaded()?.revision.status === 'staged' &&
+  readonly familyChanged = computed(() => {
+    const remote = this.remote();
+    return remote !== null && remote.family !== this.loaded()?.revision.family;
+  });
+  readonly editable = computed(() => !this.familyChanged() && this.loaded()?.revision.status === 'staged' &&
     (this.remote() === null || this.remote()?.status === 'staged'));
   readonly dirty = computed(() => {
     const state = this.loaded();
@@ -117,7 +121,7 @@ export class ContractConfigurationFacade {
   keepDraft(): void {
     const remote = this.remote();
     const state = this.loaded();
-    if (!remote || remote.status !== 'staged' || !state?.document || this.pending()) return;
+    if (!remote || remote.status !== 'staged' || !state?.document || this.pending() || this.familyChanged()) return;
     this.generation.invalidate();
     this.loaded.set({ revision: remote, document: { ...state.document, revision: remote } });
     this.failed.set(false);
@@ -137,7 +141,7 @@ export class ContractConfigurationFacade {
       this.remote.set(null);
       try {
         const current = await this.read(this.api.getConfiguration(template.template_id, 'catalog'));
-        assertEdgeContract(current.family === template.family && current.pdf_sha256 === template.pdf_sha256,
+        assertEdgeContract(current.template_id === template.template_id && current.pdf_sha256 === template.pdf_sha256,
           'template', 'the same document identity');
         this.remote.set(current);
       } catch {

@@ -7,6 +7,7 @@ import {
   type ConfigurationMode, type ContractPage, type ContractTemplateConfiguration, trimContractFamilyLabel,
 } from '../../types/contract-template-configuration';
 import { assertEdgeContract } from '../../utils/edge-contract';
+import { isRecord } from '../../utils/is-record';
 import { fetchPrivatePdf } from '../../utils/private-pdf';
 import { Backend } from '../backend/backend';
 import {
@@ -74,6 +75,23 @@ export class AdminContractTemplates {
       source_revision: source.configuration_revision,
       pages,
     });
+  }
+
+  reassignTemplate(snapshot: ContractConfiguration, targetFamily: string) {
+    return this.invoke({
+      action: 'reassignTemplate',
+      ...this.revisionArgs(snapshot),
+      expected_family: snapshot.family,
+      target_family: targetFamily,
+    }, readConfiguration).pipe(map((row) => {
+      assertEdgeContract(row.template_id === snapshot.template_id && row.family === targetFamily &&
+        row.status === 'staged' && row.pdf_sha256 === snapshot.pdf_sha256 &&
+        row.configuration_revision === snapshot.configuration_revision + 1 &&
+        row.configuration_updated_at === snapshot.configuration_updated_at &&
+        equalJson(row.configuration, snapshot.configuration),
+      'response.data', 'the reassigned template with its configuration preserved');
+      return row;
+    }));
   }
 
   upload({ family, file }: ContractTemplateUpload) {
@@ -157,4 +175,16 @@ export class AdminContractTemplates {
   private invoke<TResult, TBody>(body: TBody, reader: EdgeReader<TResult>) {
     return this.backend.invokeEdgeParsed('admin-client-contracts', { method: 'POST', body }, reader);
   }
+}
+
+function equalJson(left: unknown, right: unknown): boolean {
+  if (left === right) return true;
+  if (Array.isArray(left)) {
+    return Array.isArray(right) && left.length === right.length &&
+      left.every((value, index) => equalJson(value, right[index]));
+  }
+  if (!isRecord(left) || !isRecord(right)) return false;
+  const keys = Object.keys(left);
+  return keys.length === Object.keys(right).length &&
+    keys.every((key) => Object.hasOwn(right, key) && equalJson(left[key], right[key]));
 }

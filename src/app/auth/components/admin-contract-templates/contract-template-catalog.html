@@ -140,6 +140,64 @@
   <app-contract-configuration-editor [template]="template" (closed)="editing.set(null)" />
 }
 
+@if (catalog.reassignment(); as change) {
+  @let assignment = i18n.reassignment();
+  @let pending = change.state === 'loading' || catalog.loading() || catalog.saving();
+  @let matches = catalog.reassignmentMatchesCatalog();
+  @let targets = reassignmentTargets();
+  <p-dialog [visible]="true" [modal]="true" [header]="assignment.title" appendTo="body"
+    styleClass="mg-dialog mg-dialog--sm" [draggable]="false" [resizable]="false" [closable]="!catalog.saving()"
+    [closeOnEscape]="!catalog.saving()" [closeAriaLabel]="actions.close" (visibleChange)="$event ? null : catalog.closeReassignment()">
+    <form class="mg-form flex-col-start-stretch gap-sm" [formGroup]="reassignmentForm" [attr.aria-busy]="pending"
+      (ngSubmit)="catalog.reassignTemplate(reassignmentTargetValue())" novalidate>
+      <strong class="text-wrap-anywhere">{{ change.template.original_filename }}</strong>
+      <p class="m-0 muted-text">{{ assignment.description }}</p>
+      @if (change.review; as review) {
+        <p class="m-0 error-text" role="alert">{{ assignment[review] }}</p>
+      }
+      @if (change.state === 'ready') {
+        @if (catalog.familiesByKey().get(change.snapshot.family); as current) {
+          <p class="m-0 text-wrap-anywhere">{{ copy.family }}: <strong>{{ current.label }}</strong></p>
+        }
+        @if (change.snapshot.status !== 'staged') {
+          <p class="m-0" role="status">{{ assignment.unavailable }}</p>
+        } @else if (change.snapshot.family === reassignmentTargetValue()) {
+          <p class="m-0" role="status">{{ assignment.alreadyAssigned }}</p>
+        } @else if (!pending && matches && !targets.length) {
+          <p class="m-0" role="status">{{ assignment.noTargets }}</p>
+        }
+        @if (change.review && change.snapshot.status === 'staged') {
+          <div><p-button type="button" size="small" severity="secondary" [label]="actions.confirm"
+            [disabled]="pending || !matches || !catalog.canAct()" (onClick)="catalog.confirmReassignmentContext()" /></div>
+        }
+      } @else if (change.state === 'error') {
+        <p class="m-0 error-text" role="alert">{{ change.message }}</p>
+      }
+      @if (pending && !catalog.saving()) {
+        <p class="m-0" role="status">{{ i18n.status().loading }}</p>
+      } @else if (!pending && (catalog.loadFailed() || !matches)) {
+        @if (catalog.loadFailed() || (change.state === 'ready' && !change.review)) {
+          <p class="m-0 error-text" role="alert">{{ catalog.loadFailed() ? copy.loadFailed : assignment.changed }}</p>
+        }
+        <div><p-button type="button" size="small" severity="secondary" [label]="actions.retry"
+          (onClick)="catalog.refreshReassignment()" /></div>
+      }
+      <div class="flex-col-start-stretch gap-xs min-w-0">
+        <label id="contract-target-family-label" for="contract-target-family">{{ assignment.targetFamily }}</label>
+        <p-select class="w-100" size="small" inputId="contract-target-family" ariaLabelledBy="contract-target-family-label"
+          formControlName="family" [options]="targets" optionLabel="label" optionValue="value"
+          [placeholder]="actions.select" [readonly]="!catalog.canChooseReassignment() || !targets.length" appendTo="body" />
+      </div>
+      <div class="flex-row-end-center gap-sm">
+        <p-button type="button" size="small" severity="secondary" [label]="actions.cancel"
+          [disabled]="catalog.saving()" (onClick)="catalog.closeReassignment()" />
+        <p-button type="submit" size="small" severity="success" [label]="actions.save"
+          [loading]="catalog.saving()" [disabled]="!canSaveReassignment()" />
+      </div>
+    </form>
+  </p-dialog>
+}
+
 @if (familyDialog(); as dialog) {
   @let renaming = dialog.mode === 'rename';
   <p-dialog [visible]="true" [modal]="true" appendTo="body"

@@ -27,6 +27,19 @@
     "fileFailed": "[PH] Nie udało się pobrać pliku PDF.",
     "uploadUncertain": "[PH] Wynik dodawania wzoru jest nieznany. Sprawdź odświeżony katalog przed kolejną próbą."
   },
+  "reassignment": {
+    "title": "Zmień rodzaj umowy",
+    "description": "[PH] Wybierz inny istniejący rodzaj dla tego wzoru. Zapis zmienia wyłącznie przypisanie wzoru.",
+    "targetFamily": "[PH] Docelowy rodzaj umowy",
+    "changed": "[PH] Stan wzoru się zmienił. Sprawdź i potwierdź aktualne przypisanie przed zapisem.",
+    "conflict": "[PH] Zmiana przypisania została odrzucona. Sprawdź i potwierdź aktualny stan przed kolejną próbą.",
+    "unknown": "[PH] Wynik zmiany przypisania jest nieznany. Sprawdź i potwierdź aktualny stan przed kolejną próbą.",
+    "unavailable": "[PH] Zmiana przypisania jest dostępna tylko dla wzorów oczekujących na aktywację.",
+    "alreadyAssigned": "[PH] Wzór jest już przypisany do wybranego rodzaju.",
+    "noTargets": "[PH] Brak innego rodzaju, do którego można przypisać wzór.",
+    "readFailed": "[PH] Nie udało się odczytać aktualnego przypisania wzoru.",
+    "failed": "[PH] Nie udało się zmienić przypisania wzoru."
+  },
   "preparation": {
     "title": "[PH] Przygotuj umowę",
     "noActiveTemplate": "[PH] Brak aktywnego wzoru dla tego rodzaju umowy.",
@@ -59,6 +72,7 @@
     "readFailed": "[PH] Nie udało się wczytać konfiguracji lub PDF. Sprawdź, czy PDF jest statyczny i ma obsługiwane strony.",
     "reconciliation": "[PH] Operacja nie została potwierdzona. Robocza konfiguracja jest nadal dostępna. Sprawdź stan w bazie przed następnym zapisem.",
     "revisionConflict": "[PH] Baza odrzuciła operację z powodu konfliktu. Robocza konfiguracja jest nadal dostępna.",
+    "familyChanged": "[PH] Wzór przypisano do innego rodzaju. Przeładuj konfigurację, aby wznowić pracę.",
     "geometryMismatch": "[PH] Wymiary strony w podglądzie różnią się od zweryfikowanych wymiarów PDF.",
     "databaseVersion": "[PH] Rewizja w bazie",
     "keepDraft": "[PH] Zachowaj zmiany względem tej rewizji",
